@@ -1,0 +1,38 @@
+	
+{
+	"apim": {
+		"name": "test",
+		"path": "/test",
+		"version": "1.0.0",
+		"url": "https://10.129.60.57:8075",
+		"username": "apiadmin",
+		"password": "changeme",
+		"organization": {
+			"development": "API Development",
+			"target": [
+				"Community",
+				"Axway"
+			]
+		},
+		"authentication": {
+			"name": "API Key",
+			"type": "apiKey",
+			"properties": {
+				"apiKeyFieldName": "KeyId",
+				"takeFrom": "HEADER",
+				"removeCredentialsOnSuccess": "true"
+			}
+		}
+	},
+	"api": {
+		"modelName": "petstore.json",
+		"authentication": {
+			"name": "Basic Auth",
+			"type": "basicAuth",
+			"properties": {
+				"username": "test",
+				"password": "HEADER"
+			}
+		}
+	}
+}
