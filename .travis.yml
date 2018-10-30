@@ -1,0 +1,41 @@
+language: java
+
+services:
+  - docker
+  
+env:
+  global:
+    - CACHE_DIR=$HOME/docker
+    - APIM_DOCKER_IMAGE=docker-registry.demo.axway.com/demo/api-manager:7.6.2-01
+    - CACHE_FILE_APIM=$CACHE_DIR/api-manager_7_6_2-01.cache.tar.gz
+    - counter=0
+  
+cache:
+  directories:
+    - $CACHE_DIR
+
+before_install:
+  #- sudo apt-get update
+  #- sudo apt-get install curl
+  # All files in this folder will be cached for the next build
+  - mkdir -p $CACHE_DIR
+  # Login to the Docker-Registry
+  - docker login --username $AXWAY_DOCKER_REG_USER --password $AXWAY_DOCKER_REG_PASS docker-registry.demo.axway.com
+  # Downloading the APIM-Docker-Image takes too long (Timeout 10 minutes) - Externalized to make use of travis_wait
+  # In this script, we are either using the cached version or download a new Docker-Image
+  - travis_wait build/pull_apim_docker_image.sh
+  # Now it's time to safe the downloaded API-Management Docker-Image into the cache folder
+  - if [ ! -f $CACHE_FILE_APIM ]; then docker save $APIM_DOCKER_IMAGE | gzip > $CACHE_FILE_APIM; fi
+
+install:
+  # Start Cassandra and wait that port 9042 is reachable
+  - docker-compose run --rm start_cassandra
+  # Start the API-Gateway + API-Manager
+  - docker-compose run --rm start_apimgmt
+  # Give API-Manager a moment to start
+  - docker-compose logs --tail 30 apimgmt
+  # Create an organization in API-Manager
+  - build/base_apim_setup.sh
+  
+
+  
