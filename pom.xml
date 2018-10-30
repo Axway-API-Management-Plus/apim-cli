@@ -125,7 +125,7 @@
 				<version>2.19.1</version>
 				<configuration>
 					<failIfNoTests>false</failIfNoTests>
-					<workingDirectory>$HOME/target</workingDirectory>
+					<workingDirectory>./target</workingDirectory>
 				</configuration>
 			</plugin>
 			<plugin>
