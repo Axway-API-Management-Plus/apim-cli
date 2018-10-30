@@ -1,0 +1,27 @@
+version: "2"
+
+services:
+  cassandra:
+    image: cassandra:2.2.8
+    ports:
+      - 9042:9042   # Cassandra listen socket
+    hostname: cassandra
+
+  apimgmt:
+    image: docker-registry.demo.axway.com/demo/api-manager:7.6.2-01
+    ports:
+      - 8075:8075   # API-Manager UI
+      - 8065:8065   # API-Manager Traffic
+    depends_on: 
+      - cassandra
+  start_cassandra:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - cassandra
+    command: cassandra:9042    
+
+  start_apimgmt:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - apimgmt
+    command: apimgmt:8075
