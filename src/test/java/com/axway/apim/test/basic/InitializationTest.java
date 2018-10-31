@@ -23,15 +23,15 @@ public class InitializationTest extends TestNGCitrusTestDesigner {
 			.payload("<status>ok</status>");
 	}
 	
-	@CitrusTest(name = "Setup Development Org")
+	@CitrusTest(name = "Setup Test-Org")
 	public void setupDevOrgTest() {
-		description("Setup API-Development Org");
+		description("Setup Test Org");
 		
 		http().client("apiManager")
 			.send()
 			.post("/organizations")
 			.header("Content-Type", "application/json")
-			.payload("{'name': 'API Development', 'description': 'Test Org', 'enabled': true, 'development': true }");
+			.payload("{'name': 'Test Organisation', 'description': 'Test Org', 'enabled': true, 'development': true }");
 		
 		http().client("apiManager")
 			.receive()
