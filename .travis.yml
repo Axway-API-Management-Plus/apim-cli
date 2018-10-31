@@ -34,8 +34,6 @@ install:
   - docker-compose run --rm start_apimgmt
   # Give API-Manager a moment to start
   - docker-compose logs --tail 30 apimgmt
-  # Create an organization in API-Manager
-  - build/base_apim_setup.sh
   
 
   
