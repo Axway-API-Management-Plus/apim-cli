@@ -13,6 +13,7 @@ env:
 cache:
   directories:
     - $CACHE_DIR
+    - '$HOME/.m2/repository'
 
 before_install:
   #- sudo apt-get update
