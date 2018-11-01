@@ -5,6 +5,8 @@ import org.testng.annotations.Test;
 
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
+import com.consol.citrus.functions.core.RandomNumberFunction;
+import com.consol.citrus.message.MessageType;
 
 @Test
 public class InitializationTest extends TestNGCitrusTestDesigner {
@@ -27,15 +29,27 @@ public class InitializationTest extends TestNGCitrusTestDesigner {
 	public void setupDevOrgTest() {
 		description("Setup Test Org");
 		
+		variable("orgNumber", RandomNumberFunction.getRandomNumber(2, true));
+		
 		http().client("apiManager")
 			.send()
 			.post("/organizations")
+			.name("orgCreatedRequest")
 			.header("Content-Type", "application/json")
-			.payload("{'name': 'Test Organisation', 'description': 'Test Org', 'enabled': true, 'development': true }");
+			.payload("{\"name\": \"Test Organisation ${orgNumber}\", \"description\": \"Test Org\", \"enabled\": true, \"development\": true }");
 		
 		http().client("apiManager")
 			.receive()
-			.response(HttpStatus.CREATED);
+			.response(HttpStatus.CREATED)
+			.messageType(MessageType.JSON)
+			.validate("$.name", "Test Organisation ${orgNumber}");
+		
+		/* Can be used to show the response in case of errors!
+		receive("apiManager")
+			.name("response")
+		*/
+		
+		//echo("citrus:message(response.payload(), )");
 	}
 
 }
