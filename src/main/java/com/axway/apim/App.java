@@ -1,203 +1,105 @@
 package com.axway.apim;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.annotation.Target;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.http.Consts;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.NameValuePair;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.routing.HttpRoute;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.swagger.APIChangeState;
+import com.axway.apim.swagger.APIContract;
+import com.axway.apim.swagger.APIManagerAdapter;
+import com.axway.apim.swagger.api.APIImportDefinition;
+import com.axway.apim.swagger.api.APIManagerAPI;
+import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
 
 public class App {
 
-	private static Logger log = LoggerFactory.getLogger(App.class);
-
-
+	private static Logger LOG = LoggerFactory.getLogger(App.class);
 
 	public static void main(String args[]) throws JsonProcessingException, IOException {
-		ObjectMapper objectMapper = new ObjectMapper();
-
-		JsonNode configuration = objectMapper.readTree(new File("apim-config.json"));
-
-		JsonNode apimConfig = configuration.get("apim");
 		
-		JsonNode apiConfig = configuration.get("api");
-
-		String apiManagerURL = apimConfig.get("url").textValue();
-		String username = apimConfig.get("username").textValue();
-		String password = apimConfig.get("password").textValue();
-		String orgName = apimConfig.findPath("development").textValue();
+		Options options = new Options();
+		Option option;
 		
-		String swaggerFileLocation = apiConfig.get("modelName").textValue();
+		option = new Option("a", "swagger", true, "The Swagger-API Definition (JSON-Formated) in local-filesystem");
+			option.setRequired(true);
+			option.setArgName("./swagger.xyz.json");
+		options.addOption(option);
 		
-		ArrayNode targets = (ArrayNode) apimConfig.findPath("target");
-
-		log.info("API Manager URL {} Development Org Name {}", apiManagerURL, orgName);
-
-		String apiName = apimConfig.get("name").textValue();
-		String apiPath = apimConfig.get("path").textValue();
-
-		String authType = apimConfig.get("url").textValue();
-		String backendUsername = apimConfig.get("url").textValue();
-
-		JsonNode authentication = apimConfig.get("authentication");
-
-		AxwayClient app = new AxwayClient();
-		InputStream inputStream = null;
+		option = new Option("c", "contract", true, "This is the JSON-Formatted API-Contract containing information how to expose the API");
+			option.setRequired(true);
+			option.setArgName("./api_contract.json");
+		options.addOption(option);
+		
+		option = new Option("s", "stage", true, "The stage this API should be import. Will be used to lookup stage overrides.");
+			option.setArgName("preprod");
+		options.addOption(option);
+		
+		option = new Option("h", "host", true, "The API-Manager hostname the API should be imported");
+			option.setRequired(true);
+			option.setArgName("api-host");
+		options.addOption(option);
+		
+		option = new Option("u", "username", true, "Username used to authenticate");
+			option.setRequired(true);
+			option.setArgName("apiadmin");
+		options.addOption(option);
+		
+		option = new Option("p", "password", true, "Password used to authenticate");
+			option.setRequired(true);
+			option.setArgName("changeme");
+		options.addOption(option);
+		
+		option = new Option("f", "force", true, "Force breaking changes to be imported potentially update existing APIs");
+			option.setArgName("true/false");
+		options.addOption(option);
+		
+		CommandLineParser parser = new DefaultParser();
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.setWidth(140);
+		CommandLine cmd = null;
 		try {
-			app.createConnection(apiManagerURL, username, password);
-			URI uri = new URIBuilder(apiManagerURL).setPath("/api/portal/v1.3/organizations/")
-					.setParameter("field", "name").setParameter("op", "eq").setParameter("value", orgName).build();
-			log.info("URL :" + uri.toString());
-			inputStream = app.getRequest(uri);
-			String orgId = null;
-			try{
-				orgId = JsonPath.parse(inputStream).read("$.[0].id", String.class);
-			}catch (PathNotFoundException e) {
-				log.info("Organization is not available exiting.....");
-				System.exit(0);
-			}
+			cmd = parser.parse( options, args, false);
+		} catch (ParseException e) {
+			LOG.error("\n\n");
+			LOG.error(e.getMessage());
+			LOG.error("\n\n");
+			formatter.printHelp("Swagger-Import", options, true);
 			
-			log.info("Organization id {}" , orgId);
-			
-
-			uri = new URIBuilder(apiManagerURL).setPath("/api/portal/v1.3/apirepo/import").build();
-
-			log.info("Swagger Location : {}", swaggerFileLocation);
-			// inputStream = app.postMultipart(orgId, swaggerURL,
-			// uri.toString(), apiName);
-			File file = new File(swaggerFileLocation);
-			if (!file.exists()) {
-				log.error("Swagger file is not available in the project");
-				return;
-			}
-			log.info("Swagger file path :" + file.getAbsolutePath());
-			inputStream = app.postMultipart(orgId, file, uri.toString(), apiName);
-
-			String backendAPIId = JsonPath.parse(inputStream).read("$.id", String.class);
-			String json = "{\"apiId\":\"" + backendAPIId + "\",\"organizationId\":\"" + orgId + "\"}";
-
-			uri = new URIBuilder(apiManagerURL).setPath("/api/portal/v1.3/proxies/").build();
-
-			inputStream = app.postRequest(json, uri.toString());
-
-			JsonNode jsonNode = objectMapper.readTree(inputStream);
-
-			ArrayNode devices = (ArrayNode) ((ArrayNode) jsonNode.findPath("securityProfiles")).get(0).get("devices");
-
-			String virtualAPIId = jsonNode.findPath("id").asText();
-
-			devices.add(authentication);
-			
-			//Changing Frontend path
-			((ObjectNode) jsonNode).put("path", "/" + apiPath);
-			
-			// Adding backend Authentication
-
-			JsonNode auth = jsonNode.findPath("authenticationProfiles").get(0);
-			((ObjectNode) auth).put("type", authType);
-			JsonNode param = auth.get("parameters");
-			((ObjectNode) param).put("username", backendUsername);
-			((ObjectNode) param).put("password", "");
-
-			uri = new URIBuilder(apiManagerURL).setPath("/api/portal/v1.3/proxies/" + virtualAPIId).build();
-
-			String jsonPayload = objectMapper.writeValueAsString(jsonNode);
-
-			inputStream = app.putRequest(jsonPayload, uri.toString());
-			String name = JsonPath.parse(inputStream).read("$.name", String.class);
-			List<NameValuePair> formparams = new ArrayList<NameValuePair>();
-			formparams.add(new BasicNameValuePair("name", name));
-			// publish
-			log.info("publishing API");
-			uri = new URIBuilder(apiManagerURL).setPath("/api/portal/v1.3/proxies/" + virtualAPIId + "/publish")
-					.build();
-			inputStream = app.postRequest(formparams, uri.toString());
-
-			log.info("API publish complete");
-			
-			if ( targets == null){
-				return;
-			}
-			log.info("Granting access to Org");
-			uri = new URIBuilder(apiManagerURL).setPath("/api/portal/v1.3/proxies/grantaccess").build();
-
-//			formparams = new ArrayList<NameValuePair>();
-//			formparams.add(new BasicNameValuePair("action", "orgs"));
-//
-//			formparams.add(new BasicNameValuePair("apiId", virtualAPIId));
-//			
-		//	fo
-			
-			//app.postRequest(formparams, uri.toString());
-			//log.info("Granting access success");
-			// Grant access
-
-		} catch (KeyManagementException e) {
-			log.error("Error {}", e);
-		} catch (NoSuchAlgorithmException e) {
-			log.error("Error {}", e);
-		} catch (KeyStoreException e) {
-			log.error("Error {}", e);
-		} catch (URISyntaxException e) {
-			log.error("Error {}", e);
-		} catch (ClientProtocolException e) {
-			log.error("Error {}", e);
-		} catch (IOException e) {
-			log.error("Error {}", e);
+			System.exit(99);
 		}
+		
+		CommandParameters params = CommandParameters.getInstance();
+		params.setCmd(cmd);
+		
+		APIContract contract = new APIContract(params.getOptionValue("contract"), params.getOptionValue("stage"));
+		// Create the API-Definition that represent what we want to have
+		IAPIDefinition desiredAPI = new APIImportDefinition(contract, params.getOptionValue("swagger"));
+		// Create an API-Definition that reflects the same API in API-Manager (or indicated)
+		IAPIDefinition actualAPI = new APIManagerAPI(desiredAPI);
+		/* Both API-Definitions can be compared
+		 * - is the Change is breaking
+		 *   - and if yes, do we have a new version number + new exposure Path?
+		 *   - or is the Force-Flag set (which is may be used on the Dev-Stage to allow frequent updates)
+		 * - is the Change is Non-Breaking
+		 *   - we need to know, if only changeable properties (like status, description, ... later tags, custom-props)
+		 *     have been changed (the API-Definition needs to know that)
+		 *     - if yes, update the existing API-Entity in API-Manager, not creating a new
+		 *   - if changes are desired not applicable to the existing API, we create a new 
+		 */
+		APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
 
+		APIManagerAdapter apim = new APIManagerAdapter();
+		
+		apim.applyChanges(changeActions);
 	}
-
-
-
 }
