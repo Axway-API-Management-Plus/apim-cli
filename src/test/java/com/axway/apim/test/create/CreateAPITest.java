@@ -8,7 +8,7 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test
+//@Test
 public class CreateAPITest extends TestNGCitrusTestDesigner {
 	
 	//@CitrusTest(name = "Import API")
