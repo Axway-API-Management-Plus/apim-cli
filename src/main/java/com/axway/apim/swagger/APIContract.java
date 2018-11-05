@@ -45,8 +45,6 @@ public class APIContract {
 	}
 	
 	private void init() {
-		ObjectMapper objectMapper = new ObjectMapper();
-
 		try {
 			configuration = getConfiguration(this.apiContract);
 			if(configuration==null) {

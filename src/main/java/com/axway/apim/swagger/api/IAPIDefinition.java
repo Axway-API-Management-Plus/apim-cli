@@ -1,5 +1,8 @@
 package com.axway.apim.swagger.api;
 
+import com.axway.apim.swagger.api.properties.APIAuthentication;
+import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+
 public interface IAPIDefinition {
 	
 	public final static String STATE_PUBLISHED = "published";
@@ -22,6 +25,8 @@ public interface IAPIDefinition {
 	public String getApiName();
 	
 	public String getApiId();
+	
+	public APISwaggerDefinion getSwaggerDefinition();
 	
 	/**
 	 * Compare the actual API-Definition with the given in Def

@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.APIPropertyAnnotation;
-import com.axway.apim.swagger.api.APIProperty;
+import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 
 /**
@@ -75,7 +75,7 @@ public class APIChangeState {
 						} else {
 							this.nonBreakingChanges.add(field.getName());
 						}
-						if (!APIProperty.isWritable(field.getName(), this.actualAPI.getStatus())) {
+						if (!isWritable(property, this.actualAPI.getStatus())) {
 							this.updateExistingAPI = false; // Found a NON-Changeable property, can't update the existing API
 						}
 					}
@@ -138,6 +138,23 @@ public class APIChangeState {
 
 	public List<String> getNonBreakingChanges() {
 		return nonBreakingChanges;
+	}
+	
+	private static boolean isWritable(APIPropertyAnnotation property, String actualStatus) {
+		// Get the field annotation via reflection
+		// Check, if the actualState is in the writableStates
+		try {
+			String[] writableStates = property.writableStates();
+			for(String status : writableStates) {
+				if (actualStatus.equals(status)) {
+					return true;
+				}
+			}
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 }

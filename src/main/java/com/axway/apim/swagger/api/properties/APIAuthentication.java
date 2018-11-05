@@ -1,4 +1,4 @@
-package com.axway.apim.swagger.api;
+package com.axway.apim.swagger.api.properties;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -33,6 +33,8 @@ public class APIAuthentication {
 			if(!otherAuthN.type.equals(this.type)) return false;
 			if(!otherAuthN.name.equals(this.name)) return false;
 			if(!otherAuthN.properties.equals(this.properties)) return false;
+		} else {
+			return false;
 		}
 		return true;
 	}

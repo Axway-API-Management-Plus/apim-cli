@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Vector;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
@@ -16,7 +14,6 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.APIProperty;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,8 +23,6 @@ public class AbstractAPIMTask {
 	static Logger LOG = LoggerFactory.getLogger(APIManagerAdapter.class);
 	
 	protected static CommandParameters cmd = CommandParameters.getInstance();
-	
-	List<APIProperty> properties = new Vector<APIProperty>();
 	
 	public static JsonNode initActualAPIContext(IAPIDefinition actual) {
 		URI uri;

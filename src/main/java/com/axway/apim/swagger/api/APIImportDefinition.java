@@ -5,21 +5,20 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.RestAPICall;
-import com.axway.apim.lib.APIPropertyAnnotation;
-import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.swagger.APIContract;
+import com.axway.apim.swagger.api.properties.APIAuthentication;
+import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
@@ -48,13 +47,12 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 		super();
 		this.apiContract = apiContract;
 		this.pathToSwagger = pathToSwagger;
+		this.swaggerDefinition = new APISwaggerDefinion(getSwaggerDefFromFile());
 		this.isValid = true;
 	}
 	
 	@Override
 	public String getOrgId() {
-		CommandParameters cmd = CommandParameters.getInstance();
-		ObjectMapper mapper = new ObjectMapper();
 		try {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/")
 					.setParameter("field", "name")
@@ -62,12 +60,22 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 					.setParameter("value", apiContract.getProperty("/apim/organization/development").asText()).build();
 			GETRequest getRequest = new GETRequest(uri);
 			InputStream response = getRequest.execute();
-			JsonNode jsonNode = mapper.readTree(response);
+			JsonNode jsonNode = objectMapper.readTree(response);
 			return jsonNode.get(0).get("id").asText();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new RuntimeException(e);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private byte[] getSwaggerDefFromFile() {
+		try {
+			return IOUtils.toByteArray(getSwaggerAsStream());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -96,6 +104,8 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 		this.authentication = new APIAuthentication(authN);
 		return this.authentication;
 	}
+	
+	
 	
 	@Override
 	public String getApiVersion() {

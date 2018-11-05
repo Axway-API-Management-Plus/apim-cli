@@ -5,15 +5,16 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.RestAPICall;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.swagger.api.properties.APIAuthentication;
+import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefinition {
 	
@@ -24,6 +25,7 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 	public APIManagerAPI(IAPIDefinition desiredAPI) {
 		super();
 		initAPIFromAPIManager(desiredAPI);
+		this.swaggerDefinition = new APISwaggerDefinion(getOriginalSwaggerFromAPIM());
 	}
 	
 	public void setApiConfiguration(JsonNode apiConfiguration) {
@@ -32,9 +34,6 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 
 	private void initAPIFromAPIManager(IAPIDefinition desiredAPI) {
 		URI uri;
-		CommandParameters cmd = CommandParameters.getInstance();
-		ObjectMapper objectMapper = new ObjectMapper();
-		
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/discovery/apis").build();
 			RestAPICall getRequest = new GETRequest(uri);
@@ -73,6 +72,24 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 			e.printStackTrace();
 		}
 	}
+	
+	private byte[] getOriginalSwaggerFromAPIM() {
+		URI uri;
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+getBackendApiId()+"/download")
+					.setParameter("original", "true").build();
+			RestAPICall getRequest = new GETRequest(uri);
+			InputStream response = getRequest.execute();
+			return IOUtils.toByteArray(response);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	@Override
 	public String getApiVersion() {
@@ -100,6 +117,10 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 	@Override
 	public String getApiId() {
 		return this.apiConfiguration.get("id").asText();
+	}
+	
+	public String getBackendApiId() {
+		return this.apiConfiguration.get("apiId").asText();
 	}
 
 	@Override
