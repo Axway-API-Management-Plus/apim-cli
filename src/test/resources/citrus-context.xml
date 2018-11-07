@@ -21,6 +21,16 @@
 		</property>
 		<property name="placeholderPrefix" value="${" />
     </bean>
+    
+    <bean class="com.axway.apim.test.SwaggerImportTestAction"/>
+    
+    <citrus:global-variables>
+    	<citrus:variable name="apiManagerHost" value="${apiManagerHost}"/>
+    	<citrus:variable name="apiManagerUser" value="${apiManagerUser}"/>
+    	<citrus:variable name="apiManagerPass" value="${apiManagerPass}"/>
+    	<citrus:variable name="API_VERSION" value="/api/portal/v1.3"/>
+	</citrus:global-variables>
+
 	
 	<citrus-http:client id="apiManager"
           request-url="https://${apiManagerHost}:8075/api/portal/v1.3"

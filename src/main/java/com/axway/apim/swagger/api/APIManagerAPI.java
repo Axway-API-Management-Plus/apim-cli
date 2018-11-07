@@ -25,7 +25,10 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 	public APIManagerAPI(IAPIDefinition desiredAPI) {
 		super();
 		initAPIFromAPIManager(desiredAPI);
-		this.swaggerDefinition = new APISwaggerDefinion(getOriginalSwaggerFromAPIM());
+		// Only try to load a Backend-API if we found an API in API-Manager
+		if(this.isValid) {
+			this.swaggerDefinition = new APISwaggerDefinion(getOriginalSwaggerFromAPIM());
+		}
 	}
 	
 	public void setApiConfiguration(JsonNode apiConfiguration) {
@@ -35,19 +38,19 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 	private void initAPIFromAPIManager(IAPIDefinition desiredAPI) {
 		URI uri;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/discovery/apis").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies").build();
 			RestAPICall getRequest = new GETRequest(uri);
 			InputStream response = getRequest.execute();
 			
 			JsonNode jsonResponse;
-			String apiUri;
+			String path;
 			String apiId = null;
 			try {
 				jsonResponse = objectMapper.readTree(response);
 				for(JsonNode node : jsonResponse) {
-					apiUri = node.get("uri").asText();
-					if(apiUri.endsWith("/discovery/swagger/api" + desiredAPI.getApiPath())) {
-						LOG.info("Found existing API: " + node);
+					path = node.get("path").asText();
+					if(path.equals(desiredAPI.getApiPath())) {
+						LOG.info("Found existing API on path: '"+path+"' with id: '" + node.get("id").asText()+"'");
 						apiId = node.get("id").asText();
 						break;
 					}

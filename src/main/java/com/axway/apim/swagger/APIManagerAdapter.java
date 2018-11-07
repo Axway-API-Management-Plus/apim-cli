@@ -82,7 +82,7 @@ public class APIManagerAdapter {
 			LOG.info("Going to update existing API: " + changeState.getActualAPI().getApiName() +" (Version: "+ changeState.getActualAPI().getApiVersion() + ")");
 			if(!changeState.hasAnyChanges()) {
 				LOG.warn("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
-				return;
+				throw new RuntimeException();
 			}			
 			if (changeState.isBreaking()) {
 				LOG.info("Recognized the following breaking changes: " + changeState.getBreakingChanges() + 

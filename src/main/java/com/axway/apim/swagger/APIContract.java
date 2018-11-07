@@ -56,7 +56,7 @@ public class APIContract {
 				stageConfiguration = getConfiguration(stageFile);
 			}
 		} catch (IOException e) {
-			LOG.error("Error initializing API-Contract.");
+			LOG.error("Error initializing API-Contract.", e);
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}

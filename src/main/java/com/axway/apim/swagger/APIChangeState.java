@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.APIPropertyAnnotation;
-import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 
 /**

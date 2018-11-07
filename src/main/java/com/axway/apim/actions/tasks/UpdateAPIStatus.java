@@ -37,13 +37,15 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 	}};
 
 	public static RestAPICall execute(IAPIDefinition desired, IAPIDefinition actual) {
+		if(actual.getStatus().equals(desired.getStatus())) {
+			LOG.debug("Desired and actual status equals. No need to update status!");
+			return null;
+		}
 		LOG.info("Updating API-Status from: '" + actual.getStatus() + "' to '" + desired.getStatus() + "'");
 		URI uri;
 		HttpEntity entity;
 		ObjectMapper objectMapper = new ObjectMapper();
-		
-		
-		
+
 		Transaction context = Transaction.getInstance();
 		
 		try {

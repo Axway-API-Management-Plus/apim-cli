@@ -98,16 +98,15 @@
 			<artifactId>citrus-http</artifactId>
 			<version>2.7.7</version>
 		</dependency>
-    <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>1.7.25</version>
-    </dependency>
+    	<dependency>
+        	<groupId>org.slf4j</groupId>
+        	<artifactId>slf4j-log4j12</artifactId>
+        	<version>1.7.25</version>
+    	</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -117,7 +116,6 @@
 							<goal>repackage</goal>
 						</goals>
 						<configuration>
-
 							<mainClass>
 								com.axway.apim.App
 							</mainClass>

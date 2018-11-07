@@ -29,7 +29,7 @@ public class InitializationTest extends TestNGCitrusTestDesigner {
 	public void setupDevOrgTest() {
 		description("Setup Test Org");
 		
-		variable("orgNumber", RandomNumberFunction.getRandomNumber(2, true));
+		variable("orgNumber", RandomNumberFunction.getRandomNumber(3, true));
 		
 		http().client("apiManager")
 			.send()

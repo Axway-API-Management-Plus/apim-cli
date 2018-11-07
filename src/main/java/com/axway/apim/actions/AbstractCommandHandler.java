@@ -35,6 +35,10 @@ public abstract class AbstractCommandHandler {
 	}*/
 	
 	protected void executeAPICall(RestAPICall apiCall) {
+		if(apiCall==null) {
+			LOG.debug("No API-Call defined ... nothing to do");
+			return;
+		}
 		Transaction transaction = Transaction.getInstance();
 		InputStream response = apiCall.execute();
 		apiCall.parseResponse(response);
