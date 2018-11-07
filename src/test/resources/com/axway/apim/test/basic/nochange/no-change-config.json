@@ -6,7 +6,7 @@
 		"status": "unpublished",
 		"version": "1.0.0",
 		"organization": {
-			"development": "API Development",
+			"development": "API Development ${orgNumber}",
 			"target": [
 				"Community",
 				"Axway"
