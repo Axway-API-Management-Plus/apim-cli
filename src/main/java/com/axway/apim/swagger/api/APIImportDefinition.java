@@ -54,6 +54,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	@Override
 	public String getOrgId() {
 		try {
+			LOG.info("Getting details for organization: " + apiContract.getProperty("/apim/organization/development").asText() + " from API-Manager!");
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/")
 					.setParameter("field", "name")
 					.setParameter("op", "eq")
