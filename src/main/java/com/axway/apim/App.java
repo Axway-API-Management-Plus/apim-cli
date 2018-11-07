@@ -105,7 +105,7 @@ public class App {
 			apim.applyChanges(changeActions);
 			return 0;
 		} catch (Exception e) {
-			LOG.error(e.getMessage());
+			LOG.error(e.getMessage(), e);
 			return 99;
 		}
 	}

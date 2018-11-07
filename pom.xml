@@ -93,11 +93,6 @@
 			<version>6.9.10</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.consol.citrus</groupId>
-			<artifactId>citrus-http</artifactId>
-			<version>2.7.7</version>
-		</dependency>
     	<dependency>
         	<groupId>org.slf4j</groupId>
         	<artifactId>slf4j-log4j12</artifactId>
