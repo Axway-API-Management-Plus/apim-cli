@@ -62,6 +62,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 			GETRequest getRequest = new GETRequest(uri);
 			InputStream response = getRequest.execute();
 			JsonNode jsonNode = objectMapper.readTree(response);
+			if(jsonNode==null) LOG.error("Unable to read details for org: " + apiContract.getProperty("/apim/organization/development").asText());
 			return jsonNode.get(0).get("id").asText();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block

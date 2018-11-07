@@ -10,7 +10,7 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test
+@Test(dependsOnGroups = {"init-tests"})
 public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 	
 	@Autowired

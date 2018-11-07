@@ -7,7 +7,7 @@ import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.message.MessageType;
 
-@Test
+@Test(groups = {"init-tests"})
 public class InitializationTest extends TestNGCitrusTestDesigner {
 	
 	@CitrusTest(name = "HealthCheck")
