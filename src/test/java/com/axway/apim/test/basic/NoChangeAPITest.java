@@ -1,4 +1,4 @@
-package com.axway.apim.test.nochange;
+package com.axway.apim.test.basic;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,8 +26,8 @@ public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 
 		
 		echo("##### Importing API: '${apiName}' on path: '${apiPath}' for the first time");
-		createVariable("swaggerFile", "/com/axway/apim/test/basic/nochange/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/basic/nochange/no-change-config.json");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/no-change-config.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -42,11 +42,11 @@ public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.extractFromPayload("$.[?(@.path=='/no-change')].id", "apiId");
+			.extractFromPayload("$.[?(@.path=='/${apiPath}')].id", "apiId");
 
 		echo("##### RE-Importing same API: '${apiName}' on path: '${apiPath}' without changes. Expecting failure with RC 99.");
-		createVariable("swaggerFile", "/com/axway/apim/test/basic/nochange/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/basic/nochange/no-change-config.json");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/no-change-config.json");
 		createVariable("expectedReturnCode", "99");
 		action(swaggerImport);
 		
@@ -62,7 +62,7 @@ public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='/no-change')].id", "${apiId}"); // Must be the same API-ID as before!
+			.validate("$.[?(@.path=='/${apiPath}')].id", "${apiId}"); // Must be the same API-ID as before!
 		
 		//echo("citrus:message(response.payload(), )");
 	}

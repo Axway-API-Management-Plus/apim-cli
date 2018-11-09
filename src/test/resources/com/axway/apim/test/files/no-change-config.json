@@ -1,8 +1,8 @@
 	
 {
 	"apim": {
-		"name": "No-Change-${apiNnumber}",
-		"path": "/no-change-${apiNnumber}",
+		"name": "${apiName}",
+		"path": "${apiPath}",
 		"status": "unpublished",
 		"version": "1.0.0",
 		"organization": {

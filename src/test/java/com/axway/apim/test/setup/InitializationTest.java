@@ -1,4 +1,4 @@
-package com.axway.apim.test.basic;
+package com.axway.apim.test.setup;
 
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
@@ -33,7 +33,7 @@ public class InitializationTest extends TestNGCitrusTestDesigner {
 			.post("/organizations")
 			.name("orgCreatedRequest")
 			.header("Content-Type", "application/json")
-			.payload("{\"name\": \"API Development ${orgNumber}\", \"description\": \"Test Org\", \"enabled\": true, \"development\": true }");
+			.payload("{\"name\": \"API Development ${orgNumber}\", \"description\": \"Test Org ${orgNumber} ${orgNumber} ${orgNumber}\", \"enabled\": true, \"development\": true }");
 		
 		echo("Validating Test-Organisation: API Development ${orgNumber} has been created");
 		

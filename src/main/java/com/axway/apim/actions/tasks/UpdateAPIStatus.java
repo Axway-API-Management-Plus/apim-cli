@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.utils.URIBuilder;
@@ -23,12 +22,15 @@ import com.jayway.jsonpath.JsonPath;
 public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser {
 	
 	public static HashMap<String, String[]> statusChangeMap = new HashMap<String, String[]>() {{
-		put("unpublished", 	new String[] {"publish", "deleted"});
-		put("publish", 		new String[] {"unpublish", "deprecate"});
+		put("unpublished", 	new String[] {"published", "deleted"});
+		put("published", 	new String[] {"unpublished", "deprecatde"});
 		put("deleted", 		new String[] {});
-		put("deprecated", 	new String[] {"unpublish", "undeprecate"});
+		put("deprecated", 	new String[] {"unpublished", "undeprecated"});
 	}};
 	
+	/**
+	 * Maps the provided status to the REST-API endpoint to change the status!
+	 */
 	public static HashMap<String, String> statusEndpoint = new HashMap<String, String>() {{
 		put("unpublished", 	"unpublish");
 		put("published", 	"publish");
@@ -42,9 +44,9 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 			return null;
 		}
 		LOG.info("Updating API-Status from: '" + actual.getStatus() + "' to '" + desired.getStatus() + "'");
+		
 		URI uri;
-		HttpEntity entity;
-		ObjectMapper objectMapper = new ObjectMapper();
+		//ObjectMapper objectMapper = new ObjectMapper();
 
 		Transaction context = Transaction.getInstance();
 		
@@ -70,7 +72,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 					.setPath(RestAPICall.API_VERSION+"/proxies/"+context
 					.get("virtualAPIId")+"/"+statusEndpoint.get(desired.getStatus()))
 					.build();
-			entity = new StringEntity(objectMapper.writeValueAsString(lastJsonReponse));
+			//entity = new StringEntity(objectMapper.writeValueAsString(lastJsonReponse));
 			
 			RestAPICall changeStatus = new POSTRequest(null, uri);
 			changeStatus.setContentType("application/x-www-form-urlencoded");
@@ -80,14 +82,14 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new RuntimeException(e);
-		} catch (UnsupportedEncodingException e) {
+		/*} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new RuntimeException(e);*/
 		}
 	}
 	
