@@ -30,7 +30,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 	}
 
 	public void execute(List<String> changedProps) {
-		LOG.info("Updating API-Proxy");
+		LOG.debug("Updating API-Proxy");
 		URI uri;
 		HttpEntity entity;
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -73,7 +73,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 	
 	private static JsonNode handledChangedProps(JsonNode lastJsonReponse, IAPIDefinition desired, List<String> changedProps) {
 		if(changedProps!=null) {
-			String logMessage = "Considering changed properties found: ";
+			String logMessage = "Updating proxy for the following props: ";
 			for(String fieldName : changedProps) {
 				try {
 					Field field = desired.getClass().getSuperclass().getDeclaredField(fieldName);

@@ -21,7 +21,7 @@ public class UpdateExistingAPI {
 		
 		new UpdateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute(allChanges);
 		// This is special, as the status is not a property and requires some additional actions!
-		if(changes.getBreakingChanges().contains("status")) {
+		if(changes.getNonBreakingChanges().contains("status")) {
 			new UpdateAPIStatus(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		}
 	}

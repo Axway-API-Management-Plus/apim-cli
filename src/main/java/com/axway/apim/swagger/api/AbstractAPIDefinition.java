@@ -17,7 +17,7 @@ public abstract class AbstractAPIDefinition {
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {}, propHandler = APIPathPropertyHandler.class)
 	protected String apiPath = null;
 
-	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED})
 	protected String status = "NOT_SET";
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {}, propHandler = APIAuthenticationPropertyHandler.class)

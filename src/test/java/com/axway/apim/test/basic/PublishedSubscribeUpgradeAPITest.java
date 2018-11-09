@@ -19,19 +19,20 @@ public class PublishedSubscribeUpgradeAPITest extends TestNGCitrusTestDesigner {
 	@CitrusTest(name = "PublishedSubscribeUpgradeAPITest")
 	public void setupDevOrgTest() {
 
-		echo("Import a Published-API, subscribe to it and then Re-Import a new version.");
+		echo("####### Import a Published-API, subscribe to it and then Re-Import a new version. #######");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/my-test-api-${apiNumber}");
 		variable("apiName", "My-Test-API-${apiNumber}");
 
 		
-		echo("##### Importing API: '${apiName}' on path: '${apiPath}' for the first time");
+		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/3_2_published-api.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
-		
+
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
 		http().client("apiManager")
 			.send()
 			.get("/proxies")
@@ -47,7 +48,7 @@ public class PublishedSubscribeUpgradeAPITest extends TestNGCitrusTestDesigner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"); // Remember the API-ID
 		
 		// Subscribe to that API!
-		echo("Subscribing API: ${apiName} with test-application: ${testAppName}");
+		echo("####### Subscribing API: ${apiName} with test-application: ${testAppName} #######");
 		http().client("apiManager")
 			.send()
 			.post("/applications/${testAppId}/apis/")
@@ -59,13 +60,14 @@ public class PublishedSubscribeUpgradeAPITest extends TestNGCitrusTestDesigner {
 			.receive()
 			.response(HttpStatus.CREATED)
 			.messageType(MessageType.JSON);
-		
-		echo("##### API-State changed to published");
+
+		echo("####### Importing a new Swagger-File as a change #######");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore2.json");
 		createVariable("configFile", "/com/axway/apim/test/files/3_2_published-api.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
+		echo("####### Validate the API is still there with right status #######");
 		http().client("apiManager")
 			.send()
 			.get("/proxies")
@@ -79,9 +81,8 @@ public class PublishedSubscribeUpgradeAPITest extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "newApiId"); // We have a new API-ID
-		
-		echo("Validate subscription is still present!");
-		
+
+		echo("####### Validate subscription is still present! #######");
 		http().client("apiManager")
 			.send()
 			.get("/applications/${testAppId}/apis")

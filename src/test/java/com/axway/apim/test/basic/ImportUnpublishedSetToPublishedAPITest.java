@@ -16,21 +16,21 @@ public class ImportUnpublishedSetToPublishedAPITest extends TestNGCitrusTestDesi
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "Import-an-Unpublished-API-and-publish")
+	@CitrusTest(name = "ImportUnpublishedSetToPublishedAPITest")
 	public void setupDevOrgTest() {
-		description("Import an Unpublished-API and in the second step publish it");
+		echo("Import an Unpublished-API and in the second step publish it");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/my-test-api-${apiNumber}");
 		variable("apiName", "My-Test-API-${apiNumber}");
 
-		
-		echo("##### Importing API: '${apiName}' on path: '${apiPath}' for the first time");
+		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");		
 		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/3_1_unpublished-api.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
 		http().client("apiManager")
 			.send()
 			.get("/proxies")
@@ -45,12 +45,13 @@ public class ImportUnpublishedSetToPublishedAPITest extends TestNGCitrusTestDesi
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
-		echo("##### API-State changed to published");
+		echo("####### Change API-State from Unpublished to Published #######");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/3_2_published-api.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
+		echo("####### Validate the API-ID hasn't changed by that change #######");
 		http().client("apiManager")
 			.send()
 			.get("/proxies")

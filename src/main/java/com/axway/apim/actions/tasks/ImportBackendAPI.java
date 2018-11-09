@@ -26,7 +26,7 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 	}
 
 	public void execute() {
-		LOG.info("Importing Swagger Definition");
+		LOG.info("Importing backend API (Swagger-Import)");
 		URI uri;
 		HttpEntity entity;
 		try {

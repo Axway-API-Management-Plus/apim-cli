@@ -24,13 +24,13 @@ public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 		variable("apiPath", "/no-change-${apiNumber}");
 		variable("apiName", "No-Change-${apiNumber}");
 
-		
-		echo("##### Importing API: '${apiName}' on path: '${apiPath}' for the first time");
+		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/1_no-change-config.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
-		
+
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
 		http().client("apiManager")
 			.send()
 			.get("/proxies")
@@ -44,12 +44,13 @@ public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 
-		echo("##### RE-Importing same API: '${apiName}' on path: '${apiPath}' without changes. Expecting failure with RC 99.");
+		echo("####### RE-Importing same API: '${apiName}' on path: '${apiPath}' without changes. Expecting failure with RC 99. #######");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/1_no-change-config.json");
 		createVariable("expectedReturnCode", "99");
 		action(swaggerImport);
 		
+		echo("####### Make sure, the API-ID hasn't changed #######");
 		http().client("apiManager")
 			.send()
 			.get("/proxies")

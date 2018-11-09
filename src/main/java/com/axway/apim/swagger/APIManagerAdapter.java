@@ -75,12 +75,12 @@ public class APIManagerAdapter {
 		// No existing API found (means: No match for APIPath), creating a complete new
 		if(!changeState.getActualAPI().isValid()) {
 			// --> CreateNewAPI
-			LOG.info("No existing API found, creating new!");
+			LOG.info("Strategy: No existing API found, creating new!");
 			CreateNewAPI createAPI = new CreateNewAPI();
 			createAPI.execute(changeState);
 		// We do have a breaking change!
 		} else {
-			LOG.info("Going to update existing API: " + changeState.getActualAPI().getApiName() +" (Version: "+ changeState.getActualAPI().getApiVersion() + ")");
+			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getApiName() +" (Version: "+ changeState.getActualAPI().getApiVersion() + ")");
 			if(!changeState.hasAnyChanges()) {
 				LOG.warn("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
 				throw new RuntimeException();
@@ -89,17 +89,20 @@ public class APIManagerAdapter {
 				LOG.info("Recognized the following breaking changes: " + changeState.getBreakingChanges() + 
 						" plus Non-Breaking: " + changeState.getNonBreakingChanges());
 				if(changeState.getActualAPI().getStatus().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
-					LOG.error("Applying ALL changes on existing UNPUBLISHED API.");
+					LOG.error("Strategy: Applying ALL changes on existing UNPUBLISHED API.");
 					UpdateExistingAPI updateAPI = new UpdateExistingAPI();
 					updateAPI.execute(changeState);
 					return;
-				} else {
+				} else { // Breaking-Changes for PUBLISHED APIs and Non-Breaking
 					if(enforceBreakingChange) {
 						if(changeState.isUpdateExistingAPI()) {
-							LOG.info("Updating existing API with breaking changes: " + changeState.getBreakingChanges() + 
+							LOG.info("Strategy: Breaking changes - Updating existing API: " + changeState.getBreakingChanges() + 
 									" plus Non-Breaking: " + changeState.getNonBreakingChanges());
+							UpdateExistingAPI updateAPI = new UpdateExistingAPI();
+							updateAPI.execute(changeState);
+							return;
 						} else {
-							LOG.info("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
+							LOG.info("Strategy: Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
 									+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for PUBLISHED API. Recreating it!");
 							RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
 							recreate.execute(changeState);
@@ -113,10 +116,15 @@ public class APIManagerAdapter {
 			} else if(!changeState.isBreaking()) {
 				if(changeState.isUpdateExistingAPI()) {
 					// Contains only changes, that can be applied to the existing API (even depends on the status)
-					LOG.info("Updating existing API with Non-Breaking changes: " + changeState.getNonBreakingChanges());
+					LOG.info("Strategy: No breaking change - Updating existing API: " + changeState.getNonBreakingChanges());
+					UpdateExistingAPI updateAPI = new UpdateExistingAPI();
+					updateAPI.execute(changeState);
+					return;
 				} else {
 					// We have changes requiring a new API to be imported
-					LOG.info("Create and Update API, delete existing");
+					LOG.info("Strategy: No breaking change - Create and Update API, delete existing: " +  changeState.getNonBreakingChanges());
+					RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
+					recreate.execute(changeState);
 				}
 			}
 		}
