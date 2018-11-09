@@ -11,23 +11,23 @@ import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
 @Test(dependsOnGroups = {"init-tests"})
-public class NoChangeAPITest extends TestNGCitrusTestDesigner {
+public class ImportUnpublishedSetToPublishedAPITest extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "Re-Import API with No-Change.")
+	@CitrusTest(name = "Import an Unpublished-API and publish")
 	public void setupDevOrgTest() {
-		description("Import an API and re-import it without any change. It must be detected, that no change happened.");
+		description("Import an Unpublished-API and in the second step publish it");
 		
 		variable("apiNnumber", RandomNumberFunction.getRandomNumber(2, true));
-		variable("apiPath", "/no-change-${apiNnumber}");
-		variable("apiName", "No-Change-${apiNnumber}");
+		variable("apiPath", "/my-test-api-${apiNnumber}");
+		variable("apiName", "My-Test-API-${apiNnumber}");
 
 		
 		echo("##### Importing API: '${apiName}' on path: '${apiPath}' for the first time");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/1_no-change-config.json");
+		createVariable("configFile", "/com/axway/apim/test/files/3_1_unpublished-api.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -42,12 +42,13 @@ public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
 			.extractFromPayload("$.[?(@.path=='/${apiPath}')].id", "apiId");
-
-		echo("##### RE-Importing same API: '${apiName}' on path: '${apiPath}' without changes. Expecting failure with RC 99.");
+		
+		echo("##### API-State changed to published");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/1_no-change-config.json");
-		createVariable("expectedReturnCode", "99");
+		createVariable("configFile", "/com/axway/apim/test/files/3_2_published-api.json");
+		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
 		http().client("apiManager")
@@ -56,15 +57,13 @@ public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 			.name("api")
 			.header("Content-Type", "application/json");
 
-		// Check the API is still exposed on the same path
 		http().client("apiManager")
 			.receive()
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='/${apiPath}')].id", "${apiId}"); // Must be the same API-ID as before!
-		
-		//echo("citrus:message(response.payload(), )");
+			.validate("$.[?(@.path=='${apiPath}')].state", "published")
+			.extractFromPayload("$.[?(@.path=='/${apiPath}')].id", "apiId");
 	}
 
 }

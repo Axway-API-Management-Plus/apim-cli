@@ -29,7 +29,7 @@
     	<citrus:variable name="apiManagerUser" value="${apiManagerUser}"/>
     	<citrus:variable name="apiManagerPass" value="${apiManagerPass}"/>
     	<citrus:variable name="API_VERSION" value="/api/portal/v1.3"/>
-    	<citrus:variable name="orgNumber" value="320"/>
+    	<citrus:variable name="orgNumber" value="321"/>
 	</citrus:global-variables>
 
 	

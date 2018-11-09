@@ -11,12 +11,12 @@ import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
 @Test(dependsOnGroups = {"init-tests"})
-public class IntialPubslihedAPITest extends TestNGCitrusTestDesigner {
+public class IntiallyPublishedAPITest extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "Initial Pusblished API.")
+	@CitrusTest(name = "Initially Pusblished API.")
 	public void setupDevOrgTest() {
 		description("Import an API which initially has the status published.");
 		
@@ -27,7 +27,7 @@ public class IntialPubslihedAPITest extends TestNGCitrusTestDesigner {
 		
 		echo("##### Importing API: '${apiName}' on path: '${apiPath}' for the first time");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/initially_published.json");
+		createVariable("configFile", "/com/axway/apim/test/files/2_initially_published.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
