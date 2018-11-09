@@ -52,7 +52,7 @@ public class UnpublishedPublishedDeprecatedAPITest extends TestNGCitrusTestDesig
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
-		echo("####### Validate API-State has been changed to published, which is no breaking change #######");
+		echo("####### Validate API-State has been changed to published, which is not a breaking change #######");
 		http().client("apiManager")
 			.send()
 			.get("/proxies")
@@ -73,7 +73,7 @@ public class UnpublishedPublishedDeprecatedAPITest extends TestNGCitrusTestDesig
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
-		echo("####### Validate API-State has been changed to deprecated #######");
+		echo("####### Validate API-State has been changed to deprecated, which is not a breaking change  #######");
 		http().client("apiManager")
 			.send()
 			.get("/proxies")
@@ -86,6 +86,7 @@ public class UnpublishedPublishedDeprecatedAPITest extends TestNGCitrusTestDesig
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
+			.validate("$.[?(@.path=='${apiPath}')].id", "${apiId}")
 			.validate("$.[?(@.path=='${apiPath}')].deprecated", "true");
 			// Here no check of the API-ID as a new API has been created
 	}
