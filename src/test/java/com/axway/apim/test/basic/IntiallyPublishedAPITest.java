@@ -10,7 +10,7 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(dependsOnGroups = {"init-tests"})
+@Test
 public class IntiallyPublishedAPITest extends TestNGCitrusTestDesigner {
 	
 	@Autowired
@@ -20,9 +20,9 @@ public class IntiallyPublishedAPITest extends TestNGCitrusTestDesigner {
 	public void setupDevOrgTest() {
 		description("Import an API which initially has the status published.");
 		
-		variable("apiNnumber", RandomNumberFunction.getRandomNumber(2, true));
-		variable("apiPath", "/initially-published-${apiNnumber}");
-		variable("apiName", "Initially-Published-API-${apiNnumber}");
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiPath", "/initially-published-${apiNumber}");
+		variable("apiName", "Initially-Published-API-${apiNumber}");
 
 		
 		echo("##### Importing API: '${apiName}' on path: '${apiPath}' for the first time");
@@ -43,7 +43,7 @@ public class IntiallyPublishedAPITest extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
-			.extractFromPayload("$.[?(@.path=='/${apiPath}')].id", "apiId");
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		//echo("citrus:message(response.payload(), )");
 	}

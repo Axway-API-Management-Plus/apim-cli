@@ -11,41 +11,22 @@ import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
 @Test
-public class ImportUnpublishedSetToPublishedAPITest extends TestNGCitrusTestDesigner {
+public class PublishedSubscribeUpgradeAPITest extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "Import-an-Unpublished-API-and-publish")
+	@CitrusTest(name = "PublishedSubscribeUpgradeAPITest")
 	public void setupDevOrgTest() {
-		description("Import an Unpublished-API and in the second step publish it");
+
+		echo("Import a Published-API, subscribe to it and then Re-Import a new version.");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/my-test-api-${apiNumber}");
 		variable("apiName", "My-Test-API-${apiNumber}");
 
 		
 		echo("##### Importing API: '${apiName}' on path: '${apiPath}' for the first time");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/3_1_unpublished-api.json");
-		createVariable("expectedReturnCode", "0");
-		action(swaggerImport);
-		
-		http().client("apiManager")
-			.send()
-			.get("/proxies")
-			.name("api")
-			.header("Content-Type", "application/json");
-
-		http().client("apiManager")
-			.receive()
-			.response(HttpStatus.OK)
-			.messageType(MessageType.JSON)
-			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
-		
-		echo("##### API-State changed to published");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/3_2_published-api.json");
 		createVariable("expectedReturnCode", "0");
@@ -63,7 +44,54 @@ public class ImportUnpublishedSetToPublishedAPITest extends TestNGCitrusTestDesi
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
-			.validate("$.[?(@.path=='${apiPath}')].id", "${apiId}");
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"); // Remember the API-ID
+		
+		// Subscribe to that API!
+		echo("Subscribing API: ${apiName} with test-application: ${testAppName}");
+		http().client("apiManager")
+			.send()
+			.post("/applications/${testAppId}/apis/")
+			.contentType("application/json")
+			.payload("{\"apiId\":\"${apiId}\",\"enabled\":true}")
+			.header("Content-Type", "application/json");
+		
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.CREATED)
+			.messageType(MessageType.JSON);
+		
+		echo("##### API-State changed to published");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore2.json");
+		createVariable("configFile", "/com/axway/apim/test/files/3_2_published-api.json");
+		createVariable("expectedReturnCode", "0");
+		action(swaggerImport);
+		
+		http().client("apiManager")
+			.send()
+			.get("/proxies")
+			.name("api")
+			.header("Content-Type", "application/json");
+
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.OK)
+			.messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "published")
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "newApiId"); // We have a new API-ID
+		
+		echo("Validate subscription is still present!");
+		
+		http().client("apiManager")
+			.send()
+			.get("/applications/${testAppId}/apis")
+			.header("Content-Type", "application/json");
+		
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.OK)
+			.messageType(MessageType.JSON)
+			.validate("$.[?(@.apiId=='${newApiId}')].enabled", "true");
 	}
 
 }

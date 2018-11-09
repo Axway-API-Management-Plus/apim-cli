@@ -27,6 +27,7 @@ public class APIChangeState {
 	private static Logger LOG = LoggerFactory.getLogger(APIChangeState.class);
 	
 	private IAPIDefinition actualAPI;
+	private IAPIDefinition intransitAPI;
 	private IAPIDefinition desiredAPI;
 	
 	private boolean isBreaking = false;
@@ -115,6 +116,14 @@ public class APIChangeState {
 		this.desiredAPI = desiredAPI;
 	}
 	
+	public IAPIDefinition getIntransitAPI() {
+		return intransitAPI;
+	}
+
+	public void setIntransitAPI(IAPIDefinition intransitAPI) {
+		this.intransitAPI = intransitAPI;
+	}
+
 	public boolean hasAnyChanges() {
 		if(this.breakingChanges.size()==0 && this.nonBreakingChanges.size()==0) {
 			return false;

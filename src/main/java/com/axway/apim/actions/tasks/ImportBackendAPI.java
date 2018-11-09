@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -19,7 +20,12 @@ import com.jayway.jsonpath.JsonPath;
 
 public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParser {
 
-	public static RestAPICall execute(IAPIDefinition desired, IAPIDefinition actual) {
+	public ImportBackendAPI(IAPIDefinition desiredState, IAPIDefinition actualState) {
+		super(desiredState, actualState);
+		// TODO Auto-generated constructor stub
+	}
+
+	public void execute() {
 		LOG.info("Importing Swagger Definition");
 		URI uri;
 		HttpEntity entity;
@@ -28,15 +34,14 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 					.setParameter("field", "name").setParameter("op", "eq").setParameter("value", "API Development").build();
 			
 			entity = MultipartEntityBuilder.create()
-					.addTextBody("name", desired.getApiName())
+					.addTextBody("name", this.desiredState.getApiName())
 					.addTextBody("type", "swagger")
-					.addBinaryBody("file", ((APIImportDefinition)desired).getSwaggerAsStream(), ContentType.create("application/octet-stream"), "filename")
-					.addTextBody("fileName", "XYZ").addTextBody("organizationId", desired.getOrgId())
+					.addBinaryBody("file", ((APIImportDefinition)this.desiredState).getSwaggerAsStream(), ContentType.create("application/octet-stream"), "filename")
+					.addTextBody("fileName", "XYZ").addTextBody("organizationId", this.desiredState.getOrgId())
 					.addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
-			RestAPICall importSwagger = new POSTRequest(entity, uri);
-			importSwagger.registerResponseCallback(new ImportBackendAPI());
+			RestAPICall importSwagger = new POSTRequest(entity, uri, this);
 			importSwagger.setContentType(null);
-			return importSwagger;
+			importSwagger.execute();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -44,8 +49,10 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		}
 	}
 	
-	public JsonNode parseResponse(InputStream response) {
-		String backendAPIId = JsonPath.parse(response).read("$.id", String.class);
+	@Override
+	public JsonNode parseResponse(HttpResponse response) {
+		InputStream json = getJSONPayload(response);
+		String backendAPIId = JsonPath.parse(json).read("$.id", String.class);
 		Transaction.getInstance().put("backendAPIId", backendAPIId);
 		return null;
 	}

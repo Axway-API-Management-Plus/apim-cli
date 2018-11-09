@@ -1,7 +1,6 @@
 package com.axway.apim.actions.tasks;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -9,10 +8,10 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 
-import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.PUTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
@@ -24,8 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
 public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser {
+	
+	public UpdateAPIProxy(IAPIDefinition desiredState, IAPIDefinition actualState) {
+		super(desiredState, actualState);
+		// TODO Auto-generated constructor stub
+	}
 
-	public static RestAPICall execute(IAPIDefinition desired, IAPIDefinition actual, List<String> changedProps) {
+	public void execute(List<String> changedProps) {
 		LOG.info("Updating API-Proxy");
 		URI uri;
 		HttpEntity entity;
@@ -36,16 +40,15 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		try {
 			JsonNode lastJsonReponse = (JsonNode)context.get("lastResponse");
 			if(lastJsonReponse==null) { // This class is called as the first, so, first load the API
-				lastJsonReponse = initActualAPIContext(actual);
+				lastJsonReponse = initActualAPIContext(this.actualState);
 			}
-			handledChangedProps(lastJsonReponse, desired, changedProps);
+			handledChangedProps(lastJsonReponse, this.desiredState, changedProps);
 		
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+context.get("virtualAPIId")).build();
 			entity = new StringEntity(objectMapper.writeValueAsString(lastJsonReponse));
 			
-			RestAPICall updateAPIProxy = new PUTRequest(entity, uri);
-			updateAPIProxy.registerResponseCallback(new UpdateAPIProxy());
-			return updateAPIProxy;
+			RestAPICall updateAPIProxy = new PUTRequest(entity, uri, this);
+			updateAPIProxy.execute();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -61,8 +64,9 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		}
 	}
 	
-	public JsonNode parseResponse(InputStream response) {
-		String backendAPIId = JsonPath.parse(response).read("$.id", String.class);
+	@Override
+	public JsonNode parseResponse(HttpResponse response) {
+		String backendAPIId = JsonPath.parse(getJSONPayload(response)).read("$.id", String.class);
 		Transaction.getInstance().put("backendAPIId", backendAPIId);
 		return null;
 	}	

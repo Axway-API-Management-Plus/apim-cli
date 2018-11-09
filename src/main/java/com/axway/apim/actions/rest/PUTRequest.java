@@ -1,22 +1,26 @@
 package com.axway.apim.actions.rest;
 
-import java.io.InputStream;
 import java.net.URI;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
+
+import com.axway.apim.actions.tasks.IResponseParser;
 
 public class PUTRequest extends RestAPICall {
 
-	public PUTRequest(HttpEntity entity, URI uri) {
-		super(entity, uri);
+	public PUTRequest(HttpEntity entity, URI uri, IResponseParser responseParser) {
+		super(entity, uri, responseParser);
 	}
 
 	@Override
-	public InputStream execute() {
+	public HttpResponse execute() {
 		HttpPut httpPut = new HttpPut(uri);
 		httpPut.setEntity(entity);
 		httpPut.setHeader("Content-type", this.contentType);
-		return sendRequest(httpPut);
+		HttpResponse response = sendRequest(httpPut);
+		parseResponse(response);
+		return response;
 	}
 }

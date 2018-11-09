@@ -1,12 +1,12 @@
 package com.axway.apim.actions.tasks;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 
@@ -19,7 +19,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CreateAPIProxy extends AbstractAPIMTask implements IResponseParser {
 
-	public static RestAPICall execute(IAPIDefinition desired, IAPIDefinition actual) {
+	public CreateAPIProxy(IAPIDefinition desiredState, IAPIDefinition actualState) {
+		super(desiredState, actualState);
+	}
+	public void execute() {
 		LOG.info("Create API-Proxy (Front-End API)");
 		
 		URI uri;
@@ -29,12 +32,11 @@ public class CreateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/").build();
-			String json = "{\"apiId\":\"" + context.get("backendAPIId") + "\",\"organizationId\":\"" + desired.getOrgId() + "\"}";
+			String json = "{\"apiId\":\"" + context.get("backendAPIId") + "\",\"organizationId\":\"" + this.desiredState.getOrgId() + "\"}";
 			entity = new StringEntity(json);
 			
-			RestAPICall createAPIProxy = new POSTRequest(entity, uri);
-			createAPIProxy.registerResponseCallback(new CreateAPIProxy());
-			return createAPIProxy;
+			RestAPICall createAPIProxy = new POSTRequest(entity, uri, this);
+			createAPIProxy.execute();
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -45,11 +47,12 @@ public class CreateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 			throw new RuntimeException();
 		}
 	}
-	public JsonNode parseResponse(InputStream response) {
+	@Override
+	public JsonNode parseResponse(HttpResponse response) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonNode = null;
 		try {
-			jsonNode = objectMapper.readTree(response);
+			jsonNode = objectMapper.readTree(getJSONPayload(response));
 			String virtualAPIId = jsonNode.findPath("id").asText();
 			Transaction.getInstance().put("virtualAPIId", virtualAPIId);
 			JsonNode auth = jsonNode.findPath("authenticationProfiles").get(0);

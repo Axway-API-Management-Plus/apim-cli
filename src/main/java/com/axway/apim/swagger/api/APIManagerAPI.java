@@ -15,6 +15,7 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefinition {
 	
@@ -30,6 +31,10 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 			this.swaggerDefinition = new APISwaggerDefinion(getOriginalSwaggerFromAPIM());
 		}
 	}
+	public APIManagerAPI(JsonNode apiConfiguration) {
+		this.apiConfiguration = apiConfiguration;
+	}
+	
 	
 	public void setApiConfiguration(JsonNode apiConfiguration) {
 		this.apiConfiguration = apiConfiguration;
@@ -39,8 +44,8 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 		URI uri;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies").build();
-			RestAPICall getRequest = new GETRequest(uri);
-			InputStream response = getRequest.execute();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			InputStream response = getRequest.execute().getEntity().getContent();
 			
 			JsonNode jsonResponse;
 			String path;
@@ -61,8 +66,8 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 					return;
 				}
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId).build();
-				getRequest = new GETRequest(uri);
-				response = getRequest.execute();
+				getRequest = new GETRequest(uri, null);
+				response = getRequest.execute().getEntity().getContent();
 				jsonResponse = objectMapper.readTree(response);
 				this.apiConfiguration = jsonResponse;
 				this.isValid = true; // Mark that we found an existing API
@@ -73,6 +78,12 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (UnsupportedOperationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 	}
 	
@@ -81,8 +92,8 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+getBackendApiId()+"/download")
 					.setParameter("original", "true").build();
-			RestAPICall getRequest = new GETRequest(uri);
-			InputStream response = getRequest.execute();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			InputStream response = getRequest.execute().getEntity().getContent();
 			return IOUtils.toByteArray(response);
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
@@ -117,6 +128,11 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 		return this.apiConfiguration.get("state").asText();
 	}
 	
+	@Override
+	public void setStatus(String status) {
+		((ObjectNode)this.apiConfiguration).put("state", status);
+	}
+
 	@Override
 	public String getApiId() {
 		return this.apiConfiguration.get("id").asText();

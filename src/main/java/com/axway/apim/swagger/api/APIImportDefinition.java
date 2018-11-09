@@ -20,6 +20,7 @@ import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author cwiechmann
@@ -59,8 +60,8 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 					.setParameter("field", "name")
 					.setParameter("op", "eq")
 					.setParameter("value", apiContract.getProperty("/apim/organization/development").asText()).build();
-			GETRequest getRequest = new GETRequest(uri);
-			InputStream response = getRequest.execute();
+			GETRequest getRequest = new GETRequest(uri, null);
+			InputStream response = getRequest.execute().getEntity().getContent();
 			JsonNode jsonNode = objectMapper.readTree(response);
 			if(jsonNode==null) LOG.error("Unable to read details for org: " + apiContract.getProperty("/apim/organization/development").asText());
 			return jsonNode.get(0).get("id").asText();
@@ -98,6 +99,11 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 		String myState = node.asText(); 
 		this.status = myState;
 		return this.status;
+	}
+	
+	@Override
+	public void setStatus(String status) {
+		throw new RuntimeException("Set status on ImportAPIDefinition not implemented.");
 	}
 
 	@Override

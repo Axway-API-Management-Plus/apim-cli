@@ -1,24 +1,28 @@
 package com.axway.apim.actions.rest;
 
-import java.io.InputStream;
 import java.net.URI;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
+
+import com.axway.apim.actions.tasks.IResponseParser;
 
 public class POSTRequest extends RestAPICall {
 
-	public POSTRequest(HttpEntity entity, URI uri) {
-		super(entity, uri);
+	public POSTRequest(HttpEntity entity, URI uri, IResponseParser responseParser) {
+		super(entity, uri, responseParser);
 	}
 
 	@Override
-	public InputStream execute() {
+	public HttpResponse execute() {
 		HttpPost httpPost = new HttpPost(uri);
 		httpPost.setEntity(entity);
 		if(this.contentType!=null) {
 			httpPost.setHeader("Content-type", this.contentType);
 		}
-		return sendRequest(httpPost);
+		HttpResponse response = sendRequest(httpPost);
+		parseResponse(response);
+		return response;
 	}
 }

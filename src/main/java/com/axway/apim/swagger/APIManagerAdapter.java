@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.CreateNewAPI;
+import com.axway.apim.actions.RecreateToUpdateAPI;
 import com.axway.apim.actions.UpdateExistingAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.swagger.api.IAPIDefinition;
@@ -100,6 +101,8 @@ public class APIManagerAdapter {
 						} else {
 							LOG.info("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
 									+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for PUBLISHED API. Recreating it!");
+							RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
+							recreate.execute(changeState);
 						}
 					} else {
 						LOG.error("A breaking change can't be applied without enforcing it!");

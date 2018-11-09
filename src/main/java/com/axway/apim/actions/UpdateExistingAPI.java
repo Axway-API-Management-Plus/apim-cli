@@ -3,15 +3,13 @@ package com.axway.apim.actions;
 import java.util.List;
 import java.util.Vector;
 
-import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
 import com.axway.apim.swagger.APIChangeState;
 
-public class UpdateExistingAPI extends AbstractCommandHandler {
+public class UpdateExistingAPI {
 
-	@Override
 	public void execute(APIChangeState changes) {
 
 		Transaction.getInstance().beginTransaction();
@@ -21,12 +19,10 @@ public class UpdateExistingAPI extends AbstractCommandHandler {
 		allChanges.addAll(changes.getBreakingChanges());
 		allChanges.addAll(changes.getNonBreakingChanges());
 		
-		RestAPICall call = UpdateAPIProxy.execute(changes.getDesiredAPI(), changes.getActualAPI(), allChanges);
-		super.executeAPICall(call);
+		new UpdateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute(allChanges);
 		// This is special, as the status is not a property and requires some additional actions!
 		if(changes.getBreakingChanges().contains("status")) {
-			call = UpdateAPIStatus.execute(changes.getDesiredAPI(), changes.getActualAPI());
-			super.executeAPICall(call);
+			new UpdateAPIStatus(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		}
 	}
 

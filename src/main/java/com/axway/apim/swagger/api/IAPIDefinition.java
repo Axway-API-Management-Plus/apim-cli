@@ -15,6 +15,8 @@ public interface IAPIDefinition {
 	public String getApiPath();
 	
 	public String getStatus();
+	
+	public void setStatus(String status);
 
 	public APIAuthentication getAuthentication();
 	

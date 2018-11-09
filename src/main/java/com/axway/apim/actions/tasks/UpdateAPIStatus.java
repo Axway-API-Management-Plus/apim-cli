@@ -1,29 +1,28 @@
 package com.axway.apim.actions.tasks;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 
-import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
 
+import com.axway.apim.actions.rest.DELRequest;
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
+import com.axway.apim.swagger.api.APIBaseDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
 public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser {
 	
+	private String intent = "";
+	
 	public static HashMap<String, String[]> statusChangeMap = new HashMap<String, String[]>() {{
 		put("unpublished", 	new String[] {"published", "deleted"});
-		put("published", 	new String[] {"unpublished", "deprecatde"});
+		put("published", 	new String[] {"unpublished", "deprecated"});
 		put("deleted", 		new String[] {});
 		put("deprecated", 	new String[] {"unpublished", "undeprecated"});
 	}};
@@ -37,47 +36,90 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 		put("deprecated", 	"deprecate");
 		put("undeprecated", "undeprecate");
 	}};
+	
+	
 
-	public static RestAPICall execute(IAPIDefinition desired, IAPIDefinition actual) {
-		if(actual.getStatus().equals(desired.getStatus())) {
+	public UpdateAPIStatus(IAPIDefinition desiredState, IAPIDefinition actualState, String intent) {
+		super(desiredState, actualState);
+		this.intent = intent;
+		// TODO Auto-generated constructor stub
+	}
+	
+	public UpdateAPIStatus(IAPIDefinition desiredState, IAPIDefinition actualState) {
+		this(desiredState, actualState, "");
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+	public void execute() {
+		if(this.actualState.getStatus().equals(this.desiredState.getStatus())) {
 			LOG.debug("Desired and actual status equals. No need to update status!");
-			return null;
+			return;
 		}
-		LOG.info("Updating API-Status from: '" + actual.getStatus() + "' to '" + desired.getStatus() + "'");
+		LOG.info(this.intent + "Updating API-Status from: '" + this.actualState.getStatus() + "' to '" + this.desiredState.getStatus() + "'");
 		
 		URI uri;
 		//ObjectMapper objectMapper = new ObjectMapper();
 
 		Transaction context = Transaction.getInstance();
 		
+		RestAPICall apiCall;
+		
 		try {
-			JsonNode lastJsonReponse = (JsonNode)context.get("lastResponse");
+			/*JsonNode lastJsonReponse = (JsonNode)context.get("lastResponse");
 			if(lastJsonReponse==null) { // This class is called as the first, so, first load the API
-				lastJsonReponse = initActualAPIContext(actual);
-			}
+				lastJsonReponse = initActualAPIContext(actualState);
+			}*/
 
-			String[] possibleStatus = statusChangeMap.get(actual.getStatus());
-			boolean statusChangePossible = false;
+			String[] possibleStatus = statusChangeMap.get(actualState.getStatus());
+			String intermediateState = null;
+			boolean statusMovePossible = false;
 			for(String status : possibleStatus) {
-				if(desired.getStatus().equals(status)) {
-					statusChangePossible = true;
+				if(desiredState.getStatus().equals(status)) {
+					statusMovePossible = true; // Direkt move to new state possible
+					break;
+				} else {
+					String[] possibleStatus2 = statusChangeMap.get(status);
+					if(possibleStatus2!=null) {
+						for(String subStatus : possibleStatus2) {
+							if(desiredState.getStatus().equals(subStatus)) {
+								intermediateState = status;
+								statusMovePossible = true;
+								break;
+							}
+						}
+					}
 				}
 			}
-			if (!statusChangePossible) {
-				LOG.error("The status change from: " + actual.getStatus() + " to " + desired.getStatus() + " is not possible!");
-				throw new RuntimeException("The status change from: " + actual.getStatus() + " to " + desired.getStatus() + " is not possible!");
+			if (statusMovePossible) {
+				if(intermediateState!=null) {
+					LOG.info("Required intermediate state: "+intermediateState);
+					// In case, we can't process directly, we have to perform an intermediate state change
+					IAPIDefinition desiredIntermediate = new APIBaseDefinition();
+					desiredIntermediate.setStatus(intermediateState);
+					UpdateAPIStatus intermediateStatusUpdate = new UpdateAPIStatus(desiredIntermediate, actualState, " ### ");
+					intermediateStatusUpdate.execute();
+				}
+			} else {
+				LOG.error(this.intent + "The status change from: " + actualState.getStatus() + " to " + desiredState.getStatus() + " is not possible!");
+				throw new RuntimeException("The status change from: '" + actualState.getStatus() + "' to '" + desiredState.getStatus() + "' is not possible!");
 			}
-			
-			uri = new URIBuilder(cmd.getAPIManagerURL())
-					.setPath(RestAPICall.API_VERSION+"/proxies/"+context
-					.get("virtualAPIId")+"/"+statusEndpoint.get(desired.getStatus()))
+			if(desiredState.getStatus().equals(IAPIDefinition.STATE_DELETED)) {
+				uri = new URIBuilder(cmd.getAPIManagerURL())
+						.setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getApiId())
+						.build();
+				apiCall = new DELRequest(uri, this);
+				context.put("action", "apiDeleted");
+				apiCall.execute();
+			} else {
+				uri = new URIBuilder(cmd.getAPIManagerURL())
+					.setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getApiId()+"/"+statusEndpoint.get(desiredState.getStatus()))
 					.build();
-			//entity = new StringEntity(objectMapper.writeValueAsString(lastJsonReponse));
 			
-			RestAPICall changeStatus = new POSTRequest(null, uri);
-			changeStatus.setContentType("application/x-www-form-urlencoded");
-			changeStatus.registerResponseCallback(new UpdateAPIStatus());
-			return changeStatus;
+				apiCall = new POSTRequest(null, uri, this);
+				apiCall.setContentType("application/x-www-form-urlencoded");
+				apiCall.execute();
+			} 
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -92,10 +134,20 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 			throw new RuntimeException(e);*/
 		}
 	}
-	
-	public JsonNode parseResponse(InputStream response) {
-		String backendAPIId = JsonPath.parse(response).read("$.id", String.class);
-		Transaction.getInstance().put("backendAPIId", backendAPIId);
-		return null;
+	@Override
+	public JsonNode parseResponse(HttpResponse response) {
+		Transaction context = Transaction.getInstance();
+		if(context.get("action")!=null && context.get("action").equals("apiDeleted")) {
+			// TODO: Implement some verification
+			LOG.info("API deleted");
+			return null;
+		} else {
+			String backendAPIId = JsonPath.parse(getJSONPayload(response)).read("$.id", String.class);
+			Transaction.getInstance().put("backendAPIId", backendAPIId);
+			// The action was successful, update the status!
+			this.actualState.setStatus(desiredState.getStatus());
+			LOG.info(this.intent + "Actual API state set to: " + this.actualState.getStatus());
+			return null;
+		}
 	}
 }
