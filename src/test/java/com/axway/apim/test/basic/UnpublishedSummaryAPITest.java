@@ -27,8 +27,8 @@ public class UnpublishedSummaryAPITest extends TestNGCitrusTestDesigner {
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/3_4_unpublished-dynamic-summary-api.json");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/3_4_unpublished-dynamic-summary-api.json");
 		createVariable("expectedReturnCode", "0");
 		createVariable("apiSummary", "My great summary 1!");
 		action(swaggerImport);
@@ -51,8 +51,8 @@ public class UnpublishedSummaryAPITest extends TestNGCitrusTestDesigner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Change the API-Summary, stay in the same status #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/3_4_unpublished-dynamic-summary-api.json");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/3_4_unpublished-dynamic-summary-api.json");
 		createVariable("expectedReturnCode", "0");
 		createVariable("apiSummary", "Another great summary!!!");
 		action(swaggerImport);
@@ -74,8 +74,8 @@ public class UnpublishedSummaryAPITest extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.id=='${apiId}')].summary", "${apiSummary}");
 		
 		echo("####### Change the API back to a state without a summary #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/3_5_unpublished-no-summary-api.json");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/3_5_unpublished-no-summary-api.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -92,7 +92,7 @@ public class UnpublishedSummaryAPITest extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
 			.validate("$.[?(@.id=='${apiId}')].state", "unpublished")
-			.validate("$.[?(@.id=='${apiId}')].summary", "null");
+			.validate("$.[?(@.id=='${apiId}')].summary", null);
 	}
 
 }

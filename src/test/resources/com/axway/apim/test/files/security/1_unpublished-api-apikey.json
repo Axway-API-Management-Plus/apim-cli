@@ -1,16 +1,12 @@
 	
 {
 	"apim": {
-		"name": "test2",
-		"path": "/test2",
+		"name": "${apiName}",
+		"path": "${apiPath}",
 		"status": "unpublished",
 		"version": "1.0.0",
-		"url": "https://10.129.60.57:8075",
-		"username": "apiadmin",
-		"password": "changeme",
-		"summary": "TEST 0816",
 		"organization": {
-			"development": "API Development",
+			"development": "API Development ${orgNumber}",
 			"target": [
 				"Community",
 				"Axway"

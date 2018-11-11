@@ -27,8 +27,8 @@ public class IntiallyPublishedAPITest extends TestNGCitrusTestDesigner {
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/2_initially_published.json");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/2_initially_published.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

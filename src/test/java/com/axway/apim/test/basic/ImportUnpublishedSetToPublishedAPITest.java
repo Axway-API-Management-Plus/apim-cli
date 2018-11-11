@@ -25,8 +25,8 @@ public class ImportUnpublishedSetToPublishedAPITest extends TestNGCitrusTestDesi
 		variable("apiName", "My-Test-API-${apiNumber}");
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/3_1_unpublished-api.json");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/3_1_unpublished-api.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -46,8 +46,8 @@ public class ImportUnpublishedSetToPublishedAPITest extends TestNGCitrusTestDesi
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Change API-State from Unpublished to Published #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/3_2_published-api.json");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/3_2_published-api.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

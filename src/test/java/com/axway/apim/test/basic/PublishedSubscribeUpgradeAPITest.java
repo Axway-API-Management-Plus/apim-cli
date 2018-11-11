@@ -27,8 +27,8 @@ public class PublishedSubscribeUpgradeAPITest extends TestNGCitrusTestDesigner {
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/3_2_published-api.json");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/3_2_published-api.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 
@@ -62,8 +62,8 @@ public class PublishedSubscribeUpgradeAPITest extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON);
 
 		echo("####### Importing a new Swagger-File as a change #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/petstore2.json");
-		createVariable("configFile", "/com/axway/apim/test/files/3_2_published-api.json");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore2.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/3_2_published-api.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
