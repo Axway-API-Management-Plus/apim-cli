@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.RestAPICall;
+import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIContract;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
@@ -45,7 +47,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	 */
 	private String pathToSwagger;
 
-	public APIImportDefinition(APIContract apiContract, String pathToSwagger) {
+	public APIImportDefinition(APIContract apiContract, String pathToSwagger) throws AppException {
 		super();
 		this.apiContract = apiContract;
 		this.pathToSwagger = pathToSwagger;
@@ -54,7 +56,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	}
 	
 	@Override
-	public String getOrgId() {
+	public String getOrgId() throws AppException {
 		try {
 			LOG.info("Getting details for organization: " + apiContract.getProperty("/apim/organization/development").asText() + " from API-Manager!");
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/")
@@ -66,24 +68,16 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 			JsonNode jsonNode = objectMapper.readTree(response);
 			if(jsonNode==null) LOG.error("Unable to read details for org: " + apiContract.getProperty("/apim/organization/development").asText());
 			return jsonNode.get(0).get("id").asText();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			throw new AppException("Can't read Org-Details from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	
-	private byte[] getSwaggerDefFromFile() {
+	private byte[] getSwaggerDefFromFile() throws AppException {
 		try {
 			return IOUtils.toByteArray(getSwaggerAsStream());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new AppException("Can't read swagger-file from file", ErrorCode.CANT_READ_SWAGGER_FILE, e);
 		}
 	}
 
@@ -103,12 +97,12 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	}
 	
 	@Override
-	public void setStatus(String status) {
-		throw new RuntimeException("Set status on ImportAPIDefinition not implemented.");
+	public void setStatus(String status) throws AppException {
+		throw new AppException("Set status on ImportAPIDefinition not implemented.", ErrorCode.UNSUPPORTED_FEATURE);
 	}
 
 	@Override
-	public APIAuthentication getAuthentication() {
+	public APIAuthentication getAuthentication() throws AppException {
 		ArrayNode authN = (ArrayNode)this.apiContract.getProperty("/apim/authentication");
 		this.authentication = new APIAuthentication(authN);
 		return this.authentication;
@@ -150,8 +144,9 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	
 	/**
 	 * To make testing easier we allow reading test-files from classpath as well
+	 * @throws AppException 
 	 */
-	public InputStream getSwaggerAsStream() {
+	public InputStream getSwaggerAsStream() throws AppException {
 		File inputFile = new File(pathToSwagger);
 		InputStream is = null;
 		try {
@@ -161,21 +156,17 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 				is = this.getClass().getResourceAsStream(pathToSwagger);
 			}
 			if(is == null) {
-				throw new IOException("Unable to read swagger file from: " + pathToSwagger);
+				throw new AppException("Unable to read swagger file from: " + pathToSwagger, ErrorCode.CANT_READ_SWAGGER_FILE);
 			}
 			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new AppException("Unable to read swagger file from: " + pathToSwagger, ErrorCode.CANT_READ_SWAGGER_FILE, e);
 		}
 		return is;
 	}
 
 	@Override
-	public String getApiId() {
-		throw new RuntimeException("Import API can't have an ID");
+	public String getApiId() throws AppException {
+		throw new AppException("Import API can't have an ID", ErrorCode.UNSUPPORTED_FEATURE);
 	}
 }

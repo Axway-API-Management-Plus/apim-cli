@@ -6,6 +6,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
 import com.axway.apim.actions.tasks.IResponseParser;
+import com.axway.apim.lib.AppException;
 
 public class GETRequest extends RestAPICall {
 
@@ -14,7 +15,7 @@ public class GETRequest extends RestAPICall {
 	}
 
 	@Override
-	public HttpResponse execute() {
+	public HttpResponse execute() throws AppException {
 		HttpGet httpGet = new HttpGet(uri);
 		httpGet.setHeader("Content-type", this.contentType);
 		HttpResponse response = sendRequest(httpGet);

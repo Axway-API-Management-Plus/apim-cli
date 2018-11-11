@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.RestAPICall;
+import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,7 +26,7 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 
 	JsonNode apiConfiguration;
 
-	public APIManagerAPI(IAPIDefinition desiredAPI) {
+	public APIManagerAPI(IAPIDefinition desiredAPI) throws AppException {
 		super();
 		initAPIFromAPIManager(desiredAPI);
 		// Only try to load a Backend-API if we found an API in API-Manager
@@ -41,7 +43,7 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 		this.apiConfiguration = apiConfiguration;
 	}
 
-	private void initAPIFromAPIManager(IAPIDefinition desiredAPI) {
+	private void initAPIFromAPIManager(IAPIDefinition desiredAPI) throws AppException {
 		URI uri;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies").build();
@@ -73,22 +75,14 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 				this.apiConfiguration = jsonResponse;
 				this.isValid = true; // Mark that we found an existing API
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			}
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedOperationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (Exception e) {
+			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	
-	private byte[] getOriginalSwaggerFromAPIM() {
+	private byte[] getOriginalSwaggerFromAPIM() throws AppException {
 		URI uri;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+getBackendApiId()+"/download")
@@ -96,14 +90,9 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 			RestAPICall getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
 			return IOUtils.toByteArray(response);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_SWAGGER_FILE, e);
 		}
-		return null;
 	}
 
 	@Override
@@ -112,7 +101,7 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 	}
 
 	@Override
-	public APIAuthentication getAuthentication() {
+	public APIAuthentication getAuthentication() throws AppException {
 		if(authentication==null) {
 			this.authentication = new APIAuthentication(this.apiConfiguration.get("securityProfiles").get(0).get("devices"));
 		}

@@ -10,7 +10,9 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIContract;
 import com.axway.apim.swagger.APIManagerAdapter;
@@ -104,9 +106,16 @@ public class App {
 			
 			apim.applyChanges(changeActions);
 			return 0;
+		} catch (AppException ap) {
+			if(ap.isLogStackStrace()) {
+				LOG.error(ap.getMessage(), ap);
+			} else {
+				LOG.warn(ap.getMessage());
+			}
+			return ap.getErrorCode().getCode();
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return 99;
+			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}
 	}
 }

@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
+import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.IAPIDefinition;
@@ -36,7 +38,7 @@ public class AbstractAPIMTask {
 
 	protected static CommandParameters cmd = CommandParameters.getInstance();
 	
-	public static JsonNode initActualAPIContext(IAPIDefinition actual) {
+	public static JsonNode initActualAPIContext(IAPIDefinition actual) throws AppException {
 		URI uri;
 		ObjectMapper objectMapper = new ObjectMapper();
 		Transaction context = Transaction.getInstance();
@@ -49,28 +51,22 @@ public class AbstractAPIMTask {
 			context.put("virtualAPIId", lastJsonReponse.get("id").asText());
 			return lastJsonReponse;
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new AppException("Can't send HTTP-Request to API-Manager Proxy-Endpoint.", ErrorCode.CANT_SEND_HTTP_REQUEST, e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new AppException("IO-Exception, while sending HTTP-Request to API-Manager Proxy-Endpoint", ErrorCode.CANT_SEND_HTTP_REQUEST, e);
 		}
 		
 	}
 	
-	protected static InputStream getJSONPayload(HttpResponse response) {
+	protected static InputStream getJSONPayload(HttpResponse response) throws AppException {
 		InputStream json;
 		try {
 			json = response.getEntity().getContent();
 			return json;
 		} catch (UnsupportedOperationException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new AppException("Cannot read or parse JSON.", ErrorCode.CANT_READ_JSON_PAYLOAD, e);
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new AppException("Cannot read of parse JSON.", ErrorCode.CANT_READ_JSON_PAYLOAD, e);
 		}
 	}
 }

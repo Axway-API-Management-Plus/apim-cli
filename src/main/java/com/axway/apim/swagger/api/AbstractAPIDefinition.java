@@ -5,7 +5,9 @@ import com.axway.apim.actions.tasks.props.APINamePropertyHandler;
 import com.axway.apim.actions.tasks.props.APIPathPropertyHandler;
 import com.axway.apim.actions.tasks.props.APISummaryPropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
+import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,20 +44,20 @@ public abstract class AbstractAPIDefinition {
 	
 	protected boolean isValid = false;
 
-	public String getApiPath() {
-		throw new RuntimeException("This method must be implemented by concrete class.");
+	public String getApiPath() throws AppException {
+		throw new AppException("This method must be implemented by concrete class.", ErrorCode.UNSUPPORTED_FEATURE);
 	}
 
 	public boolean isValid() {
 		return this.isValid;
 	}
 
-	public String getStatus() {
-		throw new RuntimeException("This method must be implemented by concrete class.");
+	public String getStatus() throws AppException {
+		throw new AppException("This method must be implemented by concrete class.", ErrorCode.UNSUPPORTED_FEATURE);
 	}
 
-	public String getOrgId() {
-		throw new RuntimeException("This method must be implemented by concrete class.");
+	public String getOrgId() throws AppException {
+		throw new AppException("This method must be implemented by concrete class.", ErrorCode.UNSUPPORTED_FEATURE);
 	}
 	
 	public APISwaggerDefinion getSwaggerDefinition() {

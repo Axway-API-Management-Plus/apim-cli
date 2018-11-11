@@ -11,6 +11,8 @@ import com.axway.apim.actions.rest.DELRequest;
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
+import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIBaseDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -51,7 +53,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 	}
 	
 	
-	public void execute() {
+	public void execute() throws AppException {
 		if(this.actualState.getStatus().equals(this.desiredState.getStatus())) {
 			LOG.debug("Desired and actual status equals. No need to update status!");
 			return;
@@ -102,7 +104,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				}
 			} else {
 				LOG.error(this.intent + "The status change from: " + actualState.getStatus() + " to " + desiredState.getStatus() + " is not possible!");
-				throw new RuntimeException("The status change from: '" + actualState.getStatus() + "' to '" + desiredState.getStatus() + "' is not possible!");
+				throw new AppException("The status change from: '" + actualState.getStatus() + "' to '" + desiredState.getStatus() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS);
 			}
 			if(desiredState.getStatus().equals(IAPIDefinition.STATE_DELETED)) {
 				uri = new URIBuilder(cmd.getAPIManagerURL())
@@ -120,22 +122,12 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				apiCall.setContentType("application/x-www-form-urlencoded");
 				apiCall.execute();
 			} 
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		/*} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);*/
+		} catch (Exception e) {
+			throw new AppException("The status change from: '" + actualState.getStatus() + "' to '" + desiredState.getStatus() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS, e);
 		}
 	}
 	@Override
-	public JsonNode parseResponse(HttpResponse response) {
+	public JsonNode parseResponse(HttpResponse response) throws AppException {
 		Transaction context = Transaction.getInstance();
 		if(context.get("action")!=null && context.get("action").equals("apiDeleted")) {
 			// TODO: Implement some verification

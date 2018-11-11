@@ -7,6 +7,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
 
 import com.axway.apim.actions.tasks.IResponseParser;
+import com.axway.apim.lib.AppException;
 
 public class PUTRequest extends RestAPICall {
 
@@ -15,7 +16,7 @@ public class PUTRequest extends RestAPICall {
 	}
 
 	@Override
-	public HttpResponse execute() {
+	public HttpResponse execute() throws AppException {
 		HttpPut httpPut = new HttpPut(uri);
 		httpPut.setEntity(entity);
 		httpPut.setHeader("Content-type", this.contentType);

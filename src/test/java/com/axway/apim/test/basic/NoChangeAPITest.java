@@ -47,7 +47,7 @@ public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 		echo("####### RE-Importing same API: '${apiName}' on path: '${apiPath}' without changes. Expecting failure with RC 99. #######");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/basic/1_no-change-config.json");
-		createVariable("expectedReturnCode", "99");
+		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
 		
 		echo("####### Make sure, the API-ID hasn't changed #######");

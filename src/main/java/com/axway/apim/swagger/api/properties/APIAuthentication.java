@@ -1,5 +1,7 @@
 package com.axway.apim.swagger.api.properties;
 
+import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -11,9 +13,9 @@ public class APIAuthentication {
 	
 	protected ArrayNode jsonConfig;
 	
-	public APIAuthentication(JsonNode config) {
+	public APIAuthentication(JsonNode config) throws AppException {
 		this.jsonConfig = (ArrayNode)config;
-		if(config.size()>1) throw new RuntimeException("Supporting only one security device!");
+		if(config.size()>1) throw new AppException("Supporting only one security device!", ErrorCode.UNSUPPORTED_FEATURE);
 		if(config.size()==0) return; // No security devices configured (new API-Proxy)
 		// For now, we only support one security device!
 		this.name = config.get(0).get("name").asText();

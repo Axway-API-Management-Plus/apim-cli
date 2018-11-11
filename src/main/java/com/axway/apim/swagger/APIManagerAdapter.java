@@ -6,7 +6,9 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.actions.CreateNewAPI;
 import com.axway.apim.actions.RecreateToUpdateAPI;
 import com.axway.apim.actions.UpdateExistingAPI;
+import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.IAPIDefinition;
 
 /**
@@ -71,7 +73,7 @@ public class APIManagerAdapter {
 		this.enforceBreakingChange = CommandParameters.getInstance().isEnforceBreakingChange();
 	}
 
-	public void applyChanges(APIChangeState changeState) {
+	public void applyChanges(APIChangeState changeState) throws AppException {
 		// No existing API found (means: No match for APIPath), creating a complete new
 		if(!changeState.getActualAPI().isValid()) {
 			// --> CreateNewAPI
@@ -83,7 +85,7 @@ public class APIManagerAdapter {
 			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getApiName() +" (Version: "+ changeState.getActualAPI().getApiVersion() + ")");
 			if(!changeState.hasAnyChanges()) {
 				LOG.warn("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
-				throw new RuntimeException();
+				throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE, false);
 			}			
 			if (changeState.isBreaking()) {
 				LOG.info("Recognized the following breaking changes: " + changeState.getBreakingChanges() + 

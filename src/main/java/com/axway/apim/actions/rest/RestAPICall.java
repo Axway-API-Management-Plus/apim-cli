@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.tasks.IResponseParser;
+import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public abstract class RestAPICall {
@@ -39,9 +41,9 @@ public abstract class RestAPICall {
 		this.reponseParser = responseParser;
 	}
 
-	public abstract HttpResponse execute();
+	public abstract HttpResponse execute() throws AppException;
 	
-	public void parseResponse(HttpResponse response) {
+	public void parseResponse(HttpResponse response) throws AppException {
 		if(this.reponseParser==null) return; 
 		try {
 			JsonNode lastReponse = reponseParser.parseResponse(response);
@@ -51,29 +53,23 @@ public abstract class RestAPICall {
 			try {
 				RestAPICall.LOG.error("Response: '" + response.getStatusLine().toString() + "'");
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-				throw new RuntimeException(e1);
+				throw new AppException("Unable to parse HTTP-Response", ErrorCode.CANT_PARSE_HTTP_RESPONSE, e1);
 			}
-			throw new RuntimeException(e);
+			throw new AppException("Unable to parse HTTP-Response", ErrorCode.CANT_PARSE_HTTP_RESPONSE, e);
 		}
 			
 			
 	}
 	
-	protected CloseableHttpResponse sendRequest(HttpUriRequest request) {
+	protected CloseableHttpResponse sendRequest(HttpUriRequest request) throws AppException {
 		try {
 			APIMHttpClient apimClient = APIMHttpClient.getInstance();
 			CloseableHttpResponse response = apimClient.getHttpClient().execute(request, apimClient.getClientContext());
 			return response;
 		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new AppException("Unable to send HTTP-Request.", ErrorCode.CANT_SEND_HTTP_REQUEST, e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new AppException("Unable to send HTTP-Request.", ErrorCode.CANT_SEND_HTTP_REQUEST, e);
 		}
 	}
 	

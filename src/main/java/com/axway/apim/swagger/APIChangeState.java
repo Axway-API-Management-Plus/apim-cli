@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.APIPropertyAnnotation;
+import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.IAPIDefinition;
 
 /**
@@ -36,7 +38,7 @@ public class APIChangeState {
 	private List<String> breakingChanges = new Vector<String>();
 	private List<String> nonBreakingChanges = new Vector<String>();
 
-	public APIChangeState(IAPIDefinition actualAPI, IAPIDefinition desiredAPI) {
+	public APIChangeState(IAPIDefinition actualAPI, IAPIDefinition desiredAPI) throws AppException {
 		super();
 		this.actualAPI = actualAPI;
 		this.desiredAPI = desiredAPI;
@@ -54,8 +56,9 @@ public class APIChangeState {
 	 * Additionally, we need to know, if changes can be applied on the existing API. For that 
 	 * we need to check, if all properties can be are writable, which is depending on the state of the 
 	 * actual API. 
+	 * @throws AppException 
 	 */
-	private void getChanges() {
+	private void getChanges() throws AppException {
 		if(!actualAPI.isValid()) {
 			return; //Nothing to do, as we don't have an existing API
 		}
@@ -86,21 +89,8 @@ public class APIChangeState {
 
 				}
 			}
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new AppException("Can't create API-Change-State.", ErrorCode.CANT_CREATE_STATE_CHANGE, e);
 		}
 	}
 
@@ -152,7 +142,7 @@ public class APIChangeState {
 		return nonBreakingChanges;
 	}
 	
-	private static boolean isWritable(APIPropertyAnnotation property, String actualStatus) {
+	private static boolean isWritable(APIPropertyAnnotation property, String actualStatus) throws AppException {
 		// Get the field annotation via reflection
 		// Check, if the actualState is in the writableStates
 		try {
@@ -163,8 +153,7 @@ public class APIChangeState {
 				}
 			}
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new AppException("Can't create API-Change-State.", ErrorCode.CANT_CREATE_STATE_CHANGE, e);
 		}
 		return false;
 	}

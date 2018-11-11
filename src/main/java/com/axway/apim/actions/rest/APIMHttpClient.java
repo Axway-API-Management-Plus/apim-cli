@@ -26,7 +26,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 
+import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.ErrorCode;
 
 public class APIMHttpClient {
 	
@@ -35,19 +37,19 @@ public class APIMHttpClient {
 	private CloseableHttpClient httpClient;
 	private HttpClientContext clientContext;
 	
-	public static APIMHttpClient getInstance() {
+	public static APIMHttpClient getInstance() throws AppException {
 		if (APIMHttpClient.instance == null) {
 			APIMHttpClient.instance = new APIMHttpClient();
 		}
 		return APIMHttpClient.instance;
 	}
 	
-	private APIMHttpClient() {
+	private APIMHttpClient() throws AppException {
 		CommandParameters params = CommandParameters.getInstance();
 		createConnection("https://"+params.getHostname()+":"+params.getPort(), params.getUsername(), params.getPassword());
 	}
 
-	private void createConnection(String apiManagerURL, String username, String password) {
+	private void createConnection(String apiManagerURL, String username, String password) throws AppException {
 		CredentialsProvider credsProvider;
 		PoolingHttpClientConnectionManager cm;
 		HttpHost targetHost;
@@ -82,15 +84,8 @@ public class APIMHttpClient {
 			cm.setMaxPerRoute(new HttpRoute(targetHost), 2);
 			this.httpClient = HttpClientBuilder.create().setConnectionManager(cm)
 					.setDefaultCredentialsProvider(credsProvider).build();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (KeyManagementException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new AppException("Can't create connection to API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
 		}
 
 	}

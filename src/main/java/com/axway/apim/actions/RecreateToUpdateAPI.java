@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
 import com.axway.apim.actions.tasks.UpgradeAccessToNewerAPI;
+import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.api.APIBaseDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
@@ -14,7 +15,7 @@ public class RecreateToUpdateAPI {
 	
 	static Logger LOG = LoggerFactory.getLogger(RecreateToUpdateAPI.class);
 
-	public void execute(APIChangeState changes) {
+	public void execute(APIChangeState changes) throws AppException {
 		Transaction context = Transaction.getInstance();
 		
 		context.beginTransaction();

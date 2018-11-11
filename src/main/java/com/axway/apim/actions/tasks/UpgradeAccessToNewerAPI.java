@@ -15,6 +15,8 @@ import org.apache.http.message.BasicNameValuePair;
 
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
+import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -23,7 +25,7 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 	public UpgradeAccessToNewerAPI(IAPIDefinition desiredState, IAPIDefinition actualState) {
 		super(desiredState, actualState);
 	}
-	public void execute() {
+	public void execute() throws AppException {
 		LOG.info("Grant access to new API");
 		
 		URI uri;
@@ -41,21 +43,15 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 			postRequest.setContentType("application/x-www-form-urlencoded");
 			
 			postRequest.execute();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException();
+		} catch (Exception e) {
+			throw new AppException("Can't upgrade access to newer API!", ErrorCode.CANT_UPGRADE_API_ACCESS, e);
 		}
 	}
 	@Override
-	public JsonNode parseResponse(HttpResponse response) {
+	public JsonNode parseResponse(HttpResponse response) throws AppException {
 		JsonNode jsonNode = null;
 		if(response.getStatusLine().getStatusCode()!=204) {
-			throw new RuntimeException("Unexpected response from API-Manager:" + response.getStatusLine() + response.getEntity());
+			throw new AppException("Unexpected response from API-Manager:" + response.getStatusLine() + response.getEntity(), ErrorCode.CANT_UPGRADE_API_ACCESS);
 		}
 		return jsonNode;
 	}

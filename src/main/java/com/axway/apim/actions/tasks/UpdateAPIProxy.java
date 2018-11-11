@@ -17,6 +17,8 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.props.PropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
+import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +31,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		// TODO Auto-generated constructor stub
 	}
 
-	public void execute(List<String> changedProps) {
+	public void execute(List<String> changedProps) throws AppException {
 		LOG.debug("Updating API-Proxy");
 		URI uri;
 		HttpEntity entity;
@@ -49,34 +51,25 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 			
 			RestAPICall updateAPIProxy = new PUTRequest(entity, uri, this);
 			updateAPIProxy.execute();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			throw new AppException("Cannot update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
 		}
 	}
 	
 	@Override
-	public JsonNode parseResponse(HttpResponse response) {
+	public JsonNode parseResponse(HttpResponse response) throws AppException {
 		String backendAPIId = JsonPath.parse(getJSONPayload(response)).read("$.id", String.class);
 		Transaction.getInstance().put("backendAPIId", backendAPIId);
 		return null;
 	}	
 	
-	private static JsonNode handledChangedProps(JsonNode lastJsonReponse, IAPIDefinition desired, List<String> changedProps) {
+	private static JsonNode handledChangedProps(JsonNode lastJsonReponse, IAPIDefinition desired, List<String> changedProps) throws AppException {
+		Field field = null;
 		if(changedProps!=null) {
 			String logMessage = "Updating proxy for the following props: ";
 			for(String fieldName : changedProps) {
 				try {
-					Field field = desired.getClass().getSuperclass().getDeclaredField(fieldName);
+					field = desired.getClass().getSuperclass().getDeclaredField(fieldName);
 					if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
 						APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
 						if(void.class != property.propHandler()) {
@@ -88,18 +81,8 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 							LOG.warn("Property: " + field.getName() + " has not handler configured and WILL NOT BE UPDATED!");
 						}
 					}
-				} catch (NoSuchFieldException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				} catch (Exception e) {
+					throw new AppException("Can't handle property: "+field+" to update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
 				}
 			}
 			LOG.info(logMessage);

@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,18 +39,18 @@ public class APIContract {
 	
 	private JsonNode stageConfiguration;
 
-	public APIContract(String apiContract, String stage) {
+	public APIContract(String apiContract, String stage) throws AppException {
 		super();
 		this.apiContract = apiContract;
 		this.stage = stage;
 		init();
 	}
 	
-	private void init() {
+	private void init() throws AppException {
 		try {
 			configuration = getConfiguration(this.apiContract);
 			if(configuration==null) {
-				throw new RuntimeException("Unable to read contract from: " + this.apiContract);
+				throw new AppException("Can't read configuration as it's null.", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
 			if(this.stage!=null) {
 				String stageFile = getStageContract();
@@ -56,8 +58,7 @@ public class APIContract {
 				stageConfiguration = getConfiguration(stageFile);
 			}
 		} catch (IOException e) {
-			LOG.error("Error initializing API-Contract.", e);
-			throw new RuntimeException(e.getMessage(), e);
+			throw new AppException("Can't read configuration as it's null.", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
 	}
 	
@@ -85,8 +86,9 @@ public class APIContract {
 	
 	/**
 	 * To make testing easier we allow reading test-files from classpath as well
+	 * @throws AppException 
 	 */
-	private JsonNode getConfiguration(String pathToResource) throws JsonProcessingException, IOException {
+	private JsonNode getConfiguration(String pathToResource) throws JsonProcessingException, IOException, AppException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonConfig;
 		File inputFile = new File(pathToResource);
@@ -97,7 +99,7 @@ public class APIContract {
 			jsonConfig = objectMapper.readTree(this.getClass().getResourceAsStream(pathToResource));
 		}
 		if(jsonConfig == null) {
-			throw new IOException("Unable to read configuration from: " + pathToResource);
+			throw new AppException("Unable to read config file from, as it is null", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 		return jsonConfig;
 	}

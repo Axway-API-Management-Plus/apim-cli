@@ -13,6 +13,8 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
+import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIImportDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,7 +27,7 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		// TODO Auto-generated constructor stub
 	}
 
-	public void execute() {
+	public void execute() throws AppException {
 		LOG.info("Importing backend API (Swagger-Import)");
 		URI uri;
 		HttpEntity entity;
@@ -43,14 +45,12 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 			importSwagger.setContentType(null);
 			importSwagger.execute();
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new AppException("Can't import Swagger-definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
 		}
 	}
 	
 	@Override
-	public JsonNode parseResponse(HttpResponse response) {
+	public JsonNode parseResponse(HttpResponse response) throws AppException {
 		InputStream json = getJSONPayload(response);
 		String backendAPIId = JsonPath.parse(json).read("$.id", String.class);
 		Transaction.getInstance().put("backendAPIId", backendAPIId);

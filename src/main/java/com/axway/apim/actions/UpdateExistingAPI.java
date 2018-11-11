@@ -6,11 +6,12 @@ import java.util.Vector;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
+import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIChangeState;
 
 public class UpdateExistingAPI {
 
-	public void execute(APIChangeState changes) {
+	public void execute(APIChangeState changes) throws AppException {
 
 		Transaction.getInstance().beginTransaction();
 		Transaction.getInstance().put("orgId", "0926142d-1049-4847-a1ea-9063d9e1c135");

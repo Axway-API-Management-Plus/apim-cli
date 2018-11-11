@@ -7,6 +7,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 
 import com.axway.apim.actions.tasks.IResponseParser;
+import com.axway.apim.lib.AppException;
 
 public class POSTRequest extends RestAPICall {
 
@@ -15,7 +16,7 @@ public class POSTRequest extends RestAPICall {
 	}
 
 	@Override
-	public HttpResponse execute() {
+	public HttpResponse execute() throws AppException {
 		HttpPost httpPost = new HttpPost(uri);
 		httpPost.setEntity(entity);
 		if(this.contentType!=null) {

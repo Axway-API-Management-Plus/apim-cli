@@ -7,6 +7,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import com.axway.apim.actions.tasks.IResponseParser;
+import com.axway.apim.lib.AppException;
 
 public class DELRequest extends RestAPICall {
 
@@ -15,7 +16,7 @@ public class DELRequest extends RestAPICall {
 	}
 
 	@Override
-	public HttpResponse execute() {
+	public HttpResponse execute() throws AppException {
 		HttpUriRequest httpDel = new HttpDelete(uri);
 		httpDel.setHeader("Content-type", this.contentType);
 		HttpResponse response = sendRequest(httpDel);
