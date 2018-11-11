@@ -20,6 +20,7 @@ import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -126,6 +127,14 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 		JsonNode node = this.apiContract.getProperty("/apim/name");
 		return node.asText();
 	}
+	
+	@Override
+	public String getApiSummary() {
+		JsonNode node = this.apiContract.getProperty("/apim/summary");
+		if(node instanceof MissingNode) return null;
+		return node.asText();
+	}
+
 
 	public APIContract getApiContract() {
 		return apiContract;

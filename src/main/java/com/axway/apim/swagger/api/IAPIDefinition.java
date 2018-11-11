@@ -26,6 +26,8 @@ public interface IAPIDefinition {
 	
 	public String getApiName();
 	
+	public String getApiSummary();
+	
 	public String getApiId();
 	
 	public APISwaggerDefinion getSwaggerDefinition();

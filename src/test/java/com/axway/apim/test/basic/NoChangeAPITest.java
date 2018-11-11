@@ -10,7 +10,7 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test
+@Test(testName="NoChangeAPITest")
 public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 	
 	@Autowired
@@ -21,7 +21,7 @@ public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 		description("Import an API and re-import it without any change. It must be detected, that no change happened.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/no-change-${apiNumber}");
+		variable("apiPath", "/my-no-change-${apiNumber}");
 		variable("apiName", "No-Change-${apiNumber}");
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");

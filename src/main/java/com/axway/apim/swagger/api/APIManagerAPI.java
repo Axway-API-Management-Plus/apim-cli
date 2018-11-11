@@ -15,6 +15,7 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefinition {
@@ -121,6 +122,13 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 	@Override
 	public String getApiName() {
 		return this.apiConfiguration.get("name").asText();
+	}
+	
+	@Override
+	public String getApiSummary() {
+		JsonNode node = this.apiConfiguration.get("summary");
+		if(node instanceof MissingNode || node.asText().equals("null")) return null;
+		return node.asText();
 	}
 
 	@Override

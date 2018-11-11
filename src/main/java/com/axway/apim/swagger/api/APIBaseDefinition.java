@@ -32,6 +32,12 @@ public class APIBaseDefinition extends AbstractAPIDefinition implements IAPIDefi
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public String getApiSummary() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public String getApiId() {

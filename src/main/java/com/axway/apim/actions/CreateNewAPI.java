@@ -1,6 +1,8 @@
 package com.axway.apim.actions;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Vector;
 
@@ -38,16 +40,21 @@ public class CreateNewAPI {
 		new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI).execute();
 	}
 	
+	/**
+	 * @param desiredAPI
+	 * @return
+	 */
 	private List<String> getAllProps(IAPIDefinition desiredAPI) {
 		List<String> allProps = new Vector<String>();
 		try {
 			for (Field field : desiredAPI.getClass().getSuperclass().getDeclaredFields()) {
 				if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
-					APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
-					if (property.isBreaking()) {
-						allProps.add(field.getName());
-					}
-
+					String getterMethodName = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+					Method method = desiredAPI.getClass().getMethod(getterMethodName, null);
+					Object desiredValue = method.invoke(desiredAPI, null);
+					// For new APIs don't include empty properties (this including MissingNodes)
+					if(desiredValue==null) continue; 
+					allProps.add(field.getName());
 				}
 			}
 			return allProps;
@@ -56,6 +63,18 @@ public class CreateNewAPI {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new RuntimeException(e);

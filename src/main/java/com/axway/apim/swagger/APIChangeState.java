@@ -67,7 +67,9 @@ public class APIChangeState {
 					Method method2 = actualAPI.getClass().getMethod(getterMethodName, null);
 					Object desiredValue = method.invoke(desiredAPI, null);
 					Object actualValue = method2.invoke(actualAPI, null);
-					if(!desiredValue.equals(actualValue)) {
+					if(desiredValue == null && actualValue == null) continue;
+					// desiredValue == null - This can be used to reset/clean a property!
+					if(desiredValue == null || !desiredValue.equals(actualValue)) {
 						APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
 						if (property.isBreaking()) {
 							this.isBreaking = true;
@@ -78,6 +80,8 @@ public class APIChangeState {
 						if (!isWritable(property, this.actualAPI.getStatus())) {
 							this.updateExistingAPI = false; // Found a NON-Changeable property, can't update the existing API
 						}
+					} else {
+						LOG.info("No change for property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
 					}
 
 				}
