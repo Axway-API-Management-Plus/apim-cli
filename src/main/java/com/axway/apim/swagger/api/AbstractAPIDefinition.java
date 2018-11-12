@@ -9,6 +9,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
+import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,6 +42,10 @@ public abstract class AbstractAPIDefinition {
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
 			propHandler = APISummaryPropertyHandler.class)
 	protected String apiSummary = null;
+
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED})
+	protected APIImage apiImage = null;
 	
 	protected boolean isValid = false;
 

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Vector;
 
 import com.axway.apim.actions.rest.Transaction;
+import com.axway.apim.actions.tasks.UpdateAPIImage;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
 import com.axway.apim.lib.AppException;
@@ -21,6 +22,12 @@ public class UpdateExistingAPI {
 		allChanges.addAll(changes.getNonBreakingChanges());
 		
 		new UpdateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute(allChanges);
+		
+		// If image is include, update it
+		if(changes.getNonBreakingChanges().contains("apiImage")) {
+			new UpdateAPIImage(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+		}
+		
 		// This is special, as the status is not a property and requires some additional actions!
 		if(changes.getNonBreakingChanges().contains("status")) {
 			new UpdateAPIStatus(changes.getDesiredAPI(), changes.getActualAPI()).execute();

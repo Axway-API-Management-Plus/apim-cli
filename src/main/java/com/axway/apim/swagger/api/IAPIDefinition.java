@@ -2,6 +2,7 @@ package com.axway.apim.swagger.api;
 
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
+import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 
 public interface IAPIDefinition {
@@ -30,6 +31,8 @@ public interface IAPIDefinition {
 	public String getApiSummary();
 	
 	public String getApiId() throws AppException;
+	
+	public APIImage getApiImage();
 	
 	public APISwaggerDefinion getSwaggerDefinition();
 	

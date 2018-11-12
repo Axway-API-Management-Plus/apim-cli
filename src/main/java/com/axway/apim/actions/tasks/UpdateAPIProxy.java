@@ -1,10 +1,7 @@
 package com.axway.apim.actions.tasks;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -28,7 +25,6 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 	
 	public UpdateAPIProxy(IAPIDefinition desiredState, IAPIDefinition actualState) {
 		super(desiredState, actualState);
-		// TODO Auto-generated constructor stub
 	}
 
 	public void execute(List<String> changedProps) throws AppException {

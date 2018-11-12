@@ -2,11 +2,9 @@ package com.axway.apim.swagger.api;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -19,11 +17,11 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIContract;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
+import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author cwiechmann
@@ -52,6 +50,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 		this.apiContract = apiContract;
 		this.pathToSwagger = pathToSwagger;
 		this.swaggerDefinition = new APISwaggerDefinion(getSwaggerDefFromFile());
+		this.apiImage = new APIImage(getImageFromFile(), this.apiContract.getProperty("/apim/image").asText());
 		this.isValid = true;
 	}
 	
@@ -80,6 +79,27 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 			throw new AppException("Can't read swagger-file from file", ErrorCode.CANT_READ_SWAGGER_FILE, e);
 		}
 	}
+	
+	private byte[] getImageFromFile() throws AppException {
+		JsonNode imageNode = this.apiContract.getProperty("/apim/image");
+		if(imageNode instanceof MissingNode) {
+			return null; // No image declared! Means we have to remove the image if one is present in API-Manager
+		} else {
+			try {
+				String baseDir = new File(this.pathToSwagger).getParent();
+				File file = new File(baseDir + "/" + imageNode.asText());
+				if(file.exists()) { 
+					return IOUtils.toByteArray(new FileInputStream(file));
+				} else {
+					// Try to read it from classpath
+					return IOUtils.toByteArray(this.getClass().getResourceAsStream(imageNode.asText()));
+			}
+			} catch (IOException e) {
+				throw new AppException("Can't read image-file from file", ErrorCode.UNXPECTED_ERROR, e);
+			}
+		}
+	}
+	
 
 	@Override
 	public String getApiPath() {
@@ -129,6 +149,10 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 		return node.asText();
 	}
 
+	@Override
+	public APIImage getApiImage() {
+		return apiImage;
+	}
 
 	public APIContract getApiContract() {
 		return apiContract;

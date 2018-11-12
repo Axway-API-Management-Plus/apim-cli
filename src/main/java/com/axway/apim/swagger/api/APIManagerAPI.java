@@ -3,9 +3,9 @@ package com.axway.apim.swagger.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +15,7 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
+import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -32,6 +33,7 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 		// Only try to load a Backend-API if we found an API in API-Manager
 		if(this.isValid) {
 			this.swaggerDefinition = new APISwaggerDefinion(getOriginalSwaggerFromAPIM());
+			this.apiImage = new APIImage(getAPIImageFromAPIM(), null);
 		}
 	}
 	public APIManagerAPI(JsonNode apiConfiguration) {
@@ -94,6 +96,20 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_SWAGGER_FILE, e);
 		}
 	}
+	
+	private byte[] getAPIImageFromAPIM() throws AppException {
+		URI uri;
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+getApiId()+"/image").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpEntity response = getRequest.execute().getEntity();
+			if(response == null) return null; // no Image found in API-Manager
+			InputStream is = response.getContent();
+			return IOUtils.toByteArray(is);
+		} catch (Exception e) {
+			throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
 
 	@Override
 	public String getApiVersion() {
@@ -142,5 +158,9 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 	@Override
 	public String getApiPath() {
 		return this.apiConfiguration.get("path").asText();
+	}
+	@Override
+	public APIImage getApiImage() {
+		return this.apiImage;
 	}
 }

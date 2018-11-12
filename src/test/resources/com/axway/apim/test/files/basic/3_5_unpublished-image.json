@@ -1,0 +1,40 @@
+	
+{
+	"apim": {
+		"name": "${apiName}",
+		"path": "${apiPath}",
+		"status": "unpublished",
+		"version": "1.0.0",
+		"image":"${image}",
+		"organization": {
+			"development": "API Development ${orgNumber}",
+			"target": [
+				"Community",
+				"Axway"
+			]
+		},
+		"authentication":[
+            {
+               "name":"API Key",
+               "type":"apiKey",
+               "order":0,
+               "properties":{
+                  "apiKeyFieldName":"KeyId",
+                  "takeFrom":"HEADER",
+                  "removeCredentialsOnSuccess":"false"
+               }
+            }
+         ]
+	},
+	"api": {
+		"modelName": "petstore.json",
+		"authentication": {
+			"name": "Basic Auth",
+			"type": "basicAuth",
+			"properties": {
+				"username": "test",
+				"password": "HEADER"
+			}
+		}
+	}
+}

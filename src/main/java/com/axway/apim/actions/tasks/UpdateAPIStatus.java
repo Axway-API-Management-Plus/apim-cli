@@ -1,7 +1,6 @@
 package com.axway.apim.actions.tasks;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import org.apache.http.HttpResponse;

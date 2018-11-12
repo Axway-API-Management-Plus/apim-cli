@@ -88,7 +88,7 @@ public class APIManagerAdapter {
 				throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE, false);
 			}			
 			if (changeState.isBreaking()) {
-				LOG.info("Recognized the following breaking changes: " + changeState.getBreakingChanges() + 
+				LOG.info("Recognized the following changes. Breaking: " + changeState.getBreakingChanges() + 
 						" plus Non-Breaking: " + changeState.getNonBreakingChanges());
 				if(changeState.getActualAPI().getStatus().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
 					LOG.error("Strategy: Applying ALL changes on existing UNPUBLISHED API.");
