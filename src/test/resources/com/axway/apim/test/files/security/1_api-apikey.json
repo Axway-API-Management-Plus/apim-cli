@@ -3,7 +3,7 @@
 	"apim": {
 		"name": "${apiName}",
 		"path": "${apiPath}",
-		"status": "unpublished",
+		"status": "${status}",
 		"version": "1.0.0",
 		"organization": {
 			"development": "API Development ${orgNumber}",
@@ -18,9 +18,9 @@
                "type":"apiKey",
                "order":0,
                "properties":{
-                  "apiKeyFieldName":"KeyId",
-                  "takeFrom":"HEADER",
-                  "removeCredentialsOnSuccess":"false"
+                  "apiKeyFieldName":"${apiKeyFieldName}",
+                  "takeFrom":"${takeFrom}",
+                  "removeCredentialsOnSuccess":"${removeCredentialsOnSuccess}"
                }
             }
          ]
