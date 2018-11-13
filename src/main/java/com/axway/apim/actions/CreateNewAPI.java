@@ -38,7 +38,7 @@ public class CreateNewAPI {
 		// ... here we basically need to add all props to initially bring the API in sync!
 		new UpdateAPIProxy(changes.getDesiredAPI(), createdAPI).execute(changedProps);
 		
-		// If image is include, update it
+		// If image is included, update it
 		if(changes.getDesiredAPI().getApiImage()!=null) {
 			new UpdateAPIImage(changes.getDesiredAPI(), createdAPI).execute();
 		}

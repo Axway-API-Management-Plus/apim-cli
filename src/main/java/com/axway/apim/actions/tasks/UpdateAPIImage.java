@@ -26,7 +26,11 @@ public class UpdateAPIImage extends AbstractAPIMTask implements IResponseParser 
 		super(desiredState, actualState);
 	}
 	public void execute() throws AppException {
-		LOG.info("Updating API-Image");
+		if(!desiredState.getApiImage().isValid()) {
+			LOG.info("No image configured, doing nothing.");
+			return;
+		}
+		LOG.info("Updating API-Image from: " + desiredState.getApiImage().getFilename());
 		
 		URI uri;
 		HttpEntity entity;

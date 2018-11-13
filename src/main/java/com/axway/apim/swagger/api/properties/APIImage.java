@@ -9,9 +9,14 @@ public class APIImage {
 	private byte[] imageContent = null;
 	
 	private String filename = null;
+	
+	private boolean isValid = true;
 
 	public APIImage(byte[] imageContent, String filename) {
 		this.imageContent = imageContent;
+		if(imageContent == null) {
+			this.isValid = false;
+		}
 		this.filename = filename;
 	}	
 	
@@ -40,5 +45,9 @@ public class APIImage {
 		} else {
 			return filename.substring(filename.lastIndexOf("/")+1);
 		}
+	}
+
+	public boolean isValid() {
+		return isValid;
 	}
 }
