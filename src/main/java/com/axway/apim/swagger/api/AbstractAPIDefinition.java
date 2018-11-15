@@ -11,12 +11,18 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.OutboundProfile;
+import com.axway.apim.swagger.api.properties.OutboundProfiles;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class AbstractAPIDefinition {
 	
 	protected CommandParameters cmd = CommandParameters.getInstance();
 	protected ObjectMapper objectMapper = new ObjectMapper();
+	
+	@APIPropertyAnnotation(isBreaking = true, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED})
+	protected OutboundProfiles outboundProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {}, 
@@ -68,4 +74,9 @@ public abstract class AbstractAPIDefinition {
 	public APISwaggerDefinion getSwaggerDefinition() {
 		return this.swaggerDefinition;
 	}
+
+	public OutboundProfiles getOutboundProfiles() {
+		return this.outboundProfiles;
+	}
+	
 }

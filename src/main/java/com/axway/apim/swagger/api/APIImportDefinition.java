@@ -19,6 +19,7 @@ import com.axway.apim.swagger.APIContract;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.desired.ImportOutboundProfiles;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -51,6 +52,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 		this.pathToSwagger = pathToSwagger;
 		this.swaggerDefinition = new APISwaggerDefinion(getSwaggerDefFromFile());
 		this.apiImage = new APIImage(getImageFromFile(), this.apiContract.getProperty("/apim/image").asText());
+		this.outboundProfiles = new ImportOutboundProfiles(apiContract.getProperty("/apim/outboundProfiles"));
 		this.isValid = true;
 	}
 	
@@ -68,7 +70,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 			if(jsonNode==null) LOG.error("Unable to read details for org: " + apiContract.getProperty("/apim/organization/development").asText());
 			return jsonNode.get(0).get("id").asText();
 		} catch (Exception e) {
-			throw new AppException("Can't read Org-Details from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Can't read Org-Details from API-Manager. Is the API-Managre running?", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	

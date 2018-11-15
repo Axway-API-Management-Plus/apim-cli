@@ -17,6 +17,7 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.exiting.APIMgrOutboundProfiles;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,6 +35,7 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 		if(this.isValid) {
 			this.swaggerDefinition = new APISwaggerDefinion(getOriginalSwaggerFromAPIM());
 			this.apiImage = new APIImage(getAPIImageFromAPIM(), null);
+			this.outboundProfiles = new APIMgrOutboundProfiles(apiConfiguration);
 		}
 	}
 	public APIManagerAPI(JsonNode apiConfiguration) {

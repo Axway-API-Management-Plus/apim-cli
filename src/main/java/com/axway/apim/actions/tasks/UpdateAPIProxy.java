@@ -1,6 +1,8 @@
 package com.axway.apim.actions.tasks;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
 
@@ -68,13 +70,24 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 					field = desired.getClass().getSuperclass().getDeclaredField(fieldName);
 					if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
 						APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
-						if(void.class != property.propHandler()) {
+						if(void.class != property.propHandler()) { // Properties going this way, must be migrated
+							
 							Class clazz = property.propHandler();
 							PropertyHandler propHandler = (PropertyHandler) clazz.newInstance();
 							lastJsonReponse = propHandler.handleProperty(desired, lastJsonReponse);
 							logMessage = logMessage + field.getName() + " ";
 						} else {
-							LOG.warn("Property: " + field.getName() + " has not handler configured and WILL NOT BE UPDATED!");
+							try {
+								String getterMethodName = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+								Method method = desired.getClass().getSuperclass().getMethod(getterMethodName, null);
+								Object handler = method.invoke(desired, null);
+								if(handler instanceof PropertyHandler) { // This is NEW/Preferred way
+									((PropertyHandler)handler).handleProperty(desired, lastJsonReponse);
+									logMessage = logMessage + field.getName() + " ";
+								}
+							} catch (Exception e) {
+								LOG.warn("Property: " + field.getName() + " has no handler configured and is not a propertyHandler");
+							}
 						}
 					}
 				} catch (Exception e) {

@@ -16,7 +16,7 @@ public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "Re-Import API with No-Change.")
+	@CitrusTest(name = "NoChangeAPITest")
 	public void setupDevOrgTest() {
 		description("Import an API and re-import it without any change. It must be detected, that no change happened.");
 		
