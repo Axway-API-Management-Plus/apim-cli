@@ -4,7 +4,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
-import com.axway.apim.swagger.api.properties.OutboundProfiles;
+import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfiles;
 
 public interface IAPIDefinition {
 	
@@ -20,8 +20,6 @@ public interface IAPIDefinition {
 	public String getStatus();
 	
 	public void setStatus(String status) throws AppException;
-
-	public APIAuthentication getAuthentication() throws AppException;
 	
 	public OutboundProfiles getOutboundProfiles() throws AppException;
 	

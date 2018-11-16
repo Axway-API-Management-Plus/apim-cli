@@ -1,6 +1,5 @@
 package com.axway.apim.swagger.api;
 
-import com.axway.apim.actions.tasks.props.APIAuthenticationPropertyHandler;
 import com.axway.apim.actions.tasks.props.APINamePropertyHandler;
 import com.axway.apim.actions.tasks.props.APIPathPropertyHandler;
 import com.axway.apim.actions.tasks.props.APISummaryPropertyHandler;
@@ -8,10 +7,13 @@ import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
-import com.axway.apim.swagger.api.properties.OutboundProfiles;
+import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfiles;
+import com.axway.apim.swagger.api.properties.corsprofiles.ImportCorsProfiles;
+import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfiles;
+import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfiles;
+import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfiles;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class AbstractAPIDefinition {
@@ -24,6 +26,14 @@ public abstract class AbstractAPIDefinition {
 	protected OutboundProfiles outboundProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED})
+	protected InboundProfiles inboundProfiles = null;
+	
+	@APIPropertyAnnotation(isBreaking = true, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED})
+	protected CorsProfiles corsProfiles;
+	
+	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {}, 
 			propHandler = APIPathPropertyHandler.class)
 	protected String apiPath = null;
@@ -33,9 +43,13 @@ public abstract class AbstractAPIDefinition {
 	protected String status = "NOT_SET";
 	
 	@APIPropertyAnnotation(isBreaking = true, 
+			writableStates = {})
+	protected SecurityProfiles securityProfiles = null;
+	
+/*	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {}, 
 			propHandler = APIAuthenticationPropertyHandler.class)
-	protected APIAuthentication authentication = null;
+	protected APIAuthentication authentication = null;*/
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
 	protected APISwaggerDefinion swaggerDefinition = null;
@@ -78,4 +92,14 @@ public abstract class AbstractAPIDefinition {
 		return this.outboundProfiles;
 	}
 	
+	public SecurityProfiles getSecurityProfiles() {
+		return this.securityProfiles;
+	}
+	public InboundProfiles getInboundProfiles() {
+		return this.inboundProfiles;
+	}
+
+	public CorsProfiles getCorsProfiles() {
+		return corsProfiles;
+	}
 }

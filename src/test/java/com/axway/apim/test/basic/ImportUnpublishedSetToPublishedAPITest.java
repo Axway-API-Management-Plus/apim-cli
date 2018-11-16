@@ -10,7 +10,7 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test
+@Test(testName="ImportUnpublishedSetToPublishedAPITest")
 public class ImportUnpublishedSetToPublishedAPITest extends TestNGCitrusTestDesigner {
 	
 	@Autowired
@@ -26,7 +26,8 @@ public class ImportUnpublishedSetToPublishedAPITest extends TestNGCitrusTestDesi
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");		
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/3_1_unpublished-api.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
+		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -47,7 +48,8 @@ public class ImportUnpublishedSetToPublishedAPITest extends TestNGCitrusTestDesi
 		
 		echo("####### Change API-State from Unpublished to Published #######");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/3_2_published-api.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
+		createVariable("status", "published");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

@@ -27,7 +27,7 @@ public class BackToPublishedFromDeprecatedTest extends TestNGCitrusTestDesigner 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");		
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable("status", "published");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/4_flexible-status-config2.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -49,7 +49,7 @@ public class BackToPublishedFromDeprecatedTest extends TestNGCitrusTestDesigner 
 		echo("####### Setting API: '${apiName}' on path: '${apiPath}' to deprecated #######");		
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable("status", "deprecated");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/4_flexible-status-config2.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -71,7 +71,7 @@ public class BackToPublishedFromDeprecatedTest extends TestNGCitrusTestDesigner 
 		echo("####### Going back to status Published  for API: '${apiName}' on path: '${apiPath}' #######");		
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable("status", "published");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/4_flexible-status-config2.json");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

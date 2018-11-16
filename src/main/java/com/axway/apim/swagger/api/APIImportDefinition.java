@@ -19,7 +19,10 @@ import com.axway.apim.swagger.APIContract;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
-import com.axway.apim.swagger.api.properties.desired.ImportOutboundProfiles;
+import com.axway.apim.swagger.api.properties.corsprofiles.ImportCorsProfiles;
+import com.axway.apim.swagger.api.properties.inboundprofiles.ImportInboundProfiles;
+import com.axway.apim.swagger.api.properties.outboundprofiles.ImportOutboundProfiles;
+import com.axway.apim.swagger.api.properties.securityprofiles.ImportSecurityProfiles;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -51,23 +54,26 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 		this.apiContract = apiContract;
 		this.pathToSwagger = pathToSwagger;
 		this.swaggerDefinition = new APISwaggerDefinion(getSwaggerDefFromFile());
-		this.apiImage = new APIImage(getImageFromFile(), this.apiContract.getProperty("/apim/image").asText());
-		this.outboundProfiles = new ImportOutboundProfiles(apiContract.getProperty("/apim/outboundProfiles"));
+		this.apiImage = new APIImage(getImageFromFile(), this.apiContract.getProperty("/image").asText());
+		this.inboundProfiles = new ImportInboundProfiles(apiContract.getProperty("/inboundProfiles"));
+		this.outboundProfiles = new ImportOutboundProfiles(apiContract.getProperty("/outboundProfiles"));
+		this.securityProfiles = new ImportSecurityProfiles(apiContract.getProperty("/securityProfiles"));
+		this.corsProfiles = new ImportCorsProfiles(apiContract.getProperty("/corsProfiles"));
 		this.isValid = true;
 	}
 	
 	@Override
 	public String getOrgId() throws AppException {
 		try {
-			LOG.info("Getting details for organization: " + apiContract.getProperty("/apim/organization/development").asText() + " from API-Manager!");
+			LOG.info("Getting details for organization: " + apiContract.getProperty("/organization/development").asText() + " from API-Manager!");
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/")
 					.setParameter("field", "name")
 					.setParameter("op", "eq")
-					.setParameter("value", apiContract.getProperty("/apim/organization/development").asText()).build();
+					.setParameter("value", apiContract.getProperty("/organization/development").asText()).build();
 			GETRequest getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
 			JsonNode jsonNode = objectMapper.readTree(response);
-			if(jsonNode==null) LOG.error("Unable to read details for org: " + apiContract.getProperty("/apim/organization/development").asText());
+			if(jsonNode==null) LOG.error("Unable to read details for org: " + apiContract.getProperty("/organization/development").asText());
 			return jsonNode.get(0).get("id").asText();
 		} catch (Exception e) {
 			throw new AppException("Can't read Org-Details from API-Manager. Is the API-Managre running?", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -83,7 +89,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	}
 	
 	private byte[] getImageFromFile() throws AppException {
-		JsonNode imageNode = this.apiContract.getProperty("/apim/image");
+		JsonNode imageNode = this.apiContract.getProperty("/image");
 		if(imageNode instanceof MissingNode) {
 			return null; // No image declared! Means we have to remove the image if one is present in API-Manager
 		} else {
@@ -105,14 +111,14 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 
 	@Override
 	public String getApiPath() {
-		JsonNode node = this.apiContract.getProperty("/apim/path");
+		JsonNode node = this.apiContract.getProperty("/path");
 		this.apiPath = node.asText();
 		return this.apiPath;
 	}
 
 	@Override
 	public String getStatus() {
-		JsonNode node = this.apiContract.getProperty("/apim/status");
+		JsonNode node = this.apiContract.getProperty("/status");
 		String myState = node.asText(); 
 		this.status = myState;
 		return this.status;
@@ -122,31 +128,22 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	public void setStatus(String status) throws AppException {
 		throw new AppException("Set status on ImportAPIDefinition not implemented.", ErrorCode.UNSUPPORTED_FEATURE);
 	}
-
-	@Override
-	public APIAuthentication getAuthentication() throws AppException {
-		ArrayNode authN = (ArrayNode)this.apiContract.getProperty("/apim/authentication");
-		this.authentication = new APIAuthentication(authN);
-		return this.authentication;
-	}
-	
-	
 	
 	@Override
 	public String getApiVersion() {
-		JsonNode node = this.apiContract.getProperty("/apim/version");
+		JsonNode node = this.apiContract.getProperty("/version");
 		return node.asText();
 	}
 
 	@Override
 	public String getApiName() {
-		JsonNode node = this.apiContract.getProperty("/apim/name");
+		JsonNode node = this.apiContract.getProperty("/name");
 		return node.asText();
 	}
 	
 	@Override
 	public String getApiSummary() {
-		JsonNode node = this.apiContract.getProperty("/apim/summary");
+		JsonNode node = this.apiContract.getProperty("/summary");
 		if(node instanceof MissingNode) return null;
 		return node.asText();
 	}

@@ -11,7 +11,7 @@ public class APIAuthenticationPropertyHandler implements PropertyHandler {
 		ArrayNode devices = (ArrayNode) ((ArrayNode) response.findPath("securityProfiles")).get(0).get("devices");
 		// We put all security devices from the desired state into the request
 		devices.removeAll();
-		devices.addAll((ArrayNode)desired.getAuthentication().getJsonConfig());
+		//devices.addAll((ArrayNode)desired.getAuthentication().getJsonConfig());
 		return response;
 	}
 }

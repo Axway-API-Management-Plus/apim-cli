@@ -2,7 +2,6 @@ package com.axway.apim.actions.tasks;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.List;
 
@@ -71,7 +70,6 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 					if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
 						APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
 						if(void.class != property.propHandler()) { // Properties going this way, must be migrated
-							
 							Class clazz = property.propHandler();
 							PropertyHandler propHandler = (PropertyHandler) clazz.newInstance();
 							lastJsonReponse = propHandler.handleProperty(desired, lastJsonReponse);

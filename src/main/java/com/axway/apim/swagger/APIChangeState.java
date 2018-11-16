@@ -71,8 +71,8 @@ public class APIChangeState {
 					Object desiredValue = method.invoke(desiredAPI, null);
 					Object actualValue = method2.invoke(actualAPI, null);
 					if(desiredValue == null && actualValue == null) continue;
-					// desiredValue == null - This can be used to reset/clean a property!
-					if(desiredValue == null || !desiredValue.equals(actualValue)) {
+					// desiredValue == null - This can be used to reset/clean a property! (Need to thinks about this!)
+					if(desiredValue == null || !actualValue.equals(desiredValue)) {
 						APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
 						if (property.isBreaking()) {
 							this.isBreaking = true;

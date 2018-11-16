@@ -1,11 +1,10 @@
-	
 {
-	"name": "${apiName}",
-	"path": "${apiPath}",
+	"name": "Test 6",
+	"path": "/test6",
 	"status": "unpublished",
 	"version": "1.0.0",
 	"organization": {
-		"development": "API Development ${orgNumber}",
+		"development": "API Development",
 		"target": [
 			"Community",
 			"Axway"
@@ -18,7 +17,37 @@
 			"monitorAPI": true,
 			"monitorSubject": "authentication.subject.id"
 		}
+	}, 
+	"outboundProfiles": {
+		"_default": {
+			"authenticationProfile": "_default",
+			"routeType": "policy",
+			"requestPolicy": null,
+			"responsePolicy": null,
+			"routePolicy": "Secure Headers",
+			"faultHandlerPolicy": null,
+			"apiId": null,
+			"apiMethodId": null,
+			"parameters": [
+			]
+		}
 	},
+	"corsProfiles": [
+		{
+			"name": "_default",
+			"isDefault": true,
+			"origins": [
+				"*"
+			],
+			"allowedHeaders": [
+			],
+			"exposedHeaders": [
+				"X-CorrelationID"
+			],
+			"supportCredentials": false,
+			"maxAgeSeconds": 10
+		}
+	],
     "securityProfiles": [
      	{
      		"name": "_default",

@@ -1,6 +1,5 @@
 package com.axway.apim.swagger.api;
 
-import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APIImage;
 
 public class APIBaseDefinition extends AbstractAPIDefinition implements IAPIDefinition {
@@ -18,12 +17,6 @@ public class APIBaseDefinition extends AbstractAPIDefinition implements IAPIDefi
 
 	@Override
 	public String getApiVersion() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public APIAuthentication getAuthentication() {
 		// TODO Auto-generated method stub
 		return null;
 	}

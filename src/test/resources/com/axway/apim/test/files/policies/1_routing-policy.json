@@ -1,54 +1,53 @@
 {
-	"apim": {
-		"name": "${apiName}",
-		"path": "${apiPath}",
-		"status": "unpublished",
-		"version": "1.0.0",
-		"organization": {
-			"development": "API Development ${orgNumber}",
-			"target": [
-				"Community",
-				"Axway"
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"status": "unpublished",
+	"version": "1.0.0",
+	"organization": {
+		"development": "API Development ${orgNumber}",
+		"target": [
+			"Community",
+			"Axway"
+		]
+	},
+	"inboundProfiles": {
+		"_default": {
+			"securityProfile": "_default",
+			"corsProfile": "_default",
+			"monitorAPI": true,
+			"monitorSubject": "authentication.subject.id"
+		}
+	},
+	"outboundProfiles": {
+		"_default": {
+			"authenticationProfile": "_default",
+			"routeType": "policy",
+			"requestPolicy": null,
+			"responsePolicy": null,
+			"routePolicy": "Secure Headers",
+			"faultHandlerPolicy": null,
+			"apiId": null,
+			"apiMethodId": null,
+			"parameters": [
 			]
-		},
-		"authentication":[
-            {
-               "name":"API Key",
-               "type":"apiKey",
-               "order":0,
-               "properties":{
-                  "apiKeyFieldName":"KeyId",
-                  "takeFrom":"HEADER",
-                  "removeCredentialsOnSuccess":"false"
-               }
-            }
-		],
-  "outboundProfiles": {
-    "_default": {
-      "authenticationProfile": "_default",
-      "routeType": "policy",
-      "requestPolicy": null,
-      "responsePolicy": null,
-      "routePolicy": "Client App Registry Protection Policy",
-      "faultHandlerPolicy": null,
-      "apiId": "e884aa29-0134-43ef-910b-d140aa991b8a",
-      "apiMethodId": null,
-      "parameters": [
-        
-      ]
-    },
-    "fc6a7d15-fdb7-49ba-932d-7da410ceb1d1": {
-      "apiId": "e884aa29-0134-43ef-910b-d140aa991b8a",
-      "apiMethodId": "78334737-7e6f-41f8-9e45-89f824a66bb2",
-      "authenticationProfile": null,
-      "routeType": "policy",
-      "requestPolicy": null,
-      "responsePolicy": null,
-      "routePolicy": "Client App Registry Protection Policy",
-      "parameters": [
-        
-      ]
-    }
-  }
-	}
+		}
+	},
+    "securityProfiles": [
+     	{
+     		"name": "_default",
+     		"isDefault": true,
+     		"devices": [
+     			{
+     				"name": "API Key",
+     				"type": "apiKey",
+     				"order": 0,
+     				"properties": {
+     					"apiKeyFieldName": "KeyId",
+     					"takeFrom": "QUERY",
+     					"removeCredentialsOnSuccess": "false"
+     				}
+     			}
+     		]
+     	}
+     ]
 }

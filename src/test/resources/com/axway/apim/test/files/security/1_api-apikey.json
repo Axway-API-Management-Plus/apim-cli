@@ -1,39 +1,32 @@
 	
 {
-	"apim": {
-		"name": "${apiName}",
-		"path": "${apiPath}",
-		"status": "${status}",
-		"version": "1.0.0",
-		"organization": {
-			"development": "API Development ${orgNumber}",
-			"target": [
-				"Community",
-				"Axway"
-			]
-		},
-		"authentication":[
-            {
-               "name":"API Key",
-               "type":"apiKey",
-               "order":0,
-               "properties":{
-                  "apiKeyFieldName":"${apiKeyFieldName}",
-                  "takeFrom":"${takeFrom}",
-                  "removeCredentialsOnSuccess":"${removeCredentialsOnSuccess}"
-               }
-            }
-         ]
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"status": "${status}",
+	"version": "1.0.0",
+	"organization": {
+		"development": "API Development ${orgNumber}",
+		"target": [
+			"Community",
+			"Axway"
+		]
 	},
-	"api": {
-		"modelName": "petstore.json",
-		"authentication": {
-			"name": "Basic Auth",
-			"type": "basicAuth",
-			"properties": {
-				"username": "test",
-				"password": "HEADER"
-			}
-		}
-	}
+    "securityProfiles": [
+     	{
+     		"name": "_default",
+     		"isDefault": true,
+     		"devices": [
+     			{
+     				"name": "API Key",
+     				"type": "apiKey",
+     				"order": 0,
+     				"properties": {
+     					"apiKeyFieldName": "${apiKeyFieldName}",
+     					"takeFrom": "${takeFrom}",
+     					"removeCredentialsOnSuccess": "${removeCredentialsOnSuccess}"
+     				}
+     			}
+     		]
+     	}
+     ]
 }

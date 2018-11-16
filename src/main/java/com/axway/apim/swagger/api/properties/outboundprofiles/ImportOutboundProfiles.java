@@ -1,4 +1,4 @@
-package com.axway.apim.swagger.api.properties.desired;
+package com.axway.apim.swagger.api.properties.outboundprofiles;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,15 +17,14 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.IAPIDefinition;
-import com.axway.apim.swagger.api.properties.OutboundProfile;
-import com.axway.apim.swagger.api.properties.OutboundProfiles;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ImportOutboundProfiles extends OutboundProfiles implements PropertyHandler {
 	
-	ObjectMapper objectMapper = new ObjectMapper();
+	
 	
 	private Map<String, String> apimRoutingPolicies = initPolicyies("routing");
 	private Map<String, String> apimRequestPolicies = initPolicyies("request");
@@ -33,26 +32,30 @@ public class ImportOutboundProfiles extends OutboundProfiles implements Property
 	private Map<String, String> apimFaultHandlerPolicies = initPolicyies("faulthandler");
 
 	public ImportOutboundProfiles(JsonNode config) throws AppException {
-		OutboundProfile profile;
-		this.outboundProfiles = new LinkedHashMap<String, Object>();
-		Iterator it = config.fields();
-		while(it.hasNext()) {
-			Map.Entry<String, Object> xy = (Map.Entry<String, Object>)it.next();
-			String key = xy.getKey().toString();
-			JsonNode profileNode = (JsonNode)xy.getValue();
-			profile = new OutboundProfile();
-			profile.setRequestPolicy(profileNode.get("requestPolicy")!=null ? this.apimRequestPolicies.get(profileNode.get("requestPolicy").asText()) : null);
-			profile.setResponsePolicy(profileNode.get("responsePolicy")!=null ? this.apimResponsePolicies.get(profileNode.get("responsePolicy").asText()) : null);
-			profile.setRoutePolicy(profileNode.get("routePolicy")!=null ? this.apimRoutingPolicies.get(profileNode.get("routePolicy").asText()) : null);
-			profile.setFaultHandlerPolicy(profileNode.get("faultHandlerPolicy")!=null ? this.apimFaultHandlerPolicies.get(profileNode.get("faultHandlerPolicy").asText()) : null);
-			this.outboundProfiles.put(key, profile);
+		if(config instanceof MissingNode) {
+			 this.outboundProfiles = new LinkedHashMap<String, OutboundProfile>();
+			return;
+		}
+		try {
+			this.outboundProfiles = objectMapper.readValue( config.toString(), new TypeReference<Map<String,OutboundProfile>>(){} );
+		} catch (Exception e) {
+			throw new AppException("Cant process outbound profiles", ErrorCode.UNXPECTED_ERROR, e);
+		}
+		Iterator<String> it = outboundProfiles.keySet().iterator();
+		while (it.hasNext()) {
+			String name = it.next();
+			OutboundProfile profile = this.outboundProfiles.get(name);
+			profile.setRequestPolicy(this.apimRequestPolicies.get(profile.getRequestPolicy()));
+			profile.setResponsePolicy(this.apimResponsePolicies.get(profile.getResponsePolicy()));
+			profile.setRoutePolicy(this.apimRoutingPolicies.get(profile.getRoutePolicy()));
+			profile.setFaultHandlerPolicy(this.apimFaultHandlerPolicies.get(profile.getFaultHandlerPolicy()));
 		}
 	}
 
 	@Override
 	public JsonNode handleProperty(IAPIDefinition desired, JsonNode response) throws AppException {
 		if(this.outboundProfiles.size()!=0) {
-			((ObjectNode)response).put("outboundProfiles", objectMapper.valueToTree(this.outboundProfiles));
+			((ObjectNode)response).replace("outboundProfiles", objectMapper.valueToTree(this.outboundProfiles));
 		}
 		return response;
 	}

@@ -1,4 +1,4 @@
-package com.axway.apim.test.basic;
+package com.axway.apim.test.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,29 +10,29 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="IntiallyPublishedAPITest")
-public class IntiallyPublishedAPITest extends TestNGCitrusTestDesigner {
+//@Test(testName="NoAuthenticationGivenTest")
+public class NoAuthenticationGivenTest extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "Initially Pusblished API.")
+	//@CitrusTest(name = "NoAuthenticationGivenTest")
 	public void setupDevOrgTest() {
-		description("Import an API which initially has the status published.");
+		description("Verify no error appears, if Authentication is not configured! Must be Passthrough");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/initially-published-${apiNumber}");
-		variable("apiName", "Initially-Published-API-${apiNumber}");
+		variable("apiPath", "/no-authn-test-${apiNumber}");
+		variable("apiName", "No AuthN Test ${apiNumber}");
+		variable("status", "unpublished");
+		
 
-		
-		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/2_initially_published.json");
+		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/security/2_no_authn.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
-		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' with Passthrough-Security #######");
 		http().client("apiManager")
 			.send()
 			.get("/proxies")
@@ -44,11 +44,9 @@ public class IntiallyPublishedAPITest extends TestNGCitrusTestDesigner {
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "published")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].type", "apiKey")
+			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].type", "none")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
-		
-		//echo("citrus:message(response.payload(), )");
 	}
 
 }

@@ -14,10 +14,12 @@ import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
-import com.axway.apim.swagger.api.properties.exiting.APIMgrOutboundProfiles;
+import com.axway.apim.swagger.api.properties.corsprofiles.APIMgrCorsProfiles;
+import com.axway.apim.swagger.api.properties.inboundprofiles.APIMgrInboundProfiles;
+import com.axway.apim.swagger.api.properties.outboundprofiles.APIMgrOutboundProfiles;
+import com.axway.apim.swagger.api.properties.securityprofiles.APIMgrSecurityProfiles;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -36,6 +38,9 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 			this.swaggerDefinition = new APISwaggerDefinion(getOriginalSwaggerFromAPIM());
 			this.apiImage = new APIImage(getAPIImageFromAPIM(), null);
 			this.outboundProfiles = new APIMgrOutboundProfiles(apiConfiguration);
+			this.inboundProfiles = new APIMgrInboundProfiles(apiConfiguration);
+			this.securityProfiles = new APIMgrSecurityProfiles(apiConfiguration);
+			this.corsProfiles = new APIMgrCorsProfiles(apiConfiguration);
 		}
 	}
 	public APIManagerAPI(JsonNode apiConfiguration) {
@@ -116,14 +121,6 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 	@Override
 	public String getApiVersion() {
 		return this.apiConfiguration.get("version").asText();
-	}
-
-	@Override
-	public APIAuthentication getAuthentication() throws AppException {
-		if(authentication==null) {
-			this.authentication = new APIAuthentication(this.apiConfiguration.get("securityProfiles").get(0).get("devices"));
-		}
-		return this.authentication;
 	}
 
 	@Override

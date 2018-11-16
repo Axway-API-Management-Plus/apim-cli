@@ -1,4 +1,8 @@
-package com.axway.apim.swagger.api.properties;
+package com.axway.apim.swagger.api.properties.outboundprofiles;
+
+import java.util.Arrays;
+
+import org.apache.commons.lang.StringUtils;
 
 public class OutboundProfile {
 	String routeType;
@@ -13,18 +17,22 @@ public class OutboundProfile {
 	
 	String apiMethodId;
 	
+	String apiId;
+	
 	String authenticationProfile;
+	
+	String[] parameters;
 
 	public String getAuthenticationProfile() {
 		return "_default"; // For now, nothing else is supported!
 	}
 
+	public void setAuthenticationProfile(String authenticationProfile) {
+		this.authenticationProfile = authenticationProfile;
+	}
+
 	public String getRouteType() {
-		if(this.routePolicy!=null && !this.routePolicy.equals("null")) {
-			return "policy";
-		} else {
-			return "proxy";
-		}
+		return this.routeType;
 	}
 
 	public void setRouteType(String routeType) {
@@ -71,20 +79,38 @@ public class OutboundProfile {
 		this.apiMethodId = apiMethodId;
 	}
 
+	public String getApiId() {
+		return apiId;
+	}
+
+	public void setApiId(String apiId) {
+		this.apiId = apiId;
+	}
+
+	public String[] getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(String[] parameters) {
+		this.parameters = parameters;
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
 		if(other instanceof OutboundProfile) {
+			
 			OutboundProfile otherOutboundProfile = (OutboundProfile)other;
-			if(!otherOutboundProfile.getFaultHandlerPolicy().equals(this.getFaultHandlerPolicy())) return false;
-			if(!otherOutboundProfile.getRequestPolicy().equals(this.getRequestPolicy())) return false;
-			if(!otherOutboundProfile.getResponsePolicy().equals(this.getResponsePolicy())) return false;
-			if(!otherOutboundProfile.getRoutePolicy().equals(this.getRoutePolicy())) return false;
+
+			return
+				StringUtils.equals(otherOutboundProfile.getFaultHandlerPolicy(), this.getFaultHandlerPolicy()) &&
+				StringUtils.equals(otherOutboundProfile.getRequestPolicy(), this.getRequestPolicy()) &&
+				StringUtils.equals(otherOutboundProfile.getResponsePolicy(), this.getResponsePolicy()) &&
+				StringUtils.equals(otherOutboundProfile.getRoutePolicy(), this.getRoutePolicy()) &&
+				StringUtils.equals(otherOutboundProfile.getRouteType(), this.getRouteType()) &&
+				Arrays.equals(otherOutboundProfile.getParameters(), this.getParameters());
 		} else {
 			return false;
 		}
-		return true;
 	}
-	
-	
 }
