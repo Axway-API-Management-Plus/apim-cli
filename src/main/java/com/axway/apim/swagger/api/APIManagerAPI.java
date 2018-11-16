@@ -140,6 +140,7 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 
 	@Override
 	public String getStatus() {
+		if(this.apiConfiguration.get("deprecated").asBoolean()) return IAPIDefinition.STATE_DEPRECATED;
 		return this.apiConfiguration.get("state").asText();
 	}
 	

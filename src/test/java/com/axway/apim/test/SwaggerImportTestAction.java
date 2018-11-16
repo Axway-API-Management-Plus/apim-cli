@@ -47,7 +47,7 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 		try {
 			enforce = context.getVariable("enforce");
 		} catch (Exception ignore) {};
-		System.out.println("Expected RC: " + expectedReturnCode);
+
 		String[] args = new String[] { 
 				"-a", swaggerFile, 
 				"-c", configFile, 

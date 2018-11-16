@@ -11,7 +11,6 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
-import com.axway.apim.swagger.api.properties.OutboundProfile;
 import com.axway.apim.swagger.api.properties.OutboundProfiles;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
