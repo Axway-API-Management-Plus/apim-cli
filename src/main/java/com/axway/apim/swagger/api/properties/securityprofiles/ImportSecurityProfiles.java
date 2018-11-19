@@ -15,13 +15,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ImportSecurityProfiles extends SecurityProfiles implements PropertyHandler {
 
 	public ImportSecurityProfiles(JsonNode config) throws AppException {
-		if(config instanceof MissingNode) return;
+		if(config instanceof MissingNode) {
+			this.securityProfiles = new Vector<SecurityProfile>();
+			securityProfiles.add(createPassthroughSecurity());
+			return;
+		}
 		try {
 			this.securityProfiles = objectMapper.readValue( config.toString(), new TypeReference<List<SecurityProfile>>(){} );
 		} catch (Exception e) {
 			throw new AppException("Cant process security profiles", ErrorCode.UNXPECTED_ERROR, e);
 		} 
-		
 	}
 
 	@Override
@@ -30,5 +33,18 @@ public class ImportSecurityProfiles extends SecurityProfiles implements Property
 			((ObjectNode)response).replace("securityProfiles", objectMapper.valueToTree(this.securityProfiles));
 		}
 		return response;
+	}
+	
+	private SecurityProfile createPassthroughSecurity() {
+		SecurityProfile passthroughProfile = new SecurityProfile();
+		passthroughProfile.setName("_default");
+		passthroughProfile.setIsDefault("true");
+		SecurityDevice passthroughDevice = new SecurityDevice();
+		passthroughDevice.setName("Pass Through");
+		passthroughDevice.setType("passThrough");
+		passthroughDevice.getProperties().put("subjectIdFieldName", "Pass Through");
+		passthroughDevice.getProperties().put("removeCredentialsOnSuccess", true);
+		passthroughProfile.getDevices().add(passthroughDevice);
+		return passthroughProfile;
 	}
 }

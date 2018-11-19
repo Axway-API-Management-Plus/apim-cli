@@ -1,14 +1,12 @@
 package com.axway.apim.swagger.api.properties.inboundprofiles;
 
-import java.util.Arrays;
-
 import org.apache.commons.lang.StringUtils;
 
 public class InboundProfile {
 	
-	String monitorAPI;
+	String monitorAPI = "true";
 	
-	String monitorSubject;
+	String monitorSubject = "authentication.subject.id";
 	
 	String securityProfile;
 	

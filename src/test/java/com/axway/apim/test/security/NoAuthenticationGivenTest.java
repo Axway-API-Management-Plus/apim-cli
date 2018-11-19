@@ -10,13 +10,13 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-//@Test(testName="NoAuthenticationGivenTest")
+@Test(testName="NoAuthenticationGivenTest")
 public class NoAuthenticationGivenTest extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	//@CitrusTest(name = "NoAuthenticationGivenTest")
+	@CitrusTest(name = "NoAuthenticationGivenTest")
 	public void setupDevOrgTest() {
 		description("Verify no error appears, if Authentication is not configured! Must be Passthrough");
 		
@@ -45,7 +45,7 @@ public class NoAuthenticationGivenTest extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].type", "none")
+			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].type", "passThrough")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 	}
 

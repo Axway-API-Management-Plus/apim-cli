@@ -1,5 +1,6 @@
 package com.axway.apim.swagger.api.properties.securityprofiles;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SecurityDevice {
@@ -7,9 +8,16 @@ public class SecurityDevice {
 	
 	String type;
 	
-	String order;
+	String order = "1";
 	
-	Map<String, String> properties;
+	Map<String, Object> properties;
+	
+	
+
+	public SecurityDevice() {
+		super();
+		this.properties = new LinkedHashMap<String, Object>();
+	}
 
 	public String getName() {
 		return name;
@@ -35,11 +43,11 @@ public class SecurityDevice {
 		this.order = order;
 	}
 
-	public Map<String, String> getProperties() {
+	public Map<String, Object> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(Map<String, String> properties) {
+	public void setProperties(Map<String, Object> properties) {
 		this.properties = properties;
 	}
 	

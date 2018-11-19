@@ -1,6 +1,6 @@
 package com.axway.apim.swagger.api.properties.securityprofiles;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -12,6 +12,13 @@ public class SecurityProfile {
 	String isDefault;
 	
 	List<SecurityDevice> devices;
+	
+	
+
+	public SecurityProfile() {
+		super();
+		this.devices = new ArrayList<SecurityDevice>();
+	}
 
 	public String getName() {
 		return name;

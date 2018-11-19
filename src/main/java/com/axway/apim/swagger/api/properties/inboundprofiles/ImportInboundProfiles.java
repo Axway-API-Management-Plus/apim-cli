@@ -1,5 +1,6 @@
 package com.axway.apim.swagger.api.properties.inboundprofiles;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.axway.apim.actions.tasks.props.PropertyHandler;
@@ -14,7 +15,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ImportInboundProfiles extends InboundProfiles implements PropertyHandler {
 
 	public ImportInboundProfiles(JsonNode config) throws AppException {
-		if(config instanceof MissingNode) return;
+		if(config instanceof MissingNode) {
+			this.inboundProfiles = new LinkedHashMap<String, InboundProfile>();
+			this.inboundProfiles.put("_default", getDefaultPassthroughProfile());
+			return;
+		}
 		try {
 			this.inboundProfiles = objectMapper.readValue( config.toString(), new TypeReference<Map<String, InboundProfile>>(){} );
 		} catch (Exception e) {
@@ -28,5 +33,12 @@ public class ImportInboundProfiles extends InboundProfiles implements PropertyHa
 			((ObjectNode)response).replace("inboundProfiles", objectMapper.valueToTree(this.inboundProfiles));
 		}
 		return response;
+	}
+	
+	private InboundProfile getDefaultPassthroughProfile() {
+		InboundProfile passthroughProfile = new InboundProfile();
+		passthroughProfile.setCorsProfile("_default");
+		passthroughProfile.setSecurityProfile("_default");
+		return passthroughProfile;
 	}
 }
