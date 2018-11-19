@@ -38,9 +38,7 @@ Build and tested with API-Manager 7.6.2 SP1 at Travis CI: [![Build Status](https
 
 
 ## Limitations/Caveats
-- Enabling / Disabling of Client-IDs isn't supported, as Auth0 doesn't support it
-- API-Portal customizing is not described / included
-- displaying the generated secret would be part of API-Portal customizing as well
+- see the not completed features
 
 ## Contributing
 
