@@ -24,6 +24,7 @@ Today the following is already supported:
 - CORS-Setup
 
 The following is on the roadmap:
+- V-Host support
 - API-description
 - API-Method description
 - Tags
