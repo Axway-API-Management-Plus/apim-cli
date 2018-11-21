@@ -32,7 +32,7 @@ public class OutboundProfile {
 	}
 
 	public String getRouteType() {
-		if(this.requestPolicy!=null && !this.requestPolicy.equals("")) {
+		if(this.routePolicy!=null && !this.routePolicy.equals("")) {
 			return "policy";
 		} else {
 			return "proxy";
