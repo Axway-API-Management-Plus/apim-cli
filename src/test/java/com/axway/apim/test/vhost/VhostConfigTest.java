@@ -1,0 +1,78 @@
+package com.axway.apim.test.vhost;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.testng.annotations.Test;
+
+import com.axway.apim.test.SwaggerImportTestAction;
+import com.consol.citrus.annotations.CitrusTest;
+import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
+import com.consol.citrus.functions.core.RandomNumberFunction;
+import com.consol.citrus.message.MessageType;
+
+@Test(testName="VhostConfigTest")
+public class VhostConfigTest extends TestNGCitrusTestDesigner {
+	
+	@Autowired
+	private SwaggerImportTestAction swaggerImport;
+	
+	@CitrusTest(name = "VhostConfigTest")
+	public void setupDevOrgTest() {
+		description("Test a Request-Policy");
+		
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiPath", "/api-key-test-${apiNumber}");
+		variable("apiName", "API Key Test ${apiNumber}");
+		variable("status", "unpublished");
+		
+
+		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
+		createVariable("status", "unpublished");
+		createVariable("vhost", "api123.customer.com");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/vhost/1_vhost-config.json");
+		createVariable("expectedReturnCode", "87");
+		action(swaggerImport);
+		
+		// Search for the API anyway!
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has correct settings #######");
+		http().client("apiManager")
+			.send()
+			.get("/proxies")
+			.name("api")
+			.header("Content-Type", "application/json");
+
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.OK)
+			.messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+			.validate("$.[?(@.path=='${apiPath}')].vhost", null)
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+		
+		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
+		createVariable("status", "published");
+		createVariable("vhost", "api123.customer.com");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/vhost/1_vhost-config.json");
+		createVariable("expectedReturnCode", "0");
+		action(swaggerImport);
+		
+		// Search for the API anyway!
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has correct settings #######");
+		http().client("apiManager")
+			.send()
+			.get("/proxies/${apiId}")
+			.name("api")
+			.header("Content-Type", "application/json");
+
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.OK)
+			.messageType(MessageType.JSON)
+			.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
+			.validate("$.[?(@.id=='${apiId}')].state", "published")
+			.validate("$.[?(@.id=='${apiId}')].vhost", "api123.customer.com");
+	}
+}

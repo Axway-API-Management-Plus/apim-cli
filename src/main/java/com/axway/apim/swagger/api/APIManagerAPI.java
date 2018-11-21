@@ -137,7 +137,8 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 
 	@Override
 	public String getStatus() {
-		if(this.apiConfiguration.get("deprecated").asBoolean()) return IAPIDefinition.STATE_DEPRECATED;
+		if(this.apiConfiguration.get("deprecated")!=null 
+				&& this.apiConfiguration.get("deprecated").asBoolean()) return IAPIDefinition.STATE_DEPRECATED;
 		return this.apiConfiguration.get("state").asText();
 	}
 	
@@ -159,6 +160,12 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 	public String getApiPath() {
 		return this.apiConfiguration.get("path").asText();
 	}
+	
+	@Override
+	public String getVhost() {
+		return this.apiConfiguration.get("vhost").asText();
+	}
+	
 	@Override
 	public APIImage getApiImage() {
 		return this.apiImage;

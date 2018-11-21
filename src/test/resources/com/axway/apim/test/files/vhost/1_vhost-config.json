@@ -1,0 +1,15 @@
+	
+{
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"status": "${status}",
+	"vhost": "${vhost}",
+	"version": "1.0.0",
+	"organization": {
+		"development": "API Development ${orgNumber}",
+		"target": [
+			"Community",
+			"Axway"
+		]
+	}
+}

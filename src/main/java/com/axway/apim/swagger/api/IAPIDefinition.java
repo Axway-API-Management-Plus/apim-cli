@@ -31,6 +31,8 @@ public interface IAPIDefinition {
 	
 	public String getApiSummary();
 	
+	public String getVhost();
+	
 	public String getApiId() throws AppException;
 	
 	public APIImage getApiImage();

@@ -145,6 +145,13 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 		if(node instanceof MissingNode) return null;
 		return node.asText();
 	}
+	
+	@Override
+	public String getVhost() {
+		JsonNode node = this.apiContract.getProperty("/vhost");
+		if(node instanceof MissingNode) return null;
+		return node.asText();
+	}
 
 	@Override
 	public APIImage getApiImage() {

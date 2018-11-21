@@ -3,6 +3,7 @@ package com.axway.apim.swagger.api;
 import com.axway.apim.actions.tasks.props.APINamePropertyHandler;
 import com.axway.apim.actions.tasks.props.APIPathPropertyHandler;
 import com.axway.apim.actions.tasks.props.APISummaryPropertyHandler;
+import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
@@ -45,10 +46,10 @@ public abstract class AbstractAPIDefinition {
 			writableStates = {})
 	protected SecurityProfiles securityProfiles = null;
 	
-/*	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {}, 
-			propHandler = APIAuthenticationPropertyHandler.class)
-	protected APIAuthentication authentication = null;*/
+	@APIPropertyAnnotation(isBreaking = true, 
+			writableStates = {IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
+			propHandler = VhostPropertyHandler.class)
+	protected String vhost = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
 	protected APISwaggerDefinion swaggerDefinition = null;
@@ -100,5 +101,9 @@ public abstract class AbstractAPIDefinition {
 
 	public CorsProfiles getCorsProfiles() {
 		return corsProfiles;
+	}
+
+	public String getVhost() {
+		return vhost;
 	}
 }

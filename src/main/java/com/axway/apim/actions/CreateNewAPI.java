@@ -5,12 +5,16 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Vector;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.CreateAPIProxy;
 import com.axway.apim.actions.tasks.ImportBackendAPI;
 import com.axway.apim.actions.tasks.UpdateAPIImage;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
+import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
@@ -20,11 +24,18 @@ import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class CreateNewAPI {
+	
+	static Logger LOG = LoggerFactory.getLogger(CreateNewAPI.class);
 
 	public void execute(APIChangeState changes) throws AppException {
 		
 		Transaction context = Transaction.getInstance();
 		context.beginTransaction();
+		
+		// Force to initially update the API into the desired state!
+		List<String> changedProps = getAllProps(changes.getDesiredAPI());
+		
+		VhostPropertyHandler vHostHandler = new VhostPropertyHandler(changedProps);
 		
 		new ImportBackendAPI(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 
@@ -33,8 +44,7 @@ public class CreateNewAPI {
 		//((APIManagerAPI)changes.getActualAPI()).setApiConfiguration((JsonNode)context.get("lastResponse"));
 		IAPIDefinition createdAPI = new APIManagerAPI((JsonNode)context.get("lastResponse"));
 		changes.setIntransitAPI(createdAPI);
-		// Force to initially update the API into the desired state!
-		List<String> changedProps = getAllProps(changes.getDesiredAPI());
+
 		// ... here we basically need to add all props to initially bring the API in sync!
 		new UpdateAPIProxy(changes.getDesiredAPI(), createdAPI).execute(changedProps);
 		
@@ -42,9 +52,10 @@ public class CreateNewAPI {
 		if(changes.getDesiredAPI().getApiImage()!=null) {
 			new UpdateAPIImage(changes.getDesiredAPI(), createdAPI).execute();
 		}
-		
 		// This is special, as the status is not a property and requires some additional actions!
 		new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI).execute();
+		
+		vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
 	}
 	
 	/**

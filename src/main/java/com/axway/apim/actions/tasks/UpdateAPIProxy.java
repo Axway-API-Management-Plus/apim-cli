@@ -9,7 +9,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -84,7 +83,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 	
 	private static JsonNode handledChangedProps(JsonNode lastJsonReponse, IAPIDefinition desired, List<String> changedProps) throws AppException {
 		Field field = null;
-		if(changedProps!=null) {
+		if(changedProps!=null && changedProps.size()!=0) {
 			String logMessage = "Updating proxy for the following props: ";
 			for(String fieldName : changedProps) {
 				try {
