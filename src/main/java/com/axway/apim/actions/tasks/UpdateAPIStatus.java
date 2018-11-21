@@ -13,6 +13,7 @@ import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIBaseDefinition;
+import com.axway.apim.swagger.api.APIManagerAPI;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
@@ -67,11 +68,6 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 		RestAPICall apiCall;
 		
 		try {
-			/*JsonNode lastJsonReponse = (JsonNode)context.get("lastResponse");
-			if(lastJsonReponse==null) { // This class is called as the first, so, first load the API
-				lastJsonReponse = initActualAPIContext(actualState);
-			}*/
-
 			String[] possibleStatus = statusChangeMap.get(actualState.getStatus());
 			String intermediateState = null;
 			boolean statusMovePossible = false;
@@ -111,6 +107,12 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 						.build();
 				apiCall = new DELRequest(uri, this);
 				context.put("action", "apiDeleted");
+				apiCall.execute();
+				// Additionally we need to delete the BE-API
+				uri = new URIBuilder(cmd.getAPIManagerURL())
+						.setPath(RestAPICall.API_VERSION+"/apirepo/"+((APIManagerAPI)actualState).getBackendApiId())
+						.build();
+				apiCall = new DELRequest(uri, this);
 				apiCall.execute();
 			} else {
 				uri = new URIBuilder(cmd.getAPIManagerURL())

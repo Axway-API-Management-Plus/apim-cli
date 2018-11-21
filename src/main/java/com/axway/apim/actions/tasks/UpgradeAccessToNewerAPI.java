@@ -1,8 +1,6 @@
 package com.axway.apim.actions.tasks;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Vector;
 

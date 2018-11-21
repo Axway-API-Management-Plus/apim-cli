@@ -46,7 +46,8 @@ public class PublishedSubscribeUpgradeAPITest extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"); // Remember the API-ID
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId") // Remember the API-ID --> This is the FE-API
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].apiId", "beApiId"); // This is the BE-API
 		
 		// Subscribe to that API!
 		echo("####### Subscribing API: ${apiName} with test-application: ${testAppName} #######");
@@ -95,6 +96,28 @@ public class PublishedSubscribeUpgradeAPITest extends TestNGCitrusTestDesigner {
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.apiId=='${newApiId}')].enabled", "true");
+		
+		echo("####### Validate the previous FE-API has been deleted #######");
+		http().client("apiManager")
+			.send()
+			.get("/proxies/${apiId}")
+			.name("api")
+			.header("Content-Type", "application/json");
+		
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.FORBIDDEN);
+		
+		echo("####### Validate the previous BE-API has been deleted #######");
+		http().client("apiManager")
+			.send()
+			.get("/apirepo/${beApiId}")
+			.name("api")
+			.header("Content-Type", "application/json");
+		
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.FORBIDDEN);
 	}
 
 }
