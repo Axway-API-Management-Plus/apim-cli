@@ -22,9 +22,9 @@ Today the following is already supported:
   - Routing, Request, Response
 - Outbound Authentication
 - CORS-Setup
+- V-Host support
 
 The following is on the roadmap:
-- V-Host support
 - API-description
 - API-Method description
 - Tags
