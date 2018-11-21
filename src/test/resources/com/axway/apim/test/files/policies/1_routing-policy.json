@@ -20,7 +20,6 @@
 	},
 	"outboundProfiles": {
 		"_default": {
-			"routeType": "policy",
 			"routePolicy": "${routePolicy}"
 		}
 	},

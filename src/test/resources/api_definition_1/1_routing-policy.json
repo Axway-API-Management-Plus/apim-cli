@@ -26,7 +26,6 @@
   "outboundProfiles": {
     "_default": {
       "authenticationProfile": "_default",
-      "routeType": "policy",
       "requestPolicy": null,
       "responsePolicy": null,
       "routePolicy": "Client App Registry Protection Policy",

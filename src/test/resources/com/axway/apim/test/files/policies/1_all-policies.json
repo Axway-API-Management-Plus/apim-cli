@@ -21,7 +21,6 @@
 	"outboundProfiles": {
 		"_default": {
 			"authenticationProfile": "_default",
-			"routeType": "policy",
 			"requestPolicy": "${requestPolicy}",
 			"responsePolicy": "${responsePolicy}",
 			"routePolicy": "${routePolicy}",
