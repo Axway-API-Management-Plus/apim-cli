@@ -45,10 +45,10 @@ public class ImportOutboundProfiles extends OutboundProfiles implements Property
 		while (it.hasNext()) {
 			String name = it.next();
 			OutboundProfile profile = this.outboundProfiles.get(name);
-			profile.setRequestPolicy(getPolicy(this.apimRequestPolicies, profile.getRequestPolicy()));
-			profile.setResponsePolicy(getPolicy(this.apimResponsePolicies, profile.getResponsePolicy()));
-			profile.setRoutePolicy(getPolicy(this.apimRoutingPolicies, profile.getRoutePolicy()));
-			profile.setFaultHandlerPolicy(getPolicy(this.apimFaultHandlerPolicies, profile.getFaultHandlerPolicy()));
+			profile.setRequestPolicy(getPolicy(this.apimRequestPolicies, profile.getRequestPolicy(), "request"));
+			profile.setResponsePolicy(getPolicy(this.apimResponsePolicies, profile.getResponsePolicy(), "response"));
+			profile.setRoutePolicy(getPolicy(this.apimRoutingPolicies, profile.getRoutePolicy(), "routing"));
+			profile.setFaultHandlerPolicy(getPolicy(this.apimFaultHandlerPolicies, profile.getFaultHandlerPolicy(), "fault handler"));
 		}
 	}
 
@@ -84,10 +84,11 @@ public class ImportOutboundProfiles extends OutboundProfiles implements Property
 		return policies;
 	}
 	
-	private String getPolicy(Map<String, String> policies, String policyName) throws AppException {
+	private String getPolicy(Map<String, String> policies, String policyName, String type) throws AppException {
 		if(policyName == null) return policyName; // Do nothing if no policy is configured
 		String policy = policies.get(policyName);
 		if(policy == null) {
+			LOG.error("Available "+type+" policies: " + policies.keySet());
 			throw new AppException("The policy: '" + policyName + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
 		}
 		return policy;
