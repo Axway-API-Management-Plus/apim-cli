@@ -7,7 +7,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,10 +60,10 @@ public abstract class RestAPICall {
 			
 	}
 	
-	protected CloseableHttpResponse sendRequest(HttpUriRequest request) throws AppException {
+	protected HttpResponse sendRequest(HttpUriRequest request) throws AppException {
 		try {
 			APIMHttpClient apimClient = APIMHttpClient.getInstance();
-			CloseableHttpResponse response = apimClient.getHttpClient().execute(request, apimClient.getClientContext());
+			HttpResponse response = apimClient.getHttpClient().execute(request, apimClient.getClientContext());
 			return response;
 		} catch (ClientProtocolException e) {
 			throw new AppException("Unable to send HTTP-Request.", ErrorCode.CANT_SEND_HTTP_REQUEST, e);

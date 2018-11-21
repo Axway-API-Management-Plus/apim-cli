@@ -10,6 +10,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -21,7 +22,6 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
@@ -34,7 +34,7 @@ public class APIMHttpClient {
 	
 	private static APIMHttpClient instance;
 	
-	private CloseableHttpClient httpClient;
+	private HttpClient httpClient;
 	private HttpClientContext clientContext;
 	
 	public static APIMHttpClient getInstance() throws AppException {
@@ -90,7 +90,7 @@ public class APIMHttpClient {
 
 	}
 
-	public CloseableHttpClient getHttpClient() {
+	public HttpClient getHttpClient() {
 		return httpClient;
 	}
 	

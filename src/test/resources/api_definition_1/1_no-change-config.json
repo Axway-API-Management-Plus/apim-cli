@@ -24,7 +24,7 @@
 			"routeType": "policy",
 			"requestPolicy": null,
 			"responsePolicy": null,
-			"routePolicy": "Secure Headers",
+			"routePolicy": "Routing policy 1",
 			"faultHandlerPolicy": null,
 			"apiId": null,
 			"apiMethodId": null,
