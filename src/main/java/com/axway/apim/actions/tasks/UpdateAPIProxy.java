@@ -62,7 +62,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		String response = null;
 		try {
 			response = EntityUtils.toString(httpResponse.getEntity());
-			String backendAPIId = JsonPath.parse(response).read("$.2id", String.class);
+			String backendAPIId = JsonPath.parse(response).read("$.id", String.class);
 			Transaction.getInstance().put("backendAPIId", backendAPIId);
 		} catch (Exception e) {
 			try {
