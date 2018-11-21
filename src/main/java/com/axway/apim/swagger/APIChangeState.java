@@ -62,8 +62,8 @@ public class APIChangeState {
 		if(!actualAPI.isValid()) {
 			return; //Nothing to do, as we don't have an existing API
 		}
-		try {
-			for (Field field : desiredAPI.getClass().getSuperclass().getDeclaredFields()) {
+		for (Field field : desiredAPI.getClass().getSuperclass().getDeclaredFields()) {
+			try {
 				if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
 					String getterMethodName = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
 					Method method = desiredAPI.getClass().getMethod(getterMethodName, null);
@@ -71,8 +71,8 @@ public class APIChangeState {
 					Object desiredValue = method.invoke(desiredAPI, null);
 					Object actualValue = method2.invoke(actualAPI, null);
 					if(desiredValue == null && actualValue == null) continue;
-					// desiredValue == null - This can be used to reset/clean a property! (Need to thinks about this!)
-					if(desiredValue == null || !actualValue.equals(desiredValue)) {
+					// desiredValue == null - This can be used to reset/clean a property! (Need to think about this!)
+					if(desiredValue == null || (desiredValue!=null && actualValue==null) || !actualValue.equals(desiredValue)) {
 						APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
 						if (property.isBreaking()) {
 							this.isBreaking = true;
@@ -88,9 +88,9 @@ public class APIChangeState {
 					}
 
 				}
+			} catch (Exception e) {
+				throw new AppException("Can't verify API-Change-State for: " + field.getName(), ErrorCode.CANT_CREATE_STATE_CHANGE, e);
 			}
-		} catch (Exception e) {
-			throw new AppException("Can't create API-Change-State.", ErrorCode.CANT_CREATE_STATE_CHANGE, e);
 		}
 	}
 

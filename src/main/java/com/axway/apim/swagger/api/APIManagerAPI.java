@@ -163,6 +163,9 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 	
 	@Override
 	public String getVhost() {
+		JsonNode node = this.apiConfiguration.get("vhost");
+		if(node instanceof MissingNode) return null;
+		if(node.asText().equals("null")) return null;
 		return this.apiConfiguration.get("vhost").asText();
 	}
 	

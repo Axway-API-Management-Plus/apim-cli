@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -35,7 +34,8 @@ public class VhostPropertyHandler implements PropertyHandler {
 	public void handleVHost(IAPIDefinition desiredAPI, IAPIDefinition actualAPI) throws AppException {
 		if(updateVhost) {
 			if(actualAPI.getStatus().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
-				throw new AppException("Can't update V-Host on unpublished API! Ignoring!", ErrorCode.CANT_SETUP_VHOST, false);
+				throw new AppException("Can't update V-Host to: "+desiredAPI.getVhost()+" on unpublished API!", 
+						ErrorCode.CANT_SETUP_VHOST, false);
 			} else {
 				LOG.info("Updating V-Host for published API to: " + desiredAPI.getVhost());
 				List<String> vhostChange = new Vector<String>() {{ add ("vhost"); }};
