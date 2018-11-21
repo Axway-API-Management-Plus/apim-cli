@@ -1,8 +1,11 @@
 package com.axway.apim.swagger.api;
 
+import java.util.Map;
+
 import com.axway.apim.actions.tasks.props.APINamePropertyHandler;
 import com.axway.apim.actions.tasks.props.APIPathPropertyHandler;
 import com.axway.apim.actions.tasks.props.APISummaryPropertyHandler;
+import com.axway.apim.actions.tasks.props.APITagsPropertyHandler;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
@@ -20,6 +23,11 @@ public abstract class AbstractAPIDefinition {
 	
 	protected CommandParameters cmd = CommandParameters.getInstance();
 	protected ObjectMapper objectMapper = new ObjectMapper();
+	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
+			propHandler = APITagsPropertyHandler.class)
+	protected Map<String, String[]> tags = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED})
@@ -66,6 +74,8 @@ public abstract class AbstractAPIDefinition {
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED})
 	protected APIImage apiImage = null;
 	
+	
+	
 	protected boolean isValid = false;
 
 	public String getApiPath() throws AppException {
@@ -105,5 +115,9 @@ public abstract class AbstractAPIDefinition {
 
 	public String getVhost() {
 		return vhost;
+	}
+
+	public Map<String, String[]> getTags() {
+		return tags;
 	}
 }

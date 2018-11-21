@@ -106,13 +106,14 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 						.setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getApiId())
 						.build();
 				apiCall = new DELRequest(uri, this);
-				context.put("action", "apiDeleted");
+				context.put("responseMessage", "'Old' FE-API deleted (API-Proxy)");
 				apiCall.execute();
 				// Additionally we need to delete the BE-API
 				uri = new URIBuilder(cmd.getAPIManagerURL())
 						.setPath(RestAPICall.API_VERSION+"/apirepo/"+((APIManagerAPI)actualState).getBackendApiId())
 						.build();
 				apiCall = new DELRequest(uri, this);
+				context.put("responseMessage", "'Old' BE-API deleted.");
 				apiCall.execute();
 			} else {
 				uri = new URIBuilder(cmd.getAPIManagerURL())
@@ -130,9 +131,8 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 	@Override
 	public JsonNode parseResponse(HttpResponse response) throws AppException {
 		Transaction context = Transaction.getInstance();
-		if(context.get("action")!=null && context.get("action").equals("apiDeleted")) {
-			// TODO: Implement some verification
-			LOG.info("API deleted");
+		if(context.get("responseMessage")!=null) {
+			LOG.info(""+context.get("responseMessage"));
 			return null;
 		} else {
 			String backendAPIId = JsonPath.parse(getJSONPayload(response)).read("$.id", String.class);

@@ -16,13 +16,4 @@ public class APIMgrInboundProfiles extends InboundProfiles {
 			throw new AppException("Cant process existing inbound profiles", ErrorCode.UNXPECTED_ERROR, e);
 		}
 	}
-	/*
-	private boolean isProfileEmpty(OutboundProfile profile) {
-		if(profile.getRequestPolicy()!=null && !profile.getRequestPolicy().equals("null")) return false;
-		if(profile.getResponsePolicy()!=null && !profile.getResponsePolicy().equals("null")) return false;
-		if(profile.getRoutePolicy()!=null && !profile.getRoutePolicy().equals("null")) return false;
-		if(profile.getFaultHandlerPolicy()!=null && !profile.getFaultHandlerPolicy().equals("null")) return false;
-		return true;
-	}
-	*/
 }

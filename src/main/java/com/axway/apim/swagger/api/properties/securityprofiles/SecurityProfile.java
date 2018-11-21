@@ -53,7 +53,7 @@ public class SecurityProfile {
 			return
 					StringUtils.equals(securityProfile.getName(), this.getName()) &&
 					StringUtils.equals(securityProfile.getIsDefault(), this.getIsDefault()) &&
-					securityProfile.getDevices().containsAll(this.getDevices());
+					securityProfile.getDevices().equals(this.getDevices());
 		} else {
 			return false;
 		}

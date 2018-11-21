@@ -43,7 +43,7 @@ public class ImportSecurityProfiles extends SecurityProfiles implements Property
 		passthroughDevice.setName("Pass Through");
 		passthroughDevice.setType("passThrough");
 		passthroughDevice.getProperties().put("subjectIdFieldName", "Pass Through");
-		passthroughDevice.getProperties().put("removeCredentialsOnSuccess", true);
+		passthroughDevice.getProperties().put("removeCredentialsOnSuccess", "true");
 		passthroughProfile.getDevices().add(passthroughDevice);
 		return passthroughProfile;
 	}

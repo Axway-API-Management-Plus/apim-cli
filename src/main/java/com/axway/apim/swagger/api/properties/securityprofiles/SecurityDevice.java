@@ -1,7 +1,11 @@
 package com.axway.apim.swagger.api.properties.securityprofiles;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 
 public class SecurityDevice {
 	String name;
@@ -56,17 +60,10 @@ public class SecurityDevice {
 		if(other == null) return false;
 		if(other instanceof SecurityDevice) {
 			SecurityDevice otherSecurityDevice = (SecurityDevice)other;
-			if(otherSecurityDevice.getName()==null && this.getName()==null) return true;
-			if(otherSecurityDevice.getType()==null && this.getType()==null) return true;
-			if(otherSecurityDevice.getOrder()==null && this.getOrder()==null) return true;
-			if(otherSecurityDevice.getProperties()==null && this.getProperties()==null) return true;
-			
-			if(!otherSecurityDevice.getName().equals(this.getName())) return false;
-			if(!otherSecurityDevice.getType().equals(this.getType())) return false;
-			if(!otherSecurityDevice.getOrder().equals(this.getOrder())) return false;
+			if(!StringUtils.equals(otherSecurityDevice.getName(), this.getName())) return false;
+			if(!StringUtils.equals(otherSecurityDevice.getType(), this.getType())) return false;
+			if(!StringUtils.equals(otherSecurityDevice.getOrder(), this.getOrder())) return false;
 			if(!otherSecurityDevice.getProperties().equals(this.getProperties())) return false;
-		} else {
-			return false;
 		}
 		return true;
 	}

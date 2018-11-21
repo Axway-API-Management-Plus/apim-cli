@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -18,10 +20,13 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIContract;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.corsprofiles.ImportCorsProfiles;
 import com.axway.apim.swagger.api.properties.inboundprofiles.ImportInboundProfiles;
 import com.axway.apim.swagger.api.properties.outboundprofiles.ImportOutboundProfiles;
 import com.axway.apim.swagger.api.properties.securityprofiles.ImportSecurityProfiles;
+import com.axway.apim.swagger.api.properties.tags.TagMap;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 
@@ -57,6 +62,11 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 		this.outboundProfiles = new ImportOutboundProfiles(apiContract.getProperty("/outboundProfiles"));
 		this.securityProfiles = new ImportSecurityProfiles(apiContract.getProperty("/securityProfiles"));
 		this.corsProfiles = new ImportCorsProfiles(apiContract.getProperty("/corsProfiles"));
+		try {
+			this.tags = objectMapper.readValue( apiContract.getProperty("/tags").toString(), new TypeReference<TagMap<String, String[]>>(){} );
+		} catch (Exception e) {
+			throw new AppException("Cant initialize APIImport definition", ErrorCode.UNXPECTED_ERROR, e);
+		}
 		this.isValid = true;
 	}
 	

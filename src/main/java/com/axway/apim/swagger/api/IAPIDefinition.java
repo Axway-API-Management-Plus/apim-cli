@@ -1,5 +1,7 @@
 package com.axway.apim.swagger.api;
 
+import java.util.Map;
+
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APIImage;
@@ -36,6 +38,8 @@ public interface IAPIDefinition {
 	public String getApiId() throws AppException;
 	
 	public APIImage getApiImage();
+	
+	public Map<String, String[]> getTags();
 	
 	public APISwaggerDefinion getSwaggerDefinition();
 	
