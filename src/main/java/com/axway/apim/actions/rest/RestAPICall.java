@@ -62,6 +62,8 @@ public abstract class RestAPICall {
 	
 	protected HttpResponse sendRequest(HttpUriRequest request) throws AppException {
 		try {
+			Transaction context = Transaction.getInstance();
+			context.put("lastRequest", request);
 			APIMHttpClient apimClient = APIMHttpClient.getInstance();
 			HttpResponse response = apimClient.getHttpClient().execute(request, apimClient.getClientContext());
 			return response;

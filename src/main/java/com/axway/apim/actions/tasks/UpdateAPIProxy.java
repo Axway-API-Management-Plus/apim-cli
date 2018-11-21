@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -59,11 +62,18 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		String response = null;
 		try {
 			response = EntityUtils.toString(httpResponse.getEntity());
-			String backendAPIId = JsonPath.parse(response).read("$.id", String.class);
+			String backendAPIId = JsonPath.parse(response).read("$.2id", String.class);
 			Transaction.getInstance().put("backendAPIId", backendAPIId);
 		} catch (Exception e) {
 			try {
 				LOG.error("Unable to parse received response from API-Manager: '" + response + "'");
+				Transaction context = Transaction.getInstance();
+				Object lastRequest = context.get("lastRequest");
+				if(lastRequest instanceof HttpPost) {
+					LOG.error("Last request: " + EntityUtils.toString(((HttpPost)lastRequest).getEntity()));
+				} else if (lastRequest instanceof HttpPut) {
+					LOG.error("Last request: " + EntityUtils.toString(((HttpPut)lastRequest).getEntity()));
+				}
 				throw new AppException("Unable to parse received response from API-Manager", ErrorCode.UNXPECTED_ERROR);
 			} catch (Exception e1) {
 				throw new AppException("Unable to parse response", ErrorCode.UNXPECTED_ERROR, e1);
