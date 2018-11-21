@@ -53,7 +53,7 @@ public class NoChangeAPITest extends TestNGCitrusTestDesigner {
 		echo("####### Make sure, the API-ID hasn't changed #######");
 		http().client("apiManager")
 			.send()
-			.get("/proxies")
+			.get("/proxies/${apiId}")
 			.name("api")
 			.header("Content-Type", "application/json");
 

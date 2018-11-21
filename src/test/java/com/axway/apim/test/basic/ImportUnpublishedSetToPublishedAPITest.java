@@ -56,7 +56,7 @@ public class ImportUnpublishedSetToPublishedAPITest extends TestNGCitrusTestDesi
 		echo("####### Validate the API-ID hasn't changed by that change #######");
 		http().client("apiManager")
 			.send()
-			.get("/proxies")
+			.get("/proxies/${apiId}")
 			.name("api")
 			.header("Content-Type", "application/json");
 

@@ -61,7 +61,7 @@ public class UnpublishedSummaryAPITest extends TestNGCitrusTestDesigner {
 		echo("####### API-Summary should now be changed to: ${apiSummary} #######");
 		http().client("apiManager")
 			.send()
-			.get("/proxies")
+			.get("/proxies/${apiId}")
 			.name("api")
 			.header("Content-Type", "application/json");
 
@@ -82,7 +82,7 @@ public class UnpublishedSummaryAPITest extends TestNGCitrusTestDesigner {
 		echo("####### Validate the summary has been REMOVED, which is not a breaking change #######");
 		http().client("apiManager")
 			.send()
-			.get("/proxies")
+			.get("/proxies/${apiId}")
 			.name("api")
 			.header("Content-Type", "application/json");
 

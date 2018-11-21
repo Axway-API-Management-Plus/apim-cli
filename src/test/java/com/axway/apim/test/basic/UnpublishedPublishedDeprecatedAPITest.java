@@ -57,7 +57,7 @@ public class UnpublishedPublishedDeprecatedAPITest extends TestNGCitrusTestDesig
 		echo("####### Validate API-State has been changed to published, which is not a breaking change #######");
 		http().client("apiManager")
 			.send()
-			.get("/proxies")
+			.get("/proxies/${apiId}")
 			.name("api")
 			.header("Content-Type", "application/json");
 
@@ -79,7 +79,7 @@ public class UnpublishedPublishedDeprecatedAPITest extends TestNGCitrusTestDesig
 		echo("####### Validate API-State has been changed to deprecated, which is not a breaking change  #######");
 		http().client("apiManager")
 			.send()
-			.get("/proxies")
+			.get("/proxies/${apiId}")
 			.name("api")
 			.header("Content-Type", "application/json");
 

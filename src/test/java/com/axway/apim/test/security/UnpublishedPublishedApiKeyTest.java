@@ -67,7 +67,7 @@ public class UnpublishedPublishedApiKeyTest extends TestNGCitrusTestDesigner {
 		echo("####### Validate the Security-Settings have been changed (without changing the API-ID) #######");
 		http().client("apiManager")
 			.send()
-			.get("/proxies")
+			.get("/proxies/${apiId}")
 			.name("api")
 			.header("Content-Type", "application/json");
 

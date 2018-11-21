@@ -56,7 +56,7 @@ public class BackToPublishedFromDeprecatedTest extends TestNGCitrusTestDesigner 
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has Status Deprecated #######");
 		http().client("apiManager")
 			.send()
-			.get("/proxies")
+			.get("/proxies/${apiId}")
 			.name("api")
 			.header("Content-Type", "application/json");
 
@@ -78,7 +78,7 @@ public class BackToPublishedFromDeprecatedTest extends TestNGCitrusTestDesigner 
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' hasn't anymore deprecation #######");
 		http().client("apiManager")
 			.send()
-			.get("/proxies")
+			.get("/proxies/${apiId}")
 			.name("api")
 			.header("Content-Type", "application/json");
 
