@@ -16,7 +16,6 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIContract;
-import com.axway.apim.swagger.api.properties.APIAuthentication;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.axway.apim.swagger.api.properties.corsprofiles.ImportCorsProfiles;
@@ -24,7 +23,6 @@ import com.axway.apim.swagger.api.properties.inboundprofiles.ImportInboundProfil
 import com.axway.apim.swagger.api.properties.outboundprofiles.ImportOutboundProfiles;
 import com.axway.apim.swagger.api.properties.securityprofiles.ImportSecurityProfiles;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 
 /**

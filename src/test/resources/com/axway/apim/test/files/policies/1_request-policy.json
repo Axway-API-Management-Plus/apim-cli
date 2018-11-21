@@ -21,7 +21,7 @@
 	"outboundProfiles": {
 		"_default": {
 			"routeType": "policy",
-			"routePolicy": "${routePolicy}"
+			"requestPolicy": "${requestPolicy}"
 		}
 	},
     "securityProfiles": [

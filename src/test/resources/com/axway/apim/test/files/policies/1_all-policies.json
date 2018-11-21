@@ -20,8 +20,16 @@
 	},
 	"outboundProfiles": {
 		"_default": {
+			"authenticationProfile": "_default",
 			"routeType": "policy",
-			"routePolicy": "${routePolicy}"
+			"requestPolicy": null,
+			"responsePolicy": null,
+			"routePolicy": "${routePolicy}",
+			"faultHandlerPolicy": null,
+			"apiId": null,
+			"apiMethodId": null,
+			"parameters": [
+			]
 		}
 	},
     "securityProfiles": [

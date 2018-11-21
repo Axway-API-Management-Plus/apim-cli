@@ -10,7 +10,6 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfiles;
-import com.axway.apim.swagger.api.properties.corsprofiles.ImportCorsProfiles;
 import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfiles;
 import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfiles;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfiles;

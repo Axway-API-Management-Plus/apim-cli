@@ -21,7 +21,7 @@ public class OutboundProfile {
 	
 	String authenticationProfile;
 	
-	String[] parameters;
+	String[] parameters = new String[] {};
 
 	public String getAuthenticationProfile() {
 		return "_default"; // For now, nothing else is supported!

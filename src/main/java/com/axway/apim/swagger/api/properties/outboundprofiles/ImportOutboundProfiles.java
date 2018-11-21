@@ -32,7 +32,7 @@ public class ImportOutboundProfiles extends OutboundProfiles implements Property
 	private Map<String, String> apimFaultHandlerPolicies = initPolicyies("faulthandler");
 
 	public ImportOutboundProfiles(JsonNode config) throws AppException {
-		if(config instanceof MissingNode) {
+		if(config instanceof MissingNode) { // Default handling!
 			 this.outboundProfiles = new LinkedHashMap<String, OutboundProfile>();
 			return;
 		}
@@ -45,10 +45,10 @@ public class ImportOutboundProfiles extends OutboundProfiles implements Property
 		while (it.hasNext()) {
 			String name = it.next();
 			OutboundProfile profile = this.outboundProfiles.get(name);
-			profile.setRequestPolicy(this.apimRequestPolicies.get(profile.getRequestPolicy()));
-			profile.setResponsePolicy(this.apimResponsePolicies.get(profile.getResponsePolicy()));
-			profile.setRoutePolicy(this.apimRoutingPolicies.get(profile.getRoutePolicy()));
-			profile.setFaultHandlerPolicy(this.apimFaultHandlerPolicies.get(profile.getFaultHandlerPolicy()));
+			profile.setRequestPolicy(getPolicy(this.apimRequestPolicies, profile.getRequestPolicy()));
+			profile.setResponsePolicy(getPolicy(this.apimResponsePolicies, profile.getResponsePolicy()));
+			profile.setRoutePolicy(getPolicy(this.apimRoutingPolicies, profile.getRoutePolicy()));
+			profile.setFaultHandlerPolicy(getPolicy(this.apimFaultHandlerPolicies, profile.getFaultHandlerPolicy()));
 		}
 	}
 
@@ -82,6 +82,15 @@ public class ImportOutboundProfiles extends OutboundProfiles implements Property
 			throw new AppException("Can't find Policy: ....", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 		return policies;
+	}
+	
+	private String getPolicy(Map<String, String> policies, String policyName) throws AppException {
+		if(policyName == null) return policyName; // Do nothing if no policy is configured
+		String policy = policies.get(policyName);
+		if(policy == null) {
+			throw new AppException("The policy: '" + policyName + "' is not configured in this API-Manager", ErrorCode.UNXPECTED_ERROR);
+		}
+		return policy;
 	}
 
 }
