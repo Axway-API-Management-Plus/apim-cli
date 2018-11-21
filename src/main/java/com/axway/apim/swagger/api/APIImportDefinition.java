@@ -62,11 +62,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 		this.outboundProfiles = new ImportOutboundProfiles(apiContract.getProperty("/outboundProfiles"));
 		this.securityProfiles = new ImportSecurityProfiles(apiContract.getProperty("/securityProfiles"));
 		this.corsProfiles = new ImportCorsProfiles(apiContract.getProperty("/corsProfiles"));
-		try {
-			this.tags = objectMapper.readValue( apiContract.getProperty("/tags").toString(), new TypeReference<TagMap<String, String[]>>(){} );
-		} catch (Exception e) {
-			throw new AppException("Cant initialize APIImport definition", ErrorCode.UNXPECTED_ERROR, e);
-		}
+		this.tags = new TagMap<String, String[]>(apiContract.getProperty("/tags"));
 		this.isValid = true;
 	}
 	

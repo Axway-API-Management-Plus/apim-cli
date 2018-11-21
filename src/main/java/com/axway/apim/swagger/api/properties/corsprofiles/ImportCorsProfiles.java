@@ -1,7 +1,6 @@
 package com.axway.apim.swagger.api.properties.corsprofiles;
 
 import java.util.List;
-import java.util.Vector;
 
 import com.axway.apim.actions.tasks.props.PropertyHandler;
 import com.axway.apim.lib.AppException;

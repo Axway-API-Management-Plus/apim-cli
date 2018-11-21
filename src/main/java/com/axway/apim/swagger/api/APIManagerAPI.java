@@ -21,7 +21,6 @@ import com.axway.apim.swagger.api.properties.inboundprofiles.APIMgrInboundProfil
 import com.axway.apim.swagger.api.properties.outboundprofiles.APIMgrOutboundProfiles;
 import com.axway.apim.swagger.api.properties.securityprofiles.APIMgrSecurityProfiles;
 import com.axway.apim.swagger.api.properties.tags.TagMap;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -43,11 +42,7 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 			this.inboundProfiles = new APIMgrInboundProfiles(apiConfiguration);
 			this.securityProfiles = new APIMgrSecurityProfiles(apiConfiguration);
 			this.corsProfiles = new APIMgrCorsProfiles(apiConfiguration);
-			try {
-				this.tags = objectMapper.readValue( apiConfiguration.get("tags").toString(), new TypeReference<TagMap<String, String[]>>(){} );
-			} catch (Exception e) {
-				throw new AppException("Cant initialize API-Manager state.", ErrorCode.UNXPECTED_ERROR, e);
-			} 
+			this.tags = new TagMap<String, String[]>(apiConfiguration.get("tags"));
 		}
 	}
 	public APIManagerAPI(JsonNode apiConfiguration) {
