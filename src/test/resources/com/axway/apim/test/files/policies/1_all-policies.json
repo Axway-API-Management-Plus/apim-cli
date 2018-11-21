@@ -22,10 +22,10 @@
 		"_default": {
 			"authenticationProfile": "_default",
 			"routeType": "policy",
-			"requestPolicy": null,
-			"responsePolicy": null,
+			"requestPolicy": "${requestPolicy}",
+			"responsePolicy": "${responsePolicy}",
 			"routePolicy": "${routePolicy}",
-			"faultHandlerPolicy": null,
+			"faultHandlerPolicy": "${faultHandlerPolicy}",
 			"apiId": null,
 			"apiMethodId": null,
 			"parameters": [

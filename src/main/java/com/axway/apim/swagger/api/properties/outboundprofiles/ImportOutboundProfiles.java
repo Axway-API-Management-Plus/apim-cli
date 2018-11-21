@@ -88,7 +88,7 @@ public class ImportOutboundProfiles extends OutboundProfiles implements Property
 		if(policyName == null) return policyName; // Do nothing if no policy is configured
 		String policy = policies.get(policyName);
 		if(policy == null) {
-			throw new AppException("The policy: '" + policyName + "' is not configured in this API-Manager", ErrorCode.UNXPECTED_ERROR);
+			throw new AppException("The policy: '" + policyName + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
 		}
 		return policy;
 	}

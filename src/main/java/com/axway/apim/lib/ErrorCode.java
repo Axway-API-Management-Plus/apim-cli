@@ -17,6 +17,7 @@ public enum ErrorCode {
 	CANT_READ_CONFIG_FILE		(70, "Can't read Config-File."),
 	UNSUPPORTED_FEATURE			(75, "Unsupported feature or operation used."),
 	CANT_CREATE_STATE_CHANGE	(80, "Cannot use Import & Existing API to create change state."),
+	UNKNOWN_CUSTOM_POLICY		(85, "A custom policy-name is unknown (Request-, Routing, ..."),
 	UNXPECTED_ERROR				(99, "An unexpected error occured.");
 
 	private final int code;
