@@ -19,7 +19,7 @@ Today the following is already supported:
 - Inbound-Security settings (Default for all methods)
   - incl. all custom settings (e.g. API-Key settings, etc.)
 - Outbound-Custom-Policies
-  - Routing, Request, Response
+  - Routing, Request, Response, FaultHandler
 - Outbound Authentication
 - CORS-Setup
 - V-Host support
