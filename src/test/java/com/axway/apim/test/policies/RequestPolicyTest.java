@@ -27,7 +27,7 @@ public class RequestPolicyTest extends TestNGCitrusTestDesigner {
 		
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
-		createVariable("requestPolicy", "Request Policy 1");
+		createVariable("requestPolicy", "Request policy 1");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/policies/1_request-policy.json");
 		createVariable("expectedReturnCode", "0");
@@ -46,7 +46,7 @@ public class RequestPolicyTest extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.requestPolicy", "@assertThat(containsString(Request Policy 1))@")
+			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.requestPolicy", "@assertThat(containsString(Request policy 1))@")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 	}
 }

@@ -27,7 +27,7 @@ public class RoutingPolicyTest extends TestNGCitrusTestDesigner {
 		
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
-		createVariable("routePolicy", "Routing Policy 1");
+		createVariable("routePolicy", "Routing policy 1");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/policies/1_routing-policy.json");
 		createVariable("expectedReturnCode", "0");
@@ -46,7 +46,7 @@ public class RoutingPolicyTest extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.routePolicy", "@assertThat(containsString(Routing Policy 1))@")
+			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.routePolicy", "@assertThat(containsString(Routing policy 1))@")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 	}
 }

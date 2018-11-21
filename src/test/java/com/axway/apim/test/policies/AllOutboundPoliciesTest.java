@@ -27,9 +27,9 @@ public class AllOutboundPoliciesTest extends TestNGCitrusTestDesigner {
 		
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
-		createVariable("requestPolicy", "Request Policy 1");
-		createVariable("responsePolicy", "Response Policy 1");
-		createVariable("routePolicy", "Routing Policy 1");
+		createVariable("requestPolicy", "Request policy 1");
+		createVariable("responsePolicy", "Response policy 1");
+		createVariable("routePolicy", "Routing policy 1");
 		createVariable("faultHandlerPolicy", "Faulthandler policy 1");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/policies/1_all-policies.json");
@@ -49,9 +49,9 @@ public class AllOutboundPoliciesTest extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.requestPolicy", "@assertThat(containsString(Request Policy 1))@")
-			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.responsePolicy", "@assertThat(containsString(Response Policy 1))@")
-			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.routePolicy", "@assertThat(containsString(Routing Policy 1))@")
+			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.requestPolicy", "@assertThat(containsString(Request policy 1))@")
+			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.responsePolicy", "@assertThat(containsString(Response policy 1))@")
+			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.routePolicy", "@assertThat(containsString(Routing policy 1))@")
 			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.faultHandlerPolicy", "@assertThat(containsString(Faulthandler policy 1))@")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 	}
