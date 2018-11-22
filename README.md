@@ -23,11 +23,11 @@ Today the following is already supported:
 - Outbound Authentication
 - CORS-Setup
 - V-Host support
+- Tags
 
 The following is on the roadmap:
 - API-description
 - API-Method description
-- Tags
 - Custom-Properties
 - Method-Level settings such as security, Custom-Policies, etc.
 
