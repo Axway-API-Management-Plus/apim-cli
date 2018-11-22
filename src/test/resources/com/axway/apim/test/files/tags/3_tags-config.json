@@ -3,9 +3,17 @@
 	"name": "${apiName}",
 	"path": "${apiPath}",
 	"status": "${status}",
-	"vhost": "${vhost}",
 	"version": "1.0.0",
 	"organization": {
 		"development": "API Development ${orgNumber}"
+	}, 
+	"tags": {
+		"tag-name 5": [
+			"value ABC"
+    	],
+    	"tag-name 6": [
+    		"value DEF",
+			"value GHI"
+    	]
 	}
 }
