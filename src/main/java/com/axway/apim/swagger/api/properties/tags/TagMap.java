@@ -3,13 +3,11 @@ package com.axway.apim.swagger.api.properties.tags;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Vector;
 
 import org.apache.commons.lang.ArrayUtils;
 
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

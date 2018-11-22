@@ -36,9 +36,9 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 					.setParameter("field", "name").setParameter("op", "eq").setParameter("value", "API Development").build();
 			
 			entity = MultipartEntityBuilder.create()
-					.addTextBody("name", this.desiredState.getApiName())
+					.addTextBody("name", this.desiredState.getName())
 					.addTextBody("type", "swagger")
-					.addBinaryBody("file", ((APIImportDefinition)this.desiredState).getSwaggerAsStream(), ContentType.create("application/octet-stream"), "filename")
+					.addBinaryBody("file", ((APIImportDefinition)this.desiredState).getSwaggerDefinition().getSwaggerContent(), ContentType.create("application/octet-stream"), "filename")
 					.addTextBody("fileName", "XYZ").addTextBody("organizationId", this.desiredState.getOrgId())
 					.addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
 			RestAPICall importSwagger = new POSTRequest(entity, uri, this);

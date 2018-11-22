@@ -31,7 +31,7 @@ public class RecreateToUpdateAPI {
 		// 2. Create a new temp API-Definition, which will be used to apply changes to the existing actual API
 		IAPIDefinition newActualAPI = new APIBaseDefinition();
 		
-		if(actual.getStatus().equals(IAPIDefinition.STATE_PUBLISHED)) {
+		if(actual.getState().equals(IAPIDefinition.STATE_PUBLISHED)) {
 			// In case, the existing API is already in use (Published), we have to grant access to our new imported API
 			new UpgradeAccessToNewerAPI(changes.getIntransitAPI(), changes.getActualAPI()).execute();
 		}

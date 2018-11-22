@@ -1,52 +1,9 @@
 {
 	"name": "Test 6",
-	"path": "/test6",
-	"status": "unpublished",
+	"path": "/test6689",
+	"state": "unpublished",
 	"version": "1.0.0",
-	"organization": {
-		"development": "API Development",
-		"target": [
-			"Community",
-			"Axway"
-		]
-	},
-	"inboundProfiles": {
-		"_default": {
-			"securityProfile": "_default",
-			"corsProfile": "_default",
-			"monitorAPI": true,
-			"monitorSubject": "authentication.subject.id"
-		}
-	}, 
-	"outboundProfiles": {
-		"_default": {
-			"authenticationProfile": "_default",
-			"requestPolicy": null,
-			"responsePolicy": null,
-			"routePolicy": "Routing policy 1",
-			"faultHandlerPolicy": null,
-			"apiId": null,
-			"apiMethodId": null,
-			"parameters": [
-			]
-		}
-	},
-	"corsProfiles": [
-		{
-			"name": "_default",
-			"isDefault": true,
-			"origins": [
-				"*"
-			],
-			"allowedHeaders": [
-			],
-			"exposedHeaders": [
-				"X-CorrelationID"
-			],
-			"supportCredentials": false,
-			"maxAgeSeconds": 10
-		}
-	],
+	"organization": "API Development", 
     "securityProfiles": [
      	{
      		"name": "_default",
@@ -58,7 +15,7 @@
      				"order": 0,
      				"properties": {
      					"apiKeyFieldName": "KeyId",
-     					"takeFrom": "QUERY",
+     					"takeFrom": "HEADER",
      					"removeCredentialsOnSuccess": "false"
      				}
      			}

@@ -38,7 +38,7 @@ public class UpdateExistingAPI {
 		}
 		
 		// This is special, as the status is not a property and requires some additional actions!
-		if(changes.getNonBreakingChanges().contains("status")) {
+		if(changes.getNonBreakingChanges().contains("state")) {
 			new UpdateAPIStatus(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		}
 		

@@ -58,4 +58,9 @@ public class InboundProfile {
 			return false;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "monitorAPI: " + monitorAPI + ", monitorSubject: " + monitorSubject + ", securityProfile: " + securityProfile + ", corsProfile: " + corsProfile;
+	}
 }

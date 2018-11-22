@@ -19,7 +19,7 @@ import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIChangeState;
-import com.axway.apim.swagger.api.APIManagerAPI;
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -41,15 +41,15 @@ public class CreateNewAPI {
 
 		new CreateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		// As we have just created an API-Manager API, we should reflect this for further processing
-		//((APIManagerAPI)changes.getActualAPI()).setApiConfiguration((JsonNode)context.get("lastResponse"));
-		IAPIDefinition createdAPI = new APIManagerAPI((JsonNode)context.get("lastResponse"));
+		IAPIDefinition createdAPI = APIManagerAdapter.getAPIManagerAPI((JsonNode)context.get("lastResponse"));
 		changes.setIntransitAPI(createdAPI);
-
+		
 		// ... here we basically need to add all props to initially bring the API in sync!
+		// But without updating the Swagger, as we have just imported it!
 		new UpdateAPIProxy(changes.getDesiredAPI(), createdAPI).execute(changedProps);
 		
 		// If image is included, update it
-		if(changes.getDesiredAPI().getApiImage()!=null) {
+		if(changes.getDesiredAPI().getImage()!=null) {
 			new UpdateAPIImage(changes.getDesiredAPI(), createdAPI).execute();
 		}
 		// This is special, as the status is not a property and requires some additional actions!
@@ -72,7 +72,9 @@ public class CreateNewAPI {
 					Method method = desiredAPI.getClass().getMethod(getterMethodName, null);
 					Object desiredValue = method.invoke(desiredAPI, null);
 					// For new APIs don't include empty properties (this includes MissingNodes)
-					if(desiredValue==null) continue; 
+					if(desiredValue==null) continue;
+					// We have just inserted the Swagger-File
+					if(field.getName().equals("swaggerDefinition")) continue;
 					allProps.add(field.getName());
 				}
 			}

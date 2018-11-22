@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class APIImage {
 
 	private byte[] imageContent = null;
@@ -11,18 +13,17 @@ public class APIImage {
 	private String filename = null;
 	
 	private boolean isValid = true;
-
-	public APIImage(byte[] imageContent, String filename) {
-		this.imageContent = imageContent;
-		if(imageContent == null) {
-			this.isValid = false;
-		}
-		this.filename = filename;
-	}	
 	
 	public byte[] getImageContent() {
 		return imageContent;
 	}
+
+	public APIImage(String filename) {
+		super();
+		this.filename = filename;
+	}
+
+
 
 	@Override
 	public boolean equals(Object other) {
@@ -40,7 +41,7 @@ public class APIImage {
 	}
 	
 	public String getFilename() {
-		if(filename.indexOf("/")==-1) {
+		if(filename.indexOf("/")!=-1) {
 			return filename;
 		} else {
 			return filename.substring(filename.lastIndexOf("/")+1);
@@ -49,5 +50,17 @@ public class APIImage {
 
 	public boolean isValid() {
 		return isValid;
+	}
+
+	public void setImageContent(byte[] imageContent) {
+		this.imageContent = imageContent;
+	}
+	
+	public void setFilename(String filename) {
+		this.filename = filename;
+	}
+
+	public void setValid(boolean isValid) {
+		this.isValid = isValid;
 	}
 }

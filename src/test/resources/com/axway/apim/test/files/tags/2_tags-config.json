@@ -2,11 +2,9 @@
 {
 	"name": "${apiName}",
 	"path": "${apiPath}",
-	"status": "${status}",
+	"state": "${status}",
 	"version": "1.0.0",
-	"organization": {
-		"development": "API Development ${orgNumber}"
-	}, 
+	"organization": "API Development ${orgNumber}",
 	"tags": {
 		"tag-name 3": [
 			"value 123",

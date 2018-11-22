@@ -2,8 +2,7 @@
 {
 	"name": "${apiName}",
 	"path": "${apiPath}",
-	"state": "${status}",
-	"vhost": "${vhost}",
+	"state": "unpublished",
 	"version": "1.0.0",
 	"organization": "API Development ${orgNumber}"
 }

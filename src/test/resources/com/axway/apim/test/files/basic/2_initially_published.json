@@ -2,15 +2,9 @@
 {
 	"name": "${apiName}",
 	"path": "${apiPath}",
-	"status": "published",
+	"state": "published",
 	"version": "1.0.0",
-	"organization": {
-		"development": "API Development ${orgNumber}",
-		"target": [
-			"Community",
-			"Axway"
-		]
-	},
+	"organization": "API Development ${orgNumber}",
 	"inboundProfiles": {
 		"_default": {
 			"securityProfile": "_default",

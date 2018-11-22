@@ -2,15 +2,9 @@
 {
 	"name": "${apiName}",
 	"path": "${apiPath}",
-	"status": "${status}",
+	"state": "${status}",
 	"version": "1.0.0",
-	"organization": {
-		"development": "API Development ${orgNumber}",
-		"target": [
-			"Community",
-			"Axway"
-		]
-	},
+	"organization": "API Development ${orgNumber}",
     "securityProfiles": [
      	{
      		"name": "_default",

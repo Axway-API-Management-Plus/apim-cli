@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class APINamePropertyHandler implements PropertyHandler {
 	
 	public JsonNode handleProperty(IAPIDefinition desired, JsonNode response) {
-		((ObjectNode) response).put("name", desired.getApiName());
+		((ObjectNode) response).put("name", desired.getName());
 		return response;
 	}
 }

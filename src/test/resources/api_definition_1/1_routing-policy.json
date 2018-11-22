@@ -2,7 +2,7 @@
 	"apim": {
 		"name": "Test 6",
 		"path": "/test6",
-		"status": "unpublished",
+		"state": "unpublished",
 		"version": "1.0.0",
 		"organization": {
 			"development": "API Development",

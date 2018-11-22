@@ -43,7 +43,7 @@ public class AbstractAPIMTask {
 		ObjectMapper objectMapper = new ObjectMapper();
 		Transaction context = Transaction.getInstance();
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+actual.getApiId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+actual.getId()).build();
 			GETRequest getCall = new GETRequest(uri, null);
 			InputStream response = getCall.execute().getEntity().getContent();
 			JsonNode lastJsonReponse = objectMapper.readTree(response);

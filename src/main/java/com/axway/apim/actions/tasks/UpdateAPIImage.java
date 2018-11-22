@@ -26,11 +26,11 @@ public class UpdateAPIImage extends AbstractAPIMTask implements IResponseParser 
 		super(desiredState, actualState);
 	}
 	public void execute() throws AppException {
-		if(!desiredState.getApiImage().isValid()) {
+		if(!desiredState.getImage().isValid()) {
 			LOG.info("No image configured, doing nothing.");
 			return;
 		}
-		LOG.info("Updating API-Image from: " + desiredState.getApiImage().getFilename());
+		LOG.info("Updating API-Image from: " + desiredState.getImage().getFilename());
 		
 		URI uri;
 		HttpEntity entity;
@@ -38,10 +38,10 @@ public class UpdateAPIImage extends AbstractAPIMTask implements IResponseParser 
 		Transaction context = Transaction.getInstance();
 		
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getApiId()+"/image").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getId()+"/image").build();
 			
 			entity = MultipartEntityBuilder.create()
-					.addBinaryBody("file", ((APIImportDefinition)this.desiredState).getApiImage().getInputStream(), ContentType.create("image/jpeg"), desiredState.getApiImage().getFilename())
+					.addBinaryBody("file", ((APIImportDefinition)this.desiredState).getImage().getInputStream(), ContentType.create("image/jpeg"), desiredState.getImage().getFilename())
 					.build();
 			
 			RestAPICall apiCall = new POSTRequest(entity, uri, this);

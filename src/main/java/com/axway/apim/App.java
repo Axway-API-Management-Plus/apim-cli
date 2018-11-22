@@ -14,7 +14,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIChangeState;
-import com.axway.apim.swagger.APIContract;
+import com.axway.apim.swagger.APIImportConfig;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.APIImportDefinition;
 import com.axway.apim.swagger.api.APIManagerAPI;
@@ -85,11 +85,14 @@ public class App {
 			CommandParameters params = CommandParameters.getInstance();
 			params.setCmd(cmd);
 			
-			APIContract contract = new APIContract(params.getOptionValue("contract"), params.getOptionValue("stage"));
+			APIManagerAdapter apimAdapter = new APIManagerAdapter();
+			
+			APIImportConfig contract = new APIImportConfig(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("swagger"));
+			IAPIDefinition desiredAPI = contract.getImportAPIDefinition();
 			// Create the API-Definition that represent what we want to have
-			IAPIDefinition desiredAPI = new APIImportDefinition(contract, params.getOptionValue("swagger"));
+			//                  IAPIDefinition desiredAPI = new APIImportDefinition(contract, params.getOptionValue("swagger"));
 			// Create an API-Definition that reflects the same API in API-Manager (or indicated)
-			IAPIDefinition actualAPI = new APIManagerAPI(desiredAPI);
+			IAPIDefinition actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()));
 			/* Both API-Definitions can be compared
 			 * - is the Change is breaking
 			 *   - and if yes, do we have a new version number + new exposure Path?
@@ -102,9 +105,9 @@ public class App {
 			 */
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
 	
-			APIManagerAdapter apim = new APIManagerAdapter();
 			
-			apim.applyChanges(changeActions);
+			
+			apimAdapter.applyChanges(changeActions);
 			return 0;
 		} catch (AppException ap) {
 			if(ap.isLogStackStrace()) {

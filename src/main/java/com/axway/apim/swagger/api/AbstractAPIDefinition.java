@@ -1,11 +1,16 @@
 package com.axway.apim.swagger.api;
 
+import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.actions.tasks.props.APINamePropertyHandler;
 import com.axway.apim.actions.tasks.props.APIPathPropertyHandler;
 import com.axway.apim.actions.tasks.props.APISummaryPropertyHandler;
 import com.axway.apim.actions.tasks.props.APITagsPropertyHandler;
+import com.axway.apim.actions.tasks.props.CorsProfileHandler;
+import com.axway.apim.actions.tasks.props.InboundProfileHandler;
+import com.axway.apim.actions.tasks.props.OutboundProfileHandler;
+import com.axway.apim.actions.tasks.props.SecurityProfileHandler;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
@@ -13,16 +18,31 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
-import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfiles;
-import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfiles;
-import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfiles;
-import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfiles;
+import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
+import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
+import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
+import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class AbstractAPIDefinition {
 	
 	protected CommandParameters cmd = CommandParameters.getInstance();
 	protected ObjectMapper objectMapper = new ObjectMapper();
+	
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
+	protected APISwaggerDefinion swaggerDefinition = null;
+
+	@APIPropertyAnnotation(isBreaking = true, 
+			writableStates = {}, 
+			propHandler = SecurityProfileHandler.class)
+	protected List<SecurityProfile> securityProfiles = null;
+	
+	@APIPropertyAnnotation(isBreaking = true, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
+			propHandler = OutboundProfileHandler.class)
+	protected Map<String, OutboundProfile> outboundProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
@@ -30,64 +50,64 @@ public abstract class AbstractAPIDefinition {
 	protected Map<String, String[]> tags = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPIDefinition.STATE_UNPUBLISHED})
-	protected OutboundProfiles outboundProfiles = null;
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
+			propHandler = InboundProfileHandler.class)
+	protected Map<String, InboundProfile> inboundProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPIDefinition.STATE_UNPUBLISHED})
-	protected InboundProfiles inboundProfiles = null;
-	
-	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPIDefinition.STATE_UNPUBLISHED})
-	protected CorsProfiles corsProfiles;
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
+			propHandler = CorsProfileHandler.class)
+	protected List<CorsProfile> corsProfiles;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {}, 
 			propHandler = APIPathPropertyHandler.class)
-	protected String apiPath = null;
+	protected String path = null;
 
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED})
-	protected String status = "NOT_SET";
+	protected String state = null;
 	
-	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {})
-	protected SecurityProfiles securityProfiles = null;
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED})	
+	protected String version;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
 			propHandler = VhostPropertyHandler.class)
 	protected String vhost = null;
 	
-	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
-	protected APISwaggerDefinion swaggerDefinition = null;
-	
 	@APIPropertyAnnotation(isBreaking = false, writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, propHandler = APINamePropertyHandler.class)
-	protected String apiName = null;
+	protected String name = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
 			propHandler = APISummaryPropertyHandler.class)
-	protected String apiSummary = null;
+	protected String summary = null;
 
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED})
-	protected APIImage apiImage = null;
+	protected APIImage image = null;
 	
+	protected String organization = null;
 	
+	protected String organizationId = null;
+	
+	protected String id = null;
+	
+	protected String apiId = null;
+	
+	protected String deprecated = null;
 	
 	protected boolean isValid = false;
-
-	public String getApiPath() throws AppException {
-		throw new AppException("This method must be implemented by concrete class.", ErrorCode.UNSUPPORTED_FEATURE);
-	}
+	
 
 	public boolean isValid() {
 		return this.isValid;
 	}
 
-	public String getStatus() throws AppException {
-		throw new AppException("This method must be implemented by concrete class.", ErrorCode.UNSUPPORTED_FEATURE);
+	public void setValid(boolean isValid) {
+		this.isValid = isValid;
 	}
 
 	public String getOrgId() throws AppException {
@@ -97,19 +117,36 @@ public abstract class AbstractAPIDefinition {
 	public APISwaggerDefinion getSwaggerDefinition() {
 		return this.swaggerDefinition;
 	}
+	
+	public void setSwaggerDefinition(APISwaggerDefinion swaggerDefinition) {
+		this.swaggerDefinition = swaggerDefinition;
+	}
 
-	public OutboundProfiles getOutboundProfiles() {
+	public Map<String, OutboundProfile> getOutboundProfiles() {
 		return this.outboundProfiles;
 	}
 	
-	public SecurityProfiles getSecurityProfiles() {
+	public void setOutboundProfiles(Map<String, OutboundProfile> outboundProfiles) {
+		this.outboundProfiles = outboundProfiles;
+	}
+
+	public List<SecurityProfile> getSecurityProfiles() {
 		return this.securityProfiles;
 	}
-	public InboundProfiles getInboundProfiles() {
+	
+	public void setSecurityProfiles(List<SecurityProfile> securityProfiles) {
+		this.securityProfiles = securityProfiles;
+	}
+
+	public Map<String, InboundProfile> getInboundProfiles() {
 		return this.inboundProfiles;
 	}
 
-	public CorsProfiles getCorsProfiles() {
+	public void setInboundProfiles(Map<String, InboundProfile> inboundProfiles) {
+		this.inboundProfiles = inboundProfiles;
+	}
+
+	public List<CorsProfile> getCorsProfiles() {
 		return corsProfiles;
 	}
 
@@ -119,5 +156,93 @@ public abstract class AbstractAPIDefinition {
 
 	public Map<String, String[]> getTags() {
 		return tags;
+	}
+	
+	public void setState(String state) {
+		this.state = state;
+	}
+	
+	public String getState() throws AppException {
+		return this.state;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getSummary() {
+		return summary;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
+	public APIImage getImage() {
+		return image;
+	}
+
+	public void setImage(APIImage image) {
+		this.image = image;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getOrganization() {
+		return organization;
+	}
+
+	public void setOrganization(String organization) {
+		this.organization = organization;
+	}
+
+	public String getOrganizationId() {
+		return organizationId;
+	}
+
+	public void setOrganizationId(String organizationId) {
+		this.organizationId = organizationId;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getApiId() {
+		return apiId;
+	}
+
+	public void setApiId(String apiId) {
+		this.apiId = apiId;
+	}
+
+	public String getDeprecated() {
+		return deprecated;
+	}
+
+	public void setDeprecated(String deprecated) {
+		this.deprecated = deprecated;
 	}
 }

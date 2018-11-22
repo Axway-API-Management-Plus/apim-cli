@@ -33,7 +33,7 @@ public class VhostPropertyHandler implements PropertyHandler {
 	
 	public void handleVHost(IAPIDefinition desiredAPI, IAPIDefinition actualAPI) throws AppException {
 		if(updateVhost) {
-			if(actualAPI.getStatus().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
+			if(actualAPI.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
 				throw new AppException("Can't update V-Host to: "+desiredAPI.getVhost()+" on unpublished API!", 
 						ErrorCode.CANT_SETUP_VHOST, false);
 			} else {

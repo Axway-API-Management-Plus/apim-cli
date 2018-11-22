@@ -3,7 +3,7 @@
 	"apim": {
 		"name": "test2",
 		"path": "/test2",
-		"status": "unpublished",
+		"state": "unpublished",
 		"version": "1.0.0",
 		"url": "https://10.129.60.57:8075",
 		"username": "apiadmin",

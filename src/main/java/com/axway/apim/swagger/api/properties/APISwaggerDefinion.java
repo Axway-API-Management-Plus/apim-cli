@@ -12,8 +12,7 @@ public class APISwaggerDefinion {
 	private String swaggerFile = null;
 	
 	private byte[] swaggerContent = null;
-	
-	//private String pathToSwaggerFile = null;
+
 
 	public APISwaggerDefinion(byte[] swaggerContent) {
 		this.swaggerContent = swaggerContent;

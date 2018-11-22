@@ -30,10 +30,10 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 		HttpEntity entity;
 		
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/upgrade/"+actualState.getApiId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/upgrade/"+actualState.getId()).build();
 			
 			List<NameValuePair> params = new Vector<NameValuePair>();
-			params.add(new BasicNameValuePair("upgradeApiId", desiredState.getApiId()));
+			params.add(new BasicNameValuePair("upgradeApiId", desiredState.getId()));
 			
 			entity = new UrlEncodedFormEntity(params, "UTF-8");
 			

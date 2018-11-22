@@ -24,7 +24,7 @@ public class InitializationTest extends TestDesignerBeforeSuiteSupport {
 			.response(HttpStatus.OK)
 			.payload("<status>ok</status>");
 
-		designer.createVariable("orgNumber", RandomNumberFunction.getRandomNumber(3, true));
+		designer.createVariable("orgNumber", RandomNumberFunction.getRandomNumber(4, true));
 		
 		designer.echo("Setup Test Org: 'API Development ${orgNumber}'");
 		

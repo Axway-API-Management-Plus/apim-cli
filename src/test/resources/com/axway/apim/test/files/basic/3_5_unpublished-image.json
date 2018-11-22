@@ -2,16 +2,10 @@
 {
 	"name": "${apiName}",
 	"path": "${apiPath}",
-	"status": "unpublished",
+	"state": "unpublished",
 	"version": "1.0.0",
 	"image":"${image}",
-	"organization": {
-		"development": "API Development ${orgNumber}",
-		"target": [
-			"Community",
-			"Axway"
-		]
-	},
+	"organization": "API Development ${orgNumber}",
     "securityProfiles": [
      	{
      		"name": "_default",

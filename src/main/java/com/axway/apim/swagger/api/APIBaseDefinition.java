@@ -3,32 +3,30 @@ package com.axway.apim.swagger.api;
 import com.axway.apim.swagger.api.properties.APIImage;
 
 public class APIBaseDefinition extends AbstractAPIDefinition implements IAPIDefinition {
-	
-	private String status;
 
 	@Override
-	public String getStatus() {
-		return this.status;
+	public String getState() {
+		return this.state;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setStatus(String state) {
+		this.state = state;
 	}
 
 	@Override
-	public String getApiVersion() {
+	public String getVersion() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String getApiName() {
+	public String getName() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	@Override
-	public String getApiSummary() {
+	public String getSummary() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -40,7 +38,7 @@ public class APIBaseDefinition extends AbstractAPIDefinition implements IAPIDefi
 	}
 	
 	@Override
-	public APIImage getApiImage() {
+	public APIImage getImage() {
 		// TODO Auto-generated method stub
 		return null;
 	}

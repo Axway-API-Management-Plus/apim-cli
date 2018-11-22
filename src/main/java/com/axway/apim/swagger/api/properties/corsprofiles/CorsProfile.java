@@ -4,8 +4,6 @@ import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
-
 public class CorsProfile {
 	
 	String name;

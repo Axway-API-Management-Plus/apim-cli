@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class APISummaryPropertyHandler implements PropertyHandler {
 	
 	public JsonNode handleProperty(IAPIDefinition desired, JsonNode response) {
-		((ObjectNode) response).put("summary", desired.getApiSummary());
+		((ObjectNode) response).put("summary", desired.getSummary());
 		return response;
 	}
 }

@@ -1,15 +1,28 @@
 package com.axway.apim.swagger;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.CreateNewAPI;
 import com.axway.apim.actions.RecreateToUpdateAPI;
 import com.axway.apim.actions.UpdateExistingAPI;
+import com.axway.apim.actions.rest.GETRequest;
+import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.swagger.api.APIManagerAPI;
 import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author cwiechmann
@@ -82,7 +95,7 @@ public class APIManagerAdapter {
 			createAPI.execute(changeState);
 		// We do have a breaking change!
 		} else {
-			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getApiName() +" (Version: "+ changeState.getActualAPI().getApiVersion() + ")");
+			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getName() +" (Version: "+ changeState.getActualAPI().getVersion() + ")");
 			if(!changeState.hasAnyChanges()) {
 				LOG.warn("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
 				throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE, false);
@@ -90,7 +103,7 @@ public class APIManagerAdapter {
 			if (changeState.isBreaking()) {
 				LOG.info("Recognized the following changes. Breaking: " + changeState.getBreakingChanges() + 
 						" plus Non-Breaking: " + changeState.getNonBreakingChanges());
-				if(changeState.getActualAPI().getStatus().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
+				if(changeState.getActualAPI().getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
 					LOG.error("Strategy: Applying ALL changes on existing UNPUBLISHED API.");
 					UpdateExistingAPI updateAPI = new UpdateExistingAPI();
 					updateAPI.execute(changeState);
@@ -129,6 +142,95 @@ public class APIManagerAdapter {
 					recreate.execute(changeState);
 				}
 			}
+		}
+	}
+	
+	public static IAPIDefinition getAPIManagerAPI(JsonNode jsonConfiguration) throws AppException {
+		if(jsonConfiguration == null) {
+			IAPIDefinition apiManagerAPI = new APIManagerAPI();
+			apiManagerAPI.setValid(false);
+			return apiManagerAPI;
+		}
+		
+		ObjectMapper mapper = new ObjectMapper();
+		IAPIDefinition apiManagerApi;
+		try {
+			apiManagerApi = mapper.readValue(jsonConfiguration.toString(), APIManagerAPI.class);
+			apiManagerApi.setSwaggerDefinition(new APISwaggerDefinion(getOriginalSwaggerFromAPIM(apiManagerApi.getApiId())));
+			if(apiManagerApi.getImage()!=null) {
+				apiManagerApi.getImage().setImageContent(getAPIImageFromAPIM(apiManagerApi.getId()));
+			}
+			apiManagerApi.setValid(true);
+			return apiManagerApi;
+		} catch (Exception e) {
+			throw new AppException("Can't initialize API-Manager API-State.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+		
+	}
+	
+	public static JsonNode getExistingAPI(String apiPath) throws AppException {
+		CommandParameters cmd = CommandParameters.getInstance();
+		ObjectMapper mapper = new ObjectMapper();
+		URI uri;
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			InputStream response = getRequest.execute().getEntity().getContent();
+			
+			JsonNode jsonResponse;
+			String path;
+			String apiId = null;
+			try {
+				jsonResponse = mapper.readTree(response);
+				for(JsonNode node : jsonResponse) {
+					path = node.get("path").asText();
+					if(path.equals(apiPath)) {
+						LOG.info("Found existing API on path: '"+path+"' / "+node.get("state").asText()+" ('" + node.get("id").asText()+"')");
+						apiId = node.get("id").asText();
+						break;
+					}
+				}
+				if(apiId==null) {
+					LOG.info("No existing API found exposed on: " + apiPath);
+					return null;
+				}
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId).build();
+				getRequest = new GETRequest(uri, null);
+				response = getRequest.execute().getEntity().getContent();
+				jsonResponse = mapper.readTree(response);
+				return jsonResponse;
+			} catch (IOException e) {
+				throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			}
+		} catch (Exception e) {
+			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	private static byte[] getOriginalSwaggerFromAPIM(String backendApiID) throws AppException {
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+backendApiID+"/download")
+					.setParameter("original", "true").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			InputStream response = getRequest.execute().getEntity().getContent();
+			return IOUtils.toByteArray(response);
+		} catch (Exception e) {
+			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_SWAGGER_FILE, e);
+		}
+	}
+	
+	private static byte[] getAPIImageFromAPIM(String backendApiID) throws AppException {
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+backendApiID+"/image").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpEntity response = getRequest.execute().getEntity();
+			if(response == null) return null; // no Image found in API-Manager
+			InputStream is = response.getContent();
+			return IOUtils.toByteArray(is);
+		} catch (Exception e) {
+			throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 }

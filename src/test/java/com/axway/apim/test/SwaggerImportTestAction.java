@@ -7,19 +7,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.App;
-import com.axway.apim.swagger.api.APIImportDefinition;
 import com.consol.citrus.actions.AbstractTestAction;
 import com.consol.citrus.context.TestContext;
+import com.consol.citrus.exceptions.CitrusRuntimeException;
 import com.consol.citrus.exceptions.ValidationException;
-import com.consol.citrus.message.MessageType;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SwaggerImportTestAction extends AbstractTestAction {
@@ -32,10 +29,14 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 	
 	@Override
 	public void doExecute(TestContext context) {
-		String swaggerFile 			= context.getVariable("swaggerFile");
-		String configFile 			= context.getVariable("configFile");
-		swaggerFile = replaceDynamicContentInFile(swaggerFile, context);
-		configFile = replaceDynamicContentInFile(configFile, context);
+		String origSwaggerFile 			= context.getVariable("swaggerFile");
+		String origConfigFile 			= context.getVariable("configFile");
+		String stage				= null;
+		try {
+			stage 				= context.getVariable("stage");
+		} catch (CitrusRuntimeException ignore) {};
+		String swaggerFile = replaceDynamicContentInFile(origSwaggerFile, context);
+		String configFile = replaceDynamicContentInFile(origConfigFile, context);
 		LOG.info("Using Replaced Swagger-File: " + swaggerFile);
 		LOG.info("Using Replaced configFile-File: " + configFile);
 		int expectedReturnCode = 0;
@@ -47,13 +48,23 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 		try {
 			enforce = context.getVariable("enforce");
 		} catch (Exception ignore) {};
+		
+		if(stage==null) {
+			stage = "NOT_SET";
+		} else {
+			// We need to prepare the dynamic staging file used during the test.
+			String stageConfigFile = origConfigFile.substring(0, origConfigFile.lastIndexOf(".")+1) + stage + origConfigFile.substring(origConfigFile.lastIndexOf("."));
+			// This creates the dynamic staging config file! (Fort testing, we also support reading out of a file directly)
+			stage = replaceDynamicContentInFile(stageConfigFile, context);
+		}
 
 		String[] args = new String[] { 
 				"-a", swaggerFile, 
 				"-c", configFile, 
 				"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
 				"-p", context.replaceDynamicContentInString("${apiManagerPass}"), 
-				"-u", context.replaceDynamicContentInString("${apiManagerUser}"), 
+				"-u", context.replaceDynamicContentInString("${apiManagerUser}"),
+				"-s", stage, 
 				"-f", enforce};
 		int rc = App.run(args);
 		if(expectedReturnCode!=rc) {
@@ -80,11 +91,14 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 				throw new IOException("Unable to read swagger file from: " + pathToFile);
 			}
 			String jsonData = IOUtils.toString(is);
+			String filename = pathToFile.substring(pathToFile.lastIndexOf("/")+1); // e.g.: petstore.json, no-change-xyz-config.<stage>.json, 
+			String prefix = filename.substring(0, filename.indexOf("."));
+			String suffix = filename.substring(filename.indexOf("."));
 			String jsonReplaced = context.replaceDynamicContentInString(jsonData);
-			File tempFile = File.createTempFile("pathToFile", ".json");
+			File tempFile = File.createTempFile(prefix, suffix);
 			os = new FileOutputStream(tempFile);
 			IOUtils.write(jsonReplaced, os);
-			//tempSwaggerFile.deleteOnExit();
+			tempFile.deleteOnExit();
 			return tempFile.getAbsolutePath();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

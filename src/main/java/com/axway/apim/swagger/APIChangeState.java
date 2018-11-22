@@ -1,7 +1,6 @@
 package com.axway.apim.swagger;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Vector;
@@ -71,8 +70,12 @@ public class APIChangeState {
 					Object desiredValue = method.invoke(desiredAPI, null);
 					Object actualValue = method2.invoke(actualAPI, null);
 					if(desiredValue == null && actualValue == null) continue;
+					if(desiredValue == null) {
+						LOG.info("No change for property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
+						continue; // No change, if nothing is provided!
+					}
 					// desiredValue == null - This can be used to reset/clean a property! (Need to think about this!)
-					if(desiredValue == null || (desiredValue!=null && actualValue==null) || !actualValue.equals(desiredValue)) {
+					if((desiredValue!=null && actualValue==null) || !actualValue.equals(desiredValue)) {
 						APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
 						if (property.isBreaking()) {
 							this.isBreaking = true;
@@ -80,7 +83,7 @@ public class APIChangeState {
 						} else {
 							this.nonBreakingChanges.add(field.getName());
 						}
-						if (!isWritable(property, this.actualAPI.getStatus())) {
+						if (!isWritable(property, this.actualAPI.getState())) {
 							this.updateExistingAPI = false; // Found a NON-Changeable property, can't update the existing API
 						}
 					} else {
