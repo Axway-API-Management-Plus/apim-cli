@@ -1,8 +1,25 @@
-	
 {
 	"name": "${apiName}",
 	"path": "${apiPath}",
 	"state": "unpublished",
 	"version": "1.0.0",
-	"organization": "API Development ${orgNumber}"
+	"organization": "API Development ${orgNumber}", 
+    "securityProfiles": [
+     	{
+     		"name": "_default",
+     		"isDefault": true,
+     		"devices": [
+     			{
+     				"name": "API Key",
+     				"type": "apiKey",
+     				"order": 0,
+     				"properties": {
+     					"apiKeyFieldName": "KeyId",
+     					"takeFrom": "QUERY",
+     					"removeCredentialsOnSuccess": "false"
+     				}
+     			}
+     		]
+     	}
+     ]
 }

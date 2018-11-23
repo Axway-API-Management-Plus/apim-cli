@@ -1,10 +1,8 @@
 package com.axway.apim.swagger.api.properties.securityprofiles;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 public class SecurityDevice {
@@ -12,11 +10,9 @@ public class SecurityDevice {
 	
 	String type;
 	
-	String order = "1";
+	Integer order;
 	
 	Map<String, Object> properties;
-	
-	
 
 	public SecurityDevice() {
 		super();
@@ -39,11 +35,11 @@ public class SecurityDevice {
 		this.type = type;
 	}
 
-	public String getOrder() {
+	public Integer getOrder() {
 		return order;
 	}
 
-	public void setOrder(String order) {
+	public void setOrder(Integer order) {
 		this.order = order;
 	}
 
@@ -62,7 +58,7 @@ public class SecurityDevice {
 			SecurityDevice otherSecurityDevice = (SecurityDevice)other;
 			if(!StringUtils.equals(otherSecurityDevice.getName(), this.getName())) return false;
 			if(!StringUtils.equals(otherSecurityDevice.getType(), this.getType())) return false;
-			if(!StringUtils.equals(otherSecurityDevice.getOrder(), this.getOrder())) return false;
+			//if(!StringUtils.equals(otherSecurityDevice.getOrder(), this.getOrder())) return false;
 			if(!otherSecurityDevice.getProperties().equals(this.getProperties())) return false;
 		}
 		return true;

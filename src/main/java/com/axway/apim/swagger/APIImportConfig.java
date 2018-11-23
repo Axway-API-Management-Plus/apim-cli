@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.commons.io.IOUtils;
@@ -56,6 +58,7 @@ public class APIImportConfig {
 	
 	public IAPIDefinition getImportAPIDefinition() throws AppException {
 		IAPIDefinition stagedConfig;
+		mapper.setDefaultMergeable(true);
 		try {
 			IAPIDefinition baseConfig = mapper.readValue(new File(apiContract), APIImportDefinition.class);
 			ObjectReader updater = mapper.readerForUpdating(baseConfig);
@@ -65,7 +68,6 @@ public class APIImportConfig {
 			} else {
 				stagedConfig = baseConfig;
 			}
-			addDefaultPassthroughProfile(stagedConfig);
 			addDefaultPassthroughSecurityProfile(stagedConfig);
 			stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerDefFromFile()));
 			addImageContent(stagedConfig);
@@ -192,7 +194,7 @@ public class APIImportConfig {
 			passthroughDevice.getProperties().put("removeCredentialsOnSuccess", "true");
 			passthroughProfile.getDevices().add(passthroughDevice);
 			
-			importApi.setSecurityProfiles(new Vector<SecurityProfile>());
+			importApi.setSecurityProfiles(new TreeSet<SecurityProfile>());
 			importApi.getSecurityProfiles().add(passthroughProfile);
 		}
 		return importApi;

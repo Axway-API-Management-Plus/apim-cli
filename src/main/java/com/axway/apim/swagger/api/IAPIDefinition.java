@@ -2,6 +2,7 @@ package com.axway.apim.swagger.api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.api.properties.APIImage;
@@ -28,12 +29,12 @@ public interface IAPIDefinition {
 	
 	public Map<String, OutboundProfile> getOutboundProfiles();
 	public Map<String, InboundProfile> getInboundProfiles();
-	public List<SecurityProfile> getSecurityProfiles();
+	public Set<SecurityProfile> getSecurityProfiles();
 	public List<CorsProfile> getCorsProfiles();
 	
 	public void setInboundProfiles(Map<String, InboundProfile> inboundProfiles);
 	
-	public void setSecurityProfiles(List<SecurityProfile> securityProfiles);
+	public void setSecurityProfiles(Set<SecurityProfile> securityProfiles);
 	
 	
 	public boolean isValid();

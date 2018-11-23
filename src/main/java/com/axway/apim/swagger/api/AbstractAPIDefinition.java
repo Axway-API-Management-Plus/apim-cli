@@ -2,6 +2,7 @@ package com.axway.apim.swagger.api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.axway.apim.actions.tasks.props.APINamePropertyHandler;
 import com.axway.apim.actions.tasks.props.APIPathPropertyHandler;
@@ -23,6 +24,9 @@ import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonMerge;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -37,7 +41,9 @@ public abstract class AbstractAPIDefinition {
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {}, 
 			propHandler = SecurityProfileHandler.class)
-	protected List<SecurityProfile> securityProfiles = null;
+	@JsonMerge
+	@JsonSetter(nulls=Nulls.SKIP)
+	protected Set<SecurityProfile> securityProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
@@ -130,11 +136,11 @@ public abstract class AbstractAPIDefinition {
 		this.outboundProfiles = outboundProfiles;
 	}
 
-	public List<SecurityProfile> getSecurityProfiles() {
+	public Set<SecurityProfile> getSecurityProfiles() {
 		return this.securityProfiles;
 	}
 	
-	public void setSecurityProfiles(List<SecurityProfile> securityProfiles) {
+	public void setSecurityProfiles(Set<SecurityProfile> securityProfiles) {
 		this.securityProfiles = securityProfiles;
 	}
 

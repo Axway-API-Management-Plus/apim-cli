@@ -26,8 +26,7 @@ public class NestedPropertyStagingTest extends TestNGCitrusTestDesigner {
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/staging/1_no-change-config.json");
-		createVariable("stage", "prod"); // << Program will search for file: 1_no-change-config.prod.json
+		createVariable("configFile", "/com/axway/apim/test/files/staging/2_nested_prop-config.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 
@@ -43,8 +42,32 @@ public class NestedPropertyStagingTest extends TestNGCitrusTestDesigner {
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "published") // State must be published in "prod"
+			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.takeFrom", "QUERY")
+			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.apiKeyFieldName", "KeyId")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
-	}
+		
+		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with production settings #######");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/staging/2_nested_prop-config.json");
+		createVariable("stage", "prod"); // << Program will search for file: 2_nested_prop-config.prod.json
+		createVariable("expectedReturnCode", "0");
+		action(swaggerImport);
+		
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
+		http().client("apiManager")
+			.send()
+			.get("/proxies/${apiId}")
+			.name("api")
+			.header("Content-Type", "application/json");
 
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.OK)
+			.messageType(MessageType.JSON)
+			.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
+			.validate("$.[?(@.id=='${apiId}')].state", "unpublished")
+			.validate("$.[?(@.id=='${apiId}')].securityProfiles[0].devices[0].properties.takeFrom", "HEADER")
+			.validate("$.[?(@.id=='${apiId}')].securityProfiles[0].devices[0].properties.apiKeyFieldName", "KeyId");
+	}
 }
