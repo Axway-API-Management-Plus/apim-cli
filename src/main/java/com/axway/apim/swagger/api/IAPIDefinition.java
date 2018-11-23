@@ -29,12 +29,12 @@ public interface IAPIDefinition {
 	
 	public Map<String, OutboundProfile> getOutboundProfiles();
 	public Map<String, InboundProfile> getInboundProfiles();
-	public Set<SecurityProfile> getSecurityProfiles();
+	public List<SecurityProfile> getSecurityProfiles();
 	public List<CorsProfile> getCorsProfiles();
 	
 	public void setInboundProfiles(Map<String, InboundProfile> inboundProfiles);
 	
-	public void setSecurityProfiles(Set<SecurityProfile> securityProfiles);
+	public void setSecurityProfiles(List<SecurityProfile> securityProfiles);
 	
 	
 	public boolean isValid();

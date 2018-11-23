@@ -10,7 +10,7 @@ public class SecurityDevice {
 	
 	String type;
 	
-	Integer order;
+	String order;
 	
 	Map<String, Object> properties;
 
@@ -35,11 +35,11 @@ public class SecurityDevice {
 		this.type = type;
 	}
 
-	public Integer getOrder() {
+	public String getOrder() {
 		return order;
 	}
 
-	public void setOrder(Integer order) {
+	public void setOrder(String order) {
 		this.order = order;
 	}
 
@@ -58,7 +58,7 @@ public class SecurityDevice {
 			SecurityDevice otherSecurityDevice = (SecurityDevice)other;
 			if(!StringUtils.equals(otherSecurityDevice.getName(), this.getName())) return false;
 			if(!StringUtils.equals(otherSecurityDevice.getType(), this.getType())) return false;
-			//if(!StringUtils.equals(otherSecurityDevice.getOrder(), this.getOrder())) return false;
+			if(!StringUtils.equals(otherSecurityDevice.getOrder(), this.getOrder())) return false;
 			if(!otherSecurityDevice.getProperties().equals(this.getProperties())) return false;
 		}
 		return true;

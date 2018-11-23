@@ -10,13 +10,13 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test
+@Test(testName = "UnpublishedPublishedDeprecatedAPITest")
 public class UnpublishedPublishedDeprecatedAPITest extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "UnpublishedPublishedDreprecatedAPITest")
+	@CitrusTest(name = "UnpublishedPublishedDeprecatedAPITest")
 	public void setupDevOrgTest() {
 		description("Import an Unpublished-API, then publish it and finally deprecate it.");
 		

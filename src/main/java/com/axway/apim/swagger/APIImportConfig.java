@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.TreeSet;
@@ -58,7 +59,7 @@ public class APIImportConfig {
 	
 	public IAPIDefinition getImportAPIDefinition() throws AppException {
 		IAPIDefinition stagedConfig;
-		mapper.setDefaultMergeable(true);
+		//mapper.setDefaultMergeable(true);
 		try {
 			IAPIDefinition baseConfig = mapper.readValue(new File(apiContract), APIImportDefinition.class);
 			ObjectReader updater = mapper.readerForUpdating(baseConfig);
@@ -194,7 +195,7 @@ public class APIImportConfig {
 			passthroughDevice.getProperties().put("removeCredentialsOnSuccess", "true");
 			passthroughProfile.getDevices().add(passthroughDevice);
 			
-			importApi.setSecurityProfiles(new TreeSet<SecurityProfile>());
+			importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
 			importApi.getSecurityProfiles().add(passthroughProfile);
 		}
 		return importApi;

@@ -1,7 +1,10 @@
 package com.axway.apim.swagger.api.properties.securityprofiles;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -11,13 +14,12 @@ public class SecurityProfile {
 	
 	String isDefault;
 	
-	Set<SecurityDevice> devices;
-	
-	
+	List<SecurityDevice> devices;
+
 
 	public SecurityProfile() {
 		super();
-		this.devices = new HashSet<SecurityDevice>();
+		this.devices = new ArrayList<SecurityDevice>();
 	}
 
 	public String getName() {
@@ -36,11 +38,11 @@ public class SecurityProfile {
 		this.isDefault = isDefault;
 	}
 
-	public Set<SecurityDevice> getDevices() {
+	public List<SecurityDevice> getDevices() {
 		return devices;
 	}
 
-	public void setDevices(Set<SecurityDevice> devices) {
+	public void setDevices(List<SecurityDevice> devices) {
 		this.devices = devices;
 	}
 
