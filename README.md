@@ -24,11 +24,11 @@ Today the following is already supported:
 - CORS-Setup
 - V-Host support
 - Tags
+- Custom-Properties
 
 The following is on the roadmap:
 - API-description
 - API-Method description
-- Custom-Properties
 - Method-Level settings such as security, Custom-Policies, etc.
 
 Build and tested with API-Manager 7.6.2 SP1 at Travis CI: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=master)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
