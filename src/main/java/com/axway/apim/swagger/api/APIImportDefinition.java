@@ -11,7 +11,6 @@ import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.APIImportConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -25,11 +24,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDefinition {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIImportDefinition.class);
-
-	/**
-	 * Required meta information
-	 */
-	private APIImportConfig apiContract;
 	
 	public APIImportDefinition() throws AppException {
 		super();
@@ -46,10 +40,11 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 			GETRequest getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
 			JsonNode jsonNode = objectMapper.readTree(response);
-			if(jsonNode==null) LOG.error("Unable to read details for org: " + apiContract.getProperty("/organization/development").asText());
+			if(jsonNode==null) LOG.error("Unable to read details for org: " + this.organization);
 			return jsonNode.get(0).get("id").asText();
 		} catch (Exception e) {
-			throw new AppException("Can't read Org-Details from API-Manager. Is the API-Managre running?", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Can't read Org-Details from API-Manager. Is the API-Managre running or "
+					+ "does the Organization: '"+this.organization+"' exists?", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 }

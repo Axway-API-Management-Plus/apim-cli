@@ -2,13 +2,13 @@ package com.axway.apim.swagger.api;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.axway.apim.actions.tasks.props.APINamePropertyHandler;
 import com.axway.apim.actions.tasks.props.APIPathPropertyHandler;
 import com.axway.apim.actions.tasks.props.APISummaryPropertyHandler;
 import com.axway.apim.actions.tasks.props.APITagsPropertyHandler;
 import com.axway.apim.actions.tasks.props.CorsProfileHandler;
+import com.axway.apim.actions.tasks.props.CustomPropertyHandler;
 import com.axway.apim.actions.tasks.props.InboundProfileHandler;
 import com.axway.apim.actions.tasks.props.OutboundProfileHandler;
 import com.axway.apim.actions.tasks.props.SecurityProfileHandler;
@@ -23,6 +23,7 @@ import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
+import com.axway.apim.swagger.api.properties.tags.TagMap;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
@@ -37,9 +38,13 @@ public abstract class AbstractAPIDefinition {
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {}, 
 			propHandler = SecurityProfileHandler.class)
-	//@JsonMerge
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<SecurityProfile> securityProfiles = null;
+	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
+			propHandler = APITagsPropertyHandler.class)
+	protected TagMap<String, String[]> tags = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
 	protected APISwaggerDefinion swaggerDefinition = null;
@@ -48,11 +53,6 @@ public abstract class AbstractAPIDefinition {
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
 			propHandler = OutboundProfileHandler.class)
 	protected Map<String, OutboundProfile> outboundProfiles = null;
-	
-	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
-			propHandler = APITagsPropertyHandler.class)
-	protected Map<String, String[]> tags = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
@@ -93,6 +93,11 @@ public abstract class AbstractAPIDefinition {
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED})
 	protected APIImage image = null;
+	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
+			propHandler = CustomPropertyHandler.class)
+	protected Map<String, String> customProperties = null;
 	
 	protected String organization = null;
 	
@@ -249,5 +254,13 @@ public abstract class AbstractAPIDefinition {
 
 	public void setDeprecated(String deprecated) {
 		this.deprecated = deprecated;
+	}
+
+	public Map<String, String> getCustomProperties() {
+		return customProperties;
+	}
+
+	public void setCustomProperties(Map<String, String> customProperties) {
+		this.customProperties = customProperties;
 	}
 }

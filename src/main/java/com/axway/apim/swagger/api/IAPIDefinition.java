@@ -36,6 +36,8 @@ public interface IAPIDefinition {
 	
 	public void setSecurityProfiles(List<SecurityProfile> securityProfiles);
 	
+	public Map<String, String> getCustomProperties();
+	
 	
 	public boolean isValid();
 	

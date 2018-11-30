@@ -86,6 +86,7 @@ public class APIChangeState {
 						if (!isWritable(property, this.actualAPI.getState())) {
 							this.updateExistingAPI = false; // Found a NON-Changeable property, can't update the existing API
 						}
+						LOG.info("Changed for property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
 					} else {
 						LOG.info("No change for property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
 					}

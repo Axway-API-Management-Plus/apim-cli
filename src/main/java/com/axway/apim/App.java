@@ -92,7 +92,7 @@ public class App {
 			// Create the API-Definition that represent what we want to have
 			//                  IAPIDefinition desiredAPI = new APIImportDefinition(contract, params.getOptionValue("swagger"));
 			// Create an API-Definition that reflects the same API in API-Manager (or indicated)
-			IAPIDefinition actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()));
+			IAPIDefinition actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI.getCustomProperties());
 			/* Both API-Definitions can be compared
 			 * - is the Change is breaking
 			 *   - and if yes, do we have a new version number + new exposure Path?

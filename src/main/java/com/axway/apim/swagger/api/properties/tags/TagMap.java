@@ -20,8 +20,10 @@ public class TagMap<K, V> extends LinkedHashMap<String, String[]> {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	
 
-	public TagMap(JsonNode config) throws AppException {
+/*	public TagMap(JsonNode config) throws AppException {
 		super();
 		if(config instanceof MissingNode) {
 			return;
@@ -31,6 +33,13 @@ public class TagMap<K, V> extends LinkedHashMap<String, String[]> {
 		} catch (Exception e) {
 			throw new AppException("Cant initialize APIImport definition", ErrorCode.UNXPECTED_ERROR, e);
 		}
+	}*/
+
+
+
+	public TagMap() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
 
 

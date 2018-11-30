@@ -5,10 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.TreeSet;
-import java.util.Vector;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -19,11 +15,8 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIImportDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
-import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
@@ -39,10 +32,6 @@ public class APIImportConfig {
 	private static Logger LOG = LoggerFactory.getLogger(APIImportConfig.class);
 	
 	private ObjectMapper mapper = new ObjectMapper();
-	
-	private JsonNode configuration;
-	
-	private JsonNode stageConfiguration;
 	
 	private String pathToSwagger;
 	
@@ -112,21 +101,8 @@ public class APIImportConfig {
 		return is;
 	}
 	
-	/**
-	 * @param property - JSON-Path to the requested property
-	 * @return the value of the property stage-depending
-	 */
-	public JsonNode getProperty(String property) {
-		JsonNode returnValue;
-		if(stageConfiguration!=null && stageConfiguration.at(property)!=null) {
-			returnValue = stageConfiguration.at(property);
-		} else {
-			returnValue = configuration.at(property);
-		}
-		return returnValue;
-	}
-	
 	private String getStageContract(String stage, String apiContract) {
+		if(stage == null) return null;
 		File stageFile = new File(stage);
 		if(stageFile.exists()) { // This is to support testing with dynamic created files!
 			return stageFile.getAbsolutePath();
@@ -138,51 +114,6 @@ public class APIImportConfig {
 		return null;
 	}
 	
-	/**
-	 * To make testing easier we allow reading test-files from classpath as well
-	 * @throws AppException 
-	 */
-	private JsonNode getConfiguration(String pathToResource) throws JsonProcessingException, IOException, AppException {
-		JsonNode jsonConfig;
-		File inputFile = new File(pathToResource);
-		if(inputFile.exists()) { 
-			jsonConfig = mapper.readTree(new File(pathToResource));
-			//jsonConfig = IOUtils.read(input, buffer).readFileToString(new File(pathToResource));
-		} else {
-			jsonConfig = mapper.readTree(this.getClass().getResourceAsStream(pathToResource));
-		}
-		if(jsonConfig == null) {
-			throw new AppException("Unable to read config file from, as it is null", ErrorCode.CANT_READ_CONFIG_FILE);
-		}
-		return jsonConfig;
-	}
-	
-	private JsonNode getJsonContent(String pathToResource) throws JsonProcessingException, IOException, AppException {
-		JsonNode jsonConfig;
-		File inputFile = new File(pathToResource);
-		if(inputFile.exists()) { 
-			jsonConfig = mapper.readTree(new File(pathToResource));
-			//jsonConfig = IOUtils.read(input, buffer).readFileToString(new File(pathToResource));
-		} else {
-			jsonConfig = mapper.readTree(this.getClass().getResourceAsStream(pathToResource));
-		}
-		if(jsonConfig == null) {
-			throw new AppException("Unable to read config file from, as it is null", ErrorCode.CANT_READ_CONFIG_FILE);
-		}
-		return jsonConfig;
-	}
-	
-	private IAPIDefinition addDefaultPassthroughProfile(IAPIDefinition importApi) {
-		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) {
-			InboundProfile passthroughProfile = new InboundProfile();
-			passthroughProfile.setCorsProfile("_default");
-			passthroughProfile.setSecurityProfile("_default");
-			importApi.setInboundProfiles(new LinkedHashMap<String, InboundProfile>());
-			importApi.getInboundProfiles().put("_default", passthroughProfile);
-		}
-		return importApi;
-	}
-	
 	private IAPIDefinition addDefaultPassthroughSecurityProfile(IAPIDefinition importApi) {
 		if(importApi.getSecurityProfiles()==null || importApi.getSecurityProfiles().size()==0) {
 			SecurityProfile passthroughProfile = new SecurityProfile();
@@ -191,6 +122,7 @@ public class APIImportConfig {
 			SecurityDevice passthroughDevice = new SecurityDevice();
 			passthroughDevice.setName("Pass Through");
 			passthroughDevice.setType("passThrough");
+			passthroughDevice.setOrder("0");
 			passthroughDevice.getProperties().put("subjectIdFieldName", "Pass Through");
 			passthroughDevice.getProperties().put("removeCredentialsOnSuccess", "true");
 			passthroughProfile.getDevices().add(passthroughDevice);

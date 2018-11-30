@@ -3,6 +3,9 @@ package com.axway.apim.swagger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -19,6 +22,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIManagerAPI;
+import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -145,7 +149,14 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	public static IAPIDefinition getAPIManagerAPI(JsonNode jsonConfiguration) throws AppException {
+	/**
+	 * Creates the API-Manager API-Representation. Basically the "Current" state of the API. 
+	 * @param jsonConfiguration The JSON-Configuration returned from the API-Manager REST-Proxy endpoint
+	 * @param importCustomProperties list of customProps declared (basically from the ImportAPI, as the API-Manager REST-API don't know it)
+	 * @return an APIManagerAPI instance, which is flagged as valid, if the API was found or invalid, if not found
+	 * @throws AppException
+	 */
+	public static IAPIDefinition getAPIManagerAPI(JsonNode jsonConfiguration, Map<String, String> importCustomProperties) throws AppException {
 		if(jsonConfiguration == null) {
 			IAPIDefinition apiManagerAPI = new APIManagerAPI();
 			apiManagerAPI.setValid(false);
@@ -161,11 +172,24 @@ public class APIManagerAdapter {
 				apiManagerApi.getImage().setImageContent(getAPIImageFromAPIM(apiManagerApi.getId()));
 			}
 			apiManagerApi.setValid(true);
+			// As the API-Manager REST doesn't provide information about Custom-Properties, we have to setup 
+			// the Custom-Properties based on the Import API.
+			if(importCustomProperties != null) {
+				Map<String, String> customProperties = new LinkedHashMap<String, String>();
+				Iterator<String> it = importCustomProperties.keySet().iterator();
+				while(it.hasNext()) {
+					String customPropKey = it.next();
+					JsonNode value = jsonConfiguration.get(customPropKey);
+					String customPropValue = (value == null) ? null : value.asText();
+					customProperties.put(customPropKey, customPropValue);
+				}
+				((AbstractAPIDefinition)apiManagerApi).setCustomProperties(customProperties);
+			}
+			
 			return apiManagerApi;
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-State.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
-		
 	}
 	
 	public static JsonNode getExistingAPI(String apiPath) throws AppException {
