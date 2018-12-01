@@ -44,7 +44,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 			if(jsonNode==null) LOG.error("Unable to read details for org: " + this.organization);
 			return jsonNode.get(0).get("id").asText();
 		} catch (Exception e) {
-			throw new AppException("Can't read Org-Details from API-Manager. Is the API-Managre running or "
+			throw new AppException("Can't read Org-Details from API-Manager. Is the API-Manager running and "
 					+ "does the Organization: '"+this.organization+"' exists?", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
