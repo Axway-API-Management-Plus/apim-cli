@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+VersionComment: Original factory configuration (Environment)
+Name: Default factory configuration for API Gateway (Environment)
+Description: Original factory configuration (Environment)
+Version: v1 (Environment)
+

@@ -1,0 +1,120 @@
+<entityStoreData xmlns="http://www.vordel.com/2005/06/24/entityStore">
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" abstract="true" extends="Entity" name="RootChild"/>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="RootChild" name="ESConfiguration">
+        <constant name="_version" type="integer" value="27"/>
+        <!--
+            Give this singleton a key.
+        -->
+        <field isKey="true" name="name" type="string"/>
+        <!-- 
+            We use this field to verify that the passphrase for the 
+            encryped data is synchronized between the server and client, and
+            between multiple invocations of the client
+        -->
+        <field name="passphraseTest" type="encrypted"/>
+        <field name="version" type="string"/>
+        <!-- The product key should never change for the lifetime of the product -->
+        <field name="productKey" type="string"/>
+        <field cardinality="?" name="gitrev" type="string"/>
+    </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" abstract="true" extends="RootChild" name="NamedTopLevelGroup">
+        <constant name="_version" type="integer" value="0"/>
+		<field isKey="true" name="name" type="string"/>
+	</entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="NamedTopLevelGroup" name="EnvironmentalizedEntities">
+    <constant name="_version" type="integer" value="0"/>  
+    <componentType cardinality="*" name="EnvironmentalizedEntity"/>
+  </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" abstract="true" extends="Entity" name="EnvironmentalizedField">
+    <constant name="_version" type="integer" value="1"/>  
+    <field cardinality="1" isKey="true" name="entityFieldName" type="string"/>
+    <field cardinality="1" default="0" isKey="true" name="index" type="integer"/>
+    <field name="displayName" type="string"/>
+  </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="EnvironmentalizedField" name="EnvironmentalizedFieldInteger">
+      <constant name="_version" type="integer" value="0"/>  
+      <constant name="class" type="string" value="com.vordel.api.deployment.model.EnvironmentalizedFieldInteger"/>  
+      <field cardinality="?" name="value" type="integer"/>
+  </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="EnvironmentalizedField" name="EnvironmentalizedFieldLong">
+      <constant name="_version" type="integer" value="0"/>  
+      <constant name="class" type="string" value="com.vordel.api.deployment.model.EnvironmentalizedFieldLong"/>        
+      <field cardinality="?" name="value" type="long"/>
+  </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="EnvironmentalizedField" name="EnvironmentalizedFieldBoolean">
+      <constant name="_version" type="integer" value="0"/>  
+      <constant name="class" type="string" value="com.vordel.api.deployment.model.EnvironmentalizedFieldBoolean"/>  
+      <field cardinality="?" name="value" type="boolean"/>
+  </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="EnvironmentalizedField" name="EnvironmentalizedFieldString">
+      <constant name="_version" type="integer" value="1"/>  
+      <constant name="class" type="string" value="com.vordel.api.deployment.model.EnvironmentalizedFieldString"/>        
+      <field cardinality="?" name="value" type="string"/>
+      <field default="0" name="multiline" type="boolean"/>
+  </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="EnvironmentalizedField" name="EnvironmentalizedFieldBinary">
+      <constant name="_version" type="integer" value="0"/>  
+      <constant name="class" type="string" value="com.vordel.api.deployment.model.EnvironmentalizedFieldBinary"/>  
+      <field cardinality="?" name="value" type="binary"/>
+  </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="EnvironmentalizedField" name="EnvironmentalizedFieldEncrypted">
+      <constant name="_version" type="integer" value="0"/>    
+      <constant name="class" type="string" value="com.vordel.api.deployment.model.EnvironmentalizedFieldEncrypted"/>  
+      <field cardinality="?" name="value" type="encrypted"/>
+  </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="EnvironmentalizedField" name="EnvironmentalizedFieldReference">
+      <constant name="_version" type="integer" value="1"/>  
+      <constant name="class" type="string" value="com.vordel.api.deployment.model.EnvironmentalizedFieldReference"/>        
+      <field cardinality="?" name="value" type="^Entity"/>
+      <field name="selectorAttributeType" type="string"/>
+      <field name="selectorSearch" type="string"/>
+      <field name="selectorType" type="string"/>
+  </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="Entity" name="EnvironmentalizedEntity">
+    <constant name="_version" type="integer" value="0"/>  
+    <componentType cardinality="+" name="EnvironmentalizedField"/>
+    <field isKey="true" name="entityPk" type="^Entity"/>
+  </entityType>
+<entityType xmlns="http://www.vordel.com/2005/06/24/entityStore" extends="Entity" name="Root">
+  <componentType cardinality="*" name="RootChild"/>
+  <field isKey="true" name="name" type="string"/>
+
+  <!-- Used by the FileStore implementation, records the last time the store was written -->
+  <field name="lastModificationTime" type="utctime"/>
+
+  <!-- Used by the in-memory ad filestore implementations, records the next integer to use as a PK -->
+  <field name="pkInc" type="integer"/>
+
+  <!-- 
+          Provide a user-extensible means to tag an individual store, that won't interfere with federated store 
+      composition. If it's done in the root node, then there are no synchronization issues across stores in the
+      federated context, as each store naturally has full control of its root node, with only the Primary Store's
+      root being visible via the federated view.
+
+          Provide a pair of multivalued string fields. It is up to the user to ensure that the contents are
+      synchronized. One string list acts as the key, with the entry in the corresponding list at the same index giving
+      the value for that key, e.g.
+      
+          tagName[0] = 'gitrev'
+          tagName[0] = 'e39a0a77b92c5b82e5a662a7de0b33daeadfb170'
+          
+      equates to the mapping 'gitrev' -> 'e39a0a77b92c5b82e5a662a7de0b33daeadfb170'
+  -->
+  <field cardinality="*" name="tagName" type="string"/>
+  <field cardinality="*" name="tagValue" type="string"/>
+</entityType>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="Root" entityPK="0">
+	<fval name="name"><value>System Components</value></fval>
+	<fval name="tagName"><value>gitrev</value></fval>
+	<fval name="tagValue"><value>cc876d01142ef18df824b7466657f1620491e1bf</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="ESConfiguration" entityPK="4788687137767601146" parentPK="0">
+	<fval name="name"><value>Entity Store Configuration</value></fval>
+	<fval name="passphraseTest"><value>aHR0cDsvL3d3dy52b3JkZWwuY29t</value></fval>
+	<fval name="productKey"><value>VordelGateway</value></fval>
+	<fval name="version"><value>7.6.2</value></fval>
+</entity>
+<entity xmlns="http://www.vordel.com/2005/06/24/entityStore"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" type="EnvironmentalizedEntities" entityPK="5533038128353951405" parentPK="0">
+	<fval name="name"><value>Environmentalized Entities Metadata</value></fval>
+</entity>
+</entityStoreData>

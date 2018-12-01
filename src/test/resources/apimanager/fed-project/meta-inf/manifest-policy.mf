@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+ChangedBy: admin
+Name: API-Manager Promote
+Description: This configuration is used by the project: https://github
+ .com/Axway-API-Management-Plus/apimanager-swagger-promote for automat
+ ed tests
+Version: v1
+
