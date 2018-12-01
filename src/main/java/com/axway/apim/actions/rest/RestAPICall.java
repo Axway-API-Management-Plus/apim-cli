@@ -3,6 +3,9 @@ package com.axway.apim.actions.rest;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.servlet.http.Cookie;
+
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -43,10 +46,16 @@ public abstract class RestAPICall {
 	public abstract HttpResponse execute() throws AppException;
 	
 	public void parseResponse(HttpResponse response) throws AppException {
-		if(this.reponseParser==null) return; 
 		try {
-			JsonNode lastReponse = reponseParser.parseResponse(response);
 			Transaction context = Transaction.getInstance();
+			for (Header header : response.getAllHeaders()) {
+				if(header.getName().equals("CSRF-Token")) {
+					context.put("CSRF-Token", header.getValue());
+					break;
+				}
+			}
+			if(this.reponseParser==null) return; 
+			JsonNode lastReponse = reponseParser.parseResponse(response);
 			context.put("lastResponse", lastReponse);
 		} catch (Exception e) {
 			try {
@@ -63,6 +72,9 @@ public abstract class RestAPICall {
 	protected HttpResponse sendRequest(HttpUriRequest request) throws AppException {
 		try {
 			Transaction context = Transaction.getInstance();
+			if(context.get("CSRF-Token")!=null) {
+				request.addHeader("CSRF-Token", ""+context.get("CSRF-Token"));
+			}
 			context.put("lastRequest", request);
 			APIMHttpClient apimClient = APIMHttpClient.getInstance();
 			HttpResponse response = apimClient.getHttpClient().execute(request, apimClient.getClientContext());

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -17,8 +18,11 @@ import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 
 /**
  * @author cwiechmann
@@ -61,12 +65,42 @@ public class APIImportConfig {
 			addDefaultPassthroughSecurityProfile(stagedConfig);
 			stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerDefFromFile()));
 			addImageContent(stagedConfig);
+			validateCustomProperties(stagedConfig);
 			return stagedConfig;
 		} catch (Exception e) {
 			if(e.getCause() instanceof AppException) {
 				throw (AppException)e.getCause();
 			}
 			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
+		}
+	}
+	
+	private void validateCustomProperties(IAPIDefinition apiConfig) throws AppException {
+		if(apiConfig.getCustomProperties()!=null) {
+			JsonNode configuredProps = APIManagerAdapter.getCustomPropertiesConfig();
+			Iterator<String> props = apiConfig.getCustomProperties().keySet().iterator();
+			while(props.hasNext()) {
+				String propertyKey = props.next();
+				String propertyValue = apiConfig.getCustomProperties().get(propertyKey);
+				JsonNode configuredProp = configuredProps.at("/api/"+propertyKey);
+				if(configuredProp instanceof MissingNode) {
+					throw new AppException("The custom-property: '" + propertyKey + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+				JsonNode propType = configuredProp.get("type");
+				if(propType!=null && ( propType.asText().equals("select") || propType.asText().equals("switch") )) {
+					boolean valueFound = false;
+					ArrayNode selectOptions = (ArrayNode)configuredProp.get("options");
+					for(JsonNode option : selectOptions) {
+						if(option.at("/value").asText().equals(propertyValue)) {
+							valueFound = true;
+							break;
+						}
+					}
+					if(!valueFound) {
+						throw new AppException("The value: '" + propertyValue + "' isn't configured for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE);
+					}
+				}
+			}
 		}
 	}
 	

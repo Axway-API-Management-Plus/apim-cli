@@ -2,14 +2,27 @@ package com.axway.apim.swagger;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.FormBodyPartBuilder;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,16 +30,22 @@ import com.axway.apim.actions.CreateNewAPI;
 import com.axway.apim.actions.RecreateToUpdateAPI;
 import com.axway.apim.actions.UpdateExistingAPI;
 import com.axway.apim.actions.rest.GETRequest;
+import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.swagger.api.APIImportDefinition;
 import com.axway.apim.swagger.api.APIManagerAPI;
 import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import groovy.json.JsonParserType;
+import net.minidev.json.JSONObject;
 
 /**
  * @author cwiechmann
@@ -87,6 +106,7 @@ public class APIManagerAdapter {
 	
 	public APIManagerAdapter() {
 		super();
+		loginToAPIManager();
 		this.enforceBreakingChange = CommandParameters.getInstance().isEnforceBreakingChange();
 	}
 
@@ -147,6 +167,35 @@ public class APIManagerAdapter {
 				}
 			}
 		}
+	}
+	
+	private void loginToAPIManager() {
+		HttpEntity entity = null;
+		URI uri;
+		CommandParameters cmd = CommandParameters.getInstance();
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/login").build();
+			
+			
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+		    params.add(new BasicNameValuePair("username", cmd.getUsername()));
+		    params.add(new BasicNameValuePair("password", cmd.getPassword()));
+		    POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, null);
+			loginRequest.setContentType(null);
+		    
+			loginRequest.execute();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AppException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 	
 	/**
@@ -255,6 +304,26 @@ public class APIManagerAdapter {
 			return IOUtils.toByteArray(is);
 		} catch (Exception e) {
 			throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public static JsonNode getCustomPropertiesConfig() throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpEntity response = getRequest.execute().getEntity();
+			String appConfig = IOUtils.toString(response.getContent(), "UTF-8");
+			appConfig = appConfig.substring(appConfig.indexOf("customPropertiesConfig:")+23, appConfig.indexOf("wizardModels")-12);
+			appConfig = appConfig.substring(0, appConfig.length()-1)+"}";
+			mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+			mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+			mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+			JsonNode jsonResponse = mapper.readTree(appConfig);
+			return jsonResponse;
+		} catch (Exception e) {
+			throw new AppException("Can't read app.config from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 }

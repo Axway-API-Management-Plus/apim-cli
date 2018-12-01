@@ -2,6 +2,7 @@ package com.axway.apim.swagger.api;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Map;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
