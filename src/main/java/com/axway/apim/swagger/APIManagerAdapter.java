@@ -2,9 +2,7 @@ package com.axway.apim.swagger;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -26,6 +24,7 @@ import com.axway.apim.actions.UpdateExistingAPI;
 import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
+import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
@@ -94,7 +93,7 @@ public class APIManagerAdapter {
 	
 	private boolean enforceBreakingChange = false;
 	
-	public APIManagerAdapter() {
+	public APIManagerAdapter() throws AppException {
 		super();
 		loginToAPIManager();
 		this.enforceBreakingChange = CommandParameters.getInstance().isEnforceBreakingChange();
@@ -159,10 +158,11 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private void loginToAPIManager() {
-		HttpEntity entity = null;
+	private void loginToAPIManager() throws AppException {
 		URI uri;
 		CommandParameters cmd = CommandParameters.getInstance();
+		Transaction transaction = Transaction.getInstance();
+		transaction.beginTransaction();
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/login").build();
 			
@@ -174,15 +174,8 @@ public class APIManagerAdapter {
 			loginRequest.setContentType(null);
 		    
 			loginRequest.execute();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (AppException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 		
 		

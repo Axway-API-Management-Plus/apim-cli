@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.Map;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 
 	@Override
 	public String getOrgId() throws AppException {
+		String response = null;
 		try {
 			LOG.info("Getting details for organization: " + this.organization + " from API-Manager!");
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/")
@@ -39,11 +41,12 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 					.setParameter("op", "eq")
 					.setParameter("value", this.organization).build();
 			GETRequest getRequest = new GETRequest(uri, null);
-			InputStream response = getRequest.execute().getEntity().getContent();
+			response = EntityUtils.toString(getRequest.execute().getEntity());
 			JsonNode jsonNode = objectMapper.readTree(response);
 			if(jsonNode==null) LOG.error("Unable to read details for org: " + this.organization);
 			return jsonNode.get(0).get("id").asText();
 		} catch (Exception e) {
+			LOG.error("Received response: " + response);
 			throw new AppException("Can't read Org-Details from API-Manager. Is the API-Manager running and "
 					+ "does the Organization: '"+this.organization+"' exists?", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}

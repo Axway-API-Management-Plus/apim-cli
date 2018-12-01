@@ -16,9 +16,6 @@ public class RecreateToUpdateAPI {
 	static Logger LOG = LoggerFactory.getLogger(RecreateToUpdateAPI.class);
 
 	public void execute(APIChangeState changes) throws AppException {
-		Transaction context = Transaction.getInstance();
-		
-		context.beginTransaction();
 		
 		IAPIDefinition actual = changes.getActualAPI();
 		IAPIDefinition desired = changes.getDesiredAPI();

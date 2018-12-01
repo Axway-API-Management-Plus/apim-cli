@@ -30,7 +30,6 @@ public class CreateNewAPI {
 	public void execute(APIChangeState changes) throws AppException {
 		
 		Transaction context = Transaction.getInstance();
-		context.beginTransaction();
 		
 		// Force to initially update the API into the desired state!
 		List<String> changedProps = getAllProps(changes.getDesiredAPI());

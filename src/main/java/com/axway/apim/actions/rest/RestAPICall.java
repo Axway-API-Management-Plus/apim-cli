@@ -46,10 +46,12 @@ public abstract class RestAPICall {
 	public void parseResponse(HttpResponse response) throws AppException {
 		try {
 			Transaction context = Transaction.getInstance();
-			for (Header header : response.getAllHeaders()) {
-				if(header.getName().equals("CSRF-Token")) {
-					context.put("CSRF-Token", header.getValue());
-					break;
+			if(context.get("CSRF-Token")==null) {
+				for (Header header : response.getAllHeaders()) {
+					if(header.getName().equals("CSRF-Token")) {
+						context.put("CSRF-Token", header.getValue());
+						break;
+					}
 				}
 			}
 			if(this.reponseParser==null) return; 
@@ -63,8 +65,6 @@ public abstract class RestAPICall {
 			}
 			throw new AppException("Unable to parse HTTP-Response", ErrorCode.CANT_PARSE_HTTP_RESPONSE, e);
 		}
-			
-			
 	}
 	
 	protected HttpResponse sendRequest(HttpUriRequest request) throws AppException {
