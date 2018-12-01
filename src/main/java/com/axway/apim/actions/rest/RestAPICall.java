@@ -3,8 +3,6 @@ package com.axway.apim.actions.rest;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.servlet.http.Cookie;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
