@@ -66,12 +66,38 @@ public class APIImportConfig {
 			stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerDefFromFile()));
 			addImageContent(stagedConfig);
 			validateCustomProperties(stagedConfig);
+			validateDescription(stagedConfig);
 			return stagedConfig;
 		} catch (Exception e) {
 			if(e.getCause() instanceof AppException) {
 				throw (AppException)e.getCause();
 			}
 			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
+		}
+	}
+	
+	private void validateDescription(IAPIDefinition apiConfig) throws AppException {
+		if(apiConfig.getDescriptionType()==null || apiConfig.getDescriptionType().equals("original")) return;
+		String descriptionType = apiConfig.getDescriptionType();
+		if(descriptionType.equals("manual")) {
+			if(apiConfig.getDescriptionManual()==null) {
+				throw new AppException("descriptionManual can't be null with descriptionType set to 'manual'", ErrorCode.CANT_READ_CONFIG_FILE);
+			}
+		} else if(descriptionType.equals("url")) {
+			if(apiConfig.getDescriptionUrl()==null) {
+				throw new AppException("descriptionUrl can't be null with descriptionType set to 'url'", ErrorCode.CANT_READ_CONFIG_FILE);
+			}
+		} else if(descriptionType.equals("markdown")) {
+			if(apiConfig.getDescriptionMarkdown()==null) {
+				throw new AppException("descriptionMarkdown can't be null with descriptionType set to 'markdown'", ErrorCode.CANT_READ_CONFIG_FILE);
+			}
+			if(!apiConfig.getDescriptionMarkdown().startsWith("${env.")) {
+				throw new AppException("descriptionMarkdown must start with an environment variable", ErrorCode.CANT_READ_CONFIG_FILE);
+			}
+		} else if(descriptionType.equals("original")) {
+			return;
+		} else {
+			throw new AppException("Unknown descriptionType: '"+descriptionType.equals("manual")+"'", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 	}
 	

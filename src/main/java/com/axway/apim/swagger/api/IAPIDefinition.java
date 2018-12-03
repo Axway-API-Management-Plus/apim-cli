@@ -2,7 +2,6 @@ package com.axway.apim.swagger.api;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.api.properties.APIImage;
@@ -63,21 +62,11 @@ public interface IAPIDefinition {
 	
 	public void setSwaggerDefinition(APISwaggerDefinion swaggerDefinition);
 	
-	/**
-	 * Compare the actual API-Definition with the given in Def
-	 * 
-	 * A list of differences is returned, representing the actual differences. 
-	 * The returned list contains APIProperty which make knows, if the property is
-	 * - changeable on an existing API
-	 * - leads to a breaking change
-	 * - is non breaking, but would require a new API-Import (ZDD)
-	 * 
-	 * This List will be used as a working queue in the API-Manager Adapter to 
-	 * bring the API-Manager API into the desired state.
-	 * @param def
-	 * @return
-	 */
-//	public APIChangeState getChanges(APIDefinition def);
+	public String getDescriptionType();
 	
-	//....
+	public String getDescriptionManual();
+	
+	public String getDescriptionMarkdown();
+	
+	public String getDescriptionUrl();
 }

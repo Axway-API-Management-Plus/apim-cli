@@ -3,6 +3,7 @@ package com.axway.apim.swagger.api;
 import java.util.List;
 import java.util.Map;
 
+import com.axway.apim.actions.tasks.props.APIDescriptionPropertyHandler;
 import com.axway.apim.actions.tasks.props.APINamePropertyHandler;
 import com.axway.apim.actions.tasks.props.APIPathPropertyHandler;
 import com.axway.apim.actions.tasks.props.APISummaryPropertyHandler;
@@ -34,6 +35,24 @@ public abstract class AbstractAPIDefinition {
 	
 	protected CommandParameters cmd = CommandParameters.getInstance();
 	protected ObjectMapper objectMapper = new ObjectMapper();
+	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
+			propHandler = APIDescriptionPropertyHandler.class)
+	protected String descriptionType = null;
+	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
+			propHandler = APIDescriptionPropertyHandler.class)
+	protected String descriptionManual = null;
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
+			propHandler = APIDescriptionPropertyHandler.class)
+	protected String descriptionMarkdown = null;
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
+			propHandler = APIDescriptionPropertyHandler.class)
+	protected String descriptionUrl = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {}, 
@@ -262,5 +281,37 @@ public abstract class AbstractAPIDefinition {
 
 	public void setCustomProperties(Map<String, String> customProperties) {
 		this.customProperties = customProperties;
+	}
+
+	public String getDescriptionType() {
+		return descriptionType;
+	}
+
+	public void setDescriptionType(String descriptionType) {
+		this.descriptionType = descriptionType;
+	}
+
+	public String getDescriptionManual() {
+		return descriptionManual;
+	}
+
+	public void setDescriptionManual(String descriptionManual) {
+		this.descriptionManual = descriptionManual;
+	}
+
+	public String getDescriptionMarkdown() {
+		return descriptionMarkdown;
+	}
+
+	public void setDescriptionMarkdown(String descriptionMarkdown) {
+		this.descriptionMarkdown = descriptionMarkdown;
+	}
+
+	public String getDescriptionUrl() {
+		return descriptionUrl;
+	}
+
+	public void setDescriptionUrl(String descriptionUrl) {
+		this.descriptionUrl = descriptionUrl;
 	}
 }
