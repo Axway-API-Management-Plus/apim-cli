@@ -35,6 +35,7 @@ Build and tested with API-Manager 7.6.2 SP1 at Travis CI: [![Build Status](https
 ## Limitations/Caveats
 - API-Method description is not yet supported
 - Method-Level settings such as individual Security, Custom-Policies, etc. aren't supported
+- Deep merge of stage-config files isn't supported
 
 ## Contributing
 
