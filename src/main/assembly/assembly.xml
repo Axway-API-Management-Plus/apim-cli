@@ -24,6 +24,7 @@
                 <include>*.sh</include>
             </includes>
             <fileMode>0755</fileMode>
+            <lineEnding>unix</lineEnding>
         </fileSet>
     </fileSets>
 </assembly>
