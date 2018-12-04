@@ -24,6 +24,9 @@
                 <include>*</include>
             </includes>
             <lineEnding>unix</lineEnding>
+            <excludes>
+            	<exclude>*.formatted</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <directory>src/main/assembly/scripts</directory>
