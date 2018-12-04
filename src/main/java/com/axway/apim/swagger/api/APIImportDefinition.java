@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * the API-Contract and it used by the APIManagerImporter to 
  * import it.
  * 
- * TODO: Support JSON & YAML files 
+ * TODO: Support JSON and YAML files 
  */
 public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDefinition {
 	

@@ -140,7 +140,8 @@ public class APIImportConfig {
 	
 	/**
 	 * To make testing easier we allow reading test-files from classpath as well
-	 * @throws AppException 
+	 * @throws AppException when the Swagger-File can't be read.
+	 * @return An InputStream to the Swagger-File of the import API
 	 */
 	public InputStream getSwaggerAsStream() throws AppException {
 		File inputFile = new File(pathToSwagger);
