@@ -1,6 +1,6 @@
 # Swagger based promotion for Axway API-Manager V7
 
-This project provides you with a program that simplifies your CI/CD pipeline with the Axway API-Manager Version 7.x. 
+This project provides you with a tool that simplifies your DevOps experience with the Axway API-Manager Version 7.x. 
 
 The program works based on the API-Swagger-Definition + an API-Contract and replicates this "state" into the API-Manager. Consider the Swagger-Definition + API-Contract as the "__desired__" state and API-Manager has the "__actual__" state. This program will compare both, the desired with the actual state, and performs all neccassary actions to bring the API-Manager API into the desired state.
 
