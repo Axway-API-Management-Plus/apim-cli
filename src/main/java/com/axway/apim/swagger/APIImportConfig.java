@@ -170,7 +170,7 @@ public class APIImportConfig {
 		if(stage!=null && !stage.equals("NOT_SET")) {
 			return apiContract.substring(0, apiContract.lastIndexOf(".")+1) + stage + apiContract.substring(apiContract.lastIndexOf("."));
 		}
-		LOG.error("No stage provided");
+		LOG.debug("No stage provided");
 		return null;
 	}
 	
