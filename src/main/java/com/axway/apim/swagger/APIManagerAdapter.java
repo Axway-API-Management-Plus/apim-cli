@@ -117,7 +117,7 @@ public class APIManagerAdapter {
 				LOG.info("Recognized the following changes. Breaking: " + changeState.getBreakingChanges() + 
 						" plus Non-Breaking: " + changeState.getNonBreakingChanges());
 				if(changeState.getActualAPI().getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
-					LOG.error("Strategy: Applying ALL changes on existing UNPUBLISHED API.");
+					LOG.info("Strategy: Applying ALL changes on existing UNPUBLISHED API.");
 					UpdateExistingAPI updateAPI = new UpdateExistingAPI();
 					updateAPI.execute(changeState);
 					return;
