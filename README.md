@@ -27,14 +27,24 @@ Today the following API-Properties are already supported and can be controlled e
 
 Build and tested with API-Manager 7.6.2 SP1 at Travis CI: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=master)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
 
+## Install
+- Download the latest [release](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases)
+- extract the tar.gz file
+- make sure you have JRE 8 installed and setup JAVA_HOME environment variable
+
+## Usage
+- run the script scripts/run-swagger-import.sh to see the basic usage and a sample
+- more information can found in the project [wiki](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki) 
+  - The Wiki-Documentation is work in progress
+
 ## Changelog
-- 0.0.1 - 19.11.2018
-  - Initial version
+- 1.0.0 - 04.12.2018
+  - Initial version that supports all API-Properties besides method level settings
 
 
 ## Limitations/Caveats
 - API-Method description is not yet supported
-- Method-Level settings such as individual Security, Custom-Policies, etc. aren't supported
+- Method-Level settings such as individual Security, Custom-Policies, etc. not yet supported
 - Deep merge of stage-config files isn't supported
 
 ## Contributing
