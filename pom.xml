@@ -101,7 +101,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>apimanager-swagger-promote-v${project.version}</finalName>
+		<finalName>apimanager-swagger-promote</finalName>
 		<plugins>
 <!--  			<plugin>
 				<groupId>org.springframework.boot</groupId>
