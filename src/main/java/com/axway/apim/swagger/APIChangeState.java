@@ -71,7 +71,7 @@ public class APIChangeState {
 					Object actualValue = method2.invoke(actualAPI, null);
 					if(desiredValue == null && actualValue == null) continue;
 					if(desiredValue == null) {
-						LOG.info("Ignoring Null-Property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
+						LOG.debug("Ignoring Null-Property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
 						continue; // No change, if nothing is provided!
 					}
 					// desiredValue == null - This can be used to reset/clean a property! (Need to think about this!)
@@ -88,7 +88,7 @@ public class APIChangeState {
 						}
 						LOG.info("Changed for property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
 					} else {
-						LOG.info("No change for property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
+						LOG.debug("No change for property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
 					}
 
 				}
