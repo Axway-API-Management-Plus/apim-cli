@@ -35,7 +35,11 @@ public class APISwaggerDefinion {
 		if(other == null) return false;
 		if(other instanceof APISwaggerDefinion) {
 			APISwaggerDefinion otherSwagger = (APISwaggerDefinion)other;
-			return (Arrays.hashCode(this.swaggerContent)) == Arrays.hashCode(otherSwagger.getSwaggerContent());
+			boolean rc = (Arrays.hashCode(this.swaggerContent)) == Arrays.hashCode(otherSwagger.getSwaggerContent()); 
+			if(!rc) {
+				LOG.info("Detected Swagger-Filesizes: API-Manager: " + this.swaggerContent.length + " vs. Import: " + otherSwagger.getSwaggerContent().length);
+			}
+			return rc;
 		} else {
 			return false;
 		}
