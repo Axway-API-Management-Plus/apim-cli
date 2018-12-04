@@ -1,0 +1,52 @@
+{
+	"name": "Complete API",
+	"path": "/complete/api/v1",
+	"state": "published",
+	"summary": "My complete API-Summary",
+	"version": "1.0.0",
+	"organization": "API Development", 
+	"descriptionType": "manual", 
+	"descriptionManual": "This is my __markdown__ based API description.", 
+	"vhost": "api.custom-host.com",
+    "securityProfiles": [
+     	{
+     		"name": "_default",
+     		"isDefault": true,
+     		"devices": [
+     			{
+     				"name": "API Key",
+     				"type": "apiKey",
+     				"order": 0,
+     				"properties": {
+     					"apiKeyFieldName": "${apiKeyFieldName}",
+     					"takeFrom": "${takeFrom}",
+     					"removeCredentialsOnSuccess": "${removeCredentialsOnSuccess}"
+     				}
+     			}
+     		]
+     	}
+    ], 
+     "outboundProfiles": {
+		"_default": {
+			"requestPolicy": "Request policy 1", 
+			"routePolicy": "Routing policy 1", 
+			"responsePolicy": "Response policy 1", 
+			"faultHandlerPolicy": "Faulthandler policy 1"
+		}
+	},
+	"tags": {
+		"tag-name 2": [
+			"value 3",
+			"value 4"
+    	],
+    	"tag-name 1": [
+    		"value 1",
+    		"value 2"
+    	]
+	}, 
+	"customProperties": {
+		"customProperty1": "Test-Input 1",
+		"customProperty2": "1",
+		"customProperty3": "true"	
+	}
+}

@@ -74,10 +74,13 @@ public class App {
 			try {
 				cmd = parser.parse( options, args, false);
 			} catch (ParseException e) {
-				LOG.error("\n\n");
-				LOG.error(e.getMessage());
-				LOG.error("\n\n");
+				System.out.println("\n\n");
+				System.out.println(e.getMessage());
+				System.out.println("\n\n");
 				formatter.printHelp("Swagger-Import", options, true);
+				
+				System.out.println("You may run one of the samples");
+				System.out.println("scripts/run-swagger-import.sh -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
 				
 				System.exit(99);
 			}
@@ -108,6 +111,7 @@ public class App {
 			
 			
 			apimAdapter.applyChanges(changeActions);
+			LOG.info("Successfully replicate API-State into API-Manager");
 			return 0;
 		} catch (AppException ap) {
 			if(ap.isLogStackStrace()) {

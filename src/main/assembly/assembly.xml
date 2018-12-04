@@ -18,6 +18,14 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>src/main/assembly/samples</directory>
+            <outputDirectory>/samples</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <lineEnding>unix</lineEnding>
+        </fileSet>
+        <fileSet>
             <directory>src/main/assembly/scripts</directory>
             <outputDirectory>/scripts</outputDirectory>
             <includes>
