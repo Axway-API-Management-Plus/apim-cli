@@ -140,7 +140,8 @@ public class APIImportConfig {
 	
 	/**
 	 * To make testing easier we allow reading test-files from classpath as well
-	 * @throws AppException 
+	 * @throws AppException when the Swagger-File can't be read.
+	 * @return An InputStream to the Swagger-File of the import API
 	 */
 	public InputStream getSwaggerAsStream() throws AppException {
 		File inputFile = new File(pathToSwagger);
@@ -170,7 +171,7 @@ public class APIImportConfig {
 		if(stage!=null && !stage.equals("NOT_SET")) {
 			return apiContract.substring(0, apiContract.lastIndexOf(".")+1) + stage + apiContract.substring(apiContract.lastIndexOf("."));
 		}
-		LOG.error("No stage provided");
+		LOG.debug("No stage provided");
 		return null;
 	}
 	
