@@ -11,4 +11,3 @@ curl --insecure -u apiadmin:changeme -X POST \
   "development": true
 }'
 echo "Created organization: 'API Development'"
-
