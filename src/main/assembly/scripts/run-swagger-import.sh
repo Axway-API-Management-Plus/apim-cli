@@ -6,9 +6,11 @@ then
         exit 1
 fi
 
+scriptDir="${0%/*}"
+
 CP=$PWD
 
-for jars in ./lib/*
+for jars in $scriptDir/../lib/*
 do
         CP=$CP:$jars
 done
