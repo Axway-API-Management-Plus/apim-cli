@@ -8,7 +8,7 @@
 	"corsProfiles": [
     	{
 			"name": "New CORS Profile",
-			"isDefault": true,
+			"isDefault": false,
 			"origins": [
 				"*"
 			],

@@ -48,6 +48,7 @@ public class CorsProfileBasicTest extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
 			.validate("$.[?(@.path=='${apiPath}')].corsProfiles.[?(@.name=='New CORS Profile')].allowedHeaders[0]", "Authorization")
 			.validate("$.[?(@.path=='${apiPath}')].corsProfiles.[?(@.name=='New CORS Profile')].exposedHeaders[0]", "via")
+			.validate("$.[?(@.path=='${apiPath}')].inboundProfiles._default.corsProfile", "New CORS Profile")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 	}
 }
