@@ -1,14 +1,17 @@
 package com.axway.apim.actions.tasks;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
@@ -50,11 +53,16 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 	}
 	
 	@Override
-	public JsonNode parseResponse(HttpResponse response) throws AppException {
-		InputStream json = getJSONPayload(response);
-		String backendAPIId = JsonPath.parse(json).read("$.id", String.class);
-		Transaction.getInstance().put("backendAPIId", backendAPIId);
-		return null;
+	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
+		String response = null;
+		try {
+			response = EntityUtils.toString(httpResponse.getEntity());
+			String backendAPIId = JsonPath.parse(response).read("$.id", String.class);
+			Transaction.getInstance().put("backendAPIId", backendAPIId);
+			return null;
+		} catch (IOException e) {
+			throw new AppException("Cannot parse JSON-Payload after create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
+		}
 	}
 
 }

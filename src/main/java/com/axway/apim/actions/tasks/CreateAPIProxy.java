@@ -7,6 +7,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
@@ -42,11 +43,13 @@ public class CreateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		}
 	}
 	@Override
-	public JsonNode parseResponse(HttpResponse response) throws AppException {
+	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
+		String response = null;
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonNode = null;
 		try {
-			jsonNode = objectMapper.readTree(getJSONPayload(response));
+			response = EntityUtils.toString(httpResponse.getEntity());
+			jsonNode = objectMapper.readTree(response);
 			String virtualAPIId = jsonNode.findPath("id").asText();
 			Transaction.getInstance().put("virtualAPIId", virtualAPIId);
 			JsonNode auth = jsonNode.findPath("authenticationProfiles").get(0);

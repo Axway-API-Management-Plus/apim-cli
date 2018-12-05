@@ -57,16 +57,4 @@ public class AbstractAPIMTask {
 		}
 		
 	}
-	
-	protected static InputStream getJSONPayload(HttpResponse response) throws AppException {
-		InputStream json;
-		try {
-			json = response.getEntity().getContent();
-			return json;
-		} catch (UnsupportedOperationException e) {
-			throw new AppException("Cannot read or parse JSON.", ErrorCode.CANT_READ_JSON_PAYLOAD, e);
-		} catch (IOException e) {
-			throw new AppException("Cannot read of parse JSON.", ErrorCode.CANT_READ_JSON_PAYLOAD, e);
-		}
-	}
 }
