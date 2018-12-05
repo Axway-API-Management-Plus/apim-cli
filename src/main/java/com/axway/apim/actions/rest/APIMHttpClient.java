@@ -71,14 +71,6 @@ public class APIMHttpClient {
 			cm.setMaxTotal(5);
 			cm.setDefaultMaxPerRoute(2);
 			targetHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
-			
-			/*credsProvider = new BasicCredentialsProvider();
-			credsProvider.setCredentials(new AuthScope(targetHost.getHostName(), targetHost.getPort()),
-					new UsernamePasswordCredentials(username, password));
-	*/
-			//AuthCache authCache = new BasicAuthCache();
-			//BasicScheme basicAuth = new BasicScheme();
-			//authCache.put(targetHost, basicAuth);
 	
 			// Add AuthCache to the execution context
 			clientContext = HttpClientContext.create();
@@ -95,7 +87,6 @@ public class APIMHttpClient {
 					.setConnectionManager(cm)
 					.setDefaultRequestConfig(defaultRequestConfig)
 					.build();
-					//.setDefaultCredentialsProvider(credsProvider).build();
 		} catch (Exception e) {
 			throw new AppException("Can't create connection to API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
 		}
