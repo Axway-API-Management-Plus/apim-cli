@@ -1,0 +1,25 @@
+	
+{
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"state": "${status}",
+	"version": "1.0.0",
+	"organization": "API Development ${orgNumber}",
+	"corsProfiles": [
+    	{
+			"name": "New CORS Profile",
+			"isDefault": true,
+			"origins": [
+				"*"
+			],
+			"allowedHeaders": [
+				"Authorization"
+			],
+			"exposedHeaders": [
+				"via"
+			],
+			"supportCredentials": false,
+			"maxAgeSeconds": 0
+		}
+	]
+}

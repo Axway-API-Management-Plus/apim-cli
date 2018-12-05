@@ -16,6 +16,7 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIImportDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -67,6 +68,7 @@ public class APIImportConfig {
 			addImageContent(stagedConfig);
 			validateCustomProperties(stagedConfig);
 			validateDescription(stagedConfig);
+			validateCorsConfig(stagedConfig);
 			return stagedConfig;
 		} catch (Exception e) {
 			if(e.getCause() instanceof AppException) {
@@ -98,6 +100,29 @@ public class APIImportConfig {
 			return;
 		} else {
 			throw new AppException("Unknown descriptionType: '"+descriptionType.equals("manual")+"'", ErrorCode.CANT_READ_CONFIG_FILE);
+		}
+	}
+	
+	private void validateCorsConfig(IAPIDefinition apiConfig) throws AppException {
+		if(apiConfig.getCorsProfiles()==null || apiConfig.getCorsProfiles().size()==0) return;
+		// Check if there is a default cors profile declared otherwise create one internally
+		boolean defaultCorsFound = false;
+		for(CorsProfile profile : apiConfig.getCorsProfiles()) {
+			if(profile.getName().equals("_default")) {
+				defaultCorsFound = true;
+				break;
+			}
+		}
+		if(!defaultCorsFound) {
+			CorsProfile defaultCors = new CorsProfile();
+			defaultCors.setName("_default");
+			defaultCors.setIsDefault("true");
+			defaultCors.setOrigins(new String[] {"*"});
+			defaultCors.setAllowedHeaders(new String[] {});
+			defaultCors.setExposedHeaders(new String[] {"X-CorrelationID"});
+			defaultCors.setMaxAgeSeconds("0");
+			defaultCors.setSupportCredentials("false");
+			apiConfig.getCorsProfiles().add(defaultCors);
 		}
 	}
 	
