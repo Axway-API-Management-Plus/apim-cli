@@ -200,7 +200,7 @@ public class APIImportConfig {
 		return null;
 	}
 	
-	private IAPIDefinition addDefaultPassthroughSecurityProfile(IAPIDefinition importApi) {
+	private IAPIDefinition addDefaultPassthroughSecurityProfile(IAPIDefinition importApi) throws AppException {
 		if(importApi.getSecurityProfiles()==null || importApi.getSecurityProfiles().size()==0) {
 			SecurityProfile passthroughProfile = new SecurityProfile();
 			passthroughProfile.setName("_default");
