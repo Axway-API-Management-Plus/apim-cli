@@ -1,5 +1,6 @@
 package com.axway.apim.swagger;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -9,11 +10,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +36,7 @@ import com.axway.apim.swagger.api.APIManagerAPI;
 import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -259,6 +264,27 @@ public class APIManagerAdapter {
 			return jsonResponse;
 		} catch (Exception e) {
 			throw new AppException("Can't read app.config from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public static JsonNode getCertInfo(InputStream certFile, CaCert cert) throws AppException {
+		URI uri;
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/certinfo/").build();
+			
+			HttpEntity entity = MultipartEntityBuilder.create()
+					.addBinaryBody("file", IOUtils.toByteArray(certFile), ContentType.create("application/x-x509-ca-cert"), cert.getCertFile())
+					.addTextBody("inbound", cert.getInbound())
+					.addTextBody("outbound", cert.getOutbound())
+					.build();
+			POSTRequest postRequest = new POSTRequest(entity, uri, null);
+			postRequest.setContentType(null);
+			HttpEntity response = postRequest.execute().getEntity();
+			JsonNode jsonResponse = mapper.readTree(response.getContent());
+			return jsonResponse;
+		} catch (Exception e) {
+			throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 }

@@ -2,10 +2,12 @@ package com.axway.apim.swagger;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -16,6 +18,7 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIImportDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
@@ -53,7 +56,6 @@ public class APIImportConfig {
 	
 	public IAPIDefinition getImportAPIDefinition() throws AppException {
 		IAPIDefinition stagedConfig;
-		//mapper.setDefaultMergeable(true);
 		try {
 			IAPIDefinition baseConfig = mapper.readValue(new File(apiContract), APIImportDefinition.class);
 			ObjectReader updater = mapper.readerForUpdating(baseConfig);
@@ -69,6 +71,7 @@ public class APIImportConfig {
 			validateCustomProperties(stagedConfig);
 			validateDescription(stagedConfig);
 			validateCorsConfig(stagedConfig);
+			completeCaCerts(stagedConfig);
 			return stagedConfig;
 		} catch (Exception e) {
 			if(e.getCause() instanceof AppException) {
@@ -124,6 +127,43 @@ public class APIImportConfig {
 			defaultCors.setSupportCredentials("false");
 			apiConfig.getCorsProfiles().add(defaultCors);
 		}
+	}
+	
+	private void completeCaCerts(IAPIDefinition apiConfig) throws AppException {
+		if(apiConfig.getCaCerts()!=null) {
+			List<CaCert> completedCaCerts = new ArrayList<CaCert>();
+			for(CaCert cert :apiConfig.getCaCerts()) {
+				if(cert.getCertBlob()==null) {
+					JsonNode certInfo = APIManagerAdapter.getCertInfo(getInputStreamForCertFile(cert), cert);
+					try {
+						CaCert completedCert = mapper.readValue(certInfo.get(0).toString(), CaCert.class);
+						completedCaCerts.add(completedCert);
+					} catch (Exception e) {
+						throw new AppException("Can't initialize given certificate.", ErrorCode.CANT_READ_CONFIG_FILE, e);
+					}
+				}
+			}
+			apiConfig.getCaCerts().clear();
+			apiConfig.getCaCerts().addAll(completedCaCerts);
+		}
+	}
+	
+	private InputStream getInputStreamForCertFile(CaCert cert) throws AppException {
+		String baseDir = new File(this.pathToSwagger).getParent();
+		File file = new File(baseDir + "/" + cert.getCertFile());
+		InputStream is;
+		if(file.exists()) { 
+			try {
+				is = new FileInputStream(file);
+			} catch (FileNotFoundException e) {
+				throw new AppException("Cant read given certificate file", ErrorCode.CANT_READ_CONFIG_FILE);
+			}
+		} else {
+			// Try to read it from classpath
+			is = APIManagerAdapter.class.getResourceAsStream(cert.getCertFile()); 
+		}
+		if(is==null) throw new AppException("Can't read certificate: "+cert.getCertFile()+" from file or classpath", ErrorCode.CANT_READ_CONFIG_FILE);
+		return is;
 	}
 	
 	private void validateCustomProperties(IAPIDefinition apiConfig) throws AppException {
@@ -230,7 +270,7 @@ public class APIImportConfig {
 					// Try to read it from classpath
 					importApi.getImage().setImageContent(IOUtils.toByteArray(
 							this.getClass().getResourceAsStream(importApi.getImage().getFilename())));
-			}
+				}
 			} catch (IOException e) {
 				throw new AppException("Can't read image-file from file", ErrorCode.UNXPECTED_ERROR, e);
 			}

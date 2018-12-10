@@ -1,0 +1,38 @@
+	
+{
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"state": "${status}",
+	"version": "1.0.0",
+	"organization": "API Development ${orgNumber}",
+	"inboundProfiles": {
+		"_default": {
+			"securityProfile": "_default",
+			"corsProfile": "_default",
+			"monitorAPI": true,
+			"monitorSubject": "authentication.subject.id"
+		}
+	},
+    "caCerts": [
+     	{
+     		"certFile": "/com/axway/apim/test/files/cacerts/swaggerio.crt",
+     		"useForOutbound": true,
+     		"useForInbound": false
+     	}, 
+     	{
+     		"certFile": "/com/axway/apim/test/files/cacerts/GoDaddyRootCertificateAuthority-G2.crt",
+     		"useForOutbound": true,
+     		"useForInbound": false
+     	}, 
+     	{
+     		"certFile": "/com/axway/apim/test/files/cacerts/GoDaddySecureCertificateAuthority-G2.crt",
+     		"useForOutbound": true,
+     		"useForInbound": false
+     	}, 
+     	{
+     		"certFile": "${certFile4}",
+     		"useForOutbound": false,
+     		"useForInbound": true
+     	}
+	]
+}

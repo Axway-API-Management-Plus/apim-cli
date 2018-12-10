@@ -4,8 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class APIImage {
 
 	private byte[] imageContent = null;

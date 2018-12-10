@@ -6,6 +6,7 @@ import java.util.Map;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
@@ -69,4 +70,6 @@ public interface IAPIDefinition {
 	public String getDescriptionMarkdown();
 	
 	public String getDescriptionUrl();
+	
+	public List<CaCert> getCaCerts();
 }
