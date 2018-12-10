@@ -6,14 +6,21 @@ then
         exit 1
 fi
 
-scriptDir="${0%/*}"
+#programDir="${0%/*}"
+programDir="$( cd "$(dirname "$0")" ; pwd -P )"
 
-CP=$PWD
+cd $programDir/..
 
-for jars in $scriptDir/../lib/*
+CP=lib
+for jars in lib/*
 do
         CP=$CP:$jars
 done
 
-
 "$JAVA_HOME/bin/java" -Xms64m -Xmx256m -classpath "$CP" com.axway.apim.App $*
+rc=$?
+if [ $rc -eq 10 ];then
+        echo "No changes detected."
+        exit 0
+fi
+exit $rc

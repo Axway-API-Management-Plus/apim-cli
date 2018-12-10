@@ -29,6 +29,28 @@
             </excludes>
         </fileSet>
         <fileSet>
+            <directory>src/main/assembly/lib</directory>
+            <outputDirectory>/lib</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <lineEnding>unix</lineEnding>
+            <excludes>
+            	<exclude>*.formatted</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/assembly/certificates</directory>
+            <outputDirectory>/certificates</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <lineEnding>unix</lineEnding>
+            <excludes>
+            	<exclude>*.formatted</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
             <directory>src/main/assembly/scripts</directory>
             <outputDirectory>/scripts</outputDirectory>
             <includes>
