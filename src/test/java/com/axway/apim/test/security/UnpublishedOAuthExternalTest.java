@@ -10,29 +10,29 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="UnpublishedOAuthTest")
-public class UnpublishedOAuthTest extends TestNGCitrusTestDesigner {
+@Test(testName="UnpublishedOAuthExternalTest")
+public class UnpublishedOAuthExternalTest extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "UnpublishedOAuthTest")
+	@CitrusTest(name = "UnpublishedOAuthExternalTest")
 	public void setupDevOrgTest() {
-		description("Tests for API-OAuth Security connfiguration");
+		description("Tests for API-OAuth (External) Security connfiguration");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/oauth-test-${apiNumber}");
-		variable("apiName", "API OAuth Test ${apiNumber}");
+		variable("apiName", "API OAuth-External Test ${apiNumber}");
 		variable("status", "unpublished");
 		
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
-		createVariable("tokenStore", "OAuth Access Token Store");
+		createVariable("tokenInfoPolicy", "Tokeninfo policy 1");
 		createVariable("accessTokenLocation", "HEADER");
 		createVariable("scopes", "resource.WRITE, resource.READ, resource.ADMIN");
 		createVariable("removeCredentialsOnSuccess", "false");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/security/3_api-oauth.json");
+		createVariable("configFile", "/com/axway/apim/test/files/security/4_api-oauth_external.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -49,19 +49,24 @@ public class UnpublishedOAuthTest extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].type", "oauth")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.tokenStore", "@assertThat(containsString(${tokenStore}))@")
+			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].type", "oauthExternal")
+			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.tokenStore", "@assertThat(containsString(${tokenInfoPolicy}))@")
 			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.scopes", "${scopes}")
+			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.useClientRegistry", "true")
+			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.['oauth.token.client_id']", "${//oauth.token.client_id//}")
+			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.['oauth.token.scopes']", "${//oauth.token.scopes//}")
+			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.['oauth.token.valid']", "${//oauth.token.valid//}")
+			
 			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.accessTokenLocation", "${accessTokenLocation}")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Simulate re-import with no-change #######");
-		createVariable("tokenStore", "OAuth Access Token Store");
+		createVariable("tokenInfoPolicy", "Tokeninfo policy 1");
 		createVariable("accessTokenLocation", "HEADER");
 		createVariable("scopes", "resource.WRITE, resource.READ, resource.ADMIN");
 		createVariable("removeCredentialsOnSuccess", "false");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/security/3_api-oauth.json");
+		createVariable("configFile", "/com/axway/apim/test/files/security/4_api-oauth_external.json");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
 	}
