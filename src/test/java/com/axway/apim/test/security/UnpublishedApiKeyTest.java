@@ -35,6 +35,15 @@ public class UnpublishedApiKeyTest extends TestNGCitrusTestDesigner {
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
+		echo("####### Simulate Re-Import without changes #######");
+		createVariable("apiKeyFieldName", "KeyId");
+		createVariable("takeFrom", "HEADER");
+		createVariable("removeCredentialsOnSuccess", "false");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/security/1_api-apikey.json");
+		createVariable("expectedReturnCode", "10");
+		action(swaggerImport);
+		
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' with correct settings #######");
 		http().client("apiManager")
 			.send()

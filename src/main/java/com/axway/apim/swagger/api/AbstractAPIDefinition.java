@@ -3,6 +3,7 @@ package com.axway.apim.swagger.api;
 import java.util.List;
 import java.util.Map;
 
+import com.axway.apim.actions.tasks.props.APICaCertsPropertyHandler;
 import com.axway.apim.actions.tasks.props.APIDescriptionPropertyHandler;
 import com.axway.apim.actions.tasks.props.APINamePropertyHandler;
 import com.axway.apim.actions.tasks.props.APIPathPropertyHandler;
@@ -20,6 +21,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
@@ -35,6 +37,11 @@ public abstract class AbstractAPIDefinition {
 	
 	protected CommandParameters cmd = CommandParameters.getInstance();
 	protected ObjectMapper objectMapper = new ObjectMapper();
+
+	@APIPropertyAnnotation(isBreaking = true, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
+			propHandler = APICaCertsPropertyHandler.class)
+	protected List<CaCert> caCerts = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
@@ -313,5 +320,13 @@ public abstract class AbstractAPIDefinition {
 
 	public void setDescriptionUrl(String descriptionUrl) {
 		this.descriptionUrl = descriptionUrl;
+	}
+
+	public List<CaCert> getCaCerts() {
+		return caCerts;
+	}
+
+	public void setCaCerts(List<CaCert> caCerts) {
+		this.caCerts = caCerts;
 	}
 }

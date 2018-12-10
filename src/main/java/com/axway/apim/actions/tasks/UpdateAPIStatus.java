@@ -1,10 +1,13 @@
 package com.axway.apim.actions.tasks;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.actions.rest.DELRequest;
 import com.axway.apim.actions.rest.POSTRequest;
@@ -125,18 +128,24 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 		}
 	}
 	@Override
-	public JsonNode parseResponse(HttpResponse response) throws AppException {
+	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
+		String response = null;
 		Transaction context = Transaction.getInstance();
 		if(context.get("responseMessage")!=null) {
 			LOG.info(""+context.get("responseMessage"));
 			return null;
 		} else {
-			String backendAPIId = JsonPath.parse(getJSONPayload(response)).read("$.id", String.class);
-			Transaction.getInstance().put("backendAPIId", backendAPIId);
-			// The action was successful, update the status!
-			this.actualState.setState(desiredState.getState());
-			LOG.info(this.intent + "Actual API state set to: " + this.actualState.getState());
-			return null;
+			try {
+				response = EntityUtils.toString(httpResponse.getEntity());
+				String backendAPIId = JsonPath.parse(response).read("$.id", String.class);
+				Transaction.getInstance().put("backendAPIId", backendAPIId);
+				// The action was successful, update the status!
+				this.actualState.setState(desiredState.getState());
+				LOG.info(this.intent + "Actual API state set to: " + this.actualState.getState());
+				return null;
+			} catch (Exception e1) {
+				throw new AppException("Unable to parse response", ErrorCode.CANT_UPDATE_API_PROXY, e1);
+			}
 		}
 	}
 }

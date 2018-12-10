@@ -7,8 +7,8 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
@@ -52,11 +52,13 @@ public class UpdateAPIImage extends AbstractAPIMTask implements IResponseParser 
 		}
 	}
 	@Override
-	public JsonNode parseResponse(HttpResponse response) throws AppException {
+	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
+		String response = null;
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonNode = null;
 		try {
-			jsonNode = objectMapper.readTree(getJSONPayload(response));
+			response = EntityUtils.toString(httpResponse.getEntity());
+			jsonNode = objectMapper.readTree(response);
 			String status = jsonNode.findPath("status").asText();
 		} catch (IOException e) {
 			throw new AppException("Cannot parse JSON-Payload for create API-Proxy.", ErrorCode.CANT_CREATE_API_PROXY, e);

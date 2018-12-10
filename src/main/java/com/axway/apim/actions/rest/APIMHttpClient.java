@@ -3,10 +3,6 @@ package com.axway.apim.actions.rest;
 import java.net.URI;
 
 import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -18,13 +14,9 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.ssl.SSLContextBuilder;
 
 import com.axway.apim.lib.AppException;
@@ -53,7 +45,6 @@ public class APIMHttpClient {
 	}
 
 	private void createConnection(String apiManagerURL, String username, String password) throws AppException {
-		CredentialsProvider credsProvider;
 		PoolingHttpClientConnectionManager cm;
 		HttpHost targetHost;
 		
@@ -71,14 +62,6 @@ public class APIMHttpClient {
 			cm.setMaxTotal(5);
 			cm.setDefaultMaxPerRoute(2);
 			targetHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
-			
-			/*credsProvider = new BasicCredentialsProvider();
-			credsProvider.setCredentials(new AuthScope(targetHost.getHostName(), targetHost.getPort()),
-					new UsernamePasswordCredentials(username, password));
-	*/
-			//AuthCache authCache = new BasicAuthCache();
-			//BasicScheme basicAuth = new BasicScheme();
-			//authCache.put(targetHost, basicAuth);
 	
 			// Add AuthCache to the execution context
 			clientContext = HttpClientContext.create();
@@ -95,7 +78,6 @@ public class APIMHttpClient {
 					.setConnectionManager(cm)
 					.setDefaultRequestConfig(defaultRequestConfig)
 					.build();
-					//.setDefaultCredentialsProvider(credsProvider).build();
 		} catch (Exception e) {
 			throw new AppException("Can't create connection to API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
 		}

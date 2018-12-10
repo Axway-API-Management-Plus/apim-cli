@@ -65,7 +65,6 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 			Transaction.getInstance().put("backendAPIId", backendAPIId);
 		} catch (Exception e) {
 			try {
-				LOG.error("Unable to parse received response from API-Manager: '" + response + "'");
 				Transaction context = Transaction.getInstance();
 				Object lastRequest = context.get("lastRequest");
 				if(lastRequest instanceof HttpPost) {
@@ -73,6 +72,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 				} else if (lastRequest instanceof HttpPut) {
 					LOG.error("Last request: " + EntityUtils.toString(((HttpPut)lastRequest).getEntity()));
 				}
+				LOG.error("Unable to parse received response from API-Manager: '" + response + "'");
 				throw new AppException("Unable to parse received response from API-Manager", ErrorCode.UNXPECTED_ERROR);
 			} catch (Exception e1) {
 				throw new AppException("Unable to parse response", ErrorCode.UNXPECTED_ERROR, e1);
