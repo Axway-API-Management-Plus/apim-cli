@@ -78,8 +78,8 @@ public class App {
 				System.out.println(e.getMessage());
 				System.out.println("\n\n");
 				formatter.printHelp("Swagger-Import", options, true);
-				
-				System.out.println("You may run one of the samples");
+				System.out.println();
+				System.out.println("You may run the following examples:");
 				System.out.println("scripts/run-swagger-import.sh -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
 				
 				System.exit(99);
@@ -92,23 +92,8 @@ public class App {
 			
 			APIImportConfig contract = new APIImportConfig(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("swagger"));
 			IAPIDefinition desiredAPI = contract.getImportAPIDefinition();
-			// Create the API-Definition that represent what we want to have
-			//                  IAPIDefinition desiredAPI = new APIImportDefinition(contract, params.getOptionValue("swagger"));
-			// Create an API-Definition that reflects the same API in API-Manager (or indicated)
 			IAPIDefinition actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI.getCustomProperties());
-			/* Both API-Definitions can be compared
-			 * - is the Change is breaking
-			 *   - and if yes, do we have a new version number + new exposure Path?
-			 *   - or is the Force-Flag set (which is may be used on the Dev-Stage to allow frequent updates)
-			 * - is the Change is Non-Breaking
-			 *   - we need to know, if only changeable properties (like status, description, ... later tags, custom-props)
-			 *     have been changed (the API-Definition needs to know that)
-			 *     - if yes, update the existing API-Entity in API-Manager, not creating a new
-			 *   - if changes are desired not applicable to the existing API, we create a new 
-			 */
-			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
-	
-			
+			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);			
 			
 			apimAdapter.applyChanges(changeActions);
 			LOG.info("Successfully replicate API-State into API-Manager");
