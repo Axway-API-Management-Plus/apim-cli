@@ -93,7 +93,7 @@ public class APIManagerAdapter {
 							recreate.execute(changeState);
 						}
 					} else {
-						LOG.error("A breaking change can't be applied without enforcing it!");
+						LOG.error("A breaking change can't be applied without enforcing it! Try option: -f true");
 						return;
 					}
 				}

@@ -21,7 +21,7 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIImportDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jayway.jsonpath.JsonPath;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParser {
 
@@ -54,10 +54,12 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 	
 	@Override
 	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
+		ObjectMapper objectMapper = new ObjectMapper();
 		String response = null;
 		try {
 			response = EntityUtils.toString(httpResponse.getEntity());
-			String backendAPIId = JsonPath.parse(response).read("$.id", String.class);
+			JsonNode jsonNode = objectMapper.readTree(response);
+			String backendAPIId = jsonNode.findPath("id").asText();
 			Transaction.getInstance().put("backendAPIId", backendAPIId);
 			return null;
 		} catch (IOException e) {

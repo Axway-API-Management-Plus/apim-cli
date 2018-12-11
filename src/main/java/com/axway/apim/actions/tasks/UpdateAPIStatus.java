@@ -18,7 +18,7 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIBaseDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.jayway.jsonpath.JsonPath;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser {
 	
@@ -129,6 +129,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 	}
 	@Override
 	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
+		ObjectMapper objectMapper = new ObjectMapper();
 		String response = null;
 		Transaction context = Transaction.getInstance();
 		if(context.get("responseMessage")!=null) {
@@ -137,7 +138,8 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 		} else {
 			try {
 				response = EntityUtils.toString(httpResponse.getEntity());
-				String backendAPIId = JsonPath.parse(response).read("$.id", String.class);
+				JsonNode jsonNode = objectMapper.readTree(response);
+				String backendAPIId = jsonNode.findPath("id").asText();
 				Transaction.getInstance().put("backendAPIId", backendAPIId);
 				// The action was successful, update the status!
 				this.actualState.setState(desiredState.getState());

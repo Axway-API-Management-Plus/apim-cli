@@ -1,0 +1,8 @@
+	
+{
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"state": "${state}",
+	"version": "1.0.0",
+	"organization": "API Development ${orgNumber}"
+}

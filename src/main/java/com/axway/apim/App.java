@@ -16,8 +16,6 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIImportConfig;
 import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.APIImportDefinition;
-import com.axway.apim.swagger.api.APIManagerAPI;
 import com.axway.apim.swagger.api.IAPIDefinition;
 
 public class App {
@@ -81,6 +79,10 @@ public class App {
 				System.out.println();
 				System.out.println("You may run the following examples:");
 				System.out.println("scripts/run-swagger-import.sh -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println("scripts/run-swagger-import.sh -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme -s prod");
+				System.out.println("scripts/run-swagger-import.sh -a samples/petstore.json -c samples/complete-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println();
+				System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 				
 				System.exit(99);
 			}

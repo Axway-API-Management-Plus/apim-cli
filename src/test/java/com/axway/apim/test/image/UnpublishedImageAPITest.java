@@ -1,4 +1,4 @@
-package com.axway.apim.test.basic;
+package com.axway.apim.test.image;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,11 +23,13 @@ public class UnpublishedImageAPITest extends TestNGCitrusTestDesigner {
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/my-image-api-${apiNumber}");
 		variable("apiName", "My-Image-API-${apiNumber}");
+		variable("state", "unpublished");
+		
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/3_5_unpublished-image.json");
+		createVariable("configFile", "/com/axway/apim/test/files/image/2_image_included_flex_state.json");
 		createVariable("image", "/com/axway/apim/test/files/basic/API-Logo.jpg");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);

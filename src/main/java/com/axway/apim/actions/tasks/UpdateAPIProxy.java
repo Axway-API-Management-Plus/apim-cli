@@ -23,7 +23,6 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
 
 public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser {
 	
@@ -58,10 +57,12 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 	
 	@Override
 	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
+		ObjectMapper objectMapper = new ObjectMapper();
 		String response = null;
 		try {
 			response = EntityUtils.toString(httpResponse.getEntity());
-			String backendAPIId = JsonPath.parse(response).read("$.id", String.class);
+			JsonNode jsonNode = objectMapper.readTree(response);
+			String backendAPIId = jsonNode.findPath("id").asText();
 			Transaction.getInstance().put("backendAPIId", backendAPIId);
 		} catch (Exception e) {
 			try {
@@ -89,9 +90,11 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 				try {
 					field = desired.getClass().getSuperclass().getDeclaredField(fieldName);
 					if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
+						LOG.debug("Going to update property: " + field.getName());
 						APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
 						if(void.class != property.propHandler()) { // Properties going this way, must be migrated
 							Class clazz = property.propHandler();
+							LOG.trace("Calling property handler: " + clazz.getCanonicalName());
 							PropertyHandler propHandler = (PropertyHandler) clazz.newInstance();
 							lastJsonReponse = propHandler.handleProperty(desired, lastJsonReponse);
 							logMessage = logMessage + field.getName() + " ";
@@ -101,6 +104,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 								Method method = desired.getClass().getSuperclass().getMethod(getterMethodName, null);
 								Object handler = method.invoke(desired, null);
 								if(handler instanceof PropertyHandler) { // This is NEW/Preferred way
+									LOG.trace("Calling property handler: " + handler.getClass());
 									((PropertyHandler)handler).handleProperty(desired, lastJsonReponse);
 									logMessage = logMessage + field.getName() + " ";
 								}

@@ -272,7 +272,7 @@ public class APIImportConfig {
 							this.getClass().getResourceAsStream(importApi.getImage().getFilename())));
 				}
 			} catch (IOException e) {
-				throw new AppException("Can't read image-file from file", ErrorCode.UNXPECTED_ERROR, e);
+				throw new AppException("Can't read image-file: "+importApi.getImage().getFilename()+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
 			}
 		}
 		return importApi;

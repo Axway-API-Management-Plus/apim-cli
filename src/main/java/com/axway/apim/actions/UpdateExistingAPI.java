@@ -28,7 +28,7 @@ public class UpdateExistingAPI {
 		new UpdateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute(allChanges);
 		
 		// If image is include, update it
-		if(changes.getNonBreakingChanges().contains("apiImage")) {
+		if(changes.getNonBreakingChanges().contains("image")) {
 			new UpdateAPIImage(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		}
 		
