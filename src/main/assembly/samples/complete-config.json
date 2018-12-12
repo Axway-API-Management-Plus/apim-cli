@@ -18,9 +18,9 @@
                "type":"apiKey",
                "order":0,
                "properties":{
-                  "apiKeyFieldName":"${apiKeyFieldName}",
-                  "takeFrom":"${takeFrom}",
-                  "removeCredentialsOnSuccess":"${removeCredentialsOnSuccess}"
+                  "apiKeyFieldName":"KeyId",
+                  "takeFrom":"HEADER",
+                  "removeCredentialsOnSuccess":"false"
                }
             }
          ]
