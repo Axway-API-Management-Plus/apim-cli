@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,19 +67,21 @@ public class OutboundProfile {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/policies")
 					.setParameter("type", type).build();
 			RestAPICall getRequest = new GETRequest(uri, null);
-			InputStream response = getRequest.execute().getEntity().getContent();
+			HttpResponse httpResponse = getRequest.execute();
 			
 			JsonNode jsonResponse;
+			String response = EntityUtils.toString(httpResponse.getEntity());
 			try {
 				jsonResponse = mapper.readTree(response);
 				for(JsonNode node : jsonResponse) {
 					policies.put(node.get("name").asText(), node.get("id").asText());
 				}
-			} catch (IOException e) {
-				throw new AppException("Can't find Policy: ....", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			} catch (Exception e) {
+				LOG.error("Error reading configured custom-policies. Can't parse response: " + response);
+				throw new AppException("Can't initialize policies for type: " + type, ErrorCode.API_MANAGER_COMMUNICATION, e);
 			}
 		} catch (Exception e) {
-			throw new AppException("Can't find Policy: ....", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Can't initialize policies for type: " + type, ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 		return policies;
 	}
