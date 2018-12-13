@@ -3,8 +3,6 @@ package com.axway.apim.swagger.api;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.web.servlet.resource.VersionPathStrategy;
-
 import com.axway.apim.actions.tasks.props.APICaCertsPropertyHandler;
 import com.axway.apim.actions.tasks.props.APIDescriptionPropertyHandler;
 import com.axway.apim.actions.tasks.props.APINamePropertyHandler;
