@@ -19,6 +19,7 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -55,7 +56,9 @@ public class OutboundProfile {
 			OutboundProfile.apimRoutingPolicies = initPolicyies("routing");
 			OutboundProfile.apimRequestPolicies = initPolicyies("request");
 			OutboundProfile.apimResponsePolicies = initPolicyies("response");
-			OutboundProfile.apimFaultHandlerPolicies = initPolicyies("faulthandler");
+			if(!APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) {
+				OutboundProfile.apimFaultHandlerPolicies = initPolicyies("faulthandler");
+			}
 		}
 	}
 	
