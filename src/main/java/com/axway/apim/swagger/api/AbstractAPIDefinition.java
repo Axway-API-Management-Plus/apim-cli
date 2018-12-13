@@ -3,12 +3,15 @@ package com.axway.apim.swagger.api;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.servlet.resource.VersionPathStrategy;
+
 import com.axway.apim.actions.tasks.props.APICaCertsPropertyHandler;
 import com.axway.apim.actions.tasks.props.APIDescriptionPropertyHandler;
 import com.axway.apim.actions.tasks.props.APINamePropertyHandler;
 import com.axway.apim.actions.tasks.props.APIPathPropertyHandler;
 import com.axway.apim.actions.tasks.props.APISummaryPropertyHandler;
 import com.axway.apim.actions.tasks.props.APITagsPropertyHandler;
+import com.axway.apim.actions.tasks.props.APIVersionPropertyHandler;
 import com.axway.apim.actions.tasks.props.CorsProfileHandler;
 import com.axway.apim.actions.tasks.props.CustomPropertyHandler;
 import com.axway.apim.actions.tasks.props.InboundProfileHandler;
@@ -100,7 +103,8 @@ public abstract class AbstractAPIDefinition {
 	protected String state = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPIDefinition.STATE_UNPUBLISHED})	
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
+			propHandler = APIVersionPropertyHandler.class)	
 	protected String version;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
