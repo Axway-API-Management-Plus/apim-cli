@@ -1,5 +1,5 @@
 <assembly>
-    <id>1.0</id>
+    <id>1.0.1</id>
     <formats>
         <format>tar.gz</format>
     </formats>
