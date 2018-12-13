@@ -107,6 +107,8 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 									LOG.trace("Calling property handler: " + handler.getClass());
 									((PropertyHandler)handler).handleProperty(desired, lastJsonReponse);
 									logMessage = logMessage + field.getName() + " ";
+								} else {
+									LOG.warn("Property: " + field.getName() + " has no handler configured and is not a propertyHandler");
 								}
 							} catch (Exception e) {
 								LOG.warn("Property: " + field.getName() + " has no handler configured and is not a propertyHandler");

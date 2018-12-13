@@ -1,6 +1,5 @@
 package com.axway.apim.swagger;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -10,15 +9,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +47,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class APIManagerAdapter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerAdapter.class);
+	
+	private static String apiManagerVersion = null;
 	
 	private boolean enforceBreakingChange = false;
 	
@@ -244,6 +246,29 @@ public class APIManagerAdapter {
 			return IOUtils.toByteArray(is);
 		} catch (Exception e) {
 			throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public static String getApiManagerVersion() throws AppException {
+		if(APIManagerAdapter.apiManagerVersion!=null) {
+			return apiManagerVersion;
+		}
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			JsonNode jsonResponse;
+			jsonResponse = mapper.readTree(response);
+			String apiManagerVersion = jsonResponse.get("productVersion").asText();
+			LOG.debug("API-Manager version is: " + apiManagerVersion);
+			return jsonResponse.get("productVersion").asText();
+		} catch (Exception e) {
+			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + response);
+			throw new AppException("Can't get version from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	

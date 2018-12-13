@@ -11,13 +11,6 @@
     </dependencySets>
     <fileSets>
         <fileSet>
-            <directory>target</directory>
-            <outputDirectory>/lib</outputDirectory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>src/main/assembly/samples</directory>
             <outputDirectory>/samples</outputDirectory>
             <includes>
