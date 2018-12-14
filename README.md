@@ -39,6 +39,8 @@ Build and tested with API-Manager 7.6.2 SP1 at Travis CI: [![Build Status](https
 ## Changelog
 - 1.0.0 - 12.12.2018
   - Initial version that supports all API-Properties besides method level settings
+- 1.0.1 - 13.12.2018
+  - Added support for API-Manager 7.5.3 plus minor fixes
 
 
 ## Limitations/Caveats
