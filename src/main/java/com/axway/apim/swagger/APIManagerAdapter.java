@@ -273,22 +273,31 @@ public class APIManagerAdapter {
 	}
 	
 	public static JsonNode getCustomPropertiesConfig() throws AppException {
-		ObjectMapper mapper = new ObjectMapper();
+		
+		String appConfig = null;
 		URI uri;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			HttpEntity response = getRequest.execute().getEntity();
-			String appConfig = IOUtils.toString(response.getContent(), "UTF-8");
-			appConfig = appConfig.substring(appConfig.indexOf("customPropertiesConfig:")+23, appConfig.indexOf("wizardModels")-12);
-			appConfig = appConfig.substring(0, appConfig.length()-1)+"}";
+			appConfig = IOUtils.toString(response.getContent(), "UTF-8");
+			return parseAppConfig(appConfig);
+		} catch (Exception e) {
+			throw new AppException("Can't read app.config from API-Manager: '" + appConfig + "'", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public static JsonNode parseAppConfig(String appConfig) throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			appConfig = appConfig.substring(appConfig.indexOf("customPropertiesConfig:")+23, appConfig.indexOf("wizardModels"));
+			//appConfig = appConfig.substring(0, appConfig.length()-1); // Remove the tail comma
 			mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 			mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
 			mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-			JsonNode jsonResponse = mapper.readTree(appConfig);
-			return jsonResponse;
+			return mapper.readTree(appConfig);
 		} catch (Exception e) {
-			throw new AppException("Can't read app.config from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Can't parse API-Manager app.config.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	
