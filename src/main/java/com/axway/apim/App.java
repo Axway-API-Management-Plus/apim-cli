@@ -98,7 +98,7 @@ public class App {
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);			
 			
 			apimAdapter.applyChanges(changeActions);
-			LOG.info("Successfully replicate API-State into API-Manager");
+			LOG.info("Successfully replicated API-State into API-Manager");
 			return 0;
 		} catch (AppException ap) {
 			if(ap.isLogStackStrace()) {

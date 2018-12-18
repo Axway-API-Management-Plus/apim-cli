@@ -20,6 +20,7 @@ import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
+import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -72,12 +73,30 @@ public class APIImportConfig {
 			validateDescription(stagedConfig);
 			validateCorsConfig(stagedConfig);
 			completeCaCerts(stagedConfig);
+			addQuotaConfiguration(stagedConfig);
 			return stagedConfig;
 		} catch (Exception e) {
 			if(e.getCause() instanceof AppException) {
 				throw (AppException)e.getCause();
 			}
 			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
+		}
+	}
+	
+	private void addQuotaConfiguration(IAPIDefinition apiConfig) {
+		APIImportDefinition importAPI = (APIImportDefinition)apiConfig;
+		initQuota(importAPI.getSystemQuota());
+		initQuota(importAPI.getApplicationQuota());
+	}
+	
+	private void initQuota(APIQuota quotaConfig) {
+		if(quotaConfig==null) return;
+		if(quotaConfig.getType().equals("APPLICATION")) {
+			quotaConfig.setName("Application Default");
+			quotaConfig.setDescription("Maximum message rates per application. Applied to each application unless an Application-Specific quota is configured");
+		} else {
+			quotaConfig.setName("System Default");
+			quotaConfig.setDescription(".....");			
 		}
 	}
 	

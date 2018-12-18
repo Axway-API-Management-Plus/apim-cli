@@ -14,6 +14,7 @@ import com.axway.apim.actions.tasks.ImportBackendAPI;
 import com.axway.apim.actions.tasks.UpdateAPIImage;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
+import com.axway.apim.actions.tasks.UpdateQuotaConfiguration;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
@@ -53,6 +54,8 @@ public class CreateNewAPI {
 		}
 		// This is special, as the status is not a property and requires some additional actions!
 		new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI).execute();
+		
+		new UpdateQuotaConfiguration(changes.getDesiredAPI(), createdAPI).execute();
 		
 		vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
 	}

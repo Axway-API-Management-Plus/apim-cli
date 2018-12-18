@@ -3,8 +3,8 @@ package com.axway.apim.actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
+import com.axway.apim.actions.tasks.UpdateQuotaConfiguration;
 import com.axway.apim.actions.tasks.UpgradeAccessToNewerAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIChangeState;
@@ -36,7 +36,7 @@ public class RecreateToUpdateAPI {
 		// Delete the existing old API!
 		((APIBaseDefinition)newActualAPI).setStatus(IAPIDefinition.STATE_DELETED);
 		new UpdateAPIStatus(newActualAPI, actual).execute();
-
+		new UpdateQuotaConfiguration(newActualAPI, actual).execute();
 	}
 
 }

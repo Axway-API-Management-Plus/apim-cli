@@ -26,6 +26,7 @@ import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
+import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 import com.axway.apim.swagger.api.properties.tags.TagMap;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -126,6 +127,14 @@ public abstract class AbstractAPIDefinition {
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
 			propHandler = CustomPropertyHandler.class)
 	protected Map<String, String> customProperties = null;
+	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED})	
+	protected APIQuota applicationQuota = null;
+	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED})
+	protected APIQuota systemQuota = null;
 	
 	protected String organization = null;
 	
@@ -330,5 +339,23 @@ public abstract class AbstractAPIDefinition {
 
 	public void setCaCerts(List<CaCert> caCerts) {
 		this.caCerts = caCerts;
+	}
+	
+	public APIQuota getApplicationQuota() {
+		return applicationQuota;
+	}
+
+	public void setApplicationQuota(APIQuota applicationQuota) {
+		if(applicationQuota!=null && applicationQuota.getType()==null) applicationQuota.setType("APPLICATION");
+		this.applicationQuota = applicationQuota;
+	}
+
+	public APIQuota getSystemQuota() {
+		return systemQuota;
+	}
+
+	public void setSystemQuota(APIQuota systemQuota) {
+		if(systemQuota!=null && systemQuota.getType()==null) systemQuota.setType("SYSTEM");
+		this.systemQuota = systemQuota;
 	}
 }
