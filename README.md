@@ -34,11 +34,13 @@ Build and tested with API-Manager 7.6.2 SP1 at Travis CI: [![Build Status](https
 
 ## Usage
 - run the script scripts/run-swagger-import.sh to see the basic usage and some samples
-- more information can found in the project [wiki](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki) 
+- more information can be found in the project [wiki](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki) 
 
 ## Changelog
 - 1.0.0 - 12.12.2018
   - Initial version that supports all API-Properties besides method level settings
+- 1.0.1 - 13.12.2018
+  - Added support for API-Manager 7.5.3 plus minor fixes
 
 
 ## Limitations/Caveats
