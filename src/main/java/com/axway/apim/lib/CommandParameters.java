@@ -48,6 +48,11 @@ public class CommandParameters {
 		return Boolean.parseBoolean(this.cmd.getOptionValue("force"));
 	}
 	
+	public boolean isIgnoreQuotas() {
+		if(!this.cmd.hasOption("ignoreQuotas")) return false;
+		return Boolean.parseBoolean(this.cmd.getOptionValue("ignoreQuotas"));
+	}
+	
 	public String getAPIManagerURL() {
 		return "https://"+this.getHostname()+":"+this.getPort();
 	}

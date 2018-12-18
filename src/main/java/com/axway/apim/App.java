@@ -34,15 +34,16 @@ public class App {
 			
 			option = new Option("a", "swagger", true, "The Swagger-API Definition (JSON-Formated) in local-filesystem");
 				option.setRequired(true);
-				option.setArgName("./swagger.xyz.json");
+				option.setArgName("swagger_file.json");
 			options.addOption(option);
 			
 			option = new Option("c", "contract", true, "This is the JSON-Formatted API-Contract containing information how to expose the API");
 				option.setRequired(true);
-				option.setArgName("./api_contract.json");
+				option.setArgName("api_contract.json");
 			options.addOption(option);
 			
-			option = new Option("s", "stage", true, "The stage this API should be import. Will be used to lookup stage overrides.");
+			option = new Option("s", "stage", true, "The stage this API should be imported.\n"
+					+ "Will be used to lookup stage specific API-Contract overrides (e.g.: api_contract.preprod.json)");
 				option.setArgName("preprod");
 			options.addOption(option);
 			
@@ -51,7 +52,7 @@ public class App {
 				option.setArgName("api-host");
 			options.addOption(option);
 			
-			option = new Option("u", "username", true, "Username used to authenticate");
+			option = new Option("u", "username", true, "Username used to authenticate. Please note, that this user must have Admin-Role");
 				option.setRequired(true);
 				option.setArgName("apiadmin");
 			options.addOption(option);
@@ -61,8 +62,12 @@ public class App {
 				option.setArgName("changeme");
 			options.addOption(option);
 			
-			option = new Option("f", "force", true, "Force breaking changes to be imported potentially update existing APIs");
-				option.setArgName("true/false");
+			option = new Option("f", "force", true, "Breaking changes can't be imported without this flag, unless the API is unpublished.");
+				option.setArgName("true/[false]");
+			options.addOption(option);
+			
+			option = new Option("iq", "ignoreQuotas", true, "Use this flag to ignore configured API quotas.");
+			option.setArgName("true/[false]");
 			options.addOption(option);
 			
 			CommandLineParser parser = new DefaultParser();
@@ -72,10 +77,9 @@ public class App {
 			try {
 				cmd = parser.parse( options, args, false);
 			} catch (ParseException e) {
-				System.out.println("\n\n");
-				System.out.println(e.getMessage());
-				System.out.println("\n\n");
 				formatter.printHelp("Swagger-Import", options, true);
+				System.out.println("\n");
+				System.out.println("ERROR: " + e.getMessage());
 				System.out.println();
 				System.out.println("You may run the following examples:");
 				System.out.println("scripts/run-swagger-import.sh -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
