@@ -10,6 +10,7 @@ public enum ErrorCode {
 	CANT_CREATE_API_PROXY		(35, "Cannot create API-Proxy (FE-API)"),
 	CANT_CREATE_BE_API			(40, "Cannot import Swagger-Definition -> Can't create BE-API."),
 	CANT_UPDATE_API_PROXY		(45, "Can't update API-Proxy."),
+	CANT_UPDATE_QUOTA_CONFIG	(47, "Can't update Quota-Configuration."),
 	CANT_UPDATE_API_STATUS		(50, "Can't update the API-Status."),
 	CANT_UPGRADE_API_ACCESS		(55, "Can't upgrade API-Access"),
 	API_MANAGER_COMMUNICATION	(60, "API-Manager communication error."),

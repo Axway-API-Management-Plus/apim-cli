@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.actions.tasks.UpdateAPIImage;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
+import com.axway.apim.actions.tasks.UpdateQuotaConfiguration;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIChangeState;
@@ -38,6 +39,8 @@ public class UpdateExistingAPI {
 		}
 		
 		vHostHandler.handleVHost(changes.getDesiredAPI(), changes.getActualAPI());
+		
+		new UpdateQuotaConfiguration(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 	}
 
 }

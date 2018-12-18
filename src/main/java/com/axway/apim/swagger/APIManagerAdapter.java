@@ -37,6 +37,8 @@ import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
+import com.axway.apim.swagger.api.properties.quota.APIQuota;
+import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,6 +53,9 @@ public class APIManagerAdapter {
 	private static String apiManagerVersion = null;
 	
 	private boolean enforceBreakingChange = false;
+	
+	public static APIQuota sytemQuotaConfig = null;
+	public static APIQuota applicationQuotaConfig = null;
 	
 	public APIManagerAdapter() throws AppException {
 		super();
@@ -176,11 +181,61 @@ public class APIManagerAdapter {
 				}
 				((AbstractAPIDefinition)apiManagerApi).setCustomProperties(customProperties);
 			}
-			
+			addQuotaConfiguration(apiManagerApi);
 			return apiManagerApi;
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-State.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
+	}
+	
+	private static void addQuotaConfiguration(IAPIDefinition api) throws AppException {
+		//APPLICATION:	00000000-0000-0000-0000-000000000001
+		//SYSTEM: 		00000000-0000-0000-0000-000000000000
+		APIManagerAPI managerAPI = (APIManagerAPI)api;
+		try {
+			applicationQuotaConfig = getQuotaFromAPIManager("00000000-0000-0000-0000-000000000001"); // Get the Application-Default-Quota
+			sytemQuotaConfig = getQuotaFromAPIManager("00000000-0000-0000-0000-000000000000"); // Get the System-Default-Quota
+			managerAPI.setApplicationQuota(getAPIQuota(applicationQuotaConfig, managerAPI.getId()));
+			managerAPI.setSystemQuota(getAPIQuota(sytemQuotaConfig, managerAPI.getId()));
+		} catch (Exception e) {
+			LOG.error("Application-Default quota response: '"+applicationQuotaConfig+"'");
+			LOG.error("System-Default quota response: '"+sytemQuotaConfig+"'");
+			throw new AppException("Can't initialize API-Manager Quota-Configuration", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	private static APIQuota getQuotaFromAPIManager(String type) throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+type).build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpEntity response = getRequest.execute().getEntity();
+			String config = IOUtils.toString(response.getContent(), "UTF-8");
+			APIQuota quotaConfig = mapper.readValue(config, APIQuota.class);
+			return quotaConfig;
+		} catch (Exception e) {
+			throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	private static APIQuota getAPIQuota(APIQuota quotaConfig, String apiId) throws AppException {
+		APIQuota apiQuota;
+		try {
+			for(QuotaRestriction restriction : quotaConfig.getRestrictions()) {
+				if(restriction.getApi().equals(apiId)) {
+					apiQuota = new APIQuota();
+					apiQuota.setDescription(quotaConfig.getDescription());
+					apiQuota.setName(quotaConfig.getName());
+					apiQuota.setRestrictions(new ArrayList<QuotaRestriction>());
+					apiQuota.getRestrictions().add(restriction);
+					return apiQuota;
+				}
+			}
+		} catch (Exception e) {
+			throw new AppException("Can't parse quota from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+		return null;
 	}
 	
 	public static JsonNode getExistingAPI(String apiPath) throws AppException {
@@ -273,22 +328,31 @@ public class APIManagerAdapter {
 	}
 	
 	public static JsonNode getCustomPropertiesConfig() throws AppException {
-		ObjectMapper mapper = new ObjectMapper();
+		
+		String appConfig = null;
 		URI uri;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			HttpEntity response = getRequest.execute().getEntity();
-			String appConfig = IOUtils.toString(response.getContent(), "UTF-8");
-			appConfig = appConfig.substring(appConfig.indexOf("customPropertiesConfig:")+23, appConfig.indexOf("wizardModels")-12);
-			appConfig = appConfig.substring(0, appConfig.length()-1)+"}";
+			appConfig = IOUtils.toString(response.getContent(), "UTF-8");
+			return parseAppConfig(appConfig);
+		} catch (Exception e) {
+			throw new AppException("Can't read app.config from API-Manager: '" + appConfig + "'", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public static JsonNode parseAppConfig(String appConfig) throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			appConfig = appConfig.substring(appConfig.indexOf("customPropertiesConfig:")+23, appConfig.indexOf("wizardModels"));
+			//appConfig = appConfig.substring(0, appConfig.length()-1); // Remove the tail comma
 			mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 			mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
 			mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-			JsonNode jsonResponse = mapper.readTree(appConfig);
-			return jsonResponse;
+			return mapper.readTree(appConfig);
 		} catch (Exception e) {
-			throw new AppException("Can't read app.config from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Can't parse API-Manager app.config.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	

@@ -85,7 +85,8 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 	private static JsonNode handledChangedProps(JsonNode lastJsonReponse, IAPIDefinition desired, List<String> changedProps) throws AppException {
 		Field field = null;
 		if(changedProps!=null && changedProps.size()!=0) {
-			String logMessage = "Updating proxy for the following props: ";
+			boolean propsChangedInProxy = false;
+			String logMessage = "Updating proxy for the following properties: ";
 			for(String fieldName : changedProps) {
 				try {
 					field = desired.getClass().getSuperclass().getDeclaredField(fieldName);
@@ -98,6 +99,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 							PropertyHandler propHandler = (PropertyHandler) clazz.newInstance();
 							lastJsonReponse = propHandler.handleProperty(desired, lastJsonReponse);
 							logMessage = logMessage + field.getName() + " ";
+							propsChangedInProxy = true;
 						} else {
 							try {
 								String getterMethodName = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
@@ -107,11 +109,12 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 									LOG.trace("Calling property handler: " + handler.getClass());
 									((PropertyHandler)handler).handleProperty(desired, lastJsonReponse);
 									logMessage = logMessage + field.getName() + " ";
+									propsChangedInProxy = true;
 								} else {
-									LOG.warn("Property: " + field.getName() + " has no handler configured and is not a propertyHandler");
+									LOG.debug("Property: " + field.getName() + " has no handler configured and is not a propertyHandler");
 								}
 							} catch (Exception e) {
-								LOG.warn("Property: " + field.getName() + " has no handler configured and is not a propertyHandler");
+								LOG.debug("Property: " + field.getName() + " has no handler configured and is not a propertyHandler");
 							}
 						}
 					}
@@ -119,7 +122,8 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 					throw new AppException("Can't handle property: "+field+" to update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
 				}
 			}
-			LOG.info(logMessage);
+			if(propsChangedInProxy)
+				LOG.info(logMessage);
 		}
 		return lastJsonReponse;
 	}
