@@ -24,6 +24,7 @@ Today the following API-Properties are already supported and can be controlled e
 - V-Host
 - Tags
 - Custom-Properties
+- Quota-Management (Application- & System-Default-Quota)
 
 Build and tested with API-Manager 7.6.2 SP1 at Travis CI: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=master)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
 
@@ -41,6 +42,8 @@ Build and tested with API-Manager 7.6.2 SP1 at Travis CI: [![Build Status](https
   - Initial version that supports all API-Properties besides method level settings
 - 1.0.1 - 13.12.2018
   - Added support for API-Manager 7.5.3 plus minor fixes
+- 1.1.0 - 18.12.2018
+  - Added support for Qouta-Management plus minor fixes
 
 
 ## Limitations/Caveats
