@@ -10,6 +10,7 @@ import com.axway.apim.actions.tasks.props.APIPathPropertyHandler;
 import com.axway.apim.actions.tasks.props.APISummaryPropertyHandler;
 import com.axway.apim.actions.tasks.props.APITagsPropertyHandler;
 import com.axway.apim.actions.tasks.props.APIVersionPropertyHandler;
+import com.axway.apim.actions.tasks.props.AuthenticationProfileHandler;
 import com.axway.apim.actions.tasks.props.CorsProfileHandler;
 import com.axway.apim.actions.tasks.props.CustomPropertyHandler;
 import com.axway.apim.actions.tasks.props.InboundProfileHandler;
@@ -22,6 +23,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
@@ -69,10 +71,16 @@ public abstract class AbstractAPIDefinition {
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<SecurityProfile> securityProfiles = null;
 	
+	@APIPropertyAnnotation(isBreaking = true, 
+			writableStates = {}, 
+			propHandler = AuthenticationProfileHandler.class)
+	@JsonSetter(nulls=Nulls.SKIP)
+	protected List<AuthenticationProfile> authenticationProfiles = null;
+	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
 			propHandler = APITagsPropertyHandler.class)
-	protected TagMap<String, String[]> tags = null;
+	protected Map<String, String[]> tags = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
 	protected APISwaggerDefinion swaggerDefinition = null;
@@ -181,8 +189,19 @@ public abstract class AbstractAPIDefinition {
 		return this.securityProfiles;
 	}
 	
+	
+	
 	public void setSecurityProfiles(List<SecurityProfile> securityProfiles) {
 		this.securityProfiles = securityProfiles;
+	}
+	
+
+	public List<AuthenticationProfile> getAuthenticationProfiles() {
+		return authenticationProfiles;
+	}
+
+	public void setAuthenticationProfiles(List<AuthenticationProfile> authenticationProfiles) {
+		this.authenticationProfiles = authenticationProfiles;
 	}
 
 	public Map<String, InboundProfile> getInboundProfiles() {

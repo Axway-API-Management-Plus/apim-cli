@@ -6,6 +6,7 @@ import java.util.Map;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
@@ -31,11 +32,13 @@ public interface IAPIDefinition {
 	public Map<String, OutboundProfile> getOutboundProfiles();
 	public Map<String, InboundProfile> getInboundProfiles();
 	public List<SecurityProfile> getSecurityProfiles();
+	public List<AuthenticationProfile> getAuthenticationProfiles();
 	public List<CorsProfile> getCorsProfiles();
 	
 	public void setInboundProfiles(Map<String, InboundProfile> inboundProfiles);
 	
 	public void setSecurityProfiles(List<SecurityProfile> securityProfiles);
+	public void setAuthenticationProfiles(List<AuthenticationProfile> authenticationProfiles);
 	
 	public Map<String, String> getCustomProperties();
 	
