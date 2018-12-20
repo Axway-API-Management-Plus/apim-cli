@@ -2,16 +2,10 @@ package com.axway.apim.swagger.api.properties.tags;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
 
-import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.ErrorCode;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
 
 public class TagMap<K, V> extends LinkedHashMap<String, String[]> {
 
@@ -20,22 +14,6 @@ public class TagMap<K, V> extends LinkedHashMap<String, String[]> {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	
-
-/*	public TagMap(JsonNode config) throws AppException {
-		super();
-		if(config instanceof MissingNode) {
-			return;
-		}
-		try {
-			this.putAll((Map<String, String[]>)objectMapper.readValue( config.toString(), new TypeReference<Map<String, String[]>>(){} ));
-		} catch (Exception e) {
-			throw new AppException("Cant initialize APIImport definition", ErrorCode.UNXPECTED_ERROR, e);
-		}
-	}*/
-
-
 
 	public TagMap() {
 		super();
