@@ -8,6 +8,7 @@
    "descriptionType":"manual",
    "descriptionManual":"This is my __markdown__ based API description.",
    "vhost":"api.custom-host.com",
+   "backendBasepath":"https://any.server.com:7676",
    "securityProfiles":[
       {
          "name":"_default",
@@ -34,6 +35,18 @@
          "faultHandlerPolicy":"Faulthandler policy 1"
       }
    },
+	"authenticationProfiles": [
+		{
+			"name": "_default",
+			"isDefault": "true",
+			"parameters": {
+				"apiKey": "4249823490238490",
+				"apiKeyField": "KeyId", 
+				"httpLocation": "QUERYSTRING_PARAMETER"
+			},
+			"type": "apiKey"
+		}
+	],
    "tags":{
       "tag-name 2":[
          "value 3",
