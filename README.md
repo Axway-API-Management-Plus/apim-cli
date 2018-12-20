@@ -20,6 +20,7 @@ Today the following API-Properties are already supported and can be controlled e
 - Outbound-Custom-Policies
   - Routing, Request, Response, FaultHandler
 - Outbound Authentication
+- Backend Base-Path
 - CORS-Setup
 - V-Host
 - Tags
