@@ -11,6 +11,7 @@ import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
+import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 
@@ -80,4 +81,6 @@ public interface IAPIDefinition {
 	public APIQuota getSystemQuota();
 	
 	public APIQuota getApplicationQuota();
+	
+	public Map<String, ServiceProfile> getServiceProfiles();
 }

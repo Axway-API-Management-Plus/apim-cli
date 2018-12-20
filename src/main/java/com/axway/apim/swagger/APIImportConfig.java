@@ -90,6 +90,10 @@ public class APIImportConfig {
 		initQuota(importAPI.getApplicationQuota());
 	}
 	
+	private void addServiceProfile(IAPIDefinition apiConfig) {
+		
+	}
+	
 	private void initQuota(APIQuota quotaConfig) {
 		if(quotaConfig==null) return;
 		if(quotaConfig.getType().equals("APPLICATION")) {
