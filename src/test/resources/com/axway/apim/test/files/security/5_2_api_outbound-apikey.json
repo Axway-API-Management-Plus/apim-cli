@@ -1,0 +1,19 @@
+{
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"state": "${state}",
+	"version": "1.0.0",
+	"organization": "API Development ${orgNumber}",
+	"authenticationProfiles": [
+		{
+			"name": "_default",
+			"isDefault": "true",
+			"parameters": {
+				"apiKey": "4249823490238490",
+				"apiKeyField": "KeyId", 
+				"httpLocation": "QUERYSTRING_PARAMETER"
+			},
+			"type": "apiKey"
+		}
+	]
+}

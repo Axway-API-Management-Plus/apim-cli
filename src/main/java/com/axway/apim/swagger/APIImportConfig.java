@@ -72,6 +72,7 @@ public class APIImportConfig {
 			validateCustomProperties(stagedConfig);
 			validateDescription(stagedConfig);
 			validateCorsConfig(stagedConfig);
+			validateOutboundAuthN(stagedConfig);
 			completeCaCerts(stagedConfig);
 			addQuotaConfiguration(stagedConfig);
 			return stagedConfig;
@@ -87,6 +88,10 @@ public class APIImportConfig {
 		APIImportDefinition importAPI = (APIImportDefinition)apiConfig;
 		initQuota(importAPI.getSystemQuota());
 		initQuota(importAPI.getApplicationQuota());
+	}
+	
+	private void addServiceProfile(IAPIDefinition apiConfig) {
+		
 	}
 	
 	private void initQuota(APIQuota quotaConfig) {
@@ -276,6 +281,19 @@ public class APIImportConfig {
 			importApi.getSecurityProfiles().add(passthroughProfile);
 		}
 		return importApi;
+	}
+	
+	private void validateOutboundAuthN(IAPIDefinition importApi) throws AppException {
+		// Request to use some specific Outbound-AuthN for this API
+		if(importApi.getAuthenticationProfiles()!=null && importApi.getAuthenticationProfiles().size()!=0) {
+			// For now, we only support one DEFAULT, hence it must be configured as such
+			if(importApi.getAuthenticationProfiles().size()>1) {
+				throw new AppException("Only one AuthenticationProfile supported.", ErrorCode.CANT_READ_CONFIG_FILE);
+			}
+			importApi.getAuthenticationProfiles().get(0).setIsDefault(true);
+			importApi.getAuthenticationProfiles().get(0).setName("_default"); // Otherwise it wont be considered as default by the API-Mgr.
+		}
+		
 	}
 	
 	private IAPIDefinition addImageContent(IAPIDefinition importApi) throws AppException {
