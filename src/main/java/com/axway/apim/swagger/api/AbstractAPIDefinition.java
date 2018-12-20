@@ -80,7 +80,7 @@ public abstract class AbstractAPIDefinition {
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
 			propHandler = APITagsPropertyHandler.class)
-	protected Map<String, String[]> tags = null;
+	protected TagMap<String, String[]> tags = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
 	protected APISwaggerDefinion swaggerDefinition = null;
@@ -189,12 +189,9 @@ public abstract class AbstractAPIDefinition {
 		return this.securityProfiles;
 	}
 	
-	
-	
 	public void setSecurityProfiles(List<SecurityProfile> securityProfiles) {
 		this.securityProfiles = securityProfiles;
 	}
-	
 
 	public List<AuthenticationProfile> getAuthenticationProfiles() {
 		return authenticationProfiles;

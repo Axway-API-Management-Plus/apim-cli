@@ -18,26 +18,59 @@ public class OutboundBasicAuthTest extends TestNGCitrusTestDesigner {
 
 	@CitrusTest(name = "OutboundBasicAuthTest")
 	public void setupDevOrgTest() {
-		description("Verify no error appears, if Authentication is not configured! Must be Passthrough");
+		description("Test to validate API-Outbound-AuthN set to HTTP-Basic.");
 
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/no-authn-test-${apiNumber}");
 		variable("apiName", "No AuthN Test ${apiNumber}");
-		variable("status", "unpublished");
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/security/outbound-basic.json");
+		createVariable("configFile", "/com/axway/apim/test/files/security/5_api_outbound-basic.json");
+		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 
-		echo("####### Validate API: '${apiName}' on path: '${apiPath}' with Passthrough-Security #######");
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' with outbound security set to HTTP-Basic. #######");
 		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
 
 		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 				.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name	", "test HTTP Basic")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "test HTTP Basic")
+				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+		
+		echo("####### Change API to status published: #######");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/security/5_api_outbound-basic.json");
+		createVariable("state", "published");
+		createVariable("expectedReturnCode", "0");
+		action(swaggerImport);
+		
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has status published. #######");
+		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
+
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
+				.validate("$.[?(@.id=='${apiId}')].state", "published")
+				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "test HTTP Basic")
+				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+		
+		echo("####### Re-Import same API: '${apiName}' on path: '${apiPath}' with status published & API-Key (default): #######");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/security/5_2_api_outbound-apikey.json");
+		createVariable("state", "published");
+		createVariable("expectedReturnCode", "0");
+		action(swaggerImport);
+		
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' now configured with API-Key #######");
+		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
+
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+				.validate("$.[?(@.path=='${apiPath}')].state", "published")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "apiKey")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 	}
 
