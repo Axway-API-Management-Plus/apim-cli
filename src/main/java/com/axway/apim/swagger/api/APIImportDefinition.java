@@ -1,8 +1,7 @@
 package com.axway.apim.swagger.api;
 
-import java.io.InputStream;
 import java.net.URI;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
@@ -13,6 +12,7 @@ import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -27,12 +27,17 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIImportDefinition.class);
 	
+	private String orgId = null;
+	
+	private String backendBasepath = null;
+	
 	public APIImportDefinition() throws AppException {
 		super();
 	}
 
 	@Override
 	public String getOrgId() throws AppException {
+		if(this.orgId!=null) return this.orgId;
 		String response = null;
 		try {
 			LOG.info("Getting details for organization: " + this.organization + " from API-Manager!");
@@ -50,5 +55,21 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 			throw new AppException("Can't read Org-Details from API-Manager. Is the API-Manager running and "
 					+ "does the Organization: '"+this.organization+"' exists?", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
+	}
+
+	public String getBackendBasepath() {
+		return backendBasepath;
+	}
+
+	public void setBackendBasepath(String backendBasepath) {
+		if(backendBasepath!=null) {
+			ServiceProfile serviceProfile = new ServiceProfile();
+			serviceProfile.setBasePath(backendBasepath);
+			if(this.serviceProfiles == null) {
+				this.serviceProfiles = new LinkedHashMap<String, ServiceProfile>();
+			}
+			serviceProfiles.put("_default", serviceProfile);
+		}
+		this.backendBasepath = backendBasepath;
 	}
 }
