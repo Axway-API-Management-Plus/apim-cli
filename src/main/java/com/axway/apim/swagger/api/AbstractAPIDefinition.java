@@ -16,6 +16,7 @@ import com.axway.apim.actions.tasks.props.CustomPropertyHandler;
 import com.axway.apim.actions.tasks.props.InboundProfileHandler;
 import com.axway.apim.actions.tasks.props.OutboundProfileHandler;
 import com.axway.apim.actions.tasks.props.SecurityProfileHandler;
+import com.axway.apim.actions.tasks.props.ServiceProfileHandler;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
@@ -28,6 +29,7 @@ import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
+import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 import com.axway.apim.swagger.api.properties.tags.TagMap;
@@ -89,6 +91,11 @@ public abstract class AbstractAPIDefinition {
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
 			propHandler = OutboundProfileHandler.class)
 	protected Map<String, OutboundProfile> outboundProfiles = null;
+	
+	@APIPropertyAnnotation(isBreaking = true, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
+			propHandler = ServiceProfileHandler.class)
+	protected Map<String, ServiceProfile> serviceProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
@@ -373,5 +380,9 @@ public abstract class AbstractAPIDefinition {
 	public void setSystemQuota(APIQuota systemQuota) {
 		if(systemQuota!=null && systemQuota.getType()==null) systemQuota.setType("SYSTEM");
 		this.systemQuota = systemQuota;
+	}
+
+	public Map<String, ServiceProfile> getServiceProfiles() {
+		return serviceProfiles;
 	}
 }
