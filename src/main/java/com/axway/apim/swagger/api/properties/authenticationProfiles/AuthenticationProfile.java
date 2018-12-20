@@ -65,4 +65,9 @@ public class AuthenticationProfile {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "AuthenticationProfile [name=" + name + ", isDefault=" + isDefault + ", parameters=" + parameters
+				+ ", type=" + type + "]";
+	}
 }

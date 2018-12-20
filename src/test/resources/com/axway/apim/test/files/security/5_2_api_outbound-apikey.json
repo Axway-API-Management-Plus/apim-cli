@@ -7,10 +7,11 @@
 	"authenticationProfiles": [
 		{
 			"name": "_default",
+			"isDefault": "true",
 			"parameters": {
 				"apiKey": "4249823490238490",
 				"apiKeyField": "KeyId", 
-				"apiKeyField": "QUERYSTRING_PARAMETER"
+				"httpLocation": "QUERYSTRING_PARAMETER"
 			},
 			"type": "apiKey"
 		}
