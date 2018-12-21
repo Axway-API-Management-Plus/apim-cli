@@ -45,6 +45,8 @@ Build and tested with API-Manager 7.6.2 SP1 at Travis CI: [![Build Status](https
   - Added support for API-Manager 7.5.3 plus minor fixes
 - 1.1.0 - 18.12.2018
   - Added support for Qouta-Management plus minor fixes
+- 1.2.0 - 20.12.2018
+  - Added support for API-Outbound AuthN and support to configure the API-Backend-Basepath
 
 
 ## Limitations/Caveats
