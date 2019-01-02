@@ -3,6 +3,7 @@ package com.axway.apim.swagger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -197,26 +198,35 @@ public class APIManagerAdapter {
 			sytemQuotaConfig = getQuotaFromAPIManager("00000000-0000-0000-0000-000000000000"); // Get the System-Default-Quota
 			managerAPI.setApplicationQuota(getAPIQuota(applicationQuotaConfig, managerAPI.getId()));
 			managerAPI.setSystemQuota(getAPIQuota(sytemQuotaConfig, managerAPI.getId()));
-		} catch (Exception e) {
+		} catch (AppException e) {
 			LOG.error("Application-Default quota response: '"+applicationQuotaConfig+"'");
 			LOG.error("System-Default quota response: '"+sytemQuotaConfig+"'");
-			throw new AppException("Can't initialize API-Manager Quota-Configuration", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw e;
 		}
 	}
 	
 	private static APIQuota getQuotaFromAPIManager(String type) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
-		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+type).build();
-			RestAPICall getRequest = new GETRequest(uri, null);
-			HttpEntity response = getRequest.execute().getEntity();
-			String config = IOUtils.toString(response.getContent(), "UTF-8");
-			APIQuota quotaConfig = mapper.readValue(config, APIQuota.class);
-			return quotaConfig;
-		} catch (Exception e) {
-			throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		}
+		
+			try {
+				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+type).build();
+				RestAPICall getRequest = new GETRequest(uri, null);
+				HttpResponse response = getRequest.execute();
+				int statusCode = response.getStatusLine().getStatusCode();
+				if( statusCode == 403){
+					throw new AppException("Can't get API-Manager Quota-Configuration, User should have API administrator role", ErrorCode.API_MANAGER_COMMUNICATION);
+				}
+				if( statusCode != 200){
+					throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.API_MANAGER_COMMUNICATION);
+				}
+				String config = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+				APIQuota quotaConfig = mapper.readValue(config, APIQuota.class);
+				return quotaConfig;
+			} catch (URISyntaxException | UnsupportedOperationException | IOException e) {
+				throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			} 
+		
 	}
 	
 	private static APIQuota getAPIQuota(APIQuota quotaConfig, String apiId) throws AppException {
