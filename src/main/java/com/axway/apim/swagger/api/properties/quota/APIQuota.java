@@ -2,9 +2,6 @@ package com.axway.apim.swagger.api.properties.quota;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
-import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
