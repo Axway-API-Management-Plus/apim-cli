@@ -46,7 +46,11 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 					.addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
 			RestAPICall importSwagger = new POSTRequest(entity, uri, this);
 			importSwagger.setContentType(null);
-			importSwagger.execute();
+			HttpResponse httpResponse = importSwagger.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode != 201){
+				throw new AppException("Can't import Swagger-definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
+			}
 		} catch (URISyntaxException e) {
 			throw new AppException("Can't import Swagger-definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
 		}
