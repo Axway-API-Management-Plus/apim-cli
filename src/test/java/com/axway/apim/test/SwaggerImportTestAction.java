@@ -52,7 +52,7 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 			enforce = context.getVariable("enforce");
 		} catch (Exception ignore) {};
 		try {
-			ignoreClientOrgs = context.getVariable("ignoreQuotas");
+			ignoreQuotas = context.getVariable("ignoreQuotas");
 		} catch (Exception ignore) {};
 		try {
 			ignoreClientOrgs = context.getVariable("ignoreClientOrgs");
