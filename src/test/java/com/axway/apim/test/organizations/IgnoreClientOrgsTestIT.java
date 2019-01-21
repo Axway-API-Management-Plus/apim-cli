@@ -23,7 +23,22 @@ public class IgnoreClientOrgsTestIT extends TestNGCitrusTestDesigner {
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/grant_invalid_org-api-${apiNumber}");
 		variable("apiName", "Grant to invalid orgs API-${apiNumber}");
+		
+		variable("testOrgName", "Org without permission");
 
+		http().client("apiManager")
+			.send()
+			.post("/organizations")
+			.name("anotherOrgCreatedRequest")
+			.header("Content-Type", "application/json")
+			.payload("{\"name\": \"${testOrgName}\", \"description\": \"Org without permission\", \"enabled\": true, \"development\": true }");
+		
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.CREATED)
+			.messageType(MessageType.JSON)
+			.validate("$.name", "${testOrgName}")
+			.extractFromPayload("$.id", "noPermOrgId");
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		
@@ -31,7 +46,7 @@ public class IgnoreClientOrgsTestIT extends TestNGCitrusTestDesigner {
 		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
-		createVariable("orgName2", "${orgName2}");
+		createVariable("orgName2", "${testOrgName}");
 		createVariable("ignoreClientOrgs", "true");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
@@ -54,7 +69,7 @@ public class IgnoreClientOrgsTestIT extends TestNGCitrusTestDesigner {
 		echo("####### Validate second org has no permission #######");
 		http().client("apiManager")
 			.send()
-			.get("/organizations/${orgId2}/apis")
+			.get("/organizations/${noPermOrgId}/apis")
 			.name("org2")
 			.header("Content-Type", "application/json");
 

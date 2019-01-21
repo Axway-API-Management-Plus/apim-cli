@@ -1,5 +1,6 @@
 package com.axway.apim.actions.tasks;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +8,10 @@ import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.ParseException;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
@@ -91,6 +94,12 @@ public class GrantAccessToClientOrgs extends AbstractAPIMTask implements IRespon
 		if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_NO_CONTENT) {
 			LOG.info("Granted permission to organization: '"+context.get("orgName")+"'");
 		} else {
+			LOG.error("Received status code: " + httpResponse.getStatusLine().getStatusCode());
+			try {
+				LOG.error("Received response: " + EntityUtils.toString(httpResponse.getEntity()));
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
 			throw new AppException("Failure granting permission to organization: '"+context.get("orgName")+"'.", ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
 		}
 		return null;
