@@ -10,13 +10,13 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="APIGrantToInvalidOrgTestIT")
+@Test(testName="APIGrantToAllOrgsTestIT")
 public class APIGrantToAllOrgsTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "APIGrantToInvalidOrgTestIT")
+	@CitrusTest(name = "APIGrantToAllOrgsTestIT")
 	public void setupDevOrgTest() {
 		description("Tool must fail is not all organizations are asigned to an API.");
 		

@@ -10,13 +10,13 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="APIGrantToInvalidOrgTestIT")
+@Test(testName="IgnoreClientOrgsTestIT")
 public class IgnoreClientOrgsTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "APIGrantToInvalidOrgTestIT")
+	@CitrusTest(name = "IgnoreClientOrgsTestIT")
 	public void setupDevOrgTest() {
 		description("This test makes sure, no organizations have been granted permission.");
 		
