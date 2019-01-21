@@ -46,11 +46,16 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 		
 		String enforce = "true";
 		String ignoreQuotas = "false";
+		String ignoreClientOrgs = "false";
+		
 		try {
 			enforce = context.getVariable("enforce");
 		} catch (Exception ignore) {};
 		try {
-			ignoreQuotas = context.getVariable("ignoreQuotas");
+			ignoreClientOrgs = context.getVariable("ignoreQuotas");
+		} catch (Exception ignore) {};
+		try {
+			ignoreClientOrgs = context.getVariable("ignoreClientOrgs");
 		} catch (Exception ignore) {};
 		
 		if(stage==null) {
@@ -70,7 +75,9 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 				"-u", context.replaceDynamicContentInString("${apiManagerUser}"),
 				"-s", stage, 
 				"-f", enforce, 
-				"-iq", ignoreQuotas};
+				"-iq", ignoreQuotas, 
+				"-io", ignoreClientOrgs};
+		
 		int rc = App.run(args);
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);

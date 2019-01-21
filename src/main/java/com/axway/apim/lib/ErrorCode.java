@@ -13,6 +13,7 @@ public enum ErrorCode {
 	CANT_UPDATE_QUOTA_CONFIG	(47, "Can't update Quota-Configuration."),
 	CANT_UPDATE_API_STATUS		(50, "Can't update the API-Status."),
 	CANT_UPGRADE_API_ACCESS		(55, "Can't upgrade API-Access"),
+	UNKNOWN_ORGANIZATION		(57, "Unknown organization given. Please check the API-Contract."),
 	API_MANAGER_COMMUNICATION	(60, "API-Manager communication error."),
 	CANT_READ_SWAGGER_FILE		(65, "Can't read Swagger-File."),
 	CANT_READ_CONFIG_FILE		(70, "Can't read Config-File."),
