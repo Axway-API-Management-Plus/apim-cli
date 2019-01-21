@@ -37,10 +37,13 @@ import com.axway.apim.swagger.api.APIManagerAPI;
 import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.apiAccess.APIAccess;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
+import com.axway.apim.swagger.api.properties.organization.Organization;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -52,6 +55,8 @@ public class APIManagerAdapter {
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerAdapter.class);
 	
 	private static String apiManagerVersion = null;
+	
+	private static List<Organization> allOrgs = null;
 	
 	private boolean enforceBreakingChange = false;
 	
@@ -153,7 +158,7 @@ public class APIManagerAdapter {
 	 * @return an APIManagerAPI instance, which is flagged as valid, if the API was found or invalid, if not found
 	 * @throws AppException when the API-Manager API-State can't be created
 	 */
-	public static IAPIDefinition getAPIManagerAPI(JsonNode jsonConfiguration, Map<String, String> importCustomProperties) throws AppException {
+	public static IAPIDefinition getAPIManagerAPI(JsonNode jsonConfiguration, IAPIDefinition desiredAPI) throws AppException {
 		if(jsonConfiguration == null) {
 			IAPIDefinition apiManagerAPI = new APIManagerAPI();
 			apiManagerAPI.setValid(false);
@@ -171,9 +176,9 @@ public class APIManagerAdapter {
 			apiManagerApi.setValid(true);
 			// As the API-Manager REST doesn't provide information about Custom-Properties, we have to setup 
 			// the Custom-Properties based on the Import API.
-			if(importCustomProperties != null) {
+			if(desiredAPI!=null && desiredAPI.getCustomProperties() != null) {
 				Map<String, String> customProperties = new LinkedHashMap<String, String>();
-				Iterator<String> it = importCustomProperties.keySet().iterator();
+				Iterator<String> it = desiredAPI.getCustomProperties().keySet().iterator();
 				while(it.hasNext()) {
 					String customPropKey = it.next();
 					JsonNode value = jsonConfiguration.get(customPropKey);
@@ -183,10 +188,37 @@ public class APIManagerAdapter {
 				((AbstractAPIDefinition)apiManagerApi).setCustomProperties(customProperties);
 			}
 			addQuotaConfiguration(apiManagerApi);
+			addClientOrganizations(apiManagerApi, desiredAPI);
 			return apiManagerApi;
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-State.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
+	}
+	
+	private static void addClientOrganizations(IAPIDefinition apiManagerApi, IAPIDefinition desiredAPI) throws AppException {
+		if(desiredAPI.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
+			LOG.info("Ignoring Client-Organizations, as desired API-State is Unpublished!");
+			return;
+		}
+		List<String> grantedOrgs = new ArrayList<String>();
+		List<Organization> allOrgs = getAllOrgs();
+		for(Organization org : allOrgs) {
+			List<APIAccess> orgAPIAccess = getAPIAccess(org.getId());
+			for(APIAccess access : orgAPIAccess) {
+				if(access.getApiId().equals(apiManagerApi.getId())) {
+					grantedOrgs.add(org.getName());
+				}
+			}
+		}
+		apiManagerApi.setClientOrganizations(grantedOrgs);
+	}
+	
+	public static String getOrgId(String orgName) {
+		for(Organization org : allOrgs) {
+			if(orgName.equals(org.getName())) return org.getId();
+		}
+		LOG.error("Requested OrgId for unknown orgName: " + orgName);
+		return null;
 	}
 	
 	private static void addQuotaConfiguration(IAPIDefinition api) throws AppException {
@@ -334,6 +366,45 @@ public class APIManagerAdapter {
 		} catch (Exception e) {
 			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + response);
 			throw new AppException("Can't get version from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	private static List<APIAccess> getAPIAccess(String orgId) throws AppException {
+		List<APIAccess> allApiAccess = new ArrayList<APIAccess>();
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations/"+orgId+"/apis").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			allApiAccess = mapper.readValue(response, new TypeReference<List<APIAccess>>(){});
+			return allApiAccess;
+		} catch (Exception e) {
+			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + response);
+			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public static List<Organization> getAllOrgs() throws AppException {
+		if(APIManagerAdapter.allOrgs!=null) {
+			return APIManagerAdapter.allOrgs;
+		}
+		allOrgs = new ArrayList<Organization>();
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			allOrgs = mapper.readValue(response, new TypeReference<List<Organization>>(){});
+			return allOrgs;
+		} catch (Exception e) {
+			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + response);
+			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	

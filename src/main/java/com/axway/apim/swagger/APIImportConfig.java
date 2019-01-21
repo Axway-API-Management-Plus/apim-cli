@@ -20,6 +20,7 @@ import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
+import com.axway.apim.swagger.api.properties.organization.Organization;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
@@ -47,6 +48,8 @@ public class APIImportConfig {
 	private String apiContract;
 	
 	private String stage;
+	
+	
 
 	public APIImportConfig(String apiContract, String stage, String pathToSwagger) throws AppException {
 		super();
@@ -75,6 +78,7 @@ public class APIImportConfig {
 			validateOutboundAuthN(stagedConfig);
 			completeCaCerts(stagedConfig);
 			addQuotaConfiguration(stagedConfig);
+			handleAllOrganizations(stagedConfig);
 			return stagedConfig;
 		} catch (Exception e) {
 			if(e.getCause() instanceof AppException) {
@@ -84,14 +88,24 @@ public class APIImportConfig {
 		}
 	}
 	
+	private void handleAllOrganizations(IAPIDefinition apiConfig) throws AppException {
+		if(apiConfig.getClientOrganizations()==null) return;
+		List<String> allDesiredOrgs = new ArrayList<String>();
+		if(apiConfig.getClientOrganizations().contains("ALL")) {
+			List<Organization> allOrgs = APIManagerAdapter.getAllOrgs();
+			for(Organization org : allOrgs) {
+				allDesiredOrgs.add(org.getName());
+			}
+			apiConfig.getClientOrganizations().clear();
+			apiConfig.getClientOrganizations().addAll(allDesiredOrgs);
+			((APIImportDefinition)apiConfig).setRequestForAllOrgs(true);
+		}
+	}
+	
 	private void addQuotaConfiguration(IAPIDefinition apiConfig) {
 		APIImportDefinition importAPI = (APIImportDefinition)apiConfig;
 		initQuota(importAPI.getSystemQuota());
 		initQuota(importAPI.getApplicationQuota());
-	}
-	
-	private void addServiceProfile(IAPIDefinition apiConfig) {
-		
 	}
 	
 	private void initQuota(APIQuota quotaConfig) {

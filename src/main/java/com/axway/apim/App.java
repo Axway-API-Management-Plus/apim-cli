@@ -70,6 +70,10 @@ public class App {
 			option.setArgName("true/[false]");
 			options.addOption(option);
 			
+			option = new Option("io", "ignoreClientOrgs", true, "Use this flag to ignore configured Client-Organizations.");
+			option.setArgName("true/[false]");
+			options.addOption(option);
+			
 			CommandLineParser parser = new DefaultParser();
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.setWidth(140);
@@ -98,7 +102,7 @@ public class App {
 			
 			APIImportConfig contract = new APIImportConfig(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("swagger"));
 			IAPIDefinition desiredAPI = contract.getImportAPIDefinition();
-			IAPIDefinition actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI.getCustomProperties());
+			IAPIDefinition actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);			
 			
 			apimAdapter.applyChanges(changeActions);

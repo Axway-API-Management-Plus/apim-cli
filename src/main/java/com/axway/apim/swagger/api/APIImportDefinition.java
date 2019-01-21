@@ -31,6 +31,8 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	
 	private String backendBasepath = null;
 	
+	private boolean requestForAllOrgs = false;
+	
 	public APIImportDefinition() throws AppException {
 		super();
 	}
@@ -71,5 +73,13 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 			serviceProfiles.put("_default", serviceProfile);
 		}
 		this.backendBasepath = backendBasepath;
+	}
+	
+	public boolean isRequestForAllOrgs() {
+		return requestForAllOrgs;
+	}
+
+	public void setRequestForAllOrgs(boolean requestForAllOrgs) {
+		this.requestForAllOrgs = requestForAllOrgs;
 	}
 }

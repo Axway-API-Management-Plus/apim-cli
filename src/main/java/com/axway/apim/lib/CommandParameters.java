@@ -53,6 +53,11 @@ public class CommandParameters {
 		return Boolean.parseBoolean(this.cmd.getOptionValue("ignoreQuotas"));
 	}
 	
+	public boolean isIgnoreClientOrgs() {
+		if(!this.cmd.hasOption("ignoreClientOrgs")) return false;
+		return Boolean.parseBoolean(this.cmd.getOptionValue("ignoreClientOrgs"));
+	}	
+	
 	public String getAPIManagerURL() {
 		return "https://"+this.getHostname()+":"+this.getPort();
 	}

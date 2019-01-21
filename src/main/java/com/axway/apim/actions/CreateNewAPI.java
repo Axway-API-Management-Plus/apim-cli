@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.CreateAPIProxy;
+import com.axway.apim.actions.tasks.GrantAccessToClientOrgs;
 import com.axway.apim.actions.tasks.ImportBackendAPI;
 import com.axway.apim.actions.tasks.UpdateAPIImage;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
@@ -41,7 +42,7 @@ public class CreateNewAPI {
 
 		new CreateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		// As we have just created an API-Manager API, we should reflect this for further processing
-		IAPIDefinition createdAPI = APIManagerAdapter.getAPIManagerAPI((JsonNode)context.get("lastResponse"), null);
+		IAPIDefinition createdAPI = APIManagerAdapter.getAPIManagerAPI((JsonNode)context.get("lastResponse"), changes.getDesiredAPI());
 		changes.setIntransitAPI(createdAPI);
 		
 		// ... here we basically need to add all props to initially bring the API in sync!
@@ -56,6 +57,8 @@ public class CreateNewAPI {
 		new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI).execute();
 		
 		new UpdateQuotaConfiguration(changes.getDesiredAPI(), createdAPI).execute();
+		
+		new GrantAccessToClientOrgs(changes.getDesiredAPI(), createdAPI).execute();
 		
 		vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
 	}

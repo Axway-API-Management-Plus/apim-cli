@@ -82,5 +82,9 @@ public interface IAPIDefinition {
 	
 	public APIQuota getApplicationQuota();
 	
+	public List<String> getClientOrganizations();
+
+	public void setClientOrganizations(List<String> clientOrganizations);
+	
 	public Map<String, ServiceProfile> getServiceProfiles();
 }

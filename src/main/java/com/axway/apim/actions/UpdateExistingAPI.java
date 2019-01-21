@@ -6,6 +6,7 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.actions.tasks.GrantAccessToClientOrgs;
 import com.axway.apim.actions.tasks.UpdateAPIImage;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
@@ -41,6 +42,7 @@ public class UpdateExistingAPI {
 		vHostHandler.handleVHost(changes.getDesiredAPI(), changes.getActualAPI());
 		
 		new UpdateQuotaConfiguration(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+		new GrantAccessToClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 	}
 
 }

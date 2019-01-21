@@ -107,6 +107,10 @@ public abstract class AbstractAPIDefinition {
 			propHandler = CorsProfileHandler.class)
 	protected List<CorsProfile> corsProfiles;
 	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED})
+	protected List<String> clientOrganizations;
+	
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {}, 
 			propHandler = APIPathPropertyHandler.class)
@@ -384,5 +388,13 @@ public abstract class AbstractAPIDefinition {
 
 	public Map<String, ServiceProfile> getServiceProfiles() {
 		return serviceProfiles;
+	}
+
+	public List<String> getClientOrganizations() {
+		return clientOrganizations;
+	}
+
+	public void setClientOrganizations(List<String> clientOrganizations) {
+		this.clientOrganizations = clientOrganizations;
 	}
 }
