@@ -69,7 +69,7 @@ public class GrantAccessToClientOrgs extends AbstractAPIMTask implements IRespon
 		} else {
 			formBody = "action=orgs&apiId="+apiId;
 			for(String orgName : grantAccessToOrgs) {
-				formBody += "&grantOrgId"+APIManagerAdapter.getOrgId(orgName);
+				formBody += "&grantOrgId="+APIManagerAdapter.getOrgId(orgName);
 			}
 			Transaction.getInstance().put("orgName", grantAccessToOrgs);
 		}
