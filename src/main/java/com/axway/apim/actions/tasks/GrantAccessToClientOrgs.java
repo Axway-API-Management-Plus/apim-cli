@@ -28,10 +28,11 @@ public class GrantAccessToClientOrgs extends AbstractAPIMTask implements IRespon
 	}
 
 	public void execute() throws AppException {
+		if(desiredState.getClientOrganizations()==null) return;
 		if(desiredState.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) return;
 		List<String> grantAccessToOrgs = new ArrayList<String>();
 		if(CommandParameters.getInstance().isIgnoreClientOrgs()) {
-			LOG.info("Configured client organizations are be ignored, as flag ignoreClientOrgs has been set.");
+			LOG.info("Configured client organizations are ignored, as flag ignoreClientOrgs has been set.");
 			return;
 		}
 		if(((APIImportDefinition)desiredState).isRequestForAllOrgs()) {
