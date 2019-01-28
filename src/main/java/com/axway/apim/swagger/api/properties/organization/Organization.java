@@ -1,5 +1,7 @@
 package com.axway.apim.swagger.api.properties.organization;
 
+import org.apache.commons.lang.StringUtils;
+
 public class Organization {
 	
 	private String id;
@@ -160,6 +162,15 @@ public class Organization {
 
 	public void setIsTrial(String isTrial) {
 		this.isTrial = isTrial;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if(other == null) return false;
+		if(other instanceof Organization) {
+			return StringUtils.equals(((Organization)other).getName(), this.getName());
+		}
+		return false;
 	}
 
 	@Override
