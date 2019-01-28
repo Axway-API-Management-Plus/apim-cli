@@ -9,9 +9,20 @@ import com.axway.apim.actions.tasks.UpdateQuotaConfiguration;
 import com.axway.apim.actions.tasks.UpgradeAccessToNewerAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIChangeState;
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.APIBaseDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 
+/**
+ * This class is used by the {@link APIManagerAdapter#applyChanges(APIChangeState)} to re-create an API. 
+ * It's called, when an existing API is found, by at least one changed property can't be applied to the existing 
+ * API.</br>
+ * In that case, the desired API must be re-imported, completely updated (proxy, image, Quota, etc.), 
+ * actual subscription must be taken over. It basically performs the same steps as when creating a new API, but 
+ * having this separated in this class simplifies the code. 
+ * 
+ * @author cwiechmann@axway.com
+ */
 public class RecreateToUpdateAPI {
 	
 	static Logger LOG = LoggerFactory.getLogger(RecreateToUpdateAPI.class);

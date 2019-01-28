@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIImportDefinition;
+import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
@@ -31,11 +32,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 
 /**
- * @author cwiechmann
- * The APIContract reflects the given Meta-Information with 
- * the parameter: contract. 
- * This class will read the contract plus the optional set stage.
+ * The APIContract reflects the given API-Configuration plus the Swagger-Definition.
+ * This class will read the API-Configuration plus the optional set stage and the Swagger-File.
  * 
+ * @author cwiechmann
  */
 public class APIImportConfig {
 	
@@ -48,9 +48,14 @@ public class APIImportConfig {
 	private String apiContract;
 	
 	private String stage;
-	
-	
 
+	/**
+	 * Constructs the APIImportConfig 
+	 * @param apiContract
+	 * @param stage
+	 * @param pathToSwagger
+	 * @throws AppException
+	 */
 	public APIImportConfig(String apiContract, String stage, String pathToSwagger) throws AppException {
 		super();
 		this.apiContract = apiContract;
@@ -58,6 +63,20 @@ public class APIImportConfig {
 		this.pathToSwagger = pathToSwagger;
 	}
 	
+	/**
+	 * Returns the IAPIDefintion that returns the desired state of the API. In this method:<br>
+	 * <li>the API-Contract is read</li>
+	 * <li>the API-Contract is merged with the override</li>
+	 * <li>the Swagger-File is read</li>
+	 * <li>Additionally some validations & completions are made here</li>
+	 * <li>in the future: This is the place to do some default handling.
+	 * 
+	 * @return IAPIDefintion with the desired state of the API. This state will be 
+	 * the input to create the APIChangeState.
+	 * 
+	 * @throws AppException if the state can't be created.
+	 * @see {@link IAPIDefinition}, {@link AbstractAPIDefinition}
+	 */
 	public IAPIDefinition getImportAPIDefinition() throws AppException {
 		IAPIDefinition stagedConfig;
 		try {

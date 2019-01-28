@@ -8,20 +8,24 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.actions.CreateNewAPI;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.IAPIDefinition;
 
 /**
- * @author cwiechmann
- * This class is key, as the desired and actual API comes together and 
- * here we basically control how to apply the desired state into the API-Manager. 
- * 
- * This class iterates through all the declared API-Properties, in case of changes 
+ * This class is key, as the desired and actual API comes together.</br>
+ * </br>
+ * This class compares the desired- with the actual-API to create the Change-State. Basically 
+ * a list of changes that are needed to bring the API in sync.</br> 
+ * </br>
+ * For that the class iterates through all the declared API-Properties, in case of changes 
  * the belonging APIManagerAction is queued to be executed.
  * This way of working is esp. important when updating an existing API, without 
  * replacing it. 
+ * 
+ * @author cwiechmann
  */
 public class APIChangeState {
 	
@@ -37,6 +41,12 @@ public class APIChangeState {
 	private List<String> breakingChanges = new Vector<String>();
 	private List<String> nonBreakingChanges = new Vector<String>();
 
+	/**
+	 * Constructs the APIChangeState based on the given Actual- and Desired-API.
+	 * @param actualAPI - The API taken from the API-Manager
+	 * @param desiredAPI - The API loaded from the Swagger + Config
+	 * @throws AppException - Is thrown when something goes wrong.
+	 */
 	public APIChangeState(IAPIDefinition actualAPI, IAPIDefinition desiredAPI) throws AppException {
 		super();
 		this.actualAPI = actualAPI;
@@ -98,30 +108,65 @@ public class APIChangeState {
 		}
 	}
 
+	/**
+	 * @return the API-Manager API that has been given to this APIChangeState instance
+	 */
 	public IAPIDefinition getActualAPI() {
 		return actualAPI;
 	}
 
+	/**
+	 * @param actualAPI overwrites the API-Manager API instance
+	 */
 	public void setActualAPI(IAPIDefinition actualAPI) {
 		this.actualAPI = actualAPI;
 	}
 
+	/**
+	 * @return the desired API that has been given to this APIChangeState instance
+	 */
 	public IAPIDefinition getDesiredAPI() {
 		return desiredAPI;
 	}
 
+	/**
+	 * @param desiredAPI overwrites the desired API.
+	 */
 	public void setDesiredAPI(IAPIDefinition desiredAPI) {
 		this.desiredAPI = desiredAPI;
 	}
 	
+	/**
+	 * The IntransitAPI is used/set, when a new API has been created in API-Manager 
+	 * while the "old actual API" still exists. This is required for instance when 
+	 * the API must be Re-Created, before told old can be deleted.</br>
+	 * This API basically stores the <b>actual</b> API before the real old actual API 
+	 * can be deleted.
+	 * 
+	 * @return the in TransitAPI.
+	 * @see CreateNewAPI 
+	 */
 	public IAPIDefinition getIntransitAPI() {
 		return intransitAPI;
 	}
 
+	/**
+	 * The IntransitAPI is used/set, when a new API has been created in API-Manager 
+	 * while the "old actual API" still exists. This is required for instance when 
+	 * the API must be Re-Created, before told old can be deleted.</br>
+	 * This API basically stores the <b>actual</b> API before the real old actual API 
+	 * can be deleted.
+	 * 
+	 * @param intransitAPI the intermediate API
+	 * @see CreateNewAPI 
+	 */
 	public void setIntransitAPI(IAPIDefinition intransitAPI) {
 		this.intransitAPI = intransitAPI;
 	}
 
+	/**
+	 * @return true, if a breakingChange or a nonBreakingChange was found otherwise false.
+	 */
 	public boolean hasAnyChanges() {
 		if(this.breakingChanges.size()==0 && this.nonBreakingChanges.size()==0) {
 			return false;
@@ -130,34 +175,46 @@ public class APIChangeState {
 		}
 	}
 
+	/**
+	 * @return true, if a Breaking-Change was found otherwise false
+	 */
 	public boolean isBreaking() {
 		return isBreaking;
 	}
 
+	/**
+	 * @return true if all changes are writable to actual/current API-State.
+	 */
 	public boolean isUpdateExistingAPI() {
 		return updateExistingAPI;
 	}
 
+	/**
+	 * @return list of breaking changes
+	 */
 	public List<String> getBreakingChanges() {
 		return breakingChanges;
 	}
 
+	/**
+	 * @return list of Non-Breaking-Changes.
+	 */
 	public List<String> getNonBreakingChanges() {
 		return nonBreakingChanges;
 	}
 	
-	private static boolean isWritable(APIPropertyAnnotation property, String actualStatus) throws AppException {
-		// Get the field annotation via reflection
-		// Check, if the actualState is in the writableStates
-		try {
-			String[] writableStates = property.writableStates();
-			for(String status : writableStates) {
-				if (actualStatus.equals(status)) {
-					return true;
-				}
+	/**
+	 * Helper method to check if a certain property can be updated in the current/actual API-State.
+	 * @param property to be updated
+	 * @param actualStatus the actual state of the API
+	 * @return true if the property can be updated otherwise false
+	 */
+	private static boolean isWritable(APIPropertyAnnotation property, String actualStatus) {
+		String[] writableStates = property.writableStates();
+		for(String status : writableStates) {
+			if (actualStatus.equals(status)) {
+				return true;
 			}
-		} catch (SecurityException e) {
-			throw new AppException("Can't create API-Change-State.", ErrorCode.CANT_CREATE_STATE_CHANGE, e);
 		}
 		return false;
 	}

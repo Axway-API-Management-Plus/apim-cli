@@ -25,6 +25,12 @@ import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
 
+/**
+ * This class is used by the {@link APIManagerAdapter#applyChanges(APIChangeState)} to create a new API. 
+ * It's called, when an existing API can't be found.
+ * 
+ * @author cwiechmann@axway.com
+ */
 public class CreateNewAPI {
 	
 	static Logger LOG = LoggerFactory.getLogger(CreateNewAPI.class);
@@ -49,17 +55,20 @@ public class CreateNewAPI {
 		// But without updating the Swagger, as we have just imported it!
 		new UpdateAPIProxy(changes.getDesiredAPI(), createdAPI).execute(changedProps);
 		
-		// If image is included, update it
+		// If an image is included, update it
 		if(changes.getDesiredAPI().getImage()!=null) {
 			new UpdateAPIImage(changes.getDesiredAPI(), createdAPI).execute();
 		}
 		// This is special, as the status is not a property and requires some additional actions!
 		new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI).execute();
 		
+		// Is a Quota is defined we must manage it
 		new UpdateQuotaConfiguration(changes.getDesiredAPI(), createdAPI).execute();
 		
+		// Grant access to the API
 		new GrantAccessToClientOrgs(changes.getDesiredAPI(), createdAPI).execute();
 		
+		// V-Host must be managed almost at the end, as the status must be set already to "published"
 		vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
 	}
 	

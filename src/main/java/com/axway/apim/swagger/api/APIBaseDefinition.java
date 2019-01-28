@@ -2,6 +2,11 @@ package com.axway.apim.swagger.api;
 
 import com.axway.apim.swagger.api.properties.APIImage;
 
+/**
+ * Not sure if this class is really needed.
+ * 
+ * @author cwiechmann@axway.com
+ */
 public class APIBaseDefinition extends AbstractAPIDefinition implements IAPIDefinition {
 
 	@Override

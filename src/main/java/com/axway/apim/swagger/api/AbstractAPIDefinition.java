@@ -38,6 +38,24 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * This class defines all common properties on an API and how each property should be 
+ * treated during replication.</br>
+ * APIManagerAPI & APIImportDefintion are both an instance of this class.</br>
+ * </br>
+ * Annotations for each property are used by the APIChangeState to decide:
+ * <li>Is is a breaking change?</li>
+ * <li>Can the change be applied to the existing API?</li>
+ * <li>Which Change-Handler should finally do the required actions to replicate the change into the APIManager</li>
+ * </br>
+ * When adding new properties, please make sure to create Getter & Setter as Jackson is used to create the Instances.
+ * </br></br>
+ * Perhaps a way to simplify the code is to use for many of the properties is to use a SimplePropertyHandler 
+ * as many properties are handled in the same way.
+ * 
+ * 
+ * @author cwiechmann@axway.com
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class AbstractAPIDefinition {
 	

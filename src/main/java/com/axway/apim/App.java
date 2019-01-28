@@ -18,6 +18,16 @@ import com.axway.apim.swagger.APIImportConfig;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.IAPIDefinition;
 
+/**
+ * This is the Entry-Point of program and responsible to:</br>
+ * - read the command-line parameters to create a <code>CommandParameters</code></br>
+ * - next is to read the API-Contract by creating an <code>APIImportConfig</code> instance and calling getImportAPIDefinition()</br>
+ * - the <code>APIManagerAdapter</code> method: <code>getAPIManagerAPI()</code> is used to create the API-Manager API state</br>
+ * - An <code>APIChangeState</code> is created based on ImportAPI & API-Manager API
+ * - Finally the APIManagerAdapter:applyChanges() is called to replicate the state into the APIManager.   
+ * 
+ * @author cwiechmann@axway.com
+ */
 public class App {
 
 	private static Logger LOG = LoggerFactory.getLogger(App.class);
@@ -29,6 +39,13 @@ public class App {
 		
 	public static int run(String args[]) {
 		try {
+			LOG.info("------------------------------------------------------------------------");
+			LOG.info("API-Manager Promote Version: 1.3");
+			LOG.info("                                                                        ");
+			LOG.info("To report issues or get help, please visit: ");
+			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
+			LOG.info("------------------------------------------------------------------------");
+			
 			Options options = new Options();
 			Option option;
 			

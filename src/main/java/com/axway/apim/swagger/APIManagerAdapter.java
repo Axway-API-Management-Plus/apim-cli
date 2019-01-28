@@ -48,7 +48,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * @author cwiechmann
+ * The APIContract reflects the actual existing API in the API-Manager.
+ * 
+ *  @author cwiechmann@axway.com
  */
 public class APIManagerAdapter {
 	
@@ -69,6 +71,12 @@ public class APIManagerAdapter {
 		this.enforceBreakingChange = CommandParameters.getInstance().isEnforceBreakingChange();
 	}
 
+	/**
+	 * This method is taking in the APIChangeState to decide about the strategy how to 
+	 * synchronize the desired API-State into the API-Manager.
+	 * @param changeState containing the desired & actual API
+	 * @throws AppException is the desired state can't be replicated into the API-Manager.
+	 */
 	public void applyChanges(APIChangeState changeState) throws AppException {
 		// No existing API found (means: No match for APIPath), creating a complete new
 		if(!changeState.getActualAPI().isValid()) {
@@ -152,10 +160,11 @@ public class APIManagerAdapter {
 	}
 	
 	/**
-	 * Creates the API-Manager API-Representation. Basically the "Current" state of the API. 
-	 * @param jsonConfiguration The JSON-Configuration returned from the API-Manager REST-Proxy endpoint
-	 * @param importCustomProperties list of customProps declared (basically from the ImportAPI, as the API-Manager REST-API don't know it)
-	 * @return an APIManagerAPI instance, which is flagged as valid, if the API was found or invalid, if not found
+	 * Creates the API-Manager API-Representation. Basically the "Actual" state of the API.
+	 *  
+	 * @param jsonConfiguration the JSON-Configuration which is returned from the API-Manager REST-API (Proxy-Endpoint)
+	 * @param desiredAPI for some tasks the desiredAPI is needed (e.g. Custom-Properties)
+	 * @return an APIManagerAPI instance, which is flagged either as valid, if the API was found or invalid, if not found!
 	 * @throws AppException when the API-Manager API-State can't be created
 	 */
 	public static IAPIDefinition getAPIManagerAPI(JsonNode jsonConfiguration, IAPIDefinition desiredAPI) throws AppException {
@@ -213,6 +222,11 @@ public class APIManagerAdapter {
 		apiManagerApi.setClientOrganizations(grantedOrgs);
 	}
 	
+	/**
+	 * The actual Org-ID based on the OrgName. Lazy implementation.
+	 * @param orgName the name of the organizations
+	 * @return the id of the organization
+	 */
 	public static String getOrgId(String orgName) {
 		for(Organization org : allOrgs) {
 			if(orgName.equals(org.getName())) return org.getId();
@@ -280,6 +294,14 @@ public class APIManagerAdapter {
 		return null;
 	}
 	
+	/**
+	 * Based on the given apiPath this method returns the JSON-Configuration for the API 
+	 * as it's stored in the API-Manager. The result is basically used to create the APIManagerAPI in 
+	 * method getAPIManagerAPI
+	 * @param apiPath path of the API, which can be considered as the key.
+	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
+	 * @throws AppException if the API can't be found or created
+	 */
 	public static JsonNode getExistingAPI(String apiPath) throws AppException {
 		CommandParameters cmd = CommandParameters.getInstance();
 		ObjectMapper mapper = new ObjectMapper();
@@ -346,6 +368,12 @@ public class APIManagerAdapter {
 		}
 	}
 	
+	/**
+	 * Lazy helper method to get the actual API-Manager version. This is used to toggle on/off some 
+	 * of the features (such as API-Custom-Properties)
+	 * @return the API-Manager version as returned from the API-Manager REST-API /config endpoint
+	 * @throws AppException is something goes wrong.
+	 */
 	public static String getApiManagerVersion() throws AppException {
 		if(APIManagerAdapter.apiManagerVersion!=null) {
 			return apiManagerVersion;
@@ -423,6 +451,14 @@ public class APIManagerAdapter {
 		}
 	}
 	
+	/**
+	 * Helper method to validate that configured Custom-Properties are really configured 
+	 * in the API-Manager configuration.<br>
+	 * Will become obsolete sine the API-Manager REST-API provides an endpoint for that.
+	 * @param appConfig from the API-Manager (which isn't JSON)
+	 * @return JSON-Configuration with the custom-properties section
+	 * @throws AppException if the app.config can't be parsed
+	 */
 	public static JsonNode parseAppConfig(String appConfig) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -437,6 +473,14 @@ public class APIManagerAdapter {
 		}
 	}
 	
+	/**
+	 * Helper method to fulfill the given certificates by the API-Developer into the required 
+	 * format as it's needed by the API-Manager. 
+	 * @param certFile InputStream to the Certificate
+	 * @param cert the certificate itself
+	 * @return JsonNode as it's required by the API-Manager.
+	 * @throws AppException if JSON-Node-Config can't be created
+	 */
 	public static JsonNode getCertInfo(InputStream certFile, CaCert cert) throws AppException {
 		URI uri;
 		ObjectMapper mapper = new ObjectMapper();

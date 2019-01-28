@@ -14,7 +14,14 @@ import com.axway.apim.actions.tasks.UpdateQuotaConfiguration;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIChangeState;
+import com.axway.apim.swagger.APIManagerAdapter;
 
+/**
+ * This class is used by the {@link APIManagerAdapter#applyChanges(APIChangeState)} to update an existing API. 
+ * This happens, when all changes can be applied to the existing API which is quite of the case for an "Unpublished" API.
+ * 
+ * @author cwiechmann@axway.com
+ */
 public class UpdateExistingAPI {
 	
 	static Logger LOG = LoggerFactory.getLogger(UpdateExistingAPI.class);
