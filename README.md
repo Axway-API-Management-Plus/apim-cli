@@ -4,7 +4,7 @@ This project provides you with a tool that simplifies your DevOps experience wit
 
 The program works based on the API-Swagger-Definition + an API-Configuration-File and replicates this "state" into the API-Manager. Consider the Swagger-Definition + API-Config as the "__desired__" state and API-Manager has the "__actual__" state. This program will compare both, the desired with the actual state, and performs all neccassary actions to bring the API-Manager API into the desired state.
 
-Wath this video (28 min): https://youtu.be/2i8i1zMAMps to get an overview + demo.
+Watch this video (28 min): https://youtu.be/2i8i1zMAMps to get an overview + demo.
 
 With that, an API-Developer is just providing the Swagger-File (e.g. Code-Generated or using a Swagger-Editor) and the API-Config. When checked in, the CI/CD-Pipelines picks it up and replicates it into the API-Manager. 
 This includes __Zero-Downtime-Upgrade of existing applications__, which might have an active subscription to an API. Learn more in the [documentation](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki).
