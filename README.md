@@ -30,7 +30,7 @@ Today the following API-Properties are already supported and can be controlled e
 - Quota-Management (Application- & System-Default-Quota)
 - Client-Organization handling 
 
-Build and tested with API-Manager 7.6.2 SP1 at Travis CI:  
+Build and tested with API-Manager 7.6.2 SP2 at Travis CI:  
 Develop: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
 Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=master)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
 
