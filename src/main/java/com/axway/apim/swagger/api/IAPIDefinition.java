@@ -38,7 +38,13 @@ public interface IAPIDefinition {
 	
 	public void setInboundProfiles(Map<String, InboundProfile> inboundProfiles);
 	
+	/**
+	 * @param securityProfiles control the way an application must Authn (e.g. API-Key, etc.)
+	 */
 	public void setSecurityProfiles(List<SecurityProfile> securityProfiles);
+	/**
+	 * @param authenticationProfiles is used for AuthN against the downstream service-provider
+	 */
 	public void setAuthenticationProfiles(List<AuthenticationProfile> authenticationProfiles);
 	
 	public Map<String, String> getCustomProperties();

@@ -246,6 +246,10 @@ public abstract class AbstractAPIDefinition {
 		return vhost;
 	}
 
+	public void setVhost(String vhost) {
+		this.vhost = vhost;
+	}
+
 	public Map<String, String[]> getTags() {
 		return tags;
 	}

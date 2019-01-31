@@ -85,7 +85,7 @@ public class APIChangeState {
 						continue; // No change, if nothing is provided!
 					}
 					// desiredValue == null - This can be used to reset/clean a property! (Need to think about this!)
-					if((desiredValue!=null && actualValue==null) || !actualValue.equals(desiredValue)) {
+					if((desiredValue!=null && actualValue==null) || !(compareValues(actualValue, desiredValue))) {
 						APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
 						if (property.isBreaking()) {
 							this.isBreaking = true;
@@ -219,4 +219,13 @@ public class APIChangeState {
 		return false;
 	}
 	
+	private static boolean compareValues(Object actualValue, Object desiredValue) {
+		if(actualValue instanceof List) {
+			return ((List<?>)actualValue).size() == ((List<?>)desiredValue).size() && 
+					((List<?>)actualValue).containsAll((List<?>)desiredValue) && 
+					((List<?>)desiredValue).containsAll((List<?>)actualValue);
+		} else {
+			return actualValue.equals(desiredValue);
+		}
+	}
 }
