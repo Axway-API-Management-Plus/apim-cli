@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,6 +40,7 @@ import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.axway.apim.swagger.api.properties.apiAccess.APIAccess;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
+import com.axway.apim.swagger.api.properties.organization.ApiAccess;
 import com.axway.apim.swagger.api.properties.organization.Organization;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
@@ -59,6 +61,8 @@ public class APIManagerAdapter {
 	private static String apiManagerVersion = null;
 	
 	private static List<Organization> allOrgs = null;
+	
+	private static Map<String, List<ApiAccess>> orgsApiAccess = new HashMap<String, List<ApiAccess>>();
 	
 	private boolean enforceBreakingChange = false;
 	
@@ -433,6 +437,28 @@ public class APIManagerAdapter {
 		} catch (Exception e) {
 			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + response);
 			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public static List<ApiAccess> getOrgsApiAccess(String orgId, boolean forceReload) throws AppException {
+		if(!forceReload && orgsApiAccess.containsKey(orgId)) {
+			return orgsApiAccess.get(orgId);
+		}
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		List<ApiAccess> apiAccess;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations/"+orgId+"/apis").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			apiAccess = mapper.readValue(response, new TypeReference<List<ApiAccess>>(){});
+			orgsApiAccess.put(orgId, apiAccess);
+			return apiAccess;
+		} catch (Exception e) {
+			LOG.error("Error cant read API-Access for org: "+orgId+" from API-Manager. Can't parse response: " + response);
+			throw new AppException("Error cant read API-Access for org: "+orgId+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	

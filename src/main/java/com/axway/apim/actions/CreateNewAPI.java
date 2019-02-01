@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.CreateAPIProxy;
-import com.axway.apim.actions.tasks.GrantAccessToClientOrgs;
+import com.axway.apim.actions.tasks.ManageClientOrgs;
 import com.axway.apim.actions.tasks.ImportBackendAPI;
 import com.axway.apim.actions.tasks.UpdateAPIImage;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
@@ -66,7 +66,7 @@ public class CreateNewAPI {
 		new UpdateQuotaConfiguration(changes.getDesiredAPI(), createdAPI).execute();
 		
 		// Grant access to the API
-		new GrantAccessToClientOrgs(changes.getDesiredAPI(), createdAPI).execute();
+		new ManageClientOrgs(changes.getDesiredAPI(), createdAPI).execute();
 		
 		// V-Host must be managed almost at the end, as the status must be set already to "published"
 		vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
