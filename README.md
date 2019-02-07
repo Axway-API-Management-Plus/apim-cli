@@ -28,7 +28,9 @@ Today the following API-Properties are already supported and can be controlled e
 - Tags
 - Custom-Properties
 - Quota-Management (Application- & System-Default-Quota)
-- Client-Organization handling 
+- Client-Organization handling  
+
+Improving the API-Development experience during the API-Design phase leveraging the Stoplight integration. [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/Stoplight-Integration).
 
 Build and tested with API-Manager 7.6.2 SP2 at Travis CI:  
 Develop: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
