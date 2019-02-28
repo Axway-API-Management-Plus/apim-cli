@@ -206,14 +206,25 @@ public class APIImportConfig {
 	}
 	
 	private InputStream getInputStreamForCertFile(CaCert cert) throws AppException {
+		InputStream is;
+		File file;
+		// Certificates might be stored somewhere else, so try to load them directly
+		file = new File(cert.getCertFile());
+		if(file.exists()) { 
+			try {
+				is = new FileInputStream(file);
+				return is;
+			} catch (FileNotFoundException e) {
+				throw new AppException("Cant read given certificate file", ErrorCode.CANT_READ_CONFIG_FILE);
+			}
+		}
 		String baseDir;
 		try {
 			baseDir = new File(this.pathToSwagger).getCanonicalFile().getParent();
 		} catch (IOException e1) {
 			throw new AppException("Can't read certificate file.", ErrorCode.CANT_READ_CONFIG_FILE, e1, true);
 		}
-		File file = new File(baseDir + File.separator + cert.getCertFile());
-		InputStream is;
+		file = new File(baseDir + File.separator + cert.getCertFile());
 		if(file.exists()) { 
 			try {
 				is = new FileInputStream(file);
@@ -227,9 +238,10 @@ public class APIImportConfig {
 		}
 		if(is==null) {
 			LOG.error("Can't read certificate: "+cert.getCertFile()+" from file or classpath.");
-			LOG.error("Certificate files are expected releative to the Swagger-File.");
-			LOG.error("Either in the same directory. Example: \"myCertFile.crt\"");
-			LOG.error("Or relative to it.            Example: \"../../allMyCertsAreHere/myCertFile.crt\"");
+			LOG.error("Certificates in filesystem are either expected relative to the Swagger-File or as an absolute path.");
+			LOG.error("In the same directory. 		Example: \"myCertFile.crt\"");
+			LOG.error("Relative to it.         		Example: \"../../allMyCertsAreHere/myCertFile.crt\"");
+			LOG.error("With an absolute path   		Example: \"/another/location/with/allMyCerts/myCertFile.crt\"");
 			throw new AppException("Can't read certificate: "+cert.getCertFile()+" from file or classpath.", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 		return is;
