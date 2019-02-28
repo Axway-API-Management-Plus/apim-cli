@@ -36,6 +36,7 @@
             <outputDirectory>/scripts</outputDirectory>
             <includes>
                 <include>*.sh</include>
+                <include>*.bat</include>
             </includes>
             <fileMode>0755</fileMode>
             <lineEnding>unix</lineEnding>
