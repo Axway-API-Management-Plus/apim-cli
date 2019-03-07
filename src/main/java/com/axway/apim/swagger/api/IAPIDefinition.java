@@ -6,6 +6,7 @@ import java.util.Map;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.applications.ClientApplications;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
@@ -89,8 +90,12 @@ public interface IAPIDefinition {
 	public APIQuota getApplicationQuota();
 	
 	public List<String> getClientOrganizations();
-
+	
 	public void setClientOrganizations(List<String> clientOrganizations);
+	
+	public List<ClientApplications> getApplications();
+
+	public void setApplications(List<ClientApplications> clientApplications);
 	
 	public Map<String, ServiceProfile> getServiceProfiles();
 }

@@ -12,6 +12,7 @@ import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.CreateAPIProxy;
 import com.axway.apim.actions.tasks.ManageClientOrgs;
 import com.axway.apim.actions.tasks.ImportBackendAPI;
+import com.axway.apim.actions.tasks.ManageClientApps;
 import com.axway.apim.actions.tasks.UpdateAPIImage;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
@@ -67,6 +68,9 @@ public class CreateNewAPI {
 		
 		// Grant access to the API
 		new ManageClientOrgs(changes.getDesiredAPI(), createdAPI).execute();
+		
+		// Handle subscription to applications
+		new ManageClientApps(changes.getDesiredAPI(), createdAPI).execute();
 		
 		// V-Host must be managed almost at the end, as the status must be set already to "published"
 		vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);

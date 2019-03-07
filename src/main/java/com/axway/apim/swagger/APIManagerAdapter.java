@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -39,6 +40,7 @@ import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.axway.apim.swagger.api.properties.apiAccess.APIAccess;
+import com.axway.apim.swagger.api.properties.applications.ClientApplications;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.organization.ApiAccess;
 import com.axway.apim.swagger.api.properties.organization.Organization;
@@ -61,6 +63,9 @@ public class APIManagerAdapter {
 	private static String apiManagerVersion = null;
 	
 	private static List<Organization> allOrgs = null;
+	private static List<ClientApplications> allApps = null;
+	
+	private static Map<String, String> clientCredentialToAppIdMap = new HashMap<String, String>();
 	
 	private static Map<String, List<ApiAccess>> orgsApiAccess = new HashMap<String, List<ApiAccess>>();
 	
@@ -68,6 +73,10 @@ public class APIManagerAdapter {
 	
 	public static APIQuota sytemQuotaConfig = null;
 	public static APIQuota applicationQuotaConfig = null;
+	
+	public static String CREDENTIAL_TYPE_API_KEY 		= "apikeys";
+	public static String CREDENTIAL_TYPE_EXT_CLIENTID	= "extclients";
+	public static String CREDENTIAL_TYPE_OAUTH			= "oauth";
 	
 	public APIManagerAdapter() throws AppException {
 		super();
@@ -202,6 +211,7 @@ public class APIManagerAdapter {
 			}
 			addQuotaConfiguration(apiManagerApi);
 			addClientOrganizations(apiManagerApi, desiredAPI);
+			addClientApplications(apiManagerApi, desiredAPI);
 			return apiManagerApi;
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-State.", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -216,7 +226,7 @@ public class APIManagerAdapter {
 		List<String> grantedOrgs = new ArrayList<String>();
 		List<Organization> allOrgs = getAllOrgs();
 		for(Organization org : allOrgs) {
-			List<APIAccess> orgAPIAccess = getAPIAccess(org.getId());
+			List<APIAccess> orgAPIAccess = getAPIAccess(org.getId(), "organizations");
 			for(APIAccess access : orgAPIAccess) {
 				if(access.getApiId().equals(apiManagerApi.getId())) {
 					grantedOrgs.add(org.getName());
@@ -224,6 +234,24 @@ public class APIManagerAdapter {
 			}
 		}
 		apiManagerApi.setClientOrganizations(grantedOrgs);
+	}
+	
+	private static void addClientApplications(IAPIDefinition apiManagerApi, IAPIDefinition desiredAPI) throws AppException {
+		if(desiredAPI.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
+			LOG.info("Ignoring Client-Applications, as desired API-State is Unpublished!");
+			return;
+		}
+		List<ClientApplications> existingClientApps = new ArrayList<ClientApplications>();
+		List<ClientApplications> allApps = getAllApps();
+		for(ClientApplications app : allApps) {
+			List<APIAccess> APIAccess = getAPIAccess(app.getId(), "applications");
+			for(APIAccess access : APIAccess) {
+				if(access.getApiId().equals(apiManagerApi.getId())) {
+					existingClientApps.add(app);
+				}
+			}
+		}
+		apiManagerApi.setApplications(existingClientApps);
 	}
 	
 	/**
@@ -238,6 +266,78 @@ public class APIManagerAdapter {
 		LOG.error("Requested OrgId for unknown orgName: " + orgName);
 		return null;
 	}
+	
+	/**
+	 * The actual App-ID based on the AppName. Lazy implementation.
+	 * @param orgName the name of the organizations
+	 * @return the id of the organization
+	 */
+	public static ClientApplications getApplication(String appName) {
+		for(ClientApplications app : allApps) {
+			if(appName.equals(app.getName())) return app;
+		}
+		LOG.error("Requested AppId for unknown appName: " + appName);
+		return null;
+	}
+	
+	/**
+	 * The actual App-ID based on the AppName. Lazy implementation.
+	 * @param orgName the name of the organizations
+	 * @return the id of the organization
+	 */
+	public static ClientApplications getAppForId(String appId) {
+		for(ClientApplications app : allApps) {
+			if(appId.equals(app.getId())) return app;
+		}
+		LOG.error("Requested Application for unknown appId: "+appId+" not found.");
+		return null;
+	}
+	
+	/**
+	 * The actual App-ID based on the AppName. Lazy implementation.
+	 * @param orgName the name of the organizations
+	 * @return the id of the organization
+	 * @throws AppException 
+	 */
+	public static String getAppIdForCredential(String credential, String type) throws AppException {
+		if(clientCredentialToAppIdMap.containsKey(type+"_"+credential)) {
+			return clientCredentialToAppIdMap.get(type+"_"+credential);
+		}
+		Collection<String> appIds = clientCredentialToAppIdMap.values();
+		for(ClientApplications app : allApps) {
+			if(appIds.contains(app.getId())) continue;
+			ObjectMapper mapper = new ObjectMapper();
+			String response = null;
+			URI uri;
+			try {
+				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type+"").build();
+				RestAPICall getRequest = new GETRequest(uri, null);
+				HttpResponse httpResponse = getRequest.execute();
+				response = EntityUtils.toString(httpResponse.getEntity());
+				JsonNode clientIds = mapper.readTree(response);
+				if(clientIds.size()==0) continue;
+				for(JsonNode clientId : clientIds) {
+					String key;
+					if(type.equals(CREDENTIAL_TYPE_API_KEY)) {
+						key = clientId.get("id").asText();
+					} else if(type.equals(CREDENTIAL_TYPE_EXT_CLIENTID) || type.equals(CREDENTIAL_TYPE_OAUTH)) {
+						key = clientId.get("clientId").asText();
+					} else {
+						throw new AppException("Unknown credential type: " + type, ErrorCode.UNXPECTED_ERROR);
+					}
+					clientCredentialToAppIdMap.put(type+"_"+key, app.getId());
+					if(key.equals(credential)) return app.getId();
+				}
+			} catch (Exception e) {
+				LOG.error("Can't load applications credentials. Can't parse response: " + response);
+				throw new AppException("Can't load applications credentials.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			}
+		}
+		LOG.error("No application found for credential ("+type+"): " + credential);
+		return null;
+	}
+	
+	
 	
 	private static void addQuotaConfiguration(IAPIDefinition api) throws AppException {
 		//APPLICATION:	00000000-0000-0000-0000-000000000001
@@ -401,23 +501,25 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static List<APIAccess> getAPIAccess(String orgId) throws AppException {
+	private static List<APIAccess> getAPIAccess(String id, String type) throws AppException {
 		List<APIAccess> allApiAccess = new ArrayList<APIAccess>();
 		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
 		URI uri;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations/"+orgId+"/apis").build();
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+type+"/"+id+"/apis").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			allApiAccess = mapper.readValue(response, new TypeReference<List<APIAccess>>(){});
 			return allApiAccess;
 		} catch (Exception e) {
-			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + response);
-			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			LOG.error("Error cant API-Access for "+type+" from API-Manager. Can't parse response: " + response);
+			throw new AppException("API-Access for "+type+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
+	
+	
 	
 	public static List<Organization> getAllOrgs() throws AppException {
 		if(APIManagerAdapter.allOrgs!=null) {
@@ -439,6 +541,29 @@ public class APIManagerAdapter {
 			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
+	
+	public static List<ClientApplications> getAllApps() throws AppException {
+		if(APIManagerAdapter.allApps!=null) {
+			return APIManagerAdapter.allApps;
+		}
+		allApps = new ArrayList<ClientApplications>();
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			allApps = mapper.readValue(response, new TypeReference<List<ClientApplications>>(){});
+			return allApps;
+		} catch (Exception e) {
+			LOG.error("Error cant read all applications from API-Manager. Can't parse response: " + response);
+			throw new AppException("Can't read all applications from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	
 	
 	public static List<ApiAccess> getOrgsApiAccess(String orgId, boolean forceReload) throws AppException {
 		if(!forceReload && orgsApiAccess.containsKey(orgId)) {

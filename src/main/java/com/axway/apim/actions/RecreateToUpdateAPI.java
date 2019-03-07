@@ -3,6 +3,7 @@ package com.axway.apim.actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.actions.tasks.ManageClientApps;
 import com.axway.apim.actions.tasks.ManageClientOrgs;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
 import com.axway.apim.actions.tasks.UpdateQuotaConfiguration;
@@ -50,6 +51,8 @@ public class RecreateToUpdateAPI {
 		new UpdateAPIStatus(newActualAPI, actual).execute();
 		new UpdateQuotaConfiguration(newActualAPI, actual).execute();
 		new ManageClientOrgs(changes.getDesiredAPI(), actual).execute();
+		// Handle subscription to applications
+		new ManageClientApps(changes.getDesiredAPI(), actual).execute();
 	}
 
 }
