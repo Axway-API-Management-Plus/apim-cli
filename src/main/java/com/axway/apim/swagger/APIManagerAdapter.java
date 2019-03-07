@@ -65,7 +65,7 @@ public class APIManagerAdapter {
 	private static List<Organization> allOrgs = null;
 	private static List<ClientApplications> allApps = null;
 	
-	private static Map<String, String> clientCredentialToAppIdMap = new HashMap<String, String>();
+	private static Map<String, ClientApplications> clientCredentialToAppMap = new HashMap<String, ClientApplications>();
 	
 	private static Map<String, List<ApiAccess>> orgsApiAccess = new HashMap<String, List<ApiAccess>>();
 	
@@ -271,8 +271,10 @@ public class APIManagerAdapter {
 	 * The actual App-ID based on the AppName. Lazy implementation.
 	 * @param orgName the name of the organizations
 	 * @return the id of the organization
+	 * @throws AppException 
 	 */
-	public static ClientApplications getApplication(String appName) {
+	public static ClientApplications getApplication(String appName) throws AppException {
+		if(allApps==null) getAllApps();
 		for(ClientApplications app : allApps) {
 			if(appName.equals(app.getName())) return app;
 		}
@@ -299,11 +301,11 @@ public class APIManagerAdapter {
 	 * @return the id of the organization
 	 * @throws AppException 
 	 */
-	public static String getAppIdForCredential(String credential, String type) throws AppException {
-		if(clientCredentialToAppIdMap.containsKey(type+"_"+credential)) {
-			return clientCredentialToAppIdMap.get(type+"_"+credential);
+	public static ClientApplications getAppIdForCredential(String credential, String type) throws AppException {
+		if(clientCredentialToAppMap.containsKey(type+"_"+credential)) {
+			return clientCredentialToAppMap.get(type+"_"+credential);
 		}
-		Collection<String> appIds = clientCredentialToAppIdMap.values();
+		Collection<ClientApplications> appIds = clientCredentialToAppMap.values();
 		for(ClientApplications app : allApps) {
 			if(appIds.contains(app.getId())) continue;
 			ObjectMapper mapper = new ObjectMapper();
@@ -325,8 +327,8 @@ public class APIManagerAdapter {
 					} else {
 						throw new AppException("Unknown credential type: " + type, ErrorCode.UNXPECTED_ERROR);
 					}
-					clientCredentialToAppIdMap.put(type+"_"+key, app.getId());
-					if(key.equals(credential)) return app.getId();
+					clientCredentialToAppMap.put(type+"_"+key, app);
+					if(key.equals(credential)) return app;
 				}
 			} catch (Exception e) {
 				LOG.error("Can't load applications credentials. Can't parse response: " + response);

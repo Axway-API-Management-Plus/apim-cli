@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import com.axway.apim.swagger.api.APIImportDefinition;
 import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.applications.ClientApplications;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.organization.Organization;
@@ -98,6 +100,7 @@ public class APIImportConfig {
 			completeCaCerts(stagedConfig);
 			addQuotaConfiguration(stagedConfig);
 			handleAllOrganizations(stagedConfig);
+			completeClientApplications(stagedConfig);
 			return stagedConfig;
 		} catch (Exception e) {
 			if(e.getCause() instanceof AppException) {
@@ -184,6 +187,60 @@ public class APIImportConfig {
 			defaultCors.setSupportCredentials("false");
 			apiConfig.getCorsProfiles().add(defaultCors);
 		}
+	}
+	
+	/**
+	 * Purpose of this method is to load the actual existing applications from API-Manager 
+	 * based on the provided criteria (App-Name, API-Key, OAuth-ClientId or Ext-ClientId). 
+	 * Or, if the APP doesn't exists remove it from the list and log a warning message.
+	 * @param apiConfig
+	 * @throws AppException
+	 */
+	private void  completeClientApplications(IAPIDefinition apiConfig) throws AppException {
+		ClientApplications loadedApp = null;
+		ClientApplications app;
+		if(apiConfig.getApplications()!=null) {
+			ListIterator<ClientApplications> it = apiConfig.getApplications().listIterator();
+			while(it.hasNext()) {
+				app = it.next();
+				if(app.getName()!=null) {
+					loadedApp = APIManagerAdapter.getApplication(app.getName());
+					if(loadedApp==null) {
+						LOG.warn("Unknown application with name: '" + app.getName() + "' configured. Ignoring this application.");
+						it.remove();
+						continue;
+					}
+				} else if(app.getApiKey()!=null) {
+					loadedApp = getAppForCredential(app.getApiKey(), APIManagerAdapter.CREDENTIAL_TYPE_API_KEY);
+					if(loadedApp==null) {
+						it.remove();
+						continue;
+					} 
+				} else if(app.getOauthClientId()!=null) {
+					loadedApp = getAppForCredential(app.getOauthClientId(), APIManagerAdapter.CREDENTIAL_TYPE_OAUTH);
+					if(loadedApp==null) {
+						it.remove();
+						continue;
+					} 
+				} else if(app.getExtClientId()!=null) {
+					loadedApp = getAppForCredential(app.getExtClientId(), APIManagerAdapter.CREDENTIAL_TYPE_EXT_CLIENTID);
+					if(loadedApp==null) {
+						it.remove();
+						continue;
+					} 
+				}
+				it.set(loadedApp); // Replace the incoming app, with the App loaded from API-Manager
+			}
+		}
+	}
+	
+	private static ClientApplications getAppForCredential(String credential, String type) throws AppException {
+		ClientApplications app = APIManagerAdapter.getAppIdForCredential(credential, type);
+		if(app==null) {
+			LOG.warn("Unknown application with ("+type+"): '" + credential + "' configured. Ignoring this application.");
+			return null;
+		}
+		return app;
 	}
 	
 	private void completeCaCerts(IAPIDefinition apiConfig) throws AppException {

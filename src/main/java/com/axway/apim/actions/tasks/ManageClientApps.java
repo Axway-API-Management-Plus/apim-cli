@@ -18,7 +18,6 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.applications.ClientApplications;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -119,37 +118,8 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			if(otherApps.contains(app)) {
 				continue;
 			}
-			if(app.getName()!=null) {
-				ClientApplications existingApp = APIManagerAdapter.getApplication(app.getName());
-				if(existingApp==null) {
-					LOG.warn("Unknown application with name: '" + app.getName() + "' configured. Ignoring this application.");
-					continue;
-				} else {
-					missingApps.add(existingApp);
-					continue;
-				}
-			}
-			if(app.getOauthClientId()!=null) {
-				addMissingApplication(app.getOauthClientId(), APIManagerAdapter.CREDENTIAL_TYPE_OAUTH, missingApps);
-			}
-			if(app.getExtClientId()!=null) {
-				addMissingApplication(app.getExtClientId(), APIManagerAdapter.CREDENTIAL_TYPE_EXT_CLIENTID, missingApps);
-			}
-			if(app.getApiKey()!=null) {
-				addMissingApplication(app.getApiKey(), APIManagerAdapter.CREDENTIAL_TYPE_API_KEY, missingApps);
-			}
+			missingApps.add(app);
 		}
 		return missingApps;
-	}
-	
-	private static void addMissingApplication(String credential, String type, List<ClientApplications> missingApps) throws AppException {
-		String appId = APIManagerAdapter.getAppIdForCredential(credential, type);
-		if(appId==null) {
-			LOG.warn("Unknown application with ("+type+"): '" + credential + "' configured. Ignoring this application.");
-			return;
-		}
-		ClientApplications app = APIManagerAdapter.getAppForId(appId);
-		missingApps.add(app);
-		return;
 	}
 }
