@@ -54,7 +54,7 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.extractFromPayload("$.id", "consumingTestApp1ApiKey");
 		
-		echo("####### Added an API-Key to Test-Application 1: '${consumingTestApp1ApiKey}' #######");
+		echo("####### Added an API-Key: '${consumingTestApp1ApiKey}' to Test-Application 1 #######");
 		
 		// ############## Creating Test-Application 2 #################
 		createVariable("extClientId", RandomNumberFunction.getRandomNumber(15, true));
@@ -88,7 +88,7 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.extractFromPayload("$.id", "consumingTestApp2ClientId");
 		
-		echo("####### Added an Ext-ClientID to Test-Application 2: '${consumingTestApp2ClientId}' #######");
+		echo("####### Added an Ext-ClientID: '${extClientId}' to Test-Application 2 #######");
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		
