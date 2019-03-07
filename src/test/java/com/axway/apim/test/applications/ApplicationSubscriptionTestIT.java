@@ -24,12 +24,13 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 		variable("apiPath", "/app-subscription-${apiNumber}");
 		variable("apiName", "App Subscription API-${apiNumber}");
 		// ############## Creating Test-Application 1 #################
+		createVariable("app1Name", "Consuming Test App 1 ${orgNumber}");
 		http().client("apiManager")
 			.send()
 			.post("/applications")
 			.name("orgCreatedRequest")
 			.header("Content-Type", "application/json")
-			.payload("{\"name\":\"Consuming Test App 1 ${orgNumber}\",\"apis\":[],\"organizationId\":\"${orgId}\"}");
+			.payload("{\"name\":\"${app1Name}\",\"apis\":[],\"organizationId\":\"${orgId}\"}");
 
 		http().client("apiManager")
 			.receive()
@@ -37,6 +38,8 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.extractFromPayload("$.id", "consumingTestApp1Id")
 			.extractFromPayload("$.name", "consumingTestApp1Name");
+		
+		echo("####### Created Test-Application 1: '${consumingTestApp1Name}' with id: '${consumingTestApp1Id}' #######");
 		
 		http().client("apiManager")
 			.send()
@@ -51,8 +54,10 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.extractFromPayload("$.id", "consumingTestApp1ApiKey");
 		
+		echo("####### Added an API-Key to Test-Application 1: '${consumingTestApp1ApiKey}' #######");
+		
 		// ############## Creating Test-Application 2 #################
-		createVariable("extClientId", RandomNumberFunction.getRandomNumber(6, true));
+		createVariable("extClientId", RandomNumberFunction.getRandomNumber(15, true));
 		createVariable("app2Name", "Consuming Test App 2 ${orgNumber}");
 		http().client("apiManager")
 			.send()
@@ -67,6 +72,8 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.extractFromPayload("$.id", "consumingTestApp2Id")
 			.extractFromPayload("$.name", "consumingTestApp2Name");
+		
+		echo("####### Created Test-Application 2: '${consumingTestApp2Name}' with id: '${consumingTestApp2Id}' #######");
 	
 		http().client("apiManager")
 			.send()
@@ -80,6 +87,8 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 			.response(HttpStatus.CREATED)
 			.messageType(MessageType.JSON)
 			.extractFromPayload("$.id", "consumingTestApp2ClientId");
+		
+		echo("####### Added an Ext-ClientID to Test-Application 2: '${consumingTestApp2ClientId}' #######");
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		
