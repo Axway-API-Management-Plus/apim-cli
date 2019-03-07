@@ -144,11 +144,11 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	
 	private static void addMissingApplication(String credential, String type, List<ClientApplications> missingApps) throws AppException {
 		String appId = APIManagerAdapter.getAppIdForCredential(credential, type);
-		ClientApplications app = APIManagerAdapter.getAppForId(appId);
-		if(app==null) {
+		if(appId==null) {
 			LOG.warn("Unknown application with ("+type+"): '" + credential + "' configured. Ignoring this application.");
 			return;
 		}
+		ClientApplications app = APIManagerAdapter.getAppForId(appId);
 		missingApps.add(app);
 		return;
 	}
