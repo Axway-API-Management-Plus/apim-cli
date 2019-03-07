@@ -305,6 +305,7 @@ public class APIManagerAdapter {
 		if(clientCredentialToAppMap.containsKey(type+"_"+credential)) {
 			return clientCredentialToAppMap.get(type+"_"+credential);
 		}
+		getAllApps(); // Make sure, we loaded all app before!
 		Collection<ClientApplications> appIds = clientCredentialToAppMap.values();
 		for(ClientApplications app : allApps) {
 			if(appIds.contains(app.getId())) continue;
@@ -313,6 +314,7 @@ public class APIManagerAdapter {
 			URI uri;
 			try {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type+"").build();
+				LOG.info("Requesting credentials of type: " + type + " for application: " + app.getName() + " from API-Manager.");
 				RestAPICall getRequest = new GETRequest(uri, null);
 				HttpResponse httpResponse = getRequest.execute();
 				response = EntityUtils.toString(httpResponse.getEntity());
