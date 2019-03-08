@@ -124,7 +124,9 @@ public class APIImportConfig {
 		} else {
 			// As the API-Manager internally handles the owning organization in the same way, 
 			// we have to add the Owning-Org as a desired org
-			apiConfig.getClientOrganizations().add(apiConfig.getOrganization());
+			if(apiConfig.getClientOrganizations().contains(apiConfig.getOrganization())) {
+				apiConfig.getClientOrganizations().add(apiConfig.getOrganization());
+			}
 		}
 	}
 	
