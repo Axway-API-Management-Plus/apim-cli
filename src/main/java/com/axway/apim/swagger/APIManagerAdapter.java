@@ -128,8 +128,7 @@ public class APIManagerAdapter {
 							recreate.execute(changeState);
 						}
 					} else {
-						LOG.error("A breaking change can't be applied without enforcing it! Try option: -f true");
-						return;
+						throw new AppException("A breaking change can't be applied without enforcing it! Try option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
 					}
 				}
 			// A NON-Breaking change
