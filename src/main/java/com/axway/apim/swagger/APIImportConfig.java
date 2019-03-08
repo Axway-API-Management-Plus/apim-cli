@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -16,10 +17,13 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIImportDefinition;
+import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
+import com.axway.apim.swagger.api.properties.organization.Organization;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
@@ -30,11 +34,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 
 /**
- * @author cwiechmann
- * The APIContract reflects the given Meta-Information with 
- * the parameter: contract. 
- * This class will read the contract plus the optional set stage.
+ * The APIContract reflects the given API-Configuration plus the Swagger-Definition.
+ * This class will read the API-Configuration plus the optional set stage and the Swagger-File.
  * 
+ * @author cwiechmann
  */
 public class APIImportConfig {
 	
@@ -48,6 +51,13 @@ public class APIImportConfig {
 	
 	private String stage;
 
+	/**
+	 * Constructs the APIImportConfig 
+	 * @param apiContract
+	 * @param stage
+	 * @param pathToSwagger
+	 * @throws AppException
+	 */
 	public APIImportConfig(String apiContract, String stage, String pathToSwagger) throws AppException {
 		super();
 		this.apiContract = apiContract;
@@ -55,6 +65,20 @@ public class APIImportConfig {
 		this.pathToSwagger = pathToSwagger;
 	}
 	
+	/**
+	 * Returns the IAPIDefintion that returns the desired state of the API. In this method:<br>
+	 * <li>the API-Contract is read</li>
+	 * <li>the API-Contract is merged with the override</li>
+	 * <li>the Swagger-File is read</li>
+	 * <li>Additionally some validations & completions are made here</li>
+	 * <li>in the future: This is the place to do some default handling.
+	 * 
+	 * @return IAPIDefintion with the desired state of the API. This state will be 
+	 * the input to create the APIChangeState.
+	 * 
+	 * @throws AppException if the state can't be created.
+	 * @see {@link IAPIDefinition}, {@link AbstractAPIDefinition}
+	 */
 	public IAPIDefinition getImportAPIDefinition() throws AppException {
 		IAPIDefinition stagedConfig;
 		try {
@@ -75,6 +99,8 @@ public class APIImportConfig {
 			validateOutboundAuthN(stagedConfig);
 			completeCaCerts(stagedConfig);
 			addQuotaConfiguration(stagedConfig);
+			handleAllOrganizations(stagedConfig);
+			completeClientApplications(stagedConfig);
 			return stagedConfig;
 		} catch (Exception e) {
 			if(e.getCause() instanceof AppException) {
@@ -84,14 +110,30 @@ public class APIImportConfig {
 		}
 	}
 	
+	private void handleAllOrganizations(IAPIDefinition apiConfig) throws AppException {
+		if(apiConfig.getClientOrganizations()==null) return;
+		List<String> allDesiredOrgs = new ArrayList<String>();
+		if(apiConfig.getClientOrganizations().contains("ALL")) {
+			List<Organization> allOrgs = APIManagerAdapter.getAllOrgs();
+			for(Organization org : allOrgs) {
+				allDesiredOrgs.add(org.getName());
+			}
+			apiConfig.getClientOrganizations().clear();
+			apiConfig.getClientOrganizations().addAll(allDesiredOrgs);
+			((APIImportDefinition)apiConfig).setRequestForAllOrgs(true);
+		} else {
+			// As the API-Manager internally handles the owning organization in the same way, 
+			// we have to add the Owning-Org as a desired org
+			if(!apiConfig.getClientOrganizations().contains(apiConfig.getOrganization())) {
+				apiConfig.getClientOrganizations().add(apiConfig.getOrganization());
+			}
+		}
+	}
+	
 	private void addQuotaConfiguration(IAPIDefinition apiConfig) {
 		APIImportDefinition importAPI = (APIImportDefinition)apiConfig;
 		initQuota(importAPI.getSystemQuota());
 		initQuota(importAPI.getApplicationQuota());
-	}
-	
-	private void addServiceProfile(IAPIDefinition apiConfig) {
-		
 	}
 	
 	private void initQuota(APIQuota quotaConfig) {
@@ -153,6 +195,77 @@ public class APIImportConfig {
 		}
 	}
 	
+	/**
+	 * Purpose of this method is to load the actual existing applications from API-Manager 
+	 * based on the provided criteria (App-Name, API-Key, OAuth-ClientId or Ext-ClientId). 
+	 * Or, if the APP doesn't exists remove it from the list and log a warning message.
+	 * Additionally, for each application it's check, that the organization has access 
+	 * to this API, otherwise it will be removed from the list as well and a warning message is logged.
+	 * @param apiConfig
+	 * @throws AppException
+	 */
+	private void completeClientApplications(IAPIDefinition apiConfig) throws AppException {
+		ClientApplication loadedApp = null;
+		ClientApplication app;
+		if(apiConfig.getApplications()!=null) {
+			LOG.info("Handling configured client-applications.");
+			ListIterator<ClientApplication> it = apiConfig.getApplications().listIterator();
+			while(it.hasNext()) {
+				app = it.next();
+				if(app.getName()!=null) {
+					loadedApp = APIManagerAdapter.getApplication(app.getName());
+					if(loadedApp==null) {
+						LOG.warn("Unknown application with name: '" + app.getName() + "' configured. Ignoring this application.");
+						it.remove();
+						continue;
+					}
+					LOG.info("Found existing application: '"+app.getName()+"' based on given name '"+app.getName()+"'");
+				} else if(app.getApiKey()!=null) {
+					loadedApp = getAppForCredential(app.getApiKey(), APIManagerAdapter.CREDENTIAL_TYPE_API_KEY);
+					if(loadedApp==null) {
+						it.remove();
+						continue;
+					} 
+				} else if(app.getOauthClientId()!=null) {
+					loadedApp = getAppForCredential(app.getOauthClientId(), APIManagerAdapter.CREDENTIAL_TYPE_OAUTH);
+					if(loadedApp==null) {
+						it.remove();
+						continue;
+					} 
+				} else if(app.getExtClientId()!=null) {
+					loadedApp = getAppForCredential(app.getExtClientId(), APIManagerAdapter.CREDENTIAL_TYPE_EXT_CLIENTID);
+					if(loadedApp==null) {
+						it.remove();
+						continue;
+					} 
+				}
+				if(!hasClientAppPermission(apiConfig, loadedApp)) {
+					LOG.error("Organization of configured application: '" + app.getName() + "' has NO permission to this API. Ignoring this application.");
+					it.remove();
+					continue;
+				}
+				it.set(loadedApp); // Replace the incoming app, with the App loaded from API-Manager
+			}
+		}
+	}
+	
+	private boolean hasClientAppPermission(IAPIDefinition apiConfig, ClientApplication app) throws AppException {
+		String appsOrgId = app.getOrganizationId();
+		String appsOrgName = APIManagerAdapter.getOrgName(appsOrgId);
+		if(appsOrgName==null) return false;
+		return apiConfig.getClientOrganizations().contains(appsOrgName);
+	}
+	
+	private static ClientApplication getAppForCredential(String credential, String type) throws AppException {
+		LOG.debug("Searching application with configured credential (Type: "+type+"): '"+credential+"'");
+		ClientApplication app = APIManagerAdapter.getAppIdForCredential(credential, type);
+		if(app==null) {
+			LOG.warn("Unknown application with ("+type+"): '" + credential + "' configured. Ignoring this application.");
+			return null;
+		}
+		return app;
+	}
+	
 	private void completeCaCerts(IAPIDefinition apiConfig) throws AppException {
 		if(apiConfig.getCaCerts()!=null) {
 			List<CaCert> completedCaCerts = new ArrayList<CaCert>();
@@ -173,9 +286,25 @@ public class APIImportConfig {
 	}
 	
 	private InputStream getInputStreamForCertFile(CaCert cert) throws AppException {
-		String baseDir = new File(this.pathToSwagger).getParent();
-		File file = new File(baseDir + "/" + cert.getCertFile());
 		InputStream is;
+		File file;
+		// Certificates might be stored somewhere else, so try to load them directly
+		file = new File(cert.getCertFile());
+		if(file.exists()) { 
+			try {
+				is = new FileInputStream(file);
+				return is;
+			} catch (FileNotFoundException e) {
+				throw new AppException("Cant read given certificate file", ErrorCode.CANT_READ_CONFIG_FILE);
+			}
+		}
+		String baseDir;
+		try {
+			baseDir = new File(this.pathToSwagger).getCanonicalFile().getParent();
+		} catch (IOException e1) {
+			throw new AppException("Can't read certificate file.", ErrorCode.CANT_READ_CONFIG_FILE, e1, true);
+		}
+		file = new File(baseDir + File.separator + cert.getCertFile());
 		if(file.exists()) { 
 			try {
 				is = new FileInputStream(file);
@@ -183,10 +312,18 @@ public class APIImportConfig {
 				throw new AppException("Cant read given certificate file", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
 		} else {
+			LOG.debug("Can't read certifiate from file-location: " + file.toString() + ". Now trying to read it from the classpath.");
 			// Try to read it from classpath
 			is = APIManagerAdapter.class.getResourceAsStream(cert.getCertFile()); 
 		}
-		if(is==null) throw new AppException("Can't read certificate: "+cert.getCertFile()+" from file or classpath", ErrorCode.CANT_READ_CONFIG_FILE);
+		if(is==null) {
+			LOG.error("Can't read certificate: "+cert.getCertFile()+" from file or classpath.");
+			LOG.error("Certificates in filesystem are either expected relative to the Swagger-File or as an absolute path.");
+			LOG.error("In the same directory. 		Example: \"myCertFile.crt\"");
+			LOG.error("Relative to it.         		Example: \"../../allMyCertsAreHere/myCertFile.crt\"");
+			LOG.error("With an absolute path   		Example: \"/another/location/with/allMyCerts/myCertFile.crt\"");
+			throw new AppException("Can't read certificate: "+cert.getCertFile()+" from file or classpath.", ErrorCode.CANT_READ_CONFIG_FILE);
+		}
 		return is;
 	}
 	
@@ -301,6 +438,7 @@ public class APIImportConfig {
 			try {
 				String baseDir = new File(this.pathToSwagger).getParent();
 				File file = new File(baseDir + "/" + importApi.getImage().getFilename());
+				importApi.getImage().setBaseFilename(file.getName());
 				if(file.exists()) { 
 					importApi.getImage().setImageContent(IOUtils.toByteArray(new FileInputStream(file)));
 				} else {

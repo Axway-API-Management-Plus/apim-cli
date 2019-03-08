@@ -23,7 +23,7 @@
     </bean>
     
     <bean class="com.axway.apim.test.SwaggerImportTestAction"/>
-    <bean id="myBeforeSuite" class="com.axway.apim.test.setup.InitializationTest"/>
+    <bean id="myBeforeSuite" class="com.axway.apim.test.setup.InitializationTestIT"/>
     
     <citrus:global-variables>
     	<citrus:variable name="apiManagerHost" value="${apiManagerHost}"/>

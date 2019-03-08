@@ -18,6 +18,16 @@ import com.axway.apim.swagger.APIImportConfig;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.IAPIDefinition;
 
+/**
+ * This is the Entry-Point of program and responsible to:</br>
+ * - read the command-line parameters to create a <code>CommandParameters</code></br>
+ * - next is to read the API-Contract by creating an <code>APIImportConfig</code> instance and calling getImportAPIDefinition()</br>
+ * - the <code>APIManagerAdapter</code> method: <code>getAPIManagerAPI()</code> is used to create the API-Manager API state</br>
+ * - An <code>APIChangeState</code> is created based on ImportAPI & API-Manager API
+ * - Finally the APIManagerAdapter:applyChanges() is called to replicate the state into the APIManager.   
+ * 
+ * @author cwiechmann@axway.com
+ */
 public class App {
 
 	private static Logger LOG = LoggerFactory.getLogger(App.class);
@@ -29,6 +39,13 @@ public class App {
 		
 	public static int run(String args[]) {
 		try {
+			LOG.info("------------------------------------------------------------------------");
+			LOG.info("API-Manager Promote Version: 1.3");
+			LOG.info("                                                                        ");
+			LOG.info("To report issues or get help, please visit: ");
+			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
+			LOG.info("------------------------------------------------------------------------");
+			
 			Options options = new Options();
 			Option option;
 			
@@ -70,10 +87,20 @@ public class App {
 			option.setArgName("true/[false]");
 			options.addOption(option);
 			
+			option = new Option("io", "ignoreClientOrgs", true, "Use this flag to ignore configured Client-Organizations.");
+			option.setArgName("true/[false]");
+			options.addOption(option);
+			
+			option = new Option("ia", "ignoreClientApps", true, "Use this flag to ignore configured Client-Applications.");
+			option.setArgName("true/[false]");
+			options.addOption(option);
+			
 			CommandLineParser parser = new DefaultParser();
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.setWidth(140);
 			CommandLine cmd = null;
+			String scriptExt = "sh";
+			if(System.getProperty("os.name").toLowerCase().contains("win")) scriptExt = "bat";
 			try {
 				cmd = parser.parse( options, args, false);
 			} catch (ParseException e) {
@@ -81,10 +108,11 @@ public class App {
 				System.out.println("\n");
 				System.out.println("ERROR: " + e.getMessage());
 				System.out.println();
-				System.out.println("You may run the following examples:");
-				System.out.println("scripts/run-swagger-import.sh -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
-				System.out.println("scripts/run-swagger-import.sh -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme -s prod");
-				System.out.println("scripts/run-swagger-import.sh -a samples/petstore.json -c samples/complete-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println("You may run one of the following examples:");
+				System.out.println("scripts/run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println("scripts/run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme -s prod");
+				System.out.println("scripts/run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/complete-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println("scripts/run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/org-and-apps-config.json -h localhost -u apiadmin -p changeme");				
 				System.out.println();
 				System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 				
@@ -98,7 +126,7 @@ public class App {
 			
 			APIImportConfig contract = new APIImportConfig(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("swagger"));
 			IAPIDefinition desiredAPI = contract.getImportAPIDefinition();
-			IAPIDefinition actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI.getCustomProperties());
+			IAPIDefinition actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);			
 			
 			apimAdapter.applyChanges(changeActions);

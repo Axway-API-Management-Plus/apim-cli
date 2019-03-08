@@ -24,6 +24,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
@@ -38,6 +39,24 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * This class defines all common properties on an API and how each property should be 
+ * treated during replication.</br>
+ * APIManagerAPI & APIImportDefintion are both an instance of this class.</br>
+ * </br>
+ * Annotations for each property are used by the APIChangeState to decide:
+ * <li>Is is a breaking change?</li>
+ * <li>Can the change be applied to the existing API?</li>
+ * <li>Which Change-Handler should finally do the required actions to replicate the change into the APIManager</li>
+ * </br>
+ * When adding new properties, please make sure to create Getter & Setter as Jackson is used to create the Instances.
+ * </br></br>
+ * Perhaps a way to simplify the code is to use for many of the properties is to use a SimplePropertyHandler 
+ * as many properties are handled in the same way.
+ * 
+ * 
+ * @author cwiechmann@axway.com
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class AbstractAPIDefinition {
 	
@@ -106,6 +125,15 @@ public abstract class AbstractAPIDefinition {
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
 			propHandler = CorsProfileHandler.class)
 	protected List<CorsProfile> corsProfiles;
+	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED})
+	protected List<String> clientOrganizations;
+	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED})
+	@JsonSetter(nulls=Nulls.SKIP)
+	protected List<ClientApplication> applications = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {}, 
@@ -222,6 +250,10 @@ public abstract class AbstractAPIDefinition {
 
 	public String getVhost() {
 		return vhost;
+	}
+
+	public void setVhost(String vhost) {
+		this.vhost = vhost;
 	}
 
 	public Map<String, String[]> getTags() {
@@ -384,5 +416,21 @@ public abstract class AbstractAPIDefinition {
 
 	public Map<String, ServiceProfile> getServiceProfiles() {
 		return serviceProfiles;
+	}
+
+	public List<String> getClientOrganizations() {
+		return clientOrganizations;
+	}
+
+	public void setClientOrganizations(List<String> clientOrganizations) {
+		this.clientOrganizations = clientOrganizations;
+	}
+
+	public List<ClientApplication> getApplications() {
+		return applications;
+	}
+
+	public void setApplications(List<ClientApplication> applications) {
+		this.applications = applications;
 	}
 }

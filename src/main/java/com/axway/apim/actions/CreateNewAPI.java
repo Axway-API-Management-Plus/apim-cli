@@ -10,7 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.CreateAPIProxy;
+import com.axway.apim.actions.tasks.ManageClientOrgs;
 import com.axway.apim.actions.tasks.ImportBackendAPI;
+import com.axway.apim.actions.tasks.ManageClientApps;
 import com.axway.apim.actions.tasks.UpdateAPIImage;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
@@ -24,6 +26,12 @@ import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
 
+/**
+ * This class is used by the {@link APIManagerAdapter#applyChanges(APIChangeState)} to create a new API. 
+ * It's called, when an existing API can't be found.
+ * 
+ * @author cwiechmann@axway.com
+ */
 public class CreateNewAPI {
 	
 	static Logger LOG = LoggerFactory.getLogger(CreateNewAPI.class);
@@ -41,22 +49,30 @@ public class CreateNewAPI {
 
 		new CreateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		// As we have just created an API-Manager API, we should reflect this for further processing
-		IAPIDefinition createdAPI = APIManagerAdapter.getAPIManagerAPI((JsonNode)context.get("lastResponse"), null);
+		IAPIDefinition createdAPI = APIManagerAdapter.getAPIManagerAPI((JsonNode)context.get("lastResponse"), changes.getDesiredAPI());
 		changes.setIntransitAPI(createdAPI);
 		
 		// ... here we basically need to add all props to initially bring the API in sync!
 		// But without updating the Swagger, as we have just imported it!
 		new UpdateAPIProxy(changes.getDesiredAPI(), createdAPI).execute(changedProps);
 		
-		// If image is included, update it
+		// If an image is included, update it
 		if(changes.getDesiredAPI().getImage()!=null) {
 			new UpdateAPIImage(changes.getDesiredAPI(), createdAPI).execute();
 		}
 		// This is special, as the status is not a property and requires some additional actions!
 		new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI).execute();
 		
+		// Is a Quota is defined we must manage it
 		new UpdateQuotaConfiguration(changes.getDesiredAPI(), createdAPI).execute();
 		
+		// Grant access to the API
+		new ManageClientOrgs(changes.getDesiredAPI(), createdAPI).execute();
+		
+		// Handle subscription to applications
+		new ManageClientApps(changes.getDesiredAPI(), createdAPI).execute();
+		
+		// V-Host must be managed almost at the end, as the status must be set already to "published"
 		vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
 	}
 	

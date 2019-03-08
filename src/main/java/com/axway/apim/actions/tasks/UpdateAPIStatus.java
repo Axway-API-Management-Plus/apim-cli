@@ -1,11 +1,9 @@
 package com.axway.apim.actions.tasks;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
 

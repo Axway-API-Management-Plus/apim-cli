@@ -23,6 +23,13 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 
+/**
+ * The interface to the API-Manager itself responsible to setup the underlying HTTPS-Communication. 
+ * It's used by the RESTAPICall.</br>
+ * Implemented as a Singleton, which holds the actual connection to the API-Manager.
+ * @author cwiechmann@axway.com
+ *
+ */
 public class APIMHttpClient {
 	
 	private static APIMHttpClient instance;

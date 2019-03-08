@@ -2,6 +2,12 @@ package com.axway.apim.actions.rest;
 
 import java.util.HashMap;
 
+/**
+ * Helper class which can be used for any purpose to store information and to be pulled out later. 
+ * It's a Singleton and created when the tools logs-in for the first time into the API-Manager.
+ * 
+ * @author cwiechmann@axway.com
+ */
 public class Transaction {
 	private static Transaction instance;
 	

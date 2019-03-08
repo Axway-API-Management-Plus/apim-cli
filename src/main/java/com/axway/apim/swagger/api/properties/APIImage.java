@@ -12,6 +12,8 @@ public class APIImage {
 	
 	private boolean isValid = true;
 	
+	private String baseFilename = null;
+	
 	public byte[] getImageContent() {
 		return imageContent;
 	}
@@ -60,5 +62,13 @@ public class APIImage {
 
 	public void setValid(boolean isValid) {
 		this.isValid = isValid;
+	}
+
+	public String getBaseFilename() {
+		return baseFilename;
+	}
+
+	public void setBaseFilename(String baseFilename) {
+		this.baseFilename = baseFilename;
 	}
 }

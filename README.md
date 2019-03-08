@@ -2,10 +2,12 @@
 
 This project provides you with a tool that simplifies your DevOps experience with the Axway API-Manager Version 7.x. 
 
-The program works based on the API-Swagger-Definition + an API-Contract and replicates this "state" into the API-Manager. Consider the Swagger-Definition + API-Contract as the "__desired__" state and API-Manager has the "__actual__" state. This program will compare both, the desired with the actual state, and performs all neccassary actions to bring the API-Manager API into the desired state.
+The program works based on the API-Swagger-Definition + an API-Configuration-File and replicates this "state" into the API-Manager. Consider the Swagger-Definition + API-Config as the "__desired__" state and API-Manager has the "__actual__" state. This program will compare both, the desired with the actual state, and performs all neccassary actions to bring the API-Manager API into the desired state.
 
-With that, an API-Developer is just providing the Swagger-File (e.g. Code-Generated or using a Swagger-Editor) and the API-Contract. When checked in, the CI/CD-Pipelines picks it up and replicates it into the API-Manager. 
-This includes Zero-Downtime-Upgrade of existing applications, which might have an active subscription to an API. Learn more in the [documentation](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki).
+Watch this video (28 min): https://youtu.be/2i8i1zMAMps to get an overview + demo.
+
+With that, an API-Developer is just providing the Swagger-File (e.g. Code-Generated or using a Swagger-Editor) and the API-Config. When checked in, the CI/CD-Pipelines picks it up and replicates it into the API-Manager. 
+This includes __Zero-Downtime-Upgrade of existing applications__, which might have an active subscription to an API. Learn more in the [documentation](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki).
 
 ![API-Manager Swagger-Promote overview]( https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/blob/master/src/lib/images/apimanager-swagger-promote-overview.png )
 
@@ -26,8 +28,13 @@ Today the following API-Properties are already supported and can be controlled e
 - Tags
 - Custom-Properties
 - Quota-Management (Application- & System-Default-Quota)
+- Client-Organization handling  
 
-Build and tested with API-Manager 7.6.2 SP1 at Travis CI: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=master)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
+Improving the API-Development experience during the API-Design phase leveraging the Stoplight integration. [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/Stoplight-Integration).
+
+Build and tested with API-Manager 7.6.2 SP2 at Travis CI:  
+Develop: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
+Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=master)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
 
 ## Install
 - Download the latest [release](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases)

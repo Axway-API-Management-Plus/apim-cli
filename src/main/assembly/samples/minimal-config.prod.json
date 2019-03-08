@@ -1,8 +1,5 @@
 {
 	"name": "Minimal API on Production",
-	"path": "/minimal/api/v1",
 	"state": "published",
-	"version": "1.0.0",
-	"image": "images/sample-api-icon.jpg",
-	"organization": "API Development" 
+	"image": "images/sample-api-icon.jpg" 
 }
