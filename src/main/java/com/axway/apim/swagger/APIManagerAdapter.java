@@ -80,6 +80,7 @@ public class APIManagerAdapter {
 	
 	public APIManagerAdapter() throws AppException {
 		super();
+		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing)
 		loginToAPIManager();
 		this.enforceBreakingChange = CommandParameters.getInstance().isEnforceBreakingChange();
 	}
