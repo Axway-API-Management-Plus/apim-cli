@@ -54,6 +54,8 @@ Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimana
   - Added support for Qouta-Management plus minor fixes
 - 1.2.0 - 20.12.2018
   - Added support for API-Outbound AuthN and support to configure the API-Backend-Basepath
+- 1.3.0 - 08.03.2019
+  - Added support for Organization- & Application-Management
 
 
 ## Limitations/Caveats

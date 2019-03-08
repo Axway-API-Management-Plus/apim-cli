@@ -123,6 +123,11 @@ public class SecurityDevice {
 		this.order = order;
 	}
 
+	@Override
+	public String toString() {
+		return "SecurityDevice [type=" + type + "]";
+	}
+
 	public Map<String, String> getProperties() throws AppException {
 		if(this.type.equals("oauth")) {
 			String tokenStore = (String)properties.get("tokenStore");
