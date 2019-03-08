@@ -114,6 +114,8 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
+		echo("####### API has been created with ID: '${apiId}' #######");
+		
 		echo("####### Validate initially created application has an active subscription to the API (Based on the name) #######");
 		http().client("apiManager")
 			.send()
