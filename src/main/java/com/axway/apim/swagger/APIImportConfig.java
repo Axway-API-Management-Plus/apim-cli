@@ -418,6 +418,7 @@ public class APIImportConfig {
 			try {
 				String baseDir = new File(this.pathToSwagger).getParent();
 				File file = new File(baseDir + "/" + importApi.getImage().getFilename());
+				importApi.getImage().setBaseFilename(file.getName());
 				if(file.exists()) { 
 					importApi.getImage().setImageContent(IOUtils.toByteArray(new FileInputStream(file)));
 				} else {
