@@ -44,6 +44,11 @@ public class SecurityProfile {
 	}
 
 	@Override
+	public String toString() {
+		return "SecurityProfile [" + devices + "]";
+	}
+
+	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
 		if(other instanceof SecurityProfile) {

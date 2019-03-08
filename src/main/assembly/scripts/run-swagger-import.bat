@@ -23,7 +23,7 @@ SET ERRNO=1
 GOTO :END
 
 :OkClassPath
-ECHO "Running API-Manager Promote version 1.2 ..."
+ECHO "Running API-Manager Promote version 1.3 ..."
 
 "%JAVA_HOME%\bin\java" -Xms64m -Xmx256m -classpath "%CLASSPATH%" com.axway.apim.App %*
 SET ERRNO=%ERRORLEVEL%
