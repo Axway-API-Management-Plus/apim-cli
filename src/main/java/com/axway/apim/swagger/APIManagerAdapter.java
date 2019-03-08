@@ -80,7 +80,7 @@ public class APIManagerAdapter {
 	
 	public APIManagerAdapter() throws AppException {
 		super();
-		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing)
+		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the JVM)
 		loginToAPIManager();
 		this.enforceBreakingChange = CommandParameters.getInstance().isEnforceBreakingChange();
 	}
@@ -259,12 +259,29 @@ public class APIManagerAdapter {
 	 * The actual Org-ID based on the OrgName. Lazy implementation.
 	 * @param orgName the name of the organizations
 	 * @return the id of the organization
+	 * @throws AppException 
 	 */
-	public static String getOrgId(String orgName) {
+	public static String getOrgId(String orgName) throws AppException {
+		if(allOrgs == null) getAllOrgs();
 		for(Organization org : allOrgs) {
 			if(orgName.equals(org.getName())) return org.getId();
 		}
 		LOG.error("Requested OrgId for unknown orgName: " + orgName);
+		return null;
+	}
+	
+	/**
+	 * The actual Org-ID based on the OrgName. Lazy implementation.
+	 * @param orgName the name of the organizations
+	 * @return the id of the organization
+	 * @throws AppException 
+	 */
+	public static String getOrgName(String orgId) throws AppException {
+		if(allOrgs == null) getAllOrgs();
+		for(Organization org : allOrgs) {
+			if(orgId.equals(org.getId())) return org.getName();
+		}
+		LOG.error("Requested OrgName for unknown orgId: " + orgId);
 		return null;
 	}
 	

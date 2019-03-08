@@ -77,6 +77,6 @@ public class IgnoreClientOrgsTestIT extends TestNGCitrusTestDesigner {
 			.receive()
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
-			.validate("$.size()", "0");
+			.validate("$.*.apiId", "@assertThat(not(containsString(${apiId})))@");
 	}
 }

@@ -47,6 +47,7 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 		String enforce = "true";
 		String ignoreQuotas = "false";
 		String ignoreClientOrgs = "false";
+		String ignoreClientApps = "false";
 		
 		try {
 			enforce = context.getVariable("enforce");
@@ -56,6 +57,9 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 		} catch (Exception ignore) {};
 		try {
 			ignoreClientOrgs = context.getVariable("ignoreClientOrgs");
+		} catch (Exception ignore) {};
+		try {
+			ignoreClientApps = context.getVariable("ignoreClientApps");
 		} catch (Exception ignore) {};
 		
 		if(stage==null) {
@@ -76,7 +80,8 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 				"-s", stage, 
 				"-f", enforce, 
 				"-iq", ignoreQuotas, 
-				"-io", ignoreClientOrgs};
+				"-io", ignoreClientOrgs, 
+				"-ia", ignoreClientApps};
 		
 		int rc = App.run(args);
 		if(expectedReturnCode!=rc) {
@@ -88,7 +93,6 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 	 * To make testing easier we allow reading test-files from classpath as well
 	 */
 	private String replaceDynamicContentInFile(String pathToFile, TestContext context) {
-		ObjectMapper mapper = new ObjectMapper();
 		
 		File inputFile = new File(pathToFile);
 		InputStream is = null;

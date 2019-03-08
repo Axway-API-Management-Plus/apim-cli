@@ -91,6 +91,10 @@ public class App {
 			option.setArgName("true/[false]");
 			options.addOption(option);
 			
+			option = new Option("ia", "ignoreClientApps", true, "Use this flag to ignore configured Client-Applications.");
+			option.setArgName("true/[false]");
+			options.addOption(option);
+			
 			CommandLineParser parser = new DefaultParser();
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.setWidth(140);

@@ -17,6 +17,7 @@ import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
@@ -34,6 +35,10 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	
 	public void execute() throws AppException {
 		if(desiredState.getApplications()==null) return;
+		if(CommandParameters.getInstance().isIgnoreClientApps()) {
+			LOG.info("Configured client applications are ignored, as flag ignoreClientApps has been set.");
+			return;
+		}
 		List<ClientApplication> missingDesiredApps = getMissingApps(desiredState.getApplications(), actualState.getApplications());
 		List<ClientApplication> revomingActualApps = getMissingApps(actualState.getApplications(), desiredState.getApplications());
 		if(missingDesiredApps.size()==0) {

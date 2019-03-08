@@ -12,6 +12,8 @@ public class ClientApplication {
 	private String extClientId;
 	private String apiKey;
 	
+	private String organizationId;
+	
 	public String getId() {
 		return id;
 	}
@@ -43,6 +45,12 @@ public class ClientApplication {
 		this.apiKey = apiKey;
 	}
 	
+	public String getOrganizationId() {
+		return organizationId;
+	}
+	public void setOrganizationId(String organizationId) {
+		this.organizationId = organizationId;
+	}
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;

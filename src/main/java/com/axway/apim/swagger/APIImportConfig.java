@@ -199,10 +199,12 @@ public class APIImportConfig {
 	 * Purpose of this method is to load the actual existing applications from API-Manager 
 	 * based on the provided criteria (App-Name, API-Key, OAuth-ClientId or Ext-ClientId). 
 	 * Or, if the APP doesn't exists remove it from the list and log a warning message.
+	 * Additionally, for each application it's check, that the organization has access 
+	 * to this API, otherwise it will be removed from the list as well and a warning message is logged.
 	 * @param apiConfig
 	 * @throws AppException
 	 */
-	private void  completeClientApplications(IAPIDefinition apiConfig) throws AppException {
+	private void completeClientApplications(IAPIDefinition apiConfig) throws AppException {
 		ClientApplication loadedApp = null;
 		ClientApplication app;
 		if(apiConfig.getApplications()!=null) {
@@ -237,9 +239,21 @@ public class APIImportConfig {
 						continue;
 					} 
 				}
+				if(!hasClientAppPermission(apiConfig, loadedApp)) {
+					LOG.error("Organization of configured application: '" + app.getName() + "' has NO permission to this API. Ignoring this application.");
+					it.remove();
+					continue;
+				}
 				it.set(loadedApp); // Replace the incoming app, with the App loaded from API-Manager
 			}
 		}
+	}
+	
+	private boolean hasClientAppPermission(IAPIDefinition apiConfig, ClientApplication app) throws AppException {
+		String appsOrgId = app.getOrganizationId();
+		String appsOrgName = APIManagerAdapter.getOrgName(appsOrgId);
+		if(appsOrgName==null) return false;
+		return apiConfig.getClientOrganizations().contains(appsOrgName);
 	}
 	
 	private static ClientApplication getAppForCredential(String credential, String type) throws AppException {
