@@ -19,7 +19,7 @@ import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.IAPIDefinition;
-import com.axway.apim.swagger.api.properties.applications.ClientApplications;
+import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class ManageClientApps extends AbstractAPIMTask implements IResponseParser {
@@ -34,8 +34,8 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	
 	public void execute() throws AppException {
 		if(desiredState.getApplications()==null) return;
-		List<ClientApplications> missingDesiredApps = getMissingApps(desiredState.getApplications(), actualState.getApplications());
-		List<ClientApplications> revomingActualApps = getMissingApps(actualState.getApplications(), desiredState.getApplications());
+		List<ClientApplication> missingDesiredApps = getMissingApps(desiredState.getApplications(), actualState.getApplications());
+		List<ClientApplication> revomingActualApps = getMissingApps(actualState.getApplications(), desiredState.getApplications());
 		if(missingDesiredApps.size()==0) {
 			LOG.info("All desired applications: "+desiredState.getApplications()+" have already a subscription. Nothing to do.");
 		} else {
@@ -47,7 +47,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		}
 	}
 	
-	private void createAppSubscription(List<ClientApplications> missingDesiredApps, String apiId) throws AppException {
+	private void createAppSubscription(List<ClientApplication> missingDesiredApps, String apiId) throws AppException {
 		URI uri;
 		HttpEntity entity;
 		
@@ -55,7 +55,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		Transaction.getInstance().put(MODE, MODE_CREATE_API_ACCESS);
 		LOG.info("Creating API-Access for the following apps: '"+missingDesiredApps.toString()+"'");
 		try {
-			for(ClientApplications app : missingDesiredApps) {
+			for(ClientApplication app : missingDesiredApps) {
 				LOG.debug("Creating API-Access for application '"+app.getName()+"'");
 				Transaction.getInstance().put("appName", app.getName());
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis").build();
@@ -69,11 +69,11 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		}	
 	}
 	
-	private void removeAppSubscrioption(List<ClientApplications> revomingActualApps, String apiId) throws AppException {
+	private void removeAppSubscrioption(List<ClientApplication> revomingActualApps, String apiId) throws AppException {
 		URI uri;
 		RestAPICall apiCall;
 		Transaction.getInstance().put(MODE, MODE_REMOVE_API_ACCESS);
-		for(ClientApplications app : revomingActualApps) {
+		for(ClientApplication app : revomingActualApps) {
 			LOG.debug("Removing API-Access for application '"+app.getName()+"'");
 			try { 
 				Transaction.getInstance().put("appName", app.getName());
@@ -115,9 +115,9 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		return null;
 	}
 	
-	private static List<ClientApplications> getMissingApps(List<ClientApplications> apps, List<ClientApplications> otherApps) throws AppException {
-		List<ClientApplications> missingApps = new ArrayList<ClientApplications>();
-		for(ClientApplications app : apps) {
+	private static List<ClientApplication> getMissingApps(List<ClientApplication> apps, List<ClientApplication> otherApps) throws AppException {
+		List<ClientApplication> missingApps = new ArrayList<ClientApplication>();
+		for(ClientApplication app : apps) {
 			if(otherApps.contains(app)) {
 				continue;
 			}

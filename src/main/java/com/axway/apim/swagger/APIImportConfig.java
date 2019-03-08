@@ -20,7 +20,7 @@ import com.axway.apim.swagger.api.APIImportDefinition;
 import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
-import com.axway.apim.swagger.api.properties.applications.ClientApplications;
+import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.organization.Organization;
@@ -121,6 +121,10 @@ public class APIImportConfig {
 			apiConfig.getClientOrganizations().clear();
 			apiConfig.getClientOrganizations().addAll(allDesiredOrgs);
 			((APIImportDefinition)apiConfig).setRequestForAllOrgs(true);
+		} else {
+			// As the API-Manager internally handles the owning organization in the same way, 
+			// we have to add the Owning-Org as a desired org
+			apiConfig.getClientOrganizations().add(apiConfig.getOrganization());
 		}
 	}
 	
@@ -197,11 +201,11 @@ public class APIImportConfig {
 	 * @throws AppException
 	 */
 	private void  completeClientApplications(IAPIDefinition apiConfig) throws AppException {
-		ClientApplications loadedApp = null;
-		ClientApplications app;
+		ClientApplication loadedApp = null;
+		ClientApplication app;
 		if(apiConfig.getApplications()!=null) {
 			LOG.info("Handling configured client-applications.");
-			ListIterator<ClientApplications> it = apiConfig.getApplications().listIterator();
+			ListIterator<ClientApplication> it = apiConfig.getApplications().listIterator();
 			while(it.hasNext()) {
 				app = it.next();
 				if(app.getName()!=null) {
@@ -236,9 +240,9 @@ public class APIImportConfig {
 		}
 	}
 	
-	private static ClientApplications getAppForCredential(String credential, String type) throws AppException {
+	private static ClientApplication getAppForCredential(String credential, String type) throws AppException {
 		LOG.debug("Searching application with configured credential (Type: "+type+"): '"+credential+"'");
-		ClientApplications app = APIManagerAdapter.getAppIdForCredential(credential, type);
+		ClientApplication app = APIManagerAdapter.getAppIdForCredential(credential, type);
 		if(app==null) {
 			LOG.warn("Unknown application with ("+type+"): '" + credential + "' configured. Ignoring this application.");
 			return null;

@@ -40,7 +40,7 @@ import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
 import com.axway.apim.swagger.api.properties.apiAccess.APIAccess;
-import com.axway.apim.swagger.api.properties.applications.ClientApplications;
+import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.organization.ApiAccess;
 import com.axway.apim.swagger.api.properties.organization.Organization;
@@ -63,9 +63,9 @@ public class APIManagerAdapter {
 	private static String apiManagerVersion = null;
 	
 	private static List<Organization> allOrgs = null;
-	private static List<ClientApplications> allApps = null;
+	private static List<ClientApplication> allApps = null;
 	
-	private static Map<String, ClientApplications> clientCredentialToAppMap = new HashMap<String, ClientApplications>();
+	private static Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<String, ClientApplication>();
 	
 	private static Map<String, List<ApiAccess>> orgsApiAccess = new HashMap<String, List<ApiAccess>>();
 	
@@ -242,9 +242,9 @@ public class APIManagerAdapter {
 			LOG.info("Ignoring Client-Applications, as desired API-State is Unpublished!");
 			return;
 		}
-		List<ClientApplications> existingClientApps = new ArrayList<ClientApplications>();
-		List<ClientApplications> allApps = getAllApps();
-		for(ClientApplications app : allApps) {
+		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
+		List<ClientApplication> allApps = getAllApps();
+		for(ClientApplication app : allApps) {
 			List<APIAccess> APIAccess = getAPIAccess(app.getId(), "applications");
 			for(APIAccess access : APIAccess) {
 				if(access.getApiId().equals(apiManagerApi.getId())) {
@@ -274,9 +274,9 @@ public class APIManagerAdapter {
 	 * @return the id of the organization
 	 * @throws AppException 
 	 */
-	public static ClientApplications getApplication(String appName) throws AppException {
+	public static ClientApplication getApplication(String appName) throws AppException {
 		if(allApps==null) getAllApps();
-		for(ClientApplications app : allApps) {
+		for(ClientApplication app : allApps) {
 			LOG.debug("Configured app with name: '"+appName+"' found. ID: '"+app.getId()+"'");
 			if(appName.equals(app.getName())) return app;
 		}
@@ -289,8 +289,8 @@ public class APIManagerAdapter {
 	 * @param orgName the name of the organizations
 	 * @return the id of the organization
 	 */
-	public static ClientApplications getAppForId(String appId) {
-		for(ClientApplications app : allApps) {
+	public static ClientApplication getAppForId(String appId) {
+		for(ClientApplication app : allApps) {
 			if(appId.equals(app.getId())) return app;
 		}
 		LOG.error("Requested Application for unknown appId: "+appId+" not found.");
@@ -303,14 +303,14 @@ public class APIManagerAdapter {
 	 * @return the id of the organization
 	 * @throws AppException 
 	 */
-	public static ClientApplications getAppIdForCredential(String credential, String type) throws AppException {
+	public static ClientApplication getAppIdForCredential(String credential, String type) throws AppException {
 		if(clientCredentialToAppMap.containsKey(type+"_"+credential)) {
 			return clientCredentialToAppMap.get(type+"_"+credential);
 		}
 		getAllApps(); // Make sure, we loaded all app before!
 		LOG.debug("Searching credential (Type: "+type+"): '"+credential+"' in: " + allApps.size() + " apps.");
-		Collection<ClientApplications> appIds = clientCredentialToAppMap.values();
-		for(ClientApplications app : allApps) {
+		Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
+		for(ClientApplication app : allApps) {
 			if(appIds.contains(app.getId())) continue;
 			ObjectMapper mapper = new ObjectMapper();
 			String response = null;
@@ -557,13 +557,13 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	public static List<ClientApplications> getAllApps() throws AppException {
+	public static List<ClientApplication> getAllApps() throws AppException {
 		if(APIManagerAdapter.allApps!=null) {
 			LOG.trace("Not reloading existing apps from API-Manager. Number of apps: " + APIManagerAdapter.allApps.size());
 			return APIManagerAdapter.allApps;
 		}
 		LOG.debug("Loading existing apps from API-Manager.");
-		allApps = new ArrayList<ClientApplications>();
+		allApps = new ArrayList<ClientApplication>();
 		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
 		URI uri;
@@ -572,7 +572,7 @@ public class APIManagerAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null);
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
-			allApps = mapper.readValue(response, new TypeReference<List<ClientApplications>>(){});
+			allApps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
 			LOG.debug("Loaded: " + allApps.size() + " apps from API-Manager.");
 			return allApps;
 		} catch (Exception e) {

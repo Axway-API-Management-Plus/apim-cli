@@ -6,7 +6,7 @@ import java.util.Map;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
-import com.axway.apim.swagger.api.properties.applications.ClientApplications;
+import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
@@ -57,6 +57,8 @@ public interface IAPIDefinition {
 	
 	public String getOrgId() throws AppException;
 	
+	public String getOrganization();
+	
 	public String getName();
 	
 	public String getSummary();
@@ -93,9 +95,9 @@ public interface IAPIDefinition {
 	
 	public void setClientOrganizations(List<String> clientOrganizations);
 	
-	public List<ClientApplications> getApplications();
+	public List<ClientApplication> getApplications();
 
-	public void setApplications(List<ClientApplications> clientApplications);
+	public void setApplications(List<ClientApplication> clientApplications);
 	
 	public Map<String, ServiceProfile> getServiceProfiles();
 }

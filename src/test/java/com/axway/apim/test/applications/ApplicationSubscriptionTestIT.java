@@ -172,5 +172,28 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.*.apiId", "${apiId}");
+		
+		echo("####### Re-Importing same API: '${apiName}' - must result in No-Change #######");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/applications/1_api-with-1-org-some-apps.json");
+		createVariable("state", "published");
+		createVariable("orgName", "${orgName}");
+		createVariable("expectedReturnCode", "10");
+		action(swaggerImport);
+		
+		echo("####### Make sure, the API-ID hasn't changed #######");
+		http().client("apiManager")
+			.send()
+			.get("/proxies/${apiId}")
+			.name("api")
+			.header("Content-Type", "application/json");
+
+		// Check the API is still exposed on the same path
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.OK)
+			.messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].id", "${apiId}"); // Must be the same API-ID as before!
 	}
 }

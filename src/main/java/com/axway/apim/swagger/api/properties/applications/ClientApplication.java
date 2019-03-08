@@ -1,9 +1,11 @@
 package com.axway.apim.swagger.api.properties.applications;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ClientApplications {
+public class ClientApplication {
 	private String id;
 	private String name;
 	private String oauthClientId;
@@ -40,8 +42,17 @@ public class ClientApplications {
 	public void setApiKey(String apiKey) {
 		this.apiKey = apiKey;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if(other == null) return false;
+		if(other instanceof ClientApplication) {
+			return StringUtils.equals(((ClientApplication)other).getId(), this.getId());
+		}
+		return false;
+	}
 	@Override
 	public String toString() {
-		return "'" + name + "'";
+		return "[" + name + "]";
 	}
 }
