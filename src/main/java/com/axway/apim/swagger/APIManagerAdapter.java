@@ -316,12 +316,16 @@ public class APIManagerAdapter {
 			URI uri;
 			try {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type+"").build();
-				LOG.info("Requesting credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
+				LOG.info("Loading credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
 				RestAPICall getRequest = new GETRequest(uri, null);
 				HttpResponse httpResponse = getRequest.execute();
 				response = EntityUtils.toString(httpResponse.getEntity());
+				LOG.info("Response: " + response);
 				JsonNode clientIds = mapper.readTree(response);
-				if(clientIds.size()==0) continue;
+				if(clientIds.size()==0) {
+					LOG.info("No credentials found for application: '"+app.getName()+"' and type: '"+type+"'");
+					continue;
+				}
 				for(JsonNode clientId : clientIds) {
 					String key;
 					if(type.equals(CREDENTIAL_TYPE_API_KEY)) {
@@ -331,8 +335,12 @@ public class APIManagerAdapter {
 					} else {
 						throw new AppException("Unknown credential type: " + type, ErrorCode.UNXPECTED_ERROR);
 					}
+					LOG.info("Found credential: '"+key+"' for application: '"+app.getName()+"' and type: '"+type+"'");
 					clientCredentialToAppMap.put(type+"_"+key, app);
-					if(key.equals(credential)) return app;
+					if(key.equals(credential)) {
+						LOG.info("Requested credential: '"+credential+"' found. Returning application.");
+						return app;
+					}
 				}
 			} catch (Exception e) {
 				LOG.error("Can't load applications credentials. Can't parse response: " + response);
