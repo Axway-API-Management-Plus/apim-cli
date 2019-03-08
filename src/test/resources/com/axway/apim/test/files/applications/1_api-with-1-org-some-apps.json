@@ -5,12 +5,10 @@
    "version":"1.0.1",
    "organization":"API Development ${orgNumber}",
    "clientOrganizations":[
-      "${orgName2}"
+      "${orgName2}" 
    ],
    "applications":[
-      {
-         "name":"${consumingTestApp3Name}"
-      },
+      { "name":"${consumingTestApp3Name}" },
       {
          "extClientId":"${extClientId}"
       },

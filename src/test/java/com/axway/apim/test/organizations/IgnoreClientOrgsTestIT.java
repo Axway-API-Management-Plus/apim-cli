@@ -24,7 +24,7 @@ public class IgnoreClientOrgsTestIT extends TestNGCitrusTestDesigner {
 		variable("apiPath", "/grant_invalid_org-api-${apiNumber}");
 		variable("apiName", "Grant to invalid orgs API-${apiNumber}");
 		
-		variable("testOrgName", "Org without permission");
+		variable("testOrgName", "Org without permission ${apiNumber}");
 
 		http().client("apiManager")
 			.send()

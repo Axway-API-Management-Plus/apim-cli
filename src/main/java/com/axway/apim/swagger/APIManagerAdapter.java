@@ -305,7 +305,9 @@ public class APIManagerAdapter {
 	 */
 	public static ClientApplication getAppIdForCredential(String credential, String type) throws AppException {
 		if(clientCredentialToAppMap.containsKey(type+"_"+credential)) {
-			return clientCredentialToAppMap.get(type+"_"+credential);
+			ClientApplication app = clientCredentialToAppMap.get(type+"_"+credential);
+			LOG.info("Found existing application (in cache): '"+app.getName()+"' based on credential (Type: '"+type+"'): '"+credential+"'");
+			return app;
 		}
 		getAllApps(); // Make sure, we loaded all app before!
 		LOG.debug("Searching credential (Type: "+type+"): '"+credential+"' in: " + allApps.size() + " apps.");
