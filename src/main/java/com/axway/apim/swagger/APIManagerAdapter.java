@@ -306,6 +306,7 @@ public class APIManagerAdapter {
 			return clientCredentialToAppMap.get(type+"_"+credential);
 		}
 		getAllApps(); // Make sure, we loaded all app before!
+		LOG.info("getAppIdForCredential based on allAps with size: " + allApps.size());
 		Collection<ClientApplications> appIds = clientCredentialToAppMap.values();
 		for(ClientApplications app : allApps) {
 			if(appIds.contains(app.getId())) continue;
@@ -314,7 +315,7 @@ public class APIManagerAdapter {
 			URI uri;
 			try {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type+"").build();
-				LOG.info("Requesting credentials of type: " + type + " for application: " + app.getName() + " from API-Manager.");
+				LOG.info("Requesting credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
 				RestAPICall getRequest = new GETRequest(uri, null);
 				HttpResponse httpResponse = getRequest.execute();
 				response = EntityUtils.toString(httpResponse.getEntity());
@@ -548,8 +549,10 @@ public class APIManagerAdapter {
 	
 	public static List<ClientApplications> getAllApps() throws AppException {
 		if(APIManagerAdapter.allApps!=null) {
+			LOG.info("USING EXISTING ALL APPS: " + APIManagerAdapter.allApps.size());
 			return APIManagerAdapter.allApps;
 		}
+		LOG.info("LOADING ALL APPS FROM API-MANAGER");
 		allApps = new ArrayList<ClientApplications>();
 		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
@@ -560,6 +563,7 @@ public class APIManagerAdapter {
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			allApps = mapper.readValue(response, new TypeReference<List<ClientApplications>>(){});
+			LOG.info("LOADED ALL APPS FROM API-MANAGER: " + allApps.size());
 			return allApps;
 		} catch (Exception e) {
 			LOG.error("Error cant read all applications from API-Manager. Can't parse response: " + response);
