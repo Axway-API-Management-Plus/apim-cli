@@ -277,6 +277,7 @@ public class APIManagerAdapter {
 	public static ClientApplications getApplication(String appName) throws AppException {
 		if(allApps==null) getAllApps();
 		for(ClientApplications app : allApps) {
+			LOG.debug("Configured app with name: '"+appName+"' found. ID: '"+app.getId()+"'");
 			if(appName.equals(app.getName())) return app;
 		}
 		LOG.error("Requested AppId for unknown appName: " + appName);
@@ -307,7 +308,7 @@ public class APIManagerAdapter {
 			return clientCredentialToAppMap.get(type+"_"+credential);
 		}
 		getAllApps(); // Make sure, we loaded all app before!
-		LOG.info("getAppIdForCredential based on allAps with size: " + allApps.size());
+		LOG.debug("Searching credential (Type: "+type+"): '"+credential+"' in: " + allApps.size() + " apps.");
 		Collection<ClientApplications> appIds = clientCredentialToAppMap.values();
 		for(ClientApplications app : allApps) {
 			if(appIds.contains(app.getId())) continue;
@@ -316,14 +317,14 @@ public class APIManagerAdapter {
 			URI uri;
 			try {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type+"").build();
-				LOG.info("Loading credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
+				LOG.debug("Loading credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
 				RestAPICall getRequest = new GETRequest(uri, null);
 				HttpResponse httpResponse = getRequest.execute();
 				response = EntityUtils.toString(httpResponse.getEntity());
-				LOG.info("Response: " + response);
+				LOG.trace("Response: " + response);
 				JsonNode clientIds = mapper.readTree(response);
 				if(clientIds.size()==0) {
-					LOG.info("No credentials found for application: '"+app.getName()+"' and type: '"+type+"'");
+					LOG.debug("No credentials (Type: '"+type+"') found for application: '"+app.getName()+"'");
 					continue;
 				}
 				for(JsonNode clientId : clientIds) {
@@ -335,10 +336,10 @@ public class APIManagerAdapter {
 					} else {
 						throw new AppException("Unknown credential type: " + type, ErrorCode.UNXPECTED_ERROR);
 					}
-					LOG.info("Found credential: '"+key+"' for application: '"+app.getName()+"' and type: '"+type+"'");
+					LOG.debug("Found credential (Type: '"+type+"'): '"+key+"' for application: '"+app.getName()+"'");
 					clientCredentialToAppMap.put(type+"_"+key, app);
 					if(key.equals(credential)) {
-						LOG.info("Requested credential: '"+credential+"' found. Returning application.");
+						LOG.info("Found existing application: '"+app.getName()+"' based on credential (Type: '"+type+"'): '"+credential+"'");
 						return app;
 					}
 				}
@@ -558,10 +559,10 @@ public class APIManagerAdapter {
 	
 	public static List<ClientApplications> getAllApps() throws AppException {
 		if(APIManagerAdapter.allApps!=null) {
-			LOG.info("USING EXISTING ALL APPS: " + APIManagerAdapter.allApps.size());
+			LOG.trace("Not reloading existing apps from API-Manager. Number of apps: " + APIManagerAdapter.allApps.size());
 			return APIManagerAdapter.allApps;
 		}
-		LOG.info("LOADING ALL APPS FROM API-MANAGER");
+		LOG.debug("Loading existing apps from API-Manager.");
 		allApps = new ArrayList<ClientApplications>();
 		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
@@ -572,7 +573,7 @@ public class APIManagerAdapter {
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			allApps = mapper.readValue(response, new TypeReference<List<ClientApplications>>(){});
-			LOG.info("LOADED ALL APPS FROM API-MANAGER: " + allApps.size());
+			LOG.debug("Loaded: " + allApps.size() + " apps from API-Manager.");
 			return allApps;
 		} catch (Exception e) {
 			LOG.error("Error cant read all applications from API-Manager. Can't parse response: " + response);

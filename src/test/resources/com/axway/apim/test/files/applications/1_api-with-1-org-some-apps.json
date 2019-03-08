@@ -9,7 +9,7 @@
    ],
    "applications":[
       {
-         "name":"${testAppName}"
+         "name":"${consumingTestApp3Name}"
       },
       {
          "extClientId":"${extClientId}"

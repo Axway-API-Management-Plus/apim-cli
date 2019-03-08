@@ -53,8 +53,10 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		
 		RestAPICall apiCall;
 		Transaction.getInstance().put(MODE, MODE_CREATE_API_ACCESS);
+		LOG.info("Creating API-Access for the following apps: '"+missingDesiredApps.toString()+"'");
 		try {
 			for(ClientApplications app : missingDesiredApps) {
+				LOG.debug("Creating API-Access for application '"+app.getName()+"'");
 				Transaction.getInstance().put("appName", app.getName());
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis").build();
 				entity = new StringEntity("{\"apiId\":\""+apiId+"\",\"enabled\":true}");
@@ -72,6 +74,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		RestAPICall apiCall;
 		Transaction.getInstance().put(MODE, MODE_REMOVE_API_ACCESS);
 		for(ClientApplications app : revomingActualApps) {
+			LOG.debug("Removing API-Access for application '"+app.getName()+"'");
 			try { 
 				Transaction.getInstance().put("appName", app.getName());
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis/"+apiId).build();
@@ -90,9 +93,9 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		try {
 			if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_CREATED) {
 				if(context.get(MODE).equals(MODE_CREATE_API_ACCESS)) {
-					LOG.info("Created API-Access for application: '"+context.get("appName")+"'");
+					LOG.debug("Successfully created API-Access for application: '"+context.get("appName")+"'");
 				} else {
-					LOG.info("Removed API-Access from application: '"+context.get("appName")+"'");
+					LOG.debug("Successfully removed API-Access from application: '"+context.get("appName")+"'");
 				}
 			} else {
 				LOG.error("Received status code: " + httpResponse.getStatusLine().getStatusCode());

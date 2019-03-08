@@ -90,6 +90,24 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### Added an Ext-ClientID: '${extClientId}' to Test-Application 2 #######");
 		
+		// ############## Creating Test-Application 3 #################
+		createVariable("app3Name", "Consuming Test App 3 ${orgNumber}");
+		http().client("apiManager")
+			.send()
+			.post("/applications")
+			.name("orgCreatedRequest")
+			.header("Content-Type", "application/json")
+			.payload("{\"name\":\"${app3Name}\",\"apis\":[],\"organizationId\":\"${orgId}\"}");
+
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.CREATED)
+			.messageType(MessageType.JSON)
+			.extractFromPayload("$.id", "consumingTestApp3Id")
+			.extractFromPayload("$.name", "consumingTestApp3Name");
+		
+		echo("####### Created Test-Application 3: '${consumingTestApp3Name}' with id: '${consumingTestApp3Id}' #######");
+		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
@@ -116,10 +134,10 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### API has been created with ID: '${apiId}' #######");
 		
-		echo("####### Validate initially created application has an active subscription to the API (Based on the name) #######");
+		echo("####### Validate created application 3 has an active subscription to the API (Based on the name) #######");
 		http().client("apiManager")
 			.send()
-			.get("/applications/${testAppId}/apis")
+			.get("/applications/${consumingTestApp3Id}/apis")
 			.name("api")
 			.header("Content-Type", "application/json");
 		

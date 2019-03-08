@@ -42,6 +42,6 @@ public class ClientApplications {
 	}
 	@Override
 	public String toString() {
-		return "ClientApplications [name=" + name + ", id=" + id + "]";
+		return "'" + name + "'";
 	}
 }

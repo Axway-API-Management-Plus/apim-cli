@@ -200,6 +200,7 @@ public class APIImportConfig {
 		ClientApplications loadedApp = null;
 		ClientApplications app;
 		if(apiConfig.getApplications()!=null) {
+			LOG.info("Handling configured client-applications.");
 			ListIterator<ClientApplications> it = apiConfig.getApplications().listIterator();
 			while(it.hasNext()) {
 				app = it.next();
@@ -210,6 +211,7 @@ public class APIImportConfig {
 						it.remove();
 						continue;
 					}
+					LOG.info("Found existing application: '"+app.getName()+"' based on given name '"+app.getName()+"'");
 				} else if(app.getApiKey()!=null) {
 					loadedApp = getAppForCredential(app.getApiKey(), APIManagerAdapter.CREDENTIAL_TYPE_API_KEY);
 					if(loadedApp==null) {
@@ -235,6 +237,7 @@ public class APIImportConfig {
 	}
 	
 	private static ClientApplications getAppForCredential(String credential, String type) throws AppException {
+		LOG.debug("Searching application with configured credential (Type: "+type+"): '"+credential+"'");
 		ClientApplications app = APIManagerAdapter.getAppIdForCredential(credential, type);
 		if(app==null) {
 			LOG.warn("Unknown application with ("+type+"): '" + credential + "' configured. Ignoring this application.");
