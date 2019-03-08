@@ -77,7 +77,7 @@ public class APIRemoveAccessForAnOrgTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.apiId=='${apiId}')].enabled", "true");
 		
 		
-		echo("####### The API should now now be granted to only ONE organization - The other must be removed #######");
+		echo("####### The API should now be granted to only ONE organization - The other must be removed #######");
 		
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-client-1-org.json");
@@ -109,6 +109,6 @@ public class APIRemoveAccessForAnOrgTestIT extends TestNGCitrusTestDesigner {
 			.receive()
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
-			.validate("$.size()", "0");
+			.validate("$.*.apiId", "@assertThat(not(containsString(${apiId})))@");
 	}
 }

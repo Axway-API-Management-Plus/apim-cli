@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,6 @@ import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,10 +40,11 @@ public class AbstractAPIMTask {
 		URI uri;
 		ObjectMapper objectMapper = new ObjectMapper();
 		Transaction context = Transaction.getInstance();
+		InputStream response =null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+actual.getId()).build();
 			GETRequest getCall = new GETRequest(uri, null);
-			InputStream response = getCall.execute().getEntity().getContent();
+			response = getCall.execute().getEntity().getContent();
 			JsonNode lastJsonReponse = objectMapper.readTree(response);
 			context.put("lastResponse", lastJsonReponse);
 			context.put("virtualAPIId", lastJsonReponse.get("id").asText());
@@ -54,7 +53,10 @@ public class AbstractAPIMTask {
 			throw new AppException("Can't send HTTP-Request to API-Manager Proxy-Endpoint.", ErrorCode.CANT_SEND_HTTP_REQUEST, e);
 		} catch (IOException e) {
 			throw new AppException("IO-Exception, while sending HTTP-Request to API-Manager Proxy-Endpoint", ErrorCode.CANT_SEND_HTTP_REQUEST, e);
+		} finally {
+			try {
+				response.close();
+			} catch (Exception ignore) { }
 		}
-		
 	}
 }

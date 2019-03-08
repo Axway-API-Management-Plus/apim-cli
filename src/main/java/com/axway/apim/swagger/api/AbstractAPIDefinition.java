@@ -24,6 +24,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
@@ -128,6 +129,11 @@ public abstract class AbstractAPIDefinition {
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED})
 	protected List<String> clientOrganizations;
+	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED})
+	@JsonSetter(nulls=Nulls.SKIP)
+	protected List<ClientApplication> applications = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {}, 
@@ -418,5 +424,13 @@ public abstract class AbstractAPIDefinition {
 
 	public void setClientOrganizations(List<String> clientOrganizations) {
 		this.clientOrganizations = clientOrganizations;
+	}
+
+	public List<ClientApplication> getApplications() {
+		return applications;
+	}
+
+	public void setApplications(List<ClientApplication> applications) {
+		this.applications = applications;
 	}
 }

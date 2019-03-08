@@ -91,10 +91,16 @@ public class App {
 			option.setArgName("true/[false]");
 			options.addOption(option);
 			
+			option = new Option("ia", "ignoreClientApps", true, "Use this flag to ignore configured Client-Applications.");
+			option.setArgName("true/[false]");
+			options.addOption(option);
+			
 			CommandLineParser parser = new DefaultParser();
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.setWidth(140);
 			CommandLine cmd = null;
+			String scriptExt = "sh";
+			if(System.getProperty("os.name").toLowerCase().contains("win")) scriptExt = "bat";
 			try {
 				cmd = parser.parse( options, args, false);
 			} catch (ParseException e) {
@@ -102,10 +108,11 @@ public class App {
 				System.out.println("\n");
 				System.out.println("ERROR: " + e.getMessage());
 				System.out.println();
-				System.out.println("You may run the following examples:");
-				System.out.println("scripts/run-swagger-import.sh -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
-				System.out.println("scripts/run-swagger-import.sh -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme -s prod");
-				System.out.println("scripts/run-swagger-import.sh -a samples/petstore.json -c samples/complete-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println("You may run one of the following examples:");
+				System.out.println("scripts/run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println("scripts/run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme -s prod");
+				System.out.println("scripts/run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/complete-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println("scripts/run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/org-and-apps-config.json -h localhost -u apiadmin -p changeme");				
 				System.out.println();
 				System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 				

@@ -1,0 +1,18 @@
+{
+   "name":"API with Orgs and Apps",
+   "path":"/api/with/orgs/and/apps",
+   "state":"published",
+   "version":"1.0.0",
+   "organization":"API Development",
+   "clientOrganizations":[
+      "Another org", 
+      "My Partner",
+   ],
+   "applications":[
+      { "name":"Client App 1" },
+      { "name":"Client App 2" },
+      { "apiKey":"App with API-Key XYZ" },
+      { "extClientId":"App with external ClientID 123" },
+      { "oauthClientId":"App with internal ClientID 123" }  
+   ]
+}

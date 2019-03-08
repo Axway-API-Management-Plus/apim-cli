@@ -29,7 +29,7 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 		designer.createVariable("orgName", "API Development ${orgNumber}");
 		designer.createVariable("orgName2", "API Test-Org ${orgNumber2}");
 		
-		designer.echo("Setup Test Org: 'API Development ${orgNumber}'");
+		designer.echo("####### Setup Test Org: 'API Development ${orgNumber}' #######");
 		
 		designer.http().client("apiManager")
 			.send()
@@ -38,7 +38,7 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 			.header("Content-Type", "application/json")
 			.payload("{\"name\": \"${orgName}\", \"description\": \"Test Org ${orgNumber}\", \"enabled\": true, \"development\": true }");
 		
-		designer.echo("Validating Test-Organisation: API Development ${orgNumber} has been created");
+		designer.echo("####### Validating Test-Organisation: API Development ${orgNumber} has been created #######");
 		
 		designer.http().client("apiManager")
 			.receive()
@@ -47,9 +47,9 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 			.validate("$.name", "API Development ${orgNumber}")
 			.extractFromPayload("$.id", "orgId");
 		
-		designer.echo("Extracted organization id: ${orgId} as attribute: orgId");
+		designer.echo("####### Extracted organization id: ${orgId} as attribute: orgId #######");
 		
-		designer.echo("Setup Test Org: 'API Development ${orgNumber2}' with Non-Development flag");
+		designer.echo("####### Setup Test Org: 'API Development ${orgNumber2}' with Non-Development flag #######");
 		
 		designer.http().client("apiManager")
 			.send()
@@ -58,7 +58,7 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 			.header("Content-Type", "application/json")
 			.payload("{\"name\": \"${orgName2}\", \"description\": \"Non-Dev Org ${orgNumber2}\", \"enabled\": true, \"development\": false }");
 	
-		designer.echo("Validating Non-Development Test-Organisation: 'API Test-Org ${orgNumber2}' has been created");
+		designer.echo("####### Validating Non-Development Test-Organisation: 'API Test-Org ${orgNumber2}' has been created #######");
 		
 		designer.http().client("apiManager")
 			.receive()
@@ -67,9 +67,9 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 			.validate("$.name", "API Test-Org ${orgNumber2}")
 			.extractFromPayload("$.id", "orgId2");
 	
-		designer.echo("Extracted Non-Dev organization id: ${orgId2} as attribute: orgId2");
+		designer.echo("####### Extracted Non-Dev organization id: ${orgId2} as attribute: orgId2 #######");
 
-		designer.echo("Create a test application");
+		designer.echo("####### Create a test application #######");
 		
 		designer.http().client("apiManager")
 			.send()
@@ -84,6 +84,8 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 			.messageType(MessageType.JSON)
 			.extractFromPayload("$.id", "testAppId")
 			.extractFromPayload("$.name", "testAppName");
+		
+		designer.echo("####### Created a application: '${testAppName}' ID: '${testAppId}' #######");
 		
 		designer.action(new AbstractTestAction() {
             @Override public void doExecute(TestContext testContext) {

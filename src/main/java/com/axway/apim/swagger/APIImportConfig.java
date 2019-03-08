@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import com.axway.apim.swagger.api.APIImportDefinition;
 import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.organization.Organization;
@@ -98,6 +100,7 @@ public class APIImportConfig {
 			completeCaCerts(stagedConfig);
 			addQuotaConfiguration(stagedConfig);
 			handleAllOrganizations(stagedConfig);
+			completeClientApplications(stagedConfig);
 			return stagedConfig;
 		} catch (Exception e) {
 			if(e.getCause() instanceof AppException) {
@@ -118,6 +121,12 @@ public class APIImportConfig {
 			apiConfig.getClientOrganizations().clear();
 			apiConfig.getClientOrganizations().addAll(allDesiredOrgs);
 			((APIImportDefinition)apiConfig).setRequestForAllOrgs(true);
+		} else {
+			// As the API-Manager internally handles the owning organization in the same way, 
+			// we have to add the Owning-Org as a desired org
+			if(!apiConfig.getClientOrganizations().contains(apiConfig.getOrganization())) {
+				apiConfig.getClientOrganizations().add(apiConfig.getOrganization());
+			}
 		}
 	}
 	
@@ -184,6 +193,77 @@ public class APIImportConfig {
 			defaultCors.setSupportCredentials("false");
 			apiConfig.getCorsProfiles().add(defaultCors);
 		}
+	}
+	
+	/**
+	 * Purpose of this method is to load the actual existing applications from API-Manager 
+	 * based on the provided criteria (App-Name, API-Key, OAuth-ClientId or Ext-ClientId). 
+	 * Or, if the APP doesn't exists remove it from the list and log a warning message.
+	 * Additionally, for each application it's check, that the organization has access 
+	 * to this API, otherwise it will be removed from the list as well and a warning message is logged.
+	 * @param apiConfig
+	 * @throws AppException
+	 */
+	private void completeClientApplications(IAPIDefinition apiConfig) throws AppException {
+		ClientApplication loadedApp = null;
+		ClientApplication app;
+		if(apiConfig.getApplications()!=null) {
+			LOG.info("Handling configured client-applications.");
+			ListIterator<ClientApplication> it = apiConfig.getApplications().listIterator();
+			while(it.hasNext()) {
+				app = it.next();
+				if(app.getName()!=null) {
+					loadedApp = APIManagerAdapter.getApplication(app.getName());
+					if(loadedApp==null) {
+						LOG.warn("Unknown application with name: '" + app.getName() + "' configured. Ignoring this application.");
+						it.remove();
+						continue;
+					}
+					LOG.info("Found existing application: '"+app.getName()+"' based on given name '"+app.getName()+"'");
+				} else if(app.getApiKey()!=null) {
+					loadedApp = getAppForCredential(app.getApiKey(), APIManagerAdapter.CREDENTIAL_TYPE_API_KEY);
+					if(loadedApp==null) {
+						it.remove();
+						continue;
+					} 
+				} else if(app.getOauthClientId()!=null) {
+					loadedApp = getAppForCredential(app.getOauthClientId(), APIManagerAdapter.CREDENTIAL_TYPE_OAUTH);
+					if(loadedApp==null) {
+						it.remove();
+						continue;
+					} 
+				} else if(app.getExtClientId()!=null) {
+					loadedApp = getAppForCredential(app.getExtClientId(), APIManagerAdapter.CREDENTIAL_TYPE_EXT_CLIENTID);
+					if(loadedApp==null) {
+						it.remove();
+						continue;
+					} 
+				}
+				if(!hasClientAppPermission(apiConfig, loadedApp)) {
+					LOG.error("Organization of configured application: '" + app.getName() + "' has NO permission to this API. Ignoring this application.");
+					it.remove();
+					continue;
+				}
+				it.set(loadedApp); // Replace the incoming app, with the App loaded from API-Manager
+			}
+		}
+	}
+	
+	private boolean hasClientAppPermission(IAPIDefinition apiConfig, ClientApplication app) throws AppException {
+		String appsOrgId = app.getOrganizationId();
+		String appsOrgName = APIManagerAdapter.getOrgName(appsOrgId);
+		if(appsOrgName==null) return false;
+		return apiConfig.getClientOrganizations().contains(appsOrgName);
+	}
+	
+	private static ClientApplication getAppForCredential(String credential, String type) throws AppException {
+		LOG.debug("Searching application with configured credential (Type: "+type+"): '"+credential+"'");
+		ClientApplication app = APIManagerAdapter.getAppIdForCredential(credential, type);
+		if(app==null) {
+			LOG.warn("Unknown application with ("+type+"): '" + credential + "' configured. Ignoring this application.");
+			return null;
+		}
+		return app;
 	}
 	
 	private void completeCaCerts(IAPIDefinition apiConfig) throws AppException {
@@ -358,6 +438,7 @@ public class APIImportConfig {
 			try {
 				String baseDir = new File(this.pathToSwagger).getParent();
 				File file = new File(baseDir + "/" + importApi.getImage().getFilename());
+				importApi.getImage().setBaseFilename(file.getName());
 				if(file.exists()) { 
 					importApi.getImage().setImageContent(IOUtils.toByteArray(new FileInputStream(file)));
 				} else {

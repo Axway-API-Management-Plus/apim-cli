@@ -49,10 +49,11 @@ public class SecurityDevice {
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, String> tokenStores = new HashMap<String, String>();
 		CommandParameters cmd = CommandParameters.getInstance();
+		InputStream response = null;
 		try {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/tokenstores").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
-			InputStream response = getRequest.execute().getEntity().getContent();
+			response = getRequest.execute().getEntity().getContent();
 			
 			JsonNode jsonResponse;
 			try {
@@ -65,6 +66,10 @@ public class SecurityDevice {
 			}
 		} catch (Exception e) {
 			throw new AppException("Can't find Tokenstore: ....", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		} finally {
+			try {
+				response.close();
+			} catch (Exception ignore) { }
 		}
 		return tokenStores;
 	}

@@ -1,7 +1,6 @@
 package com.axway.apim.swagger.api.properties.outboundprofiles;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -66,11 +66,12 @@ public class OutboundProfile {
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, String> policies = new HashMap<String, String>();
 		CommandParameters cmd = CommandParameters.getInstance();
+		HttpResponse httpResponse = null;
 		try {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/policies")
 					.setParameter("type", type).build();
 			RestAPICall getRequest = new GETRequest(uri, null);
-			HttpResponse httpResponse = getRequest.execute();
+			httpResponse = getRequest.execute();
 			
 			JsonNode jsonResponse;
 			String response = EntityUtils.toString(httpResponse.getEntity());
@@ -85,6 +86,10 @@ public class OutboundProfile {
 			}
 		} catch (Exception e) {
 			throw new AppException("Can't initialize policies for type: " + type, ErrorCode.API_MANAGER_COMMUNICATION, e);
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
 		}
 		return policies;
 	}

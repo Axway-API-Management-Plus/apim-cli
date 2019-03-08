@@ -1,4 +1,4 @@
-package com.axway.apim.test.organizations;
+package com.axway.apim.test.applications;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,48 +10,49 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="IgnoreClientOrgsTestIT")
-public class IgnoreClientOrgsTestIT extends TestNGCitrusTestDesigner {
+@Test(testName="IgnoreClientAppsTestIT")
+public class IgnoreClientAppsTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "IgnoreClientOrgsTestIT")
+	@CitrusTest(name = "IgnoreClientAppsTestIT")
 	public void setupDevOrgTest() {
-		description("This test makes sure, no organizations have been granted permission.");
+		description("This test makes sure, no client-applications have got a subscription.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/grant_invalid_org-api-${apiNumber}");
-		variable("apiName", "Grant to invalid orgs API-${apiNumber}");
+		variable("apiPath", "/ignore-client-apps-test-${apiNumber}");
+		variable("apiName", "Ignore Client-Apps-API-${apiNumber}");
 		
-		variable("testOrgName", "Org without permission ${apiNumber}");
-
+		// ############## Creating Test-Application #################
+		createVariable("testAppName", "Ignored Test App-Name ${orgNumber}");
 		http().client("apiManager")
 			.send()
-			.post("/organizations")
-			.name("anotherOrgCreatedRequest")
+			.post("/applications")
+			.name("orgCreatedRequest")
 			.header("Content-Type", "application/json")
-			.payload("{\"name\": \"${testOrgName}\", \"description\": \"Org without permission\", \"enabled\": true, \"development\": true }");
-		
+			.payload("{\"name\":\"${testAppName}\",\"apis\":[],\"organizationId\":\"${orgId}\"}");
+
 		http().client("apiManager")
 			.receive()
 			.response(HttpStatus.CREATED)
 			.messageType(MessageType.JSON)
-			.validate("$.name", "${testOrgName}")
-			.extractFromPayload("$.id", "noPermOrgId");
+			.extractFromPayload("$.id", "testAppId")
+			.extractFromPayload("$.name", "testAppName");
 		
-		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
+		echo("####### Created Test-Application to be ignored: '${testAppName}' with id: '${testAppId}' #######");
+		
+		echo("####### Importing API: '${apiName}' on path: '${apiPath}' #######");
 		
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
+		createVariable("configFile", "/com/axway/apim/test/files/applications/1_api-with-1-org-1-app.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
-		createVariable("orgName2", "${testOrgName}");
-		createVariable("ignoreClientOrgs", "true");
+		createVariable("ignoreClientApps", "true");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
-		echo("####### Validate API: '${apiName}' has been imported without an error (defined orgs are ignored) #######");
+		echo("####### Validate API: '${apiName}' has been imported without an error (defined apps are ignored) #######");
 		http().client("apiManager")
 			.send()
 			.get("/proxies")
@@ -66,13 +67,13 @@ public class IgnoreClientOrgsTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
-		echo("####### Validate second org has no permission #######");
+		echo("####### Validate the application no Access to this API #######");
 		http().client("apiManager")
 			.send()
-			.get("/organizations/${noPermOrgId}/apis")
-			.name("org2")
+			.get("/applications/${testAppId}/apis")
+			.name("api")
 			.header("Content-Type", "application/json");
-
+	
 		http().client("apiManager")
 			.receive()
 			.response(HttpStatus.OK)

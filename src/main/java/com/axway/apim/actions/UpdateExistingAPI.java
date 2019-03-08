@@ -6,6 +6,7 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.actions.tasks.ManageClientApps;
 import com.axway.apim.actions.tasks.ManageClientOrgs;
 import com.axway.apim.actions.tasks.UpdateAPIImage;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
@@ -50,6 +51,8 @@ public class UpdateExistingAPI {
 		
 		new UpdateQuotaConfiguration(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+		// Handle subscription to applications
+		new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 	}
 
 }

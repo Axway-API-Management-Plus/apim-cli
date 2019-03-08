@@ -12,7 +12,6 @@ import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
-import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIImportDefinition;
@@ -35,13 +34,11 @@ public class UpdateAPIImage extends AbstractAPIMTask implements IResponseParser 
 		URI uri;
 		HttpEntity entity;
 		
-		Transaction context = Transaction.getInstance();
-		
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getId()+"/image").build();
 			
 			entity = MultipartEntityBuilder.create()
-					.addBinaryBody("file", ((APIImportDefinition)this.desiredState).getImage().getInputStream(), ContentType.create("image/jpeg"), desiredState.getImage().getFilename())
+						.addBinaryBody("file", ((APIImportDefinition)this.desiredState).getImage().getInputStream(), ContentType.create("image/jpeg"), desiredState.getImage().getBaseFilename())
 					.build();
 			
 			RestAPICall apiCall = new POSTRequest(entity, uri, this);
@@ -58,8 +55,8 @@ public class UpdateAPIImage extends AbstractAPIMTask implements IResponseParser 
 		JsonNode jsonNode = null;
 		try {
 			response = EntityUtils.toString(httpResponse.getEntity());
+			LOG.error("Can't create image: " + response);
 			jsonNode = objectMapper.readTree(response);
-			String status = jsonNode.findPath("status").asText();
 		} catch (IOException e) {
 			throw new AppException("Cannot parse JSON-Payload for create API-Proxy.", ErrorCode.CANT_CREATE_API_PROXY, e);
 		}

@@ -20,6 +20,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.APIImportDefinition;
+import com.axway.apim.swagger.api.AbstractAPIDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.organization.ApiAccess;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,6 +48,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		} else {
 			List<String> missingDesiredOrgs = getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations());
 			List<String> removingActualOrgs = getMissingOrgs(actualState.getClientOrganizations(), desiredState.getClientOrganizations());
+			if(removingActualOrgs.remove( ((AbstractAPIDefinition)desiredState).getOrganization())); // Don't try to remove the Owning-Organization
 			if(missingDesiredOrgs.size()==0) {
 				LOG.info("All desired organizations: "+desiredState.getClientOrganizations()+" have already access. Nothing to do.");
 			} else {
