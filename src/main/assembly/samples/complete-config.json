@@ -9,6 +9,7 @@
    "descriptionManual":"This is my __markdown__ based API description.",
    "vhost":"api.custom-host.com",
    "backendBasepath":"https://any.server.com:7676",
+   "image": "images/sample-api-icon.jpg", 
    "securityProfiles":[
       {
          "name":"_default",
@@ -35,18 +36,18 @@
          "faultHandlerPolicy":"Faulthandler policy 1"
       }
    },
-	"authenticationProfiles": [
-		{
-			"name": "_default",
-			"isDefault": "true",
-			"parameters": {
-				"apiKey": "4249823490238490",
-				"apiKeyField": "KeyId", 
-				"httpLocation": "QUERYSTRING_PARAMETER"
-			},
-			"type": "apiKey"
-		}
-	],
+   "authenticationProfiles":[
+      {
+         "name":"_default",
+         "isDefault":"true",
+         "parameters":{
+            "apiKey":"4249823490238490",
+            "apiKeyField":"KeyId",
+            "httpLocation":"QUERYSTRING_PARAMETER"
+         },
+         "type":"apiKey"
+      }
+   ],
    "tags":{
       "tag-name 2":[
          "value 3",
@@ -62,6 +63,23 @@
       "customProperty2":"1",
       "customProperty3":"true"
    },
+   "corsProfiles":[
+      {
+         "name":"New CORS Profile",
+         "isDefault":false,
+         "origins":[
+            "*"
+         ],
+         "allowedHeaders":[
+            "Authorization"
+         ],
+         "exposedHeaders":[
+            "via"
+         ],
+         "supportCredentials":false,
+         "maxAgeSeconds":0
+      }
+   ],
    "caCerts":[
       {
          "certFile":"certificates/swaggerio.crt",
@@ -83,5 +101,31 @@
          "useForOutbound":false,
          "useForInbound":true
       }
-   ]
+   ], 
+   "applicationQuota":{
+      "restrictions":[
+         {
+            "method":"*",
+            "type":"throttlemb",
+            "config":{
+               "period":"${applicationPeriod}",
+               "mb":555,
+               "per":1
+            }
+         }
+      ]
+   },
+   "systemQuota":{
+      "restrictions":[
+         {
+            "method":"*",
+            "type":"throttle",
+            "config":{
+               "period":"${systemPeriod}",
+               "messages":666,
+               "per":2
+            }
+         }
+      ]
+   }
 }
