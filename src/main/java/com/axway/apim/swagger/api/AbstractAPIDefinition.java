@@ -90,7 +90,7 @@ public abstract class AbstractAPIDefinition {
 	protected String descriptionUrl = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {}, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
 			propHandler = SecurityProfileHandler.class)
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<SecurityProfile> securityProfiles = null;
@@ -150,7 +150,7 @@ public abstract class AbstractAPIDefinition {
 	protected String version;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
 			propHandler = VhostPropertyHandler.class)
 	protected String vhost = null;
 	

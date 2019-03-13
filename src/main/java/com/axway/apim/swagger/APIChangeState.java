@@ -176,7 +176,7 @@ public class APIChangeState {
 	}
 
 	/**
-	 * @return true, if a Breaking-Change on an "Unpublished" API otherwise false.
+	 * @return true, if a Breaking-Change propery is found on an "Unpublished" API otherwise false.
 	 * @throws AppException 
 	 */
 	public boolean isBreaking() throws AppException {

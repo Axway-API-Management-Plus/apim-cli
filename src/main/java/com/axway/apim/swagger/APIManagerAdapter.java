@@ -123,6 +123,7 @@ public class APIManagerAdapter {
 						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for PUBLISHED API. Recreating it!");
 				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
 				recreate.execute(changeState);
+				return;
 			}
 		}
 	}
