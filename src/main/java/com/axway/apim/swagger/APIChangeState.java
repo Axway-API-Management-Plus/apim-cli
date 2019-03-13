@@ -176,9 +176,12 @@ public class APIChangeState {
 	}
 
 	/**
-	 * @return true, if a Breaking-Change was found otherwise false
+	 * @return true, if a Breaking-Change on an "Unpublished" API otherwise false.
+	 * @throws AppException 
 	 */
-	public boolean isBreaking() {
+	public boolean isBreaking() throws AppException {
+		// We will only break API, if the API is no longer in state: "unpublished"
+		if(this.actualAPI.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) return false;
 		return isBreaking;
 	}
 

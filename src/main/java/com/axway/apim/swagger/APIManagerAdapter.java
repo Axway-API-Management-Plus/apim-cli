@@ -98,53 +98,31 @@ public class APIManagerAdapter {
 			LOG.info("Strategy: No existing API found, creating new!");
 			CreateNewAPI createAPI = new CreateNewAPI();
 			createAPI.execute(changeState);
-		// We do have a breaking change!
+		// Otherwise an existing API exists
 		} else {
 			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getName() +" (Version: "+ changeState.getActualAPI().getVersion() + ")");
 			if(!changeState.hasAnyChanges()) {
-				LOG.warn("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
+				LOG.debug("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
 				throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE, false);
-			}			
-			if (changeState.isBreaking()) {
-				LOG.info("Recognized the following changes. Breaking: " + changeState.getBreakingChanges() + 
-						" plus Non-Breaking: " + changeState.getNonBreakingChanges());
-				if(changeState.getActualAPI().getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
-					LOG.info("Strategy: Applying ALL changes on existing UNPUBLISHED API.");
-					UpdateExistingAPI updateAPI = new UpdateExistingAPI();
-					updateAPI.execute(changeState);
-					return;
-				} else { // Breaking-Changes for PUBLISHED APIs and Non-Breaking
-					if(enforceBreakingChange) {
-						if(changeState.isUpdateExistingAPI()) {
-							LOG.info("Strategy: Breaking changes - Updating existing API: " + changeState.getBreakingChanges() + 
-									" plus Non-Breaking: " + changeState.getNonBreakingChanges());
-							UpdateExistingAPI updateAPI = new UpdateExistingAPI();
-							updateAPI.execute(changeState);
-							return;
-						} else {
-							LOG.info("Strategy: Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
-									+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for PUBLISHED API. Recreating it!");
-							RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
-							recreate.execute(changeState);
-						}
-					} else {
-						throw new AppException("A breaking change can't be applied without enforcing it! Try option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
-					}
+			}
+			LOG.info("Recognized the following changes. Potentially Breaking: " + changeState.getBreakingChanges() + 
+					" plus Non-Breaking: " + changeState.getNonBreakingChanges());
+			if (changeState.isBreaking()) { // Make sure, breaking changes aren't applied without enforcing it.
+				if(!enforceBreakingChange) {
+					throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
 				}
-			// A NON-Breaking change
-			} else if(!changeState.isBreaking()) {
-				if(changeState.isUpdateExistingAPI()) {
-					// Contains only changes, that can be applied to the existing API (even depends on the status)
-					LOG.info("Strategy: No breaking change - Updating existing API: " + changeState.getNonBreakingChanges());
-					UpdateExistingAPI updateAPI = new UpdateExistingAPI();
-					updateAPI.execute(changeState);
-					return;
-				} else {
-					// We have changes requiring a new API to be imported
-					LOG.info("Strategy: No breaking change - Create and Update API, delete existing: " +  changeState.getNonBreakingChanges());
-					RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
-					recreate.execute(changeState);
-				}
+			}
+			
+			if(changeState.isUpdateExistingAPI()) { // All changes can be applied to the existing API in current state
+				LOG.info("Strategy: Update existing API, as all changes can be applied in current state.");
+				UpdateExistingAPI updateAPI = new UpdateExistingAPI();
+				updateAPI.execute(changeState);
+				return;
+			} else { // We changes, that require a re-creation of the API
+				LOG.info("Strategy: Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
+						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for PUBLISHED API. Recreating it!");
+				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
+				recreate.execute(changeState);
 			}
 		}
 	}
