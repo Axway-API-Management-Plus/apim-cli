@@ -51,7 +51,10 @@ public class App {
 			Options options = new Options();
 			Option option;
 			
-			option = new Option("a", "swagger", true, "The Swagger-API Definition (JSON-Formated) in local-filesystem");
+			option = new Option("a", "swagger", true, "The Swagger-API Definition (JSON-Formated):\n"
+					+ "- in local filesystem using a relativ or absolute path. Example: swagger_file.json\n"
+					+ "- a URL providing the Swagger-File. Example: [username/password@]https://any.host.com/my/path/to/swagger.json"
+					+ "- a file called anyname-i-want.url which contains a line with the URL (same format as above).");
 				option.setRequired(true);
 				option.setArgName("swagger_file.json");
 			options.addOption(option);

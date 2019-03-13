@@ -108,7 +108,7 @@
             "method":"*",
             "type":"throttlemb",
             "config":{
-               "period":"${applicationPeriod}",
+               "period":"hour",
                "mb":555,
                "per":1
             }
@@ -121,7 +121,7 @@
             "method":"*",
             "type":"throttle",
             "config":{
-               "period":"${systemPeriod}",
+               "period":"hour",
                "messages":666,
                "per":2
             }
