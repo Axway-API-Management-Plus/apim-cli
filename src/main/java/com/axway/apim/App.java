@@ -117,7 +117,9 @@ public class App {
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme -s prod");
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/complete-config.json -h localhost -u apiadmin -p changeme");
-				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/org-and-apps-config.json -h localhost -u apiadmin -p changeme");				
+				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/org-and-apps-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.url -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a https://petstore.swagger.io/v2/swagger.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");				
 				System.out.println();
 				System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 				
