@@ -27,7 +27,7 @@ public class InvokeAuthPolicyTestIT extends TestNGCitrusTestDesigner {
 		
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
-		createVariable("authPolicy", "Authentication policy 1");
+		createVariable("authPolicy", "Inbound security policy 1");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/security/6_api-invoke-policy.json");
 		createVariable("expectedReturnCode", "0");
@@ -51,7 +51,7 @@ public class InvokeAuthPolicyTestIT extends TestNGCitrusTestDesigner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Simulate re-import with no-change #######");
-		createVariable("tokenInfoPolicy", "Authentication policy 1");
+		createVariable("tokenInfoPolicy", "Inbound security policy 1");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/security/6_api-invoke-policy.json");
 		createVariable("expectedReturnCode", "10");
