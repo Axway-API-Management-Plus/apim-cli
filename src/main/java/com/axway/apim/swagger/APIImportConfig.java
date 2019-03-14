@@ -1,16 +1,32 @@
 package com.axway.apim.swagger;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +63,7 @@ public class APIImportConfig {
 	
 	private String pathToSwagger;
 	
-	private String apiContract;
+	private String apiConfig;
 	
 	private String stage;
 
@@ -60,7 +76,7 @@ public class APIImportConfig {
 	 */
 	public APIImportConfig(String apiContract, String stage, String pathToSwagger) throws AppException {
 		super();
-		this.apiContract = apiContract;
+		this.apiConfig = apiContract;
 		this.stage = stage;
 		this.pathToSwagger = pathToSwagger;
 	}
@@ -82,16 +98,16 @@ public class APIImportConfig {
 	public IAPIDefinition getImportAPIDefinition() throws AppException {
 		IAPIDefinition stagedConfig;
 		try {
-			IAPIDefinition baseConfig = mapper.readValue(new File(apiContract), APIImportDefinition.class);
+			IAPIDefinition baseConfig = mapper.readValue(new File(apiConfig), APIImportDefinition.class);
 			ObjectReader updater = mapper.readerForUpdating(baseConfig);
-			if(getStageContract(stage, apiContract)!=null) {
-				LOG.info("Overriding configuration from: " + getStageContract(stage, apiContract));
-				stagedConfig = updater.readValue(new File(getStageContract(stage, apiContract)));
+			if(getStageContract(stage, apiConfig)!=null) {
+				LOG.info("Overriding configuration from: " + getStageContract(stage, apiConfig));
+				stagedConfig = updater.readValue(new File(getStageContract(stage, apiConfig)));
 			} else {
 				stagedConfig = baseConfig;
 			}
 			addDefaultPassthroughSecurityProfile(stagedConfig);
-			stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerDefFromFile()));
+			stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerContent()));
 			addImageContent(stagedConfig);
 			validateCustomProperties(stagedConfig);
 			validateDescription(stagedConfig);
@@ -300,7 +316,7 @@ public class APIImportConfig {
 		}
 		String baseDir;
 		try {
-			baseDir = new File(this.pathToSwagger).getCanonicalFile().getParent();
+			baseDir = new File(this.apiConfig).getCanonicalFile().getParent();
 		} catch (IOException e1) {
 			throw new AppException("Can't read certificate file.", ErrorCode.CANT_READ_CONFIG_FILE, e1, true);
 		}
@@ -318,7 +334,7 @@ public class APIImportConfig {
 		}
 		if(is==null) {
 			LOG.error("Can't read certificate: "+cert.getCertFile()+" from file or classpath.");
-			LOG.error("Certificates in filesystem are either expected relative to the Swagger-File or as an absolute path.");
+			LOG.error("Certificates in filesystem are either expected relative to the API-Config-File or as an absolute path.");
 			LOG.error("In the same directory. 		Example: \"myCertFile.crt\"");
 			LOG.error("Relative to it.         		Example: \"../../allMyCertsAreHere/myCertFile.crt\"");
 			LOG.error("With an absolute path   		Example: \"/another/location/with/allMyCerts/myCertFile.crt\"");
@@ -356,7 +372,7 @@ public class APIImportConfig {
 		}
 	}
 	
-	private byte[] getSwaggerDefFromFile() throws AppException {
+	private byte[] getSwaggerContent() throws AppException {
 		try {
 			return IOUtils.toByteArray(getSwaggerAsStream());
 		} catch (IOException e) {
@@ -370,22 +386,104 @@ public class APIImportConfig {
 	 * @return The import Swagger-File as an InputStream
 	 */
 	public InputStream getSwaggerAsStream() throws AppException {
-		File inputFile = new File(pathToSwagger);
 		InputStream is = null;
-		try {
-			if(inputFile.exists()) { 
-				is = new FileInputStream(pathToSwagger);
-			} else {
-				is = this.getClass().getResourceAsStream(pathToSwagger);
-			}
-			if(is == null) {
-				throw new AppException("Unable to read swagger file from: " + pathToSwagger, ErrorCode.CANT_READ_SWAGGER_FILE);
+		if(pathToSwagger.endsWith(".url")) {
+			return getSwaggerFromURL(getSwaggerUriFromFile(pathToSwagger));
+		} else if(isHttpUri(pathToSwagger)) {
+			return getSwaggerFromURL(pathToSwagger);
+		} else {
+			File inputFile = new File(pathToSwagger);
+			try {
+				if(inputFile.exists()) { 
+					is = new FileInputStream(pathToSwagger);
+				} else {
+					is = this.getClass().getResourceAsStream(pathToSwagger);
+				}
+				if(is == null) {
+					throw new AppException("Unable to read swagger file from: " + pathToSwagger, ErrorCode.CANT_READ_SWAGGER_FILE);
+				}
+				
+			} catch (Exception e) {
+				throw new AppException("Unable to read swagger file from: " + pathToSwagger, ErrorCode.CANT_READ_SWAGGER_FILE, e);
 			}
 			
-		} catch (Exception e) {
-			throw new AppException("Unable to read swagger file from: " + pathToSwagger, ErrorCode.CANT_READ_SWAGGER_FILE, e);
 		}
 		return is;
+	}
+	
+	private InputStream getSwaggerFromURL(String urlToSwagger) throws AppException {
+		String uri = null;
+		String username = null;
+		String password = null;
+		String[] temp = urlToSwagger.split("@");
+		if(temp.length==1) {
+			uri = temp[0];
+		} else if(temp.length==2) {
+			username = temp[0].substring(0, temp[0].indexOf("/"));
+			password = temp[0].substring(temp[0].indexOf("/")+1);
+			uri = temp[1];
+		} else {
+			throw new AppException("Swagger-URL has an invalid format. ", ErrorCode.CANT_READ_SWAGGER_FILE);
+		}
+		CloseableHttpClient httpclient = null;
+		try {
+			LOG.info("Loading Swagger-File from: " + uri);
+			if(username!=null) {
+				CredentialsProvider credsProvider = new BasicCredentialsProvider();
+				credsProvider.setCredentials(
+		                new AuthScope(AuthScope.ANY),
+		                new UsernamePasswordCredentials(username, password));
+				httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+			} else {
+				httpclient = HttpClients.createDefault();
+			}
+			HttpGet httpGet = new HttpGet(uri);
+			
+            ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
+
+                @Override
+                public String handleResponse(
+                        final HttpResponse response) throws ClientProtocolException, IOException {
+                    int status = response.getStatusLine().getStatusCode();
+                    if (status >= 200 && status < 300) {
+                        HttpEntity entity = response.getEntity();
+                        return entity != null ? EntityUtils.toString(entity) : null;
+                    } else {
+                        throw new ClientProtocolException("Unexpected response status: " + status);
+                    }
+                }
+
+            };
+            String responseBody = httpclient.execute(httpGet, responseHandler);
+            return new ByteArrayInputStream(responseBody.getBytes(StandardCharsets.UTF_8));
+		} catch (Exception e) {
+			throw new AppException("Cannot load Swagger-File from URI: "+uri, ErrorCode.CANT_READ_SWAGGER_FILE, e);
+		} finally {
+			try {
+				httpclient.close();
+			} catch (Exception ignore) {}
+		}
+	}
+	
+	public static boolean isHttpUri(String pathToSwagger) {
+		String httpUri = pathToSwagger.substring(pathToSwagger.indexOf("@")+1);
+		return( httpUri.startsWith("http://") || httpUri.startsWith("https://"));
+	}
+	
+	private static String getSwaggerUriFromFile(String pathToSwagger) throws AppException {
+		String uriToSwagger = null;
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new FileReader(pathToSwagger));
+			uriToSwagger = br.readLine();
+			return uriToSwagger;
+		} catch (Exception e) {
+			throw new AppException("Can't load file:" + pathToSwagger, ErrorCode.CANT_READ_SWAGGER_FILE, e);
+		} finally {
+			try {
+				br.close();
+			} catch (Exception ignore) {}
+		}
 	}
 	
 	private String getStageContract(String stage, String apiContract) {

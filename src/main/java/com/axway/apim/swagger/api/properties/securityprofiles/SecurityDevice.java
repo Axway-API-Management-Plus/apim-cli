@@ -26,6 +26,7 @@ public class SecurityDevice {
 	
 	private static Map<String, String> oauthTokenStores;
 	private static Map<String, String> oauthInfoPolicies;
+	private static Map<String, String> authenticationPolicies;
 	
 	String name;
 	
@@ -38,20 +39,27 @@ public class SecurityDevice {
 	public SecurityDevice() throws AppException {
 		super();
 		if(SecurityDevice.oauthTokenStores == null) { 
-			SecurityDevice.oauthTokenStores = initTokenStores();
-			SecurityDevice.oauthInfoPolicies = initOAuthInfoPolicies();
+			SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
+			SecurityDevice.oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
+			SecurityDevice.authenticationPolicies = initCustomPolicies("authentication");
 		}
 		
 		this.properties = new LinkedHashMap<String, String>();
 	}
 	
-	private static Map<String, String> initTokenStores() throws AppException { 
+	private static Map<String, String> initCustomPolicies(String type) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
-		Map<String, String> tokenStores = new HashMap<String, String>();
+		HashMap<String, String> policyMap = new HashMap<String, String>();
 		CommandParameters cmd = CommandParameters.getInstance();
 		InputStream response = null;
+		URI uri;
 		try {
-			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/tokenstores").build();
+			if(type.equals("tokenstores")) {
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/tokenstores").build();
+			} else {
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/policies")
+						.setParameter("type", type).build();
+			}
 			RestAPICall getRequest = new GETRequest(uri, null);
 			response = getRequest.execute().getEntity().getContent();
 			
@@ -59,44 +67,19 @@ public class SecurityDevice {
 			try {
 				jsonResponse = mapper.readTree(response);
 				for(JsonNode node : jsonResponse) {
-					tokenStores.put(node.get("name").asText(), node.get("id").asText());
+					policyMap.put(node.get("name").asText(), node.get("id").asText());
 				}
 			} catch (IOException e) {
-				throw new AppException("Can't find Tokenstore: ....", ErrorCode.API_MANAGER_COMMUNICATION, e);
+				throw new AppException("Can't find "+type+": ....", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			}
 		} catch (Exception e) {
-			throw new AppException("Can't find Tokenstore: ....", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Can't find "+type+": ....", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
 				response.close();
 			} catch (Exception ignore) { }
 		}
-		return tokenStores;
-	}
-	
-	private static Map<String, String> initOAuthInfoPolicies() throws AppException { 
-		ObjectMapper mapper = new ObjectMapper();
-		Map<String, String> tokenStores = new HashMap<String, String>();
-		CommandParameters cmd = CommandParameters.getInstance();
-		try {
-			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/policies")
-					.setParameter("type", "oauthtokeninfo").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
-			InputStream response = getRequest.execute().getEntity().getContent();
-			
-			JsonNode jsonResponse;
-			try {
-				jsonResponse = mapper.readTree(response);
-				for(JsonNode node : jsonResponse) {
-					tokenStores.put(node.get("name").asText(), node.get("id").asText());
-				}
-			} catch (IOException e) {
-				throw new AppException("Can't initialize Tokeninformation-Policies", ErrorCode.API_MANAGER_COMMUNICATION, e);
-			}
-		} catch (Exception e) {
-			throw new AppException("Can't initialize Tokeninformation-Policies", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		}
-		return tokenStores;
+		return policyMap;
 	}
 
 	public String getName() {
@@ -123,12 +106,18 @@ public class SecurityDevice {
 		this.order = order;
 	}
 
+	@Override
+	public String toString() {
+		return "SecurityDevice [type=" + type + "]";
+	}
+
 	public Map<String, String> getProperties() throws AppException {
 		if(this.type.equals("oauth")) {
 			String tokenStore = (String)properties.get("tokenStore");
 			if(tokenStore.startsWith("<key")) return properties;
 			String esTokenStore = oauthTokenStores.get(tokenStore);
 			if(esTokenStore == null) {
+				LOG.error("The tokenstore: '" + tokenStore + "' is not configured in this API-Manager");
 				LOG.error("Available token stores: " + oauthTokenStores.keySet());
 				throw new AppException("The tokenstore: '" + tokenStore + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
 			} else {
@@ -139,6 +128,7 @@ public class SecurityDevice {
 			if(infoPolicy.startsWith("<key")) return properties;
 			String esInfoPolicy = oauthInfoPolicies.get(infoPolicy);
 			if(esInfoPolicy == null) {
+				LOG.error("The Information-Policy: '" + infoPolicy + "' is not configured in this API-Manager");
 				LOG.error("Available information policies: " + oauthInfoPolicies.keySet());
 				throw new AppException("The Information-Policy: '" + infoPolicy + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
 			} else {
@@ -146,6 +136,17 @@ public class SecurityDevice {
 				properties.put("oauth.token.client_id", "${oauth.token.client_id}");
 				properties.put("oauth.token.scopes", "${oauth.token.scopes}");
 				properties.put("oauth.token.valid", "${oauth.token.valid}");
+			}
+		} else if (this.type.equals("authPolicy")) {
+			String authPolicy = (String)properties.get("authenticationPolicy");
+			if(authPolicy.startsWith("<key")) return properties;
+			String esAuthPolicy = authenticationPolicies.get(authPolicy);
+			if(esAuthPolicy == null) {
+				LOG.error("The Authentication-Policy: '" + authPolicy + "' is not configured in this API-Manager");
+				LOG.error("Available authentication policies: " + authenticationPolicies.keySet());
+				throw new AppException("The Authentication-Policy: '" + authPolicy + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
+			} else {
+				properties.put("authenticationPolicy", esAuthPolicy);
 			}
 		}
 		

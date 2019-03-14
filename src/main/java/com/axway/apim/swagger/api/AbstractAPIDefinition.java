@@ -62,6 +62,9 @@ public abstract class AbstractAPIDefinition {
 	
 	protected CommandParameters cmd = CommandParameters.getInstance();
 	protected ObjectMapper objectMapper = new ObjectMapper();
+	
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
+	protected APISwaggerDefinion swaggerDefinition = null;
 
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
@@ -87,7 +90,7 @@ public abstract class AbstractAPIDefinition {
 	protected String descriptionUrl = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {}, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
 			propHandler = SecurityProfileHandler.class)
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<SecurityProfile> securityProfiles = null;
@@ -102,9 +105,6 @@ public abstract class AbstractAPIDefinition {
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
 			propHandler = APITagsPropertyHandler.class)
 	protected TagMap<String, String[]> tags = null;
-	
-	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
-	protected APISwaggerDefinion swaggerDefinition = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
@@ -150,7 +150,7 @@ public abstract class AbstractAPIDefinition {
 	protected String version;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED}, 
 			propHandler = VhostPropertyHandler.class)
 	protected String vhost = null;
 	

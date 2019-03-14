@@ -71,4 +71,9 @@ public class APIImage {
 	public void setBaseFilename(String baseFilename) {
 		this.baseFilename = baseFilename;
 	}
+
+	@Override
+	public String toString() {
+		return "APIImage [filename=" + filename + "]";
+	}
 }

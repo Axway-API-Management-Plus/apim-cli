@@ -55,7 +55,6 @@ public class UpdateAPIImage extends AbstractAPIMTask implements IResponseParser 
 		JsonNode jsonNode = null;
 		try {
 			response = EntityUtils.toString(httpResponse.getEntity());
-			LOG.error("Can't create image: " + response);
 			jsonNode = objectMapper.readTree(response);
 		} catch (IOException e) {
 			throw new AppException("Cannot parse JSON-Payload for create API-Proxy.", ErrorCode.CANT_CREATE_API_PROXY, e);

@@ -54,10 +54,14 @@ Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimana
   - Added support for Qouta-Management plus minor fixes
 - 1.2.0 - 20.12.2018
   - Added support for API-Outbound AuthN and support to configure the API-Backend-Basepath
+- 1.3.0 - 08.03.2019
+  - Added support for Organization- & Application-Management
+- 1.4.0 - 14.03.2019
+  - Added support to refer a Swagger-File from a URL instead of the local File-System only
 
 
 ## Limitations/Caveats
-- API-Method description is not yet supported
+- API-Method-Level description is not yet supported
 - Method-Level settings such as individual Security, Custom-Policies, etc. not yet supported
 - Deep merge of stage-config files isn't supported
 
