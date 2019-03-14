@@ -51,12 +51,15 @@ public class App {
 			Options options = new Options();
 			Option option;
 			
-			option = new Option("a", "swagger", true, "The Swagger-API Definition (JSON-Formated) in local-filesystem");
+			option = new Option("a", "swagger", true, "The Swagger-API Definition (JSON-Formated):\n"
+					+ "- in local filesystem using a relativ or absolute path. Example: swagger_file.json\n"
+					+ "- a URL providing the Swagger-File. Example: [username/password@]https://any.host.com/my/path/to/swagger.json\n"
+					+ "- a file called anyname-i-want.url which contains a line with the URL (same format as above).");
 				option.setRequired(true);
 				option.setArgName("swagger_file.json");
 			options.addOption(option);
 			
-			option = new Option("c", "contract", true, "This is the JSON-Formatted API-Contract containing information how to expose the API");
+			option = new Option("c", "contract", true, "This is the JSON-Formatted API-Config containing information how to expose the API");
 				option.setRequired(true);
 				option.setArgName("api_contract.json");
 			options.addOption(option);
@@ -114,7 +117,9 @@ public class App {
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme -s prod");
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/complete-config.json -h localhost -u apiadmin -p changeme");
-				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/org-and-apps-config.json -h localhost -u apiadmin -p changeme");				
+				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/org-and-apps-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.url -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a https://petstore.swagger.io/v2/swagger.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");				
 				System.out.println();
 				System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 				

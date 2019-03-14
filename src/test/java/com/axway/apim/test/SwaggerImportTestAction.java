@@ -17,7 +17,6 @@ import com.consol.citrus.actions.AbstractTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.CitrusRuntimeException;
 import com.consol.citrus.exceptions.ValidationException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SwaggerImportTestAction extends AbstractTestAction {
 	
@@ -32,10 +31,15 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 		String origSwaggerFile 			= context.getVariable("swaggerFile");
 		String origConfigFile 			= context.getVariable("configFile");
 		String stage				= null;
+		String swaggerFile			= null;
 		try {
 			stage 				= context.getVariable("stage");
 		} catch (CitrusRuntimeException ignore) {};
-		String swaggerFile = replaceDynamicContentInFile(origSwaggerFile, context);
+		if(!origSwaggerFile.contains("http://") && !origSwaggerFile.contains("https://")) {
+			swaggerFile = replaceDynamicContentInFile(origSwaggerFile, context);
+		} else {
+			swaggerFile = origSwaggerFile;
+		}
 		String configFile = replaceDynamicContentInFile(origConfigFile, context);
 		LOG.info("Using Replaced Swagger-File: " + swaggerFile);
 		LOG.info("Using Replaced configFile-File: " + configFile);
