@@ -42,7 +42,7 @@ public class App {
 	public static int run(String args[]) {
 		try {
 			LOG.info("------------------------------------------------------------------------");
-			LOG.info("API-Manager Promote Version: 1.3");
+			LOG.info("API-Manager Promote Version: 1.4");
 			LOG.info("                                                                        ");
 			LOG.info("To report issues or get help, please visit: ");
 			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
