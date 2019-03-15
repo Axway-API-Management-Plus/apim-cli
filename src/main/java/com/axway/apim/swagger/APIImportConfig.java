@@ -534,7 +534,7 @@ public class APIImportConfig {
 	private IAPIDefinition addImageContent(IAPIDefinition importApi) throws AppException {
 		if(importApi.getImage()!=null) { // An image is declared
 			try {
-				String baseDir = new File(this.pathToSwagger).getParent();
+				String baseDir = new File(this.apiConfig).getParent();
 				File file = new File(baseDir + "/" + importApi.getImage().getFilename());
 				importApi.getImage().setBaseFilename(file.getName());
 				if(file.exists()) { 
@@ -544,7 +544,7 @@ public class APIImportConfig {
 					importApi.getImage().setImageContent(IOUtils.toByteArray(
 							this.getClass().getResourceAsStream(importApi.getImage().getFilename())));
 				}
-			} catch (IOException e) {
+			} catch (Exception e) {
 				throw new AppException("Can't read image-file: "+importApi.getImage().getFilename()+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
 			}
 		}
