@@ -3,6 +3,7 @@ package com.axway.apim.actions.tasks;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -19,6 +20,7 @@ import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,6 +41,16 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			LOG.info("Configured client applications are ignored, as flag ignoreClientApps has been set.");
 			return;
 		}
+		ListIterator<ClientApplication> it = desiredState.getApplications().listIterator();
+		ClientApplication app;
+		while(it.hasNext()) {
+			app = it.next();
+			if(!hasClientAppPermission(app)) {
+				LOG.error("Organization of configured application: '" + app.getName() + "' has NO permission to this API. Ignoring this application.");
+				it.remove();
+				continue;
+			}
+		}
 		List<ClientApplication> missingDesiredApps = getMissingApps(desiredState.getApplications(), actualState.getApplications());
 		List<ClientApplication> revomingActualApps = getMissingApps(actualState.getApplications(), desiredState.getApplications());
 		if(missingDesiredApps.size()==0) {
@@ -50,6 +62,13 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			LOG.info("Removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName());
 			removeAppSubscrioption(revomingActualApps, actualState.getId());
 		}
+	}
+	
+	private boolean hasClientAppPermission(ClientApplication app) throws AppException {
+		String appsOrgId = app.getOrganizationId();
+		String appsOrgName = APIManagerAdapter.getOrgName(appsOrgId);
+		if(appsOrgName==null) return false;
+		return actualState.getClientOrganizations().contains(appsOrgName);
 	}
 	
 	private void createAppSubscription(List<ClientApplication> missingDesiredApps, String apiId) throws AppException {
