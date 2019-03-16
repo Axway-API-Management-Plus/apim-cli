@@ -255,21 +255,9 @@ public class APIImportConfig {
 						continue;
 					} 
 				}
-				if(!hasClientAppPermission(apiConfig, loadedApp)) {
-					LOG.error("Organization of configured application: '" + app.getName() + "' has NO permission to this API. Ignoring this application.");
-					it.remove();
-					continue;
-				}
 				it.set(loadedApp); // Replace the incoming app, with the App loaded from API-Manager
 			}
 		}
-	}
-	
-	private boolean hasClientAppPermission(IAPIDefinition apiConfig, ClientApplication app) throws AppException {
-		String appsOrgId = app.getOrganizationId();
-		String appsOrgName = APIManagerAdapter.getOrgName(appsOrgId);
-		if(appsOrgName==null) return false;
-		return apiConfig.getClientOrganizations().contains(appsOrgName);
 	}
 	
 	private static ClientApplication getAppForCredential(String credential, String type) throws AppException {
