@@ -91,6 +91,8 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 			apiCall = new POSTRequest(entity, uri, this);
 			apiCall.setContentType("application/x-www-form-urlencoded");
 			apiCall.execute();
+			// Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
+			actualState.getClientOrganizations().addAll(grantAccessToOrgs);
 		} catch (Exception e) {
 			LOG.error("grantAccessToOrgs: '"+grantAccessToOrgs+"'");
 			LOG.error("allOrgs: '"+allOrgs+"'");
@@ -114,6 +116,8 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 						
 						apiCall = new DELRequest(uri, this);
 						apiCall.execute();
+						// Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
+						actualState.getClientOrganizations().removeAll(removingActualOrgs);
 					} catch (Exception e) {
 						LOG.error("Can't delete API-Access for organization. ");
 						throw new AppException("Can't delete API-Access for organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
@@ -128,14 +132,8 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		Transaction context = Transaction.getInstance();
 		if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_NO_CONTENT) {
 			if(context.get(MODE).equals(MODE_GRANT_ACCESS)) {
-				if(context.get("orgName") instanceof List) { 
-					actualState.getClientOrganizations().addAll((List<String>)context.get("orgName"));
-				}
 				LOG.info("Granted permission to organization: '"+context.get("orgName")+"'");
-			} else {
-				if(context.get("orgName") instanceof List) { 
-					actualState.getClientOrganizations().removeAll((List<String>)context.get("orgName"));
-				}				
+			} else {			
 				LOG.info("Removed permission from organization: '"+context.get("orgName")+"'");
 			}
 		} else {
