@@ -92,13 +92,13 @@ public class App {
 			option.setArgName("true/[false]");
 			options.addOption(option);
 			
-			option = new Option("io", "ignoreClientOrgs", true, "Use this flag to ignore configured Client-Organizations.");
-			option.setArgName("true/[false]");
+			option = new Option("clientOrgsMode", true, "Controls how configured Client-Organizations are treated. Defaults to replace!");
+			option.setArgName("ignore|replace|add");
 			options.addOption(option);
 			
-			option = new Option("ia", "ignoreClientApps", true, "Use this flag to ignore configured Client-Applications.");
-			option.setArgName("true/[false]");
-			options.addOption(option);
+			option = new Option("clientAppsMode", true, "Controls how configured Client-Applications are treated. Defaults to replace!");
+			option.setArgName("ignore|replace|add");
+			options.addOption(option);			
 			
 			CommandLineParser parser = new DefaultParser();
 			HelpFormatter formatter = new HelpFormatter();

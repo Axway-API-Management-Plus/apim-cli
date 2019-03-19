@@ -34,12 +34,14 @@ public class RecreateToUpdateAPI {
 		IAPIDefinition desired = changes.getDesiredAPI();
 		
 		// 1. Create BE- and FE-API (API-Proxy) / Including updating all belonging props!
+		// This also includes all CONFIGURED application subscriptions and client-orgs
+		// But not potentially existing Subscriptions or manually created Client-Orgs
 		CreateNewAPI createNewAPI = new CreateNewAPI();
 		createNewAPI.execute(changes);
 		LOG.info("New API created. Going to delete old API.");
 		
-		// 2. Create a new temp API-Definition, which will be used to apply changes to the existing actual API
-		IAPIDefinition newActualAPI = new APIBaseDefinition();
+		// 2. Create a new temp Desired-API-Definition, which will be used to delete the old API
+		IAPIDefinition tempDesiredDeletedAPI = new APIBaseDefinition();
 		
 		if(actual.getState().equals(IAPIDefinition.STATE_PUBLISHED)) {
 			// In case, the existing API is already in use (Published), we have to grant access to our new imported API
@@ -47,12 +49,8 @@ public class RecreateToUpdateAPI {
 		}
 		
 		// Delete the existing old API!
-		((APIBaseDefinition)newActualAPI).setStatus(IAPIDefinition.STATE_DELETED);
-		new UpdateAPIStatus(newActualAPI, actual).execute();
-		new UpdateQuotaConfiguration(newActualAPI, actual).execute();
-		new ManageClientOrgs(changes.getDesiredAPI(), actual).execute();
-		// Handle subscription to applications
-		new ManageClientApps(changes.getDesiredAPI(), actual).execute();
+		((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(IAPIDefinition.STATE_DELETED);
+		new UpdateAPIStatus(tempDesiredDeletedAPI, actual).execute();
 	}
 
 }

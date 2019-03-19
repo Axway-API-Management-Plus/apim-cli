@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.App;
+import com.axway.apim.lib.CommandParameters;
 import com.consol.citrus.actions.AbstractTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.CitrusRuntimeException;
@@ -50,8 +51,8 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 		
 		String enforce = "true";
 		String ignoreQuotas = "false";
-		String ignoreClientOrgs = "false";
-		String ignoreClientApps = "false";
+		String clientOrgsMode = CommandParameters.MODE_REPLACE;
+		String clientAppsMode = CommandParameters.MODE_REPLACE;;
 		
 		try {
 			enforce = context.getVariable("enforce");
@@ -60,10 +61,10 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 			ignoreQuotas = context.getVariable("ignoreQuotas");
 		} catch (Exception ignore) {};
 		try {
-			ignoreClientOrgs = context.getVariable("ignoreClientOrgs");
+			clientOrgsMode = context.getVariable("clientOrgsMode");
 		} catch (Exception ignore) {};
 		try {
-			ignoreClientApps = context.getVariable("ignoreClientApps");
+			clientAppsMode = context.getVariable("clientAppsMode");
 		} catch (Exception ignore) {};
 		
 		if(stage==null) {
@@ -84,8 +85,8 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 				"-s", stage, 
 				"-f", enforce, 
 				"-iq", ignoreQuotas, 
-				"-io", ignoreClientOrgs, 
-				"-ia", ignoreClientApps};
+				"-clientOrgsMode", clientOrgsMode, 
+				"-clientAppsMode", clientAppsMode};
 		
 		int rc = App.run(args);
 		if(expectedReturnCode!=rc) {

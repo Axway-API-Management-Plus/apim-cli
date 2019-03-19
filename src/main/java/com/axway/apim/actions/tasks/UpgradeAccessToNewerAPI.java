@@ -28,7 +28,7 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 			LOG.debug("No need to grant access to newly created API, as desired state of API is unpublished.");
 			return;
 		}
-		LOG.info("Grant access to new API");
+		LOG.info("Granting access to newly created API");
 		
 		URI uri;
 		HttpEntity entity;

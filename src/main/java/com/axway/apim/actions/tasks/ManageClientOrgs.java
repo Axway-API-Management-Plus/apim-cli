@@ -55,8 +55,12 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 				grantClientOrganization(missingDesiredOrgs, actualState.getId(), false);
 			}
 			if(removingActualOrgs.size()>0) {
-				LOG.info("Removing access for orgs: "+removingActualOrgs+" from API: " + actualState.getName());
-				removeClientOrganization(removingActualOrgs, actualState.getId());
+				if(CommandParameters.getInstance().getClientOrgsMode().equals(CommandParameters.MODE_REPLACE)) {
+					LOG.info("Removing access for orgs: "+removingActualOrgs+" from API: " + actualState.getName());
+					removeClientOrganization(removingActualOrgs, actualState.getId());
+				} else {
+					LOG.debug("NOT removing access for existing orgs: "+removingActualOrgs+" from API: " + actualState.getName() + " as clientOrgsMode NOT set to replace.");
+				}
 			}
 		}
 	}
@@ -124,8 +128,14 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		Transaction context = Transaction.getInstance();
 		if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_NO_CONTENT) {
 			if(context.get(MODE).equals(MODE_GRANT_ACCESS)) {
+				if(context.get("orgName") instanceof List) { 
+					actualState.getClientOrganizations().addAll((List<String>)context.get("orgName"));
+				}
 				LOG.info("Granted permission to organization: '"+context.get("orgName")+"'");
 			} else {
+				if(context.get("orgName") instanceof List) { 
+					actualState.getClientOrganizations().removeAll((List<String>)context.get("orgName"));
+				}				
 				LOG.info("Removed permission from organization: '"+context.get("orgName")+"'");
 			}
 		} else {

@@ -60,8 +60,12 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			createAppSubscription(missingDesiredApps, actualState.getId());
 		}
 		if(revomingActualApps.size()>0) {
-			LOG.info("Removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName());
-			removeAppSubscrioption(revomingActualApps, actualState.getId());
+			if(CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_REPLACE)) {
+				LOG.info("Removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName());
+				removeAppSubscrioption(revomingActualApps, actualState.getId());
+			} else {
+				LOG.debug("Removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName() + " as clientAppsMode NOT set to replace.");
+			}
 		}
 	}
 	
@@ -82,7 +86,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		try {
 			for(ClientApplication app : missingDesiredApps) {
 				LOG.debug("Creating API-Access for application '"+app.getName()+"'");
-				Transaction.getInstance().put("appName", app.getName());
+				Transaction.getInstance().put("appName", app);
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis").build();
 				entity = new StringEntity("{\"apiId\":\""+apiId+"\",\"enabled\":true}");
 				
@@ -101,7 +105,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		for(ClientApplication app : revomingActualApps) {
 			LOG.debug("Removing API-Access for application '"+app.getName()+"'");
 			try { 
-				Transaction.getInstance().put("appName", app.getName());
+				Transaction.getInstance().put("appName", app);
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis/"+apiId).build();
 				apiCall = new DELRequest(uri, this);
 				apiCall.execute();
@@ -118,8 +122,10 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		try {
 			if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_CREATED) {
 				if(context.get(MODE).equals(MODE_CREATE_API_ACCESS)) {
+					actualState.getApplications().add((ClientApplication)context.get("appName"));
 					LOG.debug("Successfully created API-Access for application: '"+context.get("appName")+"'");
 				} else {
+					actualState.getApplications().remove((ClientApplication)context.get("appName"));
 					LOG.debug("Successfully removed API-Access from application: '"+context.get("appName")+"'");
 				}
 			} else {
