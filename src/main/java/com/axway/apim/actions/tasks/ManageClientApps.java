@@ -37,6 +37,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	
 	public void execute() throws AppException {
 		if(desiredState.getApplications()==null) return;
+		if(desiredState.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) return;
 		if(CommandParameters.getInstance().isIgnoreClientApps()) {
 			LOG.info("Configured client applications are ignored, as flag ignoreClientApps has been set.");
 			return;
