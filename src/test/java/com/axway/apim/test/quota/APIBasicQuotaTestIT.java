@@ -166,6 +166,7 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestDesigner {
 		createVariable("configFile", "/com/axway/apim/test/files/quota/1_api-with-quota.json");
 		createVariable("state", "published");
 		createVariable("applicationPeriod", "seconds"); 
+		createVariable("enforce", "true");
 		createVariable("systemPeriod", "weeks");// Now, this one stays!
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);

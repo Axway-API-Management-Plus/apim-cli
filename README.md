@@ -58,6 +58,8 @@ Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimana
   - Added support for Organization- & Application-Management
 - 1.4.0 - 14.03.2019
   - Added support to refer a Swagger-File from a URL instead of the local File-System only
+- 1.4.1 - 20.03.2019
+  - Stabilized handling of Client-Orgs and Client-Apps (added support for modes: add|replace|ignore) 
 
 
 ## Limitations/Caveats

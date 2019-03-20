@@ -50,7 +50,7 @@ public class RecreateToUpdateAPI {
 		
 		// Delete the existing old API!
 		((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(IAPIDefinition.STATE_DELETED);
-		new UpdateAPIStatus(tempDesiredDeletedAPI, actual).execute();
+		new UpdateAPIStatus(tempDesiredDeletedAPI, actual).execute(true);
 	}
 
 }
