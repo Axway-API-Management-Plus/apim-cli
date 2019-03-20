@@ -4,6 +4,10 @@ import org.apache.commons.cli.CommandLine;
 
 public class CommandParameters {
 	
+	public static String MODE_REPLACE	= "replace";
+	public static String MODE_IGNORE	= "ignore";
+	public static String MODE_ADD		= "add";
+	
 	private static CommandParameters instance;
 	
 	int port = 8075;
@@ -53,15 +57,25 @@ public class CommandParameters {
 		return Boolean.parseBoolean(this.cmd.getOptionValue("ignoreQuotas"));
 	}
 	
-	public boolean isIgnoreClientOrgs() {
-		if(!this.cmd.hasOption("ignoreClientOrgs")) return false;
-		return Boolean.parseBoolean(this.cmd.getOptionValue("ignoreClientOrgs"));
+	public boolean isIgnoreClientApps() {
+		if(getClientAppsMode().equals(MODE_IGNORE)) return true;
+		return false;
 	}
 	
-	public boolean isIgnoreClientApps() {
-		if(!this.cmd.hasOption("ignoreClientApps")) return false;
-		return Boolean.parseBoolean(this.cmd.getOptionValue("ignoreClientApps"));
-	}	
+	public String getClientAppsMode() {
+		if(!this.cmd.hasOption("clientAppsMode")) return MODE_REPLACE;
+		return this.cmd.getOptionValue("clientAppsMode").toLowerCase();
+	}
+	
+	public boolean isIgnoreClientOrgs() {
+		if(getClientOrgsMode().equals(MODE_IGNORE)) return true;
+		return false;
+	}
+	
+	public String getClientOrgsMode() {
+		if(!this.cmd.hasOption("clientOrgsMode")) return MODE_REPLACE;
+		return this.cmd.getOptionValue("clientOrgsMode").toLowerCase();
+	}
 	
 	public String getAPIManagerURL() {
 		return "https://"+this.getHostname()+":"+this.getPort();

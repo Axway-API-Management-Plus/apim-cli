@@ -7,7 +7,7 @@ SET programDir=%~dp0
 SET bkpClassPath=%CLASSPATH%
 
 CD %programDir%\..
-SET CLASSPATH=lib
+SET CLASSPATH=%programDir%..\lib
 
 FOR /R ./lib %%a in (*.jar) DO CALL :AddToPath %%a
 
@@ -25,6 +25,8 @@ GOTO :END
 :OkClassPath
 ECHO "Running API-Manager Promote version 1.4 ..."
 
+CD %currentDir%
+
 "%JAVA_HOME%\bin\java" -Xms64m -Xmx256m -classpath "%CLASSPATH%" com.axway.apim.App %*
 SET ERRNO=%ERRORLEVEL%
 IF %ERRNO% EQU 10 (
@@ -35,5 +37,5 @@ IF %ERRNO% EQU 10 (
 
 :END
 SET CLASSPATH=%bkpClassPath%
-CD %currentDir%
+
 EXIT /B %ERRNO%

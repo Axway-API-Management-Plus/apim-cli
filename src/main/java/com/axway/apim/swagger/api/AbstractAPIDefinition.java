@@ -131,7 +131,7 @@ public abstract class AbstractAPIDefinition {
 	protected List<String> clientOrganizations;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPIDefinition.STATE_UNPUBLISHED})
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED, IAPIDefinition.STATE_PUBLISHED, IAPIDefinition.STATE_DEPRECATED})
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<ClientApplication> applications = null;
 	

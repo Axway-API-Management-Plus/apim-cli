@@ -47,7 +47,7 @@ public class IgnoreClientOrgsTestIT extends TestNGCitrusTestDesigner {
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("orgName2", "${testOrgName}");
-		createVariable("ignoreClientOrgs", "true");
+		createVariable("clientOrgsMode", "ignore");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

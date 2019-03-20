@@ -24,7 +24,11 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 		super(desiredState, actualState);
 	}
 	public void execute() throws AppException {
-		LOG.info("Grant access to new API");
+		if(desiredState.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
+			LOG.debug("No need to grant access to newly created API, as desired state of API is unpublished.");
+			return;
+		}
+		LOG.info("Granting access to newly created API");
 		
 		URI uri;
 		HttpEntity entity;

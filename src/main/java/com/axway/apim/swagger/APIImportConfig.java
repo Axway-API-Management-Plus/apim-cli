@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIImportDefinition;
 import com.axway.apim.swagger.api.AbstractAPIDefinition;
@@ -221,6 +222,7 @@ public class APIImportConfig {
 	 * @throws AppException
 	 */
 	private void completeClientApplications(IAPIDefinition apiConfig) throws AppException {
+		if(CommandParameters.getInstance().isIgnoreClientApps()) return;
 		ClientApplication loadedApp = null;
 		ClientApplication app;
 		if(apiConfig.getApplications()!=null) {

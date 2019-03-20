@@ -108,5 +108,30 @@ public class APIGrantOrganizationsTestIT extends TestNGCitrusTestDesigner {
 		createVariable("orgName2", "${orgName2}");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
+		
+		echo("####### Going back to unpublished forcing a breaking change #######");
+		
+		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore2.json");
+		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
+		createVariable("state", "unpublished");
+		createVariable("orgName", "${orgName}");
+		createVariable("orgName2", "${orgName2}");
+		createVariable("expectedReturnCode", "0");
+		action(swaggerImport);
+		
+		echo("####### Validate API: '${apiName}' has been imported without an error in state unpublished #######");
+		http().client("apiManager")
+			.send()
+			.get("/proxies")
+			.name("api")
+			.header("Content-Type", "application/json");
+
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.OK)
+			.messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "newApiId");
 	}
 }

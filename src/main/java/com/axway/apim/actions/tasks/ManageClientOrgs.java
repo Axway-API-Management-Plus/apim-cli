@@ -55,8 +55,12 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 				grantClientOrganization(missingDesiredOrgs, actualState.getId(), false);
 			}
 			if(removingActualOrgs.size()>0) {
-				LOG.info("Removing access for orgs: "+removingActualOrgs+" from API: " + actualState.getName());
-				removeClientOrganization(removingActualOrgs, actualState.getId());
+				if(CommandParameters.getInstance().getClientOrgsMode().equals(CommandParameters.MODE_REPLACE)) {
+					LOG.info("Removing access for orgs: "+removingActualOrgs+" from API: " + actualState.getName());
+					removeClientOrganization(removingActualOrgs, actualState.getId());
+				} else {
+					LOG.debug("NOT removing access for existing orgs: "+removingActualOrgs+" from API: " + actualState.getName() + " as clientOrgsMode NOT set to replace.");
+				}
 			}
 		}
 	}
@@ -87,6 +91,8 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 			apiCall = new POSTRequest(entity, uri, this);
 			apiCall.setContentType("application/x-www-form-urlencoded");
 			apiCall.execute();
+			// Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
+			actualState.getClientOrganizations().addAll(grantAccessToOrgs);
 		} catch (Exception e) {
 			LOG.error("grantAccessToOrgs: '"+grantAccessToOrgs+"'");
 			LOG.error("allOrgs: '"+allOrgs+"'");
@@ -110,6 +116,8 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 						
 						apiCall = new DELRequest(uri, this);
 						apiCall.execute();
+						// Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
+						actualState.getClientOrganizations().removeAll(removingActualOrgs);
 					} catch (Exception e) {
 						LOG.error("Can't delete API-Access for organization. ");
 						throw new AppException("Can't delete API-Access for organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
@@ -125,7 +133,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_NO_CONTENT) {
 			if(context.get(MODE).equals(MODE_GRANT_ACCESS)) {
 				LOG.info("Granted permission to organization: '"+context.get("orgName")+"'");
-			} else {
+			} else {			
 				LOG.info("Removed permission from organization: '"+context.get("orgName")+"'");
 			}
 		} else {

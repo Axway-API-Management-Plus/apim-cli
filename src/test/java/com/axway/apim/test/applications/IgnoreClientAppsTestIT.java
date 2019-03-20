@@ -48,7 +48,7 @@ public class IgnoreClientAppsTestIT extends TestNGCitrusTestDesigner {
 		createVariable("configFile", "/com/axway/apim/test/files/applications/1_api-with-1-org-1-app.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
-		createVariable("ignoreClientApps", "true");
+		createVariable("clientAppsMode", "ignore");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
