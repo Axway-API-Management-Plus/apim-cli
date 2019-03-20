@@ -28,6 +28,7 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/security/5_api_outbound-basic.json");
 		createVariable("state", "unpublished");
+		createVariable("username", "1234567890");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -35,6 +36,7 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/security/5_api_outbound-basic.json");
 		createVariable("state", "unpublished");
+		createVariable("username", "1234567890");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
 
@@ -48,10 +50,29 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "http_basic")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
+		echo("####### Simulate a change to the outbound configuration in UNPUBLISHED mode, by changing the username #######");
+		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
+		createVariable("configFile", "/com/axway/apim/test/files/security/5_api_outbound-basic.json");
+		createVariable("state", "unpublished");
+		createVariable("username", "0987654321");
+		createVariable("expectedReturnCode", "0");
+		action(swaggerImport);
+		
+		echo("####### Validate the changed apiKey (username) is in place #######");
+		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
+
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.id=='${apiId}')].id", "${apiId}")
+			.validate("$.[?(@.id=='${apiId}')].state", "unpublished")
+			.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "_default")
+			.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].type", "http_basic")
+			.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].parameters.username", "${username}");
+		
 		echo("####### Change API to status published: #######");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/security/5_api_outbound-basic.json");
 		createVariable("state", "published");
+		createVariable("username", "1234567890");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -62,13 +83,16 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 				.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
 				.validate("$.[?(@.id=='${apiId}')].state", "published")
 				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "_default")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "http_basic")
+				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].type", "http_basic")
+				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].parameters.username", "${username}")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
-		echo("####### Re-Import same API: '${apiName}' on path: '${apiPath}' with status published & API-Key (default): #######");
+		echo("####### Re-Import same API: '${apiName}' on path: '${apiPath}' with status published but NOW AN API-Key (default): #######");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/security/5_2_api_outbound-apikey.json");
 		createVariable("state", "published");
+		createVariable("apiKey", "1234567890");
+		createVariable("enforce", "true");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -86,9 +110,8 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/security/5_2_api_outbound-apikey.json");
 		createVariable("state", "published");
+		createVariable("apiKey", "1234567890");
 		createVariable("expectedReturnCode", "10");
-		action(swaggerImport);
+		action(swaggerImport);		
 	}
-
-
 }

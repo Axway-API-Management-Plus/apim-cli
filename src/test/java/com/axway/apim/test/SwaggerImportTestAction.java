@@ -49,7 +49,7 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 			expectedReturnCode 	= Integer.parseInt(context.getVariable("expectedReturnCode"));
 		} catch (Exception ignore) {};
 		
-		String enforce = "true";
+		String enforce = "false";
 		String ignoreQuotas = "false";
 		String clientOrgsMode = CommandParameters.MODE_REPLACE;
 		String clientAppsMode = CommandParameters.MODE_REPLACE;;

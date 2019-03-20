@@ -9,7 +9,7 @@
 			"name": "_default",
 			"isDefault": "true",
 			"parameters": {
-				"apiKey": "4249823490238490",
+				"apiKey": "${apiKey}",
 				"apiKeyField": "KeyId", 
 				"httpLocation": "QUERYSTRING_PARAMETER"
 			},

@@ -86,6 +86,7 @@ public class UnpublishedPublishedApiKeyTestIT extends TestNGCitrusTestDesigner {
 		createVariable("takeFrom", "HEADER");
 		createVariable("removeCredentialsOnSuccess", "false");
 		createVariable("status", "published");
+		createVariable("enforce", "true");
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/security/1_api-apikey.json");
 		createVariable("expectedReturnCode", "0");
