@@ -72,7 +72,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 		if(statusChangeRequiresEnforce.get(this.actualState.getState())!=null && 
 				statusChangeRequiresEnforce.get(this.actualState.getState()).contains(this.desiredState.getState())) {
 			throw new AppException("Status change from actual status: '"+actualState.getState()+"' to desired status: '"+desiredState.getState()+"' "
-					+ "is breaking an requires enforcement. Try option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
+					+ "is breaking. Enforce change with option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
 		}
 		
 		URI uri;
