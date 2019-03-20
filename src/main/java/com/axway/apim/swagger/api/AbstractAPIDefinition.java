@@ -96,7 +96,7 @@ public abstract class AbstractAPIDefinition {
 	protected List<SecurityProfile> securityProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {}, 
+			writableStates = {IAPIDefinition.STATE_UNPUBLISHED}, 
 			propHandler = AuthenticationProfileHandler.class)
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<AuthenticationProfile> authenticationProfiles = null;

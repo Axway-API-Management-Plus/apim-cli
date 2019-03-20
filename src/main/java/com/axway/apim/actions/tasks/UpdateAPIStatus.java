@@ -1,7 +1,10 @@
 package com.axway.apim.actions.tasks;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URIBuilder;
@@ -12,6 +15,7 @@ import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIBaseDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
@@ -27,6 +31,14 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 		put("published", 	new String[] {"unpublished", "deprecated"});
 		put("deleted", 		new String[] {});
 		put("deprecated", 	new String[] {"unpublished", "undeprecated"});
+	}};
+	
+	/**
+	 * Maps the actual API-State to all desired states, which requires an enforcement as it be break the API. 
+	 */
+	private static HashMap<String, List<String>> statusChangeRequiresEnforce = new HashMap<String, List<String>>() {{
+		put("published",  Arrays.asList(new String[] {"unpublished", "deleted"}));
+		put("deprecated", Arrays.asList(new String[] {"unpublished", "deleted"}));
 	}};
 	
 	/**
@@ -50,13 +62,28 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 		this(desiredState, actualState, "");
 	}
 	
-	
 	public void execute() throws AppException {
+		if(CommandParameters.getInstance().isEnforceBreakingChange()) {
+			execute(true);
+		} else {
+			execute(false);
+		}
+	}
+	
+	
+	public void execute(boolean enforceBreakingChange) throws AppException {
 		if(this.desiredState.getState().equals(this.actualState.getState())) {
-			LOG.debug("Desired and actual status equals. No need to update status!");
+			LOG.debug("Desired and actual status equal. No need to update status!");
 			return;
 		}
 		LOG.info(this.intent + "Updating API-Status from: '" + this.actualState.getState() + "' to '" + this.desiredState.getState() + "'");
+		if(!enforceBreakingChange) { 
+			if(statusChangeRequiresEnforce.get(this.actualState.getState())!=null && 
+					statusChangeRequiresEnforce.get(this.actualState.getState()).contains(this.desiredState.getState())) {
+				throw new AppException("Status change from actual status: '"+actualState.getState()+"' to desired status: '"+desiredState.getState()+"' "
+						+ "is breaking. Enforce change with option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
+			}
+		}
 		
 		URI uri;
 
@@ -92,7 +119,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 					IAPIDefinition desiredIntermediate = new APIBaseDefinition();
 					desiredIntermediate.setState(intermediateState);
 					UpdateAPIStatus intermediateStatusUpdate = new UpdateAPIStatus(desiredIntermediate, actualState, " ### ");
-					intermediateStatusUpdate.execute();
+					intermediateStatusUpdate.execute(enforceBreakingChange);
 				}
 			} else {
 				LOG.error(this.intent + "The status change from: " + actualState.getState() + " to " + desiredState.getState() + " is not possible!");
@@ -148,4 +175,6 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 			}
 		}
 	}
+	
+	
 }

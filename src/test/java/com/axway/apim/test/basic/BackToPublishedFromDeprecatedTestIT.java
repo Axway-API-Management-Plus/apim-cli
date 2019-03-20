@@ -49,6 +49,7 @@ public class BackToPublishedFromDeprecatedTestIT extends TestNGCitrusTestDesigne
 		echo("####### Setting API: '${apiName}' on path: '${apiPath}' to deprecated #######");		
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable("status", "deprecated");
+		createVariable("enforce", "true"); // Must be enforced, as it's a breaking change
 		createVariable("configFile", "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
