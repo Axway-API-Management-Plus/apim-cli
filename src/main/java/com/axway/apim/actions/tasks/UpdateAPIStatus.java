@@ -1,7 +1,10 @@
 package com.axway.apim.actions.tasks;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URIBuilder;
@@ -30,6 +33,14 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 	}};
 	
 	/**
+	 * Maps the actual API-State to all desired states, which requires an enforcement as it be break the API. 
+	 */
+	private static HashMap<String, List<String>> statusChangeRequiresEnforce = new HashMap<String, List<String>>() {{
+		put("published",  Arrays.asList(new String[] {"unpublished", "deleted"}));
+		put("deprecated", Arrays.asList(new String[] {"unpublished", "deleted"}));
+	}};
+	
+	/**
 	 * Maps the provided status to the REST-API endpoint to change the status!
 	 */
 	public static HashMap<String, String> statusEndpoint = new HashMap<String, String>() {{
@@ -53,10 +64,16 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 	
 	public void execute() throws AppException {
 		if(this.desiredState.getState().equals(this.actualState.getState())) {
-			LOG.debug("Desired and actual status equals. No need to update status!");
+			LOG.debug("Desired and actual status equal. No need to update status!");
 			return;
 		}
 		LOG.info(this.intent + "Updating API-Status from: '" + this.actualState.getState() + "' to '" + this.desiredState.getState() + "'");
+		
+		if(statusChangeRequiresEnforce.get(this.actualState.getState())!=null && 
+				statusChangeRequiresEnforce.get(this.actualState.getState()).contains(this.desiredState.getState())) {
+			throw new AppException("Status change from actual status: '"+actualState.getState()+"' to desired status: '"+desiredState.getState()+"' "
+					+ "is breaking an requires enforcement. Try option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
+		}
 		
 		URI uri;
 
