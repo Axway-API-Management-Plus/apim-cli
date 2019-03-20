@@ -10,13 +10,13 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="APIBasicQuotaTest")
+@Test(testName="APIQuotaIgnoredTestIT")
 public class APIQuotaIgnoredTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private SwaggerImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "APIBasicQuotaTest")
+	@CitrusTest(name = "APIQuotaIgnoredTestIT")
 	public void setupDevOrgTest() {
 		description("Import an API containing a quota definition, but it should be ignored-");
 		

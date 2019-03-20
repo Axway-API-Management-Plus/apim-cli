@@ -119,7 +119,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 					IAPIDefinition desiredIntermediate = new APIBaseDefinition();
 					desiredIntermediate.setState(intermediateState);
 					UpdateAPIStatus intermediateStatusUpdate = new UpdateAPIStatus(desiredIntermediate, actualState, " ### ");
-					intermediateStatusUpdate.execute();
+					intermediateStatusUpdate.execute(enforceBreakingChange);
 				}
 			} else {
 				LOG.error(this.intent + "The status change from: " + actualState.getState() + " to " + desiredState.getState() + " is not possible!");
