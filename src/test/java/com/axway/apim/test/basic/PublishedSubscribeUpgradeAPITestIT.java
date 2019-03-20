@@ -67,6 +67,7 @@ public class PublishedSubscribeUpgradeAPITestIT extends TestNGCitrusTestDesigner
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore2.json");
 		createVariable("configFile", "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("status", "published");
+		createVariable("enforce", "true");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

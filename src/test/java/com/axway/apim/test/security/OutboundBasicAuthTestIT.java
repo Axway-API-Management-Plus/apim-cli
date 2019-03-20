@@ -92,6 +92,7 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 		createVariable("configFile", "/com/axway/apim/test/files/security/5_2_api_outbound-apikey.json");
 		createVariable("state", "published");
 		createVariable("apiKey", "1234567890");
+		createVariable("enforce", "true");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
