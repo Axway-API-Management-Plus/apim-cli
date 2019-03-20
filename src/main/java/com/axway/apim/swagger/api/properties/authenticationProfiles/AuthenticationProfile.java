@@ -59,7 +59,8 @@ public class AuthenticationProfile {
 
 			return StringUtils.equals(authenticationProfile.getName(), this.getName())
 					&& authenticationProfile.getIsDefault() == this.getIsDefault() 
-					&& StringUtils.equals(authenticationProfile.getType().name(),this.getType().name());
+					&& StringUtils.equals(authenticationProfile.getType().name(),this.getType().name())
+					&& authenticationProfile.getParameters().equals(this.getParameters());
 		} else {
 			return false;
 		}
