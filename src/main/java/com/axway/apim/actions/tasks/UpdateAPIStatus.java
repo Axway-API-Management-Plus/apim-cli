@@ -15,6 +15,7 @@ import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.APIBaseDefinition;
 import com.axway.apim.swagger.api.IAPIDefinition;
@@ -61,8 +62,16 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 		this(desiredState, actualState, "");
 	}
 	
-	
 	public void execute() throws AppException {
+		if(CommandParameters.getInstance().isEnforceBreakingChange()) {
+			execute(true);
+		} else {
+			execute(false);
+		}
+	}
+	
+	
+	public void execute(boolean enforceBreakingChange) throws AppException {
 		if(this.desiredState.getState().equals(this.actualState.getState())) {
 			LOG.debug("Desired and actual status equal. No need to update status!");
 			return;
@@ -165,4 +174,6 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 			}
 		}
 	}
+	
+	
 }

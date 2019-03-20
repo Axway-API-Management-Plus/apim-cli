@@ -116,6 +116,7 @@ public class APIGrantOrganizationsTestIT extends TestNGCitrusTestDesigner {
 		createVariable("state", "unpublished");
 		createVariable("orgName", "${orgName}");
 		createVariable("orgName2", "${orgName2}");
+		createVariable("enforce", "true");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
