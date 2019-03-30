@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,9 @@ public class SecurityDevice {
 		ObjectMapper mapper = new ObjectMapper();
 		HashMap<String, String> policyMap = new HashMap<String, String>();
 		CommandParameters cmd = CommandParameters.getInstance();
-		InputStream response = null;
+		HttpResponse response = null;
+		InputStream is = null;
+		JsonNode jsonResponse = null;
 		URI uri;
 		try {
 			if(type.equals("tokenstores")) {
@@ -61,22 +64,25 @@ public class SecurityDevice {
 						.setParameter("type", type).build();
 			}
 			RestAPICall getRequest = new GETRequest(uri, null);
-			response = getRequest.execute().getEntity().getContent();
-			
-			JsonNode jsonResponse;
+			response = getRequest.execute();
 			try {
-				jsonResponse = mapper.readTree(response);
+				is = response.getEntity().getContent();
+				jsonResponse = mapper.readTree(is);
 				for(JsonNode node : jsonResponse) {
 					policyMap.put(node.get("name").asText(), node.get("id").asText());
 				}
 			} catch (IOException e) {
-				throw new AppException("Can't find "+type+": ....", ErrorCode.API_MANAGER_COMMUNICATION, e);
+				throw new AppException("Can't read "+type+" from response: '"+jsonResponse+"'. "
+						+ "Please make sure that you use an Admin-Role user.", 
+						ErrorCode.API_MANAGER_COMMUNICATION, e);
 			}
 		} catch (Exception e) {
-			throw new AppException("Can't find "+type+": ....", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Can't read "+type+" from response: '"+jsonResponse+"'. "
+					+ "Please make sure that you use an Admin-Role user.", 
+					ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
-				response.close();
+				is.close();
 			} catch (Exception ignore) { }
 		}
 		return policyMap;
