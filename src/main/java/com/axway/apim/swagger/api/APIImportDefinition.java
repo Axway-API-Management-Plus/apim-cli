@@ -36,6 +36,8 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	
 	private boolean requestForAllOrgs = false;
 	
+	private String wsdlURL = null;
+	
 	public APIImportDefinition() throws AppException {
 		super();
 	}
@@ -116,5 +118,16 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	 */
 	public void setRequestForAllOrgs(boolean requestForAllOrgs) {
 		this.requestForAllOrgs = requestForAllOrgs;
+	}
+
+	@Override
+	public void setWsdlURL(String wsdlURL) {
+		this.wsdlURL=wsdlURL;
+		
+	}
+
+	@Override
+	public String getWsdlURL() {
+		return this.wsdlURL;
 	}
 }

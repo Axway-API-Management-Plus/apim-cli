@@ -67,6 +67,8 @@ public class APIImportConfig {
 	private String apiConfig;
 	
 	private String stage;
+	
+	private String wsdlURL;
 
 	/**
 	 * Constructs the APIImportConfig 
@@ -75,11 +77,12 @@ public class APIImportConfig {
 	 * @param pathToSwagger
 	 * @throws AppException
 	 */
-	public APIImportConfig(String apiContract, String stage, String pathToSwagger) throws AppException {
+	public APIImportConfig(String apiContract, String stage, String pathToSwagger,String wsdlURL) throws AppException {
 		super();
 		this.apiConfig = apiContract;
 		this.stage = stage;
 		this.pathToSwagger = pathToSwagger;
+		this.wsdlURL=wsdlURL;
 	}
 	
 	/**
@@ -108,7 +111,14 @@ public class APIImportConfig {
 				stagedConfig = baseConfig;
 			}
 			addDefaultPassthroughSecurityProfile(stagedConfig);
-			stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerContent()));
+			if (this.wsdlURL!=null) {
+				stagedConfig.setWsdlURL(this.wsdlURL);
+				//we use the pathToSwagger even if it's a wsdl url
+				pathToSwagger=this.wsdlURL;
+				stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerContent()));
+			} else {
+				stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerContent()));
+			}
 			addImageContent(stagedConfig);
 			validateCustomProperties(stagedConfig);
 			validateDescription(stagedConfig);

@@ -43,4 +43,16 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 				&& this.deprecated.equals("true")) return IAPIDefinition.STATE_DEPRECATED;
 		return super.getState();
 	}
+
+	@Override
+	public void setWsdlURL(String wsdlURL) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getWsdlURL() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

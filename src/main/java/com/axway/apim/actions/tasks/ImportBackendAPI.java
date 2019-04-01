@@ -10,6 +10,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.util.EntityUtils;
 
@@ -31,30 +32,57 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 	}
 
 	public void execute() throws AppException {
-		LOG.info("Importing backend API (Swagger-Import)");
-		URI uri;
-		HttpEntity entity;
+		LOG.info("Importing backend API (Swagger/WSDL Import)");
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/import/")
-					.setParameter("field", "name").setParameter("op", "eq").setParameter("value", "API Development").build();
-			
-			entity = MultipartEntityBuilder.create()
-					.addTextBody("name", this.desiredState.getName())
-					.addTextBody("type", "swagger")
-					.addBinaryBody("file", ((APIImportDefinition)this.desiredState).getSwaggerDefinition().getSwaggerContent(), ContentType.create("application/octet-stream"), "filename")
-					.addTextBody("fileName", "XYZ").addTextBody("organizationId", this.desiredState.getOrgId())
-					.addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
-			RestAPICall importSwagger = new POSTRequest(entity, uri, this);
-			importSwagger.setContentType(null);
-			HttpResponse httpResponse = importSwagger.execute();
-			String response = httpResponse.getEntity().getContent().toString();
-			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if(statusCode != 201){
-				LOG.error("Received Status-Code: " +statusCode+ ", Response: " + response);
-				throw new AppException("Can't import Swagger-definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
+			if (desiredState.getWsdlURL()!=null) {
+				importFromWSDL();
+			} else {
+				importFromSwagger();
 			}
 		} catch (Exception e) {
-			throw new AppException("Can't import Swagger-definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
+			throw new AppException("Can't import definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
+		}
+	}
+
+	private void importFromWSDL() throws URISyntaxException, AppException, IOException {
+		URI uri;
+		HttpEntity entity = new StringEntity("");
+		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/importFromUrl/")
+				.setParameter("organizationId", this.desiredState.getOrgId())
+				.setParameter("type", "wsdl")
+				.setParameter("url", this.desiredState.getWsdlURL())
+				.setParameter("name", this.desiredState.getName()).build();
+		RestAPICall importWSDL = new POSTRequest(entity, uri, this);
+		importWSDL.setContentType("application/x-www-form-urlencoded");
+		HttpResponse httpResponse = importWSDL.execute();
+		String response = httpResponse.getEntity().getContent().toString();
+		int statusCode = httpResponse.getStatusLine().getStatusCode();
+		if(statusCode != 201){
+			LOG.error("Received Status-Code: " +statusCode+ ", Response: " + response);
+			throw new AppException("Can't import WSDL from URL / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
+		}
+	}
+
+	private void importFromSwagger() throws URISyntaxException, AppException, IOException {
+		URI uri;
+		HttpEntity entity;
+		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/import/")
+				.setParameter("field", "name").setParameter("op", "eq").setParameter("value", "API Development").build();
+		
+		entity = MultipartEntityBuilder.create()
+				.addTextBody("name", this.desiredState.getName())
+				.addTextBody("type", "swagger")
+				.addBinaryBody("file", ((APIImportDefinition)this.desiredState).getSwaggerDefinition().getSwaggerContent(), ContentType.create("application/octet-stream"), "filename")
+				.addTextBody("fileName", "XYZ").addTextBody("organizationId", this.desiredState.getOrgId())
+				.addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
+		RestAPICall importSwagger = new POSTRequest(entity, uri, this);
+		importSwagger.setContentType(null);
+		HttpResponse httpResponse = importSwagger.execute();
+		String response = httpResponse.getEntity().getContent().toString();
+		int statusCode = httpResponse.getStatusLine().getStatusCode();
+		if(statusCode != 201){
+			LOG.error("Received Status-Code: " +statusCode+ ", Response: " + response);
+			throw new AppException("Can't import Swagger-definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
 		}
 	}
 	
