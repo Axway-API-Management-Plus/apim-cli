@@ -5,6 +5,7 @@ public enum ErrorCode {
 	SUCCESS						(0,  "Successful."),
 	NO_CHANGE					(10, "No change detected."),
 	BREAKING_CHANGE_DETECTED	(15, "Breaking change detected."),
+	NO_ADMIN_ROLE_USER			(17, "No admin role is used"),
 	CANT_PARSE_HTTP_RESPONSE	(20, "Cannot parse HTTP-Response for REST-API-Call"),
 	CANT_SEND_HTTP_REQUEST		(25, "Cannot send HTTP-Request."),
 	CANT_READ_JSON_PAYLOAD		(30, "Cannot read or parse JSON-Payload."),
