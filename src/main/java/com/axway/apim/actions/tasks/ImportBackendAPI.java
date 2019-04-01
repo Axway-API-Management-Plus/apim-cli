@@ -1,5 +1,7 @@
 package com.axway.apim.actions.tasks;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -47,11 +49,26 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 	private void importFromWSDL() throws URISyntaxException, AppException, IOException {
 		URI uri;
 		HttpEntity entity = new StringEntity("");
-		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/importFromUrl/")
+		String username=null;
+		String pass=null;
+
+		if(this.desiredState.getWsdlURL().endsWith(".url")) {
+			String wsdlUrl = getWSDLUriFromFile(this.desiredState.getWsdlURL());
+			this.desiredState.setWsdlURL(extractURI(wsdlUrl));
+			username=extractUsername(wsdlUrl);
+			pass=extractPassword(wsdlUrl);
+		}
+		
+		URIBuilder uriBuilder = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/importFromUrl/")
 				.setParameter("organizationId", this.desiredState.getOrgId())
 				.setParameter("type", "wsdl")
 				.setParameter("url", this.desiredState.getWsdlURL())
-				.setParameter("name", this.desiredState.getName()).build();
+				.setParameter("name", this.desiredState.getName());
+		if (username!=null) {
+			uriBuilder.setParameter("username", username);
+			uriBuilder.setParameter("password", pass);
+		}
+		uri=uriBuilder.build();
 		RestAPICall importWSDL = new POSTRequest(entity, uri, this);
 		importWSDL.setContentType("application/x-www-form-urlencoded");
 		HttpResponse httpResponse = importWSDL.execute();
@@ -86,6 +103,35 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		}
 	}
 	
+	private String extractUsername(String url) {
+		String[] temp = url.split("@");
+		if(temp.length==2) {
+			return temp[0].substring(0, temp[0].indexOf("/"));
+		}
+		return null;
+	}
+	
+	private String extractPassword(String url) {
+		String[] temp = url.split("@");
+		if(temp.length==2) {
+			return temp[0].substring(temp[0].indexOf("/")+1);
+		}
+		return null;
+	}
+	
+	private String extractURI(String url) throws AppException
+	{
+		String[] temp = url.split("@");
+		if(temp.length==1) {
+			return temp[0];
+		} else if(temp.length==2) {
+			return temp[1];
+		} else {
+			throw new AppException("WSDL-URL has an invalid format. ", ErrorCode.CANT_READ_WSDL_FILE);
+		}
+	}
+	
+	
 	@Override
 	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -98,6 +144,22 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 			return null;
 		} catch (IOException e) {
 			throw new AppException("Cannot parse JSON-Payload after create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
+		}
+	}
+	
+	private String getWSDLUriFromFile(String pathToWsdlUrlFile) throws AppException {
+		String uriToWsdl = null;
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new FileReader(pathToWsdlUrlFile));
+			uriToWsdl = br.readLine();
+			return uriToWsdl;
+		} catch (Exception e) {
+			throw new AppException("Can't load file:" + pathToWsdlUrlFile, ErrorCode.CANT_READ_WSDL_FILE, e);
+		} finally {
+			try {
+				br.close();
+			} catch (Exception ignore) {}
 		}
 	}
 
