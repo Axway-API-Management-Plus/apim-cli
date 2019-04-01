@@ -26,8 +26,8 @@ public class NoAdminRoleUserTestIT extends TestNGCitrusTestDesigner {
 		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable("configFile", "/com/axway/apim/test/files/basic/1_no-change-config.json");
 		createVariable("expectedReturnCode", "17");
-		createVariable("apiManagerUser", "anna"); // This is an org-admin user
-		createVariable("apiManagerPass", "anna");
+		createVariable("apiManagerUser", "${oadminUsername1}"); // This is an org-admin user
+		createVariable("apiManagerPass", "${oadminPassword1}");
 		action(swaggerImport);
 	}
 
