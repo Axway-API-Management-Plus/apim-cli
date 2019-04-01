@@ -88,6 +88,10 @@ public class App {
 				option.setArgName("api-host");
 			options.addOption(option);
 			
+			option = new Option("port", true, "The API-Manager port where the REST-API is exposed. Defaults to 8075.");
+			option.setArgName("8181");
+			options.addOption(option);
+			
 			option = new Option("u", "username", true, "Username used to authenticate. Please note, that this user must have Admin-Role");
 				option.setRequired(true);
 				option.setArgName("apiadmin");

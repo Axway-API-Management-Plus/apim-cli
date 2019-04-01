@@ -44,7 +44,8 @@ public class CommandParameters {
 	}
 
 	public int getPort() {
-		return port;
+		if(!this.cmd.hasOption("port")) return port;
+		return Integer.parseInt(this.cmd.getOptionValue("port"));
 	}
 
 	public boolean isEnforceBreakingChange() {

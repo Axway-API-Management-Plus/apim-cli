@@ -83,6 +83,9 @@ public class APIManagerAdapter {
 		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the JVM)
 		loginToAPIManager();
 		this.enforceBreakingChange = CommandParameters.getInstance().isEnforceBreakingChange();
+		if(!getUserRole().equals("admin")) 
+			throw new AppException("Given user: '"+CommandParameters.getInstance().getUsername()+"' has no admin-role. "
+				+ "This tool needs admin role permissions.", ErrorCode.NO_ADMIN_ROLE_USER, false);
 	}
 
 	/**
@@ -135,20 +138,46 @@ public class APIManagerAdapter {
 		transaction.beginTransaction();
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/login").build();
-			
-			
+
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 		    params.add(new BasicNameValuePair("username", cmd.getUsername()));
 		    params.add(new BasicNameValuePair("password", cmd.getPassword()));
 		    POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, null);
 			loginRequest.setContentType(null);
-		    
-			loginRequest.execute();
+			HttpResponse response = loginRequest.execute();
+			int statusCode = response.getStatusLine().getStatusCode();
+			if(statusCode == 403){
+				LOG.error("Login failed: " +statusCode+ ", Response: " + response);
+				throw new AppException("Given user can't login.", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
 		} catch (Exception e) {
 			throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
-		
-		
+	}
+	
+	public static String getUserRole() throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		URI uri;
+		HttpResponse response = null;
+		InputStream is = null;
+		JsonNode jsonResponse = null;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/currentuser").build();
+		    GETRequest currentUserRequest = new GETRequest(uri, null);
+		    response = currentUserRequest.execute();
+			is = response.getEntity().getContent();
+			jsonResponse = mapper.readTree(is);
+			JsonNode role = jsonResponse.get("role");
+			if(role == null) {
+				throw new AppException("Can't get current-user information on response: '" + jsonResponse + "'", 
+						ErrorCode.API_MANAGER_COMMUNICATION);
+			}
+			return role.asText();
+		    
+		} catch (Exception e) {
+			throw new AppException("Can't get current-user information on response: '" + jsonResponse + "'", 
+					ErrorCode.API_MANAGER_COMMUNICATION);
+		}
 	}
 	
 	/**

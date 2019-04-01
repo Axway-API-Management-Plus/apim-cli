@@ -20,6 +20,8 @@ cache:
     - '$HOME/.m2/repository'
 
 before_install:
+  - sudo sed 's/DOCKER_OPTS="/DOCKER_OPTS="--insecure-registry=docker-registry.demo.axway.com /g' -i /etc/default/docker
+  - sudo service docker restart
   #- sudo apt-get update
   #- sudo apt-get install curl
   # All files in this folder will be cached for the next build
