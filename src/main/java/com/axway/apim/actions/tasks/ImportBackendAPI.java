@@ -57,6 +57,7 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 			this.desiredState.setWsdlURL(extractURI(wsdlUrl));
 			username=extractUsername(wsdlUrl);
 			pass=extractPassword(wsdlUrl);
+			LOG.info("{}",this.desiredState.getWsdlURL());
 		}
 		
 		URIBuilder uriBuilder = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/importFromUrl/")

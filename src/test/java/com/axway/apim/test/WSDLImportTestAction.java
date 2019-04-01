@@ -30,10 +30,10 @@ public class WSDLImportTestAction extends AbstractTestAction {
 	@Override
 	public void doExecute(TestContext context) {
 		String wsdlURL 			= context.getVariable("wsdlURL");
-		String configFile 			= context.getVariable("configFile");
+		String origConfigFile 			= context.getVariable("configFile");
 		String stage				= null;
 
-		//String configFile = replaceDynamicContentInFile(origConfigFile, context);
+		String configFile = replaceDynamicContentInFile(origConfigFile, context);
 		LOG.info("Using WSDL-URL: " + wsdlURL);
 		LOG.info("Using configFile-File: " + configFile);
 		int expectedReturnCode = 0;
@@ -44,7 +44,11 @@ public class WSDLImportTestAction extends AbstractTestAction {
 		String enforce = "false";
 		String ignoreQuotas = "false";
 		String clientOrgsMode = CommandParameters.MODE_REPLACE;
-		String clientAppsMode = CommandParameters.MODE_REPLACE;;
+		String clientAppsMode = CommandParameters.MODE_REPLACE;
+
+		if(!wsdlURL.contains("http://") && !wsdlURL.contains("https://")) {
+			wsdlURL=resolveFile(wsdlURL);
+		}
 		
 		try {
 			enforce = context.getVariable("enforce");
@@ -86,4 +90,75 @@ public class WSDLImportTestAction extends AbstractTestAction {
 		}
 	}
 	
+	/**
+	 * To make testing easier we allow reading test-files from classpath as well
+	 */
+	private String resolveFile(String pathToFile) {
+		
+		File inputFile = new File(pathToFile);
+		InputStream is = null;
+		OutputStream os = null;
+		try {
+			if(inputFile.exists()) { 
+				return inputFile.getAbsolutePath();
+			} else {
+				return new File(this.getClass().getResource(pathToFile).getFile()).getAbsolutePath();
+				
+			}
+		} finally {
+			if(os!=null)
+				try {
+					os.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}
+	
+	
+	/**
+	 * To make testing easier we allow reading test-files from classpath as well
+	 */
+	private String replaceDynamicContentInFile(String pathToFile, TestContext context) {
+		
+		File inputFile = new File(pathToFile);
+		InputStream is = null;
+		OutputStream os = null;
+		try {
+			if(inputFile.exists()) { 
+				is = new FileInputStream(pathToFile);
+			} else {
+				is = this.getClass().getResourceAsStream(pathToFile);
+			}
+			if(is == null) {
+				throw new IOException("Unable to read swagger file from: " + pathToFile);
+			}
+			String jsonData = IOUtils.toString(is);
+			String filename = pathToFile.substring(pathToFile.lastIndexOf("/")+1); // e.g.: petstore.json, no-change-xyz-config.<stage>.json, 
+			String prefix = filename.substring(0, filename.indexOf("."));
+			String suffix = filename.substring(filename.indexOf("."));
+			String jsonReplaced = context.replaceDynamicContentInString(jsonData);
+			File tempFile = File.createTempFile(prefix, suffix);
+			os = new FileOutputStream(tempFile);
+			IOUtils.write(jsonReplaced, os);
+			tempFile.deleteOnExit();
+			return tempFile.getAbsolutePath();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if(os!=null)
+				try {
+					os.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		return null;
+	}
 }
