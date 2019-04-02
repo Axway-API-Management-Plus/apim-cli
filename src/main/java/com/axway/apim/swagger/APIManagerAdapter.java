@@ -15,6 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.naming.ldap.StartTlsResponse;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -495,9 +497,12 @@ public class APIManagerAdapter {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+backendApiID+"/download")
 					.setParameter("original", "true").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
-			InputStream response = getRequest.execute().getEntity().getContent();
-			Reader reader = new InputStreamReader(response);
-			return IOUtils.toByteArray(reader,StandardCharsets.UTF_8);
+			HttpResponse response=getRequest.execute();
+			//InputStream response = getRequest.execute().getEntity().getContent();
+			//Reader reader = new InputStreamReader(response);
+			String res = EntityUtils.toString(response.getEntity(),StandardCharsets.UTF_8);
+			return res.getBytes(StandardCharsets.UTF_8);
+			//return IOUtils.toByteArray(res);
 		} catch (Exception e) {
 			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_SWAGGER_FILE, e);
 		}

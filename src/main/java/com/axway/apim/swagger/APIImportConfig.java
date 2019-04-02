@@ -377,7 +377,7 @@ public class APIImportConfig {
 	private byte[] getSwaggerContent() throws AppException {
 		try {
 			InputStream stream = getSwaggerAsStream();
-			Reader reader = new InputStreamReader(stream);
+			Reader reader = new InputStreamReader(stream,StandardCharsets.UTF_8);
 			return IOUtils.toByteArray(reader,StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new AppException("Can't read swagger-file from file", ErrorCode.CANT_READ_SWAGGER_FILE, e);
@@ -451,7 +451,7 @@ public class APIImportConfig {
                     int status = response.getStatusLine().getStatusCode();
                     if (status >= 200 && status < 300) {
                         HttpEntity entity = response.getEntity();
-                        return entity != null ? EntityUtils.toString(entity) : null;
+                        return entity != null ? EntityUtils.toString(entity,StandardCharsets.UTF_8) : null;
                     } else {
                         throw new ClientProtocolException("Unexpected response status: " + status);
                     }
