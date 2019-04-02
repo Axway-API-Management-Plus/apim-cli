@@ -67,6 +67,34 @@ public class WSDLFromURLDirectTestIT extends TestNGCitrusTestDesigner {
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		action(wsdlImport);
+		
+		echo("####### Setting the status to Published #######");
+		createVariable("wsdlURL", "http://www.dneonline.com/calculator.asmx?wsdl");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/wsdl-minimal-config.json");
+		createVariable("status", "published");
+		createVariable("expectedReturnCode", "0");
+		action(wsdlImport);
+		
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
+		http().client("apiManager")
+			.send()
+			.get("/proxies")
+			.name("api")
+			.header("Content-Type", "application/json");
+
+		http().client("apiManager")
+			.receive()
+			.response(HttpStatus.OK)
+			.messageType(MessageType.JSON)
+			.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
+			.validate("$.[?(@.id=='${apiId}')].state", "published");
+		
+		echo("####### Now performing a change, which required to Re-Create the API #######");
+		createVariable("wsdlURL", "http://www.dneonline.com/calculator.asmx?wsdl");
+		createVariable("configFile", "/com/axway/apim/test/files/basic/wsdl-minimal-config-with-tags.json");
+		createVariable("status", "published");
+		createVariable("expectedReturnCode", "0");
+		action(wsdlImport);
 
 	}
 
