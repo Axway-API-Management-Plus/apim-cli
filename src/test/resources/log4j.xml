@@ -41,7 +41,7 @@
 
   <!-- Limit the org.apache logger to INFO as its DEBUG is verbose -->
   <logger name="org.apache">
-    <level value="INFO"/>
+    <level value="DEBUG"/>
   </logger>
   <!-- 
   <logger name="com.consol.citrus.channel.MessageSelectingQueueChannel">
@@ -53,7 +53,7 @@
   </logger>
   
   <logger name="com.axway.apim.swagger">
-	<level value="INFO"/>
+	<level value="DEBUG"/>
   </logger>
 
   <!-- ======================= -->
