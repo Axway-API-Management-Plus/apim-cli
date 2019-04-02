@@ -2,8 +2,11 @@ package com.axway.apim.swagger;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -493,7 +496,8 @@ public class APIManagerAdapter {
 					.setParameter("original", "true").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
-			return IOUtils.toByteArray(response);
+			Reader reader = new InputStreamReader(response);
+			return IOUtils.toByteArray(reader,StandardCharsets.UTF_8);
 		} catch (Exception e) {
 			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_SWAGGER_FILE, e);
 		}

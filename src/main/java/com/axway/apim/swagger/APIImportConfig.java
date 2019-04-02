@@ -8,6 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -374,7 +376,9 @@ public class APIImportConfig {
 	
 	private byte[] getSwaggerContent() throws AppException {
 		try {
-			return IOUtils.toByteArray(getSwaggerAsStream());
+			InputStream stream = getSwaggerAsStream();
+			Reader reader = new InputStreamReader(stream);
+			return IOUtils.toByteArray(reader,StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new AppException("Can't read swagger-file from file", ErrorCode.CANT_READ_SWAGGER_FILE, e);
 		}
