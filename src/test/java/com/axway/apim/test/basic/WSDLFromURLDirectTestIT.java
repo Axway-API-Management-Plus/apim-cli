@@ -1,5 +1,11 @@
 package com.axway.apim.test.basic;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
@@ -13,6 +19,8 @@ import com.consol.citrus.message.MessageType;
 @Test(testName="WSDLFromURLDirectTestIT")
 public class WSDLFromURLDirectTestIT extends TestNGCitrusTestDesigner {
 	
+	private static Logger LOG = LoggerFactory.getLogger(WSDLFromURLDirectTestIT.class);
+	
 	@Autowired
 	private WSDLImportTestAction wsdlImport;
 	
@@ -20,6 +28,11 @@ public class WSDLFromURLDirectTestIT extends TestNGCitrusTestDesigner {
 	public void setupDevOrgTest() {
 		description("Validates a WSDL-File can be taken from a URL using the direct instruction.");
 		
+		LOG.info("Default Charset=" + Charset.defaultCharset());
+		LOG.info("file.encoding=" + System.getProperty("file.encoding"));
+		LOG.info("Default Charset=" + Charset.defaultCharset());
+		LOG.info("Default Charset in Use=" + getDefaultCharSet());
+    		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/direct-url-wsdl-${apiNumber}");
 		variable("apiName", "Direct-URL-WSDL from URL-${apiNumber}");
@@ -55,6 +68,12 @@ public class WSDLFromURLDirectTestIT extends TestNGCitrusTestDesigner {
 		createVariable("expectedReturnCode", "10");
 		action(wsdlImport);
 
+	}
+
+	private  String getDefaultCharSet() {
+		OutputStreamWriter writer = new OutputStreamWriter(new ByteArrayOutputStream());
+		String enc = writer.getEncoding();
+		return enc;
 	}
 
 }
