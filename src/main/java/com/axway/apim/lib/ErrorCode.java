@@ -20,6 +20,7 @@ public enum ErrorCode {
 	ACCESS_ORGANIZATION_ERR		(59, "An error happens while managing organization permission."),
 	API_MANAGER_COMMUNICATION	(60, "API-Manager communication error."),
 	CANT_READ_SWAGGER_FILE		(65, "Can't read Swagger-File."),
+	CANT_READ_WSDL_FILE			(66, "Can't read Wsdl-File."),
 	CANT_READ_CONFIG_FILE		(70, "Can't read Config-File."),
 	UNSUPPORTED_FEATURE			(75, "Unsupported feature or operation used."),
 	CANT_CREATE_STATE_CHANGE	(80, "Cannot use Import & Existing API to create change state."),

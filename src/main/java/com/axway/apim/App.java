@@ -7,6 +7,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -51,13 +52,26 @@ public class App {
 			Options options = new Options();
 			Option option;
 			
-			option = new Option("a", "swagger", true, "The Swagger-API Definition (JSON-Formated):\n"
+			Option optionSwagger = new Option("a", "swagger", true, "The Swagger-API Definition (JSON-Formated):\n"
 					+ "- in local filesystem using a relativ or absolute path. Example: swagger_file.json\n"
 					+ "- a URL providing the Swagger-File. Example: [username/password@]https://any.host.com/my/path/to/swagger.json\n"
 					+ "- a file called anyname-i-want.url which contains a line with the URL (same format as above).");
-				option.setRequired(true);
-				option.setArgName("swagger_file.json");
-			options.addOption(option);
+			optionSwagger.setRequired(false);
+			optionSwagger.setArgName("swagger_file.json");
+			options.addOption(optionSwagger);
+			
+			Option optionWSDL = new Option("w", "wsdl", true, "The WSDL Definition:\n"
+					+ "- a URL providing the WSDL-File. Example: [username/password@]https://any.host.com/my/path/to/myservice.wsdl\n"
+					+ "- a file called anyname-i-want.url which contains a line with the URL (same format as above).");
+			optionWSDL.setRequired(false);
+			optionWSDL.setArgName("http://myhost/example.wsdl");
+			options.addOption(optionWSDL);
+			
+			OptionGroup optgrp = new OptionGroup();
+			optgrp.setRequired(true);
+			optgrp.addOption(optionSwagger);
+			optgrp.addOption(optionWSDL);
+			options.addOptionGroup(optgrp);
 			
 			option = new Option("c", "contract", true, "This is the JSON-Formatted API-Config containing information how to expose the API");
 				option.setRequired(true);
@@ -102,7 +116,7 @@ public class App {
 			
 			option = new Option("clientAppsMode", true, "Controls how configured Client-Applications are treated. Defaults to replace!");
 			option.setArgName("ignore|replace|add");
-			options.addOption(option);			
+			options.addOption(option);	
 			
 			CommandLineParser parser = new DefaultParser();
 			HelpFormatter formatter = new HelpFormatter();
@@ -135,7 +149,7 @@ public class App {
 			
 			APIManagerAdapter apimAdapter = new APIManagerAdapter();
 			
-			APIImportConfig contract = new APIImportConfig(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("swagger"));
+			APIImportConfig contract = new APIImportConfig(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("swagger"),params.getOptionValue("wsdl"));
 			IAPIDefinition desiredAPI = contract.getImportAPIDefinition();
 			IAPIDefinition actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);			

@@ -8,6 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -67,6 +69,8 @@ public class APIImportConfig {
 	private String apiConfig;
 	
 	private String stage;
+	
+	private String wsdlURL;
 
 	/**
 	 * Constructs the APIImportConfig 
@@ -75,11 +79,12 @@ public class APIImportConfig {
 	 * @param pathToSwagger
 	 * @throws AppException
 	 */
-	public APIImportConfig(String apiContract, String stage, String pathToSwagger) throws AppException {
+	public APIImportConfig(String apiContract, String stage, String pathToSwagger,String wsdlURL) throws AppException {
 		super();
 		this.apiConfig = apiContract;
 		this.stage = stage;
 		this.pathToSwagger = pathToSwagger;
+		this.wsdlURL=wsdlURL;
 	}
 	
 	/**
@@ -108,7 +113,14 @@ public class APIImportConfig {
 				stagedConfig = baseConfig;
 			}
 			addDefaultPassthroughSecurityProfile(stagedConfig);
-			stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerContent()));
+			if (this.wsdlURL!=null) {
+				stagedConfig.setWsdlURL(this.wsdlURL);
+				//we use the pathToSwagger even if it's a wsdl url
+				pathToSwagger=this.wsdlURL;
+				stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerContent()));
+			} else {
+				stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerContent()));
+			}
 			addImageContent(stagedConfig);
 			validateCustomProperties(stagedConfig);
 			validateDescription(stagedConfig);
@@ -364,7 +376,9 @@ public class APIImportConfig {
 	
 	private byte[] getSwaggerContent() throws AppException {
 		try {
-			return IOUtils.toByteArray(getSwaggerAsStream());
+			InputStream stream = getSwaggerAsStream();
+			Reader reader = new InputStreamReader(stream,StandardCharsets.UTF_8);
+			return IOUtils.toByteArray(reader,StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new AppException("Can't read swagger-file from file", ErrorCode.CANT_READ_SWAGGER_FILE, e);
 		}
@@ -437,7 +451,7 @@ public class APIImportConfig {
                     int status = response.getStatusLine().getStatusCode();
                     if (status >= 200 && status < 300) {
                         HttpEntity entity = response.getEntity();
-                        return entity != null ? EntityUtils.toString(entity) : null;
+                        return entity != null ? EntityUtils.toString(entity,StandardCharsets.UTF_8) : null;
                     } else {
                         throw new ClientProtocolException("Unexpected response status: " + status);
                     }

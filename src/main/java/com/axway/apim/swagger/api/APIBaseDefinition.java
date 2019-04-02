@@ -47,4 +47,16 @@ public class APIBaseDefinition extends AbstractAPIDefinition implements IAPIDefi
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void setWsdlURL(String wsdlURL) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getWsdlURL() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

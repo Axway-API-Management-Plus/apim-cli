@@ -100,4 +100,8 @@ public interface IAPIDefinition {
 	public void setApplications(List<ClientApplication> clientApplications);
 	
 	public Map<String, ServiceProfile> getServiceProfiles();
+	
+	public void setWsdlURL(String wsdlURL);
+	
+	public String getWsdlURL();
 }
