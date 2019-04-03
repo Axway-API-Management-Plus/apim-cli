@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class VhostConfigTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "VhostConfigTest")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Test a Request-Policy");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -29,8 +29,8 @@ public class VhostConfigTestIT extends TestNGCitrusTestDesigner {
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "unpublished");
 		createVariable("vhost", "api123.customer.com");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/vhost/1_vhost-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/vhost/1_vhost-config.json");
 		createVariable("expectedReturnCode", "87");
 		action(swaggerImport);
 		
@@ -54,8 +54,8 @@ public class VhostConfigTestIT extends TestNGCitrusTestDesigner {
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "published");
 		createVariable("vhost", "api123.customer.com");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/vhost/1_vhost-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/vhost/1_vhost-config.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

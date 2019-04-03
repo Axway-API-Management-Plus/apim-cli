@@ -21,8 +21,8 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class ManageClientApps extends AbstractAPIMTask implements IResponseParser {
@@ -31,13 +31,13 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	private static String MODE_CREATE_API_ACCESS	= "MODE_CREATE_API_ACCESS";
 	private static String MODE_REMOVE_API_ACCESS	= "MODE_REMOVE_API_ACCESS";
 	
-	public ManageClientApps(IAPIDefinition desiredState, IAPIDefinition actualState) {
+	public ManageClientApps(IAPI desiredState, IAPI actualState) {
 		super(desiredState, actualState);
 	}
 	
 	public void execute() throws AppException {
 		if(desiredState.getApplications()==null) return;
-		if(desiredState.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) return;
+		if(desiredState.getState().equals(IAPI.STATE_UNPUBLISHED)) return;
 		if(CommandParameters.getInstance().isIgnoreClientApps()) {
 			LOG.info("Configured client applications are ignored, as flag ignoreClientApps has been set.");
 			return;

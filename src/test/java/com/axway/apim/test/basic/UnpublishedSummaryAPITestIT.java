@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class UnpublishedSummaryAPITestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "UnpublishedNewSummaryAPITest")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Make sure, the summary gets updated");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -27,8 +27,8 @@ public class UnpublishedSummaryAPITestIT extends TestNGCitrusTestDesigner {
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/3_4_unpublished-dynamic-summary-api.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/3_4_unpublished-dynamic-summary-api.json");
 		createVariable("expectedReturnCode", "0");
 		createVariable("apiSummary", "My great summary 1!");
 		action(swaggerImport);
@@ -51,8 +51,8 @@ public class UnpublishedSummaryAPITestIT extends TestNGCitrusTestDesigner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Change the API-Summary, stay in the same status #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/3_4_unpublished-dynamic-summary-api.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/3_4_unpublished-dynamic-summary-api.json");
 		createVariable("expectedReturnCode", "0");
 		createVariable("apiSummary", "Another great summary!!!");
 		action(swaggerImport);
@@ -74,8 +74,8 @@ public class UnpublishedSummaryAPITestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.id=='${apiId}')].summary", "${apiSummary}");
 		
 		echo("####### Change the API back to a state without a summary #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/3_5_unpublished-no-summary-api.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/3_5_unpublished-no-summary-api.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

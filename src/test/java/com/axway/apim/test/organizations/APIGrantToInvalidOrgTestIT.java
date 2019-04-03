@@ -3,7 +3,7 @@ package com.axway.apim.test.organizations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -12,10 +12,10 @@ import com.consol.citrus.functions.core.RandomNumberFunction;
 public class APIGrantToInvalidOrgTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "APIGrantToInvalidOrgTestIT")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Tool must fail with a defined error, if a configured org is invalid");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -25,8 +25,8 @@ public class APIGrantToInvalidOrgTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("orgName2", "Invalid Org 0815");

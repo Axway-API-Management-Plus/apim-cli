@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class APIGrantOrganizationsTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "APIGrantOrganizationsTestIT")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Import an API can grant access to a number of defined orgs");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -27,8 +27,8 @@ public class APIGrantOrganizationsTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
 		createVariable("state", "unpublished");
 		createVariable("orgName", "${orgName}");
 		createVariable("orgName2", "${orgName2}");
@@ -50,8 +50,8 @@ public class APIGrantOrganizationsTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("orgName2", "${orgName2}");
@@ -101,8 +101,8 @@ public class APIGrantOrganizationsTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### Execute the same definition - Tool must return with No-Change return code #######");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("orgName2", "${orgName2}");
@@ -111,8 +111,8 @@ public class APIGrantOrganizationsTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### Going back to unpublished forcing a breaking change #######");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore2.json");
-		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
 		createVariable("state", "unpublished");
 		createVariable("orgName", "${orgName}");
 		createVariable("orgName2", "${orgName2}");

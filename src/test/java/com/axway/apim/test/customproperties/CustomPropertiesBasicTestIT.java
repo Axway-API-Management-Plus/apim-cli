@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class CustomPropertiesBasicTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "CustomPropertiesBasicTest")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Importing & validating custom-properties");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -28,8 +28,8 @@ public class CustomPropertiesBasicTestIT extends TestNGCitrusTestDesigner {
 
 		echo("####### 1. Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "unpublished");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
 		createVariable("customProperty1", "Test-Input 1");
 		createVariable("customProperty2", "1");
 		createVariable("customProperty3", "true");
@@ -56,8 +56,8 @@ public class CustomPropertiesBasicTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### 2. Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "published");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
 		createVariable("customProperty1", "Test-Input 0815");
 		createVariable("customProperty2", "2");
 		createVariable("customProperty3", "false");
@@ -84,8 +84,8 @@ public class CustomPropertiesBasicTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### 3. Re-Import with No-Change #######");
 		createVariable("status", "published");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
 		createVariable("customProperty1", "Test-Input 0815");
 		createVariable("customProperty2", "2");
 		createVariable("customProperty3", "false");
@@ -95,8 +95,8 @@ public class CustomPropertiesBasicTestIT extends TestNGCitrusTestDesigner {
 		// Finally, Change the Custom-Prop of a published API, which will lead to a new API-ID!
 		echo("####### 4. Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "published");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
 		createVariable("customProperty1", "Test-Input Final");
 		createVariable("customProperty2", "3");
 		createVariable("customProperty3", "false");

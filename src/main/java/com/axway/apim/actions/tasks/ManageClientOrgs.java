@@ -19,10 +19,10 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.APIImportDefinition;
-import com.axway.apim.swagger.api.AbstractAPIDefinition;
-import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.organization.ApiAccess;
+import com.axway.apim.swagger.api.state.AbstractAPI;
+import com.axway.apim.swagger.api.state.DesiredAPI;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParser {
@@ -31,24 +31,24 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 	private static String MODE_GRANT_ACCESS		= "MODE_GRANT_ACCESS";
 	private static String MODE_REMOVE_ACCESS	= "MODE_REMOVE_ACCESS";
 
-	public ManageClientOrgs(IAPIDefinition desiredState, IAPIDefinition actualState) {
+	public ManageClientOrgs(IAPI desiredState, IAPI actualState) {
 		super(desiredState, actualState);
 	}
 
 	public void execute() throws AppException {
 		if(desiredState.getClientOrganizations()==null) return;
-		if(desiredState.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) return;
+		if(desiredState.getState().equals(IAPI.STATE_UNPUBLISHED)) return;
 		if(CommandParameters.getInstance().isIgnoreClientOrgs()) {
 			LOG.info("Configured client organizations are ignored, as flag ignoreClientOrgs has been set.");
 			return;
 		}
-		if(((APIImportDefinition)desiredState).isRequestForAllOrgs()) {
+		if(((DesiredAPI)desiredState).isRequestForAllOrgs()) {
 			LOG.info("Granting permission to all organizations");
 			grantClientOrganization(getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations()), actualState.getId(), true);
 		} else {
 			List<String> missingDesiredOrgs = getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations());
 			List<String> removingActualOrgs = getMissingOrgs(actualState.getClientOrganizations(), desiredState.getClientOrganizations());
-			if(removingActualOrgs.remove( ((AbstractAPIDefinition)desiredState).getOrganization())); // Don't try to remove the Owning-Organization
+			if(removingActualOrgs.remove( ((AbstractAPI)desiredState).getOrganization())); // Don't try to remove the Owning-Organization
 			if(missingDesiredOrgs.size()==0) {
 				LOG.info("All desired organizations: "+desiredState.getClientOrganizations()+" have already access. Nothing to do.");
 			} else {

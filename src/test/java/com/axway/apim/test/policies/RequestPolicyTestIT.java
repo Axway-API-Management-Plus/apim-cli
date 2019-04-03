@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class RequestPolicyTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "RequestPolicyTest")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Test a Request-Policy");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -28,8 +28,8 @@ public class RequestPolicyTestIT extends TestNGCitrusTestDesigner {
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("requestPolicy", "Request policy 1");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/policies/1_request-policy.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/policies/1_request-policy.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

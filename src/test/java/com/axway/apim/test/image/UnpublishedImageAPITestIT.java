@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class UnpublishedImageAPITestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "UnpublishedImageAPITest")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Import an API including an image!");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -28,8 +28,8 @@ public class UnpublishedImageAPITestIT extends TestNGCitrusTestDesigner {
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/image/2_image_included_flex_state.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/image/2_image_included_flex_state.json");
 		createVariable("image", "/com/axway/apim/test/files/basic/API-Logo.jpg");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);

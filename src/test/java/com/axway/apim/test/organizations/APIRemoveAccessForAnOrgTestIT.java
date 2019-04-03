@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class APIRemoveAccessForAnOrgTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "APIRemoveAccessForAnOrgTestIT")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Import an API can grant access to a number of defined orgs");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -27,8 +27,8 @@ public class APIRemoveAccessForAnOrgTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("orgName2", "${orgName2}");
@@ -79,8 +79,8 @@ public class APIRemoveAccessForAnOrgTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### The API should now be granted to only ONE organization - The other must be removed #######");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-client-1-org.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-1-org.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("expectedReturnCode", "0");

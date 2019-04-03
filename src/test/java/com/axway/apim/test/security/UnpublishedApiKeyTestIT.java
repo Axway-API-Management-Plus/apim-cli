@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class UnpublishedApiKeyTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "UnpublishedApiKeyTest")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Some checks for the API-Key security device");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -30,8 +30,8 @@ public class UnpublishedApiKeyTestIT extends TestNGCitrusTestDesigner {
 		createVariable("apiKeyFieldName", "KeyId");
 		createVariable("takeFrom", "HEADER");
 		createVariable("removeCredentialsOnSuccess", "false");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/security/1_api-apikey.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/1_api-apikey.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -39,8 +39,8 @@ public class UnpublishedApiKeyTestIT extends TestNGCitrusTestDesigner {
 		createVariable("apiKeyFieldName", "KeyId");
 		createVariable("takeFrom", "HEADER");
 		createVariable("removeCredentialsOnSuccess", "false");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/security/1_api-apikey.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/1_api-apikey.json");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
 		
@@ -67,8 +67,8 @@ public class UnpublishedApiKeyTestIT extends TestNGCitrusTestDesigner {
 		createVariable("apiKeyFieldName", "KeyId-Test");
 		createVariable("takeFrom", "QUERY");
 		createVariable("removeCredentialsOnSuccess", "true");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/security/1_api-apikey.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/1_api-apikey.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

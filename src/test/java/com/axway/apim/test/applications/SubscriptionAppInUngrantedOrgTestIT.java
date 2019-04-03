@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class SubscriptionAppInUngrantedOrgTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "SubscriptionAppInUngrantedOrgTestIT")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("This test validates the behavior if a Client-App-Subscription is configured for an org without API-Permission.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -64,8 +64,8 @@ public class SubscriptionAppInUngrantedOrgTestIT extends TestNGCitrusTestDesigne
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' #######");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/applications/1_api-with-1-org-2-app.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/applications/1_api-with-1-org-2-app.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("expectedReturnCode", "0");

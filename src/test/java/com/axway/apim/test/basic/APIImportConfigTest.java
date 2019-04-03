@@ -7,7 +7,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.AppException;
-import com.axway.apim.swagger.APIImportConfig;
+import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -20,10 +20,10 @@ public class APIImportConfigTest {
 	  String httpUri3 = "user/password";
 	  String httpUri4 = "user/password@";
 	  
-	  Assert.assertEquals(APIImportConfig.isHttpUri(httpUri1), true);
-	  Assert.assertEquals(APIImportConfig.isHttpUri(httpUri2), true); 
-	  Assert.assertEquals(APIImportConfig.isHttpUri(httpUri3), false); 
-	  Assert.assertEquals(APIImportConfig.isHttpUri(httpUri4), false);
+	  Assert.assertEquals(APIImportConfigAdapter.isHttpUri(httpUri1), true);
+	  Assert.assertEquals(APIImportConfigAdapter.isHttpUri(httpUri2), true); 
+	  Assert.assertEquals(APIImportConfigAdapter.isHttpUri(httpUri3), false); 
+	  Assert.assertEquals(APIImportConfigAdapter.isHttpUri(httpUri4), false);
 	  String fileToTest = "com/axway/apim/test/files/customproperties/app-1.config";
 	  String appConfigContent = IOUtils.toString(Thread.currentThread().getContextClassLoader().getResource(fileToTest), "UTF-8");
 	  JsonNode jsonNode = APIManagerAdapter.parseAppConfig(appConfigContent);

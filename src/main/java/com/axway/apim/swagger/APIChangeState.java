@@ -12,7 +12,7 @@ import com.axway.apim.actions.CreateNewAPI;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.IAPI;
 
 /**
  * This class is key, as the desired and actual API comes together.</br>
@@ -31,9 +31,9 @@ public class APIChangeState {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIChangeState.class);
 	
-	private IAPIDefinition actualAPI;
-	private IAPIDefinition intransitAPI;
-	private IAPIDefinition desiredAPI;
+	private IAPI actualAPI;
+	private IAPI intransitAPI;
+	private IAPI desiredAPI;
 	
 	private boolean isBreaking = false;
 	private boolean updateExistingAPI = true;
@@ -47,7 +47,7 @@ public class APIChangeState {
 	 * @param desiredAPI - The API loaded from the Swagger + Config
 	 * @throws AppException - Is thrown when something goes wrong.
 	 */
-	public APIChangeState(IAPIDefinition actualAPI, IAPIDefinition desiredAPI) throws AppException {
+	public APIChangeState(IAPI actualAPI, IAPI desiredAPI) throws AppException {
 		super();
 		this.actualAPI = actualAPI;
 		this.desiredAPI = desiredAPI;
@@ -111,28 +111,28 @@ public class APIChangeState {
 	/**
 	 * @return the API-Manager API that has been given to this APIChangeState instance
 	 */
-	public IAPIDefinition getActualAPI() {
+	public IAPI getActualAPI() {
 		return actualAPI;
 	}
 
 	/**
 	 * @param actualAPI overwrites the API-Manager API instance
 	 */
-	public void setActualAPI(IAPIDefinition actualAPI) {
+	public void setActualAPI(IAPI actualAPI) {
 		this.actualAPI = actualAPI;
 	}
 
 	/**
 	 * @return the desired API that has been given to this APIChangeState instance
 	 */
-	public IAPIDefinition getDesiredAPI() {
+	public IAPI getDesiredAPI() {
 		return desiredAPI;
 	}
 
 	/**
 	 * @param desiredAPI overwrites the desired API.
 	 */
-	public void setDesiredAPI(IAPIDefinition desiredAPI) {
+	public void setDesiredAPI(IAPI desiredAPI) {
 		this.desiredAPI = desiredAPI;
 	}
 	
@@ -146,7 +146,7 @@ public class APIChangeState {
 	 * @return the in TransitAPI.
 	 * @see CreateNewAPI 
 	 */
-	public IAPIDefinition getIntransitAPI() {
+	public IAPI getIntransitAPI() {
 		return intransitAPI;
 	}
 
@@ -160,7 +160,7 @@ public class APIChangeState {
 	 * @param intransitAPI the intermediate API
 	 * @see CreateNewAPI 
 	 */
-	public void setIntransitAPI(IAPIDefinition intransitAPI) {
+	public void setIntransitAPI(IAPI intransitAPI) {
 		this.intransitAPI = intransitAPI;
 	}
 
@@ -181,7 +181,7 @@ public class APIChangeState {
 	 */
 	public boolean isBreaking() throws AppException {
 		// We will only break API, if the API is no longer in state: "unpublished"
-		if(this.actualAPI.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) return false;
+		if(this.actualAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) return false;
 		return isBreaking;
 	}
 

@@ -17,8 +17,8 @@ import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.APIBaseDefinition;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.APIBaseDefinition;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -53,12 +53,12 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 	
 	
 
-	public UpdateAPIStatus(IAPIDefinition desiredState, IAPIDefinition actualState, String intent) {
+	public UpdateAPIStatus(IAPI desiredState, IAPI actualState, String intent) {
 		super(desiredState, actualState);
 		this.intent = intent;
 	}
 	
-	public UpdateAPIStatus(IAPIDefinition desiredState, IAPIDefinition actualState) {
+	public UpdateAPIStatus(IAPI desiredState, IAPI actualState) {
 		this(desiredState, actualState, "");
 	}
 	
@@ -116,7 +116,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				if(intermediateState!=null) {
 					LOG.info("Required intermediate state: "+intermediateState);
 					// In case, we can't process directly, we have to perform an intermediate state change
-					IAPIDefinition desiredIntermediate = new APIBaseDefinition();
+					IAPI desiredIntermediate = new APIBaseDefinition();
 					desiredIntermediate.setState(intermediateState);
 					UpdateAPIStatus intermediateStatusUpdate = new UpdateAPIStatus(desiredIntermediate, actualState, " ### ");
 					intermediateStatusUpdate.execute(enforceBreakingChange);
@@ -125,7 +125,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				LOG.error(this.intent + "The status change from: " + actualState.getState() + " to " + desiredState.getState() + " is not possible!");
 				throw new AppException("The status change from: '" + actualState.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS);
 			}
-			if(desiredState.getState().equals(IAPIDefinition.STATE_DELETED)) {
+			if(desiredState.getState().equals(IAPI.STATE_DELETED)) {
 				uri = new URIBuilder(cmd.getAPIManagerURL())
 						.setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getId())
 						.build();

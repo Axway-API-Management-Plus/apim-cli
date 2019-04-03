@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "ApplicationSubscriptionTestIT")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Import an API, grant access to an org and create an application subscription.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -110,8 +110,8 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/applications/1_api-with-1-org-some-apps.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/applications/1_api-with-1-org-some-apps.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("expectedReturnCode", "0");
@@ -174,8 +174,8 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.*.apiId", "${apiId}");
 		
 		echo("####### Re-Importing same API: '${apiName}' - must result in No-Change #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/applications/1_api-with-1-org-some-apps.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/applications/1_api-with-1-org-some-apps.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("expectedReturnCode", "10");

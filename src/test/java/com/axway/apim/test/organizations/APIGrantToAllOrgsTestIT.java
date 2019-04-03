@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class APIGrantToAllOrgsTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "APIGrantToAllOrgsTestIT")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Tool must fail is not all organizations are asigned to an API.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -27,8 +27,8 @@ public class APIGrantToAllOrgsTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-all-orgs.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-all-orgs.json");
 		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
@@ -49,15 +49,15 @@ public class APIGrantToAllOrgsTestIT extends TestNGCitrusTestDesigner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Re-Import without a change. #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-all-orgs.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-all-orgs.json");
 		createVariable("state", "published");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
 		
 		echo("####### Validate API: '${apiName}' reduce the number of orgs to TWO #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("orgName2", "${orgName2}");

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class BasicCaCertTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "BasicCaCertTest")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Test to validate, that Certificates will be imported");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -26,8 +26,8 @@ public class BasicCaCertTestIT extends TestNGCitrusTestDesigner {
 		variable("status", "unpublished");
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/cacerts/1_basic_certs.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/cacerts/1_basic_certs.json");
 		createVariable("certFile4", "/com/axway/apim/test/files/cacerts/../certificates/DSTRootCAX3.crt");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
@@ -49,14 +49,14 @@ public class BasicCaCertTestIT extends TestNGCitrusTestDesigner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Simulate Re-Import without changes #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/cacerts/1_basic_certs.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/cacerts/1_basic_certs.json");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
 		
 		echo("####### Re-Import with a new certificate #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/cacerts/1_basic_certs.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/cacerts/1_basic_certs.json");
 		createVariable("certFile4", "/com/axway/apim/test/files/cacerts/../certificates/GlobalSignRootCA-R2.crt");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
