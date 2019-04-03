@@ -59,7 +59,7 @@ public class App {
 					+ "  [username/password@]http://www.dneonline.com/calculator.asmx?wsdl\n"
 					+ "- a reference file called anyname-i-want.url which contains a line with the URL\n"
 					+ "  (same format as above for Swagger or WSDL).");
-				option.setRequired(true);
+				option.setRequired(false);
 				option.setArgName("swagger_file.json");
 			options.addOption(option);
 			

@@ -1,0 +1,8 @@
+{
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"state": "${status}",
+	"version": "2.0.0",
+	"apiDefinition":"http://www.dneonline.com/calculator.asmx?WSDL",
+	"organization": "API Development ${orgNumber}"
+}

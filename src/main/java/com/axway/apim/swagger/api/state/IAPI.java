@@ -15,6 +15,7 @@ import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public interface IAPI {
 	
@@ -25,6 +26,7 @@ public interface IAPI {
 	
 	public final int SWAGGGER_API = 1;
 	public final int WSDL_API = 2;
+
 	
 	public String getVersion();
 	
@@ -103,4 +105,6 @@ public interface IAPI {
 	public void setApplications(List<ClientApplication> clientApplications);
 	
 	public Map<String, ServiceProfile> getServiceProfiles();
+
+	String getApiDefinitionImport();
 }
