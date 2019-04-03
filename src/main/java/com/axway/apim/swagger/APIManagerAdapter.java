@@ -84,9 +84,10 @@ public class APIManagerAdapter {
 		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the JVM)
 		loginToAPIManager();
 		this.enforceBreakingChange = CommandParameters.getInstance().isEnforceBreakingChange();
-		if(!getUserRole().equals("admin")) 
+		/*if(!getUserRole().equals("admin")) 
 			throw new AppException("Given user: '"+CommandParameters.getInstance().getUsername()+"' has no admin-role. "
 				+ "This tool needs admin role permissions.", ErrorCode.NO_ADMIN_ROLE_USER, false);
+				*/
 	}
 
 	/**
@@ -218,7 +219,7 @@ public class APIManagerAdapter {
 				}
 				((AbstractAPI)apiManagerApi).setCustomProperties(customProperties);
 			}
-			addQuotaConfiguration(apiManagerApi);
+			addQuotaConfiguration(apiManagerApi, desiredAPI);
 			addClientOrganizations(apiManagerApi, desiredAPI);
 			addClientApplications(apiManagerApi, desiredAPI);
 			return apiManagerApi;
@@ -381,9 +382,11 @@ public class APIManagerAdapter {
 	
 	
 	
-	private static void addQuotaConfiguration(IAPI api) throws AppException {
+	private static void addQuotaConfiguration(IAPI api, IAPI desiredAPI) throws AppException {
 		//APPLICATION:	00000000-0000-0000-0000-000000000001
 		//SYSTEM: 		00000000-0000-0000-0000-000000000000
+		// No need to load quota, if not given in the desired API
+		if(desiredAPI!=null && (desiredAPI.getApplicationQuota() == null && desiredAPI.getSystemQuota() == null)) return;
 		ActualAPI managerAPI = (ActualAPI)api;
 		try {
 			applicationQuotaConfig = getQuotaFromAPIManager("00000000-0000-0000-0000-000000000001"); // Get the Application-Default-Quota
