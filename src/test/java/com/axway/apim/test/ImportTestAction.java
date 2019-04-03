@@ -43,6 +43,7 @@ public class ImportTestAction extends AbstractTestAction {
 		String configFile = replaceDynamicContentInFile(origConfigFile, context);
 		LOG.info("Using Replaced Swagger-File: " + apiDefinition);
 		LOG.info("Using Replaced configFile-File: " + configFile);
+		LOG.info("API-Manager import is using user: '"+context.replaceDynamicContentInString("${oadminPassword1}")+"'");
 		int expectedReturnCode = 0;
 		try {
 			expectedReturnCode 	= Integer.parseInt(context.getVariable("expectedReturnCode"));
