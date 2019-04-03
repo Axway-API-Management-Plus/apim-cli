@@ -73,10 +73,9 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		RestAPICall importWSDL = new POSTRequest(entity, uri, this);
 		importWSDL.setContentType("application/x-www-form-urlencoded");
 		HttpResponse httpResponse = importWSDL.execute();
-		String response = httpResponse.getEntity().getContent().toString();
 		int statusCode = httpResponse.getStatusLine().getStatusCode();
 		if(statusCode != 201){
-			LOG.error("Received Status-Code: " +statusCode+ ", Response: " + response);
+			LOG.error("Received Status-Code: " +statusCode+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
 			throw new AppException("Can't import WSDL from URL / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
 		}
 	}
@@ -96,10 +95,9 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		RestAPICall importSwagger = new POSTRequest(entity, uri, this);
 		importSwagger.setContentType(null);
 		HttpResponse httpResponse = importSwagger.execute();
-		String response = httpResponse.getEntity().getContent().toString();
 		int statusCode = httpResponse.getStatusLine().getStatusCode();
 		if(statusCode != 201){
-			LOG.error("Received Status-Code: " +statusCode+ ", Response: " + response);
+			LOG.error("Received Status-Code: " +statusCode+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
 			throw new AppException("Can't import Swagger-definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
 		}
 	}
