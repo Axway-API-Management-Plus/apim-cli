@@ -1,4 +1,4 @@
-package com.axway.apim.swagger.api;
+package com.axway.apim.swagger.api.state;
 
 import com.axway.apim.swagger.api.properties.APIImage;
 
@@ -7,7 +7,7 @@ import com.axway.apim.swagger.api.properties.APIImage;
  * 
  * @author cwiechmann@axway.com
  */
-public class APIBaseDefinition extends AbstractAPIDefinition implements IAPIDefinition {
+public class APIBaseDefinition extends AbstractAPI implements IAPI {
 
 	@Override
 	public String getState() {

@@ -11,8 +11,8 @@ import com.axway.apim.actions.tasks.UpgradeAccessToNewerAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.APIBaseDefinition;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.APIBaseDefinition;
+import com.axway.apim.swagger.api.state.IAPI;
 
 /**
  * This class is used by the {@link APIManagerAdapter#applyChanges(APIChangeState)} to re-create an API. 
@@ -30,8 +30,8 @@ public class RecreateToUpdateAPI {
 
 	public void execute(APIChangeState changes) throws AppException {
 		
-		IAPIDefinition actual = changes.getActualAPI();
-		IAPIDefinition desired = changes.getDesiredAPI();
+		IAPI actual = changes.getActualAPI();
+		IAPI desired = changes.getDesiredAPI();
 		
 		// 1. Create BE- and FE-API (API-Proxy) / Including updating all belonging props!
 		// This also includes all CONFIGURED application subscriptions and client-orgs
@@ -41,15 +41,15 @@ public class RecreateToUpdateAPI {
 		LOG.info("New API created. Going to delete old API.");
 		
 		// 2. Create a new temp Desired-API-Definition, which will be used to delete the old API
-		IAPIDefinition tempDesiredDeletedAPI = new APIBaseDefinition();
+		IAPI tempDesiredDeletedAPI = new APIBaseDefinition();
 		
-		if(actual.getState().equals(IAPIDefinition.STATE_PUBLISHED)) {
+		if(actual.getState().equals(IAPI.STATE_PUBLISHED)) {
 			// In case, the existing API is already in use (Published), we have to grant access to our new imported API
 			new UpgradeAccessToNewerAPI(changes.getIntransitAPI(), changes.getActualAPI()).execute();
 		}
 		
 		// Delete the existing old API!
-		((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(IAPIDefinition.STATE_DELETED);
+		((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(IAPI.STATE_DELETED);
 		new UpdateAPIStatus(tempDesiredDeletedAPI, actual).execute(true);
 	}
 

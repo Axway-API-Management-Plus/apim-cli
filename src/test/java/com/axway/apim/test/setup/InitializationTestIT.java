@@ -109,6 +109,34 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 		
 		designer.echo("####### Created a application: '${testAppName}' ID: '${testAppId}' #######");
 		
+		designer.echo("####### Create an Org-Admin-User #######");
+		
+		designer.createVariable("oadminUsername1", "anna-${orgNumber}");
+		designer.createVariable("oadminPassword1", "anna-${orgNumber}");
+		
+		designer.http().client("apiManager")
+			.send()
+			.post("/users")
+			.header("Content-Type", "application/json")
+			.payload("{\"enabled\":true,\"loginName\":\"${oadminUsername1}\",\"name\":\"Anna Owen ${orgNumber}\",\"email\":\"anna-${orgNumber}@axway.com\",\"role\":\"oadmin\",\"organizationId\":\"${orgId}\"}");
+		
+		designer.http().client("apiManager")
+			.receive()
+			.response(HttpStatus.CREATED)
+			.messageType(MessageType.JSON)
+			.extractFromPayload("$.id", "oadminUserId1")
+			.extractFromPayload("$.loginName", "oadminUsername1");
+		
+		designer.http().client("apiManager")
+			.send()
+			.post("/users/${oadminUserId1}/changepassword/")
+			.header("Content-Type", "application/x-www-form-urlencoded")
+			.payload("newPassword=${oadminPassword1}");
+		
+		designer.http().client("apiManager").receive().response(HttpStatus.NO_CONTENT);
+	
+		designer.echo("####### Created a Org-Admin user: '${oadminUsername1}' ID: '${oadminUserId1}' #######");
+		
 		designer.action(new AbstractTestAction() {
             @Override public void doExecute(TestContext testContext) {
                 testContext.getGlobalVariables().put("testAppId", testContext.getVariable("testAppId"));
@@ -122,6 +150,9 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
                 testContext.getGlobalVariables().put("orgName", testContext.getVariable("orgName"));
                 testContext.getGlobalVariables().put("orgName2", testContext.getVariable("orgName2"));
                 testContext.getGlobalVariables().put("orgName3", testContext.getVariable("orgName3"));
+                testContext.getGlobalVariables().put("oadminUserId1", testContext.getVariable("oadminUserId1"));
+                testContext.getGlobalVariables().put("oadminUsername1", testContext.getVariable("oadminUsername1"));
+                testContext.getGlobalVariables().put("oadminPassword1", testContext.getVariable("oadminPassword1"));
             }
         });
 		

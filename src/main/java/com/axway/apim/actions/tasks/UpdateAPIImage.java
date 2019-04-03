@@ -14,14 +14,14 @@ import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.APIImportDefinition;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.DesiredAPI;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UpdateAPIImage extends AbstractAPIMTask implements IResponseParser {
 
-	public UpdateAPIImage(IAPIDefinition desiredState, IAPIDefinition actualState) {
+	public UpdateAPIImage(IAPI desiredState, IAPI actualState) {
 		super(desiredState, actualState);
 	}
 	public void execute() throws AppException {
@@ -38,7 +38,7 @@ public class UpdateAPIImage extends AbstractAPIMTask implements IResponseParser 
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getId()+"/image").build();
 			
 			entity = MultipartEntityBuilder.create()
-						.addBinaryBody("file", ((APIImportDefinition)this.desiredState).getImage().getInputStream(), ContentType.create("image/jpeg"), desiredState.getImage().getBaseFilename())
+						.addBinaryBody("file", ((DesiredAPI)this.desiredState).getImage().getInputStream(), ContentType.create("image/jpeg"), desiredState.getImage().getBaseFilename())
 					.build();
 			
 			RestAPICall apiCall = new POSTRequest(entity, uri, this);

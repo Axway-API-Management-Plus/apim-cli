@@ -16,9 +16,9 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIChangeState;
-import com.axway.apim.swagger.APIImportConfig;
+import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.IAPI;
 
 /**
  * This is the Entry-Point of program and responsible to:</br>
@@ -51,10 +51,12 @@ public class App {
 			Options options = new Options();
 			Option option;
 			
-			option = new Option("a", "swagger", true, "The Swagger-API Definition (JSON-Formated):\n"
-					+ "- in local filesystem using a relativ or absolute path. Example: swagger_file.json\n"
-					+ "- a URL providing the Swagger-File. Example: [username/password@]https://any.host.com/my/path/to/swagger.json\n"
-					+ "- a file called anyname-i-want.url which contains a line with the URL (same format as above).");
+			option = new Option("a", "apidefinition", true, "The API Definition either as Swagger (JSON-Formated) or a WSDL for SOAP-Services:\n"
+					+ "- in local filesystem using a relativ or absolute path. Example: swagger_file.json (not supported for WSDL)\n"
+					+ "- a URL providing the Swagger-File or WSDL-File. Examples:\n"
+					+ "  [username/password@]https://any.host.com/my/path/to/swagger.json\n"
+					+ "  [username/password@]http://www.dneonline.com/calculator.asmx?wsdl\n"
+					+ "- a file called anyname-i-want.url which contains a line with the URL (same format as above for Swagger or WSDL).");
 				option.setRequired(true);
 				option.setArgName("swagger_file.json");
 			options.addOption(option);
@@ -72,6 +74,10 @@ public class App {
 			option = new Option("h", "host", true, "The API-Manager hostname the API should be imported");
 				option.setRequired(true);
 				option.setArgName("api-host");
+			options.addOption(option);
+			
+			option = new Option("port", true, "The API-Manager port where the REST-API is exposed. Defaults to 8075.");
+			option.setArgName("8181");
 			options.addOption(option);
 			
 			option = new Option("u", "username", true, "Username used to authenticate. Please note, that this user must have Admin-Role");
@@ -98,7 +104,7 @@ public class App {
 			
 			option = new Option("clientAppsMode", true, "Controls how configured Client-Applications are treated. Defaults to replace!");
 			option.setArgName("ignore|replace|add");
-			options.addOption(option);			
+			options.addOption(option);	
 			
 			CommandLineParser parser = new DefaultParser();
 			HelpFormatter formatter = new HelpFormatter();
@@ -131,9 +137,9 @@ public class App {
 			
 			APIManagerAdapter apimAdapter = new APIManagerAdapter();
 			
-			APIImportConfig contract = new APIImportConfig(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("swagger"));
-			IAPIDefinition desiredAPI = contract.getImportAPIDefinition();
-			IAPIDefinition actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
+			APIImportConfigAdapter contract = new APIImportConfigAdapter(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("apidefinition"));
+			IAPI desiredAPI = contract.getDesiredAPI();
+			IAPI actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);			
 			
 			apimAdapter.applyChanges(changeActions);

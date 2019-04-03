@@ -13,7 +13,7 @@ import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -58,7 +58,7 @@ public class APIMHttpClient {
 		URI uri = URI.create(apiManagerURL);
 		SSLContextBuilder builder = new SSLContextBuilder();
 		try {
-			builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+			builder.loadTrustMaterial(null, new TrustAllStrategy());
 
 			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), new NoopHostnameVerifier());
 	

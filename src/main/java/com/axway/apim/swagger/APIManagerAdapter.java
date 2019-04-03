@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,10 +36,7 @@ import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.APIManagerAPI;
-import com.axway.apim.swagger.api.AbstractAPIDefinition;
-import com.axway.apim.swagger.api.IAPIDefinition;
-import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.APIDefintion;
 import com.axway.apim.swagger.api.properties.apiAccess.APIAccess;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
@@ -46,6 +44,9 @@ import com.axway.apim.swagger.api.properties.organization.ApiAccess;
 import com.axway.apim.swagger.api.properties.organization.Organization;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
+import com.axway.apim.swagger.api.state.AbstractAPI;
+import com.axway.apim.swagger.api.state.ActualAPI;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -83,6 +84,9 @@ public class APIManagerAdapter {
 		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the JVM)
 		loginToAPIManager();
 		this.enforceBreakingChange = CommandParameters.getInstance().isEnforceBreakingChange();
+		if(!getUserRole().equals("admin")) 
+			throw new AppException("Given user: '"+CommandParameters.getInstance().getUsername()+"' has no admin-role. "
+				+ "This tool needs admin role permissions.", ErrorCode.NO_ADMIN_ROLE_USER, false);
 	}
 
 	/**
@@ -135,20 +139,46 @@ public class APIManagerAdapter {
 		transaction.beginTransaction();
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/login").build();
-			
-			
+
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 		    params.add(new BasicNameValuePair("username", cmd.getUsername()));
 		    params.add(new BasicNameValuePair("password", cmd.getPassword()));
 		    POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, null);
 			loginRequest.setContentType(null);
-		    
-			loginRequest.execute();
+			HttpResponse response = loginRequest.execute();
+			int statusCode = response.getStatusLine().getStatusCode();
+			if(statusCode == 403){
+				LOG.error("Login failed: " +statusCode+ ", Response: " + response);
+				throw new AppException("Given user can't login.", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
 		} catch (Exception e) {
 			throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
-		
-		
+	}
+	
+	public static String getUserRole() throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		URI uri;
+		HttpResponse response = null;
+		InputStream is = null;
+		JsonNode jsonResponse = null;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/currentuser").build();
+		    GETRequest currentUserRequest = new GETRequest(uri, null);
+		    response = currentUserRequest.execute();
+			is = response.getEntity().getContent();
+			jsonResponse = mapper.readTree(is);
+			JsonNode role = jsonResponse.get("role");
+			if(role == null) {
+				throw new AppException("Can't get current-user information on response: '" + jsonResponse + "'", 
+						ErrorCode.API_MANAGER_COMMUNICATION);
+			}
+			return role.asText();
+		    
+		} catch (Exception e) {
+			throw new AppException("Can't get current-user information on response: '" + jsonResponse + "'", 
+					ErrorCode.API_MANAGER_COMMUNICATION);
+		}
 	}
 	
 	/**
@@ -159,18 +189,18 @@ public class APIManagerAdapter {
 	 * @return an APIManagerAPI instance, which is flagged either as valid, if the API was found or invalid, if not found!
 	 * @throws AppException when the API-Manager API-State can't be created
 	 */
-	public static IAPIDefinition getAPIManagerAPI(JsonNode jsonConfiguration, IAPIDefinition desiredAPI) throws AppException {
+	public static IAPI getAPIManagerAPI(JsonNode jsonConfiguration, IAPI desiredAPI) throws AppException {
 		if(jsonConfiguration == null) {
-			IAPIDefinition apiManagerAPI = new APIManagerAPI();
+			IAPI apiManagerAPI = new ActualAPI();
 			apiManagerAPI.setValid(false);
 			return apiManagerAPI;
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
-		IAPIDefinition apiManagerApi;
+		IAPI apiManagerApi;
 		try {
-			apiManagerApi = mapper.readValue(jsonConfiguration.toString(), APIManagerAPI.class);
-			apiManagerApi.setSwaggerDefinition(new APISwaggerDefinion(getOriginalSwaggerFromAPIM(apiManagerApi.getApiId())));
+			apiManagerApi = mapper.readValue(jsonConfiguration.toString(), ActualAPI.class);
+			apiManagerApi.setAPIDefinition(new APIDefintion(getOriginalAPIDefinitionFromAPIM(apiManagerApi.getApiId())));
 			if(apiManagerApi.getImage()!=null) {
 				apiManagerApi.getImage().setImageContent(getAPIImageFromAPIM(apiManagerApi.getId()));
 			}
@@ -186,7 +216,7 @@ public class APIManagerAdapter {
 					String customPropValue = (value == null) ? null : value.asText();
 					customProperties.put(customPropKey, customPropValue);
 				}
-				((AbstractAPIDefinition)apiManagerApi).setCustomProperties(customProperties);
+				((AbstractAPI)apiManagerApi).setCustomProperties(customProperties);
 			}
 			addQuotaConfiguration(apiManagerApi);
 			addClientOrganizations(apiManagerApi, desiredAPI);
@@ -197,8 +227,8 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static void addClientOrganizations(IAPIDefinition apiManagerApi, IAPIDefinition desiredAPI) throws AppException {
-		if(desiredAPI.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
+	private static void addClientOrganizations(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
+		if(desiredAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
 			LOG.info("Ignoring Client-Organizations, as desired API-State is Unpublished!");
 			return;
 		}
@@ -215,8 +245,8 @@ public class APIManagerAdapter {
 		apiManagerApi.setClientOrganizations(grantedOrgs);
 	}
 	
-	private static void addClientApplications(IAPIDefinition apiManagerApi, IAPIDefinition desiredAPI) throws AppException {
-		if(desiredAPI.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
+	private static void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
+		if(desiredAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
 			LOG.info("Ignoring Client-Applications, as desired API-State is Unpublished!");
 			return;
 		}
@@ -351,10 +381,10 @@ public class APIManagerAdapter {
 	
 	
 	
-	private static void addQuotaConfiguration(IAPIDefinition api) throws AppException {
+	private static void addQuotaConfiguration(IAPI api) throws AppException {
 		//APPLICATION:	00000000-0000-0000-0000-000000000001
 		//SYSTEM: 		00000000-0000-0000-0000-000000000000
-		APIManagerAPI managerAPI = (APIManagerAPI)api;
+		ActualAPI managerAPI = (ActualAPI)api;
 		try {
 			applicationQuotaConfig = getQuotaFromAPIManager("00000000-0000-0000-0000-000000000001"); // Get the Application-Default-Quota
 			sytemQuotaConfig = getQuotaFromAPIManager("00000000-0000-0000-0000-000000000000"); // Get the System-Default-Quota
@@ -457,16 +487,17 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static byte[] getOriginalSwaggerFromAPIM(String backendApiID) throws AppException {
+	private static byte[] getOriginalAPIDefinitionFromAPIM(String backendApiID) throws AppException {
 		URI uri;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+backendApiID+"/download")
 					.setParameter("original", "true").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
-			InputStream response = getRequest.execute().getEntity().getContent();
-			return IOUtils.toByteArray(response);
+			HttpResponse response=getRequest.execute();
+			String res = EntityUtils.toString(response.getEntity(),StandardCharsets.UTF_8);
+			return res.getBytes(StandardCharsets.UTF_8);
 		} catch (Exception e) {
-			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_SWAGGER_FILE, e);
+			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		}
 	}
 	

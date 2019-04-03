@@ -20,12 +20,14 @@ cache:
     - '$HOME/.m2/repository'
 
 before_install:
+  - if [ ! -f $CACHE_FILE_APIM ]; then sudo sed 's/DOCKER_OPTS="/DOCKER_OPTS="--insecure-registry=docker-registry.demo.axway.com /g' -i /etc/default/docker; fi
+  - if [ ! -f $CACHE_FILE_APIM ]; then sudo service docker restart; fi
   #- sudo apt-get update
   #- sudo apt-get install curl
   # All files in this folder will be cached for the next build
   - mkdir -p $CACHE_DIR
   # Login to the Docker-Registry
-  - docker login --username $AXWAY_DOCKER_REG_USER --password $AXWAY_DOCKER_REG_PASS docker-registry.demo.axway.com
+  - if [ ! -f $CACHE_FILE_APIM ]; then docker login --username $AXWAY_DOCKER_REG_USER --password $AXWAY_DOCKER_REG_PASS docker-registry.demo.axway.com; fi
   # Downloading the APIM-Docker-Image takes too long (Timeout 10 minutes) - Externalized to make use of travis_wait
   # In this script, we are either using the cached version or download a new Docker-Image
   - travis_wait build/pull_apim_docker_image.sh

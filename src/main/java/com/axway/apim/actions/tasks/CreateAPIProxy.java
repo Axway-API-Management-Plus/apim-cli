@@ -14,13 +14,13 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CreateAPIProxy extends AbstractAPIMTask implements IResponseParser {
 
-	public CreateAPIProxy(IAPIDefinition desiredState, IAPIDefinition actualState) {
+	public CreateAPIProxy(IAPI desiredState, IAPI actualState) {
 		super(desiredState, actualState);
 	}
 	public void execute() throws AppException {

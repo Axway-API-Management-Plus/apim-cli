@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class SwaggerFromURLRefFileTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "SwaggerFromURLRefFileTestIT")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Validates a Swagger-File can be taken from a URL using a REF-File.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -27,8 +27,8 @@ public class SwaggerFromURLRefFileTestIT extends TestNGCitrusTestDesigner {
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/swagger-file-with-username.url");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/minimal-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/swagger-file-with-username.url");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
@@ -49,8 +49,8 @@ public class SwaggerFromURLRefFileTestIT extends TestNGCitrusTestDesigner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Re-Import API from URL without a change #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/swagger-file-with-username.url");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/minimal-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/swagger-file-with-username.url");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);

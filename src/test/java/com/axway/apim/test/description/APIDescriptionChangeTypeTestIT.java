@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class APIDescriptionChangeTypeTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "APIDescriptionChangeTypeTest")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Tests, that the description type can be changed");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -27,8 +27,8 @@ public class APIDescriptionChangeTypeTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/description/1_api_with_manual_description.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/description/1_api_with_manual_description.json");
 		createVariable("state", "published");
 		createVariable("descriptionType", "manual");
 		createVariable("descriptionManual", "This is my manual markdown description!");
@@ -52,8 +52,8 @@ public class APIDescriptionChangeTypeTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.path=='${apiPath}')].descriptionManual", "This is my manual markdown description!")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/description/1_api_with_url_description.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/description/1_api_with_url_description.json");
 		createVariable("state", "published");
 		createVariable("descriptionType", "url");
 		createVariable("descriptionUrl", "https://any.url.com/serves/my/docu.md");
@@ -76,8 +76,8 @@ public class APIDescriptionChangeTypeTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.id=='${apiId}')].descriptionType", "url")
 			.validate("$.[?(@.id=='${apiId}')].descriptionUrl", "https://any.url.com/serves/my/docu.md");
 		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/description/1_api_with_markdown_description.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/description/1_api_with_markdown_description.json");
 		createVariable("state", "published");
 		createVariable("descriptionType", "markdown");
 		createVariable("descriptionMarkdown", "${//env.DOCUMENTS//}/api/docu.md");

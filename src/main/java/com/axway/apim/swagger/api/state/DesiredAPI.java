@@ -1,4 +1,4 @@
-package com.axway.apim.swagger.api;
+package com.axway.apim.swagger.api.state;
 
 import java.net.URI;
 import java.util.LinkedHashMap;
@@ -12,7 +12,7 @@ import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.APIImportConfig;
+import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,9 +26,9 @@ import com.fasterxml.jackson.databind.JsonNode;
  * 
  * @author cwiechmann@axway.com
  */
-public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDefinition {
+public class DesiredAPI extends AbstractAPI implements IAPI {
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIImportDefinition.class);
+	private static Logger LOG = LoggerFactory.getLogger(DesiredAPI.class);
 	
 	private String orgId = null;
 	
@@ -36,7 +36,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	
 	private boolean requestForAllOrgs = false;
 	
-	public APIImportDefinition() throws AppException {
+	public DesiredAPI() throws AppException {
 		super();
 	}
 
@@ -45,7 +45,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	 * </br> 
 	 * TODO: Potential duplicate method:
 	 * @see APIManagerAdapter#getOrgId(String)
-	 * @see com.axway.apim.swagger.api.AbstractAPIDefinition#getOrgId()
+	 * @see com.axway.apim.swagger.api.state.AbstractAPI#getOrgId()
 	 */
 	@Override
 	public String getOrgId() throws AppException {
@@ -111,7 +111,7 @@ public class APIImportDefinition extends AbstractAPIDefinition implements IAPIDe
 	 * That means, when an API-Developer is defining ALL as the organization name this flag 
 	 * is set to true and it becomes the desired state.</br>
 	 * This method is used during creation of APIImportDefinition in  APIImportConfig#handleAllOrganizations()
-	 * @see APIImportConfig
+	 * @see APIImportConfigAdapter
 	 * @param requestForAllOrgs
 	 */
 	public void setRequestForAllOrgs(boolean requestForAllOrgs) {
