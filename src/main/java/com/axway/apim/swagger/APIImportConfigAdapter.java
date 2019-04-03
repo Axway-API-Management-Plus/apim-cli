@@ -1,11 +1,9 @@
 package com.axway.apim.swagger;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,10 +33,8 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.APIImportDefinition;
-import com.axway.apim.swagger.api.AbstractAPIDefinition;
-import com.axway.apim.swagger.api.IAPIDefinition;
-import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.lib.Utils;
+import com.axway.apim.swagger.api.properties.APIDefintion;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
@@ -46,6 +42,9 @@ import com.axway.apim.swagger.api.properties.organization.Organization;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
+import com.axway.apim.swagger.api.state.AbstractAPI;
+import com.axway.apim.swagger.api.state.DesiredAPI;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -53,45 +52,43 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 
 /**
- * The APIContract reflects the given API-Configuration plus the Swagger-Definition.
- * This class will read the API-Configuration plus the optional set stage and the Swagger-File.
+ * The APIConfig reflects the given API-Configuration plus the API-Definition, which is either a 
+ * Swagger-File or a WSDL.
+ * This class will read the API-Configuration plus the optional set stage and the API-Definition.
  * 
  * @author cwiechmann
  */
-public class APIImportConfig {
+public class APIImportConfigAdapter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIImportConfig.class);
+	private static Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapter.class);
 	
 	private ObjectMapper mapper = new ObjectMapper();
 	
-	private String pathToSwagger;
+	private String pathToAPIDefinition;
 	
 	private String apiConfig;
 	
 	private String stage;
-	
-	private String wsdlURL;
 
 	/**
 	 * Constructs the APIImportConfig 
-	 * @param apiContract
+	 * @param apiConfig
 	 * @param stage
-	 * @param pathToSwagger
+	 * @param pathToAPIDefinition
 	 * @throws AppException
 	 */
-	public APIImportConfig(String apiContract, String stage, String pathToSwagger,String wsdlURL) throws AppException {
+	public APIImportConfigAdapter(String apiConfig, String stage, String pathToAPIDefinition) throws AppException {
 		super();
-		this.apiConfig = apiContract;
+		this.apiConfig = apiConfig;
 		this.stage = stage;
-		this.pathToSwagger = pathToSwagger;
-		this.wsdlURL=wsdlURL;
+		this.pathToAPIDefinition = pathToAPIDefinition;
 	}
 	
 	/**
 	 * Returns the IAPIDefintion that returns the desired state of the API. In this method:<br>
-	 * <li>the API-Contract is read</li>
-	 * <li>the API-Contract is merged with the override</li>
-	 * <li>the Swagger-File is read</li>
+	 * <li>the API-Config is read</li>
+	 * <li>the API-Config is merged with the override</li>
+	 * <li>the API-Definition is read</li>
 	 * <li>Additionally some validations & completions are made here</li>
 	 * <li>in the future: This is the place to do some default handling.
 	 * 
@@ -99,28 +96,23 @@ public class APIImportConfig {
 	 * the input to create the APIChangeState.
 	 * 
 	 * @throws AppException if the state can't be created.
-	 * @see {@link IAPIDefinition}, {@link AbstractAPIDefinition}
+	 * @see {@link IAPI}, {@link AbstractAPI}
 	 */
-	public IAPIDefinition getImportAPIDefinition() throws AppException {
-		IAPIDefinition stagedConfig;
+	public IAPI getDesiredAPI() throws AppException {
+		IAPI stagedConfig;
 		try {
-			IAPIDefinition baseConfig = mapper.readValue(new File(apiConfig), APIImportDefinition.class);
+			IAPI baseConfig = mapper.readValue(new File(apiConfig), DesiredAPI.class);
 			ObjectReader updater = mapper.readerForUpdating(baseConfig);
-			if(getStageContract(stage, apiConfig)!=null) {
-				LOG.info("Overriding configuration from: " + getStageContract(stage, apiConfig));
-				stagedConfig = updater.readValue(new File(getStageContract(stage, apiConfig)));
+			if(getStageConfig(stage, apiConfig)!=null) {
+				LOG.info("Overriding configuration from: " + getStageConfig(stage, apiConfig));
+				stagedConfig = updater.readValue(new File(getStageConfig(stage, apiConfig)));
 			} else {
 				stagedConfig = baseConfig;
 			}
 			addDefaultPassthroughSecurityProfile(stagedConfig);
-			if (this.wsdlURL!=null) {
-				stagedConfig.setWsdlURL(this.wsdlURL);
-				//we use the pathToSwagger even if it's a wsdl url
-				pathToSwagger=this.wsdlURL;
-				stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerContent()));
-			} else {
-				stagedConfig.setSwaggerDefinition(new APISwaggerDefinion(getSwaggerContent()));
-			}
+			APIDefintion apiDefinition = new APIDefintion(getAPIDefinitionContent());
+			apiDefinition.setAPIDefinitionFile(this.pathToAPIDefinition);
+			stagedConfig.setAPIDefinition(apiDefinition);
 			addImageContent(stagedConfig);
 			validateCustomProperties(stagedConfig);
 			validateDescription(stagedConfig);
@@ -139,7 +131,7 @@ public class APIImportConfig {
 		}
 	}
 	
-	private void handleAllOrganizations(IAPIDefinition apiConfig) throws AppException {
+	private void handleAllOrganizations(IAPI apiConfig) throws AppException {
 		if(apiConfig.getClientOrganizations()==null) return;
 		List<String> allDesiredOrgs = new ArrayList<String>();
 		if(apiConfig.getClientOrganizations().contains("ALL")) {
@@ -149,7 +141,7 @@ public class APIImportConfig {
 			}
 			apiConfig.getClientOrganizations().clear();
 			apiConfig.getClientOrganizations().addAll(allDesiredOrgs);
-			((APIImportDefinition)apiConfig).setRequestForAllOrgs(true);
+			((DesiredAPI)apiConfig).setRequestForAllOrgs(true);
 		} else {
 			// As the API-Manager internally handles the owning organization in the same way, 
 			// we have to add the Owning-Org as a desired org
@@ -159,8 +151,8 @@ public class APIImportConfig {
 		}
 	}
 	
-	private void addQuotaConfiguration(IAPIDefinition apiConfig) {
-		APIImportDefinition importAPI = (APIImportDefinition)apiConfig;
+	private void addQuotaConfiguration(IAPI apiConfig) {
+		DesiredAPI importAPI = (DesiredAPI)apiConfig;
 		initQuota(importAPI.getSystemQuota());
 		initQuota(importAPI.getApplicationQuota());
 	}
@@ -176,7 +168,7 @@ public class APIImportConfig {
 		}
 	}
 	
-	private void validateDescription(IAPIDefinition apiConfig) throws AppException {
+	private void validateDescription(IAPI apiConfig) throws AppException {
 		if(apiConfig.getDescriptionType()==null || apiConfig.getDescriptionType().equals("original")) return;
 		String descriptionType = apiConfig.getDescriptionType();
 		if(descriptionType.equals("manual")) {
@@ -201,7 +193,7 @@ public class APIImportConfig {
 		}
 	}
 	
-	private void validateCorsConfig(IAPIDefinition apiConfig) throws AppException {
+	private void validateCorsConfig(IAPI apiConfig) throws AppException {
 		if(apiConfig.getCorsProfiles()==null || apiConfig.getCorsProfiles().size()==0) return;
 		// Check if there is a default cors profile declared otherwise create one internally
 		boolean defaultCorsFound = false;
@@ -233,7 +225,7 @@ public class APIImportConfig {
 	 * @param apiConfig
 	 * @throws AppException
 	 */
-	private void completeClientApplications(IAPIDefinition apiConfig) throws AppException {
+	private void completeClientApplications(IAPI apiConfig) throws AppException {
 		if(CommandParameters.getInstance().isIgnoreClientApps()) return;
 		ClientApplication loadedApp = null;
 		ClientApplication app;
@@ -284,7 +276,7 @@ public class APIImportConfig {
 		return app;
 	}
 	
-	private void completeCaCerts(IAPIDefinition apiConfig) throws AppException {
+	private void completeCaCerts(IAPI apiConfig) throws AppException {
 		if(apiConfig.getCaCerts()!=null) {
 			List<CaCert> completedCaCerts = new ArrayList<CaCert>();
 			for(CaCert cert :apiConfig.getCaCerts()) {
@@ -345,7 +337,7 @@ public class APIImportConfig {
 		return is;
 	}
 	
-	private void validateCustomProperties(IAPIDefinition apiConfig) throws AppException {
+	private void validateCustomProperties(IAPI apiConfig) throws AppException {
 		if(apiConfig.getCustomProperties()!=null) {
 			JsonNode configuredProps = APIManagerAdapter.getCustomPropertiesConfig();
 			Iterator<String> props = apiConfig.getCustomProperties().keySet().iterator();
@@ -374,13 +366,13 @@ public class APIImportConfig {
 		}
 	}
 	
-	private byte[] getSwaggerContent() throws AppException {
+	private byte[] getAPIDefinitionContent() throws AppException {
 		try {
-			InputStream stream = getSwaggerAsStream();
+			InputStream stream = getAPIDefinitionAsStream();
 			Reader reader = new InputStreamReader(stream,StandardCharsets.UTF_8);
 			return IOUtils.toByteArray(reader,StandardCharsets.UTF_8);
 		} catch (IOException e) {
-			throw new AppException("Can't read swagger-file from file", ErrorCode.CANT_READ_SWAGGER_FILE, e);
+			throw new AppException("Can't read API-Definition from file", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		}
 	}
 	
@@ -389,37 +381,37 @@ public class APIImportConfig {
 	 * @throws AppException when the import Swagger-File can't be read.
 	 * @return The import Swagger-File as an InputStream
 	 */
-	public InputStream getSwaggerAsStream() throws AppException {
+	public InputStream getAPIDefinitionAsStream() throws AppException {
 		InputStream is = null;
-		if(pathToSwagger.endsWith(".url")) {
-			return getSwaggerFromURL(getSwaggerUriFromFile(pathToSwagger));
-		} else if(isHttpUri(pathToSwagger)) {
-			return getSwaggerFromURL(pathToSwagger);
+		if(pathToAPIDefinition.endsWith(".url")) {
+			return getAPIDefinitionFromURL(Utils.getAPIDefinitionUriFromFile(pathToAPIDefinition));
+		} else if(isHttpUri(pathToAPIDefinition)) {
+			return getAPIDefinitionFromURL(pathToAPIDefinition);
 		} else {
-			File inputFile = new File(pathToSwagger);
+			File inputFile = new File(pathToAPIDefinition);
 			try {
 				if(inputFile.exists()) { 
-					is = new FileInputStream(pathToSwagger);
+					is = new FileInputStream(pathToAPIDefinition);
 				} else {
-					is = this.getClass().getResourceAsStream(pathToSwagger);
+					is = this.getClass().getResourceAsStream(pathToAPIDefinition);
 				}
 				if(is == null) {
-					throw new AppException("Unable to read swagger file from: " + pathToSwagger, ErrorCode.CANT_READ_SWAGGER_FILE);
+					throw new AppException("Unable to read swagger file from: " + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE);
 				}
 				
 			} catch (Exception e) {
-				throw new AppException("Unable to read swagger file from: " + pathToSwagger, ErrorCode.CANT_READ_SWAGGER_FILE, e);
+				throw new AppException("Unable to read swagger file from: " + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 			}
 			
 		}
 		return is;
 	}
 	
-	private InputStream getSwaggerFromURL(String urlToSwagger) throws AppException {
+	private InputStream getAPIDefinitionFromURL(String urlToAPIDefinition) throws AppException {
 		String uri = null;
 		String username = null;
 		String password = null;
-		String[] temp = urlToSwagger.split("@");
+		String[] temp = urlToAPIDefinition.split("@");
 		if(temp.length==1) {
 			uri = temp[0];
 		} else if(temp.length==2) {
@@ -427,11 +419,11 @@ public class APIImportConfig {
 			password = temp[0].substring(temp[0].indexOf("/")+1);
 			uri = temp[1];
 		} else {
-			throw new AppException("Swagger-URL has an invalid format. ", ErrorCode.CANT_READ_SWAGGER_FILE);
+			throw new AppException("API-Definition URL has an invalid format. ", ErrorCode.CANT_READ_API_DEFINITION_FILE);
 		}
 		CloseableHttpClient httpclient = null;
 		try {
-			LOG.info("Loading Swagger-File from: " + uri);
+			LOG.info("Loading API-Definition from: " + uri);
 			if(username!=null) {
 				CredentialsProvider credsProvider = new BasicCredentialsProvider();
 				credsProvider.setCredentials(
@@ -461,7 +453,7 @@ public class APIImportConfig {
             String responseBody = httpclient.execute(httpGet, responseHandler);
             return new ByteArrayInputStream(responseBody.getBytes(StandardCharsets.UTF_8));
 		} catch (Exception e) {
-			throw new AppException("Cannot load Swagger-File from URI: "+uri, ErrorCode.CANT_READ_SWAGGER_FILE, e);
+			throw new AppException("Cannot load API-Definition from URI: "+uri, ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {
 			try {
 				httpclient.close();
@@ -469,41 +461,25 @@ public class APIImportConfig {
 		}
 	}
 	
-	public static boolean isHttpUri(String pathToSwagger) {
-		String httpUri = pathToSwagger.substring(pathToSwagger.indexOf("@")+1);
+	public static boolean isHttpUri(String pathToAPIDefinition) {
+		String httpUri = pathToAPIDefinition.substring(pathToAPIDefinition.indexOf("@")+1);
 		return( httpUri.startsWith("http://") || httpUri.startsWith("https://"));
 	}
 	
-	private static String getSwaggerUriFromFile(String pathToSwagger) throws AppException {
-		String uriToSwagger = null;
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(pathToSwagger));
-			uriToSwagger = br.readLine();
-			return uriToSwagger;
-		} catch (Exception e) {
-			throw new AppException("Can't load file:" + pathToSwagger, ErrorCode.CANT_READ_SWAGGER_FILE, e);
-		} finally {
-			try {
-				br.close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
-	private String getStageContract(String stage, String apiContract) {
+	private String getStageConfig(String stage, String apiConfig) {
 		if(stage == null) return null;
 		File stageFile = new File(stage);
 		if(stageFile.exists()) { // This is to support testing with dynamic created files!
 			return stageFile.getAbsolutePath();
 		}
 		if(stage!=null && !stage.equals("NOT_SET")) {
-			return apiContract.substring(0, apiContract.lastIndexOf(".")+1) + stage + apiContract.substring(apiContract.lastIndexOf("."));
+			return apiConfig.substring(0, apiConfig.lastIndexOf(".")+1) + stage + apiConfig.substring(apiConfig.lastIndexOf("."));
 		}
 		LOG.debug("No stage provided");
 		return null;
 	}
 	
-	private IAPIDefinition addDefaultPassthroughSecurityProfile(IAPIDefinition importApi) throws AppException {
+	private IAPI addDefaultPassthroughSecurityProfile(IAPI importApi) throws AppException {
 		if(importApi.getSecurityProfiles()==null || importApi.getSecurityProfiles().size()==0) {
 			SecurityProfile passthroughProfile = new SecurityProfile();
 			passthroughProfile.setName("_default");
@@ -522,7 +498,7 @@ public class APIImportConfig {
 		return importApi;
 	}
 	
-	private void validateOutboundAuthN(IAPIDefinition importApi) throws AppException {
+	private void validateOutboundAuthN(IAPI importApi) throws AppException {
 		// Request to use some specific Outbound-AuthN for this API
 		if(importApi.getAuthenticationProfiles()!=null && importApi.getAuthenticationProfiles().size()!=0) {
 			// For now, we only support one DEFAULT, hence it must be configured as such
@@ -535,7 +511,7 @@ public class APIImportConfig {
 		
 	}
 	
-	private IAPIDefinition addImageContent(IAPIDefinition importApi) throws AppException {
+	private IAPI addImageContent(IAPI importApi) throws AppException {
 		if(importApi.getImage()!=null) { // An image is declared
 			try {
 				String baseDir = new File(this.apiConfig).getParent();

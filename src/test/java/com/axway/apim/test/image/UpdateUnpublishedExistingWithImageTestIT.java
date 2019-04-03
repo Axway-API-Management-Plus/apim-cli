@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class UpdateUnpublishedExistingWithImageTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "UpdateUnpublishedExistingWithImageTest")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Creates an Unpublished with which gets updated later with an Image");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -26,8 +26,8 @@ public class UpdateUnpublishedExistingWithImageTestIT extends TestNGCitrusTestDe
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/image/1_no_image_flex_state.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/image/1_no_image_flex_state.json");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
@@ -48,8 +48,8 @@ public class UpdateUnpublishedExistingWithImageTestIT extends TestNGCitrusTestDe
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Importing the same API, but now with an image #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/image/2_image_included_flex_state.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/image/2_image_included_flex_state.json");
 		createVariable("image", "/com/axway/apim/test/files/basic/API-Logo.jpg");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");

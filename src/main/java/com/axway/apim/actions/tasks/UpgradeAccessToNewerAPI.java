@@ -15,16 +15,16 @@ import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IResponseParser {
 
-	public UpgradeAccessToNewerAPI(IAPIDefinition desiredState, IAPIDefinition actualState) {
+	public UpgradeAccessToNewerAPI(IAPI desiredState, IAPI actualState) {
 		super(desiredState, actualState);
 	}
 	public void execute() throws AppException {
-		if(desiredState.getState().equals(IAPIDefinition.STATE_UNPUBLISHED)) {
+		if(desiredState.getState().equals(IAPI.STATE_UNPUBLISHED)) {
 			LOG.debug("No need to grant access to newly created API, as desired state of API is unpublished.");
 			return;
 		}

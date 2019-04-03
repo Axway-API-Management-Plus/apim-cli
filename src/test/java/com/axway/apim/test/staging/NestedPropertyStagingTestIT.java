@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class NestedPropertyStagingTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "NestedPropertyStagingTest")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Make sure nested properties can be staged as well!");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -25,8 +25,8 @@ public class NestedPropertyStagingTestIT extends TestNGCitrusTestDesigner {
 		variable("apiName", "Stage-Test-${apiNumber}");
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/staging/2_nested_prop-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/staging/2_nested_prop-config.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 
@@ -48,8 +48,8 @@ public class NestedPropertyStagingTestIT extends TestNGCitrusTestDesigner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with production settings #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/staging/2_nested_prop-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/staging/2_nested_prop-config.json");
 		createVariable("stage", "prod"); // << Program will search for file: 2_nested_prop-config.prod.json
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);

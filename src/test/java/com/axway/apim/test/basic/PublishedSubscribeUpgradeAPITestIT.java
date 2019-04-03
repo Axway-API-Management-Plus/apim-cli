@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class PublishedSubscribeUpgradeAPITestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "PublishedSubscribeUpgradeAPITest")
-	public void setupDevOrgTest() {
+	public void run() {
 
 		echo("####### Import a Published-API, subscribe to it and then Re-Import a new version. #######");
 		
@@ -27,8 +27,8 @@ public class PublishedSubscribeUpgradeAPITestIT extends TestNGCitrusTestDesigner
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("status", "published");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
@@ -64,8 +64,8 @@ public class PublishedSubscribeUpgradeAPITestIT extends TestNGCitrusTestDesigner
 			.messageType(MessageType.JSON);
 
 		echo("####### Importing a new Swagger-File as a change #######");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore2.json");
-		createVariable("configFile", "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("status", "published");
 		createVariable("enforce", "true");
 		createVariable("expectedReturnCode", "0");

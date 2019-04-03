@@ -7,7 +7,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -17,9 +16,9 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIChangeState;
-import com.axway.apim.swagger.APIImportConfig;
+import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.IAPI;
 
 /**
  * This is the Entry-Point of program and responsible to:</br>
@@ -52,26 +51,15 @@ public class App {
 			Options options = new Options();
 			Option option;
 			
-			Option optionSwagger = new Option("a", "swagger", true, "The Swagger-API Definition (JSON-Formated):\n"
-					+ "- in local filesystem using a relativ or absolute path. Example: swagger_file.json\n"
-					+ "- a URL providing the Swagger-File. Example: [username/password@]https://any.host.com/my/path/to/swagger.json\n"
-					+ "- a file called anyname-i-want.url which contains a line with the URL (same format as above).");
-			optionSwagger.setRequired(false);
-			optionSwagger.setArgName("swagger_file.json");
-			options.addOption(optionSwagger);
-			
-			Option optionWSDL = new Option("w", "wsdl", true, "The WSDL Definition:\n"
-					+ "- a URL providing the WSDL-File. Example: [username/password@]https://any.host.com/my/path/to/myservice.wsdl\n"
-					+ "- a file called anyname-i-want.url which contains a line with the URL (same format as above).");
-			optionWSDL.setRequired(false);
-			optionWSDL.setArgName("http://myhost/example.wsdl");
-			options.addOption(optionWSDL);
-			
-			OptionGroup optgrp = new OptionGroup();
-			optgrp.setRequired(true);
-			optgrp.addOption(optionSwagger);
-			optgrp.addOption(optionWSDL);
-			options.addOptionGroup(optgrp);
+			option = new Option("a", "apidefinition", true, "The API Definition either as Swagger (JSON-Formated) or a WSDL for SOAP-Services:\n"
+					+ "- in local filesystem using a relativ or absolute path. Example: swagger_file.json (not supported for WSDL)\n"
+					+ "- a URL providing the Swagger-File or WSDL-File. Examples:\n"
+					+ "  [username/password@]https://any.host.com/my/path/to/swagger.json\n"
+					+ "  [username/password@]http://www.dneonline.com/calculator.asmx?wsdl\n"
+					+ "- a file called anyname-i-want.url which contains a line with the URL (same format as above for Swagger or WSDL).");
+				option.setRequired(true);
+				option.setArgName("swagger_file.json");
+			options.addOption(option);
 			
 			option = new Option("c", "contract", true, "This is the JSON-Formatted API-Config containing information how to expose the API");
 				option.setRequired(true);
@@ -149,9 +137,9 @@ public class App {
 			
 			APIManagerAdapter apimAdapter = new APIManagerAdapter();
 			
-			APIImportConfig contract = new APIImportConfig(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("swagger"),params.getOptionValue("wsdl"));
-			IAPIDefinition desiredAPI = contract.getImportAPIDefinition();
-			IAPIDefinition actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
+			APIImportConfigAdapter contract = new APIImportConfigAdapter(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("apidefinition"));
+			IAPI desiredAPI = contract.getDesiredAPI();
+			IAPI actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);			
 			
 			apimAdapter.applyChanges(changeActions);

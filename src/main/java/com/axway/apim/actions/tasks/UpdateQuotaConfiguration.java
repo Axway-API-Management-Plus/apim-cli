@@ -16,9 +16,9 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.IAPIDefinition;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -27,7 +27,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 	private static int QUOTA_UPDATE_SUCCESS = 1;
 	private static int QUOTA_UPDATE_FAIL = 2;
 
-	public UpdateQuotaConfiguration(IAPIDefinition desiredState, IAPIDefinition actualState) {
+	public UpdateQuotaConfiguration(IAPI desiredState, IAPI actualState) {
 		super(desiredState, actualState);
 	}
 

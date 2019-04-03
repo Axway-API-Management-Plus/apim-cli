@@ -1,4 +1,4 @@
-package com.axway.apim.swagger.api;
+package com.axway.apim.swagger.api.state;
 
 import com.axway.apim.swagger.api.properties.APIImage;
 
@@ -7,7 +7,7 @@ import com.axway.apim.swagger.api.properties.APIImage;
  * 
  * @author cwiechmann@axway.com
  */
-public class APIBaseDefinition extends AbstractAPIDefinition implements IAPIDefinition {
+public class APIBaseDefinition extends AbstractAPI implements IAPI {
 
 	@Override
 	public String getState() {
@@ -44,18 +44,6 @@ public class APIBaseDefinition extends AbstractAPIDefinition implements IAPIDefi
 	
 	@Override
 	public APIImage getImage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setWsdlURL(String wsdlURL) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getWsdlURL() {
 		// TODO Auto-generated method stub
 		return null;
 	}

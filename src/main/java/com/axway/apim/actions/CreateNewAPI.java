@@ -23,7 +23,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -49,7 +49,7 @@ public class CreateNewAPI {
 
 		new CreateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		// As we have just created an API-Manager API, we should reflect this for further processing
-		IAPIDefinition createdAPI = APIManagerAdapter.getAPIManagerAPI((JsonNode)context.get("lastResponse"), changes.getDesiredAPI());
+		IAPI createdAPI = APIManagerAdapter.getAPIManagerAPI((JsonNode)context.get("lastResponse"), changes.getDesiredAPI());
 		changes.setIntransitAPI(createdAPI);
 		
 		// ... here we basically need to add all props to initially bring the API in sync!
@@ -81,7 +81,7 @@ public class CreateNewAPI {
 	 * @return
 	 * @throws AppException 
 	 */
-	private List<String> getAllProps(IAPIDefinition desiredAPI) throws AppException {
+	private List<String> getAllProps(IAPI desiredAPI) throws AppException {
 		List<String> allProps = new Vector<String>();
 		try {
 			for (Field field : desiredAPI.getClass().getSuperclass().getDeclaredFields()) {
@@ -92,7 +92,7 @@ public class CreateNewAPI {
 					// For new APIs don't include empty properties (this includes MissingNodes)
 					if(desiredValue==null) continue;
 					// We have just inserted the Swagger-File
-					if(field.getName().equals("swaggerDefinition")) continue;
+					if(field.getName().equals("apiDefinition")) continue;
 					allProps.add(field.getName());
 				}
 			}

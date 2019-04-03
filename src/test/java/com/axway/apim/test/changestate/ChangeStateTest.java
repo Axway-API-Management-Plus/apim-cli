@@ -9,15 +9,15 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIChangeState;
-import com.axway.apim.swagger.api.APIManagerAPI;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.ActualAPI;
+import com.axway.apim.swagger.api.state.IAPI;
 
 public class ChangeStateTest {
 
   @Test
   public void testOrderMakesNoChange() throws AppException, IOException {
-	  IAPIDefinition importAPI = getTestAPI();
-	  IAPIDefinition managerAPI = getTestAPI();
+	  IAPI importAPI = getTestAPI();
+	  IAPI managerAPI = getTestAPI();
 
 	  List<String> importOrgs = new ArrayList<String>();
 	  List<String> managerOrgs = new ArrayList<String>();
@@ -40,20 +40,20 @@ public class ChangeStateTest {
   
   @Test
   public void isVhostBreaking() throws Exception {
-	  IAPIDefinition importAPI = getTestAPI();
-	  IAPIDefinition managerAPI = getTestAPI();
+	  IAPI importAPI = getTestAPI();
+	  IAPI managerAPI = getTestAPI();
 	  
-	  ((APIManagerAPI)importAPI).setVhost("abc.xyz.com");
-	  ((APIManagerAPI)managerAPI).setVhost("123.xyz.com");
+	  ((ActualAPI)importAPI).setVhost("abc.xyz.com");
+	  ((ActualAPI)managerAPI).setVhost("123.xyz.com");
 	  
 	  APIChangeState changeState = new APIChangeState(managerAPI, importAPI);
 	  Assert.assertEquals(changeState.isBreaking(), true);
   }
   
-  private static IAPIDefinition getTestAPI() throws AppException {
-	  IAPIDefinition testAPI = new APIManagerAPI();
+  private static IAPI getTestAPI() throws AppException {
+	  IAPI testAPI = new ActualAPI();
 	  testAPI.setValid(true);
-	  testAPI.setState(IAPIDefinition.STATE_PUBLISHED);
+	  testAPI.setState(IAPI.STATE_PUBLISHED);
 	  return testAPI;
   }
   
