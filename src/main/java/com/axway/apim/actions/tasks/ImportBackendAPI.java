@@ -1,15 +1,11 @@
 package com.axway.apim.actions.tasks;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -21,14 +17,15 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.APIImportDefinition;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.lib.Utils;
+import com.axway.apim.swagger.api.state.DesiredAPI;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParser {
 
-	public ImportBackendAPI(IAPIDefinition desiredState, IAPIDefinition actualState) {
+	public ImportBackendAPI(IAPI desiredState, IAPI actualState) {
 		super(desiredState, actualState);
 		// TODO Auto-generated constructor stub
 	}
@@ -36,7 +33,7 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 	public void execute() throws AppException {
 		LOG.info("Importing backend API (Swagger/WSDL Import)");
 		try {
-			if (desiredState.getWsdlURL()!=null) {
+			if(desiredState.getAPIDefinition().getAPIDefinitionType()==IAPI.WSDL_API) {
 				importFromWSDL();
 			} else {
 				importFromSwagger();
@@ -51,19 +48,22 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		HttpEntity entity = new StringEntity("");
 		String username=null;
 		String pass=null;
-
-		if(this.desiredState.getWsdlURL().endsWith(".url")) {
-			String wsdlUrl = getWSDLUriFromFile(this.desiredState.getWsdlURL());
-			this.desiredState.setWsdlURL(extractURI(wsdlUrl));
-			username=extractUsername(wsdlUrl);
-			pass=extractPassword(wsdlUrl);
-			LOG.info("{}",this.desiredState.getWsdlURL());
+		String wsdlUrl=null;
+		String completeWsdlUrl=null;
+		if(this.desiredState.getAPIDefinition().getAPIDefinitionFile().endsWith(".url")) {
+			completeWsdlUrl = Utils.getAPIDefinitionUriFromFile(this.desiredState.getAPIDefinition().getAPIDefinitionFile());
+		} else {
+			completeWsdlUrl = this.desiredState.getAPIDefinition().getAPIDefinitionFile();
 		}
+		wsdlUrl = extractURI(completeWsdlUrl);
+		username=extractUsername(completeWsdlUrl);
+		pass=extractPassword(completeWsdlUrl);
+
 		
 		URIBuilder uriBuilder = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/importFromUrl/")
 				.setParameter("organizationId", this.desiredState.getOrgId())
 				.setParameter("type", "wsdl")
-				.setParameter("url", this.desiredState.getWsdlURL())
+				.setParameter("url", wsdlUrl)
 				.setParameter("name", this.desiredState.getName());
 		if (username!=null) {
 			uriBuilder.setParameter("username", username);
@@ -73,10 +73,9 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		RestAPICall importWSDL = new POSTRequest(entity, uri, this);
 		importWSDL.setContentType("application/x-www-form-urlencoded");
 		HttpResponse httpResponse = importWSDL.execute();
-		String response = httpResponse.getEntity().getContent().toString();
 		int statusCode = httpResponse.getStatusLine().getStatusCode();
 		if(statusCode != 201){
-			LOG.error("Received Status-Code: " +statusCode+ ", Response: " + response);
+			LOG.error("Received Status-Code: " +statusCode+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
 			throw new AppException("Can't import WSDL from URL / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
 		}
 	}
@@ -90,16 +89,15 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		entity = MultipartEntityBuilder.create()
 				.addTextBody("name", this.desiredState.getName())
 				.addTextBody("type", "swagger")
-				.addBinaryBody("file", ((APIImportDefinition)this.desiredState).getSwaggerDefinition().getSwaggerContent(), ContentType.create("application/octet-stream"), "filename")
+				.addBinaryBody("file", ((DesiredAPI)this.desiredState).getAPIDefinition().getAPIDefinitionContent(), ContentType.create("application/octet-stream"), "filename")
 				.addTextBody("fileName", "XYZ").addTextBody("organizationId", this.desiredState.getOrgId())
 				.addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
 		RestAPICall importSwagger = new POSTRequest(entity, uri, this);
 		importSwagger.setContentType(null);
 		HttpResponse httpResponse = importSwagger.execute();
-		String response = httpResponse.getEntity().getContent().toString();
 		int statusCode = httpResponse.getStatusLine().getStatusCode();
 		if(statusCode != 201){
-			LOG.error("Received Status-Code: " +statusCode+ ", Response: " + response);
+			LOG.error("Received Status-Code: " +statusCode+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
 			throw new AppException("Can't import Swagger-definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
 		}
 	}
@@ -147,21 +145,4 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 			throw new AppException("Cannot parse JSON-Payload after create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
 		}
 	}
-	
-	private String getWSDLUriFromFile(String pathToWsdlUrlFile) throws AppException {
-		String uriToWsdl = null;
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(pathToWsdlUrlFile));
-			uriToWsdl = br.readLine();
-			return uriToWsdl;
-		} catch (Exception e) {
-			throw new AppException("Can't load file:" + pathToWsdlUrlFile, ErrorCode.CANT_READ_WSDL_FILE, e);
-		} finally {
-			try {
-				br.close();
-			} catch (Exception ignore) {}
-		}
-	}
-
 }

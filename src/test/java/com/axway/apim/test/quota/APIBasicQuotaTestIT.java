@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class APIBasicQuotaTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "APIBasicQuotaTest")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Import an API containing a quota definition");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -26,8 +26,8 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestDesigner {
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/quota/1_api-with-quota.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/1_api-with-quota.json");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		createVariable("applicationPeriod", "hour");
@@ -84,8 +84,8 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.restrictions.[?(@.api=='${apiId}')].config.per", "1");
 		
 		echo("####### Executing a Quota-No-Change import #######");		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/quota/1_api-with-quota.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/1_api-with-quota.json");
 		createVariable("state", "unpublished");
 		createVariable("applicationPeriod", "hour");
 		createVariable("systemPeriod", "days");
@@ -93,8 +93,8 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestDesigner {
 		action(swaggerImport);
 		
 		echo("####### Perform a change in System-Default-Quota #######");		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/quota/1_api-with-quota.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/1_api-with-quota.json");
 		createVariable("state", "unpublished");
 		createVariable("applicationPeriod", "hour"); // This one stays!
 		createVariable("systemPeriod", "weeks");
@@ -119,8 +119,8 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.restrictions.[?(@.api=='${apiId}')].config.per", "2");
 		
 		echo("####### Perform a change in Application-Default-Quota #######");		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/quota/1_api-with-quota.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/1_api-with-quota.json");
 		createVariable("state", "published");
 		createVariable("applicationPeriod", "seconds"); 
 		createVariable("systemPeriod", "weeks");// Now, this one stays!
@@ -162,8 +162,8 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.restrictions.[?(@.api=='${apiId}')].config.per", "2");
 		
 		echo("####### Perform a breaking change, making sure, that defined Quotas persist #######");		
-		createVariable("swaggerFile", "/com/axway/apim/test/files/basic/petstore2.json");
-		createVariable("configFile", "/com/axway/apim/test/files/quota/1_api-with-quota.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/1_api-with-quota.json");
 		createVariable("state", "published");
 		createVariable("applicationPeriod", "seconds"); 
 		createVariable("enforce", "true");

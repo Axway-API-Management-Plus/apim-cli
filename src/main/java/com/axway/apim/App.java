@@ -7,7 +7,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -17,9 +16,9 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIChangeState;
-import com.axway.apim.swagger.APIImportConfig;
+import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.IAPI;
 
 /**
  * This is the Entry-Point of program and responsible to:</br>
@@ -43,7 +42,7 @@ public class App {
 	public static int run(String args[]) {
 		try {
 			LOG.info("------------------------------------------------------------------------");
-			LOG.info("API-Manager Promote Version: 1.4.1");
+			LOG.info("API-Manager Promote Version: 1.4.2");
 			LOG.info("                                                                        ");
 			LOG.info("To report issues or get help, please visit: ");
 			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
@@ -52,34 +51,25 @@ public class App {
 			Options options = new Options();
 			Option option;
 			
-			Option optionSwagger = new Option("a", "swagger", true, "The Swagger-API Definition (JSON-Formated):\n"
+			option = new Option("a", "apidefinition", true, "The API Definition either as Swagger (JSON-Formated) or a WSDL for SOAP-Services:\n"
 					+ "- in local filesystem using a relativ or absolute path. Example: swagger_file.json\n"
-					+ "- a URL providing the Swagger-File. Example: [username/password@]https://any.host.com/my/path/to/swagger.json\n"
-					+ "- a file called anyname-i-want.url which contains a line with the URL (same format as above).");
-			optionSwagger.setRequired(false);
-			optionSwagger.setArgName("swagger_file.json");
-			options.addOption(optionSwagger);
-			
-			Option optionWSDL = new Option("w", "wsdl", true, "The WSDL Definition:\n"
-					+ "- a URL providing the WSDL-File. Example: [username/password@]https://any.host.com/my/path/to/myservice.wsdl\n"
-					+ "- a file called anyname-i-want.url which contains a line with the URL (same format as above).");
-			optionWSDL.setRequired(false);
-			optionWSDL.setArgName("http://myhost/example.wsdl");
-			options.addOption(optionWSDL);
-			
-			OptionGroup optgrp = new OptionGroup();
-			optgrp.setRequired(true);
-			optgrp.addOption(optionSwagger);
-			optgrp.addOption(optionWSDL);
-			options.addOptionGroup(optgrp);
+					+ "  Please note: Local filesystem is not supported for WSDLs. Please use direct URL or a URL-Reference-File.\n"
+					+ "- a URL providing the Swagger-File or WSDL-File. Examples:\n"
+					+ "  [username/password@]https://any.host.com/my/path/to/swagger.json\n"
+					+ "  [username/password@]http://www.dneonline.com/calculator.asmx?wsdl\n"
+					+ "- a reference file called anyname-i-want.url which contains a line with the URL\n"
+					+ "  (same format as above for Swagger or WSDL).");
+				option.setRequired(true);
+				option.setArgName("swagger_file.json");
+			options.addOption(option);
 			
 			option = new Option("c", "contract", true, "This is the JSON-Formatted API-Config containing information how to expose the API");
 				option.setRequired(true);
-				option.setArgName("api_contract.json");
+				option.setArgName("api_config.json");
 			options.addOption(option);
 			
 			option = new Option("s", "stage", true, "The stage this API should be imported.\n"
-					+ "Will be used to lookup stage specific API-Contract overrides (e.g.: api_contract.preprod.json)");
+					+ "Will be used to lookup stage specific API-Config overrides (e.g.: api_config.preprod.json)");
 				option.setArgName("preprod");
 			options.addOption(option);
 			
@@ -88,7 +78,7 @@ public class App {
 				option.setArgName("api-host");
 			options.addOption(option);
 			
-			option = new Option("port", true, "The API-Manager port where the REST-API is exposed. Defaults to 8075.");
+			option = new Option("port", true, "Optional parameter to declare the API-Manager port. Defaults to 8075.");
 			option.setArgName("8181");
 			options.addOption(option);
 			
@@ -137,7 +127,8 @@ public class App {
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/complete-config.json -h localhost -u apiadmin -p changeme");
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/org-and-apps-config.json -h localhost -u apiadmin -p changeme");
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.url -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
-				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a https://petstore.swagger.io/v2/swagger.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");				
+				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a https://petstore.swagger.io/v2/swagger.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
+				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a http://www.dneonline.com/calculator.asmx?wsdl -c samples/minimal-config-wsdl.json -h localhost -u apiadmin -p changeme");
 				System.out.println();
 				System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 				
@@ -149,9 +140,9 @@ public class App {
 			
 			APIManagerAdapter apimAdapter = new APIManagerAdapter();
 			
-			APIImportConfig contract = new APIImportConfig(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("swagger"),params.getOptionValue("wsdl"));
-			IAPIDefinition desiredAPI = contract.getImportAPIDefinition();
-			IAPIDefinition actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
+			APIImportConfigAdapter contract = new APIImportConfigAdapter(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("apidefinition"));
+			IAPI desiredAPI = contract.getDesiredAPI();
+			IAPI actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);			
 			
 			apimAdapter.applyChanges(changeActions);

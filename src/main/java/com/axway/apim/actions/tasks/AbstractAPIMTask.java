@@ -16,7 +16,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,11 +24,11 @@ public class AbstractAPIMTask {
 	
 	static Logger LOG = LoggerFactory.getLogger(APIManagerAdapter.class);
 	
-	protected IAPIDefinition desiredState;
-	protected IAPIDefinition actualState;
-	protected IAPIDefinition transitState;
+	protected IAPI desiredState;
+	protected IAPI actualState;
+	protected IAPI transitState;
 	
-	public AbstractAPIMTask(IAPIDefinition desiredState, IAPIDefinition actualState) {
+	public AbstractAPIMTask(IAPI desiredState, IAPI actualState) {
 		super();
 		this.desiredState 	= desiredState;
 		this.actualState 	= actualState;
@@ -36,7 +36,7 @@ public class AbstractAPIMTask {
 
 	protected static CommandParameters cmd = CommandParameters.getInstance();
 	
-	public static JsonNode initActualAPIContext(IAPIDefinition actual) throws AppException {
+	public static JsonNode initActualAPIContext(IAPI actual) throws AppException {
 		URI uri;
 		ObjectMapper objectMapper = new ObjectMapper();
 		Transaction context = Transaction.getInstance();

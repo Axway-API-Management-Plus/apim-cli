@@ -19,30 +19,29 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.CitrusRuntimeException;
 import com.consol.citrus.exceptions.ValidationException;
 
-public class SwaggerImportTestAction extends AbstractTestAction {
+public class ImportTestAction extends AbstractTestAction {
 	
-	private static Logger LOG = LoggerFactory.getLogger(SwaggerImportTestAction.class);
+	public static String API_DEFINITION = "apiDefinition";
+	public static String API_CONFIG = "apiConfig";
 	
-	//private String swaggerFile;
-	
-	//private String configFile;
+	private static Logger LOG = LoggerFactory.getLogger(ImportTestAction.class);
 	
 	@Override
 	public void doExecute(TestContext context) {
-		String origSwaggerFile 			= context.getVariable("swaggerFile");
-		String origConfigFile 			= context.getVariable("configFile");
+		String origApiDefinition 			= context.getVariable(API_DEFINITION);
+		String origConfigFile 			= context.getVariable(API_CONFIG);
 		String stage				= null;
-		String swaggerFile			= null;
+		String apiDefinition			= null;
 		try {
 			stage 				= context.getVariable("stage");
 		} catch (CitrusRuntimeException ignore) {};
-		if(!origSwaggerFile.contains("http://") && !origSwaggerFile.contains("https://")) {
-			swaggerFile = replaceDynamicContentInFile(origSwaggerFile, context);
+		if(!origApiDefinition.contains("http://") && !origApiDefinition.contains("https://")) {
+			apiDefinition = replaceDynamicContentInFile(origApiDefinition, context);
 		} else {
-			swaggerFile = origSwaggerFile;
+			apiDefinition = origApiDefinition;
 		}
 		String configFile = replaceDynamicContentInFile(origConfigFile, context);
-		LOG.info("Using Replaced Swagger-File: " + swaggerFile);
+		LOG.info("Using Replaced Swagger-File: " + apiDefinition);
 		LOG.info("Using Replaced configFile-File: " + configFile);
 		int expectedReturnCode = 0;
 		try {
@@ -77,7 +76,7 @@ public class SwaggerImportTestAction extends AbstractTestAction {
 		}
 
 		String[] args = new String[] { 
-				"-a", swaggerFile, 
+				"-a", apiDefinition, 
 				"-c", configFile, 
 				"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
 				"-p", context.replaceDynamicContentInString("${apiManagerPass}"), 

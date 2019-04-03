@@ -1,4 +1,4 @@
-package com.axway.apim.swagger.api;
+package com.axway.apim.swagger.api.state;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,21 +13,21 @@ import com.fasterxml.jackson.databind.JsonNode;
  * Both classes extend the AbstractAPIDefinition which contains all the common API-Properties that 
  * are compared property by property in APIChangeState.
  * 
- * @see AbstractAPIDefinition
- * @see APIImportDefinition
+ * @see AbstractAPI
+ * @see DesiredAPI
  * @author cwiechmann@axway.com
  */
-public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefinition {
+public class ActualAPI extends AbstractAPI implements IAPI {
 	
-	static Logger LOG = LoggerFactory.getLogger(APIManagerAPI.class);
+	static Logger LOG = LoggerFactory.getLogger(ActualAPI.class);
 
 	JsonNode apiConfiguration;
 
-	public APIManagerAPI() throws AppException {
+	public ActualAPI() throws AppException {
 		super();
 	}
 
-	public APIManagerAPI(JsonNode apiConfiguration) {
+	public ActualAPI(JsonNode apiConfiguration) {
 		this.apiConfiguration = apiConfiguration;
 	}
 	
@@ -35,24 +35,12 @@ public class APIManagerAPI extends AbstractAPIDefinition implements IAPIDefiniti
 	 * The tool handles deprecation as an additional state (might not be best choice), but  
 	 * the API-Manager internally doesn't. In API-Manager deprecation is just a true/false toggle.</br>
 	 * To make Desired & Actual API comparable this method is encapsulating the difference. 
-	 * @see com.axway.apim.swagger.api.AbstractAPIDefinition#getState()
+	 * @see com.axway.apim.swagger.api.state.AbstractAPI#getState()
 	 */
 	@Override
 	public String getState() throws AppException {
 		if(this.deprecated!=null 
-				&& this.deprecated.equals("true")) return IAPIDefinition.STATE_DEPRECATED;
+				&& this.deprecated.equals("true")) return IAPI.STATE_DEPRECATED;
 		return super.getState();
-	}
-
-	@Override
-	public void setWsdlURL(String wsdlURL) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getWsdlURL() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

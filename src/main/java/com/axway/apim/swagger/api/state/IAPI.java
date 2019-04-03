@@ -1,11 +1,11 @@
-package com.axway.apim.swagger.api;
+package com.axway.apim.swagger.api.state;
 
 import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.api.properties.APIImage;
-import com.axway.apim.swagger.api.properties.APISwaggerDefinion;
+import com.axway.apim.swagger.api.properties.APIDefintion;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
@@ -16,12 +16,15 @@ import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 
-public interface IAPIDefinition {
+public interface IAPI {
 	
 	public final static String STATE_PUBLISHED = "published";
 	public final static String STATE_UNPUBLISHED = "unpublished";
 	public final static String STATE_DEPRECATED = "deprecated";
 	public final static String STATE_DELETED = "deleted";
+	
+	public final int SWAGGGER_API = 1;
+	public final int WSDL_API = 2;
 	
 	public String getVersion();
 	
@@ -73,9 +76,9 @@ public interface IAPIDefinition {
 	
 	public Map<String, String[]> getTags();
 	
-	public APISwaggerDefinion getSwaggerDefinition();
+	public APIDefintion getAPIDefinition();
 	
-	public void setSwaggerDefinition(APISwaggerDefinion swaggerDefinition);
+	public void setAPIDefinition(APIDefintion apiDefinition);
 	
 	public String getDescriptionType();
 	
@@ -100,8 +103,4 @@ public interface IAPIDefinition {
 	public void setApplications(List<ClientApplication> clientApplications);
 	
 	public Map<String, ServiceProfile> getServiceProfiles();
-	
-	public void setWsdlURL(String wsdlURL);
-	
-	public String getWsdlURL();
 }

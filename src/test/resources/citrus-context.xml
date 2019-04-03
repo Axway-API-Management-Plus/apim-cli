@@ -22,8 +22,7 @@
 		<property name="placeholderPrefix" value="${" />
     </bean>
     
-    <bean class="com.axway.apim.test.SwaggerImportTestAction"/>
-    <bean class="com.axway.apim.test.WSDLImportTestAction"/>
+    <bean class="com.axway.apim.test.ImportTestAction"/>
     <bean id="myBeforeSuite" class="com.axway.apim.test.setup.InitializationTestIT"/>
     
     <citrus:global-variables>

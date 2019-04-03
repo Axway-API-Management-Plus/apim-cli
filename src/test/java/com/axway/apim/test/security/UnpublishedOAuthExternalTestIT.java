@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.test.SwaggerImportTestAction;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
@@ -14,10 +14,10 @@ import com.consol.citrus.message.MessageType;
 public class UnpublishedOAuthExternalTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
-	private SwaggerImportTestAction swaggerImport;
+	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "UnpublishedOAuthExternalTest")
-	public void setupDevOrgTest() {
+	public void run() {
 		description("Tests for API-OAuth (External) Security connfiguration");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -31,8 +31,8 @@ public class UnpublishedOAuthExternalTestIT extends TestNGCitrusTestDesigner {
 		createVariable("accessTokenLocation", "HEADER");
 		createVariable("scopes", "resource.WRITE, resource.READ, resource.ADMIN");
 		createVariable("removeCredentialsOnSuccess", "false");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/security/4_api-oauth_external.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/4_api-oauth_external.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -65,8 +65,8 @@ public class UnpublishedOAuthExternalTestIT extends TestNGCitrusTestDesigner {
 		createVariable("accessTokenLocation", "HEADER");
 		createVariable("scopes", "resource.WRITE, resource.READ, resource.ADMIN");
 		createVariable("removeCredentialsOnSuccess", "false");
-		createVariable("swaggerFile", "/com/axway/apim/test/files/security/petstore.json");
-		createVariable("configFile", "/com/axway/apim/test/files/security/4_api-oauth_external.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/4_api-oauth_external.json");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
 	}

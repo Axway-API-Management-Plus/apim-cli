@@ -19,13 +19,13 @@ import com.axway.apim.actions.tasks.props.PropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.IAPIDefinition;
+import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser {
 	
-	public UpdateAPIProxy(IAPIDefinition desiredState, IAPIDefinition actualState) {
+	public UpdateAPIProxy(IAPI desiredState, IAPI actualState) {
 		super(desiredState, actualState);
 	}
 
@@ -81,7 +81,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		return null;
 	}	
 	
-	private static JsonNode handledChangedProps(JsonNode lastJsonReponse, IAPIDefinition desired, List<String> changedProps) throws AppException {
+	private static JsonNode handledChangedProps(JsonNode lastJsonReponse, IAPI desired, List<String> changedProps) throws AppException {
 		Field field = null;
 		if(changedProps!=null && changedProps.size()!=0) {
 			boolean propsChangedInProxy = false;

@@ -1,18 +1,18 @@
-# Swagger based promotion for Axway API-Manager V7
+# Swagger/WSDL based API promotion for Axway API-Manager V7
 
 This project provides you with a tool that simplifies your DevOps experience with the Axway API-Manager Version 7.x. 
 
-The program works based on the API-Swagger-Definition + an API-Configuration-File and replicates this "state" into the API-Manager. Consider the Swagger-Definition + API-Config as the "__desired__" state and API-Manager has the "__actual__" state. This program will compare both, the desired with the actual state, and performs all neccassary actions to bring the API-Manager API into the desired state.
+The program works based on the API-Definition (as Swagger or a WSDL (__Beta - Not for production__)) + an API-Configuration-File and replicates this "state" into the API-Manager. Consider the API-Definition + API-Config as the "__desired__" state and API-Manager has the "__actual__" state. This program will compare both, the desired with the actual state, and performs all necessary actions to bring the API-Manager API into the desired state.
 
 Watch this video (28 min): https://youtu.be/2i8i1zMAMps to get an overview + demo.
 
-With that, an API-Developer is just providing the Swagger-File (e.g. Code-Generated or using a Swagger-Editor) and the API-Config. When checked in, the CI/CD-Pipelines picks it up and replicates it into the API-Manager. 
+With that, an API-Developer is just providing the Swagger-File or WSDL (e.g. Code-Generated or using a Swagger-Editor) and the API-Config. When checked in, the CI/CD-Pipelines picks it up and replicates it into the API-Manager. 
 This includes __Zero-Downtime-Upgrade of existing applications__, which might have an active subscription to an API. Learn more in the [documentation](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki).
 
 ![API-Manager Swagger-Promote overview]( https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/blob/master/src/lib/images/apimanager-swagger-promote-overview.png )
 
 Today the following API-Properties are already supported and can be controlled externally:
-- State-Handling (Unpblished, Published, Dreprecated & Deleted)
+- State-Handling (Unpublished, Published, Deprecated & Deleted)
 - API-Summary, API-description
 - API-Image 
 - API-Version
@@ -59,13 +59,16 @@ Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimana
 - 1.4.0 - 14.03.2019
   - Added support to refer a Swagger-File from a URL instead of the local File-System only
 - 1.4.1 - 20.03.2019
-  - Stabilized handling of Client-Orgs and Client-Apps (added support for modes: add|replace|ignore) 
+  - Stabilized handling of Client-Orgs and Client-Apps (added support for modes: add|replace|ignore)
+- 1.4.2 - 03.04.2019
+  - Added support for WSDLs API-Definitions, API-Manager port now a parameter, validate Admin-Role user is used 
 
 
 ## Limitations/Caveats
 - API-Method-Level description is not yet supported
 - Method-Level settings such as individual Security, Custom-Policies, etc. not yet supported
 - Deep merge of stage-config files isn't supported
+- Support for WSDL is Beta
 
 ## Contributing
 
