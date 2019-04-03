@@ -1,7 +1,5 @@
 package com.axway.apim.actions.tasks;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -19,6 +17,7 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.Utils;
 import com.axway.apim.swagger.api.state.DesiredAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -52,7 +51,7 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		String wsdlUrl=null;
 		String completeWsdlUrl=null;
 		if(this.desiredState.getAPIDefinition().getAPIDefinitionFile().endsWith(".url")) {
-			completeWsdlUrl = getWSDLUriFromFile(this.desiredState.getAPIDefinition().getAPIDefinitionFile());
+			completeWsdlUrl = Utils.getAPIDefinitionUriFromFile(this.desiredState.getAPIDefinition().getAPIDefinitionFile());
 		} else {
 			completeWsdlUrl = this.desiredState.getAPIDefinition().getAPIDefinitionFile();
 		}
@@ -148,21 +147,4 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 			throw new AppException("Cannot parse JSON-Payload after create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
 		}
 	}
-	
-	private String getWSDLUriFromFile(String pathToWsdlUrlFile) throws AppException {
-		String uriToWsdl = null;
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(pathToWsdlUrlFile));
-			uriToWsdl = br.readLine();
-			return uriToWsdl;
-		} catch (Exception e) {
-			throw new AppException("Can't load file:" + pathToWsdlUrlFile, ErrorCode.CANT_READ_WSDL_FILE, e);
-		} finally {
-			try {
-				br.close();
-			} catch (Exception ignore) {}
-		}
-	}
-
 }

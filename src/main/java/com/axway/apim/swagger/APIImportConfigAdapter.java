@@ -1,11 +1,9 @@
 package com.axway.apim.swagger;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.Utils;
 import com.axway.apim.swagger.api.properties.APIDefintion;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
@@ -385,7 +384,7 @@ public class APIImportConfigAdapter {
 	public InputStream getAPIDefinitionAsStream() throws AppException {
 		InputStream is = null;
 		if(pathToAPIDefinition.endsWith(".url")) {
-			return getAPIDefinitionFromURL(getAPIDefinitionUriFromFile(pathToAPIDefinition));
+			return getAPIDefinitionFromURL(Utils.getAPIDefinitionUriFromFile(pathToAPIDefinition));
 		} else if(isHttpUri(pathToAPIDefinition)) {
 			return getAPIDefinitionFromURL(pathToAPIDefinition);
 		} else {
@@ -465,22 +464,6 @@ public class APIImportConfigAdapter {
 	public static boolean isHttpUri(String pathToAPIDefinition) {
 		String httpUri = pathToAPIDefinition.substring(pathToAPIDefinition.indexOf("@")+1);
 		return( httpUri.startsWith("http://") || httpUri.startsWith("https://"));
-	}
-	
-	private static String getAPIDefinitionUriFromFile(String pathToAPIDefinition) throws AppException {
-		String uriToAPIDefinition = null;
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(pathToAPIDefinition));
-			uriToAPIDefinition = br.readLine();
-			return uriToAPIDefinition;
-		} catch (Exception e) {
-			throw new AppException("Can't load file:" + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
-		} finally {
-			try {
-				br.close();
-			} catch (Exception ignore) {}
-		}
 	}
 	
 	private String getStageConfig(String stage, String apiConfig) {

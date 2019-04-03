@@ -5,6 +5,8 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.Utils;
 import com.axway.apim.swagger.api.state.IAPI;
 
 public class APIDefintion {
@@ -32,8 +34,14 @@ public class APIDefintion {
 		return apiDefinitionContent;
 	}
 	
-	public int getAPIDefinitionType() {
-		if(this.apiDefinitionFile.toLowerCase().endsWith("?wsdl")) {
+	public int getAPIDefinitionType() throws AppException {
+		String apiDefinitionSource = null;
+		if(this.apiDefinitionFile.toLowerCase().endsWith(".url")) {
+			apiDefinitionSource = Utils.getAPIDefinitionUriFromFile(this.apiDefinitionFile);
+		} else {
+			apiDefinitionSource = this.apiDefinitionFile;
+		}
+		if(apiDefinitionSource.toLowerCase().endsWith("?wsdl")) {
 			return IAPI.WSDL_API;
 		} else {
 			return IAPI.SWAGGGER_API;
