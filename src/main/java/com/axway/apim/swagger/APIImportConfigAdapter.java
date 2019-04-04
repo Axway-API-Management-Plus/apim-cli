@@ -418,10 +418,16 @@ public class APIImportConfigAdapter {
 				if(inputFile.exists()) { 
 					is = new FileInputStream(pathToAPIDefinition);
 				} else {
-					is = this.getClass().getResourceAsStream(pathToAPIDefinition);
-				}
-				if(is == null) {
-					throw new AppException("Unable to read swagger file from: " + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE);
+					String baseDir = new File(this.apiConfig).getCanonicalFile().getParent();
+					inputFile= new File(baseDir + File.separator + this.pathToAPIDefinition);
+					if(inputFile.exists()) { 
+						is = new FileInputStream(inputFile);
+					} else {
+						is = this.getClass().getResourceAsStream(pathToAPIDefinition);
+					}
+					if(is == null) {
+						throw new AppException("Unable to read swagger file from: " + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE);
+					}
 				}
 				
 			} catch (Exception e) {
