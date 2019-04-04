@@ -113,17 +113,7 @@ public class APIImportConfigAdapter {
 			} else {
 				stagedConfig = baseConfig;
 			}
-			String path = getCurrentPath();
-			LOG.info("path={}",path);
-			if (StringUtils.isEmpty(this.pathToAPIDefinition)) {
-				if (StringUtils.isNotEmpty(stagedConfig.getApiDefinitionImport())) {
-					this.pathToAPIDefinition=baseConfig.getApiDefinitionImport();
-					LOG.info("Reading API Definition from configuration file");
-				} else {
-					throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED,false);
-				}
-			}
-			LOG.info("API Definition={}",this.pathToAPIDefinition);
+			checkForAPIDefinitionInConfiguration(stagedConfig, baseConfig);
 			addDefaultPassthroughSecurityProfile(stagedConfig);
 			APIDefintion apiDefinition = new APIDefintion(getAPIDefinitionContent());
 			apiDefinition.setAPIDefinitionFile(this.pathToAPIDefinition);
@@ -144,6 +134,20 @@ public class APIImportConfigAdapter {
 			}
 			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
+	}
+
+	private void checkForAPIDefinitionInConfiguration(IAPI stagedConfig, IAPI baseConfig) throws AppException {
+		String path = getCurrentPath();
+		LOG.info("path={}",path);
+		if (StringUtils.isEmpty(this.pathToAPIDefinition)) {
+			if (StringUtils.isNotEmpty(stagedConfig.getApiDefinitionImport())) {
+				this.pathToAPIDefinition=baseConfig.getApiDefinitionImport();
+				LOG.info("Reading API Definition from configuration file");
+			} else {
+				throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED,false);
+			}
+		}
+		LOG.info("API Definition={}",this.pathToAPIDefinition);
 	}
 
 	private String getCurrentPath() {
