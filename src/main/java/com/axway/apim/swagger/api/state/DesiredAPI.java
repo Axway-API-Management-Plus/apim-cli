@@ -15,6 +15,7 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
@@ -35,6 +36,9 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	private String backendBasepath = null;
 	
 	private boolean requestForAllOrgs = false;
+	
+	@JsonProperty("apiDefinition")
+	public String apiDefinitionImport = null;
 	
 	public DesiredAPI() throws AppException {
 		super();
@@ -117,4 +121,17 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	public void setRequestForAllOrgs(boolean requestForAllOrgs) {
 		this.requestForAllOrgs = requestForAllOrgs;
 	}
+
+	@Override
+	public String getApiDefinitionImport() {
+		return apiDefinitionImport;
+	}
+
+	public void setApiDefinitionImport(String apiDefinitionImport) {
+		this.apiDefinitionImport = apiDefinitionImport;
+	}
+
+	
+	
+	
 }

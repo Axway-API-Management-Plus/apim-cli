@@ -9,12 +9,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -64,6 +67,7 @@ public class APIImportConfigAdapter {
 	
 	private ObjectMapper mapper = new ObjectMapper();
 	
+
 	private String pathToAPIDefinition;
 	
 	private String apiConfig;
@@ -109,6 +113,7 @@ public class APIImportConfigAdapter {
 			} else {
 				stagedConfig = baseConfig;
 			}
+			checkForAPIDefinitionInConfiguration(stagedConfig, baseConfig);
 			addDefaultPassthroughSecurityProfile(stagedConfig);
 			APIDefintion apiDefinition = new APIDefintion(getAPIDefinitionContent());
 			apiDefinition.setAPIDefinitionFile(this.pathToAPIDefinition);
@@ -129,6 +134,26 @@ public class APIImportConfigAdapter {
 			}
 			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
+	}
+
+	private void checkForAPIDefinitionInConfiguration(IAPI stagedConfig, IAPI baseConfig) throws AppException {
+		String path = getCurrentPath();
+		LOG.info("path={}",path);
+		if (StringUtils.isEmpty(this.pathToAPIDefinition)) {
+			if (StringUtils.isNotEmpty(stagedConfig.getApiDefinitionImport())) {
+				this.pathToAPIDefinition=baseConfig.getApiDefinitionImport();
+				LOG.info("Reading API Definition from configuration file");
+			} else {
+				throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED,false);
+			}
+		}
+		LOG.info("API Definition={}",this.pathToAPIDefinition);
+	}
+
+	private String getCurrentPath() {
+		Path currentRelativePath = Paths.get("");
+		String s = currentRelativePath.toAbsolutePath().toString();
+		return s;
 	}
 	
 	private void handleAllOrganizations(IAPI apiConfig) throws AppException {
@@ -530,4 +555,14 @@ public class APIImportConfigAdapter {
 		}
 		return importApi;
 	}
+
+	public String getPathToAPIDefinition() {
+		return pathToAPIDefinition;
+	}
+
+	public void setPathToAPIDefinition(String pathToAPIDefinition) {
+		this.pathToAPIDefinition = pathToAPIDefinition;
+	}
+	
+	
 }
