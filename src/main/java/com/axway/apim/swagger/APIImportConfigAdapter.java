@@ -121,7 +121,7 @@ public class APIImportConfigAdapter {
 					this.pathToAPIDefinition=baseConfig.getApiDefinitionImport();
 					LOG.info("Reading API Definition from contract file");
 				} else {
-					throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
+					throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED,false);
 				}
 			}
 			LOG.info("API Definition={}",this.pathToAPIDefinition);
