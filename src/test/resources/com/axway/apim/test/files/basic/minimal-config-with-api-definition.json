@@ -1,9 +1,8 @@
-	
 {
 	"name": "${apiName}",
 	"path": "${apiPath}",
 	"state": "${status}",
 	"version": "2.0.0",
-	"apiDefinition":"./src/test/resources/com/axway/apim/test/files/basic/petstore.json",
+	"apiDefinition":"${testAPIDefinition}",
 	"organization": "API Development ${orgNumber}"
 }

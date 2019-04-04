@@ -10,25 +10,26 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="WSDLFromURLRefFileInContractTestIT")
-public class WSDLFromURLRefFileInContractTestIT extends TestNGCitrusTestDesigner {
+@Test(testName="WSDLFromURLRefFileInConfigurationTestIT")
+public class WSDLFromURLRefFileInConfigurationTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private ImportTestAction importAction;
 	
-	@CitrusTest(name = "WSDLFromURLRefFileInContractTestIT")
+	@CitrusTest(name = "WSDLFromURLRefFileInConfigurationTestIT")
 	public void run() {
-		description("Validates a WSDL-File can be taken from a URL using a REF-File described in API json contract");
+		description("Validates a WSDL-File can be taken from a URL using a REF-File described in API json configuration");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/ref-file-wsdl-in-contract-${apiNumber}");
-		variable("apiName", "Ref-File-WSDL from URL-${apiNumber}");
+		variable("apiPath", "/ref-file-wsdl-in-configuration-${apiNumber}");
+		variable("apiName", "Ref-File-WSDL in configuration from URL-${apiNumber}");
 		
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
 		createVariable(ImportTestAction.API_DEFINITION, "");
-		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/minimal-config-with-import-wsdl-from-ref-file.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/wsdl/wsdl-file-with-username.url");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		action(importAction);
@@ -50,7 +51,8 @@ public class WSDLFromURLRefFileInContractTestIT extends TestNGCitrusTestDesigner
 		
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION, "");
-		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/minimal-config-with-import-wsdl-from-ref-file.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/wsdl/wsdl-file-with-username.url");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		action(importAction);

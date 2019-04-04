@@ -10,23 +10,24 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="WSDLFromURLInContractDirectTestIT")
-public class WSDLFromURLInContractDirectTestIT extends TestNGCitrusTestDesigner {
+@Test(testName="WSDLFromURLInConfigurationDirectTestIT")
+public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private ImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "WSDLFromURLInContractDirectTestIT")
+	@CitrusTest(name = "WSDLFromURLInConfigurationDirectTestIT")
 	public void run() {
-		description("Validates a WSDL-File can be taken from a URL described in API json contract.");
+		description("Validates a WSDL-File can be taken from a URL described in API json configuration.");
     		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/direct-url-wsdl-in-contract-${apiNumber}");
-		variable("apiName", "Direct-URL-WSDL from URL-${apiNumber}");
+		variable("apiPath", "/direct-url-wsdl-in-configuration-${apiNumber}");
+		variable("apiName", "Direct-URL-WSDL in configuration from URL-${apiNumber}");
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
 		createVariable(ImportTestAction.API_DEFINITION, "");
-		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/minimal-config-with-import-wsdl-from-url.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+		createVariable("testAPIDefinition","http://www.dneonline.com/calculator.asmx?WSDL");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
@@ -48,14 +49,16 @@ public class WSDLFromURLInContractDirectTestIT extends TestNGCitrusTestDesigner 
 		
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION, "");
-		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/minimal-config-with-import-wsdl-from-url.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+		createVariable("testAPIDefinition","http://www.dneonline.com/calculator.asmx?WSDL");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
 		
 		echo("####### Setting the status to Published #######");
 		createVariable(ImportTestAction.API_DEFINITION, "");
-		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/minimal-config-with-import-wsdl-from-url.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+		createVariable("testAPIDefinition","http://www.dneonline.com/calculator.asmx?WSDL");
 		createVariable("status", "published");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);

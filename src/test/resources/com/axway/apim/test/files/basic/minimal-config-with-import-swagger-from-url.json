@@ -1,9 +1,0 @@
-	
-{
-	"name": "${apiName}",
-	"path": "${apiPath}",
-	"state": "${status}",
-	"version": "2.0.0",
-	"apiDefinition":"https://petstore.swagger.io/v2/swagger.json",
-	"organization": "API Development ${orgNumber}"
-}

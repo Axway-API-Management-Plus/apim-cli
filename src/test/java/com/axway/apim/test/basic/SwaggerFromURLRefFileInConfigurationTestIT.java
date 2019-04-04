@@ -10,25 +10,26 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="SwaggerFromURLRefFileInContractTestIT")
-public class SwaggerFromURLRefFileInContractTestIT extends TestNGCitrusTestDesigner {
+@Test(testName="SwaggerFromURLRefFileInConfigurationTestIT")
+public class SwaggerFromURLRefFileInConfigurationTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private ImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "SwaggerFromURLRefFileInContractTestIT")
+	@CitrusTest(name = "SwaggerFromURLRefFileInConfigurationTestIT")
 	public void run() {
-		description("Validates a Swagger-File can be taken from a URL using a REF-File described in API json contract");
+		description("Validates a Swagger-File can be taken from a URL using a REF-File described in API json configuration");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/ref-file-swagger-in-contract-${apiNumber}");
-		variable("apiName", "Ref-File-Swagger in contract from URL-${apiNumber}");
+		variable("apiPath", "/ref-file-swagger-in-configuration-${apiNumber}");
+		variable("apiName", "Ref-File-Swagger in configuration from URL-${apiNumber}");
 		
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-import-swagger-from-ref-file.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/basic/swagger-file-with-username.url");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
@@ -50,7 +51,8 @@ public class SwaggerFromURLRefFileInContractTestIT extends TestNGCitrusTestDesig
 		
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-import-swagger-from-ref-file.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/basic/swagger-file-with-username.url");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);

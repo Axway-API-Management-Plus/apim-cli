@@ -17,7 +17,7 @@ public class NoAPIDefinitionConfiguredIT extends TestNGCitrusTestDesigner {
 	
 	@CitrusTest(name = "NoAPIDefinitionConfiguredIT")
 	public void run() {
-		description("If no api-definition is passed as argument and no apiDefinition attribute is found in contract file, the tool must fail with a dedicated return code.");
+		description("If no api-definition is passed as argument and no apiDefinition attribute is found in configuration file, the tool must fail with a dedicated return code.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/my-no-api-def-${apiNumber}");

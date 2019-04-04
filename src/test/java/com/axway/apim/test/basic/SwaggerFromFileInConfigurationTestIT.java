@@ -10,25 +10,26 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="SwaggerFromURLInContractDirectTestIT")
-public class SwaggerFromURLInContractDirectTestIT extends TestNGCitrusTestDesigner {
+@Test(testName="SwaggerFromFileInConfigurationTestIT")
+public class SwaggerFromFileInConfigurationTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private ImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "SwaggerFromURLInContractDirectTestIT")
+	@CitrusTest(name = "SwaggerFromFileInConfigurationTestIT")
 	public void run() {
-		description("Validates a Swagger-File can be taken from a URL described in API json contract.");
+		description("Validates a Swagger-File can be taken from a file path described in json configuration file");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/direct-url-swagger-in-contract-${apiNumber}");
-		variable("apiName", "Direct-URL-Swagger in contractfrom URL-${apiNumber}");
+		variable("apiPath", "/file-swagger-in-configuration-${apiNumber}");
+		variable("apiName", "File-Swagger in configuration from URL-${apiNumber}");
 		
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-import-swagger-from-url.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/basic/petstore.json");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
@@ -50,21 +51,8 @@ public class SwaggerFromURLInContractDirectTestIT extends TestNGCitrusTestDesign
 		
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-import-swagger-from-url.json");
-		createVariable("status", "unpublished");
-		createVariable("expectedReturnCode", "10");
-		action(swaggerImport);
-		
-		echo("####### Re-Import API from URL without a change #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-import-swagger-from-url.json");
-		createVariable("status", "unpublished");
-		createVariable("expectedReturnCode", "10");
-		action(swaggerImport);
-		
-		echo("####### Re-Import API from URL without a change #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "http://petstore.swagger.io/v2/swagger.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/basic/petstore.json");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
