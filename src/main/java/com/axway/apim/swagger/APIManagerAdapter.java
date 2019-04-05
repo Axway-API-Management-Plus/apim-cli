@@ -163,7 +163,7 @@ public class APIManagerAdapter {
 	}
 	
 	private boolean isAdminAccountNeeded(APIChangeState changeState) throws AppException {
-		if(changeState.getDesiredAPI().equals(IAPI.STATE_UNPUBLISHED) && 
+		if(changeState.getDesiredAPI().getState().equals(IAPI.STATE_UNPUBLISHED) && 
 				(!changeState.getActualAPI().isValid() || changeState.getActualAPI().getState().equals(IAPI.STATE_UNPUBLISHED))) {
 			return false;
 		} else {
@@ -310,7 +310,7 @@ public class APIManagerAdapter {
 			LOG.info("Ignoring Client-Organizations, as desired API-State is Unpublished!");
 			return;
 		}
-		if(desiredAPI.getClientOrganizations()==null) return;
+		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null) return;
 		List<String> grantedOrgs = new ArrayList<String>();
 		List<Organization> allOrgs = getAllOrgs();
 		for(Organization org : allOrgs) {
@@ -330,7 +330,7 @@ public class APIManagerAdapter {
 			LOG.info("Ignoring Client-Applications, as desired API-State is Unpublished!");
 			return;
 		}
-		if(desiredAPI.getApplications()==null) return;
+		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> allApps = getAllApps();
 		for(ClientApplication app : allApps) {

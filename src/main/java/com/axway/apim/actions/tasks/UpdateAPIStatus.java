@@ -128,17 +128,19 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				throw new AppException("The status change from: '" + actualState.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS);
 			}
 			if(desiredState.getState().equals(IAPI.STATE_DELETED)) {
+				// If an API in state unpublished, also an orgAdmin can delete it
+				boolean useAdmin = (actualState.getState().equals(IAPI.STATE_UNPUBLISHED)) ? false : true; 
 				uri = new URIBuilder(cmd.getAPIManagerURL())
 						.setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getId())
 						.build();
-				apiCall = new DELRequest(uri, this);
+				apiCall = new DELRequest(uri, this, useAdmin);
 				context.put("responseMessage", "'Old' FE-API deleted (API-Proxy)");
 				apiCall.execute();
 				// Additionally we need to delete the BE-API
 				uri = new URIBuilder(cmd.getAPIManagerURL())
 						.setPath(RestAPICall.API_VERSION+"/apirepo/"+actualState.getApiId())
 						.build();
-				apiCall = new DELRequest(uri, this, true);
+				apiCall = new DELRequest(uri, this, useAdmin);
 				context.put("responseMessage", "'Old' BE-API deleted.");
 				apiCall.execute();
 			} else {

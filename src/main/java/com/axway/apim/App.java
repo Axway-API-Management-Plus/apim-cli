@@ -175,7 +175,7 @@ public class App {
 				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
 				return errorState.getErrorCode().getCode();
 			} else {
-				LOG.error(ap.getMessage());
+				LOG.error(ap.getMessage(), ap);
 				return ap.getErrorCode().getCode();
 			}
 		} catch (Exception e) {
