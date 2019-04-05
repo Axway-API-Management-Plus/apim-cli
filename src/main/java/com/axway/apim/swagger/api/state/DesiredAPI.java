@@ -1,21 +1,13 @@
 package com.axway.apim.swagger.api.state;
 
-import java.net.URI;
 import java.util.LinkedHashMap;
 
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.actions.rest.GETRequest;
-import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIImportConfigAdapter;
-import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Concrete class that is used to reflect the desired API as it's defined by the API-Developer. 
@@ -30,43 +22,12 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	
 	private static Logger LOG = LoggerFactory.getLogger(DesiredAPI.class);
 	
-	private String orgId = null;
-	
 	private String backendBasepath = null;
 	
 	private boolean requestForAllOrgs = false;
 	
 	public DesiredAPI() throws AppException {
 		super();
-	}
-
-	/**
-	 * This method translates from the given Org-Name to the Org-Id!</br>
-	 * </br> 
-	 * TODO: Potential duplicate method:
-	 * @see APIManagerAdapter#getOrgId(String)
-	 * @see com.axway.apim.swagger.api.state.AbstractAPI#getOrgId()
-	 */
-	@Override
-	public String getOrgId() throws AppException {
-		if(this.orgId!=null) return this.orgId;
-		String response = null;
-		try {
-			LOG.info("Getting details for organization: " + this.organization + " from API-Manager!");
-			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/")
-					.setParameter("field", "name")
-					.setParameter("op", "eq")
-					.setParameter("value", this.organization).build();
-			GETRequest getRequest = new GETRequest(uri, null);
-			response = EntityUtils.toString(getRequest.execute().getEntity());
-			JsonNode jsonNode = objectMapper.readTree(response);
-			if(jsonNode==null) LOG.error("Unable to read details for org: " + this.organization);
-			return jsonNode.get(0).get("id").asText();
-		} catch (Exception e) {
-			LOG.error("Received response: " + response);
-			throw new AppException("Can't read Org-Details from API-Manager. Is the API-Manager running and "
-					+ "does the Organization: '"+this.organization+"' exists?", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		}
 	}
 
 	/**

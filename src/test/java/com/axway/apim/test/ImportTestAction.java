@@ -51,6 +51,7 @@ public class ImportTestAction extends AbstractTestAction {
 		
 		String enforce = "false";
 		String ignoreQuotas = "false";
+		String ignoreAdminAccount = "false";
 		String clientOrgsMode = CommandParameters.MODE_REPLACE;
 		String clientAppsMode = CommandParameters.MODE_REPLACE;;
 		
@@ -66,6 +67,10 @@ public class ImportTestAction extends AbstractTestAction {
 		try {
 			clientAppsMode = context.getVariable("clientAppsMode");
 		} catch (Exception ignore) {};
+		try {
+			ignoreAdminAccount = context.getVariable("ignoreAdminAccount");
+		} catch (Exception ignore) {};
+		
 		
 		if(stage==null) {
 			stage = "NOT_SET";
@@ -86,8 +91,9 @@ public class ImportTestAction extends AbstractTestAction {
 				"-f", enforce, 
 				"-iq", ignoreQuotas, 
 				"-clientOrgsMode", clientOrgsMode, 
-				"-clientAppsMode", clientAppsMode};
-		
+				"-clientAppsMode", clientAppsMode, 
+				"-ignoreAdminAccount", ignoreAdminAccount};
+		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"'. Enforce breaking change: " + enforce);
 		int rc = App.run(args);
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);

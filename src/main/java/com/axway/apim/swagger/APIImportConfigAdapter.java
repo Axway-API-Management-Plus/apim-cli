@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.Utils;
 import com.axway.apim.swagger.api.properties.APIDefintion;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
@@ -66,24 +67,51 @@ public class APIImportConfigAdapter {
 	
 	private String pathToAPIDefinition;
 	
-	private String apiConfig;
+	private String apiConfigFile;
 	
-	private String stage;
+	private IAPI apiConfig;
+	
+	private boolean hasAdminAccount;
+	
+	private boolean usingOrgAdmin;
+	
+	private ErrorState error = ErrorState.getInstance();
+
 
 	/**
 	 * Constructs the APIImportConfig 
 	 * @param apiConfig
 	 * @param stage
 	 * @param pathToAPIDefinition
+	 * @param hasAdminAccount - set to true, if an AdminAccount is available.
 	 * @throws AppException
 	 */
-	public APIImportConfigAdapter(String apiConfig, String stage, String pathToAPIDefinition) throws AppException {
+	public APIImportConfigAdapter(String apiConfigFile, String stage, String pathToAPIDefinition, boolean usingOrgAdmin, boolean hasAdminAccount) throws AppException {
 		super();
-		this.apiConfig = apiConfig;
-		this.stage = stage;
+		this.apiConfigFile = apiConfigFile;
 		this.pathToAPIDefinition = pathToAPIDefinition;
+		this.usingOrgAdmin = usingOrgAdmin;
+		this.hasAdminAccount = hasAdminAccount;
+		IAPI baseConfig;
+		try {
+			baseConfig = mapper.readValue(new File(apiConfigFile), DesiredAPI.class);
+			ObjectReader updater = mapper.readerForUpdating(baseConfig);
+			if(getStageConfig(stage, apiConfigFile)!=null) {
+				LOG.info("Overriding configuration from: " + getStageConfig(stage, apiConfigFile));
+				apiConfig = updater.readValue(new File(getStageConfig(stage, apiConfigFile)));
+			} else {
+				apiConfig = baseConfig;
+			}
+		} catch (Exception e) {
+			error.setError("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE);
+			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
+		}
 	}
-	
+
+	public IAPI getApiConfig() {
+		return apiConfig;
+	}
+
 	/**
 	 * Returns the IAPIDefintion that returns the desired state of the API. In this method:<br>
 	 * <li>the API-Config is read</li>
@@ -99,43 +127,42 @@ public class APIImportConfigAdapter {
 	 * @see {@link IAPI}, {@link AbstractAPI}
 	 */
 	public IAPI getDesiredAPI() throws AppException {
-		IAPI stagedConfig;
 		try {
-			IAPI baseConfig = mapper.readValue(new File(apiConfig), DesiredAPI.class);
-			ObjectReader updater = mapper.readerForUpdating(baseConfig);
-			if(getStageConfig(stage, apiConfig)!=null) {
-				LOG.info("Overriding configuration from: " + getStageConfig(stage, apiConfig));
-				stagedConfig = updater.readValue(new File(getStageConfig(stage, apiConfig)));
-			} else {
-				stagedConfig = baseConfig;
-			}
-			addDefaultPassthroughSecurityProfile(stagedConfig);
+			validateOrganization(apiConfig);
+			addDefaultPassthroughSecurityProfile(apiConfig);
 			APIDefintion apiDefinition = new APIDefintion(getAPIDefinitionContent());
 			apiDefinition.setAPIDefinitionFile(this.pathToAPIDefinition);
-			stagedConfig.setAPIDefinition(apiDefinition);
-			addImageContent(stagedConfig);
-			validateCustomProperties(stagedConfig);
-			validateDescription(stagedConfig);
-			validateCorsConfig(stagedConfig);
-			validateOutboundAuthN(stagedConfig);
-			completeCaCerts(stagedConfig);
-			addQuotaConfiguration(stagedConfig);
-			handleAllOrganizations(stagedConfig);
-			completeClientApplications(stagedConfig);
-			return stagedConfig;
+			apiConfig.setAPIDefinition(apiDefinition);
+			addImageContent(apiConfig);
+			validateCustomProperties(apiConfig);
+			validateDescription(apiConfig);
+			validateCorsConfig(apiConfig);
+			validateOutboundAuthN(apiConfig);
+			completeCaCerts(apiConfig);
+			addQuotaConfiguration(apiConfig);
+			handleAllOrganizations(apiConfig);
+			completeClientApplications(apiConfig);
+			return apiConfig;
 		} catch (Exception e) {
 			if(e.getCause() instanceof AppException) {
 				throw (AppException)e.getCause();
 			}
-			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
+			throw new AppException("Cannot validate/fulfill configuration file.", ErrorCode.CANT_READ_CONFIG_FILE, e);
+		}
+	}
+	
+	private void validateOrganization(IAPI apiConfig) throws AppException {
+		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
+			apiConfig.setOrgId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
 		}
 	}
 	
 	private void handleAllOrganizations(IAPI apiConfig) throws AppException {
 		if(apiConfig.getClientOrganizations()==null) return;
+		if(apiConfig.getState()==IAPI.STATE_UNPUBLISHED) return;
 		List<String> allDesiredOrgs = new ArrayList<String>();
 		if(apiConfig.getClientOrganizations().contains("ALL")) {
-			List<Organization> allOrgs = APIManagerAdapter.getAllOrgs();
+			List<Organization> allOrgs = APIManagerAdapter.getInstance().getAllOrgs();
 			for(Organization org : allOrgs) {
 				allDesiredOrgs.add(org.getName());
 			}
@@ -151,7 +178,8 @@ public class APIImportConfigAdapter {
 		}
 	}
 	
-	private void addQuotaConfiguration(IAPI apiConfig) {
+	private void addQuotaConfiguration(IAPI apiConfig) throws AppException {
+		if(apiConfig.getState()==IAPI.STATE_UNPUBLISHED) return;
 		DesiredAPI importAPI = (DesiredAPI)apiConfig;
 		initQuota(importAPI.getSystemQuota());
 		initQuota(importAPI.getApplicationQuota());
@@ -227,6 +255,7 @@ public class APIImportConfigAdapter {
 	 */
 	private void completeClientApplications(IAPI apiConfig) throws AppException {
 		if(CommandParameters.getInstance().isIgnoreClientApps()) return;
+		if(apiConfig.getState()==IAPI.STATE_UNPUBLISHED) return;
 		ClientApplication loadedApp = null;
 		ClientApplication app;
 		if(apiConfig.getApplications()!=null) {
@@ -235,7 +264,7 @@ public class APIImportConfigAdapter {
 			while(it.hasNext()) {
 				app = it.next();
 				if(app.getName()!=null) {
-					loadedApp = APIManagerAdapter.getApplication(app.getName());
+					loadedApp = APIManagerAdapter.getInstance().getApplication(app.getName());
 					if(loadedApp==null) {
 						LOG.warn("Unknown application with name: '" + app.getName() + "' configured. Ignoring this application.");
 						it.remove();
@@ -268,7 +297,7 @@ public class APIImportConfigAdapter {
 	
 	private static ClientApplication getAppForCredential(String credential, String type) throws AppException {
 		LOG.debug("Searching application with configured credential (Type: "+type+"): '"+credential+"'");
-		ClientApplication app = APIManagerAdapter.getAppIdForCredential(credential, type);
+		ClientApplication app = APIManagerAdapter.getInstance().getAppIdForCredential(credential, type);
 		if(app==null) {
 			LOG.warn("Unknown application with ("+type+"): '" + credential + "' configured. Ignoring this application.");
 			return null;
@@ -310,9 +339,10 @@ public class APIImportConfigAdapter {
 		}
 		String baseDir;
 		try {
-			baseDir = new File(this.apiConfig).getCanonicalFile().getParent();
+			baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
 		} catch (IOException e1) {
-			throw new AppException("Can't read certificate file.", ErrorCode.CANT_READ_CONFIG_FILE, e1, true);
+			error.setError("Can't read certificate file.", ErrorCode.CANT_READ_CONFIG_FILE);
+			throw new AppException("Can't read certificate file.", ErrorCode.CANT_READ_CONFIG_FILE, e1);
 		}
 		file = new File(baseDir + File.separator + cert.getCertFile());
 		if(file.exists()) { 
@@ -514,7 +544,7 @@ public class APIImportConfigAdapter {
 	private IAPI addImageContent(IAPI importApi) throws AppException {
 		if(importApi.getImage()!=null) { // An image is declared
 			try {
-				String baseDir = new File(this.apiConfig).getParent();
+				String baseDir = new File(this.apiConfigFile).getParent();
 				File file = new File(baseDir + "/" + importApi.getImage().getFilename());
 				importApi.getImage().setBaseFilename(file.getName());
 				if(file.exists()) { 

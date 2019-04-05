@@ -101,7 +101,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 			
 			entity = new StringEntity(objectMapper.writeValueAsString(quotaConfig));
 			
-			apiCall = new PUTRequest(entity, uri, this);
+			apiCall = new PUTRequest(entity, uri, this, true);
 			apiCall.execute();
 		} catch (Exception e) {
 			throw new AppException("Can't update Quota-Configuration in API-Manager.", ErrorCode.CANT_UPDATE_QUOTA_CONFIG, e);

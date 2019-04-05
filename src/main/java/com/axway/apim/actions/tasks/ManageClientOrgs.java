@@ -18,6 +18,7 @@ import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.properties.organization.ApiAccess;
 import com.axway.apim.swagger.api.state.AbstractAPI;
@@ -79,7 +80,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		} else {
 			formBody = "action=orgs&apiId="+apiId;
 			for(String orgName : grantAccessToOrgs) {
-				formBody += "&grantOrgId="+APIManagerAdapter.getOrgId(orgName);
+				formBody += "&grantOrgId="+APIManagerAdapter.getInstance().getOrgId(orgName);
 			}
 			Transaction.getInstance().put("orgName", grantAccessToOrgs);
 		}
@@ -88,7 +89,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 			
 			entity = new StringEntity(formBody);
 			
-			apiCall = new POSTRequest(entity, uri, this);
+			apiCall = new POSTRequest(entity, uri, this, true);
 			apiCall.setContentType("application/x-www-form-urlencoded");
 			apiCall.execute();
 			// Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
@@ -105,7 +106,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		Transaction.getInstance().put(MODE, MODE_REMOVE_ACCESS);
 		RestAPICall apiCall;
 		for(String orgName : removingActualOrgs) {
-			String orgId = APIManagerAdapter.getOrgId(orgName);
+			String orgId = APIManagerAdapter.getInstance().getOrgId(orgName);
 			Transaction.getInstance().put("orgName", orgName);
 			List<ApiAccess> orgsApis = APIManagerAdapter.getOrgsApiAccess(orgId, false);
 			for(ApiAccess apiAccess : orgsApis) {
@@ -114,7 +115,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/"+orgId+"/apis/"+apiAccess.getId()).build();
 						
 						
-						apiCall = new DELRequest(uri, this);
+						apiCall = new DELRequest(uri, this, true);
 						apiCall.execute();
 						// Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
 						actualState.getClientOrganizations().removeAll(removingActualOrgs);
@@ -155,9 +156,10 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 			if(referenceOrgs.contains(orgName)) {
 				continue;
 			}
-			if(APIManagerAdapter.getOrgId(orgName)==null) {
-				LOG.error("Configured organizations: " + APIManagerAdapter.getAllOrgs());
-				throw new AppException("Unknown Org-Name: '" + orgName + "'", ErrorCode.UNKNOWN_ORGANIZATION, false);
+			if(APIManagerAdapter.getInstance().getOrgId(orgName)==null) {
+				LOG.error("Configured organizations: " + APIManagerAdapter.getInstance().getAllOrgs());
+				ErrorState.getInstance().setError("Unknown Org-Name: '" + orgName + "'", ErrorCode.UNKNOWN_ORGANIZATION, false);
+				throw new AppException("Unknown Org-Name: '" + orgName + "'", ErrorCode.UNKNOWN_ORGANIZATION);
 			}
 			missingOrgs.add(orgName);
 		}

@@ -1,7 +1,6 @@
 package com.axway.apim.actions.tasks;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +16,7 @@ import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
 import com.axway.apim.swagger.api.state.APIBaseDefinition;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -80,8 +80,10 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 		if(!enforceBreakingChange) { 
 			if(statusChangeRequiresEnforce.get(this.actualState.getState())!=null && 
 					statusChangeRequiresEnforce.get(this.actualState.getState()).contains(this.desiredState.getState())) {
-				throw new AppException("Status change from actual status: '"+actualState.getState()+"' to desired status: '"+desiredState.getState()+"' "
+				ErrorState.getInstance().setError("Status change from actual status: '"+actualState.getState()+"' to desired status: '"+desiredState.getState()+"' "
 						+ "is breaking. Enforce change with option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
+				throw new AppException("Status change from actual status: '"+actualState.getState()+"' to desired status: '"+desiredState.getState()+"' "
+						+ "is breaking. Enforce change with option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED);
 			}
 		}
 		
@@ -97,7 +99,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 			boolean statusMovePossible = false;
 			for(String status : possibleStatus) {
 				if(desiredState.getState().equals(status)) {
-					statusMovePossible = true; // Direkt move to new state possible
+					statusMovePossible = true; // Direct move to new state possible
 					break;
 				} else {
 					String[] possibleStatus2 = statusChangeMap.get(status);
@@ -136,7 +138,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				uri = new URIBuilder(cmd.getAPIManagerURL())
 						.setPath(RestAPICall.API_VERSION+"/apirepo/"+actualState.getApiId())
 						.build();
-				apiCall = new DELRequest(uri, this);
+				apiCall = new DELRequest(uri, this, true);
 				context.put("responseMessage", "'Old' BE-API deleted.");
 				apiCall.execute();
 			} else {
@@ -144,7 +146,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 					.setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getId()+"/"+statusEndpoint.get(desiredState.getState()))
 					.build();
 			
-				apiCall = new POSTRequest(null, uri, this);
+				apiCall = new POSTRequest(null, uri, this, true);
 				apiCall.setContentType("application/x-www-form-urlencoded");
 				apiCall.execute();
 			} 

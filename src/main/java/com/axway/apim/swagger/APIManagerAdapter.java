@@ -12,8 +12,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -29,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.actions.CreateNewAPI;
 import com.axway.apim.actions.RecreateToUpdateAPI;
 import com.axway.apim.actions.UpdateExistingAPI;
+import com.axway.apim.actions.rest.APIMHttpClient;
 import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
@@ -36,6 +39,7 @@ import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
 import com.axway.apim.swagger.api.properties.APIDefintion;
 import com.axway.apim.swagger.api.properties.apiAccess.APIAccess;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
@@ -44,6 +48,7 @@ import com.axway.apim.swagger.api.properties.organization.ApiAccess;
 import com.axway.apim.swagger.api.properties.organization.Organization;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
+import com.axway.apim.swagger.api.properties.user.User;
 import com.axway.apim.swagger.api.state.AbstractAPI;
 import com.axway.apim.swagger.api.state.ActualAPI;
 import com.axway.apim.swagger.api.state.IAPI;
@@ -61,6 +66,8 @@ public class APIManagerAdapter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerAdapter.class);
 	
+	private static APIManagerAdapter instance;
+	
 	private static String apiManagerVersion = null;
 	
 	private static List<Organization> allOrgs = null;
@@ -74,20 +81,36 @@ public class APIManagerAdapter {
 	
 	public static APIQuota sytemQuotaConfig = null;
 	public static APIQuota applicationQuotaConfig = null;
+	private boolean usingOrgAdmin = false;
+	private boolean hasAdminAccount = false;
+	
+	private ErrorState error = ErrorState.getInstance();
 	
 	public static String CREDENTIAL_TYPE_API_KEY 		= "apikeys";
 	public static String CREDENTIAL_TYPE_EXT_CLIENTID	= "extclients";
 	public static String CREDENTIAL_TYPE_OAUTH			= "oauth";
 	
-	public APIManagerAdapter() throws AppException {
+	public static String ADMIN_PASSWORD_FILE = "admin.properties";
+	
+	public static synchronized APIManagerAdapter getInstance() throws AppException {
+		if (APIManagerAdapter.instance == null) {
+			APIManagerAdapter.instance = new APIManagerAdapter ();
+		}
+		return APIManagerAdapter.instance;
+	}
+	
+	public static synchronized void deleteInstance() throws AppException {
+			APIManagerAdapter.instance = null;
+	}
+	
+	private APIManagerAdapter() throws AppException {
 		super();
-		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the JVM)
-		loginToAPIManager();
+		Transaction transaction = Transaction.getInstance();
+		transaction.beginTransaction();
+		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the same JVM)
+		loginToAPIManager(false); // Login with the provided user (might be an Org-Admin)
+		loginToAPIManager(true); // Second, login if needed with an admin account
 		this.enforceBreakingChange = CommandParameters.getInstance().isEnforceBreakingChange();
-		/*if(!getUserRole().equals("admin")) 
-			throw new AppException("Given user: '"+CommandParameters.getInstance().getUsername()+"' has no admin-role. "
-				+ "This tool needs admin role permissions.", ErrorCode.NO_ADMIN_ROLE_USER, false);
-				*/
 	}
 
 	/**
@@ -97,6 +120,10 @@ public class APIManagerAdapter {
 	 * @throws AppException is the desired state can't be replicated into the API-Manager.
 	 */
 	public void applyChanges(APIChangeState changeState) throws AppException {
+		if(!this.hasAdminAccount && isAdminAccountNeeded(changeState) ) {
+			error.setError("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER, false);
+			throw new AppException("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER);
+		}
 		// No existing API found (means: No match for APIPath), creating a complete new
 		if(!changeState.getActualAPI().isValid()) {
 			// --> CreateNewAPI
@@ -108,13 +135,15 @@ public class APIManagerAdapter {
 			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getName() +" (Version: "+ changeState.getActualAPI().getVersion() + ")");
 			if(!changeState.hasAnyChanges()) {
 				LOG.debug("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
-				throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE, false);
+				error.setWarning("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE, false);
+				throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE);
 			}
 			LOG.info("Recognized the following changes. Potentially Breaking: " + changeState.getBreakingChanges() + 
 					" plus Non-Breaking: " + changeState.getNonBreakingChanges());
 			if (changeState.isBreaking()) { // Make sure, breaking changes aren't applied without enforcing it.
 				if(!enforceBreakingChange) {
-					throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
+					error.setError("A potentially breaking change can't be applied without enforcing it! Try option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
+					throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED);
 				}
 			}
 			
@@ -133,52 +162,99 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private void loginToAPIManager() throws AppException {
+	private boolean isAdminAccountNeeded(APIChangeState changeState) throws AppException {
+		if(changeState.getDesiredAPI().equals(IAPI.STATE_UNPUBLISHED) && 
+				(!changeState.getActualAPI().isValid() || changeState.getActualAPI().getState().equals(IAPI.STATE_UNPUBLISHED))) {
+			return false;
+		} else {
+			return true;
+		}		
+	}
+	
+	public void loginToAPIManager(boolean useAdmin) throws AppException {
 		URI uri;
 		CommandParameters cmd = CommandParameters.getInstance();
-		Transaction transaction = Transaction.getInstance();
-		transaction.beginTransaction();
+		if(cmd.ignoreAdminAccount() && useAdmin) return;
+		if(hasAdminAccount && useAdmin) return; // Already logged in with an Admin-Account.
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/login").build();
-
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
-		    params.add(new BasicNameValuePair("username", cmd.getUsername()));
-		    params.add(new BasicNameValuePair("password", cmd.getPassword()));
-		    POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, null);
+			String username;
+			String password;
+			if(useAdmin) {
+				String[] usernamePassword = getAdminUsernamePassword();
+				if(usernamePassword==null) return;
+				username = usernamePassword[0];
+				password = usernamePassword[1];
+				LOG.debug("Logging in with Admin-User: '" + username + "'");
+			} else {
+				username = cmd.getUsername();
+				password = cmd.getPassword();
+				LOG.debug("Logging in with User: '" + username + "'");
+			}
+		    params.add(new BasicNameValuePair("username", username));
+		    params.add(new BasicNameValuePair("password", password));
+		    POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, null, useAdmin);
 			loginRequest.setContentType(null);
 			HttpResponse response = loginRequest.execute();
 			int statusCode = response.getStatusLine().getStatusCode();
 			if(statusCode == 403){
 				LOG.error("Login failed: " +statusCode+ ", Response: " + response);
-				throw new AppException("Given user can't login.", ErrorCode.API_MANAGER_COMMUNICATION);
+				throw new AppException("Given user: '"+username+"' can't login.", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
+			Transaction context = Transaction.getInstance();
+			for (Header header : response.getAllHeaders()) {
+				if(header.getName().equals("CSRF-Token")) {
+					context.put("CSRF-Token#"+new Boolean(useAdmin), header.getValue());
+					break;
+				}
+			}
+			User user = getCurrentUser(useAdmin);
+			if(user.getRole().equals("admin")) {
+				this.hasAdminAccount = true;
+			} else if (user.getRole().equals("oadmin")) {
+				this.usingOrgAdmin = true;
+			} else {
+				error.setError("Not supported user-role: '"+user.getRole()+"'", ErrorCode.API_MANAGER_COMMUNICATION, false);
+				throw new AppException("Not supported user-role: "+user.getRole()+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 		} catch (Exception e) {
 			throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	
-	public static String getUserRole() throws AppException {
+	private String[] getAdminUsernamePassword() throws AppException {
+		Properties prop = new Properties();
+		try {
+			prop.load(APIMHttpClient.class.getClassLoader().getResourceAsStream(ADMIN_PASSWORD_FILE));
+			String[] usernamePassword =  {prop.getProperty("username"), prop.getProperty("password")};
+			return usernamePassword;
+		} catch (IOException e) {
+			LOG.debug("Can't read admin-password config file: '"+ADMIN_PASSWORD_FILE+"'");
+			return null;
+		}
+	}
+	
+	public static User getCurrentUser(boolean useAdmin) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
 		HttpResponse response = null;
-		InputStream is = null;
 		JsonNode jsonResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/currentuser").build();
-		    GETRequest currentUserRequest = new GETRequest(uri, null);
+		    GETRequest currentUserRequest = new GETRequest(uri, null, useAdmin);
 		    response = currentUserRequest.execute();
-			is = response.getEntity().getContent();
-			jsonResponse = mapper.readTree(is);
-			JsonNode role = jsonResponse.get("role");
-			if(role == null) {
-				throw new AppException("Can't get current-user information on response: '" + jsonResponse + "'", 
+			String currentUser = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+			User user = mapper.readValue(currentUser, User.class);
+			if(user == null) {
+				throw new AppException("Can't get current-user information on response: '" + currentUser + "'", 
 						ErrorCode.API_MANAGER_COMMUNICATION);
 			}
-			return role.asText();
+			return user;
 		    
 		} catch (Exception e) {
 			throw new AppException("Can't get current-user information on response: '" + jsonResponse + "'", 
-					ErrorCode.API_MANAGER_COMMUNICATION);
+					ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	
@@ -190,7 +266,7 @@ public class APIManagerAdapter {
 	 * @return an APIManagerAPI instance, which is flagged either as valid, if the API was found or invalid, if not found!
 	 * @throws AppException when the API-Manager API-State can't be created
 	 */
-	public static IAPI getAPIManagerAPI(JsonNode jsonConfiguration, IAPI desiredAPI) throws AppException {
+	public IAPI getAPIManagerAPI(JsonNode jsonConfiguration, IAPI desiredAPI) throws AppException {
 		if(jsonConfiguration == null) {
 			IAPI apiManagerAPI = new ActualAPI();
 			apiManagerAPI.setValid(false);
@@ -228,11 +304,13 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static void addClientOrganizations(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
+	private void addClientOrganizations(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
+		if(!hasAdminAccount) return;
 		if(desiredAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
 			LOG.info("Ignoring Client-Organizations, as desired API-State is Unpublished!");
 			return;
 		}
+		if(desiredAPI.getClientOrganizations()==null) return;
 		List<String> grantedOrgs = new ArrayList<String>();
 		List<Organization> allOrgs = getAllOrgs();
 		for(Organization org : allOrgs) {
@@ -246,11 +324,13 @@ public class APIManagerAdapter {
 		apiManagerApi.setClientOrganizations(grantedOrgs);
 	}
 	
-	private static void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
+	private void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
+		if(!hasAdminAccount) return;
 		if(desiredAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
 			LOG.info("Ignoring Client-Applications, as desired API-State is Unpublished!");
 			return;
 		}
+		if(desiredAPI.getApplications()==null) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> allApps = getAllApps();
 		for(ClientApplication app : allApps) {
@@ -270,7 +350,8 @@ public class APIManagerAdapter {
 	 * @return the id of the organization
 	 * @throws AppException 
 	 */
-	public static String getOrgId(String orgName) throws AppException {
+	public String getOrgId(String orgName) throws AppException {
+		if(!this.hasAdminAccount) return null;
 		if(allOrgs == null) getAllOrgs();
 		for(Organization org : allOrgs) {
 			if(orgName.equals(org.getName())) return org.getId();
@@ -285,7 +366,7 @@ public class APIManagerAdapter {
 	 * @return the id of the organization
 	 * @throws AppException 
 	 */
-	public static String getOrgName(String orgId) throws AppException {
+	public String getOrgName(String orgId) throws AppException {
 		if(allOrgs == null) getAllOrgs();
 		for(Organization org : allOrgs) {
 			if(orgId.equals(org.getId())) return org.getName();
@@ -300,7 +381,7 @@ public class APIManagerAdapter {
 	 * @return the id of the organization
 	 * @throws AppException 
 	 */
-	public static ClientApplication getApplication(String appName) throws AppException {
+	public ClientApplication getApplication(String appName) throws AppException {
 		if(allApps==null) getAllApps();
 		for(ClientApplication app : allApps) {
 			LOG.debug("Configured app with name: '"+appName+"' found. ID: '"+app.getId()+"'");
@@ -329,7 +410,7 @@ public class APIManagerAdapter {
 	 * @return the id of the organization
 	 * @throws AppException 
 	 */
-	public static ClientApplication getAppIdForCredential(String credential, String type) throws AppException {
+	public ClientApplication getAppIdForCredential(String credential, String type) throws AppException {
 		if(clientCredentialToAppMap.containsKey(type+"_"+credential)) {
 			ClientApplication app = clientCredentialToAppMap.get(type+"_"+credential);
 			LOG.info("Found existing application (in cache): '"+app.getName()+"' based on credential (Type: '"+type+"'): '"+credential+"'");
@@ -406,7 +487,7 @@ public class APIManagerAdapter {
 		
 			try {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+type).build();
-				RestAPICall getRequest = new GETRequest(uri, null);
+				RestAPICall getRequest = new GETRequest(uri, null, true);
 				HttpResponse response = getRequest.execute();
 				int statusCode = response.getStatusLine().getStatusCode();
 				if( statusCode == 403){
@@ -451,7 +532,7 @@ public class APIManagerAdapter {
 	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
 	 * @throws AppException if the API can't be found or created
 	 */
-	public static JsonNode getExistingAPI(String apiPath) throws AppException {
+	public JsonNode getExistingAPI(String apiPath) throws AppException {
 		CommandParameters cmd = CommandParameters.getInstance();
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
@@ -554,20 +635,24 @@ public class APIManagerAdapter {
 		URI uri;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+type+"/"+id+"/apis").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
+			RestAPICall getRequest = new GETRequest(uri, null, true);
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			allApiAccess = mapper.readValue(response, new TypeReference<List<APIAccess>>(){});
 			return allApiAccess;
 		} catch (Exception e) {
-			LOG.error("Error cant API-Access for "+type+" from API-Manager. Can't parse response: " + response);
+			LOG.error("Error cant load API-Access for "+type+" from API-Manager. Can't parse response: " + response);
 			throw new AppException("API-Access for "+type+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	
 	
 	
-	public static List<Organization> getAllOrgs() throws AppException {
+	public List<Organization> getAllOrgs() throws AppException {
+		if(!hasAdminAccount) {
+			LOG.error("Cant load all organizations without an Admin-Account.");
+			return null;
+		}
 		if(APIManagerAdapter.allOrgs!=null) {
 			return APIManagerAdapter.allOrgs;
 		}
@@ -577,7 +662,7 @@ public class APIManagerAdapter {
 		URI uri;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
+			RestAPICall getRequest = new GETRequest(uri, null, true);
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			allOrgs = mapper.readValue(response, new TypeReference<List<Organization>>(){});
@@ -588,7 +673,11 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	public static List<ClientApplication> getAllApps() throws AppException {
+	public List<ClientApplication> getAllApps() throws AppException {
+		if(!hasAdminAccount) {
+			LOG.error("Cant load all applications without an Admin-Account.");
+			return null;
+		}
 		if(APIManagerAdapter.allApps!=null) {
 			LOG.trace("Not reloading existing apps from API-Manager. Number of apps: " + APIManagerAdapter.allApps.size());
 			return APIManagerAdapter.allApps;
@@ -600,7 +689,7 @@ public class APIManagerAdapter {
 		URI uri;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
+			RestAPICall getRequest = new GETRequest(uri, null, true);
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			allApps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
@@ -700,5 +789,13 @@ public class APIManagerAdapter {
 		} catch (Exception e) {
 			throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
+	}
+
+	public boolean hasAdminAccount() {
+		return hasAdminAccount;
+	}
+	
+	public boolean isUsingOrgAdmin() {
+		return usingOrgAdmin;
 	}
 }

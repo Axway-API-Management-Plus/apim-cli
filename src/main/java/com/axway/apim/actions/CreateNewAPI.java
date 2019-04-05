@@ -49,7 +49,7 @@ public class CreateNewAPI {
 
 		new CreateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		// As we have just created an API-Manager API, we should reflect this for further processing
-		IAPI createdAPI = APIManagerAdapter.getAPIManagerAPI((JsonNode)context.get("lastResponse"), changes.getDesiredAPI());
+		IAPI createdAPI = APIManagerAdapter.getInstance().getAPIManagerAPI((JsonNode)context.get("lastResponse"), changes.getDesiredAPI());
 		changes.setIntransitAPI(createdAPI);
 		
 		// ... here we basically need to add all props to initially bring the API in sync!
