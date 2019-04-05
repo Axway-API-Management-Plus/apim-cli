@@ -713,7 +713,7 @@ public class APIManagerAdapter {
 		List<ApiAccess> apiAccess;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations/"+orgId+"/apis").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
+			RestAPICall getRequest = new GETRequest(uri, null, true);
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			apiAccess = mapper.readValue(response, new TypeReference<List<ApiAccess>>(){});
