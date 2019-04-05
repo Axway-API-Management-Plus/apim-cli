@@ -88,7 +88,7 @@ public abstract class RestAPICall {
 			context.put("lastRequest", request);
 			APIMHttpClient apimClient = APIMHttpClient.getInstance(this.useAdmin);
 			HttpResponse response = apimClient.getHttpClient().execute(request, apimClient.getClientContext());
-			LOG.info("Send request: "+this.getClass().getSimpleName()+" using admin-account: " + this.useAdmin + " to: " + request.getURI());
+			//LOG.info("Send request: "+this.getClass().getSimpleName()+" using admin-account: " + this.useAdmin + " to: " + request.getURI());
 			return response;
 		} catch (ClientProtocolException e) {
 			throw new AppException("Unable to send HTTP-Request.", ErrorCode.CANT_SEND_HTTP_REQUEST, e);
