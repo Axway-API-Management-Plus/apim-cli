@@ -39,7 +39,7 @@ public class SecurityDevice {
 	Map<String, String> properties;
 
 	public SecurityDevice() throws AppException {
-		super();		
+		super();
 		this.properties = new LinkedHashMap<String, String>();
 	}
 	
@@ -116,7 +116,6 @@ public class SecurityDevice {
 		if(this.type.equals("oauth")) {
 			if(SecurityDevice.oauthTokenStores == null) { 
 				SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
-				SecurityDevice.oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
 			}
 			String tokenStore = (String)properties.get("tokenStore");
 			if(tokenStore.startsWith("<key")) return properties;
@@ -130,6 +129,10 @@ public class SecurityDevice {
 				properties.put("tokenStore", esTokenStore);
 			}
 		} else if(this.type.equals("oauthExternal")) {
+			if(SecurityDevice.oauthTokenStores == null) { 
+				SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
+				SecurityDevice.oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
+			}
 			String infoPolicy = (String)properties.get("tokenStore"); // The token-info-policy is stored in the tokenStore as well
 			if(infoPolicy.startsWith("<key")) return properties;
 			String esInfoPolicy = oauthInfoPolicies.get(infoPolicy);
