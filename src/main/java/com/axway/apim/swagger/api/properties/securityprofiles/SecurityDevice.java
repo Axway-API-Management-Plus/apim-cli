@@ -114,9 +114,7 @@ public class SecurityDevice {
 
 	public Map<String, String> getProperties() throws AppException {
 		if(this.type.equals("oauth")) {
-			if(SecurityDevice.oauthTokenStores == null) { 
-				SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
-			}
+			if(SecurityDevice.oauthTokenStores == null) SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
 			String tokenStore = (String)properties.get("tokenStore");
 			if(tokenStore.startsWith("<key")) return properties;
 			String esTokenStore = oauthTokenStores.get(tokenStore);
@@ -129,10 +127,8 @@ public class SecurityDevice {
 				properties.put("tokenStore", esTokenStore);
 			}
 		} else if(this.type.equals("oauthExternal")) {
-			if(SecurityDevice.oauthTokenStores == null) { 
-				SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
-				SecurityDevice.oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
-			}
+			if(SecurityDevice.oauthInfoPolicies == null) SecurityDevice.oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
+			if(SecurityDevice.oauthTokenStores == null) SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
 			String infoPolicy = (String)properties.get("tokenStore"); // The token-info-policy is stored in the tokenStore as well
 			if(infoPolicy.startsWith("<key")) return properties;
 			String esInfoPolicy = oauthInfoPolicies.get(infoPolicy);
@@ -148,9 +144,7 @@ public class SecurityDevice {
 				properties.put("oauth.token.valid", "${oauth.token.valid}");
 			}
 		} else if (this.type.equals("authPolicy")) {
-			if(SecurityDevice.oauthTokenStores == null) { 
-				SecurityDevice.authenticationPolicies = initCustomPolicies("authentication");
-			}
+			if(SecurityDevice.authenticationPolicies == null) SecurityDevice.authenticationPolicies = initCustomPolicies("authentication");
 			String authPolicy = (String)properties.get("authenticationPolicy");
 			if(authPolicy.startsWith("<key")) return properties;
 			String esAuthPolicy = authenticationPolicies.get(authPolicy);
