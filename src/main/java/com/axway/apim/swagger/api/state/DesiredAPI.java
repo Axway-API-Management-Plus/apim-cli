@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Concrete class that is used to reflect the desired API as it's defined by the API-Developer. 

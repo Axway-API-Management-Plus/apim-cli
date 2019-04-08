@@ -169,7 +169,7 @@ public class APIImportConfigAdapter {
 				this.pathToAPIDefinition=baseConfig.getApiDefinitionImport();
 				LOG.info("Reading API Definition from configuration file");
 			} else {
-				throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED,false);
+				throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
 			}
 		}
 		LOG.info("API Definition={}",this.pathToAPIDefinition);
@@ -447,7 +447,7 @@ public class APIImportConfigAdapter {
 				if(inputFile.exists()) { 
 					is = new FileInputStream(pathToAPIDefinition);
 				} else {
-					String baseDir = new File(this.apiConfig).getCanonicalFile().getParent();
+					String baseDir = new File(pathToAPIDefinition).getCanonicalFile().getParent();
 					inputFile= new File(baseDir + File.separator + this.pathToAPIDefinition);
 					if(inputFile.exists()) { 
 						is = new FileInputStream(inputFile);
