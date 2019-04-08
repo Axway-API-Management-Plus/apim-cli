@@ -134,6 +134,7 @@ public class APIImportConfigAdapter {
 	public IAPI getDesiredAPI() throws AppException {
 		try {
 			validateOrganization(apiConfig);
+			checkForAPIDefinitionInConfiguration(apiConfig);
 			addDefaultPassthroughSecurityProfile(apiConfig);
 			APIDefintion apiDefinition = new APIDefintion(getAPIDefinitionContent());
 			apiDefinition.setAPIDefinitionFile(this.pathToAPIDefinition);
@@ -162,12 +163,12 @@ public class APIImportConfigAdapter {
 		}
 	}
 
-	private void checkForAPIDefinitionInConfiguration(IAPI stagedConfig, IAPI baseConfig) throws AppException {
+	private void checkForAPIDefinitionInConfiguration(IAPI apiConfig) throws AppException {
 		String path = getCurrentPath();
 		LOG.info("path={}",path);
 		if (StringUtils.isEmpty(this.pathToAPIDefinition)) {
-			if (StringUtils.isNotEmpty(stagedConfig.getApiDefinitionImport())) {
-				this.pathToAPIDefinition=baseConfig.getApiDefinitionImport();
+			if (StringUtils.isNotEmpty(apiConfig.getApiDefinitionImport())) {
+				this.pathToAPIDefinition=apiConfig.getApiDefinitionImport();
 				LOG.info("Reading API Definition from configuration file");
 			} else {
 				throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
