@@ -234,11 +234,11 @@ public class APIManagerAdapter {
 	private Properties getEnvironmentProperties(String stage) throws AppException {
 		Properties prop = new Properties();
 		try {
-			if(stage!=null) {
-				LOG.debug("Loading environment properties from file: env."+stage+".properties");
+			if(stage!=null && !stage.equals("NOT_SET")) {
+				LOG.info("Loading environment properties from file: env."+stage+".properties");
 				prop.load(APIMHttpClient.class.getClassLoader().getResourceAsStream("env."+stage+".properties"));
 			} else {
-				LOG.debug("Loading environment properties from file: env.properties");
+				LOG.info("Loading environment properties from file: env.properties");
 				prop.load(APIMHttpClient.class.getClassLoader().getResourceAsStream("env.properties"));
 			}
 			return prop;
