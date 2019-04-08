@@ -242,7 +242,7 @@ public class APIManagerAdapter {
 				prop.load(APIMHttpClient.class.getClassLoader().getResourceAsStream("env.properties"));
 			}
 			return prop;
-		} catch (IOException e) {
+		} catch (Exception e) {
 			LOG.debug("Can't read environment file.");
 			return null;
 		}
