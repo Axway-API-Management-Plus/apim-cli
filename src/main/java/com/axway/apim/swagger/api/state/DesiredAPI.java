@@ -26,6 +26,9 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	
 	private boolean requestForAllOrgs = false;
 	
+	@JsonProperty("apiDefinition")
+	public String apiDefinitionImport = null;
+	
 	public DesiredAPI() throws AppException {
 		super();
 	}
@@ -78,4 +81,17 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	public void setRequestForAllOrgs(boolean requestForAllOrgs) {
 		this.requestForAllOrgs = requestForAllOrgs;
 	}
+
+	@Override
+	public String getApiDefinitionImport() {
+		return apiDefinitionImport;
+	}
+
+	public void setApiDefinitionImport(String apiDefinitionImport) {
+		this.apiDefinitionImport = apiDefinitionImport;
+	}
+
+	
+	
+	
 }

@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public class ImportTestAction extends AbstractTestAction {
 		try {
 			stage 				= context.getVariable("stage");
 		} catch (CitrusRuntimeException ignore) {};
-		if(!origApiDefinition.contains("http://") && !origApiDefinition.contains("https://")) {
+		if(StringUtils.isNotEmpty(origApiDefinition) && !origApiDefinition.contains("http://") && !origApiDefinition.contains("https://")) {
 			apiDefinition = replaceDynamicContentInFile(origApiDefinition, context);
 		} else {
 			apiDefinition = origApiDefinition;

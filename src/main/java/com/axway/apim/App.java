@@ -54,15 +54,16 @@ public class App {
 			Options options = new Options();
 			Option option;
 			
-			option = new Option("a", "apidefinition", true, "The API Definition either as Swagger (JSON-Formated) or a WSDL for SOAP-Services:\n"
-					+ "- in local filesystem using a relativ or absolute path. Example: swagger_file.json\n"
+			option = new Option("a", "apidefinition", true, "(Optional) The API Definition either as Swagger (JSON-Formated) or a WSDL for SOAP-Services:\n"
+					+ "- in local filesystem using a relative or absolute path. Example: swagger_file.json\n"
 					+ "  Please note: Local filesystem is not supported for WSDLs. Please use direct URL or a URL-Reference-File.\n"
 					+ "- a URL providing the Swagger-File or WSDL-File. Examples:\n"
 					+ "  [username/password@]https://any.host.com/my/path/to/swagger.json\n"
 					+ "  [username/password@]http://www.dneonline.com/calculator.asmx?wsdl\n"
 					+ "- a reference file called anyname-i-want.url which contains a line with the URL\n"
-					+ "  (same format as above for Swagger or WSDL).");
-				option.setRequired(true);
+					+ "  (same format as above for Swagger or WSDL)."
+					+ "  If not specified, the API Definition configuration is read directly from the JSON-Formatted API-Config");
+				option.setRequired(false);
 				option.setArgName("swagger_file.json");
 			options.addOption(option);
 			
@@ -141,6 +142,7 @@ public class App {
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.url -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a https://petstore.swagger.io/v2/swagger.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a http://www.dneonline.com/calculator.asmx?wsdl -c samples/minimal-config-wsdl.json -h localhost -u apiadmin -p changeme");
+				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -c samples/minimal-config-wsdl-api-definition.json -h localhost -u apiadmin -p changeme");
 				System.out.println();
 				System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 				

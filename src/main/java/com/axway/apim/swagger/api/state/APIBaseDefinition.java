@@ -47,4 +47,10 @@ public class APIBaseDefinition extends AbstractAPI implements IAPI {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String getApiDefinitionImport() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

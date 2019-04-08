@@ -9,12 +9,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -65,6 +68,7 @@ public class APIImportConfigAdapter {
 	
 	private ObjectMapper mapper = new ObjectMapper();
 	
+
 	private String pathToAPIDefinition;
 	
 	private String apiConfigFile;
@@ -155,6 +159,26 @@ public class APIImportConfigAdapter {
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
 			apiConfig.setOrgId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
 		}
+	}
+
+	private void checkForAPIDefinitionInConfiguration(IAPI stagedConfig, IAPI baseConfig) throws AppException {
+		String path = getCurrentPath();
+		LOG.info("path={}",path);
+		if (StringUtils.isEmpty(this.pathToAPIDefinition)) {
+			if (StringUtils.isNotEmpty(stagedConfig.getApiDefinitionImport())) {
+				this.pathToAPIDefinition=baseConfig.getApiDefinitionImport();
+				LOG.info("Reading API Definition from configuration file");
+			} else {
+				throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED,false);
+			}
+		}
+		LOG.info("API Definition={}",this.pathToAPIDefinition);
+	}
+
+	private String getCurrentPath() {
+		Path currentRelativePath = Paths.get("");
+		String s = currentRelativePath.toAbsolutePath().toString();
+		return s;
 	}
 	
 	private void handleAllOrganizations(IAPI apiConfig) throws AppException {
@@ -423,10 +447,16 @@ public class APIImportConfigAdapter {
 				if(inputFile.exists()) { 
 					is = new FileInputStream(pathToAPIDefinition);
 				} else {
-					is = this.getClass().getResourceAsStream(pathToAPIDefinition);
-				}
-				if(is == null) {
-					throw new AppException("Unable to read swagger file from: " + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE);
+					String baseDir = new File(this.apiConfig).getCanonicalFile().getParent();
+					inputFile= new File(baseDir + File.separator + this.pathToAPIDefinition);
+					if(inputFile.exists()) { 
+						is = new FileInputStream(inputFile);
+					} else {
+						is = this.getClass().getResourceAsStream(pathToAPIDefinition);
+					}
+					if(is == null) {
+						throw new AppException("Unable to read swagger file from: " + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE);
+					}
 				}
 				
 			} catch (Exception e) {
@@ -560,4 +590,14 @@ public class APIImportConfigAdapter {
 		}
 		return importApi;
 	}
+
+	public String getPathToAPIDefinition() {
+		return pathToAPIDefinition;
+	}
+
+	public void setPathToAPIDefinition(String pathToAPIDefinition) {
+		this.pathToAPIDefinition = pathToAPIDefinition;
+	}
+	
+	
 }
