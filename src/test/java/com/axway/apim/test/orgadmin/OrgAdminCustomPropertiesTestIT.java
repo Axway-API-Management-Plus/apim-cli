@@ -21,6 +21,7 @@ public class OrgAdminCustomPropertiesTestIT extends TestNGCitrusTestDesigner {
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/org-admin-published-${apiNumber}");
 		variable("apiName", "OrgAdmin-Published-${apiNumber}");
+		variable("ignoreAdminAccount", "true"); // This tests simulate to use only an Org-Admin-Account
 
 		echo("####### Calling the tool with a Non-Admin-User. #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
@@ -32,7 +33,6 @@ public class OrgAdminCustomPropertiesTestIT extends TestNGCitrusTestDesigner {
 		createVariable("expectedReturnCode", "0");
 		createVariable("apiManagerUser", "${oadminUsername1}"); // This is an org-admin user
 		createVariable("apiManagerPass", "${oadminPassword1}");
-		createVariable("ignoreAdminAccount", "true"); // This tests simulate to use only an Org-Admin-Account
 		action(swaggerImport);
 	}
 
