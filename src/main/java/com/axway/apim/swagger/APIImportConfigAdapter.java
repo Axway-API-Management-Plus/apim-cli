@@ -69,14 +69,16 @@ public class APIImportConfigAdapter {
 	private ObjectMapper mapper = new ObjectMapper();
 	
 
+	/** This is the given path to WSDL or Swagger using -a parameter */
 	private String pathToAPIDefinition;
 	
+	/** The API-Config-File given by the user with -c parameter */
 	private String apiConfigFile;
 	
+	/** The APIConfig instance created by the APIConfigImporter */
 	private IAPI apiConfig;
 	
-	private boolean hasAdminAccount;
-	
+	/** If true, an OrgAdminUser is used to start the tool */
 	private boolean usingOrgAdmin;
 	
 	private ErrorState error = ErrorState.getInstance();
@@ -90,12 +92,11 @@ public class APIImportConfigAdapter {
 	 * @param hasAdminAccount - set to true, if an AdminAccount is available.
 	 * @throws AppException
 	 */
-	public APIImportConfigAdapter(String apiConfigFile, String stage, String pathToAPIDefinition, boolean usingOrgAdmin, boolean hasAdminAccount) throws AppException {
+	public APIImportConfigAdapter(String apiConfigFile, String stage, String pathToAPIDefinition, boolean usingOrgAdmin) throws AppException {
 		super();
 		this.apiConfigFile = apiConfigFile;
 		this.pathToAPIDefinition = pathToAPIDefinition;
 		this.usingOrgAdmin = usingOrgAdmin;
-		this.hasAdminAccount = hasAdminAccount;
 		IAPI baseConfig;
 		try {
 			baseConfig = mapper.readValue(new File(apiConfigFile), DesiredAPI.class);
@@ -447,7 +448,7 @@ public class APIImportConfigAdapter {
 				if(inputFile.exists()) { 
 					is = new FileInputStream(pathToAPIDefinition);
 				} else {
-					String baseDir = new File(pathToAPIDefinition).getCanonicalFile().getParent();
+					String baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
 					inputFile= new File(baseDir + File.separator + this.pathToAPIDefinition);
 					if(inputFile.exists()) { 
 						is = new FileInputStream(inputFile);

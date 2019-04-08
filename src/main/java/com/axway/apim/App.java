@@ -162,8 +162,7 @@ public class App {
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			
 			APIImportConfigAdapter contract = new APIImportConfigAdapter(params.getOptionValue("contract"), 
-					params.getOptionValue("stage"), params.getOptionValue("apidefinition"), 
-					apimAdapter.isUsingOrgAdmin(), apimAdapter.hasAdminAccount());
+					params.getOptionValue("stage"), params.getOptionValue("apidefinition"), apimAdapter.isUsingOrgAdmin());
 			IAPI desiredAPI = contract.getDesiredAPI();
 			IAPI actualAPI = apimAdapter.getAPIManagerAPI(apimAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
