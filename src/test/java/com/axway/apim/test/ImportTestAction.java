@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.management.RuntimeErrorException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -37,11 +39,11 @@ public class ImportTestAction extends AbstractTestAction {
 			stage 				= context.getVariable("stage");
 		} catch (CitrusRuntimeException ignore) {};
 		if(StringUtils.isNotEmpty(origApiDefinition) && !origApiDefinition.contains("http://") && !origApiDefinition.contains("https://")) {
-			apiDefinition = replaceDynamicContentInFile(origApiDefinition, context);
+			apiDefinition = replaceDynamicContentInFile(origApiDefinition, context, createTempFilename(origApiDefinition));
 		} else {
 			apiDefinition = origApiDefinition;
 		}
-		String configFile = replaceDynamicContentInFile(origConfigFile, context);
+		String configFile = replaceDynamicContentInFile(origConfigFile, context, createTempFilename(origConfigFile));
 		LOG.info("Using Replaced Swagger-File: " + apiDefinition);
 		LOG.info("Using Replaced configFile-File: " + configFile);
 		LOG.info("API-Manager import is using user: '"+context.replaceDynamicContentInString("${oadminPassword1}")+"'");
@@ -78,8 +80,9 @@ public class ImportTestAction extends AbstractTestAction {
 		} else {
 			// We need to prepare the dynamic staging file used during the test.
 			String stageConfigFile = origConfigFile.substring(0, origConfigFile.lastIndexOf(".")+1) + stage + origConfigFile.substring(origConfigFile.lastIndexOf("."));
-			// This creates the dynamic staging config file! (Fort testing, we also support reading out of a file directly)
-			stage = replaceDynamicContentInFile(stageConfigFile, context);
+			String replacedStagedConfig = configFile.substring(0, configFile.lastIndexOf("."))+"."+stage+".json";
+			// This creates the dynamic staging config file! (For testing, we also support reading out of a file directly)
+			replaceDynamicContentInFile(stageConfigFile, context, replacedStagedConfig);
 		}
 
 		String[] args = new String[] { 
@@ -104,7 +107,7 @@ public class ImportTestAction extends AbstractTestAction {
 	/**
 	 * To make testing easier we allow reading test-files from classpath as well
 	 */
-	private String replaceDynamicContentInFile(String pathToFile, TestContext context) {
+	private String replaceDynamicContentInFile(String pathToFile, TestContext context, String replacedFilename) {
 		
 		File inputFile = new File(pathToFile);
 		InputStream is = null;
@@ -120,14 +123,13 @@ public class ImportTestAction extends AbstractTestAction {
 			}
 			String jsonData = IOUtils.toString(is);
 			String filename = pathToFile.substring(pathToFile.lastIndexOf("/")+1); // e.g.: petstore.json, no-change-xyz-config.<stage>.json, 
-			String prefix = filename.substring(0, filename.indexOf("."));
-			String suffix = filename.substring(filename.indexOf("."));
+
 			String jsonReplaced = context.replaceDynamicContentInString(jsonData);
-			File tempFile = File.createTempFile(prefix, suffix);
-			os = new FileOutputStream(tempFile);
+
+			os = new FileOutputStream(new File(replacedFilename));
 			IOUtils.write(jsonReplaced, os);
-			tempFile.deleteOnExit();
-			return tempFile.getAbsolutePath();
+			
+			return replacedFilename;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -144,5 +146,18 @@ public class ImportTestAction extends AbstractTestAction {
 				}
 		}
 		return null;
+	}
+	
+	private String createTempFilename(String origFilename) {
+		String prefix = origFilename.substring(0, origFilename.indexOf(".")+1);
+		String suffix = origFilename.substring(origFilename.indexOf("."));
+		try {
+			File tempFile = File.createTempFile(prefix, suffix);
+			tempFile.deleteOnExit();
+			return tempFile.getAbsolutePath();
+		} catch (IOException e) {
+			LOG.error("Cant create temp file", e);
+			throw new RuntimeException(e);
+		}
 	}
 }
