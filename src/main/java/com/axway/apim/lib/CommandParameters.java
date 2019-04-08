@@ -14,6 +14,8 @@ public class CommandParameters {
 	
 	private CommandLine cmd;
 	
+	private CommandLine internalCmd;
+	
 	private CommandParameters () {}
 	
 	public static synchronized CommandParameters getInstance () {
@@ -25,6 +27,10 @@ public class CommandParameters {
 	
 	public void setCmd(CommandLine cmd) {
 		this.cmd = cmd;
+	}
+	
+	public void setInternalCmd(CommandLine internalCmd) {
+		this.internalCmd = internalCmd;
 	}
 
 	public String getOptionValue(String option) {
@@ -80,5 +86,10 @@ public class CommandParameters {
 	
 	public String getAPIManagerURL() {
 		return "https://"+this.getHostname()+":"+this.getPort();
+	}
+	
+	public boolean ignoreAdminAccount() {
+		if(!this.internalCmd.hasOption("ignoreAdminAccount")) return false;
+		return Boolean.parseBoolean(this.internalCmd.getOptionValue("ignoreAdminAccount"));
 	}
 }

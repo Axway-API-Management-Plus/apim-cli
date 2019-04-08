@@ -62,6 +62,8 @@ public interface IAPI {
 	
 	public String getOrgId() throws AppException;
 	
+	public void setOrgId(String orgId);
+	
 	public String getOrganization();
 	
 	public String getName();

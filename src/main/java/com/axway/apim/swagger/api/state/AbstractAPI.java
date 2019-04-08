@@ -191,6 +191,8 @@ public abstract class AbstractAPI {
 	
 	protected boolean isValid = false;
 	
+	protected String orgId = null;
+	
 
 	public boolean isValid() {
 		return this.isValid;
@@ -201,9 +203,13 @@ public abstract class AbstractAPI {
 	}
 
 	public String getOrgId() throws AppException {
-		throw new AppException("This method must be implemented by concrete class.", ErrorCode.UNSUPPORTED_FEATURE);
+		return this.orgId;
 	}
 	
+	public void setOrgId(String orgId) {
+		this.orgId = orgId;
+	}
+
 	public APIDefintion getAPIDefinition() {
 		return this.APIDefinition;
 	}

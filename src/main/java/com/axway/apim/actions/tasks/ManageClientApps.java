@@ -71,7 +71,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	
 	private boolean hasClientAppPermission(ClientApplication app) throws AppException {
 		String appsOrgId = app.getOrganizationId();
-		String appsOrgName = APIManagerAdapter.getOrgName(appsOrgId);
+		String appsOrgName = APIManagerAdapter.getInstance().getOrgName(appsOrgId);
 		if(appsOrgName==null) return false;
 		return actualState.getClientOrganizations().contains(appsOrgName);
 	}
@@ -90,7 +90,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis").build();
 				entity = new StringEntity("{\"apiId\":\""+apiId+"\",\"enabled\":true}");
 				
-				apiCall = new POSTRequest(entity, uri, this);
+				apiCall = new POSTRequest(entity, uri, this, true);
 				apiCall.execute();
 			}
 		} catch (Exception e) {
@@ -107,7 +107,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			try { 
 				Transaction.getInstance().put("appName", app);
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis/"+apiId).build();
-				apiCall = new DELRequest(uri, this);
+				apiCall = new DELRequest(uri, this, true);
 				apiCall.execute();
 			} catch (Exception e) {
 				LOG.error("Can't delete API access requests for application.");

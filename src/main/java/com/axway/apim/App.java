@@ -4,7 +4,6 @@ import java.io.File;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -12,9 +11,13 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.actions.rest.APIMHttpClient;
+import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
+import com.axway.apim.lib.RelaxedParser;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.APIManagerAdapter;
@@ -109,14 +112,23 @@ public class App {
 			option.setArgName("ignore|replace|add");
 			options.addOption(option);	
 			
-			CommandLineParser parser = new DefaultParser();
+			Options internalOptions = new Options();
+			option = new Option("ignoreAdminAccount", true, "If set, the tool wont load the admin.properties. This is used for testing only.");
+			option.setRequired(false);
+			option.setArgName("true");
+			internalOptions.addOption(option);
+			
+			
+			CommandLineParser parser = new RelaxedParser();
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.setWidth(140);
 			CommandLine cmd = null;
+			CommandLine internalCmd = null;
 			String scriptExt = "sh";
 			if(System.getProperty("os.name").toLowerCase().contains("win")) scriptExt = "bat";
 			try {
-				cmd = parser.parse( options, args, false);
+				cmd = parser.parse(options, args);
+				internalCmd = parser.parse( internalOptions, args);
 			} catch (ParseException e) {
 				formatter.printHelp("Swagger-Import", options, true);
 				System.out.println("\n");
@@ -139,25 +151,36 @@ public class App {
 			
 			CommandParameters params = CommandParameters.getInstance();
 			params.setCmd(cmd);
+			params.setInternalCmd(internalCmd);
 			
-			APIManagerAdapter apimAdapter = new APIManagerAdapter();
+			// We need to clean some Singleton-Instances, as tests are running in the same JVM
+			APIManagerAdapter.deleteInstance();
+			ErrorState.deleteInstance();
+			APIMHttpClient.deleteInstance();
+			Transaction.deleteInstance();
 			
-			APIImportConfigAdapter contract = new APIImportConfigAdapter(params.getOptionValue("contract"), params.getOptionValue("stage"), params.getOptionValue("apidefinition"));
+			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
+			
+			APIImportConfigAdapter contract = new APIImportConfigAdapter(params.getOptionValue("contract"), 
+					params.getOptionValue("stage"), params.getOptionValue("apidefinition"), apimAdapter.isUsingOrgAdmin());
 			IAPI desiredAPI = contract.getDesiredAPI();
-			IAPI actualAPI = APIManagerAdapter.getAPIManagerAPI(APIManagerAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
-			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);			
-			
+			IAPI actualAPI = apimAdapter.getAPIManagerAPI(apimAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
+			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
 			apimAdapter.applyChanges(changeActions);
 			LOG.info("Successfully replicated API-State into API-Manager");
 			return 0;
 		} catch (AppException ap) {
-			if(ap.isLogStackStrace()) {
-				LOG.error(ap.getMessage(), ap);
+			ErrorState errorState = ErrorState.getInstance();
+			if(errorState.hasError()) {
+				errorState.logErrorMessages(LOG);
+				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
+				return errorState.getErrorCode().getCode();
 			} else {
-				LOG.warn(ap.getMessage());
+				LOG.error(ap.getMessage(), ap);
+				return ap.getErrorCode().getCode();
 			}
-			return ap.getErrorCode().getCode();
 		} catch (Exception e) {
+
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}

@@ -18,6 +18,7 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,12 +40,6 @@ public class SecurityDevice {
 
 	public SecurityDevice() throws AppException {
 		super();
-		if(SecurityDevice.oauthTokenStores == null) { 
-			SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
-			SecurityDevice.oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
-			SecurityDevice.authenticationPolicies = initCustomPolicies("authentication");
-		}
-		
 		this.properties = new LinkedHashMap<String, String>();
 	}
 	
@@ -119,24 +114,29 @@ public class SecurityDevice {
 
 	public Map<String, String> getProperties() throws AppException {
 		if(this.type.equals("oauth")) {
+			if(SecurityDevice.oauthTokenStores == null) SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
 			String tokenStore = (String)properties.get("tokenStore");
 			if(tokenStore.startsWith("<key")) return properties;
 			String esTokenStore = oauthTokenStores.get(tokenStore);
 			if(esTokenStore == null) {
 				LOG.error("The tokenstore: '" + tokenStore + "' is not configured in this API-Manager");
 				LOG.error("Available token stores: " + oauthTokenStores.keySet());
-				throw new AppException("The tokenstore: '" + tokenStore + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
+				ErrorState.getInstance().setError("The tokenstore: '" + tokenStore + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
+				throw new AppException("The tokenstore: '" + tokenStore + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
 			} else {
 				properties.put("tokenStore", esTokenStore);
 			}
 		} else if(this.type.equals("oauthExternal")) {
+			if(SecurityDevice.oauthInfoPolicies == null) SecurityDevice.oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
+			if(SecurityDevice.oauthTokenStores == null) SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
 			String infoPolicy = (String)properties.get("tokenStore"); // The token-info-policy is stored in the tokenStore as well
 			if(infoPolicy.startsWith("<key")) return properties;
 			String esInfoPolicy = oauthInfoPolicies.get(infoPolicy);
 			if(esInfoPolicy == null) {
 				LOG.error("The Information-Policy: '" + infoPolicy + "' is not configured in this API-Manager");
 				LOG.error("Available information policies: " + oauthInfoPolicies.keySet());
-				throw new AppException("The Information-Policy: '" + infoPolicy + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
+				ErrorState.getInstance().setError("The Information-Policy: '" + infoPolicy + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
+				throw new AppException("The Information-Policy: '" + infoPolicy + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
 			} else {
 				properties.put("tokenStore", esInfoPolicy);
 				properties.put("oauth.token.client_id", "${oauth.token.client_id}");
@@ -144,13 +144,15 @@ public class SecurityDevice {
 				properties.put("oauth.token.valid", "${oauth.token.valid}");
 			}
 		} else if (this.type.equals("authPolicy")) {
+			if(SecurityDevice.authenticationPolicies == null) SecurityDevice.authenticationPolicies = initCustomPolicies("authentication");
 			String authPolicy = (String)properties.get("authenticationPolicy");
 			if(authPolicy.startsWith("<key")) return properties;
 			String esAuthPolicy = authenticationPolicies.get(authPolicy);
 			if(esAuthPolicy == null) {
 				LOG.error("The Authentication-Policy: '" + authPolicy + "' is not configured in this API-Manager");
 				LOG.error("Available authentication policies: " + authenticationPolicies.keySet());
-				throw new AppException("The Authentication-Policy: '" + authPolicy + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
+				ErrorState.getInstance().setError("The Authentication-Policy: '" + authPolicy + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
+				throw new AppException("The Authentication-Policy: '" + authPolicy + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
 			} else {
 				properties.put("authenticationPolicy", esAuthPolicy);
 			}

@@ -44,6 +44,7 @@ public class ImportTestAction extends AbstractTestAction {
 		String configFile = replaceDynamicContentInFile(origConfigFile, context);
 		LOG.info("Using Replaced Swagger-File: " + apiDefinition);
 		LOG.info("Using Replaced configFile-File: " + configFile);
+		LOG.info("API-Manager import is using user: '"+context.replaceDynamicContentInString("${oadminPassword1}")+"'");
 		int expectedReturnCode = 0;
 		try {
 			expectedReturnCode 	= Integer.parseInt(context.getVariable("expectedReturnCode"));
@@ -51,6 +52,7 @@ public class ImportTestAction extends AbstractTestAction {
 		
 		String enforce = "false";
 		String ignoreQuotas = "false";
+		String ignoreAdminAccount = "false";
 		String clientOrgsMode = CommandParameters.MODE_REPLACE;
 		String clientAppsMode = CommandParameters.MODE_REPLACE;;
 		
@@ -66,6 +68,10 @@ public class ImportTestAction extends AbstractTestAction {
 		try {
 			clientAppsMode = context.getVariable("clientAppsMode");
 		} catch (Exception ignore) {};
+		try {
+			ignoreAdminAccount = context.getVariable("ignoreAdminAccount");
+		} catch (Exception ignore) {};
+		
 		
 		if(stage==null) {
 			stage = "NOT_SET";
@@ -80,14 +86,15 @@ public class ImportTestAction extends AbstractTestAction {
 				"-a", apiDefinition, 
 				"-c", configFile, 
 				"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
-				"-p", context.replaceDynamicContentInString("${apiManagerPass}"), 
-				"-u", context.replaceDynamicContentInString("${apiManagerUser}"),
+				"-p", context.replaceDynamicContentInString("${oadminUsername1}"), 
+				"-u", context.replaceDynamicContentInString("${oadminPassword1}"),
 				"-s", stage, 
 				"-f", enforce, 
 				"-iq", ignoreQuotas, 
 				"-clientOrgsMode", clientOrgsMode, 
-				"-clientAppsMode", clientAppsMode};
-		
+				"-clientAppsMode", clientAppsMode, 
+				"-ignoreAdminAccount", ignoreAdminAccount};
+		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"'. Enforce breaking change: " + enforce);
 		int rc = App.run(args);
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);

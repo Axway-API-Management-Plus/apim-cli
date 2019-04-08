@@ -41,7 +41,7 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 			
 			entity = new UrlEncodedFormEntity(params, "UTF-8");
 			
-			RestAPICall postRequest = new POSTRequest(entity, uri, this);
+			RestAPICall postRequest = new POSTRequest(entity, uri, this, true);
 			postRequest.setContentType("application/x-www-form-urlencoded");
 			
 			postRequest.execute();

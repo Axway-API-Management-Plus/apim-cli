@@ -22,6 +22,10 @@ public class Transaction {
 		return Transaction.instance;
 	}
 	
+	public static synchronized void deleteInstance () {
+		Transaction.instance = null;
+	}
+	
 	public void beginTransaction() {
 		this.context.clear();
 	}

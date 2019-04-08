@@ -19,6 +19,7 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -99,7 +100,8 @@ public class OutboundProfile {
 		String policy = policies.get(policyName);
 		if(policy == null) {
 			LOG.error("Available "+type+" policies: " + policies.keySet());
-			throw new AppException("The policy: '" + policyName + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
+			ErrorState.getInstance().setError("The policy: '" + policyName + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
+			throw new AppException("The policy: '" + policyName + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
 		}
 		return policy;
 	}

@@ -1,6 +1,8 @@
 package com.axway.apim.actions.rest;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
@@ -32,26 +34,40 @@ import com.axway.apim.lib.ErrorCode;
  */
 public class APIMHttpClient {
 	
-	private static APIMHttpClient instance;
+	private static Map<Boolean, APIMHttpClient> instances = new HashMap<Boolean, APIMHttpClient>();
 	
 	private HttpClient httpClient;
 	private HttpClientContext clientContext;
 	
 	private BasicCookieStore cookieStore = new BasicCookieStore();
 	
-	public static APIMHttpClient getInstance() throws AppException {
-		if (APIMHttpClient.instance == null) {
-			APIMHttpClient.instance = new APIMHttpClient();
-		}
-		return APIMHttpClient.instance;
+	public static void deleteInstance() {
+		instances = new HashMap<Boolean, APIMHttpClient>();
 	}
 	
-	private APIMHttpClient() throws AppException {
+	public static APIMHttpClient getInstance() throws AppException {
+		return getInstance(false);
+	}
+	
+	public static APIMHttpClient getInstance(boolean adminInstance) throws AppException {
+		if(!APIMHttpClient.instances.containsKey(new Boolean(adminInstance))) {
+			APIMHttpClient client = new APIMHttpClient(adminInstance);
+			instances.put(new Boolean(adminInstance), client);
+		}
+		return APIMHttpClient.instances.get(new Boolean(adminInstance));
+	}
+	
+	private APIMHttpClient(boolean adminInstance) throws AppException {
 		CommandParameters params = CommandParameters.getInstance();
-		createConnection("https://"+params.getHostname()+":"+params.getPort(), params.getUsername(), params.getPassword());
+		if(adminInstance) {
+			
+			createConnection("https://"+params.getHostname()+":"+params.getPort());
+		} else {
+			createConnection("https://"+params.getHostname()+":"+params.getPort());
+		}
 	}
 
-	private void createConnection(String apiManagerURL, String username, String password) throws AppException {
+	private void createConnection(String apiManagerURL) throws AppException {
 		PoolingHttpClientConnectionManager cm;
 		HttpHost targetHost;
 		
