@@ -45,7 +45,7 @@ public class App {
 	public static int run(String args[]) {
 		try {
 			LOG.info("------------------------------------------------------------------------");
-			LOG.info("API-Manager Promote Version: 1.4.2");
+			LOG.info("API-Manager Promote Version: 1.5.0");
 			LOG.info("                                                                        ");
 			LOG.info("To report issues or get help, please visit: ");
 			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
@@ -113,7 +113,7 @@ public class App {
 			options.addOption(option);	
 			
 			Options internalOptions = new Options();
-			option = new Option("ignoreAdminAccount", true, "If set, the tool wont load the admin.properties. This is used for testing only.");
+			option = new Option("ignoreAdminAccount", true, "If set, the tool wont load the environment.properties. This is used for testing only.");
 			option.setRequired(false);
 			option.setArgName("true");
 			internalOptions.addOption(option);

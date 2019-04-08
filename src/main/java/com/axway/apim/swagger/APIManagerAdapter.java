@@ -90,7 +90,7 @@ public class APIManagerAdapter {
 	public static String CREDENTIAL_TYPE_EXT_CLIENTID	= "extclients";
 	public static String CREDENTIAL_TYPE_OAUTH			= "oauth";
 	
-	public static String ADMIN_PASSWORD_FILE = "admin.properties";
+	public static String ENVIRONMENT_FILE = "environment.properties";
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
@@ -226,11 +226,11 @@ public class APIManagerAdapter {
 	private String[] getAdminUsernamePassword() throws AppException {
 		Properties prop = new Properties();
 		try {
-			prop.load(APIMHttpClient.class.getClassLoader().getResourceAsStream(ADMIN_PASSWORD_FILE));
-			String[] usernamePassword =  {prop.getProperty("username"), prop.getProperty("password")};
+			prop.load(APIMHttpClient.class.getClassLoader().getResourceAsStream(ENVIRONMENT_FILE));
+			String[] usernamePassword =  {prop.getProperty("admin_username"), prop.getProperty("admin_password")};
 			return usernamePassword;
 		} catch (IOException e) {
-			LOG.debug("Can't read admin-password config file: '"+ADMIN_PASSWORD_FILE+"'");
+			LOG.debug("Can't read admin credentials from environment file: '"+ENVIRONMENT_FILE+"'");
 			return null;
 		}
 	}

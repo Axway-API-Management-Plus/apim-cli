@@ -1,0 +1,6 @@
+# Remove .sample to activate this file
+#
+# Admin-Credentials are loaded from here if tool is started with 
+# an Org-Admin-Account.
+admin_username=apiadmin
+admin_password=changeme
