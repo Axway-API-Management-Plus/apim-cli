@@ -113,7 +113,7 @@ public class App {
 			options.addOption(option);	
 			
 			Options internalOptions = new Options();
-			option = new Option("ignoreAdminAccount", true, "If set, the tool wont load the environment.properties. This is used for testing only.");
+			option = new Option("ignoreAdminAccount", true, "If set, the tool wont load the env.properties. This is used for testing only.");
 			option.setRequired(false);
 			option.setArgName("true");
 			internalOptions.addOption(option);

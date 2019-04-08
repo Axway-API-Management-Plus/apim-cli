@@ -90,7 +90,7 @@ public class APIManagerAdapter {
 	public static String CREDENTIAL_TYPE_EXT_CLIENTID	= "extclients";
 	public static String CREDENTIAL_TYPE_OAUTH			= "oauth";
 	
-	public static String ENVIRONMENT_FILE = "environment.properties";
+	public static String ENVIRONMENT_FILE = "env.properties";
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
