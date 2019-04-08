@@ -159,7 +159,7 @@ public class App {
 			APIMHttpClient.deleteInstance();
 			Transaction.deleteInstance();
 			
-			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
+			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance(params.getOptionValue("stage"));
 			
 			APIImportConfigAdapter contract = new APIImportConfigAdapter(params.getOptionValue("contract"), 
 					params.getOptionValue("stage"), params.getOptionValue("apidefinition"), apimAdapter.isUsingOrgAdmin());

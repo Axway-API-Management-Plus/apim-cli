@@ -84,17 +84,24 @@ public class APIManagerAdapter {
 	private boolean usingOrgAdmin = false;
 	private boolean hasAdminAccount = false;
 	
+	private Properties environmentProperties = null;
+	
 	private ErrorState error = ErrorState.getInstance();
 	
 	public static String CREDENTIAL_TYPE_API_KEY 		= "apikeys";
 	public static String CREDENTIAL_TYPE_EXT_CLIENTID	= "extclients";
 	public static String CREDENTIAL_TYPE_OAUTH			= "oauth";
 	
-	public static String ENVIRONMENT_FILE = "env.properties";
-	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
-			APIManagerAdapter.instance = new APIManagerAdapter ();
+			throw new AppException("APIManagerAdapter has been initialized yet.", ErrorCode.UNXPECTED_ERROR);
+		}
+		return APIManagerAdapter.instance;
+	}
+	
+	public static synchronized APIManagerAdapter getInstance(String stage) throws AppException {
+		if (APIManagerAdapter.instance == null) {
+			APIManagerAdapter.instance = new APIManagerAdapter (stage);
 		}
 		return APIManagerAdapter.instance;
 	}
@@ -103,8 +110,9 @@ public class APIManagerAdapter {
 			APIManagerAdapter.instance = null;
 	}
 	
-	private APIManagerAdapter() throws AppException {
+	private APIManagerAdapter(String stage) throws AppException {
 		super();
+		this.environmentProperties = getEnvironmentProperties(stage);
 		Transaction transaction = Transaction.getInstance();
 		transaction.beginTransaction();
 		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the same JVM)
@@ -223,16 +231,27 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private String[] getAdminUsernamePassword() throws AppException {
+	private Properties getEnvironmentProperties(String stage) throws AppException {
 		Properties prop = new Properties();
 		try {
-			prop.load(APIMHttpClient.class.getClassLoader().getResourceAsStream(ENVIRONMENT_FILE));
-			String[] usernamePassword =  {prop.getProperty("admin_username"), prop.getProperty("admin_password")};
-			return usernamePassword;
+			if(stage!=null) {
+				LOG.debug("Loading environment properties from file: env."+stage+".properties");
+				prop.load(APIMHttpClient.class.getClassLoader().getResourceAsStream("env."+stage+".properties"));
+			} else {
+				LOG.debug("Loading environment properties from file: env.properties");
+				prop.load(APIMHttpClient.class.getClassLoader().getResourceAsStream("env.properties"));
+			}
+			return prop;
 		} catch (IOException e) {
-			LOG.debug("Can't read admin credentials from environment file: '"+ENVIRONMENT_FILE+"'");
+			LOG.debug("Can't read environment file.");
 			return null;
 		}
+	}
+	
+	private String[] getAdminUsernamePassword() throws AppException {
+		if(this.environmentProperties==null) return null;
+		String[] usernamePassword =  {environmentProperties.getProperty("admin_username"), environmentProperties.getProperty("admin_password")};
+		return usernamePassword;
 	}
 	
 	public static User getCurrentUser(boolean useAdmin) throws AppException {
