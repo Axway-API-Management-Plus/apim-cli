@@ -153,13 +153,13 @@ public class App {
 				System.exit(99);
 			}
 			
-			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
-			
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
 			Transaction.deleteInstance();
+			
+			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			
