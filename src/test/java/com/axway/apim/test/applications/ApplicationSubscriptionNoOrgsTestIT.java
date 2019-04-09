@@ -10,13 +10,13 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="ApplicationSubscriptionTestIT")
+@Test(testName="ApplicationSubscriptionNoOrgsTestIT")
 public class ApplicationSubscriptionNoOrgsTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private ImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "ApplicationSubscriptionTestIT")
+	@CitrusTest(name = "ApplicationSubscriptionNoOrgsTestIT")
 	public void run() {
 		description("Import an API and create an application subscription while not having defined any organization in the configuration.");
 		

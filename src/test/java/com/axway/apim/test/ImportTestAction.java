@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.management.RuntimeErrorException;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,24 +35,31 @@ public class ImportTestAction extends AbstractTestAction {
 		String origConfigFile 			= context.getVariable(API_CONFIG);
 		String stage				= null;
 		String apiDefinition			= null;
+		boolean useEnvironmentOnly = false;
 		try {
 			stage 				= context.getVariable("stage");
 		} catch (CitrusRuntimeException ignore) {};
-		if(!origApiDefinition.contains("http://") && !origApiDefinition.contains("https://")) {
-			apiDefinition = replaceDynamicContentInFile(origApiDefinition, context);
+		if(StringUtils.isNotEmpty(origApiDefinition) && !origApiDefinition.contains("http://") && !origApiDefinition.contains("https://")) {
+			apiDefinition = replaceDynamicContentInFile(origApiDefinition, context, createTempFilename(origApiDefinition));
 		} else {
 			apiDefinition = origApiDefinition;
 		}
-		String configFile = replaceDynamicContentInFile(origConfigFile, context);
+		String configFile = replaceDynamicContentInFile(origConfigFile, context, createTempFilename(origConfigFile));
 		LOG.info("Using Replaced Swagger-File: " + apiDefinition);
 		LOG.info("Using Replaced configFile-File: " + configFile);
+		LOG.info("API-Manager import is using user: '"+context.replaceDynamicContentInString("${oadminPassword1}")+"'");
 		int expectedReturnCode = 0;
 		try {
 			expectedReturnCode 	= Integer.parseInt(context.getVariable("expectedReturnCode"));
 		} catch (Exception ignore) {};
 		
+		try {
+			useEnvironmentOnly 	= Boolean.parseBoolean(context.getVariable("useEnvironmentOnly"));
+		} catch (Exception ignore) {};
+		
 		String enforce = "false";
 		String ignoreQuotas = "false";
+		String ignoreAdminAccount = "false";
 		String clientOrgsMode = CommandParameters.MODE_REPLACE;
 		String clientAppsMode = CommandParameters.MODE_REPLACE;;
 		
@@ -65,28 +75,39 @@ public class ImportTestAction extends AbstractTestAction {
 		try {
 			clientAppsMode = context.getVariable("clientAppsMode");
 		} catch (Exception ignore) {};
+		try {
+			ignoreAdminAccount = context.getVariable("ignoreAdminAccount");
+		} catch (Exception ignore) {};
+		
 		
 		if(stage==null) {
 			stage = "NOT_SET";
 		} else {
 			// We need to prepare the dynamic staging file used during the test.
 			String stageConfigFile = origConfigFile.substring(0, origConfigFile.lastIndexOf(".")+1) + stage + origConfigFile.substring(origConfigFile.lastIndexOf("."));
-			// This creates the dynamic staging config file! (Fort testing, we also support reading out of a file directly)
-			stage = replaceDynamicContentInFile(stageConfigFile, context);
+			String replacedStagedConfig = configFile.substring(0, configFile.lastIndexOf("."))+"."+stage+".json";
+			// This creates the dynamic staging config file! (For testing, we also support reading out of a file directly)
+			replaceDynamicContentInFile(stageConfigFile, context, replacedStagedConfig);
 		}
-
-		String[] args = new String[] { 
-				"-a", apiDefinition, 
-				"-c", configFile, 
-				"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
-				"-p", context.replaceDynamicContentInString("${apiManagerPass}"), 
-				"-u", context.replaceDynamicContentInString("${apiManagerUser}"),
-				"-s", stage, 
-				"-f", enforce, 
-				"-iq", ignoreQuotas, 
-				"-clientOrgsMode", clientOrgsMode, 
-				"-clientAppsMode", clientAppsMode};
-		
+		String[] args;
+		if(useEnvironmentOnly) {
+			args = new String[] {  
+					"-c", configFile, "-s", stage};
+		} else {
+			args = new String[] { 
+					"-a", apiDefinition, 
+					"-c", configFile, 
+					"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
+					"-p", context.replaceDynamicContentInString("${oadminUsername1}"), 
+					"-u", context.replaceDynamicContentInString("${oadminPassword1}"),
+					"-s", stage, 
+					"-f", enforce, 
+					"-iq", ignoreQuotas, 
+					"-clientOrgsMode", clientOrgsMode, 
+					"-clientAppsMode", clientAppsMode, 
+					"-ignoreAdminAccount", ignoreAdminAccount};
+		}
+		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);
 		int rc = App.run(args);
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
@@ -96,7 +117,7 @@ public class ImportTestAction extends AbstractTestAction {
 	/**
 	 * To make testing easier we allow reading test-files from classpath as well
 	 */
-	private String replaceDynamicContentInFile(String pathToFile, TestContext context) {
+	private String replaceDynamicContentInFile(String pathToFile, TestContext context, String replacedFilename) {
 		
 		File inputFile = new File(pathToFile);
 		InputStream is = null;
@@ -112,14 +133,13 @@ public class ImportTestAction extends AbstractTestAction {
 			}
 			String jsonData = IOUtils.toString(is);
 			String filename = pathToFile.substring(pathToFile.lastIndexOf("/")+1); // e.g.: petstore.json, no-change-xyz-config.<stage>.json, 
-			String prefix = filename.substring(0, filename.indexOf("."));
-			String suffix = filename.substring(filename.indexOf("."));
+
 			String jsonReplaced = context.replaceDynamicContentInString(jsonData);
-			File tempFile = File.createTempFile(prefix, suffix);
-			os = new FileOutputStream(tempFile);
+
+			os = new FileOutputStream(new File(replacedFilename));
 			IOUtils.write(jsonReplaced, os);
-			tempFile.deleteOnExit();
-			return tempFile.getAbsolutePath();
+			
+			return replacedFilename;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -136,5 +156,18 @@ public class ImportTestAction extends AbstractTestAction {
 				}
 		}
 		return null;
+	}
+	
+	private String createTempFilename(String origFilename) {
+		String prefix = origFilename.substring(0, origFilename.indexOf(".")+1);
+		String suffix = origFilename.substring(origFilename.indexOf("."));
+		try {
+			File tempFile = File.createTempFile(prefix, suffix);
+			tempFile.deleteOnExit();
+			return tempFile.getAbsolutePath();
+		} catch (IOException e) {
+			LOG.error("Cant create temp file", e);
+			throw new RuntimeException(e);
+		}
 	}
 }

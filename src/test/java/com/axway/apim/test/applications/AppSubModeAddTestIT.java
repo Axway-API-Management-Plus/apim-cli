@@ -10,13 +10,13 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="ApplicationSubscriptionTestIT")
+@Test(testName="AppSubModeAddTestIT")
 public class AppSubModeAddTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private ImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "ApplicationSubscriptionTestIT")
+	@CitrusTest(name = "AppSubModeAddTestIT")
 	public void run() {
 		description("Test to validate existing App-Subscription wont be overwritten with ClientAppMode ADD");
 		
@@ -84,7 +84,7 @@ public class AppSubModeAddTestIT extends TestNGCitrusTestDesigner {
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/applications/1_api-with-1-org-1-app.json");
 		createVariable("state", "published");
 		createVariable("orgName2", "${orgName2}");
-		createVariable("testAppName", "${appName2}"); // Suppose this App-Subscription was created manually
+		createVariable("testAppName", "${appName2}"); // Suppose this App-Subscription was created manually maybe in API-Portal
 		
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);

@@ -3,7 +3,6 @@ package com.axway.apim.actions.rest;
 import java.io.IOException;
 import java.net.URI;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -40,7 +39,15 @@ public abstract class RestAPICall {
 	
 	protected String contentType = "application/json";
 	
+	protected boolean useAdmin = false;
 	
+	public RestAPICall(HttpEntity entity, URI uri, IResponseParser responseParser, boolean useAdmin) {
+		super();
+		this.entity = entity;
+		this.uri = uri;
+		this.reponseParser = responseParser;
+		this.useAdmin = useAdmin;
+	}
 	
 	public RestAPICall(HttpEntity entity, URI uri, IResponseParser responseParser) {
 		super();
@@ -54,14 +61,6 @@ public abstract class RestAPICall {
 	public void parseResponse(HttpResponse response) throws AppException {
 		try {
 			Transaction context = Transaction.getInstance();
-			if(context.get("CSRF-Token")==null) {
-				for (Header header : response.getAllHeaders()) {
-					if(header.getName().equals("CSRF-Token")) {
-						context.put("CSRF-Token", header.getValue());
-						break;
-					}
-				}
-			}
 			if(this.reponseParser==null) return; 
 			JsonNode lastReponse = reponseParser.parseResponse(response);
 			context.put("lastResponse", lastReponse);
@@ -78,12 +77,11 @@ public abstract class RestAPICall {
 	protected HttpResponse sendRequest(HttpUriRequest request) throws AppException {
 		try {
 			Transaction context = Transaction.getInstance();
-			if(context.get("CSRF-Token")!=null) {
-				request.addHeader("CSRF-Token", ""+context.get("CSRF-Token"));
-			}
+			APIMHttpClient apimClient = APIMHttpClient.getInstance(this.useAdmin);
+			request.addHeader("CSRF-Token", apimClient.getCsrfToken());
 			context.put("lastRequest", request);
-			APIMHttpClient apimClient = APIMHttpClient.getInstance();
 			HttpResponse response = apimClient.getHttpClient().execute(request, apimClient.getClientContext());
+			//LOG.info("Send request: "+this.getClass().getSimpleName()+" using admin-account: " + this.useAdmin + " to: " + request.getURI());
 			return response;
 		} catch (ClientProtocolException e) {
 			throw new AppException("Unable to send HTTP-Request.", ErrorCode.CANT_SEND_HTTP_REQUEST, e);

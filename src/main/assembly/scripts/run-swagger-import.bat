@@ -7,7 +7,7 @@ SET programDir=%~dp0
 SET bkpClassPath=%CLASSPATH%
 
 CD %programDir%\..
-SET CLASSPATH=%programDir%..\lib
+SET CLASSPATH=%programDir%..\lib;%programDir%..\conf
 
 FOR /R ./lib %%a in (*.jar) DO CALL :AddToPath %%a
 
@@ -23,7 +23,7 @@ SET ERRNO=1
 GOTO :END
 
 :OkClassPath
-ECHO "Running API-Manager Promote version 1.4.1 ..."
+ECHO "Running API-Manager Promote version 1.5.0 ..."
 
 CD %currentDir%
 

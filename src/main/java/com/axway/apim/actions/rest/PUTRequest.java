@@ -14,6 +14,10 @@ public class PUTRequest extends RestAPICall {
 	public PUTRequest(HttpEntity entity, URI uri, IResponseParser responseParser) {
 		super(entity, uri, responseParser);
 	}
+	
+	public PUTRequest(HttpEntity entity, URI uri, IResponseParser responseParser, boolean useAdmin) {
+		super(entity, uri, responseParser, useAdmin);
+	}
 
 	@Override
 	public HttpResponse execute() throws AppException {

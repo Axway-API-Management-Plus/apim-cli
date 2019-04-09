@@ -1,5 +1,5 @@
 <assembly>
-    <id>1.4.1</id>
+    <id>1.5.0</id>
     <formats>
         <format>tar.gz</format>
     </formats>
@@ -13,6 +13,16 @@
         <fileSet>
             <directory>src/main/assembly/samples</directory>
             <outputDirectory>/samples</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <excludes>
+            	<exclude>*.formatted</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/assembly/conf</directory>
+            <outputDirectory>/conf</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>

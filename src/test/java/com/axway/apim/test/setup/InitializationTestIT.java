@@ -111,8 +111,8 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 		
 		designer.echo("####### Create an Org-Admin-User #######");
 		
-		designer.createVariable("oadminUsername1", "anna-${orgNumber}");
-		designer.createVariable("oadminPassword1", "anna-${orgNumber}");
+		designer.createVariable("oadminUsername1", "orgadmin-${orgNumber}");
+		designer.createVariable("oadminPassword1", "orgadmin-${orgNumber}");
 		
 		designer.http().client("apiManager")
 			.send()

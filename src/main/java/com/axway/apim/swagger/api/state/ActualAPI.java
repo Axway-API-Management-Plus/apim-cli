@@ -43,4 +43,10 @@ public class ActualAPI extends AbstractAPI implements IAPI {
 				&& this.deprecated.equals("true")) return IAPI.STATE_DEPRECATED;
 		return super.getState();
 	}
+
+	@Override
+	public String getApiDefinitionImport() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -11,13 +11,13 @@ programDir="$( cd "$(dirname "$0")" ; pwd -P )"
 
 cd $programDir/..
 
-CP=lib
+CP=lib:conf
 for jars in lib/*
 do
         CP=$CP:$jars
 done
 
-echo "Running API-Manager Promote version 1.4.1 ..."
+echo "Running API-Manager Promote version 1.5.0 ..."
 
 "$JAVA_HOME/bin/java" -Xms64m -Xmx256m -classpath "$CP" com.axway.apim.App $*
 rc=$?
