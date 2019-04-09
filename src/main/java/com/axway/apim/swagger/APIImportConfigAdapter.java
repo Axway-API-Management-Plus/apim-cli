@@ -160,21 +160,22 @@ public class APIImportConfigAdapter {
 	private void validateOrganization(IAPI apiConfig) throws AppException {
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
 			apiConfig.setOrgId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
+		} else {
+			apiConfig.setOrgId(APIManagerAdapter.getInstance().getOrgId(apiConfig.getOrganization()));
 		}
 	}
 
 	private void checkForAPIDefinitionInConfiguration(IAPI apiConfig) throws AppException {
 		String path = getCurrentPath();
-		LOG.info("path={}",path);
+		LOG.debug("Current path={}",path);
 		if (StringUtils.isEmpty(this.pathToAPIDefinition)) {
 			if (StringUtils.isNotEmpty(apiConfig.getApiDefinitionImport())) {
 				this.pathToAPIDefinition=apiConfig.getApiDefinitionImport();
-				LOG.info("Reading API Definition from configuration file");
+				LOG.debug("Reading API Definition from configuration file");
 			} else {
 				throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
 			}
 		}
-		LOG.info("API Definition={}",this.pathToAPIDefinition);
 	}
 
 	private String getCurrentPath() {
@@ -444,25 +445,26 @@ public class APIImportConfigAdapter {
 		} else if(isHttpUri(pathToAPIDefinition)) {
 			return getAPIDefinitionFromURL(pathToAPIDefinition);
 		} else {
-			File inputFile = new File(pathToAPIDefinition);
 			try {
+				File inputFile = new File(pathToAPIDefinition);
 				if(inputFile.exists()) { 
+					LOG.info("Reading API-Definition (Swagger/WSDL) from file: '" + pathToAPIDefinition + "' (relative path)");
 					is = new FileInputStream(pathToAPIDefinition);
 				} else {
 					String baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
 					inputFile= new File(baseDir + File.separator + this.pathToAPIDefinition);
+					LOG.info("Reading API-Definition (Swagger/WSDL) from file: '" + inputFile.getCanonicalFile() + "' (absolute path)"); 
 					if(inputFile.exists()) { 
 						is = new FileInputStream(inputFile);
 					} else {
 						is = this.getClass().getResourceAsStream(pathToAPIDefinition);
 					}
-					if(is == null) {
-						throw new AppException("Unable to read swagger file from: " + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE);
-					}
 				}
-				
+				if(is == null) {
+					throw new AppException("Unable to read Swagger/WSDL file from: " + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE);
+				}
 			} catch (Exception e) {
-				throw new AppException("Unable to read swagger file from: " + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
+				throw new AppException("Unable to read Swagger/WSDL file from: " + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 			}
 			
 		}

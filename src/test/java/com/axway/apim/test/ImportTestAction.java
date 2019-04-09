@@ -35,6 +35,7 @@ public class ImportTestAction extends AbstractTestAction {
 		String origConfigFile 			= context.getVariable(API_CONFIG);
 		String stage				= null;
 		String apiDefinition			= null;
+		boolean useEnvironmentOnly = false;
 		try {
 			stage 				= context.getVariable("stage");
 		} catch (CitrusRuntimeException ignore) {};
@@ -50,6 +51,10 @@ public class ImportTestAction extends AbstractTestAction {
 		int expectedReturnCode = 0;
 		try {
 			expectedReturnCode 	= Integer.parseInt(context.getVariable("expectedReturnCode"));
+		} catch (Exception ignore) {};
+		
+		try {
+			useEnvironmentOnly 	= Boolean.parseBoolean(context.getVariable("useEnvironmentOnly"));
 		} catch (Exception ignore) {};
 		
 		String enforce = "false";
@@ -84,20 +89,25 @@ public class ImportTestAction extends AbstractTestAction {
 			// This creates the dynamic staging config file! (For testing, we also support reading out of a file directly)
 			replaceDynamicContentInFile(stageConfigFile, context, replacedStagedConfig);
 		}
-
-		String[] args = new String[] { 
-				"-a", apiDefinition, 
-				"-c", configFile, 
-				"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
-				"-p", context.replaceDynamicContentInString("${oadminUsername1}"), 
-				"-u", context.replaceDynamicContentInString("${oadminPassword1}"),
-				"-s", stage, 
-				"-f", enforce, 
-				"-iq", ignoreQuotas, 
-				"-clientOrgsMode", clientOrgsMode, 
-				"-clientAppsMode", clientAppsMode, 
-				"-ignoreAdminAccount", ignoreAdminAccount};
-		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"'. Enforce breaking change: " + enforce);
+		String[] args;
+		if(useEnvironmentOnly) {
+			args = new String[] {  
+					"-c", configFile, "-s", stage};
+		} else {
+			args = new String[] { 
+					"-a", apiDefinition, 
+					"-c", configFile, 
+					"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
+					"-p", context.replaceDynamicContentInString("${oadminUsername1}"), 
+					"-u", context.replaceDynamicContentInString("${oadminPassword1}"),
+					"-s", stage, 
+					"-f", enforce, 
+					"-iq", ignoreQuotas, 
+					"-clientOrgsMode", clientOrgsMode, 
+					"-clientAppsMode", clientAppsMode, 
+					"-ignoreAdminAccount", ignoreAdminAccount};
+		}
+		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);
 		int rc = App.run(args);
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);

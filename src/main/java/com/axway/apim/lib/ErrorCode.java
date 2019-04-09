@@ -3,6 +3,7 @@ package com.axway.apim.lib;
 public enum ErrorCode {
 	
 	SUCCESS						(0,  "Successful."),
+	MISSING_PARAMETER			(5,  "Missing parameter."),
 	NO_CHANGE					(10, "No change detected."),
 	BREAKING_CHANGE_DETECTED	(15, "Breaking change detected."),
 	NO_ADMIN_ROLE_USER			(17, "No admin role is used"),

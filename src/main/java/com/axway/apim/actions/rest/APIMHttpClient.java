@@ -41,8 +41,14 @@ public class APIMHttpClient {
 	
 	private BasicCookieStore cookieStore = new BasicCookieStore();
 	
+	private String csrfToken;
+	
 	public static void deleteInstance() {
 		instances = new HashMap<Boolean, APIMHttpClient>();
+	}
+	
+	public static void addInstance(boolean adminInstance, APIMHttpClient client) {
+		instances.put(adminInstance, client);
 	}
 	
 	public static APIMHttpClient getInstance() throws AppException {
@@ -113,5 +119,13 @@ public class APIMHttpClient {
 	
 	public HttpClientContext getClientContext() {
 		return clientContext;
+	}
+
+	public String getCsrfToken() {
+		return csrfToken;
+	}
+
+	public void setCsrfToken(String csrfToken) {
+		this.csrfToken = csrfToken;
 	}
 }

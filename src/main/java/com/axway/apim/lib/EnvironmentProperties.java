@@ -21,18 +21,18 @@ public class EnvironmentProperties {
 	
 	private void initProperties(String stage) throws AppException {
 		try {
-			LOG.info("Loading environment properties from file: env.properties");
 			mainProperties.load(APIMHttpClient.class.getClassLoader().getResourceAsStream("env.properties"));
+			LOG.info("Loaded environment properties from file: env.properties.");
 		} catch (Exception e) {
-			LOG.debug("Can't read base environment file.");
+			LOG.info("Trying to load environment properties from file: env.properties ... not found.");
 		}
 		try {
 			if(stage!=null && !stage.equals("NOT_SET")) {
-				LOG.info("Loading environment properties from file: env."+stage+".properties");
 				stageProperties.load(APIMHttpClient.class.getClassLoader().getResourceAsStream("env."+stage+".properties"));
+				LOG.info("Loaded environment properties from file: env."+stage+".properties.");
 			}
 		} catch (Exception e) {
-			LOG.debug("Can't read environment file.");
+			LOG.info("Trying to load environment properties from file: env."+stage+".properties ... not found.");
 		}
 	}
 	

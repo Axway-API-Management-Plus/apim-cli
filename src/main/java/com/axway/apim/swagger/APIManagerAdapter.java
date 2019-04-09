@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.actions.CreateNewAPI;
 import com.axway.apim.actions.RecreateToUpdateAPI;
 import com.axway.apim.actions.UpdateExistingAPI;
+import com.axway.apim.actions.rest.APIMHttpClient;
 import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
@@ -167,17 +168,17 @@ public class APIManagerAdapter {
 		}		
 	}
 	
-	public void loginToAPIManager(boolean useAdmin) throws AppException {
+	public void loginToAPIManager(boolean useAdminClient) throws AppException {
 		URI uri;
 		CommandParameters cmd = CommandParameters.getInstance();
-		if(cmd.ignoreAdminAccount() && useAdmin) return;
-		if(hasAdminAccount && useAdmin) return; // Already logged in with an Admin-Account.
+		if(cmd.ignoreAdminAccount() && useAdminClient) return;
+		if(hasAdminAccount && useAdminClient) return; // Already logged in with an Admin-Account.
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/login").build();
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 			String username;
 			String password;
-			if(useAdmin) {
+			if(useAdminClient) {
 				String[] usernamePassword = getAdminUsernamePassword();
 				if(usernamePassword==null) return;
 				username = usernamePassword[0];
@@ -188,9 +189,11 @@ public class APIManagerAdapter {
 				password = cmd.getPassword();
 				LOG.debug("Logging in with User: '" + username + "'");
 			}
+			// This forces to create a client which is re-used based on useAdmin
+			APIMHttpClient client = APIMHttpClient.getInstance(useAdminClient);
 		    params.add(new BasicNameValuePair("username", username));
 		    params.add(new BasicNameValuePair("password", password));
-		    POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, null, useAdmin);
+		    POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, null, useAdminClient);
 			loginRequest.setContentType(null);
 			HttpResponse response = loginRequest.execute();
 			int statusCode = response.getStatusLine().getStatusCode();
@@ -198,16 +201,17 @@ public class APIManagerAdapter {
 				LOG.error("Login failed: " +statusCode+ ", Response: " + response);
 				throw new AppException("Given user: '"+username+"' can't login.", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
-			Transaction context = Transaction.getInstance();
 			for (Header header : response.getAllHeaders()) {
 				if(header.getName().equals("CSRF-Token")) {
-					context.put("CSRF-Token#"+new Boolean(useAdmin), header.getValue());
+					client.setCsrfToken(header.getValue());
 					break;
 				}
 			}
-			User user = getCurrentUser(useAdmin);
+			User user = getCurrentUser(useAdminClient);
 			if(user.getRole().equals("admin")) {
 				this.hasAdminAccount = true;
+				// Also register this client as an Admin-Client 
+				APIMHttpClient.addInstance(true, client);
 			} else if (user.getRole().equals("oadmin")) {
 				this.usingOrgAdmin = true;
 			} else {
@@ -225,14 +229,14 @@ public class APIManagerAdapter {
 		return usernamePassword;
 	}
 	
-	public static User getCurrentUser(boolean useAdmin) throws AppException {
+	public static User getCurrentUser(boolean useAdminClient) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
 		HttpResponse response = null;
 		JsonNode jsonResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/currentuser").build();
-		    GETRequest currentUserRequest = new GETRequest(uri, null, useAdmin);
+		    GETRequest currentUserRequest = new GETRequest(uri, null, useAdminClient);
 		    response = currentUserRequest.execute();
 			String currentUser = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 			User user = mapper.readValue(currentUser, User.class);

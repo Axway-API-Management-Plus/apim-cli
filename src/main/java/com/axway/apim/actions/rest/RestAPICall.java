@@ -77,16 +77,9 @@ public abstract class RestAPICall {
 	protected HttpResponse sendRequest(HttpUriRequest request) throws AppException {
 		try {
 			Transaction context = Transaction.getInstance();
-			if(context.get("CSRF-Token#"+new Boolean(this.useAdmin))!=null) {
-				request.addHeader("CSRF-Token", ""+context.get("CSRF-Token#"+new Boolean(this.useAdmin)));
-			} else {
-				if(!request.getURI().toString().endsWith("/login")) {
-					LOG.error("Can't send request, usingAdminAccount: "+this.useAdmin+" as user isn't logged in.");
-					throw new AppException("Can't send request, usingAdminAccount: '"+this.useAdmin+"' as user isn't logged in.", ErrorCode.API_MANAGER_COMMUNICATION);
-				}
-			}
-			context.put("lastRequest", request);
 			APIMHttpClient apimClient = APIMHttpClient.getInstance(this.useAdmin);
+			request.addHeader("CSRF-Token", apimClient.getCsrfToken());
+			context.put("lastRequest", request);
 			HttpResponse response = apimClient.getHttpClient().execute(request, apimClient.getClientContext());
 			//LOG.info("Send request: "+this.getClass().getSimpleName()+" using admin-account: " + this.useAdmin + " to: " + request.getURI());
 			return response;

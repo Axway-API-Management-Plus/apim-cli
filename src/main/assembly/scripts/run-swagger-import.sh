@@ -11,7 +11,7 @@ programDir="$( cd "$(dirname "$0")" ; pwd -P )"
 
 cd $programDir/..
 
-CP=lib
+CP=lib:conf
 for jars in lib/*
 do
         CP=$CP:$jars

@@ -1,8 +1,12 @@
 package com.axway.apim.lib;
 
 import org.apache.commons.cli.CommandLine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CommandParameters {
+	
+	private static Logger LOG = LoggerFactory.getLogger(CommandParameters.class);
 	
 	public static String MODE_REPLACE	= "replace";
 	public static String MODE_IGNORE	= "ignore";
@@ -18,25 +22,20 @@ public class CommandParameters {
 	
 	private EnvironmentProperties envProperties;
 	
-	private CommandParameters () {}
+	public CommandParameters (CommandLine cmd, CommandLine internalCmd, EnvironmentProperties environment) throws AppException {
+		this.cmd = cmd;
+		this.internalCmd = internalCmd;
+		this.envProperties = environment;
+		validateRequiredParameters();
+		CommandParameters.instance = this;
+	}
 	
-	public static synchronized CommandParameters getInstance () {
+	public static synchronized CommandParameters getInstance() {
 		if (CommandParameters.instance == null) {
-			CommandParameters.instance = new CommandParameters ();
+			LOG.error("CommandParameters has not been initialized.");
+			throw new RuntimeException("CommandParameters has not been initialized.");
 		}
 		return CommandParameters.instance;
-	}
-	
-	public void setCmd(CommandLine cmd) {
-		this.cmd = cmd;
-	}
-	
-	public void setInternalCmd(CommandLine internalCmd) {
-		this.internalCmd = internalCmd;
-	}
-
-	public void setEnvironment(EnvironmentProperties environment) {
-		this.envProperties = environment;
 	}
 
 	public String getOptionValue(String option) {
@@ -105,6 +104,17 @@ public class CommandParameters {
 	public boolean ignoreAdminAccount() {
 		if(getValue("ignoreAdminAccount")==null) return false;
 		return Boolean.parseBoolean(getValue("ignoreAdminAccount"));
+	}
+	
+	public void validateRequiredParameters() throws AppException {
+		ErrorState errors  = ErrorState.getInstance();
+		if(getValue("username")==null) errors.setError("Required parameter: 'username' is missing.", ErrorCode.MISSING_PARAMETER, false);
+		if(getValue("password")==null) errors.setError("Required parameter: 'password' is missing.", ErrorCode.MISSING_PARAMETER, false);
+		if(getValue("host")==null) errors.setError("Required parameter: 'host' is missing.", ErrorCode.MISSING_PARAMETER, false);
+		if(errors.hasError) {
+			LOG.error("Provide parameters either using Command-Line-Options or in Environment.Properties");
+			throw new AppException("Missing required parameters.", ErrorCode.MISSING_PARAMETER);
+		}
 	}
 	
 	private String getValue(String key) {

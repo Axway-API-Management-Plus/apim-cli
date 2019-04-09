@@ -79,7 +79,7 @@ public class App {
 			options.addOption(option);
 			
 			option = new Option("h", "host", true, "The API-Manager hostname the API should be imported");
-				option.setRequired(true);
+				option.setRequired(false);
 				option.setArgName("api-host");
 			options.addOption(option);
 			
@@ -88,12 +88,12 @@ public class App {
 			options.addOption(option);
 			
 			option = new Option("u", "username", true, "Username used to authenticate. Please note, that this user must have Admin-Role");
-				option.setRequired(true);
+				option.setRequired(false);
 				option.setArgName("apiadmin");
 			options.addOption(option);
 			
 			option = new Option("p", "password", true, "Password used to authenticate");
-				option.setRequired(true);
+				option.setRequired(false);
 				option.setArgName("changeme");
 			options.addOption(option);
 			
@@ -145,15 +145,15 @@ public class App {
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a http://www.dneonline.com/calculator.asmx?wsdl -c samples/minimal-config-wsdl.json -h localhost -u apiadmin -p changeme");
 				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -c samples/minimal-config-wsdl-api-definition.json -h localhost -u apiadmin -p changeme");
 				System.out.println();
+				System.out.println("Using parameters provided in properties file stored in conf-folder:");
+				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -c samples/minimal-config-api-definition.json -s api-env");
+				System.out.println();
 				System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 				
 				System.exit(99);
 			}
 			
-			CommandParameters params = CommandParameters.getInstance();
-			params.setCmd(cmd);
-			params.setInternalCmd(internalCmd);
-			params.setEnvironment(new EnvironmentProperties(cmd.getOptionValue("stage")));
+			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
 			
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();

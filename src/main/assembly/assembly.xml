@@ -21,6 +21,16 @@
             </excludes>
         </fileSet>
         <fileSet>
+            <directory>src/main/assembly/conf</directory>
+            <outputDirectory>/conf</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <excludes>
+            	<exclude>*.formatted</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
             <directory>src/main/assembly/lib</directory>
             <outputDirectory>/lib</outputDirectory>
             <includes>
