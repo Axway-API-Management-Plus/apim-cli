@@ -45,13 +45,6 @@ public class App {
 		
 	public static int run(String args[]) {
 		try {
-			LOG.info("------------------------------------------------------------------------");
-			LOG.info("API-Manager Promote Version: 1.5.0");
-			LOG.info("                                                                        ");
-			LOG.info("To report issues or get help, please visit: ");
-			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
-			LOG.info("------------------------------------------------------------------------");
-			
 			Options options = new Options();
 			Option option;
 			
@@ -118,40 +111,36 @@ public class App {
 			option.setRequired(false);
 			option.setArgName("true");
 			internalOptions.addOption(option);
+
+			option = new  Option("h", "help", false, "Print the help");
+			option.setRequired(false);
+			internalOptions.addOption(option);
 			
 			
 			CommandLineParser parser = new RelaxedParser();
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.setWidth(140);
+			
 			CommandLine cmd = null;
 			CommandLine internalCmd = null;
-			String scriptExt = "sh";
-			if(System.getProperty("os.name").toLowerCase().contains("win")) scriptExt = "bat";
+			
 			try {
 				cmd = parser.parse(options, args);
 				internalCmd = parser.parse( internalOptions, args);
 			} catch (ParseException e) {
-				formatter.printHelp("Swagger-Import", options, true);
-				System.out.println("\n");
-				System.out.println("ERROR: " + e.getMessage());
-				System.out.println();
-				System.out.println("You may run one of the following examples:");
-				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
-				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme -s prod");
-				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/complete-config.json -h localhost -u apiadmin -p changeme");
-				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/org-and-apps-config.json -h localhost -u apiadmin -p changeme");
-				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.url -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
-				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a https://petstore.swagger.io/v2/swagger.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
-				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a http://www.dneonline.com/calculator.asmx?wsdl -c samples/minimal-config-wsdl.json -h localhost -u apiadmin -p changeme");
-				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -c samples/minimal-config-wsdl-api-definition.json -h localhost -u apiadmin -p changeme");
-				System.out.println();
-				System.out.println("Using parameters provided in properties file stored in conf-folder:");
-				System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -c samples/minimal-config-api-definition.json -s api-env");
-				System.out.println();
-				System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
-				
+				printUsage(options, e.getMessage());
 				System.exit(99);
 			}
+			
+			if(cmd.hasOption("help")) {
+				printUsage(options, "Usage information");
+				System.exit(0);
+			}
+			
+			LOG.info("------------------------------------------------------------------------");
+			LOG.info("API-Manager Promote Version: 1.5.0");
+			LOG.info("                                                                        ");
+			LOG.info("To report issues or get help, please visit: ");
+			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
+			LOG.info("------------------------------------------------------------------------");
 			
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
@@ -186,5 +175,31 @@ public class App {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}
+	}
+	
+	private static void printUsage(Options options, String message) {
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.setWidth(140);
+		String scriptExt = "sh";
+		if(System.getProperty("os.name").toLowerCase().contains("win")) scriptExt = "bat";
+		
+		formatter.printHelp("Swagger-Import", options, true);
+		System.out.println("\n");
+		System.out.println("ERROR: " + message);
+		System.out.println("\n");
+		System.out.println("You may run one of the following examples:");
+		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
+		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme -s prod");
+		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/complete-config.json -h localhost -u apiadmin -p changeme");
+		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/org-and-apps-config.json -h localhost -u apiadmin -p changeme");
+		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.url -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
+		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a https://petstore.swagger.io/v2/swagger.json -c samples/minimal-config.json -h localhost -u apiadmin -p changeme");
+		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a http://www.dneonline.com/calculator.asmx?wsdl -c samples/minimal-config-wsdl.json -h localhost -u apiadmin -p changeme");
+		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -c samples/minimal-config-wsdl-api-definition.json -h localhost -u apiadmin -p changeme");
+		System.out.println();
+		System.out.println("Using parameters provided in properties file stored in conf-folder:");
+		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -c samples/minimal-config-api-definition.json -s api-env");
+		System.out.println();
+		System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 	}
 }

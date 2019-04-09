@@ -403,6 +403,7 @@ public class APIImportConfigAdapter {
 				String propertyValue = apiConfig.getCustomProperties().get(propertyKey);
 				JsonNode configuredProp = configuredProps.at("/api/"+propertyKey);
 				if(configuredProp instanceof MissingNode) {
+					ErrorState.getInstance().setError("The custom-property: '" + propertyKey + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE, false);
 					throw new AppException("The custom-property: '" + propertyKey + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
 				JsonNode propType = configuredProp.get("type");
@@ -416,6 +417,7 @@ public class APIImportConfigAdapter {
 						}
 					}
 					if(!valueFound) {
+						ErrorState.getInstance().setError("The value: '" + propertyValue + "' isn't configured for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE, false);
 						throw new AppException("The value: '" + propertyValue + "' isn't configured for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE);
 					}
 				}
