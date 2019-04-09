@@ -4,6 +4,8 @@ import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.test.lib.TestIndicator;
+
 public class CommandParameters {
 	
 	private static Logger LOG = LoggerFactory.getLogger(CommandParameters.class);
@@ -31,6 +33,7 @@ public class CommandParameters {
 	}
 	
 	public static synchronized CommandParameters getInstance() {
+		if(TestIndicator.getInstance().isTestRunning()) return null; // Skip this, if executed as a test
 		if (CommandParameters.instance == null) {
 			LOG.error("CommandParameters has not been initialized.");
 			throw new RuntimeException("CommandParameters has not been initialized.");
