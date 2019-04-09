@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -31,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.actions.CreateNewAPI;
 import com.axway.apim.actions.RecreateToUpdateAPI;
 import com.axway.apim.actions.UpdateExistingAPI;
-import com.axway.apim.actions.rest.APIMHttpClient;
 import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
@@ -84,8 +82,6 @@ public class APIManagerAdapter {
 	private boolean usingOrgAdmin = false;
 	private boolean hasAdminAccount = false;
 	
-	private Properties environmentProperties = null;
-	
 	private ErrorState error = ErrorState.getInstance();
 	
 	public static String CREDENTIAL_TYPE_API_KEY 		= "apikeys";
@@ -94,14 +90,7 @@ public class APIManagerAdapter {
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
-			throw new AppException("APIManagerAdapter has been initialized yet.", ErrorCode.UNXPECTED_ERROR);
-		}
-		return APIManagerAdapter.instance;
-	}
-	
-	public static synchronized APIManagerAdapter getInstance(String stage) throws AppException {
-		if (APIManagerAdapter.instance == null) {
-			APIManagerAdapter.instance = new APIManagerAdapter (stage);
+			APIManagerAdapter.instance = new APIManagerAdapter ();
 		}
 		return APIManagerAdapter.instance;
 	}
@@ -110,9 +99,8 @@ public class APIManagerAdapter {
 			APIManagerAdapter.instance = null;
 	}
 	
-	private APIManagerAdapter(String stage) throws AppException {
+	private APIManagerAdapter() throws AppException {
 		super();
-		this.environmentProperties = getEnvironmentProperties(stage);
 		Transaction transaction = Transaction.getInstance();
 		transaction.beginTransaction();
 		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the same JVM)
@@ -231,26 +219,9 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private Properties getEnvironmentProperties(String stage) throws AppException {
-		Properties prop = new Properties();
-		try {
-			if(stage!=null && !stage.equals("NOT_SET")) {
-				LOG.info("Loading environment properties from file: env."+stage+".properties");
-				prop.load(APIMHttpClient.class.getClassLoader().getResourceAsStream("env."+stage+".properties"));
-			} else {
-				LOG.info("Loading environment properties from file: env.properties");
-				prop.load(APIMHttpClient.class.getClassLoader().getResourceAsStream("env.properties"));
-			}
-			return prop;
-		} catch (Exception e) {
-			LOG.debug("Can't read environment file.");
-			return null;
-		}
-	}
-	
 	private String[] getAdminUsernamePassword() throws AppException {
-		if(this.environmentProperties==null) return null;
-		String[] usernamePassword =  {environmentProperties.getProperty("admin_username"), environmentProperties.getProperty("admin_password")};
+		if(CommandParameters.getInstance().getAdminUsername()==null) return null;
+		String[] usernamePassword =  {CommandParameters.getInstance().getAdminUsername(), CommandParameters.getInstance().getAdminPassword()};
 		return usernamePassword;
 	}
 	

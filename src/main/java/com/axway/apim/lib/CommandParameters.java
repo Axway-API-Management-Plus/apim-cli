@@ -16,6 +16,8 @@ public class CommandParameters {
 	
 	private CommandLine internalCmd;
 	
+	private EnvironmentProperties envProperties;
+	
 	private CommandParameters () {}
 	
 	public static synchronized CommandParameters getInstance () {
@@ -33,35 +35,47 @@ public class CommandParameters {
 		this.internalCmd = internalCmd;
 	}
 
+	public void setEnvironment(EnvironmentProperties environment) {
+		this.envProperties = environment;
+	}
+
 	public String getOptionValue(String option) {
-		return this.cmd.getOptionValue(option);
+		return getValue(option);
 	}
 
 	public String getUsername() {
-		return this.cmd.getOptionValue("username");
+		return getValue("username");
 	}
 
 	public String getPassword() {
-		return this.cmd.getOptionValue("password");
+		return getValue("password");
+	}
+	
+	public String getAdminUsername() {
+		return getValue("admin_username");
+	}
+
+	public String getAdminPassword() {
+		return getValue("admin_password");
 	}
 
 	public String getHostname() {
-		return this.cmd.getOptionValue("host");
+		return getValue("host");
 	}
 
 	public int getPort() {
-		if(!this.cmd.hasOption("port")) return port;
-		return Integer.parseInt(this.cmd.getOptionValue("port"));
+		if(getValue("port")==null) return port;
+		return Integer.parseInt(getValue("port"));
 	}
 
 	public boolean isEnforceBreakingChange() {
-		if(!this.cmd.hasOption("force")) return false;
-		return Boolean.parseBoolean(this.cmd.getOptionValue("force"));
+		if(getValue("force")==null) return false;
+		return Boolean.parseBoolean(getValue("force"));
 	}
 	
 	public boolean isIgnoreQuotas() {
-		if(!this.cmd.hasOption("ignoreQuotas")) return false;
-		return Boolean.parseBoolean(this.cmd.getOptionValue("ignoreQuotas"));
+		if(getValue("ignoreQuotas")==null) return false;
+		return Boolean.parseBoolean(getValue("ignoreQuotas"));
 	}
 	
 	public boolean isIgnoreClientApps() {
@@ -70,8 +84,8 @@ public class CommandParameters {
 	}
 	
 	public String getClientAppsMode() {
-		if(!this.cmd.hasOption("clientAppsMode")) return MODE_REPLACE;
-		return this.cmd.getOptionValue("clientAppsMode").toLowerCase();
+		if(getValue("clientAppsMode")==null) return MODE_REPLACE;
+		return getValue("clientAppsMode").toLowerCase();
 	}
 	
 	public boolean isIgnoreClientOrgs() {
@@ -80,8 +94,8 @@ public class CommandParameters {
 	}
 	
 	public String getClientOrgsMode() {
-		if(!this.cmd.hasOption("clientOrgsMode")) return MODE_REPLACE;
-		return this.cmd.getOptionValue("clientOrgsMode").toLowerCase();
+		if(getValue("clientOrgsMode")==null) return MODE_REPLACE;
+		return getValue("clientOrgsMode").toLowerCase();
 	}
 	
 	public String getAPIManagerURL() {
@@ -89,7 +103,19 @@ public class CommandParameters {
 	}
 	
 	public boolean ignoreAdminAccount() {
-		if(!this.internalCmd.hasOption("ignoreAdminAccount")) return false;
-		return Boolean.parseBoolean(this.internalCmd.getOptionValue("ignoreAdminAccount"));
+		if(getValue("ignoreAdminAccount")==null) return false;
+		return Boolean.parseBoolean(getValue("ignoreAdminAccount"));
+	}
+	
+	private String getValue(String key) {
+		if(this.cmd.getOptionValue(key)!=null) {
+			return this.cmd.getOptionValue(key);
+		} else if(this.internalCmd.getOptionValue(key)!=null) {
+			return this.internalCmd.getOptionValue(key);
+		} else if(this.envProperties.containsKey(key)) {
+			return this.envProperties.get(key);
+		} else {
+			return null;
+		}
 	}
 }

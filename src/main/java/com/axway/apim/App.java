@@ -15,6 +15,7 @@ import com.axway.apim.actions.rest.APIMHttpClient;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.RelaxedParser;
@@ -152,6 +153,7 @@ public class App {
 			CommandParameters params = CommandParameters.getInstance();
 			params.setCmd(cmd);
 			params.setInternalCmd(internalCmd);
+			params.setEnvironment(new EnvironmentProperties(cmd.getOptionValue("stage")));
 			
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
@@ -159,7 +161,7 @@ public class App {
 			APIMHttpClient.deleteInstance();
 			Transaction.deleteInstance();
 			
-			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance(params.getOptionValue("stage"));
+			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			
 			APIImportConfigAdapter contract = new APIImportConfigAdapter(params.getOptionValue("contract"), 
 					params.getOptionValue("stage"), params.getOptionValue("apidefinition"), apimAdapter.isUsingOrgAdmin());
