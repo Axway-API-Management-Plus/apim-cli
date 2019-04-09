@@ -61,18 +61,21 @@ Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimana
 - 1.4.1 - 20.03.2019
   - Stabilized handling of Client-Orgs and Client-Apps (added support for modes: add|replace|ignore)
 - 1.4.2 - 03.04.2019
-  - Added support for WSDLs API-Definitions, API-Manager port now a parameter, validate Admin-Role user is used 
+  - Added support for WSDLs API-Definitions, API-Manager port now a parameter, validate Admin-Role user is used
+- 1.5.0 - 09.04.2019
+  - Added support for Org-Admins and option to externalize parameters into environment properties
 
 
 ## Limitations/Caveats
 - API-Method-Level description is not yet supported
 - Method-Level settings such as individual Security, Custom-Policies, etc. not yet supported
 - Deep merge of stage-config files isn't supported
-- Support for WSDL is Beta
+- Support for WSDL is still Beta
 
 ## Contributing
 
-Please read [Contributing.md](https://github.com/Axway-API-Management-Plus/Common/blob/master/Contributing.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [Contributing.md](https://github.com/Axway-API-Management-Plus/Common/blob/master/Contributing.md) for details on our code of conduct, and the process for submitting pull requests to us.  
+Also please read this page on [how to contribute](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/Contribute-to-this-project) to this project.
 
 ## Team
 
