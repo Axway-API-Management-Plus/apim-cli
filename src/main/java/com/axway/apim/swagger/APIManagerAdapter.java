@@ -197,7 +197,7 @@ public class APIManagerAdapter {
 			loginRequest.setContentType(null);
 			HttpResponse response = loginRequest.execute();
 			int statusCode = response.getStatusLine().getStatusCode();
-			if(statusCode == 403){
+			if(statusCode == 403 || statusCode == 401){
 				LOG.error("Login failed: " +statusCode+ ", Response: " + response);
 				throw new AppException("Given user: '"+username+"' can't login.", ErrorCode.API_MANAGER_COMMUNICATION);
 			}

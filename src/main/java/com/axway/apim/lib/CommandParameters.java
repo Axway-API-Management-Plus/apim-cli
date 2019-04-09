@@ -44,11 +44,21 @@ public class CommandParameters {
 	}
 
 	public String getUsername() {
-		return getValue("username");
+		if(getValue("username")!=null) {
+			return getValue("username");
+		} else {
+			// Perhaps the admin_username is given
+			return getValue("admin_username");
+		}
 	}
 
 	public String getPassword() {
-		return getValue("password");
+		if(getValue("password")!=null) {
+			return getValue("password");
+		} else {
+			// Perhaps the admin_password is given (hopefully in combination with the admin_username)
+			return getValue("admin_password");
+		}
 	}
 	
 	public String getAdminUsername() {
@@ -109,8 +119,8 @@ public class CommandParameters {
 	
 	public void validateRequiredParameters() throws AppException {
 		ErrorState errors  = ErrorState.getInstance();
-		if(getValue("username")==null) errors.setError("Required parameter: 'username' is missing.", ErrorCode.MISSING_PARAMETER, false);
-		if(getValue("password")==null) errors.setError("Required parameter: 'password' is missing.", ErrorCode.MISSING_PARAMETER, false);
+		if(getValue("username")==null && getValue("admin_username")==null) errors.setError("Required parameter: 'username' or 'admin_username' is missing.", ErrorCode.MISSING_PARAMETER, false);
+		if(getValue("password")==null && getValue("admin_password")==null) errors.setError("Required parameter: 'password' or 'admin_password' is missing.", ErrorCode.MISSING_PARAMETER, false);
 		if(getValue("host")==null) errors.setError("Required parameter: 'host' is missing.", ErrorCode.MISSING_PARAMETER, false);
 		if(errors.hasError) {
 			LOG.error("Provide parameters either using Command-Line-Options or in Environment.Properties");
