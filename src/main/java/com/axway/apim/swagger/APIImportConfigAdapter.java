@@ -161,7 +161,12 @@ public class APIImportConfigAdapter {
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
 			apiConfig.setOrgId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
 		} else {
-			apiConfig.setOrgId(APIManagerAdapter.getInstance().getOrgId(apiConfig.getOrganization()));
+			String desiredOrgId = APIManagerAdapter.getInstance().getOrgId(apiConfig.getOrganization(), true);
+			if(desiredOrgId==null) {
+				error.setError("Organization: '"+apiConfig.getOrganization()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION, false);
+				throw new AppException("Organization: '"+apiConfig.getOrganization()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
+			}
+			apiConfig.setOrgId(desiredOrgId);
 		}
 	}
 
