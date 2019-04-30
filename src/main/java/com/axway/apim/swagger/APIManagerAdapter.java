@@ -348,6 +348,59 @@ public class APIManagerAdapter {
 		}
 	}
 	
+	public String getMethodNameForId(String apiId, String methodId) throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations/"+methodId).build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			EntityUtils.consume(httpResponse.getEntity());
+			LOG.trace("Response: " + response);
+			JsonNode operationDetails = mapper.readTree(response);
+			if(operationDetails.size()==0) {
+				LOG.warn("No operation with ID: "+methodId+" found for API with id: " + apiId);
+				return null;
+			}
+			return operationDetails.get("name").asText();
+		} catch (Exception e) {
+			LOG.error("Can't load name for operation with id: "+methodId+" for API: "+apiId+". Can't parse response: " + response);
+			throw new AppException("Can't load name for operation with id: "+methodId+" for API: "+apiId, ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public String getMethodIdPerName(String apiId, String methodName) throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			EntityUtils.consume(httpResponse.getEntity());
+			LOG.trace("Response: " + response);
+			JsonNode operations = mapper.readTree(response);
+			if(operations.size()==0) {
+				LOG.warn("No operations found for API with id: " + apiId);
+				return null;
+			}
+			for(JsonNode operation : operations) {
+				String operationName = operation.get("name").asText();
+				if(operationName.equals(methodName)) {
+					return operation.get("id").asText();
+				}
+			}
+			LOG.warn("No operation found with name: '"+methodName+"' for API: '"+apiId+"'");
+			return null;
+		} catch (Exception e) {
+			LOG.error("Can't load operations for API: "+apiId+". Can't parse response: " + response);
+			throw new AppException("Can't load operations for API: "+apiId+".", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
 	public String getOrgId(String orgName) throws AppException {
 		return getOrgId(orgName, false);
 	}

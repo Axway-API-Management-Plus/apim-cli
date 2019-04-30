@@ -61,6 +61,11 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
+		echo("####### Get the operations/methods for the created API #######");
+		http().client("apiManager").send().get("/proxies/${apiId}/operations").header("Content-Type", "application/json");
+		
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON).extractFromPayload("$.[?(@.name=='updatePetWithForm')].id", "testMethodId");
+		
 		echo("####### Configure some Application-Quota for the imported API #######");
 		http().client("apiManager")
 			.send()
@@ -70,7 +75,8 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestDesigner {
 			.payload("{\"type\":\"APPLICATION\",\"name\":\"Client App Quota\",\"description\":\"\","
 					+ "\"restrictions\":["
 						+ "{\"api\":\"${apiId}\",\"method\":\"*\",\"type\":\"throttle\",\"config\":{\"period\":\"second\",\"per\":50,\"messages\":111}}, "
-						+ "{\"api\":\"*\",\"method\":\"*\",\"type\":\"throttle\",\"config\":{\"period\":\"hour\",\"per\":1,\"messages\":1000}} "
+						+ "{\"api\":\"*\",\"method\":\"*\",\"type\":\"throttle\",\"config\":{\"period\":\"hour\",\"per\":1,\"messages\":1000}}, "
+						+ "{\"api\":\"${apiId}\",\"method\":\"${testMethodId}\",\"type\":\"throttle\",\"config\":{\"period\":\"day\",\"per\":2,\"messages\":100000}} "
 					+ "],"
 					+ "\"system\":false}");
 		
@@ -86,7 +92,7 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestDesigner {
 		action(swaggerImport);
 		
 		echo("####### The API has been updated - Reload the the API-ID #######");
-		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
+		http().client("apiManager").send().get("/proxies").header("Content-Type", "application/json");
 
 		http().client("apiManager")
 			.receive()
@@ -96,7 +102,13 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "newApiId");
 		
+		echo("####### And reload the first methodId as we need it for validation #######");
+		http().client("apiManager").send().get("/proxies/${newApiId}/operations").header("Content-Type", "application/json");
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON).extractFromPayload("$.[?(@.name=='updatePetWithForm')].id", "newTestMethodId");
+		
 		echo("####### Load the application quota and validate it is still present #######");
+		echo("####### newApiId: '${newApiId}' #######");
+		echo("####### newTestMethodId: '${newTestMethodId}' #######");
 		http().client("apiManager").send().get("/applications/${consumingTestAppId}/quota");
 		
 		http().client("apiManager")
@@ -110,9 +122,14 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.restrictions.[?(@.api=='*')].config.per", "1")
 			.validate("$.restrictions.[?(@.api=='*')].config.messages", "1000")
 			// Next validate API-Specific quota is still present
-			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttle")
-			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "second")
-			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "50")
-			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.messages", "111");
+			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='*')].type", "throttle")
+			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='*')].config.period", "second")
+			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='*')].config.per", "50")
+			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='*')].config.messages", "111")
+			// Lastly validate API-Method-Specific quota is still present
+			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='${newTestMethodId}')].type", "throttle")
+			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='${newTestMethodId}')].config.period", "day")
+			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='${newTestMethodId}')].config.per", "2")
+			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='${newTestMethodId}')].config.messages", "100000");
 	}
 }
