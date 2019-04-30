@@ -341,7 +341,7 @@ public class APIManagerAdapter {
 		apiManagerApi.setApplications(existingClientApps);
 	}
 	private void addExistingClientAppQuotas(List<ClientApplication> existingClientApps) throws AppException {
-		if(existingClientApps.size()==0) return; // No apps subscribed to this APIs
+		if(existingClientApps==null || existingClientApps.size()==0) return; // No apps subscribed to this APIs
 		for(ClientApplication app : existingClientApps) {
 			APIQuota appQuota = getQuotaFromAPIManager(app.getId());
 			app.setAppQuota(appQuota);
