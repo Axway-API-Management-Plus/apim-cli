@@ -27,7 +27,8 @@ Today the following API-Properties are already supported and can be controlled e
 - V-Host
 - Tags
 - Custom-Properties
-- Quota-Management (Application- & System-Default-Quota)
+- Quota-Management (Application- & System-Default-Quota)  
+  - also handling Application Quotas manually configured while updating an API
 - Client-Organization handling  
 
 Improving the API-Development experience during the API-Design phase leveraging the Stoplight integration. [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/Stoplight-Integration).
