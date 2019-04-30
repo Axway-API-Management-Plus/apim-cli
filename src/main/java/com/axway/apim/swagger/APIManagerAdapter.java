@@ -337,17 +337,20 @@ public class APIManagerAdapter {
 		}
 		apiManagerApi.setApplications(existingClientApps);
 	}
-	
+	public String getOrgId(String orgName) throws AppException {
+		return getOrgId(orgName, false);
+	}
 	/**
 	 * The actual Org-ID based on the OrgName. Lazy implementation.
 	 * @param orgName the name of the organizations
 	 * @return the id of the organization
 	 * @throws AppException 
 	 */
-	public String getOrgId(String orgName) throws AppException {
+	public String getOrgId(String orgName, boolean devOrgsOnly) throws AppException {
 		if(!this.hasAdminAccount) return null;
 		if(allOrgs == null) getAllOrgs();
 		for(Organization org : allOrgs) {
+			if(devOrgsOnly && org.getDevelopment().equals("false")) continue; // Ignore non-dev orgs
 			if(orgName.equals(org.getName())) return org.getId();
 		}
 		LOG.error("Requested OrgId for unknown orgName: " + orgName);
