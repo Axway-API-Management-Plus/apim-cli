@@ -3,7 +3,7 @@
 
 	<groupId>com.axway</groupId>
 	<artifactId>apimanager-swagger-promote</artifactId>
-	<version>1.6-SNAPSHOT</version>
+	<version>1.5.1</version>
 	<packaging>jar</packaging>
 
 	<name>apimanager-swagger-promote</name>
