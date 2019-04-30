@@ -89,6 +89,9 @@ public class APIManagerAdapter {
 	public static String CREDENTIAL_TYPE_EXT_CLIENTID	= "extclients";
 	public static String CREDENTIAL_TYPE_OAUTH			= "oauth";
 	
+	private final static String SYSTEM_API_QUOTA 				= "00000000-0000-0000-0000-000000000000";
+	private final static String APPLICATION_DEFAULT_QUOTA 		= "00000000-0000-0000-0000-000000000001";
+	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
 			APIManagerAdapter.instance = new APIManagerAdapter ();
@@ -149,7 +152,7 @@ public class APIManagerAdapter {
 				UpdateExistingAPI updateAPI = new UpdateExistingAPI();
 				updateAPI.execute(changeState);
 				return;
-			} else { // We changes, that require a re-creation of the API
+			} else { // We have changes, that require a re-creation of the API
 				LOG.info("Strategy: Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
 						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for PUBLISHED API. Recreating it!");
 				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
@@ -292,6 +295,7 @@ public class APIManagerAdapter {
 			addQuotaConfiguration(apiManagerApi, desiredAPI);
 			addClientOrganizations(apiManagerApi, desiredAPI);
 			addClientApplications(apiManagerApi, desiredAPI);
+			addExistingClientAppQuotas(apiManagerApi.getApplications());
 			return apiManagerApi;
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-State.", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -324,7 +328,6 @@ public class APIManagerAdapter {
 			LOG.info("Ignoring Client-Applications, as desired API-State is Unpublished!");
 			return;
 		}
-		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> allApps = getAllApps();
 		for(ClientApplication app : allApps) {
@@ -337,17 +340,81 @@ public class APIManagerAdapter {
 		}
 		apiManagerApi.setApplications(existingClientApps);
 	}
+	private void addExistingClientAppQuotas(List<ClientApplication> existingClientApps) throws AppException {
+		if(existingClientApps==null || existingClientApps.size()==0) return; // No apps subscribed to this APIs
+		for(ClientApplication app : existingClientApps) {
+			APIQuota appQuota = getQuotaFromAPIManager(app.getId());
+			app.setAppQuota(appQuota);
+		}
+	}
 	
+	public String getMethodNameForId(String apiId, String methodId) throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations/"+methodId).build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			EntityUtils.consume(httpResponse.getEntity());
+			LOG.trace("Response: " + response);
+			JsonNode operationDetails = mapper.readTree(response);
+			if(operationDetails.size()==0) {
+				LOG.warn("No operation with ID: "+methodId+" found for API with id: " + apiId);
+				return null;
+			}
+			return operationDetails.get("name").asText();
+		} catch (Exception e) {
+			LOG.error("Can't load name for operation with id: "+methodId+" for API: "+apiId+". Can't parse response: " + response);
+			throw new AppException("Can't load name for operation with id: "+methodId+" for API: "+apiId, ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public String getMethodIdPerName(String apiId, String methodName) throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			EntityUtils.consume(httpResponse.getEntity());
+			LOG.trace("Response: " + response);
+			JsonNode operations = mapper.readTree(response);
+			if(operations.size()==0) {
+				LOG.warn("No operations found for API with id: " + apiId);
+				return null;
+			}
+			for(JsonNode operation : operations) {
+				String operationName = operation.get("name").asText();
+				if(operationName.equals(methodName)) {
+					return operation.get("id").asText();
+				}
+			}
+			LOG.warn("No operation found with name: '"+methodName+"' for API: '"+apiId+"'");
+			return null;
+		} catch (Exception e) {
+			LOG.error("Can't load operations for API: "+apiId+". Can't parse response: " + response);
+			throw new AppException("Can't load operations for API: "+apiId+".", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public String getOrgId(String orgName) throws AppException {
+		return getOrgId(orgName, false);
+	}
 	/**
 	 * The actual Org-ID based on the OrgName. Lazy implementation.
 	 * @param orgName the name of the organizations
 	 * @return the id of the organization
 	 * @throws AppException 
 	 */
-	public String getOrgId(String orgName) throws AppException {
+	public String getOrgId(String orgName, boolean devOrgsOnly) throws AppException {
 		if(!this.hasAdminAccount) return null;
 		if(allOrgs == null) getAllOrgs();
 		for(Organization org : allOrgs) {
+			if(devOrgsOnly && org.getDevelopment().equals("false")) continue; // Ignore non-dev orgs
 			if(orgName.equals(org.getName())) return org.getId();
 		}
 		LOG.error("Requested OrgId for unknown orgName: " + orgName);
@@ -458,14 +525,12 @@ public class APIManagerAdapter {
 	
 	
 	private static void addQuotaConfiguration(IAPI api, IAPI desiredAPI) throws AppException {
-		//APPLICATION:	00000000-0000-0000-0000-000000000001
-		//SYSTEM: 		00000000-0000-0000-0000-000000000000
 		// No need to load quota, if not given in the desired API
 		if(desiredAPI!=null && (desiredAPI.getApplicationQuota() == null && desiredAPI.getSystemQuota() == null)) return;
 		ActualAPI managerAPI = (ActualAPI)api;
 		try {
-			applicationQuotaConfig = getQuotaFromAPIManager("00000000-0000-0000-0000-000000000001"); // Get the Application-Default-Quota
-			sytemQuotaConfig = getQuotaFromAPIManager("00000000-0000-0000-0000-000000000000"); // Get the System-Default-Quota
+			applicationQuotaConfig = getQuotaFromAPIManager(APPLICATION_DEFAULT_QUOTA); // Get the Application-Default-Quota
+			sytemQuotaConfig = getQuotaFromAPIManager(SYSTEM_API_QUOTA); // Get the System-Default-Quota
 			managerAPI.setApplicationQuota(getAPIQuota(applicationQuotaConfig, managerAPI.getId()));
 			managerAPI.setSystemQuota(getAPIQuota(sytemQuotaConfig, managerAPI.getId()));
 		} catch (AppException e) {
@@ -475,12 +540,16 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static APIQuota getQuotaFromAPIManager(String type) throws AppException {
+	private static APIQuota getQuotaFromAPIManager(String identifier) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
 		
 			try {
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+type).build();
+				if(identifier.equals(APPLICATION_DEFAULT_QUOTA) || identifier.equals(SYSTEM_API_QUOTA)) {
+					uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+identifier).build();
+				} else {
+					uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+identifier+"/quota/").build();
+				}
 				RestAPICall getRequest = new GETRequest(uri, null, true);
 				HttpResponse response = getRequest.execute();
 				int statusCode = response.getStatusLine().getStatusCode();
