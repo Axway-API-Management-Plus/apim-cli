@@ -89,8 +89,8 @@ public class APIManagerAdapter {
 	public static String CREDENTIAL_TYPE_EXT_CLIENTID	= "extclients";
 	public static String CREDENTIAL_TYPE_OAUTH			= "oauth";
 	
+	private final static String SYSTEM_API_QUOTA 				= "00000000-0000-0000-0000-000000000000";
 	private final static String APPLICATION_DEFAULT_QUOTA 		= "00000000-0000-0000-0000-000000000001";
-	private final static String SYSTEM_API_QUOTA 				= "00000000-0000-0000-0000-000000000001";
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
