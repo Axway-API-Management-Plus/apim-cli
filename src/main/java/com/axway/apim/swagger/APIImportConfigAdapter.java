@@ -163,8 +163,8 @@ public class APIImportConfigAdapter {
 		} else {
 			String desiredOrgId = APIManagerAdapter.getInstance().getOrgId(apiConfig.getOrganization(), true);
 			if(desiredOrgId==null) {
-				error.setError("Organization: '"+apiConfig.getOrganization()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION, false);
-				throw new AppException("Organization: '"+apiConfig.getOrganization()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
+				error.setError("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION, false);
+				throw new AppException("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
 			}
 			apiConfig.setOrgId(desiredOrgId);
 		}
