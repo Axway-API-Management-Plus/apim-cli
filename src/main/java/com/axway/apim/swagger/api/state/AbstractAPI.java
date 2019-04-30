@@ -21,9 +21,8 @@ import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APIDefintion;
+import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
@@ -440,6 +439,11 @@ public abstract class AbstractAPI {
 		this.applications = applications;
 	}
 	
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " [path=" + path + ", id (FE-API)=" + id + ", apiId (BE-API)=" + apiId + "]";
+	}
+
 	public int getAPIType() {
 		/*if(this.getAPIDefinition().getAPIDefinitionFile().endsWith("?wsdl")) {
 			return IAPIDefinition.WSDL_API;
