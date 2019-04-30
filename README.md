@@ -64,6 +64,8 @@ Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimana
   - Added support for WSDLs API-Definitions, API-Manager port now a parameter, validate Admin-Role user is used
 - 1.5.0 - 09.04.2019
   - Added support for Org-Admins and option to externalize parameters into environment properties
+- 1.5.1 - 30.04.2019
+  - Validate the given API-Organization & Now existing application quotas are preserved  
 
 
 ## Limitations/Caveats
