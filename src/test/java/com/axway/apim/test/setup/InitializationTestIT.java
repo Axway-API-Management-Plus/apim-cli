@@ -142,7 +142,7 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 			.header("Content-Type", "application/json")
 			.payload("{\"changePasswordOnFirstLogin\":\"false\"}");
 	
-		designer.http().client("apiManager").receive().response(HttpStatus.NO_CONTENT);
+		designer.http().client("apiManager").receive().response(HttpStatus.OK);
 	
 		designer.echo("####### Created a Org-Admin user: '${oadminUsername1}' ID: '${oadminUserId1}' #######");
 		
