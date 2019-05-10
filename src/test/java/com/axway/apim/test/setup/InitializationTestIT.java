@@ -138,7 +138,7 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 		// Needs to be turned off for integration tests
 		designer.http().client("apiManager")
 			.send()
-			.post("/config/")
+			.put("/config")
 			.header("Content-Type", "application/json")
 			.payload("{\"changePasswordOnFirstLogin\"=\"false\"}");
 	
