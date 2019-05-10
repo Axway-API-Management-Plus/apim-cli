@@ -9,7 +9,7 @@ services:
 
   apimgmt:
     # image: docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7
-    image: docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP2
+    image: ${DOCKER_IMAGE_TO_USE}
     ports:
       - 8075:8075   # API-Manager UI
       - 8065:8065   # API-Manager Traffic
