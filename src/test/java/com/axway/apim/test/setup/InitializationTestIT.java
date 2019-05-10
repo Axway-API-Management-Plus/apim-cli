@@ -140,7 +140,7 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 			.send()
 			.put("/config")
 			.header("Content-Type", "application/json")
-			.payload("{\"changePasswordOnFirstLogin\"=\"false\"}");
+			.payload("{\"changePasswordOnFirstLogin\":\"false\"}");
 	
 		designer.http().client("apiManager").receive().response(HttpStatus.NO_CONTENT);
 	
