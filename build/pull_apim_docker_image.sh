@@ -1,12 +1,12 @@
 #!/bin/sh
 
-if [ -f $CACHE_FILE_APIM_7_7 ]
+if [ -f $CACHE_FILE_TO_USE ]
 then
-	echo "Loading docker image: $APIM_DOCKER_IMAGE from $CACHE_FILE_APIM_7_7"
-	gunzip -c $CACHE_FILE_APIM_7_7 | docker load
+	echo "Loading docker image: $DOCKER_IMAGE_TO_USE from $CACHE_FILE_TO_USE"
+	gunzip -c $CACHE_FILE_TO_USE | docker load
 else 
 	echo "Pulling APIM docker from registry, this will take a while"
-	docker pull $APIM_DOCKER_IMAGE_7_7
+	docker pull $DOCKER_IMAGE_TO_USE
 fi
 
 
