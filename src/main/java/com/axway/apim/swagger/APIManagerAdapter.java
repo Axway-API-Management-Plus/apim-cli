@@ -242,6 +242,7 @@ public class APIManagerAdapter {
 		    GETRequest currentUserRequest = new GETRequest(uri, null, useAdminClient);
 		    response = currentUserRequest.execute();
 			String currentUser = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+			LOG.info("currentUser: '" + currentUser + "'");
 			User user = mapper.readValue(currentUser, User.class);
 			if(user == null) {
 				throw new AppException("Can't get current-user information on response: '" + currentUser + "'", 
