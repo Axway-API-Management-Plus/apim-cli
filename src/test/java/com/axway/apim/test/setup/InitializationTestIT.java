@@ -1,5 +1,6 @@
 package com.axway.apim.test.setup;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 
 import com.consol.citrus.actions.AbstractTestAction;
@@ -135,14 +136,10 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 		
 		designer.http().client("apiManager").receive().response(HttpStatus.NO_CONTENT);
 		
-		// Needs to be turned off for integration tests
-		designer.http().client("apiManager")
-			.send()
-			.put("/config")
-			.header("Content-Type", "application/json")
-			.payload("{\"changePasswordOnFirstLogin\":\"false\"}");
-	
-		designer.http().client("apiManager").receive().response(HttpStatus.OK);
+		// Adjusting the API-Manager config in preparation to run integration tests
+		designer.echo("Turn off changePasswordOnFirstLogin and passwordExpiryEnabled validation to run integration tests");
+		designer.http().client("apiManager").send().put("/config").header("Content-Type", "application/json")
+			.payload(new ClassPathResource("apimanager-config.json"));
 	
 		designer.echo("####### Created a Org-Admin user: '${oadminUsername1}' ID: '${oadminUserId1}' #######");
 		
