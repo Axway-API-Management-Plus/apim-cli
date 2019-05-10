@@ -134,6 +134,15 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 			.payload("newPassword=${oadminPassword1}");
 		
 		designer.http().client("apiManager").receive().response(HttpStatus.NO_CONTENT);
+		
+		// Needs to be turned off for integration tests
+		designer.http().client("apiManager")
+			.send()
+			.post("/config/")
+			.header("Content-Type", "application/json")
+			.payload("{\"changePasswordOnFirstLogin\"=\"false\"}");
+	
+		designer.http().client("apiManager").receive().response(HttpStatus.NO_CONTENT);
 	
 		designer.echo("####### Created a Org-Admin user: '${oadminUsername1}' ID: '${oadminUserId1}' #######");
 		
