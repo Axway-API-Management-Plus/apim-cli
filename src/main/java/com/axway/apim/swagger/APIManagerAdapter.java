@@ -242,6 +242,11 @@ public class APIManagerAdapter {
 		    GETRequest currentUserRequest = new GETRequest(uri, null, useAdminClient);
 		    response = currentUserRequest.execute();
 			String currentUser = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+			int statusCode = response.getStatusLine().getStatusCode();
+			if( statusCode != 200) {
+				throw new AppException("Status-Code: "+statusCode+", Can't get current-user information on response: '" + currentUser + "'", 
+						ErrorCode.API_MANAGER_COMMUNICATION);				
+			}
 			User user = mapper.readValue(currentUser, User.class);
 			if(user == null) {
 				throw new AppException("Can't get current-user information on response: '" + currentUser + "'", 
@@ -477,18 +482,18 @@ public class APIManagerAdapter {
 			LOG.info("Found existing application (in cache): '"+app.getName()+"' based on credential (Type: '"+type+"'): '"+credential+"'");
 			return app;
 		}
-		getAllApps(); // Make sure, we loaded all app before!
+		getAllApps(); // Make sure, we loaded all apps before!
 		LOG.debug("Searching credential (Type: "+type+"): '"+credential+"' in: " + allApps.size() + " apps.");
 		Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
 		for(ClientApplication app : allApps) {
-			if(appIds.contains(app.getId())) continue;
+			if(appIds.contains(app.getId())) continue; // Not sure, if this really makes sense. Need to check!
 			ObjectMapper mapper = new ObjectMapper();
 			String response = null;
 			URI uri;
 			try {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type+"").build();
 				LOG.debug("Loading credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
-				RestAPICall getRequest = new GETRequest(uri, null);
+				RestAPICall getRequest = new GETRequest(uri, null, true);
 				HttpResponse httpResponse = getRequest.execute();
 				response = EntityUtils.toString(httpResponse.getEntity());
 				LOG.trace("Response: " + response);
