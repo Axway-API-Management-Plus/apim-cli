@@ -25,7 +25,7 @@ public class AppSubscriptionUnpublishedTestIT extends TestNGCitrusTestDesigner {
 		variable("apiName", "App Subsc Unpublished API-${apiNumber}");
 		// ############## Creating Test-Application #################
 
-		createVariable("appName", "Consuming Test App ${orgNumber}");
+		createVariable("appName", "Unpublished Test App ${apiNumber}");
 		http().client("apiManager").send()
 			.post("/applications")
 			.header("Content-Type", "application/json")
@@ -40,7 +40,7 @@ public class AppSubscriptionUnpublishedTestIT extends TestNGCitrusTestDesigner {
 		
 		echo("####### Created Test-Application: '${testAppName}' with id: '${testAppId}' #######");
 		
-		createVariable("appName2", "Consuming Test App 2 ${orgNumber}");
+		createVariable("appName2", "Unpublished Test App 2 ${apiNumber}");
 		http().client("apiManager").send()
 			.post("/applications")
 			.header("Content-Type", "application/json")
