@@ -102,8 +102,13 @@ public class APIImportConfigAdapter {
 			baseConfig = mapper.readValue(new File(apiConfigFile), DesiredAPI.class);
 			ObjectReader updater = mapper.readerForUpdating(baseConfig);
 			if(getStageConfig(stage, apiConfigFile)!=null) {
-				LOG.info("Overriding configuration from: " + getStageConfig(stage, apiConfigFile));
-				apiConfig = updater.readValue(new File(getStageConfig(stage, apiConfigFile)));
+				try {
+					apiConfig = updater.readValue(new File(getStageConfig(stage, apiConfigFile)));
+					LOG.info("Loaded stage API-Config from file: " + getStageConfig(stage, apiConfigFile));
+				} catch (FileNotFoundException e) {
+					LOG.debug("No config file found for stage: '"+stage+"'");
+					apiConfig = baseConfig;
+				}
 			} else {
 				apiConfig = baseConfig;
 			}
