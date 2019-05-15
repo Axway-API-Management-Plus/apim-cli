@@ -30,7 +30,7 @@ public class ClientOrgModeAddTestIT extends TestNGCitrusTestDesigner {
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-1-org.json");
 		createVariable("state", "published");
-		createVariable("orgName", "${orgName2}"); // Initially this org get's access (simulate doing this in the UI(
+		createVariable("orgName", "${orgName2}"); // Initially this org get's access (simulate doing this in the UI)
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -69,7 +69,6 @@ public class ClientOrgModeAddTestIT extends TestNGCitrusTestDesigner {
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-1-org.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName3}"); // This time another org must be added, the existing permission must stay
-		createVariable("clientOrgsMode", "add");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

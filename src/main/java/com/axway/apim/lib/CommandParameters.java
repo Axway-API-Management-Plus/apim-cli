@@ -94,7 +94,7 @@ public class CommandParameters {
 	}
 	
 	public String getClientAppsMode() {
-		if(getValue("clientAppsMode")==null) return MODE_REPLACE;
+		if(getValue("clientAppsMode")==null) return MODE_ADD;
 		return getValue("clientAppsMode").toLowerCase();
 	}
 	
@@ -104,7 +104,7 @@ public class CommandParameters {
 	}
 	
 	public String getClientOrgsMode() {
-		if(getValue("clientOrgsMode")==null) return MODE_REPLACE;
+		if(getValue("clientOrgsMode")==null) return MODE_ADD;
 		return getValue("clientOrgsMode").toLowerCase();
 	}
 	

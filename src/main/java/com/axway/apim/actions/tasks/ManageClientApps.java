@@ -32,29 +32,47 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	private static String MODE_CREATE_API_ACCESS	= "MODE_CREATE_API_ACCESS";
 	private static String MODE_REMOVE_API_ACCESS	= "MODE_REMOVE_API_ACCESS";
 	
-	public ManageClientApps(IAPI desiredState, IAPI actualState) {
+	/**
+	 * In case, the API has been re-created, this is object contains the API how it was before
+	 */
+	IAPI oldAPI;
+	
+	public ManageClientApps(IAPI desiredState, IAPI actualState, IAPI oldAPI) {
 		super(desiredState, actualState);
+		this.oldAPI = oldAPI;
 	}
 	
 	public void execute() throws AppException {
-		if(desiredState.getApplications()==null) return;
+		if(desiredState.getApplications()==null && (oldAPI==null || !oldAPI.isValid())) return;
 		if(CommandParameters.getInstance().isIgnoreClientApps()) {
 			LOG.info("Configured client applications are ignored, as flag ignoreClientApps has been set.");
 			return;
 		}
-		ListIterator<ClientApplication> it = desiredState.getApplications().listIterator();
-		ClientApplication app;
-		while(it.hasNext()) {
-			app = it.next();
-			if(!hasClientAppPermission(app)) {
-				LOG.error("Organization of configured application: '" + app.getName() + "' has NO permission to this API. Ignoring this application.");
-				it.remove();
-				continue;
+		if(desiredState.getApplications()!=null) { // Happens, when config-file doesn't contains client apps
+			ListIterator<ClientApplication> it = desiredState.getApplications().listIterator();
+			ClientApplication app;
+			while(it.hasNext()) {
+				app = it.next();
+				if(!hasClientAppPermission(app)) {
+					LOG.error("Organization of configured application: '" + app.getName() + "' has NO permission to this API. Ignoring this application.");
+					it.remove();
+					continue;
+				}
 			}
+		}
+		List<ClientApplication> recreateActualApps = null;
+		// If the API has been re-created we have to re-create existing App-Subscriptions
+		if(oldAPI!=null && oldAPI.isValid() && CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_ADD)) {
+			recreateActualApps = getMissingApps(oldAPI.getApplications(), actualState.getApplications());
+			// Create previously existing App-Subscriptions
+			createAppSubscription(recreateActualApps, actualState.getId());
+			// Update the actual state 
+			actualState.setApplications(recreateActualApps);
 		}
 		List<ClientApplication> missingDesiredApps = getMissingApps(desiredState.getApplications(), actualState.getApplications());
 		List<ClientApplication> revomingActualApps = getMissingApps(actualState.getApplications(), desiredState.getApplications());
-		if(missingDesiredApps.size()==0) {
+
+		if(missingDesiredApps.size()==0 && desiredState.getApplications()!=null) {
 			LOG.info("All desired applications: "+desiredState.getApplications()+" have already a subscription. Nothing to do.");
 		} else {
 			createAppSubscription(missingDesiredApps, actualState.getId());
@@ -64,7 +82,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 				LOG.info("Removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName());
 				removeAppSubscrioption(revomingActualApps, actualState.getId());
 			} else {
-				LOG.debug("Removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName() + " as clientAppsMode NOT set to replace.");
+				LOG.debug("NOT removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName() + " as clientAppsMode NOT set to replace.");
 			}
 		}
 	}
@@ -150,6 +168,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	
 	private static List<ClientApplication> getMissingApps(List<ClientApplication> apps, List<ClientApplication> otherApps) throws AppException {
 		List<ClientApplication> missingApps = new ArrayList<ClientApplication>();
+		if(apps == null || otherApps == null) return missingApps;
 		for(ClientApplication app : apps) {
 			if(otherApps.contains(app)) {
 				continue;

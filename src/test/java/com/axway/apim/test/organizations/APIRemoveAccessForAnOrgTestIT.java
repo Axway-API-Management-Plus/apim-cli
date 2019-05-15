@@ -10,13 +10,13 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="APIRemoveAccessForAnOrgTestIT")
+@Test
 public class APIRemoveAccessForAnOrgTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
 	private ImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "APIRemoveAccessForAnOrgTestIT")
+	@CitrusTest
 	public void run() {
 		description("Import an API can grant access to a number of defined orgs");
 		
@@ -77,12 +77,13 @@ public class APIRemoveAccessForAnOrgTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.apiId=='${apiId}')].enabled", "true");
 		
 		
-		echo("####### The API should now be granted to only ONE organization - The other must be removed #######");
+		echo("####### Running with mode \"Replace\" - The API should now be granted to only ONE organization - The other must be removed #######");
 		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-1-org.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
+		createVariable("clientOrgsMode", "replace");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
