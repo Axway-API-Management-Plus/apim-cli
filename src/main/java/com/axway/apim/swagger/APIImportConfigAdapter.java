@@ -583,17 +583,22 @@ public class APIImportConfigAdapter {
 	}
 	
 	private IAPI addImageContent(IAPI importApi) throws AppException {
+		File file = null;
 		if(importApi.getImage()!=null) { // An image is declared
 			try {
-				String baseDir = new File(this.apiConfigFile).getParent();
-				File file = new File(baseDir + "/" + importApi.getImage().getFilename());
+				String baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
+				file = new File(baseDir + "/" + importApi.getImage().getFilename());
 				importApi.getImage().setBaseFilename(file.getName());
+				InputStream is = this.getClass().getResourceAsStream(importApi.getImage().getFilename());
 				if(file.exists()) { 
 					importApi.getImage().setImageContent(IOUtils.toByteArray(new FileInputStream(file)));
-				} else {
+					return importApi;
+				} else if(is!=null) {
 					// Try to read it from classpath
-					importApi.getImage().setImageContent(IOUtils.toByteArray(
-							this.getClass().getResourceAsStream(importApi.getImage().getFilename())));
+					importApi.getImage().setImageContent(IOUtils.toByteArray(is));
+					return importApi;
+				} else {
+					throw new AppException("Image not found in filesystem ('"+file+"') or Classpath.", ErrorCode.UNXPECTED_ERROR);
 				}
 			} catch (Exception e) {
 				throw new AppException("Can't read image-file: "+importApi.getImage().getFilename()+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
