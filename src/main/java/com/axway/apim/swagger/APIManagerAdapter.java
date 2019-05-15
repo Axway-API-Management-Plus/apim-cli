@@ -329,10 +329,6 @@ public class APIManagerAdapter {
 	
 	private void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
 		if(!hasAdminAccount) return;
-		if(desiredAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
-			LOG.info("Ignoring Client-Applications, as desired API-State is Unpublished!");
-			return;
-		}
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> allApps = getAllApps();
 		for(ClientApplication app : allApps) {

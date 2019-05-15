@@ -22,6 +22,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
+import com.axway.apim.swagger.api.state.ActualAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -37,7 +38,6 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	
 	public void execute() throws AppException {
 		if(desiredState.getApplications()==null) return;
-		if(desiredState.getState().equals(IAPI.STATE_UNPUBLISHED)) return;
 		if(CommandParameters.getInstance().isIgnoreClientApps()) {
 			LOG.info("Configured client applications are ignored, as flag ignoreClientApps has been set.");
 			return;
@@ -73,6 +73,8 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		String appsOrgId = app.getOrganizationId();
 		String appsOrgName = APIManagerAdapter.getInstance().getOrgName(appsOrgId);
 		if(appsOrgName==null) return false;
+		// If the App belongs to the same Org as the API, it automatically has permission (esp. for Unpublished APIs)
+		if(app.getOrganizationId().equals(((ActualAPI)actualState).getOrganizationId())) return true;
 		return actualState.getClientOrganizations().contains(appsOrgName);
 	}
 	
