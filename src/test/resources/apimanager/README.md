@@ -21,7 +21,7 @@ Perform the following steps:
     cd emt-containers-1.0.0-8
     ./build_base_image.py --installer=../APIGateway_x.x.x_xxx_Install_linux-x86-64_BNxxxxxx.run --os=centos7
     ./gen_domain_cert.py --default-cert
-    ./build_gw_image.py --license=multiple.lic --default-cert --fed=$HOME/apimanager-swagger-promote/src/test/resources/apimanager/swagger-promote.fed --merge-dir $HOME/apimanager-swagger-promote/src/test/resources/apimanager/merge-dir/apigateway --out-image=api-gw-mgr:7.6.2-SP2
+    ./build_gw_image.py --license=multiple.lic --default-cert --fed=$HOME/apimanager-swagger-promote/src/test/resources/apimanager/swagger-promote-7.6.2.fed --merge-dir $HOME/apimanager-swagger-promote/src/test/resources/apimanager/merge-dir/apigateway --out-image=api-gw-mgr:7.6.2-SP3
     docker images
     docker tag api-gw-mgr:7.6.2-SP2 docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP2
     docker login docker-registry.demo.axway.com
@@ -34,6 +34,8 @@ To enable the image, please adjust the image referred in the Travis-CI configura
 ```
 edit .travis.yml
 and change:
-- APIM_DOCKER_IMAGE=docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP2
+Add/register your new Docker-Image and reference it in the following environment variables:
+- DOCKER_IMAGE_TO_USE=$APIM_DOCKER_IMAGE_7_6_2
+- CACHE_FILE_TO_USE=$CACHE_FILE_APIM_7_6_2
 ```
 After checkin & commit a Travis-CI build is started using the provided Docker-Image.
