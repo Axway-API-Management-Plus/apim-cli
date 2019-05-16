@@ -33,7 +33,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 
 	public void execute() throws AppException {
 		Transaction context = Transaction.getInstance();
-		if(desiredState.getApplicationQuota()==null || desiredState.getSystemQuota()==null) return;
+		if(desiredState.getApplicationQuota()==null && desiredState.getSystemQuota()==null) return;
 		if(CommandParameters.getInstance().isIgnoreQuotas()) {
 			LOG.info("Configured quotas will be ignored, as flag ignoreQuotas has been set.");
 			return;
