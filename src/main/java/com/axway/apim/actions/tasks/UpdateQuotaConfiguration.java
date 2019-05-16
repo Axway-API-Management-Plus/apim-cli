@@ -60,7 +60,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 				LOG.info("Default-Application-Quota for API: '"+desiredState.getName()+"' is UN-CHANGED. Nothing to do.");
 			} else {
 				LOG.info("Updating Application-Default-Quota for API: " + desiredState.getName());
-				LOG.debug("System-Quota-Config: '" + desiredState.getSystemQuota()+"'");
+				LOG.debug("Application-Quota-Config: '" + desiredState.getSystemQuota()+"'");
 				APIQuota applicationQuota = APIManagerAdapter.applicationQuotaConfig;
 				for(QuotaRestriction restriction : desiredState.getApplicationQuota().getRestrictions()) {
 					restriction.setApi(actualState.getId());
