@@ -37,6 +37,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
+import com.axway.apim.lib.URLParser;
 import com.axway.apim.lib.Utils;
 import com.axway.apim.swagger.api.properties.APIDefintion;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
@@ -484,19 +485,10 @@ public class APIImportConfigAdapter {
 	}
 	
 	private InputStream getAPIDefinitionFromURL(String urlToAPIDefinition) throws AppException {
-		String uri = null;
-		String username = null;
-		String password = null;
-		String[] temp = urlToAPIDefinition.split("@");
-		if(temp.length==1) {
-			uri = temp[0];
-		} else if(temp.length==2) {
-			username = temp[0].substring(0, temp[0].indexOf("/"));
-			password = temp[0].substring(temp[0].indexOf("/")+1);
-			uri = temp[1];
-		} else {
-			throw new AppException("API-Definition URL has an invalid format. ", ErrorCode.CANT_READ_API_DEFINITION_FILE);
-		}
+		URLParser url = new URLParser(urlToAPIDefinition);
+		String uri = url.getUri();
+		String username = url.getUsername();
+		String password = url.getPassword();
 		CloseableHttpClient httpclient = null;
 		try {
 			LOG.info("Loading API-Definition from: " + uri);
