@@ -491,14 +491,15 @@ public class APIImportConfigAdapter {
 		String password = url.getPassword();
 		CloseableHttpClient httpclient = null;
 		try {
-			LOG.info("Loading API-Definition from: " + uri);
 			if(username!=null) {
+				LOG.info("Loading API-Definition from: " + uri + " ("+username+")");
 				CredentialsProvider credsProvider = new BasicCredentialsProvider();
 				credsProvider.setCredentials(
 		                new AuthScope(AuthScope.ANY),
 		                new UsernamePasswordCredentials(username, password));
 				httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
 			} else {
+				LOG.info("Loading API-Definition from: " + uri);
 				httpclient = HttpClients.createDefault();
 			}
 			HttpGet httpGet = new HttpGet(uri);
