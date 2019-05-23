@@ -23,9 +23,9 @@ Perform the following steps:
     ./gen_domain_cert.py --default-cert
     ./build_gw_image.py --license=multiple.lic --default-cert --fed=$HOME/apimanager-swagger-promote/src/test/resources/apimanager/swagger-promote-7.6.2.fed --merge-dir $HOME/apimanager-swagger-promote/src/test/resources/apimanager/merge-dir/apigateway --out-image=api-gw-mgr:7.6.2-SP3
     docker images
-    docker tag api-gw-mgr:7.6.2-SP2 docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP2
+    docker tag api-gw-mgr:7.6.2-SP3 docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP3
     docker login docker-registry.demo.axway.com
-    docker push docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP2
+    docker push docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP3
 ```
 
 Please note, that you need Write-Permissions to the Docker-Repository to push the image!
