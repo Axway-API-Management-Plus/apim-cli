@@ -203,13 +203,7 @@ public class APIManagerAdapter {
 			if(statusCode == 403 || statusCode == 401){
 				LOG.error("Login failed: " +statusCode+ ", Response: " + response);
 				throw new AppException("Given user: '"+username+"' can't login.", ErrorCode.API_MANAGER_COMMUNICATION);
-			}
-			for (Header header : response.getAllHeaders()) {
-				if(header.getName().equals("CSRF-Token")) {
-					client.setCsrfToken(header.getValue());
-					break;
-				}
-			}
+			} 
 			User user = getCurrentUser(useAdminClient);
 			if(user.getRole().equals("admin")) {
 				this.hasAdminAccount = true;
@@ -241,6 +235,7 @@ public class APIManagerAdapter {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/currentuser").build();
 		    GETRequest currentUserRequest = new GETRequest(uri, null, useAdminClient);
 		    response = currentUserRequest.execute();
+		    getCsrfToken(response, useAdminClient); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
 			String currentUser = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 			int statusCode = response.getStatusLine().getStatusCode();
 			if( statusCode != 200) {
@@ -257,6 +252,15 @@ public class APIManagerAdapter {
 		} catch (Exception e) {
 			throw new AppException("Can't get current-user information on response: '" + jsonResponse + "'", 
 					ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	private static void getCsrfToken(HttpResponse response, boolean useAdminClient) throws AppException {
+		for (Header header : response.getAllHeaders()) {
+			if(header.getName().equals("CSRF-Token")) {
+				APIMHttpClient.getInstance(useAdminClient).setCsrfToken(header.getValue());
+				break;
+			}
 		}
 	}
 	
@@ -329,10 +333,6 @@ public class APIManagerAdapter {
 	
 	private void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
 		if(!hasAdminAccount) return;
-		if(desiredAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
-			LOG.info("Ignoring Client-Applications, as desired API-State is Unpublished!");
-			return;
-		}
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> allApps = getAllApps();
 		for(ClientApplication app : allApps) {

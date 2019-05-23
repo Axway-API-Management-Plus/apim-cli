@@ -98,11 +98,11 @@ public class App {
 			option.setArgName("true/[false]");
 			options.addOption(option);
 			
-			option = new Option("clientOrgsMode", true, "Controls how configured Client-Organizations are treated. Defaults to replace!");
+			option = new Option("clientOrgsMode", true, "Controls how configured Client-Organizations are treated. Defaults to add!");
 			option.setArgName("ignore|replace|add");
 			options.addOption(option);
 			
-			option = new Option("clientAppsMode", true, "Controls how configured Client-Applications are treated. Defaults to replace!");
+			option = new Option("clientAppsMode", true, "Controls how configured Client-Applications are treated. Defaults to add!");
 			option.setArgName("ignore|replace|add");
 			options.addOption(option);	
 			

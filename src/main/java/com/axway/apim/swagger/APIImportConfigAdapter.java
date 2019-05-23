@@ -37,6 +37,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
+import com.axway.apim.lib.URLParser;
 import com.axway.apim.lib.Utils;
 import com.axway.apim.swagger.api.properties.APIDefintion;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
@@ -102,8 +103,13 @@ public class APIImportConfigAdapter {
 			baseConfig = mapper.readValue(new File(apiConfigFile), DesiredAPI.class);
 			ObjectReader updater = mapper.readerForUpdating(baseConfig);
 			if(getStageConfig(stage, apiConfigFile)!=null) {
-				LOG.info("Overriding configuration from: " + getStageConfig(stage, apiConfigFile));
-				apiConfig = updater.readValue(new File(getStageConfig(stage, apiConfigFile)));
+				try {
+					apiConfig = updater.readValue(new File(getStageConfig(stage, apiConfigFile)));
+					LOG.info("Loaded stage API-Config from file: " + getStageConfig(stage, apiConfigFile));
+				} catch (FileNotFoundException e) {
+					LOG.debug("No config file found for stage: '"+stage+"'");
+					apiConfig = baseConfig;
+				}
 			} else {
 				apiConfig = baseConfig;
 			}
@@ -479,29 +485,21 @@ public class APIImportConfigAdapter {
 	}
 	
 	private InputStream getAPIDefinitionFromURL(String urlToAPIDefinition) throws AppException {
-		String uri = null;
-		String username = null;
-		String password = null;
-		String[] temp = urlToAPIDefinition.split("@");
-		if(temp.length==1) {
-			uri = temp[0];
-		} else if(temp.length==2) {
-			username = temp[0].substring(0, temp[0].indexOf("/"));
-			password = temp[0].substring(temp[0].indexOf("/")+1);
-			uri = temp[1];
-		} else {
-			throw new AppException("API-Definition URL has an invalid format. ", ErrorCode.CANT_READ_API_DEFINITION_FILE);
-		}
+		URLParser url = new URLParser(urlToAPIDefinition);
+		String uri = url.getUri();
+		String username = url.getUsername();
+		String password = url.getPassword();
 		CloseableHttpClient httpclient = null;
 		try {
-			LOG.info("Loading API-Definition from: " + uri);
 			if(username!=null) {
+				LOG.info("Loading API-Definition from: " + uri + " ("+username+")");
 				CredentialsProvider credsProvider = new BasicCredentialsProvider();
 				credsProvider.setCredentials(
 		                new AuthScope(AuthScope.ANY),
 		                new UsernamePasswordCredentials(username, password));
 				httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
 			} else {
+				LOG.info("Loading API-Definition from: " + uri);
 				httpclient = HttpClients.createDefault();
 			}
 			HttpGet httpGet = new HttpGet(uri);
@@ -583,17 +581,22 @@ public class APIImportConfigAdapter {
 	}
 	
 	private IAPI addImageContent(IAPI importApi) throws AppException {
+		File file = null;
 		if(importApi.getImage()!=null) { // An image is declared
 			try {
-				String baseDir = new File(this.apiConfigFile).getParent();
-				File file = new File(baseDir + "/" + importApi.getImage().getFilename());
+				String baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
+				file = new File(baseDir + "/" + importApi.getImage().getFilename());
 				importApi.getImage().setBaseFilename(file.getName());
+				InputStream is = this.getClass().getResourceAsStream(importApi.getImage().getFilename());
 				if(file.exists()) { 
 					importApi.getImage().setImageContent(IOUtils.toByteArray(new FileInputStream(file)));
-				} else {
+					return importApi;
+				} else if(is!=null) {
 					// Try to read it from classpath
-					importApi.getImage().setImageContent(IOUtils.toByteArray(
-							this.getClass().getResourceAsStream(importApi.getImage().getFilename())));
+					importApi.getImage().setImageContent(IOUtils.toByteArray(is));
+					return importApi;
+				} else {
+					throw new AppException("Image not found in filesystem ('"+file+"') or Classpath.", ErrorCode.UNXPECTED_ERROR);
 				}
 			} catch (Exception e) {
 				throw new AppException("Can't read image-file: "+importApi.getImage().getFilename()+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
