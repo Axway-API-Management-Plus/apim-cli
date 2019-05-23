@@ -606,7 +606,7 @@ public class APIManagerAdapter {
 		URI uri;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies").build();
-			RestAPICall getRequest = new GETRequest(uri, null, true);
+			RestAPICall getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
 			
 			JsonNode jsonResponse;
