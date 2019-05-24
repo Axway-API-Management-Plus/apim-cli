@@ -68,6 +68,7 @@ public class APIManagerAdapter {
 	private static APIManagerAdapter instance;
 	
 	private static String apiManagerVersion = null;
+	private static String apiManagerConfig = null;
 	
 	private static List<Organization> allOrgs = null;
 	private static List<ClientApplication> allApps = null;
@@ -101,6 +102,7 @@ public class APIManagerAdapter {
 	
 	public static synchronized void deleteInstance() throws AppException {
 			APIManagerAdapter.instance = null;
+			APIManagerAdapter.apiManagerConfig = null;
 	}
 	
 	private APIManagerAdapter() throws AppException {
@@ -667,32 +669,38 @@ public class APIManagerAdapter {
 		}
 	}
 	
+	public static String getApiManagerVersion() throws AppException {
+		if(APIManagerAdapter.apiManagerVersion!=null) {
+			return apiManagerVersion;
+		}
+		APIManagerAdapter.apiManagerVersion = getApiManagerConfig("productVersion");
+		LOG.info("API-Manager version is: " + apiManagerVersion);
+		return APIManagerAdapter.apiManagerVersion;
+	}
+	
 	/**
 	 * Lazy helper method to get the actual API-Manager version. This is used to toggle on/off some 
 	 * of the features (such as API-Custom-Properties)
 	 * @return the API-Manager version as returned from the API-Manager REST-API /config endpoint
 	 * @throws AppException is something goes wrong.
 	 */
-	public static String getApiManagerVersion() throws AppException {
-		if(APIManagerAdapter.apiManagerVersion!=null) {
-			return apiManagerVersion;
-		}
+	public static String getApiManagerConfig(String configField) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
-		String response = null;
 		URI uri;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
-			HttpResponse httpResponse = getRequest.execute();
-			response = EntityUtils.toString(httpResponse.getEntity());
+			if(apiManagerConfig==null) {
+				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
+				RestAPICall getRequest = new GETRequest(uri, null, true);
+				HttpResponse httpResponse = getRequest.execute();
+				apiManagerConfig = EntityUtils.toString(httpResponse.getEntity());
+			}
 			JsonNode jsonResponse;
-			jsonResponse = mapper.readTree(response);
-			String apiManagerVersion = jsonResponse.get("productVersion").asText();
-			LOG.debug("API-Manager version is: " + apiManagerVersion);
-			return jsonResponse.get("productVersion").asText();
+			jsonResponse = mapper.readTree(apiManagerConfig);
+			String retrievedConfigField = jsonResponse.get(configField).asText();
+			return retrievedConfigField;
 		} catch (Exception e) {
-			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + response);
-			throw new AppException("Can't get version from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + apiManagerConfig);
+			throw new AppException("Can't get "+configField+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	

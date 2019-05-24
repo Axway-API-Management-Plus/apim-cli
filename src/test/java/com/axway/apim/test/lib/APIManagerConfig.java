@@ -1,21 +1,27 @@
 package com.axway.apim.test.lib;
 
+import java.io.IOException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class APIManagerConfig {
 	
-	public static String enableQueryBasedRouting(String managerConfig, String versionParameter) {
+	private static ObjectMapper mapper = new ObjectMapper();
+	
+	public static String enableQueryBasedRouting(String managerConfig, String versionParameter) throws IOException {
 		// "apiRoutingKeyLocation": null, --> This is what we have
 		// "apiRoutingKeyLocation":"query|ver", --> This is what we need
-		String updatedConfig;
-		updatedConfig = managerConfig.replaceAll("\"apiRoutingKeyLocation\":.*,", "\"apiRoutingKeyLocation\": \"query|"+versionParameter+"\",");
-		updatedConfig = updatedConfig.replaceAll("\"apiRoutingKeyEnabled\":.*}", "\"apiRoutingKeyEnabled\":true}");
-		return updatedConfig;
+		JsonNode config = mapper.readTree(managerConfig);
+		((ObjectNode) config).put("apiRoutingKeyEnabled", true);
+		((ObjectNode) config).put("apiRoutingKeyLocation", "query|"+versionParameter);
+		return mapper.writeValueAsString(config);
 	}
 	
-	public static String disableQueryBasedRouting(String managerConfig) {
-		// "apiRoutingKeyLocation": null, --> This is what we have
-		// "apiRoutingKeyLocation":"query|ver", --> This is what we need
-		String updatedConfig;
-		updatedConfig = managerConfig.replaceAll("\"apiRoutingKeyEnabled\":.*}", "\"apiRoutingKeyEnabled\":false}");
-		return updatedConfig;
+	public static String disableQueryBasedRouting(String managerConfig) throws IOException {
+		JsonNode config = mapper.readTree(managerConfig);
+		((ObjectNode) config).put("apiRoutingKeyEnabled", false);
+		return mapper.writeValueAsString(config);
 	}
 }

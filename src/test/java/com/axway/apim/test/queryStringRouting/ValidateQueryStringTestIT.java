@@ -1,10 +1,15 @@
 package com.axway.apim.test.queryStringRouting;
 
+import java.io.IOException;
+
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
 import com.axway.apim.test.lib.APIManagerConfig;
 import com.consol.citrus.annotations.CitrusResource;
@@ -21,7 +26,7 @@ public class ValidateQueryStringTestIT extends TestNGCitrusTestRunner {
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) {
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		swaggerImport = new ImportTestAction();
 		description("Validate query string routing can be controlled and works as expected.");
 		
@@ -35,6 +40,7 @@ public class ValidateQueryStringTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").send().get("/config").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON).extractFromPayload("$", "managerConfig"));
 		variable("updatedConfig", APIManagerConfig.enableQueryBasedRouting(context.getVariable("managerConfig"), "abc"));
+		echo("updatedConfig: ${updatedConfig}");
 		http(builder -> builder.client("apiManager").send().put("/config").header("Content-Type", "application/json")
 				.payload("${updatedConfig}"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON));
@@ -84,5 +90,34 @@ public class ValidateQueryStringTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").send().put("/config").header("Content-Type", "application/json")
 				.payload("${updatedConfig}"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON));
+		
+		APIManagerAdapter.deleteInstance();
+		
+		echo("####### Try to register an API with Query-String, but API-Manager has this option disabled #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/queryStringRouting/api_with_query_string.json");
+		createVariable("apiPath", "/query-string-api-fail-${apiNumber}");
+		createVariable("apiName", "Query-String-API-Fail-${apiNumber}");
+		createVariable("state", "unpublished");
+		createVariable("apiRoutingKey", "routeKeyC");
+		createVariable("expectedReturnCode", "53"); // Must fail!
+		swaggerImport.doExecute(context);
+		
+		echo("####### Try to register an API with Query-String (using OrgAdminOnly) - Leads to a Warning-Message #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/queryStringRouting/api_with_query_string.json");
+		createVariable("apiPath", "/query-string-api-oadmin-${apiNumber}");
+		createVariable("apiName", "Query-String-API-OAdmin-${apiNumber}");
+		createVariable("state", "unpublished");
+		createVariable("ignoreAdminAccount", "true"); // This tests simulate to use only an Org-Admin-Account
+		createVariable("apiRoutingKey", "routeKeyD");
+		createVariable("expectedReturnCode", "0");
+		swaggerImport.doExecute(context);
+		
+		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+				.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
+				.validate("$.[?(@.path=='${apiPath}')].apiRoutingKey", "${apiRoutingKey}"));
 	}
 }
