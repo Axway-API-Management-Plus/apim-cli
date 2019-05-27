@@ -601,8 +601,11 @@ public class APIImportConfigAdapter {
 		File file = null;
 		if(importApi.getImage()!=null) { // An image is declared
 			try {
-				String baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
-				file = new File(baseDir + "/" + importApi.getImage().getFilename());
+				file = new File(importApi.getImage().getFilename());
+				if(!file.exists()) { // The image isn't provided with an absolute path, try to read it relativ to the config file
+					String baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
+					file = new File(baseDir + "/" + importApi.getImage().getFilename());					
+				}
 				importApi.getImage().setBaseFilename(file.getName());
 				InputStream is = this.getClass().getResourceAsStream(importApi.getImage().getFilename());
 				if(file.exists()) { 
