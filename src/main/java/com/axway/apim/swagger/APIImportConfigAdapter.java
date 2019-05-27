@@ -150,6 +150,7 @@ public class APIImportConfigAdapter {
 			validateDescription(apiConfig);
 			validateCorsConfig(apiConfig);
 			validateOutboundAuthN(apiConfig);
+			validateHasQueryStringKey(apiConfig);
 			completeCaCerts(apiConfig);
 			addQuotaConfiguration(apiConfig);
 			handleAllOrganizations(apiConfig);
@@ -579,6 +580,22 @@ public class APIImportConfigAdapter {
 		}
 		
 	}
+	
+	private void validateHasQueryStringKey(IAPI importApi) throws AppException {
+		if(APIManagerAdapter.getInstance().hasAdminAccount()) {
+			String apiRoutingKeyEnabled = APIManagerAdapter.getApiManagerConfig("apiRoutingKeyEnabled");
+			if(apiRoutingKeyEnabled.equals("true")) {
+				if(importApi.getApiRoutingKey()==null) {
+					ErrorState.getInstance().setError("API-Manager configured for Query-String option, but API doesn' declare it.", ErrorCode.API_CONFIG_REQUIRES_QUERY_STRING, false);
+					throw new AppException("API-Manager configured for Query-String option, but API doesn' declare it.", ErrorCode.API_CONFIG_REQUIRES_QUERY_STRING);
+				}
+			}
+		} else {
+			LOG.debug("Can't check if QueryString for API is needed without Admin-Account.");
+		}
+	}
+	
+	
 	
 	private IAPI addImageContent(IAPI importApi) throws AppException {
 		File file = null;

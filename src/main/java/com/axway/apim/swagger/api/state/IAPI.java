@@ -108,4 +108,6 @@ public interface IAPI {
 	public Map<String, ServiceProfile> getServiceProfiles();
 
 	String getApiDefinitionImport();
+	
+	public String getApiRoutingKey();
 }

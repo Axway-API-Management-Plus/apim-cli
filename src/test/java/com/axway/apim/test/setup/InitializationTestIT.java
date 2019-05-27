@@ -139,7 +139,7 @@ public class InitializationTestIT extends TestDesignerBeforeSuiteSupport {
 		// Adjusting the API-Manager config in preparation to run integration tests
 		designer.echo("Turn off changePasswordOnFirstLogin and passwordExpiryEnabled validation to run integration tests");
 		designer.http().client("apiManager").send().put("/config").header("Content-Type", "application/json")
-			.payload(new ClassPathResource("apimanager-config.json"));
+			.payload(new ClassPathResource("/apimanager/configs/apimanager-config.json"));
 	
 		designer.echo("####### Created a Org-Admin user: '${oadminUsername1}' ID: '${oadminUserId1}' #######");
 		
