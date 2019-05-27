@@ -68,6 +68,7 @@ public class APIManagerAdapter {
 	private static APIManagerAdapter instance;
 	
 	private static String apiManagerVersion = null;
+	private static String apiManagerConfig = null;
 	
 	private static List<Organization> allOrgs = null;
 	private static List<ClientApplication> allApps = null;
@@ -101,6 +102,7 @@ public class APIManagerAdapter {
 	
 	public static synchronized void deleteInstance() throws AppException {
 			APIManagerAdapter.instance = null;
+			APIManagerAdapter.apiManagerConfig = null;
 	}
 	
 	private APIManagerAdapter() throws AppException {
@@ -154,7 +156,7 @@ public class APIManagerAdapter {
 				return;
 			} else { // We have changes, that require a re-creation of the API
 				LOG.info("Strategy: Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
-						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for PUBLISHED API. Recreating it!");
+						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase()+" API. Recreating it!");
 				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
 				recreate.execute(changeState);
 				return;
@@ -203,13 +205,7 @@ public class APIManagerAdapter {
 			if(statusCode == 403 || statusCode == 401){
 				LOG.error("Login failed: " +statusCode+ ", Response: " + response);
 				throw new AppException("Given user: '"+username+"' can't login.", ErrorCode.API_MANAGER_COMMUNICATION);
-			}
-			for (Header header : response.getAllHeaders()) {
-				if(header.getName().equals("CSRF-Token")) {
-					client.setCsrfToken(header.getValue());
-					break;
-				}
-			}
+			} 
 			User user = getCurrentUser(useAdminClient);
 			if(user.getRole().equals("admin")) {
 				this.hasAdminAccount = true;
@@ -241,7 +237,13 @@ public class APIManagerAdapter {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/currentuser").build();
 		    GETRequest currentUserRequest = new GETRequest(uri, null, useAdminClient);
 		    response = currentUserRequest.execute();
+		    getCsrfToken(response, useAdminClient); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
 			String currentUser = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+			int statusCode = response.getStatusLine().getStatusCode();
+			if( statusCode != 200) {
+				throw new AppException("Status-Code: "+statusCode+", Can't get current-user information on response: '" + currentUser + "'", 
+						ErrorCode.API_MANAGER_COMMUNICATION);				
+			}
 			User user = mapper.readValue(currentUser, User.class);
 			if(user == null) {
 				throw new AppException("Can't get current-user information on response: '" + currentUser + "'", 
@@ -252,6 +254,15 @@ public class APIManagerAdapter {
 		} catch (Exception e) {
 			throw new AppException("Can't get current-user information on response: '" + jsonResponse + "'", 
 					ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	private static void getCsrfToken(HttpResponse response, boolean useAdminClient) throws AppException {
+		for (Header header : response.getAllHeaders()) {
+			if(header.getName().equals("CSRF-Token")) {
+				APIMHttpClient.getInstance(useAdminClient).setCsrfToken(header.getValue());
+				break;
+			}
 		}
 	}
 	
@@ -324,10 +335,6 @@ public class APIManagerAdapter {
 	
 	private void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
 		if(!hasAdminAccount) return;
-		if(desiredAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
-			LOG.info("Ignoring Client-Applications, as desired API-State is Unpublished!");
-			return;
-		}
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> allApps = getAllApps();
 		for(ClientApplication app : allApps) {
@@ -477,18 +484,18 @@ public class APIManagerAdapter {
 			LOG.info("Found existing application (in cache): '"+app.getName()+"' based on credential (Type: '"+type+"'): '"+credential+"'");
 			return app;
 		}
-		getAllApps(); // Make sure, we loaded all app before!
+		getAllApps(); // Make sure, we loaded all apps before!
 		LOG.debug("Searching credential (Type: "+type+"): '"+credential+"' in: " + allApps.size() + " apps.");
 		Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
 		for(ClientApplication app : allApps) {
-			if(appIds.contains(app.getId())) continue;
+			if(appIds.contains(app.getId())) continue; // Not sure, if this really makes sense. Need to check!
 			ObjectMapper mapper = new ObjectMapper();
 			String response = null;
 			URI uri;
 			try {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type+"").build();
 				LOG.debug("Loading credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
-				RestAPICall getRequest = new GETRequest(uri, null);
+				RestAPICall getRequest = new GETRequest(uri, null, true);
 				HttpResponse httpResponse = getRequest.execute();
 				response = EntityUtils.toString(httpResponse.getEntity());
 				LOG.trace("Response: " + response);
@@ -662,32 +669,38 @@ public class APIManagerAdapter {
 		}
 	}
 	
+	public static String getApiManagerVersion() throws AppException {
+		if(APIManagerAdapter.apiManagerVersion!=null) {
+			return apiManagerVersion;
+		}
+		APIManagerAdapter.apiManagerVersion = getApiManagerConfig("productVersion");
+		LOG.info("API-Manager version is: " + apiManagerVersion);
+		return APIManagerAdapter.apiManagerVersion;
+	}
+	
 	/**
 	 * Lazy helper method to get the actual API-Manager version. This is used to toggle on/off some 
 	 * of the features (such as API-Custom-Properties)
 	 * @return the API-Manager version as returned from the API-Manager REST-API /config endpoint
 	 * @throws AppException is something goes wrong.
 	 */
-	public static String getApiManagerVersion() throws AppException {
-		if(APIManagerAdapter.apiManagerVersion!=null) {
-			return apiManagerVersion;
-		}
+	public static String getApiManagerConfig(String configField) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
-		String response = null;
 		URI uri;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
-			HttpResponse httpResponse = getRequest.execute();
-			response = EntityUtils.toString(httpResponse.getEntity());
+			if(apiManagerConfig==null) {
+				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
+				RestAPICall getRequest = new GETRequest(uri, null, true);
+				HttpResponse httpResponse = getRequest.execute();
+				apiManagerConfig = EntityUtils.toString(httpResponse.getEntity());
+			}
 			JsonNode jsonResponse;
-			jsonResponse = mapper.readTree(response);
-			String apiManagerVersion = jsonResponse.get("productVersion").asText();
-			LOG.debug("API-Manager version is: " + apiManagerVersion);
-			return jsonResponse.get("productVersion").asText();
+			jsonResponse = mapper.readTree(apiManagerConfig);
+			String retrievedConfigField = jsonResponse.get(configField).asText();
+			return retrievedConfigField;
 		} catch (Exception e) {
-			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + response);
-			throw new AppException("Can't get version from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + apiManagerConfig);
+			throw new AppException("Can't get "+configField+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	

@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.management.RuntimeErrorException;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -60,8 +58,8 @@ public class ImportTestAction extends AbstractTestAction {
 		String enforce = "false";
 		String ignoreQuotas = "false";
 		String ignoreAdminAccount = "false";
-		String clientOrgsMode = CommandParameters.MODE_REPLACE;
-		String clientAppsMode = CommandParameters.MODE_REPLACE;;
+		String clientOrgsMode = CommandParameters.MODE_ADD;
+		String clientAppsMode = CommandParameters.MODE_ADD;;
 		
 		try {
 			enforce = context.getVariable("enforce");

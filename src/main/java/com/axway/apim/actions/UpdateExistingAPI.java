@@ -52,7 +52,7 @@ public class UpdateExistingAPI {
 		new UpdateQuotaConfiguration(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		// Handle subscription to applications
-		new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+		new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI(), null).execute();
 	}
 
 }
