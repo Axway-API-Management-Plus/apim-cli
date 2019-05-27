@@ -8,7 +8,6 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
 import com.axway.apim.test.lib.APIManagerConfig;
@@ -46,11 +45,19 @@ public class ValidateQueryStringTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON));
 		
 		// Running tests with Query-Based Routing enabled
-		// queryStringRouting.api_with_query_string.json
+		// Replication must fail, is Query-String option is enabled, but API-Manager hasn't configured it 
+		echo("####### API-Config without queryString option - Must fail #######");		
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
+		createVariable("status", "unpublished");
+		createVariable("expectedReturnCode", "54"); // Must fail!
+		swaggerImport.doExecute(context);		
+		
 		echo("####### Register an API with query string enabled #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/queryStringRouting/api_with_query_string.json");
 		createVariable("state", "unpublished");
+		createVariable("expectedReturnCode", "0");
 		createVariable("apiRoutingKey", "routeKeyA");
 		swaggerImport.doExecute(context);
 		
