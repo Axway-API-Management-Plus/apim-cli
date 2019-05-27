@@ -156,7 +156,7 @@ public class APIManagerAdapter {
 				return;
 			} else { // We have changes, that require a re-creation of the API
 				LOG.info("Strategy: Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
-						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for PUBLISHED API. Recreating it!");
+						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase()+" API. Recreating it!");
 				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
 				recreate.execute(changeState);
 				return;
