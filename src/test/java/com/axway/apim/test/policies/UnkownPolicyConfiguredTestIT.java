@@ -19,8 +19,8 @@ public class UnkownPolicyConfiguredTestIT extends TestNGCitrusTestDesigner {
 		description("A dedicated return-code is expected, when an unknown policy is configured.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/api-key-test-${apiNumber}");
-		variable("apiName", "API Key Test ${apiNumber}");
+		variable("apiPath", "/unknown-policy-test-${apiNumber}");
+		variable("apiName", "Unknown Policy Test ${apiNumber}");
 		variable("status", "unpublished");
 		
 
