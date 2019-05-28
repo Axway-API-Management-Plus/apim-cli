@@ -604,14 +604,16 @@ public class APIImportConfigAdapter {
 				file = new File(importApi.getImage().getFilename());
 				if(!file.exists()) { // The image isn't provided with an absolute path, try to read it relativ to the config file
 					String baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
-					file = new File(baseDir + "/" + importApi.getImage().getFilename());					
+					file = new File(baseDir + "/" + importApi.getImage().getFilename());
 				}
 				importApi.getImage().setBaseFilename(file.getName());
 				InputStream is = this.getClass().getResourceAsStream(importApi.getImage().getFilename());
-				if(file.exists()) { 
+				if(file.exists()) {
+					LOG.debug("Loading image from: '"+file.getCanonicalFile()+"'");
 					importApi.getImage().setImageContent(IOUtils.toByteArray(new FileInputStream(file)));
 					return importApi;
 				} else if(is!=null) {
+					LOG.debug("Trying to load image from classpath");
 					// Try to read it from classpath
 					importApi.getImage().setImageContent(IOUtils.toByteArray(is));
 					return importApi;
