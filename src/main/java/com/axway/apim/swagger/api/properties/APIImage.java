@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import com.axway.apim.lib.ImageComparision;
+
 public class APIImage {
 
 	private byte[] imageContent = null;
@@ -30,7 +32,13 @@ public class APIImage {
 		if(other == null) return false;
 		if(other instanceof APIImage) {
 			APIImage otherImage = (APIImage)other;
-			return (Arrays.hashCode(this.imageContent)) == Arrays.hashCode(otherImage.getImageContent());
+			// If the hashCode of both images are the same, it's completely the same image.
+			if((Arrays.hashCode(this.imageContent)) == Arrays.hashCode(otherImage.getImageContent())) {
+				return true;
+			} else {
+				// 
+				return ImageComparision.compare(this.imageContent, otherImage.getImageContent());
+			}
 		} else {
 			return false;
 		}
@@ -74,6 +82,6 @@ public class APIImage {
 
 	@Override
 	public String toString() {
-		return "APIImage [filename=" + filename + "]";
+		return "APIImage [bytes=" + this.imageContent.length + "]";
 	}
 }

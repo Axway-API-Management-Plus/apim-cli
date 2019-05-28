@@ -619,7 +619,7 @@ public class APIManagerAdapter {
 				for(JsonNode node : jsonResponse) {
 					path = node.get("path").asText();
 					if(path.equals(apiPath)) {
-						LOG.info("Found existing API on path: '"+path+"' / "+node.get("state").asText()+" ('" + node.get("id").asText()+"')");
+						LOG.info("Found existing API on path: '"+path+"' ("+node.get("state").asText()+") (ID: '" + node.get("id").asText()+"')");
 						apiId = node.get("id").asText();
 						break;
 					}
