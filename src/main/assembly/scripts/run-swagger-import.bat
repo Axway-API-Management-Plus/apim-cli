@@ -23,7 +23,7 @@ SET ERRNO=1
 GOTO :END
 
 :OkClassPath
-ECHO "Running API-Manager Promote version 1.5.1 ..."
+ECHO "Running API-Manager Promote version 1.5.2 ..."
 
 CD %currentDir%
 
