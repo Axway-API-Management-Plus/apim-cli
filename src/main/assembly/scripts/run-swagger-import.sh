@@ -17,7 +17,7 @@ do
         CP=$CP:$jars
 done
 
-echo "Running API-Manager Promote version 1.5.1 ..."
+echo "Running API-Manager Promote version 1.5.2 ..."
 
 "$JAVA_HOME/bin/java" -Xms64m -Xmx256m -classpath "$CP" com.axway.apim.App $*
 rc=$?

@@ -30,12 +30,14 @@ Today the following API-Properties are already supported and can be controlled e
 - Quota-Management (Application- & System-Default-Quota)  
   - also handling Application Quotas manually configured while updating an API
 - Client-Organization handling  
+- Query-String routing  
 
 Improving the API-Development experience during the API-Design phase leveraging the Stoplight integration. [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/Stoplight-Integration).
 
 Build and tested with API-Manager 7.6.2 SP2 at Travis CI:  
 Develop: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
-Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=master)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
+Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=master)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)  
+End-2-End-Tests simulate real world use cases by calling and validating API-Manager promote 156 times.  
 
 ## Install
 - Download the latest [release](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases)
@@ -52,7 +54,7 @@ Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimana
 - 1.0.1 - 13.12.2018
   - Added support for API-Manager 7.5.3 plus minor fixes
 - 1.1.0 - 18.12.2018
-  - Added support for Qouta-Management plus minor fixes
+  - Added support for Quota-Management plus minor fixes
 - 1.2.0 - 20.12.2018
   - Added support for API-Outbound AuthN and support to configure the API-Backend-Basepath
 - 1.3.0 - 08.03.2019
@@ -66,12 +68,14 @@ Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimana
 - 1.5.0 - 09.04.2019
   - Added support for Org-Admins and option to externalize parameters into environment properties
 - 1.5.1 - 30.04.2019
-  - Validate the given API-Organization & Now existing application quotas are preserved  
+  - Validate the given API-Organization & Now existing application quotas are preserved
+- 1.5.2 - 27.05.2019
+  - Added compatibility for 7.6.2 SP3, App-Quota-Handling improved, Support for Query-String-Option
 
 
 ## Limitations/Caveats
 - API-Method-Level description is not yet supported
-- Method-Level settings such as individual Security, Custom-Policies, etc. not yet supported
+- __Method-Level__ settings such as individual Security, Custom-Policies, etc. not yet supported
 - Deep merge of stage-config files isn't supported
 - Support for WSDL is still Beta
 
