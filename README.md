@@ -37,7 +37,7 @@ Improving the API-Development experience during the API-Design phase leveraging 
 Build and tested with API-Manager 7.6.2 SP2 at Travis CI:  
 Develop: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
 Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=master)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)  
-End-2-End-Tests simulate real world use cases by calling and validating API-Manager promote 156 times.  
+End-2-End-Tests simulate real world use cases by calling and validating API-Manager promote __161__ times.  
 
 ## Install
 - Download the latest [release](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases)
