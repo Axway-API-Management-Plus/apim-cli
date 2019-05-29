@@ -582,6 +582,7 @@ public class APIImportConfigAdapter {
 	}
 	
 	private void validateHasQueryStringKey(IAPI importApi) throws AppException {
+		if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return; // QueryStringRouting isn't supported
 		if(APIManagerAdapter.getInstance().hasAdminAccount()) {
 			String apiRoutingKeyEnabled = APIManagerAdapter.getApiManagerConfig("apiRoutingKeyEnabled");
 			if(apiRoutingKeyEnabled.equals("true")) {
