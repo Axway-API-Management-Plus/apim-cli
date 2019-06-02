@@ -3,10 +3,7 @@ package com.axway.apim.actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.actions.tasks.ManageClientApps;
-import com.axway.apim.actions.tasks.ManageClientOrgs;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
-import com.axway.apim.actions.tasks.UpdateQuotaConfiguration;
 import com.axway.apim.actions.tasks.UpgradeAccessToNewerAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIChangeState;
@@ -38,7 +35,6 @@ public class RecreateToUpdateAPI {
 		// But not potentially existing Subscriptions or manually created Client-Orgs
 		CreateNewAPI createNewAPI = new CreateNewAPI();
 		createNewAPI.execute(changes);
-		LOG.info("New API created. Going to delete old API.");
 		
 		// 2. Create a new temp Desired-API-Definition, which will be used to delete the old API
 		IAPI tempDesiredDeletedAPI = new APIBaseDefinition();
@@ -47,7 +43,7 @@ public class RecreateToUpdateAPI {
 			// In case, the existing API is already in use (Published), we have to grant access to our new imported API
 			new UpgradeAccessToNewerAPI(changes.getIntransitAPI(), changes.getActualAPI()).execute();
 		}
-		
+		LOG.info("New API created. Going to delete old API.");
 		// Delete the existing old API!
 		((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(IAPI.STATE_DELETED);
 		new UpdateAPIStatus(tempDesiredDeletedAPI, actual).execute(true);

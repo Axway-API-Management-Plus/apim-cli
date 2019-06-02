@@ -68,6 +68,7 @@ public class APIManagerAdapter {
 	private static APIManagerAdapter instance;
 	
 	private static String apiManagerVersion = null;
+	private static String apiManagerConfig = null;
 	
 	private static List<Organization> allOrgs = null;
 	private static List<ClientApplication> allApps = null;
@@ -89,6 +90,9 @@ public class APIManagerAdapter {
 	public static String CREDENTIAL_TYPE_EXT_CLIENTID	= "extclients";
 	public static String CREDENTIAL_TYPE_OAUTH			= "oauth";
 	
+	private final static String SYSTEM_API_QUOTA 				= "00000000-0000-0000-0000-000000000000";
+	private final static String APPLICATION_DEFAULT_QUOTA 		= "00000000-0000-0000-0000-000000000001";
+	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
 			APIManagerAdapter.instance = new APIManagerAdapter ();
@@ -98,6 +102,7 @@ public class APIManagerAdapter {
 	
 	public static synchronized void deleteInstance() throws AppException {
 			APIManagerAdapter.instance = null;
+			APIManagerAdapter.apiManagerConfig = null;
 	}
 	
 	private APIManagerAdapter() throws AppException {
@@ -149,9 +154,9 @@ public class APIManagerAdapter {
 				UpdateExistingAPI updateAPI = new UpdateExistingAPI();
 				updateAPI.execute(changeState);
 				return;
-			} else { // We changes, that require a re-creation of the API
+			} else { // We have changes, that require a re-creation of the API
 				LOG.info("Strategy: Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
-						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for PUBLISHED API. Recreating it!");
+						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase()+" API. Recreating it!");
 				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
 				recreate.execute(changeState);
 				return;
@@ -200,13 +205,7 @@ public class APIManagerAdapter {
 			if(statusCode == 403 || statusCode == 401){
 				LOG.error("Login failed: " +statusCode+ ", Response: " + response);
 				throw new AppException("Given user: '"+username+"' can't login.", ErrorCode.API_MANAGER_COMMUNICATION);
-			}
-			for (Header header : response.getAllHeaders()) {
-				if(header.getName().equals("CSRF-Token")) {
-					client.setCsrfToken(header.getValue());
-					break;
-				}
-			}
+			} 
 			User user = getCurrentUser(useAdminClient);
 			if(user.getRole().equals("admin")) {
 				this.hasAdminAccount = true;
@@ -238,7 +237,13 @@ public class APIManagerAdapter {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/currentuser").build();
 		    GETRequest currentUserRequest = new GETRequest(uri, null, useAdminClient);
 		    response = currentUserRequest.execute();
+		    getCsrfToken(response, useAdminClient); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
 			String currentUser = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+			int statusCode = response.getStatusLine().getStatusCode();
+			if( statusCode != 200) {
+				throw new AppException("Status-Code: "+statusCode+", Can't get current-user information on response: '" + currentUser + "'", 
+						ErrorCode.API_MANAGER_COMMUNICATION);				
+			}
 			User user = mapper.readValue(currentUser, User.class);
 			if(user == null) {
 				throw new AppException("Can't get current-user information on response: '" + currentUser + "'", 
@@ -249,6 +254,15 @@ public class APIManagerAdapter {
 		} catch (Exception e) {
 			throw new AppException("Can't get current-user information on response: '" + jsonResponse + "'", 
 					ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	private static void getCsrfToken(HttpResponse response, boolean useAdminClient) throws AppException {
+		for (Header header : response.getAllHeaders()) {
+			if(header.getName().equals("CSRF-Token")) {
+				APIMHttpClient.getInstance(useAdminClient).setCsrfToken(header.getValue());
+				break;
+			}
 		}
 	}
 	
@@ -292,6 +306,7 @@ public class APIManagerAdapter {
 			addQuotaConfiguration(apiManagerApi, desiredAPI);
 			addClientOrganizations(apiManagerApi, desiredAPI);
 			addClientApplications(apiManagerApi, desiredAPI);
+			addExistingClientAppQuotas(apiManagerApi.getApplications());
 			return apiManagerApi;
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-State.", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -320,11 +335,6 @@ public class APIManagerAdapter {
 	
 	private void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
 		if(!hasAdminAccount) return;
-		if(desiredAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
-			LOG.info("Ignoring Client-Applications, as desired API-State is Unpublished!");
-			return;
-		}
-		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> allApps = getAllApps();
 		for(ClientApplication app : allApps) {
@@ -337,17 +347,81 @@ public class APIManagerAdapter {
 		}
 		apiManagerApi.setApplications(existingClientApps);
 	}
+	private void addExistingClientAppQuotas(List<ClientApplication> existingClientApps) throws AppException {
+		if(existingClientApps==null || existingClientApps.size()==0) return; // No apps subscribed to this APIs
+		for(ClientApplication app : existingClientApps) {
+			APIQuota appQuota = getQuotaFromAPIManager(app.getId());
+			app.setAppQuota(appQuota);
+		}
+	}
 	
+	public String getMethodNameForId(String apiId, String methodId) throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations/"+methodId).build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			EntityUtils.consume(httpResponse.getEntity());
+			LOG.trace("Response: " + response);
+			JsonNode operationDetails = mapper.readTree(response);
+			if(operationDetails.size()==0) {
+				LOG.warn("No operation with ID: "+methodId+" found for API with id: " + apiId);
+				return null;
+			}
+			return operationDetails.get("name").asText();
+		} catch (Exception e) {
+			LOG.error("Can't load name for operation with id: "+methodId+" for API: "+apiId+". Can't parse response: " + response);
+			throw new AppException("Can't load name for operation with id: "+methodId+" for API: "+apiId, ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public String getMethodIdPerName(String apiId, String methodName) throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			EntityUtils.consume(httpResponse.getEntity());
+			LOG.trace("Response: " + response);
+			JsonNode operations = mapper.readTree(response);
+			if(operations.size()==0) {
+				LOG.warn("No operations found for API with id: " + apiId);
+				return null;
+			}
+			for(JsonNode operation : operations) {
+				String operationName = operation.get("name").asText();
+				if(operationName.equals(methodName)) {
+					return operation.get("id").asText();
+				}
+			}
+			LOG.warn("No operation found with name: '"+methodName+"' for API: '"+apiId+"'");
+			return null;
+		} catch (Exception e) {
+			LOG.error("Can't load operations for API: "+apiId+". Can't parse response: " + response);
+			throw new AppException("Can't load operations for API: "+apiId+".", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public String getOrgId(String orgName) throws AppException {
+		return getOrgId(orgName, false);
+	}
 	/**
 	 * The actual Org-ID based on the OrgName. Lazy implementation.
 	 * @param orgName the name of the organizations
 	 * @return the id of the organization
 	 * @throws AppException 
 	 */
-	public String getOrgId(String orgName) throws AppException {
+	public String getOrgId(String orgName, boolean devOrgsOnly) throws AppException {
 		if(!this.hasAdminAccount) return null;
 		if(allOrgs == null) getAllOrgs();
 		for(Organization org : allOrgs) {
+			if(devOrgsOnly && org.getDevelopment().equals("false")) continue; // Ignore non-dev orgs
 			if(orgName.equals(org.getName())) return org.getId();
 		}
 		LOG.error("Requested OrgId for unknown orgName: " + orgName);
@@ -410,18 +484,18 @@ public class APIManagerAdapter {
 			LOG.info("Found existing application (in cache): '"+app.getName()+"' based on credential (Type: '"+type+"'): '"+credential+"'");
 			return app;
 		}
-		getAllApps(); // Make sure, we loaded all app before!
+		getAllApps(); // Make sure, we loaded all apps before!
 		LOG.debug("Searching credential (Type: "+type+"): '"+credential+"' in: " + allApps.size() + " apps.");
 		Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
 		for(ClientApplication app : allApps) {
-			if(appIds.contains(app.getId())) continue;
+			if(appIds.contains(app.getId())) continue; // Not sure, if this really makes sense. Need to check!
 			ObjectMapper mapper = new ObjectMapper();
 			String response = null;
 			URI uri;
 			try {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type+"").build();
 				LOG.debug("Loading credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
-				RestAPICall getRequest = new GETRequest(uri, null);
+				RestAPICall getRequest = new GETRequest(uri, null, true);
 				HttpResponse httpResponse = getRequest.execute();
 				response = EntityUtils.toString(httpResponse.getEntity());
 				LOG.trace("Response: " + response);
@@ -458,14 +532,12 @@ public class APIManagerAdapter {
 	
 	
 	private static void addQuotaConfiguration(IAPI api, IAPI desiredAPI) throws AppException {
-		//APPLICATION:	00000000-0000-0000-0000-000000000001
-		//SYSTEM: 		00000000-0000-0000-0000-000000000000
 		// No need to load quota, if not given in the desired API
 		if(desiredAPI!=null && (desiredAPI.getApplicationQuota() == null && desiredAPI.getSystemQuota() == null)) return;
 		ActualAPI managerAPI = (ActualAPI)api;
 		try {
-			applicationQuotaConfig = getQuotaFromAPIManager("00000000-0000-0000-0000-000000000001"); // Get the Application-Default-Quota
-			sytemQuotaConfig = getQuotaFromAPIManager("00000000-0000-0000-0000-000000000000"); // Get the System-Default-Quota
+			applicationQuotaConfig = getQuotaFromAPIManager(APPLICATION_DEFAULT_QUOTA); // Get the Application-Default-Quota
+			sytemQuotaConfig = getQuotaFromAPIManager(SYSTEM_API_QUOTA); // Get the System-Default-Quota
 			managerAPI.setApplicationQuota(getAPIQuota(applicationQuotaConfig, managerAPI.getId()));
 			managerAPI.setSystemQuota(getAPIQuota(sytemQuotaConfig, managerAPI.getId()));
 		} catch (AppException e) {
@@ -475,12 +547,16 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static APIQuota getQuotaFromAPIManager(String type) throws AppException {
+	private static APIQuota getQuotaFromAPIManager(String identifier) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
 		
 			try {
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+type).build();
+				if(identifier.equals(APPLICATION_DEFAULT_QUOTA) || identifier.equals(SYSTEM_API_QUOTA)) {
+					uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+identifier).build();
+				} else {
+					uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+identifier+"/quota/").build();
+				}
 				RestAPICall getRequest = new GETRequest(uri, null, true);
 				HttpResponse response = getRequest.execute();
 				int statusCode = response.getStatusLine().getStatusCode();
@@ -543,7 +619,7 @@ public class APIManagerAdapter {
 				for(JsonNode node : jsonResponse) {
 					path = node.get("path").asText();
 					if(path.equals(apiPath)) {
-						LOG.info("Found existing API on path: '"+path+"' / "+node.get("state").asText()+" ('" + node.get("id").asText()+"')");
+						LOG.info("Found existing API on path: '"+path+"' ("+node.get("state").asText()+") (ID: '" + node.get("id").asText()+"')");
 						apiId = node.get("id").asText();
 						break;
 					}
@@ -593,32 +669,42 @@ public class APIManagerAdapter {
 		}
 	}
 	
+	public static String getApiManagerVersion() throws AppException {
+		if(APIManagerAdapter.apiManagerVersion!=null) {
+			return apiManagerVersion;
+		}
+		APIManagerAdapter.apiManagerVersion = getApiManagerConfig("productVersion");
+		LOG.info("API-Manager version is: " + apiManagerVersion);
+		return APIManagerAdapter.apiManagerVersion;
+	}
+	
 	/**
 	 * Lazy helper method to get the actual API-Manager version. This is used to toggle on/off some 
 	 * of the features (such as API-Custom-Properties)
 	 * @return the API-Manager version as returned from the API-Manager REST-API /config endpoint
 	 * @throws AppException is something goes wrong.
 	 */
-	public static String getApiManagerVersion() throws AppException {
-		if(APIManagerAdapter.apiManagerVersion!=null) {
-			return apiManagerVersion;
-		}
+	public static String getApiManagerConfig(String configField) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
-		String response = null;
 		URI uri;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
-			HttpResponse httpResponse = getRequest.execute();
-			response = EntityUtils.toString(httpResponse.getEntity());
+			if(apiManagerConfig==null) {
+				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
+				RestAPICall getRequest = new GETRequest(uri, null, true);
+				HttpResponse httpResponse = getRequest.execute();
+				apiManagerConfig = EntityUtils.toString(httpResponse.getEntity());
+			}
 			JsonNode jsonResponse;
-			jsonResponse = mapper.readTree(response);
-			String apiManagerVersion = jsonResponse.get("productVersion").asText();
-			LOG.debug("API-Manager version is: " + apiManagerVersion);
-			return jsonResponse.get("productVersion").asText();
+			jsonResponse = mapper.readTree(apiManagerConfig);
+			JsonNode retrievedConfigField = jsonResponse.get(configField);
+			if(retrievedConfigField==null) {
+				LOG.debug("Config field: '"+configField+"' is unsuporrted!");
+				return "UnknownConfigField"+configField;
+			}
+			return retrievedConfigField.asText();
 		} catch (Exception e) {
-			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + response);
-			throw new AppException("Can't get version from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + apiManagerConfig);
+			throw new AppException("Can't get "+configField+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	

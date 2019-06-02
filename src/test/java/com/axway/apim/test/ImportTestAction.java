@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.management.RuntimeErrorException;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -47,7 +45,7 @@ public class ImportTestAction extends AbstractTestAction {
 		String configFile = replaceDynamicContentInFile(origConfigFile, context, createTempFilename(origConfigFile));
 		LOG.info("Using Replaced Swagger-File: " + apiDefinition);
 		LOG.info("Using Replaced configFile-File: " + configFile);
-		LOG.info("API-Manager import is using user: '"+context.replaceDynamicContentInString("${oadminPassword1}")+"'");
+		LOG.info("API-Manager import is using user: '"+context.replaceDynamicContentInString("${oadminUsername1}")+"'");
 		int expectedReturnCode = 0;
 		try {
 			expectedReturnCode 	= Integer.parseInt(context.getVariable("expectedReturnCode"));
@@ -60,8 +58,8 @@ public class ImportTestAction extends AbstractTestAction {
 		String enforce = "false";
 		String ignoreQuotas = "false";
 		String ignoreAdminAccount = "false";
-		String clientOrgsMode = CommandParameters.MODE_REPLACE;
-		String clientAppsMode = CommandParameters.MODE_REPLACE;;
+		String clientOrgsMode = CommandParameters.MODE_ADD;
+		String clientAppsMode = CommandParameters.MODE_ADD;;
 		
 		try {
 			enforce = context.getVariable("enforce");
@@ -98,8 +96,8 @@ public class ImportTestAction extends AbstractTestAction {
 					"-a", apiDefinition, 
 					"-c", configFile, 
 					"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
-					"-p", context.replaceDynamicContentInString("${oadminUsername1}"), 
-					"-u", context.replaceDynamicContentInString("${oadminPassword1}"),
+					"-u", context.replaceDynamicContentInString("${oadminUsername1}"), 
+					"-p", context.replaceDynamicContentInString("${oadminPassword1}"),
 					"-s", stage, 
 					"-f", enforce, 
 					"-iq", ignoreQuotas, 

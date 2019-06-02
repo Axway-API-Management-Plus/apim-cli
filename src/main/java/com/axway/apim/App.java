@@ -98,11 +98,11 @@ public class App {
 			option.setArgName("true/[false]");
 			options.addOption(option);
 			
-			option = new Option("clientOrgsMode", true, "Controls how configured Client-Organizations are treated. Defaults to replace!");
+			option = new Option("clientOrgsMode", true, "Controls how configured Client-Organizations are treated. Defaults to add!");
 			option.setArgName("ignore|replace|add");
 			options.addOption(option);
 			
-			option = new Option("clientAppsMode", true, "Controls how configured Client-Applications are treated. Defaults to replace!");
+			option = new Option("clientAppsMode", true, "Controls how configured Client-Applications are treated. Defaults to add!");
 			option.setArgName("ignore|replace|add");
 			options.addOption(option);	
 			
@@ -136,7 +136,7 @@ public class App {
 			}
 			
 			LOG.info("------------------------------------------------------------------------");
-			LOG.info("API-Manager Promote Version: 1.5.0");
+			LOG.info("API-Manager Promote Version: 1.5.2");
 			LOG.info("                                                                        ");
 			LOG.info("To report issues or get help, please visit: ");
 			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");

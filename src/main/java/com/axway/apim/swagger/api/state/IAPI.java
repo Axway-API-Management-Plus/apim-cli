@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.lib.AppException;
-import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APIDefintion;
+import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
@@ -15,7 +15,6 @@ import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public interface IAPI {
 	
@@ -109,4 +108,6 @@ public interface IAPI {
 	public Map<String, ServiceProfile> getServiceProfiles();
 
 	String getApiDefinitionImport();
+	
+	public String getApiRoutingKey();
 }

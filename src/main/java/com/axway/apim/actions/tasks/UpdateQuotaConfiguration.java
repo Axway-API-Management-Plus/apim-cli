@@ -33,7 +33,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 
 	public void execute() throws AppException {
 		Transaction context = Transaction.getInstance();
-		if(desiredState.getApplicationQuota()==null || desiredState.getSystemQuota()==null) return;
+		if(desiredState.getApplicationQuota()==null && desiredState.getSystemQuota()==null) return;
 		if(CommandParameters.getInstance().isIgnoreQuotas()) {
 			LOG.info("Configured quotas will be ignored, as flag ignoreQuotas has been set.");
 			return;
@@ -60,7 +60,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 				LOG.info("Default-Application-Quota for API: '"+desiredState.getName()+"' is UN-CHANGED. Nothing to do.");
 			} else {
 				LOG.info("Updating Application-Default-Quota for API: " + desiredState.getName());
-				LOG.debug("System-Quota-Config: '" + desiredState.getSystemQuota()+"'");
+				LOG.debug("Application-Quota-Config: '" + desiredState.getApplicationQuota()+"'");
 				APIQuota applicationQuota = APIManagerAdapter.applicationQuotaConfig;
 				for(QuotaRestriction restriction : desiredState.getApplicationQuota().getRestrictions()) {
 					restriction.setApi(actualState.getId());

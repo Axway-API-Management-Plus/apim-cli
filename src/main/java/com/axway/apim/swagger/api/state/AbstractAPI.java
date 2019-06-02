@@ -15,15 +15,15 @@ import com.axway.apim.actions.tasks.props.CorsProfileHandler;
 import com.axway.apim.actions.tasks.props.CustomPropertyHandler;
 import com.axway.apim.actions.tasks.props.InboundProfileHandler;
 import com.axway.apim.actions.tasks.props.OutboundProfileHandler;
+import com.axway.apim.actions.tasks.props.RoutingKeyPropHandler;
 import com.axway.apim.actions.tasks.props.SecurityProfileHandler;
 import com.axway.apim.actions.tasks.props.ServiceProfileHandler;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.APIDefintion;
+import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
@@ -178,6 +178,10 @@ public abstract class AbstractAPI {
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})
 	protected APIQuota systemQuota = null;
+	
+	@APIPropertyAnnotation(isBreaking = true, 
+			writableStates = {IAPI.STATE_UNPUBLISHED}, propHandler = RoutingKeyPropHandler.class)
+	protected String apiRoutingKey = null;
 	
 	protected String organization = null;
 	
@@ -440,6 +444,19 @@ public abstract class AbstractAPI {
 		this.applications = applications;
 	}
 	
+	public String getApiRoutingKey() {
+		return apiRoutingKey;
+	}
+
+	public void setApiRoutingKey(String apiRoutingKey) {
+		this.apiRoutingKey = apiRoutingKey;
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " [path=" + path + ", id (FE-API)=" + id + ", apiId (BE-API)=" + apiId + "]";
+	}
+
 	public int getAPIType() {
 		/*if(this.getAPIDefinition().getAPIDefinitionFile().endsWith("?wsdl")) {
 			return IAPIDefinition.WSDL_API;
