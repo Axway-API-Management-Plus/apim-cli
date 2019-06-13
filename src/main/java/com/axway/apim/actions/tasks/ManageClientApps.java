@@ -80,6 +80,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	}
 	
 	private void removeNonGrantedClientApps(List<ClientApplication> apps) throws AppException {
+		if(apps == null) return;
 		ListIterator<ClientApplication> it = apps.listIterator();
 		ClientApplication app;
 		while(it.hasNext()) {
