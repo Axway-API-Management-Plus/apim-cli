@@ -198,7 +198,10 @@ public class APIImportConfigAdapter {
 	
 	private void handleAllOrganizations(IAPI apiConfig) throws AppException {
 		if(apiConfig.getClientOrganizations()==null) return;
-		if(apiConfig.getState()==IAPI.STATE_UNPUBLISHED) return;
+		if(apiConfig.getState().equals(IAPI.STATE_UNPUBLISHED)) {
+			apiConfig.setClientOrganizations(null); // Making sure, orgs are not considered as a changed property
+			return;
+		}
 		List<String> allDesiredOrgs = new ArrayList<String>();
 		if(apiConfig.getClientOrganizations().contains("ALL")) {
 			List<Organization> allOrgs = APIManagerAdapter.getInstance().getAllOrgs();
