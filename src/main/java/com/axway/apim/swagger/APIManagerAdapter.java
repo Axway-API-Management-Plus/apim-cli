@@ -103,6 +103,7 @@ public class APIManagerAdapter {
 	public static synchronized void deleteInstance() throws AppException {
 			APIManagerAdapter.instance = null;
 			APIManagerAdapter.apiManagerConfig = null;
+			APIManagerAdapter.allOrgs = null;
 	}
 	
 	private APIManagerAdapter() throws AppException {
@@ -734,7 +735,6 @@ public class APIManagerAdapter {
 			return null;
 		}
 		if(APIManagerAdapter.allOrgs!=null) {
-			LOG.info("Returned existing orgs: " + APIManagerAdapter.allOrgs);
 			return APIManagerAdapter.allOrgs;
 		}
 		allOrgs = new ArrayList<Organization>();
@@ -746,7 +746,6 @@ public class APIManagerAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null, true);
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
-			LOG.info("Response for /organizations: '" + response + "'");
 			allOrgs = mapper.readValue(response, new TypeReference<List<Organization>>(){});
 			return allOrgs;
 		} catch (Exception e) {
