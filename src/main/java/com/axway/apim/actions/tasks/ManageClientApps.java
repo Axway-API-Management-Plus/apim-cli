@@ -49,20 +49,12 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			return;
 		}
 		if(desiredState.getApplications()!=null) { // Happens, when config-file doesn't contains client apps
-			ListIterator<ClientApplication> it = desiredState.getApplications().listIterator();
-			ClientApplication app;
-			while(it.hasNext()) {
-				app = it.next();
-				if(!hasClientAppPermission(app)) {
-					LOG.error("Organization of configured application: '" + app.getName() + "' has NO permission to this API. Ignoring this application.");
-					it.remove();
-					continue;
-				}
-			}
+			removeNonGrantedClientApps(desiredState.getApplications());
 		}
 		List<ClientApplication> recreateActualApps = null;
 		// If the API has been re-created we have to re-create existing App-Subscriptions
 		if(oldAPI!=null && oldAPI.isValid() && CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_ADD)) {
+			removeNonGrantedClientApps(oldAPI.getApplications());
 			recreateActualApps = getMissingApps(oldAPI.getApplications(), actualState.getApplications());
 			// Create previously existing App-Subscriptions
 			createAppSubscription(recreateActualApps, actualState.getId());
@@ -83,6 +75,19 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 				removeAppSubscrioption(revomingActualApps, actualState.getId());
 			} else {
 				LOG.debug("NOT removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName() + " as clientAppsMode NOT set to replace.");
+			}
+		}
+	}
+	
+	private void removeNonGrantedClientApps(List<ClientApplication> apps) throws AppException {
+		ListIterator<ClientApplication> it = apps.listIterator();
+		ClientApplication app;
+		while(it.hasNext()) {
+			app = it.next();
+			if(!hasClientAppPermission(app)) {
+				LOG.error("Organization of configured application: '" + app.getName() + "' has NO permission to this API. Ignoring this application.");
+				it.remove();
+				continue;
 			}
 		}
 	}
