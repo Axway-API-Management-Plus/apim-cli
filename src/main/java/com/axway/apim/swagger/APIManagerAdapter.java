@@ -95,7 +95,6 @@ public class APIManagerAdapter {
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
-			LOG.info("CREATING NEW API-Manager INSTANCE");
 			APIManagerAdapter.instance = new APIManagerAdapter ();
 		}
 		return APIManagerAdapter.instance;
@@ -735,6 +734,7 @@ public class APIManagerAdapter {
 			return null;
 		}
 		if(APIManagerAdapter.allOrgs!=null) {
+			LOG.info("Returned existing orgs: " + APIManagerAdapter.allOrgs);
 			return APIManagerAdapter.allOrgs;
 		}
 		allOrgs = new ArrayList<Organization>();
@@ -746,6 +746,7 @@ public class APIManagerAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null, true);
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
+			LOG.info("Response for /organizations: '" + response + "'");
 			allOrgs = mapper.readValue(response, new TypeReference<List<Organization>>(){});
 			return allOrgs;
 		} catch (Exception e) {
