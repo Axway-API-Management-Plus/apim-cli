@@ -103,6 +103,7 @@ public class APIManagerAdapter {
 	public static synchronized void deleteInstance() throws AppException {
 			APIManagerAdapter.instance = null;
 			APIManagerAdapter.apiManagerConfig = null;
+			APIManagerAdapter.allOrgs = null;
 	}
 	
 	private APIManagerAdapter() throws AppException {
