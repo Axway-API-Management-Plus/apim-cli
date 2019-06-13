@@ -39,10 +39,6 @@ public class CommandParameters {
 		return CommandParameters.instance;
 	}
 
-	public String getOptionValue(String option) {
-		return getValue(option);
-	}
-
 	public String getUsername() {
 		if(getValue("username")!=null) {
 			return getValue("username");
@@ -117,6 +113,11 @@ public class CommandParameters {
 		return Boolean.parseBoolean(getValue("ignoreAdminAccount"));
 	}
 	
+	public String getDetailsExportFile() {
+		if(getValue("detailsExportFile")==null) return null;
+		return getValue("detailsExportFile");
+	}
+	
 	public void validateRequiredParameters() throws AppException {
 		ErrorState errors  = ErrorState.getInstance();
 		if(getValue("username")==null && getValue("admin_username")==null) errors.setError("Required parameter: 'username' or 'admin_username' is missing.", ErrorCode.MISSING_PARAMETER, false);
@@ -128,7 +129,7 @@ public class CommandParameters {
 		}
 	}
 	
-	private String getValue(String key) {
+	public String getValue(String key) {
 		if(this.cmd.getOptionValue(key)!=null) {
 			return this.cmd.getOptionValue(key);
 		} else if(this.internalCmd.getOptionValue(key)!=null) {
