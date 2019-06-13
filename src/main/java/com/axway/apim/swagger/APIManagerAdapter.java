@@ -95,6 +95,7 @@ public class APIManagerAdapter {
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
+			LOG.info("CREATING NEW API-Manager INSTANCE");
 			APIManagerAdapter.instance = new APIManagerAdapter ();
 		}
 		return APIManagerAdapter.instance;
