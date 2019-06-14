@@ -14,6 +14,7 @@ import com.axway.apim.actions.tasks.UpdateAPIStatus;
 import com.axway.apim.actions.tasks.UpdateQuotaConfiguration;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIManagerAdapter;
 
@@ -53,6 +54,8 @@ public class UpdateExistingAPI {
 		new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		// Handle subscription to applications
 		new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI(), null).execute();
+		
+		APIPropertiesExport.getInstance().setProperty("feApiId", changes.getActualAPI().getApiId());
 	}
 
 }

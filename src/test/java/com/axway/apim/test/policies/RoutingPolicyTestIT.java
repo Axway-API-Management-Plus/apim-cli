@@ -21,8 +21,8 @@ public class RoutingPolicyTestIT extends TestNGCitrusTestDesigner {
 		description("Test a Routing-Policy");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/api-key-test-${apiNumber}");
-		variable("apiName", "API Key Test ${apiNumber}");
+		variable("apiPath", "/routing-policy-test-${apiNumber}");
+		variable("apiName", "Routing Policy Test ${apiNumber}");
 		variable("status", "unpublished");
 		
 

@@ -21,8 +21,8 @@ public class RequestPolicyTestIT extends TestNGCitrusTestDesigner {
 		description("Test a Request-Policy");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/api-key-test-${apiNumber}");
-		variable("apiName", "API Key Test ${apiNumber}");
+		variable("apiPath", "/request-policy-test-${apiNumber}");
+		variable("apiName", "Request Policy Test ${apiNumber}");
 		variable("status", "unpublished");
 		
 
