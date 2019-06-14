@@ -21,8 +21,8 @@ public class AllOutboundPoliciesTestIT extends TestNGCitrusTestDesigner {
 		description("Test a Request-Policy");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/api-key-test-${apiNumber}");
-		variable("apiName", "API Key Test ${apiNumber}");
+		variable("apiPath", "/all-outbound-policies-${apiNumber}");
+		variable("apiName", "All Outbound Policies ${apiNumber}");
 		variable("status", "unpublished");
 		
 

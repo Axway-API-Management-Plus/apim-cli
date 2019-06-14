@@ -21,6 +21,7 @@ import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.state.IAPI;
@@ -74,6 +75,8 @@ public class CreateNewAPI {
 		
 		// V-Host must be managed almost at the end, as the status must be set already to "published"
 		vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
+		
+		APIPropertiesExport.getInstance().setProperty("feApiId", createdAPI.getApiId());
 	}
 	
 	/**

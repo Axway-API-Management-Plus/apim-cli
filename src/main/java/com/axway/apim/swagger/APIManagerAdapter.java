@@ -103,6 +103,7 @@ public class APIManagerAdapter {
 	public static synchronized void deleteInstance() throws AppException {
 			APIManagerAdapter.instance = null;
 			APIManagerAdapter.apiManagerConfig = null;
+			APIManagerAdapter.allOrgs = null;
 	}
 	
 	private APIManagerAdapter() throws AppException {
@@ -696,8 +697,12 @@ public class APIManagerAdapter {
 			}
 			JsonNode jsonResponse;
 			jsonResponse = mapper.readTree(apiManagerConfig);
-			String retrievedConfigField = jsonResponse.get(configField).asText();
-			return retrievedConfigField;
+			JsonNode retrievedConfigField = jsonResponse.get(configField);
+			if(retrievedConfigField==null) {
+				LOG.debug("Config field: '"+configField+"' is unsuporrted!");
+				return "UnknownConfigField"+configField;
+			}
+			return retrievedConfigField.asText();
 		} catch (Exception e) {
 			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + apiManagerConfig);
 			throw new AppException("Can't get "+configField+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
