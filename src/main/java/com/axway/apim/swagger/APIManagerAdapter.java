@@ -871,6 +871,29 @@ public class APIManagerAdapter {
 			throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
+	
+	/**
+	 * Helper method to translate a Base64 encoded format 
+	 * as it's needed by the API-Manager. 
+	 */
+	public static JsonNode getFileData(InputStream certFile, String filename) throws AppException {
+		URI uri;
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/filedata/").build();
+			
+			HttpEntity entity = MultipartEntityBuilder.create()
+					.addBinaryBody("file", IOUtils.toByteArray(certFile), ContentType.create("application/x-pkcs12"), filename)
+					.build();
+			POSTRequest postRequest = new POSTRequest(entity, uri, null);
+			postRequest.setContentType(null);
+			HttpEntity response = postRequest.execute().getEntity();
+			JsonNode jsonResponse = mapper.readTree(response.getContent());
+			return jsonResponse;
+		} catch (Exception e) {
+			throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
 
 	public boolean hasAdminAccount() {
 		return hasAdminAccount;
