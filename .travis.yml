@@ -3,7 +3,7 @@ script: "mvn clean verify"
 
 services:
   - docker
-  
+
 env:
   global:
     - CACHE_DIR=$HOME/docker
