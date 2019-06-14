@@ -11,7 +11,10 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -41,6 +44,8 @@ import com.axway.apim.lib.URLParser;
 import com.axway.apim.lib.Utils;
 import com.axway.apim.swagger.api.properties.APIDefintion;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
+import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthType;
+import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
 import com.axway.apim.swagger.api.properties.organization.Organization;
@@ -578,10 +583,60 @@ public class APIImportConfigAdapter {
 			if(importApi.getAuthenticationProfiles().size()>1) {
 				throw new AppException("Only one AuthenticationProfile supported.", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
+			if(importApi.getAuthenticationProfiles().get(0).getType().equals(AuthType.ssl)) 
+				handleOutboundSSLAuthN(importApi.getAuthenticationProfiles().get(0));
 			importApi.getAuthenticationProfiles().get(0).setIsDefault(true);
 			importApi.getAuthenticationProfiles().get(0).setName("_default"); // Otherwise it wont be considered as default by the API-Mgr.
 		}
 		
+	}
+	
+	private void handleOutboundSSLAuthN(AuthenticationProfile authnProfile) throws AppException {
+		if(!authnProfile.getType().equals(AuthType.ssl)) return;
+		String clientCert = authnProfile.getParameters().getProperty("certFile");
+		String password = authnProfile.getParameters().getProperty("password");
+		File clientCertFile = new File(clientCert);
+		InputStream is;
+		try {
+			if(!clientCertFile.exists()) {
+				// Try to find file using a relative path to the config file
+				String baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
+				clientCertFile = new File(baseDir + "/" + clientCert);
+			}
+			if(clientCertFile.exists()) {
+				is = new FileInputStream(clientCertFile);
+			} else {
+				// If not found absolute & relative - Try to load it from ClassPath
+				LOG.debug("Trying to load Client-Certificate from classpath");
+				is = this.getClass().getResourceAsStream(clientCert);
+			}
+			if(is==null) {
+				throw new AppException("Can't read Client-Cert-File: "+clientCert+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR);
+			}
+			is.mark(0);
+			KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
+			try {
+				store.load(is, password.toCharArray());
+			} catch (IOException e) {
+				if(e.getMessage().toLowerCase().contains("keystore password was incorrect")) {
+					ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config as password for keystore: '"+clientCertFile+"' is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
+					throw e;
+				}
+			}
+			Enumeration<String> e = store.aliases();
+			while (e.hasMoreElements()) {
+				String alias = e.nextElement();
+				X509Certificate certificate = (X509Certificate) store.getCertificate(alias);
+				certificate.getEncoded();
+			}
+			is.reset();
+			JsonNode node = APIManagerAdapter.getFileData(is, clientCert);
+			String data = node.get("data").asText();
+			authnProfile.getParameters().setProperty("pfx", data);
+			authnProfile.getParameters().remove("certFile");
+		} catch (Exception e) {
+			throw new AppException("Can't read Client-Cert-File: "+clientCert+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
+		} 
 	}
 	
 	private void validateHasQueryStringKey(IAPI importApi) throws AppException {
