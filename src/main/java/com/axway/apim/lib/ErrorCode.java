@@ -28,6 +28,7 @@ public enum ErrorCode {
 	CANT_READ_CONFIG_FILE		(70, "Can't read Config-File."),
 	UNSUPPORTED_FEATURE			(75, "Unsupported feature or operation used."),
 	CANT_CREATE_STATE_CHANGE	(80, "Cannot use Import & Existing API to create change state."),
+	WRONG_KEYSTORE_PASSWORD		(81, "The password for the keystore is wrong."),
 	UNKNOWN_CUSTOM_POLICY		(85, "A custom policy-name is unknown (Request-, Routing, ..."),
 	CANT_SETUP_VHOST			(87, "It wasn't possible to setup the V-Host for the FE-API"),
 	UNXPECTED_ERROR				(99, "An unexpected error occured.");
