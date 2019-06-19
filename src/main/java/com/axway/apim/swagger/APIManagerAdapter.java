@@ -132,7 +132,7 @@ public class APIManagerAdapter {
 			// --> CreateNewAPI
 			LOG.info("Strategy: No existing API found, creating new!");
 			CreateNewAPI createAPI = new CreateNewAPI();
-			createAPI.execute(changeState);
+			createAPI.execute(changeState, false);
 		// Otherwise an existing API exists
 		} else {
 			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getName() +" (Version: "+ changeState.getActualAPI().getVersion() + ")");
@@ -320,7 +320,8 @@ public class APIManagerAdapter {
 			LOG.info("Ignoring Client-Organizations, as desired API-State is Unpublished!");
 			return;
 		}
-		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null) return;
+		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null 
+				&& CommandParameters.getInstance().getClientOrgsMode().equals(CommandParameters.MODE_REPLACE)) return;
 		List<String> grantedOrgs = new ArrayList<String>();
 		List<Organization> allOrgs = getAllOrgs();
 		for(Organization org : allOrgs) {

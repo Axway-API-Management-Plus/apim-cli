@@ -34,15 +34,11 @@ public class RecreateToUpdateAPI {
 		// This also includes all CONFIGURED application subscriptions and client-orgs
 		// But not potentially existing Subscriptions or manually created Client-Orgs
 		CreateNewAPI createNewAPI = new CreateNewAPI();
-		createNewAPI.execute(changes);
+		createNewAPI.execute(changes, changes.getActualAPI().getState().equals(IAPI.STATE_PUBLISHED));
 		
 		// 2. Create a new temp Desired-API-Definition, which will be used to delete the old API
 		IAPI tempDesiredDeletedAPI = new APIBaseDefinition();
-		
-		if(actual.getState().equals(IAPI.STATE_PUBLISHED)) {
-			// In case, the existing API is already in use (Published), we have to grant access to our new imported API
-			new UpgradeAccessToNewerAPI(changes.getIntransitAPI(), changes.getActualAPI()).execute();
-		}
+
 		LOG.info("New API created. Going to delete old API.");
 		// Delete the existing old API!
 		((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(IAPI.STATE_DELETED);

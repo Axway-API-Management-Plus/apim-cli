@@ -99,6 +99,10 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		if(appsOrgName==null) return false;
 		// If the App belongs to the same Org as the API, it automatically has permission (esp. for Unpublished APIs)
 		if(app.getOrganizationId().equals(((ActualAPI)actualState).getOrganizationId())) return true;
+		if(actualState.getClientOrganizations()==null) {
+			LOG.debug("No org has access to this API, hence no other app has permission.");
+			return true;
+		}
 		return actualState.getClientOrganizations().contains(appsOrgName);
 	}
 	
