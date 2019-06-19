@@ -19,10 +19,10 @@ import com.axway.apim.actions.tasks.UpdateAPIStatus;
 import com.axway.apim.actions.tasks.UpdateQuotaConfiguration;
 import com.axway.apim.actions.tasks.UpgradeAccessToNewerAPI;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
+import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.state.IAPI;
@@ -74,10 +74,10 @@ public class CreateNewAPI {
 		new UpdateQuotaConfiguration(changes.getDesiredAPI(), createdAPI).execute();
 		
 		// Grant access to the API
-		new ManageClientOrgs(changes.getDesiredAPI(), createdAPI).execute();
+		new ManageClientOrgs(changes.getDesiredAPI(), createdAPI).execute(reCreation);
 		
 		// Handle subscription to applications
-		new ManageClientApps(changes.getDesiredAPI(), createdAPI, changes.getActualAPI()).execute();
+		new ManageClientApps(changes.getDesiredAPI(), createdAPI, changes.getActualAPI()).execute(reCreation);
 		
 		// V-Host must be managed almost at the end, as the status must be set already to "published"
 		vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);

@@ -42,24 +42,14 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		this.oldAPI = oldAPI;
 	}
 	
-	public void execute() throws AppException {
-		if(desiredState.getApplications()==null && (oldAPI==null || !oldAPI.isValid())) return;
+	public void execute(boolean reCreation) throws AppException {
+		if(desiredState.getApplications()==null && !reCreation) return;
 		if(CommandParameters.getInstance().isIgnoreClientApps()) {
 			LOG.info("Configured client applications are ignored, as flag ignoreClientApps has been set.");
 			return;
 		}
 		if(desiredState.getApplications()!=null) { // Happens, when config-file doesn't contains client apps
 			removeNonGrantedClientApps(desiredState.getApplications());
-		}
-		List<ClientApplication> recreateActualApps = null;
-		// If the API has been re-created we have to re-create existing App-Subscriptions
-		if(oldAPI!=null && oldAPI.isValid() && CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_ADD)) {
-			removeNonGrantedClientApps(oldAPI.getApplications());
-			recreateActualApps = getMissingApps(oldAPI.getApplications(), actualState.getApplications());
-			// Create previously existing App-Subscriptions
-			createAppSubscription(recreateActualApps, actualState.getId());
-			// Update the actual state 
-			actualState.setApplications(recreateActualApps);
 		}
 		List<ClientApplication> missingDesiredApps = getMissingApps(desiredState.getApplications(), actualState.getApplications());
 		List<ClientApplication> revomingActualApps = getMissingApps(actualState.getApplications(), desiredState.getApplications());
