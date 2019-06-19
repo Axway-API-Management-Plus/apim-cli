@@ -65,7 +65,7 @@ public class CreateNewAPI {
 		// This is special, as the status is not a normal property and requires some additional actions!
 		new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI).execute();
 		
-		if(reCreation) {
+		if(reCreation && changes.getActualAPI().getState().equals(IAPI.STATE_PUBLISHED)) {
 			// In case, the existing API is already in use (Published), we have to grant access to our new imported API
 			new UpgradeAccessToNewerAPI(changes.getIntransitAPI(), changes.getActualAPI()).execute();
 		}

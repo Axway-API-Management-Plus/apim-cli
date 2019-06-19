@@ -51,6 +51,17 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		if(desiredState.getApplications()!=null) { // Happens, when config-file doesn't contains client apps
 			removeNonGrantedClientApps(desiredState.getApplications());
 		}
+		List<ClientApplication> recreateActualApps = null;
+		// If an UNPUBLISHED API has been re-creared, we have to create App-Subscriptions manually, as API-Manager Upgrade only works on PUBLISHED APIs
+		// But we only need to do this, if existing App-Subscriptions should be preserved (MODE_ADD).
+		if(reCreation && actualState.getState().equals(IAPI.STATE_UNPUBLISHED) && CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_ADD)) {
+			removeNonGrantedClientApps(oldAPI.getApplications());
+			recreateActualApps = getMissingApps(oldAPI.getApplications(), actualState.getApplications());
+			// Create previously existing App-Subscriptions
+			createAppSubscription(recreateActualApps, actualState.getId());
+			// Update the actual state 
+			actualState.setApplications(recreateActualApps);
+		}
 		List<ClientApplication> missingDesiredApps = getMissingApps(desiredState.getApplications(), actualState.getApplications());
 		List<ClientApplication> revomingActualApps = getMissingApps(actualState.getApplications(), desiredState.getApplications());
 
