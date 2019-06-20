@@ -117,6 +117,11 @@ public class App {
 			option.setRequired(false);
 			option.setArgName("true");
 			internalOptions.addOption(option);
+			
+			option = new Option("replaceHostInSwagger", true, "Controls if you want to replace the host in your Swagger-File ");
+			option.setRequired(false);
+			option.setArgName("true");
+			internalOptions.addOption(option);
 
 			option = new  Option("h", "help", false, "Print the help");
 			option.setRequired(false);

@@ -147,8 +147,9 @@ public class APIImportConfigAdapter {
 			validateOrganization(apiConfig);
 			checkForAPIDefinitionInConfiguration(apiConfig);
 			addDefaultPassthroughSecurityProfile(apiConfig);
-			APIDefintion apiDefinition = new APIDefintion(getAPIDefinitionContent());
+			APIDefintion apiDefinition = new APIDefintion();
 			apiDefinition.setAPIDefinitionFile(this.pathToAPIDefinition);
+			apiDefinition.setAPIDefinitionContent(getAPIDefinitionContent(), (DesiredAPI)apiConfig);
 			apiConfig.setAPIDefinition(apiDefinition);
 			addImageContent(apiConfig);
 			validateCustomProperties(apiConfig);

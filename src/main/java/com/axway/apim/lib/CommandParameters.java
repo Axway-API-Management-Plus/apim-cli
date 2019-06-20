@@ -118,6 +118,11 @@ public class CommandParameters {
 		return getValue("detailsExportFile");
 	}
 	
+	public boolean replaceHostInSwagger() {
+		if(getValue("replaceHostInSwagger")==null) return true;
+		return Boolean.parseBoolean(getValue("replaceHostInSwagger"));
+	}
+	
 	public void validateRequiredParameters() throws AppException {
 		ErrorState errors  = ErrorState.getInstance();
 		if(getValue("username")==null && getValue("admin_username")==null) errors.setError("Required parameter: 'username' or 'admin_username' is missing.", ErrorCode.MISSING_PARAMETER, false);
