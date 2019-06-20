@@ -13,6 +13,7 @@ import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustAllStrategy;
@@ -85,7 +86,9 @@ public class APIMHttpClient {
 			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), new NoopHostnameVerifier());
 	
 			Registry<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory>create()
-					.register(uri.getScheme(), sslsf).build();
+					.register(uri.getScheme(), sslsf)
+					.register("http", PlainConnectionSocketFactory.INSTANCE)
+					.build();
 	
 			cm = new PoolingHttpClientConnectionManager(r);
 			cm.setMaxTotal(5);
@@ -105,6 +108,7 @@ public class APIMHttpClient {
 			this.httpClient = HttpClientBuilder.create()
 					.disableRedirectHandling()
 					.setConnectionManager(cm)
+					.useSystemProperties()
 					.setDefaultRequestConfig(defaultRequestConfig)
 					.build();
 		} catch (Exception e) {
