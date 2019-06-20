@@ -51,10 +51,13 @@ public class APIDefintion {
 					if(swagger.get("host")==null) {
 						LOG.info("Adding new host '"+url.getHost()+":"+port+"' to Swagger-File based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
 					} else {
-						LOG.info("Replacing existing host: '"+swagger.get("host")+"' in Swagger-File to '"+url.getHost()+":"+port+"' based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+						LOG.info("Replacing existing host: '"+swagger.get("host").asText()+"' in Swagger-File to '"+url.getHost()+":"+port+"' based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
 					}
 					((ObjectNode)swagger).put("host", url.getHost()+":"+port);
+					
 					this.apiDefinitionContent = objectMapper.writeValueAsBytes(swagger);
+					String newSwagger = new String(apiDefinitionContent);
+					LOG.info("newSwagger: '"+newSwagger+"'");
 				}
 			}
 		} catch (Exception e) {

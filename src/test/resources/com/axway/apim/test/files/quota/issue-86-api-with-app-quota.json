@@ -5,7 +5,6 @@
    "version": "1.0.0",
    "organization": "API Development ${orgNumber}",
    "image": "${image}",
-   "backendBasepath": "https://localhost",
    "securityProfiles": [
       {
          "name": "_default",
