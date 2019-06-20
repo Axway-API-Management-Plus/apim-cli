@@ -34,7 +34,7 @@ public class BackendBasepathChangeInSwaggerTestIT extends TestNGCitrusTestRunner
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore-with-invalid-host.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/serviceprofile/2_backend_basepath_test.json");
-		createVariable("backendBasepath", "https://petstore.swagger.io");
+		createVariable("backendBasepath", "https://swapi.co");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
@@ -52,7 +52,7 @@ public class BackendBasepathChangeInSwaggerTestIT extends TestNGCitrusTestRunner
 		echo("####### Perform a no change to make sure, the API-Definition is not considered as changed because we change the host on-the-fly #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore-with-invalid-host.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/serviceprofile/2_backend_basepath_test.json");
-		createVariable("backendBasepath", "https://petstore.swagger.io");
+		createVariable("backendBasepath", "https://swapi.co");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		swaggerImport.doExecute(context);
@@ -60,7 +60,7 @@ public class BackendBasepathChangeInSwaggerTestIT extends TestNGCitrusTestRunner
 		echo("####### Try to import an API without having the host configured at all #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore-without-any-host.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/serviceprofile/2_backend_basepath_test.json");
-		createVariable("backendBasepath", "https://petstore.swagger.io");
+		createVariable("backendBasepath", "https://swapi.co:443");
 		createVariable("apiPath", "/basepath-changed-in-swagger-test-2-${apiNumber}");
 		createVariable("apiName", "Basepath changed in Swagger Test 2 ${apiNumber}");
 		createVariable("state", "unpublished");

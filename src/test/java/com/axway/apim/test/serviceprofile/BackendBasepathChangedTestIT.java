@@ -27,7 +27,7 @@ public class BackendBasepathChangedTestIT extends TestNGCitrusTestDesigner {
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/serviceprofile/2_backend_basepath_test.json");
-		createVariable("backendBasepath", "https://host.xyz.com:8665");
+		createVariable("backendBasepath", "https://swapi.co:443");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
