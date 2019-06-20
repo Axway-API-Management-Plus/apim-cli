@@ -51,9 +51,9 @@ public class UpdateExistingAPI {
 		vHostHandler.handleVHost(changes.getDesiredAPI(), changes.getActualAPI());
 		
 		new UpdateQuotaConfiguration(changes.getDesiredAPI(), changes.getActualAPI()).execute();
-		new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+		new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute(false);
 		// Handle subscription to applications
-		new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI(), null).execute();
+		new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI(), null).execute(false);
 		
 		APIPropertiesExport.getInstance().setProperty("feApiId", changes.getActualAPI().getApiId());
 	}

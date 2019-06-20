@@ -14,6 +14,7 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,6 +49,12 @@ public class CreateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonNode = null;
 		try {
+			if(httpResponse.getStatusLine().getStatusCode()!=201) {
+				ErrorState.getInstance().setError("Error creating API-Proxy. "
+						+ "Unexpected response from API-Manager: " + httpResponse.getStatusLine() + " " + EntityUtils.toString(httpResponse.getEntity()) + ". "
+								+ "Please check the API-Manager traces.", ErrorCode.CANT_CREATE_API_PROXY, false);
+				throw new AppException("Error creating API-Proxy", ErrorCode.CANT_CREATE_API_PROXY);
+			}
 			response = EntityUtils.toString(httpResponse.getEntity());
 			jsonNode = objectMapper.readTree(response);
 			String virtualAPIId = jsonNode.findPath("id").asText();
