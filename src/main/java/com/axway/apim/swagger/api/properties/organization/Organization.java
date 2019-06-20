@@ -2,6 +2,9 @@ package com.axway.apim.swagger.api.properties.organization;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Organization {
 	
 	private String id;
