@@ -35,7 +35,7 @@ public class BackendBasepathChangedTestIT extends TestNGCitrusTestDesigner {
 		echo("####### No-Change test for '${apiName}' on path: '${apiPath}' #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/serviceprofile/2_backend_basepath_test.json");
-		createVariable("backendBasepath", "https://host.xyz.com:8665");
+		createVariable("backendBasepath", "https://swapi.co:443");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
@@ -52,7 +52,7 @@ public class BackendBasepathChangedTestIT extends TestNGCitrusTestDesigner {
 		echo("####### Change API to status published: #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/serviceprofile/2_backend_basepath_test.json");
-		createVariable("backendBasepath", "https://host.xyz.com:8665");
+		createVariable("backendBasepath", "https://swapi.co:443");
 		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);

@@ -46,18 +46,20 @@ public class APIDefintion {
 				if(importAPI.getBackendBasepath()!=null) {
 					URL url = new URL(importAPI.getBackendBasepath());
 					int port = url.getPort()==-1 ? url.getDefaultPort() :  url.getPort();
+					boolean noPortRequired = false;
+					if(port==443 || port==80) noPortRequired = true; 
 					ObjectMapper objectMapper = new ObjectMapper();
 					JsonNode swagger = objectMapper.readTree(apiDefinitionContent);
 					if(swagger.get("host")==null) {
 						LOG.info("Adding new host '"+url.getHost()+":"+port+"' to Swagger-File based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+						((ObjectNode)swagger).put("host", url.getHost()+":"+port);
 					} else {
-						LOG.info("Replacing existing host: '"+swagger.get("host").asText()+"' in Swagger-File to '"+url.getHost()+":"+port+"' based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+						if(!swagger.get("host").asText().equals(url.getHost()+":"+port) && (noPortRequired && swagger.get("host").asText().equals(url.getHost()))) {
+							LOG.info("Replacing existing host: '"+swagger.get("host").asText()+"' in Swagger-File to '"+url.getHost()+":"+port+"' based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+							((ObjectNode)swagger).put("host", url.getHost()+":"+port);
+						}
 					}
-					((ObjectNode)swagger).put("host", url.getHost()+":"+port);
-					
 					this.apiDefinitionContent = objectMapper.writeValueAsBytes(swagger);
-					String newSwagger = new String(apiDefinitionContent);
-					LOG.info("newSwagger: '"+newSwagger+"'");
 				}
 			}
 		} catch (Exception e) {
