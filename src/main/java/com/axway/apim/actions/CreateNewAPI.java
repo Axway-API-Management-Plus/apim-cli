@@ -17,7 +17,9 @@ import com.axway.apim.actions.tasks.UpdateAPIImage;
 import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
 import com.axway.apim.actions.tasks.UpdateQuotaConfiguration;
+import com.axway.apim.actions.tasks.UpgradeAccessToNewerAPI;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
+import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
@@ -36,7 +38,7 @@ public class CreateNewAPI {
 	
 	static Logger LOG = LoggerFactory.getLogger(CreateNewAPI.class);
 
-	public void execute(APIChangeState changes) throws AppException {
+	public void execute(APIChangeState changes, boolean reCreation) throws AppException {
 		
 		Transaction context = Transaction.getInstance();
 		
@@ -60,20 +62,27 @@ public class CreateNewAPI {
 		if(changes.getDesiredAPI().getImage()!=null) {
 			new UpdateAPIImage(changes.getDesiredAPI(), createdAPI).execute();
 		}
-		// This is special, as the status is not a property and requires some additional actions!
+		// This is special, as the status is not a normal property and requires some additional actions!
 		new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI).execute();
+		
+		if(reCreation && changes.getActualAPI().getState().equals(IAPI.STATE_PUBLISHED)) {
+			// In case, the existing API is already in use (Published), we have to grant access to our new imported API
+			new UpgradeAccessToNewerAPI(changes.getIntransitAPI(), changes.getActualAPI()).execute();
+		}
 		
 		// Is a Quota is defined we must manage it
 		new UpdateQuotaConfiguration(changes.getDesiredAPI(), createdAPI).execute();
 		
 		// Grant access to the API
-		new ManageClientOrgs(changes.getDesiredAPI(), createdAPI).execute();
+		new ManageClientOrgs(changes.getDesiredAPI(), createdAPI).execute(reCreation);
 		
 		// Handle subscription to applications
-		new ManageClientApps(changes.getDesiredAPI(), createdAPI, changes.getActualAPI()).execute();
+		new ManageClientApps(changes.getDesiredAPI(), createdAPI, changes.getActualAPI()).execute(reCreation);
 		
 		// V-Host must be managed almost at the end, as the status must be set already to "published"
 		vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
+		
+		APIPropertiesExport.getInstance().setProperty("feApiId", createdAPI.getApiId());
 	}
 	
 	/**

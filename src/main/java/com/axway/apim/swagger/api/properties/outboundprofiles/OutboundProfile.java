@@ -1,6 +1,5 @@
 package com.axway.apim.swagger.api.properties.outboundprofiles;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;

@@ -18,6 +18,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
+import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.RelaxedParser;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIImportConfigAdapter;
@@ -104,7 +105,12 @@ public class App {
 			
 			option = new Option("clientAppsMode", true, "Controls how configured Client-Applications are treated. Defaults to add!");
 			option.setArgName("ignore|replace|add");
-			options.addOption(option);	
+			options.addOption(option);
+			
+			option = new Option("detailsExportFile", true, "Configure a filename, to get a Key=Value file containing information about the created API.");
+			option.setRequired(false);
+			option.setArgName("APIDetails.properties");
+			options.addOption(option);
 			
 			Options internalOptions = new Options();
 			option = new Option("ignoreAdminAccount", true, "If set, the tool wont load the env.properties. This is used for testing only.");
@@ -152,15 +158,17 @@ public class App {
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			
-			APIImportConfigAdapter contract = new APIImportConfigAdapter(params.getOptionValue("contract"), 
-					params.getOptionValue("stage"), params.getOptionValue("apidefinition"), apimAdapter.isUsingOrgAdmin());
+			APIImportConfigAdapter contract = new APIImportConfigAdapter(params.getValue("contract"), 
+					params.getValue("stage"), params.getValue("apidefinition"), apimAdapter.isUsingOrgAdmin());
 			IAPI desiredAPI = contract.getDesiredAPI();
 			IAPI actualAPI = apimAdapter.getAPIManagerAPI(apimAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
 			apimAdapter.applyChanges(changeActions);
+			APIPropertiesExport.getInstance().store();
 			LOG.info("Successfully replicated API-State into API-Manager");
 			return 0;
 		} catch (AppException ap) {
+			APIPropertiesExport.getInstance().store(); // Try to create it, even 
 			ErrorState errorState = ErrorState.getInstance();
 			if(errorState.hasError()) {
 				errorState.logErrorMessages(LOG);
@@ -171,7 +179,6 @@ public class App {
 				return ap.getErrorCode().getCode();
 			}
 		} catch (Exception e) {
-
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}

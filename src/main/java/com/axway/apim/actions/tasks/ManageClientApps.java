@@ -42,27 +42,20 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		this.oldAPI = oldAPI;
 	}
 	
-	public void execute() throws AppException {
-		if(desiredState.getApplications()==null && (oldAPI==null || !oldAPI.isValid())) return;
+	public void execute(boolean reCreation) throws AppException {
+		if(desiredState.getApplications()==null && !reCreation) return;
 		if(CommandParameters.getInstance().isIgnoreClientApps()) {
 			LOG.info("Configured client applications are ignored, as flag ignoreClientApps has been set.");
 			return;
 		}
 		if(desiredState.getApplications()!=null) { // Happens, when config-file doesn't contains client apps
-			ListIterator<ClientApplication> it = desiredState.getApplications().listIterator();
-			ClientApplication app;
-			while(it.hasNext()) {
-				app = it.next();
-				if(!hasClientAppPermission(app)) {
-					LOG.error("Organization of configured application: '" + app.getName() + "' has NO permission to this API. Ignoring this application.");
-					it.remove();
-					continue;
-				}
-			}
+			removeNonGrantedClientApps(desiredState.getApplications());
 		}
 		List<ClientApplication> recreateActualApps = null;
-		// If the API has been re-created we have to re-create existing App-Subscriptions
-		if(oldAPI!=null && oldAPI.isValid() && CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_ADD)) {
+		// If an UNPUBLISHED API has been re-creared, we have to create App-Subscriptions manually, as API-Manager Upgrade only works on PUBLISHED APIs
+		// But we only need to do this, if existing App-Subscriptions should be preserved (MODE_ADD).
+		if(reCreation && actualState.getState().equals(IAPI.STATE_UNPUBLISHED) && CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_ADD)) {
+			removeNonGrantedClientApps(oldAPI.getApplications());
 			recreateActualApps = getMissingApps(oldAPI.getApplications(), actualState.getApplications());
 			// Create previously existing App-Subscriptions
 			createAppSubscription(recreateActualApps, actualState.getId());
@@ -87,12 +80,30 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		}
 	}
 	
+	private void removeNonGrantedClientApps(List<ClientApplication> apps) throws AppException {
+		if(apps == null) return;
+		ListIterator<ClientApplication> it = apps.listIterator();
+		ClientApplication app;
+		while(it.hasNext()) {
+			app = it.next();
+			if(!hasClientAppPermission(app)) {
+				LOG.error("Organization of configured application: '" + app.getName() + "' has NO permission to this API. Ignoring this application.");
+				it.remove();
+				continue;
+			}
+		}
+	}
+	
 	private boolean hasClientAppPermission(ClientApplication app) throws AppException {
 		String appsOrgId = app.getOrganizationId();
 		String appsOrgName = APIManagerAdapter.getInstance().getOrgName(appsOrgId);
 		if(appsOrgName==null) return false;
 		// If the App belongs to the same Org as the API, it automatically has permission (esp. for Unpublished APIs)
 		if(app.getOrganizationId().equals(((ActualAPI)actualState).getOrganizationId())) return true;
+		if(actualState.getClientOrganizations()==null) {
+			LOG.debug("No org has access to this API, hence no other app has permission.");
+			return true;
+		}
 		return actualState.getClientOrganizations().contains(appsOrgName);
 	}
 	
