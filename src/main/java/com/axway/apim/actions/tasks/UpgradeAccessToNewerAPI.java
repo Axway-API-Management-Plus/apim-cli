@@ -27,16 +27,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IResponseParser {
+	
+	private IAPI inTransitState; 
 
 	public UpgradeAccessToNewerAPI(IAPI inTransitState, IAPI actualState) {
 		super(inTransitState, actualState);
+		this.inTransitState = inTransitState;
 	}
 	public void execute() throws AppException {
 		if(desiredState.getState().equals(IAPI.STATE_UNPUBLISHED)) {
 			LOG.debug("No need to grant access to newly created API, as desired state of API is unpublished.");
 			return;
 		}
-		LOG.info("Granting access to newly created API");
+		LOG.info("Upgrade access & subscriptions to newly created API.");
 		
 		URI uri;
 		HttpEntity entity;
@@ -55,6 +58,10 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 			apiCall.setContentType("application/x-www-form-urlencoded");
 			
 			apiCall.execute();
+			// API-Manager has now granted access to all existing orgs and give a subscription to existing app
+			// therefore we have to update the new Actual-State to reflect this
+			inTransitState.setClientOrganizations(actualState.getClientOrganizations());
+			inTransitState.setApplications(actualState.getApplications());
 		} catch (Exception e) {
 			throw new AppException("Can't upgrade access to newer API!", ErrorCode.CANT_UPGRADE_API_ACCESS, e);
 		}
@@ -64,6 +71,8 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 			LOG.debug("Found: "+actualState.getApplications().size()+" subscribed applications for this API. Taking over potentially configured quota configuration.");
 			for(ClientApplication app : actualState.getApplications()) {
 				if(app.getAppQuota()==null) continue;
+				// REST-API for App-Quota is also returning Default-Quotas, but we have to ignore them here!
+				if(app.getAppQuota().getId().equals(APIManagerAdapter.APPLICATION_DEFAULT_QUOTA) || app.getAppQuota().getId().equals(APIManagerAdapter.SYSTEM_API_QUOTA)) continue;
 				for(QuotaRestriction restriction : app.getAppQuota().getRestrictions()) {
 					if(restriction.getApi().equals(actualState.getId())) { // This application has a restriction for this specific API
 						updateAppQuota = true;

@@ -36,13 +36,15 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		super(desiredState, actualState);
 	}
 
-	public void execute() throws AppException {
-		if(desiredState.getClientOrganizations()==null) return;
-		if(desiredState.getState().equals(IAPI.STATE_UNPUBLISHED)) return;
+	public void execute(boolean reCreation) throws AppException {
 		if(CommandParameters.getInstance().isIgnoreClientOrgs()) {
 			LOG.info("Configured client organizations are ignored, as flag ignoreClientOrgs has been set.");
 			return;
 		}
+		if(desiredState.getState().equals(IAPI.STATE_UNPUBLISHED)) return;
+		// The API isn't Re-Created and there are no orgs configured - We can skip the rest
+		if(desiredState.getClientOrganizations()==null && !reCreation) return;
+		// From here, the assumption is that existing Org-Access has been upgraded already - We only have to take care about additional orgs
 		if(((DesiredAPI)desiredState).isRequestForAllOrgs()) {
 			LOG.info("Granting permission to all organizations");
 			grantClientOrganization(getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations()), actualState.getId(), true);
@@ -152,6 +154,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 	
 	private static List<String> getMissingOrgs(List<String> orgs, List<String> referenceOrgs) throws AppException {
 		List<String> missingOrgs = new ArrayList<String>();
+		if(orgs==null || referenceOrgs ==null) return missingOrgs;
 		for(String orgName : orgs) {
 			if(referenceOrgs.contains(orgName)) {
 				continue;
