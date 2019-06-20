@@ -48,6 +48,7 @@ public class ReCreateAPIQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		createVariable("appName", "Recreate-with-App-Quota ${apiNumber}");
+		createVariable("appName2", "Recreate-with-App-Quota 2 ${apiNumber}");
 		echo("####### Create an application: '${appName}', used to subscribe to that API #######");
 		http(builder -> builder.client("apiManager").send().post("/applications").header("Content-Type", "application/json")
 			.payload("{\"name\":\"${appName}\",\"apis\":[],\"organizationId\":\"${orgId2}\"}"));
@@ -56,13 +57,26 @@ public class ReCreateAPIQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.extractFromPayload("$.id", "testAppId")
 			.extractFromPayload("$.name", "testAppName"));
 		
+		echo("####### Create a second application: '${appName}', used to subscribe to that API #######");
+		http(builder -> builder.client("apiManager").send().post("/applications").header("Content-Type", "application/json")
+			.payload("{\"name\":\"${appName2}\",\"apis\":[],\"organizationId\":\"${orgId2}\"}"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.CREATED)
+			.messageType(MessageType.JSON)
+			.extractFromPayload("$.id", "testAppId2")
+			.extractFromPayload("$.name", "testAppName2"));
+		
 		echo("####### Grant access to org2 for this API  #######");
 		http(builder -> builder.client("apiManager").send().post("/proxies/grantaccess").header("Content-Type", "application/x-www-form-urlencoded")
 				.payload("action=orgs&apiId=${apiId}&grantOrgId=${orgId2}"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.NO_CONTENT));
 		
-		echo("####### Subscribe App to the API #######");
+		echo("####### Subscribe App 1 to the API #######");
 		http(builder -> builder.client("apiManager").send().post("/applications/${testAppId}/apis").header("Content-Type", "application/json")
+				.payload("{\"apiId\":\"${apiId}\",\"enabled\":true}"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.CREATED));
+		
+		echo("####### Subscribe App 2 to the API (but without App-Quota) #######");
+		http(builder -> builder.client("apiManager").send().post("/applications/${testAppId2}/apis").header("Content-Type", "application/json")
 				.payload("{\"apiId\":\"${apiId}\",\"enabled\":true}"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.CREATED));
 		
@@ -96,7 +110,7 @@ public class ReCreateAPIQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "seconds")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "60"));
 		
-		echo("####### Validate the application SPECIFIC quota override is set for the API as before #######");
+		echo("####### Validate the application 1 SPECIFIC quota override is set for the API as before #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${testAppId}/quota").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttle")
@@ -104,5 +118,14 @@ public class ReCreateAPIQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.messages", "600")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "hours")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "4"));
+		
+		echo("####### Validate the application 2 returns the App-Default-Quota #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${testAppId2}/quota").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttle")
+			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")
+			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.messages", "25")
+			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "seconds")
+			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "60"));
 	}
 }

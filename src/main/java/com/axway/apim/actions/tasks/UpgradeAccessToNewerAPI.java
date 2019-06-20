@@ -71,6 +71,8 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 			LOG.debug("Found: "+actualState.getApplications().size()+" subscribed applications for this API. Taking over potentially configured quota configuration.");
 			for(ClientApplication app : actualState.getApplications()) {
 				if(app.getAppQuota()==null) continue;
+				// REST-API for App-Quota is also returning Default-Quotas, but we have to ignore them here!
+				if(app.getAppQuota().getId().equals(APIManagerAdapter.APPLICATION_DEFAULT_QUOTA) || app.getAppQuota().getId().equals(APIManagerAdapter.SYSTEM_API_QUOTA)) continue;
 				for(QuotaRestriction restriction : app.getAppQuota().getRestrictions()) {
 					if(restriction.getApi().equals(actualState.getId())) { // This application has a restriction for this specific API
 						updateAppQuota = true;
