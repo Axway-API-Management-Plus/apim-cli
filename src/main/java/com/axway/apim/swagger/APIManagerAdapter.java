@@ -268,6 +268,63 @@ public class APIManagerAdapter {
 	}
 	
 	/**
+	 * Checks if the API-Manager has at least given version. If the given requested version is the same or lower 
+	 * than the actual API-Manager version, true is returned otherwise false.  
+	 * This helps to use features, that are introduced with a certain version or even service-pack.
+	 * @param version has the API-Manager this version of higher?
+	 * @return false if API-Manager doesn't have this version otherwise true
+	 * @throws AppException
+	 */
+	public static boolean hasAPIManagerVersion(String version) throws AppException {
+		try {
+			List<Integer> managerVersion	= getMajorVersions(getApiManagerVersion());
+			List<Integer> requestedVersion	= getMajorVersions(version);
+			int managerSP	= getServicePackVersion(getApiManagerVersion());
+			int requestedSP = getServicePackVersion(version);
+			for(int i=0;i<requestedVersion.size(); i++) {
+				int managerVer = managerVersion.get(i);
+				if(managerVer>requestedVersion.get(i)) return true;
+				if(managerVer<requestedVersion.get(i)) return false;
+			}
+			if(managerSP<requestedSP) return false;
+		} catch(Exception e) {
+			LOG.warn("Can't parse API-Manager version: '"+apiManagerVersion+"'. Requested version was: '"+version+"'. Returning false!");
+			return false;
+		}
+		return true;
+	}
+	
+	private static int getServicePackVersion(String version) {
+		int spNumber = 0;
+		if(version.contains(" SP")) {
+			try {
+				String spVersion = version.substring(version.indexOf(" SP")+3);
+				spNumber = Integer.parseInt(spVersion);
+			} catch (Exception e){
+				LOG.trace("Can't parse service pack version in version: '"+version+"'");
+			}
+		}
+		return spNumber;
+	}
+	
+	private static List<Integer> getMajorVersions(String version) {
+		List<Integer> majorNumbers = new ArrayList<Integer>();
+		String versionWithoutSP = version;
+		if(version.contains(" SP")) {
+			versionWithoutSP = version.substring(0, version.indexOf(" SP"));
+		}
+		try {
+			String[] versions = versionWithoutSP.split("\\.");
+			for(int i = 0; i<versions.length; i++) {
+				majorNumbers.add(Integer.parseInt(versions[i]));
+			}
+		} catch (Exception e){
+			LOG.trace("Can't parse major version numbers in: '"+version+"'");
+		}
+		return majorNumbers;
+	}
+	
+	/**
 	 * Creates the API-Manager API-Representation. Basically the "Actual" state of the API.
 	 *  
 	 * @param jsonConfiguration the JSON-Configuration which is returned from the API-Manager REST-API (Proxy-Endpoint)
@@ -339,11 +396,15 @@ public class APIManagerAdapter {
 		if(!hasAdminAccount) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> allApps = getAllApps();
-		for(ClientApplication app : allApps) {
-			List<APIAccess> APIAccess = getAPIAccess(app.getId(), "applications");
-			for(APIAccess access : APIAccess) {
-				if(access.getApiId().equals(apiManagerApi.getId())) {
-					existingClientApps.add(app);
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
+			existingClientApps = getSubscribedApps(apiManagerApi.getId());
+		} else {
+			for(ClientApplication app : allApps) {
+				List<APIAccess> APIAccess = getAPIAccess(app.getId(), "applications");
+				for(APIAccess access : APIAccess) {
+					if(access.getApiId().equals(apiManagerApi.getId())) {
+						existingClientApps.add(app);
+					}
 				}
 			}
 		}
@@ -728,7 +789,25 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	
+	private static List<ClientApplication> getSubscribedApps(String apiId) throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		if(!APIManagerAdapter.hasAPIManagerVersion("7.7")) {
+			throw new AppException("API-Manager: " + apiManagerVersion + " doesn't support /proxies/<apiId>/applications", ErrorCode.UNXPECTED_ERROR);
+		}
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/applications").build();
+			RestAPICall getRequest = new GETRequest(uri, null, true);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			List<ClientApplication> subscribedApps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
+			return subscribedApps;
+		} catch (Exception e) {
+			LOG.error("Error cant load subscribes applications from API-Manager. Can't parse response: " + response);
+			throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
 	
 	public List<Organization> getAllOrgs() throws AppException {
 		if(!hasAdminAccount) {
