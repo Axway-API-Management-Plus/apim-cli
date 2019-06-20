@@ -42,8 +42,8 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		this.oldAPI = oldAPI;
 	}
 	
-	public void execute() throws AppException {
-		if(desiredState.getApplications()==null && (oldAPI==null || !oldAPI.isValid())) return;
+	public void execute(boolean reCreation) throws AppException {
+		if(desiredState.getApplications()==null && !reCreation) return;
 		if(CommandParameters.getInstance().isIgnoreClientApps()) {
 			LOG.info("Configured client applications are ignored, as flag ignoreClientApps has been set.");
 			return;
@@ -52,8 +52,9 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			removeNonGrantedClientApps(desiredState.getApplications());
 		}
 		List<ClientApplication> recreateActualApps = null;
-		// If the API has been re-created we have to re-create existing App-Subscriptions
-		if(oldAPI!=null && oldAPI.isValid() && CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_ADD)) {
+		// If an UNPUBLISHED API has been re-creared, we have to create App-Subscriptions manually, as API-Manager Upgrade only works on PUBLISHED APIs
+		// But we only need to do this, if existing App-Subscriptions should be preserved (MODE_ADD).
+		if(reCreation && actualState.getState().equals(IAPI.STATE_UNPUBLISHED) && CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_ADD)) {
 			removeNonGrantedClientApps(oldAPI.getApplications());
 			recreateActualApps = getMissingApps(oldAPI.getApplications(), actualState.getApplications());
 			// Create previously existing App-Subscriptions
@@ -99,6 +100,10 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		if(appsOrgName==null) return false;
 		// If the App belongs to the same Org as the API, it automatically has permission (esp. for Unpublished APIs)
 		if(app.getOrganizationId().equals(((ActualAPI)actualState).getOrganizationId())) return true;
+		if(actualState.getClientOrganizations()==null) {
+			LOG.debug("No org has access to this API, hence no other app has permission.");
+			return true;
+		}
 		return actualState.getClientOrganizations().contains(appsOrgName);
 	}
 	

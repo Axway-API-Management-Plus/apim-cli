@@ -68,7 +68,13 @@ public class AuthenticationProfile {
 
 	@Override
 	public String toString() {
-		return "AuthenticationProfile [name=" + name + ", isDefault=" + isDefault + ", parameters=" + parameters
+		String parametersString = parameters.toString();
+		if(type.equals(AuthType.ssl)) {
+			String pfx = parameters.getProperty("pfx");
+			if(pfx.length()>50) pfx = pfx.substring(0, 49) + "...";
+			parametersString = "{trustAll="+parameters.getProperty("trustAll")+", password=********, pfx="+pfx+"}";
+		}
+		return "AuthenticationProfile [name=" + name + ", isDefault=" + isDefault + ", parameters=" + parametersString
 				+ ", type=" + type + "]";
 	}
 }

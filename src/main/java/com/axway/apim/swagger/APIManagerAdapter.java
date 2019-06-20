@@ -90,8 +90,8 @@ public class APIManagerAdapter {
 	public static String CREDENTIAL_TYPE_EXT_CLIENTID	= "extclients";
 	public static String CREDENTIAL_TYPE_OAUTH			= "oauth";
 	
-	private final static String SYSTEM_API_QUOTA 				= "00000000-0000-0000-0000-000000000000";
-	private final static String APPLICATION_DEFAULT_QUOTA 		= "00000000-0000-0000-0000-000000000001";
+	public final static String SYSTEM_API_QUOTA 				= "00000000-0000-0000-0000-000000000000";
+	public final static String APPLICATION_DEFAULT_QUOTA 		= "00000000-0000-0000-0000-000000000001";
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
@@ -132,7 +132,7 @@ public class APIManagerAdapter {
 			// --> CreateNewAPI
 			LOG.info("Strategy: No existing API found, creating new!");
 			CreateNewAPI createAPI = new CreateNewAPI();
-			createAPI.execute(changeState);
+			createAPI.execute(changeState, false);
 		// Otherwise an existing API exists
 		} else {
 			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getName() +" (Version: "+ changeState.getActualAPI().getVersion() + ")");
@@ -320,7 +320,8 @@ public class APIManagerAdapter {
 			LOG.info("Ignoring Client-Organizations, as desired API-State is Unpublished!");
 			return;
 		}
-		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null) return;
+		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null 
+				&& CommandParameters.getInstance().getClientOrgsMode().equals(CommandParameters.MODE_REPLACE)) return;
 		List<String> grantedOrgs = new ArrayList<String>();
 		List<Organization> allOrgs = getAllOrgs();
 		for(Organization org : allOrgs) {
@@ -861,6 +862,29 @@ public class APIManagerAdapter {
 					.addBinaryBody("file", IOUtils.toByteArray(certFile), ContentType.create("application/x-x509-ca-cert"), cert.getCertFile())
 					.addTextBody("inbound", cert.getInbound())
 					.addTextBody("outbound", cert.getOutbound())
+					.build();
+			POSTRequest postRequest = new POSTRequest(entity, uri, null);
+			postRequest.setContentType(null);
+			HttpEntity response = postRequest.execute().getEntity();
+			JsonNode jsonResponse = mapper.readTree(response.getContent());
+			return jsonResponse;
+		} catch (Exception e) {
+			throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	/**
+	 * Helper method to translate a Base64 encoded format 
+	 * as it's needed by the API-Manager. 
+	 */
+	public static JsonNode getFileData(InputStream certFile, String filename) throws AppException {
+		URI uri;
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/filedata/").build();
+			
+			HttpEntity entity = MultipartEntityBuilder.create()
+					.addBinaryBody("file", IOUtils.toByteArray(certFile), ContentType.create("application/x-pkcs12"), filename)
 					.build();
 			POSTRequest postRequest = new POSTRequest(entity, uri, null);
 			postRequest.setContentType(null);
