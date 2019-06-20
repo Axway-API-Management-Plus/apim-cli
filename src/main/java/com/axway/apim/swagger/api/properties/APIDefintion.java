@@ -45,22 +45,21 @@ public class APIDefintion {
 			if(CommandParameters.getInstance().replaceHostInSwagger() && getAPIDefinitionType()==IAPI.SWAGGGER_API) {
 				if(importAPI.getBackendBasepath()!=null) {
 					URL url = new URL(importAPI.getBackendBasepath());
-					int port = url.getPort()==-1 ? url.getDefaultPort() :  url.getPort();
-					boolean noPortRequired = false;
-					if(port==443 || port==80) noPortRequired = true; 
+					String port = url.getPort()==-1 ? ":"+String.valueOf(url.getDefaultPort()) : ":"+String.valueOf(url.getPort());
+					if(port.equals(":443") || port.equals(":80")) port = "";
 					ObjectMapper objectMapper = new ObjectMapper();
 					JsonNode swagger = objectMapper.readTree(apiDefinitionContent);
 					if(swagger.get("host")==null) {
-						LOG.info("Adding new host '"+url.getHost()+":"+port+"' to Swagger-File based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
-						((ObjectNode)swagger).put("host", url.getHost()+":"+port);
+						LOG.info("Adding new host '"+url.getHost()+port+"' to Swagger-File based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+						((ObjectNode)swagger).put("host", url.getHost()+port);
 						this.apiDefinitionContent = objectMapper.writeValueAsBytes(swagger);
 					} else {
-						if(!swagger.get("host").asText().equals(url.getHost()+":"+port) && (noPortRequired && swagger.get("host").asText().equals(url.getHost()))) {
-							LOG.info("Replacing existing host: '"+swagger.get("host").asText()+"' in Swagger-File to '"+url.getHost()+":"+port+"' based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
-							((ObjectNode)swagger).put("host", url.getHost()+":"+port);
-							this.apiDefinitionContent = objectMapper.writeValueAsBytes(swagger);
+						if(swagger.get("host").asText().equals(url.getHost()+port)) {
+							LOG.info("Swagger Host: '"+swagger.get("host").asText()+"' already matches configured backendBasepath: '"+importAPI.getBackendBasepath()+"'. Nothing to do.");
 						} else {
-							LOG.info("Swagger Host: '"+swagger.get("host").asText()+"' already matched configuredBackendHost: '"+importAPI.getBackendBasepath()+"'. Nothing to do.");
+							LOG.info("Replacing existing host: '"+swagger.get("host").asText()+"' in Swagger-File to '"+url.getHost()+port+"' based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+							((ObjectNode)swagger).put("host", url.getHost()+port);
+							this.apiDefinitionContent = objectMapper.writeValueAsBytes(swagger);
 						}
 					}
 				}
