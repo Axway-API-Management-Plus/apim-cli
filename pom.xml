@@ -1,13 +1,36 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.axway</groupId>
+	<groupId>github.com.axway-api-management-plus</groupId>
 	<artifactId>apimanager-swagger-promote</artifactId>
 	<version>1.6-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>apimanager-swagger-promote</name>
-	<url>http://maven.apache.org</url>
+	<name>Axway API-Manager CLI called Swagger-Promote</name>
+	<description>Swagger-Promote provides an easy to CLI for Axway API-Manager allowing you to manage your APIs as Code.</description>
+	<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
+	
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	
+	<developers>
+		<developer>
+			<name>Chris Wiechmann</name>
+			<email>cwiechmann@axway.com</email>
+			<organization>Axway</organization>
+			<organizationUrl>http://www.axway.com</organizationUrl>
+		</developer>
+	</developers>
+	
+	<scm>
+		<connection>scm:git:git://github.com/Axway-API-Management-Plus/apimanager-swagger-promote.git</connection>
+		<developerConnection>scm:git:ssh://github.com:Axway-API-Management-Plus/apimanager-swagger-promote.git</developerConnection>
+		<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
+	</scm>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
