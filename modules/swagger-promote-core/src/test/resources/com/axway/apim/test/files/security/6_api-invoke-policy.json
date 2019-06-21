@@ -1,0 +1,29 @@
+{
+   "name":"${apiName}",
+   "path":"${apiPath}",
+   "state":"${status}",
+   "version":"1.0.0",
+   "organization":"API Development ${orgNumber}",
+   "securityProfiles":[
+      {
+         "name":"_default",
+         "isDefault":true,
+         "devices":[
+            {
+               "type":"authPolicy",
+               "name":"Invoke Policy",
+               "order":1,
+               "properties":{
+                  "authenticationPolicy":"${authPolicy}",
+                  "useClientRegistry":true,
+                  "subjectSelector":"authentication.subject.id",
+                  "descriptionType":"original",
+                  "descriptionUrl":"",
+                  "descriptionMarkdown":"",
+                  "description":""
+               }
+            }
+         ]
+      }
+   ]
+}

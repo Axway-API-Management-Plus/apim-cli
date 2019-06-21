@@ -1,0 +1,17 @@
+{
+   "name":"${apiName}",
+   "path":"${apiPath}",
+   "state":"${state}",
+   "version":"1.0.1",
+   "organization":"API Development ${orgNumber}",
+   "clientOrganizations":[
+      "${orgName1}", 
+      "${orgName2}", 
+      "${orgName3}"
+   ],
+   "applications":[
+      { "name":"${appName1}" },
+      { "name":"${appName2}" },
+      { "name":"${appName3}" }
+   ]
+}

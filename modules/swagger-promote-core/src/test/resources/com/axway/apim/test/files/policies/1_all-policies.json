@@ -1,0 +1,46 @@
+{
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"state": "unpublished",
+	"version": "1.0.0",
+	"organization": "API Development ${orgNumber}",
+	"inboundProfiles": {
+		"_default": {
+			"securityProfile": "_default",
+			"corsProfile": "_default",
+			"monitorAPI": true,
+			"monitorSubject": "authentication.subject.id"
+		}
+	},
+	"outboundProfiles": {
+		"_default": {
+			"authenticationProfile": "_default",
+			"requestPolicy": "${requestPolicy}",
+			"responsePolicy": "${responsePolicy}",
+			"routePolicy": "${routePolicy}",
+			"faultHandlerPolicy": "${faultHandlerPolicy}",
+			"apiId": null,
+			"apiMethodId": null,
+			"parameters": [
+			]
+		}
+	},
+    "securityProfiles": [
+     	{
+     		"name": "_default",
+     		"isDefault": true,
+     		"devices": [
+     			{
+     				"name": "API Key",
+     				"type": "apiKey",
+     				"order": 0,
+     				"properties": {
+     					"apiKeyFieldName": "KeyId",
+     					"takeFrom": "QUERY",
+     					"removeCredentialsOnSuccess": "false"
+     				}
+     			}
+     		]
+     	}
+     ]
+}

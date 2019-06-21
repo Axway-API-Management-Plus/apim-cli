@@ -1,0 +1,20 @@
+{
+   "name":"${apiName}",
+   "path":"${apiPath}",
+   "state":"${state}",
+   "version":"1.0.1",
+   "organization":"API Development ${orgNumber}",
+   "systemQuota":{
+      "restrictions":[
+         {
+            "method":"*",
+            "type":"throttle",
+            "config":{
+               "period":"${systemPeriod}",
+               "messages":${messages},
+               "per":5
+            }
+         }
+      ]
+   }
+}

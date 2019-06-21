@@ -1,8 +1,0 @@
-	
-{
-	"name": "${apiName}",
-	"path": "${apiPath}",
-	"state": "${status}",
-	"version": "2.0.0",
-	"organization": "${testOrgName}"
-}
