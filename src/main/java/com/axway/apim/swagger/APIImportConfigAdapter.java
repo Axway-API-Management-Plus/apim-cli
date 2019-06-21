@@ -52,7 +52,6 @@ import com.axway.apim.swagger.api.properties.organization.Organization;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
-import com.axway.apim.swagger.api.state.AbstractAPI;
 import com.axway.apim.swagger.api.state.DesiredAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -92,11 +91,11 @@ public class APIImportConfigAdapter {
 
 	/**
 	 * Constructs the APIImportConfig 
-	 * @param apiConfig
-	 * @param stage
-	 * @param pathToAPIDefinition
-	 * @param hasAdminAccount - set to true, if an AdminAccount is available.
-	 * @throws AppException
+	 * @param apiConfigFile the API-Config given by the user
+	 * @param stage an optional stage used to load overrides and stage specific environment properties
+	 * @param pathToAPIDefinition an optional path to the API-Definition (Swagger / WSDL), can be in the config-file as well.
+	 * @param usingOrgAdmin access to API-Manager should be limited to the Org-Admin account
+	 * @throws AppException if the config-file can't be parsed for some reason
 	 */
 	public APIImportConfigAdapter(String apiConfigFile, String stage, String pathToAPIDefinition, boolean usingOrgAdmin) throws AppException {
 		super();
@@ -130,17 +129,16 @@ public class APIImportConfigAdapter {
 
 	/**
 	 * Returns the IAPIDefintion that returns the desired state of the API. In this method:<br>
-	 * <li>the API-Config is read</li>
-	 * <li>the API-Config is merged with the override</li>
-	 * <li>the API-Definition is read</li>
-	 * <li>Additionally some validations & completions are made here</li>
-	 * <li>in the future: This is the place to do some default handling.
+	 * - the API-Config is read
+	 * - the API-Config is merged with the override
+	 * - the API-Definition is read
+	 * - Additionally some validations and completions are made here
+	 * - in the future: This is the place to do some default handling.
 	 * 
 	 * @return IAPIDefintion with the desired state of the API. This state will be 
 	 * the input to create the APIChangeState.
 	 * 
 	 * @throws AppException if the state can't be created.
-	 * @see {@link IAPI}, {@link AbstractAPI}
 	 */
 	public IAPI getDesiredAPI() throws AppException {
 		try {

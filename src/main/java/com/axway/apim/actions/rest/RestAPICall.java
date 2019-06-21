@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Encapsulates logic to perform REST-API Calls to the API-Manager REST-API. For instance 
- * it's handling the CSRF-Tokens.</br>
+ * it's handling the CSRF-Tokens.  
  * More important is the implementation of ParseReponse. For every API-Call the implementing class 
  * can override the ParseResponse method, which can be used to validate the expected output.
  * 

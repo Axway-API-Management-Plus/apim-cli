@@ -14,7 +14,7 @@ import com.axway.apim.swagger.api.state.IAPI;
 /**
  * This class is used by the {@link APIManagerAdapter#applyChanges(APIChangeState)} to re-create an API. 
  * It's called, when an existing API is found, by at least one changed property can't be applied to the existing 
- * API.</br>
+ * API.  
  * In that case, the desired API must be re-imported, completely updated (proxy, image, Quota, etc.), 
  * actual subscription must be taken over. It basically performs the same steps as when creating a new API, but 
  * having this separated in this class simplifies the code. 

@@ -119,7 +119,7 @@ public class APIManagerAdapter {
 	/**
 	 * This method is taking in the APIChangeState to decide about the strategy how to 
 	 * synchronize the desired API-State into the API-Manager.
-	 * @param changeState containing the desired & actual API
+	 * @param changeState containing the desired and actual API
 	 * @throws AppException is the desired state can't be replicated into the API-Manager.
 	 */
 	public void applyChanges(APIChangeState changeState) throws AppException {
@@ -273,7 +273,7 @@ public class APIManagerAdapter {
 	 * This helps to use features, that are introduced with a certain version or even service-pack.
 	 * @param version has the API-Manager this version of higher?
 	 * @return false if API-Manager doesn't have this version otherwise true
-	 * @throws AppException
+	 * @throws AppException if the API-Manager version can't be detected
 	 */
 	public static boolean hasAPIManagerVersion(String version) throws AppException {
 		try {
@@ -477,8 +477,9 @@ public class APIManagerAdapter {
 	/**
 	 * The actual Org-ID based on the OrgName. Lazy implementation.
 	 * @param orgName the name of the organizations
+	 * @param devOrgsOnly limit the query to organization having the development flag enabled
 	 * @return the id of the organization
-	 * @throws AppException 
+	 * @throws AppException if allOrgs can't be read from the API-Manager
 	 */
 	public String getOrgId(String orgName, boolean devOrgsOnly) throws AppException {
 		if(!this.hasAdminAccount) return null;
@@ -493,9 +494,9 @@ public class APIManagerAdapter {
 	
 	/**
 	 * The actual Org-ID based on the OrgName. Lazy implementation.
-	 * @param orgName the name of the organizations
+	 * @param orgId the id of the organizations you want the name for
 	 * @return the id of the organization
-	 * @throws AppException 
+	 * @throws AppException if allOrgs can't be read from the API-Manager
 	 */
 	public String getOrgName(String orgId) throws AppException {
 		if(allOrgs == null) getAllOrgs();
@@ -508,9 +509,9 @@ public class APIManagerAdapter {
 	
 	/**
 	 * The actual App-ID based on the AppName. Lazy implementation.
-	 * @param orgName the name of the organizations
-	 * @return the id of the organization
-	 * @throws AppException 
+	 * @param appName the name of the application
+	 * @return the application object
+	 * @throws AppException if allApps can't be read from API-Manager 
 	 */
 	public ClientApplication getApplication(String appName) throws AppException {
 		if(allApps==null) getAllApps();
@@ -524,7 +525,7 @@ public class APIManagerAdapter {
 	
 	/**
 	 * The actual App-ID based on the AppName. Lazy implementation.
-	 * @param orgName the name of the organizations
+	 * @param appId unique ID for the application
 	 * @return the id of the organization
 	 */
 	public static ClientApplication getAppForId(String appId) {
@@ -537,9 +538,10 @@ public class APIManagerAdapter {
 	
 	/**
 	 * The actual App-ID based on the AppName. Lazy implementation.
-	 * @param orgName the name of the organizations
+	 * @param credential The credentials (API-Key, Client-ID) which is registered for an application
+	 * @param type of the credential. See APIManagerAdapter for potential credential types 
 	 * @return the id of the organization
-	 * @throws AppException 
+	 * @throws AppException if JSON response from API-Manager can't be parsed
 	 */
 	public ClientApplication getAppIdForCredential(String credential, String type) throws AppException {
 		if(clientCredentialToAppMap.containsKey(type+"_"+credential)) {
@@ -745,6 +747,7 @@ public class APIManagerAdapter {
 	 * Lazy helper method to get the actual API-Manager version. This is used to toggle on/off some 
 	 * of the features (such as API-Custom-Properties)
 	 * @return the API-Manager version as returned from the API-Manager REST-API /config endpoint
+	 * @param configField name of the configField from API-Manager
 	 * @throws AppException is something goes wrong.
 	 */
 	public static String getApiManagerConfig(String configField) throws AppException {
@@ -954,7 +957,11 @@ public class APIManagerAdapter {
 	
 	/**
 	 * Helper method to translate a Base64 encoded format 
-	 * as it's needed by the API-Manager. 
+	 * as it's needed by the API-Manager.
+	 * @param certFile input stream to the certificate file
+	 * @param filename the name of the certificate file used as a reference in the generated Json object
+	 * @throws AppException when the certificate information can't be created
+	 * @return a Json-Object structure as needed by the API-Manager
 	 */
 	public static JsonNode getFileData(InputStream certFile, String filename) throws AppException {
 		URI uri;

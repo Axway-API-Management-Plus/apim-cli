@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Concrete class that is used to reflect the actual API as it's stored in the API-Manager. 
- * On the other hand, the APIImportDefintion reflects the desired state of the API.</br>
- * </br>
+ * On the other hand, the APIImportDefintion reflects the desired state of the API.
+ * 
  * Both classes extend the AbstractAPIDefinition which contains all the common API-Properties that 
  * are compared property by property in APIChangeState.
  * 
@@ -33,8 +33,8 @@ public class ActualAPI extends AbstractAPI implements IAPI {
 	
 	/**
 	 * The tool handles deprecation as an additional state (might not be best choice), but  
-	 * the API-Manager internally doesn't. In API-Manager deprecation is just a true/false toggle.</br>
-	 * To make Desired & Actual API comparable this method is encapsulating the difference. 
+	 * the API-Manager internally doesn't. In API-Manager deprecation is just a true/false toggle.
+	 * To make Desired and Actual API comparable this method is encapsulating the difference. 
 	 * @see com.axway.apim.swagger.api.state.AbstractAPI#getState()
 	 */
 	@Override

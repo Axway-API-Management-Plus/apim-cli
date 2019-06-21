@@ -28,7 +28,7 @@ import com.axway.apim.lib.ErrorCode;
 
 /**
  * The interface to the API-Manager itself responsible to setup the underlying HTTPS-Communication. 
- * It's used by the RESTAPICall.</br>
+ * It's used by the RESTAPICall.  
  * Implemented as a Singleton, which holds the actual connection to the API-Manager.
  * @author cwiechmann@axway.com
  *

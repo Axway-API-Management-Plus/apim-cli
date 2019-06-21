@@ -15,11 +15,11 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.api.state.IAPI;
 
 /**
- * This class is key, as the desired and actual API comes together.</br>
- * </br>
+ * This class is key, as the desired and actual API comes together.
+ * 
  * This class compares the desired- with the actual-API to create the Change-State. Basically 
- * a list of changes that are needed to bring the API in sync.</br> 
- * </br>
+ * a list of changes that are needed to bring the API in sync.
+ * 
  * For that the class iterates through all the declared API-Properties, in case of changes 
  * the belonging APIManagerAction is queued to be executed.
  * This way of working is esp. important when updating an existing API, without 
@@ -139,7 +139,7 @@ public class APIChangeState {
 	/**
 	 * The IntransitAPI is used/set, when a new API has been created in API-Manager 
 	 * while the "old actual API" still exists. This is required for instance when 
-	 * the API must be Re-Created, before told old can be deleted.</br>
+	 * the API must be Re-Created, before told old can be deleted.
 	 * This API basically stores the <b>actual</b> API before the real old actual API 
 	 * can be deleted.
 	 * 
@@ -153,7 +153,7 @@ public class APIChangeState {
 	/**
 	 * The IntransitAPI is used/set, when a new API has been created in API-Manager 
 	 * while the "old actual API" still exists. This is required for instance when 
-	 * the API must be Re-Created, before told old can be deleted.</br>
+	 * the API must be Re-Created, before told old can be deleted.
 	 * This API basically stores the <b>actual</b> API before the real old actual API 
 	 * can be deleted.
 	 * 
@@ -177,7 +177,7 @@ public class APIChangeState {
 
 	/**
 	 * @return true, if a Breaking-Change propery is found on an "Unpublished" API otherwise false.
-	 * @throws AppException 
+	 * @throws AppException if the actualAPI.state can't be read 
 	 */
 	public boolean isBreaking() throws AppException {
 		// We will only break API, if the API is no longer in state: "unpublished"

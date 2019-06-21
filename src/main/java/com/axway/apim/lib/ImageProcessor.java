@@ -33,13 +33,18 @@ public class ImageProcessor {
 	private byte[] imageBytes;
 	Map<String, String> responseMap = new HashMap<String, String>();
 	
+	/**
+	 * Creates an image processor object using the given ByteArray and JPG-Image-Format as default. 
+	 * @param in contains the image content as ByteArray 
+	 */
 	public ImageProcessor(byte[] in) {
 	    this(in, "jpg");
 	}
 
 	/**
-	 *
-	 * @param in
+	 * Creates an image processor object using the given ByteArray and Image-Format. 
+	 * @param in contains the image content as ByteArray 
+	 * @param formatName what kind of image format (jpg, png, etc.)
 	 */
     public ImageProcessor(byte[] in, String formatName) {
         try (final ByteArrayInputStream bis = new ByteArrayInputStream(in);

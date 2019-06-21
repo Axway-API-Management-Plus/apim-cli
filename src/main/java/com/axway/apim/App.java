@@ -26,11 +26,11 @@ import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.state.IAPI;
 
 /**
- * This is the Entry-Point of program and responsible to:</br>
- * - read the command-line parameters to create a <code>CommandParameters</code></br>
- * - next is to read the API-Contract by creating an <code>APIImportConfig</code> instance and calling getImportAPIDefinition()</br>
- * - the <code>APIManagerAdapter</code> method: <code>getAPIManagerAPI()</code> is used to create the API-Manager API state</br>
- * - An <code>APIChangeState</code> is created based on ImportAPI & API-Manager API
+ * This is the Entry-Point of program and responsible to:  
+ * - read the command-line parameters to create a <code>CommandParameters</code>
+ * - next is to read the API-Contract by creating an <code>APIImportConfig</code> instance and calling getImportAPIDefinition()
+ * - the <code>APIManagerAdapter</code> method: <code>getAPIManagerAPI()</code> is used to create the API-Manager API state
+ * - An <code>APIChangeState</code> is created based on ImportAPI and API-Manager API
  * - Finally the APIManagerAdapter:applyChanges() is called to replicate the state into the APIManager.   
  * 
  * @author cwiechmann@axway.com

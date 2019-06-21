@@ -12,8 +12,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Concrete class that is used to reflect the desired API as it's defined by the API-Developer. 
- * On the other hand, the APIManagerAPI reflects the actual state of the API inside the API-Manager.</br>
- * </br>
+ * On the other hand, the APIManagerAPI reflects the actual state of the API inside the API-Manager.
+ * 
  * Both classes extend the AbstractAPIDefinition which contains all the common API-Properties that 
  * are compared property by property in APIChangeState.
  * 
@@ -62,7 +62,7 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	}
 	
 	/**
-	 * requestForAllOrgs is used to decide if an API should grant access to ALL organizations.</br> 
+	 * requestForAllOrgs is used to decide if an API should grant access to ALL organizations. 
 	 * That means, when an API-Developer is defining ALL as the organization name this flag 
 	 * is set to true and it becomes the desired state.
 	 * @return true, if the developer wants to have permissions to this API for all Orgs.
@@ -72,12 +72,12 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	}
 
 	/**
-	 * requestForAllOrgs is used to decide if an API should grant access to ALL organizations.</br> 
+	 * requestForAllOrgs is used to decide if an API should grant access to ALL organizations. 
 	 * That means, when an API-Developer is defining ALL as the organization name this flag 
-	 * is set to true and it becomes the desired state.</br>
+	 * is set to true and it becomes the desired state.
 	 * This method is used during creation of APIImportDefinition in  APIImportConfig#handleAllOrganizations()
 	 * @see APIImportConfigAdapter
-	 * @param requestForAllOrgs
+	 * @param requestForAllOrgs when set to true, the APIs will be granted to ALL organizations.
 	 */
 	public void setRequestForAllOrgs(boolean requestForAllOrgs) {
 		this.requestForAllOrgs = requestForAllOrgs;
