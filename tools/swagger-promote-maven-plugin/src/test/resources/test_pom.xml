@@ -13,8 +13,8 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>swagger-promote-maven</groupId>
-                <artifactId>swagger-promote-maven-plugin</artifactId>
+                <groupId>com.github.axway-api-management-plus</groupId>
+                <artifactId>axway-swagger-promote-maven-plugin</artifactId>
                 <version>1.0.0</version>
                 <configuration>
                    <stageConfigurationFile>src/main/resources/EMEA-TEST.json</stageConfigurationFile>
