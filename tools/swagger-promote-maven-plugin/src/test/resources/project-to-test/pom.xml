@@ -26,7 +26,7 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.github.axway-api-management-plus.mvn</groupId>
+                        <groupId>com.github.axway-api-management-plus</groupId>
                         <artifactId>swagger-promote-maven-plugin</artifactId>
                         <version>1.6-SNAPSHOT</version>
                         <configuration>
