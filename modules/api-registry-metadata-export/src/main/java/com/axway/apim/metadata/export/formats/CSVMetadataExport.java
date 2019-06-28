@@ -70,6 +70,10 @@ public class CSVMetadataExport implements IMetadataExport {
 			for(ClientApplication app : this.metaData.getAllApps()) {
 				for(APIAccess apiAccess : app.getApiAccess()) {
 					IAPI api = APIsPerId.get(apiAccess.getApiId());
+					if(api==null) {
+						LOG.warn("Application: '"+app.getName()+"' has a subscription to non-existing API with ID: '"+apiAccess.getId()+"'");
+						continue;
+					}
 					for(APIMethod method : ((ActualAPI)api).getApiMethods()) {
 						csvPrinter.printRecord(app.getId(), api.getId(), method.getId(), "Front-End", app.getOrganizationId(), SimpleDateFormat.getDateTimeInstance().format(getMidnight()));
 					}

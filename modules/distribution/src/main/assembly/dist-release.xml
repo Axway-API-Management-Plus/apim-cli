@@ -10,7 +10,7 @@
     <moduleSet>
       <useAllReactorProjects>true</useAllReactorProjects>
       <includes>
-        <include>com.github.axway-api-management-plus:axway-swagger-promote-core</include>
+        <include>com.github.axway-api-management-plus.swagger-promote:axway-swagger-promote-core</include>
       </includes>
       <binaries>
         <unpack>false</unpack>
@@ -66,7 +66,7 @@
     <moduleSet>
       <useAllReactorProjects>true</useAllReactorProjects>
       <includes>
-        <include>com.github.axway-api-management-plus:api-registry-metadata-export</include>
+        <include>com.github.axway-api-management-plus.swagger-promote:api-registry-metadata-export</include>
       </includes>
       <binaries>
         <unpack>false</unpack>
