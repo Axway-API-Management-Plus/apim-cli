@@ -24,11 +24,11 @@ public class APIExportMetadataHandler {
 		this.mgrAdapater = apimAdapter;
 		// Initialize the base-data from API-Manager!
 		exportData.setAllOrgs(mgrAdapater.getAllOrgs());
-		LOG.info("Susccessfully retrieved " + exportData.getAllOrgs().size() + " organizations from API-Manager");
+		LOG.info("Successfully retrieved " + exportData.getAllOrgs().size() + " organizations from API-Manager");
 		exportData.setAllApps(mgrAdapater.getAllApps());
-		LOG.info("Susccessfully retrieved " + exportData.getAllApps().size() + " applications from API-Manager");
+		LOG.info("Successfully retrieved " + exportData.getAllApps().size() + " applications from API-Manager");
 		exportData.setAllAPIs(mgrAdapater.getAllAPIs());
-		LOG.info("Susccessfully retrieved " + exportData.getAllAPIs().size() + " APIs from API-Manager");
+		LOG.info("Successfully retrieved " + exportData.getAllAPIs().size() + " APIs from API-Manager");
 		// All the rest is up to the specific export format
 	}
 	

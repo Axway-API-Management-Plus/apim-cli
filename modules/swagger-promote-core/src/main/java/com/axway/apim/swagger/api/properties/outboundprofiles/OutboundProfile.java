@@ -48,7 +48,7 @@ public class OutboundProfile {
 	
 	String authenticationProfile;
 	
-	String[] parameters = new String[] {};
+	Object[] parameters = new Object[] {};
 
 	public OutboundProfile() throws AppException {
 		super();
@@ -130,7 +130,7 @@ public class OutboundProfile {
 	}
 
 	public void setRequestPolicy(String requestPolicy) throws AppException {
-		if(requestPolicy!=null && !requestPolicy.startsWith("<")) 
+		if(requestPolicy!=null && !requestPolicy.startsWith("<") && !requestPolicy.equals("")) 
 			requestPolicy = getPolicy(apimRequestPolicies, requestPolicy, "request");
 		this.requestPolicy = requestPolicy;
 	}
@@ -140,7 +140,7 @@ public class OutboundProfile {
 	}
 
 	public void setResponsePolicy(String responsePolicy) throws AppException {
-		if(responsePolicy!=null && !responsePolicy.startsWith("<")) 
+		if(responsePolicy!=null && !responsePolicy.startsWith("<") && !responsePolicy.equals("")) 
 			responsePolicy = getPolicy(apimResponsePolicies, responsePolicy, "response");
 		this.responsePolicy = responsePolicy;
 	}
@@ -150,7 +150,7 @@ public class OutboundProfile {
 	}
 
 	public void setRoutePolicy(String routePolicy) throws AppException {
-		if(routePolicy!=null && !routePolicy.startsWith("<")) 
+		if(routePolicy!=null && !routePolicy.startsWith("<") && !routePolicy.equals("")) 
 			routePolicy = getPolicy(apimRoutingPolicies, routePolicy, "routing");
 		this.routePolicy = routePolicy;
 	}
@@ -160,7 +160,7 @@ public class OutboundProfile {
 	}
 
 	public void setFaultHandlerPolicy(String faultHandlerPolicy) throws AppException {
-		if(faultHandlerPolicy!=null && !faultHandlerPolicy.startsWith("<")) 
+		if(faultHandlerPolicy!=null && !faultHandlerPolicy.startsWith("<") && !faultHandlerPolicy.equals("")) 
 			faultHandlerPolicy = getPolicy(apimFaultHandlerPolicies, faultHandlerPolicy, "fault handler");
 		this.faultHandlerPolicy = faultHandlerPolicy;
 	}
@@ -181,11 +181,11 @@ public class OutboundProfile {
 		this.apiId = apiId;
 	}
 
-	public String[] getParameters() {
+	public Object[] getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(String[] parameters) {
+	public void setParameters(Object[] parameters) {
 		this.parameters = parameters;
 	}
 
