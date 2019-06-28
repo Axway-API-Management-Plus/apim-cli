@@ -8,13 +8,19 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>axway-swagger-promote-core</artifactId>
+	<artifactId>api-registry-metadata-export</artifactId>
+	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Axway API-Manager CLI Swagger-Promote Core</name>
-	<description>The core component of Swagger-Promote replicating APIs into the API-Manager.</description>
+	<name>Axway API-Manager API-Metadata Export</name>
+	<description>Collects a number of information (Applications, APIs, etc. and the relation to and exports it.</description>
 	<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
 
 	<dependencies>
+		<dependency>
+			<artifactId>axway-swagger-promote-core</artifactId>
+			<groupId>com.github.axway-api-management-plus</groupId>
+			<version>1.6-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -93,6 +99,11 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.25</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.6</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -130,23 +141,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptors>
-						<descriptor>src/main/assembly/assembly.xml</descriptor>
-					</descriptors>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>attached</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin-->
 			<plugin>
 				<groupId>external.atlassian.jgitflow</groupId>
 				<artifactId>jgitflow-maven-plugin</artifactId>

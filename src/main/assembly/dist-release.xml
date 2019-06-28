@@ -1,0 +1,65 @@
+<assembly>
+  <id>release</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+    <format>dir</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <includeSiteDirectory>false</includeSiteDirectory>
+  <moduleSets>
+    <moduleSet>
+      <includes>
+        <include>com.github.axway-api-management-plus:axway-swagger-promote-core</include>
+        <include>com.github.axway-api-management-plus:api-registry-metadata-export</include>
+      </includes>
+      <binaries>
+        <outputDirectory>dist</outputDirectory>
+        <unpack>false</unpack>
+        <includeDependencies>false</includeDependencies>
+      </binaries>
+    </moduleSet>
+  </moduleSets>
+
+  <fileSets>
+    <!-- Reference documentation -->
+    <!--fileSet>
+      <directory>target/generated-docs</directory>
+      <outputDirectory>docs/reference/html</outputDirectory>
+    </fileSet-->
+
+    <!-- Citrus Sources -->
+    <fileSet>
+      <directory>modules/swagger-promote-core/target</directory>
+      <outputDirectory>src</outputDirectory>
+      <includes>
+        <include>*sources.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>modules/api-registry-metadata-export/target</directory>
+      <outputDirectory>src</outputDirectory>
+      <includes>
+        <include>*sources.jar</include>
+      </includes>
+    </fileSet>
+
+    <!-- License, readme, notice -->
+    <!--fileSet>
+      <directory>${project.basedir}</directory>
+      <outputDirectory></outputDirectory>
+      <includes>
+        <include>README.md</include>
+        <include>LICENSE.txt</include>
+        <include>NOTICE.txt</include>
+      </includes>
+    </fileSet-->
+  </fileSets>
+
+  <!--files>
+    <file>
+      <source>target/generated-docs/index.pdf</source>
+      <outputDirectory>docs/reference/pdf</outputDirectory>
+    </file>
+  </files-->
+</assembly>
