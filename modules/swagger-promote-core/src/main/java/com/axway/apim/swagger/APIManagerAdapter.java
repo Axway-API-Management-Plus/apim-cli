@@ -48,6 +48,7 @@ import com.axway.apim.swagger.api.properties.organization.Organization;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
 import com.axway.apim.swagger.api.properties.user.User;
+import com.axway.apim.swagger.api.state.APIMethod;
 import com.axway.apim.swagger.api.state.AbstractAPI;
 import com.axway.apim.swagger.api.state.ActualAPI;
 import com.axway.apim.swagger.api.state.IAPI;
@@ -72,6 +73,7 @@ public class APIManagerAdapter {
 	
 	private static List<Organization> allOrgs = null;
 	private static List<ClientApplication> allApps = null;
+	private static List<IAPI> allAPIs = null;
 	
 	private static Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<String, ClientApplication>();
 	
@@ -441,34 +443,43 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	public String getMethodIdPerName(String apiId, String methodName) throws AppException {
+	public List<APIMethod> getAllMethodsForAPI(String apiId) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
 		URI uri;
+		List<APIMethod> apiMethods = new ArrayList<APIMethod>();
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			HttpResponse httpResponse = getRequest.execute();
-			response = EntityUtils.toString(httpResponse.getEntity());
+			/*response = EntityUtils.toString(httpResponse.getEntity());
 			EntityUtils.consume(httpResponse.getEntity());
 			LOG.trace("Response: " + response);
 			JsonNode operations = mapper.readTree(response);
-			if(operations.size()==0) {
-				LOG.warn("No operations found for API with id: " + apiId);
-				return null;
-			}
-			for(JsonNode operation : operations) {
-				String operationName = operation.get("name").asText();
-				if(operationName.equals(methodName)) {
-					return operation.get("id").asText();
-				}
-			}
-			LOG.warn("No operation found with name: '"+methodName+"' for API: '"+apiId+"'");
-			return null;
+			HttpResponse httpResponse = getRequest.execute();*/
+			response = EntityUtils.toString(httpResponse.getEntity());
+			apiMethods = mapper.readValue(response, new TypeReference<List<APIMethod>>(){});
+			return apiMethods;
 		} catch (Exception e) {
-			LOG.error("Can't load operations for API: "+apiId+". Can't parse response: " + response);
-			throw new AppException("Can't load operations for API: "+apiId+".", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			LOG.error("Error cant load API-Methods for API: '"+apiId+"' from API-Manager. Can't parse response: " + response);
+			throw new AppException("Error cant load API-Methods for API: '"+apiId+"' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
+	}
+	
+	public String getMethodIdPerName(String apiId, String methodName) throws AppException {
+		List<APIMethod> apiMethods = getAllMethodsForAPI(apiId);
+		if(apiMethods.size()==0) {
+			LOG.warn("No operations found for API with id: " + apiId);
+			return null;
+		}
+		for(APIMethod method : apiMethods) {
+			String operationName = method.getName();
+			if(operationName.equals(methodName)) {
+				return method.getId();
+			}
+		}
+		LOG.warn("No operation found with name: '"+methodName+"' for API: '"+apiId+"'");
+		return null;
 	}
 	
 	public String getOrgId(String orgName) throws AppException {
@@ -774,7 +785,7 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static List<APIAccess> getAPIAccess(String id, String type) throws AppException {
+	public static List<APIAccess> getAPIAccess(String id, String type) throws AppException {
 		List<APIAccess> allApiAccess = new ArrayList<APIAccess>();
 		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
@@ -834,6 +845,31 @@ public class APIManagerAdapter {
 		} catch (Exception e) {
 			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + response);
 			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public List<IAPI> getAllAPIs() throws AppException {
+		if(!hasAdminAccount) {
+			LOG.error("Cant load all APIs without an Admin-Account.");
+			return null;
+		}
+		if(APIManagerAdapter.allAPIs!=null) {
+			return APIManagerAdapter.allAPIs;
+		}
+		allAPIs = new ArrayList<IAPI>();
+		ObjectMapper mapper = new ObjectMapper();
+		String response = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies").build();
+			RestAPICall getRequest = new GETRequest(uri, null, true);
+			HttpResponse httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			allAPIs = mapper.readValue(response, new TypeReference<List<ActualAPI>>(){});
+			return allAPIs;
+		} catch (Exception e) {
+			LOG.error("Error cant read all APIs from API-Manager. Can't parse response: " + response);
+			throw new AppException("Can't read all APIs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	

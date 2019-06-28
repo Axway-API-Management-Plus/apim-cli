@@ -1,7 +1,10 @@
 package com.axway.apim.swagger.api.properties.applications;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 
+import com.axway.apim.swagger.api.properties.apiAccess.APIAccess;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -12,6 +15,8 @@ public class ClientApplication {
 	private String oauthClientId;
 	private String extClientId;
 	private String apiKey;
+	
+	private List<APIAccess> apiAccess;
 	
 	private APIQuota appQuota;
 	
@@ -60,6 +65,13 @@ public class ClientApplication {
 	}
 	public void setAppQuota(APIQuota appQuota) {
 		this.appQuota = appQuota;
+	}
+	
+	public List<APIAccess> getApiAccess() {
+		return apiAccess;
+	}
+	public void setApiAccess(List<APIAccess> apiAccess) {
+		this.apiAccess = apiAccess;
 	}
 	@Override
 	public boolean equals(Object other) {

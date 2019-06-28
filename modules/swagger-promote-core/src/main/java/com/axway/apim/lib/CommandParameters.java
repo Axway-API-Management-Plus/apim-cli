@@ -22,6 +22,10 @@ public class CommandParameters {
 	
 	private EnvironmentProperties envProperties;
 	
+	public CommandParameters (CommandLine cmd) throws AppException {
+		this(cmd, null, null);
+	}
+	
 	public CommandParameters (CommandLine cmd, CommandLine internalCmd, EnvironmentProperties environment) throws AppException {
 		this.cmd = cmd;
 		this.internalCmd = internalCmd;
@@ -137,9 +141,9 @@ public class CommandParameters {
 	public String getValue(String key) {
 		if(this.cmd.getOptionValue(key)!=null) {
 			return this.cmd.getOptionValue(key);
-		} else if(this.internalCmd.getOptionValue(key)!=null) {
+		} else if(this.internalCmd!=null && this.internalCmd.getOptionValue(key)!=null) {
 			return this.internalCmd.getOptionValue(key);
-		} else if(this.envProperties.containsKey(key)) {
+		} else if(this.envProperties!=null && this.envProperties.containsKey(key)) {
 			return this.envProperties.get(key);
 		} else {
 			return null;

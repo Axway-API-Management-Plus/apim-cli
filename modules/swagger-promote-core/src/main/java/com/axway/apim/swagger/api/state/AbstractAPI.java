@@ -21,7 +21,6 @@ import com.axway.apim.actions.tasks.props.ServiceProfileHandler;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.swagger.api.properties.APIDefintion;
 import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
@@ -37,7 +36,6 @@ import com.axway.apim.swagger.api.properties.tags.TagMap;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This class defines all common properties on an API and how each property should be 
@@ -59,9 +57,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class AbstractAPI {
-	
-	protected CommandParameters cmd = CommandParameters.getInstance();
-	protected ObjectMapper objectMapper = new ObjectMapper();
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
 	protected APIDefintion APIDefinition = null;
@@ -196,6 +191,8 @@ public abstract class AbstractAPI {
 	protected boolean isValid = false;
 	
 	protected String orgId = null;
+	
+	protected List<APIMethod> apiMethods = null;
 	
 
 	public boolean isValid() {
@@ -450,6 +447,14 @@ public abstract class AbstractAPI {
 
 	public void setApiRoutingKey(String apiRoutingKey) {
 		this.apiRoutingKey = apiRoutingKey;
+	}
+
+	public List<APIMethod> getApiMethods() {
+		return apiMethods;
+	}
+
+	public void setApiMethods(List<APIMethod> apiMethods) {
+		this.apiMethods = apiMethods;
 	}
 
 	@Override
