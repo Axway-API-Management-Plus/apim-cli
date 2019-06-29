@@ -60,13 +60,15 @@ public class CSVMetadataExport implements IMetadataExport {
 	public void exportMetadata() throws AppException {
 		String filename = CommandParameters.getInstance().getValue("filename");
 		Appendable appendable;
+		CSVPrinter csvPrinter = null;
 		try {
 			File cvsFile = new File(filename);
 			if(cvsFile.exists()) {
 				LOG.info("Going to overwrite existing file: '"+cvsFile.getCanonicalPath()+"'");
 			}
 			appendable = new FileWriter(cvsFile);
-			CSVPrinter csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader("ClientApplication", "API", "APIMethod", "GatewayInstanceType", "Organization", "EventTimeStamp"));
+			csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader("ClientApplication", "API", "APIMethod", "GatewayInstanceType", "Organization", "EventTimeStamp"));
+			int i=0;
 			for(ClientApplication app : this.metaData.getAllApps()) {
 				for(APIAccess apiAccess : app.getApiAccess()) {
 					IAPI api = APIsPerId.get(apiAccess.getApiId());
@@ -75,15 +77,24 @@ public class CSVMetadataExport implements IMetadataExport {
 						continue;
 					}
 					for(APIMethod method : ((ActualAPI)api).getApiMethods()) {
+						i++;
 						csvPrinter.printRecord(app.getId(), api.getId(), method.getId(), "Front-End", app.getOrganizationId(), SimpleDateFormat.getDateTimeInstance().format(getMidnight()));
+						if( i % 50 == 0 ){
+							csvPrinter.flush();
+						}
 					}
-					
 				}
 			}
-			csvPrinter.close(true);
 			LOG.info("API-Metadata information exported into file: '"+cvsFile.getCanonicalPath()+"'");
 		} catch (IOException e) {
 			throw new AppException("Cant open CSV-File for writing", ErrorCode.UNXPECTED_ERROR);
+		} finally {
+			if(csvPrinter!=null)
+				try {
+					csvPrinter.close(true);
+				} catch (Exception ignore) {
+					throw new AppException("Unable to close CSVWriter", ErrorCode.UNXPECTED_ERROR, ignore);
+				}
 		}
 		
 	}
