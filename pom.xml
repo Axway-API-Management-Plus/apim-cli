@@ -19,7 +19,7 @@
 
 	<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
 	<artifactId>axway-swagger-promote</artifactId>
-	<version>1.5.3</version>
+	<version>1.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Axway API-Manager CLI Swagger-Promote</name>
@@ -67,10 +67,8 @@
 	</properties>
 
 	<modules>
-		<module>modules/swagger-promote-core</module>
-		<module>modules/api-registry-metadata-export</module>
+		<!--module>modules/swagger-promote-core</module-->
 		<module>modules/distribution</module>
-		<module>modules/swagger-promote-bom</module>
 	</modules>
 
 	<build>
