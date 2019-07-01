@@ -1,5 +1,3 @@
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.axway-api-management-plus.swagger-promote/axway-swagger-promote-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.axway-api-management-plus.swagger-promote%22%20AND%20a:%22axway-swagger-promote-core%22)
-
 # Swagger/WSDL based API promotion for Axway API-Manager V7
 
 This project provides you with a tool that simplifies your DevOps experience with the Axway API-Manager Version 7.x. 
