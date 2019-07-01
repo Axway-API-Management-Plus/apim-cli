@@ -4,8 +4,9 @@
     <format>tar.gz</format>
     <format>dir</format>
   </formats>
-  <includeBaseDirectory>false</includeBaseDirectory>
+  <includeBaseDirectory>true</includeBaseDirectory>
   <includeSiteDirectory>false</includeSiteDirectory>
+  <baseDirectory>swagger-promote-${pom.version}</baseDirectory>
   <moduleSets>
     <moduleSet>
       <useAllReactorProjects>true</useAllReactorProjects>
