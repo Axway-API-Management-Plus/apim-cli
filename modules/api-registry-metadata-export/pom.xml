@@ -19,7 +19,6 @@
 		<dependency>
 			<artifactId>axway-swagger-promote-core</artifactId>
 			<groupId>com.github.axway-api-management-plus</groupId>
-			<version>1.6-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
