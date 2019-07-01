@@ -19,7 +19,7 @@
 
 	<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
 	<artifactId>axway-swagger-promote</artifactId>
-	<version>1.6-SNAPSHOT</version>
+	<version>1.5.3</version>
 	<packaging>pom</packaging>
 
 	<name>Axway API-Manager CLI Swagger-Promote</name>
@@ -46,7 +46,8 @@
 		<connection>scm:git:git://github.com/Axway-API-Management-Plus/apimanager-swagger-promote.git</connection>
 		<developerConnection>scm:git:https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote.git</developerConnection>
 		<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
-	</scm>
+	  <tag>axway-swagger-promote-1.5.3</tag>
+  </scm>
 
 	<distributionManagement>
 		<snapshotRepository>
