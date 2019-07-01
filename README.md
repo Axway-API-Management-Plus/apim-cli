@@ -1,3 +1,5 @@
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.axway-api-management-plus.swagger-promote/axway-swagger-promote-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.axway-api-management-plus.swagger-promote%22%20AND%20a:%22axway-swagger-promote-core%22)
+
 # Swagger/WSDL based API promotion for Axway API-Manager V7
 
 This project provides you with a tool that simplifies your DevOps experience with the Axway API-Manager Version 7.x. 
@@ -40,8 +42,8 @@ Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimana
 End-2-End-Tests simulate real world use cases by calling and validating API-Manager promote __161__ times.  
 
 ## Install
-- Download the latest [release](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases)
-- extract the tar.gz file
+- Download the latest [release](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases) or from or from [![Maven Central](https://img.shields.io/maven-central/v/com.github.axway-api-management-plus.swagger-promote/axway-swagger-promote-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.axway-api-management-plus.swagger-promote%22%20AND%20a:%22axway-swagger-promote-core%22)  
+- extract the tar.gz file  
 - make sure you have JRE 8 installed and setup JAVA_HOME environment variable
 
 ## Usage
@@ -71,6 +73,8 @@ End-2-End-Tests simulate real world use cases by calling and validating API-Mana
   - Validate the given API-Organization & Now existing application quotas are preserved
 - 1.5.2 - 27.05.2019
   - Added compatibility for 7.6.2 SP3, App-Quota-Handling improved, Support for Query-String-Option
+- 1.5.3 - 01.07.2019
+  - Now available in Maven-Central, API-Metadata export module, Outbound SSL support
 
 
 ## Limitations/Caveats
