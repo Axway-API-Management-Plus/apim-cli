@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
 		<artifactId>axway-swagger-promote</artifactId>
-		<version>1.5.3</version>
+		<version>1.6-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>axway-swagger-promote-core</artifactId>
