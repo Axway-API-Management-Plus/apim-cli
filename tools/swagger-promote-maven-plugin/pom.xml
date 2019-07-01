@@ -6,14 +6,12 @@
 		<artifactId>axway-swagger-promote</artifactId>
 		<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
 		<version>1.6-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>axway-swagger-promote-maven-plugin</artifactId>
 	<name>Maven plugin for Swagger-Promote</name>
 	<description>Maven plugin for Swagger-Promote</description>
 	<packaging>maven-plugin</packaging>
-	<version>1.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

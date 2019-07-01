@@ -17,7 +17,20 @@
 
   <name>Distribution</name>
 
-
+	<dependencyManagement>
+	    <dependencies>
+	        <dependency>
+	            <groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+	            <artifactId>swagger-promote-core</artifactId>
+	            <version>${project.version}</version>
+	        </dependency>
+			<dependency>
+	            <groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+	            <artifactId>api-registry-metadata-export</artifactId>
+	            <version>1.0-SNAPSHOT</version>
+	        </dependency>
+	    </dependencies>
+	</dependencyManagement>
 
   <build>
     <plugins>
