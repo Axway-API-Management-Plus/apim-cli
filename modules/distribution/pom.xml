@@ -43,7 +43,7 @@
               <goal>single</goal>
             </goals>
             <configuration>
-              <finalName>apimanager-swagger-promote-${pom.version}</finalName>
+              <finalName>apimanager-swagger-promote-${project.version}</finalName>
               <descriptors>
                 <descriptor>src/main/assembly/dist-release.xml</descriptor>
               </descriptors>
