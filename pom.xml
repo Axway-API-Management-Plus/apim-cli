@@ -44,7 +44,7 @@
 
 	<scm>
 		<connection>scm:git:git://github.com/Axway-API-Management-Plus/apimanager-swagger-promote.git</connection>
-		<developerConnection>scm:git:ssh://github.com/Axway-API-Management-Plus/apimanager-swagger-promote.git</developerConnection>
+		<developerConnection>scm:git:git://github.com/Axway-API-Management-Plus/apimanager-swagger-promote.git</developerConnection>
 		<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
 	</scm>
 

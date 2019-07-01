@@ -7,7 +7,7 @@ cd C:\workspaces\api-management\apimanager-swagger-promote
 3. Validate a clean state on master
 git branch -avv
 2. From master create a new release branch
-git checkout -b release/1.5.4 origin/master
+git checkout -b release/1.5.3 origin/master
 3. Pump the version number
 4. Create a package to test with
 mvn clean package -DskipTests
