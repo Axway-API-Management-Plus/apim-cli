@@ -9,7 +9,7 @@
 
 	<artifactId>api-registry-metadata-export</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.6-SNAPSHOT</version>
 	<name>Axway API-Manager API-Metadata Export</name>
 	<description>Collects a number of information (Applications, APIs, etc. and the relation to and exports it.</description>
 	<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
@@ -17,8 +17,8 @@
 	<dependencies>
 		<dependency>
 			<artifactId>axway-swagger-promote-core</artifactId>
-			<groupId>com.github.axway-api-management-plus</groupId>
-			<version>1.6-SNAPSHOT</version>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
