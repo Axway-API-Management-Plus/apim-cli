@@ -44,9 +44,10 @@
 
 	<scm>
 		<connection>scm:git:git://github.com/Axway-API-Management-Plus/apimanager-swagger-promote.git</connection>
-		<developerConnection>scm:git:ssh://github.com:Axway-API-Management-Plus/apimanager-swagger-promote.git</developerConnection>
+		<developerConnection>scm:git:https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote.git</developerConnection>
 		<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
-	</scm>
+	  <tag>axway-swagger-promote-1.5.3</tag>
+  </scm>
 
 	<distributionManagement>
 		<snapshotRepository>
@@ -66,9 +67,7 @@
 	</properties>
 
 	<modules>
-		<module>modules/swagger-promote-core</module>
-		<module>modules/api-registry-metadata-export</module>
-		<module>tools/swagger-promote-maven-plugin</module>
+		<!--module>modules/swagger-promote-core</module-->
 		<module>modules/distribution</module>
 	</modules>
 
@@ -77,14 +76,14 @@
       <plugins>
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
-						<configuration>
-							<finalName>swagger-promote</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
-							<descriptors>
-								<descriptor>src/main/assembly/dist-release.xml</descriptor>
-							</descriptors>
-							<attach>false</attach>
-						</configuration>
+					<configuration>
+						<finalName>swagger-promote</finalName>
+						<appendAssemblyId>false</appendAssemblyId>
+						<descriptors>
+							<descriptor>src/main/assembly/dist-release.xml</descriptor>
+						</descriptors>
+						<attach>false</attach>
+					</configuration>
         </plugin>
       </plugins>
     </pluginManagement>
