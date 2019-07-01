@@ -71,6 +71,12 @@
 		<module>modules/distribution</module>
 	</modules>
 
+	<profiles>
+		<profile>
+			<id>release</id>
+		</profile>
+	</profiles>
+
 	<build>
     <pluginManagement>
       <plugins>
@@ -85,6 +91,20 @@
 						<attach>false</attach>
 					</configuration>
         </plugin>
+				<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-help-plugin</artifactId>
+						<version>3.1.0</version>
+						<executions>
+								<execution>
+										<id>show-profiles</id>
+										<phase>compile</phase>
+										<goals>
+												<goal>active-profiles</goal>
+										</goals>
+								</execution>
+						</executions>
+				</plugin>
       </plugins>
     </pluginManagement>
   </build>
