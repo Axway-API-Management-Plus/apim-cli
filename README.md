@@ -40,7 +40,7 @@ Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimana
 End-2-End-Tests simulate real world use cases by calling and validating API-Manager promote __161__ times.  
 
 ## Install
-- Download the latest [release](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases) or from or from [![Maven Central](https://img.shields.io/maven-central/v/com.github.axway-api-management-plus.swagger-promote/axway-swagger-promote-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.axway-api-management-plus.swagger-promote%22%20AND%20a:%22axway-swagger-promote-core%22)  
+- Download the latest [release](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases) or get it from  [![Maven Central](https://img.shields.io/maven-central/v/com.github.axway-api-management-plus.swagger-promote/axway-swagger-promote-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.axway-api-management-plus.swagger-promote%22%20AND%20a:%22axway-swagger-promote-core%22)  
 - extract the tar.gz file  
 - make sure you have JRE 8 installed and setup JAVA_HOME environment variable
 
