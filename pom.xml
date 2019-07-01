@@ -65,12 +65,11 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
 
-	<modules>
+	<!--modules>
 		<module>modules/swagger-promote-core</module>
 		<module>modules/api-registry-metadata-export</module>
-		<!--module>tools/swagger-promote-maven-plugin</module-->
 		<module>modules/distribution</module>
-	</modules>
+	</modules-->
 
 	<build>
     <pluginManagement>
