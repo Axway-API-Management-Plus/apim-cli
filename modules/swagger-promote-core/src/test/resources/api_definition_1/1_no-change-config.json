@@ -1,0 +1,30 @@
+{
+	"name": "1 Test 6",
+	"path": "/1test6689",
+	"state": "unpublished",
+	"version": "1.0.0",
+	"organization": "API Development", 
+    "securityProfiles": [
+     	{
+     		"name": "_default",
+     		"isDefault": true,
+     		"devices": [
+     			{
+     				"name": "API Key",
+     				"type": "apiKey",
+     				"order": 0,
+     				"properties": {
+     					"apiKeyFieldName": "KeyId",
+     					"takeFrom": "HEADER",
+     					"removeCredentialsOnSuccess": "false"
+     				}
+     			}
+     		]
+     	}
+     ], 
+     "customProperties": {
+     	"customProperty1": "Input-Field",
+     	"customProperty2": "1",
+     	"customProperty3": "true"
+     }
+}

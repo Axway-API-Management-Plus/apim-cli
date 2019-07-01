@@ -1,0 +1,10 @@
+*.project
+*.classpath
+*.settings
+/target
+*/target
+*/target/*
+*.iml
+*.idea
+*.releaseBackup
+*.vscode
