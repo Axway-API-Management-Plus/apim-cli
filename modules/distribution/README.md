@@ -1,4 +1,4 @@
-# Module to build a new Distrubution package
+# Module to build a new Distribution package
 
 With that, a new tar.gz package is created and the Swagger-Promote core is deployed to Maven-Central.
 
