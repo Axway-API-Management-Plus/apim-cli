@@ -84,7 +84,7 @@ public class CSVMetadataExport implements IMetadataExport {
 					LOG.trace("Export details of subscribed API: '"+api.getName()+"'");
 					for(APIMethod method : ((ActualAPI)api).getApiMethods()) {
 						i++;
-						csvPrinter.printRecord(app.getId(), api.getId(), method.getId(), "Front-End", app.getOrganizationId(), df.format(getMidnight()));
+						csvPrinter.printRecord(app.getName(), api.getId(), method.getId(), "Front-End", app.getOrganizationId(), df.format(getMidnight()));
 						if( i % 50 == 0 ){
 							csvPrinter.flush();
 						}
@@ -120,6 +120,7 @@ public class CSVMetadataExport implements IMetadataExport {
 	
 	private Date getMidnight() {
 		Calendar cal = GregorianCalendar.getInstance();
+		cal.add(Calendar.DAY_OF_YEAR, -1);
 		cal.set(Calendar.HOUR_OF_DAY, 23);
 		cal.set(Calendar.MINUTE, 59);
 		cal.set(Calendar.SECOND, 59);
