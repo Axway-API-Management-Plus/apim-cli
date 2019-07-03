@@ -3,7 +3,10 @@ package com.axway.apim.metadata.export.formats;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -61,6 +64,7 @@ public class CSVMetadataExport implements IMetadataExport {
 		String filename = CommandParameters.getInstance().getValue("filename");
 		Appendable appendable;
 		CSVPrinter csvPrinter = null;
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 		try {
 			File cvsFile = new File(filename);
 			if(cvsFile.exists()) {
@@ -80,7 +84,7 @@ public class CSVMetadataExport implements IMetadataExport {
 					LOG.trace("Export details of subscribed API: '"+api.getName()+"'");
 					for(APIMethod method : ((ActualAPI)api).getApiMethods()) {
 						i++;
-						csvPrinter.printRecord(app.getId(), api.getId(), method.getId(), "Front-End", app.getOrganizationId(), SimpleDateFormat.getDateTimeInstance().format(getMidnight()));
+						csvPrinter.printRecord(app.getId(), api.getId(), method.getId(), "Front-End", app.getOrganizationId(), df.format(getMidnight()));
 						if( i % 50 == 0 ){
 							csvPrinter.flush();
 						}
