@@ -678,12 +678,16 @@ public class APIManagerAdapter {
 	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
 	 * @throws AppException if the API can't be found or created
 	 */
-	public JsonNode getExistingAPI(String apiPath) throws AppException {
+	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter) throws AppException {
 		CommandParameters cmd = CommandParameters.getInstance();
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies").build();
+			if(filter == null) { filter = new ArrayList<NameValuePair>(); } 
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies")
+				.addParameter("field", "path").addParameter("op", "eq").addParameter("value", apiPath)
+				.addParameters(filter)
+				.build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
 			
@@ -704,11 +708,7 @@ public class APIManagerAdapter {
 					LOG.info("No existing API found exposed on: " + apiPath);
 					return null;
 				}
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId).build();
-				getRequest = new GETRequest(uri, null);
-				response = getRequest.execute().getEntity().getContent();
-				jsonResponse = mapper.readTree(response);
-				return jsonResponse;
+				return jsonResponse.get(0);
 			} catch (IOException e) {
 				throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			}
