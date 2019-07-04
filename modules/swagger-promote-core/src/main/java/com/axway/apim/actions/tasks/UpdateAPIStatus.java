@@ -76,7 +76,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 			LOG.debug("Desired and actual status equal. No need to update status!");
 			return;
 		}
-		LOG.info(this.intent + "Updating API-Status from: '" + this.actualState.getState() + "' to '" + this.desiredState.getState() + "'");
+		LOG.debug(this.intent + "Updating API-Status from: '" + this.actualState.getState() + "' to '" + this.desiredState.getState() + "'");
 		if(!enforceBreakingChange) { 
 			if(statusChangeRequiresEnforce.get(this.actualState.getState())!=null && 
 					statusChangeRequiresEnforce.get(this.actualState.getState()).contains(this.desiredState.getState())) {
@@ -172,7 +172,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				Transaction.getInstance().put("backendAPIId", backendAPIId);
 				// The action was successful, update the status!
 				this.actualState.setState(desiredState.getState());
-				LOG.info(this.intent + "Actual API state set to: " + this.actualState.getState());
+				LOG.debug(this.intent + "Actual API state set to: " + this.actualState.getState());
 				return null;
 			} catch (Exception e1) {
 				throw new AppException("Unable to parse response", ErrorCode.CANT_UPDATE_API_PROXY, e1);

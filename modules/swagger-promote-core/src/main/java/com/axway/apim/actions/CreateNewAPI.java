@@ -23,8 +23,13 @@ import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.rollback.RollbackAPIProxy;
+import com.axway.apim.lib.rollback.RollbackBackendAPI;
+import com.axway.apim.lib.rollback.RollbackHandler;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIManagerAdapter;
+import com.axway.apim.swagger.api.state.APIBaseDefinition;
+import com.axway.apim.swagger.api.state.AbstractAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -41,17 +46,31 @@ public class CreateNewAPI {
 	public void execute(APIChangeState changes, boolean reCreation) throws AppException {
 		
 		Transaction context = Transaction.getInstance();
+		RollbackHandler rollback = RollbackHandler.getInstance();
 		
 		// Force to initially update the API into the desired state!
 		List<String> changedProps = getAllProps(changes.getDesiredAPI());
 		
 		VhostPropertyHandler vHostHandler = new VhostPropertyHandler(changedProps);
-		
 		new ImportBackendAPI(changes.getDesiredAPI(), changes.getActualAPI()).execute();
-
-		new CreateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+		// Register the created BE-API to be rolled back in case of an error
+		IAPI rollbackAPI = new APIBaseDefinition();
+		((AbstractAPI)rollbackAPI).setName(changes.getDesiredAPI().getName());
+		((AbstractAPI)rollbackAPI).setApiId((String)context.get("backendAPIId"));
+		rollback.addRollbackAction(new RollbackBackendAPI(rollbackAPI));
+		
+		try {
+			new CreateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+		} catch (Exception e) {
+			rollback.addRollbackAction(new RollbackAPIProxy(rollbackAPI));
+			throw e;
+		} 
+		rollback.addRollbackAction(new RollbackAPIProxy(rollbackAPI)); // In any case, register the API just created for a potential rollback
+	
 		// As we have just created an API-Manager API, we should reflect this for further processing
 		IAPI createdAPI = APIManagerAdapter.getInstance().getAPIManagerAPI((JsonNode)context.get("lastResponse"), changes.getDesiredAPI());
+		// Register the created FE-API to be rolled back in case of an error
+		((AbstractAPI)rollbackAPI).setId(createdAPI.getId());
 		changes.setIntransitAPI(createdAPI);
 		
 		// ... here we basically need to add all props to initially bring the API in sync!
@@ -64,6 +83,7 @@ public class CreateNewAPI {
 		}
 		// This is special, as the status is not a normal property and requires some additional actions!
 		new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI).execute();
+		((AbstractAPI)rollbackAPI).setState(createdAPI.getState());
 		
 		if(reCreation && changes.getActualAPI().getState().equals(IAPI.STATE_PUBLISHED)) {
 			// In case, the existing API is already in use (Published), we have to grant access to our new imported API

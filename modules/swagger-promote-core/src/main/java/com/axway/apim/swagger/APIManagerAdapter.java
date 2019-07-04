@@ -95,6 +95,9 @@ public class APIManagerAdapter {
 	public final static String SYSTEM_API_QUOTA 				= "00000000-0000-0000-0000-000000000000";
 	public final static String APPLICATION_DEFAULT_QUOTA 		= "00000000-0000-0000-0000-000000000001";
 	
+	public final static String TYPE_FRONT_END = "proxies";
+	public final static String TYPE_BACK_END = "apirepo";
+	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
 			APIManagerAdapter.instance = new APIManagerAdapter ();
@@ -678,15 +681,21 @@ public class APIManagerAdapter {
 	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
 	 * @throws AppException if the API can't be found or created
 	 */
-	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter) throws AppException {
+	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type) throws AppException {
 		CommandParameters cmd = CommandParameters.getInstance();
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
 		try {
-			if(filter == null) { filter = new ArrayList<NameValuePair>(); } 
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies")
-				.addParameter("field", "path").addParameter("op", "eq").addParameter("value", apiPath)
-				.addParameters(filter)
+			List<NameValuePair> usedFilters = new ArrayList<>();
+			if(apiPath != null) { 
+				usedFilters.add(new BasicNameValuePair("field", "path"));
+				usedFilters.add(new BasicNameValuePair("op", "eq"));
+				usedFilters.add(new BasicNameValuePair("value", apiPath));
+			} 
+			if(filter != null) { usedFilters.addAll(filter); } 
+
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+type)
+				.addParameters(usedFilters)
 				.build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
@@ -697,15 +706,25 @@ public class APIManagerAdapter {
 			try {
 				jsonResponse = mapper.readTree(response);
 				for(JsonNode node : jsonResponse) {
-					path = node.get("path").asText();
-					if(path.equals(apiPath)) {
+					if(type.equals(TYPE_FRONT_END)) {
+						path = node.get("path").asText();
 						LOG.info("Found existing API on path: '"+path+"' ("+node.get("state").asText()+") (ID: '" + node.get("id").asText()+"')");
-						apiId = node.get("id").asText();
-						break;
+					} else if(type.equals(TYPE_BACK_END)) {
+						String name = node.get("name").asText();
+						LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + node.get("id").asText()+"')");						
 					}
+					apiId = node.get("id").asText();
+					break;
 				}
 				if(apiId==null) {
-					LOG.info("No existing API found exposed on: " + apiPath);
+					if(apiPath!=null && filter!=null) {
+						LOG.info("No existing API found exposed on: '" + apiPath + "' and filter: "+filter+"");
+					} else if (apiPath==null ) {
+						LOG.info("No existing API found with filters: "+filter+"");
+					} else {
+						LOG.info("No existing API found exposed on: '" + apiPath + "'");
+					}
+					
 					return null;
 				}
 				return jsonResponse.get(0);
