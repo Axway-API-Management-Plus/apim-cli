@@ -705,7 +705,6 @@ public class APIManagerAdapter {
 			String apiId = null;
 			try {
 				jsonResponse = mapper.readTree(response);
-				LOG.info("XXXXXXXXXXXX: '"+jsonResponse+"'");
 				for(JsonNode node : jsonResponse) {
 					if(type.equals(TYPE_FRONT_END)) {
 						path = node.get("path").asText();
@@ -718,6 +717,8 @@ public class APIManagerAdapter {
 					break;
 				}
 				if(apiId==null) {
+					LOG.info("YYYYYYYYYYYY: '"+uri+"'");
+					LOG.info("XXXXXXXXXXXX: '"+jsonResponse+"'");
 					if(apiPath!=null && filter!=null) {
 						LOG.info("No existing API found exposed on: '" + apiPath + "' and filter: "+filter+"");
 					} else if (apiPath==null ) {
