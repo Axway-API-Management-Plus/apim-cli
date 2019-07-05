@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -68,16 +69,22 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements IRespons
 	}
 
 	@Override
-	public JsonNode parseResponse(HttpResponse response) throws AppException {
-		if(response.getStatusLine().getStatusCode()!=204) {
-			try {
-				LOG.error("Error while deleteting FE-API: '"+this.rollbackAPI.getId()+"' to roll it back: '"+EntityUtils.toString(response.getEntity())+"'");
-			} catch (Exception e) {
-				LOG.error("Error while deleteting FE-API: '"+this.rollbackAPI.getId()+"' to roll it back", e);
+	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
+		try {
+			if(httpResponse.getStatusLine().getStatusCode()!=204) {
+				try {
+					LOG.error("Error while deleteting FE-API: '"+this.rollbackAPI.getId()+"' to roll it back: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+				} catch (Exception e) {
+					LOG.error("Error while deleteting FE-API: '"+this.rollbackAPI.getId()+"' to roll it back", e);
+				}
+			} else {
+				rolledBack = true;
+				LOG.debug("Successfully rolled back created FE-API: '"+this.rollbackAPI.getId()+"'");
 			}
-		} else {
-			rolledBack = true;
-			LOG.debug("Successfully rolled back created FE-API: '"+this.rollbackAPI.getId()+"'");
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
 		}
 		return null;
 	}

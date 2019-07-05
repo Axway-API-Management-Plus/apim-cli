@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
@@ -77,6 +78,10 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 			} catch (Exception e1) {
 				throw new AppException("Unable to parse response", ErrorCode.UNXPECTED_ERROR, e1);
 			}
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
 		}
 		return null;
 	}	

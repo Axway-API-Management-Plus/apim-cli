@@ -8,6 +8,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
@@ -103,10 +104,16 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 		}
 	}
 	@Override
-	public JsonNode parseResponse(HttpResponse response) throws AppException {
+	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
 		JsonNode jsonNode = null;
-		if(response.getStatusLine().getStatusCode()!=204 && response.getStatusLine().getStatusCode()!=200) {
-			throw new AppException("Unexpected response from API-Manager:" + response.getStatusLine() + response.getEntity(), ErrorCode.CANT_UPGRADE_API_ACCESS);
+		try {
+			if(httpResponse.getStatusLine().getStatusCode()!=204 && httpResponse.getStatusLine().getStatusCode()!=200) {
+				throw new AppException("Unexpected response from API-Manager:" + httpResponse.getStatusLine() + httpResponse.getEntity(), ErrorCode.CANT_UPGRADE_API_ACCESS);
+			}
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
 		}
 		return jsonNode;
 	}
