@@ -49,7 +49,7 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 				filters.add(new BasicNameValuePair("value", rollbackAPI.getName()+ " HTTP"));
 				filters.add(new BasicNameValuePair("field", "createdOn"));
 				filters.add(new BasicNameValuePair("op", "gt"));
-				filters.add(new BasicNameValuePair("value", Long.toString(new Date().getTime()-60000))); // Ignore all API created more than 1 minute ago!
+				filters.add(new BasicNameValuePair("value", Long.toString(new Date().getTime()-120000))); // Ignore all API created more than 1 minute ago!
 				JsonNode existingBEAPI = APIManagerAdapter.getInstance().getExistingAPI(null, filters, APIManagerAdapter.TYPE_BACK_END);
 				if(existingBEAPI.get("id")!=null) {
 					uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())

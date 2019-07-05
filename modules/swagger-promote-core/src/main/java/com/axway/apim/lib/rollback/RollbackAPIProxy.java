@@ -2,6 +2,7 @@ package com.axway.apim.lib.rollback;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -51,6 +52,9 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements IRespons
 				filters.add(new BasicNameValuePair("field", "apiid"));
 				filters.add(new BasicNameValuePair("op", "eq"));
 				filters.add(new BasicNameValuePair("value", rollbackAPI.getApiId()));
+				filters.add(new BasicNameValuePair("field", "createdOn"));
+				filters.add(new BasicNameValuePair("op", "gt"));
+				filters.add(new BasicNameValuePair("value", Long.toString(new Date().getTime()-120000))); // Ignore all API created more than 1 minute ago!
 				JsonNode existingAPI = APIManagerAdapter.getInstance().getExistingAPI(null, filters, APIManagerAdapter.TYPE_FRONT_END); // The path is not set at this point, hence we provide null
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
 						.setPath(RestAPICall.API_VERSION+"/proxies/"+existingAPI.get("id").asText())
