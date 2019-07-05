@@ -1,0 +1,17 @@
+{
+	"name": "API using HTTP-Basic for outbound calls",
+	"path": "/api/v1/using/http-basic",
+	"state": "unpublished",
+	"version": "1.0.0",
+	"organization": "API Development",
+	"authenticationProfiles": [
+		{
+			"name": "HTTP Basic",
+			"parameters": {
+				"username": "my-username",
+				"password": "my-password"
+			},
+			"type": "http_basic"
+		}
+	]
+}

@@ -1,0 +1,17 @@
+{
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"state": "${status}",
+	"version": "1.0.0",
+	"organization": "API Development ${orgNumber}",
+	"tags": {
+		"tag-name 2": [
+			"value 3",
+			"value 4"
+    	],
+    	"tag-name 1": [
+    		"value 1",
+    		"value 2"
+    	]
+	}
+}

@@ -1,0 +1,204 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.5",
+    "title": "CV MRP Complex ADMIN UI",
+    "description": "Sample admin ui api",
+    "contact": {
+      "name": "CD Technology Stack",
+      "url": "https://cd-confluence.customer.com/display/TSCK",
+      "email": "fg-212@customer.com"
+    },
+    "x-customer-msId": "mrpcomplex",
+    "x-customer-apiId": "cv-mrpcomplex-adminui",
+    "x-customer-tags": ["sample user interface", "microservice reference project", "angular", "api-gateway", "administration"],
+    "x-customer-audience": "component-internal",
+    "x-customer-2ndLevelSupportGroup": "cc-dev:global:2nd",
+    "x-customer-3rdLevelSupportGroup": "cc-dev:global:3rd"
+  },
+  "basePath": "/mrpcomplex/admin/ui/v1",
+  "host": "mrpcomplex-mrpcomplex-test.b2v-dev-cnap.customer.com",
+  "tags": [
+    {
+      "name": "adminui"
+    }
+  ],
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Default Path 0",
+        "operationId": "default0",
+        "tags": ["Path0"],
+        "produces": [
+          "application/json",
+          "text/html"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/{path1}": {
+      "get": {
+        "description": "Default Path 1",
+        "operationId": "default1",
+        "tags": ["Path1"],
+        "produces": [
+          "application/json",
+          "text/html"
+        ],
+        "parameters": [
+          {
+            "name": "path1",
+            "in": "path",
+            "description": "Path Description 1",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/{path1}/{path2}": {
+      "get": {
+        "description": "Default Path 2",
+        "operationId": "default2",
+        "tags": ["Path2"],
+        "produces": [
+          "application/json",
+          "text/html"
+        ],
+        "parameters": [
+          {
+            "name": "path1",
+            "in": "path",
+            "description": "Path Description 1",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "path2",
+            "in": "path",
+            "description": "Path Description 2",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/{path1}/{path2}/{path3}": {
+      "get": {
+        "description": "Default Path 3",
+        "operationId": "default3",
+        "tags": ["Path3"],
+        "produces": [
+          "application/json",
+          "text/html"
+        ],
+        "parameters": [
+          {
+            "name": "path1",
+            "in": "path",
+            "description": "Path Description 1",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "path2",
+            "in": "path",
+            "description": "Path Description 2",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "path3",
+            "in": "path",
+            "description": "Path Description 3",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/{path1}/{path2}/{path3}/{path4}": {
+      "get": {
+        "description": "Default Path 4",
+        "operationId": "default4",
+        "tags": ["Path4"],
+        "produces": [
+          "application/json",
+          "text/html"
+        ],
+        "parameters": [
+          {
+            "name": "path1",
+            "in": "path",
+            "description": "Path Description 1",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "path2",
+            "in": "path",
+            "description": "Path Description 2",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "path3",
+            "in": "path",
+            "description": "Path Description 3",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "path4",
+            "in": "path",
+            "description": "Path Description 4",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
