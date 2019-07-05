@@ -701,24 +701,28 @@ public class APIManagerAdapter {
 			
 			JsonNode jsonResponse;
 			String path;
+			JsonNode foundApi = null;
 			try {
 				jsonResponse = mapper.readTree(response);
 				if(hasAPIManagerVersion("7.7") && jsonResponse.size()!=0) {
-					return jsonResponse.get(0); // On 7.7. we can directly return the API if found!
+					foundApi =  jsonResponse.get(0);
 				} else {
 					for(JsonNode api : jsonResponse) {
 						path = api.get("path").asText();
 						if(path.equals(apiPath)) {
-							if(type.equals(TYPE_FRONT_END)) {
-								path = api.get("path").asText();
-								LOG.info("Found existing API on path: '"+path+"' ("+api.get("state").asText()+") (ID: '" + api.get("id").asText()+"')");
-							} else if(type.equals(TYPE_BACK_END)) {
-								String name = api.get("name").asText();
-								LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + api.get("id").asText()+"')");						
-							}
-							return api;
+							foundApi = api;
 						}
 					}
+				}
+				if(foundApi!=null) {
+					if(type.equals(TYPE_FRONT_END)) {
+						path = foundApi.get("path").asText();
+						LOG.info("Found existing API on path: '"+path+"' ("+foundApi.get("state").asText()+") (ID: '" + foundApi.get("id").asText()+"')");
+					} else if(type.equals(TYPE_BACK_END)) {
+						String name = foundApi.get("name").asText();
+						LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + foundApi.get("id").asText()+"')");						
+					}
+					return foundApi;
 				}
 				if(apiPath!=null && filter!=null) {
 					LOG.info("No existing API found exposed on: '" + apiPath + "' and filter: "+filter+"");

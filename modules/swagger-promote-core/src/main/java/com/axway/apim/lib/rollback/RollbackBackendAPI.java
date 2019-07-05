@@ -41,6 +41,7 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 			RestAPICall apiCall = new DELRequest(uri, this, false);
 			apiCall.execute();
 			if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
+				rolledBack = true;
 				// There is very likely another BE-API, as API-Manager 7.7 is creating two Backend-API. One for HTTPS and one for HTTP
 				List<NameValuePair> filters = new ArrayList<NameValuePair>();
 				filters.add(new BasicNameValuePair("field", "name"));
@@ -50,11 +51,13 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 				filters.add(new BasicNameValuePair("op", "gt"));
 				filters.add(new BasicNameValuePair("value", Long.toString(new Date().getTime()-60000))); // Ignore all API created more than 1 minute ago!
 				JsonNode existingBEAPI = APIManagerAdapter.getInstance().getExistingAPI(null, filters, APIManagerAdapter.TYPE_BACK_END);
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
-						.setPath(RestAPICall.API_VERSION+"/apirepo/"+existingBEAPI.get("id").asText())
-						.build();
-				apiCall = new DELRequest(uri, this, false);
-				apiCall.execute();
+				if(existingBEAPI.get("id")!=null) {
+					uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
+							.setPath(RestAPICall.API_VERSION+"/apirepo/"+existingBEAPI.get("id").asText())
+							.build();
+					apiCall = new DELRequest(uri, this, false);
+					apiCall.execute();
+				}
 			}
 		} catch (Exception e) {
 			LOG.error("Error while deleteting BE-API with ID: '"+rollbackAPI.getApiId()+"' to roll it back", e);
@@ -65,6 +68,7 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 	@Override
 	public JsonNode parseResponse(HttpResponse response) throws AppException {
 		if(response.getStatusLine().getStatusCode()!=204) {
+			rolledBack = false;
 			try {
 				LOG.error("Error while deleteting BE-API: '"+rollbackAPI.getApiId()+"' to roll it back: '"+EntityUtils.toString(response.getEntity())+"'");
 			} catch (Exception e) {

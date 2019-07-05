@@ -8,9 +8,7 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.AppException;
-import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
-import com.axway.apim.test.lib.APIManagerConfig;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
@@ -49,5 +47,63 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").send().get("/apirepo").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.*.name", "@assertThat(not(containsString(${apiName})))@"));
+		
+		echo("####### Try to replicate APIs, that will fail #######");		
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/rollback/backendbasepath-config.json");
+		createVariable("status", "published");
+		createVariable("clientOrg", "${orgName2}");
+		createVariable("backendBasepath", "https://unknown.host.com:443");
+		createVariable("expectedReturnCode", "35"); // Can't create API-Proxy
+		swaggerImport.doExecute(context);
+		
+		echo("####### Validate the temp. FE-API has been rolled back #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.*.path", "@assertThat(not(containsString(${apiPath})))@"));
+		
+		echo("####### Validate the temp. BE-API has been rolled back #######");
+		http(builder -> builder.client("apiManager").send().get("/apirepo").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.*.name", "@assertThat(not(containsString(${apiName})))@"));
+		
+		echo("####### Create a valid API, which will be updated later, which then fails and must be rolled back #######");		
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
+		createVariable("status", "published");
+		createVariable("expectedReturnCode", "0"); // Must fail!
+		swaggerImport.doExecute(context);
+		
+		echo("####### Validate API: '${apiName}' has a been imported #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "${status}")
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+		
+		echo("####### This will re-create the update, but fails #######");		
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/rollback/invalid-organization.json");
+		createVariable("status", "published");
+		createVariable("expectedReturnCode", "57"); // Must fail!
+		createVariable("enforce", "true"); // Must be enforced, as it's a breaking change
+		swaggerImport.doExecute(context);
+		
+		echo("####### Validate the original API is still there #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON));
+		
+		echo("####### Validate the replicate try has been rolled back #######");
+		echo("####### Validate the temp. FE-API has been rolled back #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.name=='${apiName}')].id", "@assertThat(hasSize(1))@")); // Only the original API is there
+		
+		echo("####### Validate the temp. BE-API has been rolled back #######");
+		http(builder -> builder.client("apiManager").send().get("/apirepo").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.name=='${apiName} HTTP')].id", "@assertThat(hasSize(1))@") // Only the original API is there
+			.validate("$.[?(@.name=='${apiName} HTTPS')].id", "@assertThat(hasSize(1))@")); // Only the original API is there
 	}
 }
