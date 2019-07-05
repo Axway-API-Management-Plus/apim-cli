@@ -687,13 +687,12 @@ public class APIManagerAdapter {
 		URI uri;
 		try {
 			List<NameValuePair> usedFilters = new ArrayList<>();
-			if(apiPath != null) { 
+			if(hasAPIManagerVersion("7.7") && apiPath != null) { // With 7.7 we can query the API directly on the path 
 				usedFilters.add(new BasicNameValuePair("field", "path"));
 				usedFilters.add(new BasicNameValuePair("op", "eq"));
 				usedFilters.add(new BasicNameValuePair("value", apiPath));
 			} 
 			if(filter != null) { usedFilters.addAll(filter); } 
-			LOG.info("USED-FILTERS: " + usedFilters);
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+type)
 				.addParameters(usedFilters)
 				.build();
@@ -702,39 +701,30 @@ public class APIManagerAdapter {
 			
 			JsonNode jsonResponse;
 			String path;
-			String apiId = null;
 			try {
 				jsonResponse = mapper.readTree(response);
 				for(JsonNode node : jsonResponse) {
-					if(type.equals(TYPE_FRONT_END)) {
-						path = node.get("path").asText();
-						LOG.info("Found existing API on path: '"+path+"' ("+node.get("state").asText()+") (ID: '" + node.get("id").asText()+"')");
-					} else if(type.equals(TYPE_BACK_END)) {
-						String name = node.get("name").asText();
-						LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + node.get("id").asText()+"')");						
+					path = node.get("path").asText();
+					if(path.equals(apiPath)) {
+						if(type.equals(TYPE_FRONT_END)) {
+							path = node.get("path").asText();
+							LOG.info("Found existing API on path: '"+path+"' ("+node.get("state").asText()+") (ID: '" + node.get("id").asText()+"')");
+						} else if(type.equals(TYPE_BACK_END)) {
+							String name = node.get("name").asText();
+							LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + node.get("id").asText()+"')");						
+						}
 					}
-					apiId = node.get("id").asText();
-					break;
+					return jsonResponse.get(0);
 				}
-				if(apiId==null) {
-					LOG.info("YYYYYYYYYYYY: '"+uri+"'");
-					LOG.info("XXXXXXXXXXXX: '"+jsonResponse+"'");
-					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies").build();
-					getRequest = new GETRequest(uri, null);
-					response = getRequest.execute().getEntity().getContent();
-					jsonResponse = mapper.readTree(response);
-					LOG.info("AAAAAAAAAAAA: '"+jsonResponse+"'");
-					if(apiPath!=null && filter!=null) {
-						LOG.info("No existing API found exposed on: '" + apiPath + "' and filter: "+filter+"");
-					} else if (apiPath==null ) {
-						LOG.info("No existing API found with filters: "+filter+"");
-					} else {
-						LOG.info("No existing API found exposed on: '" + apiPath + "'");
-					}
-					
-					return null;
+				if(apiPath!=null && filter!=null) {
+					LOG.info("No existing API found exposed on: '" + apiPath + "' and filter: "+filter+"");
+				} else if (apiPath==null ) {
+					LOG.info("No existing API found with filters: "+filter+"");
+				} else {
+					LOG.info("No existing API found exposed on: '" + apiPath + "'");
 				}
-				return jsonResponse.get(0);
+				
+				return null;
 			} catch (IOException e) {
 				throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			}
