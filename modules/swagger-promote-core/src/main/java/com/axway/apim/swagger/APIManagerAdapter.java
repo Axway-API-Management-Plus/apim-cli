@@ -706,17 +706,17 @@ public class APIManagerAdapter {
 				if(hasAPIManagerVersion("7.7") && jsonResponse.size()!=0) {
 					return jsonResponse.get(0); // On 7.7. we can directly return the API if found!
 				} else {
-					for(JsonNode node : jsonResponse) {
-						path = node.get("path").asText();
+					for(JsonNode api : jsonResponse) {
+						path = api.get("path").asText();
 						if(path.equals(apiPath)) {
 							if(type.equals(TYPE_FRONT_END)) {
-								path = node.get("path").asText();
-								LOG.info("Found existing API on path: '"+path+"' ("+node.get("state").asText()+") (ID: '" + node.get("id").asText()+"')");
+								path = api.get("path").asText();
+								LOG.info("Found existing API on path: '"+path+"' ("+api.get("state").asText()+") (ID: '" + api.get("id").asText()+"')");
 							} else if(type.equals(TYPE_BACK_END)) {
-								String name = node.get("name").asText();
-								LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + node.get("id").asText()+"')");						
+								String name = api.get("name").asText();
+								LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + api.get("id").asText()+"')");						
 							}
-							return jsonResponse.get(0);
+							return api;
 						}
 					}
 				}
