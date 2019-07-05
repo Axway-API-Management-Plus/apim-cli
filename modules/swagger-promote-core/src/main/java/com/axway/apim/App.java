@@ -159,6 +159,7 @@ public class App {
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
 			Transaction.deleteInstance();
+			RollbackHandler.deleteInstance();
 			
 			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
 			

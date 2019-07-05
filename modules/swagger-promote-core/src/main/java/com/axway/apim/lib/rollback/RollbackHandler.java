@@ -8,6 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 
 public class RollbackHandler {
@@ -28,6 +29,10 @@ public class RollbackHandler {
 			instance = new RollbackHandler();
 		}
 		return instance;
+	}	
+	
+	public static synchronized void deleteInstance () {
+		RollbackHandler.instance = null;
 	}
 	
 	public void addRollbackAction(RollbackAction action) {
