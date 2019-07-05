@@ -20,6 +20,7 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.RelaxedParser;
+import com.axway.apim.lib.rollback.RollbackHandler;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.APIManagerAdapter;
@@ -158,6 +159,7 @@ public class App {
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
 			Transaction.deleteInstance();
+			RollbackHandler.deleteInstance();
 			
 			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
 			
@@ -166,7 +168,7 @@ public class App {
 			APIImportConfigAdapter contract = new APIImportConfigAdapter(params.getValue("contract"), 
 					params.getValue("stage"), params.getValue("apidefinition"), apimAdapter.isUsingOrgAdmin());
 			IAPI desiredAPI = contract.getDesiredAPI();
-			IAPI actualAPI = apimAdapter.getAPIManagerAPI(apimAdapter.getExistingAPI(desiredAPI.getPath()), desiredAPI);
+			IAPI actualAPI = apimAdapter.getAPIManagerAPI(apimAdapter.getExistingAPI(desiredAPI.getPath(), null, APIManagerAdapter.TYPE_FRONT_END), desiredAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
 			apimAdapter.applyChanges(changeActions);
 			APIPropertiesExport.getInstance().store();
@@ -175,6 +177,10 @@ public class App {
 		} catch (AppException ap) {
 			APIPropertiesExport.getInstance().store(); // Try to create it, even 
 			ErrorState errorState = ErrorState.getInstance();
+			if(!ap.getErrorCode().equals(ErrorCode.NO_CHANGE)) {
+				RollbackHandler rollback = RollbackHandler.getInstance();
+				rollback.executeRollback();
+			}
 			if(errorState.hasError()) {
 				errorState.logErrorMessages(LOG);
 				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);

@@ -35,21 +35,14 @@ public class VhostConfigTestIT extends TestNGCitrusTestDesigner {
 		action(swaggerImport);
 		
 		// Search for the API anyway!
-		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has correct settings #######");
-		http().client("apiManager")
-			.send()
-			.get("/proxies")
-			.name("api")
-			.header("Content-Type", "application/json");
+		echo("####### Validate the API has been rolled back #######");
+		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
 
 		http().client("apiManager")
 			.receive()
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
-			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.validate("$.[?(@.path=='${apiPath}')].vhost", null)
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+			.validate("$.*.name", "@assertThat(not(containsString(${apiName})))@");
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "published");
@@ -61,18 +54,14 @@ public class VhostConfigTestIT extends TestNGCitrusTestDesigner {
 		
 		// Search for the API anyway!
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has correct settings #######");
-		http().client("apiManager")
-			.send()
-			.get("/proxies/${apiId}")
-			.name("api")
-			.header("Content-Type", "application/json");
+		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
 
 		http().client("apiManager")
 			.receive()
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
-			.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
-			.validate("$.[?(@.id=='${apiId}')].state", "published")
-			.validate("$.[?(@.id=='${apiId}')].vhost", "api123.customer.com");
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "published")
+			.validate("$.[?(@.path=='${apiPath}')].vhost", "api123.customer.com");
 	}
 }
