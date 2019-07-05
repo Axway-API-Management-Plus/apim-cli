@@ -705,6 +705,7 @@ public class APIManagerAdapter {
 			String apiId = null;
 			try {
 				jsonResponse = mapper.readTree(response);
+				LOG.info("XXXXXXXXXXXX: '"+jsonResponse+"'");
 				for(JsonNode node : jsonResponse) {
 					if(type.equals(TYPE_FRONT_END)) {
 						path = node.get("path").asText();
