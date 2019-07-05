@@ -49,24 +49,27 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.*.name", "@assertThat(not(containsString(${apiName})))@"));
 		
-		echo("####### Try to replicate APIs, that will fail #######");		
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/rollback/backendbasepath-config.json");
-		createVariable("status", "published");
-		createVariable("clientOrg", "${orgName2}");
-		createVariable("backendBasepath", "https://unknown.host.com:443");
-		createVariable("expectedReturnCode", "35"); // Can't create API-Proxy
-		swaggerImport.doExecute(context);
-		
-		echo("####### Validate the temp. FE-API has been rolled back #######");
-		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.*.path", "@assertThat(not(containsString(${apiPath})))@"));
-		
-		echo("####### Validate the temp. BE-API has been rolled back #######");
-		http(builder -> builder.client("apiManager").send().get("/apirepo").header("Content-Type", "application/json"));
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.*.name", "@assertThat(not(containsString(${apiName})))@"));
+		// This error only appears on 7.7 or maybe higher
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
+			echo("####### Try to replicate APIs, that will fail #######");		
+			createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+			createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/rollback/backendbasepath-config.json");
+			createVariable("status", "published");
+			createVariable("clientOrg", "${orgName2}");
+			createVariable("backendBasepath", "https://unknown.host.com:443");
+			createVariable("expectedReturnCode", "35"); // Can't create API-Proxy
+			swaggerImport.doExecute(context);
+			
+			echo("####### Validate the temp. FE-API has been rolled back #######");
+			http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.*.path", "@assertThat(not(containsString(${apiPath})))@"));
+			
+			echo("####### Validate the temp. BE-API has been rolled back #######");
+			http(builder -> builder.client("apiManager").send().get("/apirepo").header("Content-Type", "application/json"));
+			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.*.name", "@assertThat(not(containsString(${apiName})))@"));
+		}
 		
 		echo("####### Create a valid API, which will be updated later, which then fails and must be rolled back #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
@@ -83,7 +86,7 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 			.validate("$.[?(@.path=='${apiPath}')].state", "${status}")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
-		echo("####### This will re-create the update, but fails #######");		
+		echo("####### This will re-create the API, but it fails #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/rollback/invalid-organization.json");
 		createVariable("status", "published");

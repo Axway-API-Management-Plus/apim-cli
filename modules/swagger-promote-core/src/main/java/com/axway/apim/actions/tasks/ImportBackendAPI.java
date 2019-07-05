@@ -18,6 +18,7 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.Utils;
 import com.axway.apim.swagger.api.state.DesiredAPI;
 import com.axway.apim.swagger.api.state.IAPI;
@@ -137,6 +138,12 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		ObjectMapper objectMapper = new ObjectMapper();
 		String response = null;
 		try {
+			if(httpResponse.getStatusLine().getStatusCode()!=201) {
+				ErrorState.getInstance().setError("Error importing BE-API. "
+						+ "Unexpected response from API-Manager: " + httpResponse.getStatusLine() + " " + EntityUtils.toString(httpResponse.getEntity()) + ". "
+								+ "Please check the API-Manager traces.", ErrorCode.CANT_CREATE_API_PROXY, false);
+				throw new AppException("Error creating API-Proxy", ErrorCode.CANT_CREATE_API_PROXY);
+			}
 			response = EntityUtils.toString(httpResponse.getEntity());
 			JsonNode jsonNode = objectMapper.readTree(response);
 			String backendAPIId = jsonNode.findPath("id").asText();
