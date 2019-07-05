@@ -1,0 +1,14 @@
+{
+  "host": "int-api-manager.customer.com",
+  "port": 443,
+  "apis": [
+    {
+      "apiSpecification": "src/main/resources/apis/adminui-v1-min.json",
+      "apiConfig": "src/main/resources/config/adminui-v1-min-config.json"
+    },
+    {
+      "apiSpecification": "src/main/resources/apis/adminui-v2-min.json",
+      "apiConfig": "src/main/resources/config/adminui-v2-min-config.json"
+    }
+  ]
+}
