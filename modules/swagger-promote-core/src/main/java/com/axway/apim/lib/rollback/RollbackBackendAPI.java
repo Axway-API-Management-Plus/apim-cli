@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -66,11 +67,12 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 	}
 
 	@Override
-	public JsonNode parseResponse(HttpResponse response) throws AppException {
-		if(response.getStatusLine().getStatusCode()!=204) {
+	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
+		try {
+		if(httpResponse.getStatusLine().getStatusCode()!=204) {
 			rolledBack = false;
 			try {
-				LOG.error("Error while deleteting BE-API: '"+rollbackAPI.getApiId()+"' to roll it back: '"+EntityUtils.toString(response.getEntity())+"'");
+				LOG.error("Error while deleteting BE-API: '"+rollbackAPI.getApiId()+"' to roll it back: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 			} catch (Exception e) {
 				LOG.error("Error while deleteting FE-API: '"+rollbackAPI.getApiId()+"' to roll it back", e);
 			}
@@ -79,7 +81,11 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 			rolledBack = true;
 			LOG.debug("Successfully rolled back created BE-API: '"+rollbackAPI.getApiId()+"'");
 		}
-		
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
+		}
 		return null;
 	}
 }

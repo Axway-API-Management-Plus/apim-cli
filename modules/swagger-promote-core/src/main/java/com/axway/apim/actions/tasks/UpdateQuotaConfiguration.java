@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -113,22 +114,28 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 		ObjectMapper objectMapper = new ObjectMapper();
 		String response = null;
 		Transaction context = Transaction.getInstance();
-		if(context.get("responseMessage")!=null) {
-			LOG.info(""+context.get("responseMessage"));
-			return null;
-		} else {
-			try {
-				response = EntityUtils.toString(httpResponse.getEntity());
-				JsonNode jsonNode = objectMapper.readTree(response);
-				String backendAPIId = jsonNode.findPath("id").asText();
-				Transaction.getInstance().put("backendAPIId", backendAPIId);
-				// The action was successful, update the status!
-				this.actualState.setState(desiredState.getState());
-				LOG.info((String)context.get(QUOTA_UPDATE_SUCCESS));
+		try {
+			if(context.get("responseMessage")!=null) {
+				LOG.info(""+context.get("responseMessage"));
 				return null;
-			} catch (Exception e1) {
-				throw new AppException((String)context.get(QUOTA_UPDATE_FAIL), ErrorCode.CANT_UPDATE_QUOTA_CONFIG, e1);
+			} else {
+				try {
+					response = EntityUtils.toString(httpResponse.getEntity());
+					JsonNode jsonNode = objectMapper.readTree(response);
+					String backendAPIId = jsonNode.findPath("id").asText();
+					Transaction.getInstance().put("backendAPIId", backendAPIId);
+					// The action was successful, update the status!
+					this.actualState.setState(desiredState.getState());
+					LOG.info((String)context.get(QUOTA_UPDATE_SUCCESS));
+					return null;
+				} catch (Exception e1) {
+					throw new AppException((String)context.get(QUOTA_UPDATE_FAIL), ErrorCode.CANT_UPDATE_QUOTA_CONFIG, e1);
+				}
 			}
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
 		}
 	}
 }

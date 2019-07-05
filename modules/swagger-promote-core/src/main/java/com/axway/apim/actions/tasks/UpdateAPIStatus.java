@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
 
@@ -161,22 +162,28 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 		ObjectMapper objectMapper = new ObjectMapper();
 		String response = null;
 		Transaction context = Transaction.getInstance();
-		if(context.get("responseMessage")!=null) {
-			LOG.info(""+context.get("responseMessage"));
-			return null;
-		} else {
-			try {
-				response = EntityUtils.toString(httpResponse.getEntity());
-				JsonNode jsonNode = objectMapper.readTree(response);
-				String backendAPIId = jsonNode.findPath("id").asText();
-				Transaction.getInstance().put("backendAPIId", backendAPIId);
-				// The action was successful, update the status!
-				this.actualState.setState(desiredState.getState());
-				LOG.debug(this.intent + "Actual API state set to: " + this.actualState.getState());
+		try {
+			if(context.get("responseMessage")!=null) {
+				LOG.info(""+context.get("responseMessage"));
 				return null;
-			} catch (Exception e1) {
-				throw new AppException("Unable to parse response", ErrorCode.CANT_UPDATE_API_PROXY, e1);
+			} else {
+				try {
+					response = EntityUtils.toString(httpResponse.getEntity());
+					JsonNode jsonNode = objectMapper.readTree(response);
+					String backendAPIId = jsonNode.findPath("id").asText();
+					Transaction.getInstance().put("backendAPIId", backendAPIId);
+					// The action was successful, update the status!
+					this.actualState.setState(desiredState.getState());
+					LOG.debug(this.intent + "Actual API state set to: " + this.actualState.getState());
+					return null;
+				} catch (Exception e1) {
+					throw new AppException("Unable to parse response", ErrorCode.CANT_UPDATE_API_PROXY, e1);
+				}
 			}
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
 		}
 	}
 	
