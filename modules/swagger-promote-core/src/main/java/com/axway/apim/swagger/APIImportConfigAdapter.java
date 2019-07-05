@@ -142,6 +142,7 @@ public class APIImportConfigAdapter {
 	 */
 	public IAPI getDesiredAPI() throws AppException {
 		try {
+			validateExposurePath(apiConfig);
 			validateOrganization(apiConfig);
 			checkForAPIDefinitionInConfiguration(apiConfig);
 			addDefaultPassthroughSecurityProfile(apiConfig);
@@ -165,6 +166,17 @@ public class APIImportConfigAdapter {
 				throw (AppException)e.getCause();
 			}
 			throw new AppException("Cannot validate/fulfill configuration file.", ErrorCode.CANT_READ_CONFIG_FILE, e);
+		}
+	}
+	
+	private void validateExposurePath(IAPI apiConfig) throws AppException {
+		if(apiConfig.getPath()==null) {
+			ErrorState.getInstance().setError("Config-Parameter: 'path' is not given", ErrorCode.CANT_READ_CONFIG_FILE, false);
+			throw new AppException("Path is invalid.", ErrorCode.CANT_READ_CONFIG_FILE);
+		}
+		if(!apiConfig.getPath().startsWith("/")) {
+			ErrorState.getInstance().setError("Config-Parameter: 'path' must start with a \"/\" following by a valid API-Path (e.g. /api/v1/customer).", ErrorCode.CANT_READ_CONFIG_FILE, false);
+			throw new AppException("Path is invalid.", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 	}
 	
