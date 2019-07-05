@@ -123,6 +123,11 @@ public class App {
 			option.setRequired(false);
 			option.setArgName("true");
 			internalOptions.addOption(option);
+			
+			option = new Option("rollback", true, "Allows to disable the rollback feature");
+			option.setRequired(false);
+			option.setArgName("true");
+			internalOptions.addOption(option);
 
 			option = new  Option("h", "help", false, "Print the help");
 			option.setRequired(false);
@@ -148,7 +153,7 @@ public class App {
 			}
 			
 			LOG.info("------------------------------------------------------------------------");
-			LOG.info("API-Manager Promote Version: 1.5.3");
+			LOG.info("API-Manager Promote Version: 1.6-SNAPSHOT");
 			LOG.info("                                                                        ");
 			LOG.info("To report issues or get help, please visit: ");
 			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");

@@ -13,6 +13,6 @@ public abstract class AbstractRollbackAction implements RollbackAction {
 
 	@Override
 	public String toString() {
-		return name + " [Rolled back: "+rolledBack+"]";
+		return name + ": "+rolledBack;
 	}
 }

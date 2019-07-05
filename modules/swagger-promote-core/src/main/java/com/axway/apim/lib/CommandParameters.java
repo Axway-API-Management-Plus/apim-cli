@@ -127,6 +127,11 @@ public class CommandParameters {
 		return Boolean.parseBoolean(getValue("replaceHostInSwagger"));
 	}
 	
+	public boolean rollback() {
+		if(getValue("rollback")==null) return true;
+		return Boolean.parseBoolean(getValue("rollback"));
+	}
+	
 	public void validateRequiredParameters() throws AppException {
 		ErrorState errors  = ErrorState.getInstance();
 		if(getValue("username")==null && getValue("admin_username")==null) errors.setError("Required parameter: 'username' or 'admin_username' is missing.", ErrorCode.MISSING_PARAMETER, false);
