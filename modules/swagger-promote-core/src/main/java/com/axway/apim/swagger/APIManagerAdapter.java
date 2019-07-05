@@ -693,7 +693,7 @@ public class APIManagerAdapter {
 				usedFilters.add(new BasicNameValuePair("value", apiPath));
 			} 
 			if(filter != null) { usedFilters.addAll(filter); } 
-
+			LOG.info("USED-FILTERS: " + usedFilters);
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+type)
 				.addParameters(usedFilters)
 				.build();
