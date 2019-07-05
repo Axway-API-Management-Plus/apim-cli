@@ -719,6 +719,11 @@ public class APIManagerAdapter {
 				if(apiId==null) {
 					LOG.info("YYYYYYYYYYYY: '"+uri+"'");
 					LOG.info("XXXXXXXXXXXX: '"+jsonResponse+"'");
+					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies").build();
+					getRequest = new GETRequest(uri, null);
+					response = getRequest.execute().getEntity().getContent();
+					jsonResponse = mapper.readTree(response);
+					LOG.info("AAAAAAAAAAAA: '"+jsonResponse+"'");
 					if(apiPath!=null && filter!=null) {
 						LOG.info("No existing API found exposed on: '" + apiPath + "' and filter: "+filter+"");
 					} else if (apiPath==null ) {
