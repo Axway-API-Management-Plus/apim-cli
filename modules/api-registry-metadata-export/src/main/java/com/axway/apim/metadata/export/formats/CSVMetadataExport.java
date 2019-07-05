@@ -3,7 +3,10 @@ package com.axway.apim.metadata.export.formats;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -61,13 +64,25 @@ public class CSVMetadataExport implements IMetadataExport {
 		String filename = CommandParameters.getInstance().getValue("filename");
 		Appendable appendable;
 		CSVPrinter csvPrinter = null;
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		try {
 			File cvsFile = new File(filename);
 			if(cvsFile.exists()) {
 				LOG.info("Going to overwrite existing file: '"+cvsFile.getCanonicalPath()+"'");
 			}
 			appendable = new FileWriter(cvsFile);
-			csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader("ClientApplication", "API", "APIMethod", "GatewayInstanceType", "Organization", "EventTimeStamp"));
+			csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader(
+				"ClientApplicationId", 
+				"ClientApplication", 
+				"APIId", 
+				"API", 
+				"APIMethodId", 
+				"APIMethod", 
+				"GatewayInstanceType", 
+				"OrganizationId", 
+				"Organization", 
+				"EventTimeStamp"
+			));
 			int i=0;
 			for(ClientApplication app : this.metaData.getAllApps()) {
 				LOG.debug("Handling application: '"+app.getName()+"'");
@@ -80,7 +95,18 @@ public class CSVMetadataExport implements IMetadataExport {
 					LOG.trace("Export details of subscribed API: '"+api.getName()+"'");
 					for(APIMethod method : ((ActualAPI)api).getApiMethods()) {
 						i++;
-						csvPrinter.printRecord(app.getId(), api.getId(), method.getId(), "Front-End", app.getOrganizationId(), SimpleDateFormat.getDateTimeInstance().format(getMidnight()));
+						csvPrinter.printRecord(
+								app.getId(), 
+								app.getName(), 
+								api.getId(), 
+								api.getName(), 
+								method.getId(), 
+								method.getName(), 
+								"Front-End", 
+								app.getOrganizationId(), 
+								APIManagerAdapter.getInstance().getOrgName(app.getOrganizationId()), 
+								df.format(getMidnight()
+						));
 						if( i % 50 == 0 ){
 							csvPrinter.flush();
 						}
@@ -116,6 +142,7 @@ public class CSVMetadataExport implements IMetadataExport {
 	
 	private Date getMidnight() {
 		Calendar cal = GregorianCalendar.getInstance();
+		cal.add(Calendar.DAY_OF_YEAR, -1);
 		cal.set(Calendar.HOUR_OF_DAY, 23);
 		cal.set(Calendar.MINUTE, 59);
 		cal.set(Calendar.SECOND, 59);
