@@ -103,7 +103,7 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 		echo("####### Validate the temp. BE-API has been rolled back #######");
 		http(builder -> builder.client("apiManager").send().get("/apirepo").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.name=='${apiName} HTTP')].id", "@assertThat(hasSize(1))@") // Only the original API is there
-			.validate("$.[?(@.name=='${apiName} HTTPS')].id", "@assertThat(hasSize(1))@")); // Only the original API is there
+			.validate("$.[?(@.name=='${apiName}' | @.name=='${apiName} HTTP')].id", "@assertThat(hasSize(1))@") // First expression if for below 7.7, second is for 7.7
+			.validate("$.[?(@.name=='${apiName}' | @.name=='${apiName} HTTPS')].id", "@assertThat(hasSize(1))@")); // First expression if for below 7.7, second is for 7.7
 	}
 }

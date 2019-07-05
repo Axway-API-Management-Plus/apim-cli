@@ -704,7 +704,9 @@ public class APIManagerAdapter {
 			JsonNode foundApi = null;
 			try {
 				jsonResponse = mapper.readTree(response);
-				if(hasAPIManagerVersion("7.7") && jsonResponse.size()!=0) {
+				// We can directly access what we are looking for, as for 7.7 we filtered directly for the apiPath or 
+				// we have used some filters!
+				if(jsonResponse.size()!=0 && (filter!=null || hasAPIManagerVersion("7.7"))) {
 					foundApi =  jsonResponse.get(0);
 				} else {
 					for(JsonNode api : jsonResponse) {
