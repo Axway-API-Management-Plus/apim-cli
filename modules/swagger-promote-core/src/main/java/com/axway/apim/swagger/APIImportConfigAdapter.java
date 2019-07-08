@@ -134,7 +134,7 @@ public class APIImportConfigAdapter {
 	 */
 	private String substitueVariables(File inputFile) throws IOException {
 		StringSubstitutor substitutor = new StringSubstitutor(CommandParameters.getInstance().getEnvironmentProperties());
-		String givenConfig = new String(Files.readAllBytes(new File(apiConfigFile).toPath()));
+		String givenConfig = new String(Files.readAllBytes(inputFile.toPath()));
 		return substitutor.replace(givenConfig);
 	}
 
