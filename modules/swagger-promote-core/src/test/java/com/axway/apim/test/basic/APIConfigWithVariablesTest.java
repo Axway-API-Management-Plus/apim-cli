@@ -40,6 +40,7 @@ public class APIConfigWithVariablesTest {
 			Assert.assertEquals(apiConfig.getBackendBasepath(), "resolvedToSomething");
 		} catch (Exception e) {
 			LOG.error("Error running test: withoutStage", e);
+			throw e;
 		}
 	}
 	
@@ -56,6 +57,7 @@ public class APIConfigWithVariablesTest {
 			Assert.assertEquals(apiConfig.getBackendBasepath(), "resolvedToSomethingElse");
 		} catch (Exception e) {
 			LOG.error("Error running test: withStage", e);
+			throw e;
 		}
 	}
 	
@@ -73,6 +75,7 @@ public class APIConfigWithVariablesTest {
 			Assert.assertEquals(apiConfig.getOrganization(), "API Development "+osArch);
 		} catch (Exception e) {
 			LOG.error("Error running test: usingOSEnvVariable", e);
+			throw e;
 		}
 	}
 	
@@ -89,6 +92,7 @@ public class APIConfigWithVariablesTest {
 			Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
 		} catch (Exception e) {
 			LOG.error("Error running test: notDeclaredVariable", e);
+			throw e;
 		}
 	}
 }
