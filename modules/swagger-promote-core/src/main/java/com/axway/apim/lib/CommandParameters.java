@@ -1,5 +1,7 @@
 package com.axway.apim.lib;
 
+import java.util.Map;
+
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,5 +155,9 @@ public class CommandParameters {
 		} else {
 			return null;
 		}
+	}
+	
+	public Map<String, String> getEnvironmentProperties() {
+		return this.envProperties;
 	}
 }

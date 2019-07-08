@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyStore;
@@ -21,6 +22,7 @@ import java.util.ListIterator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -104,11 +106,11 @@ public class APIImportConfigAdapter {
 		this.usingOrgAdmin = usingOrgAdmin;
 		IAPI baseConfig;
 		try {
-			baseConfig = mapper.readValue(new File(apiConfigFile), DesiredAPI.class);
-			ObjectReader updater = mapper.readerForUpdating(baseConfig);
+			baseConfig = mapper.readValue(substitueVariables(new File(apiConfigFile)), DesiredAPI.class);
 			if(getStageConfig(stage, apiConfigFile)!=null) {
 				try {
-					apiConfig = updater.readValue(new File(getStageConfig(stage, apiConfigFile)));
+					ObjectReader updater = mapper.readerForUpdating(baseConfig);
+					apiConfig = updater.readValue(substitueVariables(new File(getStageConfig(stage, apiConfigFile))));
 					LOG.info("Loaded stage API-Config from file: " + getStageConfig(stage, apiConfigFile));
 				} catch (FileNotFoundException e) {
 					LOG.debug("No config file found for stage: '"+stage+"'");
@@ -121,6 +123,19 @@ public class APIImportConfigAdapter {
 			error.setError("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE);
 			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
+	}
+	
+	/**
+	 * This methood is replacing variables such as ${TokenEndpoint} with declared variables coming from either 
+	 * the Environment-Variables or from system-properties.
+	 * @param inputFile The API-Config file to be replaced and returned as String
+	 * @return a String representation of the API-Config-File
+	 * @throws IOException if the file can't be found
+	 */
+	private String substitueVariables(File inputFile) throws IOException {
+		StringSubstitutor substitutor = new StringSubstitutor(CommandParameters.getInstance().getEnvironmentProperties());
+		String givenConfig = new String(Files.readAllBytes(new File(apiConfigFile).toPath()));
+		return substitutor.replace(givenConfig);
 	}
 
 	public IAPI getApiConfig() {
