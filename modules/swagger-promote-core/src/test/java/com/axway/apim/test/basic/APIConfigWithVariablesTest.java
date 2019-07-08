@@ -14,6 +14,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.ErrorState;
+import com.axway.apim.lib.TestIndicator;
 import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.api.state.DesiredAPI;
 
@@ -34,7 +35,7 @@ public class APIConfigWithVariablesTest {
 			CommandLine cmd = new DefaultParser().parse(new Options(), new String[]{});
 			new CommandParameters(cmd, null, props);
 			CommandParameters test = CommandParameters.getInstance();
-			LOG.info("TEST: " + test);
+			LOG.info("TEST: " + test + "TestIndicator: " + TestIndicator.getInstance().isTestRunning());
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 			
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
