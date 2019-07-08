@@ -7,17 +7,25 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
+import com.axway.apim.lib.ErrorState;
 import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.api.state.DesiredAPI;
 
 public class APIConfigWithVariablesTest {
 
 	private static Logger LOG = LoggerFactory.getLogger(APIConfigWithVariablesTest.class);
+	
+	@BeforeMethod
+	public void cleanSingletons() {
+		LOG.info("Deleting singletons before exuecting test.");
+		ErrorState.deleteInstance();
+	}
 	
 	@Test
 	public void withoutStage() throws AppException, ParseException {
