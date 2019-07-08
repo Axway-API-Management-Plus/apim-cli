@@ -24,7 +24,6 @@ public class EnvironmentProperties implements Map<String, String> {
 	}
 	
 	private void initProperties(String stage) throws AppException {
-		LOG.info("HELLLOOOO " + System.getProperties());
 		try {
 			mainProperties.load(APIMHttpClient.class.getClassLoader().getResourceAsStream("env.properties"));
 			LOG.info("Loaded environment properties from file: env.properties.");

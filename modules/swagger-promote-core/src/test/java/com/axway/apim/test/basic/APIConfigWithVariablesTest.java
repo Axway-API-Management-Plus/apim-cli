@@ -33,7 +33,7 @@ public class APIConfigWithVariablesTest {
 			EnvironmentProperties props = new EnvironmentProperties(null);
 			CommandLine cmd = new DefaultParser().parse(new Options(), new String[]{});
 			new CommandParameters(cmd, null, props);
-			String test = CommandParameters.getInstance().getAdminPassword();
+			CommandParameters test = CommandParameters.getInstance();
 			LOG.info("TEST: " + test);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 			
