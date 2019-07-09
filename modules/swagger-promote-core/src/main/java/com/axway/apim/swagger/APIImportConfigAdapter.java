@@ -230,6 +230,7 @@ public class APIImportConfigAdapter {
 				this.pathToAPIDefinition=apiConfig.getApiDefinitionImport();
 				LOG.debug("Reading API Definition from configuration file");
 			} else {
+				ErrorState.getInstance().setError("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED, false);
 				throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
 			}
 		}
