@@ -63,7 +63,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 					LOG.info("Removing access for orgs: "+removingActualOrgs+" from API: " + actualState.getName());
 					removeClientOrganization(removingActualOrgs, actualState.getId());
 				} else {
-					LOG.debug("NOT removing access for existing orgs: "+removingActualOrgs+" from API: " + actualState.getName() + " as clientOrgsMode NOT set to replace.");
+					LOG.info("NOT removing access for existing orgs: "+removingActualOrgs+" from API: " + actualState.getName() + " as clientOrgsMode NOT set to replace.");
 				}
 			}
 		}

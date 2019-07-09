@@ -45,6 +45,7 @@ import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.organization.ApiAccess;
 import com.axway.apim.swagger.api.properties.organization.Organization;
+import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
 import com.axway.apim.swagger.api.properties.user.User;
@@ -1041,6 +1042,31 @@ public class APIManagerAdapter {
 			return jsonResponse;
 		} catch (Exception e) {
 			throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public <profile> void translateMethodIds(Map<String, profile> profiles, IAPI actualAPI) throws AppException {
+		Map<String, profile> updatedEntries = new LinkedHashMap<String, profile>();
+		if(profiles!=null) {
+			Iterator<String> keys = profiles.keySet().iterator();
+			while(keys.hasNext()) {
+				String key = keys.next();
+				if(key.equals("_default")) continue;
+				List<APIMethod> methods = getAllMethodsForAPI(actualAPI.getId());
+				for(APIMethod method : methods) {
+					if(method.getName().equals(key)) {
+						profile value = profiles.get(key);
+						if(value instanceof OutboundProfile) {
+							((OutboundProfile)value).setApiMethodId(method.getApiMethodId());
+							((OutboundProfile)value).setApiId(method.getApiId());
+						}
+						updatedEntries.put(method.getId(), profiles.get(key));
+						keys.remove();
+						break;
+					}
+				}
+			}
+			profiles.putAll(updatedEntries);
 		}
 	}
 

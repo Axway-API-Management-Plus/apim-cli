@@ -3,7 +3,7 @@ script: "mvn clean verify"
 
 services:
   - docker
-  
+
 env:
   global:
     - CACHE_DIR=$HOME/docker
@@ -13,22 +13,25 @@ env:
     - CACHE_FILE_APIM_7_6_2=$CACHE_DIR/api-manager_7_6_2_SP2.cache.tar.gz
     - CACHE_FILE_APIM_7_7=$CACHE_DIR/api-manager_7_7.cache.tar.gz
     - CACHE_FILE_CASSANDRA=$CACHE_DIR/cassandra_2_2_8.cache.tar.gz
-    
+
     # #####################################################################################################
     # The following controls which Docker-Image to use (it is either downloaded or expanded from the Cache)
     # #####################################################################################################
     - CACHE_FILE_TO_USE=$CACHE_FILE_APIM_7_6_2
     - DOCKER_IMAGE_TO_USE=$APIM_DOCKER_IMAGE_7_6_2
     - counter=0
-  
+
 cache:
   directories:
     - $CACHE_DIR
     - '$HOME/.m2/repository'
 
 before_install:
+  # Avoid installation if unit-tests fail anyway
+  - mvn clean test
+
   - if [ ! -f $CACHE_FILE_TO_USE ]; then sudo sed 's/DOCKER_OPTS="/DOCKER_OPTS="--insecure-registry=docker-registry.demo.axway.com /g' -i /etc/default/docker; fi
-  - if [ ! -f $CACHE_FILE_TO_USE ]; then sudo service docker restart; fi  
+  - if [ ! -f $CACHE_FILE_TO_USE ]; then sudo service docker restart; fi
 
   #- sudo apt-get update
   #- sudo apt-get install curl
@@ -53,6 +56,3 @@ install:
   - docker-compose run --rm start_apimgmt
   # Give API-Manager a moment to start
   - docker-compose logs --tail 30 apimgmt
-  
-
-  

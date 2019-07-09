@@ -32,6 +32,17 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' with outbound security set to HTTP-Basic. #######");
+		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
+
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+				.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "test HTTP Basic")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "http_basic")
+				.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.authenticationProfile", "test HTTP Basic")
+				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+		
 		echo("####### No-Change test for '${apiName}' on path: '${apiPath}' #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/5_api_outbound-basic.json");
@@ -39,16 +50,6 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 		createVariable("username", "1234567890");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
-
-		echo("####### Validate API: '${apiName}' on path: '${apiPath}' with outbound security set to HTTP-Basic. #######");
-		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
-
-		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-				.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "http_basic")
-				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Simulate a change to the outbound configuration in UNPUBLISHED mode, by changing the username #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
@@ -64,7 +65,7 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.id=='${apiId}')].id", "${apiId}")
 			.validate("$.[?(@.id=='${apiId}')].state", "unpublished")
-			.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "_default")
+			.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "test HTTP Basic")
 			.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].type", "http_basic")
 			.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].parameters.username", "${username}");
 		
@@ -82,9 +83,10 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
 				.validate("$.[?(@.id=='${apiId}')].state", "published")
-				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "_default")
+				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "test HTTP Basic")
 				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].type", "http_basic")
 				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].parameters.username", "${username}")
+				.validate("$.[?(@.id=='${apiId}')].outboundProfiles._default.authenticationProfile", "test HTTP Basic")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Re-Import same API: '${apiName}' on path: '${apiPath}' with status published but NOW AN API-Key (default): #######");
@@ -104,6 +106,7 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 				.validate("$.[?(@.path=='${apiPath}')].state", "published")
 				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "apiKey")
 				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
+				.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.authenticationProfile", "_default")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### No-Change test for '${apiName}' on path: '${apiPath}' #######");

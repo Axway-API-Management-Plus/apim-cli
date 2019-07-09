@@ -75,7 +75,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 				LOG.info("Removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName());
 				removeAppSubscrioption(revomingActualApps, actualState.getId());
 			} else {
-				LOG.debug("NOT removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName() + " as clientAppsMode NOT set to replace.");
+				LOG.info("NOT removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName() + " as clientAppsMode NOT set to replace.");
 			}
 		}
 	}

@@ -8,8 +8,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.CommandParameters;
 
 public class RollbackHandler {
 	
@@ -40,6 +40,10 @@ public class RollbackHandler {
 	}
 	
 	public void executeRollback() {
+		if(!CommandParameters.getInstance().rollback()) {
+			LOG.info("Rollback is disabled.");
+			return;
+		}
 		if(rollbackActions.size()==0) return; // Nothing to roll back
 		Collections.sort(rollbackActions, new Comparator<RollbackAction>() {
 		    @Override
@@ -58,6 +62,6 @@ public class RollbackHandler {
 				LOG.error("Can't rollback ", e);
 			}
 		}
-		LOG.info("Rollback status: '"+rollbackActions+"'");
+		LOG.info("Rolled back: '"+rollbackActions+"'");
 	}
 }

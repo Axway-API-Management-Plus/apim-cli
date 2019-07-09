@@ -44,11 +44,12 @@ public class UpdateExistingAPI {
 		}
 		
 		// This is special, as the status is not a property and requires some additional actions!
+		UpdateAPIStatus statusUpdate = new UpdateAPIStatus(changes.getDesiredAPI(), changes.getActualAPI());
 		if(changes.getNonBreakingChanges().contains("state")) {
-			new UpdateAPIStatus(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+			statusUpdate.execute();
 		}
 		
-		vHostHandler.handleVHost(changes.getDesiredAPI(), changes.getActualAPI());
+		vHostHandler.handleVHost(changes.getDesiredAPI(), changes.getActualAPI(), statusUpdate.isUpdateVHostRequired());
 		
 		new UpdateQuotaConfiguration(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute(false);
