@@ -10,6 +10,7 @@ import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -33,8 +34,12 @@ public class VhostPropertyHandler implements PropertyHandler {
 	}
 	
 	public void handleVHost(IAPI desiredAPI, IAPI actualAPI) throws AppException {
-		if(updateVhost) {
-			if(actualAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
+		handleVHost(desiredAPI, actualAPI, false);
+	}
+	
+	public void handleVHost(IAPI desiredAPI, IAPI actualAPI, boolean forceUpdate) throws AppException {
+		if(updateVhost || forceUpdate) {
+			if(!APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP3") && actualAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
 				ErrorState.getInstance().setError("Can't update V-Host to: "+desiredAPI.getVhost()+" on unpublished API!", ErrorCode.CANT_SETUP_VHOST, false);
 				throw new AppException("Can't update V-Host to: "+desiredAPI.getVhost()+" on unpublished API!", 
 						ErrorCode.CANT_SETUP_VHOST);
@@ -47,7 +52,7 @@ public class VhostPropertyHandler implements PropertyHandler {
 	}
 
 	@Override
-	public JsonNode handleProperty(IAPI desired, JsonNode response) throws AppException {
+	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException {
 		((ObjectNode) response).put("vhost", desired.getVhost());
 		return response;
 	}

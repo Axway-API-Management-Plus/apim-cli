@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -21,6 +22,11 @@ public class ChangeStateTest {
 	public void prepareTest() {
 		TestIndicator.getInstance().setTestRunning(true);
 	}
+	
+	@AfterClass
+	public void afterTest() {
+		TestIndicator.getInstance().setTestRunning(false);
+	}	
 
 	@Test
 	public void testOrderMakesNoChange() throws AppException, IOException, ParseException {

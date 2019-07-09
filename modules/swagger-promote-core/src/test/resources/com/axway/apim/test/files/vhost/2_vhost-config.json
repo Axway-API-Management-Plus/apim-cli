@@ -1,0 +1,9 @@
+	
+{
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"state": "${status}",
+	"vhost": "${vhost}",
+	"version": "1.0.0",
+	"organization": "${vhostOrgName}"
+}

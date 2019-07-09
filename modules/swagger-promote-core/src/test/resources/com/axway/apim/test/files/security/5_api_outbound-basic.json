@@ -1,34 +1,49 @@
 {
-	"name": "${apiName}",
-	"path": "${apiPath}",
-	"state": "${state}",
-	"version": "1.0.0",
-	"organization": "API Development ${orgNumber}",
-	"securityProfiles": [
-		{
-			"name": "_default",
-			"isDefault": true,
-			"devices": [
-				{
-					"name": "Pass Through",
-					"type": "passThrough",
-					"order": 0,
-					"properties": {
-						"subjectIdFieldName": "Pass Through",
-						"removeCredentialsOnSuccess": "true"
-					}
-				}
-			]
-		}
-	],
-	"authenticationProfiles": [
-		{
-			"name": "test HTTP Basic",
-			"parameters": {
-				"username": "${username}",
-				"password": "password"
-			},
-			"type": "http_basic"
-		}
-	]
+   "name":"${apiName}",
+   "path":"${apiPath}",
+   "state":"${state}",
+   "version":"1.0.0",
+   "organization":"API Development ${orgNumber}",
+   "outboundProfiles":{
+      "_default":{
+         "authenticationProfile":"test HTTP Basic",
+         "routeType":"proxy",
+         "requestPolicy":null,
+         "responsePolicy":null,
+         "routePolicy":null,
+         "faultHandlerPolicy":null,
+         "apiId":null,
+         "apiMethodId":null,
+         "parameters":[
+
+         ]
+      }
+   },
+   "securityProfiles":[
+      {
+         "name":"_default",
+         "isDefault":true,
+         "devices":[
+            {
+               "name":"Pass Through",
+               "type":"passThrough",
+               "order":0,
+               "properties":{
+                  "subjectIdFieldName":"Pass Through",
+                  "removeCredentialsOnSuccess":"true"
+               }
+            }
+         ]
+      }
+   ],
+   "authenticationProfiles":[
+      {
+         "name":"test HTTP Basic",
+         "parameters":{
+            "username":"${username}",
+            "password":"password"
+         },
+         "type":"http_basic"
+      }
+   ]
 }
