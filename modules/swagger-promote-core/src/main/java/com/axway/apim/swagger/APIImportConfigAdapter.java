@@ -616,9 +616,10 @@ public class APIImportConfigAdapter {
 	
 	private IAPI addDefaultPassthroughSecurityProfile(IAPI importApi) throws AppException {
 		boolean hasDefaultProfile = false;
-		if(importApi.getSecurityProfiles()!=null) {
+		List<SecurityProfile> profiles = importApi.getSecurityProfiles();
+		if(profiles!=null) {
 			// If we have only one profile, make it the default to be used by all methods
-			if(importApi.getSecurityProfiles().size()==1) {
+			if(profiles.size()==1 && profiles.get(0).getName()!=null) {
 				importApi.getSecurityProfiles().get(0).setName("_default");
 				importApi.getSecurityProfiles().get(0).setIsDefault(true);
 			}
@@ -647,12 +648,13 @@ public class APIImportConfigAdapter {
 	private IAPI addDefaultAuthenticationProfile(IAPI importApi) throws AppException {
 		if(importApi.getAuthenticationProfiles()==null) return importApi; // Nothing to add (no default is needed, if we don't send any Authn-Profile
 		boolean hasDefaultProfile = false;
-		// If we have only one profile, this must become the default to be used by all methods
-		if(importApi.getAuthenticationProfiles().size()==1) {
-			importApi.getAuthenticationProfiles().get(0).setName("_default");
-			importApi.getAuthenticationProfiles().get(0).setIsDefault(true);
+		List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
+		// If we have only one profile, not named specifically, this should become the default.
+		if(profiles.size()==1 && profiles.get(0).getName()==null) {
+			profiles.get(0).setName("_default");
+			profiles.get(0).setIsDefault(true);
 		}
-		for(AuthenticationProfile profile : importApi.getAuthenticationProfiles()) {
+		for(AuthenticationProfile profile : profiles) {
 			if(profile.getIsDefault() && profile.getName().equals("_default")) hasDefaultProfile=true;
 		}
 		if(!hasDefaultProfile) {
@@ -660,7 +662,7 @@ public class APIImportConfigAdapter {
 			passthroughProfile.setName("_default");
 			passthroughProfile.setIsDefault(true);
 			passthroughProfile.setType(AuthType.none);
-			importApi.getAuthenticationProfiles().add(passthroughProfile);
+			profiles.add(passthroughProfile);
 		}
 		return importApi;
 	}
