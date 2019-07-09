@@ -46,6 +46,7 @@ public class OutboundProfileHandler implements PropertyHandler {
 			if(profile.getAuthenticationProfile()!=null) {
 				boolean profileFound = false;
 				String profileName = profile.getAuthenticationProfile();
+				if(profileName.equals("_default")) continue; // Not needed. If the default it not given it falls back to "No AuthN"
 				if(authenticationProfiles!=null) {
 					for(AuthenticationProfile authProfile : authenticationProfiles) {
 						if(authProfile.getName().equals(profileName)) {
