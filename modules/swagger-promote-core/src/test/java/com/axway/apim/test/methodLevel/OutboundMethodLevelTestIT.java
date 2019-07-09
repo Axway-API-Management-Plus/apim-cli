@@ -44,7 +44,7 @@ public class OutboundMethodLevelTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
-			.validate("$.[?(@.path=='/basic-outbound-method-level-api-930')].authenticationProfiles[?(@.name=='HTTP Basic outbound Test 930')].type", "http_basic")
+			.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[?(@.name=='${outboundProfileName}')].type", "http_basic")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}/operations").header("Content-Type", "application/json"));
