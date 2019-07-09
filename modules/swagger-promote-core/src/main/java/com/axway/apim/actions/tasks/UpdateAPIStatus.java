@@ -5,9 +5,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.actions.rest.DELRequest;
@@ -26,6 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser {
 	
 	private String intent = "";
+	
+	private boolean updateVHostRequired = false;
 	
 	public static HashMap<String, String[]> statusChangeMap = new HashMap<String, String[]>() {{
 		put("unpublished", 	new String[] {"published", "deleted"});
@@ -148,10 +152,17 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				uri = new URIBuilder(cmd.getAPIManagerURL())
 					.setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getId()+"/"+statusEndpoint.get(desiredState.getState()))
 					.build();
-			
-				apiCall = new POSTRequest(null, uri, this, true);
+				if(desiredState.getVhost()!=null && desiredState.getState().equals(IAPI.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
+					HttpEntity entity = new StringEntity("vhost="+desiredState.getVhost());
+					apiCall = new POSTRequest(entity, uri, this, true);
+				} else {
+					apiCall = new POSTRequest(null, uri, this, true);
+				}
 				apiCall.setContentType("application/x-www-form-urlencoded");
 				apiCall.execute();
+				if (desiredState.getVhost()!=null && desiredState.getState().equals(IAPI.STATE_UNPUBLISHED)) { 
+					this.updateVHostRequired = true; // Flag to control update of the VHost
+				}
 			} 
 		} catch (Exception e) {
 			throw new AppException("The status change from: '" + actualState.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS, e);
@@ -186,6 +197,8 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 			} catch (Exception ignore) { }
 		}
 	}
-	
-	
+
+	public boolean isUpdateVHostRequired() {
+		return updateVHostRequired;
+	}
 }
