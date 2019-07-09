@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class APIAuthenticationPropertyHandler implements PropertyHandler {
 	
-	public JsonNode handleProperty(IAPI desired, JsonNode response) throws AppException {
+	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException {
 		ArrayNode devices = (ArrayNode) ((ArrayNode) response.findPath("securityProfiles")).get(0).get("devices");
 		// We put all security devices from the desired state into the request
 		devices.removeAll();

@@ -50,7 +50,9 @@ import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthType;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
+import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.organization.Organization;
+import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
@@ -161,6 +163,9 @@ public class APIImportConfigAdapter {
 			validateOrganization(apiConfig);
 			checkForAPIDefinitionInConfiguration(apiConfig);
 			addDefaultPassthroughSecurityProfile(apiConfig);
+			addDefaultAuthenticationProfile(apiConfig);
+			addDefaultOutboundProfile(apiConfig);
+			addDefaultInboundProfile(apiConfig);
 			APIDefintion apiDefinition = new APIDefintion();
 			apiDefinition.setAPIDefinitionFile(this.pathToAPIDefinition);
 			apiDefinition.setAPIDefinitionContent(getAPIDefinitionContent(), (DesiredAPI)apiConfig);
@@ -182,6 +187,15 @@ public class APIImportConfigAdapter {
 			}
 			throw new AppException("Cannot validate/fulfill configuration file.", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
+	}
+	
+	public IAPI completeDesiredAPI(IAPI desiredAPI, IAPI actualAPI) throws AppException {
+		if(!actualAPI.isValid()) return desiredAPI;
+		APIManagerAdapter mgrAdpater = APIManagerAdapter.getInstance();
+		mgrAdpater.translateMethodIds(desiredAPI.getInboundProfiles(), actualAPI);
+		mgrAdpater.translateMethodIds(desiredAPI.getOutboundProfiles(), actualAPI);
+		
+		return desiredAPI;
 	}
 	
 	private void validateExposurePath(IAPI apiConfig) throws AppException {
@@ -583,8 +597,30 @@ public class APIImportConfigAdapter {
 		return null;
 	}
 	
+	private IAPI addDefaultInboundProfile(IAPI importApi) {
+		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) return importApi;
+		Iterator<String> it = importApi.getInboundProfiles().keySet().iterator();
+		while(it.hasNext()) {
+			String profileName = it.next();
+			if(profileName.equals("_default")) return importApi; // Nothing to, there is a default profile
+		}
+		InboundProfile defaultProfile = new InboundProfile();
+		defaultProfile.setSecurityProfile("_default");
+		defaultProfile.setCorsProfile("_default");
+		defaultProfile.setMonitorAPI("true");
+		defaultProfile.setMonitorSubject("authentication.subject.id");
+		importApi.getInboundProfiles().put("_default", defaultProfile);
+		return importApi;
+	}
+	
 	private IAPI addDefaultPassthroughSecurityProfile(IAPI importApi) throws AppException {
-		if(importApi.getSecurityProfiles()==null || importApi.getSecurityProfiles().size()==0) {
+		boolean hasDefaultProfile = false;
+		if(importApi.getSecurityProfiles()!=null) {
+			for(SecurityProfile profile : importApi.getSecurityProfiles()) {
+				if(profile.getIsDefault().equals("true") && profile.getName().equals("_default")) hasDefaultProfile=true;
+			}
+		}
+		if(importApi.getSecurityProfiles()==null || importApi.getSecurityProfiles().size()==0 || !hasDefaultProfile) {
 			SecurityProfile passthroughProfile = new SecurityProfile();
 			passthroughProfile.setName("_default");
 			passthroughProfile.setIsDefault("true");
@@ -596,23 +632,48 @@ public class APIImportConfigAdapter {
 			passthroughDevice.getProperties().put("removeCredentialsOnSuccess", "true");
 			passthroughProfile.getDevices().add(passthroughDevice);
 			
-			importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
+			if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
 			importApi.getSecurityProfiles().add(passthroughProfile);
 		}
+		return importApi;
+	}
+	
+	private IAPI addDefaultAuthenticationProfile(IAPI importApi) throws AppException {
+		boolean hasDefaultProfile = false;
+		if(importApi.getAuthenticationProfiles()!=null) {
+			for(AuthenticationProfile profile : importApi.getAuthenticationProfiles()) {
+				if(profile.getIsDefault() && profile.getName().equals("_default")) hasDefaultProfile=true;
+			}
+		}
+		if(importApi.getAuthenticationProfiles()==null || importApi.getAuthenticationProfiles().size()==0 || !hasDefaultProfile) {
+			AuthenticationProfile passthroughProfile = new AuthenticationProfile();
+			passthroughProfile.setName("_default");
+			passthroughProfile.setIsDefault(true);
+			passthroughProfile.setType(AuthType.none);
+			importApi.getAuthenticationProfiles().add(passthroughProfile);
+		}
+		return importApi;
+	}
+	
+	private IAPI addDefaultOutboundProfile(IAPI importApi) throws AppException {
+		if(importApi.getOutboundProfiles()==null || importApi.getOutboundProfiles().size()==0) return importApi;
+		Iterator<String> it = importApi.getOutboundProfiles().keySet().iterator();
+		while(it.hasNext()) {
+			String profileName = it.next();
+			if(profileName.equals("_default")) return importApi; // Nothing to, there is a default profile
+		}
+		OutboundProfile defaultProfile = new OutboundProfile();
+		defaultProfile.setAuthenticationProfile("_default");
+		defaultProfile.setRouteType("proxy");
+		importApi.getOutboundProfiles().put("_default", defaultProfile);
 		return importApi;
 	}
 	
 	private void validateOutboundAuthN(IAPI importApi) throws AppException {
 		// Request to use some specific Outbound-AuthN for this API
 		if(importApi.getAuthenticationProfiles()!=null && importApi.getAuthenticationProfiles().size()!=0) {
-			// For now, we only support one DEFAULT, hence it must be configured as such
-			if(importApi.getAuthenticationProfiles().size()>1) {
-				throw new AppException("Only one AuthenticationProfile supported.", ErrorCode.CANT_READ_CONFIG_FILE);
-			}
 			if(importApi.getAuthenticationProfiles().get(0).getType().equals(AuthType.ssl)) 
 				handleOutboundSSLAuthN(importApi.getAuthenticationProfiles().get(0));
-			importApi.getAuthenticationProfiles().get(0).setIsDefault(true);
-			importApi.getAuthenticationProfiles().get(0).setName("_default"); // Otherwise it wont be considered as default by the API-Mgr.
 		}
 		
 	}

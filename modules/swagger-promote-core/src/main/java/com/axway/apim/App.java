@@ -170,10 +170,11 @@ public class App {
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			
-			APIImportConfigAdapter contract = new APIImportConfigAdapter(params.getValue("contract"), 
+			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params.getValue("contract"), 
 					params.getValue("stage"), params.getValue("apidefinition"), apimAdapter.isUsingOrgAdmin());
-			IAPI desiredAPI = contract.getDesiredAPI();
+			IAPI desiredAPI = configAdapter.getDesiredAPI();
 			IAPI actualAPI = apimAdapter.getAPIManagerAPI(apimAdapter.getExistingAPI(desiredAPI.getPath(), null, APIManagerAdapter.TYPE_FRONT_END), desiredAPI);
+			configAdapter.completeDesiredAPI(desiredAPI, actualAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
 			apimAdapter.applyChanges(changeActions);
 			APIPropertiesExport.getInstance().store();

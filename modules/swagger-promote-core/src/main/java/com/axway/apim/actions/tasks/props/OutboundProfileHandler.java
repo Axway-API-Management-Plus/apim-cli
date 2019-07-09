@@ -10,8 +10,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class OutboundProfileHandler implements PropertyHandler {
 
 	@Override
-	public JsonNode handleProperty(IAPI desired, JsonNode response) throws AppException {
+	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException {
 		ObjectMapper objectMapper = new ObjectMapper();
+		APIManagerAdapter.getInstance().translateMethodIds(desired.getOutboundProfiles(), actual);
 		if(desired.getOutboundProfiles().size()!=0) {
 			((ObjectNode)response).replace("outboundProfiles", objectMapper.valueToTree(desired.getOutboundProfiles()));
 		}

@@ -106,7 +106,7 @@ public class OutboundProfile {
 	}
 
 	public String getAuthenticationProfile() {
-		return "_default"; // For now, nothing else is supported!
+		return this.authenticationProfile;
 	}
 
 	public void setAuthenticationProfile(String authenticationProfile) {

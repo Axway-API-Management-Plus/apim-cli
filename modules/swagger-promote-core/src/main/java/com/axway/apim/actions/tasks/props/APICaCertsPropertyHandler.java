@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class APICaCertsPropertyHandler implements PropertyHandler {
 	
-	public JsonNode handleProperty(IAPI desired, JsonNode response) {
+	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) {
 		String[] propertiesToExclude = {"certFile", "useForInbound", "useForOutbound"};
 		FilterProvider filters = new SimpleFilterProvider()  
 			      .addFilter("IgnoreImportFields",   

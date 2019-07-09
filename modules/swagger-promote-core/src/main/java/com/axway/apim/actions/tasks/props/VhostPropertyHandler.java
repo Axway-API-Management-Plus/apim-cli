@@ -47,7 +47,7 @@ public class VhostPropertyHandler implements PropertyHandler {
 	}
 
 	@Override
-	public JsonNode handleProperty(IAPI desired, JsonNode response) throws AppException {
+	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException {
 		((ObjectNode) response).put("vhost", desired.getVhost());
 		return response;
 	}
