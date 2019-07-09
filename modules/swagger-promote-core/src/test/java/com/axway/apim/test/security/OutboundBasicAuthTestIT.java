@@ -32,14 +32,6 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
-		echo("####### No-Change test for '${apiName}' on path: '${apiPath}' #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/5_api_outbound-basic.json");
-		createVariable("state", "unpublished");
-		createVariable("username", "1234567890");
-		createVariable("expectedReturnCode", "10");
-		action(swaggerImport);
-
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' with outbound security set to HTTP-Basic. #######");
 		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
 
@@ -49,6 +41,14 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestDesigner {
 				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
 				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "http_basic")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+		
+		echo("####### No-Change test for '${apiName}' on path: '${apiPath}' #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/5_api_outbound-basic.json");
+		createVariable("state", "unpublished");
+		createVariable("username", "1234567890");
+		createVariable("expectedReturnCode", "10");
+		action(swaggerImport);
 		
 		echo("####### Simulate a change to the outbound configuration in UNPUBLISHED mode, by changing the username #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");

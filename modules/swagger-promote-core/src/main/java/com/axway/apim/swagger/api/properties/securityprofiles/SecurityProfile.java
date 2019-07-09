@@ -9,7 +9,7 @@ public class SecurityProfile {
 	
 	String name;
 	
-	String isDefault;
+	boolean isDefault;
 	
 	List<SecurityDevice> devices;
 
@@ -27,11 +27,11 @@ public class SecurityProfile {
 		this.name = name;
 	}
 
-	public String getIsDefault() {
+	public boolean getIsDefault() {
 		return isDefault;
 	}
 
-	public void setIsDefault(String isDefault) {
+	public void setIsDefault(boolean isDefault) {
 		this.isDefault = isDefault;
 	}
 
@@ -56,7 +56,7 @@ public class SecurityProfile {
 			
 			return
 					StringUtils.equals(securityProfile.getName(), this.getName()) &&
-					StringUtils.equals(securityProfile.getIsDefault(), this.getIsDefault()) &&
+					securityProfile.getIsDefault() == this.getIsDefault() &&
 					securityProfile.getDevices().equals(this.getDevices());
 		} else {
 			return false;

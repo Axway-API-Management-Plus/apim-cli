@@ -24,7 +24,7 @@ public class SecurityProfileHandler implements PropertyHandler {
 	private void preProcessSecurityProfiles(IAPI desired) throws AppException {
 		for(SecurityProfile profile : desired.getSecurityProfiles()) {
 			// Validate we have only one default declared
-			if(!profile.getName().equals("_default") && profile.getIsDefault().equals("true")) {
+			if(!profile.getName().equals("_default") && profile.getIsDefault()) {
 				ErrorState.getInstance().setError("Not allowed to configure non _default profile: '"+profile.getName()+"' as default.", ErrorCode.CANT_READ_CONFIG_FILE, false);
 				throw new AppException("Not allowed to configure non _default profile as default to true.", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
