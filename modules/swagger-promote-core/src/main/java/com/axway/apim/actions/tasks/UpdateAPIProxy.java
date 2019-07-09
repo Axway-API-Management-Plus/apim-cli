@@ -43,7 +43,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 			if(lastJsonReponse==null) { // This class is called as the first, so, first load the API
 				lastJsonReponse = initActualAPIContext(this.actualState);
 			}
-			handledChangedProps(lastJsonReponse, this.desiredState, changedProps);
+			handledChangedProps(lastJsonReponse, this.desiredState, this.actualState, changedProps);
 		
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+context.get("virtualAPIId")).build();
 			entity = new StringEntity(objectMapper.writeValueAsString(lastJsonReponse));
@@ -86,7 +86,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		return null;
 	}	
 	
-	private static JsonNode handledChangedProps(JsonNode lastJsonReponse, IAPI desired, List<String> changedProps) throws AppException {
+	private static JsonNode handledChangedProps(JsonNode lastJsonReponse, IAPI desired, IAPI actual, List<String> changedProps) throws AppException {
 		Field field = null;
 		if(changedProps!=null && changedProps.size()!=0) {
 			boolean propsChangedInProxy = false;
@@ -101,7 +101,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 							Class clazz = property.propHandler();
 							LOG.trace("Calling property handler: " + clazz.getCanonicalName());
 							PropertyHandler propHandler = (PropertyHandler) clazz.newInstance();
-							lastJsonReponse = propHandler.handleProperty(desired, lastJsonReponse);
+							lastJsonReponse = propHandler.handleProperty(desired, actual, lastJsonReponse);
 							logMessage = logMessage + field.getName() + " ";
 							propsChangedInProxy = true;
 						} else {
@@ -111,7 +111,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 								Object handler = method.invoke(desired, null);
 								if(handler instanceof PropertyHandler) { // This is NEW/Preferred way
 									LOG.trace("Calling property handler: " + handler.getClass());
-									((PropertyHandler)handler).handleProperty(desired, lastJsonReponse);
+									((PropertyHandler)handler).handleProperty(desired, actual, lastJsonReponse);
 									logMessage = logMessage + field.getName() + " ";
 									propsChangedInProxy = true;
 								} else {

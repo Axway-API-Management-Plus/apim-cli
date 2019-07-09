@@ -15,7 +15,7 @@ public class RoutingKeyPropHandler implements PropertyHandler {
 	
 	static Logger LOG = LoggerFactory.getLogger(RoutingKeyPropHandler.class);
 
-	public JsonNode handleProperty(IAPI desired, JsonNode response) {
+	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) {
 		try {
 			if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return response; // QueryStringRouting isn't supported
 			if(APIManagerAdapter.getInstance().hasAdminAccount()) {

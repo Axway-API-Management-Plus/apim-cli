@@ -5,5 +5,5 @@ import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public interface PropertyHandler {
-	public JsonNode handleProperty(IAPI desired, JsonNode response) throws AppException;
+	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException;
 }

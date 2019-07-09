@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class CorsProfileHandler implements PropertyHandler {
 
 	@Override
-	public JsonNode handleProperty(IAPI desired, JsonNode response) throws AppException {
+	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if(desired.getCorsProfiles().size()!=0) {
 			((ObjectNode)response).replace("corsProfiles", objectMapper.valueToTree(desired.getCorsProfiles()));

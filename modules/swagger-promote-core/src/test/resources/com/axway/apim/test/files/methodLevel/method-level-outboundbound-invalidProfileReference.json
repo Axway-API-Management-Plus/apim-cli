@@ -2,11 +2,11 @@
    "name":"${apiName}",
    "path":"${apiPath}",
    "state":"${state}",
-   "version":"1.0.0",
+   "version":"1.0.7",
    "organization":"API Development ${orgNumber}",
    "outboundProfiles":{
       "_default":{
-         "authenticationProfile":"test HTTP Basic",
+         "authenticationProfile":"_default",
          "routeType":"proxy",
          "requestPolicy":null,
          "responsePolicy":null,
@@ -17,30 +17,27 @@
          "parameters":[
 
          ]
-      }
-   },
-   "securityProfiles":[
-      {
-         "name":"_default",
-         "isDefault":true,
-         "devices":[
+      },
+      "getOrderById":{
+         "authenticationProfile":"${authenticationProfileName1}",
+         "parameters":[
             {
-               "name":"Pass Through",
-               "type":"passThrough",
-               "order":0,
-               "properties":{
-                  "subjectIdFieldName":"Pass Through",
-                  "removeCredentialsOnSuccess":"true"
-               }
+               "name":"additionalOutboundParam",
+               "required":false,
+               "type":"string",
+               "paramType":"header",
+               "value":"Test-Value",
+               "exclude":false,
+               "additional":true
             }
          ]
       }
-   ],
+   },
    "authenticationProfiles":[
       {
-         "name":"test HTTP Basic",
+         "name":"${authenticationProfileName2}",
          "parameters":{
-            "username":"${username}",
+            "username":"usernameabc",
             "password":"password"
          },
          "type":"http_basic"
