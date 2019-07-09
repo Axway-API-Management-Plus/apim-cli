@@ -115,7 +115,7 @@ public class InboundProfileHandler implements PropertyHandler {
 			if(method.getName().equals(operationId)) {
 				return method.getId();
 			}
-			if(method.getId().equals(operationId)) { // Already translated (happens during updated existing API)
+			if(method.getId().equals(operationId)) { // MethodIds are already translated, if an existing APIs is updated
 				return operationId;
 			}
 		}
