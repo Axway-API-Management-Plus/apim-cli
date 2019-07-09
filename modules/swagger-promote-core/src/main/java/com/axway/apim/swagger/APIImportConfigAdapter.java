@@ -639,13 +639,12 @@ public class APIImportConfigAdapter {
 	}
 	
 	private IAPI addDefaultAuthenticationProfile(IAPI importApi) throws AppException {
+		if(importApi.getAuthenticationProfiles()==null) return importApi; // Nothing to add (no default is needed, if we don't send any Authn-Profile
 		boolean hasDefaultProfile = false;
-		if(importApi.getAuthenticationProfiles()!=null) {
-			for(AuthenticationProfile profile : importApi.getAuthenticationProfiles()) {
-				if(profile.getIsDefault() && profile.getName().equals("_default")) hasDefaultProfile=true;
-			}
+		for(AuthenticationProfile profile : importApi.getAuthenticationProfiles()) {
+			if(profile.getIsDefault() && profile.getName().equals("_default")) hasDefaultProfile=true;
 		}
-		if(importApi.getAuthenticationProfiles()==null || importApi.getAuthenticationProfiles().size()==0 || !hasDefaultProfile) {
+		if(!hasDefaultProfile) {
 			AuthenticationProfile passthroughProfile = new AuthenticationProfile();
 			passthroughProfile.setName("_default");
 			passthroughProfile.setIsDefault(true);
