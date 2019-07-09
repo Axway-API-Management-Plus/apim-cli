@@ -54,5 +54,13 @@ public class OutboundMethodLevelTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.id=='${apiId}')].outboundProfiles.${apiMethodId}.authenticationProfile", "${outboundProfileName}"));
+		
+		echo("####### Perform a No-Change #######");		
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/methodLevel/method-level-outboundbound-api-key.json");
+		createVariable("state", "unpublished");
+		createVariable("expectedReturnCode", "10");
+		createVariable("outboundProfileName", "HTTP Basic outbound Test ${apiNumber}");
+		swaggerImport.doExecute(context);
 	}
 }
