@@ -56,6 +56,7 @@ import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
+import com.axway.apim.swagger.api.state.AbstractAPI;
 import com.axway.apim.swagger.api.state.DesiredAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -163,6 +164,7 @@ public class APIImportConfigAdapter {
 			validateOrganization(apiConfig);
 			checkForAPIDefinitionInConfiguration(apiConfig);
 			addDefaultPassthroughSecurityProfile(apiConfig);
+			addDefaultCorsProfile(apiConfig);
 			addDefaultAuthenticationProfile(apiConfig);
 			addDefaultOutboundProfile(apiConfig);
 			addDefaultInboundProfile(apiConfig);
@@ -173,7 +175,6 @@ public class APIImportConfigAdapter {
 			addImageContent(apiConfig);
 			validateCustomProperties(apiConfig);
 			validateDescription(apiConfig);
-			validateCorsConfig(apiConfig);
 			validateOutboundAuthN(apiConfig);
 			validateHasQueryStringKey(apiConfig);
 			completeCaCerts(apiConfig);
@@ -309,8 +310,10 @@ public class APIImportConfigAdapter {
 		}
 	}
 	
-	private void validateCorsConfig(IAPI apiConfig) throws AppException {
-		if(apiConfig.getCorsProfiles()==null || apiConfig.getCorsProfiles().size()==0) return;
+	private void addDefaultCorsProfile(IAPI apiConfig) throws AppException {
+		if(apiConfig.getCorsProfiles()==null) {
+			((AbstractAPI)apiConfig).setCorsProfiles(new ArrayList<CorsProfile>());
+		}
 		// Check if there is a default cors profile declared otherwise create one internally
 		boolean defaultCorsFound = false;
 		for(CorsProfile profile : apiConfig.getCorsProfiles()) {
@@ -598,7 +601,7 @@ public class APIImportConfigAdapter {
 		return null;
 	}
 	
-	private IAPI addDefaultInboundProfile(IAPI importApi) {
+	private IAPI addDefaultInboundProfile(IAPI importApi) throws AppException {
 		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) return importApi;
 		Iterator<String> it = importApi.getInboundProfiles().keySet().iterator();
 		while(it.hasNext()) {
@@ -646,7 +649,7 @@ public class APIImportConfigAdapter {
 	}
 	
 	private IAPI addDefaultAuthenticationProfile(IAPI importApi) throws AppException {
-		if(importApi.getAuthenticationProfiles()==null) return importApi; // Nothing to add (no default is needed, if we don't send any Authn-Profile
+		if(importApi.getAuthenticationProfiles()==null) return importApi; // Nothing to add (no default is needed, as we don't send any Authn-Profile)
 		boolean hasDefaultProfile = false;
 		List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
 		for(AuthenticationProfile profile : profiles) {

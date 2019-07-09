@@ -45,7 +45,6 @@ public class InboundMethodLevelTestIT extends TestNGCitrusTestRunner {
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
 			.validate("$.[?(@.path=='${apiPath}')].securityProfiles.[?(@.name=='${securityProfileName}')].devices[0].type", "apiKey")
-			//.validate("$.[?(@.path=='${apiPath}')].inboundProfiles[*].securityProfile", "@assertThat(contains(${securityProfileName}))@")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}/operations").header("Content-Type", "application/json"));
@@ -63,5 +62,23 @@ public class InboundMethodLevelTestIT extends TestNGCitrusTestRunner {
 		createVariable("expectedReturnCode", "10");
 		createVariable("securityProfileName", "APIKeyBased${apiNumber}");
 		swaggerImport.doExecute(context);
+		
+		echo("####### Execute a No-Change test #######");		
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/methodLevel/method-level-inbound-api-key-and-cors.json");
+		createVariable("state", "published");
+		createVariable("expectedReturnCode", "0");
+		createVariable("securityProfileName", "APIKeyBased${apiNumber}");
+		swaggerImport.doExecute(context);
+		
+		echo("####### Validate the FE-API has been configured with API-Key on method level #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
+			.validate("$.[?(@.id=='${apiId}')].state", "${state}")
+			.validate("$.[?(@.id=='${apiId}')].securityProfiles.[?(@.name=='${securityProfileName}')].devices[0].type", "apiKey")
+			.validate("$.[?(@.id=='${apiId}')].corsProfiles.[0].name", "New CORS Profile")
+			.validate("$.[?(@.id=='${apiId}')].inboundProfiles.${apiMethodId}.securityProfile", "${securityProfileName}")
+			.validate("$.[?(@.id=='${apiId}')].inboundProfiles.${apiMethodId}.corsProfile", "New CORS Profile"));
 	}
 }
