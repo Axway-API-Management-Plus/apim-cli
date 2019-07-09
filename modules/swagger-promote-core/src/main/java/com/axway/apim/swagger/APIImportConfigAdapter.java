@@ -616,18 +616,19 @@ public class APIImportConfigAdapter {
 	
 	private IAPI addDefaultPassthroughSecurityProfile(IAPI importApi) throws AppException {
 		boolean hasDefaultProfile = false;
+		if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
 		List<SecurityProfile> profiles = importApi.getSecurityProfiles();
-		if(profiles!=null) {
-			// If we have only one profile, make it the default to be used by all methods
-			if(profiles.size()==1 && profiles.get(0).getName()!=null) {
-				importApi.getSecurityProfiles().get(0).setName("_default");
-				importApi.getSecurityProfiles().get(0).setIsDefault(true);
-			}
-			for(SecurityProfile profile : importApi.getSecurityProfiles()) {
-				if(profile.getIsDefault() && profile.getName().equals("_default")) hasDefaultProfile=true;
+		for(SecurityProfile profile : importApi.getSecurityProfiles()) {
+			if(profile.getIsDefault()) {
+				if(hasDefaultProfile) {
+					ErrorState.getInstance().setError("You can have only one _default SecurityProfile.", ErrorCode.CANT_READ_CONFIG_FILE, false);
+					throw new AppException("You can have only one _default SecurityProfile.", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+				hasDefaultProfile=true;
+				profile.setName("_default"); // Overwrite the name if it is default! (this is required by the API-Manager)
 			}
 		}
-		if(importApi.getSecurityProfiles()==null || importApi.getSecurityProfiles().size()==0 || !hasDefaultProfile) {
+		if(profiles==null || profiles.size()==0 || !hasDefaultProfile) {
 			SecurityProfile passthroughProfile = new SecurityProfile();
 			passthroughProfile.setName("_default");
 			passthroughProfile.setIsDefault(true);
@@ -639,8 +640,7 @@ public class APIImportConfigAdapter {
 			passthroughDevice.getProperties().put("removeCredentialsOnSuccess", "true");
 			passthroughProfile.getDevices().add(passthroughDevice);
 			
-			if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
-			importApi.getSecurityProfiles().add(passthroughProfile);
+			profiles.add(passthroughProfile);
 		}
 		return importApi;
 	}
@@ -649,20 +649,22 @@ public class APIImportConfigAdapter {
 		if(importApi.getAuthenticationProfiles()==null) return importApi; // Nothing to add (no default is needed, if we don't send any Authn-Profile
 		boolean hasDefaultProfile = false;
 		List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
-		// If we have only one profile, not named specifically, this should become the default.
-		if(profiles.size()==1 && profiles.get(0).getName()==null) {
-			profiles.get(0).setName("_default");
-			profiles.get(0).setIsDefault(true);
-		}
 		for(AuthenticationProfile profile : profiles) {
-			if(profile.getIsDefault() && profile.getName().equals("_default")) hasDefaultProfile=true;
+			if(profile.getIsDefault()) {
+				if(hasDefaultProfile) {
+					ErrorState.getInstance().setError("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE, false);
+					throw new AppException("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+				hasDefaultProfile=true;
+				profile.setName("_default"); // Overwrite the name if it is default! (this is required by the API-Manager)
+			}
 		}
 		if(!hasDefaultProfile) {
-			AuthenticationProfile passthroughProfile = new AuthenticationProfile();
-			passthroughProfile.setName("_default");
-			passthroughProfile.setIsDefault(true);
-			passthroughProfile.setType(AuthType.none);
-			profiles.add(passthroughProfile);
+			AuthenticationProfile noAuthNProfile = new AuthenticationProfile();
+			noAuthNProfile.setName("_default");
+			noAuthNProfile.setIsDefault(true);
+			noAuthNProfile.setType(AuthType.none);
+			profiles.add(noAuthNProfile);
 		}
 		return importApi;
 	}
