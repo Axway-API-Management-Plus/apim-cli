@@ -46,7 +46,8 @@ public class VhostConfigTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
-			.validate("$.[?(@.path=='${apiPath}')].vhost", "api123.customer.com"));
+			.validate("$.[?(@.path=='${apiPath}')].vhost", "api123.customer.com")
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "unpublished");
@@ -61,17 +62,19 @@ public class VhostConfigTestIT extends TestNGCitrusTestRunner {
 		}
 		swaggerImport.doExecute(context);
 		
-		echo("####### Validate API: '${apiName}' has a been imported and VHost is set #######");
-		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json"));
 		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP3")) {
+			echo("####### Validate API: '${apiName}' has a been imported and VHost is set #######");
+			
 			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-				.validate("$.[?(@.path=='${apiPath}')].state", "${status}")
-				.validate("$.[?(@.path=='${apiPath}')].vhost", "${vhost}")
-				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+				.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
+				.validate("$.[?(@.id=='${apiId}')].state", "${status}")
+				.validate("$.[?(@.id=='${apiId}')].vhost", "${vhost}"));
 		} else {
+			echo("####### For API-Manager 7.6.2 <SP3 just validate the API is still there! #######");
 			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-					.validate("$.*.name", "@assertThat(not(containsString(${apiName})))@"));
+					.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
+					.validate("$.[?(@.id=='${apiId}')].state", "${status}")); 
 		}
 	}
 }
