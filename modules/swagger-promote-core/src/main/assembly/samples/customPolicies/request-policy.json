@@ -1,0 +1,12 @@
+{
+	"name": "Samples Request Policy only",
+	"path": "/sample/requestpolicy/api/v1",
+	"state": "unpublished",
+	"version": "1.0.0",
+	"organization": "API Development", 
+	"outboundProfiles": {
+		"_default": {
+			"requestPolicy": "Sample Request Policy 1"
+		}
+	}
+}

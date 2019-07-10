@@ -1,0 +1,11 @@
+{
+   "name":"Samples OrgsAndApps App using AppName",
+   "path":"/samples/orgsAndApps/appUsingAppName/v1/api",
+   "state":"published",
+   "version":"1.0.0",
+   "organization":"API Development",
+   "applications":[
+      { "name":"Client App 1" },
+      { "name":"Client App 2" }  
+   ]
+}

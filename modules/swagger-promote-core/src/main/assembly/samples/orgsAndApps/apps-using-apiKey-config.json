@@ -1,0 +1,10 @@
+{
+   "name":"Samples OrgsAndApps App using APIKey",
+   "path":"/samples/orgsAndApps/appUsingAPIKey/v1/api",
+   "state":"published",
+   "version":"1.0.0",
+   "organization":"API Development",
+   "applications":[
+      { "apiKey":"App with API-Key XYZ" }
+   ]
+}

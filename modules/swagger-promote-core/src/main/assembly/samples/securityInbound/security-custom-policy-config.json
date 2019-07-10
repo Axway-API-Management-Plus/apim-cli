@@ -1,6 +1,6 @@
 {
-   "name":"API with custom AuthN-Policy",
-   "path":"/api/v1/with/custom/authn/policy",
+   "name":"Samples SecurityInbound CustomPolicy",
+   "path":"/samples/securityInbound/customPolicy/v1/api",
    "state":"unpublished",
    "version":"1.0.0",
    "organization":"API Development",

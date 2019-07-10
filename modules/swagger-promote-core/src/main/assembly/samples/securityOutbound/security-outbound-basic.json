@@ -1,6 +1,6 @@
 {
-	"name": "API using HTTP-Basic for outbound calls",
-	"path": "/api/v1/using/http-basic",
+	"name": "Samples SecurityOutbound HTTP-Basic",
+	"path": "/samples/securityOutbound/httpbasic/v1/api",
 	"state": "unpublished",
 	"version": "1.0.0",
 	"organization": "API Development",

@@ -1,6 +1,6 @@
 {
-	"name": "Minimal WSDL API",
-	"path": "/minimal/wsdl/api/v1",
+	"name": "Sample Minimal WSDL API",
+	"path": "/sample/minimal/wsdl/apidefinition/api/v1",
 	"state": "unpublished",
 	"version": "1.0.0",
 	"apiDefinition":"http://www.dneonline.com/calculator.asmx?wsdl",
