@@ -1,6 +1,9 @@
 ---
 name: Feature request
 about: Tell us what you need and why in Swagger-Promote
+title: "[Feature]"
+labels: enhancement
+assignees: cwiechmann
 
 ---
 

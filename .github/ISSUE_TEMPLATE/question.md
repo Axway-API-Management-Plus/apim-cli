@@ -1,6 +1,9 @@
 ---
 name: Question
 about: Ask a question concerning Swagger-Promote
+title: "[Help]"
+labels: help wanted
+assignees: cwiechmann
 
 ---
 
