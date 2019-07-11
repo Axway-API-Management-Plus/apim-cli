@@ -17,7 +17,6 @@
 
   <modules>
 		<module>../swagger-promote-core</module>
-		<module>../api-registry-metadata-export</module>
 	</modules>
 
   <build>
