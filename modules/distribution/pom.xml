@@ -6,6 +6,7 @@
     <groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
     <artifactId>axway-swagger-promote</artifactId>
     <version>1.6-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <artifactId>distribution</artifactId>
@@ -16,7 +17,6 @@
 
   <modules>
 		<module>../swagger-promote-core</module>
-		<module>../api-registry-metadata-export</module>
 	</modules>
 
   <build>

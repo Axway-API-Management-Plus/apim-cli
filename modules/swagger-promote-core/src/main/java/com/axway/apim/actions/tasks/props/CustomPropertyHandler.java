@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class CustomPropertyHandler implements PropertyHandler {
 	
-	public JsonNode handleProperty(IAPI desired, JsonNode response) {
+	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) {
 		Iterator<String> propKeys = desired.getCustomProperties().keySet().iterator();
 		while(propKeys.hasNext()) {
 			String propKey = propKeys.next();

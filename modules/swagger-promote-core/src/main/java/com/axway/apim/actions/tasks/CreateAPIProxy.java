@@ -5,6 +5,7 @@ import java.net.URI;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -64,6 +65,10 @@ public class CreateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 			Transaction.getInstance().put("lastResponse", jsonNode);
 		} catch (IOException e) {
 			throw new AppException("Cannot parse JSON-Payload for create API-Proxy.", ErrorCode.CANT_CREATE_API_PROXY, e);
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
 		}
 		return jsonNode;
 	}

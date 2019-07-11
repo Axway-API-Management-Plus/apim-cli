@@ -1,5 +1,6 @@
 package com.axway.apim.swagger;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyStore;
@@ -21,6 +23,7 @@ import java.util.ListIterator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -48,10 +51,13 @@ import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthType;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
+import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.organization.Organization;
+import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
+import com.axway.apim.swagger.api.state.AbstractAPI;
 import com.axway.apim.swagger.api.state.DesiredAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -104,11 +110,11 @@ public class APIImportConfigAdapter {
 		this.usingOrgAdmin = usingOrgAdmin;
 		IAPI baseConfig;
 		try {
-			baseConfig = mapper.readValue(new File(apiConfigFile), DesiredAPI.class);
-			ObjectReader updater = mapper.readerForUpdating(baseConfig);
+			baseConfig = mapper.readValue(substitueVariables(new File(apiConfigFile)), DesiredAPI.class);
 			if(getStageConfig(stage, apiConfigFile)!=null) {
 				try {
-					apiConfig = updater.readValue(new File(getStageConfig(stage, apiConfigFile)));
+					ObjectReader updater = mapper.readerForUpdating(baseConfig);
+					apiConfig = updater.readValue(substitueVariables(new File(getStageConfig(stage, apiConfigFile))));
 					LOG.info("Loaded stage API-Config from file: " + getStageConfig(stage, apiConfigFile));
 				} catch (FileNotFoundException e) {
 					LOG.debug("No config file found for stage: '"+stage+"'");
@@ -121,6 +127,19 @@ public class APIImportConfigAdapter {
 			error.setError("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE);
 			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
+	}
+	
+	/**
+	 * This methood is replacing variables such as ${TokenEndpoint} with declared variables coming from either 
+	 * the Environment-Variables or from system-properties.
+	 * @param inputFile The API-Config file to be replaced and returned as String
+	 * @return a String representation of the API-Config-File
+	 * @throws IOException if the file can't be found
+	 */
+	private String substitueVariables(File inputFile) throws IOException {
+		StringSubstitutor substitutor = new StringSubstitutor(CommandParameters.getInstance().getEnvironmentProperties());
+		String givenConfig = new String(Files.readAllBytes(inputFile.toPath()));
+		return substitutor.replace(givenConfig);
 	}
 
 	public IAPI getApiConfig() {
@@ -142,9 +161,14 @@ public class APIImportConfigAdapter {
 	 */
 	public IAPI getDesiredAPI() throws AppException {
 		try {
+			validateExposurePath(apiConfig);
 			validateOrganization(apiConfig);
 			checkForAPIDefinitionInConfiguration(apiConfig);
 			addDefaultPassthroughSecurityProfile(apiConfig);
+			addDefaultCorsProfile(apiConfig);
+			addDefaultAuthenticationProfile(apiConfig);
+			addDefaultOutboundProfile(apiConfig);
+			addDefaultInboundProfile(apiConfig);
 			APIDefintion apiDefinition = new APIDefintion();
 			apiDefinition.setAPIDefinitionFile(this.pathToAPIDefinition);
 			apiDefinition.setAPIDefinitionContent(getAPIDefinitionContent(), (DesiredAPI)apiConfig);
@@ -152,7 +176,6 @@ public class APIImportConfigAdapter {
 			addImageContent(apiConfig);
 			validateCustomProperties(apiConfig);
 			validateDescription(apiConfig);
-			validateCorsConfig(apiConfig);
 			validateOutboundAuthN(apiConfig);
 			validateHasQueryStringKey(apiConfig);
 			completeCaCerts(apiConfig);
@@ -165,6 +188,26 @@ public class APIImportConfigAdapter {
 				throw (AppException)e.getCause();
 			}
 			throw new AppException("Cannot validate/fulfill configuration file.", ErrorCode.CANT_READ_CONFIG_FILE, e);
+		}
+	}
+	
+	public IAPI completeDesiredAPI(IAPI desiredAPI, IAPI actualAPI) throws AppException {
+		if(!actualAPI.isValid()) return desiredAPI;
+		APIManagerAdapter mgrAdpater = APIManagerAdapter.getInstance();
+		mgrAdpater.translateMethodIds(desiredAPI.getInboundProfiles(), actualAPI);
+		mgrAdpater.translateMethodIds(desiredAPI.getOutboundProfiles(), actualAPI);
+		
+		return desiredAPI;
+	}
+	
+	private void validateExposurePath(IAPI apiConfig) throws AppException {
+		if(apiConfig.getPath()==null) {
+			ErrorState.getInstance().setError("Config-Parameter: 'path' is not given", ErrorCode.CANT_READ_CONFIG_FILE, false);
+			throw new AppException("Path is invalid.", ErrorCode.CANT_READ_CONFIG_FILE);
+		}
+		if(!apiConfig.getPath().startsWith("/")) {
+			ErrorState.getInstance().setError("Config-Parameter: 'path' must start with a \"/\" following by a valid API-Path (e.g. /api/v1/customer).", ErrorCode.CANT_READ_CONFIG_FILE, false);
+			throw new AppException("Path is invalid.", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 	}
 	
@@ -189,6 +232,7 @@ public class APIImportConfigAdapter {
 				this.pathToAPIDefinition=apiConfig.getApiDefinitionImport();
 				LOG.debug("Reading API Definition from configuration file");
 			} else {
+				ErrorState.getInstance().setError("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED, false);
 				throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
 			}
 		}
@@ -267,8 +311,10 @@ public class APIImportConfigAdapter {
 		}
 	}
 	
-	private void validateCorsConfig(IAPI apiConfig) throws AppException {
-		if(apiConfig.getCorsProfiles()==null || apiConfig.getCorsProfiles().size()==0) return;
+	private void addDefaultCorsProfile(IAPI apiConfig) throws AppException {
+		if(apiConfig.getCorsProfiles()==null) {
+			((AbstractAPI)apiConfig).setCorsProfiles(new ArrayList<CorsProfile>());
+		}
 		// Check if there is a default cors profile declared otherwise create one internally
 		boolean defaultCorsFound = false;
 		for(CorsProfile profile : apiConfig.getCorsProfiles()) {
@@ -556,11 +602,40 @@ public class APIImportConfigAdapter {
 		return null;
 	}
 	
+	private IAPI addDefaultInboundProfile(IAPI importApi) throws AppException {
+		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) return importApi;
+		Iterator<String> it = importApi.getInboundProfiles().keySet().iterator();
+		while(it.hasNext()) {
+			String profileName = it.next();
+			if(profileName.equals("_default")) return importApi; // Nothing to, there is a default profile
+		}
+		InboundProfile defaultProfile = new InboundProfile();
+		defaultProfile.setSecurityProfile("_default");
+		defaultProfile.setCorsProfile("_default");
+		defaultProfile.setMonitorAPI("true");
+		defaultProfile.setMonitorSubject("authentication.subject.id");
+		importApi.getInboundProfiles().put("_default", defaultProfile);
+		return importApi;
+	}
+	
 	private IAPI addDefaultPassthroughSecurityProfile(IAPI importApi) throws AppException {
-		if(importApi.getSecurityProfiles()==null || importApi.getSecurityProfiles().size()==0) {
+		boolean hasDefaultProfile = false;
+		if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
+		List<SecurityProfile> profiles = importApi.getSecurityProfiles();
+		for(SecurityProfile profile : importApi.getSecurityProfiles()) {
+			if(profile.getIsDefault()) {
+				if(hasDefaultProfile) {
+					ErrorState.getInstance().setError("You can have only one _default SecurityProfile.", ErrorCode.CANT_READ_CONFIG_FILE, false);
+					throw new AppException("You can have only one _default SecurityProfile.", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+				hasDefaultProfile=true;
+				profile.setName("_default"); // Overwrite the name if it is default! (this is required by the API-Manager)
+			}
+		}
+		if(profiles==null || profiles.size()==0 || !hasDefaultProfile) {
 			SecurityProfile passthroughProfile = new SecurityProfile();
 			passthroughProfile.setName("_default");
-			passthroughProfile.setIsDefault("true");
+			passthroughProfile.setIsDefault(true);
 			SecurityDevice passthroughDevice = new SecurityDevice();
 			passthroughDevice.setName("Pass Through");
 			passthroughDevice.setType("passThrough");
@@ -569,23 +644,54 @@ public class APIImportConfigAdapter {
 			passthroughDevice.getProperties().put("removeCredentialsOnSuccess", "true");
 			passthroughProfile.getDevices().add(passthroughDevice);
 			
-			importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
-			importApi.getSecurityProfiles().add(passthroughProfile);
+			profiles.add(passthroughProfile);
 		}
+		return importApi;
+	}
+	
+	private IAPI addDefaultAuthenticationProfile(IAPI importApi) throws AppException {
+		if(importApi.getAuthenticationProfiles()==null) return importApi; // Nothing to add (no default is needed, as we don't send any Authn-Profile)
+		boolean hasDefaultProfile = false;
+		List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
+		for(AuthenticationProfile profile : profiles) {
+			if(profile.getIsDefault()) {
+				if(hasDefaultProfile) {
+					ErrorState.getInstance().setError("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE, false);
+					throw new AppException("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+				hasDefaultProfile=true;
+				profile.setName("_default"); // Overwrite the name if it is default! (this is required by the API-Manager)
+			}
+		}
+		if(!hasDefaultProfile) {
+			AuthenticationProfile noAuthNProfile = new AuthenticationProfile();
+			noAuthNProfile.setName("_default");
+			noAuthNProfile.setIsDefault(true);
+			noAuthNProfile.setType(AuthType.none);
+			profiles.add(noAuthNProfile);
+		}
+		return importApi;
+	}
+	
+	private IAPI addDefaultOutboundProfile(IAPI importApi) throws AppException {
+		if(importApi.getOutboundProfiles()==null || importApi.getOutboundProfiles().size()==0) return importApi;
+		Iterator<String> it = importApi.getOutboundProfiles().keySet().iterator();
+		while(it.hasNext()) {
+			String profileName = it.next();
+			if(profileName.equals("_default")) return importApi; // Nothing to, there is a default profile
+		}
+		OutboundProfile defaultProfile = new OutboundProfile();
+		defaultProfile.setAuthenticationProfile("_default");
+		defaultProfile.setRouteType("proxy");
+		importApi.getOutboundProfiles().put("_default", defaultProfile);
 		return importApi;
 	}
 	
 	private void validateOutboundAuthN(IAPI importApi) throws AppException {
 		// Request to use some specific Outbound-AuthN for this API
 		if(importApi.getAuthenticationProfiles()!=null && importApi.getAuthenticationProfiles().size()!=0) {
-			// For now, we only support one DEFAULT, hence it must be configured as such
-			if(importApi.getAuthenticationProfiles().size()>1) {
-				throw new AppException("Only one AuthenticationProfile supported.", ErrorCode.CANT_READ_CONFIG_FILE);
-			}
 			if(importApi.getAuthenticationProfiles().get(0).getType().equals(AuthType.ssl)) 
 				handleOutboundSSLAuthN(importApi.getAuthenticationProfiles().get(0));
-			importApi.getAuthenticationProfiles().get(0).setIsDefault(true);
-			importApi.getAuthenticationProfiles().get(0).setName("_default"); // Otherwise it wont be considered as default by the API-Mgr.
 		}
 		
 	}
@@ -603,7 +709,7 @@ public class APIImportConfigAdapter {
 				clientCertFile = new File(baseDir + "/" + clientCert);
 			}
 			if(clientCertFile.exists()) {
-				is = new FileInputStream(clientCertFile);
+				is = new BufferedInputStream(new FileInputStream(clientCertFile));
 			} else {
 				// If not found absolute & relative - Try to load it from ClassPath
 				LOG.debug("Trying to load Client-Certificate from classpath");

@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -17,7 +18,9 @@ import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.Utils;
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.state.DesiredAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -83,13 +86,18 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 	private void importFromSwagger() throws URISyntaxException, AppException, IOException {
 		URI uri;
 		HttpEntity entity;
-		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/import/")
-				.setParameter("field", "name").setParameter("op", "eq").setParameter("value", "API Development").build();
+		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2")) {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/import/").build();
+		} else {
+			// Not sure, if 7.5.3 still needs it that way!
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/import/")
+					.setParameter("field", "name").setParameter("op", "eq").setParameter("value", "API Development").build();
+		}
 		
 		entity = MultipartEntityBuilder.create()
 				.addTextBody("name", this.desiredState.getName())
 				.addTextBody("type", "swagger")
-				.addBinaryBody("file", ((DesiredAPI)this.desiredState).getAPIDefinition().getAPIDefinitionContent(), ContentType.create("application/octet-stream"), "filename")
+				.addBinaryBody("file", ((DesiredAPI)this.desiredState).getAPIDefinition().getAPIDefinitionContent(), ContentType.create("application/json"), "filename")
 				.addTextBody("fileName", "XYZ").addTextBody("organizationId", this.desiredState.getOrgId())
 				.addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
 		RestAPICall importSwagger = new POSTRequest(entity, uri, this);
@@ -136,6 +144,12 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		ObjectMapper objectMapper = new ObjectMapper();
 		String response = null;
 		try {
+			if(httpResponse.getStatusLine().getStatusCode()!=201) {
+				ErrorState.getInstance().setError("Error importing BE-API. "
+						+ "Unexpected response from API-Manager: " + httpResponse.getStatusLine() + " " + EntityUtils.toString(httpResponse.getEntity()) + ". "
+								+ "Please check the API-Manager traces.", ErrorCode.CANT_CREATE_API_PROXY, false);
+				throw new AppException("Error creating API-Proxy", ErrorCode.CANT_CREATE_API_PROXY);
+			}
 			response = EntityUtils.toString(httpResponse.getEntity());
 			JsonNode jsonNode = objectMapper.readTree(response);
 			String backendAPIId = jsonNode.findPath("id").asText();
@@ -143,6 +157,10 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 			return null;
 		} catch (IOException e) {
 			throw new AppException("Cannot parse JSON-Payload after create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
 		}
 	}
 }

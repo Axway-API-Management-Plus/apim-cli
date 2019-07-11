@@ -1,5 +1,0 @@
-{
-	"name": "Minimal API on API-ENV", 
-	"apiDefinition":"samples/petstore.json", 
-	"organization": "API Development" 
-}

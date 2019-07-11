@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class APIPathPropertyHandler implements PropertyHandler {
 	
-	public JsonNode handleProperty(IAPI desired, JsonNode response) throws AppException {
+	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException {
 		((ObjectNode) response).put("path", desired.getPath());
 		return response;
 	}

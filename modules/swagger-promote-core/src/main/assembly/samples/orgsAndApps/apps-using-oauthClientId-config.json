@@ -1,0 +1,10 @@
+{
+   "name":"Samples OrgsAndApps App using OAuthClientId",
+   "path":"/samples/orgsAndApps/appUsingOAuthClientId/v1/api",
+   "state":"published",
+   "version":"1.0.0",
+   "organization":"API Development",
+   "applications":[
+      { "oauthClientId":"App with Client-ID ABC" }
+   ]
+}

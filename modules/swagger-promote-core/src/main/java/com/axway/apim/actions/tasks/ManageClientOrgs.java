@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -62,7 +63,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 					LOG.info("Removing access for orgs: "+removingActualOrgs+" from API: " + actualState.getName());
 					removeClientOrganization(removingActualOrgs, actualState.getId());
 				} else {
-					LOG.debug("NOT removing access for existing orgs: "+removingActualOrgs+" from API: " + actualState.getName() + " as clientOrgsMode NOT set to replace.");
+					LOG.info("NOT removing access for existing orgs: "+removingActualOrgs+" from API: " + actualState.getName() + " as clientOrgsMode NOT set to replace.");
 				}
 			}
 		}
@@ -133,21 +134,27 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 	@Override
 	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
 		Transaction context = Transaction.getInstance();
-		if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_NO_CONTENT) {
-			if(context.get(MODE).equals(MODE_GRANT_ACCESS)) {
-				LOG.info("Granted permission to organization: '"+context.get("orgName")+"'");
-			} else {			
-				LOG.info("Removed permission from organization: '"+context.get("orgName")+"'");
+		try {
+			if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_NO_CONTENT) {
+				if(context.get(MODE).equals(MODE_GRANT_ACCESS)) {
+					LOG.info("Granted permission to organization: '"+context.get("orgName")+"'");
+				} else {			
+					LOG.info("Removed permission from organization: '"+context.get("orgName")+"'");
+				}
+			} else {
+				LOG.error("Received status code: " + httpResponse.getStatusLine().getStatusCode());
+				try {
+					LOG.error("Received response: " + EntityUtils.toString(httpResponse.getEntity()));
+				} catch (Exception e) {
+					LOG.error(e.getMessage(), e);
+				}
+				throw new AppException("Failure granting/deleting permission to/from organization: '"+context.get("orgName")+"'. Mode: '"+context.get(MODE)+"'", 
+						ErrorCode.ACCESS_ORGANIZATION_ERR);
 			}
-		} else {
-			LOG.error("Received status code: " + httpResponse.getStatusLine().getStatusCode());
+		} finally {
 			try {
-				LOG.error("Received response: " + EntityUtils.toString(httpResponse.getEntity()));
-			} catch (Exception e) {
-				LOG.error(e.getMessage(), e);
-			}
-			throw new AppException("Failure granting/deleting permission to/from organization: '"+context.get("orgName")+"'. Mode: '"+context.get(MODE)+"'", 
-					ErrorCode.ACCESS_ORGANIZATION_ERR);
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
 		}
 		return null;
 	}

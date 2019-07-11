@@ -1,0 +1,11 @@
+{
+   "name":"Samples OrgsAndApps SomeOrgs",
+   "path":"/samples/orgsAndApps/SomeOrgs/v1/api",
+   "state":"published",
+   "version":"1.0.0",
+   "organization":"API Development",
+   "clientOrganizations":[
+      "Another org", 
+      "My Partner"
+   ]
+}

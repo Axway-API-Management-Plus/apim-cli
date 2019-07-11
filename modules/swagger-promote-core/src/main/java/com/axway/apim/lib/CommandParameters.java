@@ -1,5 +1,7 @@
 package com.axway.apim.lib;
 
+import java.util.Map;
+
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,6 +129,11 @@ public class CommandParameters {
 		return Boolean.parseBoolean(getValue("replaceHostInSwagger"));
 	}
 	
+	public boolean rollback() {
+		if(getValue("rollback")==null) return true;
+		return Boolean.parseBoolean(getValue("rollback"));
+	}
+	
 	public void validateRequiredParameters() throws AppException {
 		ErrorState errors  = ErrorState.getInstance();
 		if(getValue("username")==null && getValue("admin_username")==null) errors.setError("Required parameter: 'username' or 'admin_username' is missing.", ErrorCode.MISSING_PARAMETER, false);
@@ -148,5 +155,9 @@ public class CommandParameters {
 		} else {
 			return null;
 		}
+	}
+	
+	public Map<String, String> getEnvironmentProperties() {
+		return this.envProperties;
 	}
 }

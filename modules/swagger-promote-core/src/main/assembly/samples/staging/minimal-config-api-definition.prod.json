@@ -1,0 +1,5 @@
+{
+	"name": "Samples Staging PROD override",
+	"state": "published",
+	"image": "../images/sample-api-icon.jpg" 
+}

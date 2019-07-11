@@ -1,0 +1,19 @@
+{
+	"name": "Samples SecurityOutbound APIKey",
+	"path": "/samples/securityOutbound/apikey/v1/api",
+	"state": "unpublished",
+	"version": "1.0.0",
+	"organization": "API Development",
+	"authenticationProfiles": [
+		{
+			"name": "_default",
+			"isDefault": "true",
+			"parameters": {
+				"apiKey": "4249823490238490",
+				"apiKeyField": "KeyId", 
+				"httpLocation": "QUERYSTRING_PARAMETER"
+			},
+			"type": "apiKey"
+		}
+	]
+}

@@ -1,0 +1,7 @@
+{
+	"name": "Sample Minimal WSDL API",
+	"path": "/sample/minimal/wsdl/api/v1",
+	"state": "unpublished",
+	"version": "1.0.0",
+	"organization": "API Development" 
+}

@@ -45,6 +45,7 @@ import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
 import com.axway.apim.swagger.api.properties.organization.ApiAccess;
 import com.axway.apim.swagger.api.properties.organization.Organization;
+import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
 import com.axway.apim.swagger.api.properties.user.User;
@@ -94,6 +95,9 @@ public class APIManagerAdapter {
 	
 	public final static String SYSTEM_API_QUOTA 				= "00000000-0000-0000-0000-000000000000";
 	public final static String APPLICATION_DEFAULT_QUOTA 		= "00000000-0000-0000-0000-000000000001";
+	
+	public final static String TYPE_FRONT_END = "proxies";
+	public final static String TYPE_BACK_END = "apirepo";
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
@@ -585,7 +589,11 @@ public class APIManagerAdapter {
 					if(type.equals(CREDENTIAL_TYPE_API_KEY)) {
 						key = clientId.get("id").asText();
 					} else if(type.equals(CREDENTIAL_TYPE_EXT_CLIENTID) || type.equals(CREDENTIAL_TYPE_OAUTH)) {
-						key = clientId.get("clientId").asText();
+						if(clientId.get("clientId")==null) {
+							key = "NOT_FOUND";
+						} else {
+							key = clientId.get("clientId").asText();
+						}
 					} else {
 						throw new AppException("Unknown credential type: " + type, ErrorCode.UNXPECTED_ERROR);
 					}
@@ -678,37 +686,60 @@ public class APIManagerAdapter {
 	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
 	 * @throws AppException if the API can't be found or created
 	 */
-	public JsonNode getExistingAPI(String apiPath) throws AppException {
+	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type) throws AppException {
 		CommandParameters cmd = CommandParameters.getInstance();
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies").build();
+			List<NameValuePair> usedFilters = new ArrayList<>();
+			if(hasAPIManagerVersion("7.7") && apiPath != null) { // With 7.7 we can query the API directly on the path 
+				usedFilters.add(new BasicNameValuePair("field", "path"));
+				usedFilters.add(new BasicNameValuePair("op", "eq"));
+				usedFilters.add(new BasicNameValuePair("value", apiPath));
+			} 
+			if(filter != null) { usedFilters.addAll(filter); } 
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+type)
+				.addParameters(usedFilters)
+				.build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
 			
 			JsonNode jsonResponse;
 			String path;
-			String apiId = null;
+			JsonNode foundApi = null;
 			try {
 				jsonResponse = mapper.readTree(response);
-				for(JsonNode node : jsonResponse) {
-					path = node.get("path").asText();
-					if(path.equals(apiPath)) {
-						LOG.info("Found existing API on path: '"+path+"' ("+node.get("state").asText()+") (ID: '" + node.get("id").asText()+"')");
-						apiId = node.get("id").asText();
-						break;
+				// We can directly access what we are looking for, as for 7.7 we filtered directly for the apiPath or 
+				// we have used some filters!
+				if(jsonResponse.size()!=0 && (filter!=null || hasAPIManagerVersion("7.7"))) {
+					foundApi =  jsonResponse.get(0);
+				} else {
+					for(JsonNode api : jsonResponse) {
+						path = api.get("path").asText();
+						if(path.equals(apiPath)) {
+							foundApi = api;
+						}
 					}
 				}
-				if(apiId==null) {
-					LOG.info("No existing API found exposed on: " + apiPath);
-					return null;
+				if(foundApi!=null) {
+					if(type.equals(TYPE_FRONT_END)) {
+						path = foundApi.get("path").asText();
+						LOG.info("Found existing API on path: '"+path+"' ("+foundApi.get("state").asText()+") (ID: '" + foundApi.get("id").asText()+"')");
+					} else if(type.equals(TYPE_BACK_END)) {
+						String name = foundApi.get("name").asText();
+						LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + foundApi.get("id").asText()+"')");						
+					}
+					return foundApi;
 				}
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId).build();
-				getRequest = new GETRequest(uri, null);
-				response = getRequest.execute().getEntity().getContent();
-				jsonResponse = mapper.readTree(response);
-				return jsonResponse;
+				if(apiPath!=null && filter!=null) {
+					LOG.info("No existing API found exposed on: '" + apiPath + "' and filter: "+filter+"");
+				} else if (apiPath==null ) {
+					LOG.info("No existing API found with filters: "+filter+"");
+				} else {
+					LOG.info("No existing API found exposed on: '" + apiPath + "'");
+				}
+				
+				return null;
 			} catch (IOException e) {
 				throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			}
@@ -1015,6 +1046,31 @@ public class APIManagerAdapter {
 			return jsonResponse;
 		} catch (Exception e) {
 			throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	public <profile> void translateMethodIds(Map<String, profile> profiles, IAPI actualAPI) throws AppException {
+		Map<String, profile> updatedEntries = new LinkedHashMap<String, profile>();
+		if(profiles!=null) {
+			Iterator<String> keys = profiles.keySet().iterator();
+			while(keys.hasNext()) {
+				String key = keys.next();
+				if(key.equals("_default")) continue;
+				List<APIMethod> methods = getAllMethodsForAPI(actualAPI.getId());
+				for(APIMethod method : methods) {
+					if(method.getName().equals(key)) {
+						profile value = profiles.get(key);
+						if(value instanceof OutboundProfile) {
+							((OutboundProfile)value).setApiMethodId(method.getApiMethodId());
+							((OutboundProfile)value).setApiId(method.getApiId());
+						}
+						updatedEntries.put(method.getId(), profiles.get(key));
+						keys.remove();
+						break;
+					}
+				}
+			}
+			profiles.putAll(updatedEntries);
 		}
 	}
 
