@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.metadata.export.beans.APIManagerExportMetadata;
-import com.axway.apim.metadata.export.formats.CSVMetadataExport;
-import com.axway.apim.metadata.export.formats.IMetadataExport;
+import com.axway.apim.metadata.export.formats.IReportFormat;
 import com.axway.apim.swagger.APIManagerAdapter;
 
 public class APIExportMetadataHandler {
@@ -15,12 +15,20 @@ public class APIExportMetadataHandler {
 	
 	APIManagerAdapter mgrAdapater;
 	
-	String exportFormatClassname;
+	Class<IReportFormat> reportClass;
 	
 	APIManagerExportMetadata exportData = new APIManagerExportMetadata();
 
 	public APIExportMetadataHandler(APIManagerAdapter apimAdapter, String exportFormatClassname) throws AppException {
 		super();
+		try {
+			if(exportFormatClassname.indexOf(".")==-1) {
+				exportFormatClassname = "com.axway.apim.metadata.export.formats."+exportFormatClassname;
+			}
+			this.reportClass = (Class<IReportFormat>) Class.forName(exportFormatClassname);
+		} catch (ClassNotFoundException e) {
+			throw new AppException("Unable to find report class. ", ErrorCode.UNXPECTED_ERROR, e);
+		}
 		this.mgrAdapater = apimAdapter;
 		// Initialize the base-data from API-Manager!
 		exportData.setAllOrgs(mgrAdapater.getAllOrgs());
@@ -32,13 +40,17 @@ public class APIExportMetadataHandler {
 		// All the rest is up to the specific export format
 	}
 	
-	public void exportMetadata() throws AppException {
-		// Detect the format (right now just static
-		// Later use we may use the exportFormatClassname to use the desired format
-		IMetadataExport metadata = new CSVMetadataExport();
-		metadata.setMgrAdapater(mgrAdapater);
-		metadata.setMetaData(exportData);
-		metadata.preProcessMetadata();
-		metadata.exportMetadata();
+	public void exportMetadata() throws AppException {		
+		IReportFormat metadata;
+		try {
+			metadata = reportClass.newInstance();
+			metadata.setMgrAdapater(mgrAdapater);
+			metadata.setMetaData(exportData);
+			metadata.preProcessMetadata();
+			metadata.exportMetadata();
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new AppException("Cant initialize report class", ErrorCode.UNXPECTED_ERROR, e);
+		}
+
 	}
 }

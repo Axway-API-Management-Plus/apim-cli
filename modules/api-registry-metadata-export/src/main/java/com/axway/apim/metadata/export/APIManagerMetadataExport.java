@@ -17,7 +17,8 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.RelaxedParser;
-import com.axway.apim.metadata.export.formats.CSVMetadataExport;
+import com.axway.apim.metadata.export.formats.CSVCustomPolicyDependencyReport;
+import com.axway.apim.metadata.export.formats.IReportFormat;
 import com.axway.apim.swagger.APIManagerAdapter;
 
 public class APIManagerMetadataExport {
@@ -59,6 +60,11 @@ public class APIManagerMetadataExport {
 			option.setArgName("api-mgr-prod-metadata-export.csv");
 			options.addOption(option);
 			
+			option = new Option("r", "report", true, "Type of report you want.");
+			option.setRequired(true);
+			option.setArgName("CSVMetadataExport|CSVCustomPolicyDependencyReport");
+			options.addOption(option);
+			
 			CommandLineParser parser = new RelaxedParser();
 			
 			CommandLine cmd = null;
@@ -79,8 +85,7 @@ public class APIManagerMetadataExport {
 			params = new CommandParameters(cmd);
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
-			APIExportMetadataHandler exportHandler = new APIExportMetadataHandler(apimAdapter, 
-					CSVMetadataExport.class.getName());
+			APIExportMetadataHandler exportHandler = new APIExportMetadataHandler(apimAdapter, params.getValue("report"));
 			exportHandler.exportMetadata();
 		} catch (AppException ap) {
 			APIPropertiesExport.getInstance().store(); // Try to create it, even 
