@@ -17,7 +17,9 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.RelaxedParser;
-import com.axway.apim.metadata.export.formats.CSVMetadataExport;
+import com.axway.apim.metadata.export.formats.CSVCustomPolicyDependencyReport;
+import com.axway.apim.metadata.export.formats.CSVEmbeddedAnalyticsReport;
+import com.axway.apim.metadata.export.formats.ExcelCustomPolicyDependencyReport;
 import com.axway.apim.swagger.APIManagerAdapter;
 
 public class APIManagerMetadataExport {
@@ -59,6 +61,11 @@ public class APIManagerMetadataExport {
 			option.setArgName("api-mgr-prod-metadata-export.csv");
 			options.addOption(option);
 			
+			option = new Option("r", "report", true, "Type of report you want.");
+			option.setRequired(true);
+			option.setArgName(CSVEmbeddedAnalyticsReport.class.getSimpleName());
+			options.addOption(option);
+			
 			CommandLineParser parser = new RelaxedParser();
 			
 			CommandLine cmd = null;
@@ -79,8 +86,7 @@ public class APIManagerMetadataExport {
 			params = new CommandParameters(cmd);
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
-			APIExportMetadataHandler exportHandler = new APIExportMetadataHandler(apimAdapter, 
-					CSVMetadataExport.class.getName());
+			APIExportMetadataHandler exportHandler = new APIExportMetadataHandler(apimAdapter, params.getValue("report"));
 			exportHandler.exportMetadata();
 		} catch (AppException ap) {
 			APIPropertiesExport.getInstance().store(); // Try to create it, even 
@@ -108,13 +114,19 @@ public class APIManagerMetadataExport {
 		if(System.getProperty("os.name").toLowerCase().contains("win")) scriptExt = "bat";
 		
 		formatter.printHelp("API-Manager Meta-Data Export", options, true);
-		System.out.println("Tool to query your API-Manager registry and exports Metadata in some format.");
-		System.out.println("Originally invented to feed metadata into Axway EA4APIM, but can be extended about other formats.");
+		System.out.println("\n");
+		System.out.println("Tool to query your API-Manager registry and generate reports in some formats.");
+		System.out.println("Originally invented to feed API-Metadata into Axway EA4APIM. Flexible for other formats");
+		System.out.println("\n");
+		System.out.println("The following Report-Formats are supported:");
+		System.out.println(CSVEmbeddedAnalyticsReport.class.getSimpleName()+":\nGenerates a report with APIs, Applications, Orgs and their relation to each other. (CSV-Format)");
+		System.out.println(CSVCustomPolicyDependencyReport.class.getSimpleName()+":\nTells you which APIs are using which Custom-Policies (CSV-Format)");
+		System.out.println(ExcelCustomPolicyDependencyReport.class.getSimpleName()+":\nTells you which APIs are using which Custom-Policies (Excel-Format)");
 		System.out.println("\n");
 		System.out.println("ERROR: " + message);
 		System.out.println("\n");
 		System.out.println("You may run one of the following examples:");
-		System.out.println("scripts"+File.separator+"run-metadata-export."+scriptExt+" -h localhost -u apiadmin -p changeme -f api-mgr-prod-metadata-export.csv");
+		System.out.println("scripts"+File.separator+"run-metadata-export."+scriptExt+" -h localhost -u apiadmin -p changeme -f custom-policies -r " +ExcelCustomPolicyDependencyReport.class.getSimpleName());
 		System.out.println();
 		System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 	}

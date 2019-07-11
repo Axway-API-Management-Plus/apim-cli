@@ -589,7 +589,11 @@ public class APIManagerAdapter {
 					if(type.equals(CREDENTIAL_TYPE_API_KEY)) {
 						key = clientId.get("id").asText();
 					} else if(type.equals(CREDENTIAL_TYPE_EXT_CLIENTID) || type.equals(CREDENTIAL_TYPE_OAUTH)) {
-						key = clientId.get("clientId").asText();
+						if(clientId.get("clientId")==null) {
+							key = "NOT_FOUND";
+						} else {
+							key = clientId.get("clientId").asText();
+						}
 					} else {
 						throw new AppException("Unknown credential type: " + type, ErrorCode.UNXPECTED_ERROR);
 					}

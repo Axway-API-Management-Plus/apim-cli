@@ -20,6 +20,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.Utils;
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.state.DesiredAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -85,13 +86,18 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 	private void importFromSwagger() throws URISyntaxException, AppException, IOException {
 		URI uri;
 		HttpEntity entity;
-		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/import/")
-				.setParameter("field", "name").setParameter("op", "eq").setParameter("value", "API Development").build();
+		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2")) {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/import/").build();
+		} else {
+			// Not sure, if 7.5.3 still needs it that way!
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/import/")
+					.setParameter("field", "name").setParameter("op", "eq").setParameter("value", "API Development").build();
+		}
 		
 		entity = MultipartEntityBuilder.create()
 				.addTextBody("name", this.desiredState.getName())
 				.addTextBody("type", "swagger")
-				.addBinaryBody("file", ((DesiredAPI)this.desiredState).getAPIDefinition().getAPIDefinitionContent(), ContentType.create("application/octet-stream"), "filename")
+				.addBinaryBody("file", ((DesiredAPI)this.desiredState).getAPIDefinition().getAPIDefinitionContent(), ContentType.create("application/json"), "filename")
 				.addTextBody("fileName", "XYZ").addTextBody("organizationId", this.desiredState.getOrgId())
 				.addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
 		RestAPICall importSwagger = new POSTRequest(entity, uri, this);

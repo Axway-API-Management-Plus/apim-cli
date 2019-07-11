@@ -1,6 +1,6 @@
 {
-	"name": "API using OAuth External",
-	"path": "/api/v1/oauth/external",
+	"name": "Samples SecurityInbound OAuthExternal",
+	"path": "/samples/securityInbound/oauthExternal/v1/api",
 	"state": "unpublished",
 	"version": "1.0.0",
 	"organization": "API Development", 
