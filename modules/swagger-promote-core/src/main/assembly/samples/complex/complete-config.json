@@ -1,6 +1,6 @@
 {
-   "name":"Complete API",
-   "path":"/complete/api/v1",
+   "name":"Samples Complete API",
+   "path":"/sample/complete/api/v1",
    "state":"published",
    "summary":"My complete API-Summary",
    "version":"1.0.0",

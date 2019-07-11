@@ -1,0 +1,12 @@
+{
+	"name": "Samples Routing Policy only",
+	"path": "/sample/routingpolicy/api/v1",
+	"state": "unpublished",
+	"version": "1.0.0",
+	"organization": "API Development",
+	"outboundProfiles": {
+		"_default": {
+			"routePolicy": "Sample Routing Policy 1"
+		}
+	}
+}

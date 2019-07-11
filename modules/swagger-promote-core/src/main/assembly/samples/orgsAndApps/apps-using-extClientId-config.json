@@ -1,0 +1,10 @@
+{
+   "name":"Samples OrgsAndApps App using ExtClientId",
+   "path":"/samples/orgsAndApps/appUsingExtClientId/v1/api",
+   "state":"published",
+   "version":"1.0.0",
+   "organization":"API Development",
+   "applications":[
+      { "extClientId":"App with external Client-ID ABC" }
+   ]
+}

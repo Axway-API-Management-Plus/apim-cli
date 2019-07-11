@@ -3,14 +3,10 @@ package com.axway.apim.metadata.export.formats;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
@@ -21,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.metadata.export.beans.APIManagerExportMetadata;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.properties.apiAccess.APIAccess;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
@@ -29,34 +24,23 @@ import com.axway.apim.swagger.api.state.APIMethod;
 import com.axway.apim.swagger.api.state.ActualAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 
-public class CSVMetadataExport implements IMetadataExport {
+public class CSVEmbeddedAnalyticsReport extends AbstractReportFormat implements IReportFormat {
 	
-	private static Logger LOG = LoggerFactory.getLogger(CSVMetadataExport.class);
-	
-	APIManagerAdapter mgrAdapater;
-	APIManagerExportMetadata metaData;
+	private static Logger LOG = LoggerFactory.getLogger(CSVEmbeddedAnalyticsReport.class);
 	
 	private Map<String, IAPI> APIsPerId;
 	
-	public CSVMetadataExport() {
+	public CSVEmbeddedAnalyticsReport() {
 		super();
 	}
-	public APIManagerExportMetadata getMetaData() {
-		return metaData;
-	}
-	public void setMetaData(APIManagerExportMetadata metaData) {
-		this.metaData = metaData;
-	}
-	public void setMgrAdapater(APIManagerAdapter mgrAdapater) {
-		this.mgrAdapater = mgrAdapater;
-	}
+
 	@Override
 	public void preProcessMetadata() throws AppException {
 		// We need to know the API-Access for each Application
 		initApplicationAPISubcription();
 		LOG.info("Successfully loaded application subscriptions.");
 		// And the API-Method for each APIs
-		initAPIMethods();
+		this.APIsPerId = getAPIMethods();
 		LOG.info("Successfully loaded all API-Methods.");
 	}
 	@Override
@@ -125,19 +109,6 @@ public class CSVMetadataExport implements IMetadataExport {
 				}
 		}
 		
-	}
-	
-	private void initApplicationAPISubcription() throws AppException {
-		for(ClientApplication app : metaData.getAllApps()) {
-			app.setApiAccess(APIManagerAdapter.getAPIAccess(app.getId(), "applications"));
-		}
-	}
-	private void initAPIMethods() throws AppException {
-		APIsPerId = new HashMap<String, IAPI>();
-		for(IAPI api : metaData.getAllAPIs()) {
-			((ActualAPI)api).setApiMethods(mgrAdapater.getAllMethodsForAPI(api.getId()));
-			APIsPerId.put(api.getId(), api);
-		}
 	}
 	
 	private Date getMidnight() {

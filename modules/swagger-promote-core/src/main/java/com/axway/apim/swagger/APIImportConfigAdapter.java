@@ -1,5 +1,6 @@
 package com.axway.apim.swagger;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -708,7 +709,7 @@ public class APIImportConfigAdapter {
 				clientCertFile = new File(baseDir + "/" + clientCert);
 			}
 			if(clientCertFile.exists()) {
-				is = new FileInputStream(clientCertFile);
+				is = new BufferedInputStream(new FileInputStream(clientCertFile));
 			} else {
 				// If not found absolute & relative - Try to load it from ClassPath
 				LOG.debug("Trying to load Client-Certificate from classpath");

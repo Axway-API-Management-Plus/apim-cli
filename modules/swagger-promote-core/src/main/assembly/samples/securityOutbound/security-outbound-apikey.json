@@ -1,6 +1,6 @@
 {
-	"name": "API using an API-Key for outbound calls",
-	"path": "/api/v1/using/api-key",
+	"name": "Samples SecurityOutbound APIKey",
+	"path": "/samples/securityOutbound/apikey/v1/api",
 	"state": "unpublished",
 	"version": "1.0.0",
 	"organization": "API Development",

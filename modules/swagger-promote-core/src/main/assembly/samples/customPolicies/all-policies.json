@@ -1,0 +1,16 @@
+{
+	"name": "Samples All Policies",
+	"path": "/sample/allpolicies/api/v1",
+	"state": "unpublished",
+	"version": "1.0.0",
+	"organization": "API Development",
+	"outboundProfiles": {
+		"_default": {
+			"authenticationProfile": "_default",
+			"requestPolicy": "Sample Request Policy 1",
+			"responsePolicy": "Sample Response Policy 1",
+			"routePolicy": "Sample Roputing Policy 1",
+			"faultHandlerPolicy": "Sample Fault-Handler Policy 1"
+		}
+	}
+}

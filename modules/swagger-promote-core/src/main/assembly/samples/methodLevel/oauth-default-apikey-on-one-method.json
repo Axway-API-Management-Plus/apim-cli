@@ -1,0 +1,62 @@
+{
+   "name":"Samples MethodLvl OAuthDefault APIKey OneMethod",
+   "path":"/sample/methodlvl/oauthdefault/apikey/one/method/api/v1",
+   "state":"unpublished",
+   "version":"1.0.7",
+   "organization":"API Development",
+   "inboundProfiles":{
+      "findPetsByStatus":{
+         "securityProfile":"Yet another API-Key profile"
+      },
+      "_default":{
+         "securityProfile":"_default"
+      }
+   },
+   "securityProfiles":[
+      {
+         "name":"_default",
+         "isDefault":true,
+         "devices":[
+            {
+               "type":"oauth",
+               "name":"OAuth",
+               "order":1,
+               "properties":{
+                  "tokenStore":"OAuth Access Token Store",
+                  "accessTokenLocation":"HEADER",
+                  "authorizationHeaderPrefix":"Bearer",
+                  "accessTokenLocationQueryString":"",
+                  "scopesMustMatch":"Any",
+                  "scopes":"resource.WRITE, resource.READ, resource.ADMIN",
+                  "removeCredentialsOnSuccess":true,
+                  "implicitGrantEnabled":true,
+                  "implicitGrantLoginEndpointUrl":"https://localhost:8089/api/oauth/authorize",
+                  "implicitGrantLoginTokenName":"access_token",
+                  "authCodeGrantTypeEnabled":true,
+                  "authCodeGrantTypeRequestEndpointUrl":"https://localhost:8089/api/oauth/authorize",
+                  "authCodeGrantTypeRequestClientIdName":"client_id",
+                  "authCodeGrantTypeRequestSecretName":"client_secret",
+                  "authCodeGrantTypeTokenEndpointUrl":"https://localhost:8089/api/oauth/token",
+                  "authCodeGrantTypeTokenEndpointTokenName":"access_code"
+               }
+            }
+         ]
+      },
+      {
+         "name":"Yet another API-Key profile",
+         "isDefault":false,
+         "devices":[
+            {
+               "name":"API Key",
+               "type":"apiKey",
+               "order":0,
+               "properties":{
+                  "apiKeyFieldName":"KeyId",
+                  "takeFrom":"HEADER",
+                  "removeCredentialsOnSuccess":"false"
+               }
+            }
+         ]
+      }
+   ]
+}

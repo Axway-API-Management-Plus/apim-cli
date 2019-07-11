@@ -11,7 +11,7 @@ public class APIAccess {
 	
 	String createdOn;
 	
-	String enabled;
+	boolean enabled;
 
 	public String getId() {
 		return id;
@@ -53,11 +53,11 @@ public class APIAccess {
 		this.createdOn = createdOn;
 	}
 
-	public String getEnabled() {
+	public boolean getEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(String enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
