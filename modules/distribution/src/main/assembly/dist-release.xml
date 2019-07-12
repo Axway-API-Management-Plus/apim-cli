@@ -6,6 +6,7 @@
   </formats>
   <includeBaseDirectory>true</includeBaseDirectory>
   <includeSiteDirectory>false</includeSiteDirectory>
+  <appendAssemblyId>false</appendAssemblyId>
   <baseDirectory>swagger-promote-${pom.version}</baseDirectory>
   <moduleSets>
     <moduleSet>
