@@ -15,10 +15,6 @@
 
   <name>Distribution</name>
 
-  <modules>
-		<module>../swagger-promote-core</module>
-	</modules>
-
   <build>
     <plugins>
       <plugin>
@@ -36,9 +32,12 @@
               <descriptors>
                 <descriptor>src/main/assembly/dist-release.xml</descriptor>
               </descriptors>
+              <attach>false</attach>
+              <appendAssemblyId>false</appendAssemblyId>
             </configuration>
           </execution>
         </executions>
+
       </plugin>
     </plugins>
   </build>
