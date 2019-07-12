@@ -153,7 +153,7 @@ public class App {
 			}
 			
 			LOG.info("------------------------------------------------------------------------");
-			LOG.info("API-Manager Promote Version: 1.6-SNAPSHOT");
+			LOG.info("API-Manager Promote Version: "+App.class.getPackage().getImplementationVersion());
 			LOG.info("                                                                        ");
 			LOG.info("To report issues or get help, please visit: ");
 			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
