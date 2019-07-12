@@ -145,6 +145,7 @@ public class App {
 			LOG.info("To report issues or get help, please visit: ");
 			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
 			LOG.info("------------------------------------------------------------------------");
+			LOG.info("");
 			
 			try {
 				cmd = parser.parse(options, args);
