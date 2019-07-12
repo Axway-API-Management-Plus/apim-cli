@@ -139,6 +139,13 @@ public class App {
 			CommandLine cmd = null;
 			CommandLine internalCmd = null;
 			
+			LOG.info("------------------------------------------------------------------------");
+			LOG.info("API-Manager Promote Version: "+App.class.getPackage().getImplementationVersion());
+			LOG.info("                                                                        ");
+			LOG.info("To report issues or get help, please visit: ");
+			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
+			LOG.info("------------------------------------------------------------------------");
+			
 			try {
 				cmd = parser.parse(options, args);
 				internalCmd = parser.parse( internalOptions, args);
@@ -151,13 +158,6 @@ public class App {
 				printUsage(options, "Usage information");
 				System.exit(0);
 			}
-			
-			LOG.info("------------------------------------------------------------------------");
-			LOG.info("API-Manager Promote Version: "+App.class.getPackage().getImplementationVersion());
-			LOG.info("                                                                        ");
-			LOG.info("To report issues or get help, please visit: ");
-			LOG.info("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
-			LOG.info("------------------------------------------------------------------------");
 			
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
