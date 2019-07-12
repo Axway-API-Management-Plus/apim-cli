@@ -15,10 +15,6 @@
 
   <name>Distribution</name>
 
-  <modules>
-		<module>../swagger-promote-core</module>
-	</modules>
-
   <build>
     <plugins>
       <plugin>
