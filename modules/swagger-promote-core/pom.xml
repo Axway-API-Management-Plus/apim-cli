@@ -134,6 +134,18 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.1.2</version>
+				<configuration>
+					<archive>
+						<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						<url>${project.url}</url>
+					</archive>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>
