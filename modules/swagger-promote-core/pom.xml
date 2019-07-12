@@ -3,7 +3,7 @@
 
 	<parent>
 		<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-		<artifactId>axway-swagger-promote</artifactId>
+		<artifactId>swagger-promote-parent</artifactId>
 		<version>1.5.5-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
@@ -189,17 +189,6 @@
 			 						</goals>
 			 					</execution>
 			 				</executions>
-			 			</plugin>
-						 <plugin>
-			 				<groupId>org.sonatype.plugins</groupId>
-			 				<artifactId>nexus-staging-maven-plugin</artifactId>
-			 				<version>1.6.7</version>
-			 				<extensions>true</extensions>
-			 				<configuration>
-			 					<serverId>ossrh</serverId>
-			 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-			 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-			 				</configuration>
 			 			</plugin>
 	         </plugins>
 	      </build>
