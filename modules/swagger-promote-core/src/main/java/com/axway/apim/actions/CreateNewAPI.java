@@ -102,7 +102,7 @@ public class CreateNewAPI {
 		// V-Host must be managed almost at the end, as the status must be set already to "published"
 		vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
 		
-		APIPropertiesExport.getInstance().setProperty("feApiId", createdAPI.getApiId());
+		APIPropertiesExport.getInstance().setProperty("feApiId", createdAPI.getId());
 	}
 	
 	/**
