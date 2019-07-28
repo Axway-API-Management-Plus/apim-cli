@@ -56,7 +56,7 @@ public class UpdateExistingAPI {
 		// Handle subscription to applications
 		new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI(), null).execute(false);
 		
-		APIPropertiesExport.getInstance().setProperty("feApiId", changes.getActualAPI().getApiId());
+		APIPropertiesExport.getInstance().setProperty("feApiId", changes.getActualAPI().getId());
 	}
 
 }
