@@ -798,7 +798,7 @@ public class APIManagerAdapter {
 		try {
 			if(apiManagerConfig==null) {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
-				RestAPICall getRequest = new GETRequest(uri, null, true);
+				RestAPICall getRequest = new GETRequest(uri, null, false); // No need to use an Admin-Account for the Config-Fields Swagger-Promote needs so far
 				HttpResponse httpResponse = getRequest.execute();
 				apiManagerConfig = EntityUtils.toString(httpResponse.getEntity());
 			}
