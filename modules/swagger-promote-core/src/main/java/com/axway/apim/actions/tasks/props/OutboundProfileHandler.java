@@ -25,13 +25,14 @@ public class OutboundProfileHandler implements PropertyHandler {
 		if(desired.getOutboundProfiles().size()!=0) {
 			((ObjectNode)response).replace("outboundProfiles", objectMapper.valueToTree(desired.getOutboundProfiles()));
 		}
-		if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")){
-			JsonNode outboundProfiles = response.get("outboundProfiles").get("_default");
-			
+		if(!APIManagerAdapter.hasAPIManagerVersion("7.6.2")){ // Versions before 7.6.2 don't support a FaultHandlerPolicy
+			JsonNode outboundProfiles = response.get("outboundProfiles");
 			if (outboundProfiles instanceof ObjectNode) {
-				
-		        ObjectNode object = (ObjectNode) outboundProfiles;
-		        object.remove("faultHandlerPolicy");
+				Iterator<JsonNode> it = outboundProfiles.elements();
+				while(it.hasNext()) {
+					ObjectNode profile = (ObjectNode)it.next();
+					profile.remove("faultHandlerPolicy");
+				}
 		    }
 		}
 		return response;
