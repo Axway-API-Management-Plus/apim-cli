@@ -64,31 +64,6 @@
         </fileSets>
       </sources>
     </moduleSet>
-    <moduleSet>
-      <useAllReactorProjects>true</useAllReactorProjects>
-      <includes>
-        <include>com.github.axway-api-management-plus.swagger-promote:api-registry-metadata-export</include>
-      </includes>
-      <binaries>
-        <unpack>false</unpack>
-        <outputDirectory>lib</outputDirectory>
-      </binaries>
-      <sources>
-        <includeModuleDirectory>false</includeModuleDirectory>
-        <fileSets>
-          <fileSet>
-              <directory>src/main/assembly/scripts</directory>
-              <outputDirectory>/scripts</outputDirectory>
-              <includes>
-                  <include>*.sh</include>
-                  <include>*.bat</include>
-              </includes>
-              <fileMode>0755</fileMode>
-              <lineEnding>unix</lineEnding>
-          </fileSet>
-        </fileSets>
-      </sources>
-    </moduleSet>
   </moduleSets>
 
   <fileSets>
