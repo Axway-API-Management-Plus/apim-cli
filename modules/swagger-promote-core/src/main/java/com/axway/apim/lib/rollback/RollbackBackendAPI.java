@@ -14,6 +14,7 @@ import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.actions.rest.DELRequest;
 import com.axway.apim.actions.rest.RestAPICall;
+import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.IResponseParser;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
@@ -39,6 +40,7 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 			URI uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
 					.setPath(RestAPICall.API_VERSION+"/apirepo/"+rollbackAPI.getApiId())
 					.build();
+			Transaction.getInstance().put("apiIdToDelete", rollbackAPI.getApiId());
 			RestAPICall apiCall = new DELRequest(uri, this, false);
 			apiCall.execute();
 			if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
@@ -56,6 +58,7 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 					uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
 							.setPath(RestAPICall.API_VERSION+"/apirepo/"+existingBEAPI.get("id").asText())
 							.build();
+					Transaction.getInstance().put("apiIdToDelete", existingBEAPI.get("id"));
 					apiCall = new DELRequest(uri, this, false);
 					apiCall.execute();
 				}
@@ -72,9 +75,9 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 		if(httpResponse.getStatusLine().getStatusCode()!=204) {
 			rolledBack = false;
 			try {
-				LOG.error("Error while deleteting BE-API: '"+rollbackAPI.getApiId()+"' to roll it back: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+				LOG.error("Error while deleteting BE-API: '"+Transaction.getInstance().get("apiIdToDelete")+"' to roll it back: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 			} catch (Exception e) {
-				LOG.error("Error while deleteting FE-API: '"+rollbackAPI.getApiId()+"' to roll it back", e);
+				LOG.error("Error while deleteting FE-API: '"+Transaction.getInstance().get("apiIdToDelete")+"' to roll it back", e);
 			}
 			
 		} else {
