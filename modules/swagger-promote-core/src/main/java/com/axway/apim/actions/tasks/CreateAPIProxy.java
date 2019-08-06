@@ -55,7 +55,7 @@ public class CreateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 				Object lastRequest = Transaction.getInstance().get("lastRequest");
 				ErrorState.getInstance().setError("Error creating API-Proxy. "
 						+ "Unexpected response from API-Manager: " + httpResponse.getStatusLine() + " " + EntityUtils.toString(httpResponse.getEntity()) + ". "
-								+ "Last request: '"+EntityUtils.toString(((HttpEntityEnclosingRequestBase)lastRequest).getEntity())+"'"
+								+ "Last request: '"+EntityUtils.toString(((HttpEntityEnclosingRequestBase)lastRequest).getEntity())+"'. "
 								+ "Please check the API-Manager traces.", ErrorCode.CANT_CREATE_API_PROXY, false);
 				throw new AppException("Error creating API-Proxy", ErrorCode.CANT_CREATE_API_PROXY);
 			}
