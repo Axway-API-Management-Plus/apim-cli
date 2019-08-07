@@ -6,6 +6,8 @@ package com.axway.apim.swagger.api.state;
  * @author cwiechmann@axway.com
  */
 public class APIBaseDefinition extends AbstractAPI implements IAPI {
+	
+	private String createdOn;
 
 	@Override
 	public String getState() {
@@ -16,6 +18,14 @@ public class APIBaseDefinition extends AbstractAPI implements IAPI {
 		this.state = state;
 	}
 	
+	public String getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(String createdOn) {
+		this.createdOn = createdOn;
+	}
+
 	@Override
 	public String getApiDefinitionImport() {
 		// TODO Auto-generated method stub

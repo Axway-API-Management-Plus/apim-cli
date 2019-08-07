@@ -57,6 +57,7 @@ public class CreateNewAPI {
 		IAPI rollbackAPI = new APIBaseDefinition();
 		((AbstractAPI)rollbackAPI).setName(changes.getDesiredAPI().getName());
 		((AbstractAPI)rollbackAPI).setApiId((String)context.get("backendAPIId"));
+		((APIBaseDefinition)rollbackAPI).setCreatedOn((String)context.get("backendAPICreatedOn"));
 		rollback.addRollbackAction(new RollbackBackendAPI(rollbackAPI));
 		
 		try {

@@ -19,6 +19,7 @@ import com.axway.apim.actions.tasks.IResponseParser;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.swagger.APIManagerAdapter;
+import com.axway.apim.swagger.api.state.APIBaseDefinition;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -43,16 +44,26 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 			Transaction.getInstance().put("apiIdToDelete", rollbackAPI.getApiId());
 			RestAPICall apiCall = new DELRequest(uri, this, false);
 			apiCall.execute();
+			/*
+			 * API-Manager 7.7 creates unfortunately two APIs at the same time, when importing a backend-API 
+			 * having both schemas: https & http. 
+			 * On top to that problem, only ONE backend-API-ID is returned when creating the BE-API-ID. The following 
+			 * code tries to find the other Backend-API, which has been created almost at the same time.
+			 */
 			if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
 				rolledBack = true;
-				// There is very likely another BE-API, as API-Manager 7.7 is creating two Backend-API. One for HTTPS and one for HTTP
+				Long beAPICreatedOn = Long.parseLong( ((APIBaseDefinition)rollbackAPI).getCreatedOn() );
+				// The createdOn of the API we are looking for, should be almost created at the same time, as the code runs internally in API-Manager.
+				beAPICreatedOn = beAPICreatedOn - 1000;
 				List<NameValuePair> filters = new ArrayList<NameValuePair>();
 				filters.add(new BasicNameValuePair("field", "name"));
 				filters.add(new BasicNameValuePair("op", "like"));
 				filters.add(new BasicNameValuePair("value", rollbackAPI.getName()+ " HTTP"));
+				// Filter on the createdOn date to execlude potentially already existing APIs with the same name,
+				// as we only want to rollback the API which has been inserted by the actual tool run
 				filters.add(new BasicNameValuePair("field", "createdOn"));
 				filters.add(new BasicNameValuePair("op", "gt"));
-				filters.add(new BasicNameValuePair("value", Long.toString(new Date().getTime()-120000))); // Ignore all API created more than 1 minute ago!
+				filters.add(new BasicNameValuePair("value", (beAPICreatedOn).toString())); // Ignore all other APIs some time ago
 				JsonNode existingBEAPI = APIManagerAdapter.getInstance().getExistingAPI(null, filters, APIManagerAdapter.TYPE_BACK_END);
 				if(existingBEAPI.get("id")!=null) {
 					uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
