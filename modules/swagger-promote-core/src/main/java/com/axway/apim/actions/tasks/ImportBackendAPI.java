@@ -30,7 +30,6 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 
 	public ImportBackendAPI(IAPI desiredState, IAPI actualState) {
 		super(desiredState, actualState);
-		// TODO Auto-generated constructor stub
 	}
 
 	public void execute() throws AppException {
@@ -145,8 +144,10 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		String response = null;
 		try {
 			if(httpResponse.getStatusLine().getStatusCode()!=201) {
+				Object lastRequest = Transaction.getInstance().get("lastRequest");
 				ErrorState.getInstance().setError("Error importing BE-API. "
 						+ "Unexpected response from API-Manager: " + httpResponse.getStatusLine() + " " + EntityUtils.toString(httpResponse.getEntity()) + ". "
+								+ "Last request: '"+lastRequest+"'. "
 								+ "Please check the API-Manager traces.", ErrorCode.CANT_CREATE_API_PROXY, false);
 				throw new AppException("Error creating API-Proxy", ErrorCode.CANT_CREATE_API_PROXY);
 			}
@@ -154,6 +155,8 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 			JsonNode jsonNode = objectMapper.readTree(response);
 			String backendAPIId = jsonNode.findPath("id").asText();
 			Transaction.getInstance().put("backendAPIId", backendAPIId);
+			// The createdOnInformation is required for the rollback action to identify the created BE-API.
+			Transaction.getInstance().put("backendAPICreatedOn", jsonNode.findPath("createdOn").asText());
 			return null;
 		} catch (IOException e) {
 			throw new AppException("Cannot parse JSON-Payload after create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
