@@ -62,11 +62,19 @@ public class APIDefintion {
 							this.apiDefinitionContent = objectMapper.writeValueAsBytes(swagger);
 						}
 					}
+					if(url.getPath()!=null && !url.getPath().equals("")) {
+						if(swagger.get("basePath").asText().equals(url.getPath())) {
+							LOG.info("Swagger basePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasepath: '"+url.getPath()+"'. Nothing to do.");
+						} else {
+							LOG.info("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.getPath()+"' based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+							((ObjectNode)swagger).put("basePath", url.getPath());
+						}
+					}
+					this.apiDefinitionContent = objectMapper.writeValueAsBytes(swagger);
 				}
 			}
 		} catch (Exception e) {
 			LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
-			
 		}
 	}
 

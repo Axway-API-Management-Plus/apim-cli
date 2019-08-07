@@ -21,7 +21,7 @@ Perform the following steps:
     cd emt-containers-1.0.0-8
     ./build_base_image.py --installer=../APIGateway_x.x.x_xxx_Install_linux-x86-64_BNxxxxxx.run --os=centos7
     ./gen_domain_cert.py --default-cert
-    ./build_gw_image.py --license=multiple.lic --default-cert --fed=$HOME/apimanager-swagger-promote/src/test/resources/apimanager/swagger-promote-7.6.2.fed --merge-dir $HOME/apimanager-swagger-promote/src/test/resources/apimanager/merge-dir/apigateway --out-image=api-gw-mgr:7.6.2-SP3
+    ./build_gw_image.py --license=multiple.lic --default-cert --fed=$HOME/apimanager-swagger-promotemodules/swagger-promote-core//src/test/resources/apimanager/swagger-promote-7.6.2.fed --merge-dir $HOME/apimanager-swagger-promote/modules/swagger-promote-core/src/test/resources/apimanager/merge-dir/apigateway --out-image=api-gw-mgr:7.6.2-SP3
     docker images
     docker tag api-gw-mgr:7.6.2-SP3 docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP3
     docker login docker-registry.demo.axway.com

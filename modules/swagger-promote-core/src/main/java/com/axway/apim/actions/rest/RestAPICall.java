@@ -79,7 +79,7 @@ public abstract class RestAPICall {
 			Transaction context = Transaction.getInstance();
 			APIMHttpClient apimClient = APIMHttpClient.getInstance(this.useAdmin);
 			if(apimClient.getCsrfToken()!=null) request.addHeader("CSRF-Token", apimClient.getCsrfToken());
-			context.put("lastRequest", request);
+			context.put("lastRequest", request.getMethod() + " " + request);
 			HttpResponse response = apimClient.getHttpClient().execute(request, apimClient.getClientContext());
 			//LOG.info("Send request: "+this.getClass().getSimpleName()+" using admin-account: " + this.useAdmin + " to: " + request.getURI());
 			return response;

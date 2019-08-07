@@ -24,6 +24,18 @@ public class CommandParameters {
 	
 	private EnvironmentProperties envProperties;
 	
+	private Map<String, String> manualParams;
+	
+	/**
+	 * Use this constructor manually build a CommandParameters instance. 
+	 * This is useful when calling Swagger-Promote other classes or running tests.
+	 * @param manualParams
+	 */
+	public CommandParameters (Map<String, String> manualParams) {
+		this.manualParams = manualParams;
+		CommandParameters.instance = this;
+	}
+	
 	public CommandParameters (CommandLine cmd) throws AppException {
 		this(cmd, null, null);
 	}
@@ -37,7 +49,9 @@ public class CommandParameters {
 	}
 	
 	public static synchronized CommandParameters getInstance() {
-		if(TestIndicator.getInstance().isTestRunning()) return null; // Skip this, if executed as a test
+		if(TestIndicator.getInstance().isTestRunning()) {
+			return null; // Skip this, if executed as a test
+		}
 		if (CommandParameters.instance == null) {
 			LOG.error("CommandParameters has not been initialized.");
 			throw new RuntimeException("CommandParameters has not been initialized.");
@@ -146,12 +160,14 @@ public class CommandParameters {
 	}
 	
 	public String getValue(String key) {
-		if(this.cmd.getOptionValue(key)!=null) {
+		if(this.internalCmd!=null && this.cmd.getOptionValue(key)!=null) {
 			return this.cmd.getOptionValue(key);
 		} else if(this.internalCmd!=null && this.internalCmd.getOptionValue(key)!=null) {
 			return this.internalCmd.getOptionValue(key);
 		} else if(this.envProperties!=null && this.envProperties.containsKey(key)) {
 			return this.envProperties.get(key);
+		} else if(this.manualParams!=null && this.manualParams.containsKey(key)) {
+			return this.manualParams.get(key);
 		} else {
 			return null;
 		}

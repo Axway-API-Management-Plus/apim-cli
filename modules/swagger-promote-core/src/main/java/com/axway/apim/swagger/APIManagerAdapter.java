@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -70,7 +71,7 @@ public class APIManagerAdapter {
 	private static APIManagerAdapter instance;
 	
 	private static String apiManagerVersion = null;
-	private static String apiManagerConfig = null;
+	private static Map<Boolean, String> apiManagerConfig = new HashMap<Boolean, String>();
 	
 	private static List<Organization> allOrgs = null;
 	private static List<ClientApplication> allApps = null;
@@ -99,6 +100,13 @@ public class APIManagerAdapter {
 	public final static String TYPE_FRONT_END = "proxies";
 	public final static String TYPE_BACK_END = "apirepo";
 	
+	private static final Map<String, Boolean> configFieldRequiresAdmin;
+    static {
+        Map<String, Boolean> temp = new HashMap<String, Boolean>();
+        temp.put("apiRoutingKeyEnabled", true);
+        configFieldRequiresAdmin = Collections.unmodifiableMap(temp);
+    }
+	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
 			APIManagerAdapter.instance = new APIManagerAdapter ();
@@ -108,7 +116,7 @@ public class APIManagerAdapter {
 	
 	public static synchronized void deleteInstance() throws AppException {
 			APIManagerAdapter.instance = null;
-			APIManagerAdapter.apiManagerConfig = null;
+			APIManagerAdapter.apiManagerConfig = new HashMap<Boolean, String>();;
 			APIManagerAdapter.allOrgs = null;
 	}
 	
@@ -794,24 +802,27 @@ public class APIManagerAdapter {
 	 */
 	public static String getApiManagerConfig(String configField) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
+		boolean useAdmin = (configFieldRequiresAdmin.containsKey(configField)) ? true : false;
+		String managerConfig = apiManagerConfig.get(useAdmin);
 		URI uri;
 		try {
-			if(apiManagerConfig==null) {
+			if(managerConfig==null) {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
-				RestAPICall getRequest = new GETRequest(uri, null, false); // No need to use an Admin-Account for the Config-Fields Swagger-Promote needs so far
+				RestAPICall getRequest = new GETRequest(uri, null, useAdmin);
 				HttpResponse httpResponse = getRequest.execute();
-				apiManagerConfig = EntityUtils.toString(httpResponse.getEntity());
+				managerConfig = EntityUtils.toString(httpResponse.getEntity());
 			}
 			JsonNode jsonResponse;
-			jsonResponse = mapper.readTree(apiManagerConfig);
+			jsonResponse = mapper.readTree(managerConfig);
 			JsonNode retrievedConfigField = jsonResponse.get(configField);
 			if(retrievedConfigField==null) {
 				LOG.debug("Config field: '"+configField+"' is unsuporrted!");
 				return "UnknownConfigField"+configField;
 			}
+			apiManagerConfig.put(useAdmin, managerConfig);
 			return retrievedConfigField.asText();
 		} catch (Exception e) {
-			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + apiManagerConfig);
+			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + managerConfig);
 			throw new AppException("Can't get "+configField+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
