@@ -464,11 +464,6 @@ public class APIManagerAdapter {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			HttpResponse httpResponse = getRequest.execute();
-			/*response = EntityUtils.toString(httpResponse.getEntity());
-			EntityUtils.consume(httpResponse.getEntity());
-			LOG.trace("Response: " + response);
-			JsonNode operations = mapper.readTree(response);
-			HttpResponse httpResponse = getRequest.execute();*/
 			response = EntityUtils.toString(httpResponse.getEntity());
 			apiMethods = mapper.readValue(response, new TypeReference<List<APIMethod>>(){});
 			return apiMethods;
@@ -1063,11 +1058,12 @@ public class APIManagerAdapter {
 	public <profile> void translateMethodIds(Map<String, profile> profiles, IAPI actualAPI) throws AppException {
 		Map<String, profile> updatedEntries = new LinkedHashMap<String, profile>();
 		if(profiles!=null) {
+			List<APIMethod> methods = null;
 			Iterator<String> keys = profiles.keySet().iterator();
 			while(keys.hasNext()) {
 				String key = keys.next();
 				if(key.equals("_default")) continue;
-				List<APIMethod> methods = getAllMethodsForAPI(actualAPI.getId());
+				if(methods==null) methods = getAllMethodsForAPI(actualAPI.getId());
 				for(APIMethod method : methods) {
 					if(method.getName().equals(key)) {
 						profile value = profiles.get(key);

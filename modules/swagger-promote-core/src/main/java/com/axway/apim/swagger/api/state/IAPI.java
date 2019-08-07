@@ -42,6 +42,7 @@ public interface IAPI {
 	public List<CorsProfile> getCorsProfiles();
 	
 	public void setInboundProfiles(Map<String, InboundProfile> inboundProfiles);
+	public void setOutboundProfiles(Map<String, OutboundProfile> outboundProfiles);
 	
 	/**
 	 * @param securityProfiles control the way an application must Authn (e.g. API-Key, etc.)

@@ -191,12 +191,25 @@ public class APIImportConfigAdapter {
 		}
 	}
 	
+	/**
+	 * The purpose of this method is to translated the given Method-Names into internal 
+	 * operationId. These operationIds are created and then known, when the API has 
+	 * been inserted. 
+	 * Translating the methodNames to operationIds already during import is required for 
+	 * the comparison between the desired and actual API.
+	 * @param desiredAPI the configured desired API
+	 * @param actualAPI a potinetially existing actual API
+	 * @return the desired API containing operationId in Inbound- and Outbound-Profiles
+	 * @throws AppException when something goes wrong
+	 */
 	public IAPI completeDesiredAPI(IAPI desiredAPI, IAPI actualAPI) throws AppException {
 		if(!actualAPI.isValid()) return desiredAPI;
 		APIManagerAdapter mgrAdpater = APIManagerAdapter.getInstance();
+		// We need to safe the original methodNames, as they are required during API-Re-Creation
+		((DesiredAPI)desiredAPI).setOriginalInboundProfiles(desiredAPI.getInboundProfiles());
+		((DesiredAPI)desiredAPI).setOriginalOutboundProfiles(desiredAPI.getOutboundProfiles());
 		mgrAdpater.translateMethodIds(desiredAPI.getInboundProfiles(), actualAPI);
 		mgrAdpater.translateMethodIds(desiredAPI.getOutboundProfiles(), actualAPI);
-		
 		return desiredAPI;
 	}
 	
