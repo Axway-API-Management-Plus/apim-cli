@@ -55,7 +55,6 @@ public class QuotaRestriction {
 		if(other == null) return false;
 		if(other instanceof QuotaRestriction) {
 			QuotaRestriction quotaRestriction = (QuotaRestriction)other;
-			
 			return
 					StringUtils.equals(quotaRestriction.getMethod(), this.getMethod()) &&
 					StringUtils.equals(quotaRestriction.getType(), this.getType()) &&

@@ -31,7 +31,7 @@ public class APIQuotaIgnoredTestIT extends TestNGCitrusTestDesigner {
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		createVariable("applicationPeriod", "hour");
-		createVariable("systemPeriod", "days");
+		createVariable("systemPeriod", "day");
 		createVariable("ignoreQuotas", "true");
 		action(swaggerImport);
 		

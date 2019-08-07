@@ -663,22 +663,22 @@ public class APIManagerAdapter {
 	}
 	
 	private static APIQuota getAPIQuota(APIQuota quotaConfig, String apiId) throws AppException {
-		APIQuota apiQuota;
+		List<QuotaRestriction> apiRestrictions = new ArrayList<QuotaRestriction>();
 		try {
 			for(QuotaRestriction restriction : quotaConfig.getRestrictions()) {
 				if(restriction.getApi().equals(apiId)) {
-					apiQuota = new APIQuota();
-					apiQuota.setDescription(quotaConfig.getDescription());
-					apiQuota.setName(quotaConfig.getName());
-					apiQuota.setRestrictions(new ArrayList<QuotaRestriction>());
-					apiQuota.getRestrictions().add(restriction);
-					return apiQuota;
+					apiRestrictions.add(restriction);
 				}
 			}
+			if(apiRestrictions.size()==0) return null;
+			APIQuota apiQuota = new APIQuota();
+			apiQuota.setDescription(quotaConfig.getDescription());
+			apiQuota.setName(quotaConfig.getName());
+			apiQuota.setRestrictions(apiRestrictions);
+			return apiQuota;
 		} catch (Exception e) {
 			throw new AppException("Can't parse quota from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
-		return null;
 	}
 	
 	/**

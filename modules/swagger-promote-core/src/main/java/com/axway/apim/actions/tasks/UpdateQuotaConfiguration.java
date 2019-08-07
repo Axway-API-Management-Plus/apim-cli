@@ -1,6 +1,7 @@
 package com.axway.apim.actions.tasks;
 
 import java.net.URI;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -74,20 +75,17 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 		}
 	}
 	
-	private void addOrMergeRestriction(List<QuotaRestriction> existingRestrictions, List<QuotaRestriction> newRestrictions) {
-		boolean existingUpdated = false;
-		for(QuotaRestriction newRestriction : newRestrictions) {
-			for(int i=0; i<existingRestrictions.size(); i++) {
-				QuotaRestriction existingRestriction = existingRestrictions.get(i);
-				if(newRestriction.isSameRestriction(existingRestriction)) {
-					existingRestrictions.set(i, newRestriction);
-					existingUpdated = true;
-				}
-			}
-			if(!existingUpdated) {
-				existingRestrictions.add(newRestriction);
+	private void addOrMergeRestriction(List<QuotaRestriction> existingRestrictions, List<QuotaRestriction> newRestrictions) throws AppException {
+		Iterator<QuotaRestriction> it = existingRestrictions.iterator();
+		// Remove all existing restriction for the API
+		while(it.hasNext()) {
+			QuotaRestriction existingRestriction = it.next();
+			if(existingRestriction.getApi().equals(this.actualState.getId())) {
+				it.remove();
 			}
 		}
+		// And all new desired restrictions
+		existingRestrictions.addAll(newRestrictions);
 	}
 	
 	
