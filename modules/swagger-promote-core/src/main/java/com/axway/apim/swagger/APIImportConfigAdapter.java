@@ -608,8 +608,13 @@ public class APIImportConfigAdapter {
 		if(stageFile.exists()) { // This is to support testing with dynamic created files!
 			return stageFile.getAbsolutePath();
 		}
-		if(stage!=null && !stage.equals("NOT_SET")) {
-			return apiConfig.substring(0, apiConfig.lastIndexOf(".")+1) + stage + apiConfig.substring(apiConfig.lastIndexOf("."));
+		if(!stage.equals("NOT_SET")) {
+			stageFile = new File(apiConfig.substring(0, apiConfig.lastIndexOf(".")+1) + stage + apiConfig.substring(apiConfig.lastIndexOf(".")));
+			if(stageFile.exists()) {
+				return stageFile.getAbsolutePath();
+			} else {
+				return null;
+			}
 		}
 		LOG.debug("No stage provided");
 		return null;
