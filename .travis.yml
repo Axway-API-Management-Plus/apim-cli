@@ -8,9 +8,9 @@ env:
   global:
     - CACHE_DIR=$HOME/docker
     - APIM_DOCKER_IMAGE=docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7
-    - CASSANDRA_DOCKER_IMAGE=cassandra:2.2.8
+    - CASSANDRA_DOCKER_IMAGE=cassandra:2.2.12
     - CACHE_FILE_APIM=$CACHE_DIR/api-manager_7_7.cache.tar.gz
-    - CACHE_FILE_CASSANDRA=$CACHE_DIR/cassandra_2_2_8.cache.tar.gz
+    - CACHE_FILE_CASSANDRA=$CACHE_DIR/cassandra_2_2_12.cache.tar.gz
     - counter=0
 
 cache:
@@ -35,7 +35,7 @@ before_install:
   # In this script, we are either using the cached version or download a new Docker-Image
   - travis_wait build/pull_apim_docker_image.sh $CACHE_FILE_APIM
   # Now it's time to safe the downloaded API-Management Docker-Image into the cache folder
-  - if [ ! -f $CACHE_FILE_APIM ]; then docker save $DOCKER_IMAGE_TO_USE | gzip > $CACHE_FILE_APIM; fi
+  - if [ ! -f $CACHE_FILE_APIM ]; then docker save $APIM_DOCKER_IMAGE | gzip > $CACHE_FILE_APIM; fi
   # Pull Cassandra Image or use the cache
   - travis_wait build/pull_cassandra_docker_image.sh
   # Safe Cassandra image inc cache file
