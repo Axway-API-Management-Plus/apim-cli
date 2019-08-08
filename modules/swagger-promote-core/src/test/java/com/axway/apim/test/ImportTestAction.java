@@ -59,13 +59,18 @@ public class ImportTestAction extends AbstractTestAction {
 		String ignoreQuotas = "false";
 		String ignoreAdminAccount = "false";
 		String clientOrgsMode = CommandParameters.MODE_ADD;
-		String clientAppsMode = CommandParameters.MODE_ADD;;
+		String clientAppsMode = CommandParameters.MODE_ADD;
+		String quotaMode = CommandParameters.MODE_ADD;
+		
 		
 		try {
 			enforce = context.getVariable("enforce");
 		} catch (Exception ignore) {};
 		try {
 			ignoreQuotas = context.getVariable("ignoreQuotas");
+		} catch (Exception ignore) {};
+		try {
+			quotaMode = context.getVariable("quotaMode");
 		} catch (Exception ignore) {};
 		try {
 			clientOrgsMode = context.getVariable("clientOrgsMode");
@@ -102,7 +107,8 @@ public class ImportTestAction extends AbstractTestAction {
 					"-f", enforce, 
 					"-iq", ignoreQuotas, 
 					"-clientOrgsMode", clientOrgsMode, 
-					"-clientAppsMode", clientAppsMode, 
+					"-clientAppsMode", clientAppsMode,
+					"-quotaMode", quotaMode,
 					"-ignoreAdminAccount", ignoreAdminAccount};
 		}
 		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);

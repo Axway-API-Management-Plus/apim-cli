@@ -108,6 +108,10 @@ public class App {
 			option.setArgName("ignore|replace|add");
 			options.addOption(option);
 			
+			option = new Option("quotaMode", true, "Controls how quotas are managed in API-Manager. Defaults to add!");
+			option.setArgName("ignore|replace|add");
+			options.addOption(option);
+			
 			option = new Option("detailsExportFile", true, "Configure a filename, to get a Key=Value file containing information about the created API.");
 			option.setRequired(false);
 			option.setArgName("APIDetails.properties");
@@ -222,7 +226,7 @@ public class App {
 		System.out.println();
 		System.out.println();
 		System.out.println("Using parameters provided in properties file stored in conf-folder:");
-		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -c samples/minimal-config-api-definition.json -s api-env");
+		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -c samples/basic/minimal-config-api-definition.json -s api-env");
 		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");
 		System.out.println("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/tree/develop/modules/swagger-promote-core/src/main/assembly/samples");

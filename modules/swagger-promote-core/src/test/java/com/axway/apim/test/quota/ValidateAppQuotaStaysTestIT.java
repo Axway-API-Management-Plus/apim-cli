@@ -46,7 +46,7 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestDesigner {
 		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0");
 		createVariable("applicationPeriod", "hour");
-		createVariable("systemPeriod", "days");
+		createVariable("systemPeriod", "day");
 		createVariable("ignoreQuotas", "true");
 		action(swaggerImport);
 		
@@ -86,7 +86,7 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestDesigner {
 		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0");
 		createVariable("applicationPeriod", "hour");
-		createVariable("systemPeriod", "days");
+		createVariable("systemPeriod", "day");
 		createVariable("ignoreQuotas", "true");
 		createVariable("enforce", "true");
 		action(swaggerImport);

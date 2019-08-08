@@ -1,12 +1,16 @@
 package com.axway.apim.swagger.api.state;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIImportConfigAdapter;
+import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
+import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -26,6 +30,14 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	private String backendBasepath = null;
 	
 	private boolean requestForAllOrgs = false;
+	
+	/*
+	 * Private fields to safe the original given profiles. This is required 
+	 * given methodNames must be translated into internal operationIds for comparison.  
+	 * But on Re-Creation the desired API still needs the original methodNames
+	 */
+	private Map<String, InboundProfile> originalInboundProfiles;
+	private Map<String, OutboundProfile> originalOutboundProfiles;
 	
 	@JsonProperty("apiDefinition")
 	public String apiDefinitionImport = null;
@@ -92,7 +104,21 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 		this.apiDefinitionImport = apiDefinitionImport;
 	}
 
-	
-	
-	
+	public Map<String, InboundProfile> getOriginalInboundProfiles() {
+		return originalInboundProfiles;
+	}
+
+	public void setOriginalInboundProfiles(Map<String, InboundProfile> originalInboundProfiles) {
+		if(originalInboundProfiles==null) return;
+		this.originalInboundProfiles = new HashMap<String, InboundProfile>(originalInboundProfiles);
+	}
+
+	public Map<String, OutboundProfile> getOriginalOutboundProfiles() {
+		return originalOutboundProfiles;
+	}
+
+	public void setOriginalOutboundProfiles(Map<String, OutboundProfile> originalOutboundProfiles) {
+		if(originalOutboundProfiles==null) return;
+		this.originalOutboundProfiles = new HashMap<String, OutboundProfile>(originalOutboundProfiles);
+	}
 }

@@ -464,11 +464,6 @@ public class APIManagerAdapter {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			HttpResponse httpResponse = getRequest.execute();
-			/*response = EntityUtils.toString(httpResponse.getEntity());
-			EntityUtils.consume(httpResponse.getEntity());
-			LOG.trace("Response: " + response);
-			JsonNode operations = mapper.readTree(response);
-			HttpResponse httpResponse = getRequest.execute();*/
 			response = EntityUtils.toString(httpResponse.getEntity());
 			apiMethods = mapper.readValue(response, new TypeReference<List<APIMethod>>(){});
 			return apiMethods;
@@ -668,22 +663,26 @@ public class APIManagerAdapter {
 	}
 	
 	private static APIQuota getAPIQuota(APIQuota quotaConfig, String apiId) throws AppException {
-		APIQuota apiQuota;
+		List<QuotaRestriction> apiRestrictions = new ArrayList<QuotaRestriction>();
 		try {
 			for(QuotaRestriction restriction : quotaConfig.getRestrictions()) {
 				if(restriction.getApi().equals(apiId)) {
-					apiQuota = new APIQuota();
-					apiQuota.setDescription(quotaConfig.getDescription());
-					apiQuota.setName(quotaConfig.getName());
-					apiQuota.setRestrictions(new ArrayList<QuotaRestriction>());
-					apiQuota.getRestrictions().add(restriction);
-					return apiQuota;
+					apiRestrictions.add(restriction);
 				}
 			}
+			if(apiRestrictions.size()==0) return null;
+			APIQuota apiQuota = new APIQuota();
+			apiQuota.setDescription(quotaConfig.getDescription());
+			apiQuota.setName(quotaConfig.getName());
+			apiQuota.setRestrictions(apiRestrictions);
+			return apiQuota;
 		} catch (Exception e) {
 			throw new AppException("Can't parse quota from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
-		return null;
+	}
+	
+	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type) throws AppException {
+		return getExistingAPI(apiPath, filter, type, true);
 	}
 	
 	/**
@@ -694,7 +693,7 @@ public class APIManagerAdapter {
 	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
 	 * @throws AppException if the API can't be found or created
 	 */
-	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type) throws AppException {
+	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type, boolean logMessage) throws AppException {
 		CommandParameters cmd = CommandParameters.getInstance();
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
@@ -732,10 +731,12 @@ public class APIManagerAdapter {
 				if(foundApi!=null) {
 					if(type.equals(TYPE_FRONT_END)) {
 						path = foundApi.get("path").asText();
-						LOG.info("Found existing API on path: '"+path+"' ("+foundApi.get("state").asText()+") (ID: '" + foundApi.get("id").asText()+"')");
+						if(logMessage) 
+							LOG.info("Found existing API on path: '"+path+"' ("+foundApi.get("state").asText()+") (ID: '" + foundApi.get("id").asText()+"')");
 					} else if(type.equals(TYPE_BACK_END)) {
 						String name = foundApi.get("name").asText();
-						LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + foundApi.get("id").asText()+"')");						
+						if(logMessage) 
+							LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + foundApi.get("id").asText()+"')");						
 					}
 					return foundApi;
 				}
@@ -1063,11 +1064,12 @@ public class APIManagerAdapter {
 	public <profile> void translateMethodIds(Map<String, profile> profiles, IAPI actualAPI) throws AppException {
 		Map<String, profile> updatedEntries = new LinkedHashMap<String, profile>();
 		if(profiles!=null) {
+			List<APIMethod> methods = null;
 			Iterator<String> keys = profiles.keySet().iterator();
 			while(keys.hasNext()) {
 				String key = keys.next();
 				if(key.equals("_default")) continue;
-				List<APIMethod> methods = getAllMethodsForAPI(actualAPI.getId());
+				if(methods==null) methods = getAllMethodsForAPI(actualAPI.getId());
 				for(APIMethod method : methods) {
 					if(method.getName().equals(key)) {
 						profile value = profiles.get(key);

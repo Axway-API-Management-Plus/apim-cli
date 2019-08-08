@@ -45,8 +45,11 @@ public class CreateNewAPI {
 
 	public void execute(APIChangeState changes, boolean reCreation) throws AppException {
 		
+		IAPI createdAPI = null;
+		
 		Transaction context = Transaction.getInstance();
 		RollbackHandler rollback = RollbackHandler.getInstance();
+		
 		
 		// Force to initially update the API into the desired state!
 		List<String> changedProps = getAllProps(changes.getDesiredAPI());
@@ -67,43 +70,51 @@ public class CreateNewAPI {
 			throw e;
 		} 
 		rollback.addRollbackAction(new RollbackAPIProxy(rollbackAPI)); // In any case, register the API just created for a potential rollback
-	
-		// As we have just created an API-Manager API, we should reflect this for further processing
-		IAPI createdAPI = APIManagerAdapter.getInstance().getAPIManagerAPI((JsonNode)context.get("lastResponse"), changes.getDesiredAPI());
-		// Register the created FE-API to be rolled back in case of an error
-		((AbstractAPI)rollbackAPI).setId(createdAPI.getId());
-		changes.setIntransitAPI(createdAPI);
 		
-		// ... here we basically need to add all props to initially bring the API in sync!
-		// But without updating the Swagger, as we have just imported it!
-		new UpdateAPIProxy(changes.getDesiredAPI(), createdAPI).execute(changedProps);
-		
-		// If an image is included, update it
-		if(changes.getDesiredAPI().getImage()!=null) {
-			new UpdateAPIImage(changes.getDesiredAPI(), createdAPI).execute();
+		try {
+			// As we have just created an API-Manager API, we should reflect this for further processing
+			createdAPI = APIManagerAdapter.getInstance().getAPIManagerAPI((JsonNode)context.get("lastResponse"), changes.getDesiredAPI());
+			// Register the created FE-API to be rolled back in case of an error
+			((AbstractAPI)rollbackAPI).setId(createdAPI.getId());
+			changes.setIntransitAPI(createdAPI);
+			
+			// ... here we basically need to add all props to initially bring the API in sync!
+			// But without updating the Swagger, as we have just imported it!
+			new UpdateAPIProxy(changes.getDesiredAPI(), createdAPI).execute(changedProps);
+			
+			// If an image is included, update it
+			if(changes.getDesiredAPI().getImage()!=null) {
+				new UpdateAPIImage(changes.getDesiredAPI(), createdAPI).execute();
+			}
+			// This is special, as the status is not a normal property and requires some additional actions!
+			new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI).execute();
+			((AbstractAPI)rollbackAPI).setState(createdAPI.getState());
+			
+			if(reCreation && changes.getActualAPI().getState().equals(IAPI.STATE_PUBLISHED)) {
+				// In case, the existing API is already in use (Published), we have to grant access to our new imported API
+				new UpgradeAccessToNewerAPI(changes.getIntransitAPI(), changes.getActualAPI()).execute();
+			}
+			
+			// Is a Quota is defined we must manage it
+			new UpdateQuotaConfiguration(changes.getDesiredAPI(), createdAPI).execute();
+			
+			// Grant access to the API
+			new ManageClientOrgs(changes.getDesiredAPI(), createdAPI).execute(reCreation);
+			
+			// Handle subscription to applications
+			new ManageClientApps(changes.getDesiredAPI(), createdAPI, changes.getActualAPI()).execute(reCreation);
+			
+			// V-Host must be managed almost at the end, as the status must be set already to "published"
+			vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if(createdAPI==null) {
+				LOG.warn("Cant create PropertiesExport as createdAPI is null");
+			} else {
+				APIPropertiesExport.getInstance().setProperty("feApiId", createdAPI.getId());
+			}
 		}
-		// This is special, as the status is not a normal property and requires some additional actions!
-		new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI).execute();
-		((AbstractAPI)rollbackAPI).setState(createdAPI.getState());
-		
-		if(reCreation && changes.getActualAPI().getState().equals(IAPI.STATE_PUBLISHED)) {
-			// In case, the existing API is already in use (Published), we have to grant access to our new imported API
-			new UpgradeAccessToNewerAPI(changes.getIntransitAPI(), changes.getActualAPI()).execute();
-		}
-		
-		// Is a Quota is defined we must manage it
-		new UpdateQuotaConfiguration(changes.getDesiredAPI(), createdAPI).execute();
-		
-		// Grant access to the API
-		new ManageClientOrgs(changes.getDesiredAPI(), createdAPI).execute(reCreation);
-		
-		// Handle subscription to applications
-		new ManageClientApps(changes.getDesiredAPI(), createdAPI, changes.getActualAPI()).execute(reCreation);
-		
-		// V-Host must be managed almost at the end, as the status must be set already to "published"
-		vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
-		
-		APIPropertiesExport.getInstance().setProperty("feApiId", createdAPI.getId());
 	}
 	
 	/**

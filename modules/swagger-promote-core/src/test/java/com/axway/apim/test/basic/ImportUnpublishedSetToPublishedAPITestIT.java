@@ -27,7 +27,7 @@ public class ImportUnpublishedSetToPublishedAPITestIT extends TestNGCitrusTestDe
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
-		createVariable("status", "unpublished");
+		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -43,13 +43,13 @@ public class ImportUnpublishedSetToPublishedAPITestIT extends TestNGCitrusTestDe
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Change API-State from Unpublished to Published #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
-		createVariable("status", "published");
+		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
@@ -65,7 +65,7 @@ public class ImportUnpublishedSetToPublishedAPITestIT extends TestNGCitrusTestDe
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "published")
+			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
 			.validate("$.[?(@.path=='${apiPath}')].id", "${apiId}");
 	}
 

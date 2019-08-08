@@ -34,29 +34,34 @@ public class UpdateExistingAPI {
 		allChanges.addAll(changes.getBreakingChanges());
 		allChanges.addAll(changes.getNonBreakingChanges());
 		
-		VhostPropertyHandler vHostHandler = new VhostPropertyHandler(allChanges);
-
-		new UpdateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute(allChanges);
+		try {
 		
-		// If image is include, update it
-		if(changes.getNonBreakingChanges().contains("image")) {
-			new UpdateAPIImage(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+			VhostPropertyHandler vHostHandler = new VhostPropertyHandler(allChanges);
+	
+			new UpdateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute(allChanges);
+			
+			// If image is include, update it
+			if(changes.getNonBreakingChanges().contains("image")) {
+				new UpdateAPIImage(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+			}
+			
+			// This is special, as the status is not a property and requires some additional actions!
+			UpdateAPIStatus statusUpdate = new UpdateAPIStatus(changes.getDesiredAPI(), changes.getActualAPI());
+			if(changes.getNonBreakingChanges().contains("state")) {
+				statusUpdate.execute();
+			}
+			
+			vHostHandler.handleVHost(changes.getDesiredAPI(), changes.getActualAPI(), statusUpdate.isUpdateVHostRequired());
+			
+			new UpdateQuotaConfiguration(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+			new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute(false);
+			// Handle subscription to applications
+			new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI(), null).execute(false);
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			APIPropertiesExport.getInstance().setProperty("feApiId", changes.getActualAPI().getId());
 		}
-		
-		// This is special, as the status is not a property and requires some additional actions!
-		UpdateAPIStatus statusUpdate = new UpdateAPIStatus(changes.getDesiredAPI(), changes.getActualAPI());
-		if(changes.getNonBreakingChanges().contains("state")) {
-			statusUpdate.execute();
-		}
-		
-		vHostHandler.handleVHost(changes.getDesiredAPI(), changes.getActualAPI(), statusUpdate.isUpdateVHostRequired());
-		
-		new UpdateQuotaConfiguration(changes.getDesiredAPI(), changes.getActualAPI()).execute();
-		new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute(false);
-		// Handle subscription to applications
-		new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI(), null).execute(false);
-		
-		APIPropertiesExport.getInstance().setProperty("feApiId", changes.getActualAPI().getId());
 	}
 
 }

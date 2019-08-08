@@ -82,7 +82,7 @@ public class ReCreateAPIQuotaStaysTestIT extends TestNGCitrusTestRunner {
 		
 		echo("####### Configure an Application specfic quota override for this APP, which must be taken over when re-creating this API #######");
 		http(builder -> builder.client("apiManager").send().post("/applications/${testAppId}/quota").header("Content-Type", "application/json")
-				.payload("{\"type\":\"APPLICATION\",\"name\":\"Recreate-with-App-Quota 758 Quota\",\"restrictions\":[{\"api\":\"${apiId}\",\"method\":\"*\",\"type\":\"throttle\",\"config\":{\"period\":\"hours\",\"messages\":600,\"per\":4}}]}"));
+				.payload("{\"type\":\"APPLICATION\",\"name\":\"Recreate-with-App-Quota 758 Quota\",\"restrictions\":[{\"api\":\"${apiId}\",\"method\":\"*\",\"type\":\"throttle\",\"config\":{\"period\":\"hour\",\"messages\":600,\"per\":4}}]}"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.CREATED));
 		
 		echo("####### For a Re-Creation of the API which fails according to the issue 86 #######");		
@@ -107,7 +107,7 @@ public class ReCreateAPIQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.messages", "25")
-			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "seconds")
+			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "second")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "60"));
 		
 		echo("####### Validate the application 1 SPECIFIC quota override is set for the API as before #######");
@@ -116,7 +116,7 @@ public class ReCreateAPIQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.messages", "600")
-			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "hours")
+			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "hour")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "4"));
 		
 		echo("####### Validate the application 2 returns the App-Default-Quota #######");
@@ -125,7 +125,7 @@ public class ReCreateAPIQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.messages", "25")
-			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "seconds")
+			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "second")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "60"));
 	}
 }
