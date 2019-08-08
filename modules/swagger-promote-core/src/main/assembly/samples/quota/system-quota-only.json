@@ -1,0 +1,20 @@
+{
+   "name":"Samples System-Quota only",
+   "path":"/samples/quota/systemonly/v1/api",
+   "state":"published",
+   "version":"1.0.1",
+   "organization":"API Development",
+   "systemQuota":{
+      "restrictions":[
+         {
+            "method":"*",
+            "type":"throttle",
+            "config":{
+               "period":"minute",
+               "messages":1000,
+               "per":5
+            }
+         }
+      ]
+   }
+}

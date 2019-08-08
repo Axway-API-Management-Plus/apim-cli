@@ -681,6 +681,10 @@ public class APIManagerAdapter {
 		}
 	}
 	
+	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type) throws AppException {
+		return getExistingAPI(apiPath, filter, type, true);
+	}
+	
 	/**
 	 * Based on the given apiPath this method returns the JSON-Configuration for the API 
 	 * as it's stored in the API-Manager. The result is basically used to create the APIManagerAPI in 
@@ -689,7 +693,7 @@ public class APIManagerAdapter {
 	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
 	 * @throws AppException if the API can't be found or created
 	 */
-	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type) throws AppException {
+	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type, boolean logMessage) throws AppException {
 		CommandParameters cmd = CommandParameters.getInstance();
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
@@ -727,10 +731,12 @@ public class APIManagerAdapter {
 				if(foundApi!=null) {
 					if(type.equals(TYPE_FRONT_END)) {
 						path = foundApi.get("path").asText();
-						LOG.info("Found existing API on path: '"+path+"' ("+foundApi.get("state").asText()+") (ID: '" + foundApi.get("id").asText()+"')");
+						if(logMessage) 
+							LOG.info("Found existing API on path: '"+path+"' ("+foundApi.get("state").asText()+") (ID: '" + foundApi.get("id").asText()+"')");
 					} else if(type.equals(TYPE_BACK_END)) {
 						String name = foundApi.get("name").asText();
-						LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + foundApi.get("id").asText()+"')");						
+						if(logMessage) 
+							LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + foundApi.get("id").asText()+"')");						
 					}
 					return foundApi;
 				}
