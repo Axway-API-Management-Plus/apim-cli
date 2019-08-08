@@ -11,7 +11,7 @@
             "type":"throttlemb",
             "config":{
                "period":"${applicationPeriod}",
-               "mb":555,
+               "mb":${applicationMb},
                "per":1
             }
          }
@@ -24,7 +24,7 @@
             "type":"throttle",
             "config":{
                "period":"${systemPeriod}",
-               "messages":666,
+               "messages":${systemMessages},
                "per":2
             }
          }

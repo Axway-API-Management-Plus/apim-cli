@@ -18,7 +18,7 @@ import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
 @Test
-public class APIBasicQuotaTestIT extends TestNGCitrusTestRunner {
+public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 
 	private ImportTestAction swaggerImport;
 	
@@ -26,51 +26,93 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestRunner {
 	@Test @Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		swaggerImport = new ImportTestAction();
-		description("Import an API containing a quota definition");
+		description("If the Quota-Mode is set to replace, evtl. existing quotas should be replaced.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/quota-api-${apiNumber}");
-		variable("apiName", "Quota-API-${apiNumber}");
+		variable("apiPath", "/quota-replace-api-${apiNumber}");
+		variable("apiName", "Quota-${apiNumber}-Replace-API");
+		variable("quotaMode", "replace");
+		
+		
+		echo("####### Import a very basic API without any quota #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
+		createVariable("state", "unpublished");
+		createVariable("expectedReturnCode", "0");
+		swaggerImport.doExecute(context);
+		
+		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+		echo("####### API: '${apiName}' on path: '${apiPath}' with ID: '${apiId}' imported #######");
+		
+		echo("####### Get the operations/methods for the created API #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}/operations").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.extractFromPayload("$.[?(@.name=='updatePetWithForm')].id", "testMethodId1")
+				.extractFromPayload("$.[?(@.name=='findPetsByStatus')].id", "testMethodId2")
+				.extractFromPayload("$.[?(@.name=='getPetById')].id", "testMethodId3")
+				.extractFromPayload("$.[?(@.name=='updateUser')].id", "testMethodId4"));
+		
+		echo("####### Define a manual application- and system-quota for the API: ${apiId} #######"); 
+		http(builder -> builder.client("apiManager").send().put("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json")
+		.payload("{\"id\":\""+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA+"\", \"type\":\"APPLICATION\",\"name\":\"Application Default\","
+				+ "\"description\":\"Maximum message rates per application. Applied to each application unless an Application-Specific quota is configured\","
+				+ "\"restrictions\":["
+					+ "{\"api\":\"${apiId}\",\"method\":\"${testMethodId1}\",\"type\":\"throttlemb\",\"config\":{\"period\":\"hour\",\"per\":1,\"mb\":700}}, "
+					+ "{\"api\":\"${apiId}\",\"method\":\"${testMethodId2}\",\"type\":\"throttle\",\"config\":{\"period\":\"day\",\"per\":2,\"messages\":100000}} "
+				+ "],"
+				+ "\"system\":true}"));
+		
+		http(builder -> builder.client("apiManager").send().put("/quotas/"+APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json")
+		.payload("{\"id\":\""+APIManagerAdapter.SYSTEM_API_QUOTA+"\", \"type\":\"API\",\"name\":\"System\","
+				+ "\"description\":\"Maximum message rates aggregated across all client applications\","
+				+ "\"restrictions\":["
+					+ "{\"api\":\"${apiId}\",\"method\":\"${testMethodId3}\",\"type\":\"throttle\",\"config\":{\"period\":\"hour\",\"per\":3,\"messages\":1003}}, "
+					+ "{\"api\":\"${apiId}\",\"method\":\"${testMethodId4}\",\"type\":\"throttlemb\",\"config\":{\"period\":\"day\",\"per\":4,\"mb\":500}} "
+				+ "],"
+				+ "\"system\":true}"));
 
 		
-		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");		
+		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with Quotas configured that must replace existing quotas #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/1_api-with-quota.json");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
-		createVariable("applicationPeriod", "hour");
-		createVariable("applicationMb", "555");
 		createVariable("systemPeriod", "day");
 		createVariable("systemMessages", "666");
+		createVariable("applicationPeriod", "hour");
+		createVariable("applicationMb", "555");
 		swaggerImport.doExecute(context);
 		
-		echo("####### Validate API: '${apiName}' has a been imported #######");
-		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
-
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
-		
-		echo("####### Check System-Quotas have been setup as configured #######");
-		http(builder -> builder.client("apiManager").send().get("/quotas/00000000-0000-0000-0000-000000000000").header("Content-Type", "application/json"));
-		
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.restrictions.[?(@.api=='${apiId}')].type", "throttle")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].method", "*")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].config.messages", "666")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].config.period", "day")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].config.per", "2"));
-		
 		echo("####### Check Application-Quotas have been setup as configured #######");
-		http(builder -> builder.client("apiManager").send().get("/quotas/00000000-0000-0000-0000-000000000001").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.restrictions.[?(@.api=='${apiId}')].type", "throttlemb")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].method", "*")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].config.mb", "555")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].config.period", "hour")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].config.per", "1"));
+			// The method specific quotas must be have been removed
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].type", "@assertThat(empty())@")
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId2}')].type", "@assertThat(empty())@")
+			
+			// These quota settings are inserted based on configuration by Swagger-Promote 
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.mb", "555")
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.period", "hour")
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.per", "1"));
+		
+		echo("####### Check that only the configured quota remains and previouls configured are removed #######");
+		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			// The method specific quotas must be have been removed
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].type", "@assertThat(empty())@")
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId4}')].type", "@assertThat(empty())@")
+
+			// These quota settings are inserted by Swagger-Promote based on configuration
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttle')].config.messages", "666")
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttle')].config.period", "day")
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttle')].config.per", "2"));
 		
 		echo("####### Executing a Quota-No-Change import #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
@@ -134,8 +176,8 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestRunner {
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/1_api-with-quota.json");
 		createVariable("state", "published"); 
 		createVariable("enforce", "true");
-		createVariable("systemMessages", "666");
-		createVariable("applicationMb", "555");
+		createVariable("systemMessages", "999");
+		createVariable("applicationMb", "1888");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 		
@@ -153,7 +195,7 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")
-			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.messages", "666")
+			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.messages", "999")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "day")
 			.validate("$.restrictions[*].api", "@assertThat(not(containsString(${apiId})))@") // Make sure, the old API-ID has been removed
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "2"));
@@ -164,7 +206,7 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttlemb")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")
-			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.mb", "555")
+			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.mb", "1888")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "hour")
 			.validate("$.restrictions[*].api", "@assertThat(not(containsString(${apiId})))@") // Make sure, the old API-ID has been removed
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "1"));

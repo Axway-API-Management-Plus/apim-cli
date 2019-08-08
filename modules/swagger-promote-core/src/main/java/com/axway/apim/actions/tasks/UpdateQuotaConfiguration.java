@@ -1,6 +1,7 @@
 package com.axway.apim.actions.tasks;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,8 +37,8 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 	public void execute() throws AppException {
 		Transaction context = Transaction.getInstance();
 		if(desiredState.getApplicationQuota()==null && desiredState.getSystemQuota()==null) return;
-		if(CommandParameters.getInstance().isIgnoreQuotas()) {
-			LOG.info("Configured quotas will be ignored, as flag ignoreQuotas has been set.");
+		if(CommandParameters.getInstance().isIgnoreQuotas() || CommandParameters.getInstance().getQuotaMode().equals(CommandParameters.MODE_IGNORE)) {
+			LOG.info("Configured quotas will be ignored, as ignoreQuotas is true or QuotaMode has been set to ignore.");
 			return;
 		}
 		
@@ -75,17 +76,46 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 		}
 	}
 	
-	private void addOrMergeRestriction(List<QuotaRestriction> existingRestrictions, List<QuotaRestriction> newRestrictions) throws AppException {
-		Iterator<QuotaRestriction> it = existingRestrictions.iterator();
-		// Remove all existing restriction for the API
-		while(it.hasNext()) {
-			QuotaRestriction existingRestriction = it.next();
-			if(existingRestriction.getApi().equals(this.actualState.getId())) {
-				it.remove();
+	private void addOrMergeRestriction(List<QuotaRestriction> existingRestrictions, List<QuotaRestriction> desiredRestrictions) throws AppException {
+		List<QuotaRestriction> newDesiredRestrictions = new ArrayList<QuotaRestriction>();
+		boolean existingRestrictionFound = false;
+		Iterator<QuotaRestriction> it;
+		if(CommandParameters.getInstance().getQuotaMode().equals(CommandParameters.MODE_REPLACE)) {
+			LOG.info("Removing existing Quotas for API: '"+this.actualState.getName()+"' as quotaMode is set to replace.");
+			it = existingRestrictions.iterator();
+			// Remove actual existing restrictions for that API
+			while(it.hasNext()) {
+				QuotaRestriction existingRestriction = it.next();
+				if(existingRestriction.getApi().equals(this.actualState.getId())) {
+					it.remove();
+				}
 			}
+			
+		}
+		it = desiredRestrictions.iterator();
+		while(it.hasNext()) {
+			QuotaRestriction desiredRestriction = it.next();
+			for(QuotaRestriction existingRestriction : existingRestrictions) {
+				// Don't care about restrictions for another APIs
+				if(!existingRestriction.getApi().equals(this.actualState.getId())) {
+					continue;
+				}
+				if(desiredRestriction.isSameRestriction(existingRestriction)) {
+					// If it the same restriction, we need to update this one!
+					if(existingRestriction.getType().equals("throttle")) {
+						existingRestriction.getConfig().put("messages", desiredRestriction.getConfig().get("messages"));
+					} else {
+						existingRestriction.getConfig().put("mb", desiredRestriction.getConfig().get("mb"));
+					}
+					existingRestrictionFound = true;
+					break;
+				}
+			}
+			// If we haven't found an existing restriction add a new one!
+			if(!existingRestrictionFound) newDesiredRestrictions.add(desiredRestriction);
 		}
 		// And all new desired restrictions
-		existingRestrictions.addAll(newRestrictions);
+		existingRestrictions.addAll(newDesiredRestrictions);
 	}
 	
 	

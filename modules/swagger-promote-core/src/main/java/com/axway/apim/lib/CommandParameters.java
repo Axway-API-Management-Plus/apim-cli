@@ -109,6 +109,11 @@ public class CommandParameters {
 		return false;
 	}
 	
+	public String getQuotaMode() {
+		if(getValue("quotaMode")==null) return MODE_ADD;
+		return getValue("quotaMode").toLowerCase();
+	}
+	
 	public String getClientAppsMode() {
 		if(getValue("clientAppsMode")==null) return MODE_ADD;
 		return getValue("clientAppsMode").toLowerCase();

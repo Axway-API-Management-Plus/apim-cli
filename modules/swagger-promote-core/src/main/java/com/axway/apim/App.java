@@ -108,6 +108,10 @@ public class App {
 			option.setArgName("ignore|replace|add");
 			options.addOption(option);
 			
+			option = new Option("quotaMode", true, "Controls how quotas are managed in API-Manager. Defaults to add!");
+			option.setArgName("ignore|replace|add");
+			options.addOption(option);
+			
 			option = new Option("detailsExportFile", true, "Configure a filename, to get a Key=Value file containing information about the created API.");
 			option.setRequired(false);
 			option.setArgName("APIDetails.properties");

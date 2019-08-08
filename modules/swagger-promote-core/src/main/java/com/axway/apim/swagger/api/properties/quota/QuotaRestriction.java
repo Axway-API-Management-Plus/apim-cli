@@ -47,7 +47,10 @@ public class QuotaRestriction {
 		if(otherRestriction == null) return false;
 		return 
 				StringUtils.equals(otherRestriction.getMethod(), this.getMethod()) &&
-				StringUtils.equals(otherRestriction.getApi(), this.getApi());
+				StringUtils.equals(otherRestriction.getApi(), this.getApi()) &&
+				StringUtils.equals(otherRestriction.getType(), this.getType()) &&
+				StringUtils.equals(otherRestriction.getConfig().get("period"), this.getConfig().get("period")) &&
+				StringUtils.equals(otherRestriction.getConfig().get("per"), this.getConfig().get("per"));
 	}
 	
 	@Override

@@ -27,21 +27,21 @@ public class UnpublishDeleteMustBeBreakingTestIT extends TestNGCitrusTestDesigne
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' as Published #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
-		createVariable("status", "published");
+		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
 		echo("####### Validate unpublishing it, will fail, with the need to enforce it #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
-		createVariable("status", "unpublished");
+		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "15");
 		action(swaggerImport);
 		
 		echo("####### Validate deleting it, will fail, with the need to enforce it #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
-		createVariable("status", "deleted");
+		createVariable("state", "deleted");
 		createVariable("expectedReturnCode", "15");
 		action(swaggerImport);
 	}
