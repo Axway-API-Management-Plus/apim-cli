@@ -37,4 +37,15 @@ public class AppConfigParserTest {
 		Assert.assertEquals(apiProperties.at("/securityClassification/type").asText(), "select");
 		Assert.assertEquals(apiProperties.at("/securityClassification/help").asText(), "Controls the agreed security classification of this API");
 	}
+	
+	@Test
+	public void testAppConfigIssue122Parser() throws AppException, IOException {
+		String fileToTest = "com/axway/apim/test/files/customproperties/app_ko_issue_122.config.txt";
+		String appConfigContent = IOUtils.toString(Thread.currentThread().getContextClassLoader().getResource(fileToTest), "UTF-8");
+		JsonNode jsonNode = APIManagerAdapter.parseAppConfig(appConfigContent);
+		JsonNode apiProperties = jsonNode.get("api");
+		Assert.assertEquals(apiProperties.at("/CGU/label").asText(), "Nom Fichier CGU");
+		Assert.assertEquals(apiProperties.at("/need_approval/required").asText(), "true");
+		Assert.assertEquals(apiProperties.at("/need_approval/type").asText(), "select");
+	}
 }
