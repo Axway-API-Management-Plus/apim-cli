@@ -75,6 +75,8 @@ End-2-End-Tests simulate real world use cases by calling and validating API-Mana
   - Now available in Maven-Central, API-Metadata export module, Outbound SSL support
 - 1.6.0 - 12.07.2019
   - Added support for method level overrides, Rollback feature
+- 1.6.1 - 09.08.2019
+  - Quota-Handling & Method-Level configuration improvements and bugfixes
 
 
 ## Limitations/Caveats
