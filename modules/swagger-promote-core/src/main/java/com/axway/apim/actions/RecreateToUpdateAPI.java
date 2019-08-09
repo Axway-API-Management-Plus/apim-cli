@@ -4,11 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
-import com.axway.apim.actions.tasks.UpgradeAccessToNewerAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.state.APIBaseDefinition;
+import com.axway.apim.swagger.api.state.DesiredAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 
 /**
@@ -29,6 +29,10 @@ public class RecreateToUpdateAPI {
 		
 		IAPI actual = changes.getActualAPI();
 		IAPI desired = changes.getDesiredAPI();
+		
+		// On Re-Creation we need to restore the orginal given methodNames for methodLevel override
+		desired.setInboundProfiles(((DesiredAPI)desired).getOriginalInboundProfiles());
+		desired.setOutboundProfiles(((DesiredAPI)desired).getOriginalOutboundProfiles());
 		
 		// 1. Create BE- and FE-API (API-Proxy) / Including updating all belonging props!
 		// This also includes all CONFIGURED application subscriptions and client-orgs

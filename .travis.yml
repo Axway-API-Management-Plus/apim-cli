@@ -7,18 +7,10 @@ services:
 env:
   global:
     - CACHE_DIR=$HOME/docker
-    - APIM_DOCKER_IMAGE_7_6_2=docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP3
-    - APIM_DOCKER_IMAGE_7_7=docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7
-    - CASSANDRA_DOCKER_IMAGE=cassandra:2.2.8
-    - CACHE_FILE_APIM_7_6_2=$CACHE_DIR/api-manager_7_6_2_SP3.cache.tar.gz
-    - CACHE_FILE_APIM_7_7=$CACHE_DIR/api-manager_7_7.cache.tar.gz
-    - CACHE_FILE_CASSANDRA=$CACHE_DIR/cassandra_2_2_8.cache.tar.gz
-
-    # #####################################################################################################
-    # The following controls which Docker-Image to use (it is either downloaded or expanded from the Cache)
-    # #####################################################################################################
-    - CACHE_FILE_TO_USE=$CACHE_FILE_APIM_7_6_2
-    - DOCKER_IMAGE_TO_USE=$APIM_DOCKER_IMAGE_7_6_2
+    - APIM_DOCKER_IMAGE=docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP4
+    - CASSANDRA_DOCKER_IMAGE=cassandra:2.2.12
+    - CACHE_FILE_APIM=$CACHE_DIR/api-manager_7_6_2_SP4.cache.tar.gz
+    - CACHE_FILE_CASSANDRA=$CACHE_DIR/cassandra_2_2_12.cache.tar.gz
     - counter=0
 
 cache:
@@ -30,20 +22,20 @@ before_install:
   # Avoid installation if unit-tests fail anyway
   - mvn clean test
 
-  - if [ ! -f $CACHE_FILE_TO_USE ]; then sudo sed 's/DOCKER_OPTS="/DOCKER_OPTS="--insecure-registry=docker-registry.demo.axway.com /g' -i /etc/default/docker; fi
-  - if [ ! -f $CACHE_FILE_TO_USE ]; then sudo service docker restart; fi
+  - if [ ! -f $CACHE_FILE_APIM ]; then sudo sed 's/DOCKER_OPTS="/DOCKER_OPTS="--insecure-registry=docker-registry.demo.axway.com /g' -i /etc/default/docker; fi
+  - if [ ! -f $CACHE_FILE_APIM ]; then sudo service docker restart; fi
 
   #- sudo apt-get update
   #- sudo apt-get install curl
   # All files in this folder will be cached for the next build
   - mkdir -p $CACHE_DIR
   # Login to the Docker-Registry
-  - if [ ! -f $CACHE_FILE_TO_USE ]; then docker login --username $AXWAY_DOCKER_REG_USER --password $AXWAY_DOCKER_REG_PASS docker-registry.demo.axway.com; fi
+  - if [ ! -f $CACHE_FILE_APIM ]; then docker login --username $AXWAY_DOCKER_REG_USER --password $AXWAY_DOCKER_REG_PASS docker-registry.demo.axway.com; fi
   # Downloading the APIM-Docker-Image takes too long (Timeout 10 minutes) - Externalized to make use of travis_wait
   # In this script, we are either using the cached version or download a new Docker-Image
-  - travis_wait build/pull_apim_docker_image.sh $CACHE_FILE_TO_USE
+  - travis_wait build/pull_apim_docker_image.sh $CACHE_FILE_APIM
   # Now it's time to safe the downloaded API-Management Docker-Image into the cache folder
-  - if [ ! -f $CACHE_FILE_TO_USE ]; then docker save $DOCKER_IMAGE_TO_USE | gzip > $CACHE_FILE_TO_USE; fi
+  - if [ ! -f $CACHE_FILE_APIM ]; then docker save $APIM_DOCKER_IMAGE | gzip > $CACHE_FILE_APIM; fi
   # Pull Cassandra Image or use the cache
   - travis_wait build/pull_cassandra_docker_image.sh
   # Safe Cassandra image inc cache file

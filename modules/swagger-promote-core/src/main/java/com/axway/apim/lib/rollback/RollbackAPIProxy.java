@@ -45,6 +45,7 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements IRespons
 		URI uri;
 		try {
 			if(rollbackAPI.getId()!=null) { // We already have an ID to the FE-API can delete it directly
+				LOG.info("Rollback FE-API: '"+this.rollbackAPI.getName()+"' (ID: '"+this.rollbackAPI.getId()+"')");
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
 						.setPath(RestAPICall.API_VERSION+"/proxies/"+this.rollbackAPI.getId())
 						.build();
@@ -56,7 +57,8 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements IRespons
 				filters.add(new BasicNameValuePair("field", "createdOn"));
 				filters.add(new BasicNameValuePair("op", "gt"));
 				filters.add(new BasicNameValuePair("value", Long.toString(new Date().getTime()-120000))); // Ignore all API created more than 1 minute ago!
-				JsonNode existingAPI = APIManagerAdapter.getInstance().getExistingAPI(null, filters, APIManagerAdapter.TYPE_FRONT_END); // The path is not set at this point, hence we provide null
+				JsonNode existingAPI = APIManagerAdapter.getInstance().getExistingAPI(null, filters, APIManagerAdapter.TYPE_FRONT_END, false); // The path is not set at this point, hence we provide null
+				LOG.info("Rollback FE-API: '"+existingAPI.get("name").asText()+"' (ID: '"+existingAPI.get("id").asText()+"')");
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
 						.setPath(RestAPICall.API_VERSION+"/proxies/"+existingAPI.get("id").asText())
 						.build();

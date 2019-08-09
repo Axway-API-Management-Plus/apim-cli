@@ -26,7 +26,7 @@ public class BackToPublishedFromDeprecatedTestIT extends TestNGCitrusTestDesigne
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("status", "published");
+		createVariable("state", "published");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
@@ -43,12 +43,12 @@ public class BackToPublishedFromDeprecatedTestIT extends TestNGCitrusTestDesigne
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "published")
+			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Setting API: '${apiName}' on path: '${apiPath}' to deprecated #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("status", "deprecated");
+		createVariable("state", "deprecated");
 		createVariable("enforce", "true"); // Must be enforced, as it's a breaking change
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("expectedReturnCode", "0");
@@ -71,7 +71,7 @@ public class BackToPublishedFromDeprecatedTestIT extends TestNGCitrusTestDesigne
 		
 		echo("####### Going back to status Published  for API: '${apiName}' on path: '${apiPath}' #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable("status", "published");
+		createVariable("state", "published");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
@@ -88,7 +88,7 @@ public class BackToPublishedFromDeprecatedTestIT extends TestNGCitrusTestDesigne
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
-			.validate("$.[?(@.id=='${apiId}')].state", "published")
+			.validate("$.[?(@.id=='${apiId}')].state", "${state}")
 			.validate("$.[?(@.id=='${apiId}')].deprecated", "false");
 	}
 }

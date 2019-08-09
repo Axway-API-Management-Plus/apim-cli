@@ -73,11 +73,12 @@ End-2-End-Tests simulate real world use cases by calling and validating API-Mana
   - Added compatibility for 7.6.2 SP3, App-Quota-Handling improved, Support for Query-String-Option
 - 1.5.3 - 01.07.2019
   - Now available in Maven-Central, API-Metadata export module, Outbound SSL support
+- 1.6.0 - 12.07.2019
+  - Added support for method level overrides, Rollback feature
 
 
 ## Limitations/Caveats
 - API-Method-Level description is not yet supported
-- __Method-Level__ settings such as individual Security, Custom-Policies, etc. not yet supported
 - Deep merge of stage-config files isn't supported
 - Support for WSDL is still Beta
 

@@ -24,6 +24,18 @@ public class CommandParameters {
 	
 	private EnvironmentProperties envProperties;
 	
+	private Map<String, String> manualParams;
+	
+	/**
+	 * Use this constructor manually build a CommandParameters instance. 
+	 * This is useful when calling Swagger-Promote other classes or running tests.
+	 * @param manualParams
+	 */
+	public CommandParameters (Map<String, String> manualParams) {
+		this.manualParams = manualParams;
+		CommandParameters.instance = this;
+	}
+	
 	public CommandParameters (CommandLine cmd) throws AppException {
 		this(cmd, null, null);
 	}
@@ -37,7 +49,9 @@ public class CommandParameters {
 	}
 	
 	public static synchronized CommandParameters getInstance() {
-		if(TestIndicator.getInstance().isTestRunning()) return null; // Skip this, if executed as a test
+		if(TestIndicator.getInstance().isTestRunning()) {
+			return null; // Skip this, if executed as a test
+		}
 		if (CommandParameters.instance == null) {
 			LOG.error("CommandParameters has not been initialized.");
 			throw new RuntimeException("CommandParameters has not been initialized.");
@@ -95,6 +109,11 @@ public class CommandParameters {
 		return false;
 	}
 	
+	public String getQuotaMode() {
+		if(getValue("quotaMode")==null) return MODE_ADD;
+		return getValue("quotaMode").toLowerCase();
+	}
+	
 	public String getClientAppsMode() {
 		if(getValue("clientAppsMode")==null) return MODE_ADD;
 		return getValue("clientAppsMode").toLowerCase();
@@ -140,18 +159,20 @@ public class CommandParameters {
 		if(getValue("password")==null && getValue("admin_password")==null) errors.setError("Required parameter: 'password' or 'admin_password' is missing.", ErrorCode.MISSING_PARAMETER, false);
 		if(getValue("host")==null) errors.setError("Required parameter: 'host' is missing.", ErrorCode.MISSING_PARAMETER, false);
 		if(errors.hasError) {
-			LOG.error("Provide parameters either using Command-Line-Options or in Environment.Properties");
+			LOG.error("Provide at least the following parameters: username, password and host either using Command-Line-Options or in Environment.Properties");
 			throw new AppException("Missing required parameters.", ErrorCode.MISSING_PARAMETER);
 		}
 	}
 	
 	public String getValue(String key) {
-		if(this.cmd.getOptionValue(key)!=null) {
+		if(this.internalCmd!=null && this.cmd.getOptionValue(key)!=null) {
 			return this.cmd.getOptionValue(key);
 		} else if(this.internalCmd!=null && this.internalCmd.getOptionValue(key)!=null) {
 			return this.internalCmd.getOptionValue(key);
 		} else if(this.envProperties!=null && this.envProperties.containsKey(key)) {
 			return this.envProperties.get(key);
+		} else if(this.manualParams!=null && this.manualParams.containsKey(key)) {
+			return this.manualParams.get(key);
 		} else {
 			return null;
 		}

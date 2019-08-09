@@ -56,7 +56,7 @@ public class OutboundProfile {
 			OutboundProfile.apimRoutingPolicies = initPolicyies("routing");
 			OutboundProfile.apimRequestPolicies = initPolicyies("request");
 			OutboundProfile.apimResponsePolicies = initPolicyies("response");
-			if(!APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) {
+			if(APIManagerAdapter.hasAPIManagerVersion("7.6.2")) {
 				OutboundProfile.apimFaultHandlerPolicies = initPolicyies("faulthandler");
 			}
 		}
