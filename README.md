@@ -34,10 +34,21 @@ Today the following API-Properties are already supported and can be controlled e
 
 Improving the API-Development experience during the API-Design phase leveraging the Stoplight integration. [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/Stoplight-Integration).
 
-Build and tested with API-Manager 7.6.2 SP2 at Travis CI:  
-Develop: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)
-Master: [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=master)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote)  
-End-2-End-Tests simulate real world use cases by calling and validating API-Manager promote __161__ times.  
+## Quality assurance process
+By using Swagger Promote to control your Axway API management infrastructure it becomes a key component of your CI/CD process. Product quality is therefore very important so that you can be confident that Swagger Promote is doing what it's supposed to do.  
+To achieve this quality bar, Swagger-Promote was developed from the beginning in a way that it can be tested fully automatically. The test process consists of different scenarios, which contain various __API-Desired__ states, which are transferred into __Actual__ state by Swagger-Promote and finally checked if the Actual State in the API-Manager is correct.  
+
+With the most recent released version 1.6.1 the automated End-2-End test suite contains of __87__ different scenarios, which includes __200__ executions of Swagger-Promote following each by a validation step. The test suite is executed at Travis CI for the following versions:  
+
+| Version       | Branch               | Status | 
+| :---          | :---                 | :---:  |
+| 7.6.2 SP2     | test-with-7.6.2-SP2  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.6.2-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
+| 7.6.2 SP3     | test-with-7.6.2-SP3  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.6.2-SP3)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
+| 7.6.2 SP4     | develop  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
+| 7.7           | test-with-7.7        | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
+
+Also version 7.5.3 is supported, but not fully automated tested.  
+
 
 ## Install
 - Download the latest [release](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases) or get it from  [![Maven Central](https://img.shields.io/maven-central/v/com.github.axway-api-management-plus.swagger-promote/axway-swagger-promote-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.axway-api-management-plus.swagger-promote%22%20AND%20a:%22axway-swagger-promote-core%22)  
