@@ -35,7 +35,7 @@ Today the following API-Properties are already supported and can be controlled e
 Improving the API-Development experience during the API-Design phase leveraging the Stoplight integration. [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/Stoplight-Integration).
 
 ## Quality assurance process
-By using Swagger Promote to control your Axway API management infrastructure makes Swagger Promote a key component of your CI/CD process. Product quality is therefore very important so that you can be confident that Swagger Promote is doing what it's supposed to do.  
+By using Swagger Promote to control your Axway API management infrastructure it becomes a key component of your CI/CD process. Product quality is therefore very important so that you can be confident that Swagger Promote is doing what it's supposed to do.  
 To achieve this quality bar, Swagger-Promote was developed from the beginning in a way that it can be tested fully automatically. The test process consists of different scenarios, which contain various __API-Desired__ states, which are transferred into __Actual__ state by Swagger-Promote and finally checked if the Actual State in the API-Manager is correct.  
 
 With the most recent released version 1.6.1 the automated End-2-End test suite contains of __87__ different scenarios, which includes __200__ executions of Swagger-Promote following each by a validation step. The test suite is executed at Travis CI for the following versions:  
