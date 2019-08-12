@@ -1,3 +1,7 @@
+# Axway API-Management Hackathon 2019
+Interested in automating the Axway API management platform? If so, visit us at the next API Management hackathon in Paris. I'd love to see you there and discuss the next Swagger Promote features with you and possibly work on them together.
+[![API-Management Hackathon](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/blob/develop/misc/images/api-management-hackathon.png)](https://go2.axway.com/EMEA-LE-2019-09-17-APIManagementHackathonParis_LP-Registration.html)
+
 # Swagger/WSDL based API promotion for Axway API-Manager V7
 
 This project provides you with a tool that simplifies your DevOps experience with the Axway API-Manager Version 7.x. 
