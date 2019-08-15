@@ -1,23 +1,30 @@
 package com.axway.apim.test.serviceprofile;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.IOException;
+
 import org.springframework.http.HttpStatus;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.AppException;
 import com.axway.apim.test.ImportTestAction;
+import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
+import com.consol.citrus.context.TestContext;
+import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName = "BackendBasepathChangedTest")
-public class BackendBasepathChangedTestIT extends TestNGCitrusTestDesigner {
+@Test
+public class BackendBasepathChangedTestIT extends TestNGCitrusTestRunner {
 
-	@Autowired
 	private ImportTestAction swaggerImport;
-
-	@CitrusTest(name = "BackendBasepathChangedTest")
-	public void run() {
+	
+	@CitrusTest
+	@Test @Parameters("context")
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+		swaggerImport = new ImportTestAction();
 		description("Import the API with a different backend-Base-Path then declared in the Swagger");
 
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -30,7 +37,7 @@ public class BackendBasepathChangedTestIT extends TestNGCitrusTestDesigner {
 		createVariable("backendBasepath", "https://swapi.co:443");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
-		action(swaggerImport);
+		swaggerImport.doExecute(context);
 		
 		echo("####### No-Change test for '${apiName}' on path: '${apiPath}' #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
@@ -38,31 +45,31 @@ public class BackendBasepathChangedTestIT extends TestNGCitrusTestDesigner {
 		createVariable("backendBasepath", "https://swapi.co:443");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "10");
-		action(swaggerImport);
+		swaggerImport.doExecute(context);
 
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has the given Base-Path configured. #######");
-		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
+		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
 
-		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 				.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-				.validate("$.[?(@.path=='${apiPath}')].serviceProfiles._default.basePath", "${backendBasepath}")
-				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+				.validate("$.[?(@.path=='${apiPath}')].serviceProfiles._default.basePath", "https://swapi.co")
+				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		echo("####### Change API to status published: #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/serviceprofile/2_backend_basepath_test.json");
-		createVariable("backendBasepath", "https://swapi.co:443");
+		createVariable("backendBasepath", "https://swapi.co");
 		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0");
-		action(swaggerImport);
+		swaggerImport.doExecute(context);
 		
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has status published. #######");
-		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
+		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
 
-		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
 				.validate("$.[?(@.id=='${apiId}')].state", "published")
-				.validate("$.[?(@.path=='${apiPath}')].serviceProfiles._default.basePath", "${backendBasepath}");
+				.validate("$.[?(@.path=='${apiPath}')].serviceProfiles._default.basePath", "${backendBasepath}"));
 	}
 }
