@@ -672,16 +672,18 @@ public class APIImportConfigAdapter {
 		boolean hasDefaultProfile = false;
 		List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
 		for(AuthenticationProfile profile : profiles) {
-			if(profile.getIsDefault()) {
+			if(profile.getIsDefault() || profile.getName().equals("_default")) {
 				if(hasDefaultProfile) {
 					ErrorState.getInstance().setError("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE, false);
 					throw new AppException("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
 				hasDefaultProfile=true;
 				profile.setName("_default"); // Overwrite the name if it is default! (this is required by the API-Manager)
+				profile.setIsDefault(true); 
 			}
 		}
 		if(!hasDefaultProfile) {
+			LOG.warn("THERE NO DEFAULT authenticationProfile CONFIGURED. Auto-Creating a No-Authentication outbound profile as default!");
 			AuthenticationProfile noAuthNProfile = new AuthenticationProfile();
 			noAuthNProfile.setName("_default");
 			noAuthNProfile.setIsDefault(true);

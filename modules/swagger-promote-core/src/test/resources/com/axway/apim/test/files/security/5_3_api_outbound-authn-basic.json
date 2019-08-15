@@ -4,21 +4,6 @@
    "state":"${state}",
    "version":"1.0.0",
    "organization":"API Development ${orgNumber}",
-   "outboundProfiles":{
-      "_default":{
-         "authenticationProfile":"test HTTP Basic",
-         "routeType":"proxy",
-         "requestPolicy":null,
-         "responsePolicy":null,
-         "routePolicy":null,
-         "faultHandlerPolicy":null,
-         "apiId":null,
-         "apiMethodId":null,
-         "parameters":[
-
-         ]
-      }
-   },
    "securityProfiles":[
       {
          "name":"_default",
@@ -38,11 +23,12 @@
    ],
    "authenticationProfiles":[
       {
-         "name":"test HTTP Basic",
+         "name":"HTTP Basic",
          "parameters":{
             "username":"${username}",
             "password":"password"
          },
+         "isDefault":true,
          "type":"http_basic"
       }
    ]
