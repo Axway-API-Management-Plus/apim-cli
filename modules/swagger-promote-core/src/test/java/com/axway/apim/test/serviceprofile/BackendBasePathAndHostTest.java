@@ -37,8 +37,7 @@ public class BackendBasePathAndHostTest {
 		testAPI.setAPIDefinition(apiDefinition);
 		
 		// Check the Service-Profile
-		ServiceProfile defaultProfile = testAPI.getServiceProfiles().get("_default");
-		Assert.assertEquals(defaultProfile.getBasePath(), "https://myhost.customer.com:8767/api/v1/myAPI");
+		Assert.assertNull(testAPI.getServiceProfiles(), "ServiceProfiles should be null, as we have already changed host and basePath in the Swagger-File");
 		
 		// Check if the Swagger-File has been changed
 		ObjectMapper mapper = new ObjectMapper();
@@ -57,8 +56,7 @@ public class BackendBasePathAndHostTest {
 		testAPI.setAPIDefinition(apiDefinition);
 
 		// Check the Service-Profile
-		ServiceProfile defaultProfile = testAPI.getServiceProfiles().get("_default");
-		Assert.assertEquals(defaultProfile.getBasePath(), "https://myhost.customer.com:8767");
+		Assert.assertNull(testAPI.getServiceProfiles(), "ServiceProfiles should be null, as we have already changed host and basePath in the Swagger-File");
 		
 		// Check if the Swagger-File has been changed
 		ObjectMapper mapper = new ObjectMapper();
@@ -77,8 +75,7 @@ public class BackendBasePathAndHostTest {
 		testAPI.setAPIDefinition(apiDefinition);
 
 		// Check the Service-Profile
-		ServiceProfile defaultProfile = testAPI.getServiceProfiles().get("_default");
-		Assert.assertEquals(defaultProfile.getBasePath(), "https://myhost.customer.com/");
+		Assert.assertNull(testAPI.getServiceProfiles(), "ServiceProfiles should be null, as we have already changed host and basePath in the Swagger-File");
 		
 		// Check if the Swagger-File has been changed
 		ObjectMapper mapper = new ObjectMapper();
