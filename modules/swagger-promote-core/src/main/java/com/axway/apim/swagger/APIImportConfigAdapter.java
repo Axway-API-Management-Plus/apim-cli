@@ -130,7 +130,7 @@ public class APIImportConfigAdapter {
 	}
 	
 	/**
-	 * This methood is replacing variables such as ${TokenEndpoint} with declared variables coming from either 
+	 * This method is replacing variables such as ${TokenEndpoint} with declared variables coming from either 
 	 * the Environment-Variables or from system-properties.
 	 * @param inputFile The API-Config file to be replaced and returned as String
 	 * @return a String representation of the API-Config-File
