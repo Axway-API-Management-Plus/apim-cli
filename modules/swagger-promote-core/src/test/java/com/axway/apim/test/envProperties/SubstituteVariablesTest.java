@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -13,13 +12,8 @@ import org.testng.annotations.Test;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIImportConfigAdapter;
-import com.axway.apim.swagger.api.properties.APIDefintion;
-import com.axway.apim.swagger.api.state.DesiredAPI;
 import com.axway.apim.swagger.api.state.IAPI;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SubstituteVariablesTest {
 	
@@ -32,9 +26,6 @@ public class SubstituteVariablesTest {
 	
 	@Test
 	public void validateSystemOSAreSubstituted() throws AppException, IOException {
-		Properties props = System.getProperties();
-		props.setProperty("OS_PROPERTY_ONLY", "apiNameFromOSProperty");
-		
 		String configFile = "com/axway/apim/test/files/envProperties/1_config-with-os-variable.json";
 		String pathToConfigFile = this.getClass().getClassLoader().getResource(configFile).getFile();
 		String apiDefinition = "/api_definition_1/petstore.json";
@@ -42,8 +33,13 @@ public class SubstituteVariablesTest {
 		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(pathToConfigFile, null, apiDefinition, false);
 		
 		IAPI testAPI = importConfig.getApiConfig();
-		
-		Assert.assertEquals(testAPI.getName(), "apiNameFromOSProperty");
+		if(System.getenv("TRAVIS")!=null && System.getenv("TRAVIS").equals("true")) {
+			// At Travis an environment-variable USER exists which should have been replaced
+			Assert.assertNotEquals(testAPI.getName(), "${USER}");			
+		} else {
+			// On Windows use USERNAME in the version
+			Assert.assertNotEquals(testAPI.getVersion(), "${USERNAME}");
+		}
 	}
 	
 	@Test
