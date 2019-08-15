@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
@@ -62,7 +63,9 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	 * @param backendBasepath the URL to the BE-API-Host.
 	 */
 	public void setBackendBasepath(String backendBasepath) {
-		if(backendBasepath!=null) {
+		// If the backendBasePath has been changed already in the Swagger-File, don't to it here again
+		// as it would duplicate the basePath
+		if(backendBasepath!=null && !CommandParameters.getInstance().replaceHostInSwagger()) {
 			ServiceProfile serviceProfile = new ServiceProfile();
 			serviceProfile.setBasePath(backendBasepath);
 			if(this.serviceProfiles == null) {

@@ -7,6 +7,7 @@
 	"authenticationProfiles": [
 		{
 			"name": "HTTP Basic",
+			"isDefault": true,
 			"parameters": {
 				"username": "my-username",
 				"password": "my-password"

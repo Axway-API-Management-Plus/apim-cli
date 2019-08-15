@@ -49,6 +49,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			return;
 		}
 		if(desiredState.getApplications()!=null) { // Happens, when config-file doesn't contains client apps
+			// Remove configured apps, for Non-Granted-Orgs!
 			removeNonGrantedClientApps(desiredState.getApplications());
 		}
 		List<ClientApplication> recreateActualApps = null;
@@ -73,7 +74,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		if(revomingActualApps.size()>0) {
 			if(CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_REPLACE)) {
 				LOG.info("Removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName());
-				removeAppSubscrioption(revomingActualApps, actualState.getId());
+				removeAppSubscription(revomingActualApps, actualState.getId());
 			} else {
 				LOG.info("NOT removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName() + " as clientAppsMode NOT set to replace.");
 			}
@@ -129,11 +130,13 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		}	
 	}
 	
-	private void removeAppSubscrioption(List<ClientApplication> revomingActualApps, String apiId) throws AppException {
+	private void removeAppSubscription(List<ClientApplication> revomingActualApps, String apiId) throws AppException {
 		URI uri;
 		RestAPICall apiCall;
 		Transaction.getInstance().put(MODE, MODE_REMOVE_API_ACCESS);
 		for(ClientApplication app : revomingActualApps) {
+			// A Client-App that doesn't belong to a granted organization, can't have a subscription.
+			if(!hasClientAppPermission(app)) continue;
 			LOG.debug("Removing API-Access for application '"+app.getName()+"'");
 			try { 
 				Transaction.getInstance().put("appName", app);
