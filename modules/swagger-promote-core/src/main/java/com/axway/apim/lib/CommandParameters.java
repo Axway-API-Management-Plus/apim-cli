@@ -181,4 +181,8 @@ public class CommandParameters {
 	public Map<String, String> getEnvironmentProperties() {
 		return this.envProperties;
 	}
+
+	public void setEnvProperties(EnvironmentProperties envProperties) {
+		this.envProperties = envProperties;
+	}
 }

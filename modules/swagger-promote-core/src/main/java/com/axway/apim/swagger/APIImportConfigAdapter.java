@@ -130,7 +130,7 @@ public class APIImportConfigAdapter {
 	}
 	
 	/**
-	 * This methood is replacing variables such as ${TokenEndpoint} with declared variables coming from either 
+	 * This method is replacing variables such as ${TokenEndpoint} with declared variables coming from either 
 	 * the Environment-Variables or from system-properties.
 	 * @param inputFile The API-Config file to be replaced and returned as String
 	 * @return a String representation of the API-Config-File
@@ -139,6 +139,7 @@ public class APIImportConfigAdapter {
 	private String substitueVariables(File inputFile) throws IOException {
 		StringSubstitutor substitutor = new StringSubstitutor(CommandParameters.getInstance().getEnvironmentProperties());
 		String givenConfig = new String(Files.readAllBytes(inputFile.toPath()));
+		givenConfig = StringSubstitutor.replace(givenConfig, System.getenv());
 		return substitutor.replace(givenConfig);
 	}
 
@@ -672,16 +673,18 @@ public class APIImportConfigAdapter {
 		boolean hasDefaultProfile = false;
 		List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
 		for(AuthenticationProfile profile : profiles) {
-			if(profile.getIsDefault()) {
+			if(profile.getIsDefault() || profile.getName().equals("_default")) {
 				if(hasDefaultProfile) {
 					ErrorState.getInstance().setError("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE, false);
 					throw new AppException("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
 				hasDefaultProfile=true;
 				profile.setName("_default"); // Overwrite the name if it is default! (this is required by the API-Manager)
+				profile.setIsDefault(true); 
 			}
 		}
 		if(!hasDefaultProfile) {
+			LOG.warn("THERE NO DEFAULT authenticationProfile CONFIGURED. Auto-Creating a No-Authentication outbound profile as default!");
 			AuthenticationProfile noAuthNProfile = new AuthenticationProfile();
 			noAuthNProfile.setName("_default");
 			noAuthNProfile.setIsDefault(true);
