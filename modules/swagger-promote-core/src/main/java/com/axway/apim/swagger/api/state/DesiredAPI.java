@@ -3,9 +3,11 @@ package com.axway.apim.swagger.api.state;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -133,14 +135,21 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	}
 	
 	public void setRetirementDate(String retirementDate) throws AppException {
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-		format.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Z")));
-		Date retDate;
-		try {
-			retDate = format.parse(retirementDate);
-			this.retirementDate = retDate.getTime();
-		} catch (ParseException e) {
+		List<String> dateFormats = Arrays.asList("y-M-d", "d.M.y", "d/M/y");
+		SimpleDateFormat format;
+		Date retDate = null;
+		for (String dateFormat : dateFormats) {
+			format = new SimpleDateFormat(dateFormat, Locale.US);
+			format.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Z")));
+			try {
+				retDate = format.parse(retirementDate);
+			} catch (ParseException e) { }
+			if(retDate!=null) break;
+		}
+		if(retDate==null) {
+			LOG.error("Unable to parse the given retirementDate using the following formats: " + dateFormats);
 			throw new AppException("Cannnot parse given retirementDate", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
+		this.retirementDate = retDate.getTime();
 	}
 }
