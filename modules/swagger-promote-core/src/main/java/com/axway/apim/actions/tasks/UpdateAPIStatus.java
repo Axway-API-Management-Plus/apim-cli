@@ -1,9 +1,15 @@
 package com.axway.apim.actions.tasks;
 
 import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,6 +26,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
+import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.api.state.APIBaseDefinition;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -200,5 +207,34 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 
 	public boolean isUpdateVHostRequired() {
 		return updateVHostRequired;
+	}
+	
+	private String formatRetirementDate(Long retirementDate) {
+		Calendar cal = GregorianCalendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Z")));
+		cal.setTimeInMillis(retirementDate);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+		format.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Z")));
+		return format.format(cal.getTime());
+	}
+	
+	public void updateRetirementDate(APIChangeState changeState) throws AppException {
+		if(changeState!=null && changeState.getNonBreakingChanges().contains("retirementDate")) {
+			// Ignore the retirementDate if desiredState is not deprecated as it's used nowhere
+			if(!desiredState.getState().equals(IAPI.STATE_DEPRECATED)) {
+				LOG.info("Ignoring given retirementDate as API-Status is not set to deprecated");
+				return;
+			}
+			try {
+				URI uri = new URIBuilder(cmd.getAPIManagerURL())
+						.setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getId()+"/deprecate").build();
+				RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate="+formatRetirementDate(desiredState.getRetirementDate())), uri, this, true);
+				apiCall.setContentType("application/x-www-form-urlencoded");
+				apiCall.execute();
+			} catch (Exception e) {
+				ErrorState.getInstance().setError("Error while updating the retirementDate.", ErrorCode.CANT_UPDATE_API_PROXY);
+				throw new AppException("Error while updating the retirementDate", ErrorCode.CANT_UPDATE_API_PROXY);
+			}
+		} 
+		return;
 	}
 }

@@ -50,6 +50,9 @@ public class UpdateExistingAPI {
 			if(changes.getNonBreakingChanges().contains("state")) {
 				statusUpdate.execute();
 			}
+			if(changes.getNonBreakingChanges().contains("retirementDate")) {
+				statusUpdate.updateRetirementDate(changes);
+			}
 			
 			vHostHandler.handleVHost(changes.getDesiredAPI(), changes.getActualAPI(), statusUpdate.isUpdateVHostRequired());
 			

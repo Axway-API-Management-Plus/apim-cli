@@ -87,8 +87,10 @@ public class CreateNewAPI {
 				new UpdateAPIImage(changes.getDesiredAPI(), createdAPI).execute();
 			}
 			// This is special, as the status is not a normal property and requires some additional actions!
-			new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI).execute();
+			UpdateAPIStatus statusUpdate = new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI);
+			statusUpdate.execute();
 			((AbstractAPI)rollbackAPI).setState(createdAPI.getState());
+			statusUpdate.updateRetirementDate(changes);
 			
 			if(reCreation && changes.getActualAPI().getState().equals(IAPI.STATE_PUBLISHED)) {
 				// In case, the existing API is already in use (Published), we have to grant access to our new imported API

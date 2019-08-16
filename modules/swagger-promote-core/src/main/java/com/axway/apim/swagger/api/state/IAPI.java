@@ -33,6 +33,8 @@ public interface IAPI {
 	
 	public String getState() throws AppException;
 	
+	public Long getRetirementDate();
+	
 	public void setState(String state) throws AppException;
 	
 	public Map<String, OutboundProfile> getOutboundProfiles();
