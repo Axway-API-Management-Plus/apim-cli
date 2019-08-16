@@ -135,7 +135,7 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	}
 	
 	public void setRetirementDate(String retirementDate) throws AppException {
-		List<String> dateFormats = Arrays.asList("y-M-d", "d.M.y", "d/M/y");
+		List<String> dateFormats = Arrays.asList("dd.MM.yyyy", "dd/MM/yyyy", "dd-MM-yyyy", "yyyy-mm-dd");
 		SimpleDateFormat format;
 		Date retDate = null;
 		for (String dateFormat : dateFormats) {
@@ -144,7 +144,10 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 			try {
 				retDate = format.parse(retirementDate);
 			} catch (ParseException e) { }
-			if(retDate!=null) break;
+			if(retDate!=null) {
+				LOG.info("Parsed retirementDate: '"+retirementDate+"' using format: '"+dateFormat+"' to: '"+retDate+"'");
+				break;
+			}
 		}
 		if(retDate==null) {
 			LOG.error("Unable to parse the given retirementDate using the following formats: " + dateFormats);

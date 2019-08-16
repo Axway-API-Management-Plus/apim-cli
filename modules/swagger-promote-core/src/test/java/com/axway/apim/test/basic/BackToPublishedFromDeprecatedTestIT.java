@@ -72,15 +72,15 @@ public class BackToPublishedFromDeprecatedTestIT extends TestNGCitrusTestRunner 
 		Calendar cal = GregorianCalendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Z")));
 		cal.add(Calendar.DAY_OF_YEAR, 30);
 		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.add(Calendar.HOUR_OF_DAY, -2);
+		cal.add(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+		SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
 		format.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Z")));
 		String retirementDate = format.format(cal.getTime());
 		
-		echo("####### Setting API: '${apiName}' on path: '${apiPath}' to deprecated including a retirement date #######");
+		echo("####### Setting API: '${apiName}' on path: '${apiPath}' to deprecated including a retirement date: "+retirementDate+" #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable("state", "deprecated");
 		createVariable("retirementDate", retirementDate);
@@ -110,7 +110,7 @@ public class BackToPublishedFromDeprecatedTestIT extends TestNGCitrusTestRunner 
 		
 		// Change the Retiremendate
 		cal.add(Calendar.DAY_OF_YEAR, 60);
-		format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+		format = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
 		format.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Z")));
 		retirementDate = format.format(cal.getTime());
 		
