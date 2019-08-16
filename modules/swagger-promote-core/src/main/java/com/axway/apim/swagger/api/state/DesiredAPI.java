@@ -1,14 +1,21 @@
 package com.axway.apim.swagger.api.state;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
@@ -123,5 +130,17 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	public void setOriginalOutboundProfiles(Map<String, OutboundProfile> originalOutboundProfiles) {
 		if(originalOutboundProfiles==null) return;
 		this.originalOutboundProfiles = new HashMap<String, OutboundProfile>(originalOutboundProfiles);
+	}
+	
+	public void setRetirementDate(String retirementDate) throws AppException {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+		format.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Z")));
+		Date retDate;
+		try {
+			retDate = format.parse(retirementDate);
+			this.retirementDate = retDate.getTime();
+		} catch (ParseException e) {
+			throw new AppException("Cannnot parse given retirementDate", ErrorCode.CANT_READ_CONFIG_FILE);
+		}
 	}
 }
