@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -135,13 +136,13 @@ public class ImportTestAction extends AbstractTestAction {
 			if(is == null) {
 				throw new IOException("Unable to read swagger file from: " + pathToFile);
 			}
-			String jsonData = IOUtils.toString(is);
+			String jsonData = IOUtils.toString(is, StandardCharsets.UTF_8);
 			String filename = pathToFile.substring(pathToFile.lastIndexOf("/")+1); // e.g.: petstore.json, no-change-xyz-config.<stage>.json, 
 
 			String jsonReplaced = context.replaceDynamicContentInString(jsonData);
 
 			os = new FileOutputStream(new File(replacedFilename));
-			IOUtils.write(jsonReplaced, os);
+			IOUtils.write(jsonReplaced, os, StandardCharsets.UTF_8);
 			
 			return replacedFilename;
 		} catch (FileNotFoundException e) {
