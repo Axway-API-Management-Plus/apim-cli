@@ -700,7 +700,15 @@ public class APIImportConfigAdapter {
 		Iterator<String> it = importApi.getOutboundProfiles().keySet().iterator();
 		while(it.hasNext()) {
 			String profileName = it.next();
-			if(profileName.equals("_default")) return importApi; // Nothing to, there is a default profile
+			if(profileName.equals("_default")) {
+				// Validate the _default Outbound-Profile has an AuthN-Profile, otherwise we must add (See isseu #133)
+				OutboundProfile profile = importApi.getOutboundProfiles().get(profileName);
+				if(profile.getAuthenticationProfile()==null) {
+					LOG.warn("Provided default outboundProfile doesn't contain AuthN-Profile - Setting it to default");
+					profile.setAuthenticationProfile("_default");
+				}
+			}
+			return importApi;
 		}
 		OutboundProfile defaultProfile = new OutboundProfile();
 		defaultProfile.setAuthenticationProfile("_default");
