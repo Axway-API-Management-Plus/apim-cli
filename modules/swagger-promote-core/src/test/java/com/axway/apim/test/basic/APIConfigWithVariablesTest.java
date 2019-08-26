@@ -95,4 +95,21 @@ public class APIConfigWithVariablesTest {
 			throw e;
 		}
 	}
+	
+	@Test
+	public void configFileWithSpaces() throws AppException, ParseException {
+		try {
+			EnvironmentProperties props = new EnvironmentProperties(null);
+			CommandLine cmd = new DefaultParser().parse(new Options(), new String[]{});
+			new CommandParameters(cmd, null, props);
+			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api config with spaces.json").getFile();
+			
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
+			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+			Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
+		} catch (Exception e) {
+			LOG.error("Error running test: notDeclaredVariable", e);
+			throw e;
+		}
+	}
 }

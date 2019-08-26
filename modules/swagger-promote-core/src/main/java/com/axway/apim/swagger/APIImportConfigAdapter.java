@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -105,17 +106,17 @@ public class APIImportConfigAdapter {
 	 */
 	public APIImportConfigAdapter(String apiConfigFile, String stage, String pathToAPIDefinition, boolean usingOrgAdmin) throws AppException {
 		super();
-		this.apiConfigFile = apiConfigFile;
-		this.pathToAPIDefinition = pathToAPIDefinition;
-		this.usingOrgAdmin = usingOrgAdmin;
 		IAPI baseConfig;
 		try {
-			baseConfig = mapper.readValue(substitueVariables(new File(apiConfigFile)), DesiredAPI.class);
-			if(getStageConfig(stage, apiConfigFile)!=null) {
+			this.pathToAPIDefinition = pathToAPIDefinition;
+			this.usingOrgAdmin = usingOrgAdmin;
+			this.apiConfigFile = URLDecoder.decode(apiConfigFile, "UTF-8");
+			baseConfig = mapper.readValue(substitueVariables(new File(this.apiConfigFile)), DesiredAPI.class);
+			if(getStageConfig(stage, this.apiConfigFile)!=null) {
 				try {
 					ObjectReader updater = mapper.readerForUpdating(baseConfig);
-					apiConfig = updater.readValue(substitueVariables(new File(getStageConfig(stage, apiConfigFile))));
-					LOG.info("Loaded stage API-Config from file: " + getStageConfig(stage, apiConfigFile));
+					apiConfig = updater.readValue(substitueVariables(new File(getStageConfig(stage, this.apiConfigFile))));
+					LOG.info("Loaded stage API-Config from file: " + getStageConfig(stage, this.apiConfigFile));
 				} catch (FileNotFoundException e) {
 					LOG.debug("No config file found for stage: '"+stage+"'");
 					apiConfig = baseConfig;
