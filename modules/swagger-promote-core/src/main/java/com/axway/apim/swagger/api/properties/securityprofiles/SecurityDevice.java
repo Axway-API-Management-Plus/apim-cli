@@ -6,8 +6,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -115,7 +113,7 @@ public class SecurityDevice {
 	}
 
 	public Map<String, String> getProperties() throws AppException {
-		if(this.type.equals("oauth")) {
+		if(type == DeviceType.oauth) {
 			if(SecurityDevice.oauthTokenStores == null) SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
 			String tokenStore = (String)properties.get("tokenStore");
 			if(tokenStore.startsWith("<key")) return properties;
@@ -128,7 +126,7 @@ public class SecurityDevice {
 			} else {
 				properties.put("tokenStore", esTokenStore);
 			}
-		} else if(this.type.equals("oauthExternal")) {
+		} else if(type == DeviceType.oauthExternal) {
 			if(SecurityDevice.oauthInfoPolicies == null) SecurityDevice.oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
 			if(SecurityDevice.oauthTokenStores == null) SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
 			String infoPolicy = (String)properties.get("tokenStore"); // The token-info-policy is stored in the tokenStore as well
@@ -145,7 +143,7 @@ public class SecurityDevice {
 				properties.put("oauth.token.scopes", "${oauth.token.scopes}");
 				properties.put("oauth.token.valid", "${oauth.token.valid}");
 			}
-		} else if (this.type.equals("authPolicy")) {
+		} else if (type == DeviceType.authPolicy) {
 			if(SecurityDevice.authenticationPolicies == null) SecurityDevice.authenticationPolicies = initCustomPolicies("authentication");
 			String authPolicy = (String)properties.get("authenticationPolicy");
 			if(authPolicy.startsWith("<key")) return properties;
