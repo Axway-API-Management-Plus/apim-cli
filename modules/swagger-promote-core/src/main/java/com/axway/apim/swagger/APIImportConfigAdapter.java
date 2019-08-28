@@ -58,6 +58,7 @@ import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
 import com.axway.apim.swagger.api.properties.quota.QuotaRestrictionDeserializer;
+import com.axway.apim.swagger.api.properties.securityprofiles.DeviceType;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 import com.axway.apim.swagger.api.state.AbstractAPI;
@@ -638,7 +639,7 @@ public class APIImportConfigAdapter {
 		InboundProfile defaultProfile = new InboundProfile();
 		defaultProfile.setSecurityProfile("_default");
 		defaultProfile.setCorsProfile("_default");
-		defaultProfile.setMonitorAPI("true");
+		defaultProfile.setMonitorAPI(true);
 		defaultProfile.setMonitorSubject("authentication.subject.id");
 		importApi.getInboundProfiles().put("_default", defaultProfile);
 		return importApi;
@@ -664,7 +665,7 @@ public class APIImportConfigAdapter {
 			passthroughProfile.setIsDefault(true);
 			SecurityDevice passthroughDevice = new SecurityDevice();
 			passthroughDevice.setName("Pass Through");
-			passthroughDevice.setType("passThrough");
+			passthroughDevice.setType(DeviceType.passThrough);
 			passthroughDevice.setOrder(0);
 			passthroughDevice.getProperties().put("subjectIdFieldName", "Pass Through");
 			passthroughDevice.getProperties().put("removeCredentialsOnSuccess", "true");

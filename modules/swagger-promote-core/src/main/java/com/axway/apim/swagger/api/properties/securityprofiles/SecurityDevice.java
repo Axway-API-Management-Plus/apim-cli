@@ -32,11 +32,9 @@ public class SecurityDevice {
 	private static Map<String, String> oauthInfoPolicies;
 	private static Map<String, String> authenticationPolicies;
 	
-	private final static String validTypes = "apiKey|basic|oauth|oauthExternal|authPolicy|passThrough|awsHeader|awsQuery|twoWaySSL";
-	
 	String name;
 	
-	String type;
+	DeviceType type;
 	
 	int order;
 	
@@ -95,17 +93,11 @@ public class SecurityDevice {
 		this.name = name;
 	}
 
-	public String getType() {
+	public DeviceType getType() {
 		return type;
 	}
 
-	public void setType(String type) {
-		Pattern pattern = Pattern.compile("^("+validTypes+")$");
-		Matcher matcher = pattern.matcher(type);
-		if(!matcher.matches()) {
-			ErrorState.getInstance().setError("Invalid securityProfile. Device type: '"+type+"'. Must be one of the following: "+validTypes, ErrorCode.CANT_READ_CONFIG_FILE, false);
-			throw new RuntimeException("Invalid securityProfile. Device type: '"+type+"'. Must be one of the following: "+validTypes);
-		}
+	public void setType(DeviceType type) {
 		this.type = type;
 	}
 
@@ -181,7 +173,7 @@ public class SecurityDevice {
 		if(other instanceof SecurityDevice) {
 			SecurityDevice otherSecurityDevice = (SecurityDevice)other;
 			if(!StringUtils.equals(otherSecurityDevice.getName(), this.getName())) return false;
-			if(!StringUtils.equals(otherSecurityDevice.getType(), this.getType())) return false;
+			if(otherSecurityDevice.getType()!=this.getType()) return false;
 			if(otherSecurityDevice.getOrder()!=this.getOrder()) return false;
 			try {
 				if(!otherSecurityDevice.getProperties().equals(this.getProperties())) return false;

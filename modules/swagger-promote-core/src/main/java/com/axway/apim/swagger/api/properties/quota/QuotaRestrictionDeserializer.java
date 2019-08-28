@@ -51,7 +51,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 			throw new JsonProcessingException("Quota period must be one of the following: "+validPeriods){};
 		}
 		QuotaRestriction restriction = new QuotaRestriction();
-		restriction.setType(type);
+		restriction.setType(QuotaRestrictiontype.valueOf(type));
 		restriction.setMethod(node.get("method").asText());
 		Map<String, String> configMap = new LinkedHashMap<String, String>();
 		configMap.put("period", period);
