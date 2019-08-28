@@ -26,6 +26,7 @@ public enum ErrorCode {
 	CANT_READ_API_DEFINITION_FILE		(65, "Can't read Swagger-File."),
 	CANT_READ_WSDL_FILE			(66, "Can't read Wsdl-File."),
 	CANT_READ_CONFIG_FILE		(70, "Can't read Config-File."),
+	INVALID_QUOTA_CONFIG		(71, "Invalid Quota-Config."),
 	API_OPERATION_NOT_FOUND		(72, "The given operationId cant be found"),
 	REFERENCED_PROFILE_INVALID	(73, "Invalid profile reference is used."),
 	UNSUPPORTED_FEATURE			(75, "Unsupported feature or operation used."),
