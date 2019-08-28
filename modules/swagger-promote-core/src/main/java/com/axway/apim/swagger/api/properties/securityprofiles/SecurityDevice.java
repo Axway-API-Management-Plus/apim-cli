@@ -6,6 +6,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -30,11 +32,13 @@ public class SecurityDevice {
 	private static Map<String, String> oauthInfoPolicies;
 	private static Map<String, String> authenticationPolicies;
 	
+	private final static String validTypes = "apiKey|basic|oauth|oauthExternal|authPolicy|passThrough|awsHeader|awsQuery|twoWaySSL";
+	
 	String name;
 	
 	String type;
 	
-	String order;
+	int order;
 	
 	Map<String, String> properties;
 
@@ -96,14 +100,20 @@ public class SecurityDevice {
 	}
 
 	public void setType(String type) {
+		Pattern pattern = Pattern.compile("^("+validTypes+")$");
+		Matcher matcher = pattern.matcher(type);
+		if(!matcher.matches()) {
+			ErrorState.getInstance().setError("Invalid securityProfile. Device type: '"+type+"'. Must be one of the following: "+validTypes, ErrorCode.CANT_READ_CONFIG_FILE, false);
+			throw new RuntimeException("Invalid securityProfile. Device type: '"+type+"'. Must be one of the following: "+validTypes);
+		}
 		this.type = type;
 	}
 
-	public String getOrder() {
+	public int getOrder() {
 		return order;
 	}
 
-	public void setOrder(String order) {
+	public void setOrder(int order) {
 		this.order = order;
 	}
 
@@ -172,7 +182,7 @@ public class SecurityDevice {
 			SecurityDevice otherSecurityDevice = (SecurityDevice)other;
 			if(!StringUtils.equals(otherSecurityDevice.getName(), this.getName())) return false;
 			if(!StringUtils.equals(otherSecurityDevice.getType(), this.getType())) return false;
-			if(!StringUtils.equals(otherSecurityDevice.getOrder(), this.getOrder())) return false;
+			if(otherSecurityDevice.getOrder()!=this.getOrder()) return false;
 			try {
 				if(!otherSecurityDevice.getProperties().equals(this.getProperties())) return false;
 			} catch (AppException e) {

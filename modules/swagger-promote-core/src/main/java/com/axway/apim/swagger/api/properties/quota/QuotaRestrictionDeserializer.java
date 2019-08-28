@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestriction> {
+	
+	private final static String validPeriods = "month|week|day|hour|minute|second";
 
 	@SuppressWarnings("serial")
 	@Override
@@ -42,11 +44,11 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		}
 		String period = quotaConfig.get("period").asText();
 		String per = quotaConfig.get("per").asText();
-		Pattern validPeriods = Pattern.compile("^(month|week|day|hour|minute|second)$");
-		Matcher matcher = validPeriods.matcher(period);
+		Pattern pattern = Pattern.compile("^("+validPeriods+")$");
+		Matcher matcher = pattern.matcher(period);
 		if(!matcher.matches()) {
-			errorState.setError("Invalid quota period: '"+period+"'. Must be one of the following: month|week|day|hour|minute|second", ErrorCode.INVALID_QUOTA_CONFIG, false);
-			throw new JsonProcessingException("Quota period must be one of the following: month|week|day|hour|minute|second"){};
+			errorState.setError("Invalid quota period: '"+period+"'. Must be one of the following: "+validPeriods, ErrorCode.INVALID_QUOTA_CONFIG, false);
+			throw new JsonProcessingException("Quota period must be one of the following: "+validPeriods){};
 		}
 		QuotaRestriction restriction = new QuotaRestriction();
 		restriction.setType(type);

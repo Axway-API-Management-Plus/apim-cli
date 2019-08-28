@@ -1,8 +1,13 @@
 package com.axway.apim.swagger.api.properties.authenticationProfiles;
 
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+
+import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
 
 public class AuthenticationProfile {
 
@@ -48,6 +53,12 @@ public class AuthenticationProfile {
 	}
 
 	public void setType(AuthType type) {
+		Pattern pattern = Pattern.compile("^("+AuthType.values()+")$");
+		Matcher matcher = pattern.matcher(type.name());
+		if(!matcher.matches()) {
+			ErrorState.getInstance().setError("Invalid authenticationProfile. Type: '"+type+"' must be one of the following: "+AuthType.values(), ErrorCode.CANT_READ_CONFIG_FILE, false);
+			throw new RuntimeException("Invalid authenticationProfile. Type type: '"+type+"' must be one of the following: "+AuthType.values());
+		}
 		this.type = type;
 	}
 

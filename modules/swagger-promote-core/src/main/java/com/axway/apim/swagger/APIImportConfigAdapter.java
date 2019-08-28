@@ -665,7 +665,7 @@ public class APIImportConfigAdapter {
 			SecurityDevice passthroughDevice = new SecurityDevice();
 			passthroughDevice.setName("Pass Through");
 			passthroughDevice.setType("passThrough");
-			passthroughDevice.setOrder("0");
+			passthroughDevice.setOrder(0);
 			passthroughDevice.getProperties().put("subjectIdFieldName", "Pass Through");
 			passthroughDevice.getProperties().put("removeCredentialsOnSuccess", "true");
 			passthroughProfile.getDevices().add(passthroughDevice);
