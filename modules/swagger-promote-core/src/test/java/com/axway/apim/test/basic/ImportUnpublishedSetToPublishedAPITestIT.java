@@ -28,8 +28,8 @@ public class ImportUnpublishedSetToPublishedAPITestIT extends TestNGCitrusTestRu
 		echo("Import an Unpublished-API and in the second step publish it");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/my-test-api-${apiNumber}");
-		variable("apiName", "My-Test-API-${apiNumber}");
+		variable("apiPath", "/change-state-to-published-api-${apiNumber}");
+		variable("apiName", "Change state to Published API ${apiNumber}");
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
