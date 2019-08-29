@@ -273,8 +273,8 @@ public class APIImportConfigAdapter {
 			return;
 		}
 		List<String> allDesiredOrgs = new ArrayList<String>();
+		List<Organization> allOrgs = APIManagerAdapter.getInstance().getAllOrgs();
 		if(apiConfig.getClientOrganizations().contains("ALL")) {
-			List<Organization> allOrgs = APIManagerAdapter.getInstance().getAllOrgs();
 			for(Organization org : allOrgs) {
 				allDesiredOrgs.add(org.getName());
 			}
@@ -286,6 +286,18 @@ public class APIImportConfigAdapter {
 			// we have to add the Owning-Org as a desired org
 			if(!apiConfig.getClientOrganizations().contains(apiConfig.getOrganization())) {
 				apiConfig.getClientOrganizations().add(apiConfig.getOrganization());
+			}
+			// And validate each configured organization really exists in the API-Manager
+			Iterator<String> it = apiConfig.getClientOrganizations().iterator();
+			while(it.hasNext()) {
+				String org = it.next();
+				Organization desiredOrg = new Organization();
+				desiredOrg.setName(org);
+				if(!allOrgs.contains(desiredOrg)) {
+					LOG.warn("Unknown organization with name: '" + desiredOrg.getName() + "' configured. Ignoring this organization.");
+					it.remove();
+					continue;
+				}
 			}
 		}
 	}
