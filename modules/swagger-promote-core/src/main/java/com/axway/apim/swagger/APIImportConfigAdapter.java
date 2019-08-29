@@ -40,6 +40,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
@@ -289,12 +290,14 @@ public class APIImportConfigAdapter {
 			}
 			// And validate each configured organization really exists in the API-Manager
 			Iterator<String> it = apiConfig.getClientOrganizations().iterator();
+			String invalidClientOrgs = null;
 			while(it.hasNext()) {
 				String org = it.next();
 				Organization desiredOrg = new Organization();
 				desiredOrg.setName(org);
 				if(!allOrgs.contains(desiredOrg)) {
 					LOG.warn("Unknown organization with name: '" + desiredOrg.getName() + "' configured. Ignoring this organization.");
+					APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_ORGANIZATION.name(), invalidClientOrgs==null ? org : invalidClientOrgs + ", "+org);
 					it.remove();
 					continue;
 				}
@@ -387,12 +390,14 @@ public class APIImportConfigAdapter {
 		if(apiConfig.getApplications()!=null) {
 			LOG.info("Handling configured client-applications.");
 			ListIterator<ClientApplication> it = apiConfig.getApplications().listIterator();
+			String invalidClientApps = null;
 			while(it.hasNext()) {
 				app = it.next();
 				if(app.getName()!=null) {
 					loadedApp = APIManagerAdapter.getInstance().getApplication(app.getName());
 					if(loadedApp==null) {
 						LOG.warn("Unknown application with name: '" + app.getName() + "' configured. Ignoring this application.");
+						APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_APPLICATION.name(), invalidClientApps==null ? app.getName() : invalidClientApps + ", "+app.getName());
 						it.remove();
 						continue;
 					}

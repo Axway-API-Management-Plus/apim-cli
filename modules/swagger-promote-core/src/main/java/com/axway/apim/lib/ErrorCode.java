@@ -22,6 +22,8 @@ public enum ErrorCode {
 	UNKNOWN_APPLICATION					(58, "Unknown application given. Please check the API-Config-File."),
 	ACCESS_ORGANIZATION_ERR				(59, "An error happens while managing organization permissions."),
 	API_MANAGER_COMMUNICATION			(60, "Generic API-Manager communication error."),
+	INVALID_CLIENT_ORGANIZATION			(61, "At least one configured organization is invalid. Check the log file for more information."),
+	INVALID_CLIENT_APPLICATION			(62, "At least one configured application is invalid. Check the log file for more information."),
 	NO_API_DEFINITION_CONFIGURED		(64, "No API Definition configured."),
 	CANT_READ_API_DEFINITION_FILE		(65, "Can't read the given Swagger-File."),
 	CANT_READ_WSDL_FILE					(66, "Can't read the given WSDL-File."),
