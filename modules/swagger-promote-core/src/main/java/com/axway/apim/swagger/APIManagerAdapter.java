@@ -378,6 +378,7 @@ public class APIManagerAdapter {
 			addQuotaConfiguration(apiManagerApi, desiredAPI);
 			addClientOrganizations(apiManagerApi, desiredAPI);
 			addClientApplications(apiManagerApi, desiredAPI);
+			addOrgName(apiManagerApi, desiredAPI);
 			addExistingClientAppQuotas(apiManagerApi.getApplications());
 			return apiManagerApi;
 		} catch (Exception e) {
@@ -424,6 +425,20 @@ public class APIManagerAdapter {
 		}
 		apiManagerApi.setApplications(existingClientApps);
 	}
+	
+	private void addOrgName(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
+		if(apiManagerApi.getOrganization()!=null) return;
+		if(desiredAPI!=null) {
+			// Is desiredOrgId is the same as the actual org just take over the desired Org-Name
+			if(desiredAPI.getOrganizationId().equals(apiManagerApi.getOrganizationId())) {
+				((ActualAPI)apiManagerApi).setOrganization(desiredAPI.getOrganization());
+			} else {
+				String actualOrgName = getOrgName(apiManagerApi.getOrganizationId());
+				((ActualAPI)apiManagerApi).setOrganization(actualOrgName);
+			}
+		}
+	}
+	
 	private void addExistingClientAppQuotas(List<ClientApplication> existingClientApps) throws AppException {
 		if(existingClientApps==null || existingClientApps.size()==0) return; // No apps subscribed to this APIs
 		for(ClientApplication app : existingClientApps) {

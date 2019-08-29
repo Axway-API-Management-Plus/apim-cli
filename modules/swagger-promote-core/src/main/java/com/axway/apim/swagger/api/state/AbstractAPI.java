@@ -178,6 +178,8 @@ public abstract class AbstractAPI {
 			writableStates = {IAPI.STATE_UNPUBLISHED}, propHandler = RoutingKeyPropHandler.class)
 	protected String apiRoutingKey = null;
 	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {})
 	protected String organization = null;
 	
 	protected String organizationId = null;
@@ -205,14 +207,6 @@ public abstract class AbstractAPI {
 
 	public void setValid(boolean isValid) {
 		this.isValid = isValid;
-	}
-
-	public String getOrgId() throws AppException {
-		return this.orgId;
-	}
-	
-	public void setOrgId(String orgId) {
-		this.orgId = orgId;
 	}
 
 	public APIDefintion getAPIDefinition() {

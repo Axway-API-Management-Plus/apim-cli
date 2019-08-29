@@ -62,9 +62,9 @@ public interface IAPI {
 	
 	public void setValid(boolean valid);
 	
-	public String getOrgId() throws AppException;
+	public String getOrganizationId() throws AppException;
 	
-	public void setOrgId(String orgId);
+	public void setOrganizationId(String orgId);
 	
 	public String getOrganization();
 	
