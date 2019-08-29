@@ -297,7 +297,8 @@ public class APIImportConfigAdapter {
 				desiredOrg.setName(org);
 				if(!allOrgs.contains(desiredOrg)) {
 					LOG.warn("Unknown organization with name: '" + desiredOrg.getName() + "' configured. Ignoring this organization.");
-					APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_ORGANIZATION.name(), invalidClientOrgs==null ? org : invalidClientOrgs + ", "+org);
+					invalidClientOrgs = invalidClientOrgs==null ? org : invalidClientOrgs + ", "+org;
+					APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_ORGANIZATIONS.name(), invalidClientOrgs);
 					it.remove();
 					continue;
 				}
@@ -397,7 +398,8 @@ public class APIImportConfigAdapter {
 					loadedApp = APIManagerAdapter.getInstance().getApplication(app.getName());
 					if(loadedApp==null) {
 						LOG.warn("Unknown application with name: '" + app.getName() + "' configured. Ignoring this application.");
-						APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_APPLICATION.name(), invalidClientApps==null ? app.getName() : invalidClientApps + ", "+app.getName());
+						invalidClientApps = invalidClientApps==null ? app.getName() : invalidClientApps + ", "+app.getName();
+						APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_APPLICATIONS.name(), invalidClientApps);
 						it.remove();
 						continue;
 					}

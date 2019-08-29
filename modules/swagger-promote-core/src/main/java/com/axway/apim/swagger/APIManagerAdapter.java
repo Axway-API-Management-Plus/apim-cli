@@ -36,6 +36,7 @@ import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
+import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
@@ -151,6 +152,7 @@ public class APIManagerAdapter {
 		} else {
 			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getName() +" (Version: "+ changeState.getActualAPI().getVersion() + ")");
 			if(!changeState.hasAnyChanges()) {
+				APIPropertiesExport.getInstance().setProperty("feApiId", changeState.getActualAPI().getId());
 				LOG.debug("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
 				error.setWarning("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE, false);
 				throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE);
