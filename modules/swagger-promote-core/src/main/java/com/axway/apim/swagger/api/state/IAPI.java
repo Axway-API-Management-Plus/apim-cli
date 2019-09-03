@@ -15,6 +15,7 @@ import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
+import com.axway.apim.swagger.api.properties.tags.TagMap;
 
 public interface IAPI {
 	
@@ -80,7 +81,7 @@ public interface IAPI {
 	
 	public APIImage getImage();
 	
-	public Map<String, String[]> getTags();
+	public TagMap<String, String[]> getTags();
 	
 	public APIDefintion getAPIDefinition();
 	

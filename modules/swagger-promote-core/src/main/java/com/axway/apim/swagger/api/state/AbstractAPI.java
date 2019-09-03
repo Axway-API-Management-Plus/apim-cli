@@ -265,7 +265,7 @@ public abstract class AbstractAPI {
 		this.vhost = vhost;
 	}
 
-	public Map<String, String[]> getTags() {
+	public TagMap<String, String[]> getTags() {
 		return tags;
 	}
 	

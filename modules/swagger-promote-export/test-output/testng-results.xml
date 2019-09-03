@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" total="1" passed="1">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Default suite" duration-ms="28572" started-at="2019-09-03T07:39:12Z" finished-at="2019-09-03T07:39:41Z">
+    <groups>
+    </groups>
+    <test name="Default test" duration-ms="28572" started-at="2019-09-03T07:39:12Z" finished-at="2019-09-03T07:39:41Z">
+      <class name="com.axway.apim.export.test.methodLevel.MethodLevelExportTestIt">
+        <test-method status="PASS" signature="beforeSuite(org.testng.ITestContext)[pri:0, instance:com.axway.apim.export.test.methodLevel.MethodLevelExportTestIt@515aebb0]" test-instance-name="" name="beforeSuite" is-config="true" duration-ms="5895" started-at="2019-09-03T09:39:06Z" finished-at="2019-09-03T09:39:12Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[org.testng.TestRunner@4110765e]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- beforeSuite -->
+        <test-method status="PASS" signature="springTestContextBeforeTestClass()[pri:0, instance:com.axway.apim.export.test.methodLevel.MethodLevelExportTestIt@515aebb0]" test-instance-name="" name="springTestContextBeforeTestClass" is-config="true" duration-ms="2" started-at="2019-09-03T09:39:12Z" finished-at="2019-09-03T09:39:12Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- springTestContextBeforeTestClass -->
+        <test-method name="springTestContextPrepareTestInstance" test-instance-name="" signature="springTestContextPrepareTestInstance()[pri:0, instance:com.axway.apim.export.test.methodLevel.MethodLevelExportTestIt@515aebb0]" is-config="true" status="PASS" duration-ms="0" finished-at="2019-09-03T09:39:12Z" started-at="2019-09-03T09:39:12Z" depends-on-methods="org.springframework.test.context.testng.AbstractTestNGSpringContextTests.springTestContextBeforeTestClass">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- springTestContextPrepareTestInstance -->
+        <test-method status="PASS" signature="springTestContextBeforeTestMethod(java.lang.reflect.Method)[pri:0, instance:com.axway.apim.export.test.methodLevel.MethodLevelExportTestIt@515aebb0]" test-instance-name="" name="springTestContextBeforeTestMethod" is-config="true" duration-ms="0" started-at="2019-09-03T09:39:12Z" finished-at="2019-09-03T09:39:12Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void com.axway.apim.export.test.methodLevel.MethodLevelExportTestIt.run(com.consol.citrus.context.TestContext) throws java.io.IOException]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- springTestContextBeforeTestMethod -->
+        <test-method status="PASS" signature="run(com.consol.citrus.context.TestContext)[pri:0, instance:com.axway.apim.export.test.methodLevel.MethodLevelExportTestIt@515aebb0]" test-instance-name="" name="run" duration-ms="28542" started-at="2019-09-03T09:39:12Z" finished-at="2019-09-03T09:39:41Z">
+          <params>
+            <param index="0">
+              <value is-null="true"/>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- run -->
+        <test-method status="PASS" signature="springTestContextAfterTestClass()[pri:0, instance:com.axway.apim.export.test.methodLevel.MethodLevelExportTestIt@515aebb0]" test-instance-name="" name="springTestContextAfterTestClass" is-config="true" duration-ms="0" started-at="2019-09-03T09:39:41Z" finished-at="2019-09-03T09:39:41Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- springTestContextAfterTestClass -->
+        <test-method status="PASS" signature="springTestContextAfterTestMethod(java.lang.reflect.Method)[pri:0, instance:com.axway.apim.export.test.methodLevel.MethodLevelExportTestIt@515aebb0]" test-instance-name="" name="springTestContextAfterTestMethod" is-config="true" duration-ms="0" started-at="2019-09-03T09:39:41Z" finished-at="2019-09-03T09:39:41Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[public void com.axway.apim.export.test.methodLevel.MethodLevelExportTestIt.run(com.consol.citrus.context.TestContext) throws java.io.IOException]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- springTestContextAfterTestMethod -->
+        <test-method status="PASS" signature="afterSuite(org.testng.ITestContext)[pri:0, instance:com.axway.apim.export.test.methodLevel.MethodLevelExportTestIt@515aebb0]" test-instance-name="" name="afterSuite" is-config="true" duration-ms="33" started-at="2019-09-03T09:39:41Z" finished-at="2019-09-03T09:39:41Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[org.testng.TestRunner@4110765e]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- afterSuite -->
+      </class> <!-- com.axway.apim.export.test.methodLevel.MethodLevelExportTestIt -->
+    </test> <!-- Default test -->
+  </suite> <!-- Default suite -->
+</testng-results>

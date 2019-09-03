@@ -49,4 +49,12 @@ public class ActualAPI extends AbstractAPI implements IAPI {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public JsonNode getApiConfiguration() {
+		return apiConfiguration;
+	}
+
+	public void setApiConfiguration(JsonNode apiConfiguration) {
+		this.apiConfiguration = apiConfiguration;
+	}
 }
