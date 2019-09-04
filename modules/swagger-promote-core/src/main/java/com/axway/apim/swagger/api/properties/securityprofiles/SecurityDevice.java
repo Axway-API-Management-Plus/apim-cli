@@ -32,9 +32,9 @@ public class SecurityDevice {
 	
 	String name;
 	
-	String type;
+	DeviceType type;
 	
-	String order;
+	int order;
 	
 	Map<String, String> properties;
 
@@ -91,19 +91,19 @@ public class SecurityDevice {
 		this.name = name;
 	}
 
-	public String getType() {
+	public DeviceType getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(DeviceType type) {
 		this.type = type;
 	}
 
-	public String getOrder() {
+	public int getOrder() {
 		return order;
 	}
 
-	public void setOrder(String order) {
+	public void setOrder(int order) {
 		this.order = order;
 	}
 
@@ -113,7 +113,7 @@ public class SecurityDevice {
 	}
 
 	public Map<String, String> getProperties() throws AppException {
-		if(this.type.equals("oauth")) {
+		if(type == DeviceType.oauth) {
 			if(SecurityDevice.oauthTokenStores == null) SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
 			String tokenStore = (String)properties.get("tokenStore");
 			if(tokenStore.startsWith("<key")) return properties;
@@ -126,7 +126,7 @@ public class SecurityDevice {
 			} else {
 				properties.put("tokenStore", esTokenStore);
 			}
-		} else if(this.type.equals("oauthExternal")) {
+		} else if(type == DeviceType.oauthExternal) {
 			if(SecurityDevice.oauthInfoPolicies == null) SecurityDevice.oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
 			if(SecurityDevice.oauthTokenStores == null) SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
 			String infoPolicy = (String)properties.get("tokenStore"); // The token-info-policy is stored in the tokenStore as well
@@ -143,7 +143,7 @@ public class SecurityDevice {
 				properties.put("oauth.token.scopes", "${oauth.token.scopes}");
 				properties.put("oauth.token.valid", "${oauth.token.valid}");
 			}
-		} else if (this.type.equals("authPolicy")) {
+		} else if (type == DeviceType.authPolicy) {
 			if(SecurityDevice.authenticationPolicies == null) SecurityDevice.authenticationPolicies = initCustomPolicies("authentication");
 			String authPolicy = (String)properties.get("authenticationPolicy");
 			if(authPolicy.startsWith("<key")) return properties;
@@ -171,8 +171,8 @@ public class SecurityDevice {
 		if(other instanceof SecurityDevice) {
 			SecurityDevice otherSecurityDevice = (SecurityDevice)other;
 			if(!StringUtils.equals(otherSecurityDevice.getName(), this.getName())) return false;
-			if(!StringUtils.equals(otherSecurityDevice.getType(), this.getType())) return false;
-			if(!StringUtils.equals(otherSecurityDevice.getOrder(), this.getOrder())) return false;
+			if(otherSecurityDevice.getType()!=this.getType()) return false;
+			if(otherSecurityDevice.getOrder()!=this.getOrder()) return false;
 			try {
 				if(!otherSecurityDevice.getProperties().equals(this.getProperties())) return false;
 			} catch (AppException e) {

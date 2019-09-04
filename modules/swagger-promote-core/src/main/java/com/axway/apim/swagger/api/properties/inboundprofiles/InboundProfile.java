@@ -4,7 +4,7 @@ import org.apache.commons.lang.StringUtils;
 
 public class InboundProfile {
 	
-	String monitorAPI = "true";
+	boolean monitorAPI = true;
 	
 	String monitorSubject = "authentication.subject.id";
 	
@@ -12,11 +12,11 @@ public class InboundProfile {
 	
 	String corsProfile;
 
-	public String getMonitorAPI() {
+	public boolean getMonitorAPI() {
 		return monitorAPI;
 	}
 
-	public void setMonitorAPI(String monitorAPI) {
+	public void setMonitorAPI(boolean monitorAPI) {
 		this.monitorAPI = monitorAPI;
 	}
 
@@ -50,7 +50,7 @@ public class InboundProfile {
 		if(other instanceof InboundProfile) {
 			InboundProfile otherInboundProfile = (InboundProfile)other;
 			return
-					StringUtils.equals(otherInboundProfile.getMonitorAPI(), this.getMonitorAPI()) &&
+					otherInboundProfile.getMonitorAPI()==this.getMonitorAPI() &&
 					StringUtils.equals(otherInboundProfile.getMonitorSubject(), this.getMonitorSubject()) &&
 					StringUtils.equals(otherInboundProfile.getSecurityProfile(), this.getSecurityProfile()) &&
 					StringUtils.equals(otherInboundProfile.getCorsProfile(), this.getCorsProfile());

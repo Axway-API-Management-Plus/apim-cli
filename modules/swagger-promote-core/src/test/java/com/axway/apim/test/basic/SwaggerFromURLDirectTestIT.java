@@ -1,23 +1,30 @@
 package com.axway.apim.test.basic;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.IOException;
+
 import org.springframework.http.HttpStatus;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.AppException;
 import com.axway.apim.test.ImportTestAction;
+import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
+import com.consol.citrus.context.TestContext;
+import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="SwaggerFromURLRefFileTestIT")
-public class SwaggerFromURLDirectTestIT extends TestNGCitrusTestDesigner {
-	
-	@Autowired
+@Test
+public class SwaggerFromURLDirectTestIT extends TestNGCitrusTestRunner {
+
 	private ImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "SwaggerFromURLRefFileTestIT")
-	public void run() {
+	@CitrusTest
+	@Test @Parameters("context")
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+		swaggerImport = new ImportTestAction();
 		description("Validates a Swagger-File can be taken from a URL using the direct instruction.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -31,43 +38,36 @@ public class SwaggerFromURLDirectTestIT extends TestNGCitrusTestDesigner {
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "0");
-		action(swaggerImport);
+		swaggerImport.doExecute(context);
 		
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
-		http().client("apiManager")
-			.send()
-			.get("/proxies")
-			.name("api")
-			.header("Content-Type", "application/json");
+		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
 
-		http().client("apiManager")
-			.receive()
-			.response(HttpStatus.OK)
-			.messageType(MessageType.JSON)
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "https://petstore.swagger.io/v2/swagger.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
-		action(swaggerImport);
+		swaggerImport.doExecute(context);
 		
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "sam/secret@https://petstore.swagger.io/v2/swagger.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
-		action(swaggerImport);
+		swaggerImport.doExecute(context);
 		
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "http://petstore.swagger.io/v2/swagger.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
-		action(swaggerImport);
+		swaggerImport.doExecute(context);
 	}
 
 }

@@ -178,6 +178,8 @@ public abstract class AbstractAPI {
 			writableStates = {IAPI.STATE_UNPUBLISHED}, propHandler = RoutingKeyPropHandler.class)
 	protected String apiRoutingKey = null;
 	
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {})
 	protected String organization = null;
 	
 	protected String organizationId = null;
@@ -187,6 +189,10 @@ public abstract class AbstractAPI {
 	protected String apiId = null;
 	
 	protected String deprecated = null;
+
+	@APIPropertyAnnotation(isBreaking = false, 
+			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})
+	protected Long retirementDate = null;
 	
 	protected boolean isValid = false;
 	
@@ -201,14 +207,6 @@ public abstract class AbstractAPI {
 
 	public void setValid(boolean isValid) {
 		this.isValid = isValid;
-	}
-
-	public String getOrgId() throws AppException {
-		return this.orgId;
-	}
-	
-	public void setOrgId(String orgId) {
-		this.orgId = orgId;
 	}
 
 	public APIDefintion getAPIDefinition() {
@@ -267,7 +265,7 @@ public abstract class AbstractAPI {
 		this.vhost = vhost;
 	}
 
-	public Map<String, String[]> getTags() {
+	public TagMap<String, String[]> getTags() {
 		return tags;
 	}
 	
@@ -357,6 +355,14 @@ public abstract class AbstractAPI {
 
 	public void setDeprecated(String deprecated) {
 		this.deprecated = deprecated;
+	}
+
+	public Long getRetirementDate() {
+		return retirementDate;
+	}
+
+	public void setRetirementDate(Long retirementDate) {
+		this.retirementDate = retirementDate;
 	}
 
 	public Map<String, String> getCustomProperties() {
