@@ -175,6 +175,8 @@ public class APIExportConfigAdapter {
 		// Required to force loading of actual quota!
 		((DesiredAPI)apiTemplate).setApplicationQuota(new APIQuota());
 		((DesiredAPI)apiTemplate).setSystemQuota(new APIQuota());
+		// Given a NOT-KNOWN organization to force the API-Manager Adapter to set the correct orgName in the actual API
+		((DesiredAPI)apiTemplate).setOrganizationId("NOT-KNOWN");
 		return apiTemplate;
 	}
 	

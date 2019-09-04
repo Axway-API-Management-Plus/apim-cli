@@ -433,8 +433,13 @@ public class APIManagerAdapter {
 	private void addOrgName(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
 		if(apiManagerApi.getOrganization()!=null) return;
 		if(desiredAPI!=null) {
+			// Is desiredOrgId is the same as the actual org just take over the desired Org-Name
+			if(desiredAPI.getOrganizationId().equals(apiManagerApi.getOrganizationId())) {
+				((ActualAPI)apiManagerApi).setOrganization(desiredAPI.getOrganization());
+			} else {
 				String actualOrgName = getOrgName(apiManagerApi.getOrganizationId());
 				((ActualAPI)apiManagerApi).setOrganization(actualOrgName);
+			}
 		}
 	}
 	
