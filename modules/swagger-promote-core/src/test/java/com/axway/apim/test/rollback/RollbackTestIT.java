@@ -32,23 +32,6 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 		variable("apiPath", "/rollback-api-${apiNumber}");
 		variable("apiName", "Rollback-API-${apiNumber}");
 		
-		echo("####### Try to replicate APIs, that will fail #######");		
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/rollback/invalid-organization.json");
-		createVariable("status", "published");
-		createVariable("expectedReturnCode", "57"); // Must fail!
-		swaggerImport.doExecute(context);
-		
-		echo("####### Validate the temp. FE-API has been rolled back #######");
-		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.*.path", "@assertThat(not(containsString(${apiPath})))@"));
-		
-		echo("####### Validate the temp. BE-API has been rolled back #######");
-		http(builder -> builder.client("apiManager").send().get("/apirepo").header("Content-Type", "application/json"));
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.*.name", "@assertThat(not(containsString(${apiName})))@"));
-		
 		// This error only appears on 7.7 or maybe higher
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
 			echo("####### Try to replicate APIs, that will fail #######");		
@@ -88,9 +71,10 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 		
 		echo("####### This will re-create the API, but it fails #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/rollback/invalid-organization.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/rollback/backendbasepath-config.json");
 		createVariable("status", "published");
-		createVariable("expectedReturnCode", "57"); // Must fail!
+		createVariable("backendBasepath", "https://unknown.host.com:443");
+		createVariable("expectedReturnCode", "35"); // Must fail!
 		createVariable("enforce", "true"); // Must be enforced, as it's a breaking change
 		swaggerImport.doExecute(context);
 		

@@ -13,6 +13,7 @@ import com.axway.apim.swagger.api.state.DesiredAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class APIDefintion {
@@ -44,31 +45,49 @@ public class APIDefintion {
 		try {
 			if(CommandParameters.getInstance().replaceHostInSwagger() && getAPIDefinitionType()==IAPI.SWAGGGER_API) {
 				if(importAPI.getBackendBasepath()!=null) {
+					boolean backendBasepathAdjusted = false;
 					URL url = new URL(importAPI.getBackendBasepath());
 					String port = url.getPort()==-1 ? ":"+String.valueOf(url.getDefaultPort()) : ":"+String.valueOf(url.getPort());
 					if(port.equals(":443") || port.equals(":80")) port = "";
 					ObjectMapper objectMapper = new ObjectMapper();
 					JsonNode swagger = objectMapper.readTree(apiDefinitionContent);
 					if(swagger.get("host")==null) {
-						LOG.info("Adding new host '"+url.getHost()+port+"' to Swagger-File based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+						LOG.debug("Adding new host '"+url.getHost()+port+"' to Swagger-File based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+						backendBasepathAdjusted = true;
 						((ObjectNode)swagger).put("host", url.getHost()+port);
-						this.apiDefinitionContent = objectMapper.writeValueAsBytes(swagger);
 					} else {
 						if(swagger.get("host").asText().equals(url.getHost()+port)) {
-							LOG.info("Swagger Host: '"+swagger.get("host").asText()+"' already matches configured backendBasepath: '"+importAPI.getBackendBasepath()+"'. Nothing to do.");
+							LOG.debug("Swagger Host: '"+swagger.get("host").asText()+"' already matches configured backendBasepath: '"+importAPI.getBackendBasepath()+"'. Nothing to do.");
 						} else {
-							LOG.info("Replacing existing host: '"+swagger.get("host").asText()+"' in Swagger-File to '"+url.getHost()+port+"' based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+							LOG.debug("Replacing existing host: '"+swagger.get("host").asText()+"' in Swagger-File to '"+url.getHost()+port+"' based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+							backendBasepathAdjusted = true;
 							((ObjectNode)swagger).put("host", url.getHost()+port);
-							this.apiDefinitionContent = objectMapper.writeValueAsBytes(swagger);
 						}
 					}
 					if(url.getPath()!=null && !url.getPath().equals("")) {
 						if(swagger.get("basePath").asText().equals(url.getPath())) {
-							LOG.info("Swagger basePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasepath: '"+url.getPath()+"'. Nothing to do.");
+							LOG.debug("Swagger basePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasepath: '"+url.getPath()+"'. Nothing to do.");
 						} else {
-							LOG.info("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.getPath()+"' based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+							LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.getPath()+"' based on configured backendBasepath: '"+importAPI.getBackendBasepath()+"'");
+							backendBasepathAdjusted = true;
 							((ObjectNode)swagger).put("basePath", url.getPath());
 						}
+					}
+					 ArrayNode newSchemes = objectMapper.createArrayNode();
+					 newSchemes.add(url.getProtocol());
+					if(swagger.get("schemes")==null) {
+						LOG.debug("Adding protocol: '"+url.getProtocol()+"' to Swagger-Definition");
+						backendBasepathAdjusted = true;
+						((ObjectNode)swagger).set("schemes", newSchemes);
+					} else {
+						if(swagger.get("schemes").size()!=1 || !swagger.get("schemes").get(0).asText().equals(url.getProtocol())) {
+							LOG.debug("Replacing existing protocol(s): '"+swagger.get("schemes")+"' with '"+url.getProtocol()+"' according to configured backendBasePath: '"+importAPI.getBackendBasepath()+"'.");
+							backendBasepathAdjusted = true;
+							((ObjectNode)swagger).replace("schemes", newSchemes);
+						}
+					}
+					if(backendBasepathAdjusted) {
+						LOG.info("Used the configured backendBasepath: '"+importAPI.getBackendBasepath()+"' to adjust the Swagger definition.");
 					}
 					this.apiDefinitionContent = objectMapper.writeValueAsBytes(swagger);
 				}

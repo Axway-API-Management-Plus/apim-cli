@@ -4,7 +4,7 @@
    "state":"published",
    "summary":"My complete API-Summary",
    "version":"1.0.0",
-   "organization":"API Development",
+   "organization":"API Development ${orgNumber}",
    "descriptionType":"manual",
    "descriptionManual":"This is my __markdown__ based API description.",
    "vhost":"api.custom-host.com",
@@ -65,8 +65,8 @@
    },
    "corsProfiles":[
       {
-         "name":"New CORS Profile",
-         "isDefault":false,
+         "name":"_default",
+         "isDefault":true,
          "origins":[
             "*"
          ],
