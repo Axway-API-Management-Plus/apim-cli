@@ -47,8 +47,31 @@ public class App {
 		
 	public static int run(String args[]) {
 		try {
+			CommandLineParser parser = new RelaxedParser();
+			CommandLine cmd = null;
+			CommandLine internalCmd = null;
+			
 			Options options = new Options();
 			Option option;
+			
+			option = new  Option("h", "help", false, "Print the help");
+			option.setRequired(false);
+			options.addOption(option);
+			
+			option = new  Option("rc", "returncodes", false, "Print the possible return codes and description.");
+			option.setRequired(false);
+			options.addOption(option);
+			
+			cmd = parser.parse(options, args);
+
+			if(cmd.hasOption("returncodes")) {
+				String spaces = "                                   ";
+				System.out.println("Possible error codes and their meaning:\n");
+				for(ErrorCode code : ErrorCode.values()) {
+					System.out.println(code.name() + spaces.substring(code.name().length()) + "("+code.getCode()+")" + ": " + code.getDescription());
+				}
+				System.exit(0);
+			}
 			
 			option = new Option("a", "apidefinition", true, "(Optional) The API Definition either as Swagger (JSON-Formated) or a WSDL for SOAP-Services:\n"
 					+ "- in local filesystem using a relative or absolute path. Example: swagger_file.json\n"
@@ -132,19 +155,14 @@ public class App {
 			option.setRequired(false);
 			option.setArgName("true");
 			internalOptions.addOption(option);
+			
+			
+			
+			
 
-			option = new  Option("h", "help", false, "Print the help");
-			option.setRequired(false);
-			internalOptions.addOption(option);
-			
-			
-			CommandLineParser parser = new RelaxedParser();
-			
-			CommandLine cmd = null;
-			CommandLine internalCmd = null;
 			
 			System.out.println("------------------------------------------------------------------------");
-			System.out.println("API-Manager Promote Version: "+App.class.getPackage().getImplementationVersion());
+			System.out.println("API-Manager Promote: "+App.class.getPackage().getImplementationVersion() + " - I M P O R T");
 			System.out.println("                                                                        ");
 			System.out.println("To report issues or get help, please visit: ");
 			System.out.println("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
@@ -163,6 +181,7 @@ public class App {
 				printUsage(options, "Usage information");
 				System.exit(0);
 			}
+
 			
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();

@@ -35,7 +35,7 @@ public class CreateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/").build();
-			String json = "{\"apiId\":\"" + context.get("backendAPIId") + "\",\"organizationId\":\"" + this.desiredState.getOrgId() + "\"}";
+			String json = "{\"apiId\":\"" + context.get("backendAPIId") + "\",\"organizationId\":\"" + this.desiredState.getOrganizationId() + "\"}";
 			entity = new StringEntity(json);
 			
 			RestAPICall createAPIProxy = new POSTRequest(entity, uri, this);

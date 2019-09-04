@@ -7,7 +7,7 @@ import org.apache.commons.lang.StringUtils;
 public class QuotaRestriction {
 	String api;
 	String method;
-	String type;
+	QuotaRestrictiontype type;
 	
 	Map<String, String> config;
 
@@ -27,11 +27,11 @@ public class QuotaRestriction {
 		this.method = method;
 	}
 
-	public String getType() {
+	public QuotaRestrictiontype getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(QuotaRestrictiontype type) {
 		this.type = type;
 	}
 
@@ -48,7 +48,7 @@ public class QuotaRestriction {
 		return 
 				StringUtils.equals(otherRestriction.getMethod(), this.getMethod()) &&
 				StringUtils.equals(otherRestriction.getApi(), this.getApi()) &&
-				StringUtils.equals(otherRestriction.getType(), this.getType()) &&
+				otherRestriction.getType()==this.getType() &&
 				StringUtils.equals(otherRestriction.getConfig().get("period"), this.getConfig().get("period")) &&
 				StringUtils.equals(otherRestriction.getConfig().get("per"), this.getConfig().get("per"));
 	}
@@ -60,7 +60,7 @@ public class QuotaRestriction {
 			QuotaRestriction quotaRestriction = (QuotaRestriction)other;
 			return
 					StringUtils.equals(quotaRestriction.getMethod(), this.getMethod()) &&
-					StringUtils.equals(quotaRestriction.getType(), this.getType()) &&
+					quotaRestriction.getType()==this.getType() &&
 					quotaRestriction.getConfig().equals(this.getConfig());
 		} else {
 			return false;

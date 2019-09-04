@@ -19,7 +19,7 @@ done
 
 echo ""
 
-"$JAVA_HOME/bin/java" -Xms64m -Xmx256m -classpath "$CP" com.axway.apim.App $*
+"$JAVA_HOME/bin/java" -Xms64m -Xmx256m -classpath "$CP" com.axway.apim.App "${@}"
 rc=$?
 if [ $rc -eq 10 ];then
         echo "No changes detected. Existing with RC: 0"

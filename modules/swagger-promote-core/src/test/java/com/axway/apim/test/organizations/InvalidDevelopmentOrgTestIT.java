@@ -34,7 +34,7 @@ public class InvalidDevelopmentOrgTestIT extends TestNGCitrusTestDesigner {
 		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/dynamic-organization.json");
-		createVariable("status", "published");
+		createVariable("state", "published");
 		createVariable("expectedReturnCode", "57");
 		action(swaggerImport);
 	}
@@ -67,7 +67,7 @@ public class InvalidDevelopmentOrgTestIT extends TestNGCitrusTestDesigner {
 		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/dynamic-organization.json");
-		createVariable("status", "published");
+		createVariable("state", "published");
 		
 		createVariable("expectedReturnCode", "57");
 		action(swaggerImport);

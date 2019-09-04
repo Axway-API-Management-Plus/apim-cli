@@ -128,11 +128,19 @@ public class OutboundProfile {
 	public String getRequestPolicy() {
 		return requestPolicy;
 	}
-
+	
 	public void setRequestPolicy(String requestPolicy) throws AppException {
-		if(requestPolicy!=null && !requestPolicy.startsWith("<") && !requestPolicy.equals("")) 
-			requestPolicy = getPolicy(apimRequestPolicies, requestPolicy, "request");
-		this.requestPolicy = requestPolicy;
+		setRequestPolicy(requestPolicy, true);
+	}
+
+	public void setRequestPolicy(String requestPolicy, boolean parseInternal) throws AppException {
+		if(!parseInternal) {
+			this.requestPolicy = requestPolicy;
+		} else {
+			if(requestPolicy!=null && !requestPolicy.startsWith("<")) 
+				requestPolicy = getPolicy(apimRequestPolicies, requestPolicy, "request");
+			this.requestPolicy = requestPolicy;
+		}
 	}
 
 	public String getResponsePolicy() {
@@ -140,9 +148,17 @@ public class OutboundProfile {
 	}
 
 	public void setResponsePolicy(String responsePolicy) throws AppException {
-		if(responsePolicy!=null && !responsePolicy.startsWith("<") && !responsePolicy.equals("")) 
-			responsePolicy = getPolicy(apimResponsePolicies, responsePolicy, "response");
-		this.responsePolicy = responsePolicy;
+		setResponsePolicy(responsePolicy, true);
+	}
+
+	public void setResponsePolicy(String responsePolicy, boolean parseInternal) throws AppException {
+		if(!parseInternal) {
+			this.responsePolicy = responsePolicy;
+		} else {
+			if(responsePolicy!=null && !responsePolicy.startsWith("<")) 
+				responsePolicy = getPolicy(apimResponsePolicies, responsePolicy, "response");
+			this.responsePolicy = responsePolicy;
+		}
 	}
 
 	public String getRoutePolicy() {
@@ -150,9 +166,17 @@ public class OutboundProfile {
 	}
 
 	public void setRoutePolicy(String routePolicy) throws AppException {
-		if(routePolicy!=null && !routePolicy.startsWith("<") && !routePolicy.equals("")) 
-			routePolicy = getPolicy(apimRoutingPolicies, routePolicy, "routing");
-		this.routePolicy = routePolicy;
+		setRoutePolicy(routePolicy, true);
+	}
+
+	public void setRoutePolicy(String routePolicy, boolean parseInternal) throws AppException {
+		if(!parseInternal) {
+			this.routePolicy = routePolicy;
+		} else {
+			if(routePolicy!=null && !routePolicy.startsWith("<")) 
+				routePolicy = getPolicy(apimRoutingPolicies, routePolicy, "routing");
+			this.routePolicy = routePolicy;
+		}
 	}
 
 	public String getFaultHandlerPolicy() {
@@ -160,9 +184,17 @@ public class OutboundProfile {
 	}
 
 	public void setFaultHandlerPolicy(String faultHandlerPolicy) throws AppException {
-		if(faultHandlerPolicy!=null && !faultHandlerPolicy.startsWith("<") && !faultHandlerPolicy.equals("")) 
-			faultHandlerPolicy = getPolicy(apimFaultHandlerPolicies, faultHandlerPolicy, "fault handler");
-		this.faultHandlerPolicy = faultHandlerPolicy;
+		setFaultHandlerPolicy(faultHandlerPolicy, true);
+	}
+
+	public void setFaultHandlerPolicy(String faultHandlerPolicy, boolean parseInternal) throws AppException {
+		if(!parseInternal) {
+			this.faultHandlerPolicy = faultHandlerPolicy;
+		} else {
+			if(faultHandlerPolicy!=null && !faultHandlerPolicy.startsWith("<")) 
+				faultHandlerPolicy = getPolicy(apimFaultHandlerPolicies, faultHandlerPolicy, "fault handler");
+			this.faultHandlerPolicy = faultHandlerPolicy;
+		}
 	}
 
 	public String getApiMethodId() {
