@@ -1,5 +1,0 @@
-com\axway\apim\api\export\APIExportConfigAdapter.class
-com\axway\apim\api\export\jackson\serializer\APIQuotaSerializer.class
-com\axway\apim\ExportApp.class
-com\axway\apim\api\export\ExportAPI.class
-com\axway\apim\api\export\jackson\serializer\AIPQuotaSerializerModifier.class
