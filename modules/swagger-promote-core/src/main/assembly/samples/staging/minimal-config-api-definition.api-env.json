@@ -1,5 +1,5 @@
 {
 	"name": "Samples Staging API-ENV override", 
-	"apiDefinition":"samples/petstore.json", 
+	"apiDefinition":"../petstore.json", 
 	"organization": "API Development" 
 }

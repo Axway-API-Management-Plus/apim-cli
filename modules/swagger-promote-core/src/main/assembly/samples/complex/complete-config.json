@@ -4,12 +4,12 @@
    "state":"published",
    "summary":"My complete API-Summary",
    "version":"1.0.0",
-   "organization":"API Development ${orgNumber}",
+   "organization":"API Development",
    "descriptionType":"manual",
    "descriptionManual":"This is my __markdown__ based API description.",
    "vhost":"api.custom-host.com",
    "backendBasepath":"https://any.server.com:7676",
-   "image": "images/sample-api-icon.jpg", 
+   "image": "../images/sample-api-icon.jpg", 
    "securityProfiles":[
       {
          "name":"_default",
@@ -82,22 +82,22 @@
    ],
    "caCerts":[
       {
-         "certFile":"certificates/swaggerio.crt",
+         "certFile":"../certificates/swaggerio.crt",
          "useForOutbound":true,
          "useForInbound":false
       },
       {
-         "certFile":"certificates/GoDaddyRootCertificateAuthority-G2.crt",
+         "certFile":"../certificates/GoDaddyRootCertificateAuthority-G2.crt",
          "useForOutbound":true,
          "useForInbound":false
       },
       {
-         "certFile":"certificates/GoDaddySecureCertificateAuthority-G2.crt",
+         "certFile":"../certificates/GoDaddySecureCertificateAuthority-G2.crt",
          "useForOutbound":true,
          "useForInbound":false
       },
       {
-         "certFile":"certificates/GlobalSignRootCA-R2.crt",
+         "certFile":"../certificates/GlobalSignRootCA-R2.crt",
          "useForOutbound":false,
          "useForInbound":true
       }
