@@ -1,6 +1,7 @@
 package com.axway.apim;
 
 import java.io.File;
+import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -93,12 +94,12 @@ public class ExportApp {
 				cmd = parser.parse(options, args);
 				internalCmd = parser.parse( internalOptions, args);
 			} catch (ParseException e) {
-				printUsage(options, e.getMessage());
+				printUsage(options, e.getMessage(), args);
 				System.exit(99);
 			}
 			
 			if(cmd.hasOption("help")) {
-				printUsage(options, "Usage information");
+				printUsage(options, "Usage information", args);
 				System.exit(0);
 			}
 			
@@ -139,21 +140,28 @@ public class ExportApp {
 		}
 	}
 	
-	private static void printUsage(Options options, String message) {
+	private static void printUsage(Options options, String message, String[] args) {
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.setWidth(140);
-		String scriptExt = "sh";
-		if(System.getProperty("os.name").toLowerCase().contains("win")) scriptExt = "bat";
+		// Special handling when called from a Choco-Shiem executable
+		String binary;
+		if(args!=null && Arrays.asList(args).contains("choco")) {
+			binary = "api-export";
+		} else {
+			String scriptExt = "sh";
+			if(System.getProperty("os.name").toLowerCase().contains("win")) scriptExt = "bat";
+			binary = "scripts"+File.separator+"api-export."+scriptExt;
+		}
 		
-		formatter.printHelp("Swagger-Export", options, true);
+		formatter.printHelp("API-Export", options, true);
 		System.out.println("\n");
 		System.out.println("ERROR: " + message);
 		System.out.println("\n");
 		System.out.println("You may run one of the following examples:");
-		System.out.println("scripts"+File.separator+"run-api-export."+scriptExt+" -a /api/v1/ -l my_apis -h location -u apiadmin -p changeme");
+		System.out.println(binary+" -a /api/v1/ -l my_apis -h location -u apiadmin -p changeme");
 		System.out.println();
 		System.out.println("Using parameters provided in properties file stored in conf-folder:");
-		System.out.println("scripts"+File.separator+"run-api-export."+scriptExt+" -a /api/v1/ -l my_apis -s api-env");
+		System.out.println(binary+" -a /api/v1/ -l my_apis -s api-env");
 		System.out.println();
 		System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 	}
