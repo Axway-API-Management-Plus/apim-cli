@@ -40,6 +40,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.App;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
@@ -118,7 +119,7 @@ public class APIImportConfigAdapter {
 		try {
 			this.pathToAPIDefinition = pathToAPIDefinition;
 			this.usingOrgAdmin = usingOrgAdmin;
-			this.apiConfigFile = URLDecoder.decode(apiConfigFile, "UTF-8");
+			this.apiConfigFile = locateAPIConfigFile(apiConfigFile);
 			baseConfig = mapper.readValue(substitueVariables(new File(this.apiConfigFile)), DesiredAPI.class);
 			if(getStageConfig(stage, this.apiConfigFile)!=null) {
 				try {
@@ -135,6 +136,21 @@ public class APIImportConfigAdapter {
 		} catch (Exception e) {
 			error.setError("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE);
 			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
+		}
+	}
+	
+	private static String locateAPIConfigFile(String apiConfigFile) throws AppException {
+		try {
+			apiConfigFile = URLDecoder.decode(apiConfigFile, "UTF-8");
+			File configFile = new File(apiConfigFile);
+			if(configFile.exists()) return configFile.getCanonicalPath();
+			// This is mainly to load the samples sitting inside the package!
+			String installFolder = new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getParent();
+			configFile = new File(installFolder + File.separator + apiConfigFile);
+			if(configFile.exists()) return configFile.getCanonicalPath();
+			throw new AppException("Unable to find given Config-File: '"+apiConfigFile+"'", ErrorCode.CANT_READ_CONFIG_FILE);
+		} catch (Exception e) {
+			throw new AppException("Unable to find given Config-File: '"+apiConfigFile+"'", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 	}
 	

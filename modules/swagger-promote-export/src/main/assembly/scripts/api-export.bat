@@ -26,17 +26,10 @@ GOTO :END
 
 CD %currentDir%
 
-"%JAVA_HOME%\bin\java" -Xms64m -Xmx256m -classpath "%CLASSPATH%" com.axway.apim.App %*
+"%JAVA_HOME%\bin\java" -Xms64m -Xmx256m -classpath "%CLASSPATH%" com.axway.apim.ExportApp %*
 SET ERRNO=%ERRORLEVEL%
-IF %ERRNO% EQU 10 (
-  ECHO "No changes detected. Existing with RC: 0"
-  SET ERRNO=0
-  GOTO :END
-)
 
 :END
 SET CLASSPATH=%bkpClassPath%
-
-ECHO "This script is DEPRECATED and will be removed in a future release. Please use 'api-import.bat' instead."
 
 EXIT /B %ERRNO%
