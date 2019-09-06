@@ -13,13 +13,12 @@
     <copyright>Axway</copyright>
     <licenseUrl>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/blob/develop/LICENSE</licenseUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <projectSourceUrl>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</projectSourceUrl>
     <docsUrl>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki</docsUrl>
     <bugTrackerUrl>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/issues</bugTrackerUrl>
     <tags>axway api devops apimanager</tags>
     <summary>Axway API-Manager CLI</summary>
     <description>Tool that simplifies your DevOps experience with the Axway API-Manager Version 7.x.</description>
-    <!--releaseNotes>__REPLACE_OR_REMOVE__MarkDown_Okay</releaseNotes-->
+    <releaseNotes>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases</releaseNotes>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
