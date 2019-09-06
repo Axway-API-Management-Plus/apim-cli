@@ -8,7 +8,7 @@ $packageArgs = @{
   file          = $fileLocation
 
   softwareName  = 'axway-swagger-promote'
-  checksum      = '668E387EC21D9C355D30EC02999387D85F8DBD4EE56E6844FCA70097590CD060EB0CECB124909F8E6905D838066398D992B8B822F33E89EAB75BB240A3741BF0'
+  checksum      = '1CF9B7D060A19DAD8141E9DB49AAFFF2'
   checksumType  = 'sha256'
 }
 
