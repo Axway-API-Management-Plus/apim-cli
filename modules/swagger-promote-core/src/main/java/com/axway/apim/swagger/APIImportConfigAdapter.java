@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +40,8 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.App;
+import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
@@ -55,6 +58,9 @@ import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.organization.Organization;
 import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
+import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
+import com.axway.apim.swagger.api.properties.quota.QuotaRestrictionDeserializer;
+import com.axway.apim.swagger.api.properties.securityprofiles.DeviceType;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 import com.axway.apim.swagger.api.state.AbstractAPI;
@@ -63,6 +69,7 @@ import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 
@@ -105,17 +112,20 @@ public class APIImportConfigAdapter {
 	 */
 	public APIImportConfigAdapter(String apiConfigFile, String stage, String pathToAPIDefinition, boolean usingOrgAdmin) throws AppException {
 		super();
-		this.apiConfigFile = apiConfigFile;
-		this.pathToAPIDefinition = pathToAPIDefinition;
-		this.usingOrgAdmin = usingOrgAdmin;
+		SimpleModule module = new SimpleModule();
+		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer());
+		mapper.registerModule(module);
 		IAPI baseConfig;
 		try {
-			baseConfig = mapper.readValue(substitueVariables(new File(apiConfigFile)), DesiredAPI.class);
-			if(getStageConfig(stage, apiConfigFile)!=null) {
+			this.pathToAPIDefinition = pathToAPIDefinition;
+			this.usingOrgAdmin = usingOrgAdmin;
+			this.apiConfigFile = locateAPIConfigFile(apiConfigFile);
+			baseConfig = mapper.readValue(substitueVariables(new File(this.apiConfigFile)), DesiredAPI.class);
+			if(getStageConfig(stage, this.apiConfigFile)!=null) {
 				try {
 					ObjectReader updater = mapper.readerForUpdating(baseConfig);
-					apiConfig = updater.readValue(substitueVariables(new File(getStageConfig(stage, apiConfigFile))));
-					LOG.info("Loaded stage API-Config from file: " + getStageConfig(stage, apiConfigFile));
+					apiConfig = updater.readValue(substitueVariables(new File(getStageConfig(stage, this.apiConfigFile))));
+					LOG.info("Loaded stage API-Config from file: " + getStageConfig(stage, this.apiConfigFile));
 				} catch (FileNotFoundException e) {
 					LOG.debug("No config file found for stage: '"+stage+"'");
 					apiConfig = baseConfig;
@@ -129,6 +139,21 @@ public class APIImportConfigAdapter {
 		}
 	}
 	
+	private static String locateAPIConfigFile(String apiConfigFile) throws AppException {
+		try {
+			apiConfigFile = URLDecoder.decode(apiConfigFile, "UTF-8");
+			File configFile = new File(apiConfigFile);
+			if(configFile.exists()) return configFile.getCanonicalPath();
+			// This is mainly to load the samples sitting inside the package!
+			String installFolder = new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getParent();
+			configFile = new File(installFolder + File.separator + apiConfigFile);
+			if(configFile.exists()) return configFile.getCanonicalPath();
+			throw new AppException("Unable to find given Config-File: '"+apiConfigFile+"'", ErrorCode.CANT_READ_CONFIG_FILE);
+		} catch (Exception e) {
+			throw new AppException("Unable to find given Config-File: '"+apiConfigFile+"'", ErrorCode.CANT_READ_CONFIG_FILE);
+		}
+	}
+	
 	/**
 	 * This method is replacing variables such as ${TokenEndpoint} with declared variables coming from either 
 	 * the Environment-Variables or from system-properties.
@@ -138,7 +163,7 @@ public class APIImportConfigAdapter {
 	 */
 	private String substitueVariables(File inputFile) throws IOException {
 		StringSubstitutor substitutor = new StringSubstitutor(CommandParameters.getInstance().getEnvironmentProperties());
-		String givenConfig = new String(Files.readAllBytes(inputFile.toPath()));
+		String givenConfig = new String(Files.readAllBytes(inputFile.toPath()), StandardCharsets.UTF_8);
 		givenConfig = StringSubstitutor.replace(givenConfig, System.getenv());
 		return substitutor.replace(givenConfig);
 	}
@@ -227,14 +252,14 @@ public class APIImportConfigAdapter {
 	
 	private void validateOrganization(IAPI apiConfig) throws AppException {
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
-			apiConfig.setOrgId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
+			apiConfig.setOrganizationId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
 		} else {
 			String desiredOrgId = APIManagerAdapter.getInstance().getOrgId(apiConfig.getOrganization(), true);
 			if(desiredOrgId==null) {
 				error.setError("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION, false);
 				throw new AppException("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
 			}
-			apiConfig.setOrgId(desiredOrgId);
+			apiConfig.setOrganizationId(desiredOrgId);
 		}
 	}
 
@@ -265,8 +290,8 @@ public class APIImportConfigAdapter {
 			return;
 		}
 		List<String> allDesiredOrgs = new ArrayList<String>();
+		List<Organization> allOrgs = APIManagerAdapter.getInstance().getAllOrgs();
 		if(apiConfig.getClientOrganizations().contains("ALL")) {
-			List<Organization> allOrgs = APIManagerAdapter.getInstance().getAllOrgs();
 			for(Organization org : allOrgs) {
 				allDesiredOrgs.add(org.getName());
 			}
@@ -278,6 +303,21 @@ public class APIImportConfigAdapter {
 			// we have to add the Owning-Org as a desired org
 			if(!apiConfig.getClientOrganizations().contains(apiConfig.getOrganization())) {
 				apiConfig.getClientOrganizations().add(apiConfig.getOrganization());
+			}
+			// And validate each configured organization really exists in the API-Manager
+			Iterator<String> it = apiConfig.getClientOrganizations().iterator();
+			String invalidClientOrgs = null;
+			while(it.hasNext()) {
+				String org = it.next();
+				Organization desiredOrg = new Organization();
+				desiredOrg.setName(org);
+				if(!allOrgs.contains(desiredOrg)) {
+					LOG.warn("Unknown organization with name: '" + desiredOrg.getName() + "' configured. Ignoring this organization.");
+					invalidClientOrgs = invalidClientOrgs==null ? org : invalidClientOrgs + ", "+org;
+					APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_ORGANIZATIONS.name(), invalidClientOrgs);
+					it.remove();
+					continue;
+				}
 			}
 		}
 	}
@@ -367,12 +407,15 @@ public class APIImportConfigAdapter {
 		if(apiConfig.getApplications()!=null) {
 			LOG.info("Handling configured client-applications.");
 			ListIterator<ClientApplication> it = apiConfig.getApplications().listIterator();
+			String invalidClientApps = null;
 			while(it.hasNext()) {
 				app = it.next();
 				if(app.getName()!=null) {
 					loadedApp = APIManagerAdapter.getInstance().getApplication(app.getName());
 					if(loadedApp==null) {
 						LOG.warn("Unknown application with name: '" + app.getName() + "' configured. Ignoring this application.");
+						invalidClientApps = invalidClientApps==null ? app.getName() : invalidClientApps + ", "+app.getName();
+						APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_APPLICATIONS.name(), invalidClientApps);
 						it.remove();
 						continue;
 					}
@@ -631,7 +674,7 @@ public class APIImportConfigAdapter {
 		InboundProfile defaultProfile = new InboundProfile();
 		defaultProfile.setSecurityProfile("_default");
 		defaultProfile.setCorsProfile("_default");
-		defaultProfile.setMonitorAPI("true");
+		defaultProfile.setMonitorAPI(true);
 		defaultProfile.setMonitorSubject("authentication.subject.id");
 		importApi.getInboundProfiles().put("_default", defaultProfile);
 		return importApi;
@@ -657,8 +700,8 @@ public class APIImportConfigAdapter {
 			passthroughProfile.setIsDefault(true);
 			SecurityDevice passthroughDevice = new SecurityDevice();
 			passthroughDevice.setName("Pass Through");
-			passthroughDevice.setType("passThrough");
-			passthroughDevice.setOrder("0");
+			passthroughDevice.setType(DeviceType.passThrough);
+			passthroughDevice.setOrder(0);
 			passthroughDevice.getProperties().put("subjectIdFieldName", "Pass Through");
 			passthroughDevice.getProperties().put("removeCredentialsOnSuccess", "true");
 			passthroughProfile.getDevices().add(passthroughDevice);
@@ -699,7 +742,15 @@ public class APIImportConfigAdapter {
 		Iterator<String> it = importApi.getOutboundProfiles().keySet().iterator();
 		while(it.hasNext()) {
 			String profileName = it.next();
-			if(profileName.equals("_default")) return importApi; // Nothing to, there is a default profile
+			if(profileName.equals("_default")) {
+				// Validate the _default Outbound-Profile has an AuthN-Profile, otherwise we must add (See isseu #133)
+				OutboundProfile profile = importApi.getOutboundProfiles().get(profileName);
+				if(profile.getAuthenticationProfile()==null) {
+					LOG.warn("Provided default outboundProfile doesn't contain AuthN-Profile - Setting it to default");
+					profile.setAuthenticationProfile("_default");
+				}
+			}
+			return importApi;
 		}
 		OutboundProfile defaultProfile = new OutboundProfile();
 		defaultProfile.setAuthenticationProfile("_default");

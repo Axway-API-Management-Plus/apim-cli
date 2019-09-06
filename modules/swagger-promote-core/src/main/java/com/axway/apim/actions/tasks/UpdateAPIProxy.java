@@ -3,6 +3,7 @@ package com.axway.apim.actions.tasks;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -46,7 +47,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 			handledChangedProps(lastJsonReponse, this.desiredState, this.actualState, changedProps);
 		
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+context.get("virtualAPIId")).build();
-			entity = new StringEntity(objectMapper.writeValueAsString(lastJsonReponse));
+			entity = new StringEntity(objectMapper.writeValueAsString(lastJsonReponse), StandardCharsets.UTF_8);
 			
 			RestAPICall updateAPIProxy = new PUTRequest(entity, uri, this);
 			updateAPIProxy.execute();

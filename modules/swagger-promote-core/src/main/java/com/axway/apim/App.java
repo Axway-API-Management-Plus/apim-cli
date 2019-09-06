@@ -1,6 +1,7 @@
 package com.axway.apim;
 
 import java.io.File;
+import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -47,8 +48,31 @@ public class App {
 		
 	public static int run(String args[]) {
 		try {
+			CommandLineParser parser = new RelaxedParser();
+			CommandLine cmd = null;
+			CommandLine internalCmd = null;
+			
 			Options options = new Options();
 			Option option;
+			
+			option = new  Option("h", "help", false, "Print the help");
+			option.setRequired(false);
+			options.addOption(option);
+			
+			option = new  Option("rc", "returncodes", false, "Print the possible return codes and description.");
+			option.setRequired(false);
+			options.addOption(option);
+			
+			cmd = parser.parse(options, args);
+
+			if(cmd.hasOption("returncodes")) {
+				String spaces = "                                   ";
+				System.out.println("Possible error codes and their meaning:\n");
+				for(ErrorCode code : ErrorCode.values()) {
+					System.out.println(code.name() + spaces.substring(code.name().length()) + "("+code.getCode()+")" + ": " + code.getDescription());
+				}
+				System.exit(0);
+			}
 			
 			option = new Option("a", "apidefinition", true, "(Optional) The API Definition either as Swagger (JSON-Formated) or a WSDL for SOAP-Services:\n"
 					+ "- in local filesystem using a relative or absolute path. Example: swagger_file.json\n"
@@ -132,19 +156,9 @@ public class App {
 			option.setRequired(false);
 			option.setArgName("true");
 			internalOptions.addOption(option);
-
-			option = new  Option("h", "help", false, "Print the help");
-			option.setRequired(false);
-			internalOptions.addOption(option);
-			
-			
-			CommandLineParser parser = new RelaxedParser();
-			
-			CommandLine cmd = null;
-			CommandLine internalCmd = null;
 			
 			System.out.println("------------------------------------------------------------------------");
-			System.out.println("API-Manager Promote Version: "+App.class.getPackage().getImplementationVersion());
+			System.out.println("API-Manager Promote: "+App.class.getPackage().getImplementationVersion() + " - I M P O R T");
 			System.out.println("                                                                        ");
 			System.out.println("To report issues or get help, please visit: ");
 			System.out.println("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
@@ -155,14 +169,15 @@ public class App {
 				cmd = parser.parse(options, args);
 				internalCmd = parser.parse( internalOptions, args);
 			} catch (ParseException e) {
-				printUsage(options, e.getMessage());
+				printUsage(options, e.getMessage(), args);
 				System.exit(99);
 			}
 			
 			if(cmd.hasOption("help")) {
-				printUsage(options, "Usage information");
+				printUsage(options, "Usage information", args);
 				System.exit(0);
 			}
+
 			
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
@@ -209,24 +224,31 @@ public class App {
 		}
 	}
 	
-	private static void printUsage(Options options, String message) {
+	private static void printUsage(Options options, String message, String[] args) {
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.setWidth(140);
-		String scriptExt = "sh";
-		if(System.getProperty("os.name").toLowerCase().contains("win")) scriptExt = "bat";
+		String binary;
+		// Special handling when called from a Choco-Shiem executable
+		if(args!=null && Arrays.asList(args).contains("choco")) {
+			binary = "api-import";
+		} else {
+			String scriptExt = "sh";
+			if(System.getProperty("os.name").toLowerCase().contains("win")) scriptExt = "bat";
+			binary = "scripts"+File.separator+"api-import."+scriptExt;
+		}
 		
-		formatter.printHelp("Swagger-Import", options, true);
+		formatter.printHelp("API-Import", options, true);
 		System.out.println("\n");
 		System.out.println("ERROR: " + message);
 		System.out.println("\n");
 		System.out.println("You may run one of the following examples:");
-		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/basic/minimal-config.json -h localhost -u apiadmin -p changeme");
-		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/basic/minimal-config.json -h localhost -u apiadmin -p changeme -s prod");
-		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -a samples/petstore.json -c samples/complex/complete-config.json -h localhost -u apiadmin -p changeme");
+		System.out.println(binary+" -c samples/basic/minimal-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme");
+		System.out.println(binary+" -c samples/basic/minimal-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme -s prod");
+		System.out.println(binary+" -c samples/complex/complete-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme");
 		System.out.println();
 		System.out.println();
 		System.out.println("Using parameters provided in properties file stored in conf-folder:");
-		System.out.println("scripts"+File.separator+"run-swagger-import."+scriptExt+" -c samples/basic/minimal-config-api-definition.json -s api-env");
+		System.out.println(binary+" -c samples/basic/minimal-config-api-definition.json -s api-env");
 		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");
 		System.out.println("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/tree/develop/modules/swagger-promote-core/src/main/assembly/samples");

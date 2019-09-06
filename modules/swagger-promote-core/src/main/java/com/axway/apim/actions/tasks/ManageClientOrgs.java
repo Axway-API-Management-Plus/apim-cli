@@ -167,7 +167,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 				continue;
 			}
 			if(APIManagerAdapter.getInstance().getOrgId(orgName)==null) {
-				LOG.error("Configured organizations: " + APIManagerAdapter.getInstance().getAllOrgs());
+				LOG.warn("Configured organizations: " + APIManagerAdapter.getInstance().getAllOrgs());
 				ErrorState.getInstance().setError("Unknown Org-Name: '" + orgName + "'", ErrorCode.UNKNOWN_ORGANIZATION, false);
 				throw new AppException("Unknown Org-Name: '" + orgName + "'", ErrorCode.UNKNOWN_ORGANIZATION);
 			}

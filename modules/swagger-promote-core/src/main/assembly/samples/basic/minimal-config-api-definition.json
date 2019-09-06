@@ -3,6 +3,6 @@
 	"path": "/sample/minimal/apidefinition/api/v1",
 	"state": "unpublished",
 	"version": "1.0.0",
-	"apiDefinition":"samples/petstore.json",
+	"apiDefinition":"../petstore.json",
 	"organization": "API Development" 
 }

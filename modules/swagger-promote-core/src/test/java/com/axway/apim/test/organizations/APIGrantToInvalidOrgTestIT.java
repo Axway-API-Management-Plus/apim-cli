@@ -30,7 +30,16 @@ public class APIGrantToInvalidOrgTestIT extends TestNGCitrusTestDesigner {
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("orgName2", "Invalid Org 0815");
-		createVariable("expectedReturnCode", "57");
+		createVariable("expectedReturnCode", "0");
+		action(swaggerImport);
+		
+		echo("####### Perform the No-Change, as the additionally configured invalid org should not lead to a change #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
+		createVariable("state", "published");
+		createVariable("orgName", "${orgName}");
+		createVariable("orgName2", "Invalid Org 0815");
+		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
 	}
 }

@@ -15,6 +15,7 @@ import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
+import com.axway.apim.swagger.api.properties.tags.TagMap;
 
 public interface IAPI {
 	
@@ -32,6 +33,8 @@ public interface IAPI {
 	public String getPath() throws AppException;
 	
 	public String getState() throws AppException;
+	
+	public Long getRetirementDate();
 	
 	public void setState(String state) throws AppException;
 	
@@ -60,9 +63,9 @@ public interface IAPI {
 	
 	public void setValid(boolean valid);
 	
-	public String getOrgId() throws AppException;
+	public String getOrganizationId() throws AppException;
 	
-	public void setOrgId(String orgId);
+	public void setOrganizationId(String orgId);
 	
 	public String getOrganization();
 	
@@ -78,7 +81,7 @@ public interface IAPI {
 	
 	public APIImage getImage();
 	
-	public Map<String, String[]> getTags();
+	public TagMap<String, String[]> getTags();
 	
 	public APIDefintion getAPIDefinition();
 	

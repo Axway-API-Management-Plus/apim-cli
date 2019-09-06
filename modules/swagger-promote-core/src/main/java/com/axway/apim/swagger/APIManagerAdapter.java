@@ -36,11 +36,13 @@ import com.axway.apim.actions.rest.GETRequest;
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
+import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
 import com.axway.apim.swagger.api.properties.APIDefintion;
+import com.axway.apim.swagger.api.properties.APIImage;
 import com.axway.apim.swagger.api.properties.apiAccess.APIAccess;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
 import com.axway.apim.swagger.api.properties.cacerts.CaCert;
@@ -151,6 +153,7 @@ public class APIManagerAdapter {
 		} else {
 			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getName() +" (Version: "+ changeState.getActualAPI().getVersion() + ")");
 			if(!changeState.hasAnyChanges()) {
+				APIPropertiesExport.getInstance().setProperty("feApiId", changeState.getActualAPI().getId());
 				LOG.debug("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
 				error.setWarning("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE, false);
 				throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE);
@@ -357,9 +360,10 @@ public class APIManagerAdapter {
 		IAPI apiManagerApi;
 		try {
 			apiManagerApi = mapper.readValue(jsonConfiguration.toString(), ActualAPI.class);
-			apiManagerApi.setAPIDefinition(new APIDefintion(getOriginalAPIDefinitionFromAPIM(apiManagerApi.getApiId())));
+			((ActualAPI)apiManagerApi).setApiConfiguration(jsonConfiguration);
+			apiManagerApi.setAPIDefinition(getOriginalAPIDefinitionFromAPIM(apiManagerApi.getApiId()));
 			if(apiManagerApi.getImage()!=null) {
-				apiManagerApi.getImage().setImageContent(getAPIImageFromAPIM(apiManagerApi.getId()));
+				((ActualAPI)apiManagerApi).setImage(getAPIImageFromAPIM(apiManagerApi.getId())); 
 			}
 			apiManagerApi.setValid(true);
 			// As the API-Manager REST doesn't provide information about Custom-Properties, we have to setup 
@@ -378,6 +382,7 @@ public class APIManagerAdapter {
 			addQuotaConfiguration(apiManagerApi, desiredAPI);
 			addClientOrganizations(apiManagerApi, desiredAPI);
 			addClientApplications(apiManagerApi, desiredAPI);
+			addOrgName(apiManagerApi, desiredAPI);
 			addExistingClientAppQuotas(apiManagerApi.getApplications());
 			return apiManagerApi;
 		} catch (Exception e) {
@@ -424,6 +429,20 @@ public class APIManagerAdapter {
 		}
 		apiManagerApi.setApplications(existingClientApps);
 	}
+	
+	private void addOrgName(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
+		if(apiManagerApi.getOrganization()!=null) return;
+		if(desiredAPI!=null) {
+			// Is desiredOrgId is the same as the actual org just take over the desired Org-Name
+			if(desiredAPI.getOrganizationId().equals(apiManagerApi.getOrganizationId())) {
+				((ActualAPI)apiManagerApi).setOrganization(desiredAPI.getOrganization());
+			} else {
+				String actualOrgName = getOrgName(apiManagerApi.getOrganizationId());
+				((ActualAPI)apiManagerApi).setOrganization(actualOrgName);
+			}
+		}
+	}
+	
 	private void addExistingClientAppQuotas(List<ClientApplication> existingClientApps) throws AppException {
 		if(existingClientApps==null || existingClientApps.size()==0) return; // No apps subscribed to this APIs
 		for(ClientApplication app : existingClientApps) {
@@ -757,29 +776,42 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static byte[] getOriginalAPIDefinitionFromAPIM(String backendApiID) throws AppException {
+	private static APIDefintion getOriginalAPIDefinitionFromAPIM(String backendApiID) throws AppException {
 		URI uri;
+		APIDefintion apiDefinition;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+backendApiID+"/download")
 					.setParameter("original", "true").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			HttpResponse response=getRequest.execute();
 			String res = EntityUtils.toString(response.getEntity(),StandardCharsets.UTF_8);
-			return res.getBytes(StandardCharsets.UTF_8);
+			apiDefinition = new APIDefintion(res.getBytes(StandardCharsets.UTF_8));
+			if(response.containsHeader("Content-Disposition")) {
+				String origFilename = response.getHeaders("Content-Disposition")[0].getValue();
+				apiDefinition.setAPIDefinitionFile(origFilename.substring(origFilename.indexOf("filename=")+9));
+			}
+			return apiDefinition;
 		} catch (Exception e) {
 			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		}
 	}
 	
-	private static byte[] getAPIImageFromAPIM(String backendApiID) throws AppException {
+	private static APIImage getAPIImageFromAPIM(String backendApiID) throws AppException {
+		APIImage image = new APIImage();
 		URI uri;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+backendApiID+"/image").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
-			HttpEntity response = getRequest.execute().getEntity();
+			HttpResponse response = getRequest.execute();
 			if(response == null) return null; // no Image found in API-Manager
-			InputStream is = response.getContent();
-			return IOUtils.toByteArray(is);
+			InputStream is = response.getEntity().getContent();
+			image.setImageContent(IOUtils.toByteArray(is));
+			image.setBaseFilename("api-image");
+			if(response.containsHeader("Content-Type")) {
+				String contentType = response.getHeaders("Content-Type")[0].getValue();
+				image.setContentType(contentType);
+			}
+			return image;
 		} catch (Exception e) {
 			throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
@@ -1026,8 +1058,13 @@ public class APIManagerAdapter {
 					.build();
 			POSTRequest postRequest = new POSTRequest(entity, uri, null);
 			postRequest.setContentType(null);
-			HttpEntity response = postRequest.execute().getEntity();
-			JsonNode jsonResponse = mapper.readTree(response.getContent());
+			HttpResponse httpResponse = postRequest.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if( statusCode != 200){
+				LOG.error("Can't decode provided certificate. Message: '"+EntityUtils.toString(httpResponse.getEntity())+"' Response-Code: "+statusCode+"");
+				throw new AppException("Can't decode provided certificate: " + cert.getCertFile(), ErrorCode.API_MANAGER_COMMUNICATION);
+			}
+			JsonNode jsonResponse = mapper.readTree(httpResponse.getEntity().getContent());
 			return jsonResponse;
 		} catch (Exception e) {
 			throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -1062,6 +1099,10 @@ public class APIManagerAdapter {
 	}
 	
 	public <profile> void translateMethodIds(Map<String, profile> profiles, IAPI actualAPI) throws AppException {
+		translateMethodIds(profiles, actualAPI, false);
+	}
+	
+	public <profile> void translateMethodIds(Map<String, profile> profiles, IAPI actualAPI, boolean toMethodames) throws AppException {
 		Map<String, profile> updatedEntries = new LinkedHashMap<String, profile>();
 		if(profiles!=null) {
 			List<APIMethod> methods = null;
@@ -1071,15 +1112,28 @@ public class APIManagerAdapter {
 				if(key.equals("_default")) continue;
 				if(methods==null) methods = getAllMethodsForAPI(actualAPI.getId());
 				for(APIMethod method : methods) {
-					if(method.getName().equals(key)) {
-						profile value = profiles.get(key);
-						if(value instanceof OutboundProfile) {
-							((OutboundProfile)value).setApiMethodId(method.getApiMethodId());
-							((OutboundProfile)value).setApiId(method.getApiId());
+					if(toMethodames) {
+						if(method.getId().equals(key)) { // Look for the methodId
+							profile value = profiles.get(key);
+							if(value instanceof OutboundProfile) {
+								((OutboundProfile)value).setApiMethodId(method.getName()); // Put the name as the ID!
+								((OutboundProfile)value).setApiId(method.getApiId());
+							}
+							updatedEntries.put(method.getName(), value);
+							keys.remove();
+							break;
+						}						
+					} else {
+						if(method.getName().equals(key)) {
+							profile value = profiles.get(key);
+							if(value instanceof OutboundProfile) {
+								((OutboundProfile)value).setApiMethodId(method.getApiMethodId());
+								((OutboundProfile)value).setApiId(method.getApiId());
+							}
+							updatedEntries.put(method.getId(), profiles.get(key));
+							keys.remove();
+							break;
 						}
-						updatedEntries.put(method.getId(), profiles.get(key));
-						keys.remove();
-						break;
 					}
 				}
 			}

@@ -1,14 +1,19 @@
 package com.axway.apim.test;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +32,8 @@ public class ImportTestAction extends AbstractTestAction {
 	
 	private static Logger LOG = LoggerFactory.getLogger(ImportTestAction.class);
 	
+	File testDir = null;
+	
 	@Override
 	public void doExecute(TestContext context) {
 		String origApiDefinition 			= context.getVariable(API_DEFINITION);
@@ -34,6 +41,7 @@ public class ImportTestAction extends AbstractTestAction {
 		String stage				= null;
 		String apiDefinition			= null;
 		boolean useEnvironmentOnly = false;
+		testDir = createTestDirectory(context);
 		try {
 			stage 				= context.getVariable("stage");
 		} catch (CitrusRuntimeException ignore) {};
@@ -92,6 +100,8 @@ public class ImportTestAction extends AbstractTestAction {
 			// This creates the dynamic staging config file! (For testing, we also support reading out of a file directly)
 			replaceDynamicContentInFile(stageConfigFile, context, replacedStagedConfig);
 		}
+		copyImagesAndCertificates(origConfigFile, context);
+		
 		String[] args;
 		if(useEnvironmentOnly) {
 			args = new String[] {  
@@ -135,13 +145,13 @@ public class ImportTestAction extends AbstractTestAction {
 			if(is == null) {
 				throw new IOException("Unable to read swagger file from: " + pathToFile);
 			}
-			String jsonData = IOUtils.toString(is);
+			String jsonData = IOUtils.toString(is, StandardCharsets.UTF_8);
 			String filename = pathToFile.substring(pathToFile.lastIndexOf("/")+1); // e.g.: petstore.json, no-change-xyz-config.<stage>.json, 
 
 			String jsonReplaced = context.replaceDynamicContentInString(jsonData);
 
 			os = new FileOutputStream(new File(replacedFilename));
-			IOUtils.write(jsonReplaced, os);
+			IOUtils.write(jsonReplaced, os, StandardCharsets.UTF_8);
 			
 			return replacedFilename;
 		} catch (FileNotFoundException e) {
@@ -166,12 +176,37 @@ public class ImportTestAction extends AbstractTestAction {
 		String prefix = origFilename.substring(0, origFilename.indexOf(".")+1);
 		String suffix = origFilename.substring(origFilename.indexOf("."));
 		try {
-			File tempFile = File.createTempFile(prefix, suffix);
+			File tempFile = File.createTempFile(prefix, suffix, testDir);
 			tempFile.deleteOnExit();
 			return tempFile.getAbsolutePath();
 		} catch (IOException e) {
 			LOG.error("Cant create temp file", e);
 			throw new RuntimeException(e);
+		}
+	}
+	
+	private File createTestDirectory(TestContext context) {
+		int randomNum = ThreadLocalRandom.current().nextInt(1, 999 + 1);
+		String apiName = context.getVariable("apiName");
+		String testDirName = "ImportActionTest-" + apiName.replace(" ", "") + "-" + randomNum;
+		String tmpDir = System.getProperty("java.io.tmpdir");
+		File testDir = new File(tmpDir + File.separator + testDirName);
+		if(!testDir.mkdir()) {
+			throw new RuntimeException("Failed to create Test-Directory: " + tmpDir + File.separator + testDirName);
+		}
+		LOG.info("Successfully created Test-Directory: "+tmpDir + File.separator + testDirName);
+		return testDir;
+	}
+	
+	private void copyImagesAndCertificates(String origConfigFile, TestContext context) {
+		File sourceDir = new File(origConfigFile).getParentFile();
+		if(!sourceDir.exists()) return;
+		FileFilter filter = new WildcardFileFilter(new String[] {"*.crt", "*.jpg", "*.png"});
+		try {
+			LOG.info("Copy certificates and images from source: "+sourceDir+" into test-dir: '"+testDir+"'");
+			FileUtils.copyDirectory(sourceDir, testDir, filter);
+		} catch (IOException e) {
+
 		}
 	}
 }

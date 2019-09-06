@@ -158,6 +158,21 @@ public class CaCert {
 	}
 
 	public String getCertFile() {
+		if(certFile==null) {
+			String finalName = null;
+			String certName = this.getName();
+			String[] nameParts = certName.split(",");
+			for(String namePart : nameParts) {
+				if(namePart.startsWith("CN=")) {
+					finalName = namePart.substring(3);
+					break;
+				}
+			}
+			finalName = finalName.replace(" ", "");
+			finalName = finalName.replace("*", "");
+			if(finalName.startsWith(".")) finalName = finalName.replaceFirst(".", "");
+			return finalName+".crt";
+		}
 		return certFile;
 	}
 
@@ -179,6 +194,11 @@ public class CaCert {
 
 	public void setUseForOutbound(String useForOutbound) {
 		this.outbound = useForOutbound;
+	}
+	
+	@Override
+	public String toString() {
+		return "CaCert [name=" + name + ", md5Fingerprint=" + md5Fingerprint + "]";
 	}
 
 	@Override

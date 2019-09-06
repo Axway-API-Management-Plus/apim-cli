@@ -21,6 +21,7 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
+import com.axway.apim.swagger.api.properties.quota.QuotaRestrictiontype;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -102,7 +103,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 				}
 				if(desiredRestriction.isSameRestriction(existingRestriction)) {
 					// If it the same restriction, we need to update this one!
-					if(existingRestriction.getType().equals("throttle")) {
+					if(existingRestriction.getType()==QuotaRestrictiontype.throttle) {
 						existingRestriction.getConfig().put("messages", desiredRestriction.getConfig().get("messages"));
 					} else {
 						existingRestriction.getConfig().put("mb", desiredRestriction.getConfig().get("mb"));

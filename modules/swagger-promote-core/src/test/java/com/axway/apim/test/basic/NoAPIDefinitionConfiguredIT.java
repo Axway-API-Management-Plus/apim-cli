@@ -1,22 +1,29 @@
 package com.axway.apim.test.basic;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.IOException;
+
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.test.ImportTestAction;
+import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
+import com.consol.citrus.context.TestContext;
+import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 
-@Test(testName="NoAPIDefinitionConfiguredIT")
-public class NoAPIDefinitionConfiguredIT extends TestNGCitrusTestDesigner {
-	
-	@Autowired
+@Test
+public class NoAPIDefinitionConfiguredIT extends TestNGCitrusTestRunner {
+
 	private ImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "NoAPIDefinitionConfiguredIT")
-	public void run() {
+	@CitrusTest
+	@Test @Parameters("context")
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+		swaggerImport = new ImportTestAction();
 		description("If no api-definition is passed as argument and no apiDefinition attribute is found in configuration file, the tool must fail with a dedicated return code.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -28,7 +35,7 @@ public class NoAPIDefinitionConfiguredIT extends TestNGCitrusTestDesigner {
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", String.valueOf(ErrorCode.NO_API_DEFINITION_CONFIGURED.getCode()));
-		action(swaggerImport);
+		swaggerImport.doExecute(context);
 	}
 
 }
