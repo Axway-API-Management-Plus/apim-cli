@@ -37,7 +37,7 @@ IF %ERRNO% EQU 10 (
 :END
 SET CLASSPATH=%bkpClassPath%
 
-ECHO ""
-ECHO ">>>> This script is DEPRECATED and will be removed in a future release. Please use 'api-import.bat' instead."
+ECHO 
+ECHO >>>> This script is DEPRECATED and will be removed in a future release. Please use 'api-import.bat' instead.
 
 EXIT /B %ERRNO%
