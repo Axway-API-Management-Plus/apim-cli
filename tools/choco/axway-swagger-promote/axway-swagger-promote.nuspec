@@ -4,7 +4,7 @@
   <metadata>
     <id>axway-swagger-promote</id>
     <version>1.6.2</version>
-    <packageSourceUrl>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases/download/1.6.2/apimanager-swagger-promote-1.6.2.ziphttps://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/tree/develop/tools/choco/axway-swagger-promote</packageSourceUrl>
+    <packageSourceUrl>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/tree/develop/tools/choco/axway-swagger-promote</packageSourceUrl>
     <owners>Christoph Wiechmann</owners>
     <title>Axway Swagger-Promote (Install)</title>
     <authors>Christoph Wiechmann</authors>
