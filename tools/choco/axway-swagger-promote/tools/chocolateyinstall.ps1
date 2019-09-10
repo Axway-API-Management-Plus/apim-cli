@@ -8,8 +8,6 @@ $packageArgs = @{
   file          = $fileLocation
 
   softwareName  = 'axway-swagger-promote'
-  checksum      = '1CF9B7D060A19DAD8141E9DB49AAFFF2'
-  checksumType  = 'sha256'
 }
 
 Get-ChocolateyUnzip "$fileLocation" $toolsDir
