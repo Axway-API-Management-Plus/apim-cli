@@ -14,13 +14,20 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+
+import javax.net.ssl.SSLContext;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -33,8 +40,12 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.ssl.SSLContexts;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -600,19 +611,8 @@ public class APIImportConfigAdapter {
 		String uri = url.getUri();
 		String username = url.getUsername();
 		String password = url.getPassword();
-		CloseableHttpClient httpclient = null;
+		CloseableHttpClient httpclient = createHttpClient(uri, username, password);
 		try {
-			if(username!=null) {
-				LOG.info("Loading API-Definition from: " + uri + " ("+username+")");
-				CredentialsProvider credsProvider = new BasicCredentialsProvider();
-				credsProvider.setCredentials(
-		                new AuthScope(AuthScope.ANY),
-		                new UsernamePasswordCredentials(username, password));
-				httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
-			} else {
-				LOG.info("Loading API-Definition from: " + uri);
-				httpclient = HttpClients.createDefault();
-			}
 			HttpGet httpGet = new HttpGet(uri);
 			
             ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
@@ -640,10 +640,49 @@ public class APIImportConfigAdapter {
 			} catch (Exception ignore) {}
 		}
 	}
+
+	private CloseableHttpClient createHttpClient(String uri, String username, String password) throws AppException {
+		HttpClientBuilder httpClientBuilder = HttpClients.custom();
+		try {
+			addBasicAuthCredential(uri, username, password, httpClientBuilder);
+			addSSLContext(uri, httpClientBuilder);
+			return httpClientBuilder.build();
+		} catch (Exception e) {
+			throw new AppException("Error during create http client for retrieving ...", ErrorCode.CANT_CREATE_HTTP_CLIENT);
+		}
+	}
+
+	private void addSSLContext(String uri, HttpClientBuilder httpClientBuilder) throws KeyManagementException,
+			NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException {
+		if (isHttpsUri(uri)) {
+			SSLConnectionSocketFactory sslCtx = createSSLContext();
+			if (sslCtx!=null) {
+				httpClientBuilder.setSSLSocketFactory(sslCtx);
+			}
+		}
+	}
+
+	private void addBasicAuthCredential(String uri, String username, String password,
+			HttpClientBuilder httpClientBuilder) {
+		if(username!=null) {
+			LOG.info("Loading API-Definition from: " + uri + " ("+username+")");
+			CredentialsProvider credsProvider = new BasicCredentialsProvider();
+			credsProvider.setCredentials(
+		            new AuthScope(AuthScope.ANY),
+		            new UsernamePasswordCredentials(username, password));
+			httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
+		} else {
+			LOG.info("Loading API-Definition from: " + uri);
+		}
+	}
 	
 	public static boolean isHttpUri(String pathToAPIDefinition) {
 		String httpUri = pathToAPIDefinition.substring(pathToAPIDefinition.indexOf("@")+1);
 		return( httpUri.startsWith("http://") || httpUri.startsWith("https://"));
+	}
+	
+	public static boolean isHttpsUri(String uri) {
+		return( uri.startsWith("https://") );
 	}
 	
 	private String getStageConfig(String stage, String apiConfig) {
@@ -870,6 +909,40 @@ public class APIImportConfigAdapter {
 	public void setPathToAPIDefinition(String pathToAPIDefinition) {
 		this.pathToAPIDefinition = pathToAPIDefinition;
 	}
+	
+	private SSLConnectionSocketFactory createSSLContext() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException {
+		String keyStorePath=System.getProperty("javax.net.ssl.keyStore","");
+		if (StringUtils.isNotEmpty(keyStorePath)) {
+			String keyStorePassword=System.getProperty("javax.net.ssl.keyStorePassword","");
+			if (StringUtils.isNotEmpty(keyStorePassword)) {
+				String keystoreType=System.getProperty("javax.net.ssl.keyStoreType",KeyStore.getDefaultType());
+				LOG.debug("Reading keystore from {}",keyStorePath);
+				KeyStore ks = KeyStore.getInstance(keystoreType);
+				ks.load(new FileInputStream(new File(keyStorePath)), keyStorePassword.toCharArray());
+				SSLContext sslcontext = SSLContexts.custom()
+	                .loadKeyMaterial(ks,keyStorePassword.toCharArray())
+	                .loadTrustMaterial(new TrustSelfSignedStrategy())
+	                .build();
+				String [] tlsProts = getAcceptedTLSProtocols();
+				SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+		                sslcontext,
+		                tlsProts,
+		                null,
+		                SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+				return sslsf;
+			}
+		} else {
+			LOG.debug("NO javax.net.ssl.keyStore property. Avoid to set SSLContextFactory ");
+		}
+		return null;
+	}
+
+	private String[] getAcceptedTLSProtocols() {
+		String protocols = System.getProperty("https.protocols","TLSv1.2"); //default TLSv1.2
+		LOG.debug("https protocols: {}",protocols);
+		return protocols.split(",");
+	}
+	
 	
 	
 }
