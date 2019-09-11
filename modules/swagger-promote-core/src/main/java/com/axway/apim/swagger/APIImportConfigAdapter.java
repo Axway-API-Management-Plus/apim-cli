@@ -18,6 +18,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -77,6 +78,7 @@ import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 import com.axway.apim.swagger.api.state.AbstractAPI;
 import com.axway.apim.swagger.api.state.DesiredAPI;
 import com.axway.apim.swagger.api.state.IAPI;
+import com.axway.apim.test.basic.DesiredTestAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -112,7 +114,13 @@ public class APIImportConfigAdapter {
 	
 	private ErrorState error = ErrorState.getInstance();
 
-
+	/**
+	 * Constructor just for testing. Don't use it!
+	 */
+	public APIImportConfigAdapter(IAPI apiConfig, String apiConfigFile) {
+		this.apiConfig = apiConfig;
+		this.apiConfigFile = apiConfigFile;
+	}
 	/**
 	 * Constructs the APIImportConfig 
 	 * @param apiConfigFile the API-Config given by the user
@@ -262,6 +270,7 @@ public class APIImportConfigAdapter {
 	}
 	
 	private void validateOrganization(IAPI apiConfig) throws AppException {
+		if(apiConfig instanceof DesiredTestAPI) return;
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
 			apiConfig.setOrganizationId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
 		} else {
@@ -664,6 +673,7 @@ public class APIImportConfigAdapter {
 
 	private void addBasicAuthCredential(String uri, String username, String password,
 			HttpClientBuilder httpClientBuilder) {
+		if(this.apiConfig instanceof DesiredTestAPI) return; // Don't do that when unit-testing
 		if(username!=null) {
 			LOG.info("Loading API-Definition from: " + uri + " ("+username+")");
 			CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -811,6 +821,9 @@ public class APIImportConfigAdapter {
 		if(!authnProfile.getType().equals(AuthType.ssl)) return;
 		String clientCert = authnProfile.getParameters().getProperty("certFile");
 		String password = authnProfile.getParameters().getProperty("password");
+		String[] result = extractKeystoreTypeFromCertFile(clientCert);
+		clientCert 			= result[0];
+		String storeType 	= result[1];
 		File clientCertFile = new File(clientCert);
 		InputStream is;
 		try {
@@ -829,18 +842,21 @@ public class APIImportConfigAdapter {
 			if(is==null) {
 				throw new AppException("Can't read Client-Cert-File: "+clientCert+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR);
 			}
-			is.mark(0);
-			KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
-			try {
-				store.load(is, password.toCharArray());
-			} catch (IOException e) {
-				if(e.getMessage().toLowerCase().contains("keystore password was incorrect")) {
-					ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config as password for keystore: '"+clientCertFile+"' is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
-					throw e;
-				} else {
-					ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config. Can't load keystore: '"+clientCertFile+"' for any reason.", ErrorCode.UNXPECTED_ERROR, true);
-					throw e;
+			KeyStore store = null;
+			if(storeType==null) {
+				LOG.debug("Loading keystore: '"+clientCertFile+"' trying the following types: " + Security.getAlgorithms("KeyStore"));
+				for(String type : Security.getAlgorithms("KeyStore")) {
+					store = loadKeystore(is, type, password);
+					if(store!=null) break;
 				}
+			} else {
+				LOG.debug("Loading keystore: '"+clientCertFile+"' using keystore type: '"+storeType+"'");
+				store = loadKeystore(is, storeType, password);
+			}
+			if(store==null) {
+				ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config. Can't load keystore: '"+clientCertFile+"' for any reason. "
+						+ "Turn on debug to see log messages.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
+				throw new AppException("Unable to configure Outbound SSL-Config. Can't load keystore: '"+clientCertFile+"' for any reason.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
 			}
 			Enumeration<String> e = store.aliases();
 			while (e.hasMoreElements()) {
@@ -849,6 +865,7 @@ public class APIImportConfigAdapter {
 				certificate.getEncoded();
 			}
 			is.reset();
+			if(this.apiConfig instanceof DesiredTestAPI) return; // Skip here when testing
 			JsonNode node = APIManagerAdapter.getFileData(is, clientCert);
 			String data = node.get("data").asText();
 			authnProfile.getParameters().setProperty("pfx", data);
@@ -858,7 +875,40 @@ public class APIImportConfigAdapter {
 		} 
 	}
 	
+	private KeyStore loadKeystore(InputStream is, String keystoreType, String password) throws IOException {
+		is.mark(0);
+		try {
+			KeyStore store = KeyStore.getInstance(keystoreType);
+			store.load(is, password.toCharArray());
+			return store;
+		} catch (IOException e) {
+			if(e.getMessage().toLowerCase().contains("keystore password was incorrect")) {
+				ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
+				throw e;
+			}
+			LOG.debug(e.getMessage());
+		} catch (Exception e) {
+			LOG.debug(e.getMessage());
+			return null;
+		}
+		return null;
+	}
+	
+	private String[] extractKeystoreTypeFromCertFile(String certFileName) throws AppException {
+		if(!certFileName.contains(":")) return new String[]{certFileName, null};
+		int pos = certFileName.lastIndexOf(":");
+		if(pos<3) return new String[]{certFileName, null}; // This occurs for the following format: c:/path/to/my/store
+		String type = certFileName.substring(pos+1);
+		if(!Security.getAlgorithms("KeyStore").contains(type)) {
+			ErrorState.getInstance().setError("Unknown keystore type: '"+type+"'. Supported: " + Security.getAlgorithms("KeyStore"), ErrorCode.WRONG_KEYSTORE_PASSWORD);
+			throw new AppException("Unknown keystore type: '"+type+"'. Supported: " + Security.getAlgorithms("KeyStore"), ErrorCode.WRONG_KEYSTORE_PASSWORD);
+		}
+		certFileName = certFileName.substring(0, pos);
+		return new String[]{certFileName, type};
+	}
+	
 	private void validateHasQueryStringKey(IAPI importApi) throws AppException {
+		if(importApi instanceof DesiredTestAPI) return; // Do nothing when unit-testing
 		if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return; // QueryStringRouting isn't supported
 		if(APIManagerAdapter.getInstance().hasAdminAccount()) {
 			String apiRoutingKeyEnabled = APIManagerAdapter.getApiManagerConfig("apiRoutingKeyEnabled");
