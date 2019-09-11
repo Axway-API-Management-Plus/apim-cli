@@ -16,8 +16,8 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthType;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
+import com.axway.apim.swagger.api.state.DesiredTestOnlyAPI;
 import com.axway.apim.swagger.api.state.IAPI;
-import com.axway.apim.test.basic.DesiredTestAPI;
 
 public class PrivateKeystoreLoadTest {
 	
@@ -45,7 +45,7 @@ public class PrivateKeystoreLoadTest {
 	
 	@Test
 	public void testWorkingKeystoreFile() throws AppException, IOException {
-		IAPI testAPI = new DesiredTestAPI();
+		IAPI testAPI = new DesiredTestOnlyAPI();
 		ArrayList<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
@@ -57,7 +57,7 @@ public class PrivateKeystoreLoadTest {
 	
 	@Test
 	public void testInvalidPasswordKeystoreFile() throws AppException, IOException {
-		IAPI testAPI = new DesiredTestAPI();
+		IAPI testAPI = new DesiredTestOnlyAPI();
 		ArrayList<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
 		profile.getParameters().setProperty("password", "thatswrong");
 		authnProfiles.add(profile);
@@ -75,7 +75,7 @@ public class PrivateKeystoreLoadTest {
 	
 	@Test
 	public void testInvalidKeystoreType() throws AppException, IOException {
-		IAPI testAPI = new DesiredTestAPI();
+		IAPI testAPI = new DesiredTestOnlyAPI();
 		ArrayList<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
 		profile.getParameters().setProperty("certFile", "/com/axway/apim/test/files/certificates/clientcert.pfx:ABC");
 		authnProfiles.add(profile);
@@ -92,7 +92,7 @@ public class PrivateKeystoreLoadTest {
 	
 	@Test
 	public void testvalidKeystoreType() throws AppException, IOException {
-		IAPI testAPI = new DesiredTestAPI();
+		IAPI testAPI = new DesiredTestOnlyAPI();
 		ArrayList<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
 		profile.getParameters().setProperty("certFile", "/com/axway/apim/test/files/certificates/clientcert.pfx:PKCS12");
 		authnProfiles.add(profile);

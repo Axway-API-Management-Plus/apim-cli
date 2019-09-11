@@ -77,8 +77,8 @@ import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 import com.axway.apim.swagger.api.state.AbstractAPI;
 import com.axway.apim.swagger.api.state.DesiredAPI;
+import com.axway.apim.swagger.api.state.DesiredTestOnlyAPI;
 import com.axway.apim.swagger.api.state.IAPI;
-import com.axway.apim.test.basic.DesiredTestAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -270,7 +270,7 @@ public class APIImportConfigAdapter {
 	}
 	
 	private void validateOrganization(IAPI apiConfig) throws AppException {
-		if(apiConfig instanceof DesiredTestAPI) return;
+		if(apiConfig instanceof DesiredTestOnlyAPI) return;
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
 			apiConfig.setOrganizationId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
 		} else {
@@ -673,7 +673,7 @@ public class APIImportConfigAdapter {
 
 	private void addBasicAuthCredential(String uri, String username, String password,
 			HttpClientBuilder httpClientBuilder) {
-		if(this.apiConfig instanceof DesiredTestAPI) return; // Don't do that when unit-testing
+		if(this.apiConfig instanceof DesiredTestOnlyAPI) return; // Don't do that when unit-testing
 		if(username!=null) {
 			LOG.info("Loading API-Definition from: " + uri + " ("+username+")");
 			CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -865,7 +865,7 @@ public class APIImportConfigAdapter {
 				certificate.getEncoded();
 			}
 			is.reset();
-			if(this.apiConfig instanceof DesiredTestAPI) return; // Skip here when testing
+			if(this.apiConfig instanceof DesiredTestOnlyAPI) return; // Skip here when testing
 			JsonNode node = APIManagerAdapter.getFileData(is, clientCert);
 			String data = node.get("data").asText();
 			authnProfile.getParameters().setProperty("pfx", data);
@@ -908,7 +908,7 @@ public class APIImportConfigAdapter {
 	}
 	
 	private void validateHasQueryStringKey(IAPI importApi) throws AppException {
-		if(importApi instanceof DesiredTestAPI) return; // Do nothing when unit-testing
+		if(importApi instanceof DesiredTestOnlyAPI) return; // Do nothing when unit-testing
 		if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return; // QueryStringRouting isn't supported
 		if(APIManagerAdapter.getInstance().hasAdminAccount()) {
 			String apiRoutingKeyEnabled = APIManagerAdapter.getApiManagerConfig("apiRoutingKeyEnabled");
