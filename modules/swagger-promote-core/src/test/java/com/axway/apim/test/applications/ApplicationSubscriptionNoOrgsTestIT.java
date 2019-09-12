@@ -21,8 +21,8 @@ public class ApplicationSubscriptionNoOrgsTestIT extends TestNGCitrusTestDesigne
 		description("Import an API and create an application subscription while not having defined any organization in the configuration.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/app-subscription-${apiNumber}");
-		variable("apiName", "App Subscription API-${apiNumber}");
+		variable("apiPath", "/app-subscription-no-orgs-${apiNumber}");
+		variable("apiName", "App Subscription No-Orgs API-${apiNumber}");
 		// ############## Creating Test-Application #################
 
 		createVariable("appName", "Consuming Test App ${orgNumber}");
