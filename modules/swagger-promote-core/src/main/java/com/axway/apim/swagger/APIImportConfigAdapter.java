@@ -43,11 +43,11 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.ssl.SSLContexts;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -819,77 +819,109 @@ public class APIImportConfigAdapter {
 	
 	private void handleOutboundSSLAuthN(AuthenticationProfile authnProfile) throws AppException {
 		if(!authnProfile.getType().equals(AuthType.ssl)) return;
-		String clientCert = authnProfile.getParameters().getProperty("certFile");
-		String password = authnProfile.getParameters().getProperty("password");
+		String clientCert = (String)authnProfile.getParameters().get("certFile");
+		String password = (String)authnProfile.getParameters().get("password");
 		String[] result = extractKeystoreTypeFromCertFile(clientCert);
 		clientCert 			= result[0];
 		String storeType 	= result[1];
 		File clientCertFile = new File(clientCert);
-		InputStream is;
+		String clientCertClasspath = null;
 		try {
 			if(!clientCertFile.exists()) {
 				// Try to find file using a relative path to the config file
 				String baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
 				clientCertFile = new File(baseDir + "/" + clientCert);
 			}
-			if(clientCertFile.exists()) {
-				is = new BufferedInputStream(new FileInputStream(clientCertFile));
-			} else {
+			if(!clientCertFile.exists()) {
 				// If not found absolute & relative - Try to load it from ClassPath
 				LOG.debug("Trying to load Client-Certificate from classpath");
-				is = this.getClass().getResourceAsStream(clientCert);
-			}
-			if(is==null) {
-				throw new AppException("Can't read Client-Cert-File: "+clientCert+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR);
+				if(this.getClass().getResource(clientCert)==null) {
+					throw new AppException("Can't read Client-Certificate-Keystore: "+clientCert+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR);
+				}
+				clientCertClasspath = clientCert;
 			}
 			KeyStore store = null;
-			if(storeType==null) {
-				LOG.debug("Loading keystore: '"+clientCertFile+"' trying the following types: " + Security.getAlgorithms("KeyStore"));
-				for(String type : Security.getAlgorithms("KeyStore")) {
-					store = loadKeystore(is, type, password);
-					if(store!=null) break;
-				}
-			} else {
-				LOG.debug("Loading keystore: '"+clientCertFile+"' using keystore type: '"+storeType+"'");
-				store = loadKeystore(is, storeType, password);
-			}
+			store = loadKeystore(clientCertFile, clientCertClasspath, storeType, password);
 			if(store==null) {
 				ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config. Can't load keystore: '"+clientCertFile+"' for any reason. "
 						+ "Turn on debug to see log messages.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
 				throw new AppException("Unable to configure Outbound SSL-Config. Can't load keystore: '"+clientCertFile+"' for any reason.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
 			}
+			X509Certificate certificate = null;
 			Enumeration<String> e = store.aliases();
 			while (e.hasMoreElements()) {
 				String alias = e.nextElement();
-				X509Certificate certificate = (X509Certificate) store.getCertificate(alias);
+				certificate = (X509Certificate) store.getCertificate(alias);
 				certificate.getEncoded();
 			}
-			is.reset();
 			if(this.apiConfig instanceof DesiredTestOnlyAPI) return; // Skip here when testing
-			JsonNode node = APIManagerAdapter.getFileData(is, clientCert);
+			JsonNode node = APIManagerAdapter.getFileData(certificate.getEncoded(), clientCert);
 			String data = node.get("data").asText();
-			authnProfile.getParameters().setProperty("pfx", data);
+			authnProfile.getParameters().put("pfx", data);
 			authnProfile.getParameters().remove("certFile");
 		} catch (Exception e) {
 			throw new AppException("Can't read Client-Cert-File: "+clientCert+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
 		} 
 	}
 	
-	private KeyStore loadKeystore(InputStream is, String keystoreType, String password) throws IOException {
-		is.mark(0);
-		try {
-			KeyStore store = KeyStore.getInstance(keystoreType);
-			store.load(is, password.toCharArray());
-			return store;
-		} catch (IOException e) {
-			if(e.getMessage().toLowerCase().contains("keystore password was incorrect")) {
-				ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
+	private KeyStore loadKeystore(File clientCertFile, String clientCertClasspath, String keystoreType, String password) throws IOException {
+		InputStream is = null;
+		KeyStore store = null;
+
+		if(keystoreType!=null) {
+			try {
+				// Get the Inputstream and load the keystore with the given Keystore-Type
+				if(clientCertClasspath==null) {
+					is = new BufferedInputStream(new FileInputStream(clientCertFile));
+				} else {
+					is = this.getClass().getResourceAsStream(clientCertClasspath);
+				}
+				LOG.debug("Loading keystore: '"+clientCertFile+"' using keystore type: '"+keystoreType+"'");
+				store = KeyStore.getInstance(keystoreType);
+				store.load(is, password.toCharArray());
+				return store;
+			} catch (IOException e) {
+				if(e.getMessage()!=null && e.getMessage().toLowerCase().contains("keystore password was incorrect")) {
+					ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
+					throw e;
+				}
+				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
 				throw e;
+			} catch (Exception e) {
+				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
+				return null;
+			} finally {
+				if(is!=null) is.close();
 			}
-			LOG.debug(e.getMessage());
-		} catch (Exception e) {
-			LOG.debug(e.getMessage());
-			return null;
+		}
+		// Otherwise we try every known type		
+		LOG.debug("Loading keystore: '"+clientCertFile+"' trying the following types: " + Security.getAlgorithms("KeyStore"));
+		for(String type : Security.getAlgorithms("KeyStore")) {
+			try {
+				LOG.debug("Trying to load keystore: '"+clientCertFile+"' using type: '"+type+"'");
+				// Get the Inputstream and load the keystore with the given Keystore-Type
+				if(clientCertClasspath==null) {
+					is = new BufferedInputStream(new FileInputStream(clientCertFile));
+				} else {
+					is = this.getClass().getResourceAsStream(clientCertClasspath);
+				}
+				store = KeyStore.getInstance(type);
+				store.load(is, password.toCharArray());
+				if(store!=null) {
+					LOG.debug("Successfully loaded keystore: '"+clientCertFile+"' with type: " + type);
+					return store;
+				}
+			} catch (IOException e) {
+				if(e.getMessage()!=null && e.getMessage().toLowerCase().contains("keystore password was incorrect")) {
+					ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
+					throw e;
+				}
+				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
+			} catch (Exception e) {
+				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
+			} finally {
+				if(is!=null) is.close();
+			}
 		}
 		return null;
 	}

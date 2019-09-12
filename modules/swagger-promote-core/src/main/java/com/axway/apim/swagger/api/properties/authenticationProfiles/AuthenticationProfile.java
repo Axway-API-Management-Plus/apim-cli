@@ -1,6 +1,7 @@
 package com.axway.apim.swagger.api.properties.authenticationProfiles;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -10,7 +11,7 @@ public class AuthenticationProfile {
 
 	private boolean isDefault;
 
-	private Properties parameters;
+	private Map<String, Object> parameters;
 	
 	private AuthType type;
 
@@ -34,12 +35,12 @@ public class AuthenticationProfile {
 		this.isDefault = isDefault;
 	}
 	
-	public Properties getParameters() {
-		if(parameters==null) return new Properties();
+	public Map<String, Object> getParameters() {
+		if(parameters==null) return new HashMap<String, Object>();
 		return parameters;
 	}
 
-	public void setParameters(Properties parameters) {
+	public void setParameters(Map<String, Object> parameters) {
 		this.parameters = parameters;
 	}
 
@@ -71,9 +72,9 @@ public class AuthenticationProfile {
 	public String toString() {
 		String parametersString = this.getParameters().toString();
 		if(type.equals(AuthType.ssl)) {
-			String pfx = parameters.getProperty("pfx");
+			String pfx = (String)parameters.get("pfx");
 			if(pfx.length()>50) pfx = pfx.substring(0, 49) + "...";
-			parametersString = "{trustAll="+this.getParameters().getProperty("trustAll")+", password=********, pfx="+pfx+"}";
+			parametersString = "{trustAll="+this.getParameters().get("trustAll")+", password=********, pfx="+pfx+"}";
 		}
 		return "AuthenticationProfile [name=" + name + ", isDefault=" + isDefault + ", parameters=" + parametersString
 				+ ", type=" + type + "]";

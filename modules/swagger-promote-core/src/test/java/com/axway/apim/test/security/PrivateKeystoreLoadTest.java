@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -35,11 +34,11 @@ public class PrivateKeystoreLoadTest {
 		profile.setName("_default");
 		profile.setIsDefault(true);
 		profile.setType(AuthType.ssl);
-		Properties parameters = new Properties();
-		parameters.setProperty("source", "file");
-		parameters.setProperty("trustAll", "true");
-		parameters.setProperty("password", "axway");
-		parameters.setProperty("certFile", "/com/axway/apim/test/files/certificates/clientcert.pfx");
+		Map<String, Object> parameters = new HashMap<>();
+		parameters.put("source", "file");
+		parameters.put("trustAll", "true");
+		parameters.put("password", "axway");
+		parameters.put("certFile", "/com/axway/apim/test/files/certificates/clientcert.pfx");
 		profile.setParameters(parameters);
 	}
 	
@@ -59,7 +58,7 @@ public class PrivateKeystoreLoadTest {
 	public void testInvalidPasswordKeystoreFile() throws AppException, IOException {
 		IAPI testAPI = new DesiredTestOnlyAPI();
 		ArrayList<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
-		profile.getParameters().setProperty("password", "thatswrong");
+		profile.getParameters().put("password", "thatswrong");
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
 		
@@ -77,7 +76,7 @@ public class PrivateKeystoreLoadTest {
 	public void testInvalidKeystoreType() throws AppException, IOException {
 		IAPI testAPI = new DesiredTestOnlyAPI();
 		ArrayList<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
-		profile.getParameters().setProperty("certFile", "/com/axway/apim/test/files/certificates/clientcert.pfx:ABC");
+		profile.getParameters().put("certFile", "/com/axway/apim/test/files/certificates/clientcert.pfx:ABC");
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
 		
@@ -94,7 +93,7 @@ public class PrivateKeystoreLoadTest {
 	public void testvalidKeystoreType() throws AppException, IOException {
 		IAPI testAPI = new DesiredTestOnlyAPI();
 		ArrayList<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
-		profile.getParameters().setProperty("certFile", "/com/axway/apim/test/files/certificates/clientcert.pfx:PKCS12");
+		profile.getParameters().put("certFile", "/com/axway/apim/test/files/certificates/clientcert.pfx:PKCS12");
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
 		

@@ -1079,14 +1079,14 @@ public class APIManagerAdapter {
 	 * @throws AppException when the certificate information can't be created
 	 * @return a Json-Object structure as needed by the API-Manager
 	 */
-	public static JsonNode getFileData(InputStream certFile, String filename) throws AppException {
+	public static JsonNode getFileData(byte[] certificate, String filename) throws AppException {
 		URI uri;
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/filedata/").build();
 			
 			HttpEntity entity = MultipartEntityBuilder.create()
-					.addBinaryBody("file", IOUtils.toByteArray(certFile), ContentType.create("application/x-pkcs12"), filename)
+					.addBinaryBody("file", certificate, ContentType.create("application/x-pkcs12"), filename)
 					.build();
 			POSTRequest postRequest = new POSTRequest(entity, uri, null);
 			postRequest.setContentType(null);
