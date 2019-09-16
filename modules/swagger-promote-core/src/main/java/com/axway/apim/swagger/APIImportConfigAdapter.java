@@ -439,7 +439,7 @@ public class APIImportConfigAdapter {
 						it.remove();
 						continue;
 					}
-					LOG.info("Found existing application: '"+app.getName()+"' based on given name '"+app.getName()+"'");
+					LOG.info("Found existing application: '"+app.getName()+"' ("+app.getId()+") based on given name '"+app.getName()+"'");
 				} else if(app.getApiKey()!=null) {
 					loadedApp = getAppForCredential(app.getApiKey(), APIManagerAdapter.CREDENTIAL_TYPE_API_KEY);
 					if(loadedApp==null) {
@@ -458,6 +458,13 @@ public class APIImportConfigAdapter {
 						it.remove();
 						continue;
 					} 
+				}
+				if(!APIManagerAdapter.getInstance().hasAdminAccount()) {
+					if(!apiConfig.getOrganizationId().equals(loadedApp.getOrganizationId())) {
+						LOG.warn("OrgAdmin can't handle application: '"+loadedApp.getName()+"' belonging to a different organization. Ignoring this application.");
+						it.remove();
+						continue;
+					}
 				}
 				it.set(loadedApp); // Replace the incoming app, with the App loaded from API-Manager
 			}

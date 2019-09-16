@@ -136,5 +136,56 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].id", "${apiId}")); // Must be the same API-ID as before!
+		
+		echo("####### Changing the state to unpublished #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/applications/1_api-with-1-org-some-apps.json");
+		createVariable("state", "unpublished");
+		createVariable("enforce", "true");
+		createVariable("orgName", "${orgName}");
+		createVariable("expectedReturnCode", "0");
+		swaggerImport.doExecute(context);
+		
+		echo("####### Re-Import the API forcing a re-creation with an ORG-ADMIN ONLY account, making sure App-Subscriptions a re-created #######");
+		createVariable("ignoreAdminAccount", "true"); // We need to ignore any given admin account!
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/applications/1_api-with-1-org-2-app.json");
+		createVariable("state", "unpublished");
+		createVariable("enforce", "false");
+		createVariable("orgName", "${orgName}");
+		createVariable("expectedReturnCode", "0");
+		// We only provide two apps instead of three, but the existing third subscription must stay!
+		createVariable("testAppName1", "${consumingTestApp1Name}");
+		createVariable("testAppName2", "${consumingTestApp2Name}");		
+		swaggerImport.doExecute(context);
+		
+		echo("####### Validate API: '${apiName}' has been RE-CREATED #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "newApiId"));
+		
+		echo("####### API has been RE-CREATED with ID: '${newApiId}' #######");
+		
+		echo("####### Validate created application 3 STILL has an active subscription to the API (Based on the name) #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestApp3Id}/apis").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.*.apiId", "${newApiId}"));
+		
+		echo("####### Validate Application 1 STILL has an active subscription to the API (based on the API-Key) #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestApp1Id}/apis").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.*.apiId", "${newApiId}"));
+		
+		echo("####### Validate Application 2 STILL has an active subscription to the API (based on the Ext-Client-Id) #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestApp2Id}/apis")
+			.header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.*.apiId", "${newApiId}"));
 	}
 }

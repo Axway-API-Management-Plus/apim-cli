@@ -412,7 +412,6 @@ public class APIManagerAdapter {
 	}
 	
 	private void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
-		if(!hasAdminAccount) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> allApps = getAllApps();
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
@@ -553,8 +552,10 @@ public class APIManagerAdapter {
 	public ClientApplication getApplication(String appName) throws AppException {
 		if(allApps==null) getAllApps();
 		for(ClientApplication app : allApps) {
-			LOG.debug("Configured app with name: '"+appName+"' found. ID: '"+app.getId()+"'");
-			if(appName.equals(app.getName())) return app;
+			if(appName.equals(app.getName())) {
+				LOG.debug("Configured app with name: '"+appName+"' found. ID: '"+app.getId()+"'");
+				return app;
+			}
 		}
 		LOG.error("Requested AppId for unknown appName: " + appName);
 		return null;
@@ -622,7 +623,7 @@ public class APIManagerAdapter {
 					LOG.debug("Found credential (Type: '"+type+"'): '"+key+"' for application: '"+app.getName()+"'");
 					clientCredentialToAppMap.put(type+"_"+key, app);
 					if(key.equals(credential)) {
-						LOG.info("Found existing application: '"+app.getName()+"' based on credential (Type: '"+type+"'): '"+credential+"'");
+						LOG.info("Found existing application: '"+app.getName()+"' ("+app.getId()+") based on credential (Type: '"+type+"'): '"+credential+"'");
 						return app;
 					}
 				}
@@ -637,7 +638,7 @@ public class APIManagerAdapter {
 	
 	
 	
-	private static void addQuotaConfiguration(IAPI api, IAPI desiredAPI) throws AppException {
+	private void addQuotaConfiguration(IAPI api, IAPI desiredAPI) throws AppException {
 		// No need to load quota, if not given in the desired API
 		if(desiredAPI!=null && (desiredAPI.getApplicationQuota() == null && desiredAPI.getSystemQuota() == null)) return;
 		ActualAPI managerAPI = (ActualAPI)api;
@@ -653,7 +654,8 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static APIQuota getQuotaFromAPIManager(String identifier) throws AppException {
+	private APIQuota getQuotaFromAPIManager(String identifier) throws AppException {
+		if(!hasAdminAccount()) return null;
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
 		
@@ -878,7 +880,7 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static List<ClientApplication> getSubscribedApps(String apiId) throws AppException {
+	private List<ClientApplication> getSubscribedApps(String apiId) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
 		URI uri;
@@ -887,7 +889,7 @@ public class APIManagerAdapter {
 		}
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/applications").build();
-			RestAPICall getRequest = new GETRequest(uri, null, true);
+			RestAPICall getRequest = new GETRequest(uri, null, hasAdminAccount);
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			List<ClientApplication> subscribedApps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
@@ -900,8 +902,7 @@ public class APIManagerAdapter {
 	
 	public List<Organization> getAllOrgs() throws AppException {
 		if(!hasAdminAccount) {
-			LOG.error("Cant load all organizations without an Admin-Account.");
-			return null;
+			LOG.error("Using OrgAdmin only to load all organizations.");
 		}
 		if(APIManagerAdapter.allOrgs!=null) {
 			return APIManagerAdapter.allOrgs;
@@ -912,7 +913,7 @@ public class APIManagerAdapter {
 		URI uri;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations").build();
-			RestAPICall getRequest = new GETRequest(uri, null, true);
+			RestAPICall getRequest = new GETRequest(uri, null, hasAdminAccount);
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			allOrgs = mapper.readValue(response, new TypeReference<List<Organization>>(){});
@@ -950,8 +951,7 @@ public class APIManagerAdapter {
 	
 	public List<ClientApplication> getAllApps() throws AppException {
 		if(!hasAdminAccount) {
-			LOG.error("Cant load all applications without an Admin-Account.");
-			return null;
+			LOG.trace("Using OrgAdmin only to loading all applications.");
 		}
 		if(APIManagerAdapter.allApps!=null) {
 			LOG.trace("Not reloading existing apps from API-Manager. Number of apps: " + APIManagerAdapter.allApps.size());
@@ -964,7 +964,7 @@ public class APIManagerAdapter {
 		URI uri;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications").build();
-			RestAPICall getRequest = new GETRequest(uri, null, true);
+			RestAPICall getRequest = new GETRequest(uri, null, hasAdminAccount);
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			allApps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
