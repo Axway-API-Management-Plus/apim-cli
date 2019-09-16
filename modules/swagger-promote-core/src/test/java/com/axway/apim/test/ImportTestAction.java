@@ -186,13 +186,18 @@ public class ImportTestAction extends AbstractTestAction {
 	}
 	
 	private File createTestDirectory(TestContext context) {
-		int randomNum = ThreadLocalRandom.current().nextInt(1, 999 + 1);
+		int randomNum = ThreadLocalRandom.current().nextInt(1, 9999 + 1);
 		String apiName = context.getVariable("apiName");
 		String testDirName = "ImportActionTest-" + apiName.replace(" ", "") + "-" + randomNum;
 		String tmpDir = System.getProperty("java.io.tmpdir");
 		File testDir = new File(tmpDir + File.separator + testDirName);
 		if(!testDir.mkdir()) {
-			throw new RuntimeException("Failed to create Test-Directory: " + tmpDir + File.separator + testDirName);
+			randomNum = ThreadLocalRandom.current().nextInt(1, 9999 + 1);
+			testDirName = "ImportActionTest-" + apiName.replace(" ", "") + "-" + randomNum;
+			testDir = new File(tmpDir + File.separator + testDirName);
+			if(!testDir.mkdir()) {
+				throw new RuntimeException("Failed to create Test-Directory: " + tmpDir + File.separator + testDirName);
+			}
 		}
 		LOG.info("Successfully created Test-Directory: "+tmpDir + File.separator + testDirName);
 		return testDir;
