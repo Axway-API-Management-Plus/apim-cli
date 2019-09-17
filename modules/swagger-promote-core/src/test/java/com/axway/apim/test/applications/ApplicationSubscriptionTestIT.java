@@ -147,13 +147,13 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 		swaggerImport.doExecute(context);
 		
 		echo("####### Re-Import the API forcing a re-creation with an ORG-ADMIN ONLY account, making sure App-Subscriptions a re-created #######");
-		createVariable("ignoreAdminAccount", "true"); // We need to ignore any given admin account!
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/applications/1_api-with-1-org-2-app.json");
 		createVariable("state", "unpublished");
 		createVariable("enforce", "false");
 		createVariable("orgName", "${orgName}");
 		createVariable("expectedReturnCode", "0");
+		createVariable("ignoreAdminAccount", "true"); // We need to ignore any given admin account!
 		// We only provide two apps instead of three, but the existing third subscription must stay!
 		createVariable("testAppName1", "${consumingTestApp1Name}");
 		createVariable("testAppName2", "${consumingTestApp2Name}");		
