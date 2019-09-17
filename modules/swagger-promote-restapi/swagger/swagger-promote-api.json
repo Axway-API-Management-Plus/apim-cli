@@ -1,0 +1,78 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Swagger Promote API",
+        "version": "1.0"
+    },
+    "host": "example.com",
+    "paths": {
+        "/v1/swagger/promote/api": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {}
+                        }
+                    }
+                },
+                "summary": "Get the actual API",
+                "operationId": "export"
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "object",
+                            "properties": {}
+                        }
+                    }
+                },
+                "summary": "Replicate the desired API state",
+                "operationId": "import",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "configFile",
+                        "type": "file",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "apiDefinition",
+                        "type": "file"
+                    },
+                    {
+                        "in": "query",
+                        "name": "stage",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "hostname",
+                        "type": "string",
+                        "default": "api-env.host.com"
+                    },
+                    {
+                        "in": "query",
+                        "name": "force",
+                        "type": "boolean",
+                        "default": true
+                    },
+                    {
+                        "in": "header",
+                        "name": "username",
+                        "type": "string"
+                    },
+                    {
+                        "in": "header",
+                        "name": "password",
+                        "type": "string"
+                    }
+                ]
+            }
+        }
+    }
+}

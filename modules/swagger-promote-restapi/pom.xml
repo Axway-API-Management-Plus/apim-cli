@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+		<artifactId>axway-swagger-promote</artifactId>
+		<version>1.6.3-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>axway-swagger-promote-restapi</artifactId>
+	<packaging>jar</packaging>
+	<name>Axway API-Manager CLI Swagger-Promote REST-API Service</name>
+	<description>Provides a REST-API for Swagger-Promote to be executed from somewhere</description>
+	<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>axway-swagger-promote-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+      <groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+      <artifactId>axway-swagger-promote-core</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+	</dependencies>
+</project>
