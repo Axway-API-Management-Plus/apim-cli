@@ -869,7 +869,7 @@ public class APIManagerAdapter {
 		URI uri;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+type+"/"+id+"/apis").build();
-			RestAPICall getRequest = new GETRequest(uri, null, true);
+			RestAPICall getRequest = new GETRequest(uri, null, hasAdminAccount());
 			HttpResponse httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			allApiAccess = mapper.readValue(response, new TypeReference<List<APIAccess>>(){});
@@ -1141,8 +1141,8 @@ public class APIManagerAdapter {
 		}
 	}
 
-	public boolean hasAdminAccount() {
-		return hasAdminAccount;
+	public static boolean hasAdminAccount() throws AppException {
+		return APIManagerAdapter.getInstance().hasAdminAccount;
 	}
 	
 	public boolean isUsingOrgAdmin() {
