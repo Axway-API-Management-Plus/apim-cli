@@ -138,8 +138,10 @@ public class OutboundProfile {
 		if(!parseInternal) {
 			this.requestPolicy = requestPolicy;
 		} else {
-			if(requestPolicy.startsWith("<")) 
+			if(requestPolicy.startsWith("<")) {
 				this.requestPolicy = requestPolicy;
+				return;
+			}
 			if(requestPolicy.equals("")) 
 				return;
 			this.requestPolicy = getPolicy(apimRequestPolicies, requestPolicy, "request");
@@ -159,8 +161,10 @@ public class OutboundProfile {
 		if(!parseInternal) {
 			this.responsePolicy = responsePolicy;
 		} else {
-			if(responsePolicy.startsWith("<"))
+			if(responsePolicy.startsWith("<")) {
 				this.responsePolicy = responsePolicy;
+				return;
+			}
 			if(responsePolicy.equals("")) 
 				return;
 			this.responsePolicy = getPolicy(apimResponsePolicies, responsePolicy, "response");
@@ -182,6 +186,7 @@ public class OutboundProfile {
 		} else {
 			if(routePolicy!=null && routePolicy.startsWith("<")) {
 				this.routePolicy = routePolicy;
+				return;
 			}
 			if(routePolicy!=null && routePolicy.equals("")) return;
 			this.routePolicy = getPolicy(apimRoutingPolicies, routePolicy, "routing");
@@ -204,6 +209,7 @@ public class OutboundProfile {
 		} else {
 			if(faultHandlerPolicy!=null && faultHandlerPolicy.startsWith("<")) {
 				this.faultHandlerPolicy = faultHandlerPolicy;
+				return;
 			}
 			if(faultHandlerPolicy!=null && faultHandlerPolicy.equals("")) return;
 			this.faultHandlerPolicy = getPolicy(apimFaultHandlerPolicies, faultHandlerPolicy, "fault handler");
