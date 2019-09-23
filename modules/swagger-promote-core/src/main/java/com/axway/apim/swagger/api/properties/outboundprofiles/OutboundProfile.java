@@ -134,12 +134,15 @@ public class OutboundProfile {
 	}
 
 	public void setRequestPolicy(String requestPolicy, boolean parseInternal) throws AppException {
+		if(requestPolicy==null) return;
 		if(!parseInternal) {
 			this.requestPolicy = requestPolicy;
 		} else {
-			if(requestPolicy!=null && !requestPolicy.startsWith("<")) 
-				requestPolicy = getPolicy(apimRequestPolicies, requestPolicy, "request");
-			this.requestPolicy = requestPolicy;
+			if(requestPolicy.startsWith("<")) 
+				this.requestPolicy = requestPolicy;
+			if(requestPolicy.equals("")) 
+				return;
+			this.requestPolicy = getPolicy(apimRequestPolicies, requestPolicy, "request");
 		}
 	}
 
@@ -152,12 +155,15 @@ public class OutboundProfile {
 	}
 
 	public void setResponsePolicy(String responsePolicy, boolean parseInternal) throws AppException {
+		if(responsePolicy==null) return;
 		if(!parseInternal) {
 			this.responsePolicy = responsePolicy;
 		} else {
-			if(responsePolicy!=null && !responsePolicy.startsWith("<")) 
-				responsePolicy = getPolicy(apimResponsePolicies, responsePolicy, "response");
-			this.responsePolicy = responsePolicy;
+			if(responsePolicy.startsWith("<"))
+				this.responsePolicy = responsePolicy;
+			if(responsePolicy.equals("")) 
+				return;
+			this.responsePolicy = getPolicy(apimResponsePolicies, responsePolicy, "response");
 		}
 	}
 
@@ -170,12 +176,16 @@ public class OutboundProfile {
 	}
 
 	public void setRoutePolicy(String routePolicy, boolean parseInternal) throws AppException {
+		if(routePolicy==null) return;
 		if(!parseInternal) {
 			this.routePolicy = routePolicy;
 		} else {
-			if(routePolicy!=null && !routePolicy.startsWith("<")) 
-				routePolicy = getPolicy(apimRoutingPolicies, routePolicy, "routing");
-			this.routePolicy = routePolicy;
+			if(routePolicy!=null && routePolicy.startsWith("<")) {
+				this.routePolicy = routePolicy;
+			}
+			if(routePolicy!=null && routePolicy.equals("")) return;
+			this.routePolicy = getPolicy(apimRoutingPolicies, routePolicy, "routing");
+			
 		}
 	}
 
@@ -188,12 +198,15 @@ public class OutboundProfile {
 	}
 
 	public void setFaultHandlerPolicy(String faultHandlerPolicy, boolean parseInternal) throws AppException {
+		if(faultHandlerPolicy==null) return;
 		if(!parseInternal) {
 			this.faultHandlerPolicy = faultHandlerPolicy;
 		} else {
-			if(faultHandlerPolicy!=null && !faultHandlerPolicy.startsWith("<")) 
-				faultHandlerPolicy = getPolicy(apimFaultHandlerPolicies, faultHandlerPolicy, "fault handler");
-			this.faultHandlerPolicy = faultHandlerPolicy;
+			if(faultHandlerPolicy!=null && faultHandlerPolicy.startsWith("<")) {
+				this.faultHandlerPolicy = faultHandlerPolicy;
+			}
+			if(faultHandlerPolicy!=null && faultHandlerPolicy.equals("")) return;
+			this.faultHandlerPolicy = getPolicy(apimFaultHandlerPolicies, faultHandlerPolicy, "fault handler");
 		}
 	}
 
