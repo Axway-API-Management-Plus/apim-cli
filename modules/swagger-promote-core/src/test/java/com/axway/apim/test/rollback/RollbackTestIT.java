@@ -34,7 +34,8 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 		
 		// This error only appears on 7.7 or maybe higher 
 		// Has been fixed on 7.7 SP1 (See RDAPI-16491)
-		if(APIManagerAdapter.hasAPIManagerVersion("7.7") && !APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7") && // Only execute on 7.7 without a se5rvice
+				(!APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || !APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5"))) {
 			echo("####### Try to replicate APIs, that will fail #######");		
 			createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 			createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/rollback/backendbasepath-config.json");
@@ -73,7 +74,8 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 		// In Version 7.6.2 SP2 (only this version) the API-Manager is able to create a FE-API based on host: https://unknown.host.com:443 for any reason
 		// found no other way to force API-Manager to fail on initial FE-API creation!
 		// Execute this test only on higher version for now
-		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP3")) {
+		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP3") && 
+				(!APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || !APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5"))) {
 			echo("####### This will re-create the API, but it fails #######");		
 			createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
 			createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/rollback/backendbasepath-config.json");

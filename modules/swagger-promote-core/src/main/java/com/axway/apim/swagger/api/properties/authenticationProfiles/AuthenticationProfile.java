@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.axway.apim.swagger.APIManagerAdapter;
+
 public class AuthenticationProfile {
 
 	private String name;
@@ -58,11 +60,21 @@ public class AuthenticationProfile {
 			return false;
 		if (other instanceof AuthenticationProfile) {
 			AuthenticationProfile authenticationProfile = (AuthenticationProfile) other;
+			Map<String, Object> otherParameters = authenticationProfile.getParameters();
+			Map<String, Object> thisParameters = this.getParameters();
+			otherParameters.remove("_id_");
+			thisParameters.remove("_id_");
+			if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
+				// Password no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
+				otherParameters.remove("password");
+				thisParameters.remove("password");
+			}
 
-			return StringUtils.equals(authenticationProfile.getName(), this.getName())
+			boolean rc = StringUtils.equals(authenticationProfile.getName(), this.getName())
 					&& authenticationProfile.getIsDefault() == this.getIsDefault() 
 					&& StringUtils.equals(authenticationProfile.getType().name(),this.getType().name())
-					&& authenticationProfile.getParameters().equals(this.getParameters());
+					&& otherParameters.equals(thisParameters);
+			return rc;
 		} else {
 			return false;
 		}
