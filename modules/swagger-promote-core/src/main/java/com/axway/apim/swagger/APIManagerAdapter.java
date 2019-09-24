@@ -292,7 +292,7 @@ public class APIManagerAdapter {
 	 * @return false if API-Manager doesn't have this version otherwise true
 	 * @throws AppException if the API-Manager version can't be detected
 	 */
-	public static boolean hasAPIManagerVersion(String version) throws AppException {
+	public static boolean hasAPIManagerVersion(String version) {
 		try {
 			List<Integer> managerVersion	= getMajorVersions(getApiManagerVersion());
 			List<Integer> requestedVersion	= getMajorVersions(version);

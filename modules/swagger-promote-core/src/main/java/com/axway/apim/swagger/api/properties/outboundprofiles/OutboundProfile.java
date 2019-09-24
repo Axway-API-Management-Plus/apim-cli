@@ -1,8 +1,9 @@
 package com.axway.apim.swagger.api.properties.outboundprofiles;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -48,7 +49,7 @@ public class OutboundProfile {
 	
 	String authenticationProfile;
 	
-	Object[] parameters = new Object[] {};
+	List<Object> parameters = new ArrayList<Object>();
 
 	public OutboundProfile() throws AppException {
 		super();
@@ -232,11 +233,11 @@ public class OutboundProfile {
 		this.apiId = apiId;
 	}
 
-	public Object[] getParameters() {
+	public List<Object> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Object[] parameters) {
+	public void setParameters(List<Object> parameters) {
 		this.parameters = parameters;
 	}
 
@@ -244,16 +245,22 @@ public class OutboundProfile {
 	public boolean equals(Object other) {
 		if(other == null) return false;
 		if(other instanceof OutboundProfile) {
-			
 			OutboundProfile otherOutboundProfile = (OutboundProfile)other;
-
-			return
+			List<Object> otherParameters = otherOutboundProfile.getParameters();
+			List<Object> thisParameters = this.getParameters();
+			if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
+				// Password no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
+				otherParameters.remove("password");
+				thisParameters.remove("password");
+			}
+			boolean rc = 
 				StringUtils.equals(otherOutboundProfile.getFaultHandlerPolicy(), this.getFaultHandlerPolicy()) &&
 				StringUtils.equals(otherOutboundProfile.getRequestPolicy(), this.getRequestPolicy()) &&
 				StringUtils.equals(otherOutboundProfile.getResponsePolicy(), this.getResponsePolicy()) &&
-				//StringUtils.equals(otherOutboundProfile.getRoutePolicy(), this.getRoutePolicy()) &&
+				StringUtils.equals(otherOutboundProfile.getRoutePolicy(), this.getRoutePolicy()) &&
 				StringUtils.equals(otherOutboundProfile.getRouteType(), this.getRouteType()) &&
-				Arrays.equals(otherOutboundProfile.getParameters(), this.getParameters());
+				otherParameters.equals(thisParameters);
+			return rc;
 		} else {
 			return false;
 		}
