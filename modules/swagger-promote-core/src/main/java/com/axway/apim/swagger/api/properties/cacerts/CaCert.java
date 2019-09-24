@@ -159,19 +159,19 @@ public class CaCert {
 
 	public String getCertFile() {
 		if(certFile==null) {
-			String finalName = null;
-			String certName = this.getName();
-			String[] nameParts = certName.split(",");
+			String filename = null;
+			String certAlias = this.getAlias();
+			String[] nameParts = certAlias.split(",");
 			for(String namePart : nameParts) {
 				if(namePart.startsWith("CN=")) {
-					finalName = namePart.substring(3);
+					filename = namePart.substring(3);
 					break;
 				}
 			}
-			finalName = finalName.replace(" ", "");
-			finalName = finalName.replace("*", "");
-			if(finalName.startsWith(".")) finalName = finalName.replaceFirst(".", "");
-			return finalName+".crt";
+			filename = filename.replace(" ", "");
+			filename = filename.replace("*", "");
+			if(filename.startsWith(".")) filename = filename.replaceFirst(".", "");
+			return filename+".crt";
 		}
 		return certFile;
 	}
