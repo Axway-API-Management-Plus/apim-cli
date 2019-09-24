@@ -32,8 +32,9 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 		variable("apiPath", "/rollback-api-${apiNumber}");
 		variable("apiName", "Rollback-API-${apiNumber}");
 		
-		// This error only appears on 7.7 or maybe higher
-		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
+		// This error only appears on 7.7 or maybe higher 
+		// Has been fixed on 7.7 SP1 (See RDAPI-16491)
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7") && !APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
 			echo("####### Try to replicate APIs, that will fail #######");		
 			createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 			createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/rollback/backendbasepath-config.json");
