@@ -8,7 +8,7 @@ public class CorsProfile {
 	
 	String name;
 	
-	String isDefault;
+	boolean isDefault;
 	
 	String[] origins;
 	
@@ -16,7 +16,7 @@ public class CorsProfile {
 	
 	String[] exposedHeaders;
 	
-	String supportCredentials;
+	boolean supportCredentials;
 	
 	String maxAgeSeconds;
 
@@ -28,11 +28,11 @@ public class CorsProfile {
 		this.name = name;
 	}
 
-	public String getIsDefault() {
+	public boolean getIsDefault() {
 		return isDefault;
 	}
 
-	public void setIsDefault(String isDefault) {
+	public void setIsDefault(boolean isDefault) {
 		this.isDefault = isDefault;
 	}
 
@@ -60,11 +60,11 @@ public class CorsProfile {
 		this.exposedHeaders = exposedHeaders;
 	}
 
-	public String getSupportCredentials() {
+	public boolean getSupportCredentials() {
 		return supportCredentials;
 	}
 
-	public void setSupportCredentials(String supportCredentials) {
+	public void setSupportCredentials(boolean supportCredentials) {
 		this.supportCredentials = supportCredentials;
 	}
 
@@ -83,14 +83,26 @@ public class CorsProfile {
 			CorsProfile otherCorsProfile = (CorsProfile)other;
 			return
 					StringUtils.equals(otherCorsProfile.getName(), this.getName()) &&
-					StringUtils.equals(otherCorsProfile.getIsDefault(), this.getIsDefault()) &&
+					otherCorsProfile.getIsDefault() == this.getIsDefault() &&
 					Arrays.equals(otherCorsProfile.getOrigins(), this.getOrigins()) &&
 					Arrays.equals(otherCorsProfile.getAllowedHeaders(), this.getAllowedHeaders()) &&
 					Arrays.equals(otherCorsProfile.getExposedHeaders(), this.getExposedHeaders()) &&
-					StringUtils.equals(otherCorsProfile.getSupportCredentials(), this.getSupportCredentials()) &&
+					otherCorsProfile.getSupportCredentials() == this.getSupportCredentials() &&
 					StringUtils.equals(otherCorsProfile.getMaxAgeSeconds(), this.getMaxAgeSeconds());
 		} else {
 			return false;
 		}
+	}
+	
+	public static CorsProfile getDefaultCorsProfile() {
+		CorsProfile defaultCorsProfile = new CorsProfile();
+		defaultCorsProfile.setName("_default");
+		defaultCorsProfile.setIsDefault(true);
+		defaultCorsProfile.setOrigins(new String[] {"*"});
+		defaultCorsProfile.setAllowedHeaders(new String[]{});
+		defaultCorsProfile.setExposedHeaders(new String[]{"X-CorrelationID"});
+		defaultCorsProfile.setSupportCredentials(false);
+		defaultCorsProfile.setMaxAgeSeconds("0");
+		return defaultCorsProfile;
 	}
 }
