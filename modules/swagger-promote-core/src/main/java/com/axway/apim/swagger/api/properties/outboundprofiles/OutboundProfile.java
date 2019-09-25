@@ -1,8 +1,9 @@
 package com.axway.apim.swagger.api.properties.outboundprofiles;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -48,7 +49,7 @@ public class OutboundProfile {
 	
 	String authenticationProfile;
 	
-	Object[] parameters = new Object[] {};
+	List<Object> parameters = new ArrayList<Object>();
 
 	public OutboundProfile() throws AppException {
 		super();
@@ -134,12 +135,17 @@ public class OutboundProfile {
 	}
 
 	public void setRequestPolicy(String requestPolicy, boolean parseInternal) throws AppException {
+		if(requestPolicy==null) return;
 		if(!parseInternal) {
 			this.requestPolicy = requestPolicy;
 		} else {
-			if(requestPolicy!=null && !requestPolicy.startsWith("<")) 
-				requestPolicy = getPolicy(apimRequestPolicies, requestPolicy, "request");
-			this.requestPolicy = requestPolicy;
+			if(requestPolicy.startsWith("<")) {
+				this.requestPolicy = requestPolicy;
+				return;
+			}
+			if(requestPolicy.equals("")) 
+				return;
+			this.requestPolicy = getPolicy(apimRequestPolicies, requestPolicy, "request");
 		}
 	}
 
@@ -152,12 +158,17 @@ public class OutboundProfile {
 	}
 
 	public void setResponsePolicy(String responsePolicy, boolean parseInternal) throws AppException {
+		if(responsePolicy==null) return;
 		if(!parseInternal) {
 			this.responsePolicy = responsePolicy;
 		} else {
-			if(responsePolicy!=null && !responsePolicy.startsWith("<")) 
-				responsePolicy = getPolicy(apimResponsePolicies, responsePolicy, "response");
-			this.responsePolicy = responsePolicy;
+			if(responsePolicy.startsWith("<")) {
+				this.responsePolicy = responsePolicy;
+				return;
+			}
+			if(responsePolicy.equals("")) 
+				return;
+			this.responsePolicy = getPolicy(apimResponsePolicies, responsePolicy, "response");
 		}
 	}
 
@@ -170,12 +181,17 @@ public class OutboundProfile {
 	}
 
 	public void setRoutePolicy(String routePolicy, boolean parseInternal) throws AppException {
+		if(routePolicy==null) return;
 		if(!parseInternal) {
 			this.routePolicy = routePolicy;
 		} else {
-			if(routePolicy!=null && !routePolicy.startsWith("<")) 
-				routePolicy = getPolicy(apimRoutingPolicies, routePolicy, "routing");
-			this.routePolicy = routePolicy;
+			if(routePolicy!=null && routePolicy.startsWith("<")) {
+				this.routePolicy = routePolicy;
+				return;
+			}
+			if(routePolicy!=null && routePolicy.equals("")) return;
+			this.routePolicy = getPolicy(apimRoutingPolicies, routePolicy, "routing");
+			
 		}
 	}
 
@@ -188,12 +204,16 @@ public class OutboundProfile {
 	}
 
 	public void setFaultHandlerPolicy(String faultHandlerPolicy, boolean parseInternal) throws AppException {
+		if(faultHandlerPolicy==null) return;
 		if(!parseInternal) {
 			this.faultHandlerPolicy = faultHandlerPolicy;
 		} else {
-			if(faultHandlerPolicy!=null && !faultHandlerPolicy.startsWith("<")) 
-				faultHandlerPolicy = getPolicy(apimFaultHandlerPolicies, faultHandlerPolicy, "fault handler");
-			this.faultHandlerPolicy = faultHandlerPolicy;
+			if(faultHandlerPolicy!=null && faultHandlerPolicy.startsWith("<")) {
+				this.faultHandlerPolicy = faultHandlerPolicy;
+				return;
+			}
+			if(faultHandlerPolicy!=null && faultHandlerPolicy.equals("")) return;
+			this.faultHandlerPolicy = getPolicy(apimFaultHandlerPolicies, faultHandlerPolicy, "fault handler");
 		}
 	}
 
@@ -213,11 +233,11 @@ public class OutboundProfile {
 		this.apiId = apiId;
 	}
 
-	public Object[] getParameters() {
+	public List<Object> getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Object[] parameters) {
+	public void setParameters(List<Object> parameters) {
 		this.parameters = parameters;
 	}
 
@@ -225,16 +245,22 @@ public class OutboundProfile {
 	public boolean equals(Object other) {
 		if(other == null) return false;
 		if(other instanceof OutboundProfile) {
-			
 			OutboundProfile otherOutboundProfile = (OutboundProfile)other;
-
-			return
+			List<Object> otherParameters = otherOutboundProfile.getParameters();
+			List<Object> thisParameters = this.getParameters();
+			if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
+				// Password no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
+				otherParameters.remove("password");
+				thisParameters.remove("password");
+			}
+			boolean rc = 
 				StringUtils.equals(otherOutboundProfile.getFaultHandlerPolicy(), this.getFaultHandlerPolicy()) &&
 				StringUtils.equals(otherOutboundProfile.getRequestPolicy(), this.getRequestPolicy()) &&
 				StringUtils.equals(otherOutboundProfile.getResponsePolicy(), this.getResponsePolicy()) &&
-				//StringUtils.equals(otherOutboundProfile.getRoutePolicy(), this.getRoutePolicy()) &&
+				StringUtils.equals(otherOutboundProfile.getRoutePolicy(), this.getRoutePolicy()) &&
 				StringUtils.equals(otherOutboundProfile.getRouteType(), this.getRouteType()) &&
-				Arrays.equals(otherOutboundProfile.getParameters(), this.getParameters());
+				otherParameters.equals(thisParameters);
+			return rc;
 		} else {
 			return false;
 		}
