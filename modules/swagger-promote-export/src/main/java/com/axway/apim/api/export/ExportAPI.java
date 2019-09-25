@@ -1,13 +1,9 @@
 package com.axway.apim.api.export;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Properties;
-
-import org.eclipse.jetty.util.log.Log;
 
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIManagerAdapter;
