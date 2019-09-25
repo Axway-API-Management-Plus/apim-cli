@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Test
-public class CustomPoliciesTestIt extends TestNGCitrusTestRunner {
+public class RoutePolicyOnlyTestIt extends TestNGCitrusTestRunner {
 
 	private ExportTestAction swaggerExport;
 	private ImportTestAction swaggerImport;
@@ -43,7 +43,7 @@ public class CustomPoliciesTestIt extends TestNGCitrusTestRunner {
 
 		swaggerExport = new ExportTestAction();
 		swaggerImport = new ImportTestAction();
-		description("Import an API to export it afterwards");
+		description("Import an API including a Routing-Policy to export it afterwards");
 
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/api/test/"+this.getClass().getSimpleName()+"-${apiNumber}");
@@ -58,9 +58,8 @@ public class CustomPoliciesTestIt extends TestNGCitrusTestRunner {
 
 		echo("####### Importing the API, which should exported in the second step #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/test/export/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/test/export/files/customPolicies/custom-policies-issue-156.json");
-		createVariable("requestPolicy", "Request policy 1");
-		createVariable("responsePolicy", "Response policy 1");
+		createVariable(ImportTestAction.API_CONFIG,  "/test/export/files/customPolicies/routing-policy-test.json");
+		createVariable("routePolicy", "Routing policy 1");
 		createVariable("tokenInfoPolicy", "Tokeninfo policy 1");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
@@ -73,7 +72,7 @@ public class CustomPoliciesTestIt extends TestNGCitrusTestRunner {
 		
 		echo("####### Reading exported API-Config file: '"+exportedAPIConfigFile+"' #######");
 		JsonNode exportedAPIConfig = mapper.readTree(new FileInputStream(new File(exportedAPIConfigFile)));
-		String tmp = context.replaceDynamicContentInString(IOUtils.toString(this.getClass().getResourceAsStream("/test/export/files/customPolicies/custom-policies-issue-156.json"), "UTF-8"));
+		String tmp = context.replaceDynamicContentInString(IOUtils.toString(this.getClass().getResourceAsStream("/test/export/files/customPolicies/routing-policy-test.json"), "UTF-8"));
 		JsonNode importedAPIConfig = mapper.readTree(tmp);
 
 		assertEquals(exportedAPIConfig.get("path").asText(), 				context.getVariable("apiPath"));
@@ -97,33 +96,6 @@ public class CustomPoliciesTestIt extends TestNGCitrusTestRunner {
 		List<CorsProfile> importedCorsProfiles = mapper.convertValue(importedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>(){});
 		List<CorsProfile> exportedCorsProfiles = mapper.convertValue(exportedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>(){});
 		assertEquals(importedCorsProfiles, exportedCorsProfiles, "CorsProfiles are not equal.");
-		
-		APIQuota importedAppQuota = mapper.convertValue(importedAPIConfig.get("applicationQuota"), new TypeReference<APIQuota>(){});
-		APIQuota exportedAppQuota = mapper.convertValue(exportedAPIConfig.get("applicationQuota"), new TypeReference<APIQuota>(){});
-		assertEquals(importedAppQuota, exportedAppQuota, "applicationQuota are not equal.");
-		
-		APIQuota importedSystemQuota = mapper.convertValue(importedAPIConfig.get("systemQuota"), new TypeReference<APIQuota>(){});
-		APIQuota exportedSystemQuota = mapper.convertValue(exportedAPIConfig.get("systemQuota"), new TypeReference<APIQuota>(){});
-		assertEquals(importedSystemQuota, exportedSystemQuota, "systemQuota are not equal.");
-		
-
-		assertEquals(exportedAPIConfig.get("caCerts").size(), 				3);
-		
-		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("certFile").asText(), 				"risequipmentservicedev.nov.cloud.crt");
-		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("inbound").asBoolean(), 			false);
-		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("outbound").asBoolean(), 			true);
-		
-		assertEquals(exportedAPIConfig.get("caCerts").get(1).get("certFile").asText(), 				"Let'sEncryptAuthorityX3.crt");
-		assertEquals(exportedAPIConfig.get("caCerts").get(1).get("inbound").asBoolean(), 			false);
-		assertEquals(exportedAPIConfig.get("caCerts").get(1).get("outbound").asBoolean(), 			true);
-		
-		assertEquals(exportedAPIConfig.get("caCerts").get(2).get("certFile").asText(), 				"DSTRootCAX3.crt");
-		assertEquals(exportedAPIConfig.get("caCerts").get(2).get("inbound").asBoolean(), 			false);
-		assertEquals(exportedAPIConfig.get("caCerts").get(2).get("outbound").asBoolean(), 			true);
-		
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/risequipmentservicedev.nov.cloud.crt").exists(), "Certificate risequipmentservicedev.nov.cloud.crt is missing");
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/Let'sEncryptAuthorityX3.crt").exists(), "Certificate Let'sEncryptAuthorityX3.crt is missing");
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/DSTRootCAX3.crt").exists(), "Certificate DSTRootCAX3.crt is missing");
 		
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/"+context.getVariable("exportAPIName")).exists(), "Exported Swagger-File is missing");
 	}
