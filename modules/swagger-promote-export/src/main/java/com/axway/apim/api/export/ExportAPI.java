@@ -1,8 +1,13 @@
 package com.axway.apim.api.export;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.Properties;
+
+import org.eclipse.jetty.util.log.Log;
 
 import com.axway.apim.lib.AppException;
 import com.axway.apim.swagger.APIManagerAdapter;
@@ -18,6 +23,7 @@ import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
 import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
 import com.axway.apim.swagger.api.properties.quota.APIQuota;
 import com.axway.apim.swagger.api.properties.securityprofiles.DeviceType;
+import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
 import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
 import com.axway.apim.swagger.api.properties.tags.TagMap;
 import com.axway.apim.swagger.api.state.ActualAPI;
@@ -73,7 +79,11 @@ public class ExportAPI {
 		if(this.actualAPIProxy.getOutboundProfiles().size()==1) {
 			OutboundProfile defaultProfile = this.actualAPIProxy.getOutboundProfiles().get("_default");
 			if(defaultProfile.getRouteType().equals("proxy")
-					&& defaultProfile.getAuthenticationProfile().equals("_default")) return null;
+				&& defaultProfile.getAuthenticationProfile().equals("_default")
+				&& defaultProfile.getRequestPolicy() == null 
+				&& defaultProfile.getRequestPolicy() == null
+				&& (APIManagerAdapter.hasAPIManagerVersion("7.6.2") && defaultProfile.getFaultHandlerPolicy() == null)
+			) return null;
 		}
 		Iterator<OutboundProfile> it = this.actualAPIProxy.getOutboundProfiles().values().iterator();
 		while(it.hasNext()) {
@@ -90,16 +100,31 @@ public class ExportAPI {
 	private static String getExternalPolicyName(String policy) {
 		if(policy.startsWith("<key")) {
 			policy = policy.substring(policy.indexOf("<key type='FilterCircuit'>"));
-			policy = policy.substring(policy.indexOf("value='")+7, policy.lastIndexOf("'/></key></key>"));
+			policy = policy.substring(policy.indexOf("value='")+7, policy.lastIndexOf("'/></key>"));
 		}
 		return policy;
 	}
 
 	
-	public List<SecurityProfile> getSecurityProfiles() {
+	public List<SecurityProfile> getSecurityProfiles() throws AppException {
 		if(this.actualAPIProxy.getSecurityProfiles().size()==1) {
 			if(this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().get(0).getType()==DeviceType.passThrough)
-			return null;
+				return null;
+		}
+		ListIterator<SecurityProfile> it = this.actualAPIProxy.getSecurityProfiles().listIterator();
+		while(it.hasNext()) {
+			SecurityProfile profile = it.next();
+			for(SecurityDevice device : profile.getDevices()) {
+				if(device.getType().equals(DeviceType.oauthExternal) || device.getType().equals(DeviceType.authPolicy)) {
+					if(device.getProperties().containsKey("tokenStore")) {
+						String tokenStore = device.getProperties().get("tokenStore");
+						if(tokenStore!=null) {
+							device.getProperties().put("tokenStore", getExternalPolicyName(tokenStore));
+						}
+					}
+				}
+				device.setConvertPolicies(false);
+			}
 		}
 		return this.actualAPIProxy.getSecurityProfiles();
 	}
@@ -126,6 +151,12 @@ public class ExportAPI {
 
 	
 	public List<CorsProfile> getCorsProfiles() {
+		if(this.actualAPIProxy.getCorsProfiles()==null) return null;
+		if(this.actualAPIProxy.getCorsProfiles().isEmpty()) return null;
+		if(this.actualAPIProxy.getCorsProfiles().size()==1) {
+			CorsProfile corsProfile = this.actualAPIProxy.getCorsProfiles().get(0);
+			if(corsProfile.equals(CorsProfile.getDefaultCorsProfile())) return null;
+		}
 		return this.actualAPIProxy.getCorsProfiles();
 	}
 

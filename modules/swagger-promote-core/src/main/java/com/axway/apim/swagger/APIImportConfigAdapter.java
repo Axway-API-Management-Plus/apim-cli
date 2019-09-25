@@ -398,15 +398,7 @@ public class APIImportConfigAdapter {
 			}
 		}
 		if(!defaultCorsFound) {
-			CorsProfile defaultCors = new CorsProfile();
-			defaultCors.setName("_default");
-			defaultCors.setIsDefault("true");
-			defaultCors.setOrigins(new String[] {"*"});
-			defaultCors.setAllowedHeaders(new String[] {});
-			defaultCors.setExposedHeaders(new String[] {"X-CorrelationID"});
-			defaultCors.setMaxAgeSeconds("0");
-			defaultCors.setSupportCredentials("false");
-			apiConfig.getCorsProfiles().add(defaultCors);
+			apiConfig.getCorsProfiles().add(CorsProfile.getDefaultCorsProfile());
 		}
 	}
 	
