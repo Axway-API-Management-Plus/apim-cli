@@ -1,9 +1,16 @@
 package com.axway.apim.swagger.api.properties.cacerts;
 
+import java.util.concurrent.ThreadLocalRandom;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonFilter;
 
 @JsonFilter("IgnoreImportFields")
 public class CaCert {
+	
+	static Logger LOG = LoggerFactory.getLogger(CaCert.class);
 
 	String certFile;
 	
@@ -159,19 +166,25 @@ public class CaCert {
 
 	public String getCertFile() {
 		if(certFile==null) {
-			String finalName = null;
-			String certName = this.getName();
-			String[] nameParts = certName.split(",");
+			String filename = null;
+			String certAlias = this.getAlias();
+			String[] nameParts = certAlias.split(",");
 			for(String namePart : nameParts) {
-				if(namePart.startsWith("CN=")) {
-					finalName = namePart.substring(3);
+				if(namePart.trim().startsWith("CN=")) {
+					filename = namePart.trim().substring(3);
 					break;
 				}
 			}
-			finalName = finalName.replace(" ", "");
-			finalName = finalName.replace("*", "");
-			if(finalName.startsWith(".")) finalName = finalName.replaceFirst(".", "");
-			return finalName+".crt";
+			if(filename == null) {
+				LOG.warn("Could not create filename for certificate based on alias: " + this.getAlias());
+				filename = "UnknownCertificate_" + ThreadLocalRandom.current().nextInt(1, 9999 + 1);
+				LOG.warn("Created a random filename: " + filename + ".ctr");
+			} else {
+				filename = filename.replace(" ", "");
+				filename = filename.replace("*", "");
+				if(filename.startsWith(".")) filename = filename.replaceFirst(".", "");
+			}
+			return filename+".crt";
 		}
 		return certFile;
 	}
@@ -195,10 +208,10 @@ public class CaCert {
 	public void setUseForOutbound(String useForOutbound) {
 		this.outbound = useForOutbound;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "CaCert [name=" + name + ", md5Fingerprint=" + md5Fingerprint + "]";
+		return "CaCert [name=" + name + ", alias=" + alias + ", md5Fingerprint=" + md5Fingerprint + "]";
 	}
 
 	@Override

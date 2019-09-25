@@ -8,6 +8,7 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.AppException;
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -42,15 +43,26 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestRunner {
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' with outbound security set to HTTP-Basic. #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
 
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-				.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "http_basic")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].isDefault", "true")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.password", "password")
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.username", "${username}")
-				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5") || APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
+			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+					.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+					.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
+					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "http_basic")
+					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].isDefault", "true")
+					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.username", "${username}")
+					.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+		} else {
+			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+					.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+					.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
+					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "http_basic")
+					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].isDefault", "true")
+					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.password", "password")
+					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.username", "${username}")
+					.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+		}
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");

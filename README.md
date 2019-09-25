@@ -1,7 +1,3 @@
-# Axway API-Management Hackathon 2019
-Interested in automating the Axway API management platform? If so, visit us at the next API Management hackathon in Paris. I'd love to see you there and discuss the next Swagger Promote features with you and possibly work on them together.
-[![API-Management Hackathon](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/blob/develop/misc/images/api-management-hackathon.png)](https://go2.axway.com/EMEA-LE-2019-09-17-APIManagementHackathonParis_LP-Registration.html)
-
 # Swagger/WSDL based API promotion for Axway API-Manager V7
 
 This project provides you with a tool that simplifies your DevOps experience with the Axway API-Manager Version 7.x. 
@@ -50,6 +46,7 @@ With the most recent released version 1.6.1 the automated End-2-End test suite c
 | 7.6.2 SP3     | test-with-7.6.2-SP3  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.6.2-SP3)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
 | 7.6.2 SP4     | develop  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
 | 7.7           | test-with-7.7        | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
+| 7.7 SP1       | test-with-7.7-SP1    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-SP1)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
 
 Also version 7.5.3 is supported, but not fully automated tested.  
 
@@ -92,6 +89,8 @@ Also version 7.5.3 is supported, but not fully automated tested.
   - Added support for method level overrides, Rollback feature
 - 1.6.1 - 09.08.2019
   - Quota-Handling & Method-Level configuration improvements and bugfixes
+- 1.6.2 - 09.08.2019
+  - Export existing APIs, Quota-Validation
 
 
 ## Limitations/Caveats

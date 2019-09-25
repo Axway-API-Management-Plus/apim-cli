@@ -32,13 +32,16 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	private static String MODE_CREATE_API_ACCESS	= "MODE_CREATE_API_ACCESS";
 	private static String MODE_REMOVE_API_ACCESS	= "MODE_REMOVE_API_ACCESS";
 	
+	private static boolean hasAdminAccount;
+	
 	/**
 	 * In case, the API has been re-created, this is object contains the API how it was before
 	 */
 	IAPI oldAPI;
 	
-	public ManageClientApps(IAPI desiredState, IAPI actualState, IAPI oldAPI) {
+	public ManageClientApps(IAPI desiredState, IAPI actualState, IAPI oldAPI) throws AppException {
 		super(desiredState, actualState);
+		hasAdminAccount = APIManagerAdapter.getInstance().hasAdminAccount();
 		this.oldAPI = oldAPI;
 	}
 	
@@ -60,7 +63,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			recreateActualApps = getMissingApps(oldAPI.getApplications(), actualState.getApplications());
 			// Create previously existing App-Subscriptions
 			createAppSubscription(recreateActualApps, actualState.getId());
-			// Update the actual state 
+			// Update the In-Memory actual state for further processing 
 			actualState.setApplications(recreateActualApps);
 		}
 		List<ClientApplication> missingDesiredApps = getMissingApps(desiredState.getApplications(), actualState.getApplications());
@@ -80,7 +83,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			}
 		}
 	}
-	
+
 	private void removeNonGrantedClientApps(List<ClientApplication> apps) throws AppException {
 		if(apps == null) return;
 		ListIterator<ClientApplication> it = apps.listIterator();
@@ -102,8 +105,8 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		// If the App belongs to the same Org as the API, it automatically has permission (esp. for Unpublished APIs)
 		if(app.getOrganizationId().equals(((ActualAPI)actualState).getOrganizationId())) return true;
 		if(actualState.getClientOrganizations()==null) {
-			LOG.debug("No org has access to this API, hence no other app has permission.");
-			return true;
+			LOG.debug("No Client-Orgs configured for this API, therefore other app has NO permission.");
+			return false;
 		}
 		return actualState.getClientOrganizations().contains(appsOrgName);
 	}
@@ -122,12 +125,12 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis").build();
 				entity = new StringEntity("{\"apiId\":\""+apiId+"\",\"enabled\":true}");
 				
-				apiCall = new POSTRequest(entity, uri, this, true);
+				apiCall = new POSTRequest(entity, uri, this, hasAdminAccount);
 				apiCall.execute();
 			}
 		} catch (Exception e) {
 			throw new AppException("Can't create API access requests.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		}	
+		}
 	}
 	
 	private void removeAppSubscription(List<ClientApplication> revomingActualApps, String apiId) throws AppException {
@@ -141,7 +144,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			try { 
 				Transaction.getInstance().put("appName", app);
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis/"+apiId).build();
-				apiCall = new DELRequest(uri, this, true);
+				apiCall = new DELRequest(uri, this, hasAdminAccount);
 				apiCall.execute();
 			} catch (Exception e) {
 				LOG.error("Can't delete API access requests for application.");
@@ -180,7 +183,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		return null;
 	}
 	
-	private static List<ClientApplication> getMissingApps(List<ClientApplication> apps, List<ClientApplication> otherApps) throws AppException {
+	private List<ClientApplication> getMissingApps(List<ClientApplication> apps, List<ClientApplication> otherApps) throws AppException {
 		List<ClientApplication> missingApps = new ArrayList<ClientApplication>();
 		if(apps == null || otherApps == null) return missingApps;
 		for(ClientApplication app : apps) {

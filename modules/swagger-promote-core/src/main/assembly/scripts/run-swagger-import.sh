@@ -26,6 +26,7 @@ if [ $rc -eq 10 ];then
         exit 0
 fi
 
-echo "This script is DEPRECATED and will be removed in a future release. Please use 'api-import.bat' instead."
+echo ""
+echo ">>>> This script is DEPRECATED and will be removed in a future release. Please use 'api-import.bat' instead."
 
 exit $rc

@@ -28,8 +28,8 @@ public class UnpublishedPublishedDeprecatedAPITestIT extends TestNGCitrusTestRun
 		description("Import an Unpublished-API, then publish it and finally deprecate it.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/my-test-api-${apiNumber}");
-		variable("apiName", "My-Test-API-${apiNumber}");
+		variable("apiPath", "/state-change-test-api-${apiNumber}");
+		variable("apiName", "State-Change-Test-API-${apiNumber}");
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
