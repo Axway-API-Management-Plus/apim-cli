@@ -205,7 +205,12 @@ public class ImportTestAction extends AbstractTestAction {
 	
 	private void copyImagesAndCertificates(String origConfigFile, TestContext context) {
 		File sourceDir = new File(origConfigFile).getParentFile();
-		if(!sourceDir.exists()) return;
+		if(!sourceDir.exists()) {
+			sourceDir = new File(ImportTestAction.class.getResource(origConfigFile).getFile()).getParentFile();
+			if(!sourceDir.exists()) { 
+				return;
+			}
+		}
 		FileFilter filter = new WildcardFileFilter(new String[] {"*.crt", "*.jpg", "*.png"});
 		try {
 			LOG.info("Copy certificates and images from source: "+sourceDir+" into test-dir: '"+testDir+"'");
