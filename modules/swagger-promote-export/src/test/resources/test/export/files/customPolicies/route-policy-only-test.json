@@ -4,42 +4,24 @@
   "state": "${state}",
   "version": "v1",
   "organization": "API Development ${orgNumber}",
-  "securityProfiles": [
-    {
-      "name": "_default",
-      "isDefault": true,
-      "devices": [
-        {
-          "name": "OAuth (External)",
-          "type": "oauthExternal",
-          "order": 1,
-          "properties": {
-            "tokenStore": "${tokenInfoPolicy}",
-            "accessTokenLocation": "HEADER",
-            "authorizationHeaderPrefix": "Bearer",
-            "accessTokenLocationQueryString": "",
-            "scopesMustMatch": "Any",
-            "scopes": "1.0",
-            "removeCredentialsOnSuccess": "false",
-            "implicitGrantEnabled": "true",
-            "implicitGrantLoginEndpointUrl": "https://login.microsoftonline.com/5ebe82bb-f23f-4bb6-b7d0-b038c066ad05/oauth2/authorize",
-            "implicitGrantLoginTokenName": "access_token",
-            "authCodeGrantTypeEnabled": "true",
-            "authCodeGrantTypeRequestEndpointUrl": "https://login.microsoftonline.com/5ebe82bb-f23f-4bb6-b7d0-b038c066ad05/oauth2/authorize",
-            "authCodeGrantTypeRequestClientIdName": "client_id",
-            "authCodeGrantTypeRequestSecretName": "client_secret",
-            "authCodeGrantTypeTokenEndpointUrl": "https://login.microsoftonline.com/5ebe82bb-f23f-4bb6-b7d0-b038c066ad05/oauth2/token",
-            "authCodeGrantTypeTokenEndpointTokenName": "access_code",
-            "useClientRegistry": "true",
-            "subjectSelector": "${//oauth.token.client_id//}",
-            "oauth.token.client_id": "${//oauth.token.client_id//}",
-            "oauth.token.scopes": "${//oauth.token.scopes//}",
-            "oauth.token.valid": "${//oauth.token.valid//}"
-          }
-        }
-      ]
-    }
-  ],
+  "securityProfiles" : [ {
+    "name" : "_default",
+    "isDefault" : true,
+    "devices" : [ {
+      "name" : "Invoke Policy",
+      "type" : "authPolicy",
+      "order" : 1,
+      "properties" : {
+        "authenticationPolicy" : "Inbound security policy 1",
+        "useClientRegistry" : "false",
+        "subjectSelector" : "${//authentication.subject.id//}",
+        "descriptionType" : "original",
+        "descriptionUrl" : "",
+        "descriptionMarkdown" : "",
+        "description" : ""
+      }
+    } ]
+  } ],
   "outboundProfiles": {
     "_default": {
       "routePolicy": "${routePolicy}"
