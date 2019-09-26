@@ -111,12 +111,15 @@ public class ExportAPI {
 		while(it.hasNext()) {
 			SecurityProfile profile = it.next();
 			for(SecurityDevice device : profile.getDevices()) {
-				if(device.getType().equals(DeviceType.oauthExternal) || device.getType().equals(DeviceType.authPolicy)) {
-					if(device.getProperties().containsKey("tokenStore")) {
-						String tokenStore = device.getProperties().get("tokenStore");
-						if(tokenStore!=null) {
-							device.getProperties().put("tokenStore", getExternalPolicyName(tokenStore));
-						}
+				if(device.getType().equals(DeviceType.oauthExternal)) {
+					String tokenStore = device.getProperties().get("tokenStore");
+					if(tokenStore!=null) {
+						device.getProperties().put("tokenStore", getExternalPolicyName(tokenStore));
+					}
+				} else if(device.getType().equals(DeviceType.authPolicy)) {
+					String authenticationPolicy = device.getProperties().get("authenticationPolicy");
+					if(authenticationPolicy!=null) {
+						device.getProperties().put("authenticationPolicy", getExternalPolicyName(authenticationPolicy));
 					}
 				}
 				device.setConvertPolicies(false);
