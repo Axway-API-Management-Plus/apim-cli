@@ -146,7 +146,7 @@ public class ImportTestAction extends AbstractTestAction {
 				throw new IOException("Unable to read swagger file from: " + pathToFile);
 			}
 			String jsonData = IOUtils.toString(is, StandardCharsets.UTF_8);
-			String filename = pathToFile.substring(pathToFile.lastIndexOf("/")+1); // e.g.: petstore.json, no-change-xyz-config.<stage>.json, 
+			//String filename = pathToFile.substring(pathToFile.lastIndexOf("/")+1); // e.g.: petstore.json, no-change-xyz-config.<stage>.json, 
 
 			String jsonReplaced = context.replaceDynamicContentInString(jsonData);
 
@@ -211,7 +211,7 @@ public class ImportTestAction extends AbstractTestAction {
 				return;
 			}
 		}
-		FileFilter filter = new WildcardFileFilter(new String[] {"*.crt", "*.jpg", "*.png"});
+		FileFilter filter = new WildcardFileFilter(new String[] {"*.crt", "*.jpg", "*.png", "*.pem"});
 		try {
 			LOG.info("Copy certificates and images from source: "+sourceDir+" into test-dir: '"+testDir+"'");
 			FileUtils.copyDirectory(sourceDir, testDir, filter);

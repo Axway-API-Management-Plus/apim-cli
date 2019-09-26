@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,7 @@ public class SecurityDevice {
 		ObjectMapper mapper = new ObjectMapper();
 		HashMap<String, String> policyMap = new HashMap<String, String>();
 		CommandParameters cmd = CommandParameters.getInstance();
-		HttpResponse response = null;
+		HttpResponse httpResponse = null;
 		InputStream is = null;
 		JsonNode jsonResponse = null;
 		URI uri;
@@ -64,9 +65,9 @@ public class SecurityDevice {
 						.setParameter("type", type).build();
 			}
 			RestAPICall getRequest = new GETRequest(uri, null);
-			response = getRequest.execute();
+			httpResponse = getRequest.execute();
 			try {
-				is = response.getEntity().getContent();
+				is = httpResponse.getEntity().getContent();
 				jsonResponse = mapper.readTree(is);
 				for(JsonNode node : jsonResponse) {
 					policyMap.put(node.get("name").asText(), node.get("id").asText());
@@ -84,7 +85,11 @@ public class SecurityDevice {
 			try {
 				is.close();
 			} catch (Exception ignore) { }
-		}
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
+		}		
 		return policyMap;
 	}
 
