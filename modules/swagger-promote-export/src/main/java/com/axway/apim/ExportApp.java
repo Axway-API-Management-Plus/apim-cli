@@ -86,6 +86,11 @@ public class ExportApp {
 			option.setRequired(false);
 			internalOptions.addOption(option);
 			
+			option = new Option("ignoreAdminAccount", true, "If set, the tool wont load the env.properties. This is used for testing only.");
+			option.setRequired(false);
+			option.setArgName("true");
+			internalOptions.addOption(option);
+			
 			CommandLineParser parser = new RelaxedParser();
 			CommandLine cmd = null;
 			CommandLine internalCmd = null;

@@ -275,7 +275,8 @@ public class ExportAPI {
 	}
 
 	
-	public List<String> getClientOrganizations() {
+	public List<String> getClientOrganizations() throws AppException {
+		if(!APIManagerAdapter.hasAdminAccount()) return null; 
 		if(this.actualAPIProxy.getClientOrganizations().size()==0) return null;
 		if(this.actualAPIProxy.getClientOrganizations().size()==1 && 
 				this.actualAPIProxy.getClientOrganizations().get(0).equals(getOrganization())) 

@@ -665,6 +665,7 @@ public class APIManagerAdapter {
 	private void addQuotaConfiguration(IAPI api, IAPI desiredAPI) throws AppException {
 		// No need to load quota, if not given in the desired API
 		if(desiredAPI!=null && (desiredAPI.getApplicationQuota() == null && desiredAPI.getSystemQuota() == null)) return;
+		if(!this.hasAdminAccount) return; // Can't load quota without having an Admin-Account
 		ActualAPI managerAPI = (ActualAPI)api;
 		try {
 			applicationQuotaConfig = getQuotaFromAPIManager(APPLICATION_DEFAULT_QUOTA); // Get the Application-Default-Quota

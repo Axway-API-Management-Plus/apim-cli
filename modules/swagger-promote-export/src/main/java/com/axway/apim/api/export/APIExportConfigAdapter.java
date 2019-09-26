@@ -126,6 +126,12 @@ public class APIExportConfigAdapter {
 			storeCaCerts(localFolder, exportAPI.getCaCerts());
 		}
 		LOG.info("Successfully export API to folder: " + localFolder);
+		if(!APIManagerAdapter.hasAdminAccount()) {
+			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
+			LOG.warn("- No Quotas has been exported for the API");
+			LOG.warn("- No Client-Organizations");
+			LOG.warn("- Only subscribed applications from the Org-Admins organization");
+		}
 	}
 	
 	private void storeCaCerts(File localFolder, List<CaCert> caCerts) throws AppException {
