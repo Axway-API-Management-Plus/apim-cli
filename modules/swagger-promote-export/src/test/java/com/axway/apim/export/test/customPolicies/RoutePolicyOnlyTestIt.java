@@ -58,7 +58,7 @@ public class RoutePolicyOnlyTestIt extends TestNGCitrusTestRunner {
 
 		echo("####### Importing the API, which should exported in the second step #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/test/export/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/test/export/files/customPolicies/routing-policy-test.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/test/export/files/customPolicies/route-policy-only-test.json");
 		createVariable("routePolicy", "Routing policy 1");
 		createVariable("tokenInfoPolicy", "Tokeninfo policy 1");
 		createVariable("expectedReturnCode", "0");
@@ -72,7 +72,7 @@ public class RoutePolicyOnlyTestIt extends TestNGCitrusTestRunner {
 		
 		echo("####### Reading exported API-Config file: '"+exportedAPIConfigFile+"' #######");
 		JsonNode exportedAPIConfig = mapper.readTree(new FileInputStream(new File(exportedAPIConfigFile)));
-		String tmp = context.replaceDynamicContentInString(IOUtils.toString(this.getClass().getResourceAsStream("/test/export/files/customPolicies/routing-policy-test.json"), "UTF-8"));
+		String tmp = context.replaceDynamicContentInString(IOUtils.toString(this.getClass().getResourceAsStream("/test/export/files/customPolicies/route-policy-only-test.json"), "UTF-8"));
 		JsonNode importedAPIConfig = mapper.readTree(tmp);
 
 		assertEquals(exportedAPIConfig.get("path").asText(), 				context.getVariable("apiPath"));
