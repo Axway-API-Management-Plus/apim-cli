@@ -1087,14 +1087,20 @@ public class APIManagerAdapter {
 		
 		String appConfig = null;
 		URI uri;
+		HttpEntity httpResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
-			HttpEntity response = getRequest.execute().getEntity();
-			appConfig = IOUtils.toString(response.getContent(), "UTF-8");
+			httpResponse = getRequest.execute().getEntity();
+			appConfig = IOUtils.toString(httpResponse.getContent(), "UTF-8");
 			return parseAppConfig(appConfig);
 		} catch (Exception e) {
 			throw new AppException("Can't read app.config from API-Manager: '" + appConfig + "'", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		} finally {
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
 		}
 	}
 	
