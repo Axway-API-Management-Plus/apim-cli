@@ -188,6 +188,7 @@ public class APIExportConfigAdapter {
 	
 	private void handleCustomProperties(IAPI actualAPI) throws AppException {
 		JsonNode customPropconfig = APIManagerAdapter.getCustomPropertiesConfig().get("api");
+		if(customPropconfig == null) return; // No custom properties configured
 		Map<String, String> customProperties = new LinkedHashMap<String, String>();
 		JsonNode actualApiConfig = ((ActualAPI)actualAPI).getApiConfiguration();
 		// Check if Custom-Properties are configured
