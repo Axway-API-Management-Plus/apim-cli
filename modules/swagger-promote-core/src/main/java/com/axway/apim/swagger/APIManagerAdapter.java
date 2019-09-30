@@ -302,7 +302,6 @@ public class APIManagerAdapter {
 	 * This helps to use features, that are introduced with a certain version or even service-pack.
 	 * @param version has the API-Manager this version of higher?
 	 * @return false if API-Manager doesn't have this version otherwise true
-	 * @throws AppException if the API-Manager version can't be detected
 	 */
 	public static boolean hasAPIManagerVersion(String version) {
 		try {
@@ -740,6 +739,9 @@ public class APIManagerAdapter {
 	 * as it's stored in the API-Manager. The result is basically used to create the APIManagerAPI in 
 	 * method getAPIManagerAPI
 	 * @param apiPath path of the API, which can be considered as the key.
+	 * @param filter restrict the search by these filters
+	 * @param type must be TYPE_FRONT_END or TYPE_FRONT_END
+	 * @param logMessage flag to control if the error message should be printed or not
 	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
 	 * @throws AppException if the API can't be found or created
 	 */
@@ -1169,7 +1171,7 @@ public class APIManagerAdapter {
 	/**
 	 * Helper method to translate a Base64 encoded format 
 	 * as it's needed by the API-Manager.
-	 * @param certFile input stream to the certificate file
+	 * @param certificate the certificate content
 	 * @param filename the name of the certificate file used as a reference in the generated Json object
 	 * @throws AppException when the certificate information can't be created
 	 * @return a Json-Object structure as needed by the API-Manager

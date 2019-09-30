@@ -116,6 +116,8 @@ public class APIImportConfigAdapter {
 
 	/**
 	 * Constructor just for testing. Don't use it!
+	 * @param apiConfig the desired API to test with
+	 * @param apiConfigFile this is the given config file
 	 */
 	public APIImportConfigAdapter(IAPI apiConfig, String apiConfigFile) {
 		this.apiConfig = apiConfig;

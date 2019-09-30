@@ -29,7 +29,7 @@ public class CommandParameters {
 	/**
 	 * Use this constructor manually build a CommandParameters instance. 
 	 * This is useful when calling Swagger-Promote other classes or running tests.
-	 * @param manualParams
+	 * @param manualParams to be used for parameter lookup internally
 	 */
 	public CommandParameters (Map<String, String> manualParams) {
 		this.manualParams = manualParams;
