@@ -8,6 +8,7 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.AppException;
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -42,14 +43,28 @@ public class OutboundSSLTestIT extends TestNGCitrusTestRunner {
 		echo("####### Validate API: '${apiName}' has a been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
 		
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
-			.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
-			.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "ssl")
-			.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.password", "${password}")
-			.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.pfx", "@assertThat(startsWith(data:application/x-pkcs12;base64,MIIJ0QIBAzCCCZcGCSqGSIb3DQEHAaCCCYgEggmEMIIJg))@")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5") || APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
+			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+				.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "ssl")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.trustAll", true)
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.pfx", "@assertThat(startsWith(data:application/x-pkcs12;base64,MIIJ0QIBAzCCCZcGCSqGSIb3DQEHAaCCCYgEggmEMIIJg))@")
+				.extractFromPayload("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.trustAll", "trustAll")
+				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+		} else {
+			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+				.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "ssl")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.password", "${password}")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.trustAll", true)
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.pfx", "@assertThat(startsWith(data:application/x-pkcs12;base64,MIIJ0QIBAzCCCZcGCSqGSIb3DQEHAaCCCYgEggmEMIIJg))@")
+				.extractFromPayload("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.trustAll", "trustAll")
+				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+		}
 		
 		echo("####### Execute a No-Change test #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
@@ -78,12 +93,21 @@ public class OutboundSSLTestIT extends TestNGCitrusTestRunner {
 		echo("####### Validate the Client-Certificate has been updated #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").name("api").header("Content-Type", "application/json"));
 		
+		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5") || APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) { 
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
 				.validate("$.[?(@.id=='${apiId}')].state", "${state}")
 				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "_default")
 				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].type", "ssl")
-				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].parameters.password", "${password}")
 				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].parameters.pfx", "@assertThat(startsWith(data:application/x-pkcs12;base64,MIIJ2QIBAzCCCZ8GCSqGSIb3DQEHAaCCCZAEggmMMIIJiDCCBD8GCSqGSIb3DQEHBqCCBDAwggQs))@"));
+		} else {
+			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
+				.validate("$.[?(@.id=='${apiId}')].state", "${state}")
+				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "_default")
+				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].type", "ssl")
+				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].parameters.password", "${password}")
+				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].parameters.pfx", "@assertThat(startsWith(data:application/x-pkcs12;base64,MIIJ2QIBAzCCCZ8GCSqGSIb3DQEHAaCCCZAEggmMMIIJiDCCBD8GCSqGSIb3DQEHBqCCBDAwggQs))@"));			
+		}
 	}
 }

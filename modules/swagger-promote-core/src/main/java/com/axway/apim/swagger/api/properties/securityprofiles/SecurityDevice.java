@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,6 +39,10 @@ public class SecurityDevice {
 	int order;
 	
 	Map<String, String> properties;
+	
+	/** Flag to control if Policy-Names should be translated or not - Currently used by the API-Export */
+	@JsonIgnore
+	boolean convertPolicies = true;
 
 	public SecurityDevice() throws AppException {
 		super();
@@ -47,7 +53,7 @@ public class SecurityDevice {
 		ObjectMapper mapper = new ObjectMapper();
 		HashMap<String, String> policyMap = new HashMap<String, String>();
 		CommandParameters cmd = CommandParameters.getInstance();
-		HttpResponse response = null;
+		HttpResponse httpResponse = null;
 		InputStream is = null;
 		JsonNode jsonResponse = null;
 		URI uri;
@@ -59,9 +65,9 @@ public class SecurityDevice {
 						.setParameter("type", type).build();
 			}
 			RestAPICall getRequest = new GETRequest(uri, null);
-			response = getRequest.execute();
+			httpResponse = getRequest.execute();
 			try {
-				is = response.getEntity().getContent();
+				is = httpResponse.getEntity().getContent();
 				jsonResponse = mapper.readTree(is);
 				for(JsonNode node : jsonResponse) {
 					policyMap.put(node.get("name").asText(), node.get("id").asText());
@@ -79,7 +85,11 @@ public class SecurityDevice {
 			try {
 				is.close();
 			} catch (Exception ignore) { }
-		}
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
+		}		
 		return policyMap;
 	}
 
@@ -126,7 +136,7 @@ public class SecurityDevice {
 			} else {
 				properties.put("tokenStore", esTokenStore);
 			}
-		} else if(type == DeviceType.oauthExternal) {
+		} else if(type == DeviceType.oauthExternal && this.convertPolicies) {
 			if(SecurityDevice.oauthInfoPolicies == null) SecurityDevice.oauthInfoPolicies = initCustomPolicies("oauthtokeninfo");
 			if(SecurityDevice.oauthTokenStores == null) SecurityDevice.oauthTokenStores = initCustomPolicies("tokenstores");
 			String infoPolicy = (String)properties.get("tokenStore"); // The token-info-policy is stored in the tokenStore as well
@@ -143,7 +153,7 @@ public class SecurityDevice {
 				properties.put("oauth.token.scopes", "${oauth.token.scopes}");
 				properties.put("oauth.token.valid", "${oauth.token.valid}");
 			}
-		} else if (type == DeviceType.authPolicy) {
+		} else if (type == DeviceType.authPolicy && this.convertPolicies) {
 			if(SecurityDevice.authenticationPolicies == null) SecurityDevice.authenticationPolicies = initCustomPolicies("authentication");
 			String authPolicy = (String)properties.get("authenticationPolicy");
 			if(authPolicy.startsWith("<key")) return properties;
@@ -165,6 +175,14 @@ public class SecurityDevice {
 		this.properties = properties;
 	}
 	
+	public boolean isConvertPolicies() {
+		return convertPolicies;
+	}
+
+	public void setConvertPolicies(boolean convertPolicies) {
+		this.convertPolicies = convertPolicies;
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;

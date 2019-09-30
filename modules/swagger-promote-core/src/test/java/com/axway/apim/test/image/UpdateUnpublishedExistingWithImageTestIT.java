@@ -21,8 +21,8 @@ public class UpdateUnpublishedExistingWithImageTestIT extends TestNGCitrusTestDe
 		description("Creates an Unpublished with which gets updated later with an Image");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/my-image-api-${apiNumber}");
-		variable("apiName", "My-Image-API-${apiNumber}");
+		variable("apiPath", "/my-image-api2-${apiNumber}");
+		variable("apiName", "My-Image-API2-${apiNumber}");
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");

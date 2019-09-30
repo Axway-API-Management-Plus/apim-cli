@@ -21,22 +21,15 @@ public class ApplicationSubscriptionNoOrgsTestIT extends TestNGCitrusTestDesigne
 		description("Import an API and create an application subscription while not having defined any organization in the configuration.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/app-subscription-${apiNumber}");
-		variable("apiName", "App Subscription API-${apiNumber}");
+		variable("apiPath", "/app-subscription-no-orgs-${apiNumber}");
+		variable("apiName", "App Subscription No-Orgs API-${apiNumber}");
 		// ############## Creating Test-Application #################
 
 		createVariable("appName", "Consuming Test App ${orgNumber}");
-		http().client("apiManager")
-			.send()
-			.post("/applications")
-			.name("orgCreatedRequest")
-			.header("Content-Type", "application/json")
+		http().client("apiManager").send().post("/applications").header("Content-Type", "application/json")
 			.payload("{\"name\":\"${appName}\",\"apis\":[],\"organizationId\":\"${orgId}\"}");
 
-		http().client("apiManager")
-			.receive()
-			.response(HttpStatus.CREATED)
-			.messageType(MessageType.JSON)
+		http().client("apiManager").receive().response(HttpStatus.CREATED).messageType(MessageType.JSON)
 			.extractFromPayload("$.id", "consumingTestAppId")
 			.extractFromPayload("$.name", "consumingTestAppName");
 		
@@ -52,16 +45,9 @@ public class ApplicationSubscriptionNoOrgsTestIT extends TestNGCitrusTestDesigne
 		action(swaggerImport);
 		
 		echo("####### Validate API: '${apiName}' has been created #######");
-		http().client("apiManager")
-			.send()
-			.get("/proxies")
-			.name("api")
-			.header("Content-Type", "application/json");
+		http().client("apiManager").send().get("/proxies").header("Content-Type", "application/json");
 
-		http().client("apiManager")
-			.receive()
-			.response(HttpStatus.OK)
-			.messageType(MessageType.JSON)
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
@@ -69,16 +55,9 @@ public class ApplicationSubscriptionNoOrgsTestIT extends TestNGCitrusTestDesigne
 		echo("####### API has been created with ID: '${apiId}' #######");
 		
 		echo("####### Validate created application has an active subscription to the API (Based on the name) #######");
-		http().client("apiManager")
-			.send()
-			.get("/applications/${consumingTestAppId}/apis")
-			.name("api")
-			.header("Content-Type", "application/json");
+		http().client("apiManager").send().get("/applications/${consumingTestAppId}/apis").header("Content-Type", "application/json");
 		
-		http().client("apiManager")
-			.receive()
-			.response(HttpStatus.OK)
-			.messageType(MessageType.JSON)
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.*.apiId", "${apiId}");
 		
 		echo("####### Re-Importing same API: '${apiName}' - must result in No-Change #######");
@@ -90,17 +69,10 @@ public class ApplicationSubscriptionNoOrgsTestIT extends TestNGCitrusTestDesigne
 		action(swaggerImport);
 		
 		echo("####### Make sure, the API-ID hasn't changed #######");
-		http().client("apiManager")
-			.send()
-			.get("/proxies/${apiId}")
-			.name("api")
-			.header("Content-Type", "application/json");
+		http().client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json");
 
 		// Check the API is still exposed on the same path
-		http().client("apiManager")
-			.receive()
-			.response(HttpStatus.OK)
-			.messageType(MessageType.JSON)
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].id", "${apiId}"); // Must be the same API-ID as before!
 	}

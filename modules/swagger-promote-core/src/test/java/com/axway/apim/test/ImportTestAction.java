@@ -146,7 +146,7 @@ public class ImportTestAction extends AbstractTestAction {
 				throw new IOException("Unable to read swagger file from: " + pathToFile);
 			}
 			String jsonData = IOUtils.toString(is, StandardCharsets.UTF_8);
-			String filename = pathToFile.substring(pathToFile.lastIndexOf("/")+1); // e.g.: petstore.json, no-change-xyz-config.<stage>.json, 
+			//String filename = pathToFile.substring(pathToFile.lastIndexOf("/")+1); // e.g.: petstore.json, no-change-xyz-config.<stage>.json, 
 
 			String jsonReplaced = context.replaceDynamicContentInString(jsonData);
 
@@ -186,13 +186,18 @@ public class ImportTestAction extends AbstractTestAction {
 	}
 	
 	private File createTestDirectory(TestContext context) {
-		int randomNum = ThreadLocalRandom.current().nextInt(1, 999 + 1);
+		int randomNum = ThreadLocalRandom.current().nextInt(1, 9999 + 1);
 		String apiName = context.getVariable("apiName");
 		String testDirName = "ImportActionTest-" + apiName.replace(" ", "") + "-" + randomNum;
 		String tmpDir = System.getProperty("java.io.tmpdir");
 		File testDir = new File(tmpDir + File.separator + testDirName);
 		if(!testDir.mkdir()) {
-			throw new RuntimeException("Failed to create Test-Directory: " + tmpDir + File.separator + testDirName);
+			randomNum = ThreadLocalRandom.current().nextInt(1, 9999 + 1);
+			testDirName = "ImportActionTest-" + apiName.replace(" ", "") + "-" + randomNum;
+			testDir = new File(tmpDir + File.separator + testDirName);
+			if(!testDir.mkdir()) {
+				throw new RuntimeException("Failed to create Test-Directory: " + tmpDir + File.separator + testDirName);
+			}
 		}
 		LOG.info("Successfully created Test-Directory: "+tmpDir + File.separator + testDirName);
 		return testDir;
@@ -200,8 +205,13 @@ public class ImportTestAction extends AbstractTestAction {
 	
 	private void copyImagesAndCertificates(String origConfigFile, TestContext context) {
 		File sourceDir = new File(origConfigFile).getParentFile();
-		if(!sourceDir.exists()) return;
-		FileFilter filter = new WildcardFileFilter(new String[] {"*.crt", "*.jpg", "*.png"});
+		if(!sourceDir.exists()) {
+			sourceDir = new File(ImportTestAction.class.getResource(origConfigFile).getFile()).getParentFile();
+			if(!sourceDir.exists()) { 
+				return;
+			}
+		}
+		FileFilter filter = new WildcardFileFilter(new String[] {"*.crt", "*.jpg", "*.png", "*.pem"});
 		try {
 			LOG.info("Copy certificates and images from source: "+sourceDir+" into test-dir: '"+testDir+"'");
 			FileUtils.copyDirectory(sourceDir, testDir, filter);

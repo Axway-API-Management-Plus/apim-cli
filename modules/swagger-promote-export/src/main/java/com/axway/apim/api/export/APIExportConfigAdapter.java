@@ -126,6 +126,12 @@ public class APIExportConfigAdapter {
 			storeCaCerts(localFolder, exportAPI.getCaCerts());
 		}
 		LOG.info("Successfully export API to folder: " + localFolder);
+		if(!APIManagerAdapter.hasAdminAccount()) {
+			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
+			LOG.warn("- No Quotas has been exported for the API");
+			LOG.warn("- No Client-Organizations");
+			LOG.warn("- Only subscribed applications from the Org-Admins organization");
+		}
 	}
 	
 	private void storeCaCerts(File localFolder, List<CaCert> caCerts) throws AppException {
@@ -182,6 +188,7 @@ public class APIExportConfigAdapter {
 	
 	private void handleCustomProperties(IAPI actualAPI) throws AppException {
 		JsonNode customPropconfig = APIManagerAdapter.getCustomPropertiesConfig().get("api");
+		if(customPropconfig == null) return; // No custom properties configured
 		Map<String, String> customProperties = new LinkedHashMap<String, String>();
 		JsonNode actualApiConfig = ((ActualAPI)actualAPI).getApiConfiguration();
 		// Check if Custom-Properties are configured

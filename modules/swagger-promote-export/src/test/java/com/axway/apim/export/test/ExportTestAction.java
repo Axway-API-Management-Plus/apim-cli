@@ -1,8 +1,5 @@
 package com.axway.apim.export.test;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.ExportApp;
 import com.consol.citrus.actions.AbstractTestAction;
 import com.consol.citrus.context.TestContext;
@@ -14,13 +11,11 @@ public class ExportTestAction extends AbstractTestAction {
 	public static String EXPORT_API			= "exportApi";
 	public static String EXPORT_LOCATION	= "exportLocation";
 	
-	
-	private static Logger LOG = LoggerFactory.getLogger(ExportTestAction.class);
-	
 	@Override
 	public void doExecute(TestContext context) {
 		
 		boolean useEnvironmentOnly	= false;
+		String ignoreAdminAccount = "false";
 		
 		String stage				= null;
 		try {
@@ -34,6 +29,10 @@ public class ExportTestAction extends AbstractTestAction {
 		
 		try {
 			useEnvironmentOnly 	= Boolean.parseBoolean(context.getVariable("useEnvironmentOnly"));
+		} catch (Exception ignore) {};
+		
+		try {
+			ignoreAdminAccount = context.getVariable("ignoreAdminAccount");
 		} catch (Exception ignore) {};
 		
 		if(stage==null) {
@@ -56,7 +55,8 @@ public class ExportTestAction extends AbstractTestAction {
 					"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
 					"-p", context.replaceDynamicContentInString("${apiManagerPass}"), 
 					"-u", context.replaceDynamicContentInString("${apiManagerUser}"),
-					"-s", stage };
+					"-s", stage,  
+					"-ignoreAdminAccount", ignoreAdminAccount};
 		}
 		int rc = ExportApp.run(args);
 		if(expectedReturnCode!=rc) {
