@@ -287,6 +287,11 @@ public class ExportAPI {
 	
 	public List<ClientApplication> getApplications() {
 		if(this.actualAPIProxy.getApplications().size()==0) return null;
+		for(ClientApplication app : this.actualAPIProxy.getApplications()) {
+			app.setId(null); // Don't export the Application-ID
+			app.setOrganizationId(null); // Don't export the Application-ID
+			app.setAppQuota(null); // Swagger-Promote doesn't managed quotas per apps
+		}
 		return this.actualAPIProxy.getApplications();
 	}
 
