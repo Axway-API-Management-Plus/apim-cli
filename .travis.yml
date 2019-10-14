@@ -19,7 +19,7 @@ cache:
     - '$HOME/.m2/repository'
 
 before_install:
-  # Avoid installation if unit-tests fail anyway
+  # Avoid installation if unit-tests fail anyway 
   - mvn clean test
 
   - if [ ! -f $CACHE_FILE_APIM ]; then sudo cat /etc/docker/daemon.json | jq '. + {\"insecure-registries\": [\"docker-registry.demo.axway.com\"]}' | sudo tee /etc/docker/daemon.json; fi
