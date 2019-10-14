@@ -22,7 +22,7 @@ before_install:
   # Avoid installation if unit-tests fail anyway
   - mvn clean test
 
-  - if [ ! -f $CACHE_FILE_APIM ]; echo "HELLO"; fi
+  - if [ ! -f $CACHE_FILE_APIM ]; then echo "HELLO"; fi
 
   - if [ ! -f $CACHE_FILE_APIM ]; then sudo sed 's/DOCKER_OPTS="/DOCKER_OPTS="--insecure-registry=docker-registry.demo.axway.com /g' -i /etc/default/docker; fi
   - if [ ! -f $CACHE_FILE_APIM ]; then sudo service docker restart; fi
