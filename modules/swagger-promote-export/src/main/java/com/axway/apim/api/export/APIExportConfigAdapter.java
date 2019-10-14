@@ -49,7 +49,8 @@ public class APIExportConfigAdapter {
 	public APIExportConfigAdapter(String exportApiPath, String localFolder) throws AppException {
 		super();
 		this.exportApiPath = exportApiPath;
-		this.localFolder = (localFolder==null) ? "." : localFolder;;
+		this.localFolder = (localFolder==null) ? "." : localFolder;
+		LOG.info("Going to export API: " + exportApiPath + " to path: " + localFolder);
 		apiManager = APIManagerAdapter.getInstance();
 	}
 
