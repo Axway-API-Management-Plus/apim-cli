@@ -66,12 +66,12 @@ public class CompleteAPIExportTestIT extends TestNGCitrusTestRunner {
 		
 		if(ignoreAdminAccount) {
 			echo("####### Exporting the API with Org-Admin permissions only #######");
-			createVariable("exportLocation", "citrus:systemProperty('java.io.tmpdir')-OrgAdmin");
+			createVariable("exportLocation", "${exportLocation}/orgAdmin");
 			createVariable("apiManagerUser", "${oadminUsername1}"); // This is an org-admin user
 			createVariable("apiManagerPass", "${oadminPassword1}");
 			createVariable("ignoreAdminAccount", "true"); // Don't use the Admin-Account given in the env.properties for this test
 		} else {
-			createVariable("exportLocation", "citrus:systemProperty('java.io.tmpdir')-"+ignoreAdminAccount);
+			createVariable("exportLocation", "${exportLocation}/ignoreAdminAccount");
 			echo("####### Exporting the API with Admin permissions #######");
 		}
 		
