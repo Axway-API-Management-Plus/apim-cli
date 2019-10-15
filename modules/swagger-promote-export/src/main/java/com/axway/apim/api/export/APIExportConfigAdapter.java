@@ -49,7 +49,8 @@ public class APIExportConfigAdapter {
 	public APIExportConfigAdapter(String exportApiPath, String localFolder) throws AppException {
 		super();
 		this.exportApiPath = exportApiPath;
-		this.localFolder = localFolder;
+		this.localFolder = (localFolder==null) ? "." : localFolder;
+		LOG.info("Going to export API: " + exportApiPath + " to path: " + localFolder);
 		apiManager = APIManagerAdapter.getInstance();
 	}
 
@@ -71,6 +72,8 @@ public class APIExportConfigAdapter {
 			}
 			IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate());
 			handleCustomProperties(actualAPI);
+			APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getInboundProfiles(), actualAPI, true);
+			APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getOutboundProfiles(), actualAPI, true);
 			exportAPI = new ExportAPI(actualAPI);
 			exportAPIList.add(exportAPI);
 		} else {
@@ -87,7 +90,7 @@ public class APIExportConfigAdapter {
 			throw new AppException("Local export folder: " + localFolder + " already exists.", ErrorCode.EXPORT_FOLDER_EXISTS);
 		}
 		if (!localFolder.mkdirs()) {
-			throw new AppException("Cant create export folder", ErrorCode.UNXPECTED_ERROR);
+			throw new AppException("Cant create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
 		LOG.info("Going to export API into folder: " + localFolder);
 		APIDefintion apiDef = exportAPI.getAPIDefinition();
@@ -204,8 +207,6 @@ public class APIExportConfigAdapter {
 		if(customProperties.size()>0) {
 			((ActualAPI)actualAPI).setCustomProperties(customProperties);
 		}
-		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getInboundProfiles(), actualAPI, true);
-		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getOutboundProfiles(), actualAPI, true);
 	}
 	
 	private void prepareToSave(ExportAPI exportAPI) throws AppException {
