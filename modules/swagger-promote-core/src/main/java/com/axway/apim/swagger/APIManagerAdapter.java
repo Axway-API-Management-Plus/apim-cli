@@ -1199,7 +1199,7 @@ public class APIManagerAdapter {
 		translateMethodIds(profiles, actualAPI, false);
 	}
 	
-	public <profile> void translateMethodIds(Map<String, profile> profiles, IAPI actualAPI, boolean toMethodames) throws AppException {
+	public <profile> void translateMethodIds(Map<String, profile> profiles, IAPI actualAPI, boolean toMethodnames) throws AppException {
 		Map<String, profile> updatedEntries = new LinkedHashMap<String, profile>();
 		if(profiles!=null) {
 			List<APIMethod> methods = null;
@@ -1209,7 +1209,7 @@ public class APIManagerAdapter {
 				if(key.equals("_default")) continue;
 				if(methods==null) methods = getAllMethodsForAPI(actualAPI.getId());
 				for(APIMethod method : methods) {
-					if(toMethodames) {
+					if(toMethodnames) {
 						if(method.getId().equals(key)) { // Look for the methodId
 							profile value = profiles.get(key);
 							if(value instanceof OutboundProfile) {
