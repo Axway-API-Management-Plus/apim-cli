@@ -21,7 +21,9 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIManagerAdapter;
+import com.axway.apim.swagger.api.properties.apiAccess.APIAccess;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
+import com.axway.apim.swagger.api.properties.organization.ApiAccess;
 import com.axway.apim.swagger.api.state.ActualAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -56,7 +58,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			removeNonGrantedClientApps(desiredState.getApplications());
 		}
 		List<ClientApplication> recreateActualApps = null;
-		// If an UNPUBLISHED API has been re-creared, we have to create App-Subscriptions manually, as API-Manager Upgrade only works on PUBLISHED APIs
+		// If an UNPUBLISHED API has been re-created, we have to create App-Subscriptions manually, as API-Manager Upgrade only works on PUBLISHED APIs
 		// But we only need to do this, if existing App-Subscriptions should be preserved (MODE_ADD).
 		if(reCreation && actualState.getState().equals(IAPI.STATE_UNPUBLISHED) && CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_ADD)) {
 			removeNonGrantedClientApps(oldAPI.getApplications());
@@ -141,9 +143,17 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			// A Client-App that doesn't belong to a granted organization, can't have a subscription.
 			if(!hasClientAppPermission(app)) continue;
 			LOG.debug("Removing API-Access for application '"+app.getName()+"'");
+			String apiAccessIdToDelete = null;
 			try { 
 				Transaction.getInstance().put("appName", app);
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis/"+apiId).build();
+				for(APIAccess accessId : app.getApiAccess()) {
+					if(accessId.getApiId().equals(apiId)) apiAccessIdToDelete = accessId.getId();
+				}
+				if(apiAccessIdToDelete==null) {
+					LOG.warn("Application: '"+app.getName()+"' ("+app.getId()+") seems not have access to API: '"+actualState.getName()+"' ("+apiId+"). Continue");
+					continue;
+				}
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis/"+apiAccessIdToDelete).build();
 				apiCall = new DELRequest(uri, this, hasAdminAccount);
 				apiCall.execute();
 			} catch (Exception e) {
@@ -156,15 +166,14 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	@Override
 	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
 		Transaction context = Transaction.getInstance();
+		int statusCode = httpResponse.getStatusLine().getStatusCode();
 		try {
-			if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_CREATED) {
-				if(context.get(MODE).equals(MODE_CREATE_API_ACCESS)) {
-					actualState.getApplications().add((ClientApplication)context.get("appName"));
-					LOG.debug("Successfully created API-Access for application: '"+context.get("appName")+"'");
-				} else {
-					actualState.getApplications().remove((ClientApplication)context.get("appName"));
-					LOG.debug("Successfully removed API-Access from application: '"+context.get("appName")+"'");
-				}
+			if(context.get(MODE).equals(MODE_CREATE_API_ACCESS) && statusCode == HttpStatus.SC_CREATED) {
+				actualState.getApplications().add((ClientApplication)context.get("appName"));
+				LOG.debug("Successfully created API-Access for application: '"+context.get("appName")+"'");
+			} else if(context.get(MODE).equals(MODE_REMOVE_API_ACCESS)  && statusCode == HttpStatus.SC_NO_CONTENT) {
+				actualState.getApplications().remove((ClientApplication)context.get("appName"));
+				LOG.debug("Successfully removed API-Access from application: '"+context.get("appName")+"'");
 			} else {
 				LOG.error("Received status code: " + httpResponse.getStatusLine().getStatusCode());
 				try {
@@ -185,7 +194,8 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	
 	private List<ClientApplication> getMissingApps(List<ClientApplication> apps, List<ClientApplication> otherApps) throws AppException {
 		List<ClientApplication> missingApps = new ArrayList<ClientApplication>();
-		if(apps == null || otherApps == null) return missingApps;
+		if(otherApps == null) otherApps = new ArrayList<ClientApplication>();
+		if(apps == null) apps = new ArrayList<ClientApplication>();
 		for(ClientApplication app : apps) {
 			if(otherApps.contains(app)) {
 				continue;

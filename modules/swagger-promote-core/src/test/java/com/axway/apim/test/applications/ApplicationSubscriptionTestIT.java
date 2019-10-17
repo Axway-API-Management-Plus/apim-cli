@@ -137,11 +137,43 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].id", "${apiId}")); // Must be the same API-ID as before!
 		
+		echo("####### Re-Importing same API: '${apiName}' - Without applications subscriptions and mode replace #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
+		createVariable("state", "published");
+		createVariable("orgName", "${orgName}");
+		createVariable("enforce", "true");
+		createVariable("clientAppsMode", "replace");
+		createVariable("expectedReturnCode", "0");
+		swaggerImport.doExecute(context);
+		
+		echo("####### Validate API: '${apiName}' has been re-created and subscriptions has been removed #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+				.validate("$.[?(@.path=='${apiPath}')].state", "published")
+				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "newApiId"));
+		
+		echo("####### Validate the application no Access to this API #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestApp1Id}/apis").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.*.apiId", "@assertThat(not(containsString(${newApiId})))@"));
+		
+		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestApp2Id}/apis").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.*.apiId", "@assertThat(not(containsString(${newApiId})))@"));
+		
+		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestApp3Id}/apis").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.*.apiId", "@assertThat(not(containsString(${newApiId})))@"));
+		
 		echo("####### Changing the state to unpublished #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/applications/1_api-with-1-org-some-apps.json");
 		createVariable("state", "unpublished");
 		createVariable("enforce", "true");
+		createVariable("clientAppsMode", "add");
 		createVariable("orgName", "${orgName}");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
