@@ -844,7 +844,7 @@ public class APIManagerAdapter {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+backendApiID+"/image").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			httpResponse = getRequest.execute();
-			if(httpResponse == null) return null; // no Image found in API-Manager
+			if(httpResponse == null || httpResponse.getEntity() == null) return null; // no Image found in API-Manager
 			InputStream is = httpResponse.getEntity().getContent();
 			image.setImageContent(IOUtils.toByteArray(is));
 			image.setBaseFilename("api-image");
