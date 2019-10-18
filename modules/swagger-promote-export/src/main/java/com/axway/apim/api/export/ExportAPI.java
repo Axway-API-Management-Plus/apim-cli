@@ -291,6 +291,7 @@ public class ExportAPI {
 			app.setId(null); // Don't export the Application-ID
 			app.setOrganizationId(null); // Don't export the Application-ID
 			app.setAppQuota(null); // Swagger-Promote doesn't managed quotas per apps
+			app.setApiAccess(null); // Don't export API-Access
 		}
 		return this.actualAPIProxy.getApplications();
 	}
