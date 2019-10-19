@@ -139,15 +139,19 @@ public class APIExportConfigAdapter {
 	
 	private void storeCaCerts(File localFolder, List<CaCert> caCerts) throws AppException {
 		for(CaCert caCert : caCerts) {
-			String filename = caCert.getCertFile();
-			Base64.Encoder encoder = Base64.getMimeEncoder(64, System.getProperty("line.separator").getBytes());
-			Base64.Decoder decoder = Base64.getDecoder();
-			final String encodedCertText = new String(encoder.encode(decoder.decode(caCert.getCertBlob())));
-			byte[] certContent = ("-----BEGIN CERTIFICATE-----\n"+encodedCertText+"\n-----END CERTIFICATE-----").getBytes();
-			try {
-				writeBytesToFile(certContent, localFolder + "/" + filename);
-			} catch (AppException e) {
-				throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
+			if (caCert.getCertBlob() == null) {
+				LOG.warn("- Ignoring cert export for null certBlob for alias: {}", caCert.getAlias());
+			} else {
+				String filename = caCert.getCertFile();
+				Base64.Encoder encoder = Base64.getMimeEncoder(64, System.getProperty("line.separator").getBytes());
+				Base64.Decoder decoder = Base64.getDecoder();
+				final String encodedCertText = new String(encoder.encode(decoder.decode(caCert.getCertBlob())));
+				byte[] certContent = ("-----BEGIN CERTIFICATE-----\n" + encodedCertText + "\n-----END CERTIFICATE-----").getBytes();
+				try {
+					writeBytesToFile(certContent, localFolder + "/" + filename);
+				} catch (AppException e) {
+					throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
+				}
 			}
 		}
 	}
