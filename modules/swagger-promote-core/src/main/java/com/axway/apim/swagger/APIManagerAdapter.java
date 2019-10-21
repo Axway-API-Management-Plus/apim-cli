@@ -422,7 +422,7 @@ public class APIManagerAdapter {
 		apiManagerApi.setClientOrganizations(grantedOrgs);
 	}
 	
-	private void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
+	public void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> allApps = getAllApps();
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
@@ -430,6 +430,7 @@ public class APIManagerAdapter {
 		} else {
 			for(ClientApplication app : allApps) {
 				List<APIAccess> APIAccess = getAPIAccess(app.getId(), "applications");
+				app.setApiAccess(APIAccess);
 				for(APIAccess access : APIAccess) {
 					if(access.getApiId().equals(apiManagerApi.getId())) {
 						existingClientApps.add(app);
@@ -843,7 +844,7 @@ public class APIManagerAdapter {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+backendApiID+"/image").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			httpResponse = getRequest.execute();
-			if(httpResponse == null) return null; // no Image found in API-Manager
+			if(httpResponse == null || httpResponse.getEntity() == null) return null; // no Image found in API-Manager
 			InputStream is = httpResponse.getEntity().getContent();
 			image.setImageContent(IOUtils.toByteArray(is));
 			image.setBaseFilename("api-image");
@@ -1024,7 +1025,7 @@ public class APIManagerAdapter {
 	
 	public List<ClientApplication> getAllApps() throws AppException {
 		if(!hasAdminAccount) {
-			LOG.trace("Using OrgAdmin only to loading all applications.");
+			LOG.trace("Using OrgAdmin to load all applications.");
 		}
 		if(APIManagerAdapter.allApps!=null) {
 			LOG.trace("Not reloading existing apps from API-Manager. Number of apps: " + APIManagerAdapter.allApps.size());
@@ -1055,7 +1056,9 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	
+	public void setAllApps(List<ClientApplication> allApps) throws AppException {
+		APIManagerAdapter.allApps = allApps;
+	}
 	
 	public static List<ApiAccess> getOrgsApiAccess(String orgId, boolean forceReload) throws AppException {
 		if(!forceReload && orgsApiAccess.containsKey(orgId)) {
