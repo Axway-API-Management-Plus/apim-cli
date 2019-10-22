@@ -21,6 +21,7 @@ Plugins should also help the community to contribute or extend Swagger-Promote m
   - if applicable official plugins are tested as part of the Core-Swagger-Promote integration tests
     - for some, it might be impossible to automatically test them
   - will become part of the official Swagger-Promote release (shipped with the release package)
+    - Plugin config-files are shipped with a (.NOTUSED) extension in order to avoid overwriting customer config files
   - they are stored at Swagger-Promote Github Swagger-Promote `plugins` directory
   - each must have a README.md documenting the Plugin
     - Purpuse, Compatibility with API-Manager, History
@@ -36,7 +37,7 @@ Plugins should also help the community to contribute or extend Swagger-Promote m
 ### Register Plugins
 - Standard plugins will be delivered in a extra folder `/plugins` within the main folder
   - A plugin is a JAR-File residing in that folder
-    - also extracted Plugins will be supported (`plugins/pluginABC/com/axway/swa.../plugins`)
+    - also extracted Plugins will be supported (`plugins/pluginABC/com/axway/swa.../myGreatPlugin`)
   - Each plugin has it's own configuration file
     - each plugin can be turned On or Off using that config-file
     - each plugin can have it's own additional config settings in that config file
@@ -52,7 +53,7 @@ Plugins should also help the community to contribute or extend Swagger-Promote m
   - each config file may contain an execution order (e.g. `order=3`)
     - this allows to control the execution order of plugins
     - if no order is given for a plugin it will be executed after all ordered plugins randomly with others unsorted
-- if the config is valid, the Plugin is turned on it get's registered into the handler
+- if the config is valid, the Plugin is turned on and it get's registered into the handler
 - According to the registered order all plugins are called by the Swagger-Promote Plugin-Handler at certain steps
   - for that it must implement a `SwaggerPromotePluginInterface`
   1. Just after the API-Config & Swagger-File has been read
@@ -74,7 +75,7 @@ Plugins should also help the community to contribute or extend Swagger-Promote m
 - in case Swagger-Promote fails, each plugin is called to indicate there is an error
   - `swaggerPromoteFail(DesiredAPI, ActualAPI, AppException)`
   - can be used by a Plugin for further error handling
-  - perform some rollback
+  - perform some rollback actions
 
 ### Tests / Documentation / Misc
 - By default Plugins are not tested as part of the core Swagger-Promote integration tests
