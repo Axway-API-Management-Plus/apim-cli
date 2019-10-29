@@ -98,10 +98,25 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.25</version>
 		</dependency>
+		<dependency>
+			<groupId>org.pf4j</groupId>
+			<artifactId>pf4j</artifactId>
+			<version>3.1.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<annotationProcessors>
+						<annotationProcessor>org.pf4j.processor.ExtensionAnnotationProcessor</annotationProcessor>
+					</annotationProcessors>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>com.consol.citrus.mvn</groupId>
 				<artifactId>citrus-maven-plugin</artifactId>

@@ -9,6 +9,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.pf4j.PluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,11 @@ import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.RelaxedParser;
 import com.axway.apim.lib.rollback.RollbackHandler;
+import com.axway.apim.plugins.PluginManagerSingleton;
+import com.axway.apim.plugins.extenstions.ActualAPIPluginExtension;
+import com.axway.apim.plugins.extenstions.ChangestatePluginExtension;
+import com.axway.apim.plugins.extenstions.DesiredAPIPluginExtension;
+import com.axway.apim.plugins.extenstions.PostProcessPluginExtension;
 import com.axway.apim.swagger.APIChangeState;
 import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.APIManagerAdapter;
@@ -189,17 +195,30 @@ public class App {
 			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
+			PluginManager pluginManager = PluginManagerSingleton.getInstance();
 			
 			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params.getValue("contract"), 
 					params.getValue("stage"), params.getValue("apidefinition"), apimAdapter.isUsingOrgAdmin());
 			// Creates an API-Representation of the desired API
 			IAPI desiredAPI = configAdapter.getDesiredAPI();
+			for(DesiredAPIPluginExtension ext : pluginManager.getExtensions(DesiredAPIPluginExtension.class)){
+				ext.preProcessDesiredAPI(desiredAPI);
+			}
 			// Lookup an existing APIs - If found the actualAPI is valid - desiredAPI is used to control what needs to be loaded
 			IAPI actualAPI = apimAdapter.getAPIManagerAPI(apimAdapter.getExistingAPI(desiredAPI.getPath(), null, APIManagerAdapter.TYPE_FRONT_END), desiredAPI);
+			for(ActualAPIPluginExtension ext : pluginManager.getExtensions(ActualAPIPluginExtension.class)){
+				ext.preProcessActualAPI(actualAPI);
+			}
 			// Based on the actual API - fulfill/complete some elements in the desired API
 			configAdapter.completeDesiredAPI(desiredAPI, actualAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
+			for(ChangestatePluginExtension ext : pluginManager.getExtensions(ChangestatePluginExtension.class)){
+				ext.beforeApplyChanges(changeActions);
+			}			
 			apimAdapter.applyChanges(changeActions);
+			for(PostProcessPluginExtension ext : pluginManager.getExtensions(PostProcessPluginExtension.class)){
+				ext.postProcess(changeActions);
+			}
 			APIPropertiesExport.getInstance().store();
 			LOG.info("Successfully replicated API-State into API-Manager");
 			return 0;
