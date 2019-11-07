@@ -148,7 +148,7 @@ public class APIImportConfigAdapter {
 					apiConfig = updater.readValue(substitueVariables(new File(getStageConfig(stage, this.apiConfigFile))));
 					LOG.info("Loaded stage API-Config from file: " + getStageConfig(stage, this.apiConfigFile));
 				} catch (FileNotFoundException e) {
-					LOG.debug("No config file found for stage: '"+stage+"'");
+					LOG.warn("No config file found for stage: '"+stage+"'");
 					apiConfig = baseConfig;
 				}
 			} else {
