@@ -732,7 +732,11 @@ public class APIManagerAdapter {
 	}
 	
 	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type) throws AppException {
-		return getExistingAPI(apiPath, filter, type, true);
+		return getExistingAPI(apiPath, filter, null, type, true);
+	}
+	
+	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type, boolean logMessage) throws AppException {
+		return getExistingAPI(apiPath, filter, null, type, logMessage);
 	}
 	
 	/**
@@ -746,7 +750,7 @@ public class APIManagerAdapter {
 	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
 	 * @throws AppException if the API can't be found or created
 	 */
-	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type, boolean logMessage) throws AppException {
+	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String vhost, String type, boolean logMessage) throws AppException {
 		CommandParameters cmd = CommandParameters.getInstance();
 		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
@@ -769,15 +773,22 @@ public class APIManagerAdapter {
 			JsonNode foundApi = null;
 			try {
 				jsonResponse = mapper.readTree(response);
-				// We can directly access what we are looking for, as for 7.7 we filtered directly for the apiPath or 
-				// we have used some filters!
-				if(jsonResponse.size()!=0 && (filter!=null || hasAPIManagerVersion("7.7"))) {
+				if(jsonResponse.size()==1) {
 					foundApi =  jsonResponse.get(0);
+					if(vhost!=null && !vhost.equals(foundApi.get("vhost").asText())) {
+						LOG.info("V-Host: '"+foundApi.get("vhost").asText()+"' of exposed API on path: '"+foundApi.get("path").asText()+"' doesn't match to requested V-Host: '"+vhost+"'");
+						return null;
+					}
 				} else {
 					for(JsonNode api : jsonResponse) {
 						path = api.get("path").asText();
 						if(path.equals(apiPath)) {
+							if(vhost!=null && !vhost.equals(api.get("vhost").asText())) {
+								LOG.info("V-Host: '"+api.get("vhost").asText()+"' of exposed API on path: '"+path+"' doesn't match to requested V-Host: '"+vhost+"'");
+								continue;
+							}
 							foundApi = api;
+							break;
 						}
 					}
 				}

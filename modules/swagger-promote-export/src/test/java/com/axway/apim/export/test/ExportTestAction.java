@@ -15,9 +15,10 @@ public class ExportTestAction extends AbstractTestAction {
 	public void doExecute(TestContext context) {
 		
 		boolean useEnvironmentOnly	= false;
-		String ignoreAdminAccount = "false";
-		
+		String ignoreAdminAccount	= "false";
 		String stage				= null;
+		String vhostToExport		= null;
+		
 		try {
 			stage 				= context.getVariable("stage");
 		} catch (CitrusRuntimeException ignore) {};
@@ -35,6 +36,10 @@ public class ExportTestAction extends AbstractTestAction {
 			ignoreAdminAccount = context.getVariable("ignoreAdminAccount");
 		} catch (Exception ignore) {};
 		
+		try {
+			vhostToExport = context.getVariable("vhostToExport");
+		} catch (Exception ignore) {};
+		
 		if(stage==null) {
 			stage = "NOT_SET";
 		} else {
@@ -50,7 +55,8 @@ public class ExportTestAction extends AbstractTestAction {
 					"-a", context.replaceDynamicContentInString("${exportApi}"), "-s", stage};
 		} else {
 			args = new String[] { 
-					"-a", context.replaceDynamicContentInString("${exportApi}"), 
+					"-a", context.replaceDynamicContentInString("${exportApi}"),
+					"-vhost", vhostToExport,
 					"-l", context.replaceDynamicContentInString("${exportLocation}"), 
 					"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
 					"-p", context.replaceDynamicContentInString("${apiManagerPass}"), 

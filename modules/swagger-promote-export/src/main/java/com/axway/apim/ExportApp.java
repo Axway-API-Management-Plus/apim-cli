@@ -51,6 +51,11 @@ public class ExportApp {
 				option.setArgName("/api/v1/my/great/api");
 			options.addOption(option);
 			
+			option = new Option("vhost", true, "Set this option to export an API on a specific V-Host.");
+			option.setRequired(false);
+			option.setArgName("vhost.customer.com");
+			options.addOption(option);
+			
 			option = new Option("l", "localFolder", true, "Defines the location to store API-Definitions locally. Defaults to current folder.\n"
 					+ "For each API a new folder is created automatically.");
 				option.setRequired(false);
@@ -124,7 +129,7 @@ public class ExportApp {
 			
 			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
 			
-			APIExportConfigAdapter exportAdapter = new APIExportConfigAdapter(params.getValue("api-path"), params.getValue("localFolder"));
+			APIExportConfigAdapter exportAdapter = new APIExportConfigAdapter(params.getValue("api-path"), params.getValue("localFolder"), params.getValue("vhost"));
 			exportAdapter.exportAPIs();
 			return 0;
 		} catch (AppException ap) {

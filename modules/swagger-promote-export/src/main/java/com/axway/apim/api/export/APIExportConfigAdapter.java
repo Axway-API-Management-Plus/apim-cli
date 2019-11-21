@@ -40,15 +40,19 @@ public class APIExportConfigAdapter {
 
 	/** Which APIs should be exported identified by the path */
 	private String exportApiPath = null;
+	
+	/** If set, export APIs with that V-Host only */
+	private String vhost = null;
 
 	/** Where to store the exported API-Definition */
 	private String localFolder = null;
 
 	APIManagerAdapter apiManager;
 
-	public APIExportConfigAdapter(String exportApiPath, String localFolder) throws AppException {
+	public APIExportConfigAdapter(String exportApiPath, String localFolder, String vhost) throws AppException {
 		super();
 		this.exportApiPath = exportApiPath;
+		this.vhost = vhost;
 		this.localFolder = (localFolder==null) ? "." : localFolder;
 		LOG.info("Going to export API: " + exportApiPath + " to path: " + localFolder);
 		apiManager = APIManagerAdapter.getInstance();
@@ -65,7 +69,7 @@ public class APIExportConfigAdapter {
 		List<ExportAPI> exportAPIList = new ArrayList<ExportAPI>();
 		ExportAPI exportAPI = null;
 		if (!this.exportApiPath.contains("*")) {
-			JsonNode mgrAPI = apiManager.getExistingAPI(this.exportApiPath, null, APIManagerAdapter.TYPE_FRONT_END);
+			JsonNode mgrAPI = apiManager.getExistingAPI(this.exportApiPath, null, vhost, APIManagerAdapter.TYPE_FRONT_END, true);
 			if(mgrAPI==null) {
 				ErrorState.getInstance().setError("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API, false);
 				throw new AppException("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API);
@@ -84,7 +88,7 @@ public class APIExportConfigAdapter {
 
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {
 		String apiPath = getAPIExportFolder(exportAPI.getPath());
-		File localFolder = new File(this.localFolder +File.separator+ apiPath);
+		File localFolder = new File(this.localFolder +File.separator+ exportAPI.getVhost() +File.separator+ apiPath);
 		if(localFolder.exists()) {
 			ErrorState.getInstance().setError("Local export folder: " + localFolder + " already exists.", ErrorCode.EXPORT_FOLDER_EXISTS, false);
 			throw new AppException("Local export folder: " + localFolder + " already exists.", ErrorCode.EXPORT_FOLDER_EXISTS);
@@ -94,7 +98,6 @@ public class APIExportConfigAdapter {
 		}
 		LOG.info("Going to export API into folder: " + localFolder);
 		APIDefintion apiDef = exportAPI.getAPIDefinition();
-		int len = apiDef.getAPIDefinitionContent().length;
 		String targetFile = null;
 		try {
 			targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName()+".json";
