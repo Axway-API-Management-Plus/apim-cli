@@ -773,23 +773,15 @@ public class APIManagerAdapter {
 			JsonNode foundApi = null;
 			try {
 				jsonResponse = mapper.readTree(response);
-				if(jsonResponse.size()==1) {
-					foundApi =  jsonResponse.get(0);
-					if(vhost!=null && !vhost.equals(foundApi.get("vhost").asText())) {
-						LOG.info("V-Host: '"+foundApi.get("vhost").asText()+"' of exposed API on path: '"+foundApi.get("path").asText()+"' doesn't match to requested V-Host: '"+vhost+"'");
-						return null;
-					}
-				} else {
-					for(JsonNode api : jsonResponse) {
-						path = api.get("path").asText();
-						if(path.equals(apiPath)) {
-							if(vhost!=null && !vhost.equals(api.get("vhost").asText())) {
-								LOG.info("V-Host: '"+api.get("vhost").asText()+"' of exposed API on path: '"+path+"' doesn't match to requested V-Host: '"+vhost+"'");
-								continue;
-							}
-							foundApi = api;
-							break;
+				for(JsonNode api : jsonResponse) {
+					path = api.get("path").asText();
+					if(path.equals(apiPath)) {
+						if(vhost!=null && !vhost.equals(api.get("vhost").asText())) {
+							LOG.info("V-Host: '"+api.get("vhost").asText()+"' of exposed API on path: '"+path+"' doesn't match to requested V-Host: '"+vhost+"'");
+							continue;
 						}
+						foundApi = api;
+						break;
 					}
 				}
 				if(foundApi!=null) {
