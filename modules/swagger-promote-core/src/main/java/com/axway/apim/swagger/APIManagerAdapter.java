@@ -448,7 +448,7 @@ public class APIManagerAdapter {
 			if(desiredAPI.getOrganizationId().equals(apiManagerApi.getOrganizationId())) {
 				((ActualAPI)apiManagerApi).setOrganization(desiredAPI.getOrganization());
 			} else {
-				String actualOrgName = getOrgName(apiManagerApi.getOrganizationId());
+				String actualOrgName = getOrg(apiManagerApi.getOrganizationId()).getName();
 				((ActualAPI)apiManagerApi).setOrganization(actualOrgName);
 			}
 		}
@@ -552,10 +552,10 @@ public class APIManagerAdapter {
 	 * @return the id of the organization
 	 * @throws AppException if allOrgs can't be read from the API-Manager
 	 */
-	public String getOrgName(String orgId) throws AppException {
+	public Organization getOrg(String orgId) throws AppException {
 		if(allOrgs == null) getAllOrgs();
 		for(Organization org : allOrgs) {
-			if(orgId.equals(org.getId())) return org.getName();
+			if(orgId.equals(org.getId())) return org;
 		}
 		LOG.error("Requested OrgName for unknown orgId: " + orgId);
 		return null;

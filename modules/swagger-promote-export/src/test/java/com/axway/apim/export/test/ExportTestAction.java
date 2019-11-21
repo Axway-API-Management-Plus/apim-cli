@@ -42,12 +42,9 @@ public class ExportTestAction extends AbstractTestAction {
 		
 		if(stage==null) {
 			stage = "NOT_SET";
-		} else {
-			// We need to prepare the dynamic staging file used during the test.
-		//	String stageConfigFile = origConfigFile.substring(0, origConfigFile.lastIndexOf(".")+1) + stage + origConfigFile.substring(origConfigFile.lastIndexOf("."));
-		//	String replacedStagedConfig = configFile.substring(0, configFile.lastIndexOf("."))+"."+stage+".json";
-			// This creates the dynamic staging config file! (For testing, we also support reading out of a file directly)
-		//	replaceDynamicContentInFile(stageConfigFile, context, replacedStagedConfig);
+		}
+		if(vhostToExport==null) {
+			vhostToExport = "NOT_SET";
 		}
 		String[] args;
 		if(useEnvironmentOnly) {
@@ -56,7 +53,7 @@ public class ExportTestAction extends AbstractTestAction {
 		} else {
 			args = new String[] { 
 					"-a", context.replaceDynamicContentInString("${exportApi}"),
-					"-vhost", vhostToExport,
+					"-v", vhostToExport,
 					"-l", context.replaceDynamicContentInString("${exportLocation}"), 
 					"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
 					"-p", context.replaceDynamicContentInString("${apiManagerPass}"), 

@@ -41,18 +41,18 @@ public class APIExportConfigAdapter {
 	/** Which APIs should be exported identified by the path */
 	private String exportApiPath = null;
 	
-	/** If set, export APIs with that V-Host only */
-	private String vhost = null;
+	/** Is set if APIs only with that V-Host should be exported */
+	private String exportVhost = null;
 
 	/** Where to store the exported API-Definition */
 	private String localFolder = null;
 
 	APIManagerAdapter apiManager;
 
-	public APIExportConfigAdapter(String exportApiPath, String localFolder, String vhost) throws AppException {
+	public APIExportConfigAdapter(String exportApiPath, String localFolder, String exportVhost) throws AppException {
 		super();
 		this.exportApiPath = exportApiPath;
-		this.vhost = vhost;
+		this.exportVhost = (exportVhost!=null && !exportVhost.equals("NOT_SET")) ? exportVhost : null;
 		this.localFolder = (localFolder==null) ? "." : localFolder;
 		LOG.info("Going to export API: " + exportApiPath + " to path: " + localFolder);
 		apiManager = APIManagerAdapter.getInstance();
@@ -69,7 +69,7 @@ public class APIExportConfigAdapter {
 		List<ExportAPI> exportAPIList = new ArrayList<ExportAPI>();
 		ExportAPI exportAPI = null;
 		if (!this.exportApiPath.contains("*")) {
-			JsonNode mgrAPI = apiManager.getExistingAPI(this.exportApiPath, null, vhost, APIManagerAdapter.TYPE_FRONT_END, true);
+			JsonNode mgrAPI = apiManager.getExistingAPI(this.exportApiPath, null, exportVhost, APIManagerAdapter.TYPE_FRONT_END, true);
 			if(mgrAPI==null) {
 				ErrorState.getInstance().setError("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API, false);
 				throw new AppException("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API);
@@ -88,7 +88,7 @@ public class APIExportConfigAdapter {
 
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {
 		String apiPath = getAPIExportFolder(exportAPI.getPath());
-		File localFolder = new File(this.localFolder +File.separator+ exportAPI.getVhost() +File.separator+ apiPath);
+		File localFolder = new File(this.localFolder +File.separator+ getVHost(exportAPI) + apiPath);
 		if(localFolder.exists()) {
 			ErrorState.getInstance().setError("Local export folder: " + localFolder + " already exists.", ErrorCode.EXPORT_FOLDER_EXISTS, false);
 			throw new AppException("Local export folder: " + localFolder + " already exists.", ErrorCode.EXPORT_FOLDER_EXISTS);
@@ -138,6 +138,13 @@ public class APIExportConfigAdapter {
 			LOG.warn("- No Client-Organizations");
 			LOG.warn("- Only subscribed applications from the Org-Admins organization");
 		}
+	}
+	
+	private String getVHost(ExportAPI exportAPI) throws AppException {
+		if(exportAPI.getVhost()!=null) return exportAPI.getVhost() + File.separator;
+		String orgVHost = apiManager.getOrg(exportAPI.getOrganizationId()).getVirtualHost();
+		if(orgVHost!=null) return orgVHost+File.separator;
+		return "";
 	}
 	
 	private void storeCaCerts(File localFolder, List<CaCert> caCerts) throws AppException {

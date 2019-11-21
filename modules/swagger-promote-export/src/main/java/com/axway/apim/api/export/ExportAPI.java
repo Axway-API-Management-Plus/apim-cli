@@ -208,7 +208,7 @@ public class ExportAPI {
 		String orgId = null;
 		try {
 			orgId = getOrganizationId();
-			return APIManagerAdapter.getInstance().getOrgName(orgId);
+			return APIManagerAdapter.getInstance().getOrg(orgId).getName();
 		} catch (Exception e) {
 			throw new RuntimeException("Can't read orgName for orgId: '"+orgId+"'");
 		}
