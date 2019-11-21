@@ -51,7 +51,7 @@ public class ExportApp {
 				option.setArgName("/api/v1/my/great/api");
 			options.addOption(option);
 			
-			option = new Option("vhost", true, "Set this option to export an API on a specific V-Host.");
+			option = new Option("v", "vhost", true, "Set this option to export an API on a specific V-Host.");
 			option.setRequired(false);
 			option.setArgName("vhost.customer.com");
 			options.addOption(option);
