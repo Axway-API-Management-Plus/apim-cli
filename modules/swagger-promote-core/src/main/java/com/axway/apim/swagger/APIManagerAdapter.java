@@ -776,7 +776,7 @@ public class APIManagerAdapter {
 				for(JsonNode api : jsonResponse) {
 					path = api.get("path").asText();
 					if(path.equals(apiPath)) {
-						if(vhost!=null && !vhost.equals(api.get("vhost").asText())) {
+						if(type.equals(TYPE_FRONT_END) && vhost!=null && !vhost.equals(api.get("vhost").asText())) {
 							LOG.info("V-Host: '"+api.get("vhost").asText()+"' of exposed API on path: '"+path+"' doesn't match to requested V-Host: '"+vhost+"'");
 							continue;
 						}
