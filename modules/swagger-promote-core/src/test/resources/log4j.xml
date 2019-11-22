@@ -55,9 +55,6 @@
   <logger name="com.axway.apim.swagger">
 	<level value="INFO"/>
   </logger>
-    <logger name="org.apache.http.wire">
-    <level value="DEBUG"/>
-  </logger>
 
   <!-- ======================= -->
   <!-- Setup the Root logger -->
