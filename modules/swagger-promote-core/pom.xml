@@ -133,6 +133,14 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<includes>
+						<include>WSDLFromURLDirectTestIT.java</include>
+						<include>WSDLFromURLInConfigurationDirectTestIT.java</include>
+						<include>WSDLFromURLRefFileInConfigurationTestIT.java</include>
+						<include>WSDLFromURLRefFileTestIT.java</include>
+					</includes>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
