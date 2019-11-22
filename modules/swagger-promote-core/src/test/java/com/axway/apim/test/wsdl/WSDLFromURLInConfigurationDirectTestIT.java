@@ -27,7 +27,7 @@ public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestDesi
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
 		createVariable(ImportTestAction.API_DEFINITION, "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition","http://www.dneonline.com/calculator.asmx?WSDL");
+		createVariable("testAPIDefinition","https://www.dneonline.com/calculator.asmx?WSDL");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
@@ -50,7 +50,7 @@ public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestDesi
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION, "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition","http://www.dneonline.com/calculator.asmx?WSDL");
+		createVariable("testAPIDefinition","https://www.dneonline.com/calculator.asmx?WSDL");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
@@ -58,7 +58,7 @@ public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestDesi
 		echo("####### Setting the status to Published #######");
 		createVariable(ImportTestAction.API_DEFINITION, "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition","http://www.dneonline.com/calculator.asmx?WSDL");
+		createVariable("testAPIDefinition","https://www.dneonline.com/calculator.asmx?WSDL");
 		createVariable("status", "published");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);

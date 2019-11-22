@@ -25,7 +25,7 @@ public class WSDLFromURLDirectTestIT extends TestNGCitrusTestDesigner {
 		variable("apiName", "Direct-URL-WSDL from URL-${apiNumber}");
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
-		createVariable(ImportTestAction.API_DEFINITION, "http://www.dneonline.com/calculator.asmx?wsdl");
+		createVariable(ImportTestAction.API_DEFINITION, "https://www.dneonline.com/calculator.asmx?wsdl");
 		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/wsdl-minimal-config.json");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "0");
@@ -47,14 +47,14 @@ public class WSDLFromURLDirectTestIT extends TestNGCitrusTestDesigner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Re-Import API from URL without a change #######");
-		createVariable(ImportTestAction.API_DEFINITION, "http://www.dneonline.com/calculator.asmx?wsdl");
+		createVariable(ImportTestAction.API_DEFINITION, "https://www.dneonline.com/calculator.asmx?wsdl");
 		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/wsdl-minimal-config.json");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		action(swaggerImport);
 		
 		echo("####### Setting the status to Published #######");
-		createVariable(ImportTestAction.API_DEFINITION, "http://www.dneonline.com/calculator.asmx?wsdl");
+		createVariable(ImportTestAction.API_DEFINITION, "https://www.dneonline.com/calculator.asmx?wsdl");
 		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/wsdl-minimal-config.json");
 		createVariable("status", "published");
 		createVariable("expectedReturnCode", "0");
@@ -75,7 +75,7 @@ public class WSDLFromURLDirectTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.id=='${apiId}')].state", "published");
 		
 		echo("####### Now performing a change, which required to Re-Create the API #######");
-		createVariable(ImportTestAction.API_DEFINITION, "http://www.dneonline.com/calculator.asmx?wsdl");
+		createVariable(ImportTestAction.API_DEFINITION, "https://www.dneonline.com/calculator.asmx?wsdl");
 		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/wsdl-minimal-config-with-tags.json");
 		createVariable("status", "published");
 		createVariable("expectedReturnCode", "0");
