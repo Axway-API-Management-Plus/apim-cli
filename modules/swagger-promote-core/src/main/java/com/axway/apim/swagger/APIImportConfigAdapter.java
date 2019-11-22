@@ -40,6 +40,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -623,7 +624,9 @@ public class APIImportConfigAdapter {
 		String password = url.getPassword();
 		CloseableHttpClient httpclient = createHttpClient(uri, username, password);
 		try {
+			RequestConfig config = RequestConfig.custom().setRelativeRedirectsAllowed(true).build();
 			HttpGet httpGet = new HttpGet(uri);
+			httpGet.setConfig(config);
 			
             ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
 
