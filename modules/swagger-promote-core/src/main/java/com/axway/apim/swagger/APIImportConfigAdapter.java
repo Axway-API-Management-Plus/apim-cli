@@ -624,7 +624,10 @@ public class APIImportConfigAdapter {
 		String password = url.getPassword();
 		CloseableHttpClient httpclient = createHttpClient(uri, username, password);
 		try {
-			RequestConfig config = RequestConfig.custom().setRelativeRedirectsAllowed(true).build();
+			RequestConfig config = RequestConfig.custom()
+					.setRelativeRedirectsAllowed(true)
+					.setCircularRedirectsAllowed(true)
+					.build();
 			HttpGet httpGet = new HttpGet(uri);
 			httpGet.setConfig(config);
 			
