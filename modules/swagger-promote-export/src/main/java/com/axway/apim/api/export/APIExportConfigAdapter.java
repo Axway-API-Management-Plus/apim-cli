@@ -9,7 +9,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +58,7 @@ public class APIExportConfigAdapter {
 		this.exportApiPath = exportApiPath;
 		this.exportVhost = (exportVhost!=null && !exportVhost.equals("NOT_SET")) ? exportVhost : null;
 		this.localFolder = (localFolder==null) ? "." : localFolder;
-		LOG.info("Going to export API: " + exportApiPath + " to path: " + localFolder);
+		LOG.debug("Constructed ExportConfigAdapter: [exportApiPath: '"+exportApiPath+"', localFolder: '"+localFolder+"', exportVhost: '"+exportVhost+"']");
 		apiManager = APIManagerAdapter.getInstance();
 	}
 
@@ -68,22 +72,50 @@ public class APIExportConfigAdapter {
 	private List<ExportAPI> getAPIsToExport() throws AppException {
 		List<ExportAPI> exportAPIList = new ArrayList<ExportAPI>();
 		ExportAPI exportAPI = null;
-		if (!this.exportApiPath.contains("*")) {
+		if (!this.exportApiPath.contains("*")) { // Direct access with a specific API exposure path
 			JsonNode mgrAPI = apiManager.getExistingAPI(this.exportApiPath, null, exportVhost, APIManagerAdapter.TYPE_FRONT_END, true);
 			if(mgrAPI==null) {
 				ErrorState.getInstance().setError("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API, false);
 				throw new AppException("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API);
 			}
-			IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate());
-			handleCustomProperties(actualAPI);
-			APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getInboundProfiles(), actualAPI, true);
-			APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getOutboundProfiles(), actualAPI, true);
-			exportAPI = new ExportAPI(actualAPI);
-			exportAPIList.add(exportAPI);
-		} else {
-			throw new UnsupportedOperationException("Wildcard API selection not yet supported.");
+			exportAPIList.add(getExportAPI(mgrAPI));
+		} else if(APIManagerAdapter.hasAPIManagerVersion("7.7") // Wild-Card search on API-Manager >7.7 filtering directly
+				&& (this.exportApiPath.startsWith("*") || this.exportApiPath.endsWith("*"))) {
+			List<NameValuePair> filters = new ArrayList<NameValuePair>();
+			filters.add(new BasicNameValuePair("field", "path"));
+			filters.add(new BasicNameValuePair("op", "like"));
+			if(exportApiPath.equals("*")) {
+				LOG.info("Using '*' to export all APIs from API-Manager.");
+				filters.add(new BasicNameValuePair("value", "/"));
+			} else {
+				LOG.info("Using wildcard pattern: '"+exportApiPath+"' to export APIs from API-Manager.");
+				filters.add(new BasicNameValuePair("value", exportApiPath.replace("*", "")));
+			}
+			List<JsonNode> foundAPIs = apiManager.getExistingAPIs(null, filters, exportVhost, APIManagerAdapter.TYPE_FRONT_END, true);
+			for(JsonNode mgrAPI : foundAPIs) {
+				exportAPIList.add(getExportAPI(mgrAPI));
+			}
+		} else { // Get all APIs and filter them out manually
+			Pattern pattern = Pattern.compile(exportApiPath.replace("*", ".*"));
+			List<JsonNode> foundAPIs = apiManager.getExistingAPIs(null, null, exportVhost, APIManagerAdapter.TYPE_FRONT_END, false);	
+			for(JsonNode mgrAPI : foundAPIs) {
+				String apiPath = mgrAPI.get("path").asText();
+				Matcher matcher = pattern.matcher(apiPath);
+				if(matcher.matches()) {
+					LOG.debug("Adding API with path: '"+apiPath+"' based on requested path: '"+exportApiPath+"' to the export list.");
+					exportAPIList.add(getExportAPI(mgrAPI));
+				}
+			}			
 		}
 		return exportAPIList;
+	}
+	
+	private ExportAPI getExportAPI(JsonNode mgrAPI) throws AppException {
+		IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate());
+		handleCustomProperties(actualAPI);
+		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getInboundProfiles(), actualAPI, true);
+		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getOutboundProfiles(), actualAPI, true);
+		return new ExportAPI(actualAPI);
 	}
 
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {
