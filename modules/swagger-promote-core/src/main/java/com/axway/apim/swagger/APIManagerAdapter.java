@@ -302,7 +302,6 @@ public class APIManagerAdapter {
 	 * This helps to use features, that are introduced with a certain version or even service-pack.
 	 * @param version has the API-Manager this version of higher?
 	 * @return false if API-Manager doesn't have this version otherwise true
-	 * @throws AppException if the API-Manager version can't be detected
 	 */
 	public static boolean hasAPIManagerVersion(String version) {
 		try {
@@ -423,7 +422,7 @@ public class APIManagerAdapter {
 		apiManagerApi.setClientOrganizations(grantedOrgs);
 	}
 	
-	private void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
+	public void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> allApps = getAllApps();
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
@@ -431,6 +430,7 @@ public class APIManagerAdapter {
 		} else {
 			for(ClientApplication app : allApps) {
 				List<APIAccess> APIAccess = getAPIAccess(app.getId(), "applications");
+				app.setApiAccess(APIAccess);
 				for(APIAccess access : APIAccess) {
 					if(access.getApiId().equals(apiManagerApi.getId())) {
 						existingClientApps.add(app);
@@ -448,7 +448,7 @@ public class APIManagerAdapter {
 			if(desiredAPI.getOrganizationId().equals(apiManagerApi.getOrganizationId())) {
 				((ActualAPI)apiManagerApi).setOrganization(desiredAPI.getOrganization());
 			} else {
-				String actualOrgName = getOrgName(apiManagerApi.getOrganizationId());
+				String actualOrgName = getOrg(apiManagerApi.getOrganizationId()).getName();
 				((ActualAPI)apiManagerApi).setOrganization(actualOrgName);
 			}
 		}
@@ -552,10 +552,10 @@ public class APIManagerAdapter {
 	 * @return the id of the organization
 	 * @throws AppException if allOrgs can't be read from the API-Manager
 	 */
-	public String getOrgName(String orgId) throws AppException {
+	public Organization getOrg(String orgId) throws AppException {
 		if(allOrgs == null) getAllOrgs();
 		for(Organization org : allOrgs) {
-			if(orgId.equals(org.getId())) return org.getName();
+			if(orgId.equals(org.getId())) return org;
 		}
 		LOG.error("Requested OrgName for unknown orgId: " + orgId);
 		return null;
@@ -665,6 +665,7 @@ public class APIManagerAdapter {
 	private void addQuotaConfiguration(IAPI api, IAPI desiredAPI) throws AppException {
 		// No need to load quota, if not given in the desired API
 		if(desiredAPI!=null && (desiredAPI.getApplicationQuota() == null && desiredAPI.getSystemQuota() == null)) return;
+		if(!this.hasAdminAccount) return; // Can't load quota without having an Admin-Account
 		ActualAPI managerAPI = (ActualAPI)api;
 		try {
 			applicationQuotaConfig = getQuotaFromAPIManager(APPLICATION_DEFAULT_QUOTA); // Get the Application-Default-Quota
@@ -731,7 +732,26 @@ public class APIManagerAdapter {
 	}
 	
 	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type) throws AppException {
-		return getExistingAPI(apiPath, filter, type, true);
+		List<JsonNode> foundAPIs = getExistingAPIs(apiPath, filter, null, type, true);
+		return getUniqueAPI(foundAPIs);
+	}
+	
+	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type, boolean logMessage) throws AppException {
+		List<JsonNode> foundAPIs = getExistingAPIs(apiPath, filter, null, type, logMessage);
+		return getUniqueAPI(foundAPIs);
+	}
+	
+	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String vhost, String type, boolean logMessage) throws AppException {
+		List<JsonNode> foundAPIs = getExistingAPIs(apiPath, filter, vhost, type, logMessage);
+		return getUniqueAPI(foundAPIs);
+	}
+	
+	private JsonNode getUniqueAPI(List<JsonNode> foundAPIs) throws AppException {
+		if(foundAPIs.size()>1) {
+			throw new AppException("No unique API found", ErrorCode.UNKNOWN_API);
+		}
+		if(foundAPIs.size()==0) return null;
+		return foundAPIs.get(0);
 	}
 	
 	/**
@@ -739,22 +759,26 @@ public class APIManagerAdapter {
 	 * as it's stored in the API-Manager. The result is basically used to create the APIManagerAPI in 
 	 * method getAPIManagerAPI
 	 * @param apiPath path of the API, which can be considered as the key.
+	 * @param filter restrict the search by these filters
+	 * @param requestedType must be TYPE_FRONT_END or TYPE_FRONT_END
+	 * @param logMessage flag to control if the error message should be printed or not
 	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
 	 * @throws AppException if the API can't be found or created
 	 */
-	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type, boolean logMessage) throws AppException {
+	public List<JsonNode> getExistingAPIs(String apiPath, List<NameValuePair> filter, String vhost, String requestedType, boolean logMessage) throws AppException {
 		CommandParameters cmd = CommandParameters.getInstance();
 		ObjectMapper mapper = new ObjectMapper();
+		List<JsonNode> foundAPIs = new ArrayList<JsonNode>();
 		URI uri;
 		try {
 			List<NameValuePair> usedFilters = new ArrayList<>();
-			if(hasAPIManagerVersion("7.7") && apiPath != null) { // With 7.7 we can query the API directly on the path 
+			if(hasAPIManagerVersion("7.7") && apiPath != null) { // With 7.7 we can query the API-PATH directly 
 				usedFilters.add(new BasicNameValuePair("field", "path"));
 				usedFilters.add(new BasicNameValuePair("op", "eq"));
 				usedFilters.add(new BasicNameValuePair("value", apiPath));
 			} 
 			if(filter != null) { usedFilters.addAll(filter); } 
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+type)
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+requestedType)
 				.addParameters(usedFilters)
 				.build();
 			RestAPICall getRequest = new GETRequest(uri, null);
@@ -762,32 +786,35 @@ public class APIManagerAdapter {
 			
 			JsonNode jsonResponse;
 			String path;
-			JsonNode foundApi = null;
 			try {
 				jsonResponse = mapper.readTree(response);
-				// We can directly access what we are looking for, as for 7.7 we filtered directly for the apiPath or 
-				// we have used some filters!
-				if(jsonResponse.size()!=0 && (filter!=null || hasAPIManagerVersion("7.7"))) {
-					foundApi =  jsonResponse.get(0);
+				// When filters are provided, we expect 1 API to be found and use it directly
+				if(jsonResponse.size()==1 && (filter!=null || hasAPIManagerVersion("7.7"))) {
+					foundAPIs.add(jsonResponse.get(0));
 				} else {
 					for(JsonNode api : jsonResponse) {
 						path = api.get("path").asText();
-						if(path.equals(apiPath)) {
-							foundApi = api;
+						if(apiPath==null || path.equals(apiPath)) {
+							if(requestedType.equals(TYPE_FRONT_END)) {
+								if (vhost!=null && !vhost.equals(api.get("vhost").asText())) {
+									LOG.debug("V-Host: '"+api.get("vhost").asText()+"' of exposed API on path: '"+path+"' doesn't match to requested V-Host: '"+vhost+"'");
+									continue;
+								} else {
+									if(logMessage) 
+										LOG.info("Found existing API on path: '"+path+"' ("+api.get("state").asText()+") (ID: '" + api.get("id").asText()+"')");									
+								}
+							} else if(requestedType.equals(TYPE_BACK_END)) {
+								String name = api.get("name").asText();
+								if(logMessage) 
+									LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + api.get("id").asText()+"')");														
+							}
+							foundAPIs.add(api);
 						}
 					}
 				}
-				if(foundApi!=null) {
-					if(type.equals(TYPE_FRONT_END)) {
-						path = foundApi.get("path").asText();
-						if(logMessage) 
-							LOG.info("Found existing API on path: '"+path+"' ("+foundApi.get("state").asText()+") (ID: '" + foundApi.get("id").asText()+"')");
-					} else if(type.equals(TYPE_BACK_END)) {
-						String name = foundApi.get("name").asText();
-						if(logMessage) 
-							LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + foundApi.get("id").asText()+"')");						
-					}
-					return foundApi;
+				if(foundAPIs.size()!=0) {
+					LOG.debug("Found: "+foundAPIs.size()+" API(s) based on given criterias: [apiPath: '"+apiPath+"', filter: "+filter+", vhost: '"+vhost+"', requestedType: "+requestedType+"]");
+					return foundAPIs;
 				}
 				if(apiPath!=null && filter!=null) {
 					LOG.info("No existing API found exposed on: '" + apiPath + "' and filter: "+filter+"");
@@ -797,7 +824,7 @@ public class APIManagerAdapter {
 					LOG.info("No existing API found exposed on: '" + apiPath + "'");
 				}
 				
-				return null;
+				return foundAPIs;
 			} catch (IOException e) {
 				throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			}
@@ -840,7 +867,7 @@ public class APIManagerAdapter {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+backendApiID+"/image").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			httpResponse = getRequest.execute();
-			if(httpResponse == null) return null; // no Image found in API-Manager
+			if(httpResponse == null || httpResponse.getEntity() == null) return null; // no Image found in API-Manager
 			InputStream is = httpResponse.getEntity().getContent();
 			image.setImageContent(IOUtils.toByteArray(is));
 			image.setBaseFilename("api-image");
@@ -1021,7 +1048,7 @@ public class APIManagerAdapter {
 	
 	public List<ClientApplication> getAllApps() throws AppException {
 		if(!hasAdminAccount) {
-			LOG.trace("Using OrgAdmin only to loading all applications.");
+			LOG.trace("Using OrgAdmin to load all applications.");
 		}
 		if(APIManagerAdapter.allApps!=null) {
 			LOG.trace("Not reloading existing apps from API-Manager. Number of apps: " + APIManagerAdapter.allApps.size());
@@ -1052,7 +1079,9 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	
+	public void setAllApps(List<ClientApplication> allApps) throws AppException {
+		APIManagerAdapter.allApps = allApps;
+	}
 	
 	public static List<ApiAccess> getOrgsApiAccess(String orgId, boolean forceReload) throws AppException {
 		if(!forceReload && orgsApiAccess.containsKey(orgId)) {
@@ -1086,14 +1115,20 @@ public class APIManagerAdapter {
 		
 		String appConfig = null;
 		URI uri;
+		HttpEntity httpResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
-			HttpEntity response = getRequest.execute().getEntity();
-			appConfig = IOUtils.toString(response.getContent(), "UTF-8");
+			httpResponse = getRequest.execute().getEntity();
+			appConfig = IOUtils.toString(httpResponse.getContent(), "UTF-8");
 			return parseAppConfig(appConfig);
 		} catch (Exception e) {
 			throw new AppException("Can't read app.config from API-Manager: '" + appConfig + "'", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		} finally {
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
 		}
 	}
 	
@@ -1162,7 +1197,7 @@ public class APIManagerAdapter {
 	/**
 	 * Helper method to translate a Base64 encoded format 
 	 * as it's needed by the API-Manager.
-	 * @param certFile input stream to the certificate file
+	 * @param certificate the certificate content
 	 * @param filename the name of the certificate file used as a reference in the generated Json object
 	 * @throws AppException when the certificate information can't be created
 	 * @return a Json-Object structure as needed by the API-Manager
@@ -1190,7 +1225,7 @@ public class APIManagerAdapter {
 		translateMethodIds(profiles, actualAPI, false);
 	}
 	
-	public <profile> void translateMethodIds(Map<String, profile> profiles, IAPI actualAPI, boolean toMethodames) throws AppException {
+	public <profile> void translateMethodIds(Map<String, profile> profiles, IAPI actualAPI, boolean toMethodnames) throws AppException {
 		Map<String, profile> updatedEntries = new LinkedHashMap<String, profile>();
 		if(profiles!=null) {
 			List<APIMethod> methods = null;
@@ -1200,7 +1235,7 @@ public class APIManagerAdapter {
 				if(key.equals("_default")) continue;
 				if(methods==null) methods = getAllMethodsForAPI(actualAPI.getId());
 				for(APIMethod method : methods) {
-					if(toMethodames) {
+					if(toMethodnames) {
 						if(method.getId().equals(key)) { // Look for the methodId
 							profile value = profiles.get(key);
 							if(value instanceof OutboundProfile) {

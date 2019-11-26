@@ -195,7 +195,7 @@ public class App {
 			// Creates an API-Representation of the desired API
 			IAPI desiredAPI = configAdapter.getDesiredAPI();
 			// Lookup an existing APIs - If found the actualAPI is valid - desiredAPI is used to control what needs to be loaded
-			IAPI actualAPI = apimAdapter.getAPIManagerAPI(apimAdapter.getExistingAPI(desiredAPI.getPath(), null, APIManagerAdapter.TYPE_FRONT_END), desiredAPI);
+			IAPI actualAPI = apimAdapter.getAPIManagerAPI(apimAdapter.getExistingAPI(desiredAPI.getPath(), null, desiredAPI.getVhost(), APIManagerAdapter.TYPE_FRONT_END, true), desiredAPI);
 			// Based on the actual API - fulfill/complete some elements in the desired API
 			configAdapter.completeDesiredAPI(desiredAPI, actualAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);

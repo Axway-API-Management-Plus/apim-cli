@@ -3,6 +3,7 @@ package com.axway.apim.actions.tasks.props;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
+import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthType;
 import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,6 +24,9 @@ public class AuthenticationProfileHandler implements PropertyHandler {
 	
 	private void preProcessAuthenticationProfiles(IAPI desired) throws AppException {
 		for(AuthenticationProfile profile : desired.getAuthenticationProfiles()) {
+			if(profile.getType()==AuthType.http_basic && profile.getParameters().get("password")==null) {
+				profile.getParameters().put("password", "");
+			}
 			// Validate we have only one default declared
 			if(!profile.getName().equals("_default") && profile.getIsDefault()) {
 				ErrorState.getInstance().setError("Not allowed to configure non _default profile: '"+profile.getName()+"' as default.", ErrorCode.CANT_READ_CONFIG_FILE, false);

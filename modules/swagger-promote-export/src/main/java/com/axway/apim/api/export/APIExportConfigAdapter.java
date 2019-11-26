@@ -9,7 +9,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,16 +44,21 @@ public class APIExportConfigAdapter {
 
 	/** Which APIs should be exported identified by the path */
 	private String exportApiPath = null;
+	
+	/** Is set if APIs only with that V-Host should be exported */
+	private String exportVhost = null;
 
 	/** Where to store the exported API-Definition */
 	private String localFolder = null;
 
 	APIManagerAdapter apiManager;
 
-	public APIExportConfigAdapter(String exportApiPath, String localFolder) throws AppException {
+	public APIExportConfigAdapter(String exportApiPath, String localFolder, String exportVhost) throws AppException {
 		super();
 		this.exportApiPath = exportApiPath;
-		this.localFolder = localFolder;
+		this.exportVhost = (exportVhost!=null && !exportVhost.equals("NOT_SET")) ? exportVhost : null;
+		this.localFolder = (localFolder==null) ? "." : localFolder;
+		LOG.debug("Constructed ExportConfigAdapter: [exportApiPath: '"+exportApiPath+"', localFolder: '"+localFolder+"', exportVhost: '"+exportVhost+"']");
 		apiManager = APIManagerAdapter.getInstance();
 	}
 
@@ -63,35 +72,64 @@ public class APIExportConfigAdapter {
 	private List<ExportAPI> getAPIsToExport() throws AppException {
 		List<ExportAPI> exportAPIList = new ArrayList<ExportAPI>();
 		ExportAPI exportAPI = null;
-		if (!this.exportApiPath.contains("*")) {
-			JsonNode mgrAPI = apiManager.getExistingAPI(this.exportApiPath, null, APIManagerAdapter.TYPE_FRONT_END);
+		if (!this.exportApiPath.contains("*")) { // Direct access with a specific API exposure path
+			JsonNode mgrAPI = apiManager.getExistingAPI(this.exportApiPath, null, exportVhost, APIManagerAdapter.TYPE_FRONT_END, true);
 			if(mgrAPI==null) {
 				ErrorState.getInstance().setError("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API, false);
 				throw new AppException("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API);
 			}
-			IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate());
-			handleCustomProperties(actualAPI);
-			exportAPI = new ExportAPI(actualAPI);
-			exportAPIList.add(exportAPI);
-		} else {
-			throw new UnsupportedOperationException("Wildcard API selection not yet supported.");
+			exportAPIList.add(getExportAPI(mgrAPI));
+		} else if(APIManagerAdapter.hasAPIManagerVersion("7.7") // Wild-Card search on API-Manager >7.7 filtering directly
+				&& (this.exportApiPath.startsWith("*") || this.exportApiPath.endsWith("*"))) {
+			List<NameValuePair> filters = new ArrayList<NameValuePair>();
+			filters.add(new BasicNameValuePair("field", "path"));
+			filters.add(new BasicNameValuePair("op", "like"));
+			if(exportApiPath.equals("*")) {
+				LOG.info("Using '*' to export all APIs from API-Manager.");
+				filters.add(new BasicNameValuePair("value", "/"));
+			} else {
+				LOG.info("Using wildcard pattern: '"+exportApiPath+"' to export APIs from API-Manager.");
+				filters.add(new BasicNameValuePair("value", exportApiPath.replace("*", "")));
+			}
+			List<JsonNode> foundAPIs = apiManager.getExistingAPIs(null, filters, exportVhost, APIManagerAdapter.TYPE_FRONT_END, true);
+			for(JsonNode mgrAPI : foundAPIs) {
+				exportAPIList.add(getExportAPI(mgrAPI));
+			}
+		} else { // Get all APIs and filter them out manually
+			Pattern pattern = Pattern.compile(exportApiPath.replace("*", ".*"));
+			List<JsonNode> foundAPIs = apiManager.getExistingAPIs(null, null, exportVhost, APIManagerAdapter.TYPE_FRONT_END, false);	
+			for(JsonNode mgrAPI : foundAPIs) {
+				String apiPath = mgrAPI.get("path").asText();
+				Matcher matcher = pattern.matcher(apiPath);
+				if(matcher.matches()) {
+					LOG.debug("Adding API with path: '"+apiPath+"' based on requested path: '"+exportApiPath+"' to the export list.");
+					exportAPIList.add(getExportAPI(mgrAPI));
+				}
+			}			
 		}
 		return exportAPIList;
+	}
+	
+	private ExportAPI getExportAPI(JsonNode mgrAPI) throws AppException {
+		IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate());
+		handleCustomProperties(actualAPI);
+		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getInboundProfiles(), actualAPI, true);
+		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getOutboundProfiles(), actualAPI, true);
+		return new ExportAPI(actualAPI);
 	}
 
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {
 		String apiPath = getAPIExportFolder(exportAPI.getPath());
-		File localFolder = new File(this.localFolder +File.separator+ apiPath);
+		File localFolder = new File(this.localFolder +File.separator+ getVHost(exportAPI) + apiPath);
 		if(localFolder.exists()) {
 			ErrorState.getInstance().setError("Local export folder: " + localFolder + " already exists.", ErrorCode.EXPORT_FOLDER_EXISTS, false);
 			throw new AppException("Local export folder: " + localFolder + " already exists.", ErrorCode.EXPORT_FOLDER_EXISTS);
 		}
 		if (!localFolder.mkdirs()) {
-			throw new AppException("Cant create export folder", ErrorCode.UNXPECTED_ERROR);
+			throw new AppException("Cant create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
 		LOG.info("Going to export API into folder: " + localFolder);
 		APIDefintion apiDef = exportAPI.getAPIDefinition();
-		int len = apiDef.getAPIDefinitionContent().length;
 		String targetFile = null;
 		try {
 			targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName()+".json";
@@ -126,19 +164,36 @@ public class APIExportConfigAdapter {
 			storeCaCerts(localFolder, exportAPI.getCaCerts());
 		}
 		LOG.info("Successfully export API to folder: " + localFolder);
+		if(!APIManagerAdapter.hasAdminAccount()) {
+			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
+			LOG.warn("- No Quotas has been exported for the API");
+			LOG.warn("- No Client-Organizations");
+			LOG.warn("- Only subscribed applications from the Org-Admins organization");
+		}
+	}
+	
+	private String getVHost(ExportAPI exportAPI) throws AppException {
+		if(exportAPI.getVhost()!=null) return exportAPI.getVhost() + File.separator;
+		String orgVHost = apiManager.getOrg(exportAPI.getOrganizationId()).getVirtualHost();
+		if(orgVHost!=null) return orgVHost+File.separator;
+		return "";
 	}
 	
 	private void storeCaCerts(File localFolder, List<CaCert> caCerts) throws AppException {
 		for(CaCert caCert : caCerts) {
-			String filename = caCert.getCertFile();
-			Base64.Encoder encoder = Base64.getMimeEncoder(64, System.getProperty("line.separator").getBytes());
-			Base64.Decoder decoder = Base64.getDecoder();
-			final String encodedCertText = new String(encoder.encode(decoder.decode(caCert.getCertBlob())));
-			byte[] certContent = ("-----BEGIN CERTIFICATE-----\n"+encodedCertText+"\n-----END CERTIFICATE-----").getBytes();
-			try {
-				writeBytesToFile(certContent, localFolder + "/" + filename);
-			} catch (AppException e) {
-				throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
+			if (caCert.getCertBlob() == null) {
+				LOG.warn("- Ignoring cert export for null certBlob for alias: {}", caCert.getAlias());
+			} else {
+				String filename = caCert.getCertFile();
+				Base64.Encoder encoder = Base64.getMimeEncoder(64, System.getProperty("line.separator").getBytes());
+				Base64.Decoder decoder = Base64.getDecoder();
+				final String encodedCertText = new String(encoder.encode(decoder.decode(caCert.getCertBlob())));
+				byte[] certContent = ("-----BEGIN CERTIFICATE-----\n" + encodedCertText + "\n-----END CERTIFICATE-----").getBytes();
+				try {
+					writeBytesToFile(certContent, localFolder + "/" + filename);
+				} catch (AppException e) {
+					throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
+				}
 			}
 		}
 	}
@@ -182,6 +237,7 @@ public class APIExportConfigAdapter {
 	
 	private void handleCustomProperties(IAPI actualAPI) throws AppException {
 		JsonNode customPropconfig = APIManagerAdapter.getCustomPropertiesConfig().get("api");
+		if(customPropconfig == null) return; // No custom properties configured
 		Map<String, String> customProperties = new LinkedHashMap<String, String>();
 		JsonNode actualApiConfig = ((ActualAPI)actualAPI).getApiConfiguration();
 		// Check if Custom-Properties are configured
@@ -197,8 +253,6 @@ public class APIExportConfigAdapter {
 		if(customProperties.size()>0) {
 			((ActualAPI)actualAPI).setCustomProperties(customProperties);
 		}
-		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getInboundProfiles(), actualAPI, true);
-		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getOutboundProfiles(), actualAPI, true);
 	}
 	
 	private void prepareToSave(ExportAPI exportAPI) throws AppException {

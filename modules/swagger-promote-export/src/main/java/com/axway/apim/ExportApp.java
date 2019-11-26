@@ -44,11 +44,16 @@ public class ExportApp {
 			option = new Option("a", "api-path", true, "Define the APIs to be exported, based on the exposure path.\n"
 					+ "You can use wildcards to export multiple APIs:\n"
 					+ "-a /api/v1/my/great/api     : Export a specific API\n"
-					+ "-a *                        : Export all APIs (Not yet supported)\n"
-					+ "-a /api/v1/any*             : Export all APIs with this prefix (Not yet supported)\n"
-					+ "-a /api/v1/*/some/other/api : Even that is possible\n");
+					+ "-a *                        : Export all APIs\n"
+					+ "-a /api/v1/any*             : Export all APIs with this prefix\n"
+					+ "-a */some/other/api         : Export APIs end with the same path\n");
 				option.setRequired(true);
 				option.setArgName("/api/v1/my/great/api");
+			options.addOption(option);
+			
+			option = new Option("v", "vhost", true, "Limit the export to that specific host.");
+			option.setRequired(false);
+			option.setArgName("vhost.customer.com");
 			options.addOption(option);
 			
 			option = new Option("l", "localFolder", true, "Defines the location to store API-Definitions locally. Defaults to current folder.\n"
@@ -86,9 +91,22 @@ public class ExportApp {
 			option.setRequired(false);
 			internalOptions.addOption(option);
 			
+			option = new Option("ignoreAdminAccount", true, "If set, the tool wont load the env.properties. This is used for testing only.");
+			option.setRequired(false);
+			option.setArgName("true");
+			internalOptions.addOption(option);
+			
 			CommandLineParser parser = new RelaxedParser();
 			CommandLine cmd = null;
 			CommandLine internalCmd = null;
+			
+			System.out.println("------------------------------------------------------------------------");
+			System.out.println("API-Manager Promote: "+App.class.getPackage().getImplementationVersion() + " - E X P O R T");
+			System.out.println("                                                                        ");
+			System.out.println("To report issues or get help, please visit: ");
+			System.out.println("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
+			System.out.println("------------------------------------------------------------------------");
+			System.out.println("");
 			
 			try {
 				cmd = parser.parse(options, args);
@@ -103,15 +121,6 @@ public class ExportApp {
 				System.exit(0);
 			}
 			
-			System.out.println("------------------------------------------------------------------------");
-			System.out.println("API-Manager Promote: "+App.class.getPackage().getImplementationVersion() + " - E X P O R T");
-			System.out.println("                                                                        ");
-			System.out.println("To report issues or get help, please visit: ");
-			System.out.println("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
-			System.out.println("------------------------------------------------------------------------");
-			System.out.println("");
-
-			
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
@@ -120,7 +129,7 @@ public class ExportApp {
 			
 			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
 			
-			APIExportConfigAdapter exportAdapter = new APIExportConfigAdapter(params.getValue("api-path"), params.getValue("localFolder"));
+			APIExportConfigAdapter exportAdapter = new APIExportConfigAdapter(params.getValue("api-path"), params.getValue("localFolder"), params.getValue("vhost"));
 			exportAdapter.exportAPIs();
 			return 0;
 		} catch (AppException ap) {
@@ -162,6 +171,7 @@ public class ExportApp {
 		System.out.println();
 		System.out.println("Using parameters provided in properties file stored in conf-folder:");
 		System.out.println(binary+" -a /api/v1/ -l my_apis -s api-env");
+		System.out.println(binary+" -a * -l all_my_apis -s api-env");
 		System.out.println();
 		System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 	}
