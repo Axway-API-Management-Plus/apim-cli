@@ -91,6 +91,8 @@ Also version 7.5.3 is supported, but not fully automated tested.
   - Quota-Handling & Method-Level configuration improvements and bugfixes
 - 1.6.2 - 09.08.2019
   - Export existing APIs, Quota-Validation
+- 1.6.3 - 30.09.2019
+  - Maintenance release with some minor bugfixes and improvements, Added support for 7.7 SP1 & 7.6.2 SP5
 
 
 ## Limitations/Caveats

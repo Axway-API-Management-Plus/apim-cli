@@ -66,6 +66,8 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 		} catch (Exception e) {
 			throw new AppException("Can't upgrade access to newer API!", ErrorCode.CANT_UPGRADE_API_ACCESS, e);
 		}
+		// Existing applications now got access to the new API, hence we have to update the internal state
+		APIManagerAdapter.getInstance().addClientApplications(inTransitState, actualState);
 		// Additionally we need to preserve existing (maybe manually created) application quotas
 		boolean updateAppQuota = false;
 		if(actualState.getApplications().size()!=0) {

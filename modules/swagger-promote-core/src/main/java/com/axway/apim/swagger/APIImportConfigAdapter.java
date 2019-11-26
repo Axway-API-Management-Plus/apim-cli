@@ -40,6 +40,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -116,6 +117,8 @@ public class APIImportConfigAdapter {
 
 	/**
 	 * Constructor just for testing. Don't use it!
+	 * @param apiConfig the desired API to test with
+	 * @param apiConfigFile this is the given config file
 	 */
 	public APIImportConfigAdapter(IAPI apiConfig, String apiConfigFile) {
 		this.apiConfig = apiConfig;
@@ -146,7 +149,7 @@ public class APIImportConfigAdapter {
 					apiConfig = updater.readValue(substitueVariables(new File(getStageConfig(stage, this.apiConfigFile))));
 					LOG.info("Loaded stage API-Config from file: " + getStageConfig(stage, this.apiConfigFile));
 				} catch (FileNotFoundException e) {
-					LOG.debug("No config file found for stage: '"+stage+"'");
+					LOG.warn("No config file found for stage: '"+stage+"'");
 					apiConfig = baseConfig;
 				}
 			} else {
@@ -621,7 +624,12 @@ public class APIImportConfigAdapter {
 		String password = url.getPassword();
 		CloseableHttpClient httpclient = createHttpClient(uri, username, password);
 		try {
+			RequestConfig config = RequestConfig.custom()
+					.setRelativeRedirectsAllowed(true)
+					.setCircularRedirectsAllowed(true)
+					.build();
 			HttpGet httpGet = new HttpGet(uri);
+			httpGet.setConfig(config);
 			
             ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
 
