@@ -44,14 +44,14 @@ public class ExportApp {
 			option = new Option("a", "api-path", true, "Define the APIs to be exported, based on the exposure path.\n"
 					+ "You can use wildcards to export multiple APIs:\n"
 					+ "-a /api/v1/my/great/api     : Export a specific API\n"
-					+ "-a *                        : Export all APIs (Not yet supported)\n"
-					+ "-a /api/v1/any*             : Export all APIs with this prefix (Not yet supported)\n"
-					+ "-a /api/v1/*/some/other/api : Even that is possible\n");
+					+ "-a *                        : Export all APIs\n"
+					+ "-a /api/v1/any*             : Export all APIs with this prefix\n"
+					+ "-a */some/other/api         : Export APIs end with the same path\n");
 				option.setRequired(true);
 				option.setArgName("/api/v1/my/great/api");
 			options.addOption(option);
 			
-			option = new Option("v", "vhost", true, "Set this option to export an API on a specific V-Host.");
+			option = new Option("v", "vhost", true, "Limit the export to that specific host.");
 			option.setRequired(false);
 			option.setArgName("vhost.customer.com");
 			options.addOption(option);
@@ -171,6 +171,7 @@ public class ExportApp {
 		System.out.println();
 		System.out.println("Using parameters provided in properties file stored in conf-folder:");
 		System.out.println(binary+" -a /api/v1/ -l my_apis -s api-env");
+		System.out.println(binary+" -a * -l all_my_apis -s api-env");
 		System.out.println();
 		System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 	}
