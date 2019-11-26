@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'; # stop on all errors
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$fileLocation = Join-Path $toolsDir 'apimanager-swagger-promote-1.6.2.zip'
+$fileLocation = Join-Path $toolsDir 'apimanager-swagger-promote-1.6.3.zip'
 
 $packageArgs = @{
   packageName   = $env:ChocolateyPackageName

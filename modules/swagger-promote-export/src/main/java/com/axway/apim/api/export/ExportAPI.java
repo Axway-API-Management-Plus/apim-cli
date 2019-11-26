@@ -208,7 +208,7 @@ public class ExportAPI {
 		String orgId = null;
 		try {
 			orgId = getOrganizationId();
-			return APIManagerAdapter.getInstance().getOrgName(orgId);
+			return APIManagerAdapter.getInstance().getOrg(orgId).getName();
 		} catch (Exception e) {
 			throw new RuntimeException("Can't read orgName for orgId: '"+orgId+"'");
 		}
@@ -275,7 +275,8 @@ public class ExportAPI {
 	}
 
 	
-	public List<String> getClientOrganizations() {
+	public List<String> getClientOrganizations() throws AppException {
+		if(!APIManagerAdapter.hasAdminAccount()) return null; 
 		if(this.actualAPIProxy.getClientOrganizations().size()==0) return null;
 		if(this.actualAPIProxy.getClientOrganizations().size()==1 && 
 				this.actualAPIProxy.getClientOrganizations().get(0).equals(getOrganization())) 
@@ -286,6 +287,12 @@ public class ExportAPI {
 	
 	public List<ClientApplication> getApplications() {
 		if(this.actualAPIProxy.getApplications().size()==0) return null;
+		for(ClientApplication app : this.actualAPIProxy.getApplications()) {
+			app.setId(null); // Don't export the Application-ID
+			app.setOrganizationId(null); // Don't export the Application-ID
+			app.setAppQuota(null); // Swagger-Promote doesn't managed quotas per apps
+			app.setApiAccess(null); // Don't export API-Access
+		}
 		return this.actualAPIProxy.getApplications();
 	}
 
