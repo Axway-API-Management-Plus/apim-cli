@@ -249,7 +249,7 @@ public class OutboundProfile {
 			List<Object> otherParameters = otherOutboundProfile.getParameters();
 			List<Object> thisParameters = this.getParameters();
 			if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
-				// Password no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
+				// Passwords no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
 				otherParameters.remove("password");
 				thisParameters.remove("password");
 			}
