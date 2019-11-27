@@ -38,7 +38,7 @@ public class DifferentVHostExportTestIT extends TestNGCitrusTestRunner {
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/api/test/"+this.getClass().getSimpleName()+"-${apiNumber}");
 		variable("apiName", this.getClass().getSimpleName()+"-${apiNumber}");
-		variable("state", "unpublished");
+		variable("state", "published");
 		variable("exportLocation", "citrus:systemProperty('java.io.tmpdir')");
 		variable(ExportTestAction.EXPORT_API,  "${apiPath}");
 		
