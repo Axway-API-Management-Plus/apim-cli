@@ -140,7 +140,6 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		RestAPICall apiCall;
 		Transaction.getInstance().put(MODE, MODE_REMOVE_API_ACCESS);
 		for(ClientApplication app : revomingActualApps) {
-			if(app==null || app.getApiAccess()==null) continue;
 			// A Client-App that doesn't belong to a granted organization, can't have a subscription.
 			if(!hasClientAppPermission(app)) continue;
 			LOG.debug("Removing API-Access for application '"+app.getName()+"'");
