@@ -424,13 +424,19 @@ public class APIManagerAdapter {
 	
 	public void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
-		List<ClientApplication> allApps = getAllApps();
+		List<ClientApplication> apps = null;
+		// With version >7.7 we can retrieve the subscribed apps directly
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-			existingClientApps = getSubscribedApps(apiManagerApi.getId());
+			apps = getSubscribedApps(apiManagerApi.getId());
 		} else {
-			for(ClientApplication app : allApps) {
-				List<APIAccess> APIAccess = getAPIAccess(app.getId(), "applications");
-				app.setApiAccess(APIAccess);
+			apps = getAllApps();
+		}
+		for(ClientApplication app : apps) {
+			List<APIAccess> APIAccess = getAPIAccess(app.getId(), "applications");
+			app.setApiAccess(APIAccess);
+			if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
+				existingClientApps.add(app);
+			} else {
 				for(APIAccess access : APIAccess) {
 					if(access.getApiId().equals(apiManagerApi.getId())) {
 						existingClientApps.add(app);
