@@ -796,7 +796,9 @@ public class APIManagerAdapter {
 				jsonResponse = mapper.readTree(response);
 				// When filters are provided, we expect 1 API to be found and use it directly
 				if(jsonResponse.size()==1 && (filter!=null || hasAPIManagerVersion("7.7"))) {
-					foundAPIs.add(jsonResponse.get(0));
+					if(vhost!=null && vhost.equals(jsonResponse.get(0).get("vhost").asText())) {
+						foundAPIs.add(jsonResponse.get(0));
+					}
 				} else {
 					for(JsonNode api : jsonResponse) {
 						path = api.get("path").asText();
@@ -822,12 +824,13 @@ public class APIManagerAdapter {
 					LOG.debug("Found: "+foundAPIs.size()+" API(s) based on given criterias: [apiPath: '"+apiPath+"', filter: "+filter+", vhost: '"+vhost+"', requestedType: "+requestedType+"]");
 					return foundAPIs;
 				}
+				String vhostMessage = (vhost!=null) ? "(V-Host: " + vhost + ") " : ""; 
 				if(apiPath!=null && filter!=null) {
-					LOG.info("No existing API found exposed on: '" + apiPath + "' and filter: "+filter+"");
+					LOG.info("No existing API found exposed "+vhostMessage+"on: '" + apiPath + "' and filter: "+filter+"");
 				} else if (apiPath==null ) {
-					LOG.info("No existing API found with filters: "+filter+"");
+					LOG.info("No existing API found with filters: "+filter+" "+vhostMessage);
 				} else {
-					LOG.info("No existing API found exposed on: '" + apiPath + "'");
+					LOG.info("No existing API found exposed on: '" + apiPath + "' "+vhostMessage);
 				}
 				
 				return foundAPIs;
