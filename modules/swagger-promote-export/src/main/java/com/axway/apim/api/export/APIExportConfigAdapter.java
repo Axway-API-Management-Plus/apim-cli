@@ -71,7 +71,6 @@ public class APIExportConfigAdapter {
 
 	private List<ExportAPI> getAPIsToExport() throws AppException {
 		List<ExportAPI> exportAPIList = new ArrayList<ExportAPI>();
-		ExportAPI exportAPI = null;
 		if (!this.exportApiPath.contains("*")) { // Direct access with a specific API exposure path
 			JsonNode mgrAPI = apiManager.getExistingAPI(this.exportApiPath, null, exportVhost, APIManagerAdapter.TYPE_FRONT_END, true);
 			if(mgrAPI==null) {
