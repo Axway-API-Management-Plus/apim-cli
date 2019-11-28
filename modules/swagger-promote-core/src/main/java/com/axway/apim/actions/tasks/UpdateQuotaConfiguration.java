@@ -1,6 +1,7 @@
 package com.axway.apim.actions.tasks;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -129,7 +130,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/quotas/"+quotaId).build();
 			
-			entity = new StringEntity(objectMapper.writeValueAsString(quotaConfig));
+			entity = new StringEntity(objectMapper.writeValueAsString(quotaConfig), StandardCharsets.UTF_8);
 			
 			apiCall = new PUTRequest(entity, uri, this, true);
 			apiCall.execute();
