@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
 import com.axway.apim.swagger.APIImportConfigAdapter;
 import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
 import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
@@ -135,7 +136,7 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 	}
 	
 	public void setRetirementDate(String retirementDate) throws AppException {
-		List<String> dateFormats = Arrays.asList("dd.MM.yyyy", "dd/MM/yyyy", "dd-MM-yyyy", "yyyy-mm-dd");
+		List<String> dateFormats = Arrays.asList("dd.MM.yyyy", "dd/MM/yyyy", "yyyy-MM-dd", "dd-MM-yyyy");
 		SimpleDateFormat format;
 		Date retDate = null;
 		for (String dateFormat : dateFormats) {
@@ -144,13 +145,13 @@ public class DesiredAPI extends AbstractAPI implements IAPI {
 			try {
 				retDate = format.parse(retirementDate);
 			} catch (ParseException e) { }
-			if(retDate!=null) {
+			if(retDate!=null && retDate.after(new Date())) {
 				LOG.info("Parsed retirementDate: '"+retirementDate+"' using format: '"+dateFormat+"' to: '"+retDate+"'");
 				break;
 			}
 		}
-		if(retDate==null) {
-			LOG.error("Unable to parse the given retirementDate using the following formats: " + dateFormats);
+		if(retDate==null || retDate.before(new Date())) {
+			ErrorState.getInstance().setError("Unable to parse the given retirementDate using the following formats: " + dateFormats, ErrorCode.CANT_READ_CONFIG_FILE, false);
 			throw new AppException("Cannnot parse given retirementDate", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 		this.retirementDate = retDate.getTime();
