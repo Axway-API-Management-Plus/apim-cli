@@ -53,6 +53,7 @@ public class DifferentVHostExportTestIT extends TestNGCitrusTestRunner {
 		createVariable("version", "1.0.0");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
+		createVariable("enforce", "true");
 		createVariable("vhost", "vhost2.customer.com");
 		createVariable("version", "2.0.0");
 		swaggerImport.doExecute(context);
