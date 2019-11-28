@@ -791,6 +791,7 @@ public class APIManagerAdapter {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+requestedType)
 				.addParameters(usedFilters)
 				.build();
+			LOG.info("Sending request to find existing APIs: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
 			
@@ -815,16 +816,16 @@ public class APIManagerAdapter {
 					if(apiPath!=null && path.equals(apiPath)) {
 						if(requestedType.equals(TYPE_FRONT_END)) {
 							if (vhost!=null && !vhost.equals(api.get("vhost").asText())) {
-								LOG.debug("V-Host: '"+api.get("vhost").asText()+"' of exposed API on path: '"+path+"' doesn't match to requested V-Host: '"+vhost+"'");
+								LOG.info("V-Host: '"+api.get("vhost").asText()+"' of exposed API on path: '"+path+"' doesn't match to requested V-Host: '"+vhost+"'");
 								continue;
 							} else {
 								if(logMessage) 
-									LOG.debug("Found existing API on path: '"+path+"' ("+api.get("state").asText()+") (ID: '" + api.get("id").asText()+"')");									
+									LOG.info("Found existing API on path: '"+path+"' ("+api.get("state").asText()+") (ID: '" + api.get("id").asText()+"')");									
 							}
 						} else if(requestedType.equals(TYPE_BACK_END)) {
 							String name = api.get("name").asText();
 							if(logMessage) 
-								LOG.debug("Found existing Backend-API with name: '"+name+"' (ID: '" + api.get("id").asText()+"')");														
+								LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + api.get("id").asText()+"')");														
 						}
 						foundAPIs.add(api);
 					}
@@ -834,7 +835,7 @@ public class APIManagerAdapter {
 				String dbgCrit = "";
 				if(foundAPIs.size()>1) 
 					dbgCrit = " (apiPath: '"+apiPath+"', filter: "+filter+", vhost: '"+vhost+"', requestedType: "+requestedType+")";
-				LOG.info("Found: "+foundAPIs.size()+" API(s) exposed on path: '" + apiPath + "'" + dbgCrit);
+				LOG.info("Found: "+foundAPIs.size()+" API(s) exposed on requested path: '" + apiPath + "'" + dbgCrit);
 				return foundAPIs;
 			}
 			String vhostMessage = (vhost!=null) ? "(V-Host: " + vhost + ") " : ""; 
