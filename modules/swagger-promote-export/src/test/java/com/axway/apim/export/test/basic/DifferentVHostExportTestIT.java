@@ -53,6 +53,7 @@ public class DifferentVHostExportTestIT extends TestNGCitrusTestRunner {
 		createVariable("version", "1.0.0");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
+		createVariable("enforce", "true");
 		createVariable("vhost", "vhost2.customer.com");
 		createVariable("version", "2.0.0");
 		swaggerImport.doExecute(context);
@@ -70,6 +71,7 @@ public class DifferentVHostExportTestIT extends TestNGCitrusTestRunner {
 		assertEquals(exportedAPIConfig.get("version").asText(), 		"1.0.0");
 		assertEquals(exportedAPIConfig.get("vhost").asText(), 			"vhost1.customer.com");
 
+		
 		echo("####### Export the API with vhost2.customer.com from the API-Manager #######");
 		createVariable("expectedReturnCode", "0");
 		createVariable("vhostToExport", "vhost2.customer.com");
