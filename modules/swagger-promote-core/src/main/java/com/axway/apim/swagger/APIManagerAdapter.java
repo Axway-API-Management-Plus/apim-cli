@@ -73,7 +73,7 @@ public class APIManagerAdapter {
 	
 	private static APIManagerAdapter instance;
 	
-	private static String apiManagerVersion = null;
+	public static String apiManagerVersion = null;
 	private static Map<Boolean, String> apiManagerConfig = new HashMap<Boolean, String>();
 	
 	private static List<Organization> allOrgs = null;
