@@ -796,7 +796,7 @@ public class APIManagerAdapter {
 				jsonResponse = mapper.readTree(response);
 				// When filters are provided, we expect 1 API to be found and use it directly
 				if(jsonResponse.size()==1 && (filter!=null || hasAPIManagerVersion("7.7"))) {
-					if(vhost!=null && vhost.equals(jsonResponse.get(0).get("vhost").asText())) {
+					if(vhost==null || vhost.equals(jsonResponse.get(0).get("vhost").asText())) {
 						foundAPIs.add(jsonResponse.get(0));
 					}
 				} else {
