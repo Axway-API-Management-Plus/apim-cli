@@ -21,6 +21,7 @@ import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
+import com.axway.apim.manager.Proxies;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.properties.APIDefintion;
 import com.axway.apim.swagger.api.properties.APIImage;
@@ -72,7 +73,7 @@ public class APIExportConfigAdapter {
 	private List<ExportAPI> getAPIsToExport() throws AppException {
 		List<ExportAPI> exportAPIList = new ArrayList<ExportAPI>();
 		if (!this.exportApiPath.contains("*")) { // Direct access with a specific API exposure path
-			JsonNode mgrAPI = apiManager.getExistingAPI(this.exportApiPath, null, exportVhost, APIManagerAdapter.TYPE_FRONT_END, true);
+			JsonNode mgrAPI = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END).hasApiPath(this.exportApiPath).hasVHost(exportVhost).build().getAPI(true);
 			if(mgrAPI==null) {
 				ErrorState.getInstance().setError("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API, false);
 				throw new AppException("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API);
@@ -90,13 +91,13 @@ public class APIExportConfigAdapter {
 				LOG.info("Using wildcard pattern: '"+exportApiPath+"' to export APIs from API-Manager.");
 				filters.add(new BasicNameValuePair("value", exportApiPath.replace("*", "")));
 			}
-			List<JsonNode> foundAPIs = apiManager.getExistingAPIs(null, filters, exportVhost, APIManagerAdapter.TYPE_FRONT_END, true);
+			List<JsonNode> foundAPIs = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END).useFilter(filters).hasVHost(exportVhost).build().getAPIs(false);
 			for(JsonNode mgrAPI : foundAPIs) {
 				exportAPIList.add(getExportAPI(mgrAPI));
 			}
 		} else { // Get all APIs and filter them out manually
 			Pattern pattern = Pattern.compile(exportApiPath.replace("*", ".*"));
-			List<JsonNode> foundAPIs = apiManager.getExistingAPIs(null, null, exportVhost, APIManagerAdapter.TYPE_FRONT_END, false);	
+			List<JsonNode> foundAPIs = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END).hasVHost(exportVhost).build().getAPIs(false);	
 			for(JsonNode mgrAPI : foundAPIs) {
 				String apiPath = mgrAPI.get("path").asText();
 				Matcher matcher = pattern.matcher(apiPath);
