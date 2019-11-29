@@ -811,6 +811,10 @@ public class APIManagerAdapter {
 		}
 		try {
 			for(JsonNode api : jsonResponse) {
+				if(requestedAPIPath==null && vhost==null) { // Nothing given to filter out.
+					foundAPIs.add(api);
+					continue;
+				}
 				apiPath = api.get("path").asText();
 				if(requestedAPIPath!=null && apiPath.equals(requestedAPIPath)) {
 					if(requestedType.equals(TYPE_FRONT_END)) {

@@ -67,4 +67,13 @@ public class GetExistingAPITest {
 		List<JsonNode> apis = apiManager.getExistingAPIs(null, jsonResponse, null, null, APIManagerAdapter.TYPE_FRONT_END, true);
 		Assert.assertEquals(apis.size(), 1, "We expect one API to get back.");
 	}	
+	
+	@Test
+	public void nothingGivenToFilterTest() throws AppException, IOException {
+		JsonNode jsonResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/allProxies.json"));
+		assertNotNull(jsonResponse);
+		int numberOfAPIs = jsonResponse.size();
+		List<JsonNode> apis = apiManager.getExistingAPIs(null, jsonResponse, null, null, APIManagerAdapter.TYPE_FRONT_END, true);
+		Assert.assertEquals(apis.size(), numberOfAPIs, "We expect all APIs to get back in the list.");
+	}	
 }
