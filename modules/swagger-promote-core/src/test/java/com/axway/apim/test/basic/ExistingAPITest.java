@@ -103,4 +103,63 @@ public class ExistingAPITest {
 
 		Assert.assertEquals(apis.size(), numberOfAPIs, "We expect all APIs to get back in the list.");
 	}
+	
+	@Test(expectedExceptions = AppException.class)
+	public void getUniqueWithRoutingKeyNotOkay() throws AppException, IOException {
+		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/proxiesWithAPIRoutingKey.json"));
+		assertNotNull(apiManagerResponse);
+		
+		new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
+				.setApiManagerResponse(apiManagerResponse)
+				.hasQueryStringVersion("1.0")
+				.build().getAPI(true);
+	}
+	
+	@Test
+	public void getUniqueWithRoutingKeyOK() throws AppException, IOException {
+		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/proxiesWithAPIRoutingKey.json"));
+		assertNotNull(apiManagerResponse);
+		
+		JsonNode api = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
+				.setApiManagerResponse(apiManagerResponse)
+				.hasQueryStringVersion("1.0")
+				.hasApiPath("/api/emr/catalog")
+				.build().getAPI(true);
+	}
+	
+	@Test
+	public void getUniqueWithRoutingKeyOK2() throws AppException, IOException {
+		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/proxiesWithAPIRoutingKey.json"));
+		assertNotNull(apiManagerResponse);
+		
+		JsonNode api = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
+				.setApiManagerResponse(apiManagerResponse)
+				.hasQueryStringVersion("1.1")
+				.build().getAPI(true);
+	}
+	
+	@Test
+	public void getUniqueWithRoutingKeyVHostOK() throws AppException, IOException {
+		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/proxiesWithAPIRoutingKey.json"));
+		assertNotNull(apiManagerResponse);
+		
+		JsonNode api = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
+				.setApiManagerResponse(apiManagerResponse)
+				.hasQueryStringVersion("1.1")
+				.hasVHost("api.customer.com")
+				.build().getAPI(true);
+	}
+	
+	@Test
+	public void getUniqueWithRoutingKeyVHostOK2() throws AppException, IOException {
+		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/proxiesWithAPIRoutingKey.json"));
+		assertNotNull(apiManagerResponse);
+		
+		List<JsonNode> apis = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
+				.setApiManagerResponse(apiManagerResponse)
+				.hasQueryStringVersion("2.0")
+				.hasVHost("api2.customer.com")
+				.build().getAPIs(true);
+		Assert.assertEquals(apis.size(), 2);
+	}
 }

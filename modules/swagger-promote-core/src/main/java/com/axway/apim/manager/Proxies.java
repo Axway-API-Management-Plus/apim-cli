@@ -100,22 +100,21 @@ public class Proxies {
 					foundAPIs.add(api);
 					continue;
 				}
-				path = api.get("path").asText();
-				if(requestedApiPath!=null && path.equals(requestedApiPath)) {
-					if(requestedType.equals(APIManagerAdapter.TYPE_FRONT_END)) {
-						if (requestedVhost!=null && !requestedVhost.equals(api.get("vhost").asText())) {
-							LOG.info("V-Host: '"+api.get("vhost").asText()+"' of exposed API on path: '"+path+"' doesn't match to requested V-Host: '"+requestedVhost+"'");
-							continue;
-						} else {
-							LOG.info("Found existing API on path: '"+path+"' ("+api.get("state").asText()+") (ID: '" + api.get("id").asText()+"')");									
-						}
-					} else if(requestedType.equals(APIManagerAdapter.TYPE_BACK_END)) {
-						String name = api.get("name").asText();
-						if(logMessage) 
-							LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + api.get("id").asText()+"')");														
-					}
-					foundAPIs.add(api);
+				if(this.requestedApiPath!=null && !this.requestedApiPath.equals(api.get("path").asText())) continue;
+				if(requestedType.equals(APIManagerAdapter.TYPE_FRONT_END)) {
+					if(this.requestedVhost!=null && !this.requestedVhost.equals(api.get("vhost").asText())) continue;
+					if(this.requestedQueryStringVersion!=null && !this.requestedQueryStringVersion.equals(api.get("apiRoutingKey").asText())) continue;
 				}
+				path = api.get("path").asText();
+				if(requestedType.equals(APIManagerAdapter.TYPE_BACK_END)) {
+					String name = api.get("name").asText();
+					if(logMessage) 
+						LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + api.get("id").asText()+"')");														
+				} else {
+					if(logMessage)
+						LOG.info("Found existing API on path: '"+path+"' ("+api.get("state").asText()+") (ID: '" + api.get("id").asText()+"')");
+				}
+				foundAPIs.add(api);
 			}
 			if(foundAPIs.size()!=0) {
 				String dbgCrit = "";

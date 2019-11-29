@@ -67,22 +67,32 @@ public class ValidateQueryStringTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
-			.validate("$.[?(@.path=='${apiPath}')].apiRoutingKey", "${apiRoutingKey}")
+			.validate("$.[?(@.path=='${apiPath}')].apiRoutingKey", "routeKeyA")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
+		echo("####### Re-Import the same API with same Routing-Key must lead to a No-Change #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/queryStringRouting/api_with_query_string.json");
+		createVariable("state", "unpublished");
+		createVariable("expectedReturnCode", "10");
+		createVariable("apiRoutingKey", "routeKeyA");
+		swaggerImport.doExecute(context);
+		
+		echo("####### Re-Import the same API with a DIFFERENT Routing-Key must lead to a NEW API #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/queryStringRouting/api_with_query_string.json");
 		createVariable("state", "published");
+		createVariable("expectedReturnCode", "0");
 		createVariable("apiRoutingKey", "routeKeyB");
 		swaggerImport.doExecute(context);
 		
-		echo("####### Has the routing key changed #######");
-		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").name("api").header("Content-Type", "application/json"));
-		
+		echo("####### Validate the second API: '${apiName}' has a been imported #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
-			.validate("$.[?(@.id=='${apiId}')].state", "${state}") // should be published now!
-			.validate("$.[?(@.id=='${apiId}')].apiRoutingKey", "${apiRoutingKey}")); // Changed to routeKeyB
+				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+				.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
+				.validate("$.[?(@.path=='${apiPath}')].apiRoutingKey", "routeKeyB")
+				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId2"));
 		
 		echo("####### Perform a No-Change #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
