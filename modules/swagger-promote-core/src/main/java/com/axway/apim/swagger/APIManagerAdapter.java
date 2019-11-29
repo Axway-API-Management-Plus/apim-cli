@@ -805,6 +805,10 @@ public class APIManagerAdapter {
 	public List<JsonNode> getExistingAPIs(String requestedAPIPath, JsonNode jsonResponse, List<NameValuePair> filter, String vhost, String requestedType, boolean logMessage) {
 		String apiPath;
 		List<JsonNode> foundAPIs = new ArrayList<JsonNode>();
+		if(requestedAPIPath==null && vhost==null && jsonResponse.size()==1) {
+			foundAPIs.add(jsonResponse.get(0));
+			return foundAPIs;
+		}
 		try {
 			for(JsonNode api : jsonResponse) {
 				apiPath = api.get("path").asText();

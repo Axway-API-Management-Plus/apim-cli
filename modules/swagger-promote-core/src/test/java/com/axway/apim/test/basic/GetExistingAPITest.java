@@ -18,17 +18,16 @@ public class GetExistingAPITest {
 	
 	APIManagerAdapter apiManager;
 	ObjectMapper mapper = new ObjectMapper();
-	JsonNode jsonResponse;
 	
 	@BeforeSuite
 	public void init() throws AppException, IOException {
 		this.apiManager = APIManagerAdapter.getInstance(true);
-		jsonResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/ProxiesWithVHostDuplicates.json"));
-		assertNotNull(jsonResponse);
 	}
 	
 	@Test
 	public void duplicateVHost() throws AppException, IOException {
+		JsonNode jsonResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/ProxiesWithVHostDuplicates.json"));
+		assertNotNull(jsonResponse);
 		List<JsonNode> apis = apiManager.getExistingAPIs("/api/test/DifferentVHostExportTestIT-531", jsonResponse, null, null, APIManagerAdapter.TYPE_FRONT_END, true);
 		// We must find two APIs, as we not limited the search to the VHost
 		Assert.assertEquals(apis.size(), 2, "Expected 2 APIs exposed on the same path with a different V-Host");
@@ -43,6 +42,8 @@ public class GetExistingAPITest {
 	
 	@Test
 	public void restrictedOnVHost() throws AppException, IOException {
+		JsonNode jsonResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/ProxiesWithVHostDuplicates.json"));
+		assertNotNull(jsonResponse);
 		List<JsonNode> apis = apiManager.getExistingAPIs("/api/test/DifferentVHostExportTestIT-531", jsonResponse, null, "vhost2.customer.com", APIManagerAdapter.TYPE_FRONT_END, true);
 		// We must find two APIs, as we not limited the search to the VHost
 		Assert.assertEquals(apis.size(), 1, "Expected 1 APIs with requested V-Host");
@@ -53,7 +54,17 @@ public class GetExistingAPITest {
 	
 	@Test
 	public void nonExistingAPI() throws AppException, IOException {
+		JsonNode jsonResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/ProxiesWithVHostDuplicates.json"));
+		assertNotNull(jsonResponse);
 		List<JsonNode> apis = apiManager.getExistingAPIs("/api/test/Not-ExistingAPI", jsonResponse, null, null, APIManagerAdapter.TYPE_FRONT_END, true);
 		Assert.assertEquals(apis.size(), 0, "It was not expected to find an API on path /api/test/Not-ExistingAPI");
 	}
+	
+	@Test
+	public void findUniqueAPIBasedOnID() throws AppException, IOException {
+		JsonNode jsonResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/incompleteProxyAPI.json"));
+		assertNotNull(jsonResponse);
+		List<JsonNode> apis = apiManager.getExistingAPIs(null, jsonResponse, null, null, APIManagerAdapter.TYPE_FRONT_END, true);
+		Assert.assertEquals(apis.size(), 1, "We expect one API to get back.");
+	}	
 }

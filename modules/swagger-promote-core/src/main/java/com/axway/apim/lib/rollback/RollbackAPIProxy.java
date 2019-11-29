@@ -52,12 +52,7 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements IRespons
 				List<NameValuePair> filters = new ArrayList<NameValuePair>();
 				filters.add(new BasicNameValuePair("field", "apiid"));
 				filters.add(new BasicNameValuePair("op", "eq"));
-				filters.add(new BasicNameValuePair("value", rollbackAPI.getApiId()));
-				// Don't filter anymore for the createdOn, the FE-API has a 1:1 relation to the created FE-API
-				// and with that, we should get only the correct result.
-				/*filters.add(new BasicNameValuePair("field", "createdOn"));
-				filters.add(new BasicNameValuePair("op", "gt"));
-				filters.add(new BasicNameValuePair("value", Long.toString(new Date().getTime()-120000))); // Ignore all API created more than 1 minute ago!*/
+				filters.add(new BasicNameValuePair("value", rollbackAPI.getApiId())); // To find the FE-API, we are using the BE-API-ID
 				JsonNode existingAPI = APIManagerAdapter.getInstance().getExistingAPI(null, filters, APIManagerAdapter.TYPE_FRONT_END, false); // The path is not set at this point, hence we provide null
 				LOG.info("Rollback FE-API: '"+existingAPI.get("name").asText()+"' (ID: '"+existingAPI.get("id").asText()+"')");
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
