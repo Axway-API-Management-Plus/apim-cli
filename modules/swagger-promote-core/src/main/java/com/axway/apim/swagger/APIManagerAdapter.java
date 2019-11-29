@@ -621,7 +621,7 @@ public class APIManagerAdapter {
 		Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
 		HttpResponse httpResponse = null;
 		for(ClientApplication app : allApps) {
-			if(appIds.contains(app.getId())) continue; // Not sure, if this really makes sense. Need to check!
+			if(appIds.contains(app)) continue;
 			ObjectMapper mapper = new ObjectMapper();
 			String response = null;
 			URI uri;
@@ -740,118 +740,6 @@ public class APIManagerAdapter {
 		} catch (Exception e) {
 			throw new AppException("Can't parse quota from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
-	}
-	
-	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type) throws AppException {
-		List<JsonNode> foundAPIs = getExistingAPIs(apiPath, filter, null, type, true);
-		return getUniqueAPI(foundAPIs);
-	}
-	
-	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type, boolean logMessage) throws AppException {
-		List<JsonNode> foundAPIs = getExistingAPIs(apiPath, filter, null, type, logMessage);
-		return getUniqueAPI(foundAPIs);
-	}
-	
-	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String vhost, String type, boolean logMessage) throws AppException {
-		List<JsonNode> foundAPIs = getExistingAPIs(apiPath, filter, vhost, type, logMessage);
-		return getUniqueAPI(foundAPIs);
-	}
-	
-	private JsonNode getUniqueAPI(List<JsonNode> foundAPIs) throws AppException {
-		if(foundAPIs.size()>1) {
-			throw new AppException("No unique API found", ErrorCode.UNKNOWN_API);
-		}
-		if(foundAPIs.size()==0) return null;
-		return foundAPIs.get(0);
-	}
-	
-	/**
-	 * Based on the given apiPath this method returns the JSON-Configuration for the API 
-	 * as it's stored in the API-Manager. The result is basically used to create the APIManagerAPI in 
-	 * method getAPIManagerAPI
-	 * @param requestedAPIPath path of the API, which can be considered as the key.
-	 * @param filter restrict the search by these filters
-	 * @param requestedType must be TYPE_FRONT_END or TYPE_FRONT_END
-	 * @param logMessage flag to control if the error message should be printed or not
-	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
-	 * @throws AppException if the API can't be found or created
-	 */
-	public List<JsonNode> getExistingAPIs(String requestedAPIPath, List<NameValuePair> filter, String vhost, String requestedType, boolean logMessage) throws AppException {
-		CommandParameters cmd = CommandParameters.getInstance();
-		ObjectMapper mapper = new ObjectMapper();
-		URI uri;
-		try {
-			List<NameValuePair> usedFilters = new ArrayList<>();
-			if(hasAPIManagerVersion("7.7") && requestedAPIPath != null) { // Since 7.7 we can query the API-PATH directly if given
-				usedFilters.add(new BasicNameValuePair("field", "path"));
-				usedFilters.add(new BasicNameValuePair("op", "eq"));
-				usedFilters.add(new BasicNameValuePair("value", requestedAPIPath));
-			} 
-			if(filter != null) { usedFilters.addAll(filter); } 
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+requestedType)
-				.addParameters(usedFilters)
-				.build();
-			LOG.info("Sending request to find existing APIs: " + uri);
-			RestAPICall getRequest = new GETRequest(uri, null);
-			InputStream response = getRequest.execute().getEntity().getContent();
-			
-			JsonNode jsonResponse = mapper.readTree(response);
-			return getExistingAPIs(requestedAPIPath, jsonResponse, filter, vhost, requestedType, logMessage);
-		} catch (Exception e) {
-			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		}
-	}
-	
-	public List<JsonNode> getExistingAPIs(String requestedAPIPath, JsonNode jsonResponse, List<NameValuePair> filter, String vhost, String requestedType, boolean logMessage) {
-		String apiPath;
-		List<JsonNode> foundAPIs = new ArrayList<JsonNode>();
-		if(requestedAPIPath==null && vhost==null && jsonResponse.size()==1) {
-			foundAPIs.add(jsonResponse.get(0));
-			return foundAPIs;
-		}
-		try {
-			for(JsonNode api : jsonResponse) {
-				if(requestedAPIPath==null && vhost==null) { // Nothing given to filter out.
-					foundAPIs.add(api);
-					continue;
-				}
-				apiPath = api.get("path").asText();
-				if(requestedAPIPath!=null && apiPath.equals(requestedAPIPath)) {
-					if(requestedType.equals(TYPE_FRONT_END)) {
-						if (vhost!=null && !vhost.equals(api.get("vhost").asText())) {
-							LOG.info("V-Host: '"+api.get("vhost").asText()+"' of exposed API on path: '"+apiPath+"' doesn't match to requested V-Host: '"+vhost+"'");
-							continue;
-						} else {
-							LOG.info("Found existing API on path: '"+apiPath+"' ("+api.get("state").asText()+") (ID: '" + api.get("id").asText()+"')");									
-						}
-					} else if(requestedType.equals(TYPE_BACK_END)) {
-						String name = api.get("name").asText();
-						if(logMessage) 
-							LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + api.get("id").asText()+"')");														
-					}
-					foundAPIs.add(api);
-				}
-			}
-			if(foundAPIs.size()!=0) {
-				String dbgCrit = "";
-				if(foundAPIs.size()>1) 
-					dbgCrit = " (apiPath: '"+requestedAPIPath+"', filter: "+filter+", vhost: '"+vhost+"', requestedType: "+requestedType+")";
-				LOG.info("Found: "+foundAPIs.size()+" API(s) exposed on requested path: '" + requestedAPIPath + "'" + dbgCrit);
-				return foundAPIs;
-			}
-			String vhostMessage = (vhost!=null) ? "(V-Host: " + vhost + ") " : ""; 
-			if(requestedAPIPath!=null && filter!=null) {
-				LOG.info("No existing API found exposed "+vhostMessage+"on: '" + requestedAPIPath + "' and filter: "+filter+"");
-			} else if (requestedAPIPath==null ) {
-				LOG.info("No existing API found with filters: "+filter+" "+vhostMessage);
-			} else {
-				LOG.info("No existing API found exposed on: '" + requestedAPIPath + "' "+vhostMessage);
-			}
-			return foundAPIs;
-		} catch (Exception e) {
-			
-		}
-		return foundAPIs;
 	}
 	
 	private static APIDefintion getOriginalAPIDefinitionFromAPIM(String backendApiID) throws AppException {
