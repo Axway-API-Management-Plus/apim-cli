@@ -1,6 +1,5 @@
 package com.axway.apim.test.wsdl;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
@@ -35,12 +34,12 @@ public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestRunn
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
 		createVariable(ImportTestAction.API_DEFINITION, "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition","https://svn.apache.org/repos/asf/airavata/sandbox/xbaya-web/test/Calculator.wsdl");
+		createVariable("testAPIDefinition","http://www.mnb.hu/arfolyamok.asmx?WSDL");
 		createVariable("status", "unpublished");
-		createVariable("expectedReturnCode", "35");
+		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 		
-/*		
+
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
 
@@ -52,7 +51,7 @@ public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestRunn
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION, "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition","https://svn.apache.org/repos/asf/airavata/sandbox/xbaya-web/test/Calculator.wsdl");
+		createVariable("testAPIDefinition","http://www.mnb.hu/arfolyamok.asmx?WSDL");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		swaggerImport.doExecute(context);
@@ -60,7 +59,7 @@ public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestRunn
 		echo("####### Setting the status to Published #######");
 		createVariable(ImportTestAction.API_DEFINITION, "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition","https://svn.apache.org/repos/asf/airavata/sandbox/xbaya-web/test/Calculator.wsdl");
+		createVariable("testAPIDefinition","http://www.mnb.hu/arfolyamok.asmx?WSDL");
 		createVariable("status", "published");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
@@ -71,6 +70,5 @@ public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestRunn
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
 			.validate("$.[?(@.id=='${apiId}')].state", "published"));
-*/
 	}
 }

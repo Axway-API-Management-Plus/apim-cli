@@ -38,10 +38,10 @@ public class WSDLFromURLRefFileInConfigurationTestIT extends TestNGCitrusTestRun
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
 		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/wsdl/wsdl-file-with-username.url");
 		createVariable("status", "unpublished");
-		createVariable("expectedReturnCode", "35");
+		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 		
-/*		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
 
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
@@ -55,7 +55,6 @@ public class WSDLFromURLRefFileInConfigurationTestIT extends TestNGCitrusTestRun
 		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/wsdl/wsdl-file-with-username.url");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
-		swaggerImport.doExecute(context);*/
+		swaggerImport.doExecute(context);
 	}
-
 }
