@@ -1,23 +1,30 @@
 package com.axway.apim.test.wsdl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.IOException;
+
 import org.springframework.http.HttpStatus;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.AppException;
 import com.axway.apim.test.ImportTestAction;
+import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
+import com.consol.citrus.context.TestContext;
+import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="WSDLFromURLRefFileInConfigurationTestIT")
-public class WSDLFromURLRefFileInConfigurationTestIT extends TestNGCitrusTestDesigner {
+@Test
+public class WSDLFromURLRefFileInConfigurationTestIT extends TestNGCitrusTestRunner {
 	
-	@Autowired
-	private ImportTestAction importAction;
+	private ImportTestAction swaggerImport;
 	
-	@CitrusTest(name = "WSDLFromURLRefFileInConfigurationTestIT")
-	public void run() {
+	@CitrusTest
+	@Test @Parameters("context")
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+		swaggerImport = new ImportTestAction();
 		description("Validates a WSDL-File can be taken from a URL using a REF-File described in API json configuration");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -31,23 +38,18 @@ public class WSDLFromURLRefFileInConfigurationTestIT extends TestNGCitrusTestDes
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
 		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/wsdl/wsdl-file-with-username.url");
 		createVariable("status", "unpublished");
-		createVariable("expectedReturnCode", "0");
-		action(importAction);
+		createVariable("expectedReturnCode", "35");
+		swaggerImport.doExecute(context);
+		
+		Process p = Runtime.getRuntime().exec("docker-compose logs --tail 100 apimgmt");
 		
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
-		http().client("apiManager")
-			.send()
-			.get("/proxies")
-			.name("api")
-			.header("Content-Type", "application/json");
+		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
 
-		http().client("apiManager")
-			.receive()
-			.response(HttpStatus.OK)
-			.messageType(MessageType.JSON)
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION, "");
@@ -55,7 +57,7 @@ public class WSDLFromURLRefFileInConfigurationTestIT extends TestNGCitrusTestDes
 		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/wsdl/wsdl-file-with-username.url");
 		createVariable("status", "unpublished");
 		createVariable("expectedReturnCode", "10");
-		action(importAction);
+		swaggerImport.doExecute(context);
 	}
 
 }

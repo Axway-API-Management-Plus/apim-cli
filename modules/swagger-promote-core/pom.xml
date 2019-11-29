@@ -133,6 +133,11 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+		        <includes>
+		            <include>**/WSDL*</include>
+		        </includes>
+		    </configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
