@@ -1,6 +1,7 @@
 package com.axway.apim.actions.tasks;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Vector;
 
@@ -92,7 +93,7 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 					LOG.info("Taking over existing quota config for application: '"+app.getName()+"' to newly created API.");
 					try {
 						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/quota").build();
-						entity = new StringEntity(objectMapper.writeValueAsString(app.getAppQuota()));
+						entity = new StringEntity(objectMapper.writeValueAsString(app.getAppQuota()), StandardCharsets.UTF_8);
 						
 						apiCall = new PUTRequest(entity, uri, this, true);
 						apiCall.execute();
