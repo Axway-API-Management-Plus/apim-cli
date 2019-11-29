@@ -40,8 +40,6 @@ public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestRunn
 		createVariable("expectedReturnCode", "35");
 		swaggerImport.doExecute(context);
 		
-		Process p = Runtime.getRuntime().exec("docker-compose logs --tail 100 apimgmt");
-		
 /*		
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
