@@ -1,0 +1,96 @@
+[
+  {
+    "id": "8992572a-06fd-4682-ba12-dca1ab3586b1",
+    "organizationId": "497ee329-cf97-407f-87af-a0610b151edd",
+    "apiId": "d357ab0c-a50c-4c0c-8892-c6e1005de082",
+    "name": "Rollback-API-432",
+    "version": "1.0.0",
+    "apiRoutingKey": null,
+    "vhost": null,
+    "path": "/v2",
+    "descriptionType": "original",
+    "descriptionManual": null,
+    "descriptionMarkdown": null,
+    "descriptionUrl": null,
+    "summary": null,
+    "retired": false,
+    "expired": false,
+    "image": null,
+    "retirementDate": 0,
+    "deprecated": false,
+    "state": "unpublished",
+    "createdOn": 1575008594736,
+    "createdBy": "65466732-dd06-4177-8c7a-f2384ac7e75d",
+    "corsProfiles": [
+      {
+        "name": "_default",
+        "isDefault": true,
+        "origins": [
+          "*"
+        ],
+        "allowedHeaders": [
+          
+        ],
+        "exposedHeaders": [
+          "X-CorrelationID"
+        ],
+        "supportCredentials": false,
+        "maxAgeSeconds": 0
+      }
+    ],
+    "securityProfiles": [
+      {
+        "name": "_default",
+        "isDefault": true,
+        "devices": [
+          
+        ]
+      }
+    ],
+    "authenticationProfiles": [
+      {
+        "name": "_default",
+        "isDefault": true,
+        "parameters": {
+          
+        },
+        "type": "none"
+      }
+    ],
+    "inboundProfiles": {
+      "_default": {
+        "securityProfile": "_default",
+        "corsProfile": "_default",
+        "monitorAPI": true,
+        "monitorSubject": "authentication.subject.id"
+      }
+    },
+    "outboundProfiles": {
+      "_default": {
+        "authenticationProfile": "_default",
+        "routeType": "proxy",
+        "requestPolicy": null,
+        "responsePolicy": null,
+        "routePolicy": null,
+        "faultHandlerPolicy": null,
+        "apiId": null,
+        "apiMethodId": null,
+        "parameters": [
+          
+        ]
+      }
+    },
+    "serviceProfiles": {
+      "_default": {
+        "apiId": "d357ab0c-a50c-4c0c-8892-c6e1005de082",
+        "basePath": "https://unknown.host.com"
+      }
+    },
+    "caCerts": [
+      
+    ],
+    "tags": {
+      
+    }
+  }
+]
