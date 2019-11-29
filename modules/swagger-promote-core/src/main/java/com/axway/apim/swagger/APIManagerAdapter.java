@@ -73,7 +73,7 @@ public class APIManagerAdapter {
 	
 	private static APIManagerAdapter instance;
 	
-	private static String apiManagerVersion = null;
+	public static String apiManagerVersion = null;
 	private static Map<Boolean, String> apiManagerConfig = new HashMap<Boolean, String>();
 	
 	private static List<Organization> allOrgs = null;
@@ -109,10 +109,14 @@ public class APIManagerAdapter {
         temp.put("apiRoutingKeyEnabled", true);
         configFieldRequiresAdmin = Collections.unmodifiableMap(temp);
     }
+    
+    public static synchronized APIManagerAdapter getInstance() throws AppException {
+    	return getInstance(false);
+    }
 	
-	public static synchronized APIManagerAdapter getInstance() throws AppException {
+	public static synchronized APIManagerAdapter getInstance(boolean forUnitTests) throws AppException {
 		if (APIManagerAdapter.instance == null) {
-			APIManagerAdapter.instance = new APIManagerAdapter ();
+			APIManagerAdapter.instance = new APIManagerAdapter (forUnitTests);
 		}
 		return APIManagerAdapter.instance;
 	}
@@ -123,8 +127,9 @@ public class APIManagerAdapter {
 			APIManagerAdapter.allOrgs = null;
 	}
 	
-	private APIManagerAdapter() throws AppException {
+	private APIManagerAdapter(boolean forUnitTests) throws AppException {
 		super();
+		if(forUnitTests) return; // No need to initialize just for Unit-Tests
 		Transaction transaction = Transaction.getInstance();
 		transaction.beginTransaction();
 		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the same JVM)
@@ -764,82 +769,89 @@ public class APIManagerAdapter {
 	 * Based on the given apiPath this method returns the JSON-Configuration for the API 
 	 * as it's stored in the API-Manager. The result is basically used to create the APIManagerAPI in 
 	 * method getAPIManagerAPI
-	 * @param apiPath path of the API, which can be considered as the key.
+	 * @param requestedAPIPath path of the API, which can be considered as the key.
 	 * @param filter restrict the search by these filters
 	 * @param requestedType must be TYPE_FRONT_END or TYPE_FRONT_END
 	 * @param logMessage flag to control if the error message should be printed or not
 	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
 	 * @throws AppException if the API can't be found or created
 	 */
-	public List<JsonNode> getExistingAPIs(String apiPath, List<NameValuePair> filter, String vhost, String requestedType, boolean logMessage) throws AppException {
+	public List<JsonNode> getExistingAPIs(String requestedAPIPath, List<NameValuePair> filter, String vhost, String requestedType, boolean logMessage) throws AppException {
 		CommandParameters cmd = CommandParameters.getInstance();
 		ObjectMapper mapper = new ObjectMapper();
-		List<JsonNode> foundAPIs = new ArrayList<JsonNode>();
 		URI uri;
 		try {
 			List<NameValuePair> usedFilters = new ArrayList<>();
-			if(hasAPIManagerVersion("7.7") && apiPath != null) { // With 7.7 we can query the API-PATH directly 
+			if(hasAPIManagerVersion("7.7") && requestedAPIPath != null) { // Since 7.7 we can query the API-PATH directly if given
 				usedFilters.add(new BasicNameValuePair("field", "path"));
 				usedFilters.add(new BasicNameValuePair("op", "eq"));
-				usedFilters.add(new BasicNameValuePair("value", apiPath));
+				usedFilters.add(new BasicNameValuePair("value", requestedAPIPath));
 			} 
 			if(filter != null) { usedFilters.addAll(filter); } 
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+requestedType)
 				.addParameters(usedFilters)
 				.build();
+			LOG.info("Sending request to find existing APIs: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
 			
-			JsonNode jsonResponse;
-			String path;
-			try {
-				jsonResponse = mapper.readTree(response);
-				// When filters are provided, we expect 1 API to be found and use it directly
-				if(jsonResponse.size()==1 && (filter!=null || hasAPIManagerVersion("7.7"))) {
-					if(vhost!=null && vhost.equals(jsonResponse.get(0).get("vhost").asText())) {
-						foundAPIs.add(jsonResponse.get(0));
-					}
-				} else {
-					for(JsonNode api : jsonResponse) {
-						path = api.get("path").asText();
-						if(apiPath==null || path.equals(apiPath)) {
-							if(requestedType.equals(TYPE_FRONT_END)) {
-								if (vhost!=null && !vhost.equals(api.get("vhost").asText())) {
-									LOG.debug("V-Host: '"+api.get("vhost").asText()+"' of exposed API on path: '"+path+"' doesn't match to requested V-Host: '"+vhost+"'");
-									continue;
-								} else {
-									if(logMessage) 
-										LOG.info("Found existing API on path: '"+path+"' ("+api.get("state").asText()+") (ID: '" + api.get("id").asText()+"')");									
-								}
-							} else if(requestedType.equals(TYPE_BACK_END)) {
-								String name = api.get("name").asText();
-								if(logMessage) 
-									LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + api.get("id").asText()+"')");														
-							}
-							foundAPIs.add(api);
-						}
-					}
-				}
-				if(foundAPIs.size()!=0) {
-					LOG.debug("Found: "+foundAPIs.size()+" API(s) based on given criterias: [apiPath: '"+apiPath+"', filter: "+filter+", vhost: '"+vhost+"', requestedType: "+requestedType+"]");
-					return foundAPIs;
-				}
-				String vhostMessage = (vhost!=null) ? "(V-Host: " + vhost + ") " : ""; 
-				if(apiPath!=null && filter!=null) {
-					LOG.info("No existing API found exposed "+vhostMessage+"on: '" + apiPath + "' and filter: "+filter+"");
-				} else if (apiPath==null ) {
-					LOG.info("No existing API found with filters: "+filter+" "+vhostMessage);
-				} else {
-					LOG.info("No existing API found exposed on: '" + apiPath + "' "+vhostMessage);
-				}
-				
-				return foundAPIs;
-			} catch (IOException e) {
-				throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-			}
+			JsonNode jsonResponse = mapper.readTree(response);
+			return getExistingAPIs(requestedAPIPath, jsonResponse, filter, vhost, requestedType, logMessage);
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
+	}
+	
+	public List<JsonNode> getExistingAPIs(String requestedAPIPath, JsonNode jsonResponse, List<NameValuePair> filter, String vhost, String requestedType, boolean logMessage) {
+		String apiPath;
+		List<JsonNode> foundAPIs = new ArrayList<JsonNode>();
+		if(requestedAPIPath==null && vhost==null && jsonResponse.size()==1) {
+			foundAPIs.add(jsonResponse.get(0));
+			return foundAPIs;
+		}
+		try {
+			for(JsonNode api : jsonResponse) {
+				if(requestedAPIPath==null && vhost==null) { // Nothing given to filter out.
+					foundAPIs.add(api);
+					continue;
+				}
+				apiPath = api.get("path").asText();
+				if(requestedAPIPath!=null && apiPath.equals(requestedAPIPath)) {
+					if(requestedType.equals(TYPE_FRONT_END)) {
+						if (vhost!=null && !vhost.equals(api.get("vhost").asText())) {
+							LOG.info("V-Host: '"+api.get("vhost").asText()+"' of exposed API on path: '"+apiPath+"' doesn't match to requested V-Host: '"+vhost+"'");
+							continue;
+						} else {
+							LOG.info("Found existing API on path: '"+apiPath+"' ("+api.get("state").asText()+") (ID: '" + api.get("id").asText()+"')");									
+						}
+					} else if(requestedType.equals(TYPE_BACK_END)) {
+						String name = api.get("name").asText();
+						if(logMessage) 
+							LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + api.get("id").asText()+"')");														
+					}
+					foundAPIs.add(api);
+				}
+			}
+			if(foundAPIs.size()!=0) {
+				String dbgCrit = "";
+				if(foundAPIs.size()>1) 
+					dbgCrit = " (apiPath: '"+requestedAPIPath+"', filter: "+filter+", vhost: '"+vhost+"', requestedType: "+requestedType+")";
+				LOG.info("Found: "+foundAPIs.size()+" API(s) exposed on requested path: '" + requestedAPIPath + "'" + dbgCrit);
+				return foundAPIs;
+			}
+			String vhostMessage = (vhost!=null) ? "(V-Host: " + vhost + ") " : ""; 
+			if(requestedAPIPath!=null && filter!=null) {
+				LOG.info("No existing API found exposed "+vhostMessage+"on: '" + requestedAPIPath + "' and filter: "+filter+"");
+			} else if (requestedAPIPath==null ) {
+				LOG.info("No existing API found with filters: "+filter+" "+vhostMessage);
+			} else {
+				LOG.info("No existing API found exposed on: '" + requestedAPIPath + "' "+vhostMessage);
+			}
+			return foundAPIs;
+		} catch (Exception e) {
+			
+		}
+		return foundAPIs;
 	}
 	
 	private static APIDefintion getOriginalAPIDefinitionFromAPIM(String backendApiID) throws AppException {

@@ -109,7 +109,8 @@ public class APIDefintion {
 			apiDefinitionSource = this.apiDefinitionFile;
 		}
 		if(apiDefinitionSource.toLowerCase().endsWith("?wsdl") ||
-		   apiDefinitionSource.toLowerCase().endsWith("?singlewsdl")) {
+				apiDefinitionSource.toLowerCase().endsWith(".wsdl") ||
+				apiDefinitionSource.toLowerCase().endsWith("?singlewsdl")) {
 			return IAPI.WSDL_API;
 		} else {
 			return IAPI.SWAGGGER_API;
