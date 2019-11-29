@@ -18,6 +18,7 @@ import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.IResponseParser;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.manager.Proxies;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.state.APIBaseDefinition;
 import com.axway.apim.swagger.api.state.IAPI;
@@ -64,7 +65,7 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 				filters.add(new BasicNameValuePair("field", "createdOn"));
 				filters.add(new BasicNameValuePair("op", "gt"));
 				filters.add(new BasicNameValuePair("value", (beAPICreatedOn).toString())); // Ignore all other APIs some time ago
-				JsonNode existingBEAPI = APIManagerAdapter.getInstance().getExistingAPI(null, filters, APIManagerAdapter.TYPE_BACK_END, false);
+				JsonNode existingBEAPI = new Proxies.Builder(APIManagerAdapter.TYPE_BACK_END).useFilter(filters).build().getAPI(false);
 				if(existingBEAPI!=null && existingBEAPI.get("id")!=null) {
 					uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
 							.setPath(RestAPICall.API_VERSION+"/apirepo/"+existingBEAPI.get("id").asText())

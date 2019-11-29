@@ -18,7 +18,7 @@ public class RoutingKeyPropHandler implements PropertyHandler {
 	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) {
 		try {
 			if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return response; // QueryStringRouting isn't supported
-			if(APIManagerAdapter.getInstance().hasAdminAccount()) {
+			if(APIManagerAdapter.hasAdminAccount()) {
 				if(!APIManagerAdapter.getApiManagerConfig("apiRoutingKeyEnabled").equals("true")) {
 					ErrorState.getInstance().setError("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED, false);
 					throw new RuntimeException();
