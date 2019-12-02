@@ -120,7 +120,7 @@ public class Proxies {
 				String dbgCrit = "";
 				if(foundAPIs.size()>1) 
 					dbgCrit = " (apiPath: '"+requestedApiPath+"', filter: "+filter+", vhost: '"+requestedVhost+"', requestedType: "+requestedType+")";
-				LOG.info("Found: "+foundAPIs.size()+" API(s) exposed on requested path: '" + requestedApiPath + "'" + dbgCrit);
+				LOG.info("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
 				return foundAPIs;
 			}
 			LOG.info("No existing API found based on filter: " + getFilterFields());

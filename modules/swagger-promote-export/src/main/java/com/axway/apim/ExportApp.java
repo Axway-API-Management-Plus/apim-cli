@@ -168,10 +168,11 @@ public class ExportApp {
 		System.out.println("\n");
 		System.out.println("You may run one of the following examples:");
 		System.out.println(binary+" -a /api/v1/ -l my_apis -h location -u apiadmin -p changeme");
+		System.out.println(binary+" -a \"/api/v1/*\" -l my_apis -h location -u apiadmin -p changeme");
 		System.out.println();
 		System.out.println("Using parameters provided in properties file stored in conf-folder:");
 		System.out.println(binary+" -a /api/v1/ -l my_apis -s api-env");
-		System.out.println(binary+" -a * -l all_my_apis -s api-env");
+		System.out.println(binary+" -a \"*\" -l all_my_apis -s api-env");
 		System.out.println();
 		System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 	}
