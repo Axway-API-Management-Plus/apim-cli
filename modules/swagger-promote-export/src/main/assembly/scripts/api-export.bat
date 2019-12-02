@@ -1,16 +1,14 @@
 @echo off
 
-@echo off
-
 where java >nul 2>nul
 SET javaFound=%errorlevel%
 
-IF DEFINED JAVA_HOME IF EXIST "%JAVA_HOME%\bin\java" (
+IF DEFINED JAVA_HOME IF EXIST "%JAVA_HOME%"\\bin\\java.exe (
 	REM ECHO Using Java from JAVA_HOME
-	SET _java="%JAVA_HOME%\bin\java"
+	SET _java="%JAVA_HOME%"\\bin\\java.exe
 ) ELSE (
 	IF %javaFound%==0 (
-		REM ECHO "Using default Java runtime."
+		REM ECHO "Using Java runtime from search path."
 		SET _java=java
 	) ELSE (
 		GOTO :MissingJava
@@ -41,7 +39,7 @@ GOTO :END
 
 CD %currentDir%
 
-"%_java%" -Xms64m -Xmx256m -classpath "%CLASSPATH%" com.axway.apim.ExportApp %*
+%_java% -Xms64m -Xmx256m -classpath "%CLASSPATH%" com.axway.apim.ExportApp %*
 SET ERRNO=%ERRORLEVEL%
 
 :END
