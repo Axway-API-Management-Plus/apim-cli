@@ -101,7 +101,8 @@ public class APIExportConfigAdapter {
 			}
 		} else { // Get all APIs and filter them out manually
 			Pattern pattern = Pattern.compile(exportApiPath.replace("*", ".*"));
-			List<JsonNode> foundAPIs = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END).hasVHost(exportVhost).build().getAPIs(false);	
+			List<JsonNode> foundAPIs = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END).hasVHost(exportVhost).build().getAPIs(false);
+			if(foundAPIs.size()>20) LOG.info("Loading actual API state from API-Manager. This may take a while. Please wait.\n");
 			for(JsonNode mgrAPI : foundAPIs) {
 				String apiPath = mgrAPI.get("path").asText();
 				Matcher matcher = pattern.matcher(apiPath);
