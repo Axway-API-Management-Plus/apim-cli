@@ -27,6 +27,8 @@ if [ $rc -eq 10 ];then
 fi
 
 echo ""
-echo ">>>> This script is DEPRECATED and will be removed in a future release. Please use 'api-import.bat' instead."
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+echo ">>>> This script is DEPRECATED and will be removed in a future release. Please use 'api-import.sh' instead."
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
 exit $rc
