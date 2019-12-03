@@ -7,8 +7,8 @@ assignees: cwiechmann
 
 ---
 
-**Swagger-Promote Version**
-
+**Swagger-Promote version**
+> Please make sure to use the latest Swagger-Promote version.
 
 **API-Manager and Service-Pack Version**
 
@@ -17,6 +17,9 @@ assignees: cwiechmann
 
 
 **Actual behavior**
+
+
+**Log-Output in Debug**
 
 
 **Test case sample**

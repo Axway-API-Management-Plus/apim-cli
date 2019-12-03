@@ -80,7 +80,7 @@ public class CompleteAPIExportTestIT extends TestNGCitrusTestRunner {
 		createVariable("expectedReturnCode", "0");
 		swaggerExport.doExecute(context);
 		
-		String exportedAPIConfigFile = context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/api-config.json";
+		String exportedAPIConfigFile = context.getVariable("exportLocation")+"/api.custom-host.com/"+context.getVariable("exportFolder")+"/api-config.json";
 		
 		echo("####### Reading exported API-Config file: '"+exportedAPIConfigFile+"' #######");
 		JsonNode exportedAPIConfig = mapper.readTree(new FileInputStream(new File(exportedAPIConfigFile)));
@@ -134,11 +134,11 @@ public class CompleteAPIExportTestIT extends TestNGCitrusTestRunner {
 		assertEquals(exportedAPIConfig.get("caCerts").get(3).get("inbound").asBoolean(), 			true);
 		assertEquals(exportedAPIConfig.get("caCerts").get(3).get("outbound").asBoolean(), 			false);
 		
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/swagger.io.crt").exists(), "Certificate swagger.io.crt is missing");
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/GoDaddySecureCertificateAuthority-G2.crt").exists(), "Certificate GoDaddySecureCertificateAuthority-G2.crt is missing");
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/GoDaddyRootCertificateAuthority-G2.crt").exists(), "Certificate GoDaddyRootCertificateAuthority-G2.crt is missing");
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/GlobalSign.crt").exists(), "Certificate GlobalSign.crt is missing");
+		assertTrue(new File(context.getVariable("exportLocation")+"/api.custom-host.com/"+context.getVariable("exportFolder")+"/swagger.io.crt").exists(), "Certificate swagger.io.crt is missing");
+		assertTrue(new File(context.getVariable("exportLocation")+"/api.custom-host.com/"+context.getVariable("exportFolder")+"/GoDaddySecureCertificateAuthority-G2.crt").exists(), "Certificate GoDaddySecureCertificateAuthority-G2.crt is missing");
+		assertTrue(new File(context.getVariable("exportLocation")+"/api.custom-host.com/"+context.getVariable("exportFolder")+"/GoDaddyRootCertificateAuthority-G2.crt").exists(), "Certificate GoDaddyRootCertificateAuthority-G2.crt is missing");
+		assertTrue(new File(context.getVariable("exportLocation")+"/api.custom-host.com/"+context.getVariable("exportFolder")+"/GlobalSign.crt").exists(), "Certificate GlobalSign.crt is missing");
 		
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/"+context.getVariable("exportAPIName")).exists(), "Exported Swagger-File is missing");		
+		assertTrue(new File(context.getVariable("exportLocation")+"/api.custom-host.com/"+context.getVariable("exportFolder")+"/"+context.getVariable("exportAPIName")).exists(), "Exported Swagger-File is missing");		
 	}
 }

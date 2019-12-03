@@ -73,7 +73,7 @@ public class APIManagerAdapter {
 	
 	private static APIManagerAdapter instance;
 	
-	private static String apiManagerVersion = null;
+	public static String apiManagerVersion = null;
 	private static Map<Boolean, String> apiManagerConfig = new HashMap<Boolean, String>();
 	
 	private static List<Organization> allOrgs = null;
@@ -109,10 +109,14 @@ public class APIManagerAdapter {
         temp.put("apiRoutingKeyEnabled", true);
         configFieldRequiresAdmin = Collections.unmodifiableMap(temp);
     }
+    
+    public static synchronized APIManagerAdapter getInstance() throws AppException {
+    	return getInstance(false);
+    }
 	
-	public static synchronized APIManagerAdapter getInstance() throws AppException {
+	public static synchronized APIManagerAdapter getInstance(boolean forUnitTests) throws AppException {
 		if (APIManagerAdapter.instance == null) {
-			APIManagerAdapter.instance = new APIManagerAdapter ();
+			APIManagerAdapter.instance = new APIManagerAdapter (forUnitTests);
 		}
 		return APIManagerAdapter.instance;
 	}
@@ -123,8 +127,9 @@ public class APIManagerAdapter {
 			APIManagerAdapter.allOrgs = null;
 	}
 	
-	private APIManagerAdapter() throws AppException {
+	private APIManagerAdapter(boolean forUnitTests) throws AppException {
 		super();
+		if(forUnitTests) return; // No need to initialize just for Unit-Tests
 		Transaction transaction = Transaction.getInstance();
 		transaction.beginTransaction();
 		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the same JVM)
@@ -424,13 +429,19 @@ public class APIManagerAdapter {
 	
 	public void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
-		List<ClientApplication> allApps = getAllApps();
+		List<ClientApplication> apps = null;
+		// With version >7.7 we can retrieve the subscribed apps directly
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-			existingClientApps = getSubscribedApps(apiManagerApi.getId());
+			apps = getSubscribedApps(apiManagerApi.getId());
 		} else {
-			for(ClientApplication app : allApps) {
-				List<APIAccess> APIAccess = getAPIAccess(app.getId(), "applications");
-				app.setApiAccess(APIAccess);
+			apps = getAllApps();
+		}
+		for(ClientApplication app : apps) {
+			List<APIAccess> APIAccess = getAPIAccess(app.getId(), "applications");
+			app.setApiAccess(APIAccess);
+			if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
+				existingClientApps.add(app);
+			} else {
 				for(APIAccess access : APIAccess) {
 					if(access.getApiId().equals(apiManagerApi.getId())) {
 						existingClientApps.add(app);
@@ -448,7 +459,7 @@ public class APIManagerAdapter {
 			if(desiredAPI.getOrganizationId().equals(apiManagerApi.getOrganizationId())) {
 				((ActualAPI)apiManagerApi).setOrganization(desiredAPI.getOrganization());
 			} else {
-				String actualOrgName = getOrgName(apiManagerApi.getOrganizationId());
+				String actualOrgName = getOrg(apiManagerApi.getOrganizationId()).getName();
 				((ActualAPI)apiManagerApi).setOrganization(actualOrgName);
 			}
 		}
@@ -552,10 +563,10 @@ public class APIManagerAdapter {
 	 * @return the id of the organization
 	 * @throws AppException if allOrgs can't be read from the API-Manager
 	 */
-	public String getOrgName(String orgId) throws AppException {
+	public Organization getOrg(String orgId) throws AppException {
 		if(allOrgs == null) getAllOrgs();
 		for(Organization org : allOrgs) {
-			if(orgId.equals(org.getId())) return org.getName();
+			if(orgId.equals(org.getId())) return org;
 		}
 		LOG.error("Requested OrgName for unknown orgId: " + orgId);
 		return null;
@@ -610,7 +621,7 @@ public class APIManagerAdapter {
 		Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
 		HttpResponse httpResponse = null;
 		for(ClientApplication app : allApps) {
-			if(appIds.contains(app.getId())) continue; // Not sure, if this really makes sense. Need to check!
+			if(appIds.contains(app)) continue;
 			ObjectMapper mapper = new ObjectMapper();
 			String response = null;
 			URI uri;
@@ -728,85 +739,6 @@ public class APIManagerAdapter {
 			return apiQuota;
 		} catch (Exception e) {
 			throw new AppException("Can't parse quota from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		}
-	}
-	
-	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type) throws AppException {
-		return getExistingAPI(apiPath, filter, type, true);
-	}
-	
-	/**
-	 * Based on the given apiPath this method returns the JSON-Configuration for the API 
-	 * as it's stored in the API-Manager. The result is basically used to create the APIManagerAPI in 
-	 * method getAPIManagerAPI
-	 * @param apiPath path of the API, which can be considered as the key.
-	 * @param filter restrict the search by these filters
-	 * @param type must be TYPE_FRONT_END or TYPE_FRONT_END
-	 * @param logMessage flag to control if the error message should be printed or not
-	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
-	 * @throws AppException if the API can't be found or created
-	 */
-	public JsonNode getExistingAPI(String apiPath, List<NameValuePair> filter, String type, boolean logMessage) throws AppException {
-		CommandParameters cmd = CommandParameters.getInstance();
-		ObjectMapper mapper = new ObjectMapper();
-		URI uri;
-		try {
-			List<NameValuePair> usedFilters = new ArrayList<>();
-			if(hasAPIManagerVersion("7.7") && apiPath != null) { // With 7.7 we can query the API directly on the path 
-				usedFilters.add(new BasicNameValuePair("field", "path"));
-				usedFilters.add(new BasicNameValuePair("op", "eq"));
-				usedFilters.add(new BasicNameValuePair("value", apiPath));
-			} 
-			if(filter != null) { usedFilters.addAll(filter); } 
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+type)
-				.addParameters(usedFilters)
-				.build();
-			RestAPICall getRequest = new GETRequest(uri, null);
-			InputStream response = getRequest.execute().getEntity().getContent();
-			
-			JsonNode jsonResponse;
-			String path;
-			JsonNode foundApi = null;
-			try {
-				jsonResponse = mapper.readTree(response);
-				// We can directly access what we are looking for, as for 7.7 we filtered directly for the apiPath or 
-				// we have used some filters!
-				if(jsonResponse.size()!=0 && (filter!=null || hasAPIManagerVersion("7.7"))) {
-					foundApi =  jsonResponse.get(0);
-				} else {
-					for(JsonNode api : jsonResponse) {
-						path = api.get("path").asText();
-						if(path.equals(apiPath)) {
-							foundApi = api;
-						}
-					}
-				}
-				if(foundApi!=null) {
-					if(type.equals(TYPE_FRONT_END)) {
-						path = foundApi.get("path").asText();
-						if(logMessage) 
-							LOG.info("Found existing API on path: '"+path+"' ("+foundApi.get("state").asText()+") (ID: '" + foundApi.get("id").asText()+"')");
-					} else if(type.equals(TYPE_BACK_END)) {
-						String name = foundApi.get("name").asText();
-						if(logMessage) 
-							LOG.info("Found existing Backend-API with name: '"+name+"' (ID: '" + foundApi.get("id").asText()+"')");						
-					}
-					return foundApi;
-				}
-				if(apiPath!=null && filter!=null) {
-					LOG.info("No existing API found exposed on: '" + apiPath + "' and filter: "+filter+"");
-				} else if (apiPath==null ) {
-					LOG.info("No existing API found with filters: "+filter+"");
-				} else {
-					LOG.info("No existing API found exposed on: '" + apiPath + "'");
-				}
-				
-				return null;
-			} catch (IOException e) {
-				throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-			}
-		} catch (Exception e) {
-			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	

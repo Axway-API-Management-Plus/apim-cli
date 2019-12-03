@@ -1,6 +1,19 @@
 @echo off
 
-IF NOT DEFINED JAVA_HOME GOTO :MissingJavaHome
+where java >nul 2>nul
+SET javaFound=%errorlevel%
+
+IF DEFINED JAVA_HOME IF EXIST "%JAVA_HOME%"\\bin\\java.exe (
+	REM ECHO Using Java from JAVA_HOME
+	SET _java="%JAVA_HOME%"\\bin\\java.exe
+) ELSE (
+	IF %javaFound%==0 (
+		REM ECHO "Using Java runtime from search path."
+		SET _java=java
+	) ELSE (
+		GOTO :MissingJava
+	)
+)
 
 SET currentDir=%cd%
 SET programDir=%~dp0
@@ -17,8 +30,8 @@ GOTO :OkClassPath
 SET CLASSPATH=%1;%CLASSPATH%
 GOTO :EOF
 
-:MissingJavaHome
-ECHO "Environment variable JAVA_HOME not set!"
+:MissingJava
+ECHO "No Java runtime available. Make java available to the path or set JAVA_HOME!"
 SET ERRNO=1
 GOTO :END
 
@@ -26,7 +39,7 @@ GOTO :END
 
 CD %currentDir%
 
-"%JAVA_HOME%\bin\java" -Xms64m -Xmx256m -classpath "%CLASSPATH%" com.axway.apim.ExportApp %*
+%_java% -Xms64m -Xmx256m -classpath "%CLASSPATH%" com.axway.apim.ExportApp %*
 SET ERRNO=%ERRORLEVEL%
 
 :END
