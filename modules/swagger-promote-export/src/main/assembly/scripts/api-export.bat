@@ -3,9 +3,9 @@
 where java >nul 2>nul
 SET javaFound=%errorlevel%
 
-IF DEFINED JAVA_HOME IF EXIST "%JAVA_HOME%"\\bin\\java.exe (
+IF DEFINED JAVA_HOME IF EXIST "%JAVA_HOME%\bin\java.exe" (
 	REM ECHO Using Java from JAVA_HOME
-	SET _java="%JAVA_HOME%"\\bin\\java.exe
+	SET _java="%JAVA_HOME%\bin\java.exe"
 ) ELSE (
 	IF %javaFound%==0 (
 		REM ECHO "Using Java runtime from search path."
