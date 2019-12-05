@@ -93,6 +93,8 @@ Also version 7.5.3 is supported, but not fully automated tested.
   - Export existing APIs, Quota-Validation
 - 1.6.3 - 30.09.2019
   - Maintenance release with some minor bugfixes and improvements, Added support for 7.7 SP1 & 7.6.2 SP5
+- 1.6.4 - 03.12.2019
+  - Added fully support for V-Host and the API-Routing-Key. [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/2.-API-Configuration#how-the-actual-api-is-looked-upped)
 
 
 ## Limitations/Caveats
