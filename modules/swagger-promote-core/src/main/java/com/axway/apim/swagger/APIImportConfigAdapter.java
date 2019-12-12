@@ -740,6 +740,10 @@ public class APIImportConfigAdapter {
 		boolean hasDefaultProfile = false;
 		if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
 		List<SecurityProfile> profiles = importApi.getSecurityProfiles();
+		if(importApi.getSecurityProfiles().size()==1) { // If there is only one securityProfile make it the default
+			importApi.getSecurityProfiles().get(0).setIsDefault(true);
+			importApi.getSecurityProfiles().get(0).setName("_default");
+		}
 		for(SecurityProfile profile : importApi.getSecurityProfiles()) {
 			if(profile.getIsDefault()) {
 				if(hasDefaultProfile) {
@@ -771,6 +775,10 @@ public class APIImportConfigAdapter {
 		if(importApi.getAuthenticationProfiles()==null) return importApi; // Nothing to add (no default is needed, as we don't send any Authn-Profile)
 		boolean hasDefaultProfile = false;
 		List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
+		if(profiles.size()==1) {
+			profiles.get(0).setIsDefault(true); // As we have only one, make it the default anyway
+			profiles.get(0).setName("_default");
+		}
 		for(AuthenticationProfile profile : profiles) {
 			if(profile.getIsDefault() || profile.getName().equals("_default")) {
 				if(hasDefaultProfile) {
@@ -783,7 +791,7 @@ public class APIImportConfigAdapter {
 			}
 		}
 		if(!hasDefaultProfile) {
-			LOG.warn("THERE NO DEFAULT authenticationProfile CONFIGURED. Auto-Creating a No-Authentication outbound profile as default!");
+			LOG.warn("THERE IS NO DEFAULT authenticationProfile CONFIGURED. Auto-Creating a No-Authentication outbound profile as default!");
 			AuthenticationProfile noAuthNProfile = new AuthenticationProfile();
 			noAuthNProfile.setName("_default");
 			noAuthNProfile.setIsDefault(true);

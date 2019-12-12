@@ -57,6 +57,7 @@ public class UnpublishedApiKeyTestIT extends TestNGCitrusTestDesigner {
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[*].name", "@assertThat(hasSize(1))@") // Only one security profile is expected!
 			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].type", "apiKey")
 			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.takeFrom", "${takeFrom}")
 			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.apiKeyFieldName", "${apiKeyFieldName}")

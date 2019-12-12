@@ -7,8 +7,7 @@
 	"organization": "API Development ${orgNumber}",
     "securityProfiles": [
      	{
-     		"name": "_default",
-     		"isDefault": true,
+     		"name": "API Key",
      		"devices": [
      			{
      				"name": "API Key",
