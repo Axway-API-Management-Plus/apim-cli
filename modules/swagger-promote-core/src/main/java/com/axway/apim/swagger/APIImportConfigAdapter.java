@@ -954,6 +954,23 @@ public class APIImportConfigAdapter {
 		return new String[]{certFileName, type};
 	}
 	
+	private void validateHasQueryStringKey(IAPI importApi) throws AppException {
+		if(1==1) return;
+		if(importApi instanceof DesiredTestOnlyAPI) return; // Do nothing when unit-testing
+		if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return; // QueryStringRouting isn't supported
+		if(APIManagerAdapter.getInstance().hasAdminAccount()) {
+			String apiRoutingKeyEnabled = APIManagerAdapter.getApiManagerConfig("apiRoutingKeyEnabled");
+			if(apiRoutingKeyEnabled.equals("true")) {
+				if(importApi.getApiRoutingKey()==null) {
+					ErrorState.getInstance().setError("API-Manager configured for Query-String option, but API doesn' declare it.", ErrorCode.API_CONFIG_REQUIRES_QUERY_STRING, false);
+					throw new AppException("API-Manager configured for Query-String option, but API doesn' declare it.", ErrorCode.API_CONFIG_REQUIRES_QUERY_STRING);
+				}
+			}
+		} else {
+			LOG.debug("Can't check if QueryString for API is needed without Admin-Account.");
+		}
+	}
+	
 	
 	
 	private IAPI addImageContent(IAPI importApi) throws AppException {
