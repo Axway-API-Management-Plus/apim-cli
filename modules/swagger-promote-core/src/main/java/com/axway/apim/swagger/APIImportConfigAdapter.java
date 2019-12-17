@@ -740,8 +740,8 @@ public class APIImportConfigAdapter {
 		boolean hasDefaultProfile = false;
 		if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
 		List<SecurityProfile> profiles = importApi.getSecurityProfiles();
-		if(importApi.getSecurityProfiles().size()==1) { // If there is only one securityProfile make it the default
-			importApi.getSecurityProfiles().get(0).setIsDefault(true);
+		if(importApi.getSecurityProfiles().size()==1 && importApi.getSecurityProfiles().get(0).getIsDefault()!=false) { 
+			importApi.getSecurityProfiles().get(0).setIsDefault(true); // If there is only one securityProfile make it the default
 			importApi.getSecurityProfiles().get(0).setName("_default");
 		}
 		for(SecurityProfile profile : importApi.getSecurityProfiles()) {
@@ -775,8 +775,8 @@ public class APIImportConfigAdapter {
 		if(importApi.getAuthenticationProfiles()==null) return importApi; // Nothing to add (no default is needed, as we don't send any Authn-Profile)
 		boolean hasDefaultProfile = false;
 		List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
-		if(profiles.size()==1) {
-			profiles.get(0).setIsDefault(true); // As we have only one, make it the default anyway
+		if(profiles.size()==1 && profiles.get(0).getIsDefault()!=false) {
+			profiles.get(0).setIsDefault(true); // As we have only one, make it the default
 			profiles.get(0).setName("_default");
 		}
 		for(AuthenticationProfile profile : profiles) {
