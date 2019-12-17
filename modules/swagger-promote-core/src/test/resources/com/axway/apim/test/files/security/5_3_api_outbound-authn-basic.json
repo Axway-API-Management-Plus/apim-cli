@@ -22,7 +22,7 @@
    ],
    "authenticationProfiles":[
       {
-         "name":"HTTP Basic",
+         "name":"_default",
          "parameters":{
             "username":"${username}",
             "password":"password"

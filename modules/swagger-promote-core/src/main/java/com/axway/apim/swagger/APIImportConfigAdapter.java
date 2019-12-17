@@ -740,18 +740,16 @@ public class APIImportConfigAdapter {
 		boolean hasDefaultProfile = false;
 		if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
 		List<SecurityProfile> profiles = importApi.getSecurityProfiles();
-		if(importApi.getSecurityProfiles().size()==1 && importApi.getSecurityProfiles().get(0).getIsDefault()!=false) { 
-			importApi.getSecurityProfiles().get(0).setIsDefault(true); // If there is only one securityProfile make it the default
-			importApi.getSecurityProfiles().get(0).setName("_default");
-		}
 		for(SecurityProfile profile : importApi.getSecurityProfiles()) {
-			if(profile.getIsDefault()) {
+			if(profile.getIsDefault() || profile.getName().equals("_default")) {
 				if(hasDefaultProfile) {
 					ErrorState.getInstance().setError("You can have only one _default SecurityProfile.", ErrorCode.CANT_READ_CONFIG_FILE, false);
 					throw new AppException("You can have only one _default SecurityProfile.", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
 				hasDefaultProfile=true;
-				profile.setName("_default"); // Overwrite the name if it is default! (this is required by the API-Manager)
+				// If the name is _default or flagged as default make it consistent!
+				profile.setName("_default");
+				profile.setIsDefault(true); 
 			}
 		}
 		if(profiles==null || profiles.size()==0 || !hasDefaultProfile) {
@@ -775,10 +773,6 @@ public class APIImportConfigAdapter {
 		if(importApi.getAuthenticationProfiles()==null) return importApi; // Nothing to add (no default is needed, as we don't send any Authn-Profile)
 		boolean hasDefaultProfile = false;
 		List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
-		if(profiles.size()==1 && profiles.get(0).getIsDefault()!=false) {
-			profiles.get(0).setIsDefault(true); // As we have only one, make it the default
-			profiles.get(0).setName("_default");
-		}
 		for(AuthenticationProfile profile : profiles) {
 			if(profile.getIsDefault() || profile.getName().equals("_default")) {
 				if(hasDefaultProfile) {
@@ -786,7 +780,8 @@ public class APIImportConfigAdapter {
 					throw new AppException("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
 				hasDefaultProfile=true;
-				profile.setName("_default"); // Overwrite the name if it is default! (this is required by the API-Manager)
+				// If the name is _default or flagged as default make it consistent!
+				profile.setName("_default");
 				profile.setIsDefault(true); 
 			}
 		}
