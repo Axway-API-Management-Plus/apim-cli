@@ -926,9 +926,9 @@ public class APIImportConfigAdapter {
 					ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
 					throw e;
 				}
-				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
+				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage(), e);
 			} catch (Exception e) {
-				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
+				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage(), e);
 			} finally {
 				if(is!=null) is.close();
 			}
