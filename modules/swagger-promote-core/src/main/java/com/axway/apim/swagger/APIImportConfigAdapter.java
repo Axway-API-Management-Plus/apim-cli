@@ -409,7 +409,7 @@ public class APIImportConfigAdapter {
 	 * Purpose of this method is to load the actual existing applications from API-Manager 
 	 * based on the provided criteria (App-Name, API-Key, OAuth-ClientId or Ext-ClientId). 
 	 * Or, if the APP doesn't exists remove it from the list and log a warning message.
-	 * Additionally, for each application it's check, that the organization has access 
+	 * Additionally, for each application it's checked, that the organization has access 
 	 * to this API, otherwise it will be removed from the list as well and a warning message is logged.
 	 * @param apiConfig
 	 * @throws AppException

@@ -579,15 +579,29 @@ public class APIManagerAdapter {
 	 * @throws AppException if allApps can't be read from API-Manager 
 	 */
 	public ClientApplication getApplication(String appName) throws AppException {
+		List<ClientApplication> foundApps = new ArrayList<ClientApplication>();
 		if(allApps==null) getAllApps();
+		String orgId = null;
+		if(appName.contains("|")) {
+			orgId = getOrgId(appName.substring(appName.indexOf("|")+1));
+			appName = appName.substring(0, appName.indexOf("|"));
+		}
 		for(ClientApplication app : allApps) {
 			if(appName.equals(app.getName())) {
-				LOG.debug("Configured app with name: '"+appName+"' found. ID: '"+app.getId()+"'");
-				return app;
+				if(orgId!=null && !orgId.equals(app.getOrganizationId())) continue;
+				foundApps.add(app);
 			}
 		}
-		LOG.error("Requested AppId for unknown appName: " + appName);
-		return null;
+		if(foundApps.size()==0) {
+			LOG.error("Requested AppId for unknown appName: " + appName);
+			return null;
+		} else if (foundApps.size()>1) {
+			ErrorState.getInstance().setError("The given application-name: '"+appName+"' doesn't resolve to a unique application. "
+					+ "You may add the organization name using format: 'appname|orgname' or use one of the application credentials.", ErrorCode.APP_NAME_IS_NOT_UNIQUE, false);
+			throw new AppException("The given application-name: '"+appName+"' doesn't resolve to a unique application. ", ErrorCode.APP_NAME_IS_NOT_UNIQUE);
+		}
+		LOG.debug("Configured app with name: '"+appName+"' found. ID: '"+foundApps.get(0)+"'");
+		return foundApps.get(0);
 	}
 	
 	/**
