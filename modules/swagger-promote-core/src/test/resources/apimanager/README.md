@@ -28,6 +28,18 @@ Perform the following steps:
     docker push docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP3
 ```
 
+### Added Untrusted Docker-Registry
+```
+vi /etc/docker/daemon.json
+```
+Add the following
+```json
+{
+  "insecure-registries" : ["docker-registry.demo.axway.com"]
+}
+systemctl restart dockerd
+```
+
 Please note, that you need Write-Permissions to the Docker-Repository to push the image!
 
 To enable the image, please adjust the image referred in the Travis-CI configuration file:
