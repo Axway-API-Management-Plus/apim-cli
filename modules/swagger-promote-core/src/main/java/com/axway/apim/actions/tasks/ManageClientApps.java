@@ -23,7 +23,6 @@ import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.properties.apiAccess.APIAccess;
 import com.axway.apim.swagger.api.properties.applications.ClientApplication;
-import com.axway.apim.swagger.api.properties.organization.ApiAccess;
 import com.axway.apim.swagger.api.state.ActualAPI;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,7 +42,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	
 	public ManageClientApps(IAPI desiredState, IAPI actualState, IAPI oldAPI) throws AppException {
 		super(desiredState, actualState);
-		hasAdminAccount = APIManagerAdapter.getInstance().hasAdminAccount();
+		hasAdminAccount = APIManagerAdapter.hasAdminAccount();
 		this.oldAPI = oldAPI;
 	}
 	
