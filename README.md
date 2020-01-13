@@ -2,7 +2,7 @@
 
 This project provides you with a tool that simplifies your DevOps experience with the Axway API-Manager Version 7.x. 
 
-The program works based on the API-Definition (as Swagger or a WSDL (__Beta - Not for production__)) + an API-Configuration-File and replicates this "state" into the API-Manager. Consider the API-Definition + API-Config as the "__desired__" state and API-Manager has the "__actual__" state. This program will compare both, the desired with the actual state, and performs all necessary actions to bring the API-Manager API into the desired state.
+The program works based on the API-Definition (as Swagger or a WSDL) + an API-Configuration-File and replicates this "state" into the API-Manager. Consider the API-Definition + API-Config as the "__desired__" state and API-Manager has the "__actual__" state. This program will compare both, the desired with the actual state, and performs all necessary actions to bring the API-Manager API into the desired state.
 
 Watch this video (28 min): https://youtu.be/2i8i1zMAMps to get an overview + demo.
 
@@ -101,7 +101,6 @@ Also version 7.5.3 is supported, but not fully automated tested.
 ## Limitations/Caveats
 - API-Method-Level description is not yet supported
 - Deep merge of stage-config files isn't supported
-- Support for WSDL is still Beta
 
 ## Contributing
 
