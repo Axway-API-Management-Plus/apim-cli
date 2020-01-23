@@ -42,12 +42,15 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -1007,6 +1010,9 @@ public class APIImportConfigAdapter {
 	}
 	
 	private SSLConnectionSocketFactory createSSLContext() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException {
+		SSLContextBuilder builder = new SSLContextBuilder();
+		builder.loadTrustMaterial(null, new TrustAllStrategy());
+		
 		String keyStorePath=System.getProperty("javax.net.ssl.keyStore","");
 		if (StringUtils.isNotEmpty(keyStorePath)) {
 			String keyStorePassword=System.getProperty("javax.net.ssl.keyStorePassword","");
@@ -1014,23 +1020,19 @@ public class APIImportConfigAdapter {
 				String keystoreType=System.getProperty("javax.net.ssl.keyStoreType",KeyStore.getDefaultType());
 				LOG.debug("Reading keystore from {}",keyStorePath);
 				KeyStore ks = KeyStore.getInstance(keystoreType);
-				ks.load(new FileInputStream(new File(keyStorePath)), keyStorePassword.toCharArray());
-				SSLContext sslcontext = SSLContexts.custom()
-	                .loadKeyMaterial(ks,keyStorePassword.toCharArray())
-	                .loadTrustMaterial(new TrustSelfSignedStrategy())
-	                .build();
-				String [] tlsProts = getAcceptedTLSProtocols();
-				SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-		                sslcontext,
-		                tlsProts,
-		                null,
-		                SSLConnectionSocketFactory.getDefaultHostnameVerifier());
-				return sslsf;
+				ks.load(new FileInputStream(new File(keyStorePath)), keyStorePassword.toCharArray());				
+				builder.loadKeyMaterial(ks,keyStorePassword.toCharArray());
 			}
 		} else {
-			LOG.debug("NO javax.net.ssl.keyStore property. Avoid to set SSLContextFactory ");
+			LOG.debug("NO javax.net.ssl.keyStore property.");
 		}
-		return null;
+		String [] tlsProts = getAcceptedTLSProtocols();
+		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+				builder.build(),
+                tlsProts,
+                null,
+                new NoopHostnameVerifier());
+		return sslsf;
 	}
 
 	private String[] getAcceptedTLSProtocols() {
