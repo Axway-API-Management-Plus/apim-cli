@@ -74,6 +74,23 @@ public class ManagerVersionCheckTest {
 		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.5.3 SP8"));
 	}
 	
+	@Test
+	public void isVersionWithAPIManager7720200130() throws Exception {
+		setAPIManagerVersion("7.7.20200130");
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.7"), "Failed with requested version 7.7");
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1"), "Failed with requested version 7.7 SP1");
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.7 SP2"), "Failed with requested version 7.7 SP2");
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130"), "Failed with requested version 7.7.20200130");
+		Assert.assertFalse(APIManagerAdapter.hasAPIManagerVersion("7.7.20200330"), "Failed with requested version 7.7.20200330"); // Should fail, as the requested version is from March release
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.5.3"), "Failed with requested version 7.5.3");
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.6.2"), "Failed with requested version 7.6.2");
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP2"), "Failed with requested version 7.6.2 SP2");
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP3"), "Failed with requested version 7.6.2 SP3");
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.5.3 SP10"), "Failed with requested version 7.5.3 SP10");
+	}
+	
+	
+	
 	private void setAPIManagerVersion(String managerVersion) throws Exception {
 		Field field = APIManagerAdapter.class.getDeclaredField("apiManagerVersion");
 		field.setAccessible(true);

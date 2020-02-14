@@ -5,9 +5,11 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -310,21 +312,38 @@ public class APIManagerAdapter {
 	 */
 	public static boolean hasAPIManagerVersion(String version) {
 		try {
-			List<Integer> managerVersion	= getMajorVersions(getApiManagerVersion());
-			List<Integer> requestedVersion	= getMajorVersions(version);
+			List<String> managerVersion	= getMajorVersions(getApiManagerVersion());
+			List<String> requestedVersion	= getMajorVersions(version);
+			Date datedManagerVersion = getDateVersion(managerVersion);
+			Date datedRequestedVersion = getDateVersion(requestedVersion);
 			int managerSP	= getServicePackVersion(getApiManagerVersion());
 			int requestedSP = getServicePackVersion(version);
 			for(int i=0;i<requestedVersion.size(); i++) {
-				int managerVer = managerVersion.get(i);
-				if(managerVer>requestedVersion.get(i)) return true;
-				if(managerVer<requestedVersion.get(i)) return false;
+				int managerVer = Integer.parseInt(managerVersion.get(i));
+				if(managerVer>Integer.parseInt(requestedVersion.get(i))) return true;
+				if(managerVer<Integer.parseInt(requestedVersion.get(i))) return false;
+				if(datedManagerVersion!=null && datedRequestedVersion!=null && datedManagerVersion.before(datedRequestedVersion)) return false;
 			}
+			if(requestedSP!=0 && datedManagerVersion!=null) return true;
 			if(managerSP<requestedSP) return false;
 		} catch(Exception e) {
 			LOG.warn("Can't parse API-Manager version: '"+apiManagerVersion+"'. Requested version was: '"+version+"'. Returning false!");
 			return false;
 		}
 		return true;
+	}
+	
+	private static Date getDateVersion(List<String> managerVersion) {
+		if(managerVersion.size()==3) {
+			try {
+				String dateVersion = managerVersion.get(2);
+				Date datedVersion=new SimpleDateFormat("yyyyMMdd").parse(dateVersion);				
+				return datedVersion;
+			} catch (Exception e) {
+				LOG.debug("API-Manager version: '"+apiManagerVersion+"' seems not to contain a dated version", e);
+			}
+		}
+		return null;
 	}
 	
 	private static int getServicePackVersion(String version) {
@@ -340,8 +359,8 @@ public class APIManagerAdapter {
 		return spNumber;
 	}
 	
-	private static List<Integer> getMajorVersions(String version) {
-		List<Integer> majorNumbers = new ArrayList<Integer>();
+	private static List<String> getMajorVersions(String version) {
+		List<String> majorNumbers = new ArrayList<String>();
 		String versionWithoutSP = version;
 		if(version.contains(" SP")) {
 			versionWithoutSP = version.substring(0, version.indexOf(" SP"));
@@ -349,7 +368,7 @@ public class APIManagerAdapter {
 		try {
 			String[] versions = versionWithoutSP.split("\\.");
 			for(int i = 0; i<versions.length; i++) {
-				majorNumbers.add(Integer.parseInt(versions[i]));
+				majorNumbers.add(versions[i]);
 			}
 		} catch (Exception e){
 			LOG.trace("Can't parse major version numbers in: '"+version+"'");
