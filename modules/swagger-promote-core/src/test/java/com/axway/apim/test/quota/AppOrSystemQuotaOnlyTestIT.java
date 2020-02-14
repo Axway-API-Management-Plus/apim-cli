@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
@@ -17,7 +18,7 @@ public class AppOrSystemQuotaOnlyTestIT extends TestNGCitrusTestDesigner {
 	private ImportTestAction swaggerImport;
 	
 	@CitrusTest
-	public void run() {
+	public void run() throws InterruptedException {
 		description("Validates quota is set when only System- or Application-Quota is configured (see bug #55)");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -74,6 +75,9 @@ public class AppOrSystemQuotaOnlyTestIT extends TestNGCitrusTestDesigner {
 		createVariable("applicationPeriod", "day");
 		action(swaggerImport);
 		
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+			Thread.sleep(200); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+		}
 		echo("####### Check Application-Quotas have been setup as configured #######");
 		http().client("apiManager")
 			.send()
