@@ -8,6 +8,7 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.AppException;
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -23,7 +24,7 @@ public class MultiRestrictionQuotaTestIT extends TestNGCitrusTestRunner {
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException, InterruptedException {
 		swaggerImport = new ImportTestAction();
 		
 		description("Make sure you can configured multiple Quota-Restrictions for an API");
@@ -64,6 +65,9 @@ public class MultiRestrictionQuotaTestIT extends TestNGCitrusTestRunner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		echo("####### Check System-Quotas have been setup as configured #######");
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+			Thread.sleep(200); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+		}
 		http(builder -> builder.client("apiManager").send().get("/quotas/00000000-0000-0000-0000-000000000000").header("Content-Type", "application/json"));
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
