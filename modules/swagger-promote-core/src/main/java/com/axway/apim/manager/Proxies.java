@@ -33,6 +33,8 @@ public class Proxies {
 	List<NameValuePair> filter;
 
 	JsonNode apiManagerResponse;
+	
+	CommandParameters params = CommandParameters.getInstance();
 
 	private Proxies() {
 

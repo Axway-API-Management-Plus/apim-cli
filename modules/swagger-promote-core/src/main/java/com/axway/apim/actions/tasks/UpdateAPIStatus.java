@@ -27,6 +27,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
 import com.axway.apim.swagger.APIChangeState;
+import com.axway.apim.swagger.APIManagerAdapter;
 import com.axway.apim.swagger.api.state.APIBaseDefinition;
 import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,6 +44,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 		put("published", 	new String[] {"unpublished", "deprecated"});
 		put("deleted", 		new String[] {});
 		put("deprecated", 	new String[] {"unpublished", "undeprecated"});
+		put("pending", 		new String[] {"deleted"});
 	}};
 	
 	/**
@@ -141,7 +143,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 			}
 			if(desiredState.getState().equals(IAPI.STATE_DELETED)) {
 				// If an API in state unpublished, also an orgAdmin can delete it
-				boolean useAdmin = (actualState.getState().equals(IAPI.STATE_UNPUBLISHED)) ? false : true; 
+				boolean useAdmin = (actualState.getState().equals(IAPI.STATE_UNPUBLISHED) || actualState.getState().equals(IAPI.STATE_PENDING)) ? false : true; 
 				uri = new URIBuilder(cmd.getAPIManagerURL())
 						.setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getId())
 						.build();
@@ -161,9 +163,9 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 					.build();
 				if(desiredState.getVhost()!=null && desiredState.getState().equals(IAPI.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
 					HttpEntity entity = new StringEntity("vhost="+desiredState.getVhost());
-					apiCall = new POSTRequest(entity, uri, this, true);
+					apiCall = new POSTRequest(entity, uri, this, useAdminAccountForPublish());
 				} else {
-					apiCall = new POSTRequest(null, uri, this, true);
+					apiCall = new POSTRequest(null, uri, this, useAdminAccountForPublish());
 				}
 				apiCall.setContentType("application/x-www-form-urlencoded");
 				apiCall.execute();
@@ -207,6 +209,14 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 
 	public boolean isUpdateVHostRequired() {
 		return updateVHostRequired;
+	}
+	
+	private boolean useAdminAccountForPublish() throws AppException {
+		if(APIManagerAdapter.hasAdminAccount()) return true;
+		// This flag should allow orgAdmins to request a publish, hence we don't use the Admin-Account
+		if(CommandParameters.getInstance().orgAdminPublishToApprove()) return false;
+		// In all other cases, we use the Admin-Account
+		return true;
 	}
 	
 	private String formatRetirementDate(Long retirementDate) {

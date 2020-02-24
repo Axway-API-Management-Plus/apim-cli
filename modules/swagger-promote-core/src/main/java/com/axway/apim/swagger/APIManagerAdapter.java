@@ -148,8 +148,12 @@ public class APIManagerAdapter {
 	 */
 	public void applyChanges(APIChangeState changeState) throws AppException {
 		if(!this.hasAdminAccount && isAdminAccountNeeded(changeState) ) {
-			error.setError("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER, false);
-			throw new AppException("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER);
+			if(CommandParameters.getInstance().orgAdminPublishToApprove()) {
+				LOG.info("Desired API-State set to published, but flag: orgAdminPublishToApprove set to true. Continue with OrgAdmin account only.");
+			} else {
+				error.setError("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER, false);
+				throw new AppException("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER);
+			}
 		}
 		// No existing API found (means: No match for APIPath), creating a complete new
 		if(!changeState.getActualAPI().isValid()) {

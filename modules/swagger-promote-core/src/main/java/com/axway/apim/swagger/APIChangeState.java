@@ -182,6 +182,7 @@ public class APIChangeState {
 	public boolean isBreaking() throws AppException {
 		// We will only break API, if the API is no longer in state: "unpublished"
 		if(this.actualAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) return false;
+		if(this.actualAPI.getState().equals(IAPI.STATE_PENDING)) return false;
 		return isBreaking;
 	}
 
