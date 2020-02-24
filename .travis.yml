@@ -23,7 +23,7 @@ before_install:
   - mvn clean test
 
 
-  - if [ ! -f /etc/docker/daemon.json ]; then sudo cp -v ./.github/daemon-default.json /etc/docker/daemon.json
+  - if [ ! -f /etc/docker/daemon.json ]; then sudo cp -v .github/daemon-default.json /etc/docker/daemon.json; fi
   - if [ ! -f $CACHE_FILE_APIM ]; then sudo cat /etc/default/docker; fi
   - if [ ! -f $CACHE_FILE_APIM ]; then echo \"Restarting Docker-Daemon\"; sudo service docker restart; sudo systemctl status docker.service; sudo journalctl -xe; fi
 
