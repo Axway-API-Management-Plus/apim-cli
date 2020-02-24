@@ -1,1 +1,1 @@
-{"insecure-registries": ["docker-registry.demo.axway.com"]}
+{"insecure-registries": ["docker-registry.demo.axway.com"], "debug": true}
