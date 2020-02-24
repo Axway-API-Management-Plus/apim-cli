@@ -139,7 +139,7 @@ public class CommandParameters {
 	}
 	
 	public boolean orgAdminPublishToApprove() {
-		if(getValue("orgAdminPublishToApprove")==null) return false;
+		if(getValue("orgAdminPublishToApprove")==null) return true;
 		return Boolean.parseBoolean(getValue("orgAdminPublishToApprove"));
 	}
 	
