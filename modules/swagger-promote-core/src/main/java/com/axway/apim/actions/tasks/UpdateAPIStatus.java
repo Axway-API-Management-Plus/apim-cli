@@ -142,7 +142,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				throw new AppException("The status change from: '" + actualState.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS);
 			}
 			if(desiredState.getState().equals(IAPI.STATE_DELETED)) {
-				// If an API in state unpublished, also an orgAdmin can delete it
+				// If an API in state unpublished or pending, also an orgAdmin can delete it
 				boolean useAdmin = (actualState.getState().equals(IAPI.STATE_UNPUBLISHED) || actualState.getState().equals(IAPI.STATE_PENDING)) ? false : true; 
 				uri = new URIBuilder(cmd.getAPIManagerURL())
 						.setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getId())
