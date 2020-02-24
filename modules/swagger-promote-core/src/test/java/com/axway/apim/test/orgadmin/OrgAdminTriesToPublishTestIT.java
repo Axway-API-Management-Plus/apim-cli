@@ -75,7 +75,24 @@ public class OrgAdminTriesToPublishTestIT extends TestNGCitrusTestRunner {
 				.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
 				.validate("$.[?(@.id=='${apiId}')].state", "published"));
 		
-		echo("####### Try to Re-Importing the same API again as an Org-Admin only (Existing APIs exists) #######");
+		echo("####### AT THIS POINT WE HAVE THE SAME API IN STATE PUBLISHED #######");
+		
+		echo("####### Trying to replicate the same API as unpublished (this should NOT conflict the with existing published API) #######");
+		echo("####### Calling the tool with a Non-Admin-User. #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/1_no-change-config.json");
+		createVariable("expectedReturnCode", "0");
+		createVariable("apiManagerUser", "${oadminUsername1}"); // This is an org-admin user
+		createVariable("apiManagerPass", "${oadminPassword1}");
+		swaggerImport.doExecute(context);
+		echo("####### Make sure, we have a second API with state unpublished #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}' && @.id!='${apiId}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}' && @.id!='${apiId}')].state", "unpublished")
+			.extractFromPayload("$.[?(@.path=='${apiPath}' && @.id!='${apiId}')].id", "pendingApiId"));
+		
+		echo("####### Now updating the unpublished API to published which lead to a pending approval API #######");
 		echo("####### Calling the tool with a Non-Admin-User. #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/2_initially_published.json");
@@ -86,8 +103,8 @@ public class OrgAdminTriesToPublishTestIT extends TestNGCitrusTestRunner {
 		// Expection is to get a new API (ID) having a state pending!
 		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.path=='${apiPath}' && @.id!='${apiId}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}' && @.id!='${apiId}')].state", "pending")
+			.validate("$.[?(@.id=='${pendingApiId}' && @.id!='${apiId}')].name", "${apiName}")
+			.validate("$.[?(@.id=='${pendingApiId}' && @.id!='${apiId}')].state", "pending")
 			.extractFromPayload("$.[?(@.path=='${apiPath}' && @.id!='${apiId}')].id", "pendingApiId"));
 		
 		echo("####### As an OrgAdmin do some changes on the pending API (e.g. update the Swagger-File) #######");
