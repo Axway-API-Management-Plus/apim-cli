@@ -147,8 +147,9 @@ public class APIManagerAdapter {
 	 * @throws AppException is the desired state can't be replicated into the API-Manager.
 	 */
 	public void applyChanges(APIChangeState changeState) throws AppException {
+		CommandParameters commands = CommandParameters.getInstance();
 		if(!this.hasAdminAccount && isAdminAccountNeeded(changeState) ) {
-			if(CommandParameters.getInstance().allowOrgAdminsToPublish()) {
+			if(commands.allowOrgAdminsToPublish()) {
 				LOG.debug("Desired API-State set to published using OrgAdmin account only. Going to create a publish request. "
 						+ "Set allowOrgAdminsToPublish to false to prevent orgAdmins from creating a publishing request.");
 			} else {
@@ -188,11 +189,14 @@ public class APIManagerAdapter {
 				return;
 			} else { // We have changes, that require a re-creation of the API
 				LOG.info("Strategy: Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
-						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase()+" API. Recreating it!");
+						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase()+" API by recreating it!");
 				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
 				recreate.execute(changeState);
-				return;
 			}
+		}
+		if(!this.hasAdminAccount && isAdminAccountNeeded(changeState) && commands.allowOrgAdminsToPublish() ) {
+			LOG.info("Actual API has been created and is waiting for an approval by an administrator. "
+					+ "You may update the pending API as often as you want before it is finally published.");
 		}
 	}
 	

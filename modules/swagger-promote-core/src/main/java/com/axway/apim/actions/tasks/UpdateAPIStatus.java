@@ -184,7 +184,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 		Transaction context = Transaction.getInstance();
 		try {
 			if(context.get("responseMessage")!=null) {
-				LOG.info(""+context.get("responseMessage"));
+				LOG.debug(""+context.get("responseMessage"));
 				return null;
 			} else {
 				try {
