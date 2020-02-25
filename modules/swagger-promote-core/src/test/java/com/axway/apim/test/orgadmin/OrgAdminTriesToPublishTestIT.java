@@ -32,6 +32,7 @@ public class OrgAdminTriesToPublishTestIT extends TestNGCitrusTestRunner {
 		variable("apiPath", "/org-admin-published-${apiNumber}");
 		variable("apiName", "OrgAdmin-Published-${apiNumber}");
 		variable("ignoreAdminAccount", "true"); // This tests simulate to use only an Org-Admin-Account
+		variable("allowOrgAdminsToPublish", "false"); // Disable OrgAdmins to publish APIs
 
 		echo("####### Calling the tool with a Non-Admin-User. #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
@@ -53,7 +54,6 @@ public class OrgAdminTriesToPublishTestIT extends TestNGCitrusTestRunner {
 		variable("apiPath", "/org-admin-published-approv-${apiNumber}");
 		variable("apiName", "OrgAdmin-Published-Approv-${apiNumber}");
 		variable("ignoreAdminAccount", "true"); // This tests simulate to use only an Org-Admin-Account
-		variable("orgAdminPublishToApprove", "true"); // With this flag, the API is published to be approved by an Admin
 
 		echo("####### Calling the tool with a Non-Admin-User. #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");

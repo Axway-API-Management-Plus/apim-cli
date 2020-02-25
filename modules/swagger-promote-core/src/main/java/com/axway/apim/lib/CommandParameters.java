@@ -138,9 +138,9 @@ public class CommandParameters {
 		return Boolean.parseBoolean(getValue("ignoreAdminAccount"));
 	}
 	
-	public boolean orgAdminPublishToApprove() {
-		if(getValue("orgAdminPublishToApprove")==null) return true;
-		return Boolean.parseBoolean(getValue("orgAdminPublishToApprove"));
+	public boolean allowOrgAdminsToPublish() {
+		if(getValue("allowOrgAdminsToPublish")==null) return true;
+		return Boolean.parseBoolean(getValue("allowOrgAdminsToPublish"));
 	}
 	
 	public String getDetailsExportFile() {

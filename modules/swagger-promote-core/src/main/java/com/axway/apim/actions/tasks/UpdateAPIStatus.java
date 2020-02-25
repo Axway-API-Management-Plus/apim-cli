@@ -213,8 +213,8 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 	
 	private boolean useAdminAccountForPublish() throws AppException {
 		if(APIManagerAdapter.hasAdminAccount()) return true;
-		// This flag should allow orgAdmins to request a publish, hence we don't use the Admin-Account
-		if(CommandParameters.getInstance().orgAdminPublishToApprove()) return false;
+		// This flag can be set to false to stop OrgAdmin from a Publishing request (means Pending approval)
+		if(CommandParameters.getInstance().allowOrgAdminsToPublish()) return false;
 		// In all other cases, we use the Admin-Account
 		return true;
 	}

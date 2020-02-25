@@ -148,10 +148,12 @@ public class APIManagerAdapter {
 	 */
 	public void applyChanges(APIChangeState changeState) throws AppException {
 		if(!this.hasAdminAccount && isAdminAccountNeeded(changeState) ) {
-			if(CommandParameters.getInstance().orgAdminPublishToApprove()) {
-				LOG.info("Desired API-State set to published, but flag: orgAdminPublishToApprove set to true. Continue with OrgAdmin account only.");
+			if(CommandParameters.getInstance().allowOrgAdminsToPublish()) {
+				LOG.debug("Desired API-State set to published using OrgAdmin account only. Going to create a publish request. "
+						+ "Set allowOrgAdminsToPublish to false to prevent orgAdmins from creating a publishing request.");
 			} else {
-				error.setError("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER, false);
+				error.setError("OrgAdmin user only allowed to change/register unpublished APIs. "
+						+ "Set allowOrgAdminsToPublish to true (default) to allow orgAdmins to create a publishing request.", ErrorCode.NO_ADMIN_ROLE_USER, false);
 				throw new AppException("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER);
 			}
 		}
@@ -1210,10 +1212,17 @@ public class APIManagerAdapter {
 		}
 	}
 
+	/**
+	 * @return true, when admin credentials are provided
+	 * @throws AppException when the API-Manager instance is not initialized
+	 */
 	public static boolean hasAdminAccount() throws AppException {
 		return APIManagerAdapter.getInstance().hasAdminAccount;
 	}
 	
+	/**
+	 * @return true, if an OrgAdmin is the primary user (additional Admin-Credentials may have provided anyway)
+	 */
 	public boolean isUsingOrgAdmin() {
 		return usingOrgAdmin;
 	}

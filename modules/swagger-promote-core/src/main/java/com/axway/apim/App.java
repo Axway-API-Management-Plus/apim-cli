@@ -152,7 +152,7 @@ public class App {
 			option.setArgName("true");
 			internalOptions.addOption(option);
 			
-			option = new Option("orgAdminPublishToApprove", true, "If set, also an Org-Admin can send a published API, which will be end in request for approval state.");
+			option = new Option("allowOrgAdminsToPublish", true, "If set to false, OrgAdmins cannot replicate an API with desired state published. Defaults to true.");
 			option.setRequired(false);
 			option.setArgName("true");
 			internalOptions.addOption(option);
@@ -206,8 +206,9 @@ public class App {
 			IAPI desiredAPI = configAdapter.getDesiredAPI();
 			// 
 			List<NameValuePair> filters = new ArrayList<NameValuePair>();
-			// If flag: orgAdminPublishToApprove (means state: pending) is set, we have to filter existing published APIs as to be the actual API
-			if(params.orgAdminPublishToApprove()) {
+			// If we don't have an AdminAccount available, we ignore published APIs - For OrgAdmins 
+			// the unpublished or pending APIs become the actual API
+			if(!APIManagerAdapter.hasAdminAccount()) {
 				filters.add(new BasicNameValuePair("field", "state"));
 				filters.add(new BasicNameValuePair("op", "ne"));
 				filters.add(new BasicNameValuePair("value", "published"));
