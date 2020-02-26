@@ -7,7 +7,6 @@
    "securityProfiles":[
       {
          "name":"_default",
-         "isDefault":true,
          "devices":[
             {
                "name":"Pass Through",
@@ -23,12 +22,11 @@
    ],
    "authenticationProfiles":[
       {
-         "name":"HTTP Basic",
+         "name":"_default",
          "parameters":{
             "username":"${username}",
             "password":"password"
          },
-         "isDefault":true,
          "type":"http_basic"
       }
    ]

@@ -22,9 +22,9 @@ before_install:
   # Avoid installation if unit-tests fail anyway
   - mvn clean test
 
-  - "sudo cat /etc/docker/daemon.json | jq '. + {\"insecure-registries\": [\"docker-registry.demo.axway.com\"]}' | sudo tee /etc/docker/daemon.json"
+  - if [ ! -f /etc/docker/daemon.json ]; then sudo cp -v .github/daemon-default.json /etc/docker/daemon.json; fi
   - if [ ! -f $CACHE_FILE_APIM ]; then sudo cat /etc/default/docker; fi
-  - if [ ! -f $CACHE_FILE_APIM ]; then echo "Restarting Docker-Daemon"; sudo service docker restart; fi
+  - if [ ! -f $CACHE_FILE_APIM ]; then echo \"Restarting Docker-Daemon\"; sudo service docker restart; sudo systemctl status docker.service; sudo journalctl -xe; fi
 
   #- sudo apt-get update
   #- sudo apt-get install curl

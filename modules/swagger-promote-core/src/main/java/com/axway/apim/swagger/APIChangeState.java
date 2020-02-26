@@ -96,7 +96,7 @@ public class APIChangeState {
 						if (!isWritable(property, this.actualAPI.getState())) {
 							this.updateExistingAPI = false; // Found a NON-Changeable property, can't update the existing API
 						}
-						LOG.info("Changed property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
+						LOG.debug("Changed property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
 					} else {
 						LOG.debug("No change for property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
 					}
@@ -182,6 +182,7 @@ public class APIChangeState {
 	public boolean isBreaking() throws AppException {
 		// We will only break API, if the API is no longer in state: "unpublished"
 		if(this.actualAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) return false;
+		if(this.actualAPI.getState().equals(IAPI.STATE_PENDING)) return false;
 		return isBreaking;
 	}
 

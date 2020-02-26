@@ -23,6 +23,7 @@ public interface IAPI {
 	public final static String STATE_UNPUBLISHED = "unpublished";
 	public final static String STATE_DEPRECATED = "deprecated";
 	public final static String STATE_DELETED = "deleted";
+	public final static String STATE_PENDING = "pending";
 	
 	public final int SWAGGGER_API = 1;
 	public final int WSDL_API = 2;

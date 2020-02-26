@@ -78,7 +78,8 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
 				.validate("$.[?(@.id=='${apiId}')].state", "unpublished")
-				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "test HTTP Basic")
+				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[*].name", "@assertThat(hasSize(1))@") // Only one authn profile is expected!
+				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "_default")
 				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].type", "http_basic")
 				.validate("$.[?(@.id=='${apiId}')].outboundProfiles._default.authenticationProfile", "_default")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
@@ -105,7 +106,7 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.id=='${apiId}')].id", "${apiId}")
 			.validate("$.[?(@.id=='${apiId}')].state", "unpublished")
-			.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "test HTTP Basic")
+			.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "_default")
 			.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].type", "http_basic")
 			.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].parameters.username", "${username}"));
 		
@@ -123,7 +124,7 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
 				.validate("$.[?(@.id=='${apiId}')].state", "published")
-				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "test HTTP Basic")
+				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "_default")
 				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].type", "http_basic")
 				.validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].parameters.username", "${username}")
 				.validate("$.[?(@.id=='${apiId}')].outboundProfiles._default.authenticationProfile", "_default")

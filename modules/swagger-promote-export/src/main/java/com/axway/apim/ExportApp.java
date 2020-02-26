@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.actions.rest.APIMHttpClient;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.api.export.APIExportConfigAdapter;
+import com.axway.apim.api.export.lib.ExportCommandParameters;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
@@ -86,6 +87,10 @@ public class ExportApp {
 				option.setArgName("preprod");
 			options.addOption(option);
 			
+			option = new Option("df", "deleteFolder", true, "Controls if an existing local folder should be deleted. Defaults to false.");
+			option.setArgName("true");
+			options.addOption(option);
+			
 			Options internalOptions = new Options();
 			option = new  Option("h", "help", false, "Print the help");
 			option.setRequired(false);
@@ -127,7 +132,7 @@ public class ExportApp {
 			APIMHttpClient.deleteInstance();
 			Transaction.deleteInstance();
 			
-			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
+			ExportCommandParameters params = new ExportCommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
 			
 			APIExportConfigAdapter exportAdapter = new APIExportConfigAdapter(params.getValue("api-path"), params.getValue("localFolder"), params.getValue("vhost"));
 			exportAdapter.exportAPIs();
@@ -168,10 +173,11 @@ public class ExportApp {
 		System.out.println("\n");
 		System.out.println("You may run one of the following examples:");
 		System.out.println(binary+" -a /api/v1/ -l my_apis -h location -u apiadmin -p changeme");
+		System.out.println(binary+" -a \"/api/v1/*\" -l my_apis -h location -u apiadmin -p changeme");
 		System.out.println();
 		System.out.println("Using parameters provided in properties file stored in conf-folder:");
 		System.out.println(binary+" -a /api/v1/ -l my_apis -s api-env");
-		System.out.println(binary+" -a * -l all_my_apis -s api-env");
+		System.out.println(binary+" -a \"*\" -l all_my_apis -s api-env");
 		System.out.println();
 		System.out.println("For more information visit: https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
 	}
