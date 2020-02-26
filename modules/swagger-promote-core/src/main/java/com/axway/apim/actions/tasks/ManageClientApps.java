@@ -117,6 +117,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		HttpEntity entity;
 		
 		RestAPICall apiCall;
+		if(missingDesiredApps.size()==0) return;
 		Transaction.getInstance().put(MODE, MODE_CREATE_API_ACCESS);
 		LOG.info("Creating API-Access for the following apps: '"+missingDesiredApps.toString()+"'");
 		try {

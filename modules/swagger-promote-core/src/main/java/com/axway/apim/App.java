@@ -1,7 +1,9 @@
 package com.axway.apim;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -9,6 +11,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,6 +152,11 @@ public class App {
 			option.setArgName("true");
 			internalOptions.addOption(option);
 			
+			option = new Option("allowOrgAdminsToPublish", true, "If set to false, OrgAdmins cannot replicate an API with desired state published. Defaults to true.");
+			option.setRequired(false);
+			option.setArgName("true");
+			internalOptions.addOption(option);
+			
 			option = new Option("replaceHostInSwagger", true, "Controls if you want to replace the host in your Swagger-File ");
 			option.setRequired(false);
 			option.setArgName("true");
@@ -195,11 +204,21 @@ public class App {
 					params.getValue("stage"), params.getValue("apidefinition"), apimAdapter.isUsingOrgAdmin());
 			// Creates an API-Representation of the desired API
 			IAPI desiredAPI = configAdapter.getDesiredAPI();
+			// 
+			List<NameValuePair> filters = new ArrayList<NameValuePair>();
+			// If we don't have an AdminAccount available, we ignore published APIs - For OrgAdmins 
+			// the unpublished or pending APIs become the actual API
+			if(!APIManagerAdapter.hasAdminAccount()) {
+				filters.add(new BasicNameValuePair("field", "state"));
+				filters.add(new BasicNameValuePair("op", "ne"));
+				filters.add(new BasicNameValuePair("value", "published"));
+			}
 			// Lookup an existing APIs - If found the actualAPI is valid - desiredAPI is used to control what needs to be loaded
 			IAPI actualAPI = apimAdapter.getAPIManagerAPI(new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
 					.hasApiPath(desiredAPI.getPath())
 					.hasVHost(desiredAPI.getVhost())
 					.hasQueryStringVersion(desiredAPI.getApiRoutingKey())
+					.useFilter(filters)
 					.build().getAPI(true), desiredAPI);
 			// Based on the actual API - fulfill/complete some elements in the desired API
 			configAdapter.completeDesiredAPI(desiredAPI, actualAPI);

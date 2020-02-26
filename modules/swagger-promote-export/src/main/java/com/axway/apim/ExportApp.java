@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.actions.rest.APIMHttpClient;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.api.export.APIExportConfigAdapter;
+import com.axway.apim.api.export.lib.ExportCommandParameters;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
@@ -86,6 +87,10 @@ public class ExportApp {
 				option.setArgName("preprod");
 			options.addOption(option);
 			
+			option = new Option("df", "deleteFolder", true, "Controls if an existing local folder should be deleted. Defaults to false.");
+			option.setArgName("true");
+			options.addOption(option);
+			
 			Options internalOptions = new Options();
 			option = new  Option("h", "help", false, "Print the help");
 			option.setRequired(false);
@@ -127,7 +132,7 @@ public class ExportApp {
 			APIMHttpClient.deleteInstance();
 			Transaction.deleteInstance();
 			
-			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
+			ExportCommandParameters params = new ExportCommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
 			
 			APIExportConfigAdapter exportAdapter = new APIExportConfigAdapter(params.getValue("api-path"), params.getValue("localFolder"), params.getValue("vhost"));
 			exportAdapter.exportAPIs();

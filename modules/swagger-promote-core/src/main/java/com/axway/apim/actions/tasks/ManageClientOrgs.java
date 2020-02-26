@@ -43,7 +43,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 			return;
 		}
 		if(desiredState.getState().equals(IAPI.STATE_UNPUBLISHED)) return;
-		// The API isn't Re-Created and there are no orgs configured - We can skip the rest
+		// The API isn't Re-Created (to take over manually created ClientOrgs) and there are no orgs configured - We can skip the rest
 		if(desiredState.getClientOrganizations()==null && !reCreation) return;
 		// From here, the assumption is that existing Org-Access has been upgraded already - We only have to take care about additional orgs
 		if(((DesiredAPI)desiredState).isRequestForAllOrgs()) {
@@ -54,7 +54,9 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 			List<String> removingActualOrgs = getMissingOrgs(actualState.getClientOrganizations(), desiredState.getClientOrganizations());
 			if(removingActualOrgs.remove( ((AbstractAPI)desiredState).getOrganization())); // Don't try to remove the Owning-Organization
 			if(missingDesiredOrgs.size()==0) {
-				LOG.info("All desired organizations: "+desiredState.getClientOrganizations()+" have already access. Nothing to do.");
+				if(desiredState.getClientOrganizations()!=null) {
+					LOG.info("All desired organizations: "+desiredState.getClientOrganizations()+" have already access. Nothing to do.");
+				}
 			} else {
 				grantClientOrganization(missingDesiredOrgs, actualState.getId(), false);
 			}
@@ -137,9 +139,9 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		try {
 			if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_NO_CONTENT) {
 				if(context.get(MODE).equals(MODE_GRANT_ACCESS)) {
-					LOG.info("Granted permission to organization: '"+context.get("orgName")+"'");
+					LOG.debug("Granted permission to organization: '"+context.get("orgName")+"'");
 				} else {			
-					LOG.info("Removed permission from organization: '"+context.get("orgName")+"'");
+					LOG.debug("Removed permission from organization: '"+context.get("orgName")+"'");
 				}
 			} else {
 				LOG.error("Received status code: " + httpResponse.getStatusLine().getStatusCode());

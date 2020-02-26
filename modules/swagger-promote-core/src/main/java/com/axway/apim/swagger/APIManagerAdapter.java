@@ -5,9 +5,11 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -145,9 +147,16 @@ public class APIManagerAdapter {
 	 * @throws AppException is the desired state can't be replicated into the API-Manager.
 	 */
 	public void applyChanges(APIChangeState changeState) throws AppException {
+		CommandParameters commands = CommandParameters.getInstance();
 		if(!this.hasAdminAccount && isAdminAccountNeeded(changeState) ) {
-			error.setError("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER, false);
-			throw new AppException("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER);
+			if(commands.allowOrgAdminsToPublish()) {
+				LOG.debug("Desired API-State set to published using OrgAdmin account only. Going to create a publish request. "
+						+ "Set allowOrgAdminsToPublish to false to prevent orgAdmins from creating a publishing request.");
+			} else {
+				error.setError("OrgAdmin user only allowed to change/register unpublished APIs. "
+						+ "Set allowOrgAdminsToPublish to true (default) to allow orgAdmins to create a publishing request.", ErrorCode.NO_ADMIN_ROLE_USER, false);
+				throw new AppException("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER);
+			}
 		}
 		// No existing API found (means: No match for APIPath), creating a complete new
 		if(!changeState.getActualAPI().isValid()) {
@@ -180,11 +189,14 @@ public class APIManagerAdapter {
 				return;
 			} else { // We have changes, that require a re-creation of the API
 				LOG.info("Strategy: Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
-						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase()+" API. Recreating it!");
+						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase()+" API by recreating it!");
 				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
 				recreate.execute(changeState);
-				return;
 			}
+		}
+		if(!this.hasAdminAccount && isAdminAccountNeeded(changeState) && commands.allowOrgAdminsToPublish() ) {
+			LOG.info("Actual API has been created and is waiting for an approval by an administrator. "
+					+ "You may update the pending API as often as you want before it is finally published.");
 		}
 	}
 	
@@ -310,21 +322,38 @@ public class APIManagerAdapter {
 	 */
 	public static boolean hasAPIManagerVersion(String version) {
 		try {
-			List<Integer> managerVersion	= getMajorVersions(getApiManagerVersion());
-			List<Integer> requestedVersion	= getMajorVersions(version);
+			List<String> managerVersion	= getMajorVersions(getApiManagerVersion());
+			List<String> requestedVersion	= getMajorVersions(version);
+			Date datedManagerVersion = getDateVersion(managerVersion);
+			Date datedRequestedVersion = getDateVersion(requestedVersion);
 			int managerSP	= getServicePackVersion(getApiManagerVersion());
 			int requestedSP = getServicePackVersion(version);
 			for(int i=0;i<requestedVersion.size(); i++) {
-				int managerVer = managerVersion.get(i);
-				if(managerVer>requestedVersion.get(i)) return true;
-				if(managerVer<requestedVersion.get(i)) return false;
+				int managerVer = Integer.parseInt(managerVersion.get(i));
+				if(managerVer>Integer.parseInt(requestedVersion.get(i))) return true;
+				if(managerVer<Integer.parseInt(requestedVersion.get(i))) return false;
+				if(datedManagerVersion!=null && datedRequestedVersion!=null && datedManagerVersion.before(datedRequestedVersion)) return false;
 			}
+			if(requestedSP!=0 && datedManagerVersion!=null) return true;
 			if(managerSP<requestedSP) return false;
 		} catch(Exception e) {
 			LOG.warn("Can't parse API-Manager version: '"+apiManagerVersion+"'. Requested version was: '"+version+"'. Returning false!");
 			return false;
 		}
 		return true;
+	}
+	
+	private static Date getDateVersion(List<String> managerVersion) {
+		if(managerVersion.size()==3) {
+			try {
+				String dateVersion = managerVersion.get(2);
+				Date datedVersion=new SimpleDateFormat("yyyyMMdd").parse(dateVersion);				
+				return datedVersion;
+			} catch (Exception e) {
+				LOG.debug("API-Manager version: '"+apiManagerVersion+"' seems not to contain a dated version", e);
+			}
+		}
+		return null;
 	}
 	
 	private static int getServicePackVersion(String version) {
@@ -340,8 +369,8 @@ public class APIManagerAdapter {
 		return spNumber;
 	}
 	
-	private static List<Integer> getMajorVersions(String version) {
-		List<Integer> majorNumbers = new ArrayList<Integer>();
+	private static List<String> getMajorVersions(String version) {
+		List<String> majorNumbers = new ArrayList<String>();
 		String versionWithoutSP = version;
 		if(version.contains(" SP")) {
 			versionWithoutSP = version.substring(0, version.indexOf(" SP"));
@@ -349,7 +378,7 @@ public class APIManagerAdapter {
 		try {
 			String[] versions = versionWithoutSP.split("\\.");
 			for(int i = 0; i<versions.length; i++) {
-				majorNumbers.add(Integer.parseInt(versions[i]));
+				majorNumbers.add(versions[i]);
 			}
 		} catch (Exception e){
 			LOG.trace("Can't parse major version numbers in: '"+version+"'");
@@ -1187,10 +1216,17 @@ public class APIManagerAdapter {
 		}
 	}
 
+	/**
+	 * @return true, when admin credentials are provided
+	 * @throws AppException when the API-Manager instance is not initialized
+	 */
 	public static boolean hasAdminAccount() throws AppException {
 		return APIManagerAdapter.getInstance().hasAdminAccount;
 	}
 	
+	/**
+	 * @return true, if an OrgAdmin is the primary user (additional Admin-Credentials may have provided anyway)
+	 */
 	public boolean isUsingOrgAdmin() {
 		return usingOrgAdmin;
 	}
