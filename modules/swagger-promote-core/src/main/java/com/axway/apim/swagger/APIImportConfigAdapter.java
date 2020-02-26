@@ -42,12 +42,15 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -409,7 +412,7 @@ public class APIImportConfigAdapter {
 	 * Purpose of this method is to load the actual existing applications from API-Manager 
 	 * based on the provided criteria (App-Name, API-Key, OAuth-ClientId or Ext-ClientId). 
 	 * Or, if the APP doesn't exists remove it from the list and log a warning message.
-	 * Additionally, for each application it's check, that the organization has access 
+	 * Additionally, for each application it's checked, that the organization has access 
 	 * to this API, otherwise it will be removed from the list as well and a warning message is logged.
 	 * @param apiConfig
 	 * @throws AppException
@@ -741,13 +744,15 @@ public class APIImportConfigAdapter {
 		if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
 		List<SecurityProfile> profiles = importApi.getSecurityProfiles();
 		for(SecurityProfile profile : importApi.getSecurityProfiles()) {
-			if(profile.getIsDefault()) {
+			if(profile.getIsDefault() || profile.getName().equals("_default")) {
 				if(hasDefaultProfile) {
 					ErrorState.getInstance().setError("You can have only one _default SecurityProfile.", ErrorCode.CANT_READ_CONFIG_FILE, false);
 					throw new AppException("You can have only one _default SecurityProfile.", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
 				hasDefaultProfile=true;
-				profile.setName("_default"); // Overwrite the name if it is default! (this is required by the API-Manager)
+				// If the name is _default or flagged as default make it consistent!
+				profile.setName("_default");
+				profile.setIsDefault(true); 
 			}
 		}
 		if(profiles==null || profiles.size()==0 || !hasDefaultProfile) {
@@ -778,12 +783,13 @@ public class APIImportConfigAdapter {
 					throw new AppException("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
 				hasDefaultProfile=true;
-				profile.setName("_default"); // Overwrite the name if it is default! (this is required by the API-Manager)
+				// If the name is _default or flagged as default make it consistent!
+				profile.setName("_default");
 				profile.setIsDefault(true); 
 			}
 		}
 		if(!hasDefaultProfile) {
-			LOG.warn("THERE NO DEFAULT authenticationProfile CONFIGURED. Auto-Creating a No-Authentication outbound profile as default!");
+			LOG.warn("THERE IS NO DEFAULT authenticationProfile CONFIGURED. Auto-Creating a No-Authentication outbound profile as default!");
 			AuthenticationProfile noAuthNProfile = new AuthenticationProfile();
 			noAuthNProfile.setName("_default");
 			noAuthNProfile.setIsDefault(true);
@@ -923,9 +929,9 @@ public class APIImportConfigAdapter {
 					ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
 					throw e;
 				}
-				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
+				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage(), e);
 			} catch (Exception e) {
-				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
+				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage(), e);
 			} finally {
 				if(is!=null) is.close();
 			}
@@ -947,6 +953,7 @@ public class APIImportConfigAdapter {
 	}
 	
 	private void validateHasQueryStringKey(IAPI importApi) throws AppException {
+		if(1==1) return;
 		if(importApi instanceof DesiredTestOnlyAPI) return; // Do nothing when unit-testing
 		if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return; // QueryStringRouting isn't supported
 		if(APIManagerAdapter.getInstance().hasAdminAccount()) {
@@ -1003,6 +1010,9 @@ public class APIImportConfigAdapter {
 	}
 	
 	private SSLConnectionSocketFactory createSSLContext() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException {
+		SSLContextBuilder builder = new SSLContextBuilder();
+		builder.loadTrustMaterial(null, new TrustAllStrategy());
+		
 		String keyStorePath=System.getProperty("javax.net.ssl.keyStore","");
 		if (StringUtils.isNotEmpty(keyStorePath)) {
 			String keyStorePassword=System.getProperty("javax.net.ssl.keyStorePassword","");
@@ -1010,23 +1020,19 @@ public class APIImportConfigAdapter {
 				String keystoreType=System.getProperty("javax.net.ssl.keyStoreType",KeyStore.getDefaultType());
 				LOG.debug("Reading keystore from {}",keyStorePath);
 				KeyStore ks = KeyStore.getInstance(keystoreType);
-				ks.load(new FileInputStream(new File(keyStorePath)), keyStorePassword.toCharArray());
-				SSLContext sslcontext = SSLContexts.custom()
-	                .loadKeyMaterial(ks,keyStorePassword.toCharArray())
-	                .loadTrustMaterial(new TrustSelfSignedStrategy())
-	                .build();
-				String [] tlsProts = getAcceptedTLSProtocols();
-				SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-		                sslcontext,
-		                tlsProts,
-		                null,
-		                SSLConnectionSocketFactory.getDefaultHostnameVerifier());
-				return sslsf;
+				ks.load(new FileInputStream(new File(keyStorePath)), keyStorePassword.toCharArray());				
+				builder.loadKeyMaterial(ks,keyStorePassword.toCharArray());
 			}
 		} else {
-			LOG.debug("NO javax.net.ssl.keyStore property. Avoid to set SSLContextFactory ");
+			LOG.debug("NO javax.net.ssl.keyStore property.");
 		}
-		return null;
+		String [] tlsProts = getAcceptedTLSProtocols();
+		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+				builder.build(),
+                tlsProts,
+                null,
+                new NoopHostnameVerifier());
+		return sslsf;
 	}
 
 	private String[] getAcceptedTLSProtocols() {

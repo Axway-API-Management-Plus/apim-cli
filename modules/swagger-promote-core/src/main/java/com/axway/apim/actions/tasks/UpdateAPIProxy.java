@@ -91,7 +91,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		Field field = null;
 		if(changedProps!=null && changedProps.size()!=0) {
 			boolean propsChangedInProxy = false;
-			String logMessage = "Updating proxy for the following properties: ";
+			String logMessage = "Updating Frontend-API (Proxy) for the following properties: ";
 			for(String fieldName : changedProps) {
 				try {
 					field = desired.getClass().getSuperclass().getDeclaredField(fieldName);

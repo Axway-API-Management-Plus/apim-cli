@@ -39,6 +39,7 @@ public enum ErrorCode {
 	UNKNOWN_CUSTOM_POLICY				(85, "A custom policy-name is unknown (Request-, Routing, ...)"),
 	CANT_SETUP_VHOST					(87, "It wasn't possible to setup the V-Host for the FE-API"),
 	CANT_CREATE_HTTP_CLIENT				(88, "Cannot create HTTP client"),
+	APP_NAME_IS_NOT_UNIQUE				(89, "The given application name is not unique. More than one application has been found."),
 	UNXPECTED_ERROR						(99, "An unexpected error occured.");
 
 	private final int code;

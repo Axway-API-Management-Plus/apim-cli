@@ -2,7 +2,7 @@
 
 This project provides you with a tool that simplifies your DevOps experience with the Axway API-Manager Version 7.x. 
 
-The program works based on the API-Definition (as Swagger or a WSDL (__Beta - Not for production__)) + an API-Configuration-File and replicates this "state" into the API-Manager. Consider the API-Definition + API-Config as the "__desired__" state and API-Manager has the "__actual__" state. This program will compare both, the desired with the actual state, and performs all necessary actions to bring the API-Manager API into the desired state.
+The program works based on the API-Definition (as Swagger or a WSDL) + an API-Configuration-File and replicates this "state" into the API-Manager. Consider the API-Definition + API-Config as the "__desired__" state and API-Manager has the "__actual__" state. This program will compare both, the desired with the actual state, and performs all necessary actions to bring the API-Manager API into the desired state.
 
 Watch this video (28 min): https://youtu.be/2i8i1zMAMps to get an overview + demo.
 
@@ -38,7 +38,7 @@ Improving the API-Development experience during the API-Design phase leveraging 
 By using Swagger Promote to control your Axway API management infrastructure it becomes a key component of your CI/CD process. Product quality is therefore very important so that you can be confident that Swagger Promote is doing what it's supposed to do.  
 To achieve this quality bar, Swagger-Promote was developed from the beginning in a way that it can be tested fully automatically. The test process consists of different scenarios, which contain various __API-Desired__ states, which are transferred into __Actual__ state by Swagger-Promote and finally checked if the Actual State in the API-Manager is correct.  
 
-With the most recent released version 1.6.1 the automated End-2-End test suite contains of __87__ different scenarios, which includes __200__ executions of Swagger-Promote following each by a validation step. The test suite is executed at Travis CI for the following versions:  
+With the most recent released version 1.6.4 the automated End-2-End test suite contains of __94__ different scenarios, which includes more than __240__ executions of Swagger-Promote following each by a validation step. The test suite is executed at Travis CI for the following versions:  
 
 | Version       | Branch               | Status | 
 | :---          | :---                 | :---:  |
@@ -47,6 +47,8 @@ With the most recent released version 1.6.1 the automated End-2-End test suite c
 | 7.6.2 SP4     | develop  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
 | 7.7           | test-with-7.7        | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
 | 7.7 SP1       | test-with-7.7-SP1    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-SP1)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
+| 7.7 SP2       | test-with-7.7-SP2    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
+| 7.7 20200130  | test-with-7.7-20200130    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-20200130)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
 
 Also version 7.5.3 is supported, but not fully automated tested.  
 
@@ -93,12 +95,13 @@ Also version 7.5.3 is supported, but not fully automated tested.
   - Export existing APIs, Quota-Validation
 - 1.6.3 - 30.09.2019
   - Maintenance release with some minor bugfixes and improvements, Added support for 7.7 SP1 & 7.6.2 SP5
+- 1.6.4 - 03.12.2019
+  - Added fully support for V-Host and the API-Routing-Key. [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/2.-API-Configuration#how-the-actual-api-is-looked-upped)
 
 
 ## Limitations/Caveats
 - API-Method-Level description is not yet supported
 - Deep merge of stage-config files isn't supported
-- Support for WSDL is still Beta
 
 ## Contributing
 

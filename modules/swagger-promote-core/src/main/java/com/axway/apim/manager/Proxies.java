@@ -33,21 +33,15 @@ public class Proxies {
 	List<NameValuePair> filter;
 
 	JsonNode apiManagerResponse;
+	
+	CommandParameters params = CommandParameters.getInstance();
 
 	private Proxies() {
 
 	}
 
 	/**
-	 * Based on the given apiPath this method returns the JSON-Configuration for the API 
-	 * as it's stored in the API-Manager. The result is basically used to create the APIManagerAPI in 
-	 * method getAPIManagerAPI
-	 * @param apiPath path of the API, which can be considered as the key.
-	 * @param filter restrict the search by these filters
-	 * @param requestedType must be TYPE_FRONT_END or TYPE_FRONT_END
-	 * @param logMessage flag to control if the error message should be printed or not
-	 * @return the JSON-Configuration as it's returned from the API-Manager REST-API /proxies endpoint.
-	 * @throws AppException if the API can't be found or created
+	 * Returns a list of requested proxies (Front-End APIs).
 	 */
 	public void getProxies() throws AppException {
 		CommandParameters cmd = CommandParameters.getInstance();
@@ -120,7 +114,7 @@ public class Proxies {
 				String dbgCrit = "";
 				if(foundAPIs.size()>1) 
 					dbgCrit = " (apiPath: '"+requestedApiPath+"', filter: "+filter+", vhost: '"+requestedVhost+"', requestedType: "+requestedType+")";
-				LOG.info("Found: "+foundAPIs.size()+" API(s) exposed on requested path: '" + requestedApiPath + "'" + dbgCrit);
+				LOG.info("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
 				return foundAPIs;
 			}
 			LOG.info("No existing API found based on filter: " + getFilterFields());
