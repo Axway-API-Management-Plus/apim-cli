@@ -138,6 +138,11 @@ public class CommandParameters {
 		return Boolean.parseBoolean(getValue("ignoreAdminAccount"));
 	}
 	
+	public boolean allowOrgAdminsToPublish() {
+		if(getValue("allowOrgAdminsToPublish")==null) return true;
+		return Boolean.parseBoolean(getValue("allowOrgAdminsToPublish"));
+	}
+	
 	public String getDetailsExportFile() {
 		if(getValue("detailsExportFile")==null) return null;
 		return getValue("detailsExportFile");
@@ -165,7 +170,7 @@ public class CommandParameters {
 	}
 	
 	public String getValue(String key) {
-		if(this.internalCmd!=null && this.cmd.getOptionValue(key)!=null) {
+		if(this.cmd!=null && this.cmd.getOptionValue(key)!=null) {
 			return this.cmd.getOptionValue(key);
 		} else if(this.internalCmd!=null && this.internalCmd.getOptionValue(key)!=null) {
 			return this.internalCmd.getOptionValue(key);

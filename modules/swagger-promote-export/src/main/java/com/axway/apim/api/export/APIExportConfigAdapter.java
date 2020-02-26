@@ -12,12 +12,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
+import com.axway.apim.api.export.lib.ExportCommandParameters;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
@@ -50,23 +52,30 @@ public class APIExportConfigAdapter {
 	private String exportVhost = null;
 
 	/** Where to store the exported API-Definition */
-	private String localFolder = null;
+	private String givenExportFolder = null;
 
 	APIManagerAdapter apiManager;
+	
+	ExportCommandParameters params;
 
-	public APIExportConfigAdapter(String exportApiPath, String localFolder, String exportVhost) throws AppException {
+	public APIExportConfigAdapter(String exportApiPath, String givenExportFolder, String exportVhost) throws AppException {
 		super();
 		this.exportApiPath = exportApiPath;
 		this.exportVhost = (exportVhost!=null && !exportVhost.equals("NOT_SET")) ? exportVhost : null;
-		this.localFolder = (localFolder==null) ? "." : localFolder;
-		LOG.debug("Constructed ExportConfigAdapter: [exportApiPath: '"+exportApiPath+"', localFolder: '"+localFolder+"', exportVhost: '"+exportVhost+"']");
+		this.givenExportFolder = (givenExportFolder==null) ? "." : givenExportFolder;
+		LOG.debug("Constructed ExportConfigAdapter: [exportApiPath: '"+exportApiPath+"', givenExportFolder: '"+givenExportFolder+"', exportVhost: '"+exportVhost+"']");
 		apiManager = APIManagerAdapter.getInstance();
+		params = (ExportCommandParameters)ExportCommandParameters.getInstance();
 	}
 
 	public void exportAPIs() throws AppException {
 		List<ExportAPI> exportAPIs = getAPIsToExport();
 		for (ExportAPI exportAPI : exportAPIs) {
-			saveAPILocally(exportAPI);
+			try {
+				saveAPILocally(exportAPI);
+			} catch (AppException e) {
+				LOG.error("Can't export API: " + e.getMessage() + " Please check in API-Manager UI the API is valid.", e);
+			}
 		}
 	}
 
@@ -97,7 +106,8 @@ public class APIExportConfigAdapter {
 			}
 		} else { // Get all APIs and filter them out manually
 			Pattern pattern = Pattern.compile(exportApiPath.replace("*", ".*"));
-			List<JsonNode> foundAPIs = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END).hasVHost(exportVhost).build().getAPIs(false);	
+			List<JsonNode> foundAPIs = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END).hasVHost(exportVhost).build().getAPIs(false);
+			if(foundAPIs.size()>20) LOG.info("Loading actual API state from API-Manager. This may take a while. Please wait.\n");
 			for(JsonNode mgrAPI : foundAPIs) {
 				String apiPath = mgrAPI.get("path").asText();
 				Matcher matcher = pattern.matcher(apiPath);
@@ -120,15 +130,24 @@ public class APIExportConfigAdapter {
 
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {
 		String apiPath = getAPIExportFolder(exportAPI.getPath());
-		File localFolder = new File(this.localFolder +File.separator+ getVHost(exportAPI) + apiPath);
+		File localFolder = new File(this.givenExportFolder +File.separator+ getVHost(exportAPI) + apiPath);
+		LOG.info("Going to export API into folder: " + localFolder);
 		if(localFolder.exists()) {
-			ErrorState.getInstance().setError("Local export folder: " + localFolder + " already exists.", ErrorCode.EXPORT_FOLDER_EXISTS, false);
-			throw new AppException("Local export folder: " + localFolder + " already exists.", ErrorCode.EXPORT_FOLDER_EXISTS);
+			if(params.deleteLocalFolder()) {
+				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
+				try {
+					FileUtils.deleteDirectory(localFolder);
+				} catch (IOException e) {
+					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
+				}				
+			} else {
+				LOG.warn("Local export folder: " + localFolder + " already exists. API will not be exported. (You may set -df true)");
+				return;
+			}
 		}
 		if (!localFolder.mkdirs()) {
 			throw new AppException("Cant create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
-		LOG.info("Going to export API into folder: " + localFolder);
 		APIDefintion apiDef = exportAPI.getAPIDefinition();
 		String targetFile = null;
 		try {
@@ -154,7 +173,7 @@ public class APIExportConfigAdapter {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/api-config.json"), exportAPI);
 		} catch (Exception e) {
-			throw new AppException("Can't write API-Configuration file.", ErrorCode.UNXPECTED_ERROR, e);
+			throw new AppException("Can't write API-Configuration file for API: '"+exportAPI.getName()+"' exposed on path: '"+exportAPI.getPath()+"'.", ErrorCode.UNXPECTED_ERROR, e);
 		}
 		APIImage image = exportAPI.getAPIImage();
 		if(image!=null) {

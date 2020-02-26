@@ -237,7 +237,18 @@ public class OutboundProfile {
 		return parameters;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setParameters(List<Object> parameters) {
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+			// We need to inject the format as default
+			for(Object params : parameters) {
+				if(params instanceof Map<?, ?>) {
+					if(!((Map<?, ?>)params).containsKey("format")) {
+						((Map<String, ?>) params).put("format", null);
+					}
+				}
+			}
+		}
 		this.parameters = parameters;
 	}
 

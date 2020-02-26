@@ -24,7 +24,7 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException, InterruptedException {
 		swaggerImport = new ImportTestAction();
 		description("If the Quota-Mode is set to replace, evtl. existing quotas should be replaced.");
 		
@@ -89,6 +89,9 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 		swaggerImport.doExecute(context);
 		
 		echo("####### Check Application-Quotas have been setup as configured #######");
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+			Thread.sleep(200); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+		}
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
