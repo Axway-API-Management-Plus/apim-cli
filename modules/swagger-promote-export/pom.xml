@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
 		<artifactId>axway-swagger-promote</artifactId>
-		<version>1.6.5</version>
+		<version>1.6.6-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
@@ -23,7 +23,7 @@
 		<dependency>
       <groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
       <artifactId>axway-swagger-promote-core</artifactId>
-      <version>1.6.5</version>
+      <version>1.6.6-SNAPSHOT</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
