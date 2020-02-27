@@ -97,6 +97,8 @@ Also version 7.5.3 is supported, but not fully automated tested.
   - Maintenance release with some minor bugfixes and improvements, Added support for 7.7 SP1 & 7.6.2 SP5
 - 1.6.4 - 03.12.2019
   - Added fully support for V-Host and the API-Routing-Key. [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/2.-API-Configuration#how-the-actual-api-is-looked-upped)
+- 1.6.5 - 27.02.2020
+  - Added support for release 7.7-20200103, Improved Org-Admin support [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/6.-OrgAdmin-support) and a number of bugfix
 
 
 ## Limitations/Caveats
