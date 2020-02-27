@@ -12,12 +12,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
+import com.axway.apim.api.export.lib.ExportCommandParameters;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
@@ -53,6 +55,8 @@ public class APIExportConfigAdapter {
 	private String givenExportFolder = null;
 
 	APIManagerAdapter apiManager;
+	
+	ExportCommandParameters params;
 
 	public APIExportConfigAdapter(String exportApiPath, String givenExportFolder, String exportVhost) throws AppException {
 		super();
@@ -61,6 +65,7 @@ public class APIExportConfigAdapter {
 		this.givenExportFolder = (givenExportFolder==null) ? "." : givenExportFolder;
 		LOG.debug("Constructed ExportConfigAdapter: [exportApiPath: '"+exportApiPath+"', givenExportFolder: '"+givenExportFolder+"', exportVhost: '"+exportVhost+"']");
 		apiManager = APIManagerAdapter.getInstance();
+		params = (ExportCommandParameters)ExportCommandParameters.getInstance();
 	}
 
 	public void exportAPIs() throws AppException {
@@ -128,8 +133,17 @@ public class APIExportConfigAdapter {
 		File localFolder = new File(this.givenExportFolder +File.separator+ getVHost(exportAPI) + apiPath);
 		LOG.info("Going to export API into folder: " + localFolder);
 		if(localFolder.exists()) {
-			LOG.warn("Local export folder: " + localFolder + " already exists. API will not be exported.");
-			return;
+			if(params.deleteLocalFolder()) {
+				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
+				try {
+					FileUtils.deleteDirectory(localFolder);
+				} catch (IOException e) {
+					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
+				}				
+			} else {
+				LOG.warn("Local export folder: " + localFolder + " already exists. API will not be exported. (You may set -df true)");
+				return;
+			}
 		}
 		if (!localFolder.mkdirs()) {
 			throw new AppException("Cant create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);

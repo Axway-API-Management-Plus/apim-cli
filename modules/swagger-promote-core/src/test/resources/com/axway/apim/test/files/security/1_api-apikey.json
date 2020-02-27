@@ -8,7 +8,6 @@
     "securityProfiles": [
      	{
      		"name": "_default",
-     		"isDefault": true,
      		"devices": [
      			{
      				"name": "API Key",

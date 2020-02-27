@@ -24,7 +24,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException, InterruptedException {
 		swaggerImport = new ImportTestAction();
 		
 		description("Swagger-Promote Quota should only overwrite configured Quota-Information and leave manual Quota unchanged!");
@@ -97,6 +97,9 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		swaggerImport.doExecute(context);
 		
 		echo("####### Validate all APPLICATION quotas (manually configured & API-Config) do exists #######");
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+			Thread.sleep(200); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+		}
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].type", "throttlemb")
