@@ -72,6 +72,20 @@ public class ManagerVersionCheckTest {
 		Assert.assertFalse(APIManagerAdapter.hasAPIManagerVersion("7.5.3 SP10"));
 		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.5.3 SP9"));
 		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.5.3 SP8"));
+		
+		setAPIManagerVersion("7.5.3 SP12");
+		Assert.assertFalse(APIManagerAdapter.hasAPIManagerVersion("7.7"));
+		Assert.assertFalse(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1"));
+		Assert.assertFalse(APIManagerAdapter.hasAPIManagerVersion("7.8"));
+		Assert.assertFalse(APIManagerAdapter.hasAPIManagerVersion("7.8"));
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.5.3"));
+		Assert.assertFalse(APIManagerAdapter.hasAPIManagerVersion("7.6.2"));
+		Assert.assertFalse(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP2"));
+		Assert.assertFalse(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP3"));
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.5.3 SP10"));
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.5.3 SP9"));
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.5.3 SP8"));
+		Assert.assertTrue(APIManagerAdapter.hasAPIManagerVersion("7.5.3 SP12"));
 	}
 	
 	@Test
