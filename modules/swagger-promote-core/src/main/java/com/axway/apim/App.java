@@ -122,7 +122,12 @@ public class App {
 			options.addOption(option);
 			
 			option = new Option("f", "force", true, "Breaking changes can't be imported without this flag, unless the API is unpublished.");
-				option.setArgName("true/[false]");
+			option.setArgName("true/[false]");
+			options.addOption(option);
+			
+			option = new Option("confDir", true, "The absolite path to the conf directory containing your stage environment properties.");
+			option.setRequired(false);
+			option.setArgName("/home/chris/swagger-promote/conf");
 			options.addOption(option);
 			
 			option = new Option("iq", "ignoreQuotas", true, "Use this flag to ignore configured API quotas.");
@@ -196,7 +201,7 @@ public class App {
 			Transaction.deleteInstance();
 			RollbackHandler.deleteInstance();
 			
-			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
+			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage"), cmd.getOptionValue("confDir")));
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			

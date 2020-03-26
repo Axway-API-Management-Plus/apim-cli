@@ -158,6 +158,11 @@ public class CommandParameters {
 		return Boolean.parseBoolean(getValue("rollback"));
 	}
 	
+	public String getConfDir() {
+		if(getValue("confDir")==null) return null;
+		return getValue("confDir");
+	}
+	
 	public void validateRequiredParameters() throws AppException {
 		ErrorState errors  = ErrorState.getInstance();
 		if(getValue("username")==null && getValue("admin_username")==null) errors.setError("Required parameter: 'username' or 'admin_username' is missing.", ErrorCode.MISSING_PARAMETER, false);
