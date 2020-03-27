@@ -43,10 +43,14 @@ public class CommandParameters {
 	}
 	
 	public CommandParameters (CommandLine cmd, CommandLine internalCmd, EnvironmentProperties environment) throws AppException {
+		this(cmd, internalCmd, environment, true);
+	}
+	
+	public CommandParameters (CommandLine cmd, CommandLine internalCmd, EnvironmentProperties environment, boolean validateParams) throws AppException {
 		this.cmd = cmd;
 		this.internalCmd = internalCmd;
 		this.envProperties = environment;
-		validateRequiredParameters();
+		if(validateParams) validateRequiredParameters();
 		CommandParameters.instance = this;
 	}
 	
