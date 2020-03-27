@@ -14,6 +14,8 @@ public class CommandParameters {
 	public static String MODE_IGNORE	= "ignore";
 	public static String MODE_ADD		= "add";
 	
+	public static String SWAGGER_PROMOTE_HOME = "SWAGGER_PROMOTE_HOME";
+	
 	private static CommandParameters instance;
 	
 	int port = 8075;

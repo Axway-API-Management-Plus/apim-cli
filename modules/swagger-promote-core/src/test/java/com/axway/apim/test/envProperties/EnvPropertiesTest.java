@@ -23,7 +23,7 @@ public class EnvPropertiesTest {
 	}
 
 	@Test
-	public void testAnyOtherStage() throws AppException, IOException {
+	public void testStage() throws AppException, IOException {
 		EnvironmentProperties properties = new EnvironmentProperties("anyOtherStage");
 
 		Assert.assertEquals(properties.containsKey("thisKeyExists"), true);
@@ -33,34 +33,34 @@ public class EnvPropertiesTest {
 	}
 	
 	@Test
-	public void testNoStageFromConfFolder() throws AppException, IOException, URISyntaxException {
+	public void testNoStageFromConfDir() throws AppException, IOException, URISyntaxException {
 		// A given path should be used to load the Environent-Config file from
 		String path = EnvPropertiesTest.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-		path += "/envProperties";
-		 
+		path += "envPropertiesTest/swaggerPromoteHome";
+
 		EnvironmentProperties properties = new EnvironmentProperties(null, path);
 
 		Assert.assertEquals(properties.containsKey("thisKeyExists"), true);
-		Assert.assertEquals(properties.get("thisKeyExists"), "BasicConfigFromPath");
+		Assert.assertEquals(properties.get("thisKeyExists"), "keyFromSwaggerPromoteHome");
 		
 		
-		Assert.assertEquals(properties.get("admin_username"), "basicUserFromPathProperty");
-		Assert.assertEquals(properties.get("admin_password"), "basicPasswordFromPathProperty");
+		Assert.assertEquals(properties.get("admin_username"), "userFromSwaggerPromoteHome");
+		Assert.assertEquals(properties.get("admin_password"), "passwordFromSwaggerPromoteHome");
 	}
 
 	@Test
-	public void testAnyOtherStageFromConfFolder() throws AppException, IOException, URISyntaxException {
+	public void testStageFromConfDir() throws AppException, IOException, URISyntaxException {
 		// A given path should be used to load the Environent-Config file from
 		String path = EnvPropertiesTest.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-		path += "/envProperties";
-		 
-		EnvironmentProperties properties = new EnvironmentProperties("fromPath", path);
+		path += "envPropertiesTest/swaggerPromoteHome";
+
+		EnvironmentProperties properties = new EnvironmentProperties("fromSwaggerPromoteHome", path);
 
 		Assert.assertEquals(properties.containsKey("thisKeyExists"), true);
-		Assert.assertEquals(properties.get("thisKeyExists"), "ThisIsComingFromAPath");
+		Assert.assertEquals(properties.get("thisKeyExists"), "stageKeyFromSwaggerPromoteHome");
 		
 		
-		Assert.assertEquals(properties.get("admin_username"), "userFromPathProperty");
-		Assert.assertEquals(properties.get("admin_password"), "passwordFromPathProperty");
+		Assert.assertEquals(properties.get("admin_username"), "stageUserFromSwaggerPromoteHome");
+		Assert.assertEquals(properties.get("admin_password"), "stageUasswordFromSwaggerPromoteHome");
 	}
 }
