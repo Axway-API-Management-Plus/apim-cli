@@ -99,6 +99,11 @@ Also version 7.5.3 is supported, but not fully automated tested.
   - Added fully support for V-Host and the API-Routing-Key. [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/2.-API-Configuration#how-the-actual-api-is-looked-upped)
 - 1.6.5 - 27.02.2020
   - Added support for release 7.7-20200103, Improved Org-Admin support [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/6.-OrgAdmin-support) and a number of bugfixes
+- 1.6.6 - 31.03.2020 [All changes](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/milestone/4?closed=1)
+  - Optimized Swagger-Promote for Jenkins-Integration:
+    - Added new environment variable: SWAGGER_PROMOTE_HOME [#249](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/issues/248)
+    - Load Stage-API-Config from subfolder [#248](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/issues/249)
+  - [Jenkins-Integration-with-GitHub-&-Bitbucket](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/9.-Jenkins-Integration-with-GitHub-&-Bitbucket)
 
 
 ## Limitations/Caveats
