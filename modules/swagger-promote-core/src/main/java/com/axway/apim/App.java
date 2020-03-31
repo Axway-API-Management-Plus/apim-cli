@@ -122,7 +122,13 @@ public class App {
 			options.addOption(option);
 			
 			option = new Option("f", "force", true, "Breaking changes can't be imported without this flag, unless the API is unpublished.");
-				option.setArgName("true/[false]");
+			option.setArgName("true/[false]");
+			options.addOption(option);
+			
+			option = new Option("swaggerPromoteHome", true, "The absolute path to the Swagger-Promote home directory containing for instance your conf folder.\n"
+					+ "You may also set the environment variable: '"+CommandParameters.SWAGGER_PROMOTE_HOME+"'");
+			option.setRequired(false);
+			option.setArgName("/home/chris/swagger-promote");
 			options.addOption(option);
 			
 			option = new Option("iq", "ignoreQuotas", true, "Use this flag to ignore configured API quotas.");
@@ -196,7 +202,7 @@ public class App {
 			Transaction.deleteInstance();
 			RollbackHandler.deleteInstance();
 			
-			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
+			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage"), cmd.getOptionValue("swaggerPromoteHome")));
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			

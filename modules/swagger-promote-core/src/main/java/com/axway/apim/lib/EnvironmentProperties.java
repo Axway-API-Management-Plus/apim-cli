@@ -1,5 +1,7 @@
 package com.axway.apim.lib;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
@@ -14,30 +16,61 @@ public class EnvironmentProperties implements Map<String, String> {
 	
 	private static Logger LOG = LoggerFactory.getLogger(EnvironmentProperties.class);
 	
+	private String stage;
+	private String swaggerPromoteHome;
+	
 	private Properties mainProperties = new Properties();
 	private Properties stageProperties = new Properties();
 	private Properties systemProperties = System.getProperties();
 
 	public EnvironmentProperties(String stage) throws AppException {
-		super();
-		initProperties(stage);
+		this(stage, null);
 	}
 	
-	private void initProperties(String stage) throws AppException {
-		try {
-			mainProperties.load(APIMHttpClient.class.getClassLoader().getResourceAsStream("env.properties"));
-			LOG.info("Loaded environment properties from file: env.properties.");
-		} catch (Exception e) {
-			LOG.info("Trying to load environment properties from file: env.properties ... not found.");
+	public EnvironmentProperties(String stage, String swaggerPromoteHome) throws AppException {
+		super();
+		this.stage = stage;
+		this.swaggerPromoteHome = swaggerPromoteHome;
+		if(swaggerPromoteHome==null) {
+			// Try to use SWAGGER_PROMOTE_HOME if not given by a parameter
+			this.swaggerPromoteHome = System.getenv(CommandParameters.SWAGGER_PROMOTE_HOME);
 		}
+		if(this.swaggerPromoteHome!=null) this.swaggerPromoteHome += "/conf";
+		initProperties();
+	}
+	
+	private void initProperties() throws AppException {
+		mainProperties = loadProperties(null);
+
+		if(stage!=null && !stage.equals("NOT_SET")) {
+			stageProperties = loadProperties(stage);
+		}
+	}
+	
+	private Properties loadProperties(String stage) {
+		/*
+		 * We load properties in the following order:
+		 * SwaggerPromote Home is used
+		 * if ConfDir is not set
+		 * if ConfDir is not set, the Classpath is used
+		 */
+		String pathToUse = null;
+		InputStream is;
+		Properties props = new Properties();
 		try {
-			if(stage!=null && !stage.equals("NOT_SET")) {
-				stageProperties.load(APIMHttpClient.class.getClassLoader().getResourceAsStream("env."+stage+".properties"));
-				LOG.info("Loaded environment properties from file: env."+stage+".properties.");
+			if(swaggerPromoteHome!=null) {
+				pathToUse = (stage==null) ? swaggerPromoteHome + "/env.properties" : swaggerPromoteHome + "/env."+stage+".properties";
+				is = new FileInputStream(pathToUse);
+			} else {
+				pathToUse = (stage==null) ? "env.properties" : "env."+stage+".properties";
+				is = APIMHttpClient.class.getClassLoader().getResourceAsStream(pathToUse);
 			}
+			props.load(is);
+			LOG.info("Loaded environment properties from file: " + pathToUse);
 		} catch (Exception e) {
-			LOG.info("Trying to load environment properties from file: env."+stage+".properties ... not found.");
+			LOG.info("Trying to load environment properties from file: "+pathToUse+" ... not found.");
 		}
+		return props;
 	}
 	
 	@Override

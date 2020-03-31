@@ -39,7 +39,7 @@ GOTO :END
 
 CD %currentDir%
 
-%_java% -Xms64m -Xmx256m -classpath "%CLASSPATH%" com.axway.apim.ExportApp %*
+%_java% -Xms64m -Xmx256m -Dlog4j.configuration=../lib/log4j.xml -classpath "%CLASSPATH%" com.axway.apim.ExportApp %*
 SET ERRNO=%ERRORLEVEL%
 
 :END
