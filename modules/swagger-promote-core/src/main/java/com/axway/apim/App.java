@@ -22,6 +22,7 @@ import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorCodeMapper;
 import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.RelaxedParser;
@@ -52,6 +53,7 @@ public class App {
 	}
 		
 	public static int run(String args[]) {
+		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 		try {
 			CommandLineParser parser = new RelaxedParser();
 			CommandLine cmd = null;
@@ -173,6 +175,11 @@ public class App {
 			option.setArgName("true");
 			internalOptions.addOption(option);
 			
+			option = new Option("returnCodeMapping", true, "Optionally maps given return codes into a desired return code. Format: 10:0, 12:0");
+			option.setRequired(false);
+			option.setArgName("true");
+			internalOptions.addOption(option);
+			
 			System.out.println("------------------------------------------------------------------------");
 			System.out.println("API-Manager Promote: "+App.class.getPackage().getImplementationVersion() + " - I M P O R T");
 			System.out.println("                                                                        ");
@@ -203,6 +210,7 @@ public class App {
 			RollbackHandler.deleteInstance();
 			
 			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage"), cmd.getOptionValue("swaggerPromoteHome")));
+			errorCodeMapper.setMapConfiguration(params.getValue("returnCodeMapping"));
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			
@@ -243,10 +251,10 @@ public class App {
 			if(errorState.hasError()) {
 				errorState.logErrorMessages(LOG);
 				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorState.getErrorCode().getCode();
+				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
 			} else {
 				LOG.error(ap.getMessage(), ap);
-				return ap.getErrorCode().getCode();
+				return errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode();
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
