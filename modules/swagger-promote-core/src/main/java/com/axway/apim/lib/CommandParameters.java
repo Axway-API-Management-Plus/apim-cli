@@ -14,6 +14,8 @@ public class CommandParameters {
 	public static String MODE_IGNORE	= "ignore";
 	public static String MODE_ADD		= "add";
 	
+	public static String SWAGGER_PROMOTE_HOME = "SWAGGER_PROMOTE_HOME";
+	
 	private static CommandParameters instance;
 	
 	int port = 8075;
@@ -41,10 +43,14 @@ public class CommandParameters {
 	}
 	
 	public CommandParameters (CommandLine cmd, CommandLine internalCmd, EnvironmentProperties environment) throws AppException {
+		this(cmd, internalCmd, environment, true);
+	}
+	
+	public CommandParameters (CommandLine cmd, CommandLine internalCmd, EnvironmentProperties environment, boolean validateParams) throws AppException {
 		this.cmd = cmd;
 		this.internalCmd = internalCmd;
 		this.envProperties = environment;
-		validateRequiredParameters();
+		if(validateParams) validateRequiredParameters();
 		CommandParameters.instance = this;
 	}
 	
@@ -156,6 +162,11 @@ public class CommandParameters {
 	public boolean rollback() {
 		if(getValue("rollback")==null) return true;
 		return Boolean.parseBoolean(getValue("rollback"));
+	}
+	
+	public String getConfDir() {
+		if(getValue("confDir")==null) return null;
+		return getValue("confDir");
 	}
 	
 	public void validateRequiredParameters() throws AppException {
