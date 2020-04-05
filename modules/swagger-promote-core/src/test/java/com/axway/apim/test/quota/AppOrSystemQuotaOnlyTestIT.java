@@ -76,7 +76,7 @@ public class AppOrSystemQuotaOnlyTestIT extends TestNGCitrusTestDesigner {
 		action(swaggerImport);
 		
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
-			Thread.sleep(200); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+			Thread.sleep(300); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
 		}
 		echo("####### Check Application-Quotas have been setup as configured #######");
 		http().client("apiManager")

@@ -44,7 +44,8 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 			if(lastJsonReponse==null) { // This class is called as the first, so, first load the API
 				lastJsonReponse = initActualAPIContext(this.actualState);
 			}
-			handledChangedProps(lastJsonReponse, this.desiredState, this.actualState, changedProps);
+			lastJsonReponse = handledChangedProps(lastJsonReponse, this.desiredState, this.actualState, changedProps);
+			if(lastJsonReponse == null) return; // No changes required for the API-Proxy
 		
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+context.get("virtualAPIId")).build();
 			entity = new StringEntity(objectMapper.writeValueAsString(lastJsonReponse), StandardCharsets.UTF_8);
@@ -127,8 +128,12 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 					throw new AppException("Can't handle property: "+field+" to update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
 				}
 			}
-			if(propsChangedInProxy)
+			if(propsChangedInProxy) {
 				LOG.info(logMessage);
+			} else {
+				LOG.debug("API-Proxy requires no updates");
+				return null;
+			}
 		}
 		return lastJsonReponse;
 	}

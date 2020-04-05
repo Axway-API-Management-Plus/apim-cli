@@ -713,8 +713,11 @@ public class APIImportConfigAdapter {
 		}
 		if(!stage.equals("NOT_SET")) {
 			stageFile = new File(apiConfig.substring(0, apiConfig.lastIndexOf(".")+1) + stage + apiConfig.substring(apiConfig.lastIndexOf(".")));
+			File subDirStageFile = new File(stageFile.getParentFile()+"/"+stage+"/"+stageFile.getName());
 			if(stageFile.exists()) {
 				return stageFile.getAbsolutePath();
+			} else if(subDirStageFile.exists()) {
+				return subDirStageFile.getAbsolutePath();
 			} else {
 				return null;
 			}
