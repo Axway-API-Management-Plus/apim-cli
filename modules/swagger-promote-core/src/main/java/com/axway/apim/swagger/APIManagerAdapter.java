@@ -350,7 +350,7 @@ public class APIManagerAdapter {
 				Date datedVersion=new SimpleDateFormat("yyyyMMdd").parse(dateVersion);				
 				return datedVersion;
 			} catch (Exception e) {
-				LOG.debug("API-Manager version: '"+apiManagerVersion+"' seems not to contain a dated version", e);
+				LOG.trace("API-Manager version: '"+apiManagerVersion+"' seems not to contain a dated version");
 			}
 		}
 		return null;

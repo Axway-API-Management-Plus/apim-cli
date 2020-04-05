@@ -8,10 +8,6 @@
 ## and https://chocolatey.org/docs/helpers-uninstall-chocolatey-package
 
 $ErrorActionPreference = 'Stop'; # stop on all errors
-$packageArgs = @{
-  packageName   = $env:ChocolateyPackageName
-  softwareName  = 'axway-swagger-promote'
-}
 
 $uninstalled = $false
 
