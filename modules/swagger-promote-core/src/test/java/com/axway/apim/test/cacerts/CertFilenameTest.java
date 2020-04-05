@@ -16,4 +16,16 @@ public class CertFilenameTest {
 		
 		Assert.assertEquals(certFilename, "srvgdywbjob02.nov.com.crt");
 	}
+
+	@Test
+	public void testAliasUnknown() {
+		String alias = "UNKNOWN";
+		CaCert cert = new CaCert();
+		cert.setAlias(alias);
+
+		String certFilename = cert.getCertFile();
+
+		Assert.assertTrue(certFilename.startsWith("UnknownCertificate_"));
+	}
+
 }
