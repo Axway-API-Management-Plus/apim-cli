@@ -4,6 +4,7 @@ public enum ErrorCode {
 	
 	SUCCESS								(0,  "Replication of the API was successful."),
 	MISSING_PARAMETER					(5,  "There is a missing parameter."),
+	API_ALREADY_EXISTS					(7,  "The API definition already exists for another organization."),
 	NO_CHANGE							(10, "No change between desired and actual API has been detected."),
 	EXPORT_FOLDER_EXISTS				(12, "Export failed Export-Folder already exists."),
 	BREAKING_CHANGE_DETECTED			(15, "A breaking change detected, but no force flag was given."),

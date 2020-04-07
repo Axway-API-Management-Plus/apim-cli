@@ -164,6 +164,11 @@ public class CommandParameters {
 		return Boolean.parseBoolean(getValue("rollback"));
 	}
 	
+	public boolean changeOrganization() {
+		if(getValue("changeOrganization")==null) return false;
+		return Boolean.parseBoolean(getValue("changeOrganization"));
+	}
+	
 	public String getConfDir() {
 		if(getValue("confDir")==null) return null;
 		return getValue("confDir");
