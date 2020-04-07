@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.actions.CreateNewAPI;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.ErrorState;
 import com.axway.apim.swagger.api.state.IAPI;
 
 /**
@@ -70,6 +72,11 @@ public class APIChangeState {
 	private void getChanges() throws AppException {
 		if(!actualAPI.isValid()) {
 			return; //Nothing to do, as we don't have an existing API
+		}
+		if(!desiredAPI.getOrganizationId().equals(actualAPI.getOrganizationId()) && !CommandParameters.getInstance().changeOrganization()) {
+			LOG.debug("You may set the toggle: changeOrganization=true to allow to changing the organization of an existing API.");
+			ErrorState.getInstance().setError("The API you would like to register already exists for another organization.", ErrorCode.API_ALREADY_EXISTS, false);
+			throw new AppException("The API you would like to register already exists for another organization.", ErrorCode.API_ALREADY_EXISTS);
 		}
 		for (Field field : desiredAPI.getClass().getSuperclass().getDeclaredFields()) {
 			try {

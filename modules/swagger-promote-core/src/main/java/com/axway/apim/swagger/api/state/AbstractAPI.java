@@ -153,7 +153,7 @@ public abstract class AbstractAPI {
 	protected String name = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED}, 
+			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_DEPRECATED}, 
 			propHandler = APISummaryPropertyHandler.class)
 	protected String summary = null;
 

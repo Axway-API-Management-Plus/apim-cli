@@ -46,8 +46,10 @@ public class ChangeStateTest {
 		managerOrgs.add("orgA");
 
 		importAPI.setClientOrganizations(importOrgs);
+		importAPI.setOrganizationId("123");
 
 		managerAPI.setClientOrganizations(managerOrgs);
+		managerAPI.setOrganizationId("123");
 
 		APIChangeState changeState = new APIChangeState(managerAPI, importAPI);
 		Assert.assertEquals(changeState.hasAnyChanges(), false);
@@ -67,6 +69,7 @@ public class ChangeStateTest {
 
 	private static IAPI getTestAPI() throws AppException {
 		IAPI testAPI = new ActualAPI();
+		testAPI.setOrganizationId("123");
 		testAPI.setValid(true);
 		testAPI.setState(IAPI.STATE_PUBLISHED);
 		return testAPI;

@@ -180,6 +180,11 @@ public class App {
 			option.setArgName("true");
 			internalOptions.addOption(option);
 			
+			option = new Option("changeOrganization", true, "Set this flag to true to allow to change the organization of an existing API. Default is false.");
+			option.setRequired(false);
+			option.setArgName("true");
+			internalOptions.addOption(option);
+			
 			System.out.println("------------------------------------------------------------------------");
 			System.out.println("API-Manager Promote: "+App.class.getPackage().getImplementationVersion() + " - I M P O R T");
 			System.out.println("                                                                        ");
