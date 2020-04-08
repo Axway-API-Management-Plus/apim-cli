@@ -90,10 +90,7 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 		
 		echo("####### Check Application-Quotas have been setup as configured #######");
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
-			System.out.println("Sleep");
-			Thread.sleep(1000); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
-		} else {
-			System.out.println("Don't sleep");
+			Thread.sleep(300); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
 		}
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
 		
