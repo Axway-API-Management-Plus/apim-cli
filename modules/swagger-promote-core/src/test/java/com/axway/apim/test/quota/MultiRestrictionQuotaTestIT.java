@@ -66,7 +66,10 @@ public class MultiRestrictionQuotaTestIT extends TestNGCitrusTestRunner {
 		
 		echo("####### Check System-Quotas have been setup as configured #######");
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+			System.out.println("Sleep");
 			Thread.sleep(1000); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+		} else {
+			System.out.println("Don't sleep");
 		}
 		http(builder -> builder.client("apiManager").send().get("/quotas/00000000-0000-0000-0000-000000000000").header("Content-Type", "application/json"));
 		
