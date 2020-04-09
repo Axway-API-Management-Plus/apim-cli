@@ -18,6 +18,11 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.rest.APIMHttpClient;
 import com.axway.apim.actions.rest.Transaction;
+import com.axway.apim.adapter.APIImportConfigAdapter;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.Proxies;
+import com.axway.apim.api.state.APIChangeState;
+import com.axway.apim.api.state.IAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
@@ -27,11 +32,6 @@ import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.RelaxedParser;
 import com.axway.apim.lib.rollback.RollbackHandler;
-import com.axway.apim.manager.Proxies;
-import com.axway.apim.swagger.APIChangeState;
-import com.axway.apim.swagger.APIImportConfigAdapter;
-import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.state.IAPI;
 
 /**
  * This is the Entry-Point of program and responsible to:  

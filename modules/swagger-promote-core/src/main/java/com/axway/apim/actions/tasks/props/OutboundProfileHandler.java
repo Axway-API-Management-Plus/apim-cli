@@ -4,13 +4,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.properties.AuthenticationProfile;
+import com.axway.apim.api.properties.OutboundProfile;
+import com.axway.apim.api.state.IAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
-import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
-import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
-import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;

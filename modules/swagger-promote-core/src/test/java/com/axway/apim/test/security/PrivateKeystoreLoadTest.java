@@ -10,13 +10,13 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.axway.apim.adapter.APIImportConfigAdapter;
+import com.axway.apim.api.properties.AuthType;
+import com.axway.apim.api.properties.AuthenticationProfile;
+import com.axway.apim.api.state.DesiredTestOnlyAPI;
+import com.axway.apim.api.state.IAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.swagger.APIImportConfigAdapter;
-import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthType;
-import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
-import com.axway.apim.swagger.api.state.DesiredTestOnlyAPI;
-import com.axway.apim.swagger.api.state.IAPI;
 
 public class PrivateKeystoreLoadTest {
 	

@@ -10,11 +10,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.axway.apim.api.state.APIChangeState;
+import com.axway.apim.api.state.ActualAPI;
+import com.axway.apim.api.state.IAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.TestIndicator;
-import com.axway.apim.swagger.APIChangeState;
-import com.axway.apim.swagger.api.state.ActualAPI;
-import com.axway.apim.swagger.api.state.IAPI;
 
 public class ChangeStateTest {
 	

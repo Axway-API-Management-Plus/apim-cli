@@ -14,12 +14,12 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import com.axway.apim.api.properties.APIQuota;
+import com.axway.apim.api.properties.CorsProfile;
+import com.axway.apim.api.properties.OutboundProfile;
+import com.axway.apim.api.properties.SecurityProfile;
+import com.axway.apim.api.properties.TagMap;
 import com.axway.apim.export.test.ExportTestAction;
-import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
-import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
-import com.axway.apim.swagger.api.properties.quota.APIQuota;
-import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
-import com.axway.apim.swagger.api.properties.tags.TagMap;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;

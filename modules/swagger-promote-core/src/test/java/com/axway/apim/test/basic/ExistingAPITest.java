@@ -8,9 +8,9 @@ import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.Proxies;
 import com.axway.apim.lib.AppException;
-import com.axway.apim.manager.Proxies;
-import com.axway.apim.swagger.APIManagerAdapter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
