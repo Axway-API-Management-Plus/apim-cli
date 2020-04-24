@@ -4,12 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.state.APIBaseDefinition;
+import com.axway.apim.api.state.APIChangeState;
+import com.axway.apim.api.state.DesiredAPI;
+import com.axway.apim.api.state.IAPI;
 import com.axway.apim.lib.AppException;
-import com.axway.apim.swagger.APIChangeState;
-import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.state.APIBaseDefinition;
-import com.axway.apim.swagger.api.state.DesiredAPI;
-import com.axway.apim.swagger.api.state.IAPI;
 
 /**
  * This class is used by the {@link APIManagerAdapter#applyChanges(APIChangeState)} to re-create an API. 

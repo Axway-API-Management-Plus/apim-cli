@@ -16,15 +16,15 @@ import com.axway.apim.actions.rest.DELRequest;
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.properties.APIAccess;
+import com.axway.apim.api.state.AbstractAPI;
+import com.axway.apim.api.state.DesiredAPI;
+import com.axway.apim.api.state.IAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
-import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.properties.organization.ApiAccess;
-import com.axway.apim.swagger.api.state.AbstractAPI;
-import com.axway.apim.swagger.api.state.DesiredAPI;
-import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParser {
@@ -113,8 +113,8 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		for(String orgName : removingActualOrgs) {
 			String orgId = APIManagerAdapter.getInstance().getOrgId(orgName);
 			Transaction.getInstance().put("orgName", orgName);
-			List<ApiAccess> orgsApis = APIManagerAdapter.getOrgsApiAccess(orgId, false);
-			for(ApiAccess apiAccess : orgsApis) {
+			List<APIAccess> orgsApis = APIManagerAdapter.getOrgsApiAccess(orgId, false);
+			for(APIAccess apiAccess : orgsApis) {
 				if(apiAccess.getApiId().equals(apiId)) {
 					try {
 						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/"+orgId+"/apis/"+apiAccess.getId()).build();

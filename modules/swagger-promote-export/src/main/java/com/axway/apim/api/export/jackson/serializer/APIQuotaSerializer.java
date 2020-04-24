@@ -2,8 +2,8 @@ package com.axway.apim.api.export.jackson.serializer;
 
 import java.io.IOException;
 
-import com.axway.apim.swagger.api.properties.quota.APIQuota;
-import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
+import com.axway.apim.api.properties.APIQuota;
+import com.axway.apim.api.properties.QuotaRestriction;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;

@@ -13,10 +13,10 @@ import com.axway.apim.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.actions.tasks.UpdateAPIStatus;
 import com.axway.apim.actions.tasks.UpdateQuotaConfiguration;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.APIPropertiesExport;
-import com.axway.apim.swagger.APIChangeState;
-import com.axway.apim.swagger.APIManagerAdapter;
 
 /**
  * This class is used by the {@link APIManagerAdapter#applyChanges(APIChangeState)} to update an existing API. 

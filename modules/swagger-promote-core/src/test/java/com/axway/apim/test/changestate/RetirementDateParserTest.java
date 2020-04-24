@@ -6,8 +6,8 @@ import java.util.Date;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.axway.apim.api.state.DesiredAPI;
 import com.axway.apim.lib.AppException;
-import com.axway.apim.swagger.api.state.DesiredAPI;
 
 public class RetirementDateParserTest {
 	

@@ -18,13 +18,13 @@ import org.apache.http.util.EntityUtils;
 import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.PUTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.properties.ClientApplication;
+import com.axway.apim.api.properties.QuotaRestriction;
+import com.axway.apim.api.state.IAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;
 import com.axway.apim.lib.ErrorState;
-import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.properties.applications.ClientApplication;
-import com.axway.apim.swagger.api.properties.quota.QuotaRestriction;
-import com.axway.apim.swagger.api.state.IAPI;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
