@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.properties.CorsProfile;
-import com.axway.apim.api.properties.InboundProfile;
-import com.axway.apim.api.properties.SecurityProfile;
+import com.axway.apim.api.model.CorsProfile;
+import com.axway.apim.api.model.InboundProfile;
+import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.state.APIMethod;
 import com.axway.apim.api.state.AbstractAPI;
 import com.axway.apim.api.state.IAPI;

@@ -1,6 +1,6 @@
 package com.axway.apim.actions.tasks.props;
 
-import com.axway.apim.api.properties.AuthenticationProfile;
+import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.state.IAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;

@@ -17,7 +17,7 @@ import com.axway.apim.actions.rest.POSTRequest;
 import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.properties.APIAccess;
+import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.state.AbstractAPI;
 import com.axway.apim.api.state.DesiredAPI;
 import com.axway.apim.api.state.IAPI;

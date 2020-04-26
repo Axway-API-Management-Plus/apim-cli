@@ -1,4 +1,4 @@
-package com.axway.apim.api.properties;
+package com.axway.apim.api.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

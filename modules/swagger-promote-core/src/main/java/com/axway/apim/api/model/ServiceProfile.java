@@ -1,4 +1,4 @@
-package com.axway.apim.api.properties;
+package com.axway.apim.api.model;
 
 public class ServiceProfile {
 	String apiId;

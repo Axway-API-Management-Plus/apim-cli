@@ -3,18 +3,18 @@ package com.axway.apim.api.state;
 import java.util.List;
 import java.util.Map;
 
-import com.axway.apim.api.properties.APIDefintion;
-import com.axway.apim.api.properties.APIImage;
-import com.axway.apim.api.properties.APIQuota;
-import com.axway.apim.api.properties.AuthenticationProfile;
-import com.axway.apim.api.properties.CaCert;
-import com.axway.apim.api.properties.ClientApplication;
-import com.axway.apim.api.properties.CorsProfile;
-import com.axway.apim.api.properties.InboundProfile;
-import com.axway.apim.api.properties.OutboundProfile;
-import com.axway.apim.api.properties.SecurityProfile;
-import com.axway.apim.api.properties.ServiceProfile;
-import com.axway.apim.api.properties.TagMap;
+import com.axway.apim.api.model.APIDefintion;
+import com.axway.apim.api.model.APIImage;
+import com.axway.apim.api.model.APIQuota;
+import com.axway.apim.api.model.AuthenticationProfile;
+import com.axway.apim.api.model.CaCert;
+import com.axway.apim.api.model.ClientApplication;
+import com.axway.apim.api.model.CorsProfile;
+import com.axway.apim.api.model.InboundProfile;
+import com.axway.apim.api.model.OutboundProfile;
+import com.axway.apim.api.model.SecurityProfile;
+import com.axway.apim.api.model.ServiceProfile;
+import com.axway.apim.api.model.TagMap;
 import com.axway.apim.lib.AppException;
 
 public interface IAPI {

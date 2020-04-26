@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.properties.AuthenticationProfile;
-import com.axway.apim.api.properties.OutboundProfile;
+import com.axway.apim.api.model.AuthenticationProfile;
+import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.state.IAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;

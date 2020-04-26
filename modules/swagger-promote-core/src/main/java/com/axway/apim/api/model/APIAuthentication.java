@@ -1,4 +1,4 @@
-package com.axway.apim.api.properties;
+package com.axway.apim.api.model;
 
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.ErrorCode;

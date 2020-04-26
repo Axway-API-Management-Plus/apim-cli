@@ -9,7 +9,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.axway.apim.api.properties.APIDefintion;
+import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.api.state.DesiredAPI;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;

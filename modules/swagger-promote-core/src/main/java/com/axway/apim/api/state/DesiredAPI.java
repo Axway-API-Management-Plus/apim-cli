@@ -16,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIImportConfigAdapter;
-import com.axway.apim.api.properties.InboundProfile;
-import com.axway.apim.api.properties.OutboundProfile;
-import com.axway.apim.api.properties.ServiceProfile;
+import com.axway.apim.api.model.InboundProfile;
+import com.axway.apim.api.model.OutboundProfile;
+import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.ErrorCode;
