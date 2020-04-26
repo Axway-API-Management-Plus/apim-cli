@@ -6,7 +6,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpUriRequest;
 
-import com.axway.apim.actions.tasks.IResponseParser;
+import com.axway.apim.apiimport.actions.tasks.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class DELRequest extends RestAPICall {

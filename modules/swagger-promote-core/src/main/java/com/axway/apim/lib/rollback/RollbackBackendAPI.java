@@ -12,11 +12,11 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import com.axway.apim.actions.tasks.IResponseParser;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.Proxies;
-import com.axway.apim.api.state.APIBaseDefinition;
-import com.axway.apim.api.state.IAPI;
+import com.axway.apim.api.APIBaseDefinition;
+import com.axway.apim.api.IAPI;
+import com.axway.apim.apiimport.actions.tasks.IResponseParser;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.rest.DELRequest;

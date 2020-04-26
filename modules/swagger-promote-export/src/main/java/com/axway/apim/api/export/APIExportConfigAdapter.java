@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.Proxies;
+import com.axway.apim.api.IAPI;
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
 import com.axway.apim.api.export.lib.ExportCommandParameters;
 import com.axway.apim.api.model.APIDefintion;
@@ -27,7 +28,6 @@ import com.axway.apim.api.model.APIImage;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.OutboundProfile;
-import com.axway.apim.api.state.IAPI;
 import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.errorHandling.AppException;

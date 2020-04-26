@@ -9,8 +9,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.axway.apim.adapter.APIImportConfigAdapter;
-import com.axway.apim.api.state.IAPI;
+import com.axway.apim.api.IAPI;
+import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;

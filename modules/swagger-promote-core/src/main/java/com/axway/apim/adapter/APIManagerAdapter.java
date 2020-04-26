@@ -31,6 +31,8 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.api.API;
+import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.api.model.APIImage;
@@ -42,9 +44,6 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.User;
-import com.axway.apim.api.state.AbstractAPI;
-import com.axway.apim.api.state.IAPI;
-import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -319,7 +318,7 @@ public class APIManagerAdapter {
 	 */
 	public IAPI getAPIManagerAPI(JsonNode jsonConfiguration, IAPI desiredAPI) throws AppException {
 		if(jsonConfiguration == null) {
-			IAPI apiManagerAPI = new ActualAPI();
+			IAPI apiManagerAPI = new API();
 			apiManagerAPI.setValid(false);
 			return apiManagerAPI;
 		}
@@ -327,11 +326,11 @@ public class APIManagerAdapter {
 		ObjectMapper mapper = new ObjectMapper();
 		IAPI apiManagerApi;
 		try {
-			apiManagerApi = mapper.readValue(jsonConfiguration.toString(), ActualAPI.class);
-			((ActualAPI)apiManagerApi).setApiConfiguration(jsonConfiguration);
+			apiManagerApi = mapper.readValue(jsonConfiguration.toString(), API.class);
+			((API)apiManagerApi).setApiConfiguration(jsonConfiguration);
 			apiManagerApi.setAPIDefinition(getOriginalAPIDefinitionFromAPIM(apiManagerApi.getApiId()));
 			if(apiManagerApi.getImage()!=null) {
-				((ActualAPI)apiManagerApi).setImage(getAPIImageFromAPIM(apiManagerApi.getId())); 
+				((API)apiManagerApi).setImage(getAPIImageFromAPIM(apiManagerApi.getId())); 
 			}
 			apiManagerApi.setValid(true);
 			// As the API-Manager REST doesn't provide information about Custom-Properties, we have to setup 
@@ -345,7 +344,7 @@ public class APIManagerAdapter {
 					String customPropValue = (value == null) ? null : value.asText();
 					customProperties.put(customPropKey, customPropValue);
 				}
-				((AbstractAPI)apiManagerApi).setCustomProperties(customProperties);
+				((API)apiManagerApi).setCustomProperties(customProperties);
 			}
 			addQuotaConfiguration(apiManagerApi, desiredAPI);
 			addClientOrganizations(apiManagerApi, desiredAPI);
@@ -409,10 +408,10 @@ public class APIManagerAdapter {
 		if(desiredAPI!=null) {
 			// Is desiredOrgId is the same as the actual org just take over the desired Org-Name
 			if(desiredAPI.getOrganizationId().equals(apiManagerApi.getOrganizationId())) {
-				((ActualAPI)apiManagerApi).setOrganization(desiredAPI.getOrganization());
+				apiManagerApi.setOrganization(desiredAPI.getOrganization());
 			} else {
 				String actualOrgName = getOrg(apiManagerApi.getOrganizationId()).getName();
-				((ActualAPI)apiManagerApi).setOrganization(actualOrgName);
+				apiManagerApi.setOrganization(actualOrgName);
 			}
 		}
 	}
@@ -643,12 +642,11 @@ public class APIManagerAdapter {
 		// No need to load quota, if not given in the desired API
 		if(desiredAPI!=null && (desiredAPI.getApplicationQuota() == null && desiredAPI.getSystemQuota() == null)) return;
 		if(!this.hasAdminAccount) return; // Can't load quota without having an Admin-Account
-		ActualAPI managerAPI = (ActualAPI)api;
 		try {
 			applicationQuotaConfig = getQuotaFromAPIManager(APPLICATION_DEFAULT_QUOTA); // Get the Application-Default-Quota
 			sytemQuotaConfig = getQuotaFromAPIManager(SYSTEM_API_QUOTA); // Get the System-Default-Quota
-			managerAPI.setApplicationQuota(getAPIQuota(applicationQuotaConfig, managerAPI.getId()));
-			managerAPI.setSystemQuota(getAPIQuota(sytemQuotaConfig, managerAPI.getId()));
+			api.setApplicationQuota(getAPIQuota(applicationQuotaConfig, api.getId()));
+			api.setSystemQuota(getAPIQuota(sytemQuotaConfig, api.getId()));
 		} catch (AppException e) {
 			LOG.error("Application-Default quota response: '"+applicationQuotaConfig+"'");
 			LOG.error("System-Default quota response: '"+sytemQuotaConfig+"'");
@@ -908,7 +906,7 @@ public class APIManagerAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null, true);
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
-			allAPIs = mapper.readValue(response, new TypeReference<List<ActualAPI>>(){});
+			allAPIs = mapper.readValue(response, new TypeReference<List<API>>(){});
 			return allAPIs;
 		} catch (Exception e) {
 			LOG.error("Error cant read all APIs from API-Manager. Can't parse response: " + response);

@@ -5,7 +5,7 @@ import java.net.URI;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
-import com.axway.apim.actions.tasks.IResponseParser;
+import com.axway.apim.apiimport.actions.tasks.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class GETRequest extends RestAPICall {
