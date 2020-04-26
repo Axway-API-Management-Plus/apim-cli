@@ -52,7 +52,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.App;
+
 import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthType;
@@ -166,7 +166,7 @@ public class APIImportConfigAdapter {
 			File configFile = new File(apiConfigFile);
 			if(configFile.exists()) return configFile.getCanonicalPath();
 			// This is mainly to load the samples sitting inside the package!
-			String installFolder = new File(App.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getParent();
+			String installFolder = new File(APIImportConfigAdapter.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getParent();
 			configFile = new File(installFolder + File.separator + apiConfigFile);
 			if(configFile.exists()) return configFile.getCanonicalPath();
 			throw new AppException("Unable to find given Config-File: '"+apiConfigFile+"'", ErrorCode.CANT_READ_CONFIG_FILE);

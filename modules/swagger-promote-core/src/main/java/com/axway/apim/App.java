@@ -23,6 +23,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.Proxies;
 import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.api.state.IAPI;
+import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
@@ -242,7 +243,7 @@ public class App {
 			// Based on the actual API - fulfill/complete some elements in the desired API
 			configAdapter.completeDesiredAPI(desiredAPI, actualAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
-			apimAdapter.applyChanges(changeActions);
+			new APIImportManager().applyChanges(changeActions);
 			APIPropertiesExport.getInstance().store();
 			LOG.info("Successfully replicated API-State into API-Manager");
 			return 0;

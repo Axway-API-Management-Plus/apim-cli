@@ -1,4 +1,4 @@
-package com.axway.apim.api.state;
+package com.axway.apim.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

@@ -21,6 +21,7 @@ import com.axway.apim.actions.tasks.props.ServiceProfileHandler;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.api.model.APIImage;
+import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
