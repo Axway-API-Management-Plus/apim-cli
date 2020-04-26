@@ -76,7 +76,7 @@ public class CreateNewAPI {
 		
 		try {
 			// As we have just created an API-Manager API, we should reflect this for further processing
-			createdAPI = APIManagerAdapter.getInstance().getAPIManagerAPI((JsonNode)context.get("lastResponse"), changes.getDesiredAPI());
+			createdAPI = APIManagerAdapter.getInstance().getAPIManagerAPI((JsonNode)context.get("lastResponse"), changes.getDesiredAPI(), ActualAPI.class);
 			// Register the created FE-API to be rolled back in case of an error
 			((API)rollbackAPI).setId(createdAPI.getId());
 			changes.setIntransitAPI(createdAPI);

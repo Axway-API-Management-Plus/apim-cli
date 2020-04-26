@@ -316,23 +316,23 @@ public class APIManagerAdapter {
 	 * @return an APIManagerAPI instance, which is flagged either as valid, if the API was found or invalid, if not found!
 	 * @throws AppException when the API-Manager API-State can't be created
 	 */
-	public IAPI getAPIManagerAPI(JsonNode jsonConfiguration, IAPI desiredAPI) throws AppException {
+	public <T> API getAPIManagerAPI(JsonNode jsonConfiguration, IAPI desiredAPI, Class<T> apiType) throws AppException {
 		if(jsonConfiguration == null) {
-			IAPI apiManagerAPI = new API();
+			API apiManagerAPI = new API();
 			apiManagerAPI.setValid(false);
 			return apiManagerAPI;
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
-		IAPI apiManagerApi;
+		T apiManagerApi;
 		try {
-			apiManagerApi = mapper.readValue(jsonConfiguration.toString(), API.class);
+			apiManagerApi = mapper.readValue(jsonConfiguration.toString(), apiType);
 			((API)apiManagerApi).setApiConfiguration(jsonConfiguration);
-			apiManagerApi.setAPIDefinition(getOriginalAPIDefinitionFromAPIM(apiManagerApi.getApiId()));
-			if(apiManagerApi.getImage()!=null) {
-				((API)apiManagerApi).setImage(getAPIImageFromAPIM(apiManagerApi.getId())); 
+			((API)apiManagerApi).setAPIDefinition(getOriginalAPIDefinitionFromAPIM(((API)apiManagerApi).getApiId()));
+			if(((API)apiManagerApi).getImage()!=null) {
+				((API)apiManagerApi).setImage(getAPIImageFromAPIM(((API)apiManagerApi).getId())); 
 			}
-			apiManagerApi.setValid(true);
+			((API)apiManagerApi).setValid(true);
 			// As the API-Manager REST doesn't provide information about Custom-Properties, we have to setup 
 			// the Custom-Properties based on the Import API.
 			if(desiredAPI!=null && desiredAPI.getCustomProperties() != null) {
@@ -346,12 +346,12 @@ public class APIManagerAdapter {
 				}
 				((API)apiManagerApi).setCustomProperties(customProperties);
 			}
-			addQuotaConfiguration(apiManagerApi, desiredAPI);
-			addClientOrganizations(apiManagerApi, desiredAPI);
-			addClientApplications(apiManagerApi, desiredAPI);
-			addOrgName(apiManagerApi, desiredAPI);
-			addExistingClientAppQuotas(apiManagerApi.getApplications());
-			return apiManagerApi;
+			addQuotaConfiguration((IAPI)apiManagerApi, desiredAPI);
+			addClientOrganizations((IAPI)apiManagerApi, desiredAPI);
+			addClientApplications((IAPI)apiManagerApi, desiredAPI);
+			addOrgName((IAPI)apiManagerApi, desiredAPI);
+			addExistingClientAppQuotas(((IAPI)apiManagerApi).getApplications());
+			return (API) apiManagerApi;
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-State.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}

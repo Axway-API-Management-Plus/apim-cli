@@ -121,7 +121,7 @@ public class APIExportConfigAdapter {
 	}
 	
 	private ExportAPI getExportAPI(JsonNode mgrAPI) throws AppException {
-		IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate());
+		IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate(), ActualAPI.class);
 		handleCustomProperties(actualAPI);
 		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getInboundProfiles(), actualAPI, true);
 		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getOutboundProfiles(), actualAPI, true);
