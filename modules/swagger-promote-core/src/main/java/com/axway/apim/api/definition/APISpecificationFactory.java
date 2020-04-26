@@ -1,12 +1,16 @@
 package com.axway.apim.api.definition;
 
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.Utils;
 
 public class APISpecificationFactory {
 	
 
 	
 	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionSource, String backendBasepath) throws AppException {
+		if(apiDefinitionSource.toLowerCase().endsWith(".url")) {
+			apiDefinitionSource = Utils.getAPIDefinitionUriFromFile(apiDefinitionSource);
+		}
 		APISpecification spec;
 		if(apiDefinitionSource.toLowerCase().endsWith("?wsdl") ||
 				apiDefinitionSource.toLowerCase().endsWith(".wsdl") ||
@@ -17,5 +21,6 @@ public class APISpecificationFactory {
 		}
 		spec.setApiSpecificationFile(apiDefinitionSource);
 		return spec;
+		
 	}
 }
