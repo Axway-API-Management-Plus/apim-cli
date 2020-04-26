@@ -50,11 +50,11 @@ public abstract class APISpecification {
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
-		if(other instanceof APIDefintion) {
-			APIDefintion otherSwagger = (APIDefintion)other;
-			boolean rc = (Arrays.hashCode(this.apiSpecificationContent)) == Arrays.hashCode(otherSwagger.getAPIDefinitionContent()); 
+		if(other instanceof APISpecification) {
+			APISpecification otherSwagger = (APISpecification)other;
+			boolean rc = (Arrays.hashCode(this.apiSpecificationContent)) == Arrays.hashCode(otherSwagger.getApiSpecificationContent()); 
 			if(!rc) {
-				LOG.info("Detected API-Definition-Filesizes: API-Manager: " + this.apiSpecificationContent.length + " vs. Import: " + otherSwagger.getAPIDefinitionContent().length);
+				LOG.info("Detected API-Definition-Filesizes: API-Manager: " + this.apiSpecificationContent.length + " vs. Import: " + otherSwagger.getApiSpecificationContent().length);
 			}
 			return rc;
 		} else {
