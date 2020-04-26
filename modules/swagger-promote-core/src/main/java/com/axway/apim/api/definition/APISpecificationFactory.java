@@ -7,13 +7,15 @@ public class APISpecificationFactory {
 
 	
 	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionSource, String backendBasepath) throws AppException {
+		APISpecification spec;
 		if(apiDefinitionSource.toLowerCase().endsWith("?wsdl") ||
 				apiDefinitionSource.toLowerCase().endsWith(".wsdl") ||
 				apiDefinitionSource.toLowerCase().endsWith("?singlewsdl")) {
-			return new WSDLSpecification(apiSpecificationContent, backendBasepath);
+			spec = new WSDLSpecification(apiSpecificationContent, backendBasepath);
 		} else {
-			return new Swagger20Specification(apiSpecificationContent, backendBasepath);
+			spec = new Swagger20Specification(apiSpecificationContent, backendBasepath);
 		}
-	
+		spec.setApiSpecificationFile(apiDefinitionSource);
+		return spec;
 	}
 }
