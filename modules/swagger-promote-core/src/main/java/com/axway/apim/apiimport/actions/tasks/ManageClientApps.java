@@ -17,7 +17,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.ClientApplication;
-import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -104,7 +103,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		String appsOrgName = APIManagerAdapter.getInstance().getOrg(appsOrgId).getName();
 		if(appsOrgName==null) return false;
 		// If the App belongs to the same Org as the API, it automatically has permission (esp. for Unpublished APIs)
-		if(app.getOrganizationId().equals(((ActualAPI)actualState).getOrganizationId())) return true;
+		if(app.getOrganizationId().equals((actualState).getOrganizationId())) return true;
 		if(actualState.getClientOrganizations()==null) {
 			LOG.debug("No Client-Orgs configured for this API, therefore other app has NO permission.");
 			return false;
