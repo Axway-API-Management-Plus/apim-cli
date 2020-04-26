@@ -9,6 +9,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.axway.apim.api.definition.APISpecification;
+import com.axway.apim.api.definition.APISpecificationFactory;
 import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.CommandParameters;
@@ -29,10 +31,8 @@ public class BackendBasePathAndHostTest {
 	@Test
 	public void backendHostAndBasePath() throws AppException, IOException {
 		DesiredAPI testAPI = new DesiredAPI();
-		testAPI.setBackendBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
-		APIDefintion apiDefinition = new APIDefintion();
-		apiDefinition.setAPIDefinitionFile("teststore.json");
-		apiDefinition.setAPIDefinitionContent(getSwaggerContent("/api_definition_1/petstore.json"), testAPI);
+		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com:8767/api/v1/myAPI");
 		testAPI.setAPIDefinition(apiDefinition);
 		
 		// Check the Service-Profile
@@ -40,7 +40,7 @@ public class BackendBasePathAndHostTest {
 		
 		// Check if the Swagger-File has been changed
 		ObjectMapper mapper = new ObjectMapper();
-		JsonNode swagger = mapper.readTree(testAPI.getAPIDefinition().getAPIDefinitionContent());
+		JsonNode swagger = mapper.readTree(testAPI.getAPIDefinition().getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com:8767");
 		Assert.assertEquals(swagger.get("basePath").asText(), "/api/v1/myAPI");
 		Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
@@ -50,10 +50,8 @@ public class BackendBasePathAndHostTest {
 	@Test
 	public void backendHostOnly() throws AppException, IOException {
 		DesiredAPI testAPI = new DesiredAPI();
-		testAPI.setBackendBasepath("http://myhost.customer.com:8767");
-		APIDefintion apiDefinition = new APIDefintion();
-		apiDefinition.setAPIDefinitionFile("teststore.json");
-		apiDefinition.setAPIDefinitionContent(getSwaggerContent("/api_definition_1/petstore.json"), testAPI);
+		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "http://myhost.customer.com:8767");
 		testAPI.setAPIDefinition(apiDefinition);
 
 		// Check the Service-Profile
@@ -61,7 +59,7 @@ public class BackendBasePathAndHostTest {
 		
 		// Check if the Swagger-File has been changed
 		ObjectMapper mapper = new ObjectMapper();
-		JsonNode swagger = mapper.readTree(testAPI.getAPIDefinition().getAPIDefinitionContent());
+		JsonNode swagger = mapper.readTree(testAPI.getAPIDefinition().getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com:8767");
 		Assert.assertEquals(swagger.get("basePath").asText(), "/v2");
 		Assert.assertEquals(swagger.get("schemes").get(0).asText(), "http");
@@ -71,10 +69,8 @@ public class BackendBasePathAndHostTest {
 	@Test
 	public void backendHostBasisBasePath() throws AppException, IOException {
 		DesiredAPI testAPI = new DesiredAPI();
-		testAPI.setBackendBasepath("https://myhost.customer.com/");
-		APIDefintion apiDefinition = new APIDefintion();
-		apiDefinition.setAPIDefinitionFile("teststore.json");
-		apiDefinition.setAPIDefinitionContent(getSwaggerContent("/api_definition_1/petstore.json"), testAPI);
+		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com/");
 		testAPI.setAPIDefinition(apiDefinition);
 
 		// Check the Service-Profile
@@ -82,7 +78,7 @@ public class BackendBasePathAndHostTest {
 		
 		// Check if the Swagger-File has been changed
 		ObjectMapper mapper = new ObjectMapper();
-		JsonNode swagger = mapper.readTree(testAPI.getAPIDefinition().getAPIDefinitionContent());
+		JsonNode swagger = mapper.readTree(testAPI.getAPIDefinition().getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com");
 		Assert.assertEquals(swagger.get("basePath").asText(), "/");
 		Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
@@ -92,10 +88,8 @@ public class BackendBasePathAndHostTest {
 	@Test
 	public void swaggerWithoutSchemes() throws AppException, IOException {
 		DesiredAPI testAPI = new DesiredAPI();
-		testAPI.setBackendBasepath("https://myhost.customer.com/");
-		APIDefintion apiDefinition = new APIDefintion();
-		apiDefinition.setAPIDefinitionFile("teststore.json");
-		apiDefinition.setAPIDefinitionContent(getSwaggerContent("/api_definition_1/petstore-without-schemes.json"), testAPI);
+		byte[] content = getSwaggerContent("/api_definition_1/petstore-without-schemes.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com/");
 		testAPI.setAPIDefinition(apiDefinition);
 
 		// Check the Service-Profile
@@ -103,7 +97,7 @@ public class BackendBasePathAndHostTest {
 		
 		// Check if the Swagger-File has been changed
 		ObjectMapper mapper = new ObjectMapper();
-		JsonNode swagger = mapper.readTree(testAPI.getAPIDefinition().getAPIDefinitionContent());
+		JsonNode swagger = mapper.readTree(testAPI.getAPIDefinition().getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com");
 		Assert.assertEquals(swagger.get("basePath").asText(), "/");
 		Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
@@ -113,10 +107,8 @@ public class BackendBasePathAndHostTest {
 	@Test
 	public void backendBasepathChangesNothing() throws AppException, IOException {
 		DesiredAPI testAPI = new DesiredAPI();
-		testAPI.setBackendBasepath("https://petstore.swagger.io");
-		APIDefintion apiDefinition = new APIDefintion();
-		apiDefinition.setAPIDefinitionFile("teststore.json");
-		apiDefinition.setAPIDefinitionContent(getSwaggerContent("/api_definition_1/petstore-only-https-scheme.json"), testAPI);
+		byte[] content = getSwaggerContent("/api_definition_1/petstore-only-https-scheme.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://petstore.swagger.io");
 		testAPI.setAPIDefinition(apiDefinition);
 
 		// Check the Service-Profile
@@ -124,7 +116,7 @@ public class BackendBasePathAndHostTest {
 		
 		// Check if the Swagger-File has been changed
 		ObjectMapper mapper = new ObjectMapper();
-		JsonNode swagger = mapper.readTree(testAPI.getAPIDefinition().getAPIDefinitionContent());
+		JsonNode swagger = mapper.readTree(testAPI.getAPIDefinition().getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "petstore.swagger.io");
 		Assert.assertEquals(swagger.get("basePath").asText(), "/v2");
 		Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");

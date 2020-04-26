@@ -3,6 +3,7 @@ package com.axway.apim.api;
 import java.util.List;
 import java.util.Map;
 
+import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.api.model.APIImage;
 import com.axway.apim.api.model.APIQuota;
@@ -26,8 +27,10 @@ public interface IAPI {
 	public final static String STATE_DELETED = "deleted";
 	public final static String STATE_PENDING = "pending";
 	
-	public final int SWAGGGER_API = 1;
-	public final int WSDL_API = 2;
+	public final int SWAGGGER_API_12 = 1;
+	public final int SWAGGGER_API_20 = 2;
+	public final int OPEN_API_30 = 3;
+	public final int WSDL_API = 4;
 
 	
 	public String getVersion();
@@ -87,9 +90,9 @@ public interface IAPI {
 	
 	public TagMap<String, String[]> getTags();
 	
-	public APIDefintion getAPIDefinition();
+	public APISpecification getAPIDefinition();
 	
-	public void setAPIDefinition(APIDefintion apiDefinition);
+	public void setAPIDefinition(APISpecification apiDefinition);
 	
 	public String getDescriptionType();
 	

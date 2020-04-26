@@ -3,6 +3,7 @@ package com.axway.apim.api;
 import java.util.List;
 import java.util.Map;
 
+import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.api.model.APIImage;
 import com.axway.apim.api.model.APIMethod;
@@ -63,7 +64,7 @@ public class API implements IAPI {
 	JsonNode apiConfiguration;
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
-	protected APIDefintion APIDefinition = null;
+	protected APISpecification APIDefinition = null;
 
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {IAPI.STATE_UNPUBLISHED}, 
@@ -213,11 +214,11 @@ public class API implements IAPI {
 		this.isValid = isValid;
 	}
 
-	public APIDefintion getAPIDefinition() {
+	public APISpecification getAPIDefinition() {
 		return this.APIDefinition;
 	}
 	
-	public void setAPIDefinition(APIDefintion APIDefinition) {
+	public void setAPIDefinition(APISpecification APIDefinition) {
 		this.APIDefinition = APIDefinition;
 	}
 

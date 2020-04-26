@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class APIDefintion {
 	
+	// TODO: This class can be deleted.
+	
 	static Logger LOG = LoggerFactory.getLogger(APIDefintion.class);
 	
 	private String apiDefinitionFile = null;
@@ -43,7 +45,7 @@ public class APIDefintion {
 	public void setAPIDefinitionContent(byte[] apiDefinitionContent, DesiredAPI importAPI) {
 		this.apiDefinitionContent = apiDefinitionContent;
 		try {
-			if(CommandParameters.getInstance().replaceHostInSwagger() && getAPIDefinitionType()==IAPI.SWAGGGER_API) {
+			if(CommandParameters.getInstance().replaceHostInSwagger() && getAPIDefinitionType()==IAPI.SWAGGGER_API_20) {
 				if(importAPI.getBackendBasepath()!=null) {
 					boolean backendBasepathAdjusted = false;
 					URL url = new URL(importAPI.getBackendBasepath());
@@ -113,7 +115,7 @@ public class APIDefintion {
 				apiDefinitionSource.toLowerCase().endsWith("?singlewsdl")) {
 			return IAPI.WSDL_API;
 		} else {
-			return IAPI.SWAGGGER_API;
+			return IAPI.SWAGGGER_API_20;
 		}
 	}
 

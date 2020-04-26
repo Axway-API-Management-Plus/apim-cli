@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
+import com.axway.apim.api.definition.APISpecification;
+import com.axway.apim.api.definition.APISpecificationFactory;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.api.model.APIImage;
@@ -706,9 +708,9 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static APIDefintion getOriginalAPIDefinitionFromAPIM(String backendApiID) throws AppException {
+	private static APISpecification getOriginalAPIDefinitionFromAPIM(String backendApiID) throws AppException {
 		URI uri;
-		APIDefintion apiDefinition;
+		APISpecification apiDefinition;
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+backendApiID+"/download")
@@ -716,11 +718,11 @@ public class APIManagerAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null);
 			httpResponse=getRequest.execute();
 			String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
-			apiDefinition = new APIDefintion(res.getBytes(StandardCharsets.UTF_8));
+			String origFilename = "Unkown filename";
 			if(httpResponse.containsHeader("Content-Disposition")) {
-				String origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
-				apiDefinition.setAPIDefinitionFile(origFilename.substring(origFilename.indexOf("filename=")+9));
+				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
 			}
+			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null);
 			return apiDefinition;
 		} catch (Exception e) {
 			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);

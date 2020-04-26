@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.Proxies;
 import com.axway.apim.api.IAPI;
+import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
 import com.axway.apim.api.export.lib.ExportCommandParameters;
 import com.axway.apim.api.model.APIDefintion;
@@ -148,12 +149,12 @@ public class APIExportConfigAdapter {
 		if (!localFolder.mkdirs()) {
 			throw new AppException("Cant create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
-		APIDefintion apiDef = exportAPI.getAPIDefinition();
+		APISpecification apiDef = exportAPI.getAPIDefinition();
 		String targetFile = null;
 		try {
 			targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName()+".json";
-			writeBytesToFile(apiDef.getAPIDefinitionContent(), targetFile);
-			exportAPI.getAPIDefinition().setAPIDefinitionFile(exportAPI.getName()+".json");
+			writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
+			exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName()+".json");
 		} catch (IOException e) {
 			throw new AppException("Can't save API-Definition locally to file: " + targetFile,
 					ErrorCode.UNXPECTED_ERROR, e);

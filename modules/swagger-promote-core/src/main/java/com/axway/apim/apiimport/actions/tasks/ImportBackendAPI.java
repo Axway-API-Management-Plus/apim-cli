@@ -52,10 +52,10 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		String pass=null;
 		String wsdlUrl=null;
 		String completeWsdlUrl=null;
-		if(this.desiredState.getAPIDefinition().getAPIDefinitionFile().endsWith(".url")) {
-			completeWsdlUrl = Utils.getAPIDefinitionUriFromFile(this.desiredState.getAPIDefinition().getAPIDefinitionFile());
+		if(this.desiredState.getAPIDefinition().getApiSpecificationFile().endsWith(".url")) {
+			completeWsdlUrl = Utils.getAPIDefinitionUriFromFile(this.desiredState.getAPIDefinition().getApiSpecificationFile());
 		} else {
-			completeWsdlUrl = this.desiredState.getAPIDefinition().getAPIDefinitionFile();
+			completeWsdlUrl = this.desiredState.getAPIDefinition().getApiSpecificationFile();
 		}
 		wsdlUrl = extractURI(completeWsdlUrl);
 		username=extractUsername(completeWsdlUrl);
@@ -96,7 +96,7 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 		entity = MultipartEntityBuilder.create()
 				.addTextBody("name", this.desiredState.getName())
 				.addTextBody("type", "swagger")
-				.addBinaryBody("file", ((DesiredAPI)this.desiredState).getAPIDefinition().getAPIDefinitionContent(), ContentType.create("application/json"), "filename")
+				.addBinaryBody("file", ((DesiredAPI)this.desiredState).getAPIDefinition().getApiSpecificationContent(), ContentType.create("application/json"), "filename")
 				.addTextBody("fileName", "XYZ").addTextBody("organizationId", this.desiredState.getOrganizationId())
 				.addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
 		RestAPICall importSwagger = new POSTRequest(entity, uri, this);
