@@ -12,19 +12,19 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
-import com.axway.apim.actions.rest.DELRequest;
-import com.axway.apim.actions.rest.POSTRequest;
-import com.axway.apim.actions.rest.RestAPICall;
-import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.state.AbstractAPI;
-import com.axway.apim.api.state.DesiredAPI;
 import com.axway.apim.api.state.IAPI;
-import com.axway.apim.lib.AppException;
+import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.lib.ErrorState;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
+import com.axway.apim.lib.utils.rest.DELRequest;
+import com.axway.apim.lib.utils.rest.POSTRequest;
+import com.axway.apim.lib.utils.rest.RestAPICall;
+import com.axway.apim.lib.utils.rest.Transaction;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParser {

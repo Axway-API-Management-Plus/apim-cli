@@ -15,16 +15,16 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
-import com.axway.apim.actions.rest.POSTRequest;
-import com.axway.apim.actions.rest.PUTRequest;
-import com.axway.apim.actions.rest.RestAPICall;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.ClientApplication;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.state.IAPI;
-import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.lib.ErrorState;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
+import com.axway.apim.lib.utils.rest.POSTRequest;
+import com.axway.apim.lib.utils.rest.PUTRequest;
+import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

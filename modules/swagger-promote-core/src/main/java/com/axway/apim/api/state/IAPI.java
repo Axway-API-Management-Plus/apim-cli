@@ -15,7 +15,7 @@ import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.api.model.TagMap;
-import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.errorHandling.AppException;
 
 public interface IAPI {
 	

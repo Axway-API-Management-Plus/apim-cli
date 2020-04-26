@@ -1,4 +1,4 @@
-package com.axway.apim.lib;
+package com.axway.apim.lib.errorHandling;
 
 import java.util.Arrays;
 import java.util.HashMap;

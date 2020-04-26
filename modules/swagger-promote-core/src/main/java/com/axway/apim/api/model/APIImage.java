@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import com.axway.apim.lib.ImageComparision;
+import com.axway.apim.lib.utils.ImageComparision;
 
 public class APIImage {
 

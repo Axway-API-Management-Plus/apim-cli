@@ -1,4 +1,4 @@
-package com.axway.apim.lib;
+package com.axway.apim.lib.utils;
 
 public class TestIndicator {
 	

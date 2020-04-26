@@ -15,7 +15,7 @@ import com.axway.apim.actions.tasks.UpdateQuotaConfiguration;
 import com.axway.apim.actions.tasks.props.VhostPropertyHandler;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.state.APIChangeState;
-import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.APIPropertiesExport;
 
 /**

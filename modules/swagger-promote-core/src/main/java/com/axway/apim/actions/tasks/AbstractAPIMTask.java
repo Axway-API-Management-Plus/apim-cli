@@ -9,14 +9,14 @@ import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.actions.rest.GETRequest;
-import com.axway.apim.actions.rest.RestAPICall;
-import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.state.IAPI;
-import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.rest.GETRequest;
+import com.axway.apim.lib.utils.rest.RestAPICall;
+import com.axway.apim.lib.utils.rest.Transaction;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.CreateNewAPI;
 import com.axway.apim.lib.APIPropertyAnnotation;
-import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.lib.ErrorState;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 
 /**
  * This class is key, as the desired and actual API comes together.

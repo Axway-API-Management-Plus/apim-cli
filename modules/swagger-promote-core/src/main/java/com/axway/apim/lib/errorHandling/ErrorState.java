@@ -1,4 +1,4 @@
-package com.axway.apim.lib;
+package com.axway.apim.lib.errorHandling;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,10 @@
-package com.axway.apim.lib;
+package com.axway.apim.lib.utils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class Utils {
 	public static String getAPIDefinitionUriFromFile(String pathToAPIDefinition) throws AppException {

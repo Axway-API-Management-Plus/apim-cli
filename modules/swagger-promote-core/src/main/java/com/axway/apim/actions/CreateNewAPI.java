@@ -8,7 +8,6 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.actions.rest.Transaction;
 import com.axway.apim.actions.tasks.CreateAPIProxy;
 import com.axway.apim.actions.tasks.ImportBackendAPI;
 import com.axway.apim.actions.tasks.ManageClientApps;
@@ -23,15 +22,16 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.state.APIBaseDefinition;
 import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.api.state.AbstractAPI;
-import com.axway.apim.api.state.ActualAPI;
 import com.axway.apim.api.state.IAPI;
+import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.APIPropertyAnnotation;
-import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.rollback.RollbackAPIProxy;
 import com.axway.apim.lib.rollback.RollbackBackendAPI;
 import com.axway.apim.lib.rollback.RollbackHandler;
+import com.axway.apim.lib.utils.rest.Transaction;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**

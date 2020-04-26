@@ -10,10 +10,10 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.api.state.IAPI;
 import com.axway.apim.lib.APIPropertiesExport;
-import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.lib.ErrorState;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 
 public class APIImportManager {
 	

@@ -1,4 +1,4 @@
-package com.axway.apim.api.state;
+package com.axway.apim.apiimport;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,10 +19,12 @@ import com.axway.apim.adapter.APIImportConfigAdapter;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.ServiceProfile;
-import com.axway.apim.lib.AppException;
+import com.axway.apim.api.state.AbstractAPI;
+import com.axway.apim.api.state.IAPI;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.lib.ErrorState;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

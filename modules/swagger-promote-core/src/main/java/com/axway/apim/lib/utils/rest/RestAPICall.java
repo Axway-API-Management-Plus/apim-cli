@@ -1,4 +1,4 @@
-package com.axway.apim.actions.rest;
+package com.axway.apim.lib.utils.rest;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.actions.tasks.IResponseParser;
-import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**

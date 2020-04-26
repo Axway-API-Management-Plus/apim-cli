@@ -1,4 +1,4 @@
-package com.axway.apim.actions.rest;
+package com.axway.apim.lib.utils.rest;
 
 import java.net.URI;
 
@@ -7,7 +7,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import com.axway.apim.actions.tasks.IResponseParser;
-import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.errorHandling.AppException;
 
 public class DELRequest extends RestAPICall {
 

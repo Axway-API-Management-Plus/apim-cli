@@ -1,4 +1,4 @@
-package com.axway.apim.actions.rest;
+package com.axway.apim.lib.utils.rest;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -22,9 +22,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 
-import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 
 /**
  * The interface to the API-Manager itself responsible to setup the underlying HTTPS-Communication. 

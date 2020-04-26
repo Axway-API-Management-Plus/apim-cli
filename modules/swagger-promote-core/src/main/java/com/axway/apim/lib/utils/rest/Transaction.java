@@ -1,4 +1,4 @@
-package com.axway.apim.actions.rest;
+package com.axway.apim.lib.utils.rest;
 
 import java.util.HashMap;
 

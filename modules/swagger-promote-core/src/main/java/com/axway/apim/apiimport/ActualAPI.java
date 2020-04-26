@@ -1,9 +1,11 @@
-package com.axway.apim.api.state;
+package com.axway.apim.apiimport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.lib.AppException;
+import com.axway.apim.api.state.AbstractAPI;
+import com.axway.apim.api.state.IAPI;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**

@@ -33,7 +33,7 @@ import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.api.model.TagMap;
 import com.axway.apim.lib.APIPropertyAnnotation;
-import com.axway.apim.lib.AppException;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;

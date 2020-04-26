@@ -1,4 +1,7 @@
-package com.axway.apim.lib;
+package com.axway.apim.lib.utils;
+
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class URLParser {
 	String username;

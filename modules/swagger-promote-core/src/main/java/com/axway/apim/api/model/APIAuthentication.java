@@ -1,7 +1,7 @@
 package com.axway.apim.api.model;
 
-import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 

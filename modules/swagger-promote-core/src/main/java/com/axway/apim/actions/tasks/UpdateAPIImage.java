@@ -11,12 +11,12 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.util.EntityUtils;
 
-import com.axway.apim.actions.rest.POSTRequest;
-import com.axway.apim.actions.rest.RestAPICall;
-import com.axway.apim.api.state.DesiredAPI;
 import com.axway.apim.api.state.IAPI;
-import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.ErrorCode;
+import com.axway.apim.apiimport.DesiredAPI;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.rest.POSTRequest;
+import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

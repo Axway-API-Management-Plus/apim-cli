@@ -6,11 +6,11 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.api.state.DesiredAPI;
 import com.axway.apim.api.state.IAPI;
-import com.axway.apim.lib.AppException;
+import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.Utils;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
