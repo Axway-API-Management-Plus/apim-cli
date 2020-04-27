@@ -16,21 +16,24 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.actions.rest.APIMHttpClient;
-import com.axway.apim.actions.rest.Transaction;
-import com.axway.apim.lib.AppException;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.Proxies;
+import com.axway.apim.api.IAPI;
+import com.axway.apim.apiimport.APIImportConfigAdapter;
+import com.axway.apim.apiimport.APIImportManager;
+import com.axway.apim.apiimport.ActualAPI;
+import com.axway.apim.apiimport.state.APIChangeState;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.RelaxedParser;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
+import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.rollback.RollbackHandler;
-import com.axway.apim.manager.Proxies;
-import com.axway.apim.swagger.APIChangeState;
-import com.axway.apim.swagger.APIImportConfigAdapter;
-import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.state.IAPI;
+import com.axway.apim.lib.utils.rest.APIMHttpClient;
+import com.axway.apim.lib.utils.rest.Transaction;
 
 /**
  * This is the Entry-Point of program and responsible to:  
@@ -52,6 +55,7 @@ public class App {
 	}
 		
 	public static int run(String args[]) {
+		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 		try {
 			CommandLineParser parser = new RelaxedParser();
 			CommandLine cmd = null;
@@ -122,7 +126,13 @@ public class App {
 			options.addOption(option);
 			
 			option = new Option("f", "force", true, "Breaking changes can't be imported without this flag, unless the API is unpublished.");
-				option.setArgName("true/[false]");
+			option.setArgName("true/[false]");
+			options.addOption(option);
+			
+			option = new Option("swaggerPromoteHome", true, "The absolute path to the Swagger-Promote home directory containing for instance your conf folder.\n"
+					+ "You may also set the environment variable: '"+CommandParameters.SWAGGER_PROMOTE_HOME+"'");
+			option.setRequired(false);
+			option.setArgName("/home/chris/swagger-promote");
 			options.addOption(option);
 			
 			option = new Option("iq", "ignoreQuotas", true, "Use this flag to ignore configured API quotas.");
@@ -167,6 +177,16 @@ public class App {
 			option.setArgName("true");
 			internalOptions.addOption(option);
 			
+			option = new Option("returnCodeMapping", true, "Optionally maps given return codes into a desired return code. Format: 10:0, 12:0");
+			option.setRequired(false);
+			option.setArgName("true");
+			internalOptions.addOption(option);
+			
+			option = new Option("changeOrganization", true, "Set this flag to true to allow to change the organization of an existing API. Default is false.");
+			option.setRequired(false);
+			option.setArgName("true");
+			internalOptions.addOption(option);
+			
 			System.out.println("------------------------------------------------------------------------");
 			System.out.println("API-Manager Promote: "+App.class.getPackage().getImplementationVersion() + " - I M P O R T");
 			System.out.println("                                                                        ");
@@ -196,7 +216,8 @@ public class App {
 			Transaction.deleteInstance();
 			RollbackHandler.deleteInstance();
 			
-			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
+			CommandParameters params = new CommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage"), cmd.getOptionValue("swaggerPromoteHome")));
+			errorCodeMapper.setMapConfiguration(params.getValue("returnCodeMapping"));
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			
@@ -219,11 +240,11 @@ public class App {
 					.hasVHost(desiredAPI.getVhost())
 					.hasQueryStringVersion(desiredAPI.getApiRoutingKey())
 					.useFilter(filters)
-					.build().getAPI(true), desiredAPI);
+					.build().getAPI(true), desiredAPI, ActualAPI.class);
 			// Based on the actual API - fulfill/complete some elements in the desired API
 			configAdapter.completeDesiredAPI(desiredAPI, actualAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
-			apimAdapter.applyChanges(changeActions);
+			new APIImportManager().applyChanges(changeActions);
 			APIPropertiesExport.getInstance().store();
 			LOG.info("Successfully replicated API-State into API-Manager");
 			return 0;
@@ -237,10 +258,10 @@ public class App {
 			if(errorState.hasError()) {
 				errorState.logErrorMessages(LOG);
 				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorState.getErrorCode().getCode();
+				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
 			} else {
 				LOG.error(ap.getMessage(), ap);
-				return ap.getErrorCode().getCode();
+				return errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode();
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);

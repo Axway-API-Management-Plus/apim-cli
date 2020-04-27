@@ -6,8 +6,8 @@ import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.AppException;
-import com.axway.apim.swagger.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class AppConfigParserTest {

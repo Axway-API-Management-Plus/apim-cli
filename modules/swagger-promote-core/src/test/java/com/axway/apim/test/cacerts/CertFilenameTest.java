@@ -3,7 +3,7 @@ package com.axway.apim.test.cacerts;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.axway.apim.swagger.api.properties.cacerts.CaCert;
+import com.axway.apim.api.model.CaCert;
 
 public class CertFilenameTest {
 	@Test
@@ -16,4 +16,16 @@ public class CertFilenameTest {
 		
 		Assert.assertEquals(certFilename, "srvgdywbjob02.nov.com.crt");
 	}
+
+	@Test
+	public void testAliasUnknown() {
+		String alias = "UNKNOWN";
+		CaCert cert = new CaCert();
+		cert.setAlias(alias);
+
+		String certFilename = cert.getCertFile();
+
+		Assert.assertTrue(certFilename.startsWith("UnknownCertificate_"));
+	}
+
 }

@@ -3,9 +3,9 @@
 where java >nul 2>nul
 SET javaFound=%errorlevel%
 
-IF DEFINED JAVA_HOME IF EXIST "%JAVA_HOME%"\\bin\\java.exe (
+IF DEFINED JAVA_HOME IF EXIST "%JAVA_HOME%\bin\java.exe" (
 	REM ECHO Using Java from JAVA_HOME
-	SET _java="%JAVA_HOME%"\\bin\\java.exe
+	SET _java="%JAVA_HOME%\bin\java.exe"
 ) ELSE (
 	IF %javaFound%==0 (
 		REM ECHO "Using Java runtime from search path."
@@ -39,7 +39,7 @@ GOTO :END
 
 CD %currentDir%
 
-%_java% -Xms64m -Xmx256m -classpath "%CLASSPATH%" com.axway.apim.App %*
+%_java% -Xms64m -Xmx256m -Dlog4j.configuration=../lib/log4j.xml -classpath "%CLASSPATH%" com.axway.apim.App %*
 SET ERRNO=%ERRORLEVEL%
 IF %ERRNO% EQU 10 (
   ECHO "No changes detected. Existing with RC: 0"
