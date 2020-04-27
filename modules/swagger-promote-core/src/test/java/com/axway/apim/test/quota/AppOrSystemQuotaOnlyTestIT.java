@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
-import com.axway.apim.swagger.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
@@ -50,6 +50,9 @@ public class AppOrSystemQuotaOnlyTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+			Thread.sleep(2000); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+		}
 		echo("####### Check System-Quotas have been setup as configured #######");
 		http().client("apiManager")
 			.send()
@@ -76,7 +79,7 @@ public class AppOrSystemQuotaOnlyTestIT extends TestNGCitrusTestDesigner {
 		action(swaggerImport);
 		
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
-			Thread.sleep(200); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+			Thread.sleep(2000); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
 		}
 		echo("####### Check Application-Quotas have been setup as configured #######");
 		http().client("apiManager")

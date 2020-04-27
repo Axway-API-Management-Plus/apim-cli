@@ -5,25 +5,25 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import com.axway.apim.lib.AppException;
-import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.properties.APIDefintion;
-import com.axway.apim.swagger.api.properties.APIImage;
-import com.axway.apim.swagger.api.properties.applications.ClientApplication;
-import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthType;
-import com.axway.apim.swagger.api.properties.authenticationProfiles.AuthenticationProfile;
-import com.axway.apim.swagger.api.properties.cacerts.CaCert;
-import com.axway.apim.swagger.api.properties.corsprofiles.CorsProfile;
-import com.axway.apim.swagger.api.properties.inboundprofiles.InboundProfile;
-import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
-import com.axway.apim.swagger.api.properties.profiles.ServiceProfile;
-import com.axway.apim.swagger.api.properties.quota.APIQuota;
-import com.axway.apim.swagger.api.properties.securityprofiles.DeviceType;
-import com.axway.apim.swagger.api.properties.securityprofiles.SecurityDevice;
-import com.axway.apim.swagger.api.properties.securityprofiles.SecurityProfile;
-import com.axway.apim.swagger.api.properties.tags.TagMap;
-import com.axway.apim.swagger.api.state.ActualAPI;
-import com.axway.apim.swagger.api.state.IAPI;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.IAPI;
+import com.axway.apim.api.definition.APISpecification;
+import com.axway.apim.api.model.APIImage;
+import com.axway.apim.api.model.APIQuota;
+import com.axway.apim.api.model.AuthType;
+import com.axway.apim.api.model.AuthenticationProfile;
+import com.axway.apim.api.model.CaCert;
+import com.axway.apim.api.model.ClientApplication;
+import com.axway.apim.api.model.CorsProfile;
+import com.axway.apim.api.model.DeviceType;
+import com.axway.apim.api.model.InboundProfile;
+import com.axway.apim.api.model.OutboundProfile;
+import com.axway.apim.api.model.SecurityDevice;
+import com.axway.apim.api.model.SecurityProfile;
+import com.axway.apim.api.model.ServiceProfile;
+import com.axway.apim.api.model.TagMap;
+import com.axway.apim.apiimport.ActualAPI;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -64,7 +64,7 @@ public class ExportAPI {
 
 	
 	@JsonIgnore
-	public APIDefintion getAPIDefinition() {
+	public APISpecification getAPIDefinition() {
 		return this.actualAPIProxy.getAPIDefinition();
 	}
 
@@ -299,7 +299,7 @@ public class ExportAPI {
 	
 	@JsonProperty("apiDefinition")
 	public String getApiDefinitionImport() {
-		return this.getAPIDefinition().getAPIDefinitionFile();
+		return this.getAPIDefinition().getApiSpecificationFile();
 	}
 	
 	@JsonIgnore

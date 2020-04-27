@@ -10,11 +10,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.TestIndicator;
-import com.axway.apim.swagger.APIChangeState;
-import com.axway.apim.swagger.api.state.ActualAPI;
-import com.axway.apim.swagger.api.state.IAPI;
+import com.axway.apim.api.IAPI;
+import com.axway.apim.apiimport.ActualAPI;
+import com.axway.apim.apiimport.state.APIChangeState;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.TestIndicator;
 
 public class ChangeStateTest {
 	
@@ -46,8 +46,10 @@ public class ChangeStateTest {
 		managerOrgs.add("orgA");
 
 		importAPI.setClientOrganizations(importOrgs);
+		importAPI.setOrganizationId("123");
 
 		managerAPI.setClientOrganizations(managerOrgs);
+		managerAPI.setOrganizationId("123");
 
 		APIChangeState changeState = new APIChangeState(managerAPI, importAPI);
 		Assert.assertEquals(changeState.hasAnyChanges(), false);
@@ -67,6 +69,7 @@ public class ChangeStateTest {
 
 	private static IAPI getTestAPI() throws AppException {
 		IAPI testAPI = new ActualAPI();
+		testAPI.setOrganizationId("123");
 		testAPI.setValid(true);
 		testAPI.setState(IAPI.STATE_PUBLISHED);
 		return testAPI;

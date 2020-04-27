@@ -7,8 +7,8 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.AppException;
-import com.axway.apim.swagger.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -60,7 +60,7 @@ public class QuotaStays4OtherAPIsTestIT extends TestNGCitrusTestRunner {
 		
 		echo("####### Check System-Quotas have been setup as configured for the first API #######");
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
-			Thread.sleep(200); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+			Thread.sleep(2000); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
 		}
 		http(builder -> builder.client("apiManager").send().get("/quotas/00000000-0000-0000-0000-000000000000").header("Content-Type", "application/json"));
 		

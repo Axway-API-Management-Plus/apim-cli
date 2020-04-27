@@ -26,6 +26,6 @@ done
 
 echo ""
 
-"$_java" -Xms64m -Xmx256m -classpath "$CP" com.axway.apim.ExportApp "${@}"
+"$_java" -Xms64m -Xmx256m -Dlog4j.configuration=../lib/log4j.xml -classpath "$CP" com.axway.apim.ExportApp "${@}"
 rc=$?
 exit $rc

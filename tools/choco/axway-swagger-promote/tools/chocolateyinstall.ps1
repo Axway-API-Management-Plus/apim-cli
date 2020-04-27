@@ -1,14 +1,6 @@
 $ErrorActionPreference = 'Stop'; # stop on all errors
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$fileLocation = Join-Path $toolsDir 'apimanager-swagger-promote-1.6.3.zip'
-
-$packageArgs = @{
-  packageName   = $env:ChocolateyPackageName
-  unzipLocation = $toolsDir
-  file          = $fileLocation
-
-  softwareName  = 'axway-swagger-promote'
-}
+$fileLocation = Join-Path $toolsDir 'apimanager-swagger-promote-1.6.5.zip'
 
 Get-ChocolateyUnzip "$fileLocation" $toolsDir
 Install-BinFile -Name "api-import" -Path "$toolsDir\swagger-promote-$env:chocolateyPackageVersion\scripts\api-import.bat" -Command "choco"
