@@ -17,15 +17,18 @@ public class APISpecificationFactory {
 		private static final long serialVersionUID = 1L;
 
 	{
-	    add(Swagger20Specification.class);
-	    add(Swagger12Specification.class);
-	    add(OAS30Specification.class);
+	    add(Swagger2xSpecification.class);
+	    add(Swagger1xSpecification.class);
+	    add(OAS3xSpecification.class);
 	    add(WSDLSpecification.class);
 	}};
 	
 	
 	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String backendBasepath) throws AppException {
-		
+		if(LOG.isDebugEnabled()) {
+			String contentStart = new String(apiSpecificationContent, 0, 200);
+			LOG.debug("Handle API-Specification: '" + contentStart + "...', apiDefinitionFile: '"+apiDefinitionFile+"'");	
+		}
 		for(Class clazz : specificationTypes) {
 			try {
 	            Class<?>[] argTypes = {byte[].class, String.class};

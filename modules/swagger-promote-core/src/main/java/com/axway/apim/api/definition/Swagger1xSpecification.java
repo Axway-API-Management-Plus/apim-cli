@@ -8,11 +8,11 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class Swagger12Specification extends APISpecification {
+public class Swagger1xSpecification extends APISpecification {
 	
 	JsonNode swagger = null;
 	
-	public Swagger12Specification(byte[] apiSpecificationContent, String backendBasepath) throws AppException {
+	public Swagger1xSpecification(byte[] apiSpecificationContent, String backendBasepath) throws AppException {
 		super(apiSpecificationContent, backendBasepath);
 	}
 
@@ -50,13 +50,17 @@ public class Swagger12Specification extends APISpecification {
 	public boolean configure() throws AppException {
 		try {
 			swagger = objectMapper.readTree(apiSpecificationContent);
-			if(!(swagger.has("swaggerVersion") && swagger.get("swaggerVersion").asText().equals("1.2"))) {
+			if(!(swagger.has("swaggerVersion") && swagger.get("swaggerVersion").asText().startsWith("1."))) {
 				return false;
 			}
 			configureBasepath();
 			return true;
 		} catch (Exception e) {
-			LOG.debug("Can't read apiSpecication. Doesn't have key \\\"swaggerVersion\\\" with value: \\\"1.2\"", e);
+			if(LOG.isTraceEnabled()) {
+				LOG.trace("No Swager 1.x specification. Doesn't have key \"swaggerVersion\" starting with value: \"1.\"", e);
+			} else {
+				LOG.debug("No Swager 1.x specification. Doesn't have key \"swaggerVersion\" starting with value: \"1.\"");	
+			}
 			return false;
 		}
 	}

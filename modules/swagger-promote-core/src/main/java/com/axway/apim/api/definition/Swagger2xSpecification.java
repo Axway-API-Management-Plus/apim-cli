@@ -9,16 +9,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class Swagger20Specification extends APISpecification {
+public class Swagger2xSpecification extends APISpecification {
 	
 	JsonNode swagger = null;
 	
 
-	public Swagger20Specification() {
+	public Swagger2xSpecification() {
 		super();
 	}
 
-	public Swagger20Specification(byte[] apiSpecificationContent, String backendBasepath) throws AppException {
+	public Swagger2xSpecification(byte[] apiSpecificationContent, String backendBasepath) throws AppException {
 		super(apiSpecificationContent, backendBasepath);
 	}
 
@@ -87,13 +87,17 @@ public class Swagger20Specification extends APISpecification {
 	public boolean configure() throws AppException {
 		try {
 			swagger = objectMapper.readTree(apiSpecificationContent);
-			if(!(swagger.has("swagger") && swagger.get("swagger").asText().equals("2.0"))) {
+			if(!(swagger.has("swagger") && swagger.get("swagger").asText().startsWith("2."))) {
 				return false;
 			}
 			configureBasepath();
 			return true;
 		} catch (Exception e) {
-			LOG.debug("Can't read apiSpecication. Doesn't have key \\\"swagger\\\" with value: \\\"2.0\"", e);
+			if(LOG.isTraceEnabled()) {
+				LOG.trace("No Swagger 2.x specification. Doesn't have key \"swagger\" starting with value: \"2.\"", e);
+			} else {
+				LOG.debug("No Swagger 2.x specification. Doesn't have key \"swagger\" starting with value: \"2.\"");	
+			}
 			return false;
 		}
 	}

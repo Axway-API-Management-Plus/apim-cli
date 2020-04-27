@@ -17,7 +17,7 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class APISpecificationSwagger20Test {
+public class APISpecificationSwagger2xTest {
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
@@ -35,7 +35,7 @@ public class APISpecificationSwagger20Test {
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com:8767/api/v1/myAPI");
 		
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof Swagger20Specification);
+		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com:8767");
 		Assert.assertEquals(swagger.get("basePath").asText(), "/api/v1/myAPI");
@@ -48,7 +48,7 @@ public class APISpecificationSwagger20Test {
 		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "http://myhost.customer.com:8767");
 
-		Assert.assertTrue(apiDefinition instanceof Swagger20Specification);
+		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com:8767");
 		Assert.assertEquals(swagger.get("basePath").asText(), "/v2");
@@ -61,7 +61,7 @@ public class APISpecificationSwagger20Test {
 		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com/");
 		
-		Assert.assertTrue(apiDefinition instanceof Swagger20Specification);
+		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com");
 		Assert.assertEquals(swagger.get("basePath").asText(), "/");
@@ -74,7 +74,7 @@ public class APISpecificationSwagger20Test {
 		byte[] content = getSwaggerContent("/api_definition_1/petstore-without-schemes.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com/");
 		
-		Assert.assertTrue(apiDefinition instanceof Swagger20Specification);
+		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com");
 		Assert.assertEquals(swagger.get("basePath").asText(), "/");
@@ -87,7 +87,7 @@ public class APISpecificationSwagger20Test {
 		byte[] content = getSwaggerContent("/api_definition_1/petstore-only-https-scheme.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://petstore.swagger.io");
 		
-		Assert.assertTrue(apiDefinition instanceof Swagger20Specification);
+		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "petstore.swagger.io");
 		Assert.assertEquals(swagger.get("basePath").asText(), "/v2");
@@ -102,7 +102,7 @@ public class APISpecificationSwagger20Test {
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", null);
 		
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof Swagger20Specification);
+		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "petstore.swagger.io");
 		Assert.assertEquals(swagger.get("basePath").asText(), "/v2");

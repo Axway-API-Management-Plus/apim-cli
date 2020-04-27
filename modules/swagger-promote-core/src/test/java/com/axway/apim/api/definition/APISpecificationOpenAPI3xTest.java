@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-public class APISpecificationOpenAPI30Test {
+public class APISpecificationOpenAPI3xTest {
 	
 	private static final String testPackage = "/com/axway/apim/api/definition";
 	
@@ -38,7 +38,7 @@ public class APISpecificationOpenAPI30Test {
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com:8767/api/v1/myAPI");
 		
 		// Check if the Swagger-File has been changed
-		Assert.assertTrue(apiDefinition instanceof OAS30Specification);
+		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).size(), 1, "Expected to get only one server url");
 		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).get(0).get("url").asText(), "https://myhost.customer.com:8767/api/v1/myAPI");

@@ -112,7 +112,7 @@ public class APIExportConfigAdapter {
 				String apiPath = mgrAPI.get("path").asText();
 				Matcher matcher = pattern.matcher(apiPath);
 				if(matcher.matches()) {
-					LOG.debug("Adding API with path: '"+apiPath+"' based on requested path: '"+exportApiPath+"' to the export list.");
+					LOG.info("Adding API with path: '"+apiPath+"' based on requested path: '"+exportApiPath+"' to the export list.");
 					exportAPIList.add(getExportAPI(mgrAPI));
 				}
 			}			

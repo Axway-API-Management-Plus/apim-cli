@@ -10,11 +10,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class OAS30Specification extends APISpecification {
+public class OAS3xSpecification extends APISpecification {
 	
 	JsonNode openAPI = null;
 	
-	public OAS30Specification(byte[] apiSpecificationContent, String backendBasepath) throws AppException {
+	public OAS3xSpecification(byte[] apiSpecificationContent, String backendBasepath) throws AppException {
 		super(apiSpecificationContent, backendBasepath);
 	}
 
@@ -59,7 +59,11 @@ public class OAS30Specification extends APISpecification {
 			configureBasepath();
 			return true;
 		} catch (IOException e) {
-			LOG.debug("Can't read apiSpecication. Doesn't have key \\\"openapi\\\" start with value: \\\"3.0.\"", e);
+			if(LOG.isTraceEnabled()) {
+				LOG.trace("No OpenAPI 3.0 specification. Doesn't have key \"openapi\" starting with value: \"3.0.\"", e);
+			} else {
+				LOG.debug("No OpenAPI 3.0 specification. Doesn't have key \"openapi\" starting with value: \"3.0.\"");	
+			}
 			return false;
 		}
 	}
