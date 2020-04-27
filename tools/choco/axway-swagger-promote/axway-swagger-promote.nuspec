@@ -3,7 +3,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>axway-swagger-promote</id>
-    <version>1.6.5</version>
+    <version>1.6.7</version>
     <packageSourceUrl>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/tree/develop/tools/choco/axway-swagger-promote</packageSourceUrl>
     <owners>Christoph Wiechmann</owners>
     <title>Axway Swagger-Promote (Install)</title>
