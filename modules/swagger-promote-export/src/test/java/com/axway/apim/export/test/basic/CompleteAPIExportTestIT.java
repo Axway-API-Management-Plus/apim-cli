@@ -38,7 +38,7 @@ public class CompleteAPIExportTestIT extends TestNGCitrusTestRunner {
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException {
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, InterruptedException {
 		description("Import an API, export it afterwards and validate it equals to the imported API");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/api/test/"+this.getClass().getSimpleName()+"-${apiNumber}");
@@ -52,6 +52,9 @@ public class CompleteAPIExportTestIT extends TestNGCitrusTestRunner {
 		createVariable("expectedReturnCode", "0");
 		
 		swaggerImport.doExecute(context);
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+			Thread.sleep(1000); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+		}
 		
 		exportAPI(context, false);
 		exportAPI(context, true);
