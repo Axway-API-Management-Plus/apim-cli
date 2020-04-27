@@ -315,6 +315,7 @@ public class APIManagerAdapter {
 	 * @param jsonConfiguration the JSON-Configuration which is returned from the API-Manager REST-API (Proxy-Endpoint)
 	 * @param desiredAPI for some tasks the desiredAPI is needed (e.g. Custom-Properties)
 	 * @return an APIManagerAPI instance, which is flagged either as valid, if the API was found or invalid, if not found!
+	 * @param apiType the class type the API representation is returned
 	 * @throws AppException when the API-Manager API-State can't be created
 	 */
 	public <T> API getAPIManagerAPI(JsonNode jsonConfiguration, IAPI desiredAPI, Class<T> apiType) throws AppException {

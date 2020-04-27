@@ -41,6 +41,7 @@ public class Proxies {
 
 	/**
 	 * Returns a list of requested proxies (Front-End APIs).
+	 * @throws AppException if the API representation cannot be created
 	 */
 	public void getProxies() throws AppException {
 		CommandParameters cmd = CommandParameters.getInstance();

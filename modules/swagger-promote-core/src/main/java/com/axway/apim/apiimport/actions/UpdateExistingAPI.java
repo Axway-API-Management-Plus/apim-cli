@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.apiimport.actions.tasks.ManageClientApps;
 import com.axway.apim.apiimport.actions.tasks.ManageClientOrgs;
 import com.axway.apim.apiimport.actions.tasks.UpdateAPIImage;
@@ -19,7 +20,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.APIPropertiesExport;
 
 /**
- * This class is used by the {@link APIManagerAdapter#applyChanges(APIChangeState)} to update an existing API. 
+ * This class is used by the {@link APIImportManager#applyChanges(APIChangeState)} to update an existing API. 
  * This happens, when all changes can be applied to the existing API which is quite of the case for an "Unpublished" API.
  * 
  * @author cwiechmann@axway.com

@@ -12,6 +12,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
+import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.apiimport.actions.tasks.CreateAPIProxy;
 import com.axway.apim.apiimport.actions.tasks.ImportBackendAPI;
@@ -35,7 +36,7 @@ import com.axway.apim.lib.utils.rest.Transaction;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- * This class is used by the {@link APIManagerAdapter#applyChanges(APIChangeState)} to create a new API. 
+ * This class is used by the {@link APIImportManager#applyChanges(APIChangeState)} to create a new API. 
  * It's called, when an existing API can't be found.
  * 
  * @author cwiechmann@axway.com
