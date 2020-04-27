@@ -95,6 +95,20 @@ public class APISpecificationSwagger20Test {
 		Assert.assertEquals(swagger.get("schemes").size(), 1);
 	}
 	
+	@Test
+	public void testWithoutBackendBasepath() throws AppException, IOException {
+
+		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", null);
+		
+		// Check if the Swagger-File has been changed
+		Assert.assertTrue(apiDefinition instanceof Swagger20Specification);
+		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
+		Assert.assertEquals(swagger.get("host").asText(), "petstore.swagger.io");
+		Assert.assertEquals(swagger.get("basePath").asText(), "/v2");
+		Assert.assertEquals(swagger.get("schemes").size(), 2);
+	}
+	
 	
 	private byte[] getSwaggerContent(String swaggerFile) throws AppException {
 		try {

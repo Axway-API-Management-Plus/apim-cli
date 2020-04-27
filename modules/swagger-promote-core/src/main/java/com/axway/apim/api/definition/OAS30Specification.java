@@ -28,7 +28,6 @@ public class OAS30Specification extends APISpecification {
 		if(!CommandParameters.getInstance().replaceHostInSwagger()) return;
 		try {
 			if(this.backendBasepath!=null) {
-				boolean backendBasepathAdjusted = false;
 				URL backendBasepath = new URL(this.backendBasepath);
 				for(JsonNode server : openAPI.get("servers")) {
 					String url = server.get("url").asText();
@@ -43,17 +42,6 @@ public class OAS30Specification extends APISpecification {
 				 //newServers.add(objectMapper. new JsonNode  url.getProtocol());
 				((ArrayNode) openAPI.get("servers")).removeAll();
 				((ArrayNode) openAPI.get("servers")).add(newServer);
-				/*
-				if(openAPI.get("servers").asText().equals(url.toString())) {
-					LOG.debug("Swagger resourcePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasepath: '"+url.getPath()+"'. Nothing to do.");
-				} else {
-					LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.toString()+"' based on configured backendBasepath: '"+this.backendBasepath+"'");
-					backendBasepathAdjusted = true;
-					((ObjectNode)swagger).put("basePath", url.toString());
-				}
-				if(backendBasepathAdjusted) {
-					LOG.info("Used the configured backendBasepath: '"+this.backendBasepath+"' to adjust the Swagger definition.");
-				}*/
 				this.apiSpecificationContent = objectMapper.writeValueAsBytes(openAPI);
 			}
 		} catch (Exception e) {
@@ -75,4 +63,12 @@ public class OAS30Specification extends APISpecification {
 			return false;
 		}
 	}
+
+	@Override
+	public boolean equals(Object other) {
+		// TODO Auto-generated method stub
+		return super.equals(other);
+	}
+	
+	
 }
