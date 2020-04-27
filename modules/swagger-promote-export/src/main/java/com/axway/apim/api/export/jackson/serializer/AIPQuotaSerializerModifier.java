@@ -1,6 +1,6 @@
 package com.axway.apim.api.export.jackson.serializer;
 
-import com.axway.apim.swagger.api.properties.quota.APIQuota;
+import com.axway.apim.api.model.APIQuota;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializationConfig;

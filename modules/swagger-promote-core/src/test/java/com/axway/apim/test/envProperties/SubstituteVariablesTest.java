@@ -9,11 +9,11 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.AppException;
+import com.axway.apim.api.IAPI;
+import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.swagger.APIImportConfigAdapter;
-import com.axway.apim.swagger.api.state.IAPI;
+import com.axway.apim.lib.errorHandling.AppException;
 
 public class SubstituteVariablesTest {
 	

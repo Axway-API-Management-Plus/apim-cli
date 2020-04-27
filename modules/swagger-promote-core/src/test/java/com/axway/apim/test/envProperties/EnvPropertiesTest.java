@@ -6,8 +6,8 @@ import java.net.URISyntaxException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.EnvironmentProperties;
+import com.axway.apim.lib.errorHandling.AppException;
 
 public class EnvPropertiesTest {
 
