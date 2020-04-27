@@ -24,7 +24,6 @@ import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
 import com.axway.apim.api.export.lib.ExportCommandParameters;
-import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.api.model.APIImage;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.CaCert;

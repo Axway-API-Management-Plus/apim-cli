@@ -5,12 +5,14 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class APISpecification {
 	
 	static Logger LOG = LoggerFactory.getLogger(APISpecification.class);
+	
+	protected ObjectMapper objectMapper = new ObjectMapper();
 	
 	protected String apiSpecificationFile = null;
 	
@@ -22,9 +24,6 @@ public abstract class APISpecification {
 		super();
 		this.apiSpecificationContent = apiSpecificationContent;
 		this.backendBasepath = backendBasepath;
-		if(this.backendBasepath!=null) {
-			configureBasepath();
-		}
 	}
 	
 	public APISpecification() {
@@ -65,4 +64,6 @@ public abstract class APISpecification {
 	protected abstract void configureBasepath() throws AppException;
 	
 	public abstract int getAPIDefinitionType() throws AppException;
+	
+	public abstract boolean configure() throws AppException;
 }

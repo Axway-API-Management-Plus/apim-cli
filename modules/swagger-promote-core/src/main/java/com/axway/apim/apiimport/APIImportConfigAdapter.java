@@ -57,7 +57,6 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.definition.APISpecificationFactory;
-import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;

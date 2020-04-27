@@ -6,11 +6,13 @@ import com.axway.apim.api.IAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Swagger20Specification extends APISpecification {
+	
+	JsonNode swagger = null;
+	
 
 	public Swagger20Specification() {
 		super();
@@ -34,8 +36,8 @@ public class Swagger20Specification extends APISpecification {
 				URL url = new URL(this.backendBasepath);
 				String port = url.getPort()==-1 ? ":"+String.valueOf(url.getDefaultPort()) : ":"+String.valueOf(url.getPort());
 				if(port.equals(":443") || port.equals(":80")) port = "";
-				ObjectMapper objectMapper = new ObjectMapper();
-				JsonNode swagger = objectMapper.readTree(apiSpecificationContent);
+				
+				
 				if(swagger.get("host")==null) {
 					LOG.debug("Adding new host '"+url.getHost()+port+"' to Swagger-File based on configured backendBasepath: '"+this.backendBasepath+"'");
 					backendBasepathAdjusted = true;
@@ -78,6 +80,21 @@ public class Swagger20Specification extends APISpecification {
 			}
 		} catch (Exception e) {
 			LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
+		}
+	}
+
+	@Override
+	public boolean configure() throws AppException {
+		try {
+			swagger = objectMapper.readTree(apiSpecificationContent);
+			if(!(swagger.has("swagger") && swagger.get("swagger").asText().equals("2.0"))) {
+				return false;
+			}
+			configureBasepath();
+			return true;
+		} catch (Exception e) {
+			LOG.debug("Can't read apiSpecication. Doesn't have key \\\"swagger\\\" with value: \\\"2.0\"", e);
+			return false;
 		}
 	}
 }

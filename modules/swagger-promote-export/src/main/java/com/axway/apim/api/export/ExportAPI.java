@@ -8,7 +8,6 @@ import java.util.Map;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
-import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.api.model.APIImage;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthType;
