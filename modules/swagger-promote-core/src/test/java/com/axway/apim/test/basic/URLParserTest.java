@@ -5,8 +5,8 @@ import static org.testng.Assert.assertThrows;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.URLParser;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.URLParser;
 
 public class URLParserTest {
 	

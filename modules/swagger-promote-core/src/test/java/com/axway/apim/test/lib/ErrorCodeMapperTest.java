@@ -4,9 +4,9 @@ import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.lib.ErrorCodeMapper;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 
 public class ErrorCodeMapperTest {
 	

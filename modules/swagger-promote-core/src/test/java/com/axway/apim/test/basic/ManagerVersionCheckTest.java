@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.axway.apim.swagger.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapter;
 
 public class ManagerVersionCheckTest {
 	

@@ -2,9 +2,9 @@ package com.axway.apim.api.export.lib;
 
 import org.apache.commons.cli.CommandLine;
 
-import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
+import com.axway.apim.lib.errorHandling.AppException;
 
 public class ExportCommandParameters extends CommandParameters {
 

@@ -67,6 +67,7 @@ public class ImportTestAction extends AbstractTestAction {
 		String ignoreQuotas = "false";
 		String ignoreAdminAccount = "false";
 		String allowOrgAdminsToPublish = "true";
+		String changeOrganization = "false";
 		String clientOrgsMode = CommandParameters.MODE_ADD;
 		String clientAppsMode = CommandParameters.MODE_ADD;
 		String quotaMode = CommandParameters.MODE_ADD;
@@ -92,6 +93,9 @@ public class ImportTestAction extends AbstractTestAction {
 		} catch (Exception ignore) {};
 		try {
 			allowOrgAdminsToPublish = context.getVariable("allowOrgAdminsToPublish");
+		} catch (Exception ignore) {};
+		try {
+			changeOrganization = context.getVariable("changeOrganization");
 		} catch (Exception ignore) {};
 		
 		
@@ -124,7 +128,8 @@ public class ImportTestAction extends AbstractTestAction {
 					"-clientAppsMode", clientAppsMode,
 					"-quotaMode", quotaMode,
 					"-ignoreAdminAccount", ignoreAdminAccount, 
-					"-allowOrgAdminsToPublish", allowOrgAdminsToPublish};
+					"-allowOrgAdminsToPublish", allowOrgAdminsToPublish, 
+					"-changeOrganization", changeOrganization};
 		}
 		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);
 		int rc = App.run(args);
