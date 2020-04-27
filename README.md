@@ -105,6 +105,8 @@ Also version 7.5.3 is supported, but not fully automated tested.
     - Added new environment variable: SWAGGER_PROMOTE_HOME [#249](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/issues/248)
     - Load Stage-API-Config from subfolder [#248](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/issues/249)
   - [Jenkins-Integration-with-GitHub-&-Bitbucket](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/9.-Jenkins-Integration-with-GitHub-&-Bitbucket)
+- 1.6.7 - 27.04.2020 [All changes](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/milestone/6?closed=1)
+  - Added support for OpenAPI 3.0 - Now [backendBasepath](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/2.-API-Configuration#parameter-backendbasepath) can be used for OpenAPI 3.0 specifications
 
 
 ## Limitations/Caveats
