@@ -6,6 +6,11 @@ import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
+import com.axway.apim.lib.utils.TestIndicator;
+
 public class CommandParameters {
 	
 	private static Logger LOG = LoggerFactory.getLogger(CommandParameters.class);
@@ -164,6 +169,11 @@ public class CommandParameters {
 		return Boolean.parseBoolean(getValue("rollback"));
 	}
 	
+	public boolean changeOrganization() {
+		if(getValue("changeOrganization")==null) return false;
+		return Boolean.parseBoolean(getValue("changeOrganization"));
+	}
+	
 	public String getConfDir() {
 		if(getValue("confDir")==null) return null;
 		return getValue("confDir");
@@ -174,7 +184,7 @@ public class CommandParameters {
 		if(getValue("username")==null && getValue("admin_username")==null) errors.setError("Required parameter: 'username' or 'admin_username' is missing.", ErrorCode.MISSING_PARAMETER, false);
 		if(getValue("password")==null && getValue("admin_password")==null) errors.setError("Required parameter: 'password' or 'admin_password' is missing.", ErrorCode.MISSING_PARAMETER, false);
 		if(getValue("host")==null) errors.setError("Required parameter: 'host' is missing.", ErrorCode.MISSING_PARAMETER, false);
-		if(errors.hasError) {
+		if(errors.hasError()) {
 			LOG.error("Provide at least the following parameters: username, password and host either using Command-Line-Options or in Environment.Properties");
 			throw new AppException("Missing required parameters.", ErrorCode.MISSING_PARAMETER);
 		}

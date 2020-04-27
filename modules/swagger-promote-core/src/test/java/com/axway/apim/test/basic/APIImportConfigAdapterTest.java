@@ -10,12 +10,12 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.AppException;
+import com.axway.apim.apiimport.APIImportConfigAdapter;
+import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.lib.ErrorState;
-import com.axway.apim.swagger.APIImportConfigAdapter;
-import com.axway.apim.swagger.api.state.DesiredAPI;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorState;
 
 public class APIImportConfigAdapterTest {
 

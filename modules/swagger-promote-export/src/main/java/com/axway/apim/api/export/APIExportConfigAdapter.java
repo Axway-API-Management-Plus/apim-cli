@@ -18,21 +18,21 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.Proxies;
+import com.axway.apim.api.IAPI;
+import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
 import com.axway.apim.api.export.lib.ExportCommandParameters;
-import com.axway.apim.lib.AppException;
-import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.lib.ErrorState;
-import com.axway.apim.manager.Proxies;
-import com.axway.apim.swagger.APIManagerAdapter;
-import com.axway.apim.swagger.api.properties.APIDefintion;
-import com.axway.apim.swagger.api.properties.APIImage;
-import com.axway.apim.swagger.api.properties.cacerts.CaCert;
-import com.axway.apim.swagger.api.properties.outboundprofiles.OutboundProfile;
-import com.axway.apim.swagger.api.properties.quota.APIQuota;
-import com.axway.apim.swagger.api.state.ActualAPI;
-import com.axway.apim.swagger.api.state.DesiredAPI;
-import com.axway.apim.swagger.api.state.IAPI;
+import com.axway.apim.api.model.APIImage;
+import com.axway.apim.api.model.APIQuota;
+import com.axway.apim.api.model.CaCert;
+import com.axway.apim.api.model.OutboundProfile;
+import com.axway.apim.apiimport.ActualAPI;
+import com.axway.apim.apiimport.DesiredAPI;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -112,7 +112,7 @@ public class APIExportConfigAdapter {
 				String apiPath = mgrAPI.get("path").asText();
 				Matcher matcher = pattern.matcher(apiPath);
 				if(matcher.matches()) {
-					LOG.debug("Adding API with path: '"+apiPath+"' based on requested path: '"+exportApiPath+"' to the export list.");
+					LOG.info("Adding API with path: '"+apiPath+"' based on requested path: '"+exportApiPath+"' to the export list.");
 					exportAPIList.add(getExportAPI(mgrAPI));
 				}
 			}			
@@ -121,7 +121,7 @@ public class APIExportConfigAdapter {
 	}
 	
 	private ExportAPI getExportAPI(JsonNode mgrAPI) throws AppException {
-		IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate());
+		IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate(), ActualAPI.class);
 		handleCustomProperties(actualAPI);
 		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getInboundProfiles(), actualAPI, true);
 		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getOutboundProfiles(), actualAPI, true);
@@ -148,12 +148,12 @@ public class APIExportConfigAdapter {
 		if (!localFolder.mkdirs()) {
 			throw new AppException("Cant create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
-		APIDefintion apiDef = exportAPI.getAPIDefinition();
+		APISpecification apiDef = exportAPI.getAPIDefinition();
 		String targetFile = null;
 		try {
 			targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName()+".json";
-			writeBytesToFile(apiDef.getAPIDefinitionContent(), targetFile);
-			exportAPI.getAPIDefinition().setAPIDefinitionFile(exportAPI.getName()+".json");
+			writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
+			exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName()+".json");
 		} catch (IOException e) {
 			throw new AppException("Can't save API-Definition locally to file: " + targetFile,
 					ErrorCode.UNXPECTED_ERROR, e);
