@@ -6,7 +6,8 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.model.APIDefintion;
+import com.axway.apim.api.IAPI;
+import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.model.APIImage;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthType;
@@ -21,7 +22,6 @@ import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.api.model.TagMap;
-import com.axway.apim.api.state.IAPI;
 import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -64,7 +64,7 @@ public class ExportAPI {
 
 	
 	@JsonIgnore
-	public APIDefintion getAPIDefinition() {
+	public APISpecification getAPIDefinition() {
 		return this.actualAPIProxy.getAPIDefinition();
 	}
 
@@ -299,7 +299,7 @@ public class ExportAPI {
 	
 	@JsonProperty("apiDefinition")
 	public String getApiDefinitionImport() {
-		return this.getAPIDefinition().getAPIDefinitionFile();
+		return this.getAPIDefinition().getApiSpecificationFile();
 	}
 	
 	@JsonIgnore

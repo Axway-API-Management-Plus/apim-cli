@@ -15,12 +15,11 @@ import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.APIImportConfigAdapter;
+import com.axway.apim.api.API;
+import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.ServiceProfile;
-import com.axway.apim.api.state.AbstractAPI;
-import com.axway.apim.api.state.IAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -36,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 
  * @author cwiechmann@axway.com
  */
-public class DesiredAPI extends AbstractAPI implements IAPI {
+public class DesiredAPI extends API implements IAPI {
 	
 	private static Logger LOG = LoggerFactory.getLogger(DesiredAPI.class);
 	

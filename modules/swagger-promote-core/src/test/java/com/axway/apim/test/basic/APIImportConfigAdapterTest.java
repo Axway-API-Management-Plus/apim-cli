@@ -10,7 +10,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.axway.apim.adapter.APIImportConfigAdapter;
+import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;

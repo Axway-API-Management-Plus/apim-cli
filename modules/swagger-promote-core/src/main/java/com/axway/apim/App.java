@@ -16,12 +16,13 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.APIImportConfigAdapter;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.Proxies;
-import com.axway.apim.api.state.APIChangeState;
-import com.axway.apim.api.state.IAPI;
+import com.axway.apim.api.IAPI;
+import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.APIImportManager;
+import com.axway.apim.apiimport.ActualAPI;
+import com.axway.apim.apiimport.state.APIChangeState;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.APIPropertiesExport;
@@ -239,7 +240,7 @@ public class App {
 					.hasVHost(desiredAPI.getVhost())
 					.hasQueryStringVersion(desiredAPI.getApiRoutingKey())
 					.useFilter(filters)
-					.build().getAPI(true), desiredAPI);
+					.build().getAPI(true), desiredAPI, ActualAPI.class);
 			// Based on the actual API - fulfill/complete some elements in the desired API
 			configAdapter.completeDesiredAPI(desiredAPI, actualAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);

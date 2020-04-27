@@ -31,8 +31,11 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.api.API;
+import com.axway.apim.api.IAPI;
+import com.axway.apim.api.definition.APISpecification;
+import com.axway.apim.api.definition.APISpecificationFactory;
 import com.axway.apim.api.model.APIAccess;
-import com.axway.apim.api.model.APIDefintion;
 import com.axway.apim.api.model.APIImage;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
@@ -42,9 +45,6 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.User;
-import com.axway.apim.api.state.AbstractAPI;
-import com.axway.apim.api.state.IAPI;
-import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -317,23 +317,23 @@ public class APIManagerAdapter {
 	 * @return an APIManagerAPI instance, which is flagged either as valid, if the API was found or invalid, if not found!
 	 * @throws AppException when the API-Manager API-State can't be created
 	 */
-	public IAPI getAPIManagerAPI(JsonNode jsonConfiguration, IAPI desiredAPI) throws AppException {
+	public <T> API getAPIManagerAPI(JsonNode jsonConfiguration, IAPI desiredAPI, Class<T> apiType) throws AppException {
 		if(jsonConfiguration == null) {
-			IAPI apiManagerAPI = new ActualAPI();
+			API apiManagerAPI = new API();
 			apiManagerAPI.setValid(false);
 			return apiManagerAPI;
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
-		IAPI apiManagerApi;
+		T apiManagerApi;
 		try {
-			apiManagerApi = mapper.readValue(jsonConfiguration.toString(), ActualAPI.class);
-			((ActualAPI)apiManagerApi).setApiConfiguration(jsonConfiguration);
-			apiManagerApi.setAPIDefinition(getOriginalAPIDefinitionFromAPIM(apiManagerApi.getApiId()));
-			if(apiManagerApi.getImage()!=null) {
-				((ActualAPI)apiManagerApi).setImage(getAPIImageFromAPIM(apiManagerApi.getId())); 
+			apiManagerApi = mapper.readValue(jsonConfiguration.toString(), apiType);
+			((API)apiManagerApi).setApiConfiguration(jsonConfiguration);
+			((API)apiManagerApi).setAPIDefinition(getOriginalAPIDefinitionFromAPIM(((API)apiManagerApi).getApiId()));
+			if(((API)apiManagerApi).getImage()!=null) {
+				((API)apiManagerApi).setImage(getAPIImageFromAPIM(((API)apiManagerApi).getId())); 
 			}
-			apiManagerApi.setValid(true);
+			((API)apiManagerApi).setValid(true);
 			// As the API-Manager REST doesn't provide information about Custom-Properties, we have to setup 
 			// the Custom-Properties based on the Import API.
 			if(desiredAPI!=null && desiredAPI.getCustomProperties() != null) {
@@ -345,14 +345,14 @@ public class APIManagerAdapter {
 					String customPropValue = (value == null) ? null : value.asText();
 					customProperties.put(customPropKey, customPropValue);
 				}
-				((AbstractAPI)apiManagerApi).setCustomProperties(customProperties);
+				((API)apiManagerApi).setCustomProperties(customProperties);
 			}
-			addQuotaConfiguration(apiManagerApi, desiredAPI);
-			addClientOrganizations(apiManagerApi, desiredAPI);
-			addClientApplications(apiManagerApi, desiredAPI);
-			addOrgName(apiManagerApi, desiredAPI);
-			addExistingClientAppQuotas(apiManagerApi.getApplications());
-			return apiManagerApi;
+			addQuotaConfiguration((IAPI)apiManagerApi, desiredAPI);
+			addClientOrganizations((IAPI)apiManagerApi, desiredAPI);
+			addClientApplications((IAPI)apiManagerApi, desiredAPI);
+			addOrgName((IAPI)apiManagerApi, desiredAPI);
+			addExistingClientAppQuotas(((IAPI)apiManagerApi).getApplications());
+			return (API) apiManagerApi;
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-State.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
@@ -409,10 +409,10 @@ public class APIManagerAdapter {
 		if(desiredAPI!=null) {
 			// Is desiredOrgId is the same as the actual org just take over the desired Org-Name
 			if(desiredAPI.getOrganizationId().equals(apiManagerApi.getOrganizationId())) {
-				((ActualAPI)apiManagerApi).setOrganization(desiredAPI.getOrganization());
+				apiManagerApi.setOrganization(desiredAPI.getOrganization());
 			} else {
 				String actualOrgName = getOrg(apiManagerApi.getOrganizationId()).getName();
-				((ActualAPI)apiManagerApi).setOrganization(actualOrgName);
+				apiManagerApi.setOrganization(actualOrgName);
 			}
 		}
 	}
@@ -643,12 +643,11 @@ public class APIManagerAdapter {
 		// No need to load quota, if not given in the desired API
 		if(desiredAPI!=null && (desiredAPI.getApplicationQuota() == null && desiredAPI.getSystemQuota() == null)) return;
 		if(!this.hasAdminAccount) return; // Can't load quota without having an Admin-Account
-		ActualAPI managerAPI = (ActualAPI)api;
 		try {
 			applicationQuotaConfig = getQuotaFromAPIManager(APPLICATION_DEFAULT_QUOTA); // Get the Application-Default-Quota
 			sytemQuotaConfig = getQuotaFromAPIManager(SYSTEM_API_QUOTA); // Get the System-Default-Quota
-			managerAPI.setApplicationQuota(getAPIQuota(applicationQuotaConfig, managerAPI.getId()));
-			managerAPI.setSystemQuota(getAPIQuota(sytemQuotaConfig, managerAPI.getId()));
+			api.setApplicationQuota(getAPIQuota(applicationQuotaConfig, api.getId()));
+			api.setSystemQuota(getAPIQuota(sytemQuotaConfig, api.getId()));
 		} catch (AppException e) {
 			LOG.error("Application-Default quota response: '"+applicationQuotaConfig+"'");
 			LOG.error("System-Default quota response: '"+sytemQuotaConfig+"'");
@@ -708,9 +707,9 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static APIDefintion getOriginalAPIDefinitionFromAPIM(String backendApiID) throws AppException {
+	private static APISpecification getOriginalAPIDefinitionFromAPIM(String backendApiID) throws AppException {
 		URI uri;
-		APIDefintion apiDefinition;
+		APISpecification apiDefinition;
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+backendApiID+"/download")
@@ -718,11 +717,11 @@ public class APIManagerAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null);
 			httpResponse=getRequest.execute();
 			String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
-			apiDefinition = new APIDefintion(res.getBytes(StandardCharsets.UTF_8));
+			String origFilename = "Unkown filename";
 			if(httpResponse.containsHeader("Content-Disposition")) {
-				String origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
-				apiDefinition.setAPIDefinitionFile(origFilename.substring(origFilename.indexOf("filename=")+9));
+				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
 			}
+			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null);
 			return apiDefinition;
 		} catch (Exception e) {
 			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
@@ -908,7 +907,7 @@ public class APIManagerAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null, true);
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
-			allAPIs = mapper.readValue(response, new TypeReference<List<ActualAPI>>(){});
+			allAPIs = mapper.readValue(response, new TypeReference<List<API>>(){});
 			return allAPIs;
 		} catch (Exception e) {
 			LOG.error("Error cant read all APIs from API-Manager. Can't parse response: " + response);
