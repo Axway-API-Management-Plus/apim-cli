@@ -4,7 +4,6 @@ import com.axway.apim.api.IAPI;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 public class WSDLSpecification extends APISpecification {
 	
