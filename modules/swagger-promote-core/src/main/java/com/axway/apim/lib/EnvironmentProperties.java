@@ -10,7 +10,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.actions.rest.APIMHttpClient;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.APIMHttpClient;
 
 public class EnvironmentProperties implements Map<String, String> {
 	

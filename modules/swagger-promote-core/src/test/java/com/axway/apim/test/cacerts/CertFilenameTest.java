@@ -3,7 +3,7 @@ package com.axway.apim.test.cacerts;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.axway.apim.swagger.api.properties.cacerts.CaCert;
+import com.axway.apim.api.model.CaCert;
 
 public class CertFilenameTest {
 	@Test

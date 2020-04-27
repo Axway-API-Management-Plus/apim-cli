@@ -7,8 +7,8 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.AppException;
-import com.axway.apim.swagger.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -98,7 +98,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		
 		echo("####### Validate all APPLICATION quotas (manually configured & API-Config) do exists #######");
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
-			Thread.sleep(300); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+			Thread.sleep(2000); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
 		}
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)

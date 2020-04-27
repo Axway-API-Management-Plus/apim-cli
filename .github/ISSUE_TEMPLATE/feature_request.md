@@ -12,4 +12,4 @@ assignees: cwiechmann
 >Swagger-Promote available as a Maven-Module.
 
 **Additional context**
->This would avoid to manage Swagger-Promote in a local repositry.
+>This would avoid to manage Swagger-Promote in a local repository.

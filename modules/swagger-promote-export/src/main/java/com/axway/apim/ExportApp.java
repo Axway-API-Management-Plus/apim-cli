@@ -12,17 +12,17 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.actions.rest.APIMHttpClient;
-import com.axway.apim.actions.rest.Transaction;
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.export.APIExportConfigAdapter;
 import com.axway.apim.api.export.lib.ExportCommandParameters;
-import com.axway.apim.lib.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.lib.ErrorCode;
-import com.axway.apim.lib.ErrorState;
 import com.axway.apim.lib.RelaxedParser;
-import com.axway.apim.swagger.APIManagerAdapter;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
+import com.axway.apim.lib.utils.rest.APIMHttpClient;
+import com.axway.apim.lib.utils.rest.Transaction;
 
 /**
  * 

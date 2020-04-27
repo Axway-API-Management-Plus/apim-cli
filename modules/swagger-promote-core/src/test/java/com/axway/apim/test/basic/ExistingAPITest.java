@@ -8,9 +8,9 @@ import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.AppException;
-import com.axway.apim.manager.Proxies;
-import com.axway.apim.swagger.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.Proxies;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -120,7 +120,7 @@ public class ExistingAPITest {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
 		
-		JsonNode api = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
+		new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
 				.setApiManagerResponse(apiManagerResponse)
 				.hasQueryStringVersion("1.0")
 				.hasApiPath("/api/emr/catalog")
@@ -132,7 +132,7 @@ public class ExistingAPITest {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
 		
-		JsonNode api = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
+		new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
 				.setApiManagerResponse(apiManagerResponse)
 				.hasQueryStringVersion("1.1")
 				.build().getAPI(true);
@@ -143,7 +143,7 @@ public class ExistingAPITest {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("restapi/proxies/proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
 		
-		JsonNode api = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
+		new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
 				.setApiManagerResponse(apiManagerResponse)
 				.hasQueryStringVersion("1.1")
 				.hasVHost("api.customer.com")
