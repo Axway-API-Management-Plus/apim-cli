@@ -40,16 +40,16 @@ To achieve this quality bar, Swagger-Promote was developed from the beginning in
 
 With the most recent released version 1.6.5 the automated End-2-End test suite contains of __104__ different scenarios, which includes more than __250__ executions of Swagger-Promote (Import & Export) following each by a validation step. The test suite is executed at Travis CI for the following versions:  
 
-| Version       | Branch               | Status | 
-| :---          | :---                 | :---:  |
-| 7.6.2 SP2     | test-with-7.6.2-SP2  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.6.2-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
-| 7.6.2 SP3     | test-with-7.6.2-SP3  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.6.2-SP3)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
-| 7.6.2 SP4     | develop  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
-| 7.7           | test-with-7.7        | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
-| 7.7 SP1       | test-with-7.7-SP1    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-SP1)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
-| 7.7 SP2       | test-with-7.7-SP2    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
-| 7.7 20200130  | test-with-7.7-20200130    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-20200130)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
-| 7.7 20200331  | test-with-7.7-20200331    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-20200331)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|
+| Version       | Branch               | Status | Comment | 
+| :---          | :---                 | :---:  | :--- |
+| 7.6.2 SP2     | test-with-7.6.2-SP2  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.6.2-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
+| 7.6.2 SP3     | test-with-7.6.2-SP3  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.6.2-SP3)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
+| 7.6.2 SP4     | develop  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
+| 7.7           | test-with-7.7        | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
+| 7.7 SP1       | test-with-7.7-SP1    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-SP1)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
+| 7.7 SP2       | test-with-7.7-SP2    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
+| 7.7 20200130  | test-with-7.7-20200130    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-20200130)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
+| 7.7 20200331  | test-with-7.7-20200331    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-20200331)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|Also the March-Release works, but some of the Quota-Tests are a flaky.|
 
 Also version 7.5.3 is supported, but not fully automated tested.  
 
