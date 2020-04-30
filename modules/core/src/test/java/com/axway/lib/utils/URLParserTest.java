@@ -1,4 +1,4 @@
-package com.axway.apim.test.basic;
+package com.axway.lib.utils;
 
 import static org.testng.Assert.assertThrows;
 

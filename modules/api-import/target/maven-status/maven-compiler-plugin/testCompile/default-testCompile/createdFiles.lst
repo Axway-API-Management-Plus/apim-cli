@@ -1,7 +1,6 @@
 com\axway\apim\test\basic\APIImportConfigTest.class
 com\axway\apim\test\orgadmin\OrgAdminOAuthExternalTestIT.class
 com\axway\apim\test\security\NoAuthenticationGivenTestIT.class
-com\axway\apim\test\basic\URLParserTest.class
 com\axway\apim\test\quota\AppOrSystemQuotaOnlyTestIT.class
 com\axway\apim\test\applications\ReplaceOrgPermissionsWithSubscribedAppsTestIT.class
 com\axway\apim\test\wsdl\WSDLFromURLDirectTestIT.class

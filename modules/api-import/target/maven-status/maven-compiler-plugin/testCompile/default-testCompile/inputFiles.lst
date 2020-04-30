@@ -7,7 +7,6 @@ C:\workspaces\api-management\apimanager-swagger-promote\modules\api-import\src\t
 C:\workspaces\api-management\apimanager-swagger-promote\modules\api-import\src\test\java\com\axway\apim\test\orgadmin\OrgAdminTriesToPublishTestIT.java
 C:\workspaces\api-management\apimanager-swagger-promote\modules\api-import\src\test\java\com\axway\apim\test\policies\RoutingPolicyTestIT.java
 C:\workspaces\api-management\apimanager-swagger-promote\modules\api-import\src\test\java\com\axway\apim\test\basic\NoAPIDefinitionConfiguredIT.java
-C:\workspaces\api-management\apimanager-swagger-promote\modules\api-import\src\test\java\com\axway\apim\test\basic\URLParserTest.java
 C:\workspaces\api-management\apimanager-swagger-promote\modules\api-import\src\test\java\com\axway\apim\test\cacerts\CertFilenameTest.java
 C:\workspaces\api-management\apimanager-swagger-promote\modules\api-import\src\test\java\com\axway\apim\test\image\APIImageTestIT.java
 C:\workspaces\api-management\apimanager-swagger-promote\modules\api-import\src\test\java\com\axway\apim\test\security\NoAuthenticationGivenTestIT.java
