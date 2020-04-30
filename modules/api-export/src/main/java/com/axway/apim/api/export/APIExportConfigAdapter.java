@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.Proxies;
+import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
@@ -119,7 +120,7 @@ public class APIExportConfigAdapter {
 	}
 	
 	private ExportAPI getExportAPI(JsonNode mgrAPI) throws AppException {
-		IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate(), ExportAPI.class);
+		IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate(), API.class);
 		handleCustomProperties(actualAPI);
 		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getInboundProfiles(), actualAPI, true);
 		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getOutboundProfiles(), actualAPI, true);
@@ -241,14 +242,14 @@ public class APIExportConfigAdapter {
 	 * @throws AppException
 	 */
 	private IAPI getAPITemplate() throws AppException {
-		IAPI apiTemplate = new ExportAPI();
+		IAPI apiTemplate = new API();
 		apiTemplate.setState(IAPI.STATE_PUBLISHED);
 		apiTemplate.setClientOrganizations(new ArrayList<String>());
 		// Required to force loading of actual quota!
-		((ExportAPI)apiTemplate).setApplicationQuota(new APIQuota());
-		((ExportAPI)apiTemplate).setSystemQuota(new APIQuota());
+		apiTemplate.setApplicationQuota(new APIQuota());
+		apiTemplate.setSystemQuota(new APIQuota());
 		// Given a NOT-KNOWN organization to force the API-Manager Adapter to set the correct orgName in the actual API
-		((ExportAPI)apiTemplate).setOrganizationId("NOT-KNOWN");
+		apiTemplate.setOrganizationId("NOT-KNOWN");
 		return apiTemplate;
 	}
 	
@@ -256,7 +257,7 @@ public class APIExportConfigAdapter {
 		JsonNode customPropconfig = APIManagerAdapter.getCustomPropertiesConfig().get("api");
 		if(customPropconfig == null) return; // No custom properties configured
 		Map<String, String> customProperties = new LinkedHashMap<String, String>();
-		JsonNode actualApiConfig = ((ExportAPI)actualAPI).getApiConfiguration();
+		JsonNode actualApiConfig = actualAPI.getApiConfiguration();
 		// Check if Custom-Properties are configured
 		Iterator<String> customPropKeys = customPropconfig.fieldNames();
 		while(customPropKeys.hasNext()) {
@@ -268,7 +269,7 @@ public class APIExportConfigAdapter {
 			}
 		}
 		if(customProperties.size()>0) {
-			((ExportAPI)actualAPI).setCustomProperties(customProperties);
+			((API)actualAPI).setCustomProperties(customProperties);
 		}
 	}
 	
