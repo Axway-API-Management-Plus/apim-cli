@@ -1,0 +1,33 @@
+{
+   "name":"${apiName}",
+   "path":"${apiPath}",
+   "state":"${state}",
+   "version":"1.0.1",
+   "organization":"API Development ${orgNumber}",
+   "applicationQuota":{
+      "restrictions":[
+         {
+            "method":"*",
+            "type":"throttlemb",
+            "config":{
+               "period":"${applicationPeriod}",
+               "mb":${applicationMb},
+               "per":1
+            }
+         }
+      ]
+   },
+   "systemQuota":{
+      "restrictions":[
+         {
+            "method":"*",
+            "type":"throttle",
+            "config":{
+               "period":"${systemPeriod}",
+               "messages":${systemMessages},
+               "per":2
+            }
+         }
+      ]
+   }
+}

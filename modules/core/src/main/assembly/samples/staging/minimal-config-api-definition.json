@@ -1,0 +1,8 @@
+{
+	"name": "Samples Staging Minimal API Base-Config",
+	"path": "/samples/staging/minimal/api/v1",
+	"state": "unpublished",
+	"version": "1.0.0",
+	"apiDefinition":"../petstore.json",
+	"organization": "API Development" 
+}

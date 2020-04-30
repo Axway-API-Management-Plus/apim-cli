@@ -1,0 +1,33 @@
+{
+   "name":"${apiName}",
+   "path":"${apiPath}",
+   "state":"${state}",
+   "version":"1.0.7",
+   "organization":"API Development ${orgNumber}",
+   "inboundProfiles":{
+      "somethingWrong":{
+         "securityProfile":"${securityProfileName}",
+         "corsProfile":null,
+         "monitorAPI":true,
+         "monitorSubject":null
+      }
+   },
+   "securityProfiles":[
+      {
+         "name":"${securityProfileName}",
+         "isDefault":false,
+         "devices":[
+            {
+               "name":"API Key",
+               "type":"apiKey",
+               "order":0,
+               "properties":{
+                  "apiKeyFieldName":"KeyId",
+                  "takeFrom":"HEADER",
+                  "removeCredentialsOnSuccess":"false"
+               }
+            }
+         ]
+      }
+   ]
+}

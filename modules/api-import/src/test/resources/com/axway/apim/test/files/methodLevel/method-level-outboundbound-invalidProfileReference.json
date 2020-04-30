@@ -1,0 +1,46 @@
+{
+   "name":"${apiName}",
+   "path":"${apiPath}",
+   "state":"${state}",
+   "version":"1.0.7",
+   "organization":"API Development ${orgNumber}",
+   "outboundProfiles":{
+      "_default":{
+         "authenticationProfile":"_default",
+         "routeType":"proxy",
+         "requestPolicy":null,
+         "responsePolicy":null,
+         "routePolicy":null,
+         "faultHandlerPolicy":null,
+         "apiId":null,
+         "apiMethodId":null,
+         "parameters":[
+
+         ]
+      },
+      "getOrderById":{
+         "authenticationProfile":"${authenticationProfileName1}",
+         "parameters":[
+            {
+               "name":"additionalOutboundParam",
+               "required":false,
+               "type":"string",
+               "paramType":"header",
+               "value":"Test-Value",
+               "exclude":false,
+               "additional":true
+            }
+         ]
+      }
+   },
+   "authenticationProfiles":[
+      {
+         "name":"${authenticationProfileName2}",
+         "parameters":{
+            "username":"usernameabc",
+            "password":"password"
+         },
+         "type":"http_basic"
+      }
+   ]
+}

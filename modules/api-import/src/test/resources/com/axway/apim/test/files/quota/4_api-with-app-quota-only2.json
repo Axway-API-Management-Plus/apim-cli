@@ -1,0 +1,20 @@
+{
+   "name":"${apiName}",
+   "path":"${apiPath}",
+   "state":"${state}",
+   "version":"1.0.1",
+   "organization":"API Development ${orgNumber}",
+   "applicationQuota":{
+      "restrictions":[
+         {
+            "method":"*",
+            "type":"throttlemb",
+            "config":{
+               "period":"${applicationPeriod}",
+               "mb":787,
+               "per":4
+            }
+         }
+      ]
+   }
+}
