@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 	"backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties", 
 	"corsProfiles", "caCerts", "applicationQuota", "systemQuota" })
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class ExportAPI extends API {
+public class ExportAPI {
 	
 	IAPI actualAPIProxy = null;
 	
@@ -190,10 +190,10 @@ public class ExportAPI extends API {
 		return this.actualAPIProxy.getSummary();
 	}
 
-	public APIImage getImage() {
+	public String getImage() {
 		if(this.actualAPIProxy.getImage()==null) return null;
 		// We don't have an Image provided from the API-Manager
-		return this.actualAPIProxy.getImage();
+		return "api-image"+this.actualAPIProxy.getImage().getFileExtension();
 	}
 	
 	@JsonIgnore
