@@ -22,7 +22,7 @@
 	<version>1.7.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Axway API-Manager CLI Swagger-Promote Parent</name>
+	<name>Axway API-Manager CLI Parent</name>
 	<description>Swagger-Promote provides an easy CLI for Axway API-Manager allowing you to manage your APIs/Apps and Orgs as Code.</description>
 	<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
 
@@ -72,13 +72,31 @@
 
 	<modules>
 		<module>modules/core</module>
+		<module>modules/apim-cli</module>
 		<module>modules/api-export</module>
 		<module>modules/api-import</module>
-		<module>modules/distribution</module>
+		<module>modules/app-import</module>
+		<module>modules/app-export</module>
+		<module>distribution</module>
 	</modules>
 	
 	<dependencyManagement>
 		<dependencies>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>api-import</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>api-export</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>

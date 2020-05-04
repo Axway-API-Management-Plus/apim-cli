@@ -10,7 +10,7 @@
 
 	<artifactId>core</artifactId>
 	<packaging>jar</packaging>
-	<name>Axway API-Manager CLI Swagger-Promote Core</name>
+	<name>Axway API-Manager CLI API-Manager Client/Core</name>
 	<description>The core component of Swagger-Promote replicating APIs into the API-Manager.</description>
 	<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
 

@@ -1,6 +1,6 @@
 package com.axway.apim.export.test;
 
-import com.axway.apim.ExportApp;
+import com.axway.apim.APIExportApp;
 import com.consol.citrus.actions.AbstractTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.CitrusRuntimeException;
@@ -61,7 +61,7 @@ public class ExportTestAction extends AbstractTestAction {
 					"-s", stage,  
 					"-ignoreAdminAccount", ignoreAdminAccount};
 		}
-		int rc = ExportApp.run(args);
+		int rc = APIExportApp.run(args);
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
 		}

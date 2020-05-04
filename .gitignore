@@ -12,3 +12,4 @@
 /modules/**/.settings/
 /modules/**/test-output/
 
+/distribution/**/target/
