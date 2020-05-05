@@ -111,7 +111,8 @@ public class CreateNewAPI {
 			new ManageClientApps(changes.getDesiredAPI(), createdAPI, changes.getActualAPI()).execute(reCreation);
 			
 			// V-Host must be managed almost at the end, as the status must be set already to "published"
-			vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
+			//vHostHandler.handleVHost(changes.getDesiredAPI(), createdAPI);
+			// Vhost should be setup during the api publish
 		} catch (Exception e) {
 			throw e;
 		} finally {
