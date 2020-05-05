@@ -74,6 +74,16 @@ public abstract class APIMCoreCLIOptions {
 		option.setRequired(false);
 		option.setArgName("/home/chris/swagger-promote");
 		options.addOption(option);
+		
+		option = new Option("rollback", true, "Allows to disable the rollback feature");
+		option.setRequired(false);
+		option.setArgName("true");
+		internalOptions.addOption(option);
+		
+		option = new Option("returnCodeMapping", true, "Optionally maps given return codes into a desired return code. Format: 10:0, 12:0");
+		option.setRequired(false);
+		option.setArgName("true");
+		internalOptions.addOption(option);
 
 		this.args = args;
 	}

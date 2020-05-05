@@ -15,7 +15,6 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
 
 public class APIMgrAppsAdapterTest {
 	
@@ -33,12 +32,16 @@ public class APIMgrAppsAdapterTest {
 	@Test
 	public void withoutAnyFilter() throws AppException, IOException, URISyntaxException {
 		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder().build();
+		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
+		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications");
 	}
 	
 	@Test
 	public void usingApplicationId() throws AppException, IOException, URISyntaxException {
 		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder("5893475934875934").build();
+		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
+		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications/5893475934875934");
 	}
 	
@@ -47,6 +50,8 @@ public class APIMgrAppsAdapterTest {
 		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder()
 				.hasName("MyTestApp")
 				.build();
+		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
+		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=name&op=eq&value=MyTestApp");
 	}
 	
@@ -55,6 +60,8 @@ public class APIMgrAppsAdapterTest {
 		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder()
 				.hasOrgId("42342342342343223")
 				.build();
+		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
+		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=orgid&op=eq&value=42342342342343223");
 	}
 	
@@ -63,6 +70,8 @@ public class APIMgrAppsAdapterTest {
 		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder()
 				.hasState("pending")
 				.build();
+		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
+		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=state&op=eq&value=pending");
 	}
 	
@@ -72,6 +81,8 @@ public class APIMgrAppsAdapterTest {
 				.hasState("pending")
 				.hasName("AnotherPendingApp")
 				.build();
+		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
+		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=state&op=eq&value=pending&field=name&op=eq&value=AnotherPendingApp");
 	}
 	
@@ -85,6 +96,8 @@ public class APIMgrAppsAdapterTest {
 				.hasName("AnotherPendingApp")
 				.useFilter(customFilters)
 				.build();
+		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
+		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=name&op=eq&value=AnotherPendingApp&field=email&op=eq&value=this%40there.com");
 	}
 	
@@ -95,6 +108,8 @@ public class APIMgrAppsAdapterTest {
 				.hasName(null)
 				.hasOrgId(null)
 				.build();
+		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
+		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications");
 	}
 	
