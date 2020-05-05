@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.Proxies;
+import com.axway.apim.adapter.APIMgrProxiesAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
@@ -81,7 +81,7 @@ public class APIExportConfigAdapter {
 	private List<ExportAPI> getAPIsToExport() throws AppException {
 		List<ExportAPI> exportAPIList = new ArrayList<ExportAPI>();
 		if (!this.exportApiPath.contains("*")) { // Direct access with a specific API exposure path
-			JsonNode mgrAPI = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END).hasApiPath(this.exportApiPath).hasVHost(exportVhost).build().getAPI(true);
+			JsonNode mgrAPI = new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END).hasApiPath(this.exportApiPath).hasVHost(exportVhost).build().getAPI(true);
 			if(mgrAPI==null) {
 				ErrorState.getInstance().setError("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API, false);
 				throw new AppException("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API);
@@ -99,13 +99,13 @@ public class APIExportConfigAdapter {
 				LOG.info("Using wildcard pattern: '"+exportApiPath+"' to export APIs from API-Manager.");
 				filters.add(new BasicNameValuePair("value", exportApiPath.replace("*", "")));
 			}
-			List<JsonNode> foundAPIs = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END).useFilter(filters).hasVHost(exportVhost).build().getAPIs(false);
+			List<JsonNode> foundAPIs = new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END).useFilter(filters).hasVHost(exportVhost).build().getAPIs(false);
 			for(JsonNode mgrAPI : foundAPIs) {
 				exportAPIList.add(getExportAPI(mgrAPI));
 			}
 		} else { // Get all APIs and filter them out manually
 			Pattern pattern = Pattern.compile(exportApiPath.replace("*", ".*"));
-			List<JsonNode> foundAPIs = new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END).hasVHost(exportVhost).build().getAPIs(false);
+			List<JsonNode> foundAPIs = new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END).hasVHost(exportVhost).build().getAPIs(false);
 			if(foundAPIs.size()>20) LOG.info("Loading actual API state from API-Manager. This may take a while. Please wait.\n");
 			for(JsonNode mgrAPI : foundAPIs) {
 				String apiPath = mgrAPI.get("path").asText();

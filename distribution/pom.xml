@@ -11,7 +11,7 @@
 
   <artifactId>distribution</artifactId>
 
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
   <name>Distribution</name>
 
@@ -49,7 +49,7 @@
               <finalName>apimanager-swagger-promote-${project.version}</finalName>
               <appendAssemblyId>false</appendAssemblyId>
               <descriptors>
-                <descriptor>src/main/assembly/dist-release.xml</descriptor>
+                <descriptor>assembly/dist-release.xml</descriptor>
               </descriptors>
               <attach>false</attach>
               <appendAssemblyId>false</appendAssemblyId>

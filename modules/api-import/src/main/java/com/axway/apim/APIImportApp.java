@@ -17,17 +17,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.Proxies;
+import com.axway.apim.adapter.APIMgrProxiesAdapter;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.apiimport.rollback.RollbackHandler;
 import com.axway.apim.apiimport.state.APIChangeState;
-import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.APIMCLIServiceProvider;
 import com.axway.apim.lib.APIPropertiesExport;
+import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.RelaxedParser;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -236,7 +236,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 				filters.add(new BasicNameValuePair("value", "published"));
 			}
 			// Lookup an existing APIs - If found the actualAPI is valid - desiredAPI is used to control what needs to be loaded
-			IAPI actualAPI = apimAdapter.getAPIManagerAPI(new Proxies.Builder(APIManagerAdapter.TYPE_FRONT_END)
+			IAPI actualAPI = apimAdapter.getAPIManagerAPI(new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
 					.hasApiPath(desiredAPI.getPath())
 					.hasVHost(desiredAPI.getVhost())
 					.hasQueryStringVersion(desiredAPI.getApiRoutingKey())
@@ -305,6 +305,11 @@ public class APIImportApp implements APIMCLIServiceProvider {
 	public String getId() {
 		return "api";
 	}
+	
+	@Override
+	public String getVersion() {
+		return APIImportApp.class.getPackage().getImplementationVersion();
+	}
 
 	@Override
 	public String getMethod() {
@@ -314,6 +319,10 @@ public class APIImportApp implements APIMCLIServiceProvider {
 	@Override
 	public String getDescription() {
 		return "Import APIs into the API-Manager";
+	}
+	
+	public String getName() {
+		return "API Import";
 	}
 
 	@Override

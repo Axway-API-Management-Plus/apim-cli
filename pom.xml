@@ -75,8 +75,8 @@
 		<module>modules/apim-cli</module>
 		<module>modules/api-export</module>
 		<module>modules/api-import</module>
-		<!--module>modules/app-import</module>
-		<module>modules/app-export</module-->
+		<module>modules/app-import</module>
+		<module>modules/app-export</module>
 		<module>distribution</module>
 	</modules>
 	
@@ -95,6 +95,11 @@
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
 			<artifactId>api-export</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>app-export</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

@@ -18,7 +18,6 @@
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
 			<artifactId>core</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -84,6 +83,7 @@
 
 	<build>
 		<plugins>
+			<!-- Creating a Test-Jar as it's required to run api-export tests -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>

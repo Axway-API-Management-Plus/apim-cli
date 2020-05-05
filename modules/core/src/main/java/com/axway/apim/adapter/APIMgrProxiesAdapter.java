@@ -19,9 +19,9 @@ import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Proxies {
+public class APIMgrProxiesAdapter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(Proxies.class);
+	private static Logger LOG = LoggerFactory.getLogger(APIMgrProxiesAdapter.class);
 
 	String requestedVhost;
 	String requestedApiPath;
@@ -35,7 +35,7 @@ public class Proxies {
 	
 	CommandParameters params = CommandParameters.getInstance();
 
-	private Proxies() {
+	private APIMgrProxiesAdapter() {
 
 	}
 
@@ -150,8 +150,8 @@ public class Proxies {
 			this.requestedType = requestedType;
 		}
 		
-		public Proxies build() {
-			Proxies existingAPIs = new Proxies();
+		public APIMgrProxiesAdapter build() {
+			APIMgrProxiesAdapter existingAPIs = new APIMgrProxiesAdapter();
 			existingAPIs.apiManagerResponse = this.apiManagerResponse;
 			existingAPIs.filter = this.filter;
 			existingAPIs.requestedApiPath = this.requestedApiPath;

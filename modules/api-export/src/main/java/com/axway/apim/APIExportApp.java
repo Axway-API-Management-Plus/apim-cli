@@ -186,6 +186,10 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public String getMethod() {
 		return "export";
 	}
+	
+	public String getName() {
+		return "API Export";
+	}
 
 	@Override
 	public String getDescription() {
@@ -195,6 +199,11 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	@Override
 	public String getId() {
 		return "api";
+	}
+	
+	@Override
+	public String getVersion() {
+		return APIExportApp.class.getPackage().getImplementationVersion();
 	}
 
 	@Override

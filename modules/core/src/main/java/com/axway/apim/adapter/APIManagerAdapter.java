@@ -77,6 +77,8 @@ public class APIManagerAdapter {
 	private static List<ClientApplication> allApps = null;
 	private static List<IAPI> allAPIs = null;
 	
+	public static ObjectMapper mapper = new ObjectMapper();
+	
 	private static Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<String, ClientApplication>();
 	
 	private static Map<String, List<APIAccess>> orgsApiAccess = new HashMap<String, List<APIAccess>>();
@@ -194,7 +196,6 @@ public class APIManagerAdapter {
 	}
 	
 	public static User getCurrentUser(boolean useAdminClient) throws AppException {
-		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
 		HttpResponse response = null;
 		JsonNode jsonResponse = null;
@@ -325,7 +326,6 @@ public class APIManagerAdapter {
 			return apiManagerAPI;
 		}
 		
-		ObjectMapper mapper = new ObjectMapper();
 		T apiManagerApi;
 		try {
 			apiManagerApi = mapper.readValue(jsonConfiguration.toString(), apiType);
@@ -418,7 +418,7 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private void addExistingClientAppQuotas(List<ClientApplication> existingClientApps) throws AppException {
+	public void addExistingClientAppQuotas(List<ClientApplication> existingClientApps) throws AppException {
 		if(existingClientApps==null || existingClientApps.size()==0) return; // No apps subscribed to this APIs
 		for(ClientApplication app : existingClientApps) {
 			APIQuota appQuota = getQuotaFromAPIManager(app.getId());
@@ -427,7 +427,6 @@ public class APIManagerAdapter {
 	}
 	
 	public String getMethodNameForId(String apiId, String methodId) throws AppException {
-		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
 		URI uri;
 		try {
@@ -450,7 +449,6 @@ public class APIManagerAdapter {
 	}
 	
 	public List<APIMethod> getAllMethodsForAPI(String apiId) throws AppException {
-		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
 		URI uri;
 		List<APIMethod> apiMethods = new ArrayList<APIMethod>();
@@ -589,7 +587,6 @@ public class APIManagerAdapter {
 		HttpResponse httpResponse = null;
 		for(ClientApplication app : allApps) {
 			if(appIds.contains(app)) continue;
-			ObjectMapper mapper = new ObjectMapper();
 			String response = null;
 			URI uri;
 			try {
@@ -658,7 +655,6 @@ public class APIManagerAdapter {
 	
 	private APIQuota getQuotaFromAPIManager(String identifier) throws AppException {
 		if(!hasAdminAccount()) return null;
-		ObjectMapper mapper = new ObjectMapper();
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
@@ -778,7 +774,6 @@ public class APIManagerAdapter {
 	 * @throws AppException is something goes wrong.
 	 */
 	public static String getApiManagerConfig(String configField) throws AppException {
-		ObjectMapper mapper = new ObjectMapper();
 		boolean useAdmin = (configFieldRequiresAdmin.containsKey(configField)) ? true : false;
 		String managerConfig = apiManagerConfig.get(useAdmin);
 		URI uri;
@@ -812,7 +807,6 @@ public class APIManagerAdapter {
 	
 	public static List<APIAccess> getAPIAccess(String id, String type) throws AppException {
 		List<APIAccess> allApiAccess = new ArrayList<APIAccess>();
-		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
 		URI uri;
 		HttpResponse httpResponse = null;
@@ -835,7 +829,6 @@ public class APIManagerAdapter {
 	}
 	
 	private List<ClientApplication> getSubscribedApps(String apiId) throws AppException {
-		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
 		URI uri;
 		HttpResponse httpResponse = null;
@@ -868,7 +861,6 @@ public class APIManagerAdapter {
 			return APIManagerAdapter.allOrgs;
 		}
 		allOrgs = new ArrayList<Organization>();
-		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
 		URI uri;
 		HttpResponse httpResponse = null;
@@ -899,7 +891,6 @@ public class APIManagerAdapter {
 			return APIManagerAdapter.allAPIs;
 		}
 		allAPIs = new ArrayList<IAPI>();
-		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
 		URI uri;
 		HttpResponse httpResponse = null;
@@ -931,7 +922,6 @@ public class APIManagerAdapter {
 		}
 		LOG.debug("Loading existing apps from API-Manager.");
 		allApps = new ArrayList<ClientApplication>();
-		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
 		URI uri;
 		HttpResponse httpResponse = null;
@@ -962,7 +952,6 @@ public class APIManagerAdapter {
 		if(!forceReload && orgsApiAccess.containsKey(orgId)) {
 			return orgsApiAccess.get(orgId);
 		}
-		ObjectMapper mapper = new ObjectMapper();
 		String response = null;
 		URI uri;
 		List<APIAccess> apiAccess;
@@ -1039,7 +1028,6 @@ public class APIManagerAdapter {
 	 */
 	public static JsonNode getCertInfo(InputStream certFile, CaCert cert) throws AppException {
 		URI uri;
-		ObjectMapper mapper = new ObjectMapper();
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/certinfo/").build();
@@ -1079,7 +1067,6 @@ public class APIManagerAdapter {
 	 */
 	public static JsonNode getFileData(byte[] certificate, String filename) throws AppException {
 		URI uri;
-		ObjectMapper mapper = new ObjectMapper();
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/filedata/").build();
 			

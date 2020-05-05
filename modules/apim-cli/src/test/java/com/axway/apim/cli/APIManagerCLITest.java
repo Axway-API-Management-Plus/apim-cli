@@ -20,8 +20,10 @@ public class APIManagerCLITest {
   @Test
   public void testEmptyArgs() {
 	  APIManagerCLI cli = new APIManagerCLI(new String[] {});
+	  // These tests required to have the app- and api modules available in the classpath
 	  Assert.assertTrue(cli.servicesMappedByGroup instanceof Map);
 	  Assert.assertTrue(cli.servicesMappedByGroup.containsKey("api"));
+	  Assert.assertTrue(cli.servicesMappedByGroup.containsKey("app"));
 	  Assert.assertTrue(cli.servicesMappedByGroup.get("api").size()==2);
 	  Assert.assertNull(cli.selectedService);
 	  Assert.assertNull(cli.selectedMethod);
