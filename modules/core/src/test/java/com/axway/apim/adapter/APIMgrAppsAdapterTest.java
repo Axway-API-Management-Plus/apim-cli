@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.TestIndicator;
 
 public class APIMgrAppsAdapterTest {
 	
@@ -23,6 +24,7 @@ public class APIMgrAppsAdapterTest {
 	
 	@BeforeClass
 	private void initTestIndicator() {
+		TestIndicator.getInstance().setTestRunning(false);
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("host", testHostname);
 		params.put("port", testPort);
@@ -33,7 +35,6 @@ public class APIMgrAppsAdapterTest {
 	public void withoutAnyFilter() throws AppException, IOException, URISyntaxException {
 		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder().build();
 		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
-		System.out.println("adapter: " + adapter);
 		System.out.println("adapter.getRequestUri(): " + adapter.getRequestUri());
 		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications");

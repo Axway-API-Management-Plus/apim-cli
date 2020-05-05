@@ -60,7 +60,7 @@ public class CommandParameters {
 	}
 	
 	public static synchronized CommandParameters getInstance() {
-		if(TestIndicator.getInstance().isTestRunning()) {
+		if(CommandParameters.instance == null && TestIndicator.getInstance().isTestRunning()) {
 			return null; // Skip this, if executed as a test
 		}
 		if (CommandParameters.instance == null) {
