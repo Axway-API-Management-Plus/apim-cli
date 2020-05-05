@@ -33,6 +33,8 @@ public class APIMgrAppsAdapterTest {
 	public void withoutAnyFilter() throws AppException, IOException, URISyntaxException {
 		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder().build();
 		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
+		System.out.println("adapter: " + adapter);
+		System.out.println("adapter.getRequestUri(): " + adapter.getRequestUri());
 		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications");
 	}
