@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.export.APIExportConfigAdapter;
-import com.axway.apim.api.export.lib.ExportCommandParameters;
+import com.axway.apim.api.export.lib.APIExportCLIOptions;
+import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.lib.APIMCLIServiceProvider;
-import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.RelaxedParser;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -131,8 +131,8 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
 			Transaction.deleteInstance();
-			
-			ExportCommandParameters params = new ExportCommandParameters(cmd, internalCmd, new EnvironmentProperties(cmd.getOptionValue("stage")));
+
+			APIExportParams params = new APIExportParams(new APIExportCLIOptions(args));
 			
 			APIExportConfigAdapter exportAdapter = new APIExportConfigAdapter(params.getValue("api-path"), params.getValue("localFolder"), params.getValue("vhost"));
 			exportAdapter.exportAPIs();

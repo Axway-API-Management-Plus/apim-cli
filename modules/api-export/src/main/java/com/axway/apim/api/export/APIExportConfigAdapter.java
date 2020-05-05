@@ -24,7 +24,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
-import com.axway.apim.api.export.lib.ExportCommandParameters;
+import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.model.APIImage;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.CaCert;
@@ -55,7 +55,7 @@ public class APIExportConfigAdapter {
 
 	APIManagerAdapter apiManager;
 	
-	ExportCommandParameters params;
+	APIExportParams params;
 
 	public APIExportConfigAdapter(String exportApiPath, String givenExportFolder, String exportVhost) throws AppException {
 		super();
@@ -64,7 +64,7 @@ public class APIExportConfigAdapter {
 		this.givenExportFolder = (givenExportFolder==null) ? "." : givenExportFolder;
 		LOG.debug("Constructed ExportConfigAdapter: [exportApiPath: '"+exportApiPath+"', givenExportFolder: '"+givenExportFolder+"', exportVhost: '"+exportVhost+"']");
 		apiManager = APIManagerAdapter.getInstance();
-		params = (ExportCommandParameters)ExportCommandParameters.getInstance();
+		params = APIExportParams.getInstance();
 	}
 
 	public void exportAPIs() throws AppException {
