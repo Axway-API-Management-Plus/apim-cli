@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.TestIndicator;
 
 public class APIMgrAppsAdapterTest {
 	

@@ -49,6 +49,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
+import com.axway.apim.lib.utils.TestIndicator;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
@@ -106,14 +107,10 @@ public class APIManagerAdapter {
         temp.put("apiRoutingKeyEnabled", true);
         configFieldRequiresAdmin = Collections.unmodifiableMap(temp);
     }
-    
-    public static synchronized APIManagerAdapter getInstance() throws AppException {
-    	return getInstance(false);
-    }
 	
-	public static synchronized APIManagerAdapter getInstance(boolean forUnitTests) throws AppException {
+	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
-			APIManagerAdapter.instance = new APIManagerAdapter (forUnitTests);
+			APIManagerAdapter.instance = new APIManagerAdapter();
 		}
 		return APIManagerAdapter.instance;
 	}
@@ -124,9 +121,9 @@ public class APIManagerAdapter {
 			APIManagerAdapter.allOrgs = null;
 	}
 	
-	private APIManagerAdapter(boolean forUnitTests) throws AppException {
+	private APIManagerAdapter() throws AppException {
 		super();
-		if(forUnitTests) return; // No need to initialize just for Unit-Tests
+		if(TestIndicator.getInstance().isTestRunning()) return; // No need to initialize just for Unit-Tests
 		Transaction transaction = Transaction.getInstance();
 		transaction.beginTransaction();
 		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the same JVM)

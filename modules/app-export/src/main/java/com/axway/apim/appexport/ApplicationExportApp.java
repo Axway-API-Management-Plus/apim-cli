@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIMgrAppsAdapter;
 import com.axway.apim.api.model.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
@@ -52,6 +53,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	public int execute(String[] args) {
 		try {
 			new AppExportParams(new AppExportCLIOptions(args));
+			APIManagerAdapter.getInstance();
 			List<ClientApplication> apps =  new APIMgrAppsAdapter.Builder()
 					.hasState(AppExportParams.getInstance().getAppState())
 					.hasName(AppExportParams.getInstance().getAppName())

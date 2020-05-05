@@ -111,7 +111,6 @@ public class APIMgrAppsAdapter {
 		
 		public Builder(String applicationId) throws AppException {
 			super();
-			APIManagerAdapter.getInstance();
 			this.applicationId = applicationId;
 		}
 		
