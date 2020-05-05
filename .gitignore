@@ -3,3 +3,8 @@
 .classpath
 .project
 /test-output/
+
+distribution/target/
+modules/*/target/
+modules/*/test-output/
+modules/*/.settings/
