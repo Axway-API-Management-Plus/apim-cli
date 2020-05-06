@@ -14,58 +14,29 @@ public class APIExportCLIOptions extends APIMCoreCLIOptions {
 	public APIExportCLIOptions(String[] args) throws ParseException {
 		super(args);
 		// Define command line options required for Application export
-		Option option = new Option("a", "apidefinition", true, "(Optional) The API Definition either as Swagger (JSON-Formated) or a WSDL for SOAP-Services:\n"
-				+ "- in local filesystem using a relative or absolute path. Example: swagger_file.json\n"
-				+ "  Please note: Local filesystem is not supported for WSDLs. Please use direct URL or a URL-Reference-File.\n"
-				+ "- a URL providing the Swagger-File or WSDL-File. Examples:\n"
-				+ "  [username/password@]https://any.host.com/my/path/to/swagger.json\n"
-				+ "  [username/password@]http://www.dneonline.com/calculator.asmx?wsdl\n"
-				+ "- a reference file called anyname-i-want.url which contains a line with the URL\n"
-				+ "  (same format as above for Swagger or WSDL)."
-				+ "  If not specified, the API Definition configuration is read directly from the JSON-Formatted API-Config");
-		option.setRequired(false);
-		option.setArgName("swagger_file.json");
+		Option option = new Option("a", "api-path", true, "Define the APIs to be exported, based on the exposure path.\n"
+				+ "You can use wildcards to export multiple APIs:\n"
+				+ "-a /api/v1/my/great/api     : Export a specific API\n"
+				+ "-a *                        : Export all APIs\n"
+				+ "-a /api/v1/any*             : Export all APIs with this prefix\n"
+				+ "-a */some/other/api         : Export APIs end with the same path\n");
+		option.setRequired(true);
+		option.setArgName("/api/v1/my/great/api");
 		options.addOption(option);
 
-		option = new Option("c", "contract", true, "This is the JSON-Formatted API-Config containing information how to expose the API");
-		option.setRequired(true);
-		option.setArgName("api_config.json");
-		options.addOption(option);
-		
-		option = new Option("iq", "ignoreQuotas", true, "Use this flag to ignore configured API quotas.");
-		option.setArgName("true/[false]");
-		options.addOption(option);
-		
-		option = new Option("clientOrgsMode", true, "Controls how configured Client-Organizations are treated. Defaults to add!");
-		option.setArgName("ignore|replace|add");
-		options.addOption(option);
-		
-		option = new Option("clientAppsMode", true, "Controls how configured Client-Applications are treated. Defaults to add!");
-		option.setArgName("ignore|replace|add");
-		options.addOption(option);
-		
-		option = new Option("quotaMode", true, "Controls how quotas are managed in API-Manager. Defaults to add!");
-		option.setArgName("ignore|replace|add");
-		options.addOption(option);
-		
-		option = new Option("allowOrgAdminsToPublish", true, "If set to false, OrgAdmins cannot replicate an API with desired state published. Defaults to true.");
+		option = new Option("v", "vhost", true, "Limit the export to that specific host.");
 		option.setRequired(false);
+		option.setArgName("vhost.customer.com");
+		options.addOption(option);
+
+		option = new Option("l", "localFolder", true, "Defines the location to store API-Definitions locally. Defaults to current folder.\n"
+				+ "For each API a new folder is created automatically.");
+		option.setRequired(false);
+		option.setArgName("my/apis");
+		options.addOption(option);
+
+		option = new Option("df", "deleteFolder", true, "Controls if an existing local folder should be deleted. Defaults to false.");
 		option.setArgName("true");
-		internalOptions.addOption(option);
-		
-		option = new Option("replaceHostInSwagger", true, "Controls if you want to replace the host in your Swagger-File ");
-		option.setRequired(false);
-		option.setArgName("true");
-		internalOptions.addOption(option);
-		
-		option = new Option("changeOrganization", true, "Set this flag to true to allow to change the organization of an existing API. Default is false.");
-		option.setRequired(false);
-		option.setArgName("true");
-		internalOptions.addOption(option);
-		
-		option = new Option("detailsExportFile", true, "Configure a filename, to get a Key=Value file containing information about the created API.");
-		option.setRequired(false);
-		option.setArgName("APIDetails.properties");
 		options.addOption(option);
 	}
 
