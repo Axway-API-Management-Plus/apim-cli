@@ -66,6 +66,13 @@
 					<skipTests>true</skipTests>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<skipIfEmpty>true</skipIfEmpty>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>

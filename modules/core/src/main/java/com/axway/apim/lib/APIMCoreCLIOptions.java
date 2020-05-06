@@ -20,6 +20,8 @@ public abstract class APIMCoreCLIOptions {
 	protected Options internalOptions = new Options();
 
 	protected CommandLineParser parser = new RelaxedParser();
+	
+	protected String executable = "apim";
 
 	/** This cmd contains all options visible in the usage when using help */
 	protected CommandLine cmd;
@@ -154,11 +156,11 @@ public abstract class APIMCoreCLIOptions {
 		String binary;
 		// Special handling when called from a Choco-Shiem executable
 		if(args!=null && Arrays.asList(args).contains("choco")) {
-			binary = "api-import";
+			binary = this.executable;
 		} else {
-			String scriptExt = "sh";
-			if(System.getProperty("os.name").toLowerCase().contains("win")) scriptExt = "bat";
-			binary = "scripts"+File.separator+"api-import."+scriptExt;
+			String scriptExt = ".sh";
+			if(System.getProperty("os.name").toLowerCase().contains("win")) scriptExt = ".bat";
+			binary = "scripts"+File.separator+this.executable+scriptExt;
 		}
 		return binary;
 	}

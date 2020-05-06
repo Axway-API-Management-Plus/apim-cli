@@ -106,11 +106,11 @@ public class APIManagerCLI {
 		System.out.println("To report issues or get help, please visit: ");
 		System.out.println("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
 		System.out.println("------------------------------------------------------------------------");
-		System.out.println("Running module: " + this.selectedService.getName() + " "+this.selectedService.getVersion());
-		System.out.println("------------------------------------------------------------------------");
 		if(this.selectedMethod==null) {
 			this.printUsage();
 		} else {
+			System.out.println("Running module: " + this.selectedService.getName() + " "+this.selectedService.getVersion());
+			System.out.println("------------------------------------------------------------------------");
 			this.selectedService.execute(Arrays.copyOfRange(args, 2, args.length));
 		}
 	}

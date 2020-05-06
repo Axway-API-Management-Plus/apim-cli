@@ -26,7 +26,7 @@ done
 
 echo ""
 
-"$_java" -Xms64m -Xmx256m -Dlog4j.configuration=../lib/log4j.xml -classpath "$CP" com.axway.apim.App "${@}"
+"$_java" -Xms64m -Xmx256m -Dlog4j.configuration=../lib/log4j.xml -classpath "$CP" com.axway.apim.APIImportApp "${@}"
 rc=$?
 if [ $rc -eq 10 ];then
         echo "No changes detected. Existing with RC: 0"
