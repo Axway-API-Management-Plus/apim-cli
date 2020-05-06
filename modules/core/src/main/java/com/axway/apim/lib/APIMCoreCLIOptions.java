@@ -80,6 +80,11 @@ public abstract class APIMCoreCLIOptions {
 		option.setArgName("true");
 		internalOptions.addOption(option);
 		
+		option = new Option("ignoreAdminAccount", true, "If set, the tool wont load the env.properties. This is used for testing only.");
+		option.setRequired(false);
+		option.setArgName("true");
+		internalOptions.addOption(option);
+		
 		option = new Option("returnCodeMapping", true, "Optionally maps given return codes into a desired return code. Format: 10:0, 12:0");
 		option.setRequired(false);
 		option.setArgName("true");
