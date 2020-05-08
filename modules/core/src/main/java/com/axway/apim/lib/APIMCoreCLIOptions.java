@@ -106,12 +106,12 @@ public abstract class APIMCoreCLIOptions {
 			cmd = parser.parse(options, args);
 			internalCmd = parser.parse( internalOptions, args);
 		} catch (ParseException e) {
-			printUsage(options, e.getMessage(), args);
+			printUsage(e.getMessage(), args);
 			System.exit(99);
 		}
 		
 		if(cmd.hasOption("help")) {
-			printUsage(options, "Usage information", args);
+			printUsage("Usage information", args);
 			System.exit(0);
 		}
 
@@ -137,7 +137,7 @@ public abstract class APIMCoreCLIOptions {
 		}
 	}
 	
-	public void printUsage(Options options, String message, String[] args) {
+	public void printUsage(String message, String[] args) {
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.setWidth(140);
 		
@@ -173,5 +173,13 @@ public abstract class APIMCoreCLIOptions {
 	public CommandLine getInternalCmd() {
 		if(this.internalCmd==null) parse();
 		return internalCmd;
+	}
+
+	public Options getOptions() {
+		return options;
+	}
+
+	public Options getInternalOptions() {
+		return internalOptions;
 	}
 }

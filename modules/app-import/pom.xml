@@ -15,6 +15,13 @@
 	<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
 
 	<dependencies>
-
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
 	</dependencies>
 </project>

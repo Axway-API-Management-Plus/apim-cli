@@ -2,7 +2,6 @@ package com.axway.apim.apiimport.lib;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import com.axway.apim.lib.APIMCoreCLIOptions;
@@ -27,7 +26,7 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		option.setArgName("swagger_file.json");
 		options.addOption(option);
 
-		option = new Option("c", "contract", true, "This is the JSON-Formatted API-Config containing information how to expose the API");
+		option = new Option("c", "config", true, "This is the JSON-Formatted API-Config containing information how to expose the API");
 		option.setRequired(true);
 		option.setArgName("api_config.json");
 		options.addOption(option);
@@ -69,8 +68,9 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		options.addOption(option);
 	}
 
-	public void printUsage(Options options, String message, String[] args) {
-		super.printUsage(options, message, args);		
+	@Override
+	public void printUsage(String message, String[] args) {
+		super.printUsage(message, args);		
 		System.out.println("You may run one of the following examples:");
 		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme");
 		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme -s prod");

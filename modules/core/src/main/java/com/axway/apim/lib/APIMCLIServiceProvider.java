@@ -8,7 +8,9 @@ public interface APIMCLIServiceProvider {
 	
 	String getDescription();
 	
-	String getId();
+	String getGroupId();
+	
+	String getGroupDescription();
 	
 	String getMethod();
 	

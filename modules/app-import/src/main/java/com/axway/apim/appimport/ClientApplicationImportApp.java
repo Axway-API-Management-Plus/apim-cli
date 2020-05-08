@@ -1,4 +1,4 @@
-package com.axway.apim.appexport;
+package com.axway.apim.appimport;
 
 import java.util.List;
 
@@ -6,45 +6,42 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.api.model.ClientApplication;
-import com.axway.apim.appexport.impl.ApplicationExporter;
-import com.axway.apim.appexport.impl.JsonApplicationExporter;
-import com.axway.apim.appexport.lib.AppExportCLIOptions;
-import com.axway.apim.appexport.lib.AppExportParams;
+import com.axway.apim.appimport.lib.AppImportCLIOptions;
+import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.lib.APIMCLIServiceProvider;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.errorHandling.ErrorState;
 
-public class ApplicationExportApp implements APIMCLIServiceProvider {
-
-	private static Logger LOG = LoggerFactory.getLogger(ApplicationExportApp.class);
-
+public class ClientApplicationImportApp implements APIMCLIServiceProvider {
+	
+	private static Logger LOG = LoggerFactory.getLogger(ClientApplicationImportApp.class);
+	
 	ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 
 	@Override
 	public String getName() {
-		return "Export applications";
+		return "Import applications";
 	}
-
+	
 	@Override
 	public String getVersion() {
-		return ApplicationExportApp.class.getPackage().getImplementationVersion();
+		return ClientApplicationImportApp.class.getPackage().getImplementationVersion();
 	}
-
+	
 	@Override
 	public String getDescription() {
-		return "Export applications from the API-Manager";
+		return "Import an applications into the API-Manager";
 	}
 
 	@Override
 	public String getGroupId() {
 		return "app";
 	}
-
+	
 	@Override
 	public String getGroupDescription() {
 		return "Manage your applications";
@@ -52,30 +49,28 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 
 	@Override
 	public String getMethod() {
-		return "export";
+		return "import";
 	}
 
 	@Override
 	public int execute(String[] args) {
 		try {
-			new AppExportParams(new AppExportCLIOptions(args));
-
-			List<ClientApplication> apps = new ClientAppAdapter.Builder(APIManagerAdapter.getInstance())
-					.hasState(AppExportParams.getInstance().getAppState())
-					.hasName(AppExportParams.getInstance().getAppName())
+			AppImportParams params = new AppImportParams(new AppImportCLIOptions(args));
+			APIManagerAdapter.getInstance();
+			// Load the desired state of the application
+			ClientAppImportManager importManager = new ClientAppImportManager();
+			ClientAppAdapter desiredAppsAdapter = new ClientAppAdapter.Builder(params.getValue("config"))
+					.build();
+			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
+			ClientAppAdapter apimClientAppAdapter =  new ClientAppAdapter.Builder(APIManagerAdapter.getInstance())
 					.includeQuotas(true)
-					.build().getApplications();
-			if(apps.size()==0) {
-				LOG.info("No applications selected for export");
-			} else {
-				LOG.info("Selected " + apps.size() + " for export.");
-				ApplicationExporter exporter = new JsonApplicationExporter(apps, AppExportParams.getInstance().getTargetFolder());
-				exporter.export();
-				if(exporter.hasError()) {
-					LOG.info("Please check the log. At least one error was recorded.");
-				} else {
-					LOG.info("Successfully exported " + apps.size() + " application(s).");
-				}
+					.build();
+			
+			for(ClientApplication desiredApp : desiredApps) {
+				ClientApplication actualApp = apimClientAppAdapter.getApplication(desiredApp.getName());
+				importManager.setDesiredApp(desiredApp);
+				importManager.setActualApp(actualApp);
+				importManager.replicate();
 			}
 		} catch (AppException ap) { 
 			ErrorState errorState = ErrorState.getInstance();
@@ -93,7 +88,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		}
 		return 0;
 	}
-
+	
 
 
 }

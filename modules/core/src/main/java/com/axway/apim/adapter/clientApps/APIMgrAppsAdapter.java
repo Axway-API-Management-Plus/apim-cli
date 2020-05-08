@@ -1,4 +1,4 @@
-package com.axway.apim.adapter;
+package com.axway.apim.adapter.clientApps;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -12,6 +12,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.ClientApplication;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -21,38 +22,45 @@ import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class APIMgrAppsAdapter {
+public class APIMgrAppsAdapter extends ClientAppAdapter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIMgrAppsAdapter.class);
 
-	List<NameValuePair> filters;
+	List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
-	List<ClientApplication> apps;
+	List<ClientApplication> apps = null;
 	
-	CommandParameters params = CommandParameters.getInstance();
+	CommandParameters params;
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
-	String requestedApplicationId;
-	
 	boolean includeQuota = false;
 
-	private APIMgrAppsAdapter() {}
+	public APIMgrAppsAdapter() {}
+	
+	@Override
+	public boolean readConfig(Object config) throws AppException {
+		if(config instanceof APIManagerAdapter && CommandParameters.getInstance()!=null) return true;
+		return false;
+	}
 
 	/**
 	 * Returns a list of applications.
 	 * @throws AppException if applications cannot be retrieved
 	 */
 	void readApplications() throws AppException {
+		if(this.apps !=null) return;
 		try {
 			URI uri = getRequestUri();
 			LOG.info("Sending request to find existing applications: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
-
 			this.apps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+		if(this.includeQuota) {
+			APIManagerAdapter.getInstance().addExistingClientAppQuotas(apps);
 		}
 	}
 	
@@ -60,10 +68,10 @@ public class APIMgrAppsAdapter {
 		CommandParameters cmd = CommandParameters.getInstance();
 		URI uri;
 		List<NameValuePair> usedFilters = new ArrayList<>();
-		if(filters != null) { usedFilters.addAll(filters); }
+		if(filters != null && filters.size()!=0) { usedFilters.addAll(filters); }
 		String searchForAppId = "";
-		if(requestedApplicationId!=null) {
-			searchForAppId = "/"+requestedApplicationId;
+		if(this.applicationId!=null) {
+			searchForAppId = "/"+this.applicationId;
 		}
 		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications"+searchForAppId)
 				.addParameters(usedFilters)
@@ -71,7 +79,35 @@ public class APIMgrAppsAdapter {
 		return uri;
 	}
 	
+	@Override
+	public void setApplicationName(String applicationName) {
+		if(applicationName==null) return;
+		filters.add(new BasicNameValuePair("field", "name"));
+		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("value", applicationName));
+	}
+
+	@Override
+	public void setOrganization(String organization) {
+		if(organization==null) return;
+		filters.add(new BasicNameValuePair("field", "orgid"));
+		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("value", organization));
+	}
+
+
+	@Override
+	public void setState(String state) {
+		if(state==null) return;
+		filters.add(new BasicNameValuePair("field", "state"));
+		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("value", state));
+	}
 	
+	public void useFilter(List<NameValuePair> filter) {
+		this.filters.addAll(filter);
+	}
+
 	public ClientApplication getApplication(String requestedApplicationId) throws AppException {
 		List<ClientApplication> foundApps = getApplications(requestedApplicationId);
 		return uniqueApplication(foundApps);
@@ -90,74 +126,7 @@ public class APIMgrAppsAdapter {
 	}
 
 	public List<ClientApplication> getApplications(String requestedApplicationId) throws AppException {
-		if(this.apps==null) readApplications();
-		if(this.includeQuota) {
-			APIManagerAdapter.getInstance().addExistingClientAppQuotas(apps);
-		}
+		readApplications();
 		return apps;
-	}
-
-	public static class Builder {
-		
-		boolean includeQuota;
-		
-		String applicationId;
-
-		List<NameValuePair> filters = new ArrayList<NameValuePair>();
-		
-		public Builder() throws AppException {
-			this(null);
-		}
-		
-		public Builder(String applicationId) throws AppException {
-			super();
-			this.applicationId = applicationId;
-		}
-		
-		/**
-		 * Method called to build the APIMgrAppsAdapter
-		 * @return the initialized adapter
-		 */
-		public APIMgrAppsAdapter build() {
-			APIMgrAppsAdapter applicationAdapter = new APIMgrAppsAdapter();
-			applicationAdapter.filters = this.filters;
-			applicationAdapter.requestedApplicationId = this.applicationId;
-			applicationAdapter.includeQuota = this.includeQuota;
-			return applicationAdapter;
-		}
-
-		public Builder hasName(String requestedAppName) {
-			if(requestedAppName==null) return this;
-			filters.add(new BasicNameValuePair("field", "name"));
-			filters.add(new BasicNameValuePair("op", "eq"));
-			filters.add(new BasicNameValuePair("value", requestedAppName));
-			return this;
-		}
-
-		public Builder hasOrgId(String requestedOrgId) {
-			if(requestedOrgId==null) return this;
-			filters.add(new BasicNameValuePair("field", "orgid"));
-			filters.add(new BasicNameValuePair("op", "eq"));
-			filters.add(new BasicNameValuePair("value", requestedOrgId));
-			return this;
-		}
-
-		public Builder hasState(String requestedAppState) {
-			if(requestedAppState==null) return this;
-			filters.add(new BasicNameValuePair("field", "state"));
-			filters.add(new BasicNameValuePair("op", "eq"));
-			filters.add(new BasicNameValuePair("value", requestedAppState));
-			return this;
-		}
-
-		public Builder useFilter(List<NameValuePair> filter) {
-			this.filters.addAll(filter);
-			return this;
-		}
-		
-		public Builder includeQuotas(boolean includeQuota) {
-			this.includeQuota = includeQuota;
-			return this;
-		}
 	}
 }

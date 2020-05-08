@@ -62,7 +62,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			
-			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params.getValue("contract"), 
+			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params.getValue("config"), 
 					params.getValue("stage"), params.getValue("apidefinition"), apimAdapter.isUsingOrgAdmin());
 			// Creates an API-Representation of the desired API
 			IAPI desiredAPI = configAdapter.getDesiredAPI();
@@ -111,10 +111,15 @@ public class APIImportApp implements APIMCLIServiceProvider {
 	}
 
 	@Override
-	public String getId() {
+	public String getGroupId() {
 		return "api";
 	}
 	
+	@Override
+	public String getGroupDescription() {
+		return "Manage your APIs";
+	}
+
 	@Override
 	public String getVersion() {
 		return APIImportApp.class.getPackage().getImplementationVersion();
@@ -131,7 +136,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 	}
 	
 	public String getName() {
-		return "API Import";
+		return "API - I M P O R T";
 	}
 
 	@Override

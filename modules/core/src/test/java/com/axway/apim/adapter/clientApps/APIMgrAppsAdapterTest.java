@@ -1,4 +1,4 @@
-package com.axway.apim.adapter;
+package com.axway.apim.adapter.clientApps;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -13,6 +13,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
@@ -24,7 +26,7 @@ public class APIMgrAppsAdapterTest {
 	
 	@BeforeClass
 	private void initTestIndicator() {
-		TestIndicator.getInstance().setTestRunning(false);
+		TestIndicator.getInstance().setTestRunning(true);
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("host", testHostname);
 		params.put("port", testPort);
@@ -33,8 +35,10 @@ public class APIMgrAppsAdapterTest {
 	
 	@Test
 	public void withoutAnyFilter() throws AppException, IOException, URISyntaxException {
-		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder().build();
-		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
+		ClientAppAdapter clientAppAdapter = new ClientAppAdapter.Builder(APIManagerAdapter.getInstance()).build();
+		Assert.assertNotNull(clientAppAdapter, "APIMgrAppsAdapter is null");
+		Assert.assertTrue(clientAppAdapter instanceof APIMgrAppsAdapter, "Adapter must be instance of APIMgrAppsAdapter");
+		APIMgrAppsAdapter adapter = (APIMgrAppsAdapter)clientAppAdapter;
 		System.out.println("adapter.getRequestUri(): " + adapter.getRequestUri());
 		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications");
@@ -42,7 +46,12 @@ public class APIMgrAppsAdapterTest {
 	
 	@Test
 	public void usingApplicationId() throws AppException, IOException, URISyntaxException {
-		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder("5893475934875934").build();
+		ClientAppAdapter clientAppAdapter = new ClientAppAdapter.Builder(APIManagerAdapter.getInstance())
+				.hasId("5893475934875934")
+				.build();
+		Assert.assertNotNull(clientAppAdapter, "APIMgrAppsAdapter is null");
+		Assert.assertTrue(clientAppAdapter instanceof APIMgrAppsAdapter, "Adapter must be instance of APIMgrAppsAdapter");
+		APIMgrAppsAdapter adapter = (APIMgrAppsAdapter)clientAppAdapter;
 		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
 		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications/5893475934875934");
@@ -50,9 +59,13 @@ public class APIMgrAppsAdapterTest {
 	
 	@Test
 	public void filterForAppName() throws AppException, IOException, URISyntaxException {
-		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder()
+		ClientAppAdapter clientAppAdapter = new ClientAppAdapter.Builder(APIManagerAdapter.getInstance())
 				.hasName("MyTestApp")
 				.build();
+		Assert.assertNotNull(clientAppAdapter, "APIMgrAppsAdapter is null");
+		Assert.assertTrue(clientAppAdapter instanceof APIMgrAppsAdapter, "Adapter must be instance of APIMgrAppsAdapter");
+		APIMgrAppsAdapter adapter = (APIMgrAppsAdapter)clientAppAdapter;
+		
 		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
 		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=name&op=eq&value=MyTestApp");
@@ -60,9 +73,13 @@ public class APIMgrAppsAdapterTest {
 	
 	@Test
 	public void filterForOrgId() throws AppException, IOException, URISyntaxException {
-		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder()
-				.hasOrgId("42342342342343223")
+		ClientAppAdapter clientAppAdapter = new ClientAppAdapter.Builder(APIManagerAdapter.getInstance())
+				.hasOrganization("42342342342343223")
 				.build();
+		Assert.assertNotNull(clientAppAdapter, "APIMgrAppsAdapter is null");
+		Assert.assertTrue(clientAppAdapter instanceof APIMgrAppsAdapter, "Adapter must be instance of APIMgrAppsAdapter");
+		APIMgrAppsAdapter adapter = (APIMgrAppsAdapter)clientAppAdapter;
+
 		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
 		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=orgid&op=eq&value=42342342342343223");
@@ -70,9 +87,13 @@ public class APIMgrAppsAdapterTest {
 	
 	@Test
 	public void filterStatePending() throws AppException, IOException, URISyntaxException {
-		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder()
+		ClientAppAdapter clientAppAdapter = new ClientAppAdapter.Builder(APIManagerAdapter.getInstance())
 				.hasState("pending")
 				.build();
+		Assert.assertNotNull(clientAppAdapter, "APIMgrAppsAdapter is null");
+		Assert.assertTrue(clientAppAdapter instanceof APIMgrAppsAdapter, "Adapter must be instance of APIMgrAppsAdapter");
+		APIMgrAppsAdapter adapter = (APIMgrAppsAdapter)clientAppAdapter;
+		
 		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
 		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=state&op=eq&value=pending");
@@ -80,13 +101,17 @@ public class APIMgrAppsAdapterTest {
 	
 	@Test
 	public void filterStatePendingAndAppName() throws AppException, IOException, URISyntaxException {
-		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder()
+		ClientAppAdapter clientAppAdapter = new ClientAppAdapter.Builder(APIManagerAdapter.getInstance())
 				.hasState("pending")
 				.hasName("AnotherPendingApp")
 				.build();
+		Assert.assertNotNull(clientAppAdapter, "APIMgrAppsAdapter is null");
+		Assert.assertTrue(clientAppAdapter instanceof APIMgrAppsAdapter, "Adapter must be instance of APIMgrAppsAdapter");
+		APIMgrAppsAdapter adapter = (APIMgrAppsAdapter)clientAppAdapter;
+
 		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
 		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
-		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=state&op=eq&value=pending&field=name&op=eq&value=AnotherPendingApp");
+		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=name&op=eq&value=AnotherPendingApp&field=state&op=eq&value=pending");
 	}
 	
 	@Test
@@ -95,10 +120,15 @@ public class APIMgrAppsAdapterTest {
 		customFilters.add(new BasicNameValuePair("field", "email"));
 		customFilters.add(new BasicNameValuePair("op", "eq"));
 		customFilters.add(new BasicNameValuePair("value", "this@there.com"));
-		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder()
+		
+		ClientAppAdapter clientAppAdapter = new ClientAppAdapter.Builder(APIManagerAdapter.getInstance())
 				.hasName("AnotherPendingApp")
-				.useFilter(customFilters)
 				.build();
+		Assert.assertNotNull(clientAppAdapter, "APIMgrAppsAdapter is null");
+		Assert.assertTrue(clientAppAdapter instanceof APIMgrAppsAdapter, "Adapter must be instance of APIMgrAppsAdapter");
+		APIMgrAppsAdapter adapter = (APIMgrAppsAdapter)clientAppAdapter;
+		adapter.useFilter(customFilters);
+		
 		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
 		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=name&op=eq&value=AnotherPendingApp&field=email&op=eq&value=this%40there.com");
@@ -106,11 +136,16 @@ public class APIMgrAppsAdapterTest {
 	
 	@Test
 	public void filterNullValues() throws AppException, IOException, URISyntaxException {
-		APIMgrAppsAdapter adapter = new APIMgrAppsAdapter.Builder()
+		ClientAppAdapter clientAppAdapter = new ClientAppAdapter.Builder(APIManagerAdapter.getInstance())
 				.hasState(null)
 				.hasName(null)
-				.hasOrgId(null)
+				.hasOrganization(null)
 				.build();
+		
+		Assert.assertNotNull(clientAppAdapter, "APIMgrAppsAdapter is null");
+		Assert.assertTrue(clientAppAdapter instanceof APIMgrAppsAdapter, "Adapter must be instance of APIMgrAppsAdapter");
+		APIMgrAppsAdapter adapter = (APIMgrAppsAdapter)clientAppAdapter;
+
 		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
 		Assert.assertNotNull(adapter.getRequestUri(), "RequestUri is null");
 		Assert.assertEquals(adapter.getRequestUri().toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications");

@@ -32,6 +32,7 @@ public class APIManagerCLITest {
   @Test
   public void testWithServiceIdOnly() {
 	  APIManagerCLI cli = new APIManagerCLI(new String[] {"api"});
+	  Assert.assertNotNull(cli.selectedServiceGroup);
 	  Assert.assertTrue(cli.selectedServiceGroup instanceof List, "cli.service is type: " + cli.selectedServiceGroup.getClass().getName());
 	  Assert.assertNull(cli.selectedMethod);
   }
@@ -39,6 +40,17 @@ public class APIManagerCLITest {
   @Test
   public void testWithServiceIdAndMethod() {
 	  APIManagerCLI cli = new APIManagerCLI(new String[] {"api", "import"});
+	  Assert.assertNotNull(cli.selectedServiceGroup);
+	  Assert.assertTrue(cli.selectedServiceGroup instanceof List, "cli.service is type: " + cli.selectedServiceGroup.getClass().getName());
+	  Assert.assertNotNull(cli.selectedMethod);
+	  Assert.assertTrue(cli.selectedService instanceof APIMCLIServiceProvider, "cli.selectedService is type: " + cli.selectedService.getClass().getName());
+	  Assert.assertEquals(cli.selectedMethod, "import");
+  }
+  
+  @Test
+  public void simulateChocoExecution() {
+	  APIManagerCLI cli = new APIManagerCLI(new String[] {"choco", "api", "import"});
+	  Assert.assertNotNull(cli.selectedServiceGroup);
 	  Assert.assertTrue(cli.selectedServiceGroup instanceof List, "cli.service is type: " + cli.selectedServiceGroup.getClass().getName());
 	  Assert.assertNotNull(cli.selectedMethod);
 	  Assert.assertTrue(cli.selectedService instanceof APIMCLIServiceProvider, "cli.selectedService is type: " + cli.selectedService.getClass().getName());

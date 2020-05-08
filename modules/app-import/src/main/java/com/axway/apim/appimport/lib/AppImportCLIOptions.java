@@ -1,4 +1,4 @@
-package com.axway.apim.appexport.lib;
+package com.axway.apim.appimport.lib;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -6,33 +6,16 @@ import org.apache.commons.cli.ParseException;
 
 import com.axway.apim.lib.APIMCoreCLIOptions;
 
-public class AppExportCLIOptions extends APIMCoreCLIOptions {
+public class AppImportCLIOptions extends APIMCoreCLIOptions {
 
 	CommandLine cmd;
 
-	public AppExportCLIOptions(String[] args) throws ParseException {
+	public AppImportCLIOptions(String[] args) throws ParseException {
 		super(args);
 		// Define command line options required for Application export
-		Option option = new  Option("n", "name", true, "Name of the application to export.");
+		Option option = new Option("c", "config", true, "This is the JSON-Formatted Application-Config file containing the application");
 		option.setRequired(true);
-		options.addOption(option);
-
-		option = new  Option("state", false, "Export application with specific state: pending | approved");
-		option.setRequired(false);
-		options.addOption(option);
-
-		option = new  Option("orgName", false, "Limit applications to this organization");
-		option.setRequired(false);
-		options.addOption(option);
-
-		option = new Option("t", "targetFolder", true, "Defines the location to store the application locally. Defaults to current folder.\n"
-				+ "For each application a new folder is created automatically.");
-		option.setRequired(false);
-		option.setArgName("my/apps");
-		options.addOption(option);
-		
-		option = new Option("df", "deleteFolder", true, "Controls if an existing local folder should be deleted. Defaults to false.");
-		option.setArgName("true");
+		option.setArgName("app_config.json");
 		options.addOption(option);
 	}
 

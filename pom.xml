@@ -75,7 +75,7 @@
 		<module>modules/apim-cli</module>
 		<module>modules/api-export</module>
 		<module>modules/api-import</module>
-		<!--module>modules/app-import</module-->
+		<module>modules/app-import</module>
 		<module>modules/app-export</module>
 		<module>distribution</module>
 	</modules>

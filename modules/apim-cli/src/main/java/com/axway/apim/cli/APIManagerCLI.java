@@ -49,11 +49,11 @@ public class APIManagerCLI {
 		Iterator<APIMCLIServiceProvider> it = loader.iterator();
 		while(it.hasNext()) {
 			APIMCLIServiceProvider cliService = it.next();
-			List<APIMCLIServiceProvider> providerList = servicesMappedByGroup.get(cliService.getId());
+			List<APIMCLIServiceProvider> providerList = servicesMappedByGroup.get(cliService.getGroupId());
 			if(providerList==null) {
 				providerList = new ArrayList<APIMCLIServiceProvider>();
 				providerList.add(cliService);
-				servicesMappedByGroup.put(cliService.getId(), providerList);
+				servicesMappedByGroup.put(cliService.getGroupId(), providerList);
 			} else {
 				providerList.add(cliService);
 			}
@@ -69,14 +69,20 @@ public class APIManagerCLI {
 	
 	private void parseArguments(String[] args) {
 		if(args==null || args.length<1) return;
-		this.selectedServiceGroup = servicesMappedByGroup.get(args[0]);
-		if(this.selectedServiceGroup!=null && args.length>1) {
-			String method = args[1];
-			for(APIMCLIServiceProvider service : selectedServiceGroup) {
-				if(method.equals(service.getMethod())) {
-					this.selectedService = service;
-					this.selectedMethod = method;
+		for(int i=0; i<args.length; i++) {
+			// Skip the first argument when it's choco
+			if(args[i]==null || args[i].equals("choco")) continue;
+			if(servicesMappedByGroup.get(args[i])!=null) {
+				this.selectedServiceGroup = servicesMappedByGroup.get(args[i]);
+				if(args.length <= i+1) break;
+				String method = args[i+1];
+				for(APIMCLIServiceProvider service : selectedServiceGroup) {
+					if(method.equals(service.getMethod())) {
+						this.selectedService = service;
+						this.selectedMethod = method;
+					}
 				}
+				break;
 			}
 		}
 	}
@@ -87,14 +93,15 @@ public class APIManagerCLI {
 		System.out.println("");
 		System.out.println("Available commands and options: ");
 		Iterator<String> it = servicesMappedByGroup.keySet().iterator();
-		while(it.hasNext()) {
-			String key = it.next();
-			if(this.selectedServiceGroup==null) {
-				System.out.println(APIM_CLI_CDM + " " + key);
-			} else {
-				for(APIMCLIServiceProvider provider : this.servicesMappedByGroup.get(key)) {
-					System.out.println(APIM_CLI_CDM + " " + key + " " + provider.getMethod() + " - " + provider.getDescription());
-				}
+		if(this.selectedServiceGroup==null) {
+			while(it.hasNext()) {
+				String key = it.next();
+				// We just take the first registered service for a group to retrieve the group description
+				System.out.println(APIM_CLI_CDM + " " + key + " - " + servicesMappedByGroup.get(key).get(0).getGroupDescription());
+			}
+		} else {
+			for(APIMCLIServiceProvider service : this.selectedServiceGroup) {
+				System.out.println(APIM_CLI_CDM + " " + service.getGroupId()  + " " + service.getMethod() + " - " + service.getDescription());
 			}
 		}
 	}
@@ -111,7 +118,7 @@ public class APIManagerCLI {
 		} else {
 			System.out.println("Running module: " + this.selectedService.getName() + " "+this.selectedService.getVersion());
 			System.out.println("------------------------------------------------------------------------");
-			this.selectedService.execute(Arrays.copyOfRange(args, 2, args.length));
+			this.selectedService.execute(args);
 		}
 	}
 
