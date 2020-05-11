@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -19,6 +21,8 @@ public class ClientApplication {
 	private APIQuota appQuota;
 	
 	private String organizationId;
+	
+	private String organization;
 	
 	public String getId() {
 		return id;
@@ -51,13 +55,20 @@ public class ClientApplication {
 		this.apiKey = apiKey;
 	}
 	
-	public String getOrganizationId() {
+	public String getOrganizationId() throws AppException {
+		if(this.organizationId==null) this.organizationId = APIManagerAdapter.getInstance().getOrgId(this.organization);
 		return organizationId;
 	}
 	public void setOrganizationId(String organizationId) {
 		this.organizationId = organizationId;
 	}
 	
+	public String getOrganization() {
+		return organization;
+	}
+	public void setOrganization(String organization) {
+		this.organization = organization;
+	}
 	public APIQuota getAppQuota() {
 		return appQuota;
 	}

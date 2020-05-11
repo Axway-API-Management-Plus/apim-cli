@@ -1,6 +1,7 @@
 package com.axway.apim.appexport.model;
 
 import com.axway.apim.api.model.ClientApplication;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -15,7 +16,7 @@ public class ExportApplication extends ClientApplication {
 	}
 
 	@JsonIgnore
-	public String getOrganizationId() {
+	public String getOrganizationId() throws AppException {
 		return clientApp.getOrganizationId();
 	}
 

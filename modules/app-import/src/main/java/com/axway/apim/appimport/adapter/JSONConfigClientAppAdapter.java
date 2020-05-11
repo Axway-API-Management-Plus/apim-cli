@@ -57,4 +57,9 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		}
 		return null;
 	}
+
+	@Override
+	public ClientApplication createApplication(ClientApplication app) throws AppException {
+		throw new UnsupportedOperationException("createApplication not implemented for JSONConfigClientAppAdapter");
+	}
 }

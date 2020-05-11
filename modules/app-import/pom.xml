@@ -21,11 +21,32 @@
 		</dependency>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
 			<artifactId>apim-cli</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-http</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-java-dsl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-ws</artifactId>
 		</dependency>
 	</dependencies>
 </project>

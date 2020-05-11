@@ -1,4 +1,4 @@
-package com.axway.apim.test.lib;
+package com.axway.lib;
 
 import org.apache.commons.cli.ParseException;
 import org.testng.Assert;

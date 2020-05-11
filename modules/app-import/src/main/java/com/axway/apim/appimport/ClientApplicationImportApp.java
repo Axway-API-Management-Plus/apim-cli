@@ -21,7 +21,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 	
 	private static Logger LOG = LoggerFactory.getLogger(ClientApplicationImportApp.class);
 	
-	ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 
 	@Override
 	public String getName() {
@@ -44,19 +44,18 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 	}
 
 	@CLIServiceMethod(name = "import", description = "Import an applications into the API-Manager")
-	public int importApp(String[] args) {
+	public static int importApp(String[] args) {
 		try {
 			AppImportParams params = new AppImportParams(new AppImportCLIOptions(args));
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the application
-			ClientAppImportManager importManager = new ClientAppImportManager();
 			ClientAppAdapter desiredAppsAdapter = new ClientAppAdapter.Builder(params.getValue("config"))
 					.build();
 			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
 			ClientAppAdapter apimClientAppAdapter =  new ClientAppAdapter.Builder(APIManagerAdapter.getInstance())
 					.includeQuotas(true)
 					.build();
-			
+			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter, apimClientAppAdapter);
 			for(ClientApplication desiredApp : desiredApps) {
 				ClientApplication actualApp = apimClientAppAdapter.getApplication(desiredApp.getName());
 				importManager.setDesiredApp(desiredApp);

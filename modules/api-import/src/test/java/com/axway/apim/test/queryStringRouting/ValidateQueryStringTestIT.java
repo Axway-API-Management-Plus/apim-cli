@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
-import com.axway.apim.test.lib.APIManagerConfig;
+import com.axway.lib.APIManagerConfig;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;

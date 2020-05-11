@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.api.model.ClientApplication;
 import com.axway.apim.export.test.ExportTestAction;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -35,7 +36,7 @@ public class ApplicationExportTestIT extends TestNGCitrusTestRunner {
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException {		
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {		
 		ObjectMapper mapper = new ObjectMapper();
 
 		swaggerExport = new ExportTestAction();

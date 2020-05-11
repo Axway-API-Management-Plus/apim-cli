@@ -28,7 +28,7 @@ public abstract class ClientAppAdapter {
 	}
 	
 	/**
-	 * Returns a list of ClientApplications from the Adpater
+	 * Returns a list of ClientApplications from the Adapter
 	 * @return list of ClientApplications
 	 * @throws AppException when something goes wrong
 	 */
@@ -36,25 +36,27 @@ public abstract class ClientAppAdapter {
 	
 	public abstract ClientApplication getApplication(String applicationName) throws AppException;
 	
+	public abstract ClientApplication createApplication(ClientApplication app) throws AppException;
+	
 	public abstract boolean readConfig(Object config) throws AppException;
 	
-	public void setIncludeQuota(boolean includeQuota) {
+	void setIncludeQuota(boolean includeQuota) {
 		this.includeQuota = includeQuota;
 	}
 
-	public void setApplicationName(String applicationName) {
+	void setApplicationName(String applicationName) {
 		this.applicationName = applicationName;
 	}
 
-	public void setApplicationId(String applicationId) {
+	void setApplicationId(String applicationId) {
 		this.applicationId = applicationId;
 	}
 
-	public void setOrganization(String organization) {
+	void setOrganization(String organization) {
 		this.organization = organization;
 	}
 	
-	public void setState(String state) {
+	void setState(String state) {
 		this.state = state;
 	}
 

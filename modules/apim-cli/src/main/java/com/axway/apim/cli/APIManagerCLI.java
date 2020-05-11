@@ -133,7 +133,7 @@ public class APIManagerCLI {
 			System.out.println("Running module: " + this.selectedService.getName() + " "+this.selectedService.getVersion());
 			System.out.println("------------------------------------------------------------------------");
 			try {
-				this.selectedMethod.invoke(this.selectedService, args);
+				this.selectedMethod.invoke (this.selectedService, (Object)args);
 			} catch (IllegalAccessException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
