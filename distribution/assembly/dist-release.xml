@@ -15,6 +15,8 @@
         <include>com.github.axway-api-management-plus.swagger-promote:core</include>
 		<include>com.github.axway-api-management-plus.swagger-promote:api-import</include>
         <include>com.github.axway-api-management-plus.swagger-promote:api-export</include>
+        <include>com.github.axway-api-management-plus.swagger-promote:app-import</include>
+        <include>com.github.axway-api-management-plus.swagger-promote:app-export</include>
         <include>com.github.axway-api-management-plus.swagger-promote:apim-cli</include>
       </includes>
       <binaries>

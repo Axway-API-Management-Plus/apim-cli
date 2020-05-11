@@ -20,18 +20,6 @@
 			<artifactId>core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-			<artifactId>api-import</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-			<artifactId>api-export</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-			<artifactId>app-export</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 		</dependency>

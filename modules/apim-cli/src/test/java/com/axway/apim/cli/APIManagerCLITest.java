@@ -1,12 +1,11 @@
 package com.axway.apim.cli;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import com.axway.apim.lib.APIMCLIServiceProvider;
 
 public class APIManagerCLITest {
 	
@@ -44,7 +43,8 @@ public class APIManagerCLITest {
 	  Assert.assertTrue(cli.selectedServiceGroup instanceof List, "cli.service is type: " + cli.selectedServiceGroup.getClass().getName());
 	  Assert.assertNotNull(cli.selectedMethod);
 	  Assert.assertTrue(cli.selectedService instanceof APIMCLIServiceProvider, "cli.selectedService is type: " + cli.selectedService.getClass().getName());
-	  Assert.assertEquals(cli.selectedMethod, "import");
+	  Assert.assertTrue(cli.selectedMethod instanceof Method);
+	  Assert.assertEquals(cli.selectedMethod.getName(), "importAPI");
   }
   
   @Test
@@ -54,6 +54,6 @@ public class APIManagerCLITest {
 	  Assert.assertTrue(cli.selectedServiceGroup instanceof List, "cli.service is type: " + cli.selectedServiceGroup.getClass().getName());
 	  Assert.assertNotNull(cli.selectedMethod);
 	  Assert.assertTrue(cli.selectedService instanceof APIMCLIServiceProvider, "cli.selectedService is type: " + cli.selectedService.getClass().getName());
-	  Assert.assertEquals(cli.selectedMethod, "import");
+	  Assert.assertEquals(cli.selectedMethod.getName(), "importAPI");
   }
 }

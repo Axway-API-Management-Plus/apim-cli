@@ -10,7 +10,8 @@ import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.api.model.ClientApplication;
 import com.axway.apim.appimport.lib.AppImportCLIOptions;
 import com.axway.apim.appimport.lib.AppImportParams;
-import com.axway.apim.lib.APIMCLIServiceProvider;
+import com.axway.apim.cli.APIMCLIServiceProvider;
+import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
@@ -31,11 +32,6 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 	public String getVersion() {
 		return ClientApplicationImportApp.class.getPackage().getImplementationVersion();
 	}
-	
-	@Override
-	public String getDescription() {
-		return "Import an applications into the API-Manager";
-	}
 
 	@Override
 	public String getGroupId() {
@@ -47,13 +43,8 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 		return "Manage your applications";
 	}
 
-	@Override
-	public String getMethod() {
-		return "import";
-	}
-
-	@Override
-	public int execute(String[] args) {
+	@CLIServiceMethod(name = "import", description = "Import an applications into the API-Manager")
+	public int importApp(String[] args) {
 		try {
 			AppImportParams params = new AppImportParams(new AppImportCLIOptions(args));
 			APIManagerAdapter.getInstance();

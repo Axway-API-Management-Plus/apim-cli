@@ -6,14 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.api.model.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
 import com.axway.apim.appexport.impl.JsonApplicationExporter;
 import com.axway.apim.appexport.lib.AppExportCLIOptions;
 import com.axway.apim.appexport.lib.AppExportParams;
-import com.axway.apim.lib.APIMCLIServiceProvider;
+import com.axway.apim.cli.APIMCLIServiceProvider;
+import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
@@ -36,11 +36,6 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	}
 
 	@Override
-	public String getDescription() {
-		return "Export applications from the API-Manager";
-	}
-
-	@Override
 	public String getGroupId() {
 		return "app";
 	}
@@ -50,13 +45,8 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		return "Manage your applications";
 	}
 
-	@Override
-	public String getMethod() {
-		return "export";
-	}
-
-	@Override
-	public int execute(String[] args) {
+	@CLIServiceMethod(name = "export", description = "Export applications from the API-Manager")
+	public int export(String[] args) {
 		try {
 			new AppExportParams(new AppExportCLIOptions(args));
 

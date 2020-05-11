@@ -7,7 +7,8 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.export.APIExportConfigAdapter;
 import com.axway.apim.api.export.lib.APIExportCLIOptions;
 import com.axway.apim.api.export.lib.APIExportParams;
-import com.axway.apim.lib.APIMCLIServiceProvider;
+import com.axway.apim.cli.APIMCLIServiceProvider;
+import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -23,11 +24,12 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	private static Logger LOG = LoggerFactory.getLogger(APIExportApp.class);
 
 	public static void main(String args[]) { 
-		int rc = run(args);
+		int rc = export(args);
 		System.exit(rc);
 	}
-		
-	public static int run(String args[]) {
+	
+	@CLIServiceMethod(description = "Export APIs from the API-Manager")
+	public static int export(String args[]) {
 		try {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
@@ -56,19 +58,10 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}
 	}
-
-	@Override
-	public String getMethod() {
-		return "export";
-	}
 	
+	@Override
 	public String getName() {
 		return "API Export";
-	}
-
-	@Override
-	public String getDescription() {
-		return "Export APIs from the API-Manager";
 	}
 
 	@Override
@@ -84,10 +77,5 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	@Override
 	public String getVersion() {
 		return APIExportApp.class.getPackage().getImplementationVersion();
-	}
-
-	@Override
-	public int execute(String[] args) {
-		return run(args);
 	}
 }

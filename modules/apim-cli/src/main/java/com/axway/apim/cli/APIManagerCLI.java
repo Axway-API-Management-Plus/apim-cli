@@ -1,14 +1,12 @@
 package com.axway.apim.cli;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
-
-import com.axway.apim.APIImportApp;
-import com.axway.apim.lib.APIMCLIServiceProvider;
 
 /**
  * This class implements a pluggable CLI interface that allows to dynamically add new 
@@ -26,6 +24,8 @@ public class APIManagerCLI {
 	 */
 	HashMap<String, List<APIMCLIServiceProvider>> servicesMappedByGroup = new HashMap<String, List<APIMCLIServiceProvider>>();
 	
+	HashMap<APIMCLIServiceProvider, List<Method>> methodsMappedByService = new HashMap<APIMCLIServiceProvider, List<Method>>();
+	
 	/**
 	 * Is set by parseArguments when the first parameter is set. For instance: apim api - With that the selected service group is api and will 
 	 * contain all CLI services related to API handling. 
@@ -40,7 +40,7 @@ public class APIManagerCLI {
 	/**
 	 * The parsed method as part of a service.
 	 */
-	String selectedMethod = null;
+	Method selectedMethod = null;
 
 	public APIManagerCLI(String[] args) {
 		super();
@@ -56,6 +56,14 @@ public class APIManagerCLI {
 				servicesMappedByGroup.put(cliService.getGroupId(), providerList);
 			} else {
 				providerList.add(cliService);
+			}
+			for(Method method : cliService.getClass().getDeclaredMethods()) {
+				if(method.isAnnotationPresent(CLIServiceMethod.class)) {
+					List<Method> methodList = methodsMappedByService.get(cliService);
+					if(methodList==null) methodList = new ArrayList<Method>();
+					methodList.add(method);
+					methodsMappedByService.put(cliService, methodList);
+				}
 			}
 		}
 		parseArguments(args);
@@ -76,10 +84,14 @@ public class APIManagerCLI {
 				this.selectedServiceGroup = servicesMappedByGroup.get(args[i]);
 				if(args.length <= i+1) break;
 				String method = args[i+1];
+				// Iterate over all Service-Providers registered for that group
 				for(APIMCLIServiceProvider service : selectedServiceGroup) {
-					if(method.equals(service.getMethod())) {
-						this.selectedService = service;
-						this.selectedMethod = method;
+					List<Method> serviceMethods =  this.methodsMappedByService.get(service);
+					for(Method serviceMethod : serviceMethods) {
+						if(getMethodName(serviceMethod).equals(method)) {
+							this.selectedService = service;
+							this.selectedMethod = serviceMethod;
+						}
 					}
 				}
 				break;
@@ -92,8 +104,8 @@ public class APIManagerCLI {
 		System.out.println("To get more information for each command, please run for instance: 'apim api'");
 		System.out.println("");
 		System.out.println("Available commands and options: ");
-		Iterator<String> it = servicesMappedByGroup.keySet().iterator();
 		if(this.selectedServiceGroup==null) {
+			Iterator<String> it = servicesMappedByGroup.keySet().iterator();
 			while(it.hasNext()) {
 				String key = it.next();
 				// We just take the first registered service for a group to retrieve the group description
@@ -101,14 +113,16 @@ public class APIManagerCLI {
 			}
 		} else {
 			for(APIMCLIServiceProvider service : this.selectedServiceGroup) {
-				System.out.println(APIM_CLI_CDM + " " + service.getGroupId()  + " " + service.getMethod() + " - " + service.getDescription());
+				for(Method method : this.methodsMappedByService.get(service)) {
+					System.out.println(APIM_CLI_CDM + " " + service.getGroupId()  + " " + getMethodName(method) + " - " + method.getAnnotation(CLIServiceMethod.class).description());
+				}
 			}
 		}
 	}
 	
 	void run(String[] args) {
 		System.out.println("------------------------------------------------------------------------");
-		System.out.println("API-Manager CLI: "+APIImportApp.class.getPackage().getImplementationVersion());
+		System.out.println("API-Manager CLI: "+APIManagerCLI.class.getPackage().getImplementationVersion());
 		System.out.println("                                                                        ");
 		System.out.println("To report issues or get help, please visit: ");
 		System.out.println("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
@@ -118,8 +132,23 @@ public class APIManagerCLI {
 		} else {
 			System.out.println("Running module: " + this.selectedService.getName() + " "+this.selectedService.getVersion());
 			System.out.println("------------------------------------------------------------------------");
-			this.selectedService.execute(args);
+			try {
+				this.selectedMethod.invoke(this.selectedService, args);
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+	}
+	
+	private String getMethodName(Method m) {
+		return (m.getAnnotation(CLIServiceMethod.class).name().equals("")) ? m.getName() : m.getAnnotation(CLIServiceMethod.class).name();
 	}
 
 }

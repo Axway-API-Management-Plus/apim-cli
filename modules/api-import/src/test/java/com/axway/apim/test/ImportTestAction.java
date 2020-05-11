@@ -132,7 +132,7 @@ public class ImportTestAction extends AbstractTestAction {
 					"-changeOrganization", changeOrganization};
 		}
 		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);
-		int rc = APIImportApp.run(args);
+		int rc = APIImportApp.importAPI(args);
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
 		}

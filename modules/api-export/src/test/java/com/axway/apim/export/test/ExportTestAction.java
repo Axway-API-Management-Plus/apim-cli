@@ -61,7 +61,7 @@ public class ExportTestAction extends AbstractTestAction {
 					"-s", stage,  
 					"-ignoreAdminAccount", ignoreAdminAccount};
 		}
-		int rc = APIExportApp.run(args);
+		int rc = APIExportApp.export(args);
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
 		}

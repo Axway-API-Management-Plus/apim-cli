@@ -18,7 +18,8 @@ import com.axway.apim.apiimport.lib.APIImportCLIOptions;
 import com.axway.apim.apiimport.lib.APIImportParams;
 import com.axway.apim.apiimport.rollback.RollbackHandler;
 import com.axway.apim.apiimport.state.APIChangeState;
-import com.axway.apim.lib.APIMCLIServiceProvider;
+import com.axway.apim.cli.APIMCLIServiceProvider;
+import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -42,11 +43,12 @@ public class APIImportApp implements APIMCLIServiceProvider {
 	private static Logger LOG = LoggerFactory.getLogger(APIImportApp.class);
 
 	public static void main(String args[]) { 
-		int rc = run(args);
+		int rc = importAPI(args);
 		System.exit(rc);
 	}
-		
-	public static int run(String args[]) {
+	
+	@CLIServiceMethod(name = "import", description = "Import APIs into the API-Manager")
+	public static int importAPI(String args[]) {
 		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 		try {
 			
@@ -124,23 +126,8 @@ public class APIImportApp implements APIMCLIServiceProvider {
 	public String getVersion() {
 		return APIImportApp.class.getPackage().getImplementationVersion();
 	}
-
-	@Override
-	public String getMethod() {
-		return "import";
-	}
-
-	@Override
-	public String getDescription() {
-		return "Import APIs into the API-Manager";
-	}
 	
 	public String getName() {
 		return "API - I M P O R T";
-	}
-
-	@Override
-	public int execute(String[] args) {
-		return run(args);
 	}
 }
