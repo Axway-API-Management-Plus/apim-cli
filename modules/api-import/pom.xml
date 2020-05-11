@@ -24,6 +24,13 @@
 			<artifactId>apim-cli</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>core</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
