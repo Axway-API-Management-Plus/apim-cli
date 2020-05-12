@@ -6,9 +6,12 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 import com.axway.apim.api.model.APIAccess;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientApplication {
@@ -19,7 +22,13 @@ public class ClientApplication {
 	private String phone;
 	private boolean enabled;
 	private String state;
-	private String image;
+	
+	@JsonProperty("image")
+	private String imageUrl;
+	
+	@JsonIgnore
+	private Image image;
+	
 	private String oauthClientId;
 	private String extClientId;
 	private String apiKey;
@@ -78,10 +87,17 @@ public class ClientApplication {
 	public void setState(String state) {
 		this.state = state;
 	}
-	public String getImage() {
+	
+	public String getImageUrl() {
+		return imageUrl;
+	}
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+	public Image getImage() {
 		return image;
 	}
-	public void setImage(String image) {
+	public void setImage(Image image) {
 		this.image = image;
 	}
 	public String getOauthClientId() {

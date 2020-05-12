@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 import com.axway.apim.lib.utils.ImageComparision;
 
-public class APIImage {
+public class Image {
 
 	private byte[] imageContent = null;
 	
@@ -24,11 +24,11 @@ public class APIImage {
 		return imageContent;
 	}
 	
-	public APIImage() {
+	public Image() {
 		super();
 	}
 
-	public APIImage(String filename) {
+	public Image(String filename) {
 		super();
 		this.filename = filename;
 	}
@@ -38,8 +38,8 @@ public class APIImage {
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
-		if(other instanceof APIImage) {
-			APIImage otherImage = (APIImage)other;
+		if(other instanceof Image) {
+			Image otherImage = (Image)other;
 			// If the hashCode of both images are the same, it's completely the same image.
 			if((Arrays.hashCode(this.imageContent)) == Arrays.hashCode(otherImage.getImageContent())) {
 				return true;
@@ -102,6 +102,9 @@ public class APIImage {
 	}
 
 	public void setBaseFilename(String baseFilename) {
+		if(baseFilename.indexOf(".")==-1) {
+			baseFilename += getFileExtension();
+		}
 		this.baseFilename = baseFilename;
 	}
 

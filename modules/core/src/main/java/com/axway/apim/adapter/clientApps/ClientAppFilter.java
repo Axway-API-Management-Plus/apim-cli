@@ -5,16 +5,14 @@ import java.util.List;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ClientAppFilter {
-	
-	private static Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
 	
 	boolean includeQuota;
 	
 	boolean includeCredentials;
+	
+	boolean includeImage;
 	
 	String applicationId;
 	
@@ -30,6 +28,10 @@ public class ClientAppFilter {
 	
 	public boolean isIncludeCredentials() {
 		return includeCredentials;
+	}
+
+	public boolean isIncludeImage() {
+		return includeImage;
 	}
 
 	public String getApplicationId() {
@@ -85,6 +87,8 @@ public class ClientAppFilter {
 		
 		boolean includeCredentials;
 		
+		boolean includeImage;
+		
 		String organization;
 		
 		/** The name of the application */
@@ -113,6 +117,7 @@ public class ClientAppFilter {
 			filter.setState(this.state);
 			filter.includeQuota = this.includeQuota;
 			filter.includeCredentials = this.includeCredentials;
+			filter.includeImage = this.includeImage;
 			return filter;
 		}
 		
@@ -143,6 +148,11 @@ public class ClientAppFilter {
 		
 		public Builder includeCredentials(boolean includeCredentials) {
 			this.includeCredentials = includeCredentials;
+			return this;
+		}
+		
+		public Builder includeImage(boolean includeImage) {
+			this.includeImage = includeImage;
 			return this;
 		}
 	}

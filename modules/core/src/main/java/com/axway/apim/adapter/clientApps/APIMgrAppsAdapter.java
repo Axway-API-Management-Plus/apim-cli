@@ -15,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.API;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -59,7 +61,9 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
 			this.apps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
-			
+			if(appFilter.isIncludeImage()) {
+				addImage(apps);
+			}
 			if(appFilter.isIncludeQuota()) {
 				APIManagerAdapter.getInstance().addExistingClientAppQuotas(apps);
 			}
@@ -107,6 +111,17 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 				credentials = mapper.readValue(response, classType);
 				app.getCredentials().addAll(credentials);
 			}
+		}
+	}
+	
+	void addImage(List<ClientApplication> apps) throws Exception {
+		URI uri;
+		for(ClientApplication app : apps) {
+			if(app.getImageUrl()==null) continue;
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/image")
+					.build();
+			Image image = APIManagerAdapter.getImageFromAPIM(uri, "app-image");
+			app.setImage(image);
 		}
 	}
 

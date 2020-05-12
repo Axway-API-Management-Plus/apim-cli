@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.api.definition.APISpecification;
-import com.axway.apim.api.model.APIImage;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthenticationProfile;
@@ -163,7 +163,7 @@ public class API implements IAPI {
 
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})
-	protected APIImage image = null;
+	protected Image image = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED}, 
@@ -297,11 +297,11 @@ public class API implements IAPI {
 		this.summary = summary;
 	}
 
-	public APIImage getImage() {
+	public Image getImage() {
 		return image;
 	}
 
-	public void setImage(APIImage image) {
+	public void setImage(Image image) {
 		this.image = image;
 	}
 

@@ -1,11 +1,8 @@
 {
   "name" : "Client App",
-  "description" : "Sample Client Application, registered for use in the Client Demo",
-  "email" : "sample@sampleapp.com",
-  "phone" : "012345678",
-  "enabled" : true,
   "state" : "approved",
-  "image" : "/api/portal/v1.3/applications/4e8634ba-6762-45ca-bbe5-7ca4e99192ac/image",
+  "description" : "Sample Client Application, registered for use in the Client Demo",
+  "image" : "app-image.jpg",
   "credentials" : [ {
     "credentialType" : "oauth",
     "enabled" : true,
@@ -20,6 +17,8 @@
     "secret" : "34f2b2d6-0334-4dcc-8442-e0e7009b8950",
     "corsOrigins" : [ "*" ]
   } ],
+  "enabled" : true,
+  "email" : "sample@sampleapp.com",
   "appQuota" : {
     "id" : "00000000-0000-0000-0000-000000000001",
     "type" : "APPLICATION",
@@ -45,5 +44,6 @@
         "mb" : "555"
       }
     } ]
-  }
+  },
+  "phone" : "012345678"
 }

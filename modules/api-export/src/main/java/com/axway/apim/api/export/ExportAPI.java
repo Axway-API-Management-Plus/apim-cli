@@ -9,7 +9,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
-import com.axway.apim.api.model.APIImage;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
@@ -197,7 +197,7 @@ public class ExportAPI {
 	}
 	
 	@JsonIgnore
-	public APIImage getAPIImage() {
+	public Image getAPIImage() {
 		if(this.actualAPIProxy.getImage()==null) return null;
 		return this.actualAPIProxy.getImage();
 	}

@@ -2,6 +2,7 @@ package com.axway.apim.appexport.model;
 
 import java.util.List;
 
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -10,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonPropertyOrder({ "name" })
-public class ExportApplication extends ClientApplication {
+public class ExportApplication {
 	
 	ClientApplication clientApp;
 
@@ -32,42 +33,35 @@ public class ExportApplication extends ClientApplication {
 		return clientApp.getCredentials();
 	}
 
-	@Override
 	public String getDescription() {
 		return clientApp.getDescription();
 	}
 
-	@Override
 	public String getEmail() {
 		return clientApp.getEmail();
 	}
 
-	@Override
+
 	public String getPhone() {
 		return clientApp.getPhone();
 	}
 
-	@Override
 	public boolean isEnabled() {
 		return clientApp.isEnabled();
 	}
 
-	@Override
 	public String getState() {
 		return clientApp.getState();
 	}
 
-	@Override
-	public String getImage() {
+	public Image getImage() {
 		return clientApp.getImage();
 	}
 
-	@Override
 	public String getOrganization() {
 		return clientApp.getOrganization();
 	}
 
-	@Override
 	public APIQuota getAppQuota() {
 		return clientApp.getAppQuota();
 	}

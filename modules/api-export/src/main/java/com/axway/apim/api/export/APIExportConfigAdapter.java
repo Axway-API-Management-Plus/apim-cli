@@ -25,7 +25,7 @@ import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
 import com.axway.apim.api.export.lib.APIExportParams;
-import com.axway.apim.api.model.APIImage;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.OutboundProfile;
@@ -174,9 +174,9 @@ public class APIExportConfigAdapter {
 		} catch (Exception e) {
 			throw new AppException("Can't write API-Configuration file for API: '"+exportAPI.getName()+"' exposed on path: '"+exportAPI.getPath()+"'.", ErrorCode.UNXPECTED_ERROR, e);
 		}
-		APIImage image = exportAPI.getAPIImage();
+		Image image = exportAPI.getAPIImage();
 		if(image!=null) {
-			writeBytesToFile(image.getImageContent(), localFolder+File.separator + image.getBaseFilename()+image.getFileExtension());
+			writeBytesToFile(image.getImageContent(), localFolder+File.separator + image.getBaseFilename());
 		}
 		if(exportAPI.getCaCerts()!=null && !exportAPI.getCaCerts().isEmpty()) {
 			storeCaCerts(localFolder, exportAPI.getCaCerts());

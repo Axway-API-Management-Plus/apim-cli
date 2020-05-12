@@ -7,8 +7,10 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.appexport.impl.jackson.AppCredentialSerializerModifier;
+import com.axway.apim.appexport.impl.jackson.AppExportSerializerModifier;
+import com.axway.apim.appexport.impl.jackson.ImageSerializer;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.appexport.model.ExportApplication;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -53,13 +55,17 @@ public class JsonApplicationExporter extends ApplicationExporter {
 			throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(new SimpleModule().setSerializerModifier(new AppCredentialSerializerModifier()));
+		mapper.registerModule(new SimpleModule().setSerializerModifier(new AppExportSerializerModifier()));
+		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/"+app.getName()+".json"), app);
 		} catch (Exception e) {
 			throw new AppException("Can't write Application-Configuration file for application: '"+app.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
+		}
+		if(app.getImage()!=null) {
+			writeBytesToFile(app.getImage().getImageContent(), localFolder+File.separator + app.getImage().getBaseFilename());
 		}
 		LOG.info("Successfully exported application to folder: " + localFolder);
 		if(!APIManagerAdapter.hasAdminAccount()) {

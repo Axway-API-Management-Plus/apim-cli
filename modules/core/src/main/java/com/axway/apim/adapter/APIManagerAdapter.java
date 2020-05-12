@@ -36,7 +36,7 @@ import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.definition.APISpecificationFactory;
 import com.axway.apim.api.model.APIAccess;
-import com.axway.apim.api.model.APIImage;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.CaCert;
@@ -329,7 +329,8 @@ public class APIManagerAdapter {
 			((API)apiManagerApi).setApiConfiguration(jsonConfiguration);
 			((API)apiManagerApi).setAPIDefinition(getOriginalAPIDefinitionFromAPIM(((API)apiManagerApi).getApiId()));
 			if(((API)apiManagerApi).getImage()!=null) {
-				((API)apiManagerApi).setImage(getAPIImageFromAPIM(((API)apiManagerApi).getId())); 
+				URI uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+((API)apiManagerApi).getId()+"/image").build();
+				((API)apiManagerApi).setImage(getImageFromAPIM(uri, "api-image")); 
 			}
 			((API)apiManagerApi).setValid(true);
 			// As the API-Manager REST doesn't provide information about Custom-Properties, we have to setup 
@@ -727,22 +728,20 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	private static APIImage getAPIImageFromAPIM(String backendApiID) throws AppException {
-		APIImage image = new APIImage();
-		URI uri;
+	public static Image getImageFromAPIM(URI uri, String baseFilename) throws AppException {
+		Image image = new Image();
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+backendApiID+"/image").build();
 			RestAPICall getRequest = new GETRequest(uri, null);
 			httpResponse = getRequest.execute();
 			if(httpResponse == null || httpResponse.getEntity() == null) return null; // no Image found in API-Manager
 			InputStream is = httpResponse.getEntity().getContent();
 			image.setImageContent(IOUtils.toByteArray(is));
-			image.setBaseFilename("api-image");
 			if(httpResponse.containsHeader("Content-Type")) {
 				String contentType = httpResponse.getHeaders("Content-Type")[0].getValue();
 				image.setContentType(contentType);
 			}
+			image.setBaseFilename(baseFilename);
 			return image;
 		} catch (Exception e) {
 			throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);

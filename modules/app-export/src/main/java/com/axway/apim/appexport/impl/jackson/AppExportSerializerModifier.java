@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
-public class AppCredentialSerializerModifier extends BeanSerializerModifier {
+public class AppExportSerializerModifier extends BeanSerializerModifier {
 	
 	
 

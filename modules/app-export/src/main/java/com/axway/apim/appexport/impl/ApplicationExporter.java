@@ -1,5 +1,7 @@
 package com.axway.apim.appexport.impl;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -7,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public abstract class ApplicationExporter {
 	
@@ -27,5 +30,14 @@ public abstract class ApplicationExporter {
 	
 	public boolean hasError() {
 		return this.hasError;
+	}
+	
+	protected static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
+
+		try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {
+			fileOuputStream.write(bFile);
+		} catch (IOException e) {
+			throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
+		}
 	}
 }
