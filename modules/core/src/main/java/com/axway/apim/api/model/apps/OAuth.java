@@ -1,13 +1,19 @@
 package com.axway.apim.api.model.apps;
 
+import com.axway.apim.adapter.clientApps.jackson.JSONViews;
+import com.fasterxml.jackson.annotation.JsonView;
+
 public class OAuth extends ClientAppCredential {
 	
+	@JsonView(JSONViews.CredentialsBase.class)
 	String cert;
 	
+	@JsonView(JSONViews.CredentialsBase.class)
 	String type;
 	
 	String clientId;
 	
+	@JsonView(JSONViews.CredentialsBase.class)
 	String[] redirectUrls;
 
 	@Override

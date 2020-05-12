@@ -72,6 +72,7 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$[0].id", "ClientConfidentialApp-${appNumber}")
+				.validate("$[0].cert", "@assertThat(containsString(-----BEGIN CERTIFICATE-----))@")
 				.validate("$[0].secret", "9cb76d80-1bc2-48d3-8d31-edeec0fddf6c"));
 		
 		echo("####### Validate application: '${appName}' with id: ${appId} API-Key has been imported #######");

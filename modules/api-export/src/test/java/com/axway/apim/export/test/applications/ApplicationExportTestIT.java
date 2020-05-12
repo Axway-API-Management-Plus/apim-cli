@@ -96,7 +96,7 @@ public class ApplicationExportTestIT extends TestNGCitrusTestRunner {
 		List<ClientApplication> exportedApps = mapper.convertValue(exportedAPIConfig.get("applications"), new TypeReference<List<ClientApplication>>(){});
 		assertEquals(exportedApps.size(), 1, "Number of exported apps not correct");
 		ClientApplication app = exportedApps.get(0);
-		assertNull(app.getApiAccess(), "Exported Apps should not contains API-Access");
+		assertTrue(app.getApiAccess()==null || app.getApiAccess().size()==0, "Exported Apps should not contains API-Access");
 		assertNull(app.getId(), "The ID of an application shouldn't be exported.");
 		assertNull(app.getOrganizationId(), "The Org-ID of an application shouldn't be exported.");
 		assertNull(app.getAppQuota(), "The application quota should not be exported. It's not supported by the export!");

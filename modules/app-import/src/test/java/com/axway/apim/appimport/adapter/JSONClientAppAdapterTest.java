@@ -73,10 +73,13 @@ public class JSONClientAppAdapterTest {
 		assertEquals(app.getPhone(), "012345678");
 		assertNotNull(app.getCredentials(), "getCredentials is null");
 		assertEquals(app.getCredentials().size(), 2, "Expected 2 credentials");
+		
 		ClientAppCredential oauthCred = app.getCredentials().get(0);
-		ClientAppCredential apikeyCred = app.getCredentials().get(1);
 		assertTrue(oauthCred instanceof OAuth, "Expected OAuth credentials");
 		assertEquals(oauthCred.getId(), "ClientConfidentialApp");
+		assertTrue(((OAuth)oauthCred).getCert().startsWith("-----BEGIN CERTIFICATE-----"), "Expecte OAuth-Cert: '"+((OAuth)oauthCred).getCert()+"' to start with -----BEGIN CERTIFICATE-----");
+		
+		ClientAppCredential apikeyCred = app.getCredentials().get(1);
 		assertTrue(apikeyCred instanceof APIKey, "Expected APIKey credentials");
 		assertEquals(apikeyCred.getId(), "6cd55c27-675a-444a-9bc7-ae9a7869184d");
 		

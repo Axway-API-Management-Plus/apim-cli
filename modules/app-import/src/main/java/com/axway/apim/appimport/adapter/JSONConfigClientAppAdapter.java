@@ -1,6 +1,9 @@
 package com.axway.apim.appimport.adapter;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +12,7 @@ import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.api.model.apps.OAuth;
 import com.axway.apim.appimport.adapter.jackson.AppCredentialsDeserializer;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -48,6 +52,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 			throw new AppException("Cannot read apps from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		}
 		addImage(apps, configFile.getParentFile());
+		addOAuthCertificate(apps, configFile.getParentFile());
 		return true;
 	}
 	
@@ -80,6 +85,25 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 			if(app.getImageUrl()==null || app.getImageUrl().equals("")) continue;
 			app.setImage(Image.createImageFromFile(new File(parentFolder + File.separator + app.getImageUrl())));
 			
+		}
+	}
+	
+	private void addOAuthCertificate(List<ClientApplication> apps, File parentFolder) throws AppException {
+		for(ClientApplication app : apps) {
+			for(ClientAppCredential cred : app.getCredentials()) {
+				if(cred instanceof OAuth && ((OAuth) cred).getCert()!=null) {
+					File certFile = new File(parentFolder + File.separator +((OAuth) cred).getCert());
+					if(!certFile.exists()) {
+						throw new AppException("Certificate file: '"+certFile+"' not found.", ErrorCode.UNXPECTED_ERROR);
+					}
+					try {
+						String certBlob = new String(Files.readAllBytes(certFile.toPath()));
+						((OAuth) cred).setCert(certBlob);
+					} catch (Exception e) {
+						throw new AppException("Can't read certificate from disc", ErrorCode.UNXPECTED_ERROR, e);
+					}
+				}
+			}
 		}
 	}
 }
