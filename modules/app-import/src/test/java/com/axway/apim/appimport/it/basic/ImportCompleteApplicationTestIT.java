@@ -28,7 +28,7 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 	public void importApplicationBasicTest(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		description("Import application into API-Manager");
 		
-		variable("appNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("appNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("appName", "Complete-App-${appNumber}");
 		variable("phone", "123456789-${appNumber}");
 		variable("description", "My App-Description ${appNumber}");
