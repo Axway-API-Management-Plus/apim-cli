@@ -19,6 +19,8 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.errorHandling.ErrorState;
+import com.axway.apim.lib.utils.rest.APIMHttpClient;
+import com.axway.apim.lib.utils.rest.Transaction;
 
 public class ApplicationExportApp implements APIMCLIServiceProvider {
 
@@ -49,6 +51,12 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "export", description = "Export applications from the API-Manager")
 	public static int export(String[] args) {
 		try {
+			// We need to clean some Singleton-Instances, as tests are running in the same JVM
+			APIManagerAdapter.deleteInstance();
+			ErrorState.deleteInstance();
+			APIMHttpClient.deleteInstance();
+			Transaction.deleteInstance();
+			
 			new AppExportParams(new AppExportCLIOptions(args));
 			ClientAppAdapter appAdapter = ClientAppAdapter.create(APIManagerAdapter.getInstance());
 			ClientAppFilter filter = new ClientAppFilter.Builder()
