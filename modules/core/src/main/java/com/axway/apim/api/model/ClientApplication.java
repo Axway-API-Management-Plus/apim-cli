@@ -56,7 +56,6 @@ public class ClientApplication {
 	}
 	
 	public String getOrganizationId() throws AppException {
-		if(this.organizationId==null) this.organizationId = APIManagerAdapter.getInstance().getOrgId(this.organization);
 		return organizationId;
 	}
 	public void setOrganizationId(String organizationId) {
