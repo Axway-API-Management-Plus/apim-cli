@@ -42,5 +42,9 @@ public class ImportApplicationTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
 			.extractFromPayload("$.[?(@.id=='${appName}')].id", "appId"));
+		
+		echo("####### Re-Import same application - Should be a No-Change #######");
+		createVariable("expectedReturnCode", "10");
+		appImport.doExecute(context);		
 	}
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
+import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -45,15 +46,15 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	}
 	
 	@Override
-	public List<ClientApplication> getApplications() throws AppException {
-		return this.apps;
+	public List<ClientApplication> getApplications(ClientAppFilter filter) throws AppException {
+		throw new UnsupportedOperationException("Filtering results is not supported for the JSON implementation");
 	}
 
 	@Override
-	public ClientApplication getApplication(String applicationName) throws AppException {
+	public ClientApplication getApplication(ClientApplication applicationName) throws AppException {
 		if(this.apps==null) return null;
 		for(ClientApplication app : this.apps) {
-			if(applicationName.equals(app.getName())) return app;
+			if(applicationName.getName().equals(app.getName())) return app;
 		}
 		return null;
 	}
@@ -61,5 +62,10 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	@Override
 	public ClientApplication createApplication(ClientApplication app) throws AppException {
 		throw new UnsupportedOperationException("createApplication not implemented for JSONConfigClientAppAdapter");
+	}
+
+	@Override
+	public List<ClientApplication> getApplications() throws AppException {
+		return this.apps;
 	}
 }

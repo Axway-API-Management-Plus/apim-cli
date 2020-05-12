@@ -10,6 +10,7 @@ import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.api.model.ClientApplication;
 import com.axway.apim.appimport.lib.AppImportCLIOptions;
 import com.axway.apim.appimport.lib.AppImportParams;
+import com.axway.apim.appimport.lib.ClientAppBuilder;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -49,15 +50,12 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			AppImportParams params = new AppImportParams(new AppImportCLIOptions(args));
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the application
-			ClientAppAdapter desiredAppsAdapter = new ClientAppAdapter.Builder(params.getValue("config"))
-					.build();
+			ClientAppAdapter desiredAppsAdapter = ClientAppAdapter.create(params.getValue("config"));
 			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
-			ClientAppAdapter apimClientAppAdapter =  new ClientAppAdapter.Builder(APIManagerAdapter.getInstance())
-					.includeQuotas(true)
-					.build();
+			ClientAppAdapter apimClientAppAdapter =  ClientAppAdapter.create(APIManagerAdapter.getInstance());
 			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter, apimClientAppAdapter);
 			for(ClientApplication desiredApp : desiredApps) {
-				ClientApplication actualApp = apimClientAppAdapter.getApplication(desiredApp.getName());
+				ClientApplication actualApp = apimClientAppAdapter.getApplication(desiredApp);
 				importManager.setDesiredApp(desiredApp);
 				importManager.setActualApp(actualApp);
 				importManager.replicate();

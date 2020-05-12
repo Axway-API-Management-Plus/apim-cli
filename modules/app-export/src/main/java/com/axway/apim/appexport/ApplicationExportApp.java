@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
+import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
 import com.axway.apim.appexport.impl.JsonApplicationExporter;
@@ -49,12 +50,13 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	public int export(String[] args) {
 		try {
 			new AppExportParams(new AppExportCLIOptions(args));
-
-			List<ClientApplication> apps = new ClientAppAdapter.Builder(APIManagerAdapter.getInstance())
+			ClientAppAdapter appAdapter = ClientAppAdapter.create(APIManagerAdapter.getInstance());
+			ClientAppFilter filter = new ClientAppFilter.Builder()
 					.hasState(AppExportParams.getInstance().getAppState())
 					.hasName(AppExportParams.getInstance().getAppName())
 					.includeQuotas(true)
-					.build().getApplications();
+					.build();
+			List<ClientApplication> apps = appAdapter.getApplications(filter);
 			if(apps.size()==0) {
 				LOG.info("No applications selected for export");
 			} else {

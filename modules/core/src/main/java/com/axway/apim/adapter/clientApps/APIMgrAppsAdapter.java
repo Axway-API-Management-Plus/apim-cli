@@ -11,8 +11,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,22 +23,17 @@ import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class APIMgrAppsAdapter extends ClientAppAdapter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIMgrAppsAdapter.class);
 
-	List<NameValuePair> filters = new ArrayList<NameValuePair>();
-
 	List<ClientApplication> apps = null;
 	
 	CommandParameters params;
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
-	
-	boolean includeQuota = false;
 
 	public APIMgrAppsAdapter() {}
 	
@@ -54,10 +47,10 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	 * Returns a list of applications.
 	 * @throws AppException if applications cannot be retrieved
 	 */
-	void readApplications() throws AppException {
+	void readApplications(ClientAppFilter appFilter) throws AppException {
 		if(this.apps !=null) return;
 		try {
-			URI uri = getRequestUri();
+			URI uri = getRequestUri(appFilter);
 			LOG.info("Sending request to find existing applications: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
@@ -65,62 +58,36 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
-		if(this.includeQuota) {
+		if(appFilter.includeQuota) {
 			APIManagerAdapter.getInstance().addExistingClientAppQuotas(apps);
 		}
 	}
 	
-	URI getRequestUri() throws URISyntaxException {
+	URI getRequestUri(ClientAppFilter appFilter) throws URISyntaxException {
 		CommandParameters cmd = CommandParameters.getInstance();
 		URI uri;
 		List<NameValuePair> usedFilters = new ArrayList<>();
-		if(filters != null && filters.size()!=0) { usedFilters.addAll(filters); }
 		String searchForAppId = "";
-		if(this.applicationId!=null) {
-			searchForAppId = "/"+this.applicationId;
+		if(appFilter!=null) {
+			if(appFilter != null && appFilter.getFilters().size()!=0) { usedFilters.addAll(appFilter.getFilters()); }
+			
+			if(appFilter.getApplicationId()!=null) {
+				searchForAppId = "/"+appFilter.getApplicationId();
+			}
 		}
 		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications"+searchForAppId)
 				.addParameters(usedFilters)
 				.build();
 		return uri;
 	}
-	
-	@Override
-	void setApplicationName(String applicationName) {
-		if(applicationName==null) return;
-		filters.add(new BasicNameValuePair("field", "name"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", applicationName));
-	}
 
-	@Override
-	void setOrganization(String organization) {
-		if(organization==null) return;
-		filters.add(new BasicNameValuePair("field", "orgid"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", organization));
-	}
-
-
-	@Override
-	void setState(String state) {
-		if(state==null) return;
-		filters.add(new BasicNameValuePair("field", "state"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", state));
-	}
-	
-	void useFilter(List<NameValuePair> filter) {
-		this.filters.addAll(filter);
-	}
-
-	public ClientApplication getApplication(String requestedApplicationId) throws AppException {
-		List<ClientApplication> foundApps = getApplications(requestedApplicationId);
-		return uniqueApplication(foundApps);
+	public ClientApplication getApplication(ClientApplication application) throws AppException {
+		readApplications(new ClientAppFilter.Builder().hasName(application.getName()).build());
+		return uniqueApplication(application.getName());
 	}
 	
 	public ClientApplication createApplication(ClientApplication app) throws AppException {
-		readApplications();
+		getApplication(app);
 		try {
 			CommandParameters cmd = CommandParameters.getInstance();
 			String orgId = "";
@@ -147,20 +114,27 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		}
 	}
 	
-	private ClientApplication uniqueApplication(List<ClientApplication> foundApps) throws AppException {
-		if(foundApps.size()>1) {
-			throw new AppException("No unique API found", ErrorCode.UNKNOWN_API);
+	private ClientApplication uniqueApplication(String applicationName) throws AppException {
+		if(this.apps.size()>1) {
+			throw new AppException("No unique application found", ErrorCode.UNKNOWN_API);
 		}
-		if(foundApps.size()==0) return null;
-		return foundApps.get(0);
+		if(this.apps.size()==0) return null;
+		return this.apps.get(0);
 	}
 	
+	@Override
 	public List<ClientApplication> getApplications() throws AppException {
-		return this.getApplications(null);
+		return this.getApplications(new ClientAppFilter.Builder().build());
 	}
 
 	public List<ClientApplication> getApplications(String requestedApplicationId) throws AppException {
-		readApplications();
+		readApplications(new ClientAppFilter.Builder().hasId(requestedApplicationId).build());
+		return apps;
+	}
+	
+	@Override
+	public List<ClientApplication> getApplications(ClientAppFilter filter) throws AppException {
+		readApplications(filter);
 		return apps;
 	}
 }

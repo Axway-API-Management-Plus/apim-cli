@@ -20,9 +20,9 @@ public class JSONClientAppAdapterTest {
 	public void testSingleAppAsArray() throws AppException {
 		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/SingleClientAppAsArray.json").getPath();
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
-		ClientAppAdapter adapter = new ClientAppAdapter.Builder(testFile).build();
+		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
 		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
-		List<ClientApplication> apps = adapter.getApplications();
+		List<ClientApplication> apps = adapter.getApplications(null);
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
 	}
 	
@@ -30,9 +30,9 @@ public class JSONClientAppAdapterTest {
 	public void testSingleApp() throws AppException {
 		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/OneSingleClientApp.json").getPath();
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
-		ClientAppAdapter adapter = new ClientAppAdapter.Builder(testFile).build();
+		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
 		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
-		List<ClientApplication> apps = adapter.getApplications();
+		List<ClientApplication> apps = adapter.getApplications(null);
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
 	}
 }

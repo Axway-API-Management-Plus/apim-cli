@@ -86,7 +86,7 @@ public class ClientApplication {
 	public boolean equals(Object other) {
 		if(other == null) return false;
 		if(other instanceof ClientApplication) {
-			return StringUtils.equals(((ClientApplication)other).getId(), this.getId());
+			return StringUtils.equals(((ClientApplication)other).getName(), this.getName());
 		}
 		return false;
 	}
