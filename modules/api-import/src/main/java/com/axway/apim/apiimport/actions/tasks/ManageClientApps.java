@@ -16,7 +16,7 @@ import org.apache.http.util.EntityUtils;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.APIAccess;
-import com.axway.apim.api.model.ClientApplication;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;

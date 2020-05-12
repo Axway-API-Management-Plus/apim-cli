@@ -5,7 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.api.model.ClientApplication;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public abstract class ApplicationExporter {

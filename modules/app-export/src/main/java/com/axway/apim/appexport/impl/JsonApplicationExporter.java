@@ -7,7 +7,8 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.model.ClientApplication;
+import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.appexport.impl.jackson.AppCredentialSerializerModifier;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.appexport.model.ExportApplication;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -15,6 +16,7 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class JsonApplicationExporter extends ApplicationExporter {
 
@@ -50,7 +52,8 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		if (!localFolder.mkdirs()) {
 			throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
-		ObjectMapper mapper = new ObjectMapper();		
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new SimpleModule().setSerializerModifier(new AppCredentialSerializerModifier()));
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);

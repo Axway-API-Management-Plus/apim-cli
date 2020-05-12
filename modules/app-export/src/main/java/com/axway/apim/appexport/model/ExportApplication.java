@@ -1,6 +1,10 @@
 package com.axway.apim.appexport.model;
 
-import com.axway.apim.api.model.ClientApplication;
+import java.util.List;
+
+import com.axway.apim.api.model.APIQuota;
+import com.axway.apim.api.model.apps.ClientAppCredential;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -23,4 +27,50 @@ public class ExportApplication extends ClientApplication {
 	public String getName() {
 		return clientApp.getName();
 	}
+
+	public List<ClientAppCredential> getCredentials() {
+		return clientApp.getCredentials();
+	}
+
+	@Override
+	public String getDescription() {
+		return clientApp.getDescription();
+	}
+
+	@Override
+	public String getEmail() {
+		return clientApp.getEmail();
+	}
+
+	@Override
+	public String getPhone() {
+		return clientApp.getPhone();
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return clientApp.isEnabled();
+	}
+
+	@Override
+	public String getState() {
+		return clientApp.getState();
+	}
+
+	@Override
+	public String getImage() {
+		return clientApp.getImage();
+	}
+
+	@Override
+	public String getOrganization() {
+		return clientApp.getOrganization();
+	}
+
+	@Override
+	public APIQuota getAppQuota() {
+		return clientApp.getAppQuota();
+	}
+	
+	
 }

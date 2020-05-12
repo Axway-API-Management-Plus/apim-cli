@@ -14,6 +14,8 @@ public class ClientAppFilter {
 	
 	boolean includeQuota;
 	
+	boolean includeCredentials;
+	
 	String applicationId;
 	
 	List<NameValuePair> filters = new ArrayList<NameValuePair>();
@@ -24,6 +26,10 @@ public class ClientAppFilter {
 	
 	public boolean isIncludeQuota() {
 		return includeQuota;
+	}
+	
+	public boolean isIncludeCredentials() {
+		return includeCredentials;
 	}
 
 	public String getApplicationId() {
@@ -77,6 +83,8 @@ public class ClientAppFilter {
 		
 		boolean includeQuota;
 		
+		boolean includeCredentials;
+		
 		String organization;
 		
 		/** The name of the application */
@@ -104,12 +112,8 @@ public class ClientAppFilter {
 			filter.setOrganization(this.organization);
 			filter.setState(this.state);
 			filter.includeQuota = this.includeQuota;
+			filter.includeCredentials = this.includeCredentials;
 			return filter;
-		}
-		
-		public Builder includeQuotas(boolean includeQuota) {
-			this.includeQuota = includeQuota;
-			return this;
 		}
 		
 		public Builder hasName(String name) {
@@ -129,6 +133,16 @@ public class ClientAppFilter {
 		
 		public Builder hasState(String state) {
 			this.state = state;
+			return this;
+		}
+		
+		public Builder includeQuotas(boolean includeQuota) {
+			this.includeQuota = includeQuota;
+			return this;
+		}
+		
+		public Builder includeCredentials(boolean includeCredentials) {
+			this.includeCredentials = includeCredentials;
 			return this;
 		}
 	}

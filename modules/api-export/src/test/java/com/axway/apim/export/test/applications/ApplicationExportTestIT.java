@@ -14,7 +14,7 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.api.model.ClientApplication;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.export.test.ExportTestAction;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;

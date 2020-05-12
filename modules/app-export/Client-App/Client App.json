@@ -1,0 +1,49 @@
+{
+  "name" : "Client App",
+  "description" : "Sample Client Application, registered for use in the Client Demo",
+  "email" : "sample@sampleapp.com",
+  "phone" : "012345678",
+  "enabled" : true,
+  "state" : "approved",
+  "image" : "/api/portal/v1.3/applications/4e8634ba-6762-45ca-bbe5-7ca4e99192ac/image",
+  "credentials" : [ {
+    "credentialType" : "oauth",
+    "enabled" : true,
+    "secret" : "9cb76d80-1bc2-48d3-8d31-edeec0fddf6c",
+    "corsOrigins" : [ ],
+    "cert" : "-----BEGIN CERTIFICATE-----\nMIIDpTCCAw6gAwIBAgIJAKqGffYjCdSiMA0GCSqGSIb3DQEBBQUAMIGUMQswCQYD\nVQQGEwJVUzELMAkGA1UECBMCTUExDzANBgNVBAcTBk5ld3RvbjEPMA0GA1UEChMG\nVm9yZGVsMRMwEQYDVQQLEwpBUEkgU2VydmVyMR4wHAYDVQQDExVTYW1wbGVDb25m\naWRlbnRpYWxBcHAxITAfBgkqhkiG9w0BCQEWEnN1cHBvcnRAdm9yZGVsLmNvbTAe\nFw0xMjA2MjMxMjAzMjdaFw0xMzA2MjMxMjAzMjdaMIGUMQswCQYDVQQGEwJVUzEL\nMAkGA1UECBMCTUExDzANBgNVBAcTBk5ld3RvbjEPMA0GA1UEChMGVm9yZGVsMRMw\nEQYDVQQLEwpBUEkgU2VydmVyMR4wHAYDVQQDExVTYW1wbGVDb25maWRlbnRpYWxB\ncHAxITAfBgkqhkiG9w0BCQEWEnN1cHBvcnRAdm9yZGVsLmNvbTCBnzANBgkqhkiG\n9w0BAQEFAAOBjQAwgYkCgYEAufg2vIfcmO7tSYcSkfGv3i9CHF+DxB99uwlJcm/g\nKh/9qw3enTzqbq1YkZPzkaWIrclgf7bY3Ux5+9WvWN03/denOtlai/eHQtHYAIBd\n7LtTR3482hZq9qVEYOY6E2zH/eReFcJelqfs8lpFswRQhBR1ayY/+rAS57PrJqz7\nenkCAwEAAaOB/DCB+TAdBgNVHQ4EFgQU+LJbKjC8u9lv8ijauNXomEEcT3EwgckG\nA1UdIwSBwTCBvoAU+LJbKjC8u9lv8ijauNXomEEcT3GhgZqkgZcwgZQxCzAJBgNV\nBAYTAlVTMQswCQYDVQQIEwJNQTEPMA0GA1UEBxMGTmV3dG9uMQ8wDQYDVQQKEwZW\nb3JkZWwxEzARBgNVBAsTCkFQSSBTZXJ2ZXIxHjAcBgNVBAMTFVNhbXBsZUNvbmZp\nZGVudGlhbEFwcDEhMB8GCSqGSIb3DQEJARYSc3VwcG9ydEB2b3JkZWwuY29tggkA\nqoZ99iMJ1KIwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOBgQCbacb6DV3Q\n9RQUHju1acDVUO+mUsZgTk3pCcNNKl0nwG+MECw8tIo65tNURNHeWZmGaA30YGtZ\nyyN927ViaxpJYL1O1Pfjmw8XjHo0uIYVy65cNnTslROG4OvbpQeJqS2qZBHI6om3\nSrzimi399xbb1Fld74/sLXR7WMVJt9b+Ng==\n-----END CERTIFICATE-----",
+    "type" : "confidential",
+    "redirectUrls" : [ "https://localhost:8088/client/apigateway/callback", "https://oauthclient:8088/client/apigateway/callback" ]
+  }, {
+    "credentialType" : "apikeys",
+    "enabled" : true,
+    "secret" : "34f2b2d6-0334-4dcc-8442-e0e7009b8950",
+    "corsOrigins" : [ "*" ]
+  } ],
+  "appQuota" : {
+    "id" : "00000000-0000-0000-0000-000000000001",
+    "type" : "APPLICATION",
+    "name" : "Application Default",
+    "description" : "Maximum message rates per application. Applied to each application unless an Application-Specific quota is configured",
+    "system" : "true",
+    "restrictions" : [ {
+      "api" : "1fef37cd-4066-4f1a-91e9-133582556ed1",
+      "method" : "*",
+      "type" : "throttlemb",
+      "config" : {
+        "period" : "hour",
+        "per" : "1",
+        "mb" : "555"
+      }
+    }, {
+      "api" : "31edef32-e4e4-4c01-8158-1b7abf0cabe5",
+      "method" : "*",
+      "type" : "throttlemb",
+      "config" : {
+        "period" : "hour",
+        "per" : "1",
+        "mb" : "555"
+      }
+    } ]
+  }
+}

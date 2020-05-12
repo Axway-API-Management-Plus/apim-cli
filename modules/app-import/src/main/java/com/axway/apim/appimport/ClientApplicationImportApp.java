@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
-import com.axway.apim.api.model.ClientApplication;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appimport.lib.AppImportCLIOptions;
 import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.appimport.lib.ClientAppBuilder;

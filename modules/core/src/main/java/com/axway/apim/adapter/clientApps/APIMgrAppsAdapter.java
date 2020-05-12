@@ -15,7 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.model.ClientApplication;
+import com.axway.apim.api.model.apps.APIKey;
+import com.axway.apim.api.model.apps.ClientAppCredential;
+import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.api.model.apps.ExtClients;
+import com.axway.apim.api.model.apps.OAuth;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -31,7 +35,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 
 	List<ClientApplication> apps = null;
 	
-	CommandParameters params;
+	CommandParameters cmd  = CommandParameters.getInstance();
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 
@@ -50,21 +54,27 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	void readApplications(ClientAppFilter appFilter) throws AppException {
 		if(this.apps !=null) return;
 		try {
-			URI uri = getRequestUri(appFilter);
+			URI uri = getApplicationsUri(appFilter);
 			LOG.info("Sending request to find existing applications: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null);
 			InputStream response = getRequest.execute().getEntity().getContent();
 			this.apps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
+			
+			if(appFilter.isIncludeQuota()) {
+				APIManagerAdapter.getInstance().addExistingClientAppQuotas(apps);
+			}
+			if(appFilter.isIncludeCredentials()) {
+				addApplicationCredentials(apps);
+			}
+			
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
-		if(appFilter.includeQuota) {
-			APIManagerAdapter.getInstance().addExistingClientAppQuotas(apps);
-		}
+
 	}
 	
-	URI getRequestUri(ClientAppFilter appFilter) throws URISyntaxException {
-		CommandParameters cmd = CommandParameters.getInstance();
+	URI getApplicationsUri(ClientAppFilter appFilter) throws URISyntaxException {
+		
 		URI uri;
 		List<NameValuePair> usedFilters = new ArrayList<>();
 		String searchForAppId = "";
@@ -79,6 +89,25 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 				.addParameters(usedFilters)
 				.build();
 		return uri;
+	}
+	
+	void addApplicationCredentials(List<ClientApplication> apps) throws Exception {
+		URI uri;
+		List<ClientAppCredential> credentials;
+		String[] types = new String[] {"extclients", "oauth", "apikeys"};
+		TypeReference[] classTypes = new TypeReference[] {new TypeReference<List<ExtClients>>(){}, new TypeReference<List<OAuth>>(){}, new TypeReference<List<APIKey>>(){}};
+		for(ClientApplication app : apps) {
+			for(int i=0; i<types.length; i++) {
+				String type = types[i];
+				TypeReference classType = classTypes[i];
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type)
+						.build();
+				RestAPICall getRequest = new GETRequest(uri, null);
+				InputStream response = getRequest.execute().getEntity().getContent();
+				credentials = mapper.readValue(response, classType);
+				app.getCredentials().addAll(credentials);
+			}
+		}
 	}
 
 	public ClientApplication getApplication(ClientApplication application) throws AppException {

@@ -1,6 +1,6 @@
 package com.axway.apim.appimport.lib;
 
-import com.axway.apim.api.model.ClientApplication;
+import com.axway.apim.api.model.apps.ClientApplication;
 
 public class ClientAppBuilder {
 

@@ -9,7 +9,7 @@ import java.util.List;
 import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
-import com.axway.apim.api.model.ClientApplication;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class JSONClientAppAdapterTest {

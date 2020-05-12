@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
-import com.axway.apim.api.model.ClientApplication;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
 import com.axway.apim.appexport.impl.JsonApplicationExporter;
 import com.axway.apim.appexport.lib.AppExportCLIOptions;
@@ -24,7 +24,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 
 	private static Logger LOG = LoggerFactory.getLogger(ApplicationExportApp.class);
 
-	ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 
 	@Override
 	public String getName() {
@@ -47,7 +47,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	}
 
 	@CLIServiceMethod(name = "export", description = "Export applications from the API-Manager")
-	public int export(String[] args) {
+	public static int export(String[] args) {
 		try {
 			new AppExportParams(new AppExportCLIOptions(args));
 			ClientAppAdapter appAdapter = ClientAppAdapter.create(APIManagerAdapter.getInstance());
@@ -55,6 +55,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 					.hasState(AppExportParams.getInstance().getAppState())
 					.hasName(AppExportParams.getInstance().getAppName())
 					.includeQuotas(true)
+					.includeCredentials(true)
 					.build();
 			List<ClientApplication> apps = appAdapter.getApplications(filter);
 			if(apps.size()==0) {
@@ -86,6 +87,10 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		return 0;
 	}
 
+	public static void main(String args[]) { 
+		int rc = export(args);
+		System.exit(rc);
+	}
 
 
 }
