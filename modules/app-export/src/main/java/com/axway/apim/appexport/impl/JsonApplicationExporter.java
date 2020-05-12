@@ -55,7 +55,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 			throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(new SimpleModule().setSerializerModifier(new AppExportSerializerModifier()));
+		mapper.registerModule(new SimpleModule().setSerializerModifier(new AppExportSerializerModifier(localFolder)));
 		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {

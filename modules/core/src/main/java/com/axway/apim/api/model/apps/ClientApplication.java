@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.axway.apim.adapter.clientApps.jackson.JSONViews;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.APIQuota;
@@ -12,16 +13,24 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientApplication {
 	private String id;
+	@JsonView(JSONViews.ApplicationBase.class)
 	private String name;
+	@JsonView(JSONViews.ApplicationBase.class)
 	private String description;
+	@JsonView(JSONViews.ApplicationBase.class)
 	private String email;
+	@JsonView(JSONViews.ApplicationBase.class)
 	private String phone;
+	@JsonView(JSONViews.ApplicationBase.class)
 	private boolean enabled;
+	@JsonView(JSONViews.ApplicationBase.class)
 	private String state;
+	
 	
 	@JsonProperty("image")
 	private String imageUrl;
@@ -33,7 +42,9 @@ public class ClientApplication {
 	private String extClientId;
 	private String apiKey;
 	
-	private List<APIAccess> apiAccess;
+	@JsonView(JSONViews.ApplicationBase.class)
+	@JsonProperty("apis")
+	private List<APIAccess> apiAccess = new ArrayList<APIAccess>();
 	
 	private List<ClientAppCredential> credentials = new ArrayList<ClientAppCredential>(); 
 	

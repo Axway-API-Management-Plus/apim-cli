@@ -1,4 +1,4 @@
-package com.axway.apim.appimport.basic;
+package com.axway.apim.appimport.it.basic;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
 @Test
-public class ImportApplicationTestIT extends TestNGCitrusTestRunner {
+public class ImportSimpleApplicationTestIT extends TestNGCitrusTestRunner {
 
 	private ApplicationImportTestAction appImport = new ApplicationImportTestAction();
 	
@@ -25,7 +25,7 @@ public class ImportApplicationTestIT extends TestNGCitrusTestRunner {
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void importApplicationBasicTest(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		description("Import application into API-Manager");
 		
 		variable("appNumber", RandomNumberFunction.getRandomNumber(3, true));

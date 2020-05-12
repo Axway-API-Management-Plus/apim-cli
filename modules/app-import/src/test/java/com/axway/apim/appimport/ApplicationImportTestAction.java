@@ -1,6 +1,7 @@
 package com.axway.apim.appimport;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -10,7 +11,9 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,11 +53,14 @@ public class ApplicationImportTestAction extends AbstractTestAction {
 		} catch (Exception ignore) {};
 		
 		String enforce = "false";
+		String ignoreAdminAccount = "false";
 		
 		try {
 			enforce = context.getVariable("enforce");
 		} catch (Exception ignore) {};
-		
+		try {
+			ignoreAdminAccount = context.getVariable("ignoreAdminAccount");
+		} catch (Exception ignore) {};
 		
 		if(stage==null) {
 			stage = "NOT_SET";
@@ -66,6 +72,8 @@ public class ApplicationImportTestAction extends AbstractTestAction {
 			replaceDynamicContentInFile(stageConfigFile, context, replacedStagedConfig);
 		}
 		
+		copyImagesAndCertificates(origConfigFile, context);
+
 		String[] args;
 		if(useEnvironmentOnly) {
 			args = new String[] {  
@@ -80,7 +88,7 @@ public class ApplicationImportTestAction extends AbstractTestAction {
 					"-f", enforce
 			};
 		}
-		//LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);
+		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);
 		int rc = ClientApplicationImportApp.importApp(args);
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
@@ -160,5 +168,22 @@ public class ApplicationImportTestAction extends AbstractTestAction {
 		}
 		LOG.info("Successfully created Test-Directory: "+tmpDir + File.separator + testDirName);
 		return testDir;
+	}
+	
+	private void copyImagesAndCertificates(String origConfigFile, TestContext context) {
+		File sourceDir = new File(origConfigFile).getParentFile();
+		if(!sourceDir.exists()) {
+			sourceDir = new File(this.getClass().getResource(origConfigFile).getFile()).getParentFile();
+			if(!sourceDir.exists()) { 
+				return;
+			}
+		}
+		FileFilter filter = new WildcardFileFilter(new String[] {"*.crt", "*.jpg", "*.png", "*.pem"});
+		try {
+			LOG.info("Copy certificates and images from source: "+sourceDir+" into test-dir: '"+testDir+"'");
+			FileUtils.copyDirectory(sourceDir, testDir, filter);
+		} catch (IOException e) {
+
+		}
 	}
 }

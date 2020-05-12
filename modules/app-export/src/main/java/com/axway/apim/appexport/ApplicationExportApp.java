@@ -63,7 +63,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 				LOG.info("No applications selected for export");
 			} else {
 				LOG.info("Selected " + apps.size() + " for export.");
-				ApplicationExporter exporter = new JsonApplicationExporter(apps, AppExportParams.getInstance().getTargetFolder());
+				ApplicationExporter exporter = ApplicationExporter.create(apps, AppExportParams.getInstance().getTargetFolder());
 				exporter.export();
 				if(exporter.hasError()) {
 					LOG.info("Please check the log. At least one error was recorded.");

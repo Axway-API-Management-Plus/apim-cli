@@ -6,12 +6,16 @@ import java.util.List;
 
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.appimport.adapter.jackson.AppCredentialsDeserializer;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	
@@ -30,6 +34,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		File configFile = new File(myConfig);
 		if(!configFile.exists()) return false;
 		try {
+			mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
 			this.apps = mapper.readValue(configFile, new TypeReference<List<ClientApplication>>(){});
 		} catch (MismatchedInputException me) {
 			try {
@@ -42,6 +47,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		} catch (Exception e) {
 			throw new AppException("Cannot read apps from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		}
+		addImage(apps, configFile.getParentFile());
 		return true;
 	}
 	
@@ -67,5 +73,13 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	@Override
 	public List<ClientApplication> getApplications() throws AppException {
 		return this.apps;
+	}
+	
+	private void addImage(List<ClientApplication> apps, File parentFolder) throws AppException {
+		for(ClientApplication app : apps) {
+			if(app.getImageUrl()==null || app.getImageUrl().equals("")) continue;
+			app.setImage(Image.createImageFromFile(new File(parentFolder + File.separator + app.getImageUrl())));
+			
+		}
 	}
 }

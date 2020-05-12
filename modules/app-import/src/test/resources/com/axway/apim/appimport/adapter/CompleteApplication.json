@@ -1,5 +1,5 @@
 {
-  "name" : "Client App",
+  "name" : "Complete application",
   "description" : "Sample Client Application, registered for use in the Client Demo",
   "state" : "approved",
   "image" : "app-image.jpg",
@@ -23,16 +23,7 @@
     "apiKey" : "6cd55c27-675a-444a-9bc7-ae9a7869184d"
   } ],
   "appQuota" : {
-    "restrictions" : [ {
-      "api" : "2104224d-ddcb-448f-b950-1dd3d201d2aa",
-      "method" : "669dc34b-e4ff-4e91-b7b6-a29bd2ad0171",
-      "type" : "throttle",
-      "config" : {
-        "messages" : "222",
-        "period" : "second",
-        "per" : "2"
-      }
-    }, {
+    "restrictions" : [{
       "api" : "*",
       "method" : "*",
       "type" : "throttle",

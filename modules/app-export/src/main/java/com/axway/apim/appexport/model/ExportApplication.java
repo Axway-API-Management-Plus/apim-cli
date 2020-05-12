@@ -10,7 +10,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({ "name" })
+@JsonPropertyOrder({ "name", "description", "state", "image", "enabled", "email", "phone", "credentials", "appQuota" })
 public class ExportApplication {
 	
 	ClientApplication clientApp;

@@ -18,13 +18,6 @@ public class APIKey extends ClientAppCredential {
 	public void setDeletedOn(String deletedOn) {
 		this.deletedOn = deletedOn;
 	}
-	
-	@Override
-	public void setId(String id) {
-		// Copy the field id into a more human readable field
-		this.apiKey = id;
-		super.setId(id);
-	}
 
 	public String getApiKey() {
 		return apiKey;
@@ -32,6 +25,5 @@ public class APIKey extends ClientAppCredential {
 
 	public void setApiKey(String apiKey) {
 		this.apiKey = apiKey;
-		this.id = apiKey;
 	}
 }
