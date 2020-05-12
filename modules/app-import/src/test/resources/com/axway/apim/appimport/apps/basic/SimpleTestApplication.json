@@ -1,6 +1,14 @@
 [
 	{
-		"name": "${appName}", 
+		"name": "${appName1}", 
+		"organization": "API Development" 
+	}, 
+	{
+		"name": "${appName2}", 
+		"organization": "API Development" 
+	}, 
+	{
+		"name": "${appName3}", 
 		"organization": "API Development" 
 	}
 ]

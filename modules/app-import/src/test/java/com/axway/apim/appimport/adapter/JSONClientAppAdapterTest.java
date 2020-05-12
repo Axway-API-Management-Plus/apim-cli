@@ -22,7 +22,7 @@ public class JSONClientAppAdapterTest {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
 		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
-		List<ClientApplication> apps = adapter.getApplications(null);
+		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
 	}
 	
@@ -32,7 +32,17 @@ public class JSONClientAppAdapterTest {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
 		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
-		List<ClientApplication> apps = adapter.getApplications(null);
+		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
+	}
+	
+	@Test
+	public void testMultipleApps() throws AppException {
+		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/MulitpleTestApplications.json").getPath();
+		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
+		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
+		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
+		List<ClientApplication> apps = adapter.getApplications();
+		assertEquals(apps.size(), 2, "Expected 2 app returned from the Adapter");
 	}
 }
