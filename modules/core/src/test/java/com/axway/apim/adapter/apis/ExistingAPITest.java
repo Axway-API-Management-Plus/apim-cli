@@ -1,4 +1,4 @@
-package com.axway.apim.adapter;
+package com.axway.apim.adapter.apis;
 
 import static org.testng.Assert.assertNotNull;
 
@@ -9,6 +9,11 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIAdapter;
+import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
+import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ExistingAPITest {
 	
 	ObjectMapper mapper = new ObjectMapper();
-	APIMgrProxiesAdapter existingApis;
+	APIManagerAPIAdapter existingApis;
 	
 	@BeforeClass
 	private void initTestIndicator() {
@@ -28,9 +33,13 @@ public class ExistingAPITest {
 	public void duplicateVHost() throws AppException, IOException {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/ProxiesWithVHostDuplicates.json"));
 		assertNotNull(apiManagerResponse);
-		List<JsonNode> apis = new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
-			.setApiManagerResponse(apiManagerResponse)
-			.hasApiPath("/api/test/DifferentVHostExportTestIT-531").build().getAPIs(true);
+		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
+		((APIManagerAPIAdapter)apiAdapter).setTestAPIManagerResponse(apiManagerResponse);
+		
+		APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
+			.hasApiPath("/api/test/DifferentVHostExportTestIT-531").build();
+
+		List<JsonNode> apis = apiAdapter.getAPIs(filter, true);
 		// We must find two APIs, as we not limited the search to the VHost
 		Assert.assertEquals(apis.size(), 2, "Expected 2 APIs exposed on the same path with a different V-Host");
 		Assert.assertEquals(apis.get(0).get("path").asText(), "/api/test/DifferentVHostExportTestIT-531", "Found API not exposed on expected path");
@@ -46,10 +55,15 @@ public class ExistingAPITest {
 	public void restrictedOnVHost() throws AppException, IOException {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/ProxiesWithVHostDuplicates.json"));
 		assertNotNull(apiManagerResponse);
-		List<JsonNode> apis = new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
-				.setApiManagerResponse(apiManagerResponse)
+		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
+		((APIManagerAPIAdapter)apiAdapter).setTestAPIManagerResponse(apiManagerResponse);
+		
+		APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
+				.hasApiPath("/api/test/DifferentVHostExportTestIT-531")
 				.hasVHost("vhost2.customer.com")
-				.hasApiPath("/api/test/DifferentVHostExportTestIT-531").build().getAPIs(true);
+				.build();
+		List<JsonNode> apis = apiAdapter.getAPIs(filter, true);
+		
 		// We must find two APIs, as we not limited the search to the VHost
 		Assert.assertEquals(apis.size(), 1, "Expected 1 APIs with requested V-Host");
 		Assert.assertEquals(apis.get(0).get("path").asText(), "/api/test/DifferentVHostExportTestIT-531", "Found API not exposed on expected path");
@@ -61,9 +75,14 @@ public class ExistingAPITest {
 	public void nonExistingAPI() throws AppException, IOException {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/ProxiesWithVHostDuplicates.json"));
 		assertNotNull(apiManagerResponse);
-		List<JsonNode> apis = new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
-				.setApiManagerResponse(apiManagerResponse)
-				.hasApiPath("/api/test/Not-ExistingAPI").build().getAPIs(true);
+		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
+		((APIManagerAPIAdapter)apiAdapter).setTestAPIManagerResponse(apiManagerResponse);
+		
+		APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
+				.hasApiPath("/api/test/Not-ExistingAPI")
+				.build();
+		List<JsonNode> apis = apiAdapter.getAPIs(filter, true);
+
 		Assert.assertEquals(apis.size(), 0, "It was not expected to find an API on path /api/test/Not-ExistingAPI");
 	}
 	
@@ -71,9 +90,14 @@ public class ExistingAPITest {
 	public void nonExistingUniqueAPI() throws AppException, IOException {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/ProxiesWithVHostDuplicates.json"));
 		assertNotNull(apiManagerResponse);
-		JsonNode api = new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
-				.setApiManagerResponse(apiManagerResponse)
-				.hasApiPath("/api/test/Not-ExistingAPI").build().getAPI(true);
+		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
+		((APIManagerAPIAdapter)apiAdapter).setTestAPIManagerResponse(apiManagerResponse);
+		
+		APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
+				.hasApiPath("/api/test/Not-ExistingAPI")
+				.build();
+		JsonNode api = apiAdapter.getAPI(filter, true);
+
 		Assert.assertNull(api);
 	}
 	
@@ -81,18 +105,27 @@ public class ExistingAPITest {
 	public void resultMustBeUniqueButIsNot() throws AppException, IOException {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/ProxiesWithVHostDuplicates.json"));
 		assertNotNull(apiManagerResponse);
-		new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
-				.setApiManagerResponse(apiManagerResponse)
-				.hasApiPath("/api/test/DifferentVHostExportTestIT-531").build().getAPI(true);
+		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
+		((APIManagerAPIAdapter)apiAdapter).setTestAPIManagerResponse(apiManagerResponse);
+		
+		APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
+				.hasApiPath("/api/test/DifferentVHostExportTestIT-531")
+				.build();
+		
+		apiAdapter.getAPI(filter, true);
 	}
 	
 	@Test
 	public void reponseContainsOneAPIOnly() throws AppException, IOException {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/incompleteProxyAPI.json"));
 		assertNotNull(apiManagerResponse);
-		List<JsonNode> apis = new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
-				.setApiManagerResponse(apiManagerResponse)
-				.build().getAPIs(true);
+		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
+		((APIManagerAPIAdapter)apiAdapter).setTestAPIManagerResponse(apiManagerResponse);
+		
+		APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
+				.build();
+		List<JsonNode> apis = apiAdapter.getAPIs(filter, true);
+
 		Assert.assertEquals(apis.size(), 1, "We expect one API to get back.");
 	}	
 	
@@ -100,11 +133,14 @@ public class ExistingAPITest {
 	public void nothingGivenToFilterTest() throws AppException, IOException {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/allProxies.json"));
 		assertNotNull(apiManagerResponse);
-		int numberOfAPIs = apiManagerResponse.size();
+		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
+		((APIManagerAPIAdapter)apiAdapter).setTestAPIManagerResponse(apiManagerResponse);
 		
-		List<JsonNode> apis = new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
-				.setApiManagerResponse(apiManagerResponse)
-				.build().getAPIs(true);
+		APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
+				.build();
+		List<JsonNode> apis = apiAdapter.getAPIs(filter, true);
+		
+		int numberOfAPIs = apiManagerResponse.size();
 
 		Assert.assertEquals(apis.size(), numberOfAPIs, "We expect all APIs to get back in the list.");
 	}
@@ -114,10 +150,13 @@ public class ExistingAPITest {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
 		
-		new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
-				.setApiManagerResponse(apiManagerResponse)
+		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
+		((APIManagerAPIAdapter)apiAdapter).setTestAPIManagerResponse(apiManagerResponse);
+		
+		APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
 				.hasQueryStringVersion("1.0")
-				.build().getAPI(true);
+				.build();
+		apiAdapter.getAPI(filter, true);
 	}
 	
 	@Test
@@ -125,11 +164,14 @@ public class ExistingAPITest {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
 		
-		new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
-				.setApiManagerResponse(apiManagerResponse)
+		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
+		((APIManagerAPIAdapter)apiAdapter).setTestAPIManagerResponse(apiManagerResponse);
+		
+		APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
 				.hasQueryStringVersion("1.0")
 				.hasApiPath("/api/emr/catalog")
-				.build().getAPI(true);
+				.build();
+		apiAdapter.getAPI(filter, true);
 	}
 	
 	@Test
@@ -137,22 +179,28 @@ public class ExistingAPITest {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
 		
-		new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
-				.setApiManagerResponse(apiManagerResponse)
+		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
+		((APIManagerAPIAdapter)apiAdapter).setTestAPIManagerResponse(apiManagerResponse);
+		
+		APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
 				.hasQueryStringVersion("1.1")
-				.build().getAPI(true);
+				.build();
+		apiAdapter.getAPI(filter, true);
 	}
 	
 	@Test
 	public void getUniqueWithRoutingKeyVHostOK() throws AppException, IOException {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
+			
+		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
+		((APIManagerAPIAdapter)apiAdapter).setTestAPIManagerResponse(apiManagerResponse);
 		
-		new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
-				.setApiManagerResponse(apiManagerResponse)
+		APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
 				.hasQueryStringVersion("1.1")
 				.hasVHost("api.customer.com")
-				.build().getAPI(true);
+				.build();
+		apiAdapter.getAPI(filter, true);
 	}
 	
 	@Test
@@ -160,11 +208,15 @@ public class ExistingAPITest {
 		JsonNode apiManagerResponse = mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
 		
-		List<JsonNode> apis = new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
-				.setApiManagerResponse(apiManagerResponse)
+		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
+		((APIManagerAPIAdapter)apiAdapter).setTestAPIManagerResponse(apiManagerResponse);
+		
+		APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
 				.hasQueryStringVersion("2.0")
 				.hasVHost("api2.customer.com")
-				.build().getAPIs(true);
+				.build();
+		List<JsonNode> apis = apiAdapter.getAPIs(filter, true);
+
 		Assert.assertEquals(apis.size(), 2);
 	}
 }

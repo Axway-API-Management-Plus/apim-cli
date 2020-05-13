@@ -9,7 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIMgrProxiesAdapter;
+import com.axway.apim.adapter.apis.APIAdapter;
+import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.APIImportManager;
@@ -78,12 +80,13 @@ public class APIImportApp implements APIMCLIServiceProvider {
 				filters.add(new BasicNameValuePair("value", "published"));
 			}
 			// Lookup an existing APIs - If found the actualAPI is valid - desiredAPI is used to control what needs to be loaded
-			IAPI actualAPI = apimAdapter.getAPIManagerAPI(new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END)
+			APIFilter filter = new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
 					.hasApiPath(desiredAPI.getPath())
 					.hasVHost(desiredAPI.getVhost())
 					.hasQueryStringVersion(desiredAPI.getApiRoutingKey())
 					.useFilter(filters)
-					.build().getAPI(true), desiredAPI, ActualAPI.class);
+					.build();
+			IAPI actualAPI = apimAdapter.getAPIManagerAPI(APIAdapter.create(apimAdapter).getAPI(filter, true), desiredAPI, ActualAPI.class);
 			// Based on the actual API - fulfill/complete some elements in the desired API
 			configAdapter.completeDesiredAPI(desiredAPI, actualAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);

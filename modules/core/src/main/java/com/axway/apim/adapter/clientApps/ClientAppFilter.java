@@ -18,9 +18,7 @@ public class ClientAppFilter {
 	
 	List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
-	private ClientAppFilter() {
-		// TODO Auto-generated constructor stub
-	}
+	private ClientAppFilter() {	}
 	
 	public boolean isIncludeQuota() {
 		return includeQuota;

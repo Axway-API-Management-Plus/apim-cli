@@ -12,7 +12,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIMgrProxiesAdapter;
+import com.axway.apim.adapter.apis.APIAdapter;
+import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.actions.tasks.UpdateAPIStatus;
@@ -54,7 +55,7 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements IRespons
 				filters.add(new BasicNameValuePair("field", "apiid"));
 				filters.add(new BasicNameValuePair("op", "eq"));
 				filters.add(new BasicNameValuePair("value", rollbackAPI.getApiId())); // To find the FE-API, we are using the BE-API-ID
-				JsonNode existingAPI = new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_FRONT_END).useFilter(filters).build().getAPI(false); // The path is not set at this point, hence we provide null 
+				JsonNode existingAPI = APIAdapter.create(APIManagerAdapter.getInstance()).getAPI(new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END).useFilter(filters).build(), false);// The path is not set at this point, hence we provide null 
 				LOG.info("Rollback FE-API: '"+existingAPI.get("name").asText()+"' (ID: '"+existingAPI.get("id").asText()+"')");
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
 						.setPath(RestAPICall.API_VERSION+"/proxies/"+existingAPI.get("id").asText())

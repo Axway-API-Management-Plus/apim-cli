@@ -10,7 +10,6 @@ import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
-import com.axway.apim.appexport.impl.JsonApplicationExporter;
 import com.axway.apim.appexport.lib.AppExportCLIOptions;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;

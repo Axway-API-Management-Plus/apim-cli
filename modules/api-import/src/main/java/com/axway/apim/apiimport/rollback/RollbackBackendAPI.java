@@ -2,7 +2,6 @@ package com.axway.apim.apiimport.rollback;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -13,7 +12,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIMgrProxiesAdapter;
+import com.axway.apim.adapter.apis.APIAdapter;
+import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.lib.CommandParameters;
@@ -65,7 +65,7 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 				filters.add(new BasicNameValuePair("field", "createdOn"));
 				filters.add(new BasicNameValuePair("op", "gt"));
 				filters.add(new BasicNameValuePair("value", (beAPICreatedOn).toString())); // Ignore all other APIs some time ago
-				JsonNode existingBEAPI = new APIMgrProxiesAdapter.Builder(APIManagerAdapter.TYPE_BACK_END).useFilter(filters).build().getAPI(false);
+				JsonNode existingBEAPI = APIAdapter.create(APIManagerAdapter.getInstance()).getAPI(new APIFilter.Builder(APIManagerAdapter.TYPE_BACK_END).useFilter(filters).build(), false);
 				if(existingBEAPI!=null && existingBEAPI.get("id")!=null) {
 					uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
 							.setPath(RestAPICall.API_VERSION+"/apirepo/"+existingBEAPI.get("id").asText())
