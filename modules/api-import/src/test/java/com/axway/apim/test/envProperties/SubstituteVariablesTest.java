@@ -77,7 +77,7 @@ public class SubstituteVariablesTest {
 		
 		API testAPI = importConfig.getApiConfig();
 		
-		Assert.assertEquals(testAPI.getOrganization(), "valueFromAnyOtherStageEnv");
+		Assert.assertEquals(testAPI.getOrganization().getName(), "valueFromAnyOtherStageEnv");
 	}
 
 }

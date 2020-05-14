@@ -268,14 +268,14 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		}
 		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null 
 				&& CommandParameters.getInstance().getClientOrgsMode().equals(CommandParameters.MODE_REPLACE)) return;*/
-		List<String> grantedOrgs = new ArrayList<String>();
+		List<Organization> grantedOrgs = new ArrayList<Organization>();
 		List<Organization> allOrgs = this.orgAdapter.getAllOrgs();
 		for(Organization org : allOrgs) {
 			List<APIAccess> orgAPIAccess = accessAdapter.getAPIAccess(org.getId(), APIManagerAPIAccessAdapter.Type.organizations);
 			for(API api : apis) {
 				for(APIAccess access : orgAPIAccess) {
 					if(access.getApiId().equals(api.getId())) {
-						grantedOrgs.add(org.getName());
+						grantedOrgs.add(org);
 					}
 				}
 				api.setClientOrganizations(grantedOrgs);

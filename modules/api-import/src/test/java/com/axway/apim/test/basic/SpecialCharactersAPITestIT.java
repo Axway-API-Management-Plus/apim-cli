@@ -44,10 +44,10 @@ public class SpecialCharactersAPITestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			// TODO: Find a way to validate unicode characters as well
-			//.validate("$.[?(@.path=='${apiPath}')].summary", "Ð�Ð´Ð¿Ð°Ñ‚ Ð¸Ð»Ð¸ ÑƒÐ¼Ñ€Ð¸.")
+			//.validate("$.[?(@.path=='${apiPath}')].summary", "Ã�ï¿½Ã�Â´Ã�Â¿Ã�Â°Ã‘â€š Ã�Â¸Ã�Â»Ã�Â¸ Ã‘Æ’Ã�Â¼Ã‘â‚¬Ã�Â¸.")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 
-		echo("####### RE-Importing same API: '${apiName}' on path: '${apiPath}' without changes. Expecting failure with RC 99. #######");
+		echo("####### RE-Importing same API: '${apiName}' on path: '${apiPath}' without changes. Expecting failure with RC 10. #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore-special-chars.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/special-chars-config.json");
 		createVariable("expectedReturnCode", "10");

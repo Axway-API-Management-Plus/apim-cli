@@ -26,8 +26,11 @@ public class APIManagerAPIAdapterTest {
 	APIManagerAPIAdapter existingApis;
 	
 	@BeforeClass
-	private void initTestIndicator() {
+	private void initTestIndicator() throws AppException, IOException {
 		TestIndicator.getInstance().setTestRunning(true);
+		APIManagerAdapter.getInstance();
+		APIManagerAdapter.configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsAdmin.json")), true);
+		APIManagerAdapter.configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsOrgAdmin.json")), false);
 	}
 	
 	@Test
@@ -272,11 +275,12 @@ public class APIManagerAPIAdapterTest {
 	}
 	
 	@Test
-	public void loadAPIIncludingQuotaTest() throws AppException, IOException {
+	public void loadAPIIncludingQuota() throws AppException, IOException {
 		String testAPI = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiHavingMethods.json"));
 		String systemQuotas = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "quotas/systemAPIQuota.json"));
 		String applicationDefaultQuotas = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "quotas/applicationDefaultQuota.json"));
 		String testApplications = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "applications/allApplications.json"));
+		String grantedAppsForAPI = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "applications/grantedAppsToAPI.json"));
 		String testAppAPIAccess = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiaccess/applicationAPIAccess.json"));
 		String applicationQuota = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "quotas/applicationQuota.json"));
 		
@@ -287,6 +291,7 @@ public class APIManagerAPIAdapterTest {
 		apiAdapter.quotaAdapter.apiManagerResponse.put("ecf109cd-d012-4c57-897a-b3e8b041889b", applicationQuota);
 		apiAdapter.accessAdapter.setAPIManagerTestResponse(APIManagerAPIAccessAdapter.Type.applications, "ecf109cd-d012-4c57-897a-b3e8b041889b", testAppAPIAccess);
 		apiAdapter.appAdapter.setTestApiManagerResponse(new ClientAppFilter.Builder().build(), testApplications);
+		apiAdapter.appAdapter.setTestSubscribedAppAPIManagerResponse("72745ed9-f75b-428c-959c-b483eea497a1", grantedAppsForAPI);
 		
 		
 		APIFilter filter = new APIFilter.Builder()
@@ -339,17 +344,18 @@ public class APIManagerAPIAdapterTest {
 		String testAppAPIAccess = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiaccess/applicationAPIAccess.json"));
 		String applicationQuota = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "quotas/applicationQuota.json"));
 		String systemQuotas = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "quotas/systemAPIQuota.json"));
-		String applicationDefaultQuotas = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "quotas/applicationDefaultQuota.json"));		
+		String applicationDefaultQuotas = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "quotas/applicationDefaultQuota.json"));
+		String grantedAppsForAPI = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "applications/grantedAppsToAPI.json"));
 
 		APIManagerAPIAdapter apiAdapter = new APIManagerAPIAdapter();
 		apiAdapter.setAPIManagerResponse(testAPI);
-		//apiAdapter.orgAdapter.apiManagerResponse = testOrganizations;
 		
 		apiAdapter.accessAdapter.setAPIManagerTestResponse(APIManagerAPIAccessAdapter.Type.applications, "ecf109cd-d012-4c57-897a-b3e8b041889b", testAppAPIAccess);
 		apiAdapter.appAdapter.setTestApiManagerResponse(new ClientAppFilter.Builder().build(), testApplications);
 		apiAdapter.quotaAdapter.apiManagerResponse.put(APIManagerQuotaAdapter.SYSTEM_API_QUOTA, systemQuotas);
 		apiAdapter.quotaAdapter.apiManagerResponse.put(APIManagerQuotaAdapter.APPLICATION_DEFAULT_QUOTA, applicationDefaultQuotas);
 		apiAdapter.quotaAdapter.apiManagerResponse.put("ecf109cd-d012-4c57-897a-b3e8b041889b", applicationQuota);
+		apiAdapter.appAdapter.setTestSubscribedAppAPIManagerResponse("72745ed9-f75b-428c-959c-b483eea497a1", grantedAppsForAPI);
 		
 		APIFilter filter = new APIFilter.Builder()
 				.includeClientApplications(true)
@@ -360,7 +366,8 @@ public class APIManagerAPIAdapterTest {
 		API api = apiAdapter.getAPI(filter, true);
 		
 		Assert.assertNotNull(api.getApplications(), "Should have a some client applications");
-		Assert.assertEquals(api.getApplications().get(0).getApiAccess().get(2).getApiId(), "72745ed9-f75b-428c-959c-b483eea497a1", "We should have a an API-Access for the test api");
+		Assert.assertEquals(api.getApplications().size(), 1, "Should have a some client applications");
+		Assert.assertEquals(api.getApplications().get(0).getId(), "ecf109cd-d012-4c57-897a-b3e8b041889b", "We should have a an API-Access for the test api");
 		
 		Assert.assertNotNull(api.getApplications(), "should have a subscribed application");
 		Assert.assertNotNull(api.getApplications().get(0).getAppQuota(), "Subscribed application should have a quota");

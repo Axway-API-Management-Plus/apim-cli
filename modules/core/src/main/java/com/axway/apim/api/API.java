@@ -11,6 +11,7 @@ import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
 import com.axway.apim.api.model.InboundProfile;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.ServiceProfile;
@@ -127,7 +128,7 @@ public class API {
 	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})
-	protected List<String> clientOrganizations;
+	protected List<Organization> clientOrganizations;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})
@@ -184,9 +185,7 @@ public class API {
 	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {})
-	protected String organization = null;
-	
-	protected String organizationId = null;
+	protected Organization organization = null;
 	
 	protected String id = null;
 	
@@ -302,20 +301,12 @@ public class API {
 		this.name = name;
 	}
 
-	public String getOrganization() {
+	public Organization getOrganization() {
 		return organization;
 	}
 
-	public void setOrganization(String organization) {
+	public void setOrganization(Organization organization) {
 		this.organization = organization;
-	}
-
-	public String getOrganizationId() {
-		return organizationId;
-	}
-
-	public void setOrganizationId(String organizationId) {
-		this.organizationId = organizationId;
 	}
 
 	public String getPath() throws AppException {
@@ -428,11 +419,11 @@ public class API {
 		return serviceProfiles;
 	}
 
-	public List<String> getClientOrganizations() throws AppException {
+	public List<Organization> getClientOrganizations() throws AppException {
 		return clientOrganizations;
 	}
 
-	public void setClientOrganizations(List<String> clientOrganizations) {
+	public void setClientOrganizations(List<Organization> clientOrganizations) {
 		this.clientOrganizations = clientOrganizations;
 	}
 

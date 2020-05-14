@@ -93,8 +93,6 @@ public class APIFilter {
 		String apiPath;
 		String queryStringVersion;
 		
-		Type type;
-		
 		int translateMethodMode = NO_TRANSLATION;
 		
 		boolean useBackendAPI = false;
@@ -129,12 +127,11 @@ public class APIFilter {
 		 */
 		public Builder(Type type, boolean useBackendAPI) {
 			super();
-			this.type = type;
+			initType(type);
 			this.useBackendAPI = useBackendAPI;
 		}
 		
 		public APIFilter build() {
-			initType();
 			APIFilter apiFilter = new APIFilter();
 			apiFilter.apiPath = this.apiPath;
 			apiFilter.queryStringVersion = this.queryStringVersion;
@@ -151,8 +148,8 @@ public class APIFilter {
 			return apiFilter;
 		}
 
-		private void initType() {
-			switch(this.type) {
+		private void initType(Type type) {
+			switch(type) {
 			case ACTUAL_API:
 				this.includeQuotas = true;
 				this.translateMethodMode = METHODS_AS_NAME;

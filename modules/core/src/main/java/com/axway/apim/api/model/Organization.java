@@ -38,6 +38,15 @@ public class Organization {
 	private String trialDuration;
 	
 	private String isTrial;
+	
+	public Organization() {
+		super();
+	}
+	
+	public Organization(String name) {
+		super();
+		this.name = name;
+	}
 
 	public String getId() {
 		return id;
@@ -51,8 +60,9 @@ public class Organization {
 		return name;
 	}
 
-	public void setName(String name) {
+	public Organization setName(String name) {
 		this.name = name;
+		return this;
 	}
 
 	public String getDescription() {

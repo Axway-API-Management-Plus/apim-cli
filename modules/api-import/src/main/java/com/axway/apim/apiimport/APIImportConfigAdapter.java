@@ -276,14 +276,16 @@ public class APIImportConfigAdapter {
 	private void validateOrganization(API apiConfig) throws AppException {
 		if(apiConfig instanceof DesiredTestOnlyAPI) return;
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
-			apiConfig.setOrganizationId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
+			Organization org = new Organization();
+			org.setId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
+			apiConfig.setOrganization(org);
 		} else {
-			String desiredOrgId = orgsAdapter.getOrg(new OrgFilter.Builder().hasName(apiConfig.getOrganization()).build()).getId();
+			Organization desiredOrgId = orgsAdapter.getOrg(new OrgFilter.Builder().hasName(apiConfig.getOrganization().getName()).build());
 			if(desiredOrgId==null) {
 				error.setError("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION, false);
 				throw new AppException("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
 			}
-			apiConfig.setOrganizationId(desiredOrgId);
+			apiConfig.setOrganization(desiredOrgId);
 		}
 	}
 
@@ -313,14 +315,10 @@ public class APIImportConfigAdapter {
 			apiConfig.setClientOrganizations(null); // Making sure, orgs are not considered as a changed property
 			return;
 		}
-		List<String> allDesiredOrgs = new ArrayList<String>();
 		List<Organization> allOrgs = orgsAdapter.getAllOrgs();
 		if(apiConfig.getClientOrganizations().contains("ALL")) {
-			for(Organization org : allOrgs) {
-				allDesiredOrgs.add(org.getName());
-			}
 			apiConfig.getClientOrganizations().clear();
-			apiConfig.getClientOrganizations().addAll(allDesiredOrgs);
+			apiConfig.getClientOrganizations().addAll(allOrgs);
 			((DesiredAPI)apiConfig).setRequestForAllOrgs(true);
 		} else {
 			// As the API-Manager internally handles the owning organization in the same way, 
@@ -329,15 +327,13 @@ public class APIImportConfigAdapter {
 				apiConfig.getClientOrganizations().add(apiConfig.getOrganization());
 			}
 			// And validate each configured organization really exists in the API-Manager
-			Iterator<String> it = apiConfig.getClientOrganizations().iterator();
+			Iterator<Organization> it = apiConfig.getClientOrganizations().iterator();
 			String invalidClientOrgs = null;
 			while(it.hasNext()) {
-				String org = it.next();
-				Organization desiredOrg = new Organization();
-				desiredOrg.setName(org);
+				Organization desiredOrg = it.next();
 				if(!allOrgs.contains(desiredOrg)) {
 					LOG.warn("Unknown organization with name: '" + desiredOrg.getName() + "' configured. Ignoring this organization.");
-					invalidClientOrgs = invalidClientOrgs==null ? org : invalidClientOrgs + ", "+org;
+					invalidClientOrgs = invalidClientOrgs==null ? desiredOrg.getName() : invalidClientOrgs + ", "+desiredOrg.getName();
 					APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_ORGANIZATIONS.name(), invalidClientOrgs);
 					it.remove();
 					continue;
@@ -455,8 +451,8 @@ public class APIImportConfigAdapter {
 						continue;
 					} 
 				}
-				if(!APIManagerAdapter.getInstance().hasAdminAccount()) {
-					if(!apiConfig.getOrganizationId().equals(loadedApp.getOrganizationId())) {
+				if(!APIManagerAdapter.hasAdminAccount()) {
+					if(!apiConfig.getOrganization().getId().equals(loadedApp.getOrganizationId())) {
 						LOG.warn("OrgAdmin can't handle application: '"+loadedApp.getName()+"' belonging to a different organization. Ignoring this application.");
 						it.remove();
 						continue;
@@ -958,7 +954,7 @@ public class APIImportConfigAdapter {
 		if(importApi instanceof DesiredTestOnlyAPI) return; // Do nothing when unit-testing
 		if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return; // QueryStringRouting isn't supported
 		if(APIManagerAdapter.getInstance().hasAdminAccount()) {
-			String apiRoutingKeyEnabled = APIManagerAdapter.getApiManagerConfig("apiRoutingKeyEnabled");
+			String apiRoutingKeyEnabled = APIManagerAdapter.configAdapter.getApiManagerConfig("apiRoutingKeyEnabled");
 			if(apiRoutingKeyEnabled.equals("true")) {
 				if(importApi.getApiRoutingKey()==null) {
 					ErrorState.getInstance().setError("API-Manager configured for Query-String option, but API doesn' declare it.", ErrorCode.API_CONFIG_REQUIRES_QUERY_STRING, false);

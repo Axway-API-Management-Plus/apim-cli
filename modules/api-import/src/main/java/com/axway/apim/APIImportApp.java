@@ -83,6 +83,9 @@ public class APIImportApp implements APIMCLIServiceProvider {
 					.hasApiPath(desiredAPI.getPath())
 					.hasVHost(desiredAPI.getVhost())
 					.hasQueryStringVersion(desiredAPI.getApiRoutingKey())
+					.includeClientOrganizations(desiredAPI.getClientOrganizations()!=null) // For performance reasons don't load ClientOrgs
+					.includeClientApplications(desiredAPI.getApplications()!=null) // and Apps 
+					.includeQuotas(desiredAPI.getApplicationQuota()!=null) // and Quotas if not given in the Desired-API
 					.useFilter(filters)
 					.build();
 			API actualAPI = APIManagerAPIAdapter.create(apimAdapter).getAPI(filter, true);

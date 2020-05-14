@@ -65,7 +65,7 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 
 		
 		URIBuilder uriBuilder = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/importFromUrl/")
-				.setParameter("organizationId", this.desiredState.getOrganizationId())
+				.setParameter("organizationId", this.desiredState.getOrganization().getId())
 				.setParameter("type", "wsdl")
 				.setParameter("url", wsdlUrl)
 				.setParameter("name", this.desiredState.getName());
@@ -99,7 +99,7 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 				.addTextBody("name", this.desiredState.getName())
 				.addTextBody("type", "swagger")
 				.addBinaryBody("file", ((DesiredAPI)this.desiredState).getAPIDefinition().getApiSpecificationContent(), ContentType.create("application/json"), "filename")
-				.addTextBody("fileName", "XYZ").addTextBody("organizationId", this.desiredState.getOrganizationId())
+				.addTextBody("fileName", "XYZ").addTextBody("organizationId", this.desiredState.getOrganization().getId())
 				.addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
 		RestAPICall importSwagger = new POSTRequest(entity, uri, this);
 		importSwagger.setContentType(null);

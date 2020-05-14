@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,16 +26,13 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.apis.APIManagerConfigAdapter;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
-import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.definition.APISpecificationFactory;
-import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CommandParameters;
@@ -65,17 +61,14 @@ public class APIManagerAdapter {
 	private static APIManagerAdapter instance;
 	
 	public static String apiManagerVersion = null;
-	private static Map<Boolean, String> apiManagerConfig = new HashMap<Boolean, String>();
 	
-	private static List<Organization> allOrgs = null;
 	private static List<ClientApplication> allApps = null;
-	private static List<IAPI> allAPIs = null;
 	
 	public static ObjectMapper mapper = new ObjectMapper();
 	
 	private static Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<String, ClientApplication>();
 	
-	private static Map<String, List<APIAccess>> orgsApiAccess = new HashMap<String, List<APIAccess>>();
+	
 	
 	public static APIQuota sytemQuotaConfig = null;
 	public static APIQuota applicationQuotaConfig = null;
@@ -94,12 +87,7 @@ public class APIManagerAdapter {
 	public final static String TYPE_FRONT_END = "proxies";
 	public final static String TYPE_BACK_END = "apirepo";
 	
-	private static final Map<String, Boolean> configFieldRequiresAdmin;
-    static {
-        Map<String, Boolean> temp = new HashMap<String, Boolean>();
-        temp.put("apiRoutingKeyEnabled", true);
-        configFieldRequiresAdmin = Collections.unmodifiableMap(temp);
-    }
+	public static APIManagerConfigAdapter configAdapter = new APIManagerConfigAdapter();
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
@@ -110,8 +98,6 @@ public class APIManagerAdapter {
 	
 	public static synchronized void deleteInstance() throws AppException {
 			APIManagerAdapter.instance = null;
-			APIManagerAdapter.apiManagerConfig = new HashMap<Boolean, String>();;
-			APIManagerAdapter.allOrgs = null;
 	}
 	
 	private APIManagerAdapter() throws AppException {
@@ -496,48 +482,9 @@ public class APIManagerAdapter {
 		if(APIManagerAdapter.apiManagerVersion!=null) {
 			return apiManagerVersion;
 		}
-		APIManagerAdapter.apiManagerVersion = getApiManagerConfig("productVersion");
+		APIManagerAdapter.apiManagerVersion = configAdapter.getApiManagerConfig("productVersion");
 		LOG.info("API-Manager version is: " + apiManagerVersion);
 		return APIManagerAdapter.apiManagerVersion;
-	}
-	
-	/**
-	 * Lazy helper method to get the actual API-Manager version. This is used to toggle on/off some 
-	 * of the features (such as API-Custom-Properties)
-	 * @return the API-Manager version as returned from the API-Manager REST-API /config endpoint
-	 * @param configField name of the configField from API-Manager
-	 * @throws AppException is something goes wrong.
-	 */
-	public static String getApiManagerConfig(String configField) throws AppException {
-		boolean useAdmin = (configFieldRequiresAdmin.containsKey(configField)) ? true : false;
-		String managerConfig = apiManagerConfig.get(useAdmin);
-		URI uri;
-		HttpResponse httpResponse = null;
-		try {
-			if(managerConfig==null) {
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
-				RestAPICall getRequest = new GETRequest(uri, null, useAdmin);
-				httpResponse = getRequest.execute();
-				managerConfig = EntityUtils.toString(httpResponse.getEntity());
-			}
-			JsonNode jsonResponse;
-			jsonResponse = mapper.readTree(managerConfig);
-			JsonNode retrievedConfigField = jsonResponse.get(configField);
-			if(retrievedConfigField==null) {
-				LOG.debug("Config field: '"+configField+"' is unsuporrted!");
-				return "UnknownConfigField"+configField;
-			}
-			apiManagerConfig.put(useAdmin, managerConfig);
-			return retrievedConfigField.asText();
-		} catch (Exception e) {
-			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + managerConfig);
-			throw new AppException("Can't get "+configField+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
 	}
 	
 	public static JsonNode getCustomPropertiesConfig() throws AppException {

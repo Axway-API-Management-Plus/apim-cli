@@ -354,7 +354,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		this.apiManagerResponse.put(filter, apiManagerResponse);
 	}
 
-	void setTestSubscribedAppAPIManagerResponse(Map<String, String> subscribedAppAPIManagerResponse) {
-		this.subscribedAppAPIManagerResponse = subscribedAppAPIManagerResponse;
+	public void setTestSubscribedAppAPIManagerResponse(String apiId, String subscribedAppAPIManagerResponse) {
+		this.subscribedAppAPIManagerResponse.put(apiId, subscribedAppAPIManagerResponse);
 	}
 }

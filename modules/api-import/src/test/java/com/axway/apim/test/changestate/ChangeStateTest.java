@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.apiimport.state.APIChangeState;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -35,22 +36,23 @@ public class ChangeStateTest {
 		API importAPI = getTestAPI();
 		API managerAPI = getTestAPI();
 
-		List<String> importOrgs = new ArrayList<String>();
-		List<String> managerOrgs = new ArrayList<String>();
+		List<Organization> importOrgs = new ArrayList<Organization>();
+		List<Organization> managerOrgs = new ArrayList<Organization>();
 
-		importOrgs.add("orgA");
-		importOrgs.add("orgB");
-		importOrgs.add("orgC");
+		
+		importOrgs.add(new Organization().setName("orgA"));
+		importOrgs.add(new Organization().setName("orgB"));
+		importOrgs.add(new Organization().setName("orgC"));
 
-		managerOrgs.add("orgC");
-		managerOrgs.add("orgB");
-		managerOrgs.add("orgA");
+		managerOrgs.add(new Organization().setName("orgC"));
+		managerOrgs.add(new Organization().setName("orgB"));
+		managerOrgs.add(new Organization().setName("orgA"));
 
 		importAPI.setClientOrganizations(importOrgs);
-		importAPI.setOrganizationId("123");
+		importAPI.setOrganization(new Organization().setName("123"));
 
 		managerAPI.setClientOrganizations(managerOrgs);
-		managerAPI.setOrganizationId("123");
+		managerAPI.setOrganization(new Organization().setName("123"));
 
 		APIChangeState changeState = new APIChangeState(managerAPI, importAPI);
 		Assert.assertEquals(changeState.hasAnyChanges(), false);
@@ -70,7 +72,7 @@ public class ChangeStateTest {
 
 	private static API getTestAPI() throws AppException {
 		API testAPI = new ActualAPI();
-		testAPI.setOrganizationId("123");
+		testAPI.setOrganization(new Organization().setName("123"));
 		testAPI.setState(IAPI.STATE_PUBLISHED);
 		return testAPI;
 	}

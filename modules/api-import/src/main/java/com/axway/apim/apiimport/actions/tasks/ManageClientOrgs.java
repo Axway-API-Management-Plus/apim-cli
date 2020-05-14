@@ -15,9 +15,11 @@ import org.apache.http.util.EntityUtils;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
+import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.APIAccess;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.IResponseParser;
@@ -56,8 +58,8 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 			LOG.info("Granting permission to all organizations");
 			grantClientOrganization(getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations()), actualState.getId(), true);
 		} else {
-			List<String> missingDesiredOrgs = getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations());
-			List<String> removingActualOrgs = getMissingOrgs(actualState.getClientOrganizations(), desiredState.getClientOrganizations());
+			List<Organization> missingDesiredOrgs = getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations());
+			List<Organization> removingActualOrgs = getMissingOrgs(actualState.getClientOrganizations(), desiredState.getClientOrganizations());
 			if(removingActualOrgs.remove( ((API)desiredState).getOrganization())); // Don't try to remove the Owning-Organization
 			if(missingDesiredOrgs.size()==0) {
 				if(desiredState.getClientOrganizations()!=null) {
@@ -78,7 +80,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 	}
 	
 	
-	private void grantClientOrganization(List<String> grantAccessToOrgs, String apiId, boolean allOrgs) throws AppException {
+	private void grantClientOrganization(List<Organization> grantAccessToOrgs, String apiId, boolean allOrgs) throws AppException {
 		URI uri;
 		HttpEntity entity;
 		
@@ -90,8 +92,8 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 			Transaction.getInstance().put("orgName", "ALL");
 		} else {
 			formBody = "action=orgs&apiId="+apiId;
-			for(String orgName : grantAccessToOrgs) {
-				formBody += "&grantOrgId="+orgsAdapter.getOrgId(orgName);
+			for(Organization org : grantAccessToOrgs) {
+				formBody += "&grantOrgId="+org.getId();
 			}
 			Transaction.getInstance().put("orgName", grantAccessToOrgs);
 		}
@@ -112,18 +114,17 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		}	
 	}
 	
-	private void removeClientOrganization(List<String> removingActualOrgs, String apiId) throws AppException {
+	private void removeClientOrganization(List<Organization> removingActualOrgs, String apiId) throws AppException {
 		URI uri;
 		Transaction.getInstance().put(MODE, MODE_REMOVE_ACCESS);
 		RestAPICall apiCall;
-		for(String orgName : removingActualOrgs) {
-			String orgId = orgsAdapter.getOrgId(orgName);
-			Transaction.getInstance().put("orgName", orgName);
-			List<APIAccess> orgsApis = accessAdapter.getAPIAccess(orgId, Type.organizations);
+		for(Organization org : removingActualOrgs) {
+			Transaction.getInstance().put("orgName", org.getName());
+			List<APIAccess> orgsApis = accessAdapter.getAPIAccess(org.getId(), Type.organizations);
 			for(APIAccess apiAccess : orgsApis) {
 				if(apiAccess.getApiId().equals(apiId)) {
 					try {
-						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/"+orgId+"/apis/"+apiAccess.getId()).build();
+						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/"+org.getId()+"/apis/"+apiAccess.getId()).build();
 						
 						
 						apiCall = new DELRequest(uri, this, true);
@@ -167,19 +168,19 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		return null;
 	}
 	
-	private List<String> getMissingOrgs(List<String> orgs, List<String> referenceOrgs) throws AppException {
-		List<String> missingOrgs = new ArrayList<String>();
+	private List<Organization> getMissingOrgs(List<Organization> orgs, List<Organization> referenceOrgs) throws AppException {
+		List<Organization> missingOrgs = new ArrayList<Organization>();
 		if(orgs==null || referenceOrgs ==null) return missingOrgs;
-		for(String orgName : orgs) {
-			if(referenceOrgs.contains(orgName)) {
+		for(Organization org : orgs) {
+			if(referenceOrgs.contains(org)) {
 				continue;
 			}
-			if(orgsAdapter.getOrgId(orgName)==null) {
+			if(orgsAdapter.getOrg(new OrgFilter.Builder().hasId(org.getId()).build())==null) {
 				LOG.warn("Configured organizations: " + orgsAdapter.getAllOrgs());
-				ErrorState.getInstance().setError("Unknown Org-Name: '" + orgName + "'", ErrorCode.UNKNOWN_ORGANIZATION, false);
-				throw new AppException("Unknown Org-Name: '" + orgName + "'", ErrorCode.UNKNOWN_ORGANIZATION);
+				ErrorState.getInstance().setError("Unknown Org-Name: '" + org.getName() + "'", ErrorCode.UNKNOWN_ORGANIZATION, false);
+				throw new AppException("Unknown Org-Name: '" + org.getName() + "'", ErrorCode.UNKNOWN_ORGANIZATION);
 			}
-			missingOrgs.add(orgName);
+			missingOrgs.add(org);
 		}
 		return missingOrgs;
 	}

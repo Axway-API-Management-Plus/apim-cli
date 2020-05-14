@@ -31,6 +31,7 @@ import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -208,7 +209,7 @@ public class APIExportConfigAdapter {
 	
 	private String getVHost(ExportAPI exportAPI) throws AppException {
 		if(exportAPI.getVhost()!=null) return exportAPI.getVhost() + File.separator;
-		String orgVHost = new APIManagerOrganizationAdapter().getOrg(new OrgFilter.Builder().hasId(exportAPI.getOrganizationId()).build()).getVirtualHost();
+		String orgVHost = new APIManagerOrganizationAdapter().getOrg(new OrgFilter.Builder().hasId(exportAPI.getOrganization().getId()).build()).getVirtualHost();
 		if(orgVHost!=null) return orgVHost+File.separator;
 		return "";
 	}
@@ -260,12 +261,12 @@ public class APIExportConfigAdapter {
 	private API getAPITemplate() throws AppException {
 		API apiTemplate = new API();
 		apiTemplate.setState(IAPI.STATE_PUBLISHED);
-		apiTemplate.setClientOrganizations(new ArrayList<String>());
+		apiTemplate.setClientOrganizations(new ArrayList<Organization>());
 		// Required to force loading of actual quota!
 		apiTemplate.setApplicationQuota(new APIQuota());
 		apiTemplate.setSystemQuota(new APIQuota());
 		// Given a NOT-KNOWN organization to force the API-Manager Adapter to set the correct orgName in the actual API
-		apiTemplate.setOrganizationId("NOT-KNOWN");
+		//apiTemplate.setOrganizationId("NOT-KNOWN");
 		return apiTemplate;
 	}
 	

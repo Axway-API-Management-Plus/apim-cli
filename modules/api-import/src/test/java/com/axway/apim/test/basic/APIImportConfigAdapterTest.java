@@ -72,7 +72,7 @@ public class APIImportConfigAdapterTest {
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			String osArch = System.getProperty("os.arch");
-			Assert.assertEquals(apiConfig.getOrganization(), "API Development "+osArch);
+			Assert.assertEquals(apiConfig.getOrganization().getName(), "API Development "+osArch);
 		} catch (Exception e) {
 			LOG.error("Error running test: usingOSEnvVariable", e);
 			throw e;

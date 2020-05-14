@@ -19,6 +19,7 @@ import com.axway.apim.api.model.CorsProfile;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.InboundProfile;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
@@ -53,8 +54,8 @@ public class ExportAPI {
 	}
 	
 	@JsonIgnore
-	public String getOrganizationId() {
-		return this.actualAPIProxy.getOrganizationId();
+	public Organization getOrganization() {
+		return this.actualAPIProxy.getOrganization();
 	}
 
 	
@@ -198,16 +199,16 @@ public class ExportAPI {
 		return this.actualAPIProxy.getName();
 	}
 
-	
+	/*
 	public String getOrganization() {
 		String orgId = null;
 		try {
-			orgId = getOrganizationId();
+			orgId = getOrganization();
 			return new APIManagerOrganizationAdapter().getOrg(new OrgFilter.Builder().hasId(orgId).build()).getName();
 		} catch (Exception e) {
 			throw new RuntimeException("Can't read orgName for orgId: '"+orgId+"'");
 		}
-	}
+	}*/
 
 	
 	@JsonIgnore
@@ -270,7 +271,7 @@ public class ExportAPI {
 	}
 
 	
-	public List<String> getClientOrganizations() throws AppException {
+	public List<Organization> getClientOrganizations() throws AppException {
 		if(!APIManagerAdapter.hasAdminAccount()) return null; 
 		if(this.actualAPIProxy.getClientOrganizations().size()==0) return null;
 		if(this.actualAPIProxy.getClientOrganizations().size()==1 && 

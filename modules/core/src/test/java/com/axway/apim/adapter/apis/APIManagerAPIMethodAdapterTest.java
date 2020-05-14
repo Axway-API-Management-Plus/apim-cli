@@ -10,17 +10,24 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.reporters.Files;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class APIManagerAPIMethodAdapterTest {
 	
 	private static final String testPackage = "com/axway/apim/adapter/apis/";
 	
+	ObjectMapper mapper = new ObjectMapper();
+	
 	@BeforeClass
-	private void initTestIndicator() {
+	private void initTestIndicator() throws AppException, IOException {
 		TestIndicator.getInstance().setTestRunning(true);
+		APIManagerAdapter.getInstance();
+		APIManagerAdapter.configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsAdmin.json")), true);
+		APIManagerAdapter.configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsOrgAdmin.json")), false);
 	}
 	
 	@Test
