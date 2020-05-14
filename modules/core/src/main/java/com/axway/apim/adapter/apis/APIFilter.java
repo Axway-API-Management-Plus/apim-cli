@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.http.NameValuePair;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+
 public class APIFilter {
 	
 	public static int NO_TRANSLATION = -1;
@@ -19,11 +21,11 @@ public class APIFilter {
 	String apiPath;
 	String queryStringVersion;
 	
-	String type;
+	private String apiType;
 	
 	int translateMethodMode = NO_TRANSLATION;
 	
-	boolean useBackendAPI = false;
+	private boolean useBackendAPI = false;
 	
 	boolean includeOperations = false;
 	boolean includeQuotas = false;
@@ -45,10 +47,33 @@ public class APIFilter {
 		return vhost;
 	}
 
+	public String getApiType() {
+		if(useBackendAPI) {
+			return APIManagerAdapter.TYPE_BACK_END;
+		} else {
+			return APIManagerAdapter.TYPE_FRONT_END;
+		}
+	}
+
+
+
 	/**
 	 * Build an applicationAdapter based on the given configuration
 	 */
 	public static class Builder {
+		
+		public static enum APIType {
+			/**
+			 * APIs are created with:</br> 
+			 * - includingQuotas</br>
+			 * - Methods translated to name</br>
+			 * - Policies have the external name</br>
+			 * - Client-Organizations and -Applications are initialized
+			 */
+			ACTUAL_API, 
+			DESIRED_API, 
+			CUSTOM
+		}
 		
 		public static enum Type {
 			/**

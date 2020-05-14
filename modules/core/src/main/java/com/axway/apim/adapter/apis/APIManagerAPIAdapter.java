@@ -101,7 +101,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				usedFilters.add(new BasicNameValuePair("value", filter.apiPath));
 			} 
 			if(filter != null) { usedFilters.addAll(filter.filters); } 
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+filter.type)
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+filter.getApiType())
 					.addParameters(usedFilters)
 					.build();
 			LOG.info("Sending request to find existing APIs: " + uri);
@@ -134,11 +134,11 @@ public class APIManagerAPIAdapter extends APIAdapter {
 					continue;
 				}
 				if(filter.apiPath!=null && !filter.apiPath.equals(api.getPath())) continue;
-				if(!filter.useBackendAPI) {
+				if(filter.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
 					if(filter.vhost!=null && !filter.vhost.equals(api.getVhost())) continue;
 					if(filter.queryStringVersion!=null && !filter.queryStringVersion.equals(api.getApiRoutingKey())) continue;
 				}
-				if(filter.useBackendAPI) {
+				if(filter.getApiType().equals(APIManagerAdapter.TYPE_BACK_END)) {
 					if(logMessage) 
 						LOG.info("Found existing Backend-API with name: '"+api.getName()+"' (ID: '" + api.getId()+"')");														
 				} else {
@@ -150,7 +150,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			if(foundAPIs.size()!=0) {
 				String dbgCrit = "";
 				if(foundAPIs.size()>1) 
-					dbgCrit = " (apiPath: '"+filter.apiPath+"', filter: "+filter+", vhost: '"+filter.vhost+"', requestedType: "+filter.type+")";
+					dbgCrit = " (apiPath: '"+filter.apiPath+"', filter: "+filter+", vhost: '"+filter.vhost+"', requestedType: "+filter.getApiType()+")";
 				LOG.info("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
 				return foundAPIs;
 			}
