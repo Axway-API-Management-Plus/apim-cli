@@ -18,7 +18,6 @@ import org.apache.http.util.EntityUtils;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.IResponseParser;
@@ -42,7 +41,7 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 		this.inTransitState = inTransitState;
 	}
 	public void execute() throws AppException {
-		if(desiredState.getState().equals(IAPI.STATE_UNPUBLISHED)) {
+		if(desiredState.getState().equals(API.STATE_UNPUBLISHED)) {
 			LOG.debug("No need to grant access to newly created API, as desired state of API is unpublished.");
 			return;
 		}

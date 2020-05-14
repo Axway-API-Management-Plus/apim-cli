@@ -2,7 +2,7 @@ package com.axway.apim.api.definition;
 
 import java.net.URL;
 
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,7 +18,7 @@ public class Swagger1xSpecification extends APISpecification {
 
 	@Override
 	public int getAPIDefinitionType() throws AppException {
-		return IAPI.SWAGGGER_API_12;
+		return API.SWAGGGER_API_12;
 	}
 
 	@Override

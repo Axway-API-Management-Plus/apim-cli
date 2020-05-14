@@ -15,7 +15,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;

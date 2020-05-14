@@ -15,9 +15,10 @@ import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.InboundProfile;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.lib.CommandParameters;
@@ -25,6 +26,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Concrete class that is used to reflect the desired API as it's defined by the API-Developer. 
@@ -51,12 +53,19 @@ public class DesiredAPI extends API {
 	private Map<String, InboundProfile> originalInboundProfiles;
 	private Map<String, OutboundProfile> originalOutboundProfiles;
 	
+
+	@JsonDeserialize( using = OrganizationDeserializer.class)
+	@JsonProperty(value = "organization")
+	protected Organization organization = null;
+	
 	@JsonProperty("apiDefinition")
 	public String apiDefinitionImport = null;
 	
 	public DesiredAPI() throws AppException {
 		super();
 	}
+	
+	
 
 	/**
 	 * BackendBasePath is a property which doesn't exists in API-Manager naturally. 

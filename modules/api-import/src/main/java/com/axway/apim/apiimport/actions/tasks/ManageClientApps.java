@@ -17,7 +17,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -63,7 +62,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		List<ClientApplication> recreateActualApps = null;
 		// If an UNPUBLISHED API has been re-created, we have to create App-Subscriptions manually, as API-Manager Upgrade only works on PUBLISHED APIs
 		// But we only need to do this, if existing App-Subscriptions should be preserved (MODE_ADD).
-		if(reCreation && actualState.getState().equals(IAPI.STATE_UNPUBLISHED) && CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_ADD)) {
+		if(reCreation && actualState.getState().equals(API.STATE_UNPUBLISHED) && CommandParameters.getInstance().getClientAppsMode().equals(CommandParameters.MODE_ADD)) {
 			removeNonGrantedClientApps(oldAPI.getApplications());
 			recreateActualApps = getMissingApps(oldAPI.getApplications(), actualState.getApplications());
 			// Create previously existing App-Subscriptions

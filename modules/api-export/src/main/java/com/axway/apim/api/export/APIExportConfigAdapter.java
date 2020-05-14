@@ -24,7 +24,6 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
 import com.axway.apim.api.export.lib.APIExportParams;
@@ -260,7 +259,7 @@ public class APIExportConfigAdapter {
 	 */
 	private API getAPITemplate() throws AppException {
 		API apiTemplate = new API();
-		apiTemplate.setState(IAPI.STATE_PUBLISHED);
+		apiTemplate.setState(API.STATE_PUBLISHED);
 		apiTemplate.setClientOrganizations(new ArrayList<Organization>());
 		// Required to force loading of actual quota!
 		apiTemplate.setApplicationQuota(new APIQuota());
@@ -270,7 +269,7 @@ public class APIExportConfigAdapter {
 		return apiTemplate;
 	}
 	
-	private void handleCustomProperties(IAPI actualAPI) throws AppException {
+	private void handleCustomProperties(API actualAPI) throws AppException {
 		JsonNode customPropconfig = APIManagerAdapter.getCustomPropertiesConfig().get("api");
 		if(customPropconfig == null) return; // No custom properties configured
 		Map<String, String> customProperties = new LinkedHashMap<String, String>();

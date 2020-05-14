@@ -16,7 +16,6 @@ import com.axway.apim.adapter.apis.APIAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.actions.tasks.UpdateAPIStatus;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.IResponseParser;
@@ -39,9 +38,9 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements IRespons
 
 	@Override
 	public void rollback() throws AppException {
-		if(rollbackAPI.getState()!=null && rollbackAPI.getState().equals(IAPI.STATE_PUBLISHED)) {
+		if(rollbackAPI.getState()!=null && rollbackAPI.getState().equals(API.STATE_PUBLISHED)) {
 			API tempDesiredDeletedAPI = new APIBaseDefinition();
-			((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(IAPI.STATE_UNPUBLISHED);
+			((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(API.STATE_UNPUBLISHED);
 			new UpdateAPIStatus(tempDesiredDeletedAPI, rollbackAPI).execute(true);
 		}
 		URI uri;

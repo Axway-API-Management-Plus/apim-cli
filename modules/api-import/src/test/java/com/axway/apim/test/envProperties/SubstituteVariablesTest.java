@@ -8,17 +8,25 @@ import java.util.Properties;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.testng.reporters.Files;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.TestIndicator;
 
-public class SubstituteVariablesTest {
+public class SubstituteVariablesTest extends APIManagerMockBase {
+	
+	private static final String testPackage = "com/axway/apim/adapter/apimanager/singleTests/";
 	
 	@BeforeClass
-	private void initCommandParameters() {
+	private void initCommandParameters() throws AppException, IOException {
+		setupMockData();
+		TestIndicator.getInstance().setTestRunning(true);
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("replaceHostInSwagger", "true");
 		new CommandParameters(params);
@@ -68,6 +76,8 @@ public class SubstituteVariablesTest {
 		
 		EnvironmentProperties envProps = new EnvironmentProperties("anyOtherStage");
 		CommandParameters.getInstance().setEnvProperties(envProps);
+		String testOrganizations = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(			testPackage + "organizations.json"));
+		APIManagerAdapter.getInstance().orgAdapter.setAPIManagerTestResponse(testOrganizations);
 		
 		String configFile = "com/axway/apim/test/files/envProperties/1_config-with-os-variable.json";
 		String pathToConfigFile = this.getClass().getClassLoader().getResource(configFile).getFile();

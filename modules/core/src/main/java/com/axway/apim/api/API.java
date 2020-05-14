@@ -3,6 +3,7 @@ package com.axway.apim.api;
 import java.util.List;
 import java.util.Map;
 
+import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.APIMethod;
@@ -36,9 +37,11 @@ import com.axway.apim.lib.props.SecurityProfileHandler;
 import com.axway.apim.lib.props.ServiceProfileHandler;
 import com.axway.apim.lib.props.VhostPropertyHandler;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * This class defines all common properties on an API and how each property should be 
@@ -61,77 +64,88 @@ import com.fasterxml.jackson.databind.JsonNode;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class API {
 	
+	public final static String STATE_PUBLISHED = "published";
+	public final static String STATE_UNPUBLISHED = "unpublished";
+	public final static String STATE_DEPRECATED = "deprecated";
+	public final static String STATE_DELETED = "deleted";
+	public final static String STATE_PENDING = "pending";
+	
+	public final static int SWAGGGER_API_12 = 1;
+	public final static int SWAGGGER_API_20 = 2;
+	public final static int OPEN_API_30 = 3;
+	public final static int WSDL_API = 4;
+	
 	JsonNode apiConfiguration;
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
 	protected APISpecification APIDefinition = null;
 
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPI.STATE_UNPUBLISHED}, 
+			writableStates = {API.STATE_UNPUBLISHED}, 
 			propHandler = APICaCertsPropertyHandler.class)
 	protected List<CaCert> caCerts = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED}, 
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
 			propHandler = APIDescriptionPropertyHandler.class)
 	protected String descriptionType = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED}, 
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
 			propHandler = APIDescriptionPropertyHandler.class)
 	protected String descriptionManual = null;
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED}, 
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
 			propHandler = APIDescriptionPropertyHandler.class)
 	protected String descriptionMarkdown = null;
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED}, 
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
 			propHandler = APIDescriptionPropertyHandler.class)
 	protected String descriptionUrl = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPI.STATE_UNPUBLISHED}, 
+			writableStates = {API.STATE_UNPUBLISHED}, 
 			propHandler = SecurityProfileHandler.class)
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<SecurityProfile> securityProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPI.STATE_UNPUBLISHED}, 
+			writableStates = {API.STATE_UNPUBLISHED}, 
 			propHandler = AuthenticationProfileHandler.class)
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<AuthenticationProfile> authenticationProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED}, 
+			writableStates = {API.STATE_UNPUBLISHED}, 
 			propHandler = APITagsPropertyHandler.class)
 	protected TagMap<String, String[]> tags = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPI.STATE_UNPUBLISHED}, 
+			writableStates = {API.STATE_UNPUBLISHED}, 
 			propHandler = OutboundProfileHandler.class)
 	protected Map<String, OutboundProfile> outboundProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPI.STATE_UNPUBLISHED}, 
+			writableStates = {API.STATE_UNPUBLISHED}, 
 			propHandler = ServiceProfileHandler.class)
 	protected Map<String, ServiceProfile> serviceProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPI.STATE_UNPUBLISHED}, 
+			writableStates = {API.STATE_UNPUBLISHED}, 
 			propHandler = InboundProfileHandler.class)
 	protected Map<String, InboundProfile> inboundProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPI.STATE_UNPUBLISHED}, 
+			writableStates = {API.STATE_UNPUBLISHED}, 
 			propHandler = CorsProfileHandler.class)
 	protected List<CorsProfile> corsProfiles;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected List<Organization> clientOrganizations;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<ClientApplication> applications = null;
 	
@@ -141,51 +155,55 @@ public class API {
 	protected String path = null;
 
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected String state = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED}, 
+			writableStates = {API.STATE_UNPUBLISHED}, 
 			propHandler = APIVersionPropertyHandler.class)	
 	protected String version;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED}, 
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
 			propHandler = VhostPropertyHandler.class)
 	protected String vhost = null;
 	
-	@APIPropertyAnnotation(isBreaking = false, writableStates = {IAPI.STATE_UNPUBLISHED}, propHandler = APINamePropertyHandler.class)
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED}, propHandler = APINamePropertyHandler.class)
 	protected String name = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_DEPRECATED}, 
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_DEPRECATED}, 
 			propHandler = APISummaryPropertyHandler.class)
 	protected String summary = null;
 
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected Image image = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED}, 
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
 			propHandler = CustomPropertyHandler.class)
 	protected Map<String, String> customProperties = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})	
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})	
 	protected APIQuota applicationQuota = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected APIQuota systemQuota = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {IAPI.STATE_UNPUBLISHED}, propHandler = RoutingKeyPropHandler.class)
+			writableStates = {API.STATE_UNPUBLISHED}, propHandler = RoutingKeyPropHandler.class)
 	protected String apiRoutingKey = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {})
+	@JsonDeserialize( using = OrganizationDeserializer.class)
+	@JsonProperty(value = "organizationId")
 	protected Organization organization = null;
+	
+	//protected String organizationId;
 	
 	protected String id = null;
 	
@@ -194,10 +212,8 @@ public class API {
 	protected String deprecated = null;
 
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected Long retirementDate = null;
-	
-	protected String orgId = null;
 	
 	protected List<APIMethod> apiMethods = null;
 

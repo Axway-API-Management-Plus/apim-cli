@@ -58,7 +58,6 @@ import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.definition.APISpecificationFactory;
 import com.axway.apim.api.model.APIQuota;
@@ -311,7 +310,7 @@ public class APIImportConfigAdapter {
 	
 	private void handleAllOrganizations(API apiConfig) throws AppException {
 		if(apiConfig.getClientOrganizations()==null) return;
-		if(apiConfig.getState().equals(IAPI.STATE_UNPUBLISHED)) {
+		if(apiConfig.getState().equals(API.STATE_UNPUBLISHED)) {
 			apiConfig.setClientOrganizations(null); // Making sure, orgs are not considered as a changed property
 			return;
 		}
@@ -343,7 +342,7 @@ public class APIImportConfigAdapter {
 	}
 	
 	private void addQuotaConfiguration(API apiConfig) throws AppException {
-		if(apiConfig.getState()==IAPI.STATE_UNPUBLISHED) return;
+		if(apiConfig.getState()==API.STATE_UNPUBLISHED) return;
 		DesiredAPI importAPI = (DesiredAPI)apiConfig;
 		initQuota(importAPI.getSystemQuota());
 		initQuota(importAPI.getApplicationQuota());
@@ -413,7 +412,7 @@ public class APIImportConfigAdapter {
 	 */
 	private void completeClientApplications(API apiConfig) throws AppException {
 		if(CommandParameters.getInstance().isIgnoreClientApps()) return;
-		if(apiConfig.getState()==IAPI.STATE_UNPUBLISHED) return;
+		if(apiConfig.getState()==API.STATE_UNPUBLISHED) return;
 		ClientApplication loadedApp = null;
 		ClientApplication app;
 		if(apiConfig.getApplications()!=null) {

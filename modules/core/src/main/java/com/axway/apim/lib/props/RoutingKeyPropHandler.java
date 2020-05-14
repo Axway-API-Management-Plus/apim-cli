@@ -19,7 +19,7 @@ public class RoutingKeyPropHandler implements PropertyHandler {
 		try {
 			if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return response; // QueryStringRouting isn't supported
 			if(APIManagerAdapter.hasAdminAccount()) {
-				if(!APIManagerAdapter.configAdapter.getApiManagerConfig("apiRoutingKeyEnabled").equals("true")) {
+				if(!APIManagerAdapter.getInstance().configAdapter.getApiManagerConfig("apiRoutingKeyEnabled").equals("true")) {
 					ErrorState.getInstance().setError("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED, false);
 					throw new RuntimeException();
 				}

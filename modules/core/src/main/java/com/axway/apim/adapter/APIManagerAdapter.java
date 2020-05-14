@@ -26,7 +26,13 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.adapter.apis.APIManagerConfigAdapter;
+import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
+import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter;
+import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.definition.APISpecificationFactory;
@@ -88,6 +94,12 @@ public class APIManagerAdapter {
 	public final static String TYPE_BACK_END = "apirepo";
 	
 	public static APIManagerConfigAdapter configAdapter = new APIManagerConfigAdapter();
+	public APIManagerAPIMethodAdapter methodAdapter = new APIManagerAPIMethodAdapter();
+	public APIManagerPoliciesAdapter policiesAdapter = new APIManagerPoliciesAdapter();
+	public APIManagerQuotaAdapter quotaAdapter = new APIManagerQuotaAdapter();
+	public APIManagerOrganizationAdapter orgAdapter = new APIManagerOrganizationAdapter();
+	public APIManagerAPIAccessAdapter accessAdapter = new APIManagerAPIAccessAdapter();
+	public APIMgrAppsAdapter appAdapter = new APIMgrAppsAdapter();
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {

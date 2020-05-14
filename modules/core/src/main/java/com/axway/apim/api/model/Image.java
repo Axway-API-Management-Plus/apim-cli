@@ -8,7 +8,6 @@ import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 
-import com.axway.apim.api.IAPI;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.ImageComparision;

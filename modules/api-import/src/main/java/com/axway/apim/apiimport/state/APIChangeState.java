@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.CommandParameters;
@@ -189,8 +188,8 @@ public class APIChangeState {
 	 */
 	public boolean isBreaking() throws AppException {
 		// We will only break API, if the API is no longer in state: "unpublished"
-		if(this.actualAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) return false;
-		if(this.actualAPI.getState().equals(IAPI.STATE_PENDING)) return false;
+		if(this.actualAPI.getState().equals(API.STATE_UNPUBLISHED)) return false;
+		if(this.actualAPI.getState().equals(API.STATE_PENDING)) return false;
 		return isBreaking;
 	}
 

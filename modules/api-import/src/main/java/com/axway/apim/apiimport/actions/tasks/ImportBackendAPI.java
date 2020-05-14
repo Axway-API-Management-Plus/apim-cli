@@ -15,7 +15,6 @@ import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -37,7 +36,7 @@ public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParse
 	public void execute() throws AppException {
 		LOG.info("Importing backend API (Swagger/WSDL Import)");
 		try {
-			if(desiredState.getAPIDefinition().getAPIDefinitionType()==IAPI.WSDL_API) {
+			if(desiredState.getAPIDefinition().getAPIDefinitionType()==API.WSDL_API) {
 				importFromWSDL();
 			} else {
 				importFromSwagger();

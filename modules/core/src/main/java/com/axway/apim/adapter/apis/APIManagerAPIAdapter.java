@@ -42,18 +42,13 @@ public class APIManagerAPIAdapter extends APIAdapter {
 
 	String apiManagerResponse;
 	
-	ObjectMapper mapper = APIManagerAdapter.mapper;
+	ObjectMapper mapper = new ObjectMapper();
 	
 	CommandParameters params = CommandParameters.getInstance();
 	
-	APIManagerAPIMethodAdapter methodAdapter = new APIManagerAPIMethodAdapter();
-	APIManagerPoliciesAdapter policiesAdapter = new APIManagerPoliciesAdapter();
-	APIManagerQuotaAdapter quotaAdapter = new APIManagerQuotaAdapter();
-	APIManagerOrganizationAdapter orgAdapter = new APIManagerOrganizationAdapter();
-	APIManagerAPIAccessAdapter accessAdapter = new APIManagerAPIAccessAdapter();
-	APIMgrAppsAdapter appAdapter = new APIMgrAppsAdapter();
+	APIManagerAdapter apim = APIManagerAdapter.getInstance(); 
 
-	public APIManagerAPIAdapter() {
+	public APIManagerAPIAdapter() throws AppException {
 
 	}
 	
@@ -67,7 +62,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	public List<API> getAPIs(APIFilter filter, boolean logMessage) throws AppException {
 		List<API> apis = new ArrayList<API>();
 		try {
-			if(this.apiManagerResponse==null) readAPIsFromAPIManager(filter);
+			_readAPIsFromAPIManager(filter);
 			apis = filterAPIs(filter, logMessage);
 			translateMethodIds(apis, filter.translateMethodMode);
 			translatePolicies(apis, filter.translatePolicyMode);
@@ -90,7 +85,8 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	 * Returns a list of requested proxies (Front-End APIs).
 	 * @throws AppException if the API representation cannot be created
 	 */
-	private void readAPIsFromAPIManager(APIFilter filter) throws AppException {
+	private void _readAPIsFromAPIManager(APIFilter filter) throws AppException {
+		if(this.apiManagerResponse!=null) return;
 		CommandParameters cmd = CommandParameters.getInstance();
 		URI uri;
 		try {
@@ -170,7 +166,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		Map<String, profile> updatedEntries = new LinkedHashMap<String, profile>();
 		
 		if(profiles!=null) {
-			List<APIMethod> methods = methodAdapter.getAllMethodsForAPI(apiId);
+			List<APIMethod> methods = apim.methodAdapter.getAllMethodsForAPI(apiId);
 			Iterator<String> keys = profiles.keySet().iterator();
 			while(keys.hasNext()) {
 				String key = keys.next();
@@ -213,15 +209,15 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				while(it.hasNext()) {
 					OutboundProfile profile = it.next();
 					if(mode == APIFilter.TO_INTERNAL_POLICY_NAME) {
-						profile.setRequestPolicy(policiesAdapter.getPolicyKey(profile.getRequestPolicy(), APIManagerPoliciesAdapter.REQUEST));
-						profile.setRoutePolicy(policiesAdapter.getPolicyKey(profile.getRoutePolicy(), APIManagerPoliciesAdapter.ROUTING));
-						profile.setResponsePolicy(policiesAdapter.getPolicyKey(profile.getResponsePolicy(), APIManagerPoliciesAdapter.RESPONSE));
-						profile.setFaultHandlerPolicy(policiesAdapter.getPolicyKey(profile.getFaultHandlerPolicy(), APIManagerPoliciesAdapter.FAULT_HANDLER));						
+						profile.setRequestPolicy(apim.policiesAdapter.getPolicyKey(profile.getRequestPolicy(), APIManagerPoliciesAdapter.REQUEST));
+						profile.setRoutePolicy(apim.policiesAdapter.getPolicyKey(profile.getRoutePolicy(), APIManagerPoliciesAdapter.ROUTING));
+						profile.setResponsePolicy(apim.policiesAdapter.getPolicyKey(profile.getResponsePolicy(), APIManagerPoliciesAdapter.RESPONSE));
+						profile.setFaultHandlerPolicy(apim.policiesAdapter.getPolicyKey(profile.getFaultHandlerPolicy(), APIManagerPoliciesAdapter.FAULT_HANDLER));						
 					} else {
-						profile.setRequestPolicy(policiesAdapter.getPolicyName(profile.getRequestPolicy(), APIManagerPoliciesAdapter.REQUEST));
-						profile.setRoutePolicy(policiesAdapter.getPolicyName(profile.getRoutePolicy(), APIManagerPoliciesAdapter.ROUTING));
-						profile.setResponsePolicy(policiesAdapter.getPolicyName(profile.getResponsePolicy(), APIManagerPoliciesAdapter.RESPONSE));
-						profile.setFaultHandlerPolicy(policiesAdapter.getPolicyName(profile.getFaultHandlerPolicy(), APIManagerPoliciesAdapter.FAULT_HANDLER));
+						profile.setRequestPolicy(apim.policiesAdapter.getPolicyName(profile.getRequestPolicy(), APIManagerPoliciesAdapter.REQUEST));
+						profile.setRoutePolicy(apim.policiesAdapter.getPolicyName(profile.getRoutePolicy(), APIManagerPoliciesAdapter.ROUTING));
+						profile.setResponsePolicy(apim.policiesAdapter.getPolicyName(profile.getResponsePolicy(), APIManagerPoliciesAdapter.RESPONSE));
+						profile.setFaultHandlerPolicy(apim.policiesAdapter.getPolicyName(profile.getFaultHandlerPolicy(), APIManagerPoliciesAdapter.FAULT_HANDLER));
 					}
 				}
 			}
@@ -236,8 +232,8 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		//if(desiredAPI!=null && (desiredAPI.getApplicationQuota() == null && desiredAPI.getSystemQuota() == null)) return;
 		for(API api : apis) {			
 			try {
-				applicationQuota = quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.APPLICATION_DEFAULT_QUOTA, api.getId()); // Get the Application-Default-Quota
-				sytemQuota = quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.SYSTEM_API_QUOTA, api.getId()); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
+				applicationQuota = apim.quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.APPLICATION_DEFAULT_QUOTA, api.getId()); // Get the Application-Default-Quota
+				sytemQuota = apim.quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.SYSTEM_API_QUOTA, api.getId()); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
 				api.setApplicationQuota(applicationQuota);
 				api.setSystemQuota(sytemQuota);
 			} catch (AppException e) {
@@ -253,7 +249,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		for(API api : apis) {
 			if(api.getApplications()==null || api.getApplications().size()==0) return;
 			for(ClientApplication app : api.getApplications()) {
-				APIQuota appQuota = this.quotaAdapter.getQuotaForAPI(app.getId(), null);
+				APIQuota appQuota = apim.quotaAdapter.getQuotaForAPI(app.getId(), null);
 				app.setAppQuota(appQuota);
 			}
 		}
@@ -269,9 +265,9 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null 
 				&& CommandParameters.getInstance().getClientOrgsMode().equals(CommandParameters.MODE_REPLACE)) return;*/
 		List<Organization> grantedOrgs = new ArrayList<Organization>();
-		List<Organization> allOrgs = this.orgAdapter.getAllOrgs();
+		List<Organization> allOrgs = apim.orgAdapter.getAllOrgs();
 		for(Organization org : allOrgs) {
-			List<APIAccess> orgAPIAccess = accessAdapter.getAPIAccess(org.getId(), APIManagerAPIAccessAdapter.Type.organizations);
+			List<APIAccess> orgAPIAccess = apim.accessAdapter.getAPIAccess(org.getId(), APIManagerAPIAccessAdapter.Type.organizations);
 			for(API api : apis) {
 				for(APIAccess access : orgAPIAccess) {
 					if(access.getApiId().equals(api.getId())) {
@@ -290,13 +286,13 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		// With version >7.7 we can retrieve the subscribed apps directly
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
 			for(API api : apis) {
-				apps = this.appAdapter.getAppsSubscribedWithAPI(api.getId());
+				apps = apim.appAdapter.getAppsSubscribedWithAPI(api.getId());
 				api.setApplications(apps);
 			}
 		} else {
-			apps = this.appAdapter.getApplications(new ClientAppFilter.Builder().build());
+			apps = apim.appAdapter.getApplications(new ClientAppFilter.Builder().build());
 			for(ClientApplication app : apps) {
-				List<APIAccess> APIAccess = this.accessAdapter.getAPIAccess(app.getId(), APIManagerAPIAccessAdapter.Type.applications);
+				List<APIAccess> APIAccess = apim.accessAdapter.getAPIAccess(app.getId(), APIManagerAPIAccessAdapter.Type.applications);
 				app.setApiAccess(APIAccess);
 				for(API api : apis) {
 					for(APIAccess access : APIAccess) {

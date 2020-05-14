@@ -43,7 +43,6 @@ public class APIManagerOrganizationAdapter {
 		if(filter.id!=null) {
 			orgId = "/"+filter.id;
 		}
-		String response = null;
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
@@ -53,10 +52,8 @@ public class APIManagerOrganizationAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			apiManagerResponse = EntityUtils.toString(httpResponse.getEntity());
-			//allOrgs = mapper.readValue(response, new TypeReference<List<Organization>>(){});
-			return;
 		} catch (Exception e) {
-			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + response);
+			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + httpResponse);
 			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
@@ -95,7 +92,7 @@ public class APIManagerOrganizationAdapter {
 		return orgs.get(0);
 	}
 	
-	void setAPIManagerTestResponse(String response) {
+	public void setAPIManagerTestResponse(String response) {
 		this.apiManagerResponse = response;
 	}
 }

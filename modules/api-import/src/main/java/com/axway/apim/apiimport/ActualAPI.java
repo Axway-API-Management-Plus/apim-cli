@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.lib.errorHandling.AppException;
 
 /**
@@ -35,7 +34,7 @@ public class ActualAPI extends API {
 	@Override
 	public String getState() throws AppException {
 		if(this.deprecated!=null 
-				&& this.deprecated.equals("true")) return IAPI.STATE_DEPRECATED;
+				&& this.deprecated.equals("true")) return API.STATE_DEPRECATED;
 		return super.getState();
 	}
 }

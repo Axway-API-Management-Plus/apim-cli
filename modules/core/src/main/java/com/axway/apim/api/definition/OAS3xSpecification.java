@@ -3,7 +3,7 @@ package com.axway.apim.api.definition;
 import java.io.IOException;
 import java.net.URL;
 
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,7 +20,7 @@ public class OAS3xSpecification extends APISpecification {
 
 	@Override
 	public int getAPIDefinitionType() throws AppException {
-		return IAPI.OPEN_API_30;
+		return API.OPEN_API_30;
 	}
 
 	@Override

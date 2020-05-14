@@ -1,0 +1,20 @@
+[
+    {
+        "id": "9bdfe6d1-2eec-4971-8611-c4825d67ac55",
+        "name": "valueFromAnyOtherStageEnv",
+        "description": "Dev Org 7920",
+        "email": null,
+        "image": null,
+        "restricted": false,
+        "virtualHost": null,
+        "phone": null,
+        "enabled": true,
+        "development": true,
+        "dn": "o=API Test-Org 3 2423,ou=organizations,ou=APIPortal",
+        "createdOn": 1589204055029,
+        "startTrialDate": null,
+        "endTrialDate": null,
+        "trialDuration": null,
+        "isTrial": null
+    }
+]

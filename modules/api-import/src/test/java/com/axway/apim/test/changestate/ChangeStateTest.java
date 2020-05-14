@@ -11,7 +11,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.apiimport.state.APIChangeState;
@@ -73,7 +72,7 @@ public class ChangeStateTest {
 	private static API getTestAPI() throws AppException {
 		API testAPI = new ActualAPI();
 		testAPI.setOrganization(new Organization().setName("123"));
-		testAPI.setState(IAPI.STATE_PUBLISHED);
+		testAPI.setState(API.STATE_PUBLISHED);
 		return testAPI;
 	}
 

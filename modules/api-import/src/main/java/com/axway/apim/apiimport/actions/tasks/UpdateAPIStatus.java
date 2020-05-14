@@ -21,11 +21,10 @@ import org.apache.http.util.EntityUtils;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.state.APIChangeState;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.IResponseParser;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.DELRequest;
@@ -143,9 +142,9 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				LOG.error(this.intent + "The status change from: " + actualState.getState() + " to " + desiredState.getState() + " is not possible!");
 				throw new AppException("The status change from: '" + actualState.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS);
 			}
-			if(desiredState.getState().equals(IAPI.STATE_DELETED)) {
+			if(desiredState.getState().equals(API.STATE_DELETED)) {
 				// If an API in state unpublished or pending, also an orgAdmin can delete it
-				boolean useAdmin = (actualState.getState().equals(IAPI.STATE_UNPUBLISHED) || actualState.getState().equals(IAPI.STATE_PENDING)) ? false : true; 
+				boolean useAdmin = (actualState.getState().equals(API.STATE_UNPUBLISHED) || actualState.getState().equals(API.STATE_PENDING)) ? false : true; 
 				uri = new URIBuilder(cmd.getAPIManagerURL())
 						.setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getId())
 						.build();
@@ -163,7 +162,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				uri = new URIBuilder(cmd.getAPIManagerURL())
 					.setPath(RestAPICall.API_VERSION+"/proxies/"+actualState.getId()+"/"+statusEndpoint.get(desiredState.getState()))
 					.build();
-				if(desiredState.getVhost()!=null && desiredState.getState().equals(IAPI.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
+				if(desiredState.getVhost()!=null && desiredState.getState().equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
 					HttpEntity entity = new StringEntity("vhost="+desiredState.getVhost());
 					apiCall = new POSTRequest(entity, uri, this, useAdminAccountForPublish());
 				} else {
@@ -171,7 +170,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				}
 				apiCall.setContentType("application/x-www-form-urlencoded");
 				apiCall.execute();
-				if (desiredState.getVhost()!=null && desiredState.getState().equals(IAPI.STATE_UNPUBLISHED)) { 
+				if (desiredState.getVhost()!=null && desiredState.getState().equals(API.STATE_UNPUBLISHED)) { 
 					this.updateVHostRequired = true; // Flag to control update of the VHost
 				}
 			} 
@@ -232,7 +231,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 	public void updateRetirementDate(APIChangeState changeState) throws AppException {
 		if(changeState!=null && changeState.getNonBreakingChanges().contains("retirementDate")) {
 			// Ignore the retirementDate if desiredState is not deprecated as it's used nowhere
-			if(!desiredState.getState().equals(IAPI.STATE_DEPRECATED)) {
+			if(!desiredState.getState().equals(API.STATE_DEPRECATED)) {
 				LOG.info("Ignoring given retirementDate as API-Status is not set to deprecated");
 				return;
 			}

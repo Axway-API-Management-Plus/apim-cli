@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -25,7 +24,7 @@ public class VHostManager {
 	
 	public void handleVHost(API desiredAPI, API actualAPI, boolean forceUpdate) throws AppException {
 		if(updateVhost || forceUpdate) {
-			if(!APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP3") && actualAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
+			if(!APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP3") && actualAPI.getState().equals(API.STATE_UNPUBLISHED)) {
 				ErrorState.getInstance().setError("Can't update V-Host to: "+desiredAPI.getVhost()+" on unpublished API!", ErrorCode.CANT_SETUP_VHOST, false);
 				throw new AppException("Can't update V-Host to: "+desiredAPI.getVhost()+" on unpublished API!", 
 						ErrorCode.CANT_SETUP_VHOST);

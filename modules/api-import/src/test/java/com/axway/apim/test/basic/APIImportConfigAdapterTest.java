@@ -1,5 +1,9 @@
 package com.axway.apim.test.basic;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
@@ -7,23 +11,30 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorState;
+import com.axway.apim.lib.utils.TestIndicator;
 
-public class APIImportConfigAdapterTest {
+public class APIImportConfigAdapterTest extends APIManagerMockBase {
 
 	private static Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapterTest.class);
 	
+	@BeforeClass
+	private void initCommandParameters() throws AppException, IOException {
+		setupMockData();
+	}
+	
 	@BeforeMethod
 	public void cleanSingletons() {
-		LOG.info("Deleting singletons before executing test.");
 		ErrorState.deleteInstance();
 	}
 	
@@ -72,7 +83,7 @@ public class APIImportConfigAdapterTest {
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			String osArch = System.getProperty("os.arch");
-			Assert.assertEquals(apiConfig.getOrganization().getName(), "API Development "+osArch);
+			Assert.assertEquals(apiConfig.getState(), "notUsed "+osArch);
 		} catch (Exception e) {
 			LOG.error("Error running test: usingOSEnvVariable", e);
 			throw e;

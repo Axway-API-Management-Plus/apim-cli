@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.apiimport.actions.RecreateToUpdateAPI;
 import com.axway.apim.apiimport.actions.UpdateExistingAPI;
@@ -84,8 +84,8 @@ public class APIImportManager {
 	}
 	
 	private boolean isAdminAccountNeeded(APIChangeState changeState) throws AppException {
-		if(changeState.getDesiredAPI().getState().equals(IAPI.STATE_UNPUBLISHED) && 
-				(changeState.getActualAPI()==null || changeState.getActualAPI().getState().equals(IAPI.STATE_UNPUBLISHED))) {
+		if(changeState.getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) && 
+				(changeState.getActualAPI()==null || changeState.getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
 			return false;
 		} else {
 			return true;

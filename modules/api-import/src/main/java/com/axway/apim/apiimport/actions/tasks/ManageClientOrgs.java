@@ -17,7 +17,6 @@ import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.DesiredAPI;
@@ -50,7 +49,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 			LOG.info("Configured client organizations are ignored, as flag ignoreClientOrgs has been set.");
 			return;
 		}
-		if(desiredState.getState().equals(IAPI.STATE_UNPUBLISHED)) return;
+		if(desiredState.getState().equals(API.STATE_UNPUBLISHED)) return;
 		// The API isn't Re-Created (to take over manually created ClientOrgs) and there are no orgs configured - We can skip the rest
 		if(desiredState.getClientOrganizations()==null && !reCreation) return;
 		// From here, the assumption is that existing Org-Access has been upgraded already - We only have to take care about additional orgs
