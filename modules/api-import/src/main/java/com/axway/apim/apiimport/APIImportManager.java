@@ -85,7 +85,7 @@ public class APIImportManager {
 	
 	private boolean isAdminAccountNeeded(APIChangeState changeState) throws AppException {
 		if(changeState.getDesiredAPI().getState().equals(IAPI.STATE_UNPUBLISHED) && 
-				(!changeState.getActualAPI().isValid() || changeState.getActualAPI().getState().equals(IAPI.STATE_UNPUBLISHED))) {
+				(changeState.getActualAPI()==null || changeState.getActualAPI().getState().equals(IAPI.STATE_UNPUBLISHED))) {
 			return false;
 		} else {
 			return true;
