@@ -42,7 +42,7 @@ public class APIImportManager {
 			}
 		}
 		// No existing API found (means: No match for APIPath), creating a complete new
-		if(!changeState.getActualAPI().isValid()) {
+		if(changeState.getActualAPI()==null) {
 			// --> CreateNewAPI
 			LOG.info("Strategy: No existing API found, creating new!");
 			CreateNewAPI createAPI = new CreateNewAPI();

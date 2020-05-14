@@ -53,7 +53,7 @@ public class APIChangeState {
 		super();
 		this.actualAPI = actualAPI;
 		this.desiredAPI = desiredAPI;
-		if(!actualAPI.isValid()) { // No existing API found, just create a new one and that's all
+		if(actualAPI==null) { // No existing API found, just create a new one and that's all
 			LOG.debug("No existing API found. Creating  complete new API");
 			return;
 		}

@@ -255,7 +255,7 @@ public class APIImportConfigAdapter {
 	 * @throws AppException when something goes wrong
 	 */
 	public IAPI completeDesiredAPI(IAPI desiredAPI, IAPI actualAPI) throws AppException {
-		if(!actualAPI.isValid()) return desiredAPI;
+		if(actualAPI==null) return desiredAPI;
 		// We need to safe the original methodNames, as they are required during API-Re-Creation
 		((DesiredAPI)desiredAPI).setOriginalInboundProfiles(desiredAPI.getInboundProfiles());
 		((DesiredAPI)desiredAPI).setOriginalOutboundProfiles(desiredAPI.getOutboundProfiles());
