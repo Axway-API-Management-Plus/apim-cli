@@ -21,7 +21,7 @@ public class OutboundProfileHandler implements PropertyHandler {
 	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		validateAuthenticationProfiles(desired);
-		APIManagerAdapter.getInstance().translateMethodIds(desired.getOutboundProfiles(), actual);
+		//APIManagerAdapter.getInstance().translateMethodIds(desired.getOutboundProfiles(), actual);
 		if(desired.getOutboundProfiles().size()!=0) {
 			((ObjectNode)response).replace("outboundProfiles", objectMapper.valueToTree(desired.getOutboundProfiles()));
 		}

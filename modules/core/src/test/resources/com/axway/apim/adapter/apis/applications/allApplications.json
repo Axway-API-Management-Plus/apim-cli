@@ -1,0 +1,16 @@
+[
+    {
+        "id": "ecf109cd-d012-4c57-897a-b3e8b041889b",
+        "name": "Test App 3457",
+        "description": null,
+        "organizationId": "d9ea6280-8811-4baf-8b5b-011a97142840",
+        "phone": null,
+        "email": null,
+        "createdBy": "f60e3e05-cdf3-4b70-affc-4cb61a10f4bb",
+        "managedBy": [],
+        "createdOn": 1588742758106,
+        "enabled": true,
+        "image": null,
+        "state": "approved"
+    }
+]

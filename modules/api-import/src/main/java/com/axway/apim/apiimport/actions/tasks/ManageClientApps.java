@@ -14,8 +14,11 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
+import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.APIAccess;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.IResponseParser;
@@ -101,15 +104,15 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	
 	private boolean hasClientAppPermission(ClientApplication app) throws AppException {
 		String appsOrgId = app.getOrganizationId();
-		String appsOrgName = APIManagerAdapter.getInstance().getOrg(appsOrgId).getName();
-		if(appsOrgName==null) return false;
+		Organization appsOrgs = new APIManagerOrganizationAdapter().getOrg(new OrgFilter.Builder().hasId(appsOrgId).build());
+		if(appsOrgs==null) return false;
 		// If the App belongs to the same Org as the API, it automatically has permission (esp. for Unpublished APIs)
 		if(app.getOrganizationId().equals((actualState).getOrganizationId())) return true;
 		if(actualState.getClientOrganizations()==null) {
 			LOG.debug("No Client-Orgs configured for this API, therefore other app has NO permission.");
 			return false;
 		}
-		return actualState.getClientOrganizations().contains(appsOrgName);
+		return actualState.getClientOrganizations().contains(appsOrgs.getName());
 	}
 	
 	private void createAppSubscription(List<ClientApplication> missingDesiredApps, String apiId) throws AppException {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.APIMethod;
@@ -109,7 +110,7 @@ public class InboundProfileHandler implements PropertyHandler {
 	
 	private String lookupAPIMethodId(String operationId, IAPI actual) throws AppException {
 		if(((API)actual).getApiMethods()==null) {
-			((API)actual).setApiMethods(APIManagerAdapter.getInstance().getAllMethodsForAPI(actual.getId()));
+			((API)actual).setApiMethods(new APIManagerAPIMethodAdapter().getAllMethodsForAPI(actual.getId()));
 		}
 		for(APIMethod method : ((API)actual).getApiMethods()) {
 			if(method.getName().equals(operationId)) {

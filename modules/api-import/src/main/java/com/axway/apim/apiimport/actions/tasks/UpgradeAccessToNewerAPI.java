@@ -16,6 +16,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -30,6 +31,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IResponseParser {
+	
+	APIManagerAPIMethodAdapter methodAdapter = new APIManagerAPIMethodAdapter();
 	
 	private IAPI inTransitState; 
 
@@ -69,7 +72,7 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 			throw new AppException("Can't upgrade access to newer API!", ErrorCode.CANT_UPGRADE_API_ACCESS, e);
 		}
 		// Existing applications now got access to the new API, hence we have to update the internal state
-		APIManagerAdapter.getInstance().addClientApplications(inTransitState, actualState);
+		// APIManagerAdapter.getInstance().addClientApplications(inTransitState, actualState);
 		// Additionally we need to preserve existing (maybe manually created) application quotas
 		boolean updateAppQuota = false;
 		if(actualState.getApplications().size()!=0) {
@@ -83,9 +86,9 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 						updateAppQuota = true;
 						restriction.setApi(desiredState.getId()); // Take over the quota config to new API
 						if(!restriction.getMethod().equals("*")) { // The restriction is for a specific method
-							String originalMethodName = APIManagerAdapter.getInstance().getMethodNameForId(actualState.getId(), restriction.getMethod());
+							String originalMethodName = methodAdapter.getMethodNameForId(actualState.getId(), restriction.getMethod());
 							// Try to find the same operation for the newly created API based on the name
-							String newMethodId = APIManagerAdapter.getInstance().getMethodIdPerName(desiredState.getId(), originalMethodName);
+							String newMethodId = methodAdapter.getMethodIdPerName(desiredState.getId(), originalMethodName);
 							restriction.setMethod(newMethodId);
 						}
 					}

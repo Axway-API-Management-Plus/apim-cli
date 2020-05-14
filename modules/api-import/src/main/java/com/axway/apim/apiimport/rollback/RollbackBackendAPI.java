@@ -14,6 +14,8 @@ import org.apache.http.util.EntityUtils;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
+import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.lib.CommandParameters;
@@ -65,12 +67,12 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements IRespo
 				filters.add(new BasicNameValuePair("field", "createdOn"));
 				filters.add(new BasicNameValuePair("op", "gt"));
 				filters.add(new BasicNameValuePair("value", (beAPICreatedOn).toString())); // Ignore all other APIs some time ago
-				JsonNode existingBEAPI = APIAdapter.create(APIManagerAdapter.getInstance()).getAPI(new APIFilter.Builder(APIManagerAdapter.TYPE_BACK_END).useFilter(filters).build(), false);
-				if(existingBEAPI!=null && existingBEAPI.get("id")!=null) {
+				API existingBEAPI = APIAdapter.create(APIManagerAdapter.getInstance()).getAPI(new APIFilter.Builder(Type.CUSTOM, true).useFilter(filters).build(), false);
+				if(existingBEAPI!=null && existingBEAPI.getId()!=null) {
 					uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL())
-							.setPath(RestAPICall.API_VERSION+"/apirepo/"+existingBEAPI.get("id").asText())
+							.setPath(RestAPICall.API_VERSION+"/apirepo/"+existingBEAPI.getId())
 							.build();
-					Transaction.getInstance().put("apiIdToDelete", existingBEAPI.get("id"));
+					Transaction.getInstance().put("apiIdToDelete", existingBEAPI.getId());
 					apiCall = new DELRequest(uri, this, false);
 					apiCall.execute();
 				}

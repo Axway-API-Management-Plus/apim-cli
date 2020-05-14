@@ -1,8 +1,6 @@
 package com.axway.apim.appimport.adapter;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,12 +58,21 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	public List<ClientApplication> getApplications(ClientAppFilter filter) throws AppException {
 		throw new UnsupportedOperationException("Filtering results is not supported for the JSON implementation");
 	}
-
+	
 	@Override
-	public ClientApplication getApplication(ClientApplication applicationName) throws AppException {
+	public List<ClientApplication> getAllApplications() throws AppException {
+		return this.apps;
+	}
+	
+	@Override
+	public ClientApplication getApplication(ClientAppFilter filter) throws AppException {
+		return getApplicationByName(filter.getApplicationName());
+	}
+
+	private ClientApplication getApplicationByName(String applicationName) throws AppException {
 		if(this.apps==null) return null;
 		for(ClientApplication app : this.apps) {
-			if(applicationName.getName().equals(app.getName())) return app;
+			if(applicationName.equals(app.getName())) return app;
 		}
 		return null;
 	}
@@ -73,11 +80,6 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	@Override
 	public ClientApplication createApplication(ClientApplication app) throws AppException {
 		throw new UnsupportedOperationException("createApplication not implemented for JSONConfigClientAppAdapter");
-	}
-
-	@Override
-	public List<ClientApplication> getApplications() throws AppException {
-		return this.apps;
 	}
 	
 	private void addImage(List<ClientApplication> apps, File parentFolder) throws AppException {

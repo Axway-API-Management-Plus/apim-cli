@@ -7,11 +7,30 @@ import org.apache.http.NameValuePair;
 
 public class APIFilter {
 	
+	public static int NO_TRANSLATION = -1;
+	public static int METHODS_AS_NAME = 0;
+	public static int METHODS_AS_ID = 1;
+
+	public static int TO_INTERNAL_POLICY_NAME = 10;
+	public static int TO_EXTERNAL_POLICY_NAME = 15;
+	
+	String id;
 	String vhost;
 	String apiPath;
 	String queryStringVersion;
 	
 	String type;
+	
+	int translateMethodMode = NO_TRANSLATION;
+	
+	boolean useBackendAPI = false;
+	
+	boolean includeOperations = false;
+	boolean includeQuotas = false;
+	boolean includeClientOrganizations = false;
+	boolean includeClientApplications = false;
+	
+	int translatePolicyMode = NO_TRANSLATION;
 	
 	List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
@@ -25,19 +44,42 @@ public class APIFilter {
 	public String getVhost() {
 		return vhost;
 	}
-	
-	
 
 	/**
 	 * Build an applicationAdapter based on the given configuration
 	 */
 	public static class Builder {
 		
+		public static enum Type {
+			/**
+			 * APIs are created with:</br> 
+			 * - includingQuotas</br>
+			 * - Methods translated to name</br>
+			 * - Policies have the external name</br>
+			 * - Client-Organizations and -Applications are initialized
+			 */
+			ACTUAL_API, 
+			DESIRED_API, 
+			CUSTOM
+		}
+		
+		String id;
 		String vhost;
 		String apiPath;
 		String queryStringVersion;
 		
-		String type;
+		Type type;
+		
+		int translateMethodMode = NO_TRANSLATION;
+		
+		boolean useBackendAPI = false;
+		
+		boolean includeOperations = false;
+		boolean includeQuotas = false;
+		boolean includeClientOrganizations = false;
+		boolean includeClientApplications = false;
+		
+		int translatePolicyMode = NO_TRANSLATION;
 		
 		List<NameValuePair> filters = new ArrayList<NameValuePair>();
 		
@@ -45,26 +87,64 @@ public class APIFilter {
 		 * @param config the config that is used what kind of adapter should be used
 		 */
 		public Builder() {
-			super();
+			this(Type.CUSTOM, false);
 		}
 
 		/**
 		 * Creates a ClientAppAdapter based on the provided configuration using all registered Adapters
 		 * @return a valid Adapter able to handle the config or null
 		 */
-		public Builder(String type) {
+		public Builder(Type type) {
+			this(type, false);
+		}
+		
+		/**
+		 * Creates a ClientAppAdapter based on the provided configuration using all registered Adapters
+		 * @return a valid Adapter able to handle the config or null
+		 */
+		public Builder(Type type, boolean useBackendAPI) {
 			super();
 			this.type = type;
+			this.useBackendAPI = useBackendAPI;
 		}
 		
 		public APIFilter build() {
+			initType();
 			APIFilter apiFilter = new APIFilter();
 			apiFilter.apiPath = this.apiPath;
 			apiFilter.queryStringVersion = this.queryStringVersion;
-			apiFilter.type = this.type;
 			apiFilter.vhost = this.vhost;
 			apiFilter.filters = this.filters;
+			apiFilter.id = this.id;
+			apiFilter.includeOperations = this.includeOperations;
+			apiFilter.includeQuotas = this.includeQuotas;
+			apiFilter.translateMethodMode = this.translateMethodMode;
+			apiFilter.translatePolicyMode = this.translatePolicyMode;
+			apiFilter.includeClientOrganizations = this.includeClientOrganizations;
+			apiFilter.includeClientApplications = this.includeClientApplications;
+			apiFilter.useBackendAPI = this.useBackendAPI;
 			return apiFilter;
+		}
+
+		private void initType() {
+			switch(this.type) {
+			case ACTUAL_API:
+				this.includeQuotas = true;
+				this.translateMethodMode = METHODS_AS_NAME;
+				this.translatePolicyMode = TO_EXTERNAL_POLICY_NAME;
+				this.includeClientOrganizations = true;
+				this.includeClientApplications = true;
+				break;
+			case DESIRED_API:
+				break;
+			default:
+				break;
+			}
+		}
+		
+		public Builder hasId(String id) {
+			this.id = id;
+			return this;
 		}
 
 		public Builder hasVHost(String vhost) {
@@ -84,6 +164,36 @@ public class APIFilter {
 		
 		public Builder useFilter(List<NameValuePair> filters) {
 			this.filters = filters;
+			return this;
+		}
+		
+		public Builder includeOperations(boolean includeOperations) {
+			this.includeOperations = includeOperations;
+			return this;
+		}
+		
+		public Builder includeQuotas(boolean includeQuotas) {
+			this.includeQuotas = includeQuotas;
+			return this;
+		}
+		
+		public Builder includeClientOrganizations(boolean includeClientOrganizations) {
+			this.includeClientOrganizations = includeClientOrganizations;
+			return this;
+		}
+		
+		public Builder includeClientApplications(boolean includeClientApplications) {
+			this.includeClientApplications = includeClientApplications;
+			return this;
+		}
+		
+		public Builder translatePolicies(int translatePolicyMode) {
+			this.translatePolicyMode = translatePolicyMode;
+			return this;
+		}
+		
+		public Builder translateMethods(int translateMethodMode) {
+			this.translateMethodMode = translateMethodMode;
 			return this;
 		}
 	}

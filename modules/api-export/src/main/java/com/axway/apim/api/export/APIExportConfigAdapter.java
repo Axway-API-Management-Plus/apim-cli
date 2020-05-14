@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
+import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
@@ -82,8 +84,8 @@ public class APIExportConfigAdapter {
 	private List<ExportAPI> getAPIsToExport() throws AppException {
 		List<ExportAPI> exportAPIList = new ArrayList<ExportAPI>();
 		if (!this.exportApiPath.contains("*")) { // Direct access with a specific API exposure path
-			JsonNode mgrAPI = APIAdapter.create(APIManagerAdapter.getInstance()).getAPI(
-					new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
+			API mgrAPI = APIAdapter.create(APIManagerAdapter.getInstance()).getAPI(
+					new APIFilter.Builder()
 					.hasApiPath(this.exportApiPath)
 					.hasVHost(exportVhost)
 					.build()
@@ -92,7 +94,7 @@ public class APIExportConfigAdapter {
 				ErrorState.getInstance().setError("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API, false);
 				throw new AppException("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API);
 			}
-			exportAPIList.add(getExportAPI(mgrAPI));
+			exportAPIList.add(new ExportAPI(mgrAPI));
 		} else if(APIManagerAdapter.hasAPIManagerVersion("7.7") // Wild-Card search on API-Manager >7.7 filtering directly
 				&& (this.exportApiPath.startsWith("*") || this.exportApiPath.endsWith("*"))) {
 			List<NameValuePair> filters = new ArrayList<NameValuePair>();
@@ -105,42 +107,41 @@ public class APIExportConfigAdapter {
 				LOG.info("Using wildcard pattern: '"+exportApiPath+"' to export APIs from API-Manager.");
 				filters.add(new BasicNameValuePair("value", exportApiPath.replace("*", "")));
 			}
-			List<JsonNode> foundAPIs = APIAdapter.create(APIManagerAdapter.getInstance()).getAPIs(
-					new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
+			List<API> foundAPIs = APIAdapter.create(APIManagerAdapter.getInstance()).getAPIs(
+					new APIFilter.Builder()
 					.hasVHost(exportVhost)
 					.useFilter(filters)
 					.build()
 			, false);
-			for(JsonNode mgrAPI : foundAPIs) {
-				exportAPIList.add(getExportAPI(mgrAPI));
+			for(API mgrAPI : foundAPIs) {
+				exportAPIList.add(new ExportAPI(mgrAPI));
 			}
 		} else { // Get all APIs and filter them out manually
 			Pattern pattern = Pattern.compile(exportApiPath.replace("*", ".*"));
-			List<JsonNode> foundAPIs = APIAdapter.create(APIManagerAdapter.getInstance()).getAPIs(
-					new APIFilter.Builder(APIManagerAdapter.TYPE_FRONT_END)
+			List<API> foundAPIs = APIAdapter.create(APIManagerAdapter.getInstance()).getAPIs(
+					new APIFilter.Builder()
 					.hasVHost(exportVhost)
 					.build()
 			, false); 
 			if(foundAPIs.size()>20) LOG.info("Loading actual API state from API-Manager. This may take a while. Please wait.\n");
-			for(JsonNode mgrAPI : foundAPIs) {
-				String apiPath = mgrAPI.get("path").asText();
-				Matcher matcher = pattern.matcher(apiPath);
+			for(API mgrAPI : foundAPIs) {
+				Matcher matcher = pattern.matcher(mgrAPI.getPath());
 				if(matcher.matches()) {
-					LOG.info("Adding API with path: '"+apiPath+"' based on requested path: '"+exportApiPath+"' to the export list.");
-					exportAPIList.add(getExportAPI(mgrAPI));
+					LOG.info("Adding API with path: '"+mgrAPI.getPath()+"' based on requested path: '"+exportApiPath+"' to the export list.");
+					exportAPIList.add(new ExportAPI(mgrAPI));
 				}
 			}			
 		}
 		return exportAPIList;
 	}
-	
+	/*
 	private ExportAPI getExportAPI(JsonNode mgrAPI) throws AppException {
 		IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate(), API.class);
 		handleCustomProperties(actualAPI);
 		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getInboundProfiles(), actualAPI, true);
 		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getOutboundProfiles(), actualAPI, true);
 		return new ExportAPI(actualAPI);
-	}
+	}*/
 
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {
 		String apiPath = getAPIExportFolder(exportAPI.getPath());
@@ -207,7 +208,7 @@ public class APIExportConfigAdapter {
 	
 	private String getVHost(ExportAPI exportAPI) throws AppException {
 		if(exportAPI.getVhost()!=null) return exportAPI.getVhost() + File.separator;
-		String orgVHost = apiManager.getOrg(exportAPI.getOrganizationId()).getVirtualHost();
+		String orgVHost = new APIManagerOrganizationAdapter().getOrg(new OrgFilter.Builder().hasId(exportAPI.getOrganizationId()).build()).getVirtualHost();
 		if(orgVHost!=null) return orgVHost+File.separator;
 		return "";
 	}

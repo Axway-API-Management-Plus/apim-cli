@@ -6,7 +6,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -16,10 +18,12 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
 import com.axway.apim.adapter.clientApps.jackson.JSONViews;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.APIKey;
@@ -43,11 +47,15 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIMgrAppsAdapter.class);
 
-	List<ClientApplication> apps = null;
+	Map<ClientAppFilter, String> apiManagerResponse = new HashMap<ClientAppFilter, String>();
+	
+	Map<String, String> subscribedAppAPIManagerResponse = new HashMap<String, String>();
 	
 	CommandParameters cmd  = CommandParameters.getInstance();
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
+	
+	APIManagerQuotaAdapter quotaAdapter = new APIManagerQuotaAdapter();
 
 	public APIMgrAppsAdapter() {}
 	
@@ -61,32 +69,107 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	 * Returns a list of applications.
 	 * @throws AppException if applications cannot be retrieved
 	 */
-	void readApplications(ClientAppFilter appFilter) throws AppException {
-		if(this.apps !=null) return;
+	private void readApplicationsFromAPIManager(ClientAppFilter appFilter) throws AppException {
+		if(this.apiManagerResponse !=null && this.apiManagerResponse.get(appFilter)!=null) return;
 		try {
 			URI uri = getApplicationsUri(appFilter);
 			LOG.info("Sending request to find existing applications: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null);
-			InputStream response = getRequest.execute().getEntity().getContent();
-			this.apps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
-			if(appFilter.isIncludeImage()) {
-				addImage(apps);
-			}
-			if(appFilter.isIncludeQuota()) {
-				APIManagerAdapter.getInstance().addExistingClientAppQuotas(apps);
-			}
-			if(appFilter.isIncludeCredentials()) {
-				addApplicationCredentials(apps);
-			}
+			
+			HttpResponse response = getRequest.execute();
+			this.apiManagerResponse.put(appFilter,EntityUtils.toString(response.getEntity(), "UTF-8"));
+			//this.apps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
 			
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
+	}
+	
+	@Override
+	public List<ClientApplication> getApplications(ClientAppFilter filter) throws AppException {
+		readApplicationsFromAPIManager(filter);
+		List<ClientApplication> apps;
+		try {
+			apps = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<ClientApplication>>(){});
+			if(filter.isIncludeImage()) {
+				addImage(apps);
+			}
+			if(filter.isIncludeQuota()) {
+				for(ClientApplication app : apps) {
+					quotaAdapter.getQuotaForAPI(app.getId(), null);
+				}
+			}
+			if(filter.isIncludeCredentials()) {
+				addApplicationCredentials(apps);
+			}
+		} catch (Exception e) {
+			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
 
+		return apps;
+	}
+	
+	@Override
+	public List<ClientApplication> getAllApplications() throws AppException {
+		return getApplications(new ClientAppFilter.Builder().build());
+	}
+	
+	public List<ClientApplication> getAppsSubscribedWithAPI(String apiId) throws AppException {
+		readAppsSubscribedFromAPIManager(apiId);
+		List<ClientApplication> subscribedApps;
+		try {
+			subscribedApps = mapper.readValue(this.subscribedAppAPIManagerResponse.get(apiId), new TypeReference<List<ClientApplication>>(){});
+		} catch (IOException e) {
+			LOG.error("Error cant load subscribes applications from API-Manager. Can't parse response: " + this.subscribedAppAPIManagerResponse.get(apiId));
+			throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+		return subscribedApps;
+	}
+	
+	private void readAppsSubscribedFromAPIManager(String apiId) throws AppException {
+		if(this.subscribedAppAPIManagerResponse.get(apiId) !=null) return;
+		
+		String response = null;
+		URI uri;
+		HttpResponse httpResponse = null;
+		if(!APIManagerAdapter.hasAPIManagerVersion("7.7")) {
+			throw new AppException("API-Manager: " + APIManagerAdapter.apiManagerVersion + " doesn't support /proxies/<apiId>/applications", ErrorCode.UNXPECTED_ERROR);
+		}
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/applications").build();
+			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
+			httpResponse = getRequest.execute();
+			response = EntityUtils.toString(httpResponse.getEntity());
+			subscribedAppAPIManagerResponse.put(apiId, response);
+			
+			
+		} catch (Exception e) {
+			LOG.error("Error cant load subscribes applications from API-Manager. Can't parse response: " + response);
+			throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		} finally {
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
+		}
+	}
+	
+	
+	
+	public ClientApplication getApplication(ClientAppFilter filter) throws AppException {
+		List<ClientApplication> apps = getApplications(filter);
+		return uniqueApplication(apps);
+	}
+	
+	private ClientApplication uniqueApplication(List<ClientApplication> apps) throws AppException {
+		if(apps.size()>1) {
+			throw new AppException("No unique application found", ErrorCode.UNKNOWN_API);
+		}
+		if(apps.size()==0) return null;
+		return apps.get(0);
 	}
 	
 	URI getApplicationsUri(ClientAppFilter appFilter) throws URISyntaxException {
-		
 		URI uri;
 		List<NameValuePair> usedFilters = new ArrayList<>();
 		String searchForAppId = "";
@@ -132,14 +215,9 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			app.setImage(image);
 		}
 	}
-
-	public ClientApplication getApplication(ClientApplication application) throws AppException {
-		readApplications(new ClientAppFilter.Builder().hasName(application.getName()).build());
-		return uniqueApplication(application.getName());
-	}
 	
 	public ClientApplication createApplication(ClientApplication app) throws AppException {
-		getApplication(app);
+		getApplication(new ClientAppFilter.Builder().hasName(app.getName()).build());
 		HttpResponse httpResponse = null;
 		ClientApplication createdApp;
 		try {
@@ -176,30 +254,6 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		} catch (Exception e) {
 			throw new AppException("Error creating application", ErrorCode.CANT_CREATE_API_PROXY, e);
 		}
-	}
-	
-	private ClientApplication uniqueApplication(String applicationName) throws AppException {
-		if(this.apps.size()>1) {
-			throw new AppException("No unique application found", ErrorCode.UNKNOWN_API);
-		}
-		if(this.apps.size()==0) return null;
-		return this.apps.get(0);
-	}
-	
-	@Override
-	public List<ClientApplication> getApplications() throws AppException {
-		return this.getApplications(new ClientAppFilter.Builder().build());
-	}
-
-	public List<ClientApplication> getApplications(String requestedApplicationId) throws AppException {
-		readApplications(new ClientAppFilter.Builder().hasId(requestedApplicationId).build());
-		return apps;
-	}
-	
-	@Override
-	public List<ClientApplication> getApplications(ClientAppFilter filter) throws AppException {
-		readApplications(filter);
-		return apps;
 	}
 	
 	private void saveImage(ClientApplication app) throws URISyntaxException, AppException {
@@ -294,5 +348,13 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 				((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) { }
 		}
+	}
+	
+	public void setTestApiManagerResponse(ClientAppFilter filter, String apiManagerResponse) {
+		this.apiManagerResponse.put(filter, apiManagerResponse);
+	}
+
+	void setTestSubscribedAppAPIManagerResponse(Map<String, String> subscribedAppAPIManagerResponse) {
+		this.subscribedAppAPIManagerResponse = subscribedAppAPIManagerResponse;
 	}
 }

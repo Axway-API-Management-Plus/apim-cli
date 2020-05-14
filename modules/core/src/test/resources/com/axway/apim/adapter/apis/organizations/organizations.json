@@ -1,0 +1,20 @@
+[
+    {
+        "id": "d9ea6280-8811-4baf-8b5b-011a97142840",
+        "name": "API Development 3457",
+        "description": "Test Org 3457",
+        "email": null,
+        "image": null,
+        "restricted": false,
+        "virtualHost": null,
+        "phone": null,
+        "enabled": true,
+        "development": true,
+        "dn": "o=API Development 3457,ou=organizations,ou=APIPortal",
+        "createdOn": 1588742757436,
+        "startTrialDate": null,
+        "endTrialDate": null,
+        "trialDuration": null,
+        "isTrial": null
+    }
+]

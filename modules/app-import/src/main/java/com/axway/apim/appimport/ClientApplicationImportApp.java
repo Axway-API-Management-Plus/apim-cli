@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
+import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appimport.lib.AppImportCLIOptions;
 import com.axway.apim.appimport.lib.AppImportParams;
@@ -59,11 +60,11 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the application
 			ClientAppAdapter desiredAppsAdapter = ClientAppAdapter.create(params.getValue("config"));
-			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
+			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications(new ClientAppFilter.Builder().build());
 			ClientAppAdapter apimClientAppAdapter =  ClientAppAdapter.create(APIManagerAdapter.getInstance());
 			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter, apimClientAppAdapter);
 			for(ClientApplication desiredApp : desiredApps) {
-				ClientApplication actualApp = apimClientAppAdapter.getApplication(desiredApp);
+				ClientApplication actualApp = apimClientAppAdapter.getApplication(new ClientAppFilter.Builder().hasId(desiredApp.getId()).build());
 				importManager.setDesiredApp(desiredApp);
 				importManager.setActualApp(actualApp);
 				importManager.replicate();

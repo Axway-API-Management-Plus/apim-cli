@@ -53,6 +53,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
+import com.axway.apim.adapter.apis.OrgFilter;
+import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
+import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
@@ -112,6 +116,10 @@ public class APIImportConfigAdapter {
 	private boolean usingOrgAdmin;
 	
 	private ErrorState error = ErrorState.getInstance();
+	
+	APIManagerOrganizationAdapter orgsAdapter = new APIManagerOrganizationAdapter();
+	APIMgrAppsAdapter appsAdapter = new APIMgrAppsAdapter();
+	
 
 	/**
 	 * Constructor just for testing. Don't use it!
@@ -242,18 +250,15 @@ public class APIImportConfigAdapter {
 	 * Translating the methodNames to operationIds already during import is required for 
 	 * the comparison between the desired and actual API.
 	 * @param desiredAPI the configured desired API
-	 * @param actualAPI a potinetially existing actual API
+	 * @param actualAPI a potentially existing actual API
 	 * @return the desired API containing operationId in Inbound- and Outbound-Profiles
 	 * @throws AppException when something goes wrong
 	 */
 	public IAPI completeDesiredAPI(IAPI desiredAPI, IAPI actualAPI) throws AppException {
 		if(!actualAPI.isValid()) return desiredAPI;
-		APIManagerAdapter mgrAdpater = APIManagerAdapter.getInstance();
 		// We need to safe the original methodNames, as they are required during API-Re-Creation
 		((DesiredAPI)desiredAPI).setOriginalInboundProfiles(desiredAPI.getInboundProfiles());
 		((DesiredAPI)desiredAPI).setOriginalOutboundProfiles(desiredAPI.getOutboundProfiles());
-		mgrAdpater.translateMethodIds(desiredAPI.getInboundProfiles(), actualAPI);
-		mgrAdpater.translateMethodIds(desiredAPI.getOutboundProfiles(), actualAPI);
 		return desiredAPI;
 	}
 	
@@ -273,7 +278,7 @@ public class APIImportConfigAdapter {
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
 			apiConfig.setOrganizationId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
 		} else {
-			String desiredOrgId = APIManagerAdapter.getInstance().getOrgId(apiConfig.getOrganization(), true);
+			String desiredOrgId = orgsAdapter.getOrg(new OrgFilter.Builder().hasName(apiConfig.getOrganization()).build()).getId();
 			if(desiredOrgId==null) {
 				error.setError("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION, false);
 				throw new AppException("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
@@ -309,7 +314,7 @@ public class APIImportConfigAdapter {
 			return;
 		}
 		List<String> allDesiredOrgs = new ArrayList<String>();
-		List<Organization> allOrgs = APIManagerAdapter.getInstance().getAllOrgs();
+		List<Organization> allOrgs = orgsAdapter.getAllOrgs();
 		if(apiConfig.getClientOrganizations().contains("ALL")) {
 			for(Organization org : allOrgs) {
 				allDesiredOrgs.add(org.getName());
@@ -422,7 +427,7 @@ public class APIImportConfigAdapter {
 			while(it.hasNext()) {
 				app = it.next();
 				if(app.getName()!=null) {
-					loadedApp = APIManagerAdapter.getInstance().getApplication(app.getName());
+					loadedApp = appsAdapter.getApplication(new ClientAppFilter.Builder().hasName(app.getName()).build());
 					if(loadedApp==null) {
 						LOG.warn("Unknown application with name: '" + app.getName() + "' configured. Ignoring this application.");
 						invalidClientApps = invalidClientApps==null ? app.getName() : invalidClientApps + ", "+app.getName();
@@ -464,7 +469,7 @@ public class APIImportConfigAdapter {
 	
 	private static ClientApplication getAppForCredential(String credential, String type) throws AppException {
 		LOG.debug("Searching application with configured credential (Type: "+type+"): '"+credential+"'");
-		ClientApplication app = APIManagerAdapter.getInstance().getAppIdForCredential(credential, type);
+		ClientApplication app =  APIManagerAdapter.getInstance().getAppIdForCredential(credential, type);
 		if(app==null) {
 			LOG.warn("Unknown application with ("+type+"): '" + credential + "' configured. Ignoring this application.");
 			return null;

@@ -31,6 +31,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
@@ -123,7 +124,10 @@ public class APIManagerAdapter {
 	
 	private APIManagerAdapter() throws AppException {
 		super();
-		if(TestIndicator.getInstance().isTestRunning()) return; // No need to initialize just for Unit-Tests
+		if(TestIndicator.getInstance().isTestRunning()) {
+			this.hasAdminAccount = true; // For unit tests we have an admin account
+			return; // No need to initialize just for Unit-Tests
+		}
 		Transaction transaction = Transaction.getInstance();
 		transaction.beginTransaction();
 		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the same JVM)
@@ -316,8 +320,8 @@ public class APIManagerAdapter {
 	 * @param apiType the class type the API representation is returned
 	 * @throws AppException when the API-Manager API-State can't be created
 	 */
-	public <T> API getAPIManagerAPI(JsonNode jsonConfiguration, IAPI desiredAPI, Class<T> apiType) throws AppException {
-		if(jsonConfiguration == null) {
+	public <T> API getAPIManagerAPI(T api, IAPI desiredAPI, Class<T> apiType) throws AppException {
+		if(api == null) {
 			API apiManagerAPI = new API();
 			apiManagerAPI.setValid(false);
 			return apiManagerAPI;
@@ -325,8 +329,8 @@ public class APIManagerAdapter {
 		
 		T apiManagerApi;
 		try {
-			apiManagerApi = mapper.readValue(jsonConfiguration.toString(), apiType);
-			((API)apiManagerApi).setApiConfiguration(jsonConfiguration);
+			apiManagerApi = api;
+			//((API)apiManagerApi).setApiConfiguration(jsonConfiguration);
 			((API)apiManagerApi).setAPIDefinition(getOriginalAPIDefinitionFromAPIM(((API)apiManagerApi).getApiId()));
 			if(((API)apiManagerApi).getImage()!=null) {
 				URI uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+((API)apiManagerApi).getId()+"/image").build();
@@ -335,7 +339,7 @@ public class APIManagerAdapter {
 			((API)apiManagerApi).setValid(true);
 			// As the API-Manager REST doesn't provide information about Custom-Properties, we have to setup 
 			// the Custom-Properties based on the Import API.
-			if(desiredAPI!=null && desiredAPI.getCustomProperties() != null) {
+			/*if(desiredAPI!=null && desiredAPI.getCustomProperties() != null) {
 				Map<String, String> customProperties = new LinkedHashMap<String, String>();
 				Iterator<String> it = desiredAPI.getCustomProperties().keySet().iterator();
 				while(it.hasNext()) {
@@ -345,39 +349,13 @@ public class APIManagerAdapter {
 					customProperties.put(customPropKey, customPropValue);
 				}
 				((API)apiManagerApi).setCustomProperties(customProperties);
-			}
-			addQuotaConfiguration((IAPI)apiManagerApi, desiredAPI);
-			addClientOrganizations((IAPI)apiManagerApi, desiredAPI);
-			addClientApplications((IAPI)apiManagerApi, desiredAPI);
-			addOrgName((IAPI)apiManagerApi, desiredAPI);
-			addExistingClientAppQuotas(((IAPI)apiManagerApi).getApplications());
+			}*/
 			return (API) apiManagerApi;
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-State.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
-	
-	private void addClientOrganizations(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
-		if(!hasAdminAccount) return;
-		if(desiredAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
-			LOG.info("Ignoring Client-Organizations, as desired API-State is Unpublished!");
-			return;
-		}
-		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null 
-				&& CommandParameters.getInstance().getClientOrgsMode().equals(CommandParameters.MODE_REPLACE)) return;
-		List<String> grantedOrgs = new ArrayList<String>();
-		List<Organization> allOrgs = getAllOrgs();
-		for(Organization org : allOrgs) {
-			List<APIAccess> orgAPIAccess = getAPIAccess(org.getId(), "organizations");
-			for(APIAccess access : orgAPIAccess) {
-				if(access.getApiId().equals(apiManagerApi.getId())) {
-					grantedOrgs.add(org.getName());
-				}
-			}
-		}
-		apiManagerApi.setClientOrganizations(grantedOrgs);
-	}
-	
+	/*
 	public void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> apps = null;
@@ -401,170 +379,7 @@ public class APIManagerAdapter {
 			}
 		}
 		apiManagerApi.setApplications(existingClientApps);
-	}
-	
-	private void addOrgName(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
-		if(apiManagerApi.getOrganization()!=null) return;
-		if(desiredAPI!=null) {
-			// Is desiredOrgId is the same as the actual org just take over the desired Org-Name
-			if(desiredAPI.getOrganizationId().equals(apiManagerApi.getOrganizationId())) {
-				apiManagerApi.setOrganization(desiredAPI.getOrganization());
-			} else {
-				String actualOrgName = getOrg(apiManagerApi.getOrganizationId()).getName();
-				apiManagerApi.setOrganization(actualOrgName);
-			}
-		}
-	}
-	
-	public void addExistingClientAppQuotas(List<ClientApplication> existingClientApps) throws AppException {
-		if(existingClientApps==null || existingClientApps.size()==0) return; // No apps subscribed to this APIs
-		for(ClientApplication app : existingClientApps) {
-			APIQuota appQuota = getQuotaFromAPIManager(app.getId());
-			app.setAppQuota(appQuota);
-		}
-	}
-	
-	public String getMethodNameForId(String apiId, String methodId) throws AppException {
-		String response = null;
-		URI uri;
-		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations/"+methodId).build();
-			RestAPICall getRequest = new GETRequest(uri, null);
-			HttpResponse httpResponse = getRequest.execute();
-			response = EntityUtils.toString(httpResponse.getEntity());
-			EntityUtils.consume(httpResponse.getEntity());
-			LOG.trace("Response: " + response);
-			JsonNode operationDetails = mapper.readTree(response);
-			if(operationDetails.size()==0) {
-				LOG.warn("No operation with ID: "+methodId+" found for API with id: " + apiId);
-				return null;
-			}
-			return operationDetails.get("name").asText();
-		} catch (Exception e) {
-			LOG.error("Can't load name for operation with id: "+methodId+" for API: "+apiId+". Can't parse response: " + response);
-			throw new AppException("Can't load name for operation with id: "+methodId+" for API: "+apiId, ErrorCode.API_MANAGER_COMMUNICATION, e);
-		}
-	}
-	
-	public List<APIMethod> getAllMethodsForAPI(String apiId) throws AppException {
-		String response = null;
-		URI uri;
-		List<APIMethod> apiMethods = new ArrayList<APIMethod>();
-		HttpResponse httpResponse = null;
-		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
-			httpResponse = getRequest.execute();
-			response = EntityUtils.toString(httpResponse.getEntity());
-			apiMethods = mapper.readValue(response, new TypeReference<List<APIMethod>>(){});
-			return apiMethods;
-		} catch (Exception e) {
-			LOG.error("Error cant load API-Methods for API: '"+apiId+"' from API-Manager. Can't parse response: " + response);
-			throw new AppException("Error cant load API-Methods for API: '"+apiId+"' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
-	public String getMethodIdPerName(String apiId, String methodName) throws AppException {
-		List<APIMethod> apiMethods = getAllMethodsForAPI(apiId);
-		if(apiMethods.size()==0) {
-			LOG.warn("No operations found for API with id: " + apiId);
-			return null;
-		}
-		for(APIMethod method : apiMethods) {
-			String operationName = method.getName();
-			if(operationName.equals(methodName)) {
-				return method.getId();
-			}
-		}
-		LOG.warn("No operation found with name: '"+methodName+"' for API: '"+apiId+"'");
-		return null;
-	}
-	
-	public String getOrgId(String orgName) throws AppException {
-		return getOrgId(orgName, false);
-	}
-	/**
-	 * The actual Org-ID based on the OrgName. Lazy implementation.
-	 * @param orgName the name of the organizations
-	 * @param devOrgsOnly limit the query to organization having the development flag enabled
-	 * @return the id of the organization
-	 * @throws AppException if allOrgs can't be read from the API-Manager
-	 */
-	public String getOrgId(String orgName, boolean devOrgsOnly) throws AppException {
-		if(!this.hasAdminAccount) return null;
-		if(allOrgs == null) getAllOrgs();
-		for(Organization org : allOrgs) {
-			if(devOrgsOnly && org.getDevelopment().equals("false")) continue; // Ignore non-dev orgs
-			if(orgName.equals(org.getName())) return org.getId();
-		}
-		LOG.error("Requested OrgId for unknown orgName: " + orgName);
-		return null;
-	}
-	
-	/**
-	 * The actual Org-ID based on the OrgName. Lazy implementation.
-	 * @param orgId the id of the organizations you want the name for
-	 * @return the id of the organization
-	 * @throws AppException if allOrgs can't be read from the API-Manager
-	 */
-	public Organization getOrg(String orgId) throws AppException {
-		if(allOrgs == null) getAllOrgs();
-		for(Organization org : allOrgs) {
-			if(orgId.equals(org.getId())) return org;
-		}
-		LOG.error("Requested OrgName for unknown orgId: " + orgId);
-		return null;
-	}
-	
-	/**
-	 * The actual App-ID based on the AppName. Lazy implementation.
-	 * @param appName the name of the application
-	 * @return the application object
-	 * @throws AppException if allApps can't be read from API-Manager 
-	 */
-	public ClientApplication getApplication(String appName) throws AppException {
-		List<ClientApplication> foundApps = new ArrayList<ClientApplication>();
-		if(allApps==null) getAllApps();
-		String orgId = null;
-		if(appName.contains("|")) {
-			orgId = getOrgId(appName.substring(appName.indexOf("|")+1));
-			appName = appName.substring(0, appName.indexOf("|"));
-		}
-		for(ClientApplication app : allApps) {
-			if(appName.equals(app.getName())) {
-				if(orgId!=null && !orgId.equals(app.getOrganizationId())) continue;
-				foundApps.add(app);
-			}
-		}
-		if(foundApps.size()==0) {
-			LOG.error("Requested AppId for unknown appName: " + appName);
-			return null;
-		} else if (foundApps.size()>1) {
-			ErrorState.getInstance().setError("The given application-name: '"+appName+"' doesn't resolve to a unique application. "
-					+ "You may add the organization name using format: 'appname|orgname' or use one of the application credentials.", ErrorCode.APP_NAME_IS_NOT_UNIQUE, false);
-			throw new AppException("The given application-name: '"+appName+"' doesn't resolve to a unique application. ", ErrorCode.APP_NAME_IS_NOT_UNIQUE);
-		}
-		LOG.debug("Configured app with name: '"+appName+"' found. ID: '"+foundApps.get(0)+"'");
-		return foundApps.get(0);
-	}
-	
-	/**
-	 * The actual App-ID based on the AppName. Lazy implementation.
-	 * @param appId unique ID for the application
-	 * @return the id of the organization
-	 */
-	public static ClientApplication getAppForId(String appId) {
-		for(ClientApplication app : allApps) {
-			if(appId.equals(app.getId())) return app;
-		}
-		LOG.error("Requested Application for unknown appId: "+appId+" not found.");
-		return null;
-	}
+	}*/
 	
 	/**
 	 * The actual App-ID based on the AppName. Lazy implementation.
@@ -579,7 +394,7 @@ public class APIManagerAdapter {
 			LOG.info("Found existing application (in cache): '"+app.getName()+"' based on credential (Type: '"+type+"'): '"+credential+"'");
 			return app;
 		}
-		getAllApps(); // Make sure, we loaded all apps before!
+		new APIMgrAppsAdapter().getAllApplications(); // Make sure, we loaded all apps before!
 		LOG.debug("Searching credential (Type: "+type+"): '"+credential+"' in: " + allApps.size() + " apps.");
 		Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
 		HttpResponse httpResponse = null;
@@ -633,74 +448,6 @@ public class APIManagerAdapter {
 		return null;
 	}
 	
-	
-	
-	private void addQuotaConfiguration(IAPI api, IAPI desiredAPI) throws AppException {
-		// No need to load quota, if not given in the desired API
-		if(desiredAPI!=null && (desiredAPI.getApplicationQuota() == null && desiredAPI.getSystemQuota() == null)) return;
-		if(!this.hasAdminAccount) return; // Can't load quota without having an Admin-Account
-		try {
-			applicationQuotaConfig = getQuotaFromAPIManager(APPLICATION_DEFAULT_QUOTA); // Get the Application-Default-Quota
-			sytemQuotaConfig = getQuotaFromAPIManager(SYSTEM_API_QUOTA); // Get the System-Default-Quota
-			api.setApplicationQuota(getAPIQuota(applicationQuotaConfig, api.getId()));
-			api.setSystemQuota(getAPIQuota(sytemQuotaConfig, api.getId()));
-		} catch (AppException e) {
-			LOG.error("Application-Default quota response: '"+applicationQuotaConfig+"'");
-			LOG.error("System-Default quota response: '"+sytemQuotaConfig+"'");
-			throw e;
-		}
-	}
-	
-	private APIQuota getQuotaFromAPIManager(String identifier) throws AppException {
-		if(!hasAdminAccount()) return null;
-		URI uri;
-		HttpResponse httpResponse = null;
-		try {
-			if(identifier.equals(APPLICATION_DEFAULT_QUOTA) || identifier.equals(SYSTEM_API_QUOTA)) {
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+identifier).build();
-			} else {
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+identifier+"/quota/").build();
-			}
-			RestAPICall getRequest = new GETRequest(uri, null, true);
-			httpResponse = getRequest.execute();
-			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if( statusCode == 403){
-				throw new AppException("Can't get API-Manager Quota-Configuration, User should have API administrator role", ErrorCode.API_MANAGER_COMMUNICATION);
-			}
-			if( statusCode != 200){
-				throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.API_MANAGER_COMMUNICATION);
-			}
-			String config = IOUtils.toString(httpResponse.getEntity().getContent(), "UTF-8");
-			APIQuota quotaConfig = mapper.readValue(config, APIQuota.class);
-			return quotaConfig;
-		} catch (URISyntaxException | UnsupportedOperationException | IOException e) {
-			throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
-	private static APIQuota getAPIQuota(APIQuota quotaConfig, String apiId) throws AppException {
-		List<QuotaRestriction> apiRestrictions = new ArrayList<QuotaRestriction>();
-		try {
-			for(QuotaRestriction restriction : quotaConfig.getRestrictions()) {
-				if(restriction.getApi().equals(apiId)) {
-					apiRestrictions.add(restriction);
-				}
-			}
-			if(apiRestrictions.size()==0) return null;
-			APIQuota apiQuota = new APIQuota();
-			apiQuota.setDescription(quotaConfig.getDescription());
-			apiQuota.setName(quotaConfig.getName());
-			apiQuota.setRestrictions(apiRestrictions);
-			return apiQuota;
-		} catch (Exception e) {
-			throw new AppException("Can't parse quota from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		}
-	}
 	
 	private static APISpecification getOriginalAPIDefinitionFromAPIM(String backendApiID) throws AppException {
 		URI uri;
@@ -793,176 +540,6 @@ public class APIManagerAdapter {
 		} catch (Exception e) {
 			LOG.error("Error AppInfo from API-Manager. Can't parse response: " + managerConfig);
 			throw new AppException("Can't get "+configField+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
-	public static List<APIAccess> getAPIAccess(String id, String type) throws AppException {
-		List<APIAccess> allApiAccess = new ArrayList<APIAccess>();
-		String response = null;
-		URI uri;
-		HttpResponse httpResponse = null;
-		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+type+"/"+id+"/apis").build();
-			RestAPICall getRequest = new GETRequest(uri, null, hasAdminAccount());
-			httpResponse = getRequest.execute();
-			response = EntityUtils.toString(httpResponse.getEntity());
-			allApiAccess = mapper.readValue(response, new TypeReference<List<APIAccess>>(){});
-			return allApiAccess;
-		} catch (Exception e) {
-			LOG.error("Error cant load API-Access for "+type+" from API-Manager. Can't parse response: " + response);
-			throw new AppException("API-Access for "+type+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
-	private List<ClientApplication> getSubscribedApps(String apiId) throws AppException {
-		String response = null;
-		URI uri;
-		HttpResponse httpResponse = null;
-		if(!APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-			throw new AppException("API-Manager: " + apiManagerVersion + " doesn't support /proxies/<apiId>/applications", ErrorCode.UNXPECTED_ERROR);
-		}
-		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/applications").build();
-			RestAPICall getRequest = new GETRequest(uri, null, hasAdminAccount);
-			httpResponse = getRequest.execute();
-			response = EntityUtils.toString(httpResponse.getEntity());
-			List<ClientApplication> subscribedApps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
-			return subscribedApps;
-		} catch (Exception e) {
-			LOG.error("Error cant load subscribes applications from API-Manager. Can't parse response: " + response);
-			throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
-	public List<Organization> getAllOrgs() throws AppException {
-		if(!hasAdminAccount) {
-			LOG.error("Using OrgAdmin only to load all organizations.");
-		}
-		if(APIManagerAdapter.allOrgs!=null) {
-			return APIManagerAdapter.allOrgs;
-		}
-		allOrgs = new ArrayList<Organization>();
-		String response = null;
-		URI uri;
-		HttpResponse httpResponse = null;
-		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations").build();
-			RestAPICall getRequest = new GETRequest(uri, null, hasAdminAccount);
-			httpResponse = getRequest.execute();
-			response = EntityUtils.toString(httpResponse.getEntity());
-			allOrgs = mapper.readValue(response, new TypeReference<List<Organization>>(){});
-			return allOrgs;
-		} catch (Exception e) {
-			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + response);
-			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
-	public List<IAPI> getAllAPIs() throws AppException {
-		if(!hasAdminAccount) {
-			LOG.error("Cant load all APIs without an Admin-Account.");
-			return null;
-		}
-		if(APIManagerAdapter.allAPIs!=null) {
-			return APIManagerAdapter.allAPIs;
-		}
-		allAPIs = new ArrayList<IAPI>();
-		String response = null;
-		URI uri;
-		HttpResponse httpResponse = null;
-		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies").build();
-			RestAPICall getRequest = new GETRequest(uri, null, true);
-			httpResponse = getRequest.execute();
-			response = EntityUtils.toString(httpResponse.getEntity());
-			allAPIs = mapper.readValue(response, new TypeReference<List<API>>(){});
-			return allAPIs;
-		} catch (Exception e) {
-			LOG.error("Error cant read all APIs from API-Manager. Can't parse response: " + response);
-			throw new AppException("Can't read all APIs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
-	public List<ClientApplication> getAllApps() throws AppException {
-		if(!hasAdminAccount) {
-			LOG.trace("Using OrgAdmin to load all applications.");
-		}
-		if(APIManagerAdapter.allApps!=null) {
-			LOG.trace("Not reloading existing apps from API-Manager. Number of apps: " + APIManagerAdapter.allApps.size());
-			return APIManagerAdapter.allApps;
-		}
-		LOG.debug("Loading existing apps from API-Manager.");
-		allApps = new ArrayList<ClientApplication>();
-		String response = null;
-		URI uri;
-		HttpResponse httpResponse = null;
-		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications").build();
-			RestAPICall getRequest = new GETRequest(uri, null, hasAdminAccount);
-			httpResponse = getRequest.execute();
-			response = EntityUtils.toString(httpResponse.getEntity());
-			allApps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
-			LOG.debug("Loaded: " + allApps.size() + " apps from API-Manager.");
-			return allApps;
-		} catch (Exception e) {
-			LOG.error("Error cant read all applications from API-Manager. Can't parse response: " + response);
-			throw new AppException("Can't read all applications from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
-	public void setAllApps(List<ClientApplication> allApps) throws AppException {
-		APIManagerAdapter.allApps = allApps;
-	}
-	
-	public static List<APIAccess> getOrgsApiAccess(String orgId, boolean forceReload) throws AppException {
-		if(!forceReload && orgsApiAccess.containsKey(orgId)) {
-			return orgsApiAccess.get(orgId);
-		}
-		String response = null;
-		URI uri;
-		List<APIAccess> apiAccess;
-		HttpResponse httpResponse = null;
-		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations/"+orgId+"/apis").build();
-			RestAPICall getRequest = new GETRequest(uri, null, true);
-			httpResponse = getRequest.execute();
-			response = EntityUtils.toString(httpResponse.getEntity());
-			apiAccess = mapper.readValue(response, new TypeReference<List<APIAccess>>(){});
-			orgsApiAccess.put(orgId, apiAccess);
-			return apiAccess;
-		} catch (Exception e) {
-			LOG.error("Error cant read API-Access for org: "+orgId+" from API-Manager. Can't parse response: " + response);
-			throw new AppException("Error cant read API-Access for org: "+orgId+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 
@@ -1076,49 +653,6 @@ public class APIManagerAdapter {
 			return jsonResponse;
 		} catch (Exception e) {
 			throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		}
-	}
-	
-	public <profile> void translateMethodIds(Map<String, profile> profiles, IAPI actualAPI) throws AppException {
-		translateMethodIds(profiles, actualAPI, false);
-	}
-	
-	public <profile> void translateMethodIds(Map<String, profile> profiles, IAPI actualAPI, boolean toMethodnames) throws AppException {
-		Map<String, profile> updatedEntries = new LinkedHashMap<String, profile>();
-		if(profiles!=null) {
-			List<APIMethod> methods = null;
-			Iterator<String> keys = profiles.keySet().iterator();
-			while(keys.hasNext()) {
-				String key = keys.next();
-				if(key.equals("_default")) continue;
-				if(methods==null) methods = getAllMethodsForAPI(actualAPI.getId());
-				for(APIMethod method : methods) {
-					if(toMethodnames) {
-						if(method.getId().equals(key)) { // Look for the methodId
-							profile value = profiles.get(key);
-							if(value instanceof OutboundProfile) {
-								((OutboundProfile)value).setApiMethodId(method.getName()); // Put the name as the ID!
-								((OutboundProfile)value).setApiId(method.getApiId());
-							}
-							updatedEntries.put(method.getName(), value);
-							keys.remove();
-							break;
-						}						
-					} else {
-						if(method.getName().equals(key)) {
-							profile value = profiles.get(key);
-							if(value instanceof OutboundProfile) {
-								((OutboundProfile)value).setApiMethodId(method.getApiMethodId());
-								((OutboundProfile)value).setApiId(method.getApiId());
-							}
-							updatedEntries.put(method.getId(), profiles.get(key));
-							keys.remove();
-							break;
-						}
-					}
-				}
-			}
-			profiles.putAll(updatedEntries);
 		}
 	}
 

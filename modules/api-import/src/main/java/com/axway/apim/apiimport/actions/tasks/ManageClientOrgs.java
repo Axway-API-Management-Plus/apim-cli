@@ -12,7 +12,9 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
-import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
+import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.APIAccess;
@@ -33,6 +35,9 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 	private static String MODE					= "MODE";
 	private static String MODE_GRANT_ACCESS		= "MODE_GRANT_ACCESS";
 	private static String MODE_REMOVE_ACCESS	= "MODE_REMOVE_ACCESS";
+	
+	APIManagerOrganizationAdapter orgsAdapter = new APIManagerOrganizationAdapter();
+	APIManagerAPIAccessAdapter accessAdapter = new APIManagerAPIAccessAdapter();
 
 	public ManageClientOrgs(IAPI desiredState, IAPI actualState) {
 		super(desiredState, actualState);
@@ -86,7 +91,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		} else {
 			formBody = "action=orgs&apiId="+apiId;
 			for(String orgName : grantAccessToOrgs) {
-				formBody += "&grantOrgId="+APIManagerAdapter.getInstance().getOrgId(orgName);
+				formBody += "&grantOrgId="+orgsAdapter.getOrgId(orgName);
 			}
 			Transaction.getInstance().put("orgName", grantAccessToOrgs);
 		}
@@ -112,9 +117,9 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		Transaction.getInstance().put(MODE, MODE_REMOVE_ACCESS);
 		RestAPICall apiCall;
 		for(String orgName : removingActualOrgs) {
-			String orgId = APIManagerAdapter.getInstance().getOrgId(orgName);
+			String orgId = orgsAdapter.getOrgId(orgName);
 			Transaction.getInstance().put("orgName", orgName);
-			List<APIAccess> orgsApis = APIManagerAdapter.getOrgsApiAccess(orgId, false);
+			List<APIAccess> orgsApis = accessAdapter.getAPIAccess(orgId, Type.organizations);
 			for(APIAccess apiAccess : orgsApis) {
 				if(apiAccess.getApiId().equals(apiId)) {
 					try {
@@ -162,15 +167,15 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 		return null;
 	}
 	
-	private static List<String> getMissingOrgs(List<String> orgs, List<String> referenceOrgs) throws AppException {
+	private List<String> getMissingOrgs(List<String> orgs, List<String> referenceOrgs) throws AppException {
 		List<String> missingOrgs = new ArrayList<String>();
 		if(orgs==null || referenceOrgs ==null) return missingOrgs;
 		for(String orgName : orgs) {
 			if(referenceOrgs.contains(orgName)) {
 				continue;
 			}
-			if(APIManagerAdapter.getInstance().getOrgId(orgName)==null) {
-				LOG.warn("Configured organizations: " + APIManagerAdapter.getInstance().getAllOrgs());
+			if(orgsAdapter.getOrgId(orgName)==null) {
+				LOG.warn("Configured organizations: " + orgsAdapter.getAllOrgs());
 				ErrorState.getInstance().setError("Unknown Org-Name: '" + orgName + "'", ErrorCode.UNKNOWN_ORGANIZATION, false);
 				throw new AppException("Unknown Org-Name: '" + orgName + "'", ErrorCode.UNKNOWN_ORGANIZATION);
 			}

@@ -6,16 +6,18 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
+import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.definition.APISpecification;
-import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
 import com.axway.apim.api.model.DeviceType;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.SecurityDevice;
@@ -89,10 +91,10 @@ public class ExportAPI {
 		while(it.hasNext()) {
 			OutboundProfile profile = it.next();
 			profile.setApiId(null);
-			if(profile.getRequestPolicy()!=null) profile.setRequestPolicy(getExternalPolicyName(profile.getRequestPolicy()), false);
-			if(profile.getResponsePolicy()!=null) profile.setResponsePolicy(getExternalPolicyName(profile.getResponsePolicy()), false);
-			if(profile.getRoutePolicy()!=null) profile.setRoutePolicy(getExternalPolicyName(profile.getRoutePolicy()), false);
-			if(profile.getFaultHandlerPolicy()!=null) profile.setFaultHandlerPolicy(getExternalPolicyName(profile.getFaultHandlerPolicy()), false);
+			if(profile.getRequestPolicy()!=null) profile.setRequestPolicy(getExternalPolicyName(profile.getRequestPolicy()));
+			if(profile.getResponsePolicy()!=null) profile.setResponsePolicy(getExternalPolicyName(profile.getResponsePolicy()));
+			if(profile.getRoutePolicy()!=null) profile.setRoutePolicy(getExternalPolicyName(profile.getRoutePolicy()));
+			if(profile.getFaultHandlerPolicy()!=null) profile.setFaultHandlerPolicy(getExternalPolicyName(profile.getFaultHandlerPolicy()));
 		}
 		return this.actualAPIProxy.getOutboundProfiles();
 	}
@@ -212,7 +214,7 @@ public class ExportAPI {
 		String orgId = null;
 		try {
 			orgId = getOrganizationId();
-			return APIManagerAdapter.getInstance().getOrg(orgId).getName();
+			return new APIManagerOrganizationAdapter().getOrg(new OrgFilter.Builder().hasId(orgId).build()).getName();
 		} catch (Exception e) {
 			throw new RuntimeException("Can't read orgName for orgId: '"+orgId+"'");
 		}

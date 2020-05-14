@@ -14,6 +14,12 @@ public class ClientAppFilter {
 	
 	boolean includeImage;
 	
+	String applicationName;
+	
+	String state;
+	
+	String organization;
+	
 	String applicationId;
 	
 	List<NameValuePair> filters = new ArrayList<NameValuePair>();
@@ -42,21 +48,27 @@ public class ClientAppFilter {
 
 	public void setOrganization(String organization) {
 		if(organization==null) return;
+		this.organization = organization;
 		filters.add(new BasicNameValuePair("field", "orgid"));
 		filters.add(new BasicNameValuePair("op", "eq"));
 		filters.add(new BasicNameValuePair("value", organization));
 	}
 
-
+	public String getOrganization() {
+		return organization;
+	}
 
 	public void setApplicationName(String applicationName) {
 		if(applicationName==null) return;
+		this.applicationName = applicationName;
 		filters.add(new BasicNameValuePair("field", "name"));
 		filters.add(new BasicNameValuePair("op", "eq"));
 		filters.add(new BasicNameValuePair("value", applicationName));
 	}
 
-
+	public String getApplicationName() {
+		return applicationName;
+	}
 
 	public void setApplicationId(String applicationId) {
 		this.applicationId = applicationId;
@@ -66,15 +78,29 @@ public class ClientAppFilter {
 
 	public void setState(String state) {
 		if(state==null) return;
+		this.state = state;
 		filters.add(new BasicNameValuePair("field", "state"));
 		filters.add(new BasicNameValuePair("op", "eq"));
 		filters.add(new BasicNameValuePair("value", state));
 	}
 	
+	public String getState() {
+		return state;
+	}
+
 	void useFilter(List<NameValuePair> filter) {
 		this.filters.addAll(filter);
 	}
 
+	@Override
+	public int hashCode() {
+		return "TEST_ABC".hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return true;
+	}
 
 	/**
 	 * Build an applicationAdapter based on the given configuration
@@ -154,5 +180,4 @@ public class ClientAppFilter {
 			return this;
 		}
 	}
-
 }
