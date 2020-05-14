@@ -11,7 +11,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.util.EntityUtils;
 
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UpdateAPIImage extends AbstractAPIMTask implements IResponseParser {
 
-	public UpdateAPIImage(IAPI desiredState, IAPI actualState) {
+	public UpdateAPIImage(API desiredState, API actualState) {
 		super(desiredState, actualState);
 	}
 	public void execute() throws AppException {

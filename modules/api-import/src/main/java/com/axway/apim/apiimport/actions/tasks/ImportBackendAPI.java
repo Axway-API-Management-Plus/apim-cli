@@ -14,6 +14,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.IResponseParser;
@@ -29,7 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ImportBackendAPI extends AbstractAPIMTask implements IResponseParser {
 
-	public ImportBackendAPI(IAPI desiredState, IAPI actualState) {
+	public ImportBackendAPI(API desiredState, API actualState) {
 		super(desiredState, actualState);
 	}
 

@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -24,11 +24,11 @@ public class AbstractAPIMTask {
 	
 	static Logger LOG = LoggerFactory.getLogger(APIManagerAdapter.class);
 	
-	protected IAPI desiredState;
-	protected IAPI actualState;
-	protected IAPI transitState;
+	protected API desiredState;
+	protected API actualState;
+	protected API transitState;
 	
-	public AbstractAPIMTask(IAPI desiredState, IAPI actualState) {
+	public AbstractAPIMTask(API desiredState, API actualState) {
 		super();
 		this.desiredState 	= desiredState;
 		this.actualState 	= actualState;
@@ -36,7 +36,7 @@ public class AbstractAPIMTask {
 
 	protected static CommandParameters cmd = CommandParameters.getInstance();
 	
-	public static JsonNode initActualAPIContext(IAPI actual) throws AppException {
+	public static JsonNode initActualAPIContext(API actual) throws AppException {
 		URI uri;
 		ObjectMapper objectMapper = new ObjectMapper();
 		Transaction context = Transaction.getInstance();

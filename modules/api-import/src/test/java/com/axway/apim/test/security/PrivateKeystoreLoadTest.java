@@ -10,6 +10,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
@@ -44,7 +45,7 @@ public class PrivateKeystoreLoadTest {
 	
 	@Test
 	public void testWorkingKeystoreFile() throws AppException, IOException {
-		IAPI testAPI = new DesiredTestOnlyAPI();
+		API testAPI = new DesiredTestOnlyAPI();
 		ArrayList<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
@@ -56,7 +57,7 @@ public class PrivateKeystoreLoadTest {
 	
 	@Test
 	public void testInvalidPasswordKeystoreFile() throws AppException, IOException {
-		IAPI testAPI = new DesiredTestOnlyAPI();
+		API testAPI = new DesiredTestOnlyAPI();
 		ArrayList<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
 		profile.getParameters().put("password", "thatswrong");
 		authnProfiles.add(profile);
@@ -74,7 +75,7 @@ public class PrivateKeystoreLoadTest {
 	
 	@Test
 	public void testInvalidKeystoreType() throws AppException, IOException {
-		IAPI testAPI = new DesiredTestOnlyAPI();
+		API testAPI = new DesiredTestOnlyAPI();
 		ArrayList<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
 		profile.getParameters().put("certFile", "/com/axway/apim/test/files/certificates/clientcert.pfx:ABC");
 		authnProfiles.add(profile);
@@ -91,7 +92,7 @@ public class PrivateKeystoreLoadTest {
 	
 	@Test
 	public void testvalidKeystoreType() throws AppException, IOException {
-		IAPI testAPI = new DesiredTestOnlyAPI();
+		API testAPI = new DesiredTestOnlyAPI();
 		ArrayList<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
 		profile.getParameters().put("certFile", "/com/axway/apim/test/files/certificates/clientcert.pfx:PKCS12");
 		authnProfiles.add(profile);

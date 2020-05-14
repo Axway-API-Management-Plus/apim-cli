@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -15,7 +15,7 @@ public class RoutingKeyPropHandler implements PropertyHandler {
 	
 	static Logger LOG = LoggerFactory.getLogger(RoutingKeyPropHandler.class);
 
-	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) {
+	public JsonNode handleProperty(API desired, API actual, JsonNode response) {
 		try {
 			if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return response; // QueryStringRouting isn't supported
 			if(APIManagerAdapter.hasAdminAccount()) {

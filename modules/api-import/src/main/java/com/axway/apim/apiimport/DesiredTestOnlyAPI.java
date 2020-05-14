@@ -1,9 +1,8 @@
 package com.axway.apim.apiimport;
 
-import com.axway.apim.api.IAPI;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class DesiredTestOnlyAPI extends DesiredAPI implements IAPI {
+public class DesiredTestOnlyAPI extends DesiredAPI {
 
 	public DesiredTestOnlyAPI() throws AppException {
 		super();

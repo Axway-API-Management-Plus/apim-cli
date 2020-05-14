@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class ExportAPI {
 	
-	IAPI actualAPIProxy = null;
+	API actualAPIProxy = null;
 	
 	public String getPath() throws AppException {
 		return this.actualAPIProxy.getPath();
@@ -47,25 +47,14 @@ public class ExportAPI {
 		
 	}
 
-	public ExportAPI(IAPI actualAPIProxy) {
+	public ExportAPI(API actualAPIProxy) {
 		super();
 		this.actualAPIProxy = actualAPIProxy;
 	}
 	
-	
-	@JsonIgnore
-	public boolean isValid() {
-		return this.actualAPIProxy.isValid();
-	}
-
-	
 	@JsonIgnore
 	public String getOrganizationId() {
-		try {
-			return this.actualAPIProxy.getOrganizationId();
-		} catch (AppException e) {
-			throw new RuntimeException("Can't read orgId");
-		}
+		return this.actualAPIProxy.getOrganizationId();
 	}
 
 	

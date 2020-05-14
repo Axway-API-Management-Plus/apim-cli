@@ -3,6 +3,7 @@ package com.axway.apim.apiimport.actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.APIImportManager;
@@ -27,8 +28,8 @@ public class RecreateToUpdateAPI {
 
 	public void execute(APIChangeState changes) throws AppException {
 		
-		IAPI actual = changes.getActualAPI();
-		IAPI desired = changes.getDesiredAPI();
+		API actual = changes.getActualAPI();
+		API desired = changes.getDesiredAPI();
 		
 		// On Re-Creation we need to restore the orginal given methodNames for methodLevel override
 		desired.setInboundProfiles(((DesiredAPI)desired).getOriginalInboundProfiles());
@@ -41,7 +42,7 @@ public class RecreateToUpdateAPI {
 		createNewAPI.execute(changes, true);
 		
 		// 2. Create a new temp Desired-API-Definition, which will be used to delete the old API
-		IAPI tempDesiredDeletedAPI = new APIBaseDefinition();
+		API tempDesiredDeletedAPI = new APIBaseDefinition();
 
 		LOG.info("New API created. Going to delete old API.");
 		// Delete the existing old API!

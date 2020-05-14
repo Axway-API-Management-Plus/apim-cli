@@ -1,6 +1,6 @@
 package com.axway.apim.lib.props;
 
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class APIAuthenticationPropertyHandler implements PropertyHandler {
 	
-	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException {
+	public JsonNode handleProperty(API desired, API actual, JsonNode response) throws AppException {
 		preProcessAuthenticationProfiles(desired);
 		ArrayNode devices = (ArrayNode) ((ArrayNode) response.findPath("securityProfiles")).get(0).get("devices");
 		// We put all security devices from the desired state into the request
@@ -19,7 +19,7 @@ public class APIAuthenticationPropertyHandler implements PropertyHandler {
 		return response;
 	}
 	
-	private void preProcessAuthenticationProfiles(IAPI desired) throws AppException {
+	private void preProcessAuthenticationProfiles(API desired) throws AppException {
 		for(AuthenticationProfile profile : desired.getAuthenticationProfiles()) {
 			// Validate we have only one default declared
 			if(!profile.getName().equals("_default") && profile.getIsDefault()) {

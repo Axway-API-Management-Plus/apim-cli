@@ -9,7 +9,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
@@ -32,7 +32,7 @@ public class SubstituteVariablesTest {
 		
 		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(pathToConfigFile, null, apiDefinition, false);
 		
-		IAPI testAPI = importConfig.getApiConfig();
+		API testAPI = importConfig.getApiConfig();
 		if(System.getenv("TRAVIS")!=null && System.getenv("TRAVIS").equals("true")) {
 			// At Travis an environment-variable USER exists which should have been replaced
 			Assert.assertNotEquals(testAPI.getName(), "${USER}");			
@@ -56,7 +56,7 @@ public class SubstituteVariablesTest {
 		
 		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(pathToConfigFile, null, apiDefinition, false);
 		
-		IAPI testAPI = importConfig.getApiConfig();
+		API testAPI = importConfig.getApiConfig();
 		
 		Assert.assertEquals(testAPI.getPath(), "valueFromMainEnv");
 	}
@@ -75,7 +75,7 @@ public class SubstituteVariablesTest {
 		
 		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(pathToConfigFile, null, apiDefinition, false);
 		
-		IAPI testAPI = importConfig.getApiConfig();
+		API testAPI = importConfig.getApiConfig();
 		
 		Assert.assertEquals(testAPI.getOrganization(), "valueFromAnyOtherStageEnv");
 	}

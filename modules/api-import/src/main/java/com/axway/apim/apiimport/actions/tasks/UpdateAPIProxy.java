@@ -14,6 +14,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
+import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.IResponseParser;
@@ -28,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser {
 	
-	public UpdateAPIProxy(IAPI desiredState, IAPI actualState) {
+	public UpdateAPIProxy(API desiredState, API actualState) {
 		super(desiredState, actualState);
 	}
 
@@ -89,7 +90,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		return null;
 	}	
 	
-	private static JsonNode handledChangedProps(JsonNode lastJsonReponse, IAPI desired, IAPI actual, List<String> changedProps) throws AppException {
+	private static JsonNode handledChangedProps(JsonNode lastJsonReponse, API desired, API actual, List<String> changedProps) throws AppException {
 		Field field = null;
 		if(changedProps!=null && changedProps.size()!=0) {
 			boolean propsChangedInProxy = false;

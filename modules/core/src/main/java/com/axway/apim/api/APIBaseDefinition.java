@@ -5,7 +5,7 @@ package com.axway.apim.api;
  * 
  * @author cwiechmann@axway.com
  */
-public class APIBaseDefinition extends API implements IAPI {
+public class APIBaseDefinition extends API {
 	
 	private String createdOn;
 
@@ -24,11 +24,5 @@ public class APIBaseDefinition extends API implements IAPI {
 
 	public void setCreatedOn(String createdOn) {
 		this.createdOn = createdOn;
-	}
-
-	@Override
-	public String getApiDefinitionImport() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

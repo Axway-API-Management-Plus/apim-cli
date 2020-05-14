@@ -5,10 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.CorsProfile;
 import com.axway.apim.api.model.InboundProfile;
@@ -23,7 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class InboundProfileHandler implements PropertyHandler {
 
 	@Override
-	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException {
+	public JsonNode handleProperty(API desired, API actual, JsonNode response) throws AppException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if(desired.getInboundProfiles().size()!=0) {
 			validateSecurityProfiles(desired);
@@ -34,7 +32,7 @@ public class InboundProfileHandler implements PropertyHandler {
 		return response;
 	}
 	
-	private void validateSecurityProfiles(IAPI desired) throws AppException {	
+	private void validateSecurityProfiles(API desired) throws AppException {	
 		Map<String, InboundProfile> inboundProfiles = desired.getInboundProfiles();
 		List<SecurityProfile> securityProfiles = desired.getSecurityProfiles();
 		Iterator<InboundProfile> it = inboundProfiles.values().iterator();
@@ -59,7 +57,7 @@ public class InboundProfileHandler implements PropertyHandler {
 		}
 	}
 	
-	private void validateCORSProfiles(IAPI desired) throws AppException {	
+	private void validateCORSProfiles(API desired) throws AppException {	
 		Map<String, InboundProfile> inboundProfiles = desired.getInboundProfiles();
 		List<CorsProfile> corsProfiles = desired.getCorsProfiles();
 		Iterator<InboundProfile> it = inboundProfiles.values().iterator();
@@ -84,7 +82,7 @@ public class InboundProfileHandler implements PropertyHandler {
 		}
 	}
 	
-	private void translateOperationId(IAPI desired, IAPI actual) throws AppException {
+	private void translateOperationId(API desired, API actual) throws AppException {
 		boolean defaultFound = false;
 		Map<String, InboundProfile> profiles = desired.getInboundProfiles();
 		Iterator<String> keys = profiles.keySet().iterator();
@@ -108,7 +106,7 @@ public class InboundProfileHandler implements PropertyHandler {
 		profiles.putAll(updatedProfiles);
 	}
 	
-	private String lookupAPIMethodId(String operationId, IAPI actual) throws AppException {
+	private String lookupAPIMethodId(String operationId, API actual) throws AppException {
 		if(((API)actual).getApiMethods()==null) {
 			((API)actual).setApiMethods(new APIManagerAPIMethodAdapter().getAllMethodsForAPI(actual.getId()));
 		}

@@ -8,15 +8,12 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
-import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
-import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.API;
+import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.APIImportManager;
-import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.apiimport.actions.tasks.CreateAPIProxy;
 import com.axway.apim.apiimport.actions.tasks.ImportBackendAPI;
 import com.axway.apim.apiimport.actions.tasks.ManageClientApps;
@@ -34,9 +31,7 @@ import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.props.VhostPropertyHandler;
 import com.axway.apim.lib.utils.rest.Transaction;
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * This class is used by the {@link APIImportManager#applyChanges(APIChangeState)} to create a new API. 
@@ -50,7 +45,7 @@ public class CreateNewAPI {
 
 	public void execute(APIChangeState changes, boolean reCreation) throws AppException {
 		
-		IAPI createdAPI = null;
+		API createdAPI = null;
 		
 		Transaction context = Transaction.getInstance();
 		RollbackHandler rollback = RollbackHandler.getInstance();
@@ -64,7 +59,7 @@ public class CreateNewAPI {
 		VHostManager vHostManager = new VHostManager();
 		new ImportBackendAPI(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		// Register the created BE-API to be rolled back in case of an error
-		IAPI rollbackAPI = new APIBaseDefinition();
+		API rollbackAPI = new APIBaseDefinition();
 		((API)rollbackAPI).setName(changes.getDesiredAPI().getName());
 		((API)rollbackAPI).setApiId((String)context.get("backendAPIId"));
 		((APIBaseDefinition)rollbackAPI).setCreatedOn((String)context.get("backendAPICreatedOn"));
@@ -132,7 +127,7 @@ public class CreateNewAPI {
 	 * @return
 	 * @throws AppException 
 	 */
-	private List<String> getAllProps(IAPI desiredAPI) throws AppException {
+	private List<String> getAllProps(API desiredAPI) throws AppException {
 		List<String> allProps = new Vector<String>();
 		try {
 			for (Field field : desiredAPI.getClass().getSuperclass().getDeclaredFields()) {

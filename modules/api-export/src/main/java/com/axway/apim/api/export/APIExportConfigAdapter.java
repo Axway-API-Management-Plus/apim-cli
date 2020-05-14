@@ -257,8 +257,8 @@ public class APIExportConfigAdapter {
 	 * @return
 	 * @throws AppException
 	 */
-	private IAPI getAPITemplate() throws AppException {
-		IAPI apiTemplate = new API();
+	private API getAPITemplate() throws AppException {
+		API apiTemplate = new API();
 		apiTemplate.setState(IAPI.STATE_PUBLISHED);
 		apiTemplate.setClientOrganizations(new ArrayList<String>());
 		// Required to force loading of actual quota!

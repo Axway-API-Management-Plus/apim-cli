@@ -18,7 +18,7 @@ import com.axway.apim.lib.errorHandling.AppException;
  * @see DesiredAPI
  * @author cwiechmann@axway.com
  */
-public class ActualAPI extends API implements IAPI {
+public class ActualAPI extends API {
 	
 	static Logger LOG = LoggerFactory.getLogger(ActualAPI.class);
 
@@ -37,11 +37,5 @@ public class ActualAPI extends API implements IAPI {
 		if(this.deprecated!=null 
 				&& this.deprecated.equals("true")) return IAPI.STATE_DEPRECATED;
 		return super.getState();
-	}
-
-	@Override
-	public String getApiDefinitionImport() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

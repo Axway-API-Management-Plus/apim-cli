@@ -17,7 +17,6 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
 import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -29,9 +28,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class RollbackBackendAPI extends AbstractRollbackAction implements IResponseParser, RollbackAction {
 	
 	/** This is the API to be deleted */
-	IAPI rollbackAPI;
+	API rollbackAPI;
 
-	public RollbackBackendAPI(IAPI rollbackAPI) {
+	public RollbackBackendAPI(API rollbackAPI) {
 		super();
 		this.rollbackAPI = rollbackAPI;
 		this.executeOrder = 20;

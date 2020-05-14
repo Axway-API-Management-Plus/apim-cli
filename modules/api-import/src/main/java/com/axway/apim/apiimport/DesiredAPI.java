@@ -35,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 
  * @author cwiechmann@axway.com
  */
-public class DesiredAPI extends API implements IAPI {
+public class DesiredAPI extends API {
 	
 	private static Logger LOG = LoggerFactory.getLogger(DesiredAPI.class);
 	
@@ -109,7 +109,6 @@ public class DesiredAPI extends API implements IAPI {
 		this.requestForAllOrgs = requestForAllOrgs;
 	}
 
-	@Override
 	public String getApiDefinitionImport() {
 		return apiDefinitionImport;
 	}

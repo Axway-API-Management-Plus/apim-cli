@@ -9,15 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.APIImportManager;
-import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.apiimport.lib.APIImportCLIOptions;
 import com.axway.apim.apiimport.lib.APIImportParams;
 import com.axway.apim.apiimport.rollback.RollbackHandler;
@@ -71,7 +68,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params.getValue("config"), 
 					params.getValue("stage"), params.getValue("apidefinition"), apimAdapter.isUsingOrgAdmin());
 			// Creates an API-Representation of the desired API
-			IAPI desiredAPI = configAdapter.getDesiredAPI();
+			API desiredAPI = configAdapter.getDesiredAPI();
 			// 
 			List<NameValuePair> filters = new ArrayList<NameValuePair>();
 			// If we don't have an AdminAccount available, we ignore published APIs - For OrgAdmins 

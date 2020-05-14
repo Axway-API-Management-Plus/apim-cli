@@ -39,7 +39,7 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 	APIManagerOrganizationAdapter orgsAdapter = new APIManagerOrganizationAdapter();
 	APIManagerAPIAccessAdapter accessAdapter = new APIManagerAPIAccessAdapter();
 
-	public ManageClientOrgs(IAPI desiredState, IAPI actualState) {
+	public ManageClientOrgs(API desiredState, API actualState) {
 		super(desiredState, actualState);
 	}
 

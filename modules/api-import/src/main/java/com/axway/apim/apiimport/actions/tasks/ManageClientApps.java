@@ -16,6 +16,7 @@ import org.apache.http.util.EntityUtils;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
+import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Organization;
@@ -41,9 +42,9 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	/**
 	 * In case, the API has been re-created, this is object contains the API how it was before
 	 */
-	IAPI oldAPI;
+	API oldAPI;
 	
-	public ManageClientApps(IAPI desiredState, IAPI actualState, IAPI oldAPI) throws AppException {
+	public ManageClientApps(API desiredState, API actualState, API oldAPI) throws AppException {
 		super(desiredState, actualState);
 		hasAdminAccount = APIManagerAdapter.hasAdminAccount();
 		this.oldAPI = oldAPI;

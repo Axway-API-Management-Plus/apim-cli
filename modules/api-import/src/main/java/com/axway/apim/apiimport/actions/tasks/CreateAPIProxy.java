@@ -10,7 +10,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CreateAPIProxy extends AbstractAPIMTask implements IResponseParser {
 
-	public CreateAPIProxy(IAPI desiredState, IAPI actualState) {
+	public CreateAPIProxy(API desiredState, API actualState) {
 		super(desiredState, actualState);
 	}
 	public void execute() throws AppException {

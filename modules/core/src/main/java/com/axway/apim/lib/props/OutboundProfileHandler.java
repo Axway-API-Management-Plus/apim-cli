@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -18,7 +18,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class OutboundProfileHandler implements PropertyHandler {
 
 	@Override
-	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException {
+	public JsonNode handleProperty(API desired, API actual, JsonNode response) throws AppException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		validateAuthenticationProfiles(desired);
 		//APIManagerAdapter.getInstance().translateMethodIds(desired.getOutboundProfiles(), actual);
@@ -38,7 +38,7 @@ public class OutboundProfileHandler implements PropertyHandler {
 		return response;
 	}
 	
-	private void validateAuthenticationProfiles(IAPI desired) throws AppException {
+	private void validateAuthenticationProfiles(API desired) throws AppException {
 		Map<String, OutboundProfile> outboundProfiles = desired.getOutboundProfiles();
 		List<AuthenticationProfile> authenticationProfiles = desired.getAuthenticationProfiles();
 		Iterator<OutboundProfile> it = outboundProfiles.values().iterator();

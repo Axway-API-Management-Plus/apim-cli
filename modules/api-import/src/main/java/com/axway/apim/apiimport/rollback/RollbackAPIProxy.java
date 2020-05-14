@@ -28,9 +28,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class RollbackAPIProxy extends AbstractRollbackAction implements IResponseParser, RollbackAction {
 
 	/** This is the API to be deleted */
-	IAPI rollbackAPI;
+	API rollbackAPI;
 
-	public RollbackAPIProxy(IAPI rollbackAPI) {
+	public RollbackAPIProxy(API rollbackAPI) {
 		super();
 		this.rollbackAPI = rollbackAPI;
 		executeOrder = 10;
@@ -40,7 +40,7 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements IRespons
 	@Override
 	public void rollback() throws AppException {
 		if(rollbackAPI.getState()!=null && rollbackAPI.getState().equals(IAPI.STATE_PUBLISHED)) {
-			IAPI tempDesiredDeletedAPI = new APIBaseDefinition();
+			API tempDesiredDeletedAPI = new APIBaseDefinition();
 			((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(IAPI.STATE_UNPUBLISHED);
 			new UpdateAPIStatus(tempDesiredDeletedAPI, rollbackAPI).execute(true);
 		}

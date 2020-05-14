@@ -17,6 +17,7 @@ import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
+import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -34,9 +35,9 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 	
 	APIManagerAPIMethodAdapter methodAdapter = new APIManagerAPIMethodAdapter();
 	
-	private IAPI inTransitState; 
+	private API inTransitState; 
 
-	public UpgradeAccessToNewerAPI(IAPI inTransitState, IAPI actualState) {
+	public UpgradeAccessToNewerAPI(API inTransitState, API actualState) {
 		super(inTransitState, actualState);
 		this.inTransitState = inTransitState;
 	}

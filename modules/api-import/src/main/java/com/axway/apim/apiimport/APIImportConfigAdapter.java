@@ -110,7 +110,7 @@ public class APIImportConfigAdapter {
 	private String apiConfigFile;
 	
 	/** The APIConfig instance created by the APIConfigImporter */
-	private IAPI apiConfig;
+	private API apiConfig;
 	
 	/** If true, an OrgAdminUser is used to start the tool */
 	private boolean usingOrgAdmin;
@@ -126,7 +126,7 @@ public class APIImportConfigAdapter {
 	 * @param apiConfig the desired API to test with
 	 * @param apiConfigFile this is the given config file
 	 */
-	public APIImportConfigAdapter(IAPI apiConfig, String apiConfigFile) {
+	public APIImportConfigAdapter(API apiConfig, String apiConfigFile) {
 		this.apiConfig = apiConfig;
 		this.apiConfigFile = apiConfigFile;
 	}
@@ -143,7 +143,7 @@ public class APIImportConfigAdapter {
 		SimpleModule module = new SimpleModule();
 		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer());
 		mapper.registerModule(module);
-		IAPI baseConfig;
+		API baseConfig;
 		try {
 			this.pathToAPIDefinition = pathToAPIDefinition;
 			this.usingOrgAdmin = usingOrgAdmin;
@@ -196,7 +196,7 @@ public class APIImportConfigAdapter {
 		return substitutor.replace(givenConfig);
 	}
 
-	public IAPI getApiConfig() {
+	public API getApiConfig() {
 		return apiConfig;
 	}
 
@@ -213,7 +213,7 @@ public class APIImportConfigAdapter {
 	 * 
 	 * @throws AppException if the state can't be created.
 	 */
-	public IAPI getDesiredAPI() throws AppException {
+	public API getDesiredAPI() throws AppException {
 		try {
 			validateExposurePath(apiConfig);
 			validateOrganization(apiConfig);
@@ -254,7 +254,7 @@ public class APIImportConfigAdapter {
 	 * @return the desired API containing operationId in Inbound- and Outbound-Profiles
 	 * @throws AppException when something goes wrong
 	 */
-	public IAPI completeDesiredAPI(IAPI desiredAPI, IAPI actualAPI) throws AppException {
+	public API completeDesiredAPI(API desiredAPI, API actualAPI) throws AppException {
 		if(actualAPI==null) return desiredAPI;
 		// We need to safe the original methodNames, as they are required during API-Re-Creation
 		((DesiredAPI)desiredAPI).setOriginalInboundProfiles(desiredAPI.getInboundProfiles());
@@ -262,7 +262,7 @@ public class APIImportConfigAdapter {
 		return desiredAPI;
 	}
 	
-	private void validateExposurePath(IAPI apiConfig) throws AppException {
+	private void validateExposurePath(API apiConfig) throws AppException {
 		if(apiConfig.getPath()==null) {
 			ErrorState.getInstance().setError("Config-Parameter: 'path' is not given", ErrorCode.CANT_READ_CONFIG_FILE, false);
 			throw new AppException("Path is invalid.", ErrorCode.CANT_READ_CONFIG_FILE);
@@ -273,7 +273,7 @@ public class APIImportConfigAdapter {
 		}
 	}
 	
-	private void validateOrganization(IAPI apiConfig) throws AppException {
+	private void validateOrganization(API apiConfig) throws AppException {
 		if(apiConfig instanceof DesiredTestOnlyAPI) return;
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
 			apiConfig.setOrganizationId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
@@ -287,7 +287,7 @@ public class APIImportConfigAdapter {
 		}
 	}
 
-	private void checkForAPIDefinitionInConfiguration(IAPI apiConfig) throws AppException {
+	private void checkForAPIDefinitionInConfiguration(API apiConfig) throws AppException {
 		String path = getCurrentPath();
 		LOG.debug("Current path={}",path);
 		if (StringUtils.isEmpty(this.pathToAPIDefinition)) {
@@ -307,7 +307,7 @@ public class APIImportConfigAdapter {
 		return s;
 	}
 	
-	private void handleAllOrganizations(IAPI apiConfig) throws AppException {
+	private void handleAllOrganizations(API apiConfig) throws AppException {
 		if(apiConfig.getClientOrganizations()==null) return;
 		if(apiConfig.getState().equals(IAPI.STATE_UNPUBLISHED)) {
 			apiConfig.setClientOrganizations(null); // Making sure, orgs are not considered as a changed property
@@ -346,7 +346,7 @@ public class APIImportConfigAdapter {
 		}
 	}
 	
-	private void addQuotaConfiguration(IAPI apiConfig) throws AppException {
+	private void addQuotaConfiguration(API apiConfig) throws AppException {
 		if(apiConfig.getState()==IAPI.STATE_UNPUBLISHED) return;
 		DesiredAPI importAPI = (DesiredAPI)apiConfig;
 		initQuota(importAPI.getSystemQuota());
@@ -364,7 +364,7 @@ public class APIImportConfigAdapter {
 		}
 	}
 	
-	private void validateDescription(IAPI apiConfig) throws AppException {
+	private void validateDescription(API apiConfig) throws AppException {
 		if(apiConfig.getDescriptionType()==null || apiConfig.getDescriptionType().equals("original")) return;
 		String descriptionType = apiConfig.getDescriptionType();
 		if(descriptionType.equals("manual")) {
@@ -389,7 +389,7 @@ public class APIImportConfigAdapter {
 		}
 	}
 	
-	private void addDefaultCorsProfile(IAPI apiConfig) throws AppException {
+	private void addDefaultCorsProfile(API apiConfig) throws AppException {
 		if(apiConfig.getCorsProfiles()==null) {
 			((API)apiConfig).setCorsProfiles(new ArrayList<CorsProfile>());
 		}
@@ -415,7 +415,7 @@ public class APIImportConfigAdapter {
 	 * @param apiConfig
 	 * @throws AppException
 	 */
-	private void completeClientApplications(IAPI apiConfig) throws AppException {
+	private void completeClientApplications(API apiConfig) throws AppException {
 		if(CommandParameters.getInstance().isIgnoreClientApps()) return;
 		if(apiConfig.getState()==IAPI.STATE_UNPUBLISHED) return;
 		ClientApplication loadedApp = null;
@@ -477,7 +477,7 @@ public class APIImportConfigAdapter {
 		return app;
 	}
 	
-	private void completeCaCerts(IAPI apiConfig) throws AppException {
+	private void completeCaCerts(API apiConfig) throws AppException {
 		if(apiConfig.getCaCerts()!=null) {
 			List<CaCert> completedCaCerts = new ArrayList<CaCert>();
 			for(CaCert cert :apiConfig.getCaCerts()) {
@@ -539,7 +539,7 @@ public class APIImportConfigAdapter {
 		return is;
 	}
 	
-	private void validateCustomProperties(IAPI apiConfig) throws AppException {
+	private void validateCustomProperties(API apiConfig) throws AppException {
 		if(apiConfig.getCustomProperties()!=null) {
 			JsonNode configuredProps = APIManagerAdapter.getCustomPropertiesConfig();
 			Iterator<String> props = apiConfig.getCustomProperties().keySet().iterator();
@@ -724,7 +724,7 @@ public class APIImportConfigAdapter {
 		return null;
 	}
 	
-	private IAPI addDefaultInboundProfile(IAPI importApi) throws AppException {
+	private API addDefaultInboundProfile(API importApi) throws AppException {
 		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) return importApi;
 		Iterator<String> it = importApi.getInboundProfiles().keySet().iterator();
 		while(it.hasNext()) {
@@ -740,7 +740,7 @@ public class APIImportConfigAdapter {
 		return importApi;
 	}
 	
-	private IAPI addDefaultPassthroughSecurityProfile(IAPI importApi) throws AppException {
+	private API addDefaultPassthroughSecurityProfile(API importApi) throws AppException {
 		boolean hasDefaultProfile = false;
 		if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
 		List<SecurityProfile> profiles = importApi.getSecurityProfiles();
@@ -773,7 +773,7 @@ public class APIImportConfigAdapter {
 		return importApi;
 	}
 	
-	private IAPI addDefaultAuthenticationProfile(IAPI importApi) throws AppException {
+	private API addDefaultAuthenticationProfile(API importApi) throws AppException {
 		if(importApi.getAuthenticationProfiles()==null) return importApi; // Nothing to add (no default is needed, as we don't send any Authn-Profile)
 		boolean hasDefaultProfile = false;
 		List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
@@ -800,7 +800,7 @@ public class APIImportConfigAdapter {
 		return importApi;
 	}
 	
-	private IAPI addDefaultOutboundProfile(IAPI importApi) throws AppException {
+	private API addDefaultOutboundProfile(API importApi) throws AppException {
 		if(importApi.getOutboundProfiles()==null || importApi.getOutboundProfiles().size()==0) return importApi;
 		Iterator<String> it = importApi.getOutboundProfiles().keySet().iterator();
 		while(it.hasNext()) {
@@ -822,7 +822,7 @@ public class APIImportConfigAdapter {
 		return importApi;
 	}
 	
-	private void validateOutboundAuthN(IAPI importApi) throws AppException {
+	private void validateOutboundAuthN(API importApi) throws AppException {
 		// Request to use some specific Outbound-AuthN for this API
 		if(importApi.getAuthenticationProfiles()!=null && importApi.getAuthenticationProfiles().size()!=0) {
 			if(importApi.getAuthenticationProfiles().get(0).getType().equals(AuthType.ssl)) 
@@ -953,7 +953,7 @@ public class APIImportConfigAdapter {
 		return new String[]{certFileName, type};
 	}
 	
-	private void validateHasQueryStringKey(IAPI importApi) throws AppException {
+	private void validateHasQueryStringKey(API importApi) throws AppException {
 		if(1==1) return;
 		if(importApi instanceof DesiredTestOnlyAPI) return; // Do nothing when unit-testing
 		if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return; // QueryStringRouting isn't supported
@@ -972,7 +972,7 @@ public class APIImportConfigAdapter {
 	
 	
 	
-	private IAPI addImageContent(IAPI importApi) throws AppException {
+	private API addImageContent(API importApi) throws AppException {
 		File file = null;
 		if(importApi.getImage()!=null) { // An image is declared
 			try {

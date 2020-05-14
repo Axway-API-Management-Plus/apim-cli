@@ -19,6 +19,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.state.APIChangeState;
@@ -68,12 +69,12 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 	
 	
 
-	public UpdateAPIStatus(IAPI desiredState, IAPI actualState, String intent) {
+	public UpdateAPIStatus(API desiredState, API actualState, String intent) {
 		super(desiredState, actualState);
 		this.intent = intent;
 	}
 	
-	public UpdateAPIStatus(IAPI desiredState, IAPI actualState) {
+	public UpdateAPIStatus(API desiredState, API actualState) {
 		this(desiredState, actualState, "");
 	}
 	
@@ -133,7 +134,7 @@ public class UpdateAPIStatus extends AbstractAPIMTask implements IResponseParser
 				if(intermediateState!=null) {
 					LOG.info("Required intermediate state: "+intermediateState);
 					// In case, we can't process directly, we have to perform an intermediate state change
-					IAPI desiredIntermediate = new APIBaseDefinition();
+					API desiredIntermediate = new APIBaseDefinition();
 					desiredIntermediate.setState(intermediateState);
 					UpdateAPIStatus intermediateStatusUpdate = new UpdateAPIStatus(desiredIntermediate, actualState, " ### ");
 					intermediateStatusUpdate.execute(enforceBreakingChange);

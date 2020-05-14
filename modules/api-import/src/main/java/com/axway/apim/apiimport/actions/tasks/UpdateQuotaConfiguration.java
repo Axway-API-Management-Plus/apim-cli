@@ -14,13 +14,13 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.QuotaRestrictiontype;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.IResponseParser;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
@@ -33,7 +33,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 	private static int QUOTA_UPDATE_SUCCESS = 1;
 	private static int QUOTA_UPDATE_FAIL = 2;
 
-	public UpdateQuotaConfiguration(IAPI desiredState, IAPI actualState) {
+	public UpdateQuotaConfiguration(API desiredState, API actualState) {
 		super(desiredState, actualState);
 	}
 

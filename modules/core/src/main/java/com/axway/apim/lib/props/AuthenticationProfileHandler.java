@@ -1,6 +1,6 @@
 package com.axway.apim.lib.props;
 
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class AuthenticationProfileHandler implements PropertyHandler {
 
 	@Override
-	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException {
+	public JsonNode handleProperty(API desired, API actual, JsonNode response) throws AppException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if(desired.getAuthenticationProfiles().size()!=0) {
 			preProcessAuthenticationProfiles(desired);
@@ -22,7 +22,7 @@ public class AuthenticationProfileHandler implements PropertyHandler {
 		return response;
 	}
 	
-	private void preProcessAuthenticationProfiles(IAPI desired) throws AppException {
+	private void preProcessAuthenticationProfiles(API desired) throws AppException {
 		for(AuthenticationProfile profile : desired.getAuthenticationProfiles()) {
 			if(profile.getType()==AuthType.http_basic && profile.getParameters().get("password")==null) {
 				profile.getParameters().put("password", "");

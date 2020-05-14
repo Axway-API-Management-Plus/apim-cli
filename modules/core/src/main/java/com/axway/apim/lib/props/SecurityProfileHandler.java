@@ -1,6 +1,6 @@
 package com.axway.apim.lib.props;
 
-import com.axway.apim.api.IAPI;
+import com.axway.apim.api.API;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class SecurityProfileHandler implements PropertyHandler {
 
 	@Override
-	public JsonNode handleProperty(IAPI desired, IAPI actual, JsonNode response) throws AppException {
+	public JsonNode handleProperty(API desired, API actual, JsonNode response) throws AppException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		if(desired.getSecurityProfiles().size()!=0) {
 			preProcessSecurityProfiles(desired);
@@ -21,7 +21,7 @@ public class SecurityProfileHandler implements PropertyHandler {
 		return response;
 	}
 	
-	private void preProcessSecurityProfiles(IAPI desired) throws AppException {
+	private void preProcessSecurityProfiles(API desired) throws AppException {
 		for(SecurityProfile profile : desired.getSecurityProfiles()) {
 			// Validate we have only one default declared
 			if(!profile.getName().equals("_default") && profile.getIsDefault()) {

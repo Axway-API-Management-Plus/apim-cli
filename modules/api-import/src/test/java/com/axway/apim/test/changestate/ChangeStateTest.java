@@ -10,6 +10,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.apiimport.state.APIChangeState;
@@ -31,8 +32,8 @@ public class ChangeStateTest {
 	@Test
 	public void testOrderMakesNoChange() throws AppException, IOException, ParseException {
 
-		IAPI importAPI = getTestAPI();
-		IAPI managerAPI = getTestAPI();
+		API importAPI = getTestAPI();
+		API managerAPI = getTestAPI();
 
 		List<String> importOrgs = new ArrayList<String>();
 		List<String> managerOrgs = new ArrayList<String>();
@@ -57,8 +58,8 @@ public class ChangeStateTest {
 
 	@Test
 	public void isVhostBreaking() throws Exception {
-		IAPI importAPI = getTestAPI();
-		IAPI managerAPI = getTestAPI();
+		API importAPI = getTestAPI();
+		API managerAPI = getTestAPI();
 
 		((ActualAPI)importAPI).setVhost("abc.xyz.com");
 		((ActualAPI)managerAPI).setVhost("123.xyz.com");
@@ -67,10 +68,9 @@ public class ChangeStateTest {
 		Assert.assertEquals(changeState.isBreaking(), true);
 	}
 
-	private static IAPI getTestAPI() throws AppException {
-		IAPI testAPI = new ActualAPI();
+	private static API getTestAPI() throws AppException {
+		API testAPI = new ActualAPI();
 		testAPI.setOrganizationId("123");
-		testAPI.setValid(true);
 		testAPI.setState(IAPI.STATE_PUBLISHED);
 		return testAPI;
 	}

@@ -312,7 +312,7 @@ public class APIManagerAdapter {
 	 * @param apiType the class type the API representation is returned
 	 * @throws AppException when the API-Manager API-State can't be created
 	 */
-	public <T> API getAPIManagerAPI(T api, IAPI desiredAPI, Class<T> apiType) throws AppException {
+	/*public <T> API getAPIManagerAPI(T api, IAPI desiredAPI, Class<T> apiType) throws AppException {
 		if(api == null) {
 			API apiManagerAPI = new API();
 			apiManagerAPI.setValid(false);
@@ -342,11 +342,11 @@ public class APIManagerAdapter {
 				}
 				((API)apiManagerApi).setCustomProperties(customProperties);
 			}*/
-			return (API) apiManagerApi;
+	/*		return (API) apiManagerApi;
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-State.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
-	}
+	}*/
 	/*
 	public void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();

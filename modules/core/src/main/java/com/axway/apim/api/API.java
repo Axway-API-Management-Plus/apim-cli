@@ -58,7 +58,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author cwiechmann@axway.com
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class API implements IAPI {
+public class API {
 	
 	JsonNode apiConfiguration;
 	
@@ -198,20 +198,9 @@ public class API implements IAPI {
 			writableStates = {IAPI.STATE_UNPUBLISHED, IAPI.STATE_PUBLISHED, IAPI.STATE_DEPRECATED})
 	protected Long retirementDate = null;
 	
-	protected boolean isValid = false;
-	
 	protected String orgId = null;
 	
 	protected List<APIMethod> apiMethods = null;
-	
-
-	public boolean isValid() {
-		return this.isValid;
-	}
-
-	public void setValid(boolean isValid) {
-		this.isValid = isValid;
-	}
 
 	public APISpecification getAPIDefinition() {
 		return this.APIDefinition;
@@ -477,17 +466,10 @@ public class API implements IAPI {
 	}
 
 	public int getAPIType() {
-		/*if(this.getAPIDefinition().getAPIDefinitionFile().endsWith("?wsdl")) {
-			return IAPIDefinition.WSDL_API;
-		} else {
-			return IAPIDefinition.SWAGGGER_API;
-		}*/
 		return 0;
 	}
 
-	@Override
 	public String getApiDefinitionImport() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

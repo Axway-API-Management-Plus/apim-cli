@@ -8,6 +8,7 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.api.API;
 import com.axway.apim.api.IAPI;
 import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.lib.APIPropertyAnnotation;
@@ -33,9 +34,9 @@ public class APIChangeState {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIChangeState.class);
 	
-	private IAPI actualAPI;
-	private IAPI intransitAPI;
-	private IAPI desiredAPI;
+	private API actualAPI;
+	private API intransitAPI;
+	private API desiredAPI;
 	
 	private boolean isBreaking = false;
 	private boolean updateExistingAPI = true;
@@ -49,7 +50,7 @@ public class APIChangeState {
 	 * @param desiredAPI - The API loaded from the Swagger + Config
 	 * @throws AppException - Is thrown when something goes wrong.
 	 */
-	public APIChangeState(IAPI actualAPI, IAPI desiredAPI) throws AppException {
+	public APIChangeState(API actualAPI, API desiredAPI) throws AppException {
 		super();
 		this.actualAPI = actualAPI;
 		this.desiredAPI = desiredAPI;
@@ -70,7 +71,7 @@ public class APIChangeState {
 	 * @throws AppException 
 	 */
 	private void getChanges() throws AppException {
-		if(!actualAPI.isValid()) {
+		if(actualAPI==null) {
 			return; //Nothing to do, as we don't have an existing API
 		}
 		if(!desiredAPI.getOrganizationId().equals(actualAPI.getOrganizationId()) && !CommandParameters.getInstance().changeOrganization()) {
@@ -118,28 +119,28 @@ public class APIChangeState {
 	/**
 	 * @return the API-Manager API that has been given to this APIChangeState instance
 	 */
-	public IAPI getActualAPI() {
+	public API getActualAPI() {
 		return actualAPI;
 	}
 
 	/**
 	 * @param actualAPI overwrites the API-Manager API instance
 	 */
-	public void setActualAPI(IAPI actualAPI) {
+	public void setActualAPI(API actualAPI) {
 		this.actualAPI = actualAPI;
 	}
 
 	/**
 	 * @return the desired API that has been given to this APIChangeState instance
 	 */
-	public IAPI getDesiredAPI() {
+	public API getDesiredAPI() {
 		return desiredAPI;
 	}
 
 	/**
 	 * @param desiredAPI overwrites the desired API.
 	 */
-	public void setDesiredAPI(IAPI desiredAPI) {
+	public void setDesiredAPI(API desiredAPI) {
 		this.desiredAPI = desiredAPI;
 	}
 	
@@ -153,7 +154,7 @@ public class APIChangeState {
 	 * @return the in TransitAPI.
 	 * @see CreateNewAPI 
 	 */
-	public IAPI getIntransitAPI() {
+	public API getIntransitAPI() {
 		return intransitAPI;
 	}
 
@@ -167,7 +168,7 @@ public class APIChangeState {
 	 * @param intransitAPI the intermediate API
 	 * @see CreateNewAPI 
 	 */
-	public void setIntransitAPI(IAPI intransitAPI) {
+	public void setIntransitAPI(API intransitAPI) {
 		this.intransitAPI = intransitAPI;
 	}
 
