@@ -10,10 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,16 +91,9 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		if(this.apiManagerResponse!=null) return;
 		CommandParameters cmd = CommandParameters.getInstance();
 		URI uri;
-		try {
-			List<NameValuePair> usedFilters = new ArrayList<>();
-			if(APIManagerAdapter.hasAPIManagerVersion("7.7") && filter.getApiPath() != null) { // Since 7.7 we can query the API-PATH directly if given
-				usedFilters.add(new BasicNameValuePair("field", "path"));
-				usedFilters.add(new BasicNameValuePair("op", "eq"));
-				usedFilters.add(new BasicNameValuePair("value", filter.getApiPath()));
-			} 
-			if(filter != null) { usedFilters.addAll(filter.filters); } 
+		try { 
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+filter.getApiType())
-					.addParameters(usedFilters)
+					.addParameters(filter.getFilters())
 					.build();
 			LOG.info("Sending request to find existing APIs: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null);

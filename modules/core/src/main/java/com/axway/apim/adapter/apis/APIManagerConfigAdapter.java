@@ -1,5 +1,6 @@
 package com.axway.apim.adapter.apis;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -82,7 +83,11 @@ public class APIManagerConfigAdapter {
 		return retrievedConfigField.asText();
 	}
 	
-	void setAPIManagerTestResponse(JsonNode response, boolean useAdmin) {
-		this.apiManagerResponse.put(useAdmin, response);
+	void setAPIManagerTestResponse(JsonNode jsonResponse, boolean useAdmin) {
+		this.apiManagerResponse.put(useAdmin, jsonResponse);
+	}
+	
+	void setAPIManagerTestResponse(String response, boolean useAdmin) throws IOException {
+		this.apiManagerResponse.put(useAdmin, mapper.readTree(response));
 	}
 }

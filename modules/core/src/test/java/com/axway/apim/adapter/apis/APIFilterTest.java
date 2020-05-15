@@ -1,8 +1,11 @@
 package com.axway.apim.adapter.apis;
 
+import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
 
 public class APIFilterTest {
@@ -38,7 +41,10 @@ public class APIFilterTest {
 	}
 	
 	@Test
-	public void filterWithPath() {
+	public void filterWithPath() throws IOException {
+		// For this test, we must simulate API-Manager version >7.7
+		APIManagerAdapter.apiManagerVersion = null;
+		APIManagerAdapter.configAdapter.setAPIManagerTestResponse("{ \"productVersion\": \"7.7.20200130\" }", false);
 		APIFilter filter = new APIFilter.Builder()
 				.hasApiPath("/v1/api")
 				.build();
@@ -46,6 +52,18 @@ public class APIFilterTest {
 		Assert.assertEquals(filter.getFilters().get(0).getValue(), "path");
 		Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
 		Assert.assertEquals(filter.getFilters().get(2).getValue(), "/v1/api");
+	}
+	
+	@Test
+	public void filterWithPathOn762() throws IOException {
+		// For this test, we must simulate API-Manager version >7.7
+		APIManagerAdapter.apiManagerVersion = null;
+		APIManagerAdapter.configAdapter.setAPIManagerTestResponse("{ \"productVersion\": \"7.6.2 SP4\" }", false);
+		APIFilter filter = new APIFilter.Builder()
+				.hasApiPath("/v1/api")
+				.build();
+		Assert.assertEquals(filter.getFilters().size(), 0);
+		Assert.assertEquals(filter.getApiPath(), "/v1/api");
 	}
 	
 	@Test

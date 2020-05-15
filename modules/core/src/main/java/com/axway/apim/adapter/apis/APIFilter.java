@@ -119,9 +119,12 @@ public class APIFilter {
 	public void setApiPath(String apiPath) {
 		if(apiPath==null) return;
 		this.apiPath = apiPath;
-		filters.add(new BasicNameValuePair("field", "path"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", apiPath));
+		// Only from version 7.7 on we can query for the path directly.
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
+			filters.add(new BasicNameValuePair("field", "path"));
+			filters.add(new BasicNameValuePair("op", "eq"));
+			filters.add(new BasicNameValuePair("value", apiPath));
+		}
 	}
 
 	public String getQueryStringVersion() {
