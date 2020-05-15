@@ -56,8 +56,6 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 		
 		EnvironmentProperties envProps = new EnvironmentProperties(null);
 		CommandParameters.getInstance().setEnvProperties(envProps);
-		String anotherOrg = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(	testPackage + "organizations/anotherOrg.json"));
-		APIManagerAdapter.getInstance().orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasName("valueFromMainEnv").build(), anotherOrg);
 		
 		String configFile = "com/axway/apim/test/files/envProperties/1_config-with-os-variable.json";
 		String pathToConfigFile = this.getClass().getClassLoader().getResource(configFile).getFile();

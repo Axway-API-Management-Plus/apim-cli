@@ -438,33 +438,6 @@ public class APIManagerAdapter {
 		return null;
 	}
 	
-	
-	private static APISpecification getOriginalAPIDefinitionFromAPIM(String backendApiID) throws AppException {
-		URI uri;
-		APISpecification apiDefinition;
-		HttpResponse httpResponse = null;
-		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+backendApiID+"/download")
-					.setParameter("original", "true").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
-			httpResponse=getRequest.execute();
-			String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
-			String origFilename = "Unkown filename";
-			if(httpResponse.containsHeader("Content-Disposition")) {
-				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
-			}
-			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null);
-			return apiDefinition;
-		} catch (Exception e) {
-			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
 	public static Image getImageFromAPIM(URI uri, String baseFilename) throws AppException {
 		Image image = new Image();
 		HttpResponse httpResponse = null;

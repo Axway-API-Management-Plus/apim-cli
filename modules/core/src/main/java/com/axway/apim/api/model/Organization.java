@@ -25,7 +25,7 @@ public class Organization {
 	
 	private String enabled;
 	
-	private String development;
+	private boolean development;
 	
 	private String dn;
 	
@@ -121,11 +121,11 @@ public class Organization {
 		this.enabled = enabled;
 	}
 
-	public String getDevelopment() {
+	public boolean getDevelopment() {
 		return development;
 	}
 
-	public void setDevelopment(String development) {
+	public void setDevelopment(boolean development) {
 		this.development = development;
 	}
 

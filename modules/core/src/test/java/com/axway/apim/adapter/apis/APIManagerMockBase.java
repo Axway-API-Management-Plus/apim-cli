@@ -47,9 +47,9 @@ public abstract class APIManagerMockBase {
 		String responsePolicies = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(			testPackage + "policies/responsePolicies.json"));
 		String faultHandlerPolicies = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(		testPackage + "policies/faultHandlerPolicies.json"));
 		String testOrganizations = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(			testPackage + "organizations/organizations.json"));
+		String singleOrganization = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(		testPackage + "organizations/singleOrg.json"));
 		String testOrgsAPIAccess = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(			testPackage + "apiaccess/organizationAPIAccess.json"));
-		
-		
+
 		apiAdapter.setAPIManagerResponse(testAPI);
 		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.REQUEST, requestPolicies);
 		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.ROUTING, routingPolicies);
@@ -64,6 +64,7 @@ public abstract class APIManagerMockBase {
 		apim.appAdapter.setTestSubscribedAppAPIManagerResponse("72745ed9-f75b-428c-959c-b483eea497a1", grantedAppsForAPI);
 		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasId("d9ea6280-8811-4baf-8b5b-011a97142840").build(), testOrganizations);
 		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasName("API Development").build(), testOrganizations);
+		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasName("Single Result Org").build(), "["+singleOrganization +"]");
 	}
 
 }

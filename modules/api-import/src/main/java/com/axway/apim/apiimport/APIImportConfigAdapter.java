@@ -275,16 +275,14 @@ public class APIImportConfigAdapter {
 	private void validateOrganization(API apiConfig) throws AppException {
 		if(apiConfig instanceof DesiredTestOnlyAPI) return;
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
-			Organization org = new Organization();
-			org.setId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
+			OrgFilter filter = new OrgFilter.Builder().hasId(APIManagerAdapter.getCurrentUser(false).getOrganizationId()).build();
+			Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrg(filter) ;
 			apiConfig.setOrganization(org);
 		} else {
-			Organization desiredOrgId = orgsAdapter.getOrg(new OrgFilter.Builder().hasName(apiConfig.getOrganization().getName()).build());
-			if(desiredOrgId==null) {
+			if(!apiConfig.getOrganization().getDevelopment()) {
 				error.setError("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION, false);
 				throw new AppException("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
 			}
-			apiConfig.setOrganization(desiredOrgId);
 		}
 	}
 

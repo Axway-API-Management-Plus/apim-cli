@@ -64,8 +64,6 @@ public class DesiredAPI extends API {
 	public DesiredAPI() throws AppException {
 		super();
 	}
-	
-	
 
 	/**
 	 * BackendBasePath is a property which doesn't exists in API-Manager naturally. 

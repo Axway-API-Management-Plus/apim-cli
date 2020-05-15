@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 
@@ -16,27 +17,75 @@ public class APIFilter {
 	public static int TO_INTERNAL_POLICY_NAME = 10;
 	public static int TO_EXTERNAL_POLICY_NAME = 15;
 	
-	String id;
-	String vhost;
-	String apiPath;
-	String queryStringVersion;
+	private String id;
+	private String apiId;
+	private String name;
+	private String vhost;
+	private String apiPath;
+	private String queryStringVersion;
+	private String state;
+	
+	private boolean deprecated;
+	private boolean retired;
 	
 	private String apiType;
 	
-	int translateMethodMode = NO_TRANSLATION;
+	private int translateMethodMode = NO_TRANSLATION;
 	
 	private boolean useBackendAPI = false;
 	
-	boolean includeOperations = false;
-	boolean includeQuotas = false;
-	boolean includeClientOrganizations = false;
-	boolean includeClientApplications = false;
+	private boolean includeOperations = false;
+	private boolean includeQuotas = false;
+	private boolean includeClientOrganizations = false;
+	private boolean includeClientApplications = false;
+	
+	private boolean includeOriginalAPIDefinition = false;
 	
 	int translatePolicyMode = NO_TRANSLATION;
 	
 	List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
 	private APIFilter() {
+	}
+
+	public List<NameValuePair> getFilters() {
+		return filters;
+	}
+
+	public void setFilters(List<NameValuePair> filters) {
+		this.filters.addAll(filters);
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getApiId() {
+		return apiId;
+	}
+
+	public void setApiId(String apiId) {
+		if(apiId==null) return;
+		this.apiId = apiId;
+		filters.add(new BasicNameValuePair("field", "apiid"));
+		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("value", apiId));
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		if(name==null) return;
+		this.name = name;
+		filters.add(new BasicNameValuePair("field", "name"));
+		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("value", name));
 	}
 
 	public void setVhost(String vhost) {
@@ -55,6 +104,129 @@ public class APIFilter {
 		}
 	}
 
+	public boolean isIncludeOriginalAPIDefinition() {
+		return includeOriginalAPIDefinition;
+	}
+
+	public void setIncludeOriginalAPIDefinition(boolean includeOriginalAPIDefinition) {
+		this.includeOriginalAPIDefinition = includeOriginalAPIDefinition;
+	}
+
+	public String getApiPath() {
+		return apiPath;
+	}
+
+	public void setApiPath(String apiPath) {
+		if(apiPath==null) return;
+		this.apiPath = apiPath;
+		filters.add(new BasicNameValuePair("field", "path"));
+		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("value", apiPath));
+	}
+
+	public String getQueryStringVersion() {
+		return queryStringVersion;
+	}
+
+	public void setQueryStringVersion(String queryStringVersion) {
+		this.queryStringVersion = queryStringVersion;
+	}
+
+	public int getTranslateMethodMode() {
+		return translateMethodMode;
+	}
+
+	public void setTranslateMethodMode(int translateMethodMode) {
+		this.translateMethodMode = translateMethodMode;
+	}
+
+	public int getTranslatePolicyMode() {
+		return translatePolicyMode;
+	}
+
+	public void setTranslatePolicyMode(int translatePolicyMode) {
+		this.translatePolicyMode = translatePolicyMode;
+	}
+
+	public boolean isUseBackendAPI() {
+		return useBackendAPI;
+	}
+
+	public void setUseBackendAPI(boolean useBackendAPI) {
+		this.useBackendAPI = useBackendAPI;
+	}
+
+	public boolean isIncludeOperations() {
+		return includeOperations;
+	}
+
+	public void setIncludeOperations(boolean includeOperations) {
+		this.includeOperations = includeOperations;
+	}
+
+	public boolean isIncludeQuotas() {
+		return includeQuotas;
+	}
+
+	public void setIncludeQuotas(boolean includeQuotas) {
+		this.includeQuotas = includeQuotas;
+	}
+
+	public boolean isIncludeClientOrganizations() {
+		return includeClientOrganizations;
+	}
+
+	public void setIncludeClientOrganizations(boolean includeClientOrganizations) {
+		this.includeClientOrganizations = includeClientOrganizations;
+	}
+
+	public boolean isIncludeClientApplications() {
+		return includeClientApplications;
+	}
+
+	public void setIncludeClientApplications(boolean includeClientApplications) {
+		this.includeClientApplications = includeClientApplications;
+	}
+
+	public void setApiType(String apiType) {
+		this.apiType = apiType;
+	}
+
+	public boolean isDeprecated() {
+		return deprecated;
+	}
+
+	public void setDeprecated(boolean deprecated) {
+		if(this.deprecated==deprecated) return;
+		this.deprecated = deprecated;
+		filters.add(new BasicNameValuePair("field", "deprecated"));
+		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("value", (deprecated) ? "true" : "false"));
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public boolean isRetired() {
+		return retired;
+	}
+
+	public void setRetired(boolean retired) {
+		if(this.retired==retired) return;
+		this.retired = retired;
+		filters.add(new BasicNameValuePair("field", "retired"));
+		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("value", (retired) ? "true" : "false"));
+	}
+
+	public void setState(String state) {
+		if(state==null) return;
+		this.state = state;
+		filters.add(new BasicNameValuePair("field", "state"));
+		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("value", state));
+	}
 
 
 	/**
@@ -78,6 +250,7 @@ public class APIFilter {
 		public static enum Type {
 			/**
 			 * APIs are created with:</br> 
+			 * - including the original API-Definition
 			 * - includingQuotas</br>
 			 * - Methods translated to name</br>
 			 * - Policies have the external name</br>
@@ -89,9 +262,15 @@ public class APIFilter {
 		}
 		
 		String id;
+		String apiId;
+		String name;
 		String vhost;
 		String apiPath;
 		String queryStringVersion;
+		String state;
+		
+		boolean deprecated;
+		boolean retired;
 		
 		int translateMethodMode = NO_TRANSLATION;
 		
@@ -101,6 +280,8 @@ public class APIFilter {
 		boolean includeQuotas = false;
 		boolean includeClientOrganizations = false;
 		boolean includeClientApplications = false;
+		
+		boolean includeOriginalAPIDefinition = false;
 		
 		int translatePolicyMode = NO_TRANSLATION;
 		
@@ -133,18 +314,24 @@ public class APIFilter {
 		
 		public APIFilter build() {
 			APIFilter apiFilter = new APIFilter();
-			apiFilter.apiPath = this.apiPath;
-			apiFilter.queryStringVersion = this.queryStringVersion;
-			apiFilter.vhost = this.vhost;
-			apiFilter.filters = this.filters;
-			apiFilter.id = this.id;
-			apiFilter.includeOperations = this.includeOperations;
-			apiFilter.includeQuotas = this.includeQuotas;
-			apiFilter.translateMethodMode = this.translateMethodMode;
-			apiFilter.translatePolicyMode = this.translatePolicyMode;
-			apiFilter.includeClientOrganizations = this.includeClientOrganizations;
-			apiFilter.includeClientApplications = this.includeClientApplications;
-			apiFilter.useBackendAPI = this.useBackendAPI;
+			apiFilter.setApiPath(this.apiPath);
+			apiFilter.setQueryStringVersion(this.queryStringVersion);
+			apiFilter.setVhost(this.vhost);
+			apiFilter.setName(this.name);
+			apiFilter.setFilters(this.filters);
+			apiFilter.setId(this.id);
+			apiFilter.setApiId(apiId);
+			apiFilter.setIncludeOperations(this.includeOperations);
+			apiFilter.setIncludeQuotas(this.includeQuotas);
+			apiFilter.setTranslateMethodMode(this.translateMethodMode);
+			apiFilter.setTranslatePolicyMode(this.translatePolicyMode);
+			apiFilter.setIncludeClientOrganizations(this.includeClientOrganizations);
+			apiFilter.setIncludeClientApplications(this.includeClientApplications);
+			apiFilter.setIncludeOriginalAPIDefinition(this.includeOriginalAPIDefinition);
+			apiFilter.setUseBackendAPI(this.useBackendAPI);
+			apiFilter.setState(this.state);
+			apiFilter.setRetired(this.retired);
+			apiFilter.setDeprecated(this.deprecated);
 			return apiFilter;
 		}
 
@@ -156,6 +343,7 @@ public class APIFilter {
 				this.translatePolicyMode = TO_EXTERNAL_POLICY_NAME;
 				this.includeClientOrganizations = true;
 				this.includeClientApplications = true;
+				this.includeOriginalAPIDefinition = true;
 				break;
 			case DESIRED_API:
 				break;
@@ -168,6 +356,16 @@ public class APIFilter {
 			this.id = id;
 			return this;
 		}
+		
+		public Builder hasApiId(String apiId) {
+			this.apiId = apiId;
+			return this;
+		}
+		
+		public Builder hasName(String name) {
+			this.name = name;
+			return this;
+		}
 
 		public Builder hasVHost(String vhost) {
 			this.vhost = vhost;
@@ -178,6 +376,22 @@ public class APIFilter {
 			this.apiPath = apiPath;
 			return this;
 		}
+		
+		public Builder hasState(String state) {
+			this.state = state;
+			return this;
+		}
+		
+		public Builder isDeprecated(boolean deprecated) {
+			this.deprecated = deprecated;
+			return this;
+		}
+		
+		public Builder isRetired(boolean retired) {
+			this.retired = retired;
+			return this;
+		}
+		
 
 		public Builder hasQueryStringVersion(String queryStringVersion) {
 			this.queryStringVersion = queryStringVersion;
@@ -206,6 +420,11 @@ public class APIFilter {
 		
 		public Builder includeClientApplications(boolean includeClientApplications) {
 			this.includeClientApplications = includeClientApplications;
+			return this;
+		}
+		
+		public Builder includeOriginalAPIDefinition(boolean includeOriginalAPIDefinition) {
+			this.includeOriginalAPIDefinition = includeOriginalAPIDefinition;
 			return this;
 		}
 		

@@ -2,6 +2,7 @@ package com.axway.apim.adapter.apis;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -10,6 +11,7 @@ import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -17,9 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
+import com.axway.apim.api.definition.APISpecification;
+import com.axway.apim.api.definition.APISpecificationFactory;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
@@ -64,12 +67,13 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		try {
 			_readAPIsFromAPIManager(filter);
 			apis = filterAPIs(filter, logMessage);
-			translateMethodIds(apis, filter.translateMethodMode);
-			translatePolicies(apis, filter.translatePolicyMode);
-			addQuotaConfiguration(apis, filter.includeQuotas);
-			addClientOrganizations(apis, filter.includeClientOrganizations);
-			addClientApplications(apis, filter.includeClientApplications);
-			addExistingClientAppQuotas(apis, filter.includeQuotas);
+			translateMethodIds(apis, filter.getTranslateMethodMode());
+			translatePolicies(apis, filter.getTranslatePolicyMode());
+			addQuotaConfiguration(apis, filter.isIncludeQuotas());
+			addClientOrganizations(apis, filter.isIncludeClientOrganizations());
+			addClientApplications(apis, filter.isIncludeClientApplications());
+			addExistingClientAppQuotas(apis, filter.isIncludeQuotas());
+			addOriginalAPIDefinitionFromAPIM(apis, filter.isIncludeOriginalAPIDefinition());
 		} catch (IOException e) {
 			throw new AppException("Cant reads API from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
@@ -91,10 +95,10 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		URI uri;
 		try {
 			List<NameValuePair> usedFilters = new ArrayList<>();
-			if(APIManagerAdapter.hasAPIManagerVersion("7.7") && filter.apiPath != null) { // Since 7.7 we can query the API-PATH directly if given
+			if(APIManagerAdapter.hasAPIManagerVersion("7.7") && filter.getApiPath() != null) { // Since 7.7 we can query the API-PATH directly if given
 				usedFilters.add(new BasicNameValuePair("field", "path"));
 				usedFilters.add(new BasicNameValuePair("op", "eq"));
-				usedFilters.add(new BasicNameValuePair("value", filter.apiPath));
+				usedFilters.add(new BasicNameValuePair("value", filter.getApiPath()));
 			} 
 			if(filter != null) { usedFilters.addAll(filter.filters); } 
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+filter.getApiType())
@@ -121,18 +125,18 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	private List<API> filterAPIs(APIFilter filter, boolean logMessage) throws AppException, JsonParseException, JsonMappingException, IOException {
 		List<API> apis = mapper.readValue(this.apiManagerResponse, new TypeReference<List<API>>(){});
 		List<API> foundAPIs = new ArrayList<API>();
-		if(filter.apiPath==null && filter.vhost==null && filter.queryStringVersion==null && apis.size()==1) {
+		if(filter.getApiPath()==null && filter.getVhost()==null && filter.getQueryStringVersion()==null && apis.size()==1) {
 			return apis;
 		}
 			for(API api : apis) {
-				if(filter.apiPath==null && filter.vhost==null && filter.queryStringVersion==null) { // Nothing given to filter out.
+				if(filter.getApiPath()==null && filter.getVhost()==null && filter.getQueryStringVersion()==null) { // Nothing given to filter out.
 					foundAPIs.add(api);
 					continue;
 				}
-				if(filter.apiPath!=null && !filter.apiPath.equals(api.getPath())) continue;
+				if(filter.getApiPath()!=null && !filter.getApiPath().equals(api.getPath())) continue;
 				if(filter.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
-					if(filter.vhost!=null && !filter.vhost.equals(api.getVhost())) continue;
-					if(filter.queryStringVersion!=null && !filter.queryStringVersion.equals(api.getApiRoutingKey())) continue;
+					if(filter.getVhost()!=null && !filter.getVhost().equals(api.getVhost())) continue;
+					if(filter.getQueryStringVersion()!=null && !filter.getQueryStringVersion().equals(api.getApiRoutingKey())) continue;
 				}
 				if(filter.getApiType().equals(APIManagerAdapter.TYPE_BACK_END)) {
 					if(logMessage) 
@@ -146,7 +150,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			if(foundAPIs.size()!=0) {
 				String dbgCrit = "";
 				if(foundAPIs.size()>1) 
-					dbgCrit = " (apiPath: '"+filter.apiPath+"', filter: "+filter+", vhost: '"+filter.vhost+"', requestedType: "+filter.getApiType()+")";
+					dbgCrit = " (apiPath: '"+filter.getApiPath()+"', filter: "+filter+", vhost: '"+filter.getVhost()+"', requestedType: "+filter.getApiType()+")";
 				LOG.info("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
 				return foundAPIs;
 			}
@@ -306,11 +310,40 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		}		
 	}
 	
+	private static void addOriginalAPIDefinitionFromAPIM(List<API> apis, boolean includeOriginalAPIDefinition) throws AppException {
+		if(!includeOriginalAPIDefinition) return;
+		URI uri;
+		APISpecification apiDefinition;
+		HttpResponse httpResponse = null;
+		for(API api : apis) {
+			try {
+				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
+						.setParameter("original", "true").build();
+				RestAPICall getRequest = new GETRequest(uri, null);
+				httpResponse=getRequest.execute();
+				String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
+				String origFilename = "Unkown filename";
+				if(httpResponse.containsHeader("Content-Disposition")) {
+					origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
+				}
+				apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null);
+				api.setAPIDefinition(apiDefinition);
+			} catch (Exception e) {
+				throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
+			} finally {
+				try {
+					if(httpResponse!=null) 
+						((CloseableHttpResponse)httpResponse).close();
+				} catch (Exception ignore) {}
+			}
+		}
+	}
+	
 	private String getFilterFields(APIFilter filter) {
 		String filterFields = "[";
-		if(filter.apiPath!=null) filterFields += "apiPath=" + filter.apiPath;
-		if(filter.vhost!=null) filterFields += " vHost=" + filter.vhost;
-		if(filter.queryStringVersion!=null) filterFields += " queryString=" + filter.queryStringVersion;
+		if(filter.getApiPath()!=null) filterFields += "apiPath=" + filter.getApiPath();
+		if(filter.getVhost()!=null) filterFields += " vHost=" + filter.getVhost();
+		if(filter.getQueryStringVersion()!=null) filterFields += " queryString=" + filter.getQueryStringVersion();
 		if(filter!=null) filterFields += " filter=" + filter;
 		filterFields += "]";
 		return filterFields;

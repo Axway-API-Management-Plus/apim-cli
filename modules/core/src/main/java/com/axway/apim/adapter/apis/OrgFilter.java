@@ -9,7 +9,7 @@ import org.apache.http.message.BasicNameValuePair;
 
 public class OrgFilter {
 
-	String id;
+	private String id;
 	String apiId;
 	String description;
 	String email;
@@ -17,7 +17,7 @@ public class OrgFilter {
 	String name;
 	String phone;
 
-	List<NameValuePair> filters = new ArrayList<NameValuePair>();
+	private List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
 	private OrgFilter() { }
 
@@ -33,7 +33,7 @@ public class OrgFilter {
 		if(description==null) return;
 		this.description = description;
 		filters.add(new BasicNameValuePair("field", "description"));
-		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("op", "like"));
 		filters.add(new BasicNameValuePair("value", description));
 	}
 
@@ -46,8 +46,9 @@ public class OrgFilter {
 	}
 
 	public void setEnabled(boolean enabled) {
+		if(this.enabled==enabled) return;
 		this.enabled = enabled;
-		filters.add(new BasicNameValuePair("field", "email"));
+		filters.add(new BasicNameValuePair("field", "enabled"));
 		filters.add(new BasicNameValuePair("op", "eq"));
 		filters.add(new BasicNameValuePair("value", (enabled) ? "enabled" : "disabled"));
 	}
@@ -66,6 +67,10 @@ public class OrgFilter {
 		filters.add(new BasicNameValuePair("field", "phone"));
 		filters.add(new BasicNameValuePair("op", "eq"));
 		filters.add(new BasicNameValuePair("value", phone));
+	}
+
+	public List<NameValuePair> getFilters() {
+		return filters;
 	}
 
 	public String getName() {
@@ -140,13 +145,13 @@ public class OrgFilter {
 
 		public OrgFilter build() {
 			OrgFilter filter = new OrgFilter();
-			filter.id = this.id;
-			filter.apiId = this.apiId;
-			filter.description = this.description;
-			filter.email = this.email;
-			filter.enabled = this.enabled;
-			filter.name = this.name;
-			filter.phone = this.phone;
+			filter.setId(this.id);
+			filter.setApiId(this.apiId);
+			filter.setDescription(this.description);
+			filter.setEmail(this.email);
+			filter.setEnabled(this.enabled);
+			filter.setName(this.name);
+			filter.setPhone(this.phone);
 			return filter;
 		}
 

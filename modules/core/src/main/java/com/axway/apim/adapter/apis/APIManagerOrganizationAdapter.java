@@ -42,18 +42,24 @@ public class APIManagerOrganizationAdapter {
 		}
 		if(apiManagerResponse.get(filter) != null) return;
 		String orgId = "";
-		if(filter.id!=null) {
-			orgId = "/"+filter.id;
+		if(filter.getId()!=null) {
+			orgId = "/"+filter.getId();
 		}
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations"+orgId)
-					.addParameters(filter.filters)
+					.addParameters(filter.getFilters())
 					.build();
 			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
-			apiManagerResponse.put(filter, EntityUtils.toString(httpResponse.getEntity()));
+			if(filter.getId()!=null) {
+				// Store it as an Array
+				apiManagerResponse.put(filter, "[" + EntityUtils.toString(httpResponse.getEntity()) + "]");
+			} else {
+				// We get an Array from API-Manager
+				apiManagerResponse.put(filter, EntityUtils.toString(httpResponse.getEntity()));
+			}
 		} catch (Exception e) {
 			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + httpResponse);
 			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
