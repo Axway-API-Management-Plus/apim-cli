@@ -14,21 +14,17 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class APIManagerAPIAdapterSingleTests {
+public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 	
 	private static final String testPackage = "com/axway/apim/adapter/apimanager/singleTests/";
 	
-	ObjectMapper mapper = new ObjectMapper();
-	APIManagerAPIAdapter apiAdapter;
-	
 	@BeforeClass
 	private void initTestIndicator() throws AppException, IOException {
+		setupMockData();
 		APIManagerAdapter.configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsAdmin.json")), true);
 		APIManagerAdapter.configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsOrgAdmin.json")), false);
 		TestIndicator.getInstance().setTestRunning(true);
-		APIManagerAdapter.getInstance();
 		apiAdapter = (APIManagerAPIAdapter)APIAdapter.create(APIManagerAdapter.getInstance());
 	}
 	

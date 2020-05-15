@@ -120,4 +120,17 @@ public class APIFilterTest {
 		Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
 		Assert.assertEquals(filter.getFilters().get(2).getValue(), "unpublished");
 	}
+	
+	@Test
+	public void apiFilterEqualTest() {
+		APIFilter filter1 = new APIFilter.Builder()
+				.hasId("12345")
+				.build();
+		
+		APIFilter filter2 = new APIFilter.Builder()
+				.hasId("12345")
+				.build();
+		
+		Assert.assertEquals(filter1, filter2, "Both filters should be equal");
+	}
 }

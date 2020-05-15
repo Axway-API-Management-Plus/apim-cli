@@ -66,7 +66,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			_readAPIsFromAPIManager(filter);
 			apis = filterAPIs(filter, logMessage);
 			translateMethodIds(apis, filter.getTranslateMethodMode());
-			translatePolicies(apis, filter.getTranslatePolicyMode());
+			//translatePolicies(apis, filter.getTranslatePolicyMode());
 			addQuotaConfiguration(apis, filter.isIncludeQuotas());
 			addClientOrganizations(apis, filter.isIncludeClientOrganizations());
 			addClientApplications(apis, filter.isIncludeClientApplications());
@@ -195,7 +195,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			profiles.putAll(updatedEntries);
 		}
 	}
-	
+	/*
 	public <profile> void translatePolicies(List<API> apis, int mode) throws AppException {
 		if(mode == APIFilter.NO_TRANSLATION) return; 
 		for(API api : apis) {
@@ -217,7 +217,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				}
 			}
 		}
-	}
+	}*/
 	
 	private void addQuotaConfiguration(List<API> apis, boolean addQuota) throws AppException {
 		if(!addQuota || !APIManagerAdapter.hasAdminAccount()) return;

@@ -3,6 +3,7 @@ package com.axway.apim.adapter.apis;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -229,6 +230,32 @@ public class APIFilter {
 		filters.add(new BasicNameValuePair("field", "state"));
 		filters.add(new BasicNameValuePair("op", "eq"));
 		filters.add(new BasicNameValuePair("value", state));
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (this == obj) return true;
+		if(obj instanceof APIFilter == false) return false;
+		APIFilter other = (APIFilter)obj;
+		return (
+				StringUtils.equals(other.getId(), this.getId()) && 
+				StringUtils.equals(other.getName(), this.getName()) &&
+				StringUtils.equals(other.getApiId(), this.getApiId())
+				);
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = 0;
+		hashCode += (this.id!=null) ? this.id.hashCode() : 0;
+		hashCode += (this.name!=null) ? this.name.hashCode() : 0;
+		return hashCode;
+	}
+
+	@Override
+	public String toString() {
+		return "OrgFilter [name=" + name + ", id=" + id + "]";
 	}
 
 

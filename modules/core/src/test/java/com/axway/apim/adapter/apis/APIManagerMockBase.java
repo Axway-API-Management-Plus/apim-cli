@@ -51,10 +51,10 @@ public abstract class APIManagerMockBase {
 		String testOrgsAPIAccess = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(			testPackage + "apiaccess/organizationAPIAccess.json"));
 
 		apiAdapter.setAPIManagerResponse(testAPI);
-		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.REQUEST, requestPolicies);
-		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.ROUTING, routingPolicies);
-		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.RESPONSE, responsePolicies);
-		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.FAULT_HANDLER, faultHandlerPolicies);
+		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.REQUEST, requestPolicies);
+		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.ROUTING, routingPolicies);
+		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.RESPONSE, responsePolicies);
+		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.FAULT_HANDLER, faultHandlerPolicies);
 		apim.quotaAdapter.apiManagerResponse.put(APIManagerQuotaAdapter.SYSTEM_API_QUOTA, systemQuotas);
 		apim.quotaAdapter.apiManagerResponse.put(APIManagerQuotaAdapter.APPLICATION_DEFAULT_QUOTA, applicationDefaultQuotas);
 		apim.quotaAdapter.apiManagerResponse.put("ecf109cd-d012-4c57-897a-b3e8b041889b", applicationQuota);
@@ -64,6 +64,7 @@ public abstract class APIManagerMockBase {
 		apim.appAdapter.setTestSubscribedAppAPIManagerResponse("72745ed9-f75b-428c-959c-b483eea497a1", grantedAppsForAPI);
 		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasId("d9ea6280-8811-4baf-8b5b-011a97142840").build(), testOrganizations);
 		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasName("API Development").build(), testOrganizations);
+		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().build(), testOrganizations); // Used for all orgs query
 		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasName("Single Result Org").build(), "["+singleOrganization +"]");
 	}
 

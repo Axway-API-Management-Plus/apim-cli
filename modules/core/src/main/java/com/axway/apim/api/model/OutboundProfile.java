@@ -9,7 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.jackson.PolicyDeserializer;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 public class OutboundProfile {
 	
@@ -17,13 +19,17 @@ public class OutboundProfile {
 	
 	String routeType;
 	
-	String requestPolicy;
+	@JsonDeserialize( using = PolicyDeserializer.class)
+	Policy requestPolicy;
 	
-	String responsePolicy;
+	@JsonDeserialize( using = PolicyDeserializer.class)
+	Policy responsePolicy;
 	
-	String routePolicy;
+	@JsonDeserialize( using = PolicyDeserializer.class)
+	Policy routePolicy;
 	
-	String faultHandlerPolicy;
+	@JsonDeserialize( using = PolicyDeserializer.class)
+	Policy faultHandlerPolicy;
 	
 	String apiMethodId;
 	
@@ -57,35 +63,39 @@ public class OutboundProfile {
 		this.routeType = routeType;
 	}
 
-	public String getRequestPolicy() {
+	public Policy getRequestPolicy() {
+		if(requestPolicy==null) return new Policy();
 		return requestPolicy;
 	}
 	
-	public void setRequestPolicy(String requestPolicy) throws AppException {
+	public void setRequestPolicy(Policy requestPolicy) throws AppException {
 		this.requestPolicy = requestPolicy;
 	}
 
-	public String getResponsePolicy() {
+	public Policy getResponsePolicy() {
+		if(responsePolicy==null) return new Policy();
 		return responsePolicy;
 	}
 
-	public void setResponsePolicy(String responsePolicy) throws AppException {
+	public void setResponsePolicy(Policy responsePolicy) throws AppException {
 		this.responsePolicy = responsePolicy;
 	}
 
-	public String getRoutePolicy() {
+	public Policy getRoutePolicy() {
+		if(routePolicy==null) return new Policy();
 		return routePolicy;
 	}
 
-	public void setRoutePolicy(String routePolicy) throws AppException {
+	public void setRoutePolicy(Policy routePolicy) throws AppException {
 		this.routePolicy = routePolicy;
 	}
 
-	public String getFaultHandlerPolicy() {
+	public Policy getFaultHandlerPolicy() {
+		if(faultHandlerPolicy==null) return new Policy();
 		return faultHandlerPolicy;
 	}
 
-	public void setFaultHandlerPolicy(String faultHandlerPolicy) throws AppException {
+	public void setFaultHandlerPolicy(Policy faultHandlerPolicy) throws AppException {
 		this.faultHandlerPolicy = faultHandlerPolicy;
 	}
 
@@ -137,10 +147,10 @@ public class OutboundProfile {
 				thisParameters.remove("password");
 			}
 			boolean rc = 
-				StringUtils.equals(otherOutboundProfile.getFaultHandlerPolicy(), this.getFaultHandlerPolicy()) &&
-				StringUtils.equals(otherOutboundProfile.getRequestPolicy(), this.getRequestPolicy()) &&
-				StringUtils.equals(otherOutboundProfile.getResponsePolicy(), this.getResponsePolicy()) &&
-				StringUtils.equals(otherOutboundProfile.getRoutePolicy(), this.getRoutePolicy()) &&
+				this.getFaultHandlerPolicy().equals(otherOutboundProfile.getFaultHandlerPolicy()) &&
+				this.getRequestPolicy().equals(otherOutboundProfile.getRequestPolicy()) &&
+				this.getResponsePolicy().equals(otherOutboundProfile.getResponsePolicy()) &&
+				this.getRoutePolicy().equals(otherOutboundProfile.getRoutePolicy()) &&
 				StringUtils.equals(otherOutboundProfile.getRouteType(), this.getRouteType()) &&
 				otherParameters.equals(thisParameters);
 			return rc;

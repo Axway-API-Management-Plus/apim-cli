@@ -1,0 +1,11 @@
+{
+	"authenticationProfile": "_default",
+	"routeType": "policy",
+	"requestPolicy": "<key type='CircuitContainer'><id field='name' value='API Keys'/><key type='FilterCircuit'><id field='name' value='Amazon V2 - DescribeInstances'/></key></key>",
+	"responsePolicy": "<key type='CircuitContainer'><id field='name' value='0 - Mockup'/><key type='CircuitContainer'><id field='name' value='Banking Services'/><key type='FilterCircuit'><id field='name' value='Routing'/></key></key></key>",
+	"routePolicy": "<key type='CircuitContainer'><id field='name' value='Client App Registry Policies'/><key type='FilterCircuit'><id field='name' value='Client App Registry Static Content Protection Policy'/></key></key>",
+	"faultHandlerPolicy": "<key type='CircuitContainer'><id field='name' value='Generated Policies'/><key type='CircuitContainer'><id field='name' value='REST API&apos;s'/><key type='CircuitContainer'><id field='name' value='Templates'/><key type='FilterCircuit'><id field='name' value='Default Fault Handler'/></key></key></key></key>",
+	"apiId": "10f02b84-fa4a-4cb6-a0c9-da6974c77005",
+	"apiMethodId": null,
+	"parameters": []
+}

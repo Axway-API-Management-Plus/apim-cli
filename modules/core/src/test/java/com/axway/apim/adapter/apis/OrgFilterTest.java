@@ -3,11 +3,8 @@ package com.axway.apim.adapter.apis;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.message.BasicNameValuePair;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
 
 public class OrgFilterTest {
 	@Test
@@ -150,5 +147,17 @@ public class OrgFilterTest {
 		Assert.assertEquals(filter.getFilters().get(1).getValue(), "like");
 		Assert.assertEquals(filter.getFilters().get(2).getValue(), "my description I want");
 	}
-
+	
+	@Test
+	public void filterOrgEqualTest() {
+		OrgFilter filter1 = new OrgFilter.Builder()
+				.hasId("12345")
+				.build();
+		
+		OrgFilter filter2 = new OrgFilter.Builder()
+				.hasId("12345")
+				.build();
+		
+		Assert.assertEquals(filter1, filter2, "Both filters should be equal");
+	}
 }

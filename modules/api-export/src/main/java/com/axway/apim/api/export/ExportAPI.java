@@ -78,10 +78,10 @@ public class ExportAPI {
 		while(it.hasNext()) {
 			OutboundProfile profile = it.next();
 			profile.setApiId(null);
-			if(profile.getRequestPolicy()!=null) profile.setRequestPolicy(getExternalPolicyName(profile.getRequestPolicy()));
+			/*if(profile.getRequestPolicy()!=null) profile.setRequestPolicy(getExternalPolicyName(profile.getRequestPolicy()));
 			if(profile.getResponsePolicy()!=null) profile.setResponsePolicy(getExternalPolicyName(profile.getResponsePolicy()));
 			if(profile.getRoutePolicy()!=null) profile.setRoutePolicy(getExternalPolicyName(profile.getRoutePolicy()));
-			if(profile.getFaultHandlerPolicy()!=null) profile.setFaultHandlerPolicy(getExternalPolicyName(profile.getFaultHandlerPolicy()));
+			if(profile.getFaultHandlerPolicy()!=null) profile.setFaultHandlerPolicy(getExternalPolicyName(profile.getFaultHandlerPolicy()));*/
 		}
 		return this.actualAPIProxy.getOutboundProfiles();
 	}

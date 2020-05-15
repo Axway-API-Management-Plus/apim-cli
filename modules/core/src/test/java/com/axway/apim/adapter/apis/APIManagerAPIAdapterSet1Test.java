@@ -15,7 +15,7 @@ import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.QuotaRestrictiontype;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class APIManagerAPIAdapterTestSet1 extends APIManagerMockBase {
+public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	
 	private static final String testPackage = "com/axway/apim/adapter/apimanager/testSet1/";
 	
@@ -56,10 +56,10 @@ public class APIManagerAPIAdapterTestSet1 extends APIManagerMockBase {
 		
 		API api = apiAdapter.getAPI(filter, true);
 		
-		Assert.assertEquals(api.getOutboundProfiles().get("_default").getRequestPolicy(), "Amazon V2 - DescribeInstances");
-		Assert.assertEquals(api.getOutboundProfiles().get("_default").getRoutePolicy(), "Client App Registry Static Content Protection Policy");
-		Assert.assertEquals(api.getOutboundProfiles().get("_default").getResponsePolicy(), "Routing");
-		Assert.assertEquals(api.getOutboundProfiles().get("_default").getFaultHandlerPolicy(), "Default Fault Handler");
+		Assert.assertEquals(api.getOutboundProfiles().get("_default").getRequestPolicy().getName(), "Amazon V2 - DescribeInstances");
+		Assert.assertEquals(api.getOutboundProfiles().get("_default").getRoutePolicy().getName(), "Client App Registry Static Content Protection Policy");
+		Assert.assertEquals(api.getOutboundProfiles().get("_default").getResponsePolicy().getName(), "Routing");
+		Assert.assertEquals(api.getOutboundProfiles().get("_default").getFaultHandlerPolicy().getName(), "Default Fault Handler");
 	}
 	
 	@Test
@@ -87,7 +87,7 @@ public class APIManagerAPIAdapterTestSet1 extends APIManagerMockBase {
 	public void loadAPIIncludingClientOrgs() throws AppException, IOException {		
 		APIFilter filter = new APIFilter.Builder()
 				.includeClientOrganizations(true)
-				.hasId("72745ed9-f75b-428c-959c-b483eea497a1")
+				.hasId("d9ea6280-8811-4baf-8b5b-011a97142840")
 				.build();
 		
 		API api = apiAdapter.getAPI(filter, true);

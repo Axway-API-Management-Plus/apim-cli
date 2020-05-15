@@ -15,7 +15,7 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 
 @Test
-public class NoChangedOrgsUnpublishedAPI extends TestNGCitrusTestRunner {
+public class NoChangedOrgsUnpublishedAPITestIT extends TestNGCitrusTestRunner {
 
 	private ImportTestAction swaggerImport;
 	
