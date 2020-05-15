@@ -31,10 +31,17 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 	public Organization deserialize(JsonParser jp, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
 		JsonNode node = jp.getCodec().readTree(jp);
-		String orgId = node.asText();
+		OrgFilter filter;
 		try {
-			Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(orgId).build());
-			return org;
+			// Deserialization depends on the direction
+			if("organizationId".equals(jp.currentName())) {
+				// organizationId is given by API-Manager
+				filter = new OrgFilter.Builder().hasId(node.asText()).build();
+			} else {
+				// organization name is given in the config file
+				filter = new OrgFilter.Builder().hasName(node.asText()).build();
+			}
+			return APIManagerAdapter.getInstance().orgAdapter.getOrg(filter);
 		} catch (AppException e) {
 			throw new IOException("Error reading organization", e);
 		}

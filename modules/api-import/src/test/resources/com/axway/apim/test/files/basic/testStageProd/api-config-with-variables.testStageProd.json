@@ -2,8 +2,8 @@
 {
 	"name": "API Config from testStageProd sub folder",
 	"path": "doesntMatter",
-	"state": "notUsed",
+	"state": "notUsed ${os.arch}",
 	"version": "9.0.0",
-	"organization": "API Development ${os.arch}", 
+	"organization": "API Development", 
 	"backendBasepath": "${myTestVariable}"
 }

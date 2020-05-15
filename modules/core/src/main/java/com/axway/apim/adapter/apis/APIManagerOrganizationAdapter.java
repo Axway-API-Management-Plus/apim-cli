@@ -2,7 +2,9 @@ package com.axway.apim.adapter.apis;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -32,13 +34,13 @@ public class APIManagerOrganizationAdapter {
 
 	public APIManagerOrganizationAdapter() {}
 	
-	String apiManagerResponse;
+	Map<OrgFilter, String> apiManagerResponse = new HashMap<OrgFilter, String>();
 	
 	private void readOrgsFromAPIManager(OrgFilter filter) throws AppException {
 		if(!APIManagerAdapter.hasAdminAccount()) {
 			LOG.error("Using OrgAdmin only to load all organizations.");
 		}
-		if(apiManagerResponse != null) return;
+		if(apiManagerResponse.get(filter) != null) return;
 		String orgId = "";
 		if(filter.id!=null) {
 			orgId = "/"+filter.id;
@@ -51,7 +53,7 @@ public class APIManagerOrganizationAdapter {
 					.build();
 			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
-			apiManagerResponse = EntityUtils.toString(httpResponse.getEntity());
+			apiManagerResponse.put(filter, EntityUtils.toString(httpResponse.getEntity()));
 		} catch (Exception e) {
 			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + httpResponse);
 			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -66,7 +68,7 @@ public class APIManagerOrganizationAdapter {
 	public List<Organization> getOrgs(OrgFilter filter) throws AppException {
 		readOrgsFromAPIManager(filter);
 		try {
-			List<Organization> allOrgs = mapper.readValue(this.apiManagerResponse, new TypeReference<List<Organization>>(){});
+			List<Organization> allOrgs = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<Organization>>(){});
 			return allOrgs;
 		} catch (IOException e) {
 			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + apiManagerResponse);
@@ -92,7 +94,7 @@ public class APIManagerOrganizationAdapter {
 		return orgs.get(0);
 	}
 	
-	public void setAPIManagerTestResponse(String response) {
-		this.apiManagerResponse = response;
+	public void setAPIManagerTestResponse(OrgFilter key, String response) {
+		this.apiManagerResponse.put(key, response);
 	}
 }

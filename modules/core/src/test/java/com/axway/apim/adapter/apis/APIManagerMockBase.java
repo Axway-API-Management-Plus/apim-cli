@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class APIManagerMockBase {
 	
-	private static final String testPackage = "com/axway/apim/adapter/apimanager/testSet1/";
+	protected static final String testPackage = "com/axway/apim/adapter/apimanager/testSet1/";
 	
 	protected APIManagerAPIAdapter apiAdapter;
 	
@@ -62,7 +62,8 @@ public abstract class APIManagerMockBase {
 		apim.accessAdapter.setAPIManagerTestResponse(APIManagerAPIAccessAdapter.Type.organizations, "d9ea6280-8811-4baf-8b5b-011a97142840", testOrgsAPIAccess);
 		apim.appAdapter.setTestApiManagerResponse(new ClientAppFilter.Builder().build(), testApplications);
 		apim.appAdapter.setTestSubscribedAppAPIManagerResponse("72745ed9-f75b-428c-959c-b483eea497a1", grantedAppsForAPI);
-		apim.orgAdapter.apiManagerResponse = testOrganizations;	
+		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasId("d9ea6280-8811-4baf-8b5b-011a97142840").build(), testOrganizations);
+		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasName("API Development").build(), testOrganizations);
 	}
 
 }

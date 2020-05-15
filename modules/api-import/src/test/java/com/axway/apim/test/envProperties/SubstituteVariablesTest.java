@@ -12,6 +12,7 @@ import org.testng.reporters.Files;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerMockBase;
+import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.lib.CommandParameters;
@@ -20,8 +21,6 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 
 public class SubstituteVariablesTest extends APIManagerMockBase {
-	
-	private static final String testPackage = "com/axway/apim/adapter/apimanager/singleTests/";
 	
 	@BeforeClass
 	private void initCommandParameters() throws AppException, IOException {
@@ -57,6 +56,8 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 		
 		EnvironmentProperties envProps = new EnvironmentProperties(null);
 		CommandParameters.getInstance().setEnvProperties(envProps);
+		String anotherOrg = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(	testPackage + "organizations/anotherOrg.json"));
+		APIManagerAdapter.getInstance().orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasName("valueFromMainEnv").build(), anotherOrg);
 		
 		String configFile = "com/axway/apim/test/files/envProperties/1_config-with-os-variable.json";
 		String pathToConfigFile = this.getClass().getClassLoader().getResource(configFile).getFile();
@@ -76,8 +77,6 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 		
 		EnvironmentProperties envProps = new EnvironmentProperties("anyOtherStage");
 		CommandParameters.getInstance().setEnvProperties(envProps);
-		String testOrganizations = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(			testPackage + "organizations.json"));
-		APIManagerAdapter.getInstance().orgAdapter.setAPIManagerTestResponse(testOrganizations);
 		
 		String configFile = "com/axway/apim/test/files/envProperties/1_config-with-os-variable.json";
 		String pathToConfigFile = this.getClass().getClassLoader().getResource(configFile).getFile();
@@ -87,7 +86,7 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 		
 		API testAPI = importConfig.getApiConfig();
 		
-		Assert.assertEquals(testAPI.getOrganization().getName(), "valueFromAnyOtherStageEnv");
+		Assert.assertEquals(testAPI.getDescriptionManual(), "valueFromAnyOtherStageEnv");
 	}
 
 }

@@ -1,8 +1,8 @@
 [
     {
-        "id": "9bdfe6d1-2eec-4971-8611-c4825d67ac55",
+        "id": "d9ea6280-8811-4baf-8b5b-011a9999999",
         "name": "valueFromAnyOtherStageEnv",
-        "description": "Dev Org 7920",
+        "description": "Another Test Org",
         "email": null,
         "image": null,
         "restricted": false,
@@ -10,8 +10,8 @@
         "phone": null,
         "enabled": true,
         "development": true,
-        "dn": "o=API Test-Org 3 2423,ou=organizations,ou=APIPortal",
-        "createdOn": 1589204055029,
+        "dn": "o=API Development,ou=organizations,ou=APIPortal",
+        "createdOn": 1588742757436,
         "startTrialDate": null,
         "endTrialDate": null,
         "trialDuration": null,
