@@ -29,7 +29,7 @@ public class APIManagerPoliciesAdapter {
 		ROUTING ("routing", "routePolicy"), 
 		REQUEST ("request", "requestPolicy"),
 		RESPONSE ("response", "responsePolicy"),
-		FAULT_HANDLER ("faultHandler", "faultHandlerPolicy"), 
+		FAULT_HANDLER ("faulthandler", "faultHandlerPolicy"), 
 		UNKNOWN ("unknown", "Unknown");
 		
 		private final String restAPIKey;
