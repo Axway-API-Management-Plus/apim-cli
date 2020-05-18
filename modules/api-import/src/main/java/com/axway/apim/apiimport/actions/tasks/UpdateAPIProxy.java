@@ -23,6 +23,7 @@ import com.axway.apim.lib.props.PropertyHandler;
 import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.axway.apim.lib.utils.rest.Transaction;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,6 +38,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		URI uri;
 		HttpEntity entity;
 		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.setSerializationInclusion(Include.NON_NULL);
 		
 		Transaction context = Transaction.getInstance();
 		

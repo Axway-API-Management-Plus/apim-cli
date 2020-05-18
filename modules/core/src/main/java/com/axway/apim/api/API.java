@@ -5,12 +5,12 @@ import java.util.Map;
 
 import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
 import com.axway.apim.api.definition.APISpecification;
-import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
