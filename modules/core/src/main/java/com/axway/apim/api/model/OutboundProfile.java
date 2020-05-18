@@ -15,7 +15,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-public class OutboundProfile {
+public class OutboundProfile extends Profile {
 	
 	protected static Logger LOG = LoggerFactory.getLogger(OutboundProfile.class);
 	
@@ -36,10 +36,6 @@ public class OutboundProfile {
 	@JsonDeserialize( using = PolicyDeserializer.class)
 	@JsonSerialize(using = PolicySerializer.class)
 	Policy faultHandlerPolicy;
-	
-	String apiMethodId;
-	
-	String apiId;
 	
 	String authenticationProfile;
 	
@@ -103,22 +99,6 @@ public class OutboundProfile {
 
 	public void setFaultHandlerPolicy(Policy faultHandlerPolicy) throws AppException {
 		this.faultHandlerPolicy = faultHandlerPolicy;
-	}
-
-	public String getApiMethodId() {
-		return apiMethodId;
-	}
-
-	public void setApiMethodId(String apiMethodId) {
-		this.apiMethodId = apiMethodId;
-	}
-
-	public String getApiId() {
-		return apiId;
-	}
-
-	public void setApiId(String apiId) {
-		this.apiId = apiId;
 	}
 
 	public List<Object> getParameters() {

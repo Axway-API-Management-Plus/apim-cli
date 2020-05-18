@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.axway.apim.adapter.clientApps.jackson.JSONViews;
+import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.APIQuota;

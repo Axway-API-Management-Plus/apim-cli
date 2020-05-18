@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
-import com.axway.apim.adapter.clientApps.jackson.JSONViews;
+import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;

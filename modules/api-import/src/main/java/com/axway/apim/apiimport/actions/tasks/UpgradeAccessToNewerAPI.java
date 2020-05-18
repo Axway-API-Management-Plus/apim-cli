@@ -86,9 +86,9 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 						updateAppQuota = true;
 						restriction.setApi(desiredState.getId()); // Take over the quota config to new API
 						if(!restriction.getMethod().equals("*")) { // The restriction is for a specific method
-							String originalMethodName = methodAdapter.getMethodNameForId(actualState.getId(), restriction.getMethod());
+							String originalMethodName = methodAdapter.getMethodForId(actualState.getId(), restriction.getMethod()).getName();
 							// Try to find the same operation for the newly created API based on the name
-							String newMethodId = methodAdapter.getMethodIdPerName(desiredState.getId(), originalMethodName);
+							String newMethodId = methodAdapter.getMethodForName(desiredState.getId(), originalMethodName).getName();
 							restriction.setMethod(newMethodId);
 						}
 					}

@@ -66,7 +66,7 @@ public class APIManagerAPIMethodAdapter {
 		return apiMethods;
 	}
 	
-	public String getMethodIdPerName(String apiId, String methodName) throws AppException {
+	public APIMethod getMethodForName(String apiId, String methodName) throws AppException {
 		List<APIMethod> apiMethods = getAllMethodsForAPI(apiId);
 		if(apiMethods.size()==0) {
 			LOG.warn("No operations found for API with id: " + apiId);
@@ -75,14 +75,14 @@ public class APIManagerAPIMethodAdapter {
 		for(APIMethod method : apiMethods) {
 			String operationName = method.getName();
 			if(operationName.equals(methodName)) {
-				return method.getId();
+				return method;
 			}
 		}
 		LOG.warn("No operation found with name: '"+methodName+"' for API: '"+apiId+"'");
 		return null;
 	}
 	
-	public String getMethodNameForId(String apiId, String methodId) throws AppException {
+	public APIMethod getMethodForId(String apiId, String methodId) throws AppException {
 		List<APIMethod> apiMethods = getAllMethodsForAPI(apiId);
 		if(apiMethods.size()==0) {
 			LOG.warn("No operations found for API with id: " + apiId);
@@ -91,7 +91,7 @@ public class APIManagerAPIMethodAdapter {
 		for(APIMethod method : apiMethods) {
 			String operationId = method.getId();
 			if(operationId.equals(methodId)) {
-				return method.getName();
+				return method;
 			}
 		}
 		LOG.warn("No operation found with name: '"+methodId+"' for API: '"+apiId+"'");

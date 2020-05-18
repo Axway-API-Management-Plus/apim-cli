@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,7 +27,7 @@ import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.OutboundProfile;
+import com.axway.apim.api.model.Profile;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -41,13 +43,13 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerAPIAdapter.class);
 
-	String apiManagerResponse;
+	Map<APIFilter, String> apiManagerResponse = new HashMap<APIFilter, String>();
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
 	CommandParameters params = CommandParameters.getInstance();
 	
-	APIManagerAdapter apim = APIManagerAdapter.getInstance(); 
+	APIManagerAdapter apim;; 
 
 	public APIManagerAPIAdapter() throws AppException {
 
@@ -55,7 +57,10 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	
 	@Override
 	public boolean readConfig(Object config) throws AppException {
-		if(config instanceof APIManagerAdapter && CommandParameters.getInstance()!=null) return true;
+		if(config instanceof APIManagerAdapter) {
+			this.apim = (APIManagerAdapter)config;
+			return true;
+		}
 		return false;
 	}
 
@@ -88,7 +93,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	 * @throws AppException if the API representation cannot be created
 	 */
 	private void _readAPIsFromAPIManager(APIFilter filter) throws AppException {
-		if(this.apiManagerResponse!=null) return;
+		if(this.apiManagerResponse.get(filter)!=null) return;
 		CommandParameters cmd = CommandParameters.getInstance();
 		URI uri;
 		try { 
@@ -99,7 +104,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null);
 			HttpResponse response = getRequest.execute();
 
-			apiManagerResponse = EntityUtils.toString(response.getEntity());
+			apiManagerResponse.put(filter, EntityUtils.toString(response.getEntity()));
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
@@ -114,7 +119,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	}
 
 	private List<API> filterAPIs(APIFilter filter, boolean logMessage) throws AppException, JsonParseException, JsonMappingException, IOException {
-		List<API> apis = mapper.readValue(this.apiManagerResponse, new TypeReference<List<API>>(){});
+		List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>(){});
 		List<API> foundAPIs = new ArrayList<API>();
 		if(filter.getApiPath()==null && filter.getVhost()==null && filter.getQueryStringVersion()==null && apis.size()==1) {
 			return apis;
@@ -149,6 +154,11 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			return foundAPIs;
 	}
 	
+	public <profile> void translateMethodIds(API api, int mode) throws AppException {
+		if(mode == APIFilter.NO_TRANSLATION) return; 
+		translateMethodIds(Arrays.asList(api), mode);
+	}
+	
 	public <profile> void translateMethodIds(List<API> apis, int mode) throws AppException {
 		if(mode == APIFilter.NO_TRANSLATION) return; 
 		for(API api : apis) {
@@ -157,22 +167,40 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		}
 	}
 	
-	private <profile> void _translateMethodIds(Map<String, profile> profiles, int mode, String apiId) throws AppException {
-		Map<String, profile> updatedEntries = new LinkedHashMap<String, profile>();
+	private <ProfileType> void _translateMethodIds(Map<String, ProfileType> profiles, int mode, String apiId) throws AppException {
+		Map<String, ProfileType> updatedEntries = new LinkedHashMap<String, ProfileType>();
 		
 		if(profiles!=null) {
-			List<APIMethod> methods = apim.methodAdapter.getAllMethodsForAPI(apiId);
+			//List<APIMethod> methods = apim.methodAdapter.getAllMethodsForAPI(apiId);
 			Iterator<String> keys = profiles.keySet().iterator();
 			while(keys.hasNext()) {
 				String key = keys.next();
 				if(key.equals("_default")) continue;
-				for(APIMethod method : methods) {
+				APIMethod method;
+				if(mode==APIFilter.METHODS_AS_NAME) {
+					method = apim.methodAdapter.getMethodForId(apiId, key);
+				} else {
+					method = apim.methodAdapter.getMethodForName(apiId, key);
+				}
+				ProfileType profileWithType = profiles.get(key);
+				Profile profile = (Profile)profileWithType;
+				profile.setApiMethodId(method.getApiMethodId());
+				profile.setApiMethodName(method.getName());
+				profile.setApiId(method.getVirtualizedApiId());
+				if(mode==APIFilter.METHODS_AS_NAME) {
+					updatedEntries.put(method.getName(), profileWithType);
+				} else {
+					updatedEntries.put(method.getApiMethodId(), profileWithType);
+				}
+				keys.remove();
+				/*for(APIMethod method : methods) {
 					if(mode==APIFilter.METHODS_AS_NAME) {
 						if(method.getId().equals(key)) { // Look for the methodId
 							profile value = profiles.get(key);
 							if(value instanceof OutboundProfile) {
-								((OutboundProfile)value).setApiMethodId(method.getName()); // Put the name as the ID!
-								((OutboundProfile)value).setApiId(method.getApiId());
+								((OutboundProfile)value).setApiMethodId(method.getApiMethodId());
+								((OutboundProfile)value).setApiMethodName(method.getName());
+								((OutboundProfile)value).setApiId(method.getVirtualizedApiId());
 							}
 							updatedEntries.put(method.getName(), value);
 							keys.remove();
@@ -183,14 +211,15 @@ public class APIManagerAPIAdapter extends APIAdapter {
 							profile value = profiles.get(key);
 							if(value instanceof OutboundProfile) {
 								((OutboundProfile)value).setApiMethodId(method.getApiMethodId());
-								((OutboundProfile)value).setApiId(method.getApiId());
+								((OutboundProfile)value).setApiMethodName(method.getName());
+								((OutboundProfile)value).setApiId(method.getVirtualizedApiId());
 							}
 							updatedEntries.put(method.getId(), profiles.get(key));
 							keys.remove();
 							break;
 						}
 					}
-				}
+				}*/
 			}
 			profiles.putAll(updatedEntries);
 		}
@@ -340,8 +369,8 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		return filterFields;
 	}
 	
-	public APIManagerAPIAdapter setAPIManagerResponse(String apiManagerResponse) {
-		this.apiManagerResponse = apiManagerResponse;
+	public APIManagerAPIAdapter setAPIManagerResponse(APIFilter filter, String apiManagerResponse) {
+		this.apiManagerResponse.put(filter, apiManagerResponse);
 		return this;
 	}
 }

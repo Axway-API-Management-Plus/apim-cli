@@ -17,18 +17,21 @@ public abstract class APIAdapter {
 	public abstract API getAPI(APIFilter filter, boolean logMessage) throws AppException;
 	
 	public static APIAdapter create(Object config) throws AppException{
+		APIAdapter adapter;
 		// Simple static factory for now
 		if(config instanceof APIManagerAdapter) {
-			return new APIManagerAPIAdapter();
+			adapter = new APIManagerAPIAdapter();
+			if(adapter.readConfig(config)) {
+				return adapter;
+			}
 		} else if(config instanceof String) {
-			APIAdapter adapter = new JSONAPIAdapter();
+			adapter = new JSONAPIAdapter();
 			if(adapter.readConfig(config)) {
 				return adapter;
 			} else {
-				return null;
+				return null;	
 			}
-		} else {
-			return null;
 		}
+		return null;
 	}
 }

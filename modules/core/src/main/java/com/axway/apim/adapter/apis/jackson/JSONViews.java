@@ -1,4 +1,4 @@
-package com.axway.apim.adapter.clientApps.jackson;
+package com.axway.apim.adapter.apis.jackson;
 
 public class JSONViews {
 	

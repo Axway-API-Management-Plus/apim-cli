@@ -2,7 +2,7 @@ package com.axway.apim.api.model;
 
 import org.apache.commons.lang.StringUtils;
 
-public class InboundProfile {
+public class InboundProfile extends Profile {
 	
 	boolean monitorAPI = true;
 	
@@ -43,7 +43,7 @@ public class InboundProfile {
 	public void setCorsProfile(String corsProfile) {
 		this.corsProfile = corsProfile;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;

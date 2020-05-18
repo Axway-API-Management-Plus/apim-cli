@@ -255,7 +255,7 @@ public class APIFilter {
 
 	@Override
 	public String toString() {
-		return "OrgFilter [name=" + name + ", id=" + id + "]";
+		return "APIFilter [name=" + name + ", id=" + id + "]";
 	}
 
 

@@ -26,6 +26,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.apis.APIAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
@@ -94,6 +95,7 @@ public class APIManagerAdapter {
 	public final static String TYPE_BACK_END = "apirepo";
 	
 	public static APIManagerConfigAdapter configAdapter = new APIManagerConfigAdapter();
+	public APIAdapter apiAdapter;
 	public APIManagerAPIMethodAdapter methodAdapter = new APIManagerAPIMethodAdapter();
 	public APIManagerPoliciesAdapter policiesAdapter = new APIManagerPoliciesAdapter();
 	public APIManagerQuotaAdapter quotaAdapter = new APIManagerQuotaAdapter();
@@ -114,6 +116,7 @@ public class APIManagerAdapter {
 	
 	private APIManagerAdapter() throws AppException {
 		super();
+		this.apiAdapter = APIAdapter.create(this);
 		if(TestIndicator.getInstance().isTestRunning()) {
 			this.hasAdminAccount = true; // For unit tests we have an admin account
 			return; // No need to initialize just for Unit-Tests

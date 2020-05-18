@@ -5,11 +5,6 @@ import java.io.IOException;
 import org.testng.reporters.Files;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIAdapter;
-import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
-import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
-import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter;
-import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
@@ -31,11 +26,13 @@ public abstract class APIManagerMockBase {
 		APIManagerAdapter apim = APIManagerAdapter.getInstance();
 		APIManagerAdapter.configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsAdmin.json")), true);
 		APIManagerAdapter.configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsOrgAdmin.json")), false);
-		apiAdapter = (APIManagerAPIAdapter)APIAdapter.create(APIManagerAdapter.getInstance());
+		apiAdapter = (APIManagerAPIAdapter) APIManagerAdapter.getInstance().apiAdapter;
 		
 		apim.methodAdapter.setAPIManagerTestResponse("72745ed9-f75b-428c-959c-b483eea497a1", Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiMethods.json")));
+		apim.methodAdapter.setAPIManagerTestResponse("72745ed9-f75b-428c-959c-99999999", Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiMethodsUsedWithMethodNames.json")));
 		
-		String testAPI = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(					testPackage + "apiHavingMethods.json"));
+		String testAPI1 = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(					testPackage + "apiHavingMethods.json"));
+		String testAPI2 = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(					testPackage + "apiHavingMethodsWithMethodsNames.json"));
 		String systemQuotas = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(				testPackage + "quotas/systemAPIQuota.json"));
 		String applicationDefaultQuotas = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(	testPackage + "quotas/applicationDefaultQuota.json"));
 		String testApplications = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(			testPackage + "applications/allApplications.json"));
@@ -50,7 +47,8 @@ public abstract class APIManagerMockBase {
 		String singleOrganization = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(		testPackage + "organizations/singleOrg.json"));
 		String testOrgsAPIAccess = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(			testPackage + "apiaccess/organizationAPIAccess.json"));
 
-		apiAdapter.setAPIManagerResponse(testAPI);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().hasId("72745ed9-f75b-428c-959c-b483eea497a1").build(), testAPI1);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().hasId("72745ed9-f75b-428c-959c-99999999").build(), testAPI2);
 		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.REQUEST, requestPolicies);
 		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.ROUTING, routingPolicies);
 		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.RESPONSE, responsePolicies);

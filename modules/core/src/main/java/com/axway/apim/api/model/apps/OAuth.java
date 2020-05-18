@@ -1,6 +1,6 @@
 package com.axway.apim.api.model.apps;
 
-import com.axway.apim.adapter.clientApps.jackson.JSONViews;
+import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.fasterxml.jackson.annotation.JsonView;
 
 public class OAuth extends ClientAppCredential {
