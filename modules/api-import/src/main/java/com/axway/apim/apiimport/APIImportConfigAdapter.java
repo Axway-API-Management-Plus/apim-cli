@@ -53,9 +53,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
-import com.axway.apim.adapter.apis.OrgFilter;
-import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
@@ -230,7 +227,6 @@ public class APIImportConfigAdapter {
 			completeCaCerts(apiConfig);
 			addQuotaConfiguration(apiConfig);
 			handleAllOrganizations(apiConfig);
-			LOG.info("getDesiredAPI -10: " + apiConfig.getOrganization());
 			completeClientApplications(apiConfig);
 			return apiConfig;
 		} catch (Exception e) {

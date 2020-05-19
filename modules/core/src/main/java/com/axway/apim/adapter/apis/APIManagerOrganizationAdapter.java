@@ -57,6 +57,7 @@ public class APIManagerOrganizationAdapter {
 			LOG.trace("Load organization with URI: " + uri);
 			httpResponse = getRequest.execute();
 			if(httpResponse.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
+				LOG.error("Sent request: " + uri);
 				LOG.error("Received Status-Code: " +httpResponse.getStatusLine().getStatusCode()+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
 				throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
@@ -96,6 +97,19 @@ public class APIManagerOrganizationAdapter {
 	public Organization getOrgForName(String orgName) throws AppException {
 		Organization org = getOrg(new OrgFilter.Builder().hasName(orgName).build());
 		return org;
+	}
+	
+	public Organization getOrgForId(String orgId) throws AppException {
+		try {
+			Organization org = getOrg(new OrgFilter.Builder().hasId(orgId).build());
+			return org;
+		} catch (AppException e) {
+			// Workaround as in some version the Org-Admin cannot load it's very organization
+			LOG.warn("Cannot load organization from API-Manager. Returning new organization.");
+			Organization org = new Organization();
+			org.setId(orgId);
+			return org;
+		}
 	}
 	
 	public Organization getOrg(OrgFilter filter) throws AppException {
