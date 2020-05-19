@@ -41,8 +41,6 @@ before_install:
   - travis_wait build/pull_cassandra_docker_image.sh
   # Safe Cassandra image inc cache file
   - if [ ! -f $CACHE_FILE_CASSANDRA ]; then docker save $CASSANDRA_DOCKER_IMAGE | gzip > $CACHE_FILE_CASSANDRA; fi
-  
-  - mvn -Dit.test=ApplicationSubscriptionTestIT -DfailIfNoTests=false verify
 
 install:
   # Start Cassandra and wait that port 9042 is reachable
@@ -52,4 +50,5 @@ install:
   # Give API-Manager a moment to start
   - docker-compose logs --tail 30 apimgmt
 
-
+script:
+  - mvn -Dit.test=ApplicationSubscriptionTestIT -DfailIfNoTests=false verify
