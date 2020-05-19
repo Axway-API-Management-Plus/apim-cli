@@ -51,6 +51,8 @@ public class APIManagerAPIAdapter extends APIAdapter {
 
 	Map<APIFilter, String> apiManagerResponse = new HashMap<APIFilter, String>();
 	
+	Map<String, Image> imagesResponse = new HashMap<String, Image>();
+	
 	ObjectMapper mapper = new ObjectMapper();
 	
 	CommandParameters params = CommandParameters.getInstance();
@@ -82,7 +84,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			addExistingClientAppQuotas(apis, filter.isIncludeQuotas());
 			addCustomProperties(apis, filter);
 			addOriginalAPIDefinitionFromAPIM(apis, filter.isIncludeOriginalAPIDefinition());
-			addImageFromAPIM(apis); 
+			addImageFromAPIM(apis, filter.isIncludeImage()); 
 		} catch (IOException e) {
 			throw new AppException("Cant reads API from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
@@ -202,7 +204,8 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		}
 	}
 	
-	private static void addImageFromAPIM(List<API> apis) throws AppException {
+	private void addImageFromAPIM(List<API> apis, boolean includeImage) throws AppException {
+		if(!includeImage) return;
 		Image image = new Image();
 		for(API api : apis) {
 			image = new Image();
@@ -415,6 +418,11 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	
 	public APIManagerAPIAdapter setAPIManagerResponse(APIFilter filter, String apiManagerResponse) {
 		this.apiManagerResponse.put(filter, apiManagerResponse);
+		return this;
+	}
+	
+	public APIManagerAPIAdapter setAPIManagerResponse(String apiId, Image image) {
+		this.imagesResponse.put(apiId, image);
 		return this;
 	}
 }

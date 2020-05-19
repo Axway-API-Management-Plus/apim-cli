@@ -951,7 +951,7 @@ public class APIImportConfigAdapter {
 		if(importApi instanceof DesiredTestOnlyAPI) return; // Do nothing when unit-testing
 		if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return; // QueryStringRouting isn't supported
 		if(APIManagerAdapter.getInstance().hasAdminAccount()) {
-			String apiRoutingKeyEnabled = APIManagerAdapter.configAdapter.getApiManagerConfig("apiRoutingKeyEnabled");
+			String apiRoutingKeyEnabled = APIManagerAdapter.getInstance().configAdapter.getApiManagerConfig("apiRoutingKeyEnabled");
 			if(apiRoutingKeyEnabled.equals("true")) {
 				if(importApi.getApiRoutingKey()==null) {
 					ErrorState.getInstance().setError("API-Manager configured for Query-String option, but API doesn' declare it.", ErrorCode.API_CONFIG_REQUIRES_QUERY_STRING, false);

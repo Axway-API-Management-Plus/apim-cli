@@ -3,12 +3,21 @@ package com.axway.apim.adapter.apis;
 import java.io.IOException;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.TestIndicator;
 
 public class APIFilterTest {
+	
+	@BeforeClass
+	public void setupTestIndicator() {
+		TestIndicator.getInstance().setTestRunning(true);
+	}
+	
 	@Test
 	public void testStandardActualAPI() {
 		APIFilter filter = new APIFilter.Builder(Type.ACTUAL_API).build();
@@ -41,10 +50,10 @@ public class APIFilterTest {
 	}
 	
 	@Test
-	public void filterWithPath() throws IOException {
+	public void filterWithPath() throws IOException, AppException {
 		// For this test, we must simulate API-Manager version >7.7
 		APIManagerAdapter.apiManagerVersion = null;
-		APIManagerAdapter.configAdapter.setAPIManagerTestResponse("{ \"productVersion\": \"7.7.20200130\" }", false);
+		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse("{ \"productVersion\": \"7.7.20200130\" }", false);
 		APIFilter filter = new APIFilter.Builder()
 				.hasApiPath("/v1/api")
 				.build();
@@ -55,10 +64,10 @@ public class APIFilterTest {
 	}
 	
 	@Test
-	public void filterWithPathOn762() throws IOException {
+	public void filterWithPathOn762() throws IOException, AppException {
 		// For this test, we must simulate API-Manager version >7.7
 		APIManagerAdapter.apiManagerVersion = null;
-		APIManagerAdapter.configAdapter.setAPIManagerTestResponse("{ \"productVersion\": \"7.6.2 SP4\" }", false);
+		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse("{ \"productVersion\": \"7.6.2 SP4\" }", false);
 		APIFilter filter = new APIFilter.Builder()
 				.hasApiPath("/v1/api")
 				.build();

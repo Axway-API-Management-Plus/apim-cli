@@ -47,6 +47,7 @@ public class APIFilter {
 	private boolean includeQuotas = false;
 	private boolean includeClientOrganizations = false;
 	private boolean includeClientApplications = false;
+	private boolean includeImage = false;
 	
 	private boolean includeOriginalAPIDefinition = false;
 	
@@ -199,6 +200,16 @@ public class APIFilter {
 	public void setIncludeClientApplications(boolean includeClientApplications) {
 		this.includeClientApplications = includeClientApplications;
 	}
+	
+	
+
+	public boolean isIncludeImage() {
+		return includeImage;
+	}
+
+	public void setIncludeImage(boolean includeImage) {
+		this.includeImage = includeImage;
+	}
 
 	public void setApiType(String apiType) {
 		this.apiType = apiType;
@@ -328,6 +339,7 @@ public class APIFilter {
 		boolean includeQuotas = false;
 		boolean includeClientOrganizations = false;
 		boolean includeClientApplications = false;
+		boolean includeImage = false;
 		
 		boolean includeOriginalAPIDefinition = false;
 		
@@ -376,6 +388,7 @@ public class APIFilter {
 			apiFilter.setIncludeClientOrganizations(this.includeClientOrganizations);
 			apiFilter.setIncludeClientApplications(this.includeClientApplications);
 			apiFilter.setIncludeOriginalAPIDefinition(this.includeOriginalAPIDefinition);
+			apiFilter.setIncludeImage(this.includeImage);
 			apiFilter.setUseBackendAPI(this.useBackendAPI);
 			apiFilter.setState(this.state);
 			apiFilter.setRetired(this.retired);
@@ -393,6 +406,7 @@ public class APIFilter {
 				this.includeClientOrganizations = true;
 				this.includeClientApplications = true;
 				this.includeOriginalAPIDefinition = true;
+				this.includeImage = true;
 				break;
 			case DESIRED_API:
 				break;
@@ -474,6 +488,11 @@ public class APIFilter {
 		
 		public Builder includeOriginalAPIDefinition(boolean includeOriginalAPIDefinition) {
 			this.includeOriginalAPIDefinition = includeOriginalAPIDefinition;
+			return this;
+		}
+		
+		public Builder includeImage(boolean includeImage) {
+			this.includeImage = includeImage;
 			return this;
 		}
 		

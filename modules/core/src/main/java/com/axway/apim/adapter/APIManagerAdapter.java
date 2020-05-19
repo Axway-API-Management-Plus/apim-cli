@@ -89,7 +89,7 @@ public class APIManagerAdapter {
 	public final static String TYPE_FRONT_END = "proxies";
 	public final static String TYPE_BACK_END = "apirepo";
 	
-	public static APIManagerConfigAdapter configAdapter = new APIManagerConfigAdapter();
+	public APIManagerConfigAdapter configAdapter = new APIManagerConfigAdapter();
 	public APIAdapter apiAdapter;
 	public APIManagerAPIMethodAdapter methodAdapter = new APIManagerAPIMethodAdapter();
 	public APIManagerPoliciesAdapter policiesAdapter = new APIManagerPoliciesAdapter();
@@ -464,7 +464,7 @@ public class APIManagerAdapter {
 		if(APIManagerAdapter.apiManagerVersion!=null) {
 			return apiManagerVersion;
 		}
-		APIManagerAdapter.apiManagerVersion = configAdapter.getApiManagerConfig("productVersion");
+		APIManagerAdapter.apiManagerVersion = APIManagerAdapter.getInstance().configAdapter.getApiManagerConfig("productVersion");
 		LOG.info("API-Manager version is: " + apiManagerVersion);
 		return APIManagerAdapter.apiManagerVersion;
 	}

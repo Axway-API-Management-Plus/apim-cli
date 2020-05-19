@@ -22,18 +22,16 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 	@BeforeClass
 	private void initTestIndicator() throws AppException, IOException {
 		setupMockData();
-		APIManagerAdapter.configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsAdmin.json")), true);
-		APIManagerAdapter.configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsOrgAdmin.json")), false);
+		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsAdmin.json")), true);
+		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsOrgAdmin.json")), false);
 		TestIndicator.getInstance().setTestRunning(true);
-		apiAdapter = (APIManagerAPIAdapter)APIAdapter.create(APIManagerAdapter.getInstance());
 	}
 	
 	@Test
 	public void duplicateVHost() throws AppException, IOException {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "ProxiesWithVHostDuplicates.json"));
 		assertNotNull(apiManagerResponse);
-		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
-		((APIManagerAPIAdapter)apiAdapter).setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
 		
 		APIFilter filter = new APIFilter.Builder()
 			.hasApiPath("/api/test/DifferentVHostExportTestIT-531").build();
@@ -55,8 +53,7 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 	public void restrictedOnVHost() throws AppException, IOException {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "ProxiesWithVHostDuplicates.json"));
 		assertNotNull(apiManagerResponse);
-		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
-		((APIManagerAPIAdapter)apiAdapter).setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
 		
 		APIFilter filter = new APIFilter.Builder()
 				.hasApiPath("/api/test/DifferentVHostExportTestIT-531")
@@ -75,8 +72,7 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 	public void nonExistingAPI() throws AppException, IOException {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "ProxiesWithVHostDuplicates.json"));
 		assertNotNull(apiManagerResponse);
-		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
-		((APIManagerAPIAdapter)apiAdapter).setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
 		
 		APIFilter filter = new APIFilter.Builder()
 				.hasApiPath("/api/test/Not-ExistingAPI")
@@ -90,8 +86,7 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 	public void nonExistingUniqueAPI() throws AppException, IOException {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "ProxiesWithVHostDuplicates.json"));
 		assertNotNull(apiManagerResponse);
-		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
-		((APIManagerAPIAdapter)apiAdapter).setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
 		
 		APIFilter filter = new APIFilter.Builder()
 				.hasApiPath("/api/test/Not-ExistingAPI")
@@ -105,8 +100,7 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 	public void resultMustBeUniqueButIsNot() throws AppException, IOException {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "ProxiesWithVHostDuplicates.json"));
 		assertNotNull(apiManagerResponse);
-		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
-		((APIManagerAPIAdapter)apiAdapter).setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
 		
 		APIFilter filter = new APIFilter.Builder()
 				.hasApiPath("/api/test/DifferentVHostExportTestIT-531")
@@ -119,8 +113,7 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 	public void reponseContainsOneAPIOnly() throws AppException, IOException {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "incompleteProxyAPI.json"));
 		assertNotNull(apiManagerResponse);
-		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
-		((APIManagerAPIAdapter)apiAdapter).setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
 		
 		APIFilter filter = new APIFilter.Builder()
 				.build();
@@ -133,8 +126,7 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 	public void nothingGivenToFilterTest() throws AppException, IOException {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "allProxies.json"));
 		assertNotNull(apiManagerResponse);
-		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
-		((APIManagerAPIAdapter)apiAdapter).setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
 		
 		APIFilter filter = new APIFilter.Builder()
 				.build();
@@ -149,9 +141,8 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 	public void getUniqueWithRoutingKeyNotOkay() throws AppException, IOException {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
-		
-		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
-		((APIManagerAPIAdapter)apiAdapter).setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
+
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
 		
 		APIFilter filter = new APIFilter.Builder()
 				.hasQueryStringVersion("1.0")
@@ -164,8 +155,7 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
 		
-		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
-		((APIManagerAPIAdapter)apiAdapter).setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
 		
 		APIFilter filter = new APIFilter.Builder()
 				.hasQueryStringVersion("1.0")
@@ -179,8 +169,7 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
 		
-		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
-		((APIManagerAPIAdapter)apiAdapter).setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
 		
 		APIFilter filter = new APIFilter.Builder()
 				.hasQueryStringVersion("1.1")
@@ -193,8 +182,7 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
 			
-		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
-		((APIManagerAPIAdapter)apiAdapter).setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
 		
 		APIFilter filter = new APIFilter.Builder()
 				.hasQueryStringVersion("1.1")
@@ -208,8 +196,7 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "proxiesWithAPIRoutingKey.json"));
 		assertNotNull(apiManagerResponse);
 		
-		APIAdapter apiAdapter = APIAdapter.create(APIManagerAdapter.getInstance());
-		((APIManagerAPIAdapter)apiAdapter).setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().build(), apiManagerResponse);
 		
 		APIFilter filter = new APIFilter.Builder()
 				.hasQueryStringVersion("2.0")

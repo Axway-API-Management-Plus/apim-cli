@@ -6,6 +6,7 @@ import org.testng.reporters.Files;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,8 +25,8 @@ public abstract class APIManagerMockBase {
 	protected void setupMockData() throws AppException, IOException {
 		TestIndicator.getInstance().setTestRunning(true);
 		APIManagerAdapter apim = APIManagerAdapter.getInstance();
-		APIManagerAdapter.configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsAdmin.json")), true);
-		APIManagerAdapter.configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsOrgAdmin.json")), false);
+		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsAdmin.json")), true);
+		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsOrgAdmin.json")), false);
 		apiAdapter = (APIManagerAPIAdapter) APIManagerAdapter.getInstance().apiAdapter;
 		
 		apim.methodAdapter.setAPIManagerTestResponse("72745ed9-f75b-428c-959c-b483eea497a1", Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiMethods.json")));
@@ -49,6 +50,8 @@ public abstract class APIManagerMockBase {
 
 		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().hasId("72745ed9-f75b-428c-959c-b483eea497a1").build(), testAPI1);
 		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().hasId("72745ed9-f75b-428c-959c-99999999").build(), testAPI2);
+		apiAdapter.setAPIManagerResponse("72745ed9-f75b-428c-959c-b483eea497a1", new Image());
+		apiAdapter.setAPIManagerResponse("72745ed9-f75b-428c-959c-99999999", new Image());
 		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.REQUEST, requestPolicies);
 		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.ROUTING, routingPolicies);
 		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.RESPONSE, responsePolicies);
