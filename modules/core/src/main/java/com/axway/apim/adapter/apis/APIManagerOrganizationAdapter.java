@@ -59,12 +59,12 @@ public class APIManagerOrganizationAdapter {
 				// Store it as an Array
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				LOG.info("filter.getId()!=null response: " + response);
-				apiManagerResponse.put(filter, "[" + EntityUtils.toString(httpResponse.getEntity()) + "]");
+				apiManagerResponse.put(filter, "[" + response + "]");
 			} else {
 				// We get an Array from API-Manager
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				LOG.info("Array response: " + response);
-				apiManagerResponse.put(filter, EntityUtils.toString(httpResponse.getEntity()));
+				apiManagerResponse.put(filter, response);
 			}
 		} catch (Exception e) {
 			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + httpResponse);
