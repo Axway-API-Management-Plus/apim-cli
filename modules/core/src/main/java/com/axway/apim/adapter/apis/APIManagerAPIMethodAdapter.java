@@ -94,7 +94,7 @@ public class APIManagerAPIMethodAdapter {
 				return method;
 			}
 		}
-		LOG.warn("No operation found with name: '"+methodId+"' for API: '"+apiId+"'");
+		LOG.warn("No operation found with ID: '"+methodId+"' for API: '"+apiId+"'");
 		return null;
 	}
 	

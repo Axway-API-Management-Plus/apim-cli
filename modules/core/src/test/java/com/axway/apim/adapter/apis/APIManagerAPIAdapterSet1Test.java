@@ -11,6 +11,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.reporters.Files;
 
+import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
+import com.axway.apim.adapter.apis.APIFilter.POLICY_TRANSLATION;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.InboundProfile;
@@ -40,7 +42,7 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	@Test
 	public void testTranslateMethodToName() throws AppException, IOException {		
 		APIFilter filter = new APIFilter.Builder()
-				.translateMethods(APIFilter.METHODS_AS_NAME)
+				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.hasId("72745ed9-f75b-428c-959c-b483eea497a1")
 				.build();
 		API api = apiAdapter.getAPI(filter, true);
@@ -48,10 +50,10 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 		Assert.assertEquals(api.getOutboundProfiles().size(), 2);
 		Map<String, OutboundProfile> outboundProfiles = api.getOutboundProfiles();
 		Assert.assertNotNull(outboundProfiles.get("_default"), "Expected to find default outbound profile");
-		Assert.assertNotNull(outboundProfiles.get("deletePet").getApiMethodId(), "deletePet");
+		Assert.assertNotNull(outboundProfiles.get("deletePet").getApiOperationId(), "deletePet");
 		Assert.assertEquals(outboundProfiles.get("deletePet").getApiId(), "72745ed9-f75b-428c-959c-b483eea497a1");
-		Assert.assertEquals(outboundProfiles.get("deletePet").getApiMethodId(), "db89e373-f678-4990-88ca-891e434c34db");
-		Assert.assertEquals(outboundProfiles.get("deletePet").getApiMethodName(), "deletePet");
+		Assert.assertEquals(outboundProfiles.get("deletePet").getApiOperationId(), "132712e4-c132-4298-bfa0-f6f5c811ad65");
+		Assert.assertEquals(outboundProfiles.get("deletePet").getApiOperationName(), "deletePet");
 		
 		Assert.assertEquals(api.getInboundProfiles().size(), 2);
 		Map<String, InboundProfile> inboundProfiles = api.getInboundProfiles();
@@ -62,7 +64,7 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	@Test
 	public void testTranslateMethodToId() throws AppException, IOException {		
 		APIFilter filter = new APIFilter.Builder()
-				.translateMethods(APIFilter.METHODS_AS_ID)
+				.translateMethods(METHOD_TRANSLATION.AS_ID)
 				.hasId("72745ed9-f75b-428c-959c-99999999")
 				.build();
 		API api = apiAdapter.getAPI(filter, true);
@@ -70,19 +72,19 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 		Assert.assertEquals(api.getOutboundProfiles().size(), 2);
 		Map<String, OutboundProfile> outboundProfiles = api.getOutboundProfiles();
 		Assert.assertNotNull(outboundProfiles.get("_default"), "Expected to find default outbound profile");
-		Assert.assertNotNull(outboundProfiles.get("db89e373-f678-4990-88ca-891e434c34db"), "Expected to get deletePet based on the method per ID");
+		Assert.assertNotNull(outboundProfiles.get("132712e4-c132-4298-bfa0-f6f5c811ad65"), "Expected to get deletePet based on the method per ID");
 		
 		Assert.assertEquals(api.getInboundProfiles().size(), 2);
 		Map<String, InboundProfile> inboundProfiles = api.getInboundProfiles();
 		Assert.assertNotNull(inboundProfiles.get("_default"), "Expected to find default outbound profile");
-		Assert.assertNotNull(inboundProfiles.get("1af41c74-5e2f-4e2e-aa83-df480f2c1d73"), "Expected to get createUser based on the method per ID");
+		Assert.assertNotNull(inboundProfiles.get("919cbfef-729e-4840-a43a-0ebe5a95e75f"), "Expected to get createUser based on the method per ID");
 	}
 	
 	@Test
 	public void testTranslatePolicyToExternalName() throws AppException, IOException {
 		// Get the API to test with
 		APIFilter filter = new APIFilter.Builder()
-				.translatePolicies(APIFilter.TO_EXTERNAL_POLICY_NAME)
+				.translatePolicies(POLICY_TRANSLATION.TO_NAME)
 				.hasId("72745ed9-f75b-428c-959c-b483eea497a1")
 				.build();
 		

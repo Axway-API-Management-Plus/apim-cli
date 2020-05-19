@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
@@ -154,20 +155,43 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			return foundAPIs;
 	}
 	
-	public <profile> void translateMethodIds(API api, int mode) throws AppException {
-		if(mode == APIFilter.NO_TRANSLATION) return; 
-		translateMethodIds(Arrays.asList(api), mode);
+	/**
+	 * Translates the methodIds of the given api. The operations are loaded from the API-Manager based on the apiId
+	 * @param <profile> An Outbound- or InboundProfile
+	 * @param api in which the methods should be translated
+	 * @param apiId the methods are loaded based on this API-ID (this might be a another referenced API 
+	 * @param mode translation direction 
+	 * @throws AppException when something goes wrong
+	 */
+	public <profile> void translateMethodIds(API api, String apiId, METHOD_TRANSLATION mode) throws AppException {
+		if(mode == METHOD_TRANSLATION.NONE) return; 
+		translateMethodIds(Arrays.asList(api), Arrays.asList(apiId), mode);
 	}
 	
-	public <profile> void translateMethodIds(List<API> apis, int mode) throws AppException {
-		if(mode == APIFilter.NO_TRANSLATION) return; 
+	/**
+	 * Translates the methodIds of the given api. The operations are loaded from the API-Manager based on the api.getId()
+	 * @param <profile> An Outbound- or InboundProfile
+	 * @param apis in which the methods should be translated
+	 * @param mode translation direction 
+	 * @throws AppException
+	 */
+	public <profile> void translateMethodIds(List<API> apis, METHOD_TRANSLATION mode) throws AppException {
+		if(mode == METHOD_TRANSLATION.NONE) return;
 		for(API api : apis) {
-			if(api.getOutboundProfiles()!=null) _translateMethodIds(api.getOutboundProfiles(), mode, api.getId());
-			if(api.getInboundProfiles()!=null) _translateMethodIds(api.getInboundProfiles(), mode, api.getId());
+			if(api.getOutboundProfiles()!=null) _translateMethodIds(api.getOutboundProfiles(), mode, Arrays.asList(api.getId()));
+			if(api.getInboundProfiles()!=null) _translateMethodIds(api.getInboundProfiles(), mode, Arrays.asList(api.getId()));
 		}
 	}
 	
-	private <ProfileType> void _translateMethodIds(Map<String, ProfileType> profiles, int mode, String apiId) throws AppException {
+	public <profile> void translateMethodIds(List<API> apis, List<String> apiIds, METHOD_TRANSLATION mode) throws AppException {
+		if(mode == METHOD_TRANSLATION.NONE) return; 
+		for(API api : apis) {
+			if(api.getOutboundProfiles()!=null) _translateMethodIds(api.getOutboundProfiles(), mode, apiIds);
+			if(api.getInboundProfiles()!=null) _translateMethodIds(api.getInboundProfiles(), mode, apiIds);
+		}
+	}
+	
+	private <ProfileType> void _translateMethodIds(Map<String, ProfileType> profiles, METHOD_TRANSLATION mode, List<String> apiIds) throws AppException {
 		Map<String, ProfileType> updatedEntries = new LinkedHashMap<String, ProfileType>();
 		
 		if(profiles!=null) {
@@ -176,18 +200,21 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			while(keys.hasNext()) {
 				String key = keys.next();
 				if(key.equals("_default")) continue;
-				APIMethod method;
-				if(mode==APIFilter.METHODS_AS_NAME) {
-					method = apim.methodAdapter.getMethodForId(apiId, key);
-				} else {
-					method = apim.methodAdapter.getMethodForName(apiId, key);
+				APIMethod method = null;
+				for(String apiId : apiIds) {
+					if(mode==METHOD_TRANSLATION.AS_NAME) {
+						method = apim.methodAdapter.getMethodForId(apiId, key);
+					} else {
+						method = apim.methodAdapter.getMethodForName(apiId, key);
+					}
+					if(method!=null) break;
 				}
 				ProfileType profileWithType = profiles.get(key);
 				Profile profile = (Profile)profileWithType;
-				profile.setApiMethodId(method.getId());
-				profile.setApiMethodName(method.getName());
+				profile.setApiOperationId(method.getId());
+				profile.setApiOperationName(method.getName());
 				profile.setApiId(method.getVirtualizedApiId());
-				if(mode==APIFilter.METHODS_AS_NAME) {
+				if(mode==METHOD_TRANSLATION.AS_NAME) {
 					updatedEntries.put(method.getName(), profileWithType);
 				} else {
 					updatedEntries.put(method.getId(), profileWithType);

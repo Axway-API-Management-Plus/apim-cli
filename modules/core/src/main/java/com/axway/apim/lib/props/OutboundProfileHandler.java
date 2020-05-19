@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.AuthenticationProfile;
@@ -23,6 +23,8 @@ public class OutboundProfileHandler implements PropertyHandler {
 	public JsonNode handleProperty(API desired, API actual, JsonNode response) throws AppException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		validateAuthenticationProfiles(desired);
+		APIManagerAPIAdapter apiAdapter = (APIManagerAPIAdapter) APIManagerAdapter.getInstance().apiAdapter;
+		apiAdapter.translateMethodIds(desired, actual.getId(), METHOD_TRANSLATION.AS_ID);
 		if(desired.getOutboundProfiles().size()!=0) {
 			//APIManagerAPIAdapter apiAdapter = (APIManagerAPIAdapter) APIManagerAdapter.getInstance().apiAdapter;
 			//apiAdapter.translateMethodIds(desired, APIFilter.METHODS_AS_ID);

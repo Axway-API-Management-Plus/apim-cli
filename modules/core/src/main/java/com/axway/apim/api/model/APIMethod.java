@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class APIMethod {
+	/**
+	 * The ID of the FE-API operation
+	 */
 	private String id;
 	
 	private String virtualizedApiId;
@@ -12,6 +15,9 @@ public class APIMethod {
 	
 	private String apiId;
 	
+	/**
+	 * The ID of the Backend-API method
+	 */
 	private String apiMethodId;
 
 	private String summary;

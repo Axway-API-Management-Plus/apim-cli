@@ -11,12 +11,17 @@ import com.axway.apim.adapter.APIManagerAdapter;
 
 public class APIFilter {
 	
-	public static int NO_TRANSLATION = -1;
-	public static int METHODS_AS_NAME = 0;
-	public static int METHODS_AS_ID = 1;
-
-	public static int TO_INTERNAL_POLICY_NAME = 10;
-	public static int TO_EXTERNAL_POLICY_NAME = 15;
+	public static enum METHOD_TRANSLATION {
+		NONE, 
+		AS_NAME, 
+		AS_ID
+	}
+	
+	public static enum POLICY_TRANSLATION {
+		NONE, 
+		TO_KEY, 
+		TO_NAME
+	}
 	
 	private String id;
 	private String apiId;
@@ -31,7 +36,7 @@ public class APIFilter {
 	
 	private String apiType;
 	
-	private int translateMethodMode = NO_TRANSLATION;
+	private METHOD_TRANSLATION translateMethodMode = METHOD_TRANSLATION.NONE;
 	
 	private boolean useBackendAPI = false;
 	
@@ -42,7 +47,7 @@ public class APIFilter {
 	
 	private boolean includeOriginalAPIDefinition = false;
 	
-	int translatePolicyMode = NO_TRANSLATION;
+	POLICY_TRANSLATION translatePolicyMode = POLICY_TRANSLATION.NONE;
 	
 	List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
@@ -136,19 +141,19 @@ public class APIFilter {
 		this.queryStringVersion = queryStringVersion;
 	}
 
-	public int getTranslateMethodMode() {
+	public METHOD_TRANSLATION getTranslateMethodMode() {
 		return translateMethodMode;
 	}
 
-	public void setTranslateMethodMode(int translateMethodMode) {
+	public void setTranslateMethodMode(METHOD_TRANSLATION translateMethodMode) {
 		this.translateMethodMode = translateMethodMode;
 	}
 
-	public int getTranslatePolicyMode() {
+	public POLICY_TRANSLATION getTranslatePolicyMode() {
 		return translatePolicyMode;
 	}
 
-	public void setTranslatePolicyMode(int translatePolicyMode) {
+	public void setTranslatePolicyMode(POLICY_TRANSLATION translatePolicyMode) {
 		this.translatePolicyMode = translatePolicyMode;
 	}
 
@@ -282,7 +287,7 @@ public class APIFilter {
 			 * APIs are created with:</br> 
 			 * - including the original API-Definition
 			 * - includingQuotas</br>
-			 * - Methods stay with the ID</br>
+			 * - Methods are not translated and stay with ID</br>
 			 * - Policies have the external name</br>
 			 * - Client-Organizations and -Applications are initialized
 			 */
@@ -302,7 +307,7 @@ public class APIFilter {
 		boolean deprecated;
 		boolean retired;
 		
-		int translateMethodMode = NO_TRANSLATION;
+		METHOD_TRANSLATION translateMethodMode = METHOD_TRANSLATION.NONE;
 		
 		boolean useBackendAPI = false;
 		
@@ -313,7 +318,7 @@ public class APIFilter {
 		
 		boolean includeOriginalAPIDefinition = false;
 		
-		int translatePolicyMode = NO_TRANSLATION;
+		POLICY_TRANSLATION translatePolicyMode = POLICY_TRANSLATION.NONE;
 		
 		List<NameValuePair> filters = new ArrayList<NameValuePair>();
 		
@@ -369,8 +374,8 @@ public class APIFilter {
 			switch(type) {
 			case ACTUAL_API:
 				this.includeQuotas = true;
-				this.translateMethodMode = METHODS_AS_ID;
-				this.translatePolicyMode = TO_EXTERNAL_POLICY_NAME;
+				this.translateMethodMode = METHOD_TRANSLATION.NONE;
+				this.translatePolicyMode = POLICY_TRANSLATION.TO_NAME;
 				this.includeClientOrganizations = true;
 				this.includeClientApplications = true;
 				this.includeOriginalAPIDefinition = true;
@@ -458,12 +463,12 @@ public class APIFilter {
 			return this;
 		}
 		
-		public Builder translatePolicies(int translatePolicyMode) {
+		public Builder translatePolicies(POLICY_TRANSLATION translatePolicyMode) {
 			this.translatePolicyMode = translatePolicyMode;
 			return this;
 		}
 		
-		public Builder translateMethods(int translateMethodMode) {
+		public Builder translateMethods(METHOD_TRANSLATION translateMethodMode) {
 			this.translateMethodMode = translateMethodMode;
 			return this;
 		}
