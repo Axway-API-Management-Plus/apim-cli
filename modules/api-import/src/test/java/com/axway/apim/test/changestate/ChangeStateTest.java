@@ -39,19 +39,19 @@ public class ChangeStateTest {
 		List<Organization> managerOrgs = new ArrayList<Organization>();
 
 		
-		importOrgs.add(new Organization().setName("orgA"));
-		importOrgs.add(new Organization().setName("orgB"));
-		importOrgs.add(new Organization().setName("orgC"));
+		importOrgs.add(new Organization().setName("orgA").setId("123"));
+		importOrgs.add(new Organization().setName("orgB").setId("456"));
+		importOrgs.add(new Organization().setName("orgC").setId("789"));
 
-		managerOrgs.add(new Organization().setName("orgC"));
-		managerOrgs.add(new Organization().setName("orgB"));
-		managerOrgs.add(new Organization().setName("orgA"));
+		managerOrgs.add(new Organization().setName("orgC").setId("123"));
+		managerOrgs.add(new Organization().setName("orgB").setId("456"));
+		managerOrgs.add(new Organization().setName("orgA").setId("789"));
 
 		importAPI.setClientOrganizations(importOrgs);
-		importAPI.setOrganization(new Organization().setName("123"));
+		importAPI.setOrganization(new Organization().setName("123").setId("789"));
 
 		managerAPI.setClientOrganizations(managerOrgs);
-		managerAPI.setOrganization(new Organization().setName("123"));
+		managerAPI.setOrganization(new Organization().setName("123").setId("789"));
 
 		APIChangeState changeState = new APIChangeState(managerAPI, importAPI);
 		Assert.assertEquals(changeState.hasAnyChanges(), false);
@@ -71,7 +71,7 @@ public class ChangeStateTest {
 
 	private static API getTestAPI() throws AppException {
 		API testAPI = new ActualAPI();
-		testAPI.setOrganization(new Organization().setName("123"));
+		testAPI.setOrganization(new Organization().setName("123").setId("123"));
 		testAPI.setState(API.STATE_PUBLISHED);
 		return testAPI;
 	}

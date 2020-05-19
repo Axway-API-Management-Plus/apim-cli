@@ -43,7 +43,7 @@ public class APIManagerOrganizationAdapter {
 			LOG.warn("Using OrgAdmin only to load all organizations.");
 		}
 		String orgId = "";
-		if(filter.getId()!=null) {
+		if(filter.getId()!=null && APIManagerAdapter.hasAdminAccount()) {
 			orgId = "/"+filter.getId();
 		}
 		URI uri;
@@ -100,16 +100,8 @@ public class APIManagerOrganizationAdapter {
 	}
 	
 	public Organization getOrgForId(String orgId) throws AppException {
-		try {
-			Organization org = getOrg(new OrgFilter.Builder().hasId(orgId).build());
-			return org;
-		} catch (AppException e) {
-			// Workaround as in some version the Org-Admin cannot load it's very organization
-			LOG.warn("Cannot load organization from API-Manager. Returning new organization.");
-			Organization org = new Organization();
-			org.setId(orgId);
-			return org;
-		}
+		Organization org = getOrg(new OrgFilter.Builder().hasId(orgId).build());
+		return org;
 	}
 	
 	public Organization getOrg(OrgFilter filter) throws AppException {
