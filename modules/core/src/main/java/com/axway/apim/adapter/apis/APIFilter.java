@@ -282,7 +282,7 @@ public class APIFilter {
 			 * APIs are created with:</br> 
 			 * - including the original API-Definition
 			 * - includingQuotas</br>
-			 * - Methods translated to name</br>
+			 * - Methods stay with the ID</br>
 			 * - Policies have the external name</br>
 			 * - Client-Organizations and -Applications are initialized
 			 */
@@ -369,7 +369,7 @@ public class APIFilter {
 			switch(type) {
 			case ACTUAL_API:
 				this.includeQuotas = true;
-				this.translateMethodMode = METHODS_AS_NAME;
+				this.translateMethodMode = METHODS_AS_ID;
 				this.translatePolicyMode = TO_EXTERNAL_POLICY_NAME;
 				this.includeClientOrganizations = true;
 				this.includeClientApplications = true;

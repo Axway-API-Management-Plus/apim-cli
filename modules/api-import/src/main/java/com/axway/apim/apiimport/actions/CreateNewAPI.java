@@ -13,6 +13,7 @@ import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.apiimport.APIImportManager;
+import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.apiimport.actions.tasks.CreateAPIProxy;
 import com.axway.apim.apiimport.actions.tasks.ImportBackendAPI;
 import com.axway.apim.apiimport.actions.tasks.ManageClientApps;

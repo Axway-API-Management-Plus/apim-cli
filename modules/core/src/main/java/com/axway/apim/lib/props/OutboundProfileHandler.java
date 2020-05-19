@@ -24,8 +24,8 @@ public class OutboundProfileHandler implements PropertyHandler {
 		ObjectMapper objectMapper = new ObjectMapper();
 		validateAuthenticationProfiles(desired);
 		if(desired.getOutboundProfiles().size()!=0) {
-			APIManagerAPIAdapter apiAdapter = (APIManagerAPIAdapter) APIManagerAdapter.getInstance().apiAdapter;
-			apiAdapter.translateMethodIds(desired, APIFilter.METHODS_AS_ID);
+			//APIManagerAPIAdapter apiAdapter = (APIManagerAPIAdapter) APIManagerAdapter.getInstance().apiAdapter;
+			//apiAdapter.translateMethodIds(desired, APIFilter.METHODS_AS_ID);
 			((ObjectNode)response).replace("outboundProfiles", objectMapper.valueToTree(desired.getOutboundProfiles()));
 		}
 		if(!APIManagerAdapter.hasAPIManagerVersion("7.6.2")){ // Versions before 7.6.2 don't support a FaultHandlerPolicy

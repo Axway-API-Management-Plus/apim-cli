@@ -53,6 +53,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
+import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
@@ -60,6 +63,7 @@ import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.definition.APISpecificationFactory;
+import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
@@ -255,6 +259,8 @@ public class APIImportConfigAdapter {
 	 */
 	public API completeDesiredAPI(API desiredAPI, API actualAPI) throws AppException {
 		if(actualAPI==null) return desiredAPI;
+		desiredAPI.setId(desiredAPI.getId());
+		((APIManagerAPIAdapter)APIManagerAdapter.getInstance().apiAdapter).translateMethodIds(desiredAPI, APIFilter.METHODS_AS_ID);
 		// We need to safe the original methodNames, as they are required during API-Re-Creation
 		((DesiredAPI)desiredAPI).setOriginalInboundProfiles(desiredAPI.getInboundProfiles());
 		((DesiredAPI)desiredAPI).setOriginalOutboundProfiles(desiredAPI.getOutboundProfiles());
