@@ -43,6 +43,8 @@ public class APIManagerOrganizationAdapter {
 			LOG.warn("Using OrgAdmin only to load all organizations.");
 		}
 		String orgId = "";
+		// In some versions (e.g. 7.6.2 - 7.6.2 SP4 confirmed) an Org-Admin can't provide it's own Org-Id to load it's own org
+		// Therefore we need to skip that here
 		if(filter.getId()!=null && APIManagerAdapter.hasAdminAccount()) {
 			orgId = "/"+filter.getId();
 		}
@@ -61,7 +63,7 @@ public class APIManagerOrganizationAdapter {
 				LOG.error("Received Status-Code: " +httpResponse.getStatusLine().getStatusCode()+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
 				throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
-			if(filter.getId()!=null) {
+			if(!orgId.equals("")) {
 				// Store it as an Array
 				apiManagerResponse.put(filter, "[" + EntityUtils.toString(httpResponse.getEntity()) + "]");
 			} else {
@@ -85,8 +87,8 @@ public class APIManagerOrganizationAdapter {
 			List<Organization> allOrgs = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<Organization>>(){});
 			return allOrgs;
 		} catch (IOException e) {
-			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + apiManagerResponse);
-			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			LOG.error("Error cant read orgs from API-Manager with filter: "+filter+". Returned response: " + apiManagerResponse);
+			throw new AppException("Error cant read orgs from API-Manager with filter: "+filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
 	
