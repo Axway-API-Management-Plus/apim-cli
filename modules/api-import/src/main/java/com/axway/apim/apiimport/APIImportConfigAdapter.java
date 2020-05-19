@@ -116,9 +116,6 @@ public class APIImportConfigAdapter {
 	
 	private ErrorState error = ErrorState.getInstance();
 	
-	APIManagerOrganizationAdapter orgsAdapter;
-	APIMgrAppsAdapter appsAdapter;
-	
 
 	/**
 	 * Constructor just for testing. Don't use it!
@@ -129,8 +126,6 @@ public class APIImportConfigAdapter {
 	public APIImportConfigAdapter(API apiConfig, String apiConfigFile) throws AppException {
 		this.apiConfig = apiConfig;
 		this.apiConfigFile = apiConfigFile;
-		this.appsAdapter = APIManagerAdapter.getInstance().appAdapter;
-		this.orgsAdapter = APIManagerAdapter.getInstance().orgAdapter;
 	}
 	/**
 	 * Constructs the APIImportConfig 
@@ -316,7 +311,7 @@ public class APIImportConfigAdapter {
 			apiConfig.setClientOrganizations(null); // Making sure, orgs are not considered as a changed property
 			return;
 		}
-		List<Organization> allOrgs = orgsAdapter.getAllOrgs();
+		List<Organization> allOrgs =  APIManagerAdapter.getInstance().orgAdapter.getAllOrgs();
 		if(apiConfig.getClientOrganizations().contains("ALL")) {
 			apiConfig.getClientOrganizations().clear();
 			apiConfig.getClientOrganizations().addAll(allOrgs);
@@ -425,7 +420,7 @@ public class APIImportConfigAdapter {
 				app = it.next();
 				if(app.getName()!=null) {
 					ClientAppFilter filter = new ClientAppFilter.Builder().hasName(app.getName()).build();
-					loadedApp = appsAdapter.getApplication(filter);
+					loadedApp =  APIManagerAdapter.getInstance().appAdapter.getApplication(filter);
 					if(loadedApp==null) {
 						LOG.warn("Unknown application with name: '" + filter.getApplicationName() + "' configured. Ignoring this application.");
 						invalidClientApps = invalidClientApps==null ? app.getName() : invalidClientApps + ", "+app.getName();
