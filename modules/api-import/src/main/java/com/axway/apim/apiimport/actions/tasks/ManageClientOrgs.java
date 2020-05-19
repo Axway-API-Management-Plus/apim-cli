@@ -174,12 +174,13 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 			if(referenceOrgs.contains(org)) {
 				continue;
 			}
-			if(orgsAdapter.getOrg(new OrgFilter.Builder().hasId(org.getId()).build())==null) {
+			Organization organization =  orgsAdapter.getOrgForName(org.getName());
+			if(organization==null) {
 				LOG.warn("Configured organizations: " + orgsAdapter.getAllOrgs());
 				ErrorState.getInstance().setError("Unknown Org-Name: '" + org.getName() + "'", ErrorCode.UNKNOWN_ORGANIZATION, false);
 				throw new AppException("Unknown Org-Name: '" + org.getName() + "'", ErrorCode.UNKNOWN_ORGANIZATION);
 			}
-			missingOrgs.add(org);
+			missingOrgs.add(organization);
 		}
 		return missingOrgs;
 	}

@@ -86,9 +86,9 @@ public class APIManagerOrganizationAdapter {
 		return getOrgs(new OrgFilter.Builder().build());
 	}
 	
-	public String getOrgId(String orgName) throws AppException {
+	public Organization getOrgForName(String orgName) throws AppException {
 		Organization org = getOrg(new OrgFilter.Builder().hasName(orgName).build());
-		return org.getId();
+		return org;
 	}
 	
 	public Organization getOrg(OrgFilter filter) throws AppException {

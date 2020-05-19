@@ -158,15 +158,15 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 		echo("####### Validate the application no Access to this API #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestApp1Id}/apis").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.*.apiId", "@assertThat(not(containsString(${newApiId})))@"));
+			.validate("$.*.apiId", "@assertThat(not(contains(${newApiId})))@"));
 		
 		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestApp2Id}/apis").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.*.apiId", "@assertThat(not(containsString(${newApiId})))@"));
+			.validate("$.*.apiId", "@assertThat(not(contains(${newApiId})))@"));
 		
 		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestApp3Id}/apis").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.*.apiId", "@assertThat(not(containsString(${newApiId})))@"));
+			.validate("$.*.apiId", "@assertThat(not(contains(${newApiId})))@"));
 		
 		echo("####### Changing the state to unpublished #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");

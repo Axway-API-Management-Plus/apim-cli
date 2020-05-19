@@ -8,7 +8,9 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
@@ -75,8 +77,8 @@ public class CreateNewAPI {
 		
 		try {
 			// As we have just created an API-Manager API, we should reflect this for further processing
-			APIFilter filter = new APIFilter.Builder().build();
-			createdAPI = new APIManagerAPIAdapter().setAPIManagerResponse(new APIFilter.Builder().build(), "["+context.get("lastResponse").toString()+"]").getAPI(filter, true);
+			APIFilter filter = new APIFilter.Builder(Type.ACTUAL_API).build();
+			createdAPI = ((APIManagerAPIAdapter)APIManagerAdapter.getInstance().apiAdapter).setAPIManagerResponse(filter, "["+context.get("lastResponse").toString()+"]").getAPI(filter, true);
 			// Register the created FE-API to be rolled back in case of an error
 			((API)rollbackAPI).setId(createdAPI.getId());
 			changes.setIntransitAPI(createdAPI);

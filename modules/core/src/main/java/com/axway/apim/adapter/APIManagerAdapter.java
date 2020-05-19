@@ -69,8 +69,6 @@ public class APIManagerAdapter {
 	
 	public static String apiManagerVersion = null;
 	
-	private static List<ClientApplication> allApps = null;
-	
 	public static ObjectMapper mapper = new ObjectMapper();
 	
 	private static Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<String, ClientApplication>();
@@ -123,7 +121,6 @@ public class APIManagerAdapter {
 		}
 		Transaction transaction = Transaction.getInstance();
 		transaction.beginTransaction();
-		APIManagerAdapter.allApps = null; // Reset allApps with every run (relevant for testing, as executed in the same JVM)
 		loginToAPIManager(false); // Login with the provided user (might be an Org-Admin)
 		loginToAPIManager(true); // Second, login if needed with an admin account
 	}
@@ -387,7 +384,7 @@ public class APIManagerAdapter {
 			LOG.info("Found existing application (in cache): '"+app.getName()+"' based on credential (Type: '"+type+"'): '"+credential+"'");
 			return app;
 		}
-		new APIMgrAppsAdapter().getAllApplications(); // Make sure, we loaded all apps before!
+		List<ClientApplication> allApps = new APIMgrAppsAdapter().getAllApplications(); // Make sure, we loaded all apps before!
 		LOG.debug("Searching credential (Type: "+type+"): '"+credential+"' in: " + allApps.size() + " apps.");
 		Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
 		HttpResponse httpResponse = null;

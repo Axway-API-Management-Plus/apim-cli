@@ -3,8 +3,11 @@ package com.axway.apim.adapter.clientApps;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+
+import com.axway.apim.adapter.apis.APIFilter;
 
 public class ClientAppFilter {
 	
@@ -91,15 +94,32 @@ public class ClientAppFilter {
 	void useFilter(List<NameValuePair> filter) {
 		this.filters.addAll(filter);
 	}
-
+	
 	@Override
-	public int hashCode() {
-		return "TEST_ABC".hashCode();
+	public boolean equals(Object obj) {
+		if (obj == null) return false;
+		if (this == obj) return true;
+		if(obj instanceof ClientAppFilter == false) return false;
+		ClientAppFilter other = (ClientAppFilter)obj;
+		return (
+				StringUtils.equals(other.getApplicationName(), this.getApplicationName()) && 
+				StringUtils.equals(other.getState(), this.getState()) &&
+				StringUtils.equals(other.getOrganization(), this.getOrganization())
+				);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		return true;
+	public int hashCode() {
+		int hashCode = 0;
+		hashCode += (this.applicationId!=null) ? this.applicationId.hashCode() : 0;
+		hashCode += (this.state!=null) ? this.state.hashCode() : 0;
+		hashCode += (this.applicationName!=null) ? this.applicationName.hashCode() : 0;
+		return hashCode;
+	}
+
+	@Override
+	public String toString() {
+		return "ClientAppFilter [name=" + applicationName + ", id=" + applicationId + "]";
 	}
 
 	/**

@@ -50,10 +50,9 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	
 	CommandParameters params = CommandParameters.getInstance();
 	
-	APIManagerAdapter apim;; 
+	APIManagerAdapter apim; 
 
-	public APIManagerAPIAdapter() throws AppException {
-
+	APIManagerAPIAdapter() throws AppException {
 	}
 	
 	@Override
@@ -315,23 +314,24 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		}
 		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null 
 				&& CommandParameters.getInstance().getClientOrgsMode().equals(CommandParameters.MODE_REPLACE)) return;*/
-		List<Organization> grantedOrgs = new ArrayList<Organization>();
+		List<Organization> grantedOrgs;
 		List<Organization> allOrgs = apim.orgAdapter.getAllOrgs();
-		for(Organization org : allOrgs) {
-			List<APIAccess> orgAPIAccess = apim.accessAdapter.getAPIAccess(org.getId(), APIManagerAPIAccessAdapter.Type.organizations);
-			for(API api : apis) {
+		for(API api : apis) {
+			grantedOrgs = new ArrayList<Organization>();
+			for(Organization org : allOrgs) {
+				List<APIAccess> orgAPIAccess = apim.accessAdapter.getAPIAccess(org.getId(), APIManagerAPIAccessAdapter.Type.organizations);
 				for(APIAccess access : orgAPIAccess) {
 					if(access.getApiId().equals(api.getId())) {
 						grantedOrgs.add(org);
 					}
 				}
-				api.setClientOrganizations(grantedOrgs);
 			}
+			api.setClientOrganizations(grantedOrgs);
 		}
 	}
 	
 	public void addClientApplications(List<API> apis, boolean addClientApplication) throws AppException {
-		if(!addClientApplication || !APIManagerAdapter.hasAdminAccount()) return;
+		if(!addClientApplication) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> apps = null;
 		// With version >7.7 we can retrieve the subscribed apps directly

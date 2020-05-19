@@ -114,7 +114,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 		}
 		return actualState.getClientOrganizations().contains(appsOrgs.getName());
 	}
-	
+
 	private void createAppSubscription(List<ClientApplication> missingDesiredApps, String apiId) throws AppException {
 		URI uri;
 		HttpEntity entity;
@@ -127,28 +127,29 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 				Transaction.getInstance().put("appName", app);
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis").build();
 				entity = new StringEntity("{\"apiId\":\""+apiId+"\",\"enabled\":true}");
-				
-				RestAPICall apiCall = new POSTRequest(entity, uri, null, hasAdminAccount);
-				httpResponse = apiCall.execute();
-				if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_CREATED) {
-					LOG.debug("Successfully created API-Access for application: '"+app.getName()+"'");
-				} else {
-					LOG.error("Received status code: " + httpResponse.getStatusLine().getStatusCode());
-					try {
-						LOG.error("Received response: " + EntityUtils.toString(httpResponse.getEntity()));
-					} catch (Exception e) {
-						LOG.error(e.getMessage(), e);
+				try {
+					RestAPICall apiCall = new POSTRequest(entity, uri, null, hasAdminAccount);
+					httpResponse = apiCall.execute();
+					if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_CREATED) {
+						LOG.debug("Successfully created API-Access for application: '"+app.getName()+"'");
+					} else {
+						LOG.error("Received status code: " + httpResponse.getStatusLine().getStatusCode());
+						try {
+							LOG.error("Received response: " + EntityUtils.toString(httpResponse.getEntity()));
+						} catch (Exception e) {
+							LOG.error(e.getMessage(), e);
+						}
+						throw new AppException("Failure creating/deleting API-Access to/from application: '"+app.getName()+"'. Mode: 'MODE_CREATE_API_ACCESS'", 
+								ErrorCode.API_MANAGER_COMMUNICATION);
 					}
-					throw new AppException("Failure creating/deleting API-Access to/from application: '"+app.getName()+"'. Mode: 'MODE_CREATE_API_ACCESS'", 
-							ErrorCode.API_MANAGER_COMMUNICATION);
+				} finally {
+					try {
+						((CloseableHttpResponse)httpResponse).close();
+					} catch (Exception ignore) {}
 				}
 			}
 		} catch (Exception e) {
 			throw new AppException("Can't create API access requests.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
 		}
 	}
 	
