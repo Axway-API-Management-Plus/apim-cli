@@ -55,11 +55,9 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	CommandParameters cmd  = CommandParameters.getInstance();
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
-	
-	APIManagerQuotaAdapter quotaAdapter;
 
 	public APIMgrAppsAdapter() throws AppException {
-		quotaAdapter = APIManagerAdapter.getInstance().quotaAdapter;
+		
 	}
 	
 	@Override
@@ -103,7 +101,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			}
 			if(filter.isIncludeQuota()) {
 				for(ClientApplication app : apps) {
-					quotaAdapter.getQuotaForAPI(app.getId(), null);
+					APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(app.getId(), null);
 				}
 			}
 			if(filter.isIncludeCredentials()) {
