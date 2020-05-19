@@ -8,6 +8,7 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.TestIndicator;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -24,6 +25,7 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 	@CitrusTest
 	@Test @Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+		TestIndicator.getInstance().setTestRunning(false);
 		swaggerImport = new ImportTestAction();
 		swaggerImport = new ImportTestAction();
 		description("Import an API, grant access to an org and create an application subscription.");
