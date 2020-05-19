@@ -53,8 +53,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
-import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
@@ -118,7 +116,7 @@ public class APIImportConfigAdapter {
 	
 	private ErrorState error = ErrorState.getInstance();
 	
-	APIManagerOrganizationAdapter orgsAdapter = new APIManagerOrganizationAdapter();
+	APIManagerOrganizationAdapter orgsAdapter;
 	APIMgrAppsAdapter appsAdapter;
 	
 
@@ -132,6 +130,7 @@ public class APIImportConfigAdapter {
 		this.apiConfig = apiConfig;
 		this.apiConfigFile = apiConfigFile;
 		this.appsAdapter = APIManagerAdapter.getInstance().appAdapter;
+		this.orgsAdapter = APIManagerAdapter.getInstance().orgAdapter;
 	}
 	/**
 	 * Constructs the APIImportConfig 
