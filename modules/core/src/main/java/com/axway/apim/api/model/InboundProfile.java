@@ -2,6 +2,9 @@ package com.axway.apim.api.model;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(value = {"apiMethodId", "apiId", "apiMethodName"})
 public class InboundProfile extends Profile {
 	
 	boolean monitorAPI = true;
