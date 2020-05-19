@@ -38,6 +38,7 @@ import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class APIManagerAPIAdapter extends APIAdapter {
@@ -71,11 +72,11 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			_readAPIsFromAPIManager(filter);
 			apis = filterAPIs(filter, logMessage);
 			translateMethodIds(apis, filter.getTranslateMethodMode());
-			//translatePolicies(apis, filter.getTranslatePolicyMode());
 			addQuotaConfiguration(apis, filter.isIncludeQuotas());
 			addClientOrganizations(apis, filter.isIncludeClientOrganizations());
 			addClientApplications(apis, filter.isIncludeClientApplications());
 			addExistingClientAppQuotas(apis, filter.isIncludeQuotas());
+			addCustomProperties(apis, filter);
 			addOriginalAPIDefinitionFromAPIM(apis, filter.isIncludeOriginalAPIDefinition());
 		} catch (IOException e) {
 			throw new AppException("Cant reads API from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -303,8 +304,32 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				app.setAppQuota(appQuota);
 			}
 		}
-
 	}
+	
+	private void addCustomProperties(List<API> apis, APIFilter filter) throws IOException {
+		if(filter.getCustomProperties() == null) return;
+		Map<String, String> customProperties = new LinkedHashMap<String, String>();
+		Iterator<String> it = filter.getCustomProperties().keySet().iterator();
+		Map<String, JsonNode> apiAsJsonMappedWithId = new HashMap<String, JsonNode>();
+		JsonNode jsonPayload = mapper.readTree(this.apiManagerResponse.get(filter));
+		// Create a map for each API containing the JSON-Payload
+		for(JsonNode node : jsonPayload) {
+			String apiId = node.get("id").asText();
+			apiAsJsonMappedWithId.put(apiId, node);
+		}
+		for(API api : apis) {
+			JsonNode node = apiAsJsonMappedWithId.get(api.getId());
+			while(it.hasNext()) {
+				String customPropKey = it.next();
+				JsonNode value = node.get(customPropKey);
+				String customPropValue = (value == null) ? null : value.asText();
+				customProperties.put(customPropKey, customPropValue);
+			}
+			api.setCustomProperties(customProperties);
+		}
+	}
+	
+	
 	
 	private void addClientOrganizations(List<API> apis, boolean addClientOrganizations) throws AppException {
 		if(!addClientOrganizations || !APIManagerAdapter.hasAdminAccount()) return;

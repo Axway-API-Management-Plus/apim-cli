@@ -2,6 +2,7 @@ package com.axway.apim.adapter.apis;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
@@ -30,6 +31,8 @@ public class APIFilter {
 	private String apiPath;
 	private String queryStringVersion;
 	private String state;
+	
+	private Map<String, String> customProperties;
 	
 	private boolean deprecated;
 	private boolean retired;
@@ -237,6 +240,14 @@ public class APIFilter {
 		filters.add(new BasicNameValuePair("value", state));
 	}
 	
+	public Map<String, String> getCustomProperties() {
+		return customProperties;
+	}
+
+	public void setCustomProperties(Map<String, String> customProperties) {
+		this.customProperties = customProperties;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
@@ -304,6 +315,8 @@ public class APIFilter {
 		String queryStringVersion;
 		String state;
 		
+		Map<String, String> customProperties;
+		
 		boolean deprecated;
 		boolean retired;
 		
@@ -367,6 +380,7 @@ public class APIFilter {
 			apiFilter.setState(this.state);
 			apiFilter.setRetired(this.retired);
 			apiFilter.setDeprecated(this.deprecated);
+			apiFilter.setCustomProperties(this.customProperties);
 			return apiFilter;
 		}
 
@@ -460,6 +474,11 @@ public class APIFilter {
 		
 		public Builder includeOriginalAPIDefinition(boolean includeOriginalAPIDefinition) {
 			this.includeOriginalAPIDefinition = includeOriginalAPIDefinition;
+			return this;
+		}
+		
+		public Builder includeCustomProperties(Map<String, String> customProperties) {
+			this.customProperties = customProperties;
 			return this;
 		}
 		

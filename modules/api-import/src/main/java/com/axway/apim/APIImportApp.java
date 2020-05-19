@@ -82,6 +82,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			APIFilter filter = new APIFilter.Builder(Builder.Type.ACTUAL_API)
 					.hasApiPath(desiredAPI.getPath())
 					.hasVHost(desiredAPI.getVhost())
+					.includeCustomProperties(desiredAPI.getCustomProperties())
 					.hasQueryStringVersion(desiredAPI.getApiRoutingKey())
 					.includeClientOrganizations(desiredAPI.getClientOrganizations()!=null) // For performance reasons don't load ClientOrgs
 					.includeQuotas(desiredAPI.getApplicationQuota()!=null) // and Quotas if not given in the Desired-API
