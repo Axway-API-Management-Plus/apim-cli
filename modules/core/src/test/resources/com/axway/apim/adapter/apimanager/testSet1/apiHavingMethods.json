@@ -85,7 +85,7 @@
             "routePolicy": "<key type='CircuitContainer'><id field='name' value='Client App Registry Policies'/><key type='FilterCircuit'><id field='name' value='Client App Registry Static Content Protection Policy'/></key></key>",
             "faultHandlerPolicy": "<key type='CircuitContainer'><id field='name' value='Generated Policies'/><key type='CircuitContainer'><id field='name' value='REST API&apos;s'/><key type='CircuitContainer'><id field='name' value='Templates'/><key type='FilterCircuit'><id field='name' value='Default Fault Handler'/></key></key></key></key>",
             "apiId": "10f02b84-fa4a-4cb6-a0c9-da6974c77005",
-            "apiOperationId": null,
+            "apiMethodId": null,
             "parameters": []
         },
         "132712e4-c132-4298-bfa0-f6f5c811ad65": {
@@ -96,7 +96,7 @@
             "routePolicy": null,
             "faultHandlerPolicy": null,
             "apiId": "10f02b84-fa4a-4cb6-a0c9-da6974c77005",
-            "apiOperationId": "db89e373-f678-4990-88ca-891e434c34db",
+            "apiMethodId": "db89e373-f678-4990-88ca-891e434c34db",
             "parameters": []
         }
     },

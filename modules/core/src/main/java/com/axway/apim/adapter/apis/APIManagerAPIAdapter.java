@@ -211,8 +211,8 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				}
 				ProfileType profileWithType = profiles.get(key);
 				Profile profile = (Profile)profileWithType;
-				profile.setApiOperationId(method.getId());
-				profile.setApiOperationName(method.getName());
+				profile.setApiMethodId(method.getId());
+				profile.setApiMethodName(method.getName());
 				profile.setApiId(method.getVirtualizedApiId());
 				if(mode==METHOD_TRANSLATION.AS_NAME) {
 					updatedEntries.put(method.getName(), profileWithType);

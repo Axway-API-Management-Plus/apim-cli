@@ -294,6 +294,6 @@ public class APIExportConfigAdapter {
 		if(exportAPI.getOutboundProfiles()==null) return;
 		OutboundProfile profile = exportAPI.getOutboundProfiles().get("_default");
 		profile.setApiId(null);
-		profile.setApiOperationId(null);
+		profile.setApiMethodId(null);
 	}
 }

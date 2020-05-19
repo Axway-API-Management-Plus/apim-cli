@@ -3,38 +3,30 @@ package com.axway.apim.api.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public abstract class Profile {
-	/**  it
-	 * Used internally to save original API-Method ID as given by the API-Manager
-	 */
-	@JsonIgnore
-	String apiOperationId;
-	
-	/**
-	 * Stores the API-Method name 
-	 */
-	@JsonIgnore
-	String apiOperationName;
-	
-	/**
-	 * Used internally to save original API-ID as given by the API-Manager
-	 */
-	@JsonIgnore
+	String apiMethodId;
+
 	String apiId;
+	
+	/**
+	 * Stores the API-Method name (internally used only) 
+	 */
+	@JsonIgnore
+	String apiMethodName;
 
-	public String getApiOperationId() {
-		return apiOperationId;
+	public String getApiMethodId() {
+		return apiMethodId;
 	}
 
-	public void setApiOperationId(String apiOperationId) {
-		this.apiOperationId = apiOperationId;
+	public void setApiMethodId(String apiMethodId) {
+		this.apiMethodId = apiMethodId;
 	}
 
-	public String getApiOperationName() {
-		return apiOperationName;
+	public String getApiMethodName() {
+		return apiMethodName;
 	}
 
-	public void setApiOperationName(String apiOperationName) {
-		this.apiOperationName = apiOperationName;
+	public void setApiMethodName(String apiMethodName) {
+		this.apiMethodName = apiMethodName;
 	}
 
 	public String getApiId() {
