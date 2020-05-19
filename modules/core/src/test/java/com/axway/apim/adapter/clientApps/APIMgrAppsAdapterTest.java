@@ -92,7 +92,7 @@ public class APIMgrAppsAdapterTest {
 		Assert.assertTrue(clientAppAdapter instanceof APIMgrAppsAdapter, "Adapter must be instance of APIMgrAppsAdapter");
 		APIMgrAppsAdapter adapter = (APIMgrAppsAdapter)clientAppAdapter;
 		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");
-		ClientAppFilter filter = new ClientAppFilter.Builder().hasOrganization("42342342342343223").build();
+		ClientAppFilter filter = new ClientAppFilter.Builder().hasOrganizationId("42342342342343223").build();
 		URI requestUri = adapter.getApplicationsUri(filter);
 		
 		Assert.assertNotNull(requestUri, "RequestUri is null");
@@ -159,7 +159,7 @@ public class APIMgrAppsAdapterTest {
 		Assert.assertTrue(clientAppAdapter instanceof APIMgrAppsAdapter, "Adapter must be instance of APIMgrAppsAdapter");
 		APIMgrAppsAdapter adapter = (APIMgrAppsAdapter)clientAppAdapter;
 		
-		ClientAppFilter filter = new ClientAppFilter.Builder().hasState(null).hasName(null).hasOrganization(null).build();
+		ClientAppFilter filter = new ClientAppFilter.Builder().hasState(null).hasName(null).hasOrganizationId(null).build();
 		URI requestUri = adapter.getApplicationsUri(filter);
 
 		Assert.assertNotNull(adapter, "APIMgrAppsAdapter is null");

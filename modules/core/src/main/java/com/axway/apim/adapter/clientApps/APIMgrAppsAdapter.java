@@ -34,6 +34,7 @@ import com.axway.apim.api.model.apps.OAuth;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
@@ -42,6 +43,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.xml.bind.v2.model.core.ErrorHandler;
 
 public class APIMgrAppsAdapter extends ClientAppAdapter {
 	
@@ -71,17 +73,21 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	 */
 	private void readApplicationsFromAPIManager(ClientAppFilter appFilter) throws AppException {
 		if(this.apiManagerResponse !=null && this.apiManagerResponse.get(appFilter)!=null) return;
+		HttpResponse response = null;
 		try {
 			URI uri = getApplicationsUri(appFilter);
-			LOG.info("Sending request to find existing applications: " + uri);
+			LOG.debug("Sending request to find existing applications: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
 			
-			HttpResponse response = getRequest.execute();
+			response = getRequest.execute();
 			this.apiManagerResponse.put(appFilter,EntityUtils.toString(response.getEntity(), "UTF-8"));
-			//this.apps = mapper.readValue(response, new TypeReference<List<ClientApplication>>(){});
-			
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		} finally {
+			try {
+				if(response!=null) 
+					((CloseableHttpResponse)response).close();
+			} catch (Exception ignore) {}
 		}
 	}
 	
@@ -163,7 +169,8 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	
 	private ClientApplication uniqueApplication(List<ClientApplication> apps) throws AppException {
 		if(apps.size()>1) {
-			throw new AppException("No unique application found", ErrorCode.UNKNOWN_API);
+			ErrorState.getInstance().setError("No unique application found", ErrorCode.APP_NAME_IS_NOT_UNIQUE, false);
+			throw new AppException("No unique application found", ErrorCode.APP_NAME_IS_NOT_UNIQUE);
 		}
 		if(apps.size()==0) return null;
 		return apps.get(0);

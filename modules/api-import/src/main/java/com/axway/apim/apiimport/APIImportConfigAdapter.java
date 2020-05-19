@@ -423,9 +423,10 @@ public class APIImportConfigAdapter {
 			while(it.hasNext()) {
 				app = it.next();
 				if(app.getName()!=null) {
-					loadedApp = appsAdapter.getApplication(new ClientAppFilter.Builder().hasName(app.getName()).build());
+					ClientAppFilter filter = new ClientAppFilter.Builder().hasName(app.getName()).build();
+					loadedApp = appsAdapter.getApplication(filter);
 					if(loadedApp==null) {
-						LOG.warn("Unknown application with name: '" + app.getName() + "' configured. Ignoring this application.");
+						LOG.warn("Unknown application with name: '" + filter.getApplicationName() + "' configured. Ignoring this application.");
 						invalidClientApps = invalidClientApps==null ? app.getName() : invalidClientApps + ", "+app.getName();
 						APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_APPLICATIONS.name(), invalidClientApps);
 						it.remove();
@@ -452,6 +453,8 @@ public class APIImportConfigAdapter {
 					} 
 				}
 				if(!APIManagerAdapter.hasAdminAccount()) {
+					System.out.println("apiConfig.getOrganization(): " + apiConfig.getOrganization());
+					System.out.println("loadedApp: " + loadedApp);
 					if(!apiConfig.getOrganization().getId().equals(loadedApp.getOrganizationId())) {
 						LOG.warn("OrgAdmin can't handle application: '"+loadedApp.getName()+"' belonging to a different organization. Ignoring this application.");
 						it.remove();

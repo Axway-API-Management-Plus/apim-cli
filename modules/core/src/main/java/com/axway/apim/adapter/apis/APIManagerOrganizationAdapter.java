@@ -37,10 +37,10 @@ public class APIManagerOrganizationAdapter {
 	Map<OrgFilter, String> apiManagerResponse = new HashMap<OrgFilter, String>();
 	
 	private void readOrgsFromAPIManager(OrgFilter filter) throws AppException {
-		if(!APIManagerAdapter.hasAdminAccount()) {
-			LOG.error("Using OrgAdmin only to load all organizations.");
-		}
 		if(apiManagerResponse.get(filter) != null) return;
+		if(!APIManagerAdapter.hasAdminAccount()) {
+			LOG.warn("Using OrgAdmin only to load all organizations.");
+		}
 		String orgId = "";
 		if(filter.getId()!=null) {
 			orgId = "/"+filter.getId();

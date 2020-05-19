@@ -50,8 +50,6 @@ public class APIManagerAPIAccessAdapter {
 			Map<String, String> mappedResponse = new HashMap<String, String>();
 			mappedResponse.put(id, response);
 			apiManagerResponse.put(type, mappedResponse);
-			//allApiAccess = mapper.readValue(response, new TypeReference<List<APIAccess>>(){});
-			//return allApiAccess;
 		} catch (Exception e) {
 			LOG.error("Error cant load API-Access for "+type+" from API-Manager. Can't parse response: " + response);
 			throw new AppException("API-Access for "+type+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);

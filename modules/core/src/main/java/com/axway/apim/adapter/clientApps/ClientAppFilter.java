@@ -7,7 +7,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.model.Organization;
+import com.axway.apim.lib.errorHandling.AppException;
 
 public class ClientAppFilter {
 	
@@ -21,7 +23,7 @@ public class ClientAppFilter {
 	
 	String state;
 	
-	String organization;
+	String organizationId;
 	
 	String applicationId;
 	
@@ -49,16 +51,16 @@ public class ClientAppFilter {
 		return filters;
 	}
 
-	public void setOrganization(String organization) {
-		if(organization==null) return;
-		this.organization = organization;
+	public void setOrganizationId(String organizationId) {
+		if(organizationId==null) return;
+		this.organizationId = organizationId;
 		filters.add(new BasicNameValuePair("field", "orgid"));
 		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", organization));
+		filters.add(new BasicNameValuePair("value", organizationId));
 	}
 
 	public String getOrganization() {
-		return organization;
+		return organizationId;
 	}
 
 	public void setApplicationName(String applicationName) {
@@ -133,7 +135,7 @@ public class ClientAppFilter {
 		
 		boolean includeImage;
 		
-		String organization;
+		String organizationId;
 		
 		/** The name of the application */
 		String applicationName;
@@ -157,7 +159,7 @@ public class ClientAppFilter {
 			ClientAppFilter filter = new ClientAppFilter();
 			filter.setApplicationId(this.applicationId);
 			filter.setApplicationName(this.applicationName);
-			filter.setOrganization(this.organization);
+			filter.setOrganizationId(this.organizationId);
 			filter.setState(this.state);
 			filter.includeQuota = this.includeQuota;
 			filter.includeCredentials = this.includeCredentials;
@@ -165,8 +167,15 @@ public class ClientAppFilter {
 			return filter;
 		}
 		
-		public Builder hasName(String name) {
-			this.applicationName = name;
+		public Builder hasName(String name) throws AppException {
+			if(name==null) return this;
+			if(name.contains("|")) {
+				Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(name.substring(name.indexOf("|")+1));
+				hasOrganizationId(org.getId());
+				this.applicationName = name.substring(0, name.indexOf("|"));
+			} else {
+				this.applicationName = name;	
+			}
 			return this;
 		}
 		
@@ -175,8 +184,8 @@ public class ClientAppFilter {
 			return this;
 		}
 		
-		public Builder hasOrganization(String organization) {
-			this.organization = organization;
+		public Builder hasOrganizationId(String organizationId) {
+			this.organizationId = organizationId;
 			return this;
 		}
 		

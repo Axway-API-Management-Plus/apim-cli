@@ -97,17 +97,23 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		if(this.apiManagerResponse.get(filter)!=null) return;
 		CommandParameters cmd = CommandParameters.getInstance();
 		URI uri;
+		HttpResponse response = null;
 		try { 
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+filter.getApiType())
 					.addParameters(filter.getFilters())
 					.build();
 			LOG.info("Sending request to find existing APIs: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null);
-			HttpResponse response = getRequest.execute();
+			response = getRequest.execute();
 
 			apiManagerResponse.put(filter, EntityUtils.toString(response.getEntity()));
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		} finally {
+			try {
+				if(response!=null) 
+					((CloseableHttpResponse)response).close();
+			} catch (Exception ignore) {}
 		}
 	}
 	
@@ -220,67 +226,15 @@ public class APIManagerAPIAdapter extends APIAdapter {
 					updatedEntries.put(method.getId(), profileWithType);
 				}
 				keys.remove();
-				/*for(APIMethod method : methods) {
-					if(mode==APIFilter.METHODS_AS_NAME) {
-						if(method.getId().equals(key)) { // Look for the methodId
-							profile value = profiles.get(key);
-							if(value instanceof OutboundProfile) {
-								((OutboundProfile)value).setApiMethodId(method.getApiMethodId());
-								((OutboundProfile)value).setApiMethodName(method.getName());
-								((OutboundProfile)value).setApiId(method.getVirtualizedApiId());
-							}
-							updatedEntries.put(method.getName(), value);
-							keys.remove();
-							break;
-						}						
-					} else {
-						if(method.getName().equals(key)) {
-							profile value = profiles.get(key);
-							if(value instanceof OutboundProfile) {
-								((OutboundProfile)value).setApiMethodId(method.getApiMethodId());
-								((OutboundProfile)value).setApiMethodName(method.getName());
-								((OutboundProfile)value).setApiId(method.getVirtualizedApiId());
-							}
-							updatedEntries.put(method.getId(), profiles.get(key));
-							keys.remove();
-							break;
-						}
-					}
-				}*/
 			}
 			profiles.putAll(updatedEntries);
 		}
 	}
-	/*
-	public <profile> void translatePolicies(List<API> apis, int mode) throws AppException {
-		if(mode == APIFilter.NO_TRANSLATION) return; 
-		for(API api : apis) {
-			if(api.getOutboundProfiles()!=null) {
-				Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
-				while(it.hasNext()) {
-					OutboundProfile profile = it.next();
-					if(mode == APIFilter.TO_INTERNAL_POLICY_NAME) {
-						profile.setRequestPolicy(apim.policiesAdapter.getPolicyKey(profile.getRequestPolicy(), APIManagerPoliciesAdapter.REQUEST));
-						profile.setRoutePolicy(apim.policiesAdapter.getPolicyKey(profile.getRoutePolicy(), APIManagerPoliciesAdapter.ROUTING));
-						profile.setResponsePolicy(apim.policiesAdapter.getPolicyKey(profile.getResponsePolicy(), APIManagerPoliciesAdapter.RESPONSE));
-						profile.setFaultHandlerPolicy(apim.policiesAdapter.getPolicyKey(profile.getFaultHandlerPolicy(), APIManagerPoliciesAdapter.FAULT_HANDLER));						
-					} else {
-						profile.setRequestPolicy(apim.policiesAdapter.getPolicyName(profile.getRequestPolicy(), APIManagerPoliciesAdapter.REQUEST));
-						profile.setRoutePolicy(apim.policiesAdapter.getPolicyName(profile.getRoutePolicy(), APIManagerPoliciesAdapter.ROUTING));
-						profile.setResponsePolicy(apim.policiesAdapter.getPolicyName(profile.getResponsePolicy(), APIManagerPoliciesAdapter.RESPONSE));
-						profile.setFaultHandlerPolicy(apim.policiesAdapter.getPolicyName(profile.getFaultHandlerPolicy(), APIManagerPoliciesAdapter.FAULT_HANDLER));
-					}
-				}
-			}
-		}
-	}*/
 	
 	private void addQuotaConfiguration(List<API> apis, boolean addQuota) throws AppException {
 		if(!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
 		APIQuota applicationQuota = null;
 		APIQuota sytemQuota = null;
-		// No need to load quota, if not given in the desired API
-		//if(desiredAPI!=null && (desiredAPI.getApplicationQuota() == null && desiredAPI.getSystemQuota() == null)) return;
 		for(API api : apis) {			
 			try {
 				applicationQuota = apim.quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.APPLICATION_DEFAULT_QUOTA, api.getId()); // Get the Application-Default-Quota
