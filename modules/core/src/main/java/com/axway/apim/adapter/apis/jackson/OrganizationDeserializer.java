@@ -10,14 +10,11 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 public class OrganizationDeserializer extends StdDeserializer<Organization> {
 	
 	private static final long serialVersionUID = 1L;
-	
-	private static final ObjectMapper mapper = new ObjectMapper();
 	
 	public OrganizationDeserializer() {
 		this(null);
@@ -41,7 +38,9 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 				// organization name is given in the config file
 				filter = new OrgFilter.Builder().hasName(node.asText()).build();
 			}
-			return APIManagerAdapter.getInstance().orgAdapter.getOrg(filter);
+			Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrg(filter);
+			System.out.println("Resolved org: " + org);
+			return org;
 		} catch (AppException e) {
 			throw new IOException("Error reading organization", e);
 		}

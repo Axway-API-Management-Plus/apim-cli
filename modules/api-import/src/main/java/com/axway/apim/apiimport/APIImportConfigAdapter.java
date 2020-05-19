@@ -212,14 +212,23 @@ public class APIImportConfigAdapter {
 	 */
 	public API getDesiredAPI() throws AppException {
 		try {
+			LOG.info("getDesiredAPI -1: " + apiConfig.getOrganization());
 			validateExposurePath(apiConfig);
+			LOG.info("getDesiredAPI -2: " + apiConfig.getOrganization());
 			validateOrganization(apiConfig);
+			LOG.info("getDesiredAPI -3: " + apiConfig.getOrganization());
 			checkForAPIDefinitionInConfiguration(apiConfig);
+			LOG.info("getDesiredAPI -4: " + apiConfig.getOrganization());
 			addDefaultPassthroughSecurityProfile(apiConfig);
+			LOG.info("getDesiredAPI -5: " + apiConfig.getOrganization());
 			addDefaultCorsProfile(apiConfig);
+			LOG.info("getDesiredAPI -6: " + apiConfig.getOrganization());
 			addDefaultAuthenticationProfile(apiConfig);
+			LOG.info("getDesiredAPI -7: " + apiConfig.getOrganization());
 			addDefaultOutboundProfile(apiConfig);
+			LOG.info("getDesiredAPI -8: " + apiConfig.getOrganization());
 			addDefaultInboundProfile(apiConfig);
+			LOG.info("getDesiredAPI -9: " + apiConfig.getOrganization());
 			APISpecification apiSpecification = APISpecificationFactory.getAPISpecification(getAPIDefinitionContent(), this.pathToAPIDefinition, ((DesiredAPI)apiConfig).getBackendBasepath());
 			apiConfig.setAPIDefinition(apiSpecification);
 			addImageContent(apiConfig);
@@ -230,6 +239,7 @@ public class APIImportConfigAdapter {
 			completeCaCerts(apiConfig);
 			addQuotaConfiguration(apiConfig);
 			handleAllOrganizations(apiConfig);
+			LOG.info("getDesiredAPI -10: " + apiConfig.getOrganization());
 			completeClientApplications(apiConfig);
 			return apiConfig;
 		} catch (Exception e) {
