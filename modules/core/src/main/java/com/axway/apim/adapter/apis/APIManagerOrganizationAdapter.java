@@ -61,7 +61,7 @@ public class APIManagerOrganizationAdapter {
 				LOG.info("filter.getId()!=null response: " + response);
 				apiManagerResponse.put(filter, "[" + response + "]");
 			} else {
-				// We get an Array from API-Manager
+				// We got an Array from API-Manager
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				LOG.info("Array response: " + response);
 				apiManagerResponse.put(filter, response);

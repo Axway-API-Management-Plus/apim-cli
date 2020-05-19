@@ -212,23 +212,14 @@ public class APIImportConfigAdapter {
 	 */
 	public API getDesiredAPI() throws AppException {
 		try {
-			LOG.info("getDesiredAPI -1: " + apiConfig.getOrganization());
 			validateExposurePath(apiConfig);
-			LOG.info("getDesiredAPI -2: " + apiConfig.getOrganization());
 			validateOrganization(apiConfig);
-			LOG.info("getDesiredAPI -3: " + apiConfig.getOrganization());
 			checkForAPIDefinitionInConfiguration(apiConfig);
-			LOG.info("getDesiredAPI -4: " + apiConfig.getOrganization());
 			addDefaultPassthroughSecurityProfile(apiConfig);
-			LOG.info("getDesiredAPI -5: " + apiConfig.getOrganization());
 			addDefaultCorsProfile(apiConfig);
-			LOG.info("getDesiredAPI -6: " + apiConfig.getOrganization());
 			addDefaultAuthenticationProfile(apiConfig);
-			LOG.info("getDesiredAPI -7: " + apiConfig.getOrganization());
 			addDefaultOutboundProfile(apiConfig);
-			LOG.info("getDesiredAPI -8: " + apiConfig.getOrganization());
 			addDefaultInboundProfile(apiConfig);
-			LOG.info("getDesiredAPI -9: " + apiConfig.getOrganization());
 			APISpecification apiSpecification = APISpecificationFactory.getAPISpecification(getAPIDefinitionContent(), this.pathToAPIDefinition, ((DesiredAPI)apiConfig).getBackendBasepath());
 			apiConfig.setAPIDefinition(apiSpecification);
 			addImageContent(apiConfig);
@@ -263,10 +254,6 @@ public class APIImportConfigAdapter {
 	 */
 	public API completeDesiredAPI(API desiredAPI, API actualAPI) throws AppException {
 		if(actualAPI==null) return desiredAPI;
-		//((APIManagerAPIAdapter)APIManagerAdapter.getInstance().apiAdapter).translateMethodIds(desiredAPI, actualAPI.getId(), METHOD_TRANSLATION.AS_ID);
-		// We need to safe the original methodNames, as they are required during API-Re-Creation
-		// ((DesiredAPI)desiredAPI).setOriginalInboundProfiles(desiredAPI.getInboundProfiles());
-		// ((DesiredAPI)desiredAPI).setOriginalOutboundProfiles(desiredAPI.getOutboundProfiles());
 		return desiredAPI;
 	}
 	
@@ -284,9 +271,8 @@ public class APIImportConfigAdapter {
 	private void validateOrganization(API apiConfig) throws AppException {
 		if(apiConfig instanceof DesiredTestOnlyAPI) return;
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
-			OrgFilter filter = new OrgFilter.Builder().hasId(APIManagerAdapter.getCurrentUser(false).getOrganizationId()).build();
-			Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrg(filter) ;
-			LOG.info("validateOrganization org: " + org);
+			Organization org = new Organization();
+			org.setId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
 			apiConfig.setOrganization(org);
 		} else {
 			if(!apiConfig.getOrganization().getDevelopment()) {
