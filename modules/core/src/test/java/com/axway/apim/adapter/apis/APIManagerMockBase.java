@@ -53,8 +53,8 @@ public abstract class APIManagerMockBase {
 		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.ROUTING, routingPolicies);
 		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.RESPONSE, responsePolicies);
 		apim.policiesAdapter.apiManagerResponse.put(APIManagerPoliciesAdapter.PolicyType.FAULT_HANDLER, faultHandlerPolicies);
-		apim.quotaAdapter.apiManagerResponse.put(APIManagerQuotaAdapter.SYSTEM_API_QUOTA, systemQuotas);
-		apim.quotaAdapter.apiManagerResponse.put(APIManagerQuotaAdapter.APPLICATION_DEFAULT_QUOTA, applicationDefaultQuotas);
+		apim.quotaAdapter.apiManagerResponse.put(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), systemQuotas);
+		apim.quotaAdapter.apiManagerResponse.put(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), applicationDefaultQuotas);
 		apim.quotaAdapter.apiManagerResponse.put("ecf109cd-d012-4c57-897a-b3e8b041889b", applicationQuota);
 		apim.accessAdapter.setAPIManagerTestResponse(APIManagerAPIAccessAdapter.Type.applications, "ecf109cd-d012-4c57-897a-b3e8b041889b", testAppAPIAccess);
 		apim.accessAdapter.setAPIManagerTestResponse(APIManagerAPIAccessAdapter.Type.organizations, "d9ea6280-8811-4baf-8b5b-011a97142840", testOrgsAPIAccess);

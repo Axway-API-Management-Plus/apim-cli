@@ -237,8 +237,8 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		APIQuota sytemQuota = null;
 		for(API api : apis) {			
 			try {
-				applicationQuota = apim.quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.APPLICATION_DEFAULT_QUOTA, api.getId()); // Get the Application-Default-Quota
-				sytemQuota = apim.quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.SYSTEM_API_QUOTA, api.getId()); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
+				applicationQuota = apim.quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), api.getId()); // Get the Application-Default-Quota
+				sytemQuota = apim.quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), api.getId()); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
 				api.setApplicationQuota(applicationQuota);
 				api.setSystemQuota(sytemQuota);
 			} catch (AppException e) {

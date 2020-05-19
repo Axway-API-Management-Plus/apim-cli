@@ -29,8 +29,20 @@ public class APIManagerQuotaAdapter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerQuotaAdapter.class);
 	
-	public final static String SYSTEM_API_QUOTA 				= "00000000-0000-0000-0000-000000000000";
-	public final static String APPLICATION_DEFAULT_QUOTA 		= "00000000-0000-0000-0000-000000000001";
+	public static enum Quota {
+		SYSTEM_DEFAULT ("00000000-0000-0000-0000-000000000000"), 
+		APPLICATION_DEFAULT ("00000000-0000-0000-0000-000000000001");
+		
+		private final String quotaId;
+		
+		private Quota(String quotaId) {
+			this.quotaId = quotaId;
+		}
+
+		public String getQuotaId() {
+			return quotaId;
+		}
+	}
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 
@@ -44,7 +56,7 @@ public class APIManagerQuotaAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			if(APPLICATION_DEFAULT_QUOTA.equals(quotaId) || SYSTEM_API_QUOTA.equals(quotaId)) {
+			if(Quota.APPLICATION_DEFAULT.getQuotaId().equals(quotaId) || Quota.SYSTEM_DEFAULT.getQuotaId().equals(quotaId)) {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+quotaId).build();
 			} else {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+quotaId+"/quota/").build();
@@ -78,6 +90,17 @@ public class APIManagerQuotaAdapter {
 		}
 		return quotaConfig;
 	}
+	
+	public APIQuota getDefaultQuota(Quota quotaType) throws AppException {
+		readQuotaFromAPIManager(quotaType.getQuotaId());
+		APIQuota quotaConfig;
+		try {
+			quotaConfig = mapper.readValue(apiManagerResponse.get(quotaType.getQuotaId()), APIQuota.class);
+		} catch (IOException e) {
+			throw new AppException("Error cant load default quotas from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+		return quotaConfig;
+	}	
 	
 	private static APIQuota filterQuotaForAPI(APIQuota quotaConfig, String apiId) throws AppException {
 		List<QuotaRestriction> apiRestrictions = new ArrayList<QuotaRestriction>();

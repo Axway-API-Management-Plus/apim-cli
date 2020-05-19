@@ -34,6 +34,7 @@ import com.axway.apim.adapter.apis.APIManagerConfigAdapter;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter;
 import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
+import com.axway.apim.adapter.apis.APIManagerQuotaAdapter.Quota;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.definition.APISpecificationFactory;
@@ -73,10 +74,6 @@ public class APIManagerAdapter {
 	
 	private static Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<String, ClientApplication>();
 	
-	
-	
-	public static APIQuota sytemQuotaConfig = null;
-	public static APIQuota applicationQuotaConfig = null;
 	private boolean usingOrgAdmin = false;
 	private boolean hasAdminAccount = false;
 	

@@ -14,6 +14,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerQuotaAdapter.Quota;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
@@ -51,7 +52,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 			} else {
 				LOG.info("Updating System-Default-Quota for API: " + desiredState.getName());
 				LOG.debug("System-Quota-Config: '" + desiredState.getSystemQuota()+"'");
-				APIQuota systemQuota = APIManagerAdapter.sytemQuotaConfig;
+				APIQuota systemQuota = APIManagerAdapter.getInstance().quotaAdapter.getDefaultQuota(Quota.SYSTEM_DEFAULT);
 				for(QuotaRestriction restriction : desiredState.getSystemQuota().getRestrictions()) {
 					restriction.setApi(actualState.getId());
 				}
@@ -67,7 +68,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 			} else {
 				LOG.info("Updating Application-Default-Quota for API: " + desiredState.getName());
 				LOG.debug("Application-Quota-Config: '" + desiredState.getApplicationQuota()+"'");
-				APIQuota applicationQuota = APIManagerAdapter.applicationQuotaConfig;
+				APIQuota applicationQuota = APIManagerAdapter.getInstance().quotaAdapter.getDefaultQuota(Quota.APPLICATION_DEFAULT);
 				for(QuotaRestriction restriction : desiredState.getApplicationQuota().getRestrictions()) {
 					restriction.setApi(actualState.getId());
 				}
