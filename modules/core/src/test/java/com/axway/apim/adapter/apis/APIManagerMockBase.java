@@ -29,6 +29,8 @@ public abstract class APIManagerMockBase {
 		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsOrgAdmin.json")), false);
 		apiAdapter = (APIManagerAPIAdapter) APIManagerAdapter.getInstance().apiAdapter;
 		
+		apim.configAdapter.setAPIManagerTestResponse("{ \"productVersion\": \"7.7.20200130\" }", false);
+		
 		apim.methodAdapter.setAPIManagerTestResponse("72745ed9-f75b-428c-959c-b483eea497a1", Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiMethods.json")));
 		apim.methodAdapter.setAPIManagerTestResponse("72745ed9-f75b-428c-959c-99999999", Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiMethodsUsedWithMethodNames.json")));
 		
