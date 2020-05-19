@@ -282,6 +282,8 @@ public class API {
 	}
 	
 	public String getState() throws AppException {
+		if(this.deprecated!=null 
+				&& this.deprecated.equals("true")) return STATE_DEPRECATED;
 		return this.state;
 	}
 
