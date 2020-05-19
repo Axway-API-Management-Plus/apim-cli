@@ -53,12 +53,17 @@ public class APIManagerOrganizationAdapter {
 					.build();
 			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
 			LOG.info("Sending request to API-Manager to load organizations using filter: " + filter);
+			LOG.info("URI: " + uri);
 			httpResponse = getRequest.execute();
 			if(filter.getId()!=null) {
 				// Store it as an Array
+				String response = EntityUtils.toString(httpResponse.getEntity());
+				LOG.info("filter.getId()!=null response: " + response);
 				apiManagerResponse.put(filter, "[" + EntityUtils.toString(httpResponse.getEntity()) + "]");
 			} else {
 				// We get an Array from API-Manager
+				String response = EntityUtils.toString(httpResponse.getEntity());
+				LOG.info("Array response: " + response);
 				apiManagerResponse.put(filter, EntityUtils.toString(httpResponse.getEntity()));
 			}
 		} catch (Exception e) {
