@@ -112,7 +112,7 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 			LOG.debug("No Client-Orgs configured for this API, therefore other app has NO permission.");
 			return false;
 		}
-		return actualState.getClientOrganizations().contains(appsOrgs.getName());
+		return actualState.getClientOrganizations().contains(appsOrgs);
 	}
 
 	private void createAppSubscription(List<ClientApplication> missingDesiredApps, String apiId) throws AppException {

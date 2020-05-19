@@ -74,7 +74,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		try {
 			URI uri = getApplicationsUri(appFilter);
 			LOG.info("Sending request to find existing applications: " + uri);
-			RestAPICall getRequest = new GETRequest(uri, null);
+			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
 			
 			HttpResponse response = getRequest.execute();
 			this.apiManagerResponse.put(appFilter,EntityUtils.toString(response.getEntity(), "UTF-8"));
