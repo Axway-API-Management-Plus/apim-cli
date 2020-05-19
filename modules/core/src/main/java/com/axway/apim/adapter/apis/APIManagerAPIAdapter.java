@@ -1,6 +1,7 @@
 package com.axway.apim.adapter.apis;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -11,7 +12,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
@@ -27,6 +30,7 @@ import com.axway.apim.api.definition.APISpecificationFactory;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.Profile;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -78,6 +82,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			addExistingClientAppQuotas(apis, filter.isIncludeQuotas());
 			addCustomProperties(apis, filter);
 			addOriginalAPIDefinitionFromAPIM(apis, filter.isIncludeOriginalAPIDefinition());
+			addImageFromAPIM(apis); 
 		} catch (IOException e) {
 			throw new AppException("Cant reads API from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
@@ -194,6 +199,39 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		for(API api : apis) {
 			if(api.getOutboundProfiles()!=null) _translateMethodIds(api.getOutboundProfiles(), mode, apiIds);
 			if(api.getInboundProfiles()!=null) _translateMethodIds(api.getInboundProfiles(), mode, apiIds);
+		}
+	}
+	
+	private static void addImageFromAPIM(List<API> apis) throws AppException {
+		Image image = new Image();
+		for(API api : apis) {
+			image = new Image();
+			URI uri;
+			HttpResponse httpResponse = null;
+			try {
+				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+api.getId()+"/image").build();
+				RestAPICall getRequest = new GETRequest(uri, null);
+				httpResponse = getRequest.execute();
+				if(httpResponse == null || httpResponse.getEntity() == null || httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
+					api.setImage(null);
+					continue; // no Image found in API-Manager
+				}
+				InputStream is = httpResponse.getEntity().getContent();
+				image.setImageContent(IOUtils.toByteArray(is));
+				image.setBaseFilename("api-image");
+				if(httpResponse.containsHeader("Content-Type")) {
+					String contentType = httpResponse.getHeaders("Content-Type")[0].getValue();
+					image.setContentType(contentType);
+				}
+				api.setImage(image);
+			} catch (Exception e) {
+				throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			} finally {
+				try {
+					if(httpResponse!=null) 
+						((CloseableHttpResponse)httpResponse).close();
+				} catch (Exception ignore) {}
+			}
 		}
 	}
 	
