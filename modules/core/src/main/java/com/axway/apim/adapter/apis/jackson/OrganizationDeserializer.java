@@ -33,12 +33,11 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 			// Deserialization depends on the direction
 			if("organizationId".equals(jp.currentName())) {
 				// organizationId is given by API-Manager
-				filter = new OrgFilter.Builder().hasId(node.asText()).build();
+				return APIManagerAdapter.getInstance().orgAdapter.getOrgForId(node.asText());
 			} else {
 				// organization name is given in the config file
-				filter = new OrgFilter.Builder().hasName(node.asText()).build();
+				return APIManagerAdapter.getInstance().orgAdapter.getOrgForName(node.asText());
 			}
-			return APIManagerAdapter.getInstance().orgAdapter.getOrg(filter);
 		} catch (AppException e) {
 			throw new IOException("Error reading organization", e);
 		}
