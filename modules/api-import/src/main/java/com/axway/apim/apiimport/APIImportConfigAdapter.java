@@ -286,6 +286,7 @@ public class APIImportConfigAdapter {
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
 			OrgFilter filter = new OrgFilter.Builder().hasId(APIManagerAdapter.getCurrentUser(false).getOrganizationId()).build();
 			Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrg(filter) ;
+			LOG.info("validateOrganization org: " + org);
 			apiConfig.setOrganization(org);
 		} else {
 			if(!apiConfig.getOrganization().getDevelopment()) {
