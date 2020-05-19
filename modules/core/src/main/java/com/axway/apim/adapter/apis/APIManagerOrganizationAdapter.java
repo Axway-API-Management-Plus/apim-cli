@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
@@ -52,23 +53,23 @@ public class APIManagerOrganizationAdapter {
 					.addParameters(filter.getFilters())
 					.build();
 			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
-			LOG.info("Sending request to API-Manager to load organizations using filter: " + filter);
-			LOG.info("URI: " + uri);
+			LOG.debug("Load organizations from API-Manager using filter: " + filter);
+			LOG.trace("Load organization with URI: " + uri);
 			httpResponse = getRequest.execute();
+			if(httpResponse.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
+				LOG.error("Received Status-Code: " +httpResponse.getStatusLine().getStatusCode()+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+				throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
 			if(filter.getId()!=null) {
 				// Store it as an Array
-				String response = EntityUtils.toString(httpResponse.getEntity());
-				LOG.info("filter.getId()!=null response: " + response);
-				apiManagerResponse.put(filter, "[" + response + "]");
+				apiManagerResponse.put(filter, "[" + EntityUtils.toString(httpResponse.getEntity()) + "]");
 			} else {
 				// We got an Array from API-Manager
-				String response = EntityUtils.toString(httpResponse.getEntity());
-				LOG.info("Array response: " + response);
-				apiManagerResponse.put(filter, response);
+				apiManagerResponse.put(filter, EntityUtils.toString(httpResponse.getEntity()));
 			}
 		} catch (Exception e) {
-			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + httpResponse);
-			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			LOG.error("Error cant read orgs from API-Manager with filter: "+filter+". Can't parse response: " + httpResponse);
+			throw new AppException("Error cant read orgs from API-Manager with filter: "+filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 

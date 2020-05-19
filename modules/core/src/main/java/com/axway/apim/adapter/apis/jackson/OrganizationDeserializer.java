@@ -38,9 +38,7 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 				// organization name is given in the config file
 				filter = new OrgFilter.Builder().hasName(node.asText()).build();
 			}
-			Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrg(filter);
-			System.out.println("Resolved org: " + org);
-			return org;
+			return APIManagerAdapter.getInstance().orgAdapter.getOrg(filter);
 		} catch (AppException e) {
 			throw new IOException("Error reading organization", e);
 		}
