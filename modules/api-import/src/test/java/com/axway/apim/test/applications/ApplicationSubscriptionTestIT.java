@@ -25,7 +25,7 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 	@CitrusTest
 	@Test @Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
-		TestIndicator.getInstance().setTestRunning(false);
+		//TestIndicator.getInstance().setTestRunning(false);
 		swaggerImport = new ImportTestAction();
 		swaggerImport = new ImportTestAction();
 		description("Import an API, grant access to an org and create an application subscription.");

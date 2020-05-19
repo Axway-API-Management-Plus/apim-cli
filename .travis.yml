@@ -42,7 +42,7 @@ before_install:
   # Safe Cassandra image inc cache file
   - if [ ! -f $CACHE_FILE_CASSANDRA ]; then docker save $CASSANDRA_DOCKER_IMAGE | gzip > $CACHE_FILE_CASSANDRA; fi
   
-  - mvn clean verify -Dtest=ApplicationSubscriptionTestIT
+  - mvn -Dit.test=ApplicationSubscriptionTestIT -DfailIfNoTests=false verify
 
 install:
   # Start Cassandra and wait that port 9042 is reachable
