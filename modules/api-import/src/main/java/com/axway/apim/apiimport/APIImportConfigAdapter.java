@@ -119,17 +119,19 @@ public class APIImportConfigAdapter {
 	private ErrorState error = ErrorState.getInstance();
 	
 	APIManagerOrganizationAdapter orgsAdapter = new APIManagerOrganizationAdapter();
-	APIMgrAppsAdapter appsAdapter = new APIMgrAppsAdapter();
+	APIMgrAppsAdapter appsAdapter;
 	
 
 	/**
 	 * Constructor just for testing. Don't use it!
 	 * @param apiConfig the desired API to test with
 	 * @param apiConfigFile this is the given config file
+	 * @throws AppException 
 	 */
-	public APIImportConfigAdapter(API apiConfig, String apiConfigFile) {
+	public APIImportConfigAdapter(API apiConfig, String apiConfigFile) throws AppException {
 		this.apiConfig = apiConfig;
 		this.apiConfigFile = apiConfigFile;
+		this.appsAdapter = APIManagerAdapter.getInstance().appAdapter;
 	}
 	/**
 	 * Constructs the APIImportConfig 
@@ -453,8 +455,6 @@ public class APIImportConfigAdapter {
 					} 
 				}
 				if(!APIManagerAdapter.hasAdminAccount()) {
-					System.out.println("apiConfig.getOrganization(): " + apiConfig.getOrganization());
-					System.out.println("loadedApp: " + loadedApp);
 					if(!apiConfig.getOrganization().getId().equals(loadedApp.getOrganizationId())) {
 						LOG.warn("OrgAdmin can't handle application: '"+loadedApp.getName()+"' belonging to a different organization. Ignoring this application.");
 						it.remove();

@@ -56,9 +56,11 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
-	APIManagerQuotaAdapter quotaAdapter = new APIManagerQuotaAdapter();
+	APIManagerQuotaAdapter quotaAdapter;
 
-	public APIMgrAppsAdapter() {}
+	public APIMgrAppsAdapter() throws AppException {
+		quotaAdapter = APIManagerAdapter.getInstance().quotaAdapter;
+	}
 	
 	@Override
 	public boolean readConfig(Object config) throws AppException {

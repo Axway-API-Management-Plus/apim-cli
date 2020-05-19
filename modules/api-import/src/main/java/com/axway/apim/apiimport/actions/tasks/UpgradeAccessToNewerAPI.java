@@ -32,12 +32,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IResponseParser {
 	
-	APIManagerAPIMethodAdapter methodAdapter = new APIManagerAPIMethodAdapter();
+	APIManagerAPIMethodAdapter methodAdapter;
 	
 	private API inTransitState; 
 
-	public UpgradeAccessToNewerAPI(API inTransitState, API actualState) {
+	public UpgradeAccessToNewerAPI(API inTransitState, API actualState) throws AppException {
 		super(inTransitState, actualState);
+		this.methodAdapter = APIManagerAdapter.getInstance().methodAdapter;
 		this.inTransitState = inTransitState;
 	}
 	public void execute() throws AppException {

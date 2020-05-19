@@ -12,6 +12,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
@@ -37,11 +38,13 @@ public class ManageClientOrgs extends AbstractAPIMTask implements IResponseParse
 	private static String MODE_GRANT_ACCESS		= "MODE_GRANT_ACCESS";
 	private static String MODE_REMOVE_ACCESS	= "MODE_REMOVE_ACCESS";
 	
-	APIManagerOrganizationAdapter orgsAdapter = new APIManagerOrganizationAdapter();
-	APIManagerAPIAccessAdapter accessAdapter = new APIManagerAPIAccessAdapter();
+	APIManagerOrganizationAdapter orgsAdapter;
+	APIManagerAPIAccessAdapter accessAdapter;
 
-	public ManageClientOrgs(API desiredState, API actualState) {
+	public ManageClientOrgs(API desiredState, API actualState) throws AppException {
 		super(desiredState, actualState);
+		orgsAdapter = APIManagerAdapter.getInstance().orgAdapter;
+		accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
 	}
 
 	public void execute(boolean reCreation) throws AppException {

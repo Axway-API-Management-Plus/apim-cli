@@ -208,7 +208,7 @@ public class APIExportConfigAdapter {
 	
 	private String getVHost(ExportAPI exportAPI) throws AppException {
 		if(exportAPI.getVhost()!=null) return exportAPI.getVhost() + File.separator;
-		String orgVHost = new APIManagerOrganizationAdapter().getOrg(new OrgFilter.Builder().hasId(exportAPI.getOrganization().getId()).build()).getVirtualHost();
+		String orgVHost = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(exportAPI.getOrganization().getId()).build()).getVirtualHost();
 		if(orgVHost!=null) return orgVHost+File.separator;
 		return "";
 	}

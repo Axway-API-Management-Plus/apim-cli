@@ -384,7 +384,7 @@ public class APIManagerAdapter {
 			LOG.info("Found existing application (in cache): '"+app.getName()+"' based on credential (Type: '"+type+"'): '"+credential+"'");
 			return app;
 		}
-		List<ClientApplication> allApps = new APIMgrAppsAdapter().getAllApplications(); // Make sure, we loaded all apps before!
+		List<ClientApplication> allApps = this.appAdapter.getAllApplications(); // Make sure, we loaded all apps before!
 		LOG.debug("Searching credential (Type: "+type+"): '"+credential+"' in: " + allApps.size() + " apps.");
 		Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
 		HttpResponse httpResponse = null;
