@@ -88,7 +88,7 @@ public class UpgradeAccessToNewerAPI extends AbstractAPIMTask implements IRespon
 						if(!restriction.getMethod().equals("*")) { // The restriction is for a specific method
 							String originalMethodName = methodAdapter.getMethodForId(actualState.getId(), restriction.getMethod()).getName();
 							// Try to find the same operation for the newly created API based on the name
-							String newMethodId = methodAdapter.getMethodForName(desiredState.getId(), originalMethodName).getName();
+							String newMethodId = methodAdapter.getMethodForName(desiredState.getId(), originalMethodName).getId();
 							restriction.setMethod(newMethodId);
 						}
 					}
