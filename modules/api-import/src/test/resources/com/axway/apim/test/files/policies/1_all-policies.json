@@ -20,7 +20,7 @@
 			"routePolicy": "${routePolicy}",
 			"faultHandlerPolicy": "${faultHandlerPolicy}",
 			"apiId": null,
-			"apiOperationId": null,
+			"apiMethodId": null,
 			"parameters": [
 			]
 		}
