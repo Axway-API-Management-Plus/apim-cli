@@ -52,6 +52,7 @@ public class APIManagerOrganizationAdapter {
 					.addParameters(filter.getFilters())
 					.build();
 			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
+			LOG.info("Sending request to API-Manager to load organizations using filter: " + filter);
 			httpResponse = getRequest.execute();
 			if(filter.getId()!=null) {
 				// Store it as an Array
@@ -96,7 +97,10 @@ public class APIManagerOrganizationAdapter {
 		if(orgs.size()>1) {
 			throw new AppException("No unique Organization found", ErrorCode.UNKNOWN_API);
 		}
-		if(orgs.size()==0) return null;
+		if(orgs.size()==0) {
+			LOG.info("No organization found using filter: " + filter);
+			return null;
+		}
 		return orgs.get(0);
 	}
 	
