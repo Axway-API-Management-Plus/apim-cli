@@ -31,8 +31,8 @@ public class RecreateToUpdateAPI {
 		API desired = changes.getDesiredAPI();
 		
 		// On Re-Creation we need to restore the orginal given methodNames for methodLevel override
-		desired.setInboundProfiles(((DesiredAPI)desired).getOriginalInboundProfiles());
-		desired.setOutboundProfiles(((DesiredAPI)desired).getOriginalOutboundProfiles());
+		// desired.setInboundProfiles(((DesiredAPI)desired).getOriginalInboundProfiles());
+		// desired.setOutboundProfiles(((DesiredAPI)desired).getOriginalOutboundProfiles());
 		
 		// 1. Create BE- and FE-API (API-Proxy) / Including updating all belonging props!
 		// This also includes all CONFIGURED application subscriptions and client-orgs

@@ -374,7 +374,7 @@ public class APIFilter {
 			switch(type) {
 			case ACTUAL_API:
 				this.includeQuotas = true;
-				this.translateMethodMode = METHOD_TRANSLATION.NONE;
+				this.translateMethodMode = METHOD_TRANSLATION.AS_NAME;
 				this.translatePolicyMode = POLICY_TRANSLATION.TO_NAME;
 				this.includeClientOrganizations = true;
 				this.includeClientApplications = true;

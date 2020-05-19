@@ -257,10 +257,10 @@ public class APIImportConfigAdapter {
 	 */
 	public API completeDesiredAPI(API desiredAPI, API actualAPI) throws AppException {
 		if(actualAPI==null) return desiredAPI;
-		((APIManagerAPIAdapter)APIManagerAdapter.getInstance().apiAdapter).translateMethodIds(desiredAPI, actualAPI.getId(), METHOD_TRANSLATION.AS_ID);
+		//((APIManagerAPIAdapter)APIManagerAdapter.getInstance().apiAdapter).translateMethodIds(desiredAPI, actualAPI.getId(), METHOD_TRANSLATION.AS_ID);
 		// We need to safe the original methodNames, as they are required during API-Re-Creation
-		((DesiredAPI)desiredAPI).setOriginalInboundProfiles(desiredAPI.getInboundProfiles());
-		((DesiredAPI)desiredAPI).setOriginalOutboundProfiles(desiredAPI.getOutboundProfiles());
+		// ((DesiredAPI)desiredAPI).setOriginalInboundProfiles(desiredAPI.getInboundProfiles());
+		// ((DesiredAPI)desiredAPI).setOriginalOutboundProfiles(desiredAPI.getOutboundProfiles());
 		return desiredAPI;
 	}
 	
