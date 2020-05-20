@@ -3,6 +3,6 @@
    "path": "${apiPath}",
    "state": "${status}",
    "version":"1.0.0",
-   "organization":"API Development",
+   "organization":"${orgName}",
    "backendBasepath": "${backendBasepath}"
 }
