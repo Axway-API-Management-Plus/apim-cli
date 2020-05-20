@@ -303,7 +303,7 @@ public class APIImportConfigAdapter {
 			return;
 		}
 		List<Organization> allOrgs =  APIManagerAdapter.getInstance().orgAdapter.getAllOrgs();
-		if(apiConfig.getClientOrganizations().contains("ALL")) {
+		if(apiConfig.getClientOrganizations().contains(new Organization().setName("ALL"))) {
 			apiConfig.getClientOrganizations().clear();
 			apiConfig.getClientOrganizations().addAll(allOrgs);
 			((DesiredAPI)apiConfig).setRequestForAllOrgs(true);
