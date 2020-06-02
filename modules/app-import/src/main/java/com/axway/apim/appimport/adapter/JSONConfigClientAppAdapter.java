@@ -12,6 +12,7 @@ import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.OAuth;
 import com.axway.apim.appimport.adapter.jackson.AppCredentialsDeserializer;
+import com.axway.apim.appimport.lib.DesiredClientApp;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -37,7 +38,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		if(!configFile.exists()) return false;
 		try {
 			mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
-			this.apps = mapper.readValue(configFile, new TypeReference<List<ClientApplication>>(){});
+			this.apps = mapper.readValue(configFile, new TypeReference<List<DesiredClientApp>>(){});
 		} catch (MismatchedInputException me) {
 			try {
 				ClientApplication app = mapper.readValue(configFile, ClientApplication.class);
@@ -56,7 +57,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	
 	@Override
 	public List<ClientApplication> getApplications(ClientAppFilter filter) throws AppException {
-		LOG.warn("Filtering results is not supported for the JSON implementation. Returning all applications.");
+		LOG.trace("Filtering results is not supported for the JSON implementation. Returning all applications.");
 		return getAllApplications();
 	}
 	

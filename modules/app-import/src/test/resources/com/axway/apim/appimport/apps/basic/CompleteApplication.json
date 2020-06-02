@@ -1,5 +1,6 @@
 {
   "name" : "${appName}",
+  "organization" : "${orgName}",
   "description" : "${description}",
   "state" : "${state}",
   "image" : "app-image.jpg",

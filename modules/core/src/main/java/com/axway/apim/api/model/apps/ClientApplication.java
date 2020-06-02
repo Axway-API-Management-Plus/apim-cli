@@ -8,10 +8,9 @@ import org.apache.commons.lang.StringUtils;
 import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
 import com.axway.apim.api.model.APIAccess;
+import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.APIQuota;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,8 +32,7 @@ public class ClientApplication {
 	private boolean enabled;
 	@JsonView(JSONViews.ApplicationBase.class)
 	private String state;
-	
-	
+
 	@JsonProperty("image")
 	private String imageUrl;
 	
@@ -54,6 +52,7 @@ public class ClientApplication {
 	private APIQuota appQuota;
 	
 	@JsonDeserialize( using = OrganizationDeserializer.class)
+	@JsonView(JSONViews.ApplicationBase.class)
 	@JsonProperty(value = "organizationId")
 	private Organization organization;
 	
@@ -140,6 +139,7 @@ public class ClientApplication {
 	public void setOrganization(Organization organization) {
 		this.organization = organization;
 	}
+	
 	public APIQuota getAppQuota() {
 		return appQuota;
 	}
