@@ -74,6 +74,6 @@ public class BackendBasepathChangeInSwaggerTestIT extends TestNGCitrusTestRunner
 				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 				.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
 				.validate("$.[?(@.path=='${apiPath}')].serviceProfiles._default.basePath", "${backendBasepath}")
-				.validate("$.[?(@.path=='${apiPath}')].caCerts[?(@.md5Fingerprint=='4D:98:60:03:B7:20:5A:5C:D3:1D:FB:A6:8C:DF:C7:ED')].name", "@assertThat(containsString(*.swagger.io))@"));
+				.validate("$.[?(@.path=='${apiPath}')].caCerts[?(@.md5Fingerprint=='81:AD:AF:05:B1:39:ED:FF:BE:EE:79:94:28:B3:F2:10')].name", "@assertThat(containsString(*.swagger.io))@"));
 	}
 }
