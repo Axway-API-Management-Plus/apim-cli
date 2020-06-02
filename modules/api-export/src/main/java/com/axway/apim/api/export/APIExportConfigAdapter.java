@@ -88,6 +88,11 @@ public class APIExportConfigAdapter {
 					new APIFilter.Builder()
 					.hasApiPath(this.exportApiPath)
 					.hasVHost(exportVhost)
+					.includeImage(true)
+					.includeClientApplications(true)
+					.includeClientOrganizations(true)
+					.includeImage(true)
+					.includeOriginalAPIDefinition(true)
 					.build()
 			, true);
 			if(mgrAPI==null) {
@@ -208,7 +213,7 @@ public class APIExportConfigAdapter {
 	
 	private String getVHost(ExportAPI exportAPI) throws AppException {
 		if(exportAPI.getVhost()!=null) return exportAPI.getVhost() + File.separator;
-		String orgVHost = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(exportAPI.getOrganization().getId()).build()).getVirtualHost();
+		String orgVHost = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(exportAPI.getOrganizationId()).build()).getVirtualHost();
 		if(orgVHost!=null) return orgVHost+File.separator;
 		return "";
 	}

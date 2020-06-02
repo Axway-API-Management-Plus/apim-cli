@@ -51,12 +51,6 @@ public class ExportAPI {
 	}
 	
 	@JsonIgnore
-	public Organization getOrganization() {
-		return this.actualAPIProxy.getOrganization();
-	}
-
-	
-	@JsonIgnore
 	public APISpecification getAPIDefinition() {
 		return this.actualAPIProxy.getAPIDefinition();
 	}
@@ -196,16 +190,14 @@ public class ExportAPI {
 		return this.actualAPIProxy.getName();
 	}
 
-	/*
 	public String getOrganization() {
-		String orgId = null;
-		try {
-			orgId = getOrganization();
-			return new APIManagerOrganizationAdapter().getOrg(new OrgFilter.Builder().hasId(orgId).build()).getName();
-		} catch (Exception e) {
-			throw new RuntimeException("Can't read orgName for orgId: '"+orgId+"'");
-		}
-	}*/
+		return this.actualAPIProxy.getOrganization().getName();
+	}
+	
+	@JsonIgnore
+	public String getOrganizationId() {
+		return this.actualAPIProxy.getOrganization().getId();
+	}
 
 	
 	@JsonIgnore
