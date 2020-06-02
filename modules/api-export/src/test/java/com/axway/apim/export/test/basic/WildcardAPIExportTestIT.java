@@ -82,15 +82,16 @@ public class WildcardAPIExportTestIT extends TestNGCitrusTestRunner {
 		assertEquals(exportedAPIConfig.get("state").asText(), 				"unpublished");
 		assertEquals(exportedAPIConfig.get("path").asText(), 				context.getVariable("apiPath1"));
 		assertEquals(exportedAPIConfig.get("name").asText(), 				context.getVariable("apiName1"));
-		assertEquals(exportedAPIConfig.get("caCerts").size(), 				3);
+		assertEquals(exportedAPIConfig.get("caCerts").size(), 				4);
 		
 		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("certFile").asText(), 				"swagger.io.crt");
 		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("inbound").asBoolean(), 			false);
 		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("outbound").asBoolean(), 			true);
 		
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder1")+"/swagger.io.crt").exists(), "Certificate swagger.io.crt is missing");
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder1")+"/GoDaddySecureCertificateAuthority-G2.crt").exists(), "Certificate GoDaddySecureCertificateAuthority-G2.crt is missing");
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder1")+"/GoDaddyRootCertificateAuthority-G2.crt").exists(), "Certificate GoDaddyRootCertificateAuthority-G2.crt is missing");
+		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder1")+"/StarfieldServicesRootCertificateAuthority-G2.crt").exists(), "Certificate StarfieldServicesRootCertificateAuthority-G2.crt is missing");
+		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder1")+"/AmazonRootCA1.crt").exists(), "Certificate AmazonRootCA1.crt is missing");
+		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder1")+"/Amazon.crt").exists(), "Certificate Amazon.crt is missing");
 		
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder1")+"/"+context.getVariable("exportAPIName1")).exists(), "Exported Swagger-File is missing");
 		
@@ -105,15 +106,16 @@ public class WildcardAPIExportTestIT extends TestNGCitrusTestRunner {
 		assertEquals(exportedAPIConfig.get("state").asText(), 				"unpublished");
 		assertEquals(exportedAPIConfig.get("path").asText(), 				context.getVariable("apiPath2"));
 		assertEquals(exportedAPIConfig.get("name").asText(), 				context.getVariable("apiName2"));
-		assertEquals(exportedAPIConfig.get("caCerts").size(), 				3);
+		assertEquals(exportedAPIConfig.get("caCerts").size(), 				4);
 		
 		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("certFile").asText(), 				"swagger.io.crt");
 		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("inbound").asBoolean(), 			false);
 		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("outbound").asBoolean(), 			true);
 		
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder2")+"/swagger.io.crt").exists(), "Certificate swagger.io.crt is missing");
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder2")+"/GoDaddySecureCertificateAuthority-G2.crt").exists(), "Certificate GoDaddySecureCertificateAuthority-G2.crt is missing");
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder2")+"/GoDaddyRootCertificateAuthority-G2.crt").exists(), "Certificate GoDaddyRootCertificateAuthority-G2.crt is missing");
+		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder2")+"/StarfieldServicesRootCertificateAuthority-G2.crt").exists(), "Certificate StarfieldServicesRootCertificateAuthority-G2.crt is missing");
+		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder2")+"/AmazonRootCA1.crt").exists(), "Certificate AmazonRootCA1.crt is missing");
+		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder2")+"/Amazon.crt").exists(), "Certificate Amazon.crt is missing");
 		
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder2")+"/"+context.getVariable("exportAPIName2")).exists(), "Exported Swagger-File is missing");
 	}

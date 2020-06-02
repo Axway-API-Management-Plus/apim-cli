@@ -23,6 +23,7 @@ import com.axway.apim.adapter.apis.APIAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
+import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
@@ -85,14 +86,9 @@ public class APIExportConfigAdapter {
 		List<ExportAPI> exportAPIList = new ArrayList<ExportAPI>();
 		if (!this.exportApiPath.contains("*")) { // Direct access with a specific API exposure path
 			API mgrAPI = APIAdapter.create(APIManagerAdapter.getInstance()).getAPI(
-					new APIFilter.Builder()
+					new APIFilter.Builder(Type.ACTUAL_API)
 					.hasApiPath(this.exportApiPath)
 					.hasVHost(exportVhost)
-					.includeImage(true)
-					.includeClientApplications(true)
-					.includeClientOrganizations(true)
-					.includeImage(true)
-					.includeOriginalAPIDefinition(true)
 					.build()
 			, true);
 			if(mgrAPI==null) {
@@ -113,7 +109,7 @@ public class APIExportConfigAdapter {
 				filters.add(new BasicNameValuePair("value", exportApiPath.replace("*", "")));
 			}
 			List<API> foundAPIs = APIAdapter.create(APIManagerAdapter.getInstance()).getAPIs(
-					new APIFilter.Builder()
+					new APIFilter.Builder(Type.ACTUAL_API)
 					.hasVHost(exportVhost)
 					.useFilter(filters)
 					.build()
@@ -124,7 +120,7 @@ public class APIExportConfigAdapter {
 		} else { // Get all APIs and filter them out manually
 			Pattern pattern = Pattern.compile(exportApiPath.replace("*", ".*"));
 			List<API> foundAPIs = APIAdapter.create(APIManagerAdapter.getInstance()).getAPIs(
-					new APIFilter.Builder()
+					new APIFilter.Builder(Type.ACTUAL_API)
 					.hasVHost(exportVhost)
 					.build()
 			, false); 
@@ -139,14 +135,6 @@ public class APIExportConfigAdapter {
 		}
 		return exportAPIList;
 	}
-	/*
-	private ExportAPI getExportAPI(JsonNode mgrAPI) throws AppException {
-		IAPI actualAPI = apiManager.getAPIManagerAPI(mgrAPI, getAPITemplate(), API.class);
-		handleCustomProperties(actualAPI);
-		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getInboundProfiles(), actualAPI, true);
-		APIManagerAdapter.getInstance().translateMethodIds(actualAPI.getOutboundProfiles(), actualAPI, true);
-		return new ExportAPI(actualAPI);
-	}*/
 
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {
 		String apiPath = getAPIExportFolder(exportAPI.getPath());

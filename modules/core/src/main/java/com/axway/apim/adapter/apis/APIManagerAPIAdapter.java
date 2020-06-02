@@ -221,11 +221,11 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				}
 				InputStream is = httpResponse.getEntity().getContent();
 				image.setImageContent(IOUtils.toByteArray(is));
-				image.setBaseFilename("api-image");
 				if(httpResponse.containsHeader("Content-Type")) {
 					String contentType = httpResponse.getHeaders("Content-Type")[0].getValue();
 					image.setContentType(contentType);
 				}
+				image.setBaseFilename("api-image");
 				api.setImage(image);
 			} catch (Exception e) {
 				throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);

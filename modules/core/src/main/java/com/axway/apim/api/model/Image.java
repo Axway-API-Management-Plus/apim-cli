@@ -71,19 +71,23 @@ public class Image {
 	}
 	
 	public void setContentType(String contentType) {
-		if(contentType.toLowerCase().contains("jpeg") || contentType.toLowerCase().contains("jpg")) {
-			fileExtension = ".jpg";
-		} else if(contentType.toLowerCase().contains("png")) {
-			fileExtension = ".jpg";
-		} else if(contentType.toLowerCase().contains("gif")) {
-			fileExtension = ".gif";
-		} else {
-			fileExtension = ".unknown";
-		}
 		this.contentType = contentType;
 	}
 	
 	public String getFileExtension() {
+		if(this.fileExtension==null) {
+			if(contentType==null) {
+				fileExtension = ".unknown";
+			} else if(contentType.toLowerCase().contains("jpeg") || contentType.toLowerCase().contains("jpg")) {
+				fileExtension = ".jpg";
+			} else if(contentType.toLowerCase().contains("png")) {
+				fileExtension = ".jpg";
+			} else if(contentType.toLowerCase().contains("gif")) {
+				fileExtension = ".gif";
+			} else {
+				fileExtension = ".unknown";
+			}
+		}
 		return fileExtension;
 	}
 
