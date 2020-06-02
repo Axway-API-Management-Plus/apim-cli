@@ -1,0 +1,9 @@
+	
+{
+	"name": "API Config with variables",
+	"path": "doesntMatter",
+	"state": "notUsed ${os.arch}",
+	"version": "${notDeclared}",
+	"organization": "API Development", 
+	"backendBasepath": "${myTestVariable}"
+}

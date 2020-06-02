@@ -1,0 +1,5 @@
+{
+	"requestPolicy": "Amazon V2 - DescribeInstances",
+	"responsePolicy": "Routing", 
+	"routePolicy": "Client App Registry Static Content Protection Policy"
+}

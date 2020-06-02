@@ -1,0 +1,38 @@
+{    "outboundProfiles": {
+      "_default": {
+        "authenticationProfile": "_default",
+        "routeType": "proxy",
+        "requestPolicy": null,
+        "responsePolicy": null,
+        "routePolicy": null,
+        "faultHandlerPolicy": null,
+        "apiId": null,
+        "apiMethodId": null,
+        "parameters": [
+          
+        ]
+      },
+      "getOrderById": {
+        "authenticationProfile": "HTTP Basic outbound Test 624",
+        "routeType": "proxy",
+        "requestPolicy": null,
+        "responsePolicy": null,
+        "routePolicy": null,
+        "faultHandlerPolicy": null,
+        "apiId": null,
+        "apiMethodId": null,
+        "parameters": [
+          {
+            "name": "additionalOutboundParam",
+            "paramType": "header",
+            "type": "string",
+            "format": null,
+            "value": "Test-Value",
+            "required": false,
+            "exclude": false,
+            "additional": true
+          }
+        ]
+      }
+    }
+   }

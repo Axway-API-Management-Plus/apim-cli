@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.7.0-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>app-import</artifactId>
+	<packaging>jar</packaging>
+	<name>Axway API-Manager CLI Application Import-Tool</name>
+	<description>Import applications module</description>
+	<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>apim-cli</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>core</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-http</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-java-dsl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-ws</artifactId>
+		</dependency>
+	</dependencies>
+</project>

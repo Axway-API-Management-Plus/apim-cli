@@ -1,0 +1,6 @@
+[
+    {
+        "name": "Client App Registry Static Content Protection Policy",
+        "id": "<key type='CircuitContainer'><id field='name' value='Client App Registry Policies'/><key type='FilterCircuit'><id field='name' value='Client App Registry Static Content Protection Policy'/></key></key>"
+    }
+]
