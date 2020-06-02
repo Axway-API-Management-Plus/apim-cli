@@ -98,7 +98,7 @@ public class ApplicationExportTestIT extends TestNGCitrusTestRunner {
 		ClientApplication app = exportedApps.get(0);
 		assertTrue(app.getApiAccess()==null || app.getApiAccess().size()==0, "Exported Apps should not contains API-Access");
 		assertNull(app.getId(), "The ID of an application shouldn't be exported.");
-		assertNull(app.getOrganizationId(), "The Org-ID of an application shouldn't be exported.");
+		assertNull(app.getOrganization(), "The Org-ID of an application shouldn't be exported.");
 		assertNull(app.getAppQuota(), "The application quota should not be exported. It's not supported by the export!");
 		
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/swagger.io.crt").exists(), "Certificate swagger.io.crt is missing");

@@ -43,11 +43,6 @@ public abstract class APIMCoreCLIOptions {
 		// Parse at this point, if return codes should be shown
 		showReturnCodes();
 
-		option = new Option("s", "stage", true, "The stage this API should be imported.\n"
-				+ "Will be used to lookup stage specific API-Config overrides (e.g.: api_config.preprod.json)");
-		option.setArgName("preprod");
-		options.addOption(option);
-
 		option = new Option("h", "host", true, "The API-Manager hostname the API should be imported");
 		option.setRequired(false);
 		option.setArgName("api-host");

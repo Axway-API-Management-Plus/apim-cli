@@ -22,6 +22,11 @@ public class APIExportCLIOptions extends APIMCoreCLIOptions {
 		option.setRequired(true);
 		option.setArgName("/api/v1/my/great/api");
 		options.addOption(option);
+		
+		option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
+				+ "Is used to lookup the stage configuration file.");
+		option.setArgName("preprod");
+		options.addOption(option);
 
 		option = new Option("v", "vhost", true, "Limit the export to that specific host.");
 		option.setRequired(false);

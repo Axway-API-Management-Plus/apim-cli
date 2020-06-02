@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
 import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.APIKey;
@@ -101,7 +100,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			}
 			if(filter.isIncludeQuota()) {
 				for(ClientApplication app : apps) {
-					APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(app.getId(), null);
+					app.setAppQuota(APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(app.getId(), null));
 				}
 			}
 			if(filter.isIncludeCredentials()) {
@@ -239,7 +238,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 				httpResponse = postRequest.execute();
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
 				if( statusCode != 201){
-					LOG.error("Error creating application' Response-Code: "+statusCode+"");
+					LOG.error("Error creating application. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 					throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
 				createdApp = mapper.readValue(httpResponse.getEntity().getContent(), ClientApplication.class);

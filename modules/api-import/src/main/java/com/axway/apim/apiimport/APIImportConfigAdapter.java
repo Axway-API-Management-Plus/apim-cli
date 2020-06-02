@@ -439,7 +439,7 @@ public class APIImportConfigAdapter {
 					} 
 				}
 				if(!APIManagerAdapter.hasAdminAccount()) {
-					if(!apiConfig.getOrganization().getId().equals(loadedApp.getOrganizationId())) {
+					if(!apiConfig.getOrganization().equals(loadedApp.getOrganization())) {
 						LOG.warn("OrgAdmin can't handle application: '"+loadedApp.getName()+"' belonging to a different organization. Ignoring this application.");
 						it.remove();
 						continue;

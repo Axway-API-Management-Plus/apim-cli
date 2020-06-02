@@ -17,6 +17,11 @@ public class AppImportCLIOptions extends APIMCoreCLIOptions {
 		option.setRequired(true);
 		option.setArgName("app_config.json");
 		options.addOption(option);
+		
+		option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
+				+ "Will be used to lookup the stage config");
+		option.setArgName("preprod");
+		options.addOption(option);
 	}
 
 	@Override

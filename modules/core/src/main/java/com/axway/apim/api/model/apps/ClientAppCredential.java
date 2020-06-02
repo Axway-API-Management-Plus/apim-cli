@@ -1,5 +1,9 @@
 package com.axway.apim.api.model.apps;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang.StringUtils;
+
 import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -75,4 +79,18 @@ public abstract class ClientAppCredential {
 	}
 
 	public abstract String getCredentialType();
+
+	@Override
+	public boolean equals(Object other) {
+		if(other == null) return false;
+		if(other instanceof ClientAppCredential) {
+			ClientAppCredential otherAppCredential = (ClientAppCredential)other;
+			return 
+					StringUtils.equals(otherAppCredential.getCredentialType(), this.getCredentialType() ) && 
+					otherAppCredential.isEnabled()==this.isEnabled() && 
+					StringUtils.equals(otherAppCredential.getSecret(), this.getSecret() ) &&
+					Arrays.equals(otherAppCredential.getCorsOrigins(), this.getCorsOrigins());
+		}
+		return false;
+	}	
 }

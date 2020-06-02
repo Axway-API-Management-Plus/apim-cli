@@ -1,5 +1,9 @@
 package com.axway.apim.api.model.apps;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang.StringUtils;
+
 import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -51,5 +55,19 @@ public class OAuth extends ClientAppCredential {
 
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if(other == null) return false;
+		if(other instanceof OAuth) {
+			OAuth otherOAuth = (OAuth)other;
+			return 
+				StringUtils.equals(otherOAuth.getClientId(), this.getClientId()) &&
+				Arrays.equals(otherOAuth.getRedirectUrls(), this.getRedirectUrls()) && 
+				super.equals(other);
+		} else {
+			return false;
+		}
 	}
 }

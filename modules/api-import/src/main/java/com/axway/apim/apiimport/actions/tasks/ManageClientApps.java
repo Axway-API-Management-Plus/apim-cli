@@ -103,11 +103,11 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	}
 	
 	private boolean hasClientAppPermission(ClientApplication app) throws AppException {
-		String appsOrgId = app.getOrganizationId();
+		String appsOrgId = app.getOrganization().getId();
 		Organization appsOrgs = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(appsOrgId).build());
 		if(appsOrgs==null) return false;
 		// If the App belongs to the same Org as the API, it automatically has permission (esp. for Unpublished APIs)
-		if(app.getOrganizationId().equals((actualState).getOrganization().getId())) return true;
+		if(app.getOrganization().equals((actualState).getOrganization())) return true;
 		if(actualState.getClientOrganizations()==null) {
 			LOG.debug("No Client-Orgs configured for this API, therefore other app has NO permission.");
 			return false;

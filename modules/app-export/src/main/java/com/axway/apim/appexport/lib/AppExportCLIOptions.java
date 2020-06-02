@@ -16,6 +16,11 @@ public class AppExportCLIOptions extends APIMCoreCLIOptions {
 		Option option = new  Option("n", "name", true, "Name of the application to export.");
 		option.setRequired(true);
 		options.addOption(option);
+		
+		option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
+				+ "Will be used to lookup the stage config");
+		option.setArgName("preprod");
+		options.addOption(option);
 
 		option = new  Option("state", false, "Export application with specific state: pending | approved");
 		option.setRequired(false);

@@ -73,6 +73,8 @@ public class ApplicationImportTestAction extends AbstractTestAction {
 		}
 		
 		copyImagesAndCertificates(origConfigFile, context);
+		
+		context.setVariable("configFile", configFile);
 
 		String[] args;
 		if(useEnvironmentOnly) {

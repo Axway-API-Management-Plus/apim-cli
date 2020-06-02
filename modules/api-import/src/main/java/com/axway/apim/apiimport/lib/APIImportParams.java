@@ -15,31 +15,4 @@ public class APIImportParams extends CommandParameters {
 	public static synchronized APIImportParams getInstance() {
 		return (APIImportParams)CommandParameters.getInstance();
 	}
-/*	
-	public boolean deleteLocalFolder() {
-		if(getValue("deleteFolder")==null) return false;
-		return Boolean.parseBoolean(getValue("deleteFolder"));
-	}
-	
-	public static synchronized APIImportParams getInstance() {
-		
-		return (APIImportParams)CommandParameters.getInstance();
-	}
-	
-	public String getAppState() {
-		return getValue("state");
-	}
-	
-	public String getAppName() {
-		return getValue("name");
-	}
-	
-	public String getOrgName() {
-		return getValue("orgName");
-	}
-	
-	public String getTargetFolder() {
-		return getValue("targetFolder");
-	}
-*/
 }

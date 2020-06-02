@@ -6,14 +6,17 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 import com.axway.apim.adapter.apis.jackson.JSONViews;
+import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientApplication {
@@ -50,9 +53,9 @@ public class ClientApplication {
 	
 	private APIQuota appQuota;
 	
-	private String organizationId;
-	
-	private String organization;
+	@JsonDeserialize( using = OrganizationDeserializer.class)
+	@JsonProperty(value = "organizationId")
+	private Organization organization;
 	
 	public String getId() {
 		return id;
@@ -131,17 +134,10 @@ public class ClientApplication {
 		this.apiKey = apiKey;
 	}
 	
-	public String getOrganizationId() throws AppException {
-		return organizationId;
-	}
-	public void setOrganizationId(String organizationId) {
-		this.organizationId = organizationId;
-	}
-	
-	public String getOrganization() {
+	public Organization getOrganization() {
 		return organization;
 	}
-	public void setOrganization(String organization) {
+	public void setOrganization(Organization organization) {
 		this.organization = organization;
 	}
 	public APIQuota getAppQuota() {
