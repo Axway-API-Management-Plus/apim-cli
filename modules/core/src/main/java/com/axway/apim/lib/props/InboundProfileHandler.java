@@ -5,10 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
-import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.CorsProfile;
@@ -29,9 +26,6 @@ public class InboundProfileHandler implements PropertyHandler {
 		if(desired.getInboundProfiles().size()!=0) {
 			validateSecurityProfiles(desired);
 			validateCORSProfiles(desired);
-			APIManagerAPIAdapter apiAdapter = (APIManagerAPIAdapter) APIManagerAdapter.getInstance().apiAdapter;
-			apiAdapter.translateMethodIds(desired, actual.getId(), METHOD_TRANSLATION.AS_ID);
-			//translateOperationId(desired, actual);
 			((ObjectNode)response).replace("inboundProfiles", objectMapper.valueToTree(desired.getInboundProfiles()));
 		}
 		return response;

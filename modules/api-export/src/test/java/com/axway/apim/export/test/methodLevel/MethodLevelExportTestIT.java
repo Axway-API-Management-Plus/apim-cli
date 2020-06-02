@@ -72,8 +72,6 @@ public class MethodLevelExportTestIT extends TestNGCitrusTestRunner {
 		echo("####### Reading exported API-Config file: '"+exportedAPIConfigFile+"' #######");
 		JsonNode exportedAPIConfig = mapper.readTree(new FileInputStream(new File(exportedAPIConfigFile)));
 		JsonNode importedAPIConfig = mapper.readTree(this.getClass().getResourceAsStream("/test/export/files/methodLevel/inbound-api-key-and-cors.json"));
-		
-		
 
 		assertEquals(exportedAPIConfig.get("path").asText(), 				context.getVariable("apiPath"));
 		assertEquals(exportedAPIConfig.get("name").asText(), 				context.getVariable("apiName"));

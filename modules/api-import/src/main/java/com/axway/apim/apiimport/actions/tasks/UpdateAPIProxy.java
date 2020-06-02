@@ -14,6 +14,10 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.IResponseParser;
@@ -47,6 +51,10 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 			if(lastJsonReponse==null) { // This class is called as the first, so, first load the API
 				lastJsonReponse = initActualAPIContext(this.actualState);
 			}
+
+			APIManagerAPIAdapter apiAdapter = (APIManagerAPIAdapter) APIManagerAdapter.getInstance().apiAdapter;
+			apiAdapter.translateMethodIds(this.desiredState,this.actualState.getId(),  METHOD_TRANSLATION.AS_ID);
+			
 			lastJsonReponse = handledChangedProps(lastJsonReponse, this.desiredState, this.actualState, changedProps);
 			if(lastJsonReponse == null) return; // No changes required for the API-Proxy
 		

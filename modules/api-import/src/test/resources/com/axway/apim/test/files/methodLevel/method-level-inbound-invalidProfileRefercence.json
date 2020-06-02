@@ -5,7 +5,7 @@
    "version":"1.0.7",
    "organization":"API Development ${orgNumber}",
    "inboundProfiles":{
-      "somethingWrong":{
+      "getOrderById":{
          "securityProfile":"${securityProfileName1}",
          "corsProfile":null,
          "monitorAPI":true,
