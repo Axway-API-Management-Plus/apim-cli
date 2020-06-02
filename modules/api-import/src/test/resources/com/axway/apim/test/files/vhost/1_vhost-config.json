@@ -1,9 +1,19 @@
-	
 {
-	"name": "${apiName}",
-	"path": "${apiPath}",
-	"state": "${status}",
-	"vhost": "${vhost}",
-	"version": "1.0.0",
-	"organization": "API Development ${orgNumber}"
+  "name": "${apiName}",
+  "path": "${apiPath}",
+  "state": "${status}",
+  "vhost": "${vhost}",
+  "version": "1.0.0",
+  "organization": "API Development ${orgNumber}",
+  "authenticationProfiles": [
+    {
+      "name": "_default",
+      "isDefault": true,
+      "parameters": {
+        "username": "daskdjaskldjaskljdklasjdl",
+        "password": ""
+      },
+      "type": "http_basic"
+    }
+  ]
 }

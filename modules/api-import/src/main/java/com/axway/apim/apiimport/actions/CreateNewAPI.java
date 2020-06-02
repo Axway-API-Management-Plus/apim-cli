@@ -36,28 +36,28 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.rest.Transaction;
 
 /**
- * This class is used by the {@link APIImportManager#applyChanges(APIChangeState)} to create a new API. 
+ * This class is used by the {@link APIImportManager#applyChanges(APIChangeState)} to create a new API.
  * It's called, when an existing API can't be found.
- * 
+ *
  * @author cwiechmann@axway.com
  */
 public class CreateNewAPI {
-	
+
 	static Logger LOG = LoggerFactory.getLogger(CreateNewAPI.class);
 
 	public void execute(APIChangeState changes, boolean reCreation) throws AppException {
-		
+
 		API createdAPI = null;
-		
+
 		Transaction context = Transaction.getInstance();
 		RollbackHandler rollback = RollbackHandler.getInstance();
-		
-		// During Re-Creation we have to Re-Init the Application-State 
+
+		// During Re-Creation we have to Re-Init the Application-State
 		//if(reCreation) APIManagerAdapter.getInstance().setAllApps(null);
-		
+
 		// Force to initially update the API into the desired state!
 		List<String> changedProps = getAllProps(changes.getDesiredAPI());
-		
+
 		VHostManager vHostManager = new VHostManager();
 		new ImportBackendAPI(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		// Register the created BE-API to be rolled back in case of an error
@@ -66,15 +66,15 @@ public class CreateNewAPI {
 		((API)rollbackAPI).setApiId((String)context.get("backendAPIId"));
 		((APIBaseDefinition)rollbackAPI).setCreatedOn((String)context.get("backendAPICreatedOn"));
 		rollback.addRollbackAction(new RollbackBackendAPI(rollbackAPI));
-		
+
 		try {
 			new CreateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 		} catch (Exception e) {
 			rollback.addRollbackAction(new RollbackAPIProxy(rollbackAPI));
 			throw e;
-		} 
+		}
 		rollback.addRollbackAction(new RollbackAPIProxy(rollbackAPI)); // In any case, register the API just created for a potential rollback
-		
+
 		try {
 			// As we have just created an API-Manager API, we should reflect this for further processing
 			APIFilter filter = new APIFilter.Builder(Type.ACTUAL_API).build();
@@ -82,11 +82,11 @@ public class CreateNewAPI {
 			// Register the created FE-API to be rolled back in case of an error
 			((API)rollbackAPI).setId(createdAPI.getId());
 			changes.setIntransitAPI(createdAPI);
-			
+
 			// ... here we basically need to add all props to initially bring the API in sync!
 			// But without updating the Swagger, as we have just imported it!
 			new UpdateAPIProxy(changes.getDesiredAPI(), createdAPI).execute(changedProps);
-			
+
 			// If an image is included, update it
 			if(changes.getDesiredAPI().getImage()!=null) {
 				new UpdateAPIImage(changes.getDesiredAPI(), createdAPI).execute();
@@ -96,21 +96,21 @@ public class CreateNewAPI {
 			statusUpdate.execute();
 			((API)rollbackAPI).setState(createdAPI.getState());
 			statusUpdate.updateRetirementDate(changes);
-			
+
 			if(reCreation && changes.getActualAPI().getState().equals(API.STATE_PUBLISHED)) {
 				// In case, the existing API is already in use (Published), we have to grant access to our new imported API
 				new UpgradeAccessToNewerAPI(changes.getIntransitAPI(), changes.getActualAPI()).execute();
 			}
-			
+
 			// Is a Quota is defined we must manage it
 			new UpdateQuotaConfiguration(changes.getDesiredAPI(), createdAPI).execute();
-			
+
 			// Grant access to the API
 			new ManageClientOrgs(changes.getDesiredAPI(), createdAPI).execute(reCreation);
-			
+
 			// Handle subscription to applications
 			new ManageClientApps(changes.getDesiredAPI(), createdAPI, changes.getActualAPI()).execute(reCreation);
-			
+
 			// V-Host must be managed almost at the end, as the status must be set already to "published"
 			vHostManager.handleVHost(changes.getDesiredAPI(), createdAPI);
 		} catch (Exception e) {
@@ -123,11 +123,11 @@ public class CreateNewAPI {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param desiredAPI
 	 * @return
-	 * @throws AppException 
+	 * @throws AppException
 	 */
 	private List<String> getAllProps(API desiredAPI) throws AppException {
 		List<String> allProps = new Vector<String>();
