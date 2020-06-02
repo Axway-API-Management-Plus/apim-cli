@@ -12,7 +12,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 
 public abstract class ClientAppAdapter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(ClientAppAdapter.class);
+	protected static Logger LOG = LoggerFactory.getLogger(ClientAppAdapter.class);
 
 	protected ClientAppAdapter() {
 

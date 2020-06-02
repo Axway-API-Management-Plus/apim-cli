@@ -64,7 +64,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			ClientAppAdapter apimClientAppAdapter =  ClientAppAdapter.create(APIManagerAdapter.getInstance());
 			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter, apimClientAppAdapter);
 			for(ClientApplication desiredApp : desiredApps) {
-				ClientApplication actualApp = apimClientAppAdapter.getApplication(new ClientAppFilter.Builder().hasId(desiredApp.getId()).build());
+				ClientApplication actualApp = apimClientAppAdapter.getApplication(new ClientAppFilter.Builder().hasName(desiredApp.getName()).build());
 				importManager.setDesiredApp(desiredApp);
 				importManager.setActualApp(actualApp);
 				importManager.replicate();

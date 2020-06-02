@@ -56,7 +56,8 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	
 	@Override
 	public List<ClientApplication> getApplications(ClientAppFilter filter) throws AppException {
-		throw new UnsupportedOperationException("Filtering results is not supported for the JSON implementation");
+		LOG.warn("Filtering results is not supported for the JSON implementation. Returning all applications.");
+		return getAllApplications();
 	}
 	
 	@Override
