@@ -177,7 +177,7 @@ public class ApplicationImportTestAction extends AbstractTestAction {
 		if(!sourceDir.exists()) {
 			sourceDir = new File(this.getClass().getResource(origConfigFile).getFile()).getParentFile();
 			if(!sourceDir.exists()) {
-				LOG.error("Unable to copy certificates & images to test directory: '"+testDir+"'. Could not found sourceDir based on configFile: '"+origConfigFile+"'");
+				LOG.error("Unable to copy certificates & images to test directory: '"+testDir+"'. Could not find sourceDir based on configFile: '"+origConfigFile+"'");
 				return;
 			}
 		}

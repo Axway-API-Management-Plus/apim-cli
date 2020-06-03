@@ -40,7 +40,7 @@ public class ExportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 	private ApplicationExportTestAction appExport = new ApplicationExportTestAction();
 	private ImportTestAction apiImport = new ImportTestAction();
 	
-	private static String PACKAGE = "/com/axway/apim/appimport/apps/basic/";
+	private static String PACKAGE = "/com/axway/apim/appexport/apps/basic/";
 	
 	@CitrusTest
 	@Test @Parameters("context")
