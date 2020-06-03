@@ -63,6 +63,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 					.hasName(AppExportParams.getInstance().getAppName())
 					.includeQuotas(true)
 					.includeCredentials(true)
+					.includeAPIAccess(true)
 					.includeImage(true)
 					.build();
 			List<ClientApplication> apps = appAdapter.getApplications(filter);

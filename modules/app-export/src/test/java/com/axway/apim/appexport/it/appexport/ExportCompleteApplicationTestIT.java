@@ -13,7 +13,6 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.axway.apim.api.model.APIQuota;
-import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.appexport.ApplicationExportTestAction;
 import com.axway.apim.appimport.ApplicationImportTestAction;
@@ -53,7 +52,11 @@ public class ExportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 		variable("description", "My App-Description ${appNumber}");
 		variable("email", "email-${appNumber}@customer.com");
 		variable("state", "approved");
-
+		variable("appImage", "app-image.jpg");
+		variable("quotaMessages", "9999");
+		variable("quotaPeriod", "week");
+		
+		
 		echo("####### Import application: '${appName}' to be exported afterwards #######");		
 		createVariable(ApplicationImportTestAction.CONFIG,  PACKAGE + "CompleteApplication.json");
 		createVariable("expectedReturnCode", "0");

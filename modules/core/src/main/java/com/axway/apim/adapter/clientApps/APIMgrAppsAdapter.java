@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.jackson.JSONViews;
+import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
@@ -106,6 +107,9 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			}
 			if(filter.isIncludeCredentials()) {
 				addApplicationCredentials(apps);
+			}
+			if(filter.isIncludeAPIAccess()) {
+				addAPIAccess(apps);
 			}
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -194,19 +198,59 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	
 	void addApplicationCredentials(List<ClientApplication> apps) throws Exception {
 		URI uri;
+		HttpResponse httpResponse = null;
 		List<ClientAppCredential> credentials;
 		String[] types = new String[] {"extclients", "oauth", "apikeys"};
 		TypeReference[] classTypes = new TypeReference[] {new TypeReference<List<ExtClients>>(){}, new TypeReference<List<OAuth>>(){}, new TypeReference<List<APIKey>>(){}};
 		for(ClientApplication app : apps) {
 			for(int i=0; i<types.length; i++) {
-				String type = types[i];
-				TypeReference classType = classTypes[i];
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type)
+				try {
+					String type = types[i];
+					TypeReference classType = classTypes[i];
+					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type)
+							.build();
+					RestAPICall getRequest = new GETRequest(uri, null);
+					httpResponse = getRequest.execute();
+					int statusCode = httpResponse.getStatusLine().getStatusCode();
+					if(statusCode != 200){
+						LOG.error("Error reading application credentials. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+						throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+					}
+					credentials = mapper.readValue(httpResponse.getEntity().getContent(), classType);
+					app.getCredentials().addAll(credentials);
+				} catch (Exception e) {
+					throw new AppException("Error reading application credentials.", ErrorCode.CANT_CREATE_API_PROXY, e);
+				} finally {
+					try {
+						((CloseableHttpResponse)httpResponse).close();
+					} catch (Exception ignore) { }
+				}
+			}
+		}
+	}
+	
+	void addAPIAccess(List<ClientApplication> apps) throws Exception {
+		URI uri;
+		HttpResponse httpResponse = null;
+		for(ClientApplication app : apps) {
+			try {
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/apis")
 						.build();
 				RestAPICall getRequest = new GETRequest(uri, null);
-				InputStream response = getRequest.execute().getEntity().getContent();
-				credentials = mapper.readValue(response, classType);
-				app.getCredentials().addAll(credentials);
+				httpResponse = getRequest.execute();//.getEntity().getContent();
+				int statusCode = httpResponse.getStatusLine().getStatusCode();
+				if(statusCode != 200){
+					LOG.error("Error reading application API Access. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+					throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+				}
+				List<APIAccess> apiAccess = mapper.readValue(httpResponse.getEntity().getContent(), new TypeReference<List<APIAccess>>(){});
+				app.getApiAccess().addAll(apiAccess);
+			} catch (Exception e) {
+				throw new AppException("Error reading application API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
+			} finally {
+				try {
+					((CloseableHttpResponse)httpResponse).close();
+				} catch (Exception ignore) { }
 			}
 		}
 	}

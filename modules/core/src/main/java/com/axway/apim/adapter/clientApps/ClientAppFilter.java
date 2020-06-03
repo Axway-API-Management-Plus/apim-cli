@@ -17,6 +17,8 @@ public class ClientAppFilter {
 	
 	boolean includeCredentials;
 	
+	boolean includeAPIAccess;
+	
 	boolean includeImage;
 	
 	String applicationName;
@@ -41,6 +43,10 @@ public class ClientAppFilter {
 
 	public boolean isIncludeImage() {
 		return includeImage;
+	}
+	
+	public boolean isIncludeAPIAccess() {
+		return includeAPIAccess;
 	}
 
 	public String getApplicationId() {
@@ -135,6 +141,8 @@ public class ClientAppFilter {
 		
 		boolean includeImage;
 		
+		boolean includeAPIAccess;
+		
 		String organizationId;
 		
 		/** The name of the application */
@@ -164,6 +172,7 @@ public class ClientAppFilter {
 			filter.includeQuota = this.includeQuota;
 			filter.includeCredentials = this.includeCredentials;
 			filter.includeImage = this.includeImage;
+			filter.includeAPIAccess = this.includeAPIAccess;
 			return filter;
 		}
 		
@@ -206,6 +215,11 @@ public class ClientAppFilter {
 		
 		public Builder includeImage(boolean includeImage) {
 			this.includeImage = includeImage;
+			return this;
+		}
+		
+		public Builder includeAPIAccess(boolean includeAPIAccess) {
+			this.includeAPIAccess = includeAPIAccess;
 			return this;
 		}
 	}
