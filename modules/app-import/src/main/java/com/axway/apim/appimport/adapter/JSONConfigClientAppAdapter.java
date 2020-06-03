@@ -3,6 +3,7 @@ package com.axway.apim.appimport.adapter;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.axway.apim.adapter.APIManagerAdapter;
@@ -19,6 +20,7 @@ import com.axway.apim.api.model.apps.OAuth;
 import com.axway.apim.appimport.adapter.jackson.AppCredentialsDeserializer;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
@@ -126,17 +128,23 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		APIAdapter apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
 		for(ClientApplication app : apps) {
 			if(app.getApiAccess()==null) continue;
-			for(APIAccess apiAccess : app.getApiAccess()) {
+			Iterator<APIAccess> it = app.getApiAccess().iterator();
+			while(it.hasNext()) {
+				APIAccess apiAccess = it.next();
 				List<API> apis = apiAdapter.getAPIs(new APIFilter.Builder()
 						.hasName(apiAccess.getApiName())
 						.build()
 				, false);
 				if(apis==null || apis.size()==0) {
 					LOG.error("API with name: " + apiAccess.getApiName() + " not found. Ignoring this APIs.");
+					ErrorState.getInstance().setError("API with name: " + apiAccess.getApiName() + " not found.", ErrorCode.UNKNOWN_API);
+					it.remove();
 					continue;
 				}
 				if(apis.size()>1 && apiAccess.getApiVersion()==null) {
 					LOG.error("Found: "+apis.size()+" APIs with name: " + apiAccess.getApiName() + " not providing a version. Ignoring this APIs.");
+					it.remove();
+					ErrorState.getInstance().setError("API with name: " + apiAccess.getApiName() + " not found.", ErrorCode.UNKNOWN_API);
 					continue;
 				}
 				API api = apis.get(0);

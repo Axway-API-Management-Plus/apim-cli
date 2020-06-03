@@ -180,7 +180,7 @@ public class ClientApplication {
 					StringUtils.equals(otherApp.getDescription(), this.getDescription()) &&
 					StringUtils.equals(otherApp.getPhone(), this.getPhone()) &&
 					StringUtils.equals(otherApp.getState(), this.getState()) &&
-					(otherApp.getApiAccess()==null || otherApp.getApiAccess().equals(this.getApiAccess())) && 
+					(otherApp.getCredentials()==null || otherApp.getCredentials().equals(this.getCredentials())) &&
 					(otherApp.getImage()==null || otherApp.getImage().equals(this.getImage()))
 					;
 		}

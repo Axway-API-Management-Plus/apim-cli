@@ -88,7 +88,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}
-		return 0;
+		return errorCodeMapper.getMapedErrorCode(ErrorState.getInstance().getErrorCode()).getCode();
 	}
 	
 

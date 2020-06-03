@@ -93,7 +93,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}
-		return 0;
+		return ErrorState.getInstance().getErrorCode().getCode();
 	}
 
 	public static void main(String args[]) { 
