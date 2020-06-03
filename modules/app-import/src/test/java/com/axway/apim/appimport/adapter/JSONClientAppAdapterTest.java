@@ -5,10 +5,13 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
@@ -20,9 +23,14 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.OAuth;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class JSONClientAppAdapterTest {
+public class JSONClientAppAdapterTest extends APIManagerMockBase {
 
 	private static final String testPackage = "/com/axway/apim/appimport/adapter";
+	
+	@BeforeClass
+	private void initTestIndicator() throws AppException, IOException {
+		setupMockData();
+	}
 
 	@Test
 	public void testSingleAppAsArray() throws AppException {
