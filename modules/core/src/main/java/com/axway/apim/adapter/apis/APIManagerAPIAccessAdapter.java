@@ -107,7 +107,7 @@ public class APIManagerAPIAccessAdapter {
 			String json = mapper.writerWithView(JSONViews.APIAccessForAPIManager.class).writeValueAsString(apiAccess);
 			HttpEntity entity = new StringEntity(json);
 			// Use an admin account for this request
-			RestAPICall request = new POSTRequest(entity, uri, null, true);
+			RestAPICall request = new POSTRequest(entity, uri, null, APIManagerAdapter.hasAdminAccount());
 			request.setContentType("application/json");
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -134,7 +134,7 @@ public class APIManagerAPIAccessAdapter {
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/"+type+"/"+parentId+"/apis/"+apiAccess.getId()).build();
 			// Use an admin account for this request
-			RestAPICall request = new DELRequest(uri, null, true);
+			RestAPICall request = new DELRequest(uri, null, APIManagerAdapter.hasAdminAccount());
 			request.setContentType("application/json");
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
