@@ -42,6 +42,12 @@
 		</dependency>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>api-import</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
 			<artifactId>app-import</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
