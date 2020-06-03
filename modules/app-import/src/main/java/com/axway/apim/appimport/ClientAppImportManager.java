@@ -31,10 +31,10 @@ public class ClientAppImportManager {
 	public void replicate() throws AppException {
 		if(actualApp==null) {
 			targetAppAdapter.createApplication(desiredApp);
-		} else if(desiredApp.equals(actualApp)) {
+		} else if(appsAreEqual(desiredApp, actualApp)) {
 			LOG.debug("No changes detected between Desired- and Actual-App. Exiting now...");
 			ErrorState.getInstance().setWarning("No changes detected between Desired- and Actual-App.", ErrorCode.NO_CHANGE, false);
-			throw new AppException("No changes detected between Desired- and Actual-App.", ErrorCode.NO_CHANGE);
+			throw new AppException("No changes detected between Desired- and Actual-App.", ErrorCode.NO_CHANGE);			
 		} else {
 			LOG.debug("Update existing application");
 			targetAppAdapter.updateApplication(desiredApp, actualApp);
@@ -55,5 +55,11 @@ public class ClientAppImportManager {
 
 	public void setActualApp(ClientApplication actualApp) {
 		this.actualApp = actualApp;
+	}
+	
+	private static boolean appsAreEqual(ClientApplication desiredApp, ClientApplication actualApp) {
+		return 
+			desiredApp.equals(actualApp) && 
+			(desiredApp.getApiAccess()==null || desiredApp.getApiAccess().equals(actualApp.getCredentials()));
 	}
 }
