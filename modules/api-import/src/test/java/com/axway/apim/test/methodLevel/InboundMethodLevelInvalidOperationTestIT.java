@@ -25,7 +25,7 @@ public class InboundMethodLevelInvalidOperationTestIT extends TestNGCitrusTestRu
 		swaggerImport = new ImportTestAction();
 		description("Make sure, the error that an invalid operationId is given is properly handled.");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/basic-method-level-api-${apiNumber}");
 		variable("apiName", "Basic Method-Level-API-${apiNumber}");
 		

@@ -104,22 +104,29 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		if(this.apiManagerResponse.get(filter)!=null) return;
 		CommandParameters cmd = CommandParameters.getInstance();
 		URI uri;
-		HttpResponse response = null;
+		HttpResponse httpResponse = null;
+		String requestedId = "";
+		if(filter.getId()!=null) {
+			requestedId = "/"+filter.getId();
+		}
 		try { 
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+filter.getApiType())
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+filter.getApiType() + requestedId)
 					.addParameters(filter.getFilters())
 					.build();
 			LOG.info("Sending request to find existing APIs: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null);
-			response = getRequest.execute();
-
-			apiManagerResponse.put(filter, EntityUtils.toString(response.getEntity()));
+			httpResponse = getRequest.execute();
+			String response = EntityUtils.toString(httpResponse.getEntity());
+			if(response.startsWith("{")) { // Got a single response!
+				response = "["+response+"]";
+			}
+			apiManagerResponse.put(filter, response);
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
-				if(response!=null) 
-					((CloseableHttpResponse)response).close();
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}

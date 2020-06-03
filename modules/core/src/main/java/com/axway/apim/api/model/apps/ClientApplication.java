@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.axway.apim.adapter.apis.jackson.APIAccessSerializer;
 import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
 import com.axway.apim.adapter.apis.jackson.OrganizationSerializer;
@@ -47,7 +48,8 @@ public class ClientApplication {
 	private String extClientId;
 	private String apiKey;
 	
-	@JsonView(JSONViews.ApplicationBase.class)
+	@JsonView(JSONViews.ApplicationBaseIncludingAPIs.class)
+	@JsonSerialize (using = APIAccessSerializer.class)
 	@JsonProperty("apis")
 	private List<APIAccess> apiAccess = new ArrayList<APIAccess>();
 	
@@ -178,6 +180,7 @@ public class ClientApplication {
 					StringUtils.equals(otherApp.getDescription(), this.getDescription()) &&
 					StringUtils.equals(otherApp.getPhone(), this.getPhone()) &&
 					StringUtils.equals(otherApp.getState(), this.getState()) &&
+					(otherApp.getApiAccess()==null || otherApp.getApiAccess().equals(this.getApiAccess())) && 
 					(otherApp.getImage()==null || otherApp.getImage().equals(this.getImage()))
 					;
 		}

@@ -1,0 +1,11 @@
+{
+  "name" : "${appName}",
+  "organization" : "${orgName}",
+  "state" : "approved",
+  "enabled" : true,
+  "email" : "user@domain.com",
+  "phone" : "654654646234",
+  "apis" : [ {
+    "apiName" : "${apiName1}"
+  } ]
+}

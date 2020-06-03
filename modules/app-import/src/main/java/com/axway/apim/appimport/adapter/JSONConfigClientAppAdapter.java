@@ -5,8 +5,13 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIAdapter;
+import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.api.API;
+import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -51,6 +56,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		}
 		addImage(apps, configFile.getParentFile());
 		addOAuthCertificate(apps, configFile.getParentFile());
+		addAPIAccess(apps);
 		return true;
 	}
 	
@@ -112,6 +118,29 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 						throw new AppException("Can't read certificate from disc", ErrorCode.UNXPECTED_ERROR, e);
 					}
 				}
+			}
+		}
+	}
+	
+	private void addAPIAccess(List<ClientApplication> apps) throws AppException {
+		APIAdapter apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
+		for(ClientApplication app : apps) {
+			if(app.getApiAccess()==null) continue;
+			for(APIAccess apiAccess : app.getApiAccess()) {
+				List<API> apis = apiAdapter.getAPIs(new APIFilter.Builder()
+						.hasName(apiAccess.getApiName())
+						.build()
+				, false);
+				if(apis==null || apis.size()==0) {
+					LOG.error("API with name: " + apiAccess.getApiName() + " not found. Ignoring this APIs.");
+					continue;
+				}
+				if(apis.size()>1 && apiAccess.getApiVersion()==null) {
+					LOG.error("Found: "+apis.size()+" APIs with name: " + apiAccess.getApiName() + " not providing a version. Ignoring this APIs.");
+					continue;
+				}
+				API api = apis.get(0);
+				apiAccess.setApiId(api.getId());
 			}
 		}
 	}

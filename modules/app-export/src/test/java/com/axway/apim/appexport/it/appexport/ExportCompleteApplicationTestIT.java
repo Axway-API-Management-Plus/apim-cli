@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -18,11 +19,13 @@ import com.axway.apim.appexport.ApplicationExportTestAction;
 import com.axway.apim.appimport.ApplicationImportTestAction;
 import com.axway.apim.appimport.adapter.jackson.AppCredentialsDeserializer;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
+import com.consol.citrus.message.MessageType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,16 +38,37 @@ public class ExportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 
 	private ApplicationImportTestAction appImport = new ApplicationImportTestAction();
 	private ApplicationExportTestAction appExport = new ApplicationExportTestAction();
+	private ImportTestAction apiImport = new ImportTestAction();
 	
 	private static String PACKAGE = "/com/axway/apim/appimport/apps/basic/";
 	
 	@CitrusTest
 	@Test @Parameters("context")
 	public void exportComplteApplicationTest(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+		description("Export complete application from API-Manager tests");
+		
 		variable("targetFolder", "citrus:systemProperty('java.io.tmpdir')");
 		mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
 		
-		description("Export complete application from API-Manager tests");
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
+		
+
+		variable("apiPath", "/test-app-api-${apiNumber}");
+		variable("apiName", "Test-App-API-${apiNumber}");
+		variable("apiName", "${apiName}");
+
+		echo("####### Importing Test API: '${apiName}' on path: '${apiPath}' #######");
+		createVariable(ImportTestAction.API_DEFINITION,  PACKAGE + "petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  PACKAGE + "test-api-config.json");
+		createVariable("expectedReturnCode", "0");
+		apiImport.doExecute(context);
+		
+		echo("####### Extract ID of imported API: '${apiName}' on path: '${apiPath}' #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		variable("appNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("appName", "Complete-App-for-export-${appNumber}");
@@ -56,9 +80,8 @@ public class ExportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 		variable("quotaMessages", "9999");
 		variable("quotaPeriod", "week");
 		
-		
 		echo("####### Import application: '${appName}' to be exported afterwards #######");		
-		createVariable(ApplicationImportTestAction.CONFIG,  PACKAGE + "CompleteApplication.json");
+		createVariable(ApplicationImportTestAction.CONFIG,  PACKAGE + "CompleteApplicationWithAPIAccess.json");
 		createVariable("expectedReturnCode", "0");
 		appImport.doExecute(context);
 		

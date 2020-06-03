@@ -4,5 +4,9 @@ public class JSONViews {
 	
 	public static class ApplicationBase {}
 	
+	public static class ApplicationBaseIncludingAPIs extends ApplicationBase {}
+	
 	public static class CredentialsBase {}
+	
+	public static class APIAccessBase {}
 }

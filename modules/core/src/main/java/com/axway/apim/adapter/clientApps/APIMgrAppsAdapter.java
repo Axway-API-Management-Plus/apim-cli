@@ -1,7 +1,6 @@
 package com.axway.apim.adapter.clientApps;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
 import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
@@ -230,27 +231,12 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	}
 	
 	void addAPIAccess(List<ClientApplication> apps) throws Exception {
-		URI uri;
-		HttpResponse httpResponse = null;
-		for(ClientApplication app : apps) {
+		for(ClientApplication app : apps) {			
 			try {
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/apis")
-						.build();
-				RestAPICall getRequest = new GETRequest(uri, null);
-				httpResponse = getRequest.execute();//.getEntity().getContent();
-				int statusCode = httpResponse.getStatusLine().getStatusCode();
-				if(statusCode != 200){
-					LOG.error("Error reading application API Access. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
-					throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
-				}
-				List<APIAccess> apiAccess = mapper.readValue(httpResponse.getEntity().getContent(), new TypeReference<List<APIAccess>>(){});
+				List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app.getId(), Type.applications, true);
 				app.getApiAccess().addAll(apiAccess);
 			} catch (Exception e) {
 				throw new AppException("Error reading application API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
-			} finally {
-				try {
-					((CloseableHttpResponse)httpResponse).close();
-				} catch (Exception ignore) { }
 			}
 		}
 	}
@@ -291,13 +277,15 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			}
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			mapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
-			String json = mapper.writerWithView(JSONViews.ApplicationBase.class).writeValueAsString(desiredApp);
-			HttpEntity entity = new StringEntity(json);
 			try {
 				RestAPICall request;
 				if(actualApp==null) {
+					String json = mapper.writerWithView(JSONViews.ApplicationBaseIncludingAPIs.class).writeValueAsString(desiredApp);
+					HttpEntity entity = new StringEntity(json);
 					request = new POSTRequest(entity, uri, null);
 				} else {
+					String json = mapper.writerWithView(JSONViews.ApplicationBase.class).writeValueAsString(desiredApp);
+					HttpEntity entity = new StringEntity(json);
 					request = new PUTRequest(entity, uri, null);
 				}
 				request.setContentType("application/json");
@@ -318,6 +306,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			
 			desiredApp.setId(createdApp.getId());
 			saveImage(desiredApp, actualApp);
+			saveAPIAccess(desiredApp, actualApp);
 			saveCredentials(desiredApp, actualApp);
 			saveQuota(desiredApp, actualApp);
 			return createdApp;
@@ -428,6 +417,21 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			} catch (Exception ignore) { }
 		}
 	}
+	
+	private void saveAPIAccess(ClientApplication app, ClientApplication actualApp) throws AppException {
+		if(app.getApiAccess()==null || app.getApiAccess().size()==0) return;
+		if(actualApp!=null && app.getApiAccess().equals(actualApp.getApiAccess())) return;
+		if(!APIManagerAdapter.hasAdminAccount()) {
+			LOG.warn("Ignoring API-Access, as no admin account is given");
+			return;
+		}
+		APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
+		for(APIAccess access : app.getApiAccess()) {
+			accessAdapter.saveOrUpdateAPIAccess(access, app.getId(), Type.applications);
+		}
+	}
+	
+	
 	
 	public void setTestApiManagerResponse(ClientAppFilter filter, String apiManagerResponse) {
 		this.apiManagerResponse.put(filter, apiManagerResponse);
