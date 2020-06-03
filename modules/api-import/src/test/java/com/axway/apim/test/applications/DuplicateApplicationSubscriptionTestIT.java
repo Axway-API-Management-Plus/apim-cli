@@ -27,7 +27,7 @@ public class DuplicateApplicationSubscriptionTestIT extends TestNGCitrusTestRunn
 		swaggerImport = new ImportTestAction();
 		description("Verify subscription handling, if App isn't unique based on the name (See issue #217)");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/duplicate.app-subscription-${apiNumber}");
 		variable("apiName", "Duplicate-App Subscription API-${apiNumber}");
 		// ############## Creating Test-Application 1 #################

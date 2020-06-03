@@ -30,7 +30,7 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 		swaggerImport = new ImportTestAction();
 		description("Import an API, grant access to an org and create an application subscription.");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/app-subscription-${apiNumber}");
 		variable("apiName", "App Subscription API-${apiNumber}");
 		// ############## Creating Test-Application 1 #################

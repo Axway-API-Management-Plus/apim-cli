@@ -20,7 +20,7 @@ public class AppSubscriptionUnpublishedTestIT extends TestNGCitrusTestDesigner {
 	public void run() {
 		description("Validates, that App-Subscriptions are working on a Unpublished API!");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/app-subscr-unpublished-${apiNumber}");
 		variable("apiName", "App Subsc Unpublished API-${apiNumber}");
 		// ############## Creating Test-Application #################

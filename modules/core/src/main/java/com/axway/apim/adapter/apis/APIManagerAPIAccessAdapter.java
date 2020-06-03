@@ -22,6 +22,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.PUTRequest;
@@ -103,7 +104,7 @@ public class APIManagerAPIAccessAdapter {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/"+type+"/"+parentId+"/apis").build();
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			mapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
-			String json = mapper.writerWithView(JSONViews.APIAccessBase.class).writeValueAsString(apiAccess);
+			String json = mapper.writerWithView(JSONViews.APIAccessForAPIManager.class).writeValueAsString(apiAccess);
 			HttpEntity entity = new StringEntity(json);
 			// Use an admin account for this request
 			RestAPICall request = new POSTRequest(entity, uri, null, true);
@@ -117,6 +118,33 @@ public class APIManagerAPIAccessAdapter {
 			return mapper.readValue(httpResponse.getEntity().getContent(), APIAccess.class);
 		} catch (Exception e) {
 			throw new AppException("Error creating/updating API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
+		}
+	}
+	
+	public void deleteAPIAccess(APIAccess apiAccess, String parentId, Type type) throws AppException {
+		List<APIAccess> existingAPIAccess = getAPIAccess(parentId, type);
+		// Nothing to delete
+		if(existingAPIAccess!=null && !existingAPIAccess.contains(apiAccess)) return;
+		URI uri;
+		HttpResponse httpResponse = null;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/"+type+"/"+parentId+"/apis/"+apiAccess.getId()).build();
+			// Use an admin account for this request
+			RestAPICall request = new DELRequest(uri, null, true);
+			request.setContentType("application/json");
+			httpResponse = request.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode < 200 || statusCode > 299){
+				LOG.error("Can't delete API access requests for application. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+				throw new AppException("Can't delete API access requests for application. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
+			return;
+		} catch (Exception e) {
+			throw new AppException("Can't delete API access requests for application.", ErrorCode.CANT_CREATE_API_PROXY, e);
 		} finally {
 			try {
 				((CloseableHttpResponse)httpResponse).close();

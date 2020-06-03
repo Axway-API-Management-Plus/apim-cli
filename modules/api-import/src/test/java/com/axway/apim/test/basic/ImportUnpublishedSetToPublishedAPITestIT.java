@@ -27,7 +27,7 @@ public class ImportUnpublishedSetToPublishedAPITestIT extends TestNGCitrusTestRu
 		swaggerImport = new ImportTestAction();
 		echo("Import an Unpublished-API and in the second step publish it");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/change-state-to-published-api-${apiNumber}");
 		variable("apiName", "Change state to Published API ${apiNumber}");
 

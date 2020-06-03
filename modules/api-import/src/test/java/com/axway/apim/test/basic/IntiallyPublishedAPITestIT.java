@@ -27,7 +27,7 @@ public class IntiallyPublishedAPITestIT extends TestNGCitrusTestRunner {
 		swaggerImport = new ImportTestAction();
 		description("Import an API which initially has the status published.");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/initially-published-${apiNumber}");
 		variable("apiName", "Initially-Published-API-${apiNumber}");
 

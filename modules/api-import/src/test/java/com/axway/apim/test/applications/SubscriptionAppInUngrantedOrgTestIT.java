@@ -20,7 +20,7 @@ public class SubscriptionAppInUngrantedOrgTestIT extends TestNGCitrusTestDesigne
 	public void run() {
 		description("This test validates the behavior if a Client-App-Subscription is configured for an org without API-Permission.");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/app-in-ungranted-org-${apiNumber}");
 		variable("apiName", "App-Subscription wrong Org-${apiNumber}");
 		// ############## Creating Test-Application 1 #################

@@ -25,7 +25,7 @@ public class ReplaceOrgPermissionsWithSubscribedAppsTestIT extends TestNGCitrusT
 	public void run(@Optional @CitrusResource TestContext context) {
 		description("When an org is removed, belong apps are automatically removed. This isn't handled properly by Swagger-Promote. Testing this here! issue: #124");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/replace-org-permissions-with-subscribed-apps-${apiNumber}");
 		variable("apiName", "Replace Org-Permissions with subscribed Apps-${apiNumber}");
 		variable("clientAppsMode", "replace");

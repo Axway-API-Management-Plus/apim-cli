@@ -26,7 +26,7 @@ public class NoAPIDefinitionConfiguredIT extends TestNGCitrusTestRunner {
 		swaggerImport = new ImportTestAction();
 		description("If no api-definition is passed as argument and no apiDefinition attribute is found in configuration file, the tool must fail with a dedicated return code.");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/my-no-api-def-${apiNumber}");
 		variable("apiName", "No-API-DEF-CONFIGURED-${apiNumber}");
 

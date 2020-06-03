@@ -14,6 +14,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
@@ -30,13 +32,15 @@ import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.axway.apim.lib.utils.rest.Transaction;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class ManageClientApps extends AbstractAPIMTask implements IResponseParser {
+public class ManageClientApps extends AbstractAPIMTask {
 	
 	private static String MODE						= "MODE";
 	private static String MODE_CREATE_API_ACCESS	= "MODE_CREATE_API_ACCESS";
 	private static String MODE_REMOVE_API_ACCESS	= "MODE_REMOVE_API_ACCESS";
 	
 	private static boolean hasAdminAccount;
+	
+	APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
 	
 	/**
 	 * In case, the API has been re-created, this is object contains the API how it was before
@@ -116,36 +120,18 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	}
 
 	private void createAppSubscription(List<ClientApplication> missingDesiredApps, String apiId) throws AppException {
-		URI uri;
-		HttpEntity entity;
-		HttpResponse httpResponse = null;
 		if(missingDesiredApps.size()==0) return;
 		LOG.info("Creating API-Access for the following apps: '"+missingDesiredApps.toString()+"'");
 		try {
 			for(ClientApplication app : missingDesiredApps) {
-				LOG.info("Creating API-Access for application '"+app.getName()+"'");
-				Transaction.getInstance().put("appName", app);
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis").build();
-				entity = new StringEntity("{\"apiId\":\""+apiId+"\",\"enabled\":true}");
 				try {
-					RestAPICall apiCall = new POSTRequest(entity, uri, null, hasAdminAccount);
-					httpResponse = apiCall.execute();
-					if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_CREATED) {
-						LOG.debug("Successfully created API-Access for application: '"+app.getName()+"'");
-					} else {
-						LOG.error("Received status code: " + httpResponse.getStatusLine().getStatusCode());
-						try {
-							LOG.error("Received response: " + EntityUtils.toString(httpResponse.getEntity()));
-						} catch (Exception e) {
-							LOG.error(e.getMessage(), e);
-						}
-						throw new AppException("Failure creating/deleting API-Access to/from application: '"+app.getName()+"'. Mode: 'MODE_CREATE_API_ACCESS'", 
-								ErrorCode.API_MANAGER_COMMUNICATION);
-					}
-				} finally {
-					try {
-						((CloseableHttpResponse)httpResponse).close();
-					} catch (Exception ignore) {}
+					LOG.info("Creating API-Access for application '"+app.getName()+"'");
+					APIAccess apiAccess = new APIAccess();
+					apiAccess.setApiId(apiId);
+					accessAdapter.saveOrUpdateAPIAccess(apiAccess, app.getId(), Type.applications);
+				} catch(AppException e) {
+					throw new AppException("Failure creating/deleting API-Access to/from application: '"+app.getName()+"'. Mode: 'MODE_CREATE_API_ACCESS'", 
+							ErrorCode.API_MANAGER_COMMUNICATION);
 				}
 			}
 		} catch (Exception e) {
@@ -154,60 +140,21 @@ public class ManageClientApps extends AbstractAPIMTask implements IResponseParse
 	}
 	
 	private void removeAppSubscription(List<ClientApplication> revomingActualApps, String apiId) throws AppException {
-		URI uri;
-		RestAPICall apiCall;
 		Transaction.getInstance().put(MODE, MODE_REMOVE_API_ACCESS);
 		for(ClientApplication app : revomingActualApps) {
+			
 			// A Client-App that doesn't belong to a granted organization, can't have a subscription.
 			if(!hasClientAppPermission(app)) continue;
 			LOG.debug("Removing API-Access for application '"+app.getName()+"'");
-			String apiAccessIdToDelete = null;
 			try { 
-				Transaction.getInstance().put("appName", app);
-				for(APIAccess accessId : app.getApiAccess()) {
-					if(accessId.getApiId().equals(apiId)) apiAccessIdToDelete = accessId.getId();
+				for(APIAccess apiAccess: app.getApiAccess()) {
+					accessAdapter.deleteAPIAccess(apiAccess, app.getId(), Type.applications);
 				}
-				if(apiAccessIdToDelete==null) {
-					LOG.warn("Application: '"+app.getName()+"' ("+app.getId()+") seems not have access to API: '"+actualState.getName()+"' ("+apiId+"). Continue");
-					continue;
-				}
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/apis/"+apiAccessIdToDelete).build();
-				apiCall = new DELRequest(uri, this, hasAdminAccount);
-				apiCall.execute();
 			} catch (Exception e) {
 				LOG.error("Can't delete API access requests for application.");
 				throw new AppException("Can't delete API access requests for application.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			}	
 		}
-	}
-
-	@Override
-	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
-		Transaction context = Transaction.getInstance();
-		int statusCode = httpResponse.getStatusLine().getStatusCode();
-		try {
-			if(context.get(MODE).equals(MODE_CREATE_API_ACCESS) && statusCode == HttpStatus.SC_CREATED) {
-				actualState.getApplications().add((ClientApplication)context.get("appName"));
-				LOG.debug("Successfully created API-Access for application: '"+context.get("appName")+"'");
-			} else if(context.get(MODE).equals(MODE_REMOVE_API_ACCESS)  && statusCode == HttpStatus.SC_NO_CONTENT) {
-				actualState.getApplications().remove((ClientApplication)context.get("appName"));
-				LOG.debug("Successfully removed API-Access from application: '"+context.get("appName")+"'");
-			} else {
-				LOG.error("Received status code: " + httpResponse.getStatusLine().getStatusCode());
-				try {
-					LOG.error("Received response: " + EntityUtils.toString(httpResponse.getEntity()));
-				} catch (Exception e) {
-					LOG.error(e.getMessage(), e);
-				}
-				throw new AppException("Failure creating/deleting API-Access to/from application: '"+context.get("appName")+"'. Mode: '"+context.get(MODE)+"'", 
-						ErrorCode.API_MANAGER_COMMUNICATION);
-			}
-		} finally {
-			try {
-				((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) { }
-		}
-		return null;
 	}
 	
 	private List<ClientApplication> getMissingApps(List<ClientApplication> apps, List<ClientApplication> otherApps) throws AppException {

@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.jackson.AppExportSerializerModifier;
@@ -60,7 +61,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/"+app.getName()+".json"), app);
+			mapper.writerWithView(JSONViews.APIAccessForExport.class).writeValue(new File(localFolder.getCanonicalPath() + "/"+app.getName()+".json"), app);
 		} catch (Exception e) {
 			throw new AppException("Can't write Application-Configuration file for application: '"+app.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
 		}

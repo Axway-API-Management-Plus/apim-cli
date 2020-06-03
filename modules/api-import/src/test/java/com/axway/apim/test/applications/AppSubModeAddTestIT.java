@@ -20,7 +20,7 @@ public class AppSubModeAddTestIT extends TestNGCitrusTestDesigner {
 	public void run() {
 		description("Test to validate existing App-Subscription wont be overwritten with ClientAppMode ADD");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/app-subs-mode-add-${apiNumber}");
 		variable("apiName", "App-Subscription-Mode Add Test API-${apiNumber}");
 		variable("appName1", "App Subcription-Add-Test 1 ${orgNumber}");

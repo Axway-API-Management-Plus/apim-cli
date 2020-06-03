@@ -8,5 +8,7 @@ public class JSONViews {
 	
 	public static class CredentialsBase {}
 	
-	public static class APIAccessBase {}
+	public static class APIAccessForAPIManager {}
+	
+	public static class APIAccessForExport {}
 }

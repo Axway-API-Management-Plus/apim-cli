@@ -33,7 +33,7 @@ public class BackToPublishedFromDeprecatedTestIT extends TestNGCitrusTestRunner 
 		swaggerImport = new ImportTestAction();
 		description("Once an API in status deprecated, it must be possible to go back to published, basically remove the deperation status");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/my-test-api-${apiNumber}");
 		variable("apiName", "My-Test-API-${apiNumber}");
 

@@ -29,6 +29,7 @@ public class ExportApplication {
 	}
 
 	public List<ClientAppCredential> getCredentials() {
+		if(clientApp.getCredentials()==null || clientApp.getCredentials().size()==0) return null;
 		return clientApp.getCredentials();
 	}
 
@@ -57,6 +58,7 @@ public class ExportApplication {
 	}
 
 	public APIQuota getAppQuota() {
+		if(clientApp.getAppQuota()==null || clientApp.getAppQuota().getRestrictions()==null || clientApp.getAppQuota().getRestrictions().size()==0) return null;
 		return clientApp.getAppQuota();
 	}
 	

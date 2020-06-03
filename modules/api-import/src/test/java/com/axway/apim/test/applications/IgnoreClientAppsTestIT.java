@@ -20,7 +20,7 @@ public class IgnoreClientAppsTestIT extends TestNGCitrusTestDesigner {
 	public void run() {
 		description("This test makes sure, no client-applications have got a subscription.");
 		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/ignore-client-apps-test-${apiNumber}");
 		variable("apiName", "Ignore Client-Apps-API-${apiNumber}");
 		
