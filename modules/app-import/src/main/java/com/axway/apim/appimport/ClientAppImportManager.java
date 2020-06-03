@@ -60,6 +60,6 @@ public class ClientAppImportManager {
 	private static boolean appsAreEqual(ClientApplication desiredApp, ClientApplication actualApp) {
 		return 
 			desiredApp.equals(actualApp) && 
-			(desiredApp.getApiAccess()==null || desiredApp.getApiAccess().equals(actualApp.getCredentials()));
+			(desiredApp.getApiAccess()==null || desiredApp.getApiAccess().equals(actualApp.getApiAccess()));
 	}
 }
