@@ -176,7 +176,8 @@ public class ApplicationImportTestAction extends AbstractTestAction {
 		File sourceDir = new File(origConfigFile).getParentFile();
 		if(!sourceDir.exists()) {
 			sourceDir = new File(this.getClass().getResource(origConfigFile).getFile()).getParentFile();
-			if(!sourceDir.exists()) { 
+			if(!sourceDir.exists()) {
+				LOG.error("Unable to copy certificates & images to test directory: '"+testDir+"'. Could not found sourceDir based on configFile: '"+origConfigFile+"'");
 				return;
 			}
 		}
@@ -185,7 +186,7 @@ public class ApplicationImportTestAction extends AbstractTestAction {
 			LOG.info("Copy certificates and images from source: "+sourceDir+" into test-dir: '"+testDir+"'");
 			FileUtils.copyDirectory(sourceDir, testDir, filter);
 		} catch (IOException e) {
-
+			LOG.error("Unable to copy certificates and images from source: '"+sourceDir+"' into test directory: '"+testDir+"'", e);
 		}
 	}
 }
