@@ -36,6 +36,7 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
+import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -221,48 +222,70 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		}
 	}
 	
-	public ClientApplication createApplication(ClientApplication app) throws AppException {
-		getApplication(new ClientAppFilter.Builder().hasName(app.getName()).build());
+	@Override
+	public ClientApplication updateApplication(ClientApplication desiredApp, ClientApplication actualApp) throws AppException {
+		return createOrUpdateApplication(desiredApp, actualApp);
+	}
+	
+	@Override
+	public ClientApplication createApplication(ClientApplication desiredApp) throws AppException {
+		return createOrUpdateApplication(desiredApp, null);
+	}
+	
+	public ClientApplication createOrUpdateApplication(ClientApplication desiredApp, ClientApplication actualApp) throws AppException {
 		HttpResponse httpResponse = null;
 		ClientApplication createdApp;
 		try {
 			CommandParameters cmd = CommandParameters.getInstance();
-			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/").build();
+			URI uri;
+			if(actualApp==null) {
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/").build();
+			} else {
+				if(desiredApp.getApiAccess()!=null && desiredApp.getApiAccess().size()==0) desiredApp.setApiAccess(null);
+				desiredApp.setId(actualApp.getId());
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+actualApp.getId()).build();
+			}
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			mapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
-			String json = mapper.writerWithView(JSONViews.ApplicationBase.class).writeValueAsString(app);
+			String json = mapper.writerWithView(JSONViews.ApplicationBase.class).writeValueAsString(desiredApp);
 			HttpEntity entity = new StringEntity(json);
 			try {
-				POSTRequest postRequest = new POSTRequest(entity, uri, null);
-				postRequest.setContentType("application/json");
-				httpResponse = postRequest.execute();
+				RestAPICall request;
+				if(actualApp==null) {
+					request = new POSTRequest(entity, uri, null);
+				} else {
+					request = new PUTRequest(entity, uri, null);
+				}
+				request.setContentType("application/json");
+				httpResponse = request.execute();
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
-				if( statusCode != 201){
-					LOG.error("Error creating application. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+				if(statusCode < 200 || statusCode > 299){
+					LOG.error("Error creating/updating application. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 					throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
 				createdApp = mapper.readValue(httpResponse.getEntity().getContent(), ClientApplication.class);
 			} catch (Exception e) {
-				throw new AppException("Error uploading application image", ErrorCode.CANT_CREATE_API_PROXY, e);
+				throw new AppException("Error creating/updating application.", ErrorCode.CANT_CREATE_API_PROXY, e);
 			} finally {
 				try {
 					((CloseableHttpResponse)httpResponse).close();
 				} catch (Exception ignore) { }
 			}
 			
-			app.setId(createdApp.getId());
-			saveImage(app);
-			saveCredentials(app);
-			saveQuota(app);
+			desiredApp.setId(createdApp.getId());
+			saveImage(desiredApp, actualApp);
+			saveCredentials(desiredApp, actualApp);
+			saveQuota(desiredApp, actualApp);
 			return createdApp;
 
 		} catch (Exception e) {
-			throw new AppException("Error creating application", ErrorCode.CANT_CREATE_API_PROXY, e);
+			throw new AppException("Error creating/updating application", ErrorCode.CANT_CREATE_API_PROXY, e);
 		}
 	}
 	
-	private void saveImage(ClientApplication app) throws URISyntaxException, AppException {
+	private void saveImage(ClientApplication app, ClientApplication actualApp) throws URISyntaxException, AppException {
 		if(app.getImage()==null) return;
+		if(actualApp!=null && app.getImage().equals(actualApp.getImage())) return;
 		HttpResponse httpResponse = null;
 		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/image").build();
 		HttpEntity entity = MultipartEntityBuilder.create()
@@ -273,8 +296,8 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			apiCall.setContentType(null);
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if( statusCode != 200){
-				LOG.error("Error uploading application image' Response-Code: "+statusCode+"");
+			if(statusCode < 200 || statusCode > 299){
+				LOG.error("Error saving/updating application image. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 			}
 		} catch (Exception e) {
 			throw new AppException("Error uploading application image", ErrorCode.CANT_CREATE_API_PROXY, e);
@@ -285,11 +308,12 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		}
 	}
 	
-	private void saveCredentials(ClientApplication app) throws AppException, URISyntaxException, JsonProcessingException, UnsupportedEncodingException {
+	private void saveCredentials(ClientApplication app, ClientApplication actualApp) throws AppException, URISyntaxException, JsonProcessingException, UnsupportedEncodingException {
 		if(app.getCredentials()==null || app.getCredentials().size()==0) return;
 		String endpoint = "";
 		HttpResponse httpResponse = null;
 		for(ClientAppCredential cred : app.getCredentials()) {
+			if(actualApp!=null && actualApp.getCredentials().contains(cred)) continue;
 			if(cred instanceof OAuth) {
 				endpoint = "oauth";
 			} else if (cred instanceof ExtClients) {
@@ -310,8 +334,8 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 				postRequest.setContentType("application/json");
 				httpResponse = postRequest.execute();
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
-				if( statusCode != 201){
-					LOG.error("Error creating application' Response-Code: "+statusCode+"");
+				if(statusCode < 200 || statusCode > 299){
+					LOG.error("Error saving/updating application credentials. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 					throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
 			} catch (Exception e) {
@@ -324,8 +348,9 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		}
 	}
 	
-	private void saveQuota(ClientApplication app) throws AppException {
+	private void saveQuota(ClientApplication app, ClientApplication actualApp) throws AppException {
 		if(app.getAppQuota()==null || app.getAppQuota().getRestrictions().size()==0) return;
+		if(actualApp!=null && app.getAppQuota().equals(actualApp.getAppQuota())) return;
 		if(!APIManagerAdapter.hasAdminAccount()) {
 			LOG.warn("Ignoring quota, as no admin account is given");
 			return;
@@ -338,12 +363,17 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			String json = mapper.writeValueAsString(app.getAppQuota());
 			HttpEntity entity = new StringEntity(json);
 			// Use an admin account for this request
-			POSTRequest postRequest = new POSTRequest(entity, uri, null, true);
-			postRequest.setContentType("application/json");
-			httpResponse = postRequest.execute();
+			RestAPICall request;
+			if(actualApp==null) {
+				request = new POSTRequest(entity, uri, null, true);
+			} else {
+				request = new PUTRequest(entity, uri, null, true);
+			}
+			request.setContentType("application/json");
+			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if( statusCode != 201){
-				LOG.error("Error creating application' Response-Code: "+statusCode+"");
+			if(statusCode < 200 || statusCode > 299){
+				LOG.error("Error creating/updating application quota. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 				throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 		} catch (Exception e) {

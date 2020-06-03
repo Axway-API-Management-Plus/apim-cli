@@ -84,6 +84,12 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		throw new UnsupportedOperationException("createApplication not implemented for JSONConfigClientAppAdapter");
 	}
 	
+	@Override
+	public ClientApplication updateApplication(ClientApplication desiredApp, ClientApplication actualApp)
+			throws AppException {
+		throw new UnsupportedOperationException("updateApplication not implemented for JSONConfigClientAppAdapter");
+	}
+
 	private void addImage(List<ClientApplication> apps, File parentFolder) throws AppException {
 		for(ClientApplication app : apps) {
 			if(app.getImageUrl()==null || app.getImageUrl().equals("")) continue;

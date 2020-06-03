@@ -17,6 +17,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+			<artifactId>core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
 			<artifactId>app-import</artifactId>
 			<version>${project.version}</version>
 			<type>test-jar</type>

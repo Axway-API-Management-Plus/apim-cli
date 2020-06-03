@@ -37,7 +37,9 @@ public abstract class ClientAppAdapter {
 	
 	public abstract ClientApplication getApplication(ClientAppFilter filter) throws AppException;
 	
-	public abstract ClientApplication createApplication(ClientApplication app) throws AppException;
+	public abstract ClientApplication createApplication(ClientApplication desiredApp) throws AppException;
+	
+	public abstract ClientApplication updateApplication(ClientApplication desiredApp, ClientApplication actualApp) throws AppException;
 	
 	public abstract boolean readConfig(Object config) throws AppException;
 

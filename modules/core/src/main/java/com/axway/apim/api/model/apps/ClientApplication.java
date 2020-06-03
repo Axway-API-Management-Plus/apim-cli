@@ -7,18 +7,22 @@ import org.apache.commons.lang.StringUtils;
 
 import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
+import com.axway.apim.adapter.apis.jackson.OrganizationSerializer;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientApplication {
+	@JsonView(JSONViews.ApplicationBase.class)
 	private String id;
 	@JsonView(JSONViews.ApplicationBase.class)
 	private String name;
@@ -52,8 +56,10 @@ public class ClientApplication {
 	private APIQuota appQuota;
 	
 	@JsonDeserialize( using = OrganizationDeserializer.class)
-	@JsonView(JSONViews.ApplicationBase.class)
+	@JsonSerialize (using = OrganizationSerializer.class)
 	@JsonProperty(value = "organizationId")
+	@JsonAlias({ "organization" })
+	@JsonView(JSONViews.ApplicationBase.class)
 	private Organization organization;
 	
 	public String getId() {
@@ -164,7 +170,15 @@ public class ClientApplication {
 	public boolean equals(Object other) {
 		if(other == null) return false;
 		if(other instanceof ClientApplication) {
-			return StringUtils.equals(((ClientApplication)other).getName(), this.getName());
+			ClientApplication otherApp = (ClientApplication)other;
+			return 
+					StringUtils.equals(otherApp.getName(), this.getName()) &&
+					StringUtils.equals(otherApp.getEmail(), this.getEmail()) && 
+					StringUtils.equals(otherApp.getDescription(), this.getDescription()) &&
+					StringUtils.equals(otherApp.getPhone(), this.getPhone()) &&
+					StringUtils.equals(otherApp.getState(), this.getState()) &&
+					(otherApp.getImage()!=null && otherApp.getImage().equals(this.getImage()))
+					;
 		}
 		return false;
 	}

@@ -35,6 +35,9 @@ public class ClientAppImportManager {
 			LOG.debug("No changes detected between Desired- and Actual-App. Exiting now...");
 			ErrorState.getInstance().setWarning("No changes detected between Desired- and Actual-App.", ErrorCode.NO_CHANGE, false);
 			throw new AppException("No changes detected between Desired- and Actual-App.", ErrorCode.NO_CHANGE);
+		} else {
+			LOG.debug("Update existing application");
+			targetAppAdapter.updateApplication(desiredApp, actualApp);
 		}
 	}
 

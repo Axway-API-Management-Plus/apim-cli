@@ -15,8 +15,6 @@ public class OAuth extends ClientAppCredential {
 	@JsonView(JSONViews.CredentialsBase.class)
 	String type;
 	
-	String clientId;
-	
 	@JsonView(JSONViews.CredentialsBase.class)
 	String[] redirectUrls;
 
@@ -50,11 +48,11 @@ public class OAuth extends ClientAppCredential {
 	}
 
 	public String getClientId() {
-		return clientId;
+		return id;
 	}
 
 	public void setClientId(String clientId) {
-		this.clientId = clientId;
+		this.id = clientId;
 	}
 
 	@Override

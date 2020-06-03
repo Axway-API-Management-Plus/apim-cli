@@ -6,8 +6,6 @@ public class APIKey extends ClientAppCredential {
 	
 	String deletedOn;
 	
-	String apiKey;
-	
 	@Override
 	public String getCredentialType() {
 		return "apikeys";
@@ -22,11 +20,11 @@ public class APIKey extends ClientAppCredential {
 	}
 
 	public String getApiKey() {
-		return apiKey;
+		return id;
 	}
 
 	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
+		this.id = apiKey;
 	}
 	
 	@Override

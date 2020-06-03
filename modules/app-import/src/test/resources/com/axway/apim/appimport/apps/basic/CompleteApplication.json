@@ -3,7 +3,7 @@
   "organization" : "${orgName}",
   "description" : "${description}",
   "state" : "${state}",
-  "image" : "app-image.jpg",
+  "image" : "${appImage}",
   "enabled" : true,
   "email" : "${email}",
   "phone" : "${phone}",
@@ -29,8 +29,8 @@
       "method" : "*",
       "type" : "throttle",
       "config" : {
-        "messages" : "9999",
-        "period" : "week",
+        "messages" : "${quotaMessages}",
+        "period" : "${quotaPeriod}",
         "per" : "1"
       }
     } ]

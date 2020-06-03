@@ -33,9 +33,10 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 		variable("phone", "123456789-${appNumber}");
 		variable("description", "My App-Description ${appNumber}");
 		variable("email", "email-${appNumber}@customer.com");
+		variable("quotaMessages", "9999");
+		variable("quotaPeriod", "week");
 		variable("state", "approved");
-		
-		
+		variable("appImage", "app-image.jpg");
 
 		echo("####### Import application: '${appName}' #######");		
 		createVariable(ApplicationImportTestAction.CONFIG,  PACKAGE + "CompleteApplication.json");
@@ -63,8 +64,8 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 				.validate("$.restrictions[0].api", "*")
 				.validate("$.restrictions[0].method", "*")
 				.validate("$.restrictions[0].type", "throttle")
-				.validate("$.restrictions[0].config.messages", "9999")
-				.validate("$.restrictions[0].config.period", "week")
+				.validate("$.restrictions[0].config.messages", "${quotaMessages}")
+				.validate("$.restrictions[0].config.period", "${quotaPeriod}")
 				.validate("$.restrictions[0].config.per", "1"));
 		
 		echo("####### Validate application: '${appName}' with id: ${appId} OAuth has been imported #######");
@@ -84,6 +85,45 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 		
 		echo("####### Re-Import same application - Should be a No-Change #######");
 		createVariable("expectedReturnCode", "10");
-		appImport.doExecute(context);		
+		appImport.doExecute(context);
+		
+		echo("####### Re-Import slightly modified application - Existing App should be updated #######");
+		variable("email", "newemail-${appNumber}@customer.com");
+		variable("quotaMessages", "1111");
+		variable("quotaPeriod", "day");
+		
+		createVariable("expectedReturnCode", "0");
+		appImport.doExecute(context);
+		
+		echo("####### Validate application: '${appName}' (${appId}) has been updated #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${appId}").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
+				.validate("$.[?(@.name=='${appName}')].phone", "${phone}")
+				.validate("$.[?(@.name=='${appName}')].description", "${description}")
+				.validate("$.[?(@.name=='${appName}')].email", "${email}") // This should be the new email
+				.validate("$.[?(@.name=='${appName}')].state", "${state}")
+				.validate("$.[?(@.name=='${appName}')].image", "@assertThat(containsString(/api/portal/v))@")
+				.extractFromPayload("$.[?(@.name=='${appName}')].id", "appId"));
+		
+		echo("####### Validate modified quota for application: '${appName}' with id: ${appId} has been updated #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/quota").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.type", "APPLICATION")
+				.validate("$.restrictions[*].api", "@assertThat(hasSize(1))@")
+				.validate("$.restrictions[0].api", "*")
+				.validate("$.restrictions[0].method", "*")
+				.validate("$.restrictions[0].type", "throttle")
+				.validate("$.restrictions[0].config.messages", "${quotaMessages}")
+				.validate("$.restrictions[0].config.period", "${quotaPeriod}")
+				.validate("$.restrictions[0].config.per", "1"));
+		
+		echo("####### Update the application image only #######");
+		variable("appImage", "other-app-image.jpg");
+		
+		createVariable("expectedReturnCode", "0");
+		appImport.doExecute(context);
 	}
 }

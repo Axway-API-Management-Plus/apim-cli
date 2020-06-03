@@ -4,19 +4,17 @@ import org.apache.commons.lang.StringUtils;
 
 public class ExtClients extends ClientAppCredential {
 	
-	String clientId;
-	
 	@Override
 	public String getCredentialType() {
 		return "extclients";
 	}
 
 	public String getClientId() {
-		return clientId;
+		return id;
 	}
 
 	public void setClientId(String clientId) {
-		this.clientId = clientId;
+		this.id = clientId;
 	}
 	
 	@Override
