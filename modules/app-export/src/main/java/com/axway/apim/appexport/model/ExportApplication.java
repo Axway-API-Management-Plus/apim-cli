@@ -2,13 +2,14 @@ package com.axway.apim.appexport.model;
 
 import java.util.List;
 
+import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({ "name", "organization", "description", "state", "image", "enabled", "email", "phone", "credentials", "appQuota" })
+@JsonPropertyOrder({ "name", "organization", "description", "state", "image", "enabled", "email", "phone", "credentials", "appQuota", "APIAccess" })
 public class ExportApplication {
 	
 	ClientApplication clientApp;
@@ -38,7 +39,6 @@ public class ExportApplication {
 		return clientApp.getEmail();
 	}
 
-
 	public String getPhone() {
 		return clientApp.getPhone();
 	}
@@ -59,5 +59,7 @@ public class ExportApplication {
 		return clientApp.getAppQuota();
 	}
 	
-	
+	public List<APIAccess> getAPIAccess() {
+		return clientApp.getApiAccess();
+	}
 }

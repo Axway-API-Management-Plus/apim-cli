@@ -101,6 +101,7 @@ public class ClientApplication {
 		this.enabled = enabled;
 	}
 	public String getState() {
+		if(this.state==null) return "approved";
 		return state;
 	}
 	public void setState(String state) {
