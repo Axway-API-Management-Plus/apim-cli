@@ -4,43 +4,43 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+		<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.7.0-SNAPSHOT</version>
+		<version>0.0.9-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>api-export</artifactId>
+	<artifactId>apimcli-api-export</artifactId>
 	<packaging>jar</packaging>
 	<name>Axway API-Manager CLI API Export-Tool</name>
 	<description>Exports existing APIs from a running API-Manager to get the actual API state</description>
-	<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
+	<url>https://github.com/Axway-API-Management-Plus/apim-cli</url>
 
 	<dependencies>
 		<dependency>
-			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-			<artifactId>core</artifactId>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-			<artifactId>apim-cli</artifactId>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-tool</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-			<artifactId>api-import</artifactId>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-api-import</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-			<artifactId>api-import</artifactId>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-api-import</artifactId>
 			<version>${project.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-			<artifactId>core</artifactId>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-core</artifactId>
 			<version>${project.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>

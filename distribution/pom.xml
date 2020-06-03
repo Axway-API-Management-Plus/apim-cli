@@ -5,9 +5,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+		<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.7.0-SNAPSHOT</version>
+		<version>0.0.9-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -19,24 +19,20 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-			<artifactId>core</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-			<artifactId>api-export</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-api-export</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-			<artifactId>api-import</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-api-import</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-			<artifactId>app-export</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-app-export</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -53,7 +49,7 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>apimanager-swagger-promote-${project.version}</finalName>
+							<finalName>apimanager-apimcli-${project.version}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
 								<descriptor>assembly/dist-release.xml</descriptor>

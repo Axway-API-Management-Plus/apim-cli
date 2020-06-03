@@ -7,17 +7,17 @@
   </formats>
   <includeBaseDirectory>true</includeBaseDirectory>
   <includeSiteDirectory>false</includeSiteDirectory>
-  <baseDirectory>swagger-promote-${pom.version}</baseDirectory>
+  <baseDirectory>apim-cli-${pom.version}</baseDirectory>
   <moduleSets>
     <moduleSet>
       <useAllReactorProjects>true</useAllReactorProjects>
       <includes>
-        <include>com.github.axway-api-management-plus.swagger-promote:core</include>
-		<include>com.github.axway-api-management-plus.swagger-promote:api-import</include>
-        <include>com.github.axway-api-management-plus.swagger-promote:api-export</include>
-        <include>com.github.axway-api-management-plus.swagger-promote:app-import</include>
-        <include>com.github.axway-api-management-plus.swagger-promote:app-export</include>
-        <include>com.github.axway-api-management-plus.swagger-promote:apim-cli</include>
+        <include>com.github.axway-api-management-plus.apim-cli:apimcli-core</include>
+		<include>com.github.axway-api-management-plus.apim-cli:apimcli-api-import</include>
+        <include>com.github.axway-api-management-plus.apim-cli:apimcli-api-export</include>
+        <include>com.github.axway-api-management-plus.apim-cli:apimcli-app-import</include>
+        <include>com.github.axway-api-management-plus.apim-cli:apimcli-app-export</include>
+        <include>com.github.axway-api-management-plus.apim-cli:apimcli-tool</include>
       </includes>
       <binaries>
         <unpack>false</unpack>

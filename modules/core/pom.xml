@@ -2,17 +2,17 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
+		<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.7.0-SNAPSHOT</version>
+		<version>0.0.9-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>core</artifactId>
+	<artifactId>apimcli-core</artifactId>
 	<packaging>jar</packaging>
 	<name>Axway API-Manager CLI API-Manager Client/Core</name>
-	<description>The core component of Swagger-Promote replicating APIs into the API-Manager.</description>
-	<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
+	<description>The core component of the CLI providing an interface to the API-Manager.</description>
+	<url>https://github.com/Axway-API-Management-Plus/apim-cli</url>
 
 	<dependencies>
 		<dependency>
