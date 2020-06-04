@@ -1,117 +1,57 @@
-# Swagger/WSDL based API promotion for Axway API-Manager V7
+# Axway API-Management CLI
 
-This project provides you with a tool that simplifies your DevOps experience with the Axway API-Manager Version 7.x. 
+This CLI tool allows you to control the Axway API management solution without access through the Web UI. You can call the CLI manually or integrate it into a CI/CD pipeline. The CLI is based on [Swagger-Promote](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote), which has been refactored to support more use-cases than only APIs.
 
-The program works based on the API-Definition (as Swagger or a WSDL) + an API-Configuration-File and replicates this "state" into the API-Manager. Consider the API-Definition + API-Config as the "__desired__" state and API-Manager has the "__actual__" state. This program will compare both, the desired with the actual state, and performs all necessary actions to bring the API-Manager API into the desired state.
+## Everything as code
+The basic idea for the so-called "Everything as code" approach is that the desired state of something is declared in a configuration file which stored in your version management system. A tool is replicating that declared state to become the actual state. This is used for instance to manage a complex Cloud-Infrastructure called Infrastructure as code. You may read more here: https://hackernoon.com/everything-as-code-explained-0ibg32a3  
+  
+This CLI is following the same approach for your APIs, Applications, etc. Everything is declared as code in a config file and stored in your version management system. The CLI transfers this desired state manually or automatically via a pipeline into the API management platform to become the actual state.  
+Additionally the CLI supports basic administrative commands for instance to display entities and perform simple tasks.  
 
 Watch this video (28 min): https://youtu.be/2i8i1zMAMps to get an overview + demo.
 
-With that, an API-Developer is just providing the Swagger-File or WSDL (e.g. Code-Generated or using a Swagger-Editor) and the API-Config. When checked in, the [CI/CD-Pipeline](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/9.-Jenkins-Integration-with-GitHub-&-Bitbucket) picks it up and replicates it into the API-Manager. 
-This includes __Zero-Downtime-Upgrade of existing applications__, which might have an active subscription to an API. Learn more in the [documentation](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki).
+With that, an API developer is just providing the desired state configuration of the API, Application. When checked in, the [CI/CD-Pipeline](https://github.com/Axway-API-Management-Plus/apim-cli/wiki/9.-Jenkins-Integration-with-GitHub-&-Bitbucket) picks it up and replicates it into the API Manager. 
 
-![API-Manager Swagger-Promote overview]( https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/blob/develop/misc/images/apimanager-swagger-promote-overview.png )
+![API Manager Swagger-Promote overview](https://github.com/Axway-API-Management-Plus/apim-cli/blob/develop/misc/images/apimanager-swagger-promote-overview.png )
 
-Today the following API-Properties are already supported and can be controlled externally:
-- State-Handling (Unpublished, Published, Deprecated & Deleted)
-- API-Summary, API-description
-- API-Image 
-- API-Version
-- API-Path
-- API-Inbound-Security settings 
-  - incl. all custom settings (e.g. API-Key settings, etc.)
-- Outbound-Custom-Policies
-  - Routing, Request, Response, FaultHandler
-- Outbound Authentication
-- Backend Base-Path
-- CORS-Setup
-- V-Host
-- Tags
-- Custom-Properties
-- Quota-Management (Application- & System-Default-Quota)  
-  - also handling Application Quotas manually configured while updating an API
-- Client-Organization handling  
-- Query-String routing  
+## Supported commands
 
-Improving the API-Development experience during the API-Design phase leveraging the Stoplight integration. [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/Stoplight-Integration).
+### APIs 
+| Command       | Comment | 
+| :---        | :---  |
+|**import**|Replicates an API into the API-Manager |  
+|**export**|Exports one or more APIs from a running API-Manager |  
+
+### Applications
+| Command       | Comment | 
+| :---        | :---  |
+|**import**|Replicates an application into the API-Manager |  
+|**export**|Exports one or more applications from a running API-Manager | 
 
 ## Quality assurance process
-By using Swagger Promote to control your Axway API management infrastructure it becomes a key component of your CI/CD process. Product quality is therefore very important so that you can be confident that Swagger Promote is doing what it's supposed to do.  
-To achieve this quality bar, Swagger-Promote was developed from the beginning in a way that it can be tested fully automatically. The test process consists of different scenarios, which contain various __API-Desired__ states, which are transferred into __Actual__ state by Swagger-Promote and finally checked if the Actual State in the API-Manager is correct.  
+By using this CLI to control your Axway API management infrastructure it becomes a key component of your CI/CD process. Product quality is therefore very important so that you can be confident this CLI is doing what it's supposed to do.  
+To achieve this quality bar, the tools was developed from the beginning in a way that it can be tested fully automatically.  
+In addition to a number of executed unit-tests, sophisticated integration tests are performed. These integration tests are executed against different API-Management versions and consists of a number of different scenarios. Each scenrioa contains various __Desired__ states, which are transferred into __Actual__ state by the CLI and finally checked if the Actual State in the API-Manager is as expected. This is performed for APIs and applications.   
 
-With the most recent released version 1.6.5 the automated End-2-End test suite contains of __104__ different scenarios, which includes more than __250__ executions of Swagger-Promote (Import & Export) following each by a validation step. The test suite is executed at Travis CI for the following versions:  
+The automated End-2-End test suite contains of __113__ different scenarios, which includes more than __250__ executions of CLI (Import & Export) following each by a validation step. The test suite is executed at Travis CI for the following versions and you may check yourself what is done by clicking on the badge icon:  
 
 | Version       | Branch               | Status | Comment | 
 | :---          | :---                 | :---:  | :--- |
-| 7.6.2 SP2     | test-with-7.6.2-SP2  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.6.2-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
-| 7.6.2 SP3     | test-with-7.6.2-SP3  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.6.2-SP3)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
-| 7.6.2 SP4     | develop  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
-| 7.7           | test-with-7.7        | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
-| 7.7 SP1       | test-with-7.7-SP1    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-SP1)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
-| 7.7 SP2       | test-with-7.7-SP2    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
-| 7.7 20200130  | test-with-7.7-20200130    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-20200130)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)||
-| 7.7 20200331  | test-with-7.7-20200331    | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote.svg?branch=test-with-7.7-20200331)](https://travis-ci.org/Axway-API-Management-Plus/apimanager-swagger-promote/branches)|Also the March-Release works, but some of the Quota-Tests are a flaky.|
+| 7.6.2 SP4     | develop  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
 
-Also version 7.5.3 is supported, but not fully automated tested.  
+Version 7.5.3 is NOT supported.  
 
+## Get started
 
-## Install
-- Download the latest [release](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases) or get it from  [![Maven Central](https://img.shields.io/maven-central/v/com.github.axway-api-management-plus.swagger-promote/axway-swagger-promote-core.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.github.axway-api-management-plus.swagger-promote%22%20AND%20a:%22axway-swagger-promote-core%22)  
-- extract the tar.gz file  
-- make sure you have JRE 8 installed and setup JAVA_HOME environment variable
+To get started, you have several options to download the CLI and then just run the CLI as shown in the example below
 
-## Usage
-- run the script scripts/run-swagger-import.sh to see the basic usage and some samples
-- more information can be found in the project [wiki](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki) 
+```
+scripts\apim api import -c samples/basic/minimal-config-api-definition.json -s api-env
+```
+This command is reading the API-Management platform configuration details from the environment file: `env.api-env.properties` and replicates the given desired API state in the configuration file: `minimal-config-api-definition.json` into the API-Management platform. 
 
 ## Changelog
-- 1.0.0 - 12.12.2018
-  - Initial version that supports all API-Properties besides method level settings
-- 1.0.1 - 13.12.2018
-  - Added support for API-Manager 7.5.3 plus minor fixes
-- 1.1.0 - 18.12.2018
-  - Added support for Quota-Management plus minor fixes
-- 1.2.0 - 20.12.2018
-  - Added support for API-Outbound AuthN and support to configure the API-Backend-Basepath
-- 1.3.0 - 08.03.2019
-  - Added support for Organization- & Application-Management
-- 1.4.0 - 14.03.2019
-  - Added support to refer a Swagger-File from a URL instead of the local File-System only
-- 1.4.1 - 20.03.2019
-  - Stabilized handling of Client-Orgs and Client-Apps (added support for modes: add|replace|ignore)
-- 1.4.2 - 03.04.2019
-  - Added support for WSDLs API-Definitions, API-Manager port now a parameter, validate Admin-Role user is used
-- 1.5.0 - 09.04.2019
-  - Added support for Org-Admins and option to externalize parameters into environment properties
-- 1.5.1 - 30.04.2019
-  - Validate the given API-Organization & Now existing application quotas are preserved
-- 1.5.2 - 27.05.2019
-  - Added compatibility for 7.6.2 SP3, App-Quota-Handling improved, Support for Query-String-Option
-- 1.5.3 - 01.07.2019
-  - Now available in Maven-Central, API-Metadata export module, Outbound SSL support
-- 1.6.0 - 12.07.2019
-  - Added support for method level overrides, Rollback feature
-- 1.6.1 - 09.08.2019
-  - Quota-Handling & Method-Level configuration improvements and bugfixes
-- 1.6.2 - 09.08.2019
-  - Export existing APIs, Quota-Validation
-- 1.6.3 - 30.09.2019
-  - Maintenance release with some minor bugfixes and improvements, Added support for 7.7 SP1 & 7.6.2 SP5
-- 1.6.4 - 03.12.2019
-  - Added fully support for V-Host and the API-Routing-Key. [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/2.-API-Configuration#how-the-actual-api-is-looked-upped)
-- 1.6.5 - 27.02.2020
-  - Added support for release 7.7-20200103, Improved Org-Admin support [Learn more](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/6.-OrgAdmin-support) and a number of bugfixes
-- 1.6.6 - 31.03.2020 [All changes](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/milestone/4?closed=1)
-  - Optimized Swagger-Promote for Jenkins-Integration:
-    - Added new environment variable: SWAGGER_PROMOTE_HOME [#249](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/issues/248)
-    - Load Stage-API-Config from subfolder [#248](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/issues/249)
-  - [Jenkins-Integration-with-GitHub-&-Bitbucket](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/9.-Jenkins-Integration-with-GitHub-&-Bitbucket)
-- 1.6.7 - 27.04.2020 [All changes](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/milestone/6?closed=1)
-  - Added support for OpenAPI 3.0 - Now [backendBasepath](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/2.-API-Configuration#parameter-backendbasepath) can be used for OpenAPI 3.0 specifications
-
-
-## Limitations/Caveats
-- API-Method-Level description is not yet supported
-- Deep merge of stage-config files isn't supported
+See [change log](CHANGELOG.md)
 
 ## Contributing
 
