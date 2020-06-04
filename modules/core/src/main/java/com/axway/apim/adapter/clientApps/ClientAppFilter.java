@@ -114,7 +114,7 @@ public class ClientAppFilter {
 		return (
 				StringUtils.equals(other.getApplicationName(), this.getApplicationName()) && 
 				StringUtils.equals(other.getState(), this.getState()) &&
-				(other.getOrganization()!=null || other.getOrganization().equals(this.getOrganization()))
+				(other.getOrganization()==null || other.getOrganization().equals(this.getOrganization()))
 				);
 	}
 

@@ -35,7 +35,7 @@ public class ClientApplication {
 	private String phone;
 	@JsonView(JSONViews.ApplicationBase.class)
 	private boolean enabled;
-	@JsonView(JSONViews.ApplicationBase.class)
+
 	private String state;
 
 	@JsonProperty("image")

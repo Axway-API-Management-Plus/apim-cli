@@ -22,8 +22,6 @@ public class APIManagerAPIAdapterSingleTest extends APIManagerMockBase {
 	@BeforeClass
 	private void initTestIndicator() throws AppException, IOException {
 		setupMockData();
-		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsAdmin.json")), true);
-		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream("com/axway/apim/adapter/apis/config/configAsOrgAdmin.json")), false);
 		TestIndicator.getInstance().setTestRunning(true);
 	}
 	

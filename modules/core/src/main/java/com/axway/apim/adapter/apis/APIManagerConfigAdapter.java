@@ -84,10 +84,14 @@ public class APIManagerConfigAdapter {
 	}
 	
 	void setAPIManagerTestResponse(JsonNode jsonResponse, boolean useAdmin) {
+		if(jsonResponse==null) {
+			LOG.error("Test-Response is empty. Ignoring!");
+			return;
+		}
 		this.apiManagerResponse.put(useAdmin, jsonResponse);
 	}
 	
 	void setAPIManagerTestResponse(String response, boolean useAdmin) throws IOException {
-		this.apiManagerResponse.put(useAdmin, mapper.readTree(response));
+		setAPIManagerTestResponse(mapper.readTree(response), useAdmin);
 	}
 }
