@@ -29,10 +29,11 @@ With that, an API developer is just providing the desired state configuration of
 |**export**|Exports one or more applications from a running API-Manager | 
 
 ## Quality assurance process
-By using Swagger Promote to control your Axway API management infrastructure it becomes a key component of your CI/CD process. Product quality is therefore very important so that you can be confident that Swagger Promote is doing what it's supposed to do.  
-To achieve this quality bar, Swagger-Promote was developed from the beginning in a way that it can be tested fully automatically. The test process consists of different scenarios, which contain various __API-Desired__ states, which are transferred into __Actual__ state by Swagger-Promote and finally checked if the Actual State in the API-Manager is correct.  
+By using this CLI to control your Axway API management infrastructure it becomes a key component of your CI/CD process. Product quality is therefore very important so that you can be confident this CLI is doing what it's supposed to do.  
+To achieve this quality bar, the tools was developed from the beginning in a way that it can be tested fully automatically.  
+In addition to a number of executed unit-tests, sophisticated integration tests are performed. These integration tests are executed against different API-Management versions and consists of a number of different scenarios. Each scenrioa contains various __Desired__ states, which are transferred into __Actual__ state by the CLI and finally checked if the Actual State in the API-Manager is as expected. This is performed for APIs and applications.   
 
-With the most recent released version 1.6.5 the automated End-2-End test suite contains of __104__ different scenarios, which includes more than __250__ executions of Swagger-Promote (Import & Export) following each by a validation step. The test suite is executed at Travis CI for the following versions:  
+The automated End-2-End test suite contains of __113__ different scenarios, which includes more than __250__ executions of CLI (Import & Export) following each by a validation step. The test suite is executed at Travis CI for the following versions and you may check yourself what is done by clicking on the badge icon:  
 
 | Version       | Branch               | Status | Comment | 
 | :---          | :---                 | :---:  | :--- |
