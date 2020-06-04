@@ -2,7 +2,6 @@ package com.axway.apim.adapter;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,17 +27,12 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.apis.APIAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
-import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.adapter.apis.APIManagerConfigAdapter;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter;
 import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
-import com.axway.apim.adapter.apis.APIManagerQuotaAdapter.Quota;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
-import com.axway.apim.api.definition.APISpecification;
-import com.axway.apim.api.definition.APISpecificationFactory;
-import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.User;
@@ -441,6 +435,12 @@ public class APIManagerAdapter {
 		try {
 			RestAPICall getRequest = new GETRequest(uri, null);
 			httpResponse = getRequest.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode == 404) return null; // No Image found
+			if(statusCode != 200) {
+				LOG.error("Can't read Image from API-Manager.. Message: '"+EntityUtils.toString(httpResponse.getEntity())+"' Response-Code: "+statusCode+"");
+				throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
 			if(httpResponse == null || httpResponse.getEntity() == null) return null; // no Image found in API-Manager
 			InputStream is = httpResponse.getEntity().getContent();
 			image.setImageContent(IOUtils.toByteArray(is));
@@ -561,6 +561,7 @@ public class APIManagerAdapter {
 	 */
 	public static JsonNode getFileData(byte[] certificate, String filename) throws AppException {
 		URI uri;
+		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/filedata/").build();
 			
@@ -569,11 +570,16 @@ public class APIManagerAdapter {
 					.build();
 			POSTRequest postRequest = new POSTRequest(entity, uri, null);
 			postRequest.setContentType(null);
-			HttpEntity response = postRequest.execute().getEntity();
-			JsonNode jsonResponse = mapper.readTree(response.getContent());
+			httpResponse = postRequest.execute();
+			JsonNode jsonResponse = mapper.readTree(httpResponse.getEntity().getContent());
 			return jsonResponse;
 		} catch (Exception e) {
 			throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		} finally {
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
 		}
 	}
 

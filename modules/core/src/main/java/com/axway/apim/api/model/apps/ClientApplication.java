@@ -78,6 +78,7 @@ public class ClientApplication {
 	}
 	
 	public String getDescription() {
+		if(StringUtils.isEmpty(description)) return null;
 		return description;
 	}
 	public void setDescription(String description) {
@@ -85,12 +86,14 @@ public class ClientApplication {
 	}
 	
 	public String getEmail() {
+		if(StringUtils.isEmpty(email)) return null;
 		return email;
 	}
 	public void setEmail(String email) {
 		this.email = email;
 	}
 	public String getPhone() {
+		if(StringUtils.isEmpty(phone)) return null;
 		return phone;
 	}
 	public void setPhone(String phone) {
