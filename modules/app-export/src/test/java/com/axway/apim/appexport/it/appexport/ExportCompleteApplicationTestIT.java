@@ -13,6 +13,7 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.appexport.ApplicationExportTestAction;
@@ -108,7 +109,7 @@ public class ExportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 		assertTrue(new File(context.getVariable("targetFolder")+"/"+context.getVariable("appName")+"/app-image.jpg").exists(), "Application image is missing");
 		
 		List<ClientAppCredential> importedCredentials = mapper.convertValue(importedAppConfig.get("credentials"), new TypeReference<List<ClientAppCredential>>(){});
-		List<ClientAppCredential> exportedCredentials = mapper.convertValue(importedAppConfig.get("credentials"), new TypeReference<List<ClientAppCredential>>(){});
+		List<ClientAppCredential> exportedCredentials = mapper.convertValue(exportedAppConfig.get("credentials"), new TypeReference<List<ClientAppCredential>>(){});
 		
 		assertEquals(importedCredentials, exportedCredentials, "Application credentials are not equal.");
 		
@@ -116,5 +117,10 @@ public class ExportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 		APIQuota exportedAppQuota = mapper.convertValue(exportedAppConfig.get("appQuota"), APIQuota.class);
 		
 		assertEquals(importedAppQuota, exportedAppQuota, "Application quotas are not equal.");
+		
+		List<APIAccess> importedAPIAccess = mapper.convertValue(importedAppConfig.get("apis"), new TypeReference<List<APIAccess>>(){});
+		List<APIAccess> exportedAPIAccess = mapper.convertValue(exportedAppConfig.get("apis"), new TypeReference<List<APIAccess>>(){});
+		
+		assertEquals(importedAPIAccess, exportedAPIAccess, "Application API-Access are not equal.");
 	}
 }

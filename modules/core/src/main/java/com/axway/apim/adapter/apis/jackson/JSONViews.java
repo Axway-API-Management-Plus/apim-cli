@@ -2,13 +2,21 @@ package com.axway.apim.adapter.apis.jackson;
 
 public class JSONViews {
 	
-	public static class ApplicationBase {}
+	public static class ApplicationForExport implements ApplicationBase, ApplicationAPIs, CredentialsBase, CredentialsExport, APIAccessForExport {}
 	
-	public static class ApplicationBaseIncludingAPIs extends ApplicationBase {}
+	public static class ApplicationForAPIManager implements ApplicationBase, ApplicationAPIs {}
 	
-	public static class CredentialsBase {}
+	public static class CredentialsForAPIManager implements CredentialsBase, CredentialsForManager {}
 	
-	public static class APIAccessForAPIManager {}
+	public static interface ApplicationBase {}
 	
-	public static class APIAccessForExport {}
+	public static interface ApplicationAPIs {}
+	
+	public static interface CredentialsBase {}
+	public static interface CredentialsForManager {}
+	public static interface CredentialsExport {}
+	
+	public static interface APIAccessForAPIManager {}
+	
+	public static interface APIAccessForExport {}
 }

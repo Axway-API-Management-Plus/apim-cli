@@ -1,6 +1,7 @@
 package com.axway.apim.adapter.apis;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,14 +19,12 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
-import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
-import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -95,9 +94,27 @@ public class APIManagerAPIAccessAdapter {
 		}
 	}
 	
-	public APIAccess saveOrUpdateAPIAccess(APIAccess apiAccess, String parentId, Type type) throws AppException {
+	public List<APIAccess> saveAPIAccess(List<APIAccess> apiAccess, String parentId, Type type) throws AppException {
 		List<APIAccess> existingAPIAccess = getAPIAccess(parentId, type);
-		if(existingAPIAccess!=null && existingAPIAccess.contains(apiAccess)) return existingAPIAccess.get(0);
+		
+		List<APIAccess> toBeRemovedAccesses = getMissingAPIAccesses(existingAPIAccess, apiAccess);
+		List<APIAccess> toBeAddeddAccesses = getMissingAPIAccesses(apiAccess, existingAPIAccess);
+
+		for(APIAccess access : toBeRemovedAccesses) {
+			deleteAPIAccess(access, parentId, type);
+		}
+		for(APIAccess access : toBeAddeddAccesses) {
+			createAPIAccess(access, parentId, type);
+		}
+		return apiAccess;
+	}
+	
+	public APIAccess createAPIAccess(APIAccess apiAccess, String parentId, Type type) throws AppException {
+		List<APIAccess> existingAPIAccess = getAPIAccess(parentId, type);
+		if(existingAPIAccess!=null && existingAPIAccess.contains(apiAccess)) {
+			apiAccess.setId(existingAPIAccess.get(0).getId());
+			return apiAccess;
+		}
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
@@ -150,6 +167,19 @@ public class APIManagerAPIAccessAdapter {
 				((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) { }
 		}
+	}
+	
+	private List<APIAccess> getMissingAPIAccesses(List<APIAccess> apiAccess, List<APIAccess> otherApiAccess) throws AppException {
+		List<APIAccess> missingAccess = new ArrayList<APIAccess>();
+		if(otherApiAccess == null) otherApiAccess = new ArrayList<APIAccess>();
+		if(apiAccess == null) apiAccess = new ArrayList<APIAccess>();
+		for(APIAccess access : apiAccess) {
+			if(otherApiAccess.contains(access)) {
+				continue;
+			}
+			missingAccess.add(access);
+		}
+		return missingAccess;
 	}
 	
 	void setAPIManagerTestResponse(Type type, String id, String response) {

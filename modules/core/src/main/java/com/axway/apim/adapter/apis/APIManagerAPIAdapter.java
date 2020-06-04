@@ -113,7 +113,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+filter.getApiType() + requestedId)
 					.addParameters(filter.getFilters())
 					.build();
-			LOG.info("Sending request to find existing APIs: " + uri);
+			LOG.debug("Sending request to find existing APIs: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null);
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());

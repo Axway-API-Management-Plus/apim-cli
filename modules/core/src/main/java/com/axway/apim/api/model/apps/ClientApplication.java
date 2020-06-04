@@ -48,7 +48,7 @@ public class ClientApplication {
 	private String extClientId;
 	private String apiKey;
 	
-	@JsonView(JSONViews.ApplicationBaseIncludingAPIs.class)
+	@JsonView(JSONViews.ApplicationAPIs.class)
 	@JsonSerialize (using = APIAccessSerializer.class)
 	@JsonProperty("apis")
 	private List<APIAccess> apiAccess = new ArrayList<APIAccess>();

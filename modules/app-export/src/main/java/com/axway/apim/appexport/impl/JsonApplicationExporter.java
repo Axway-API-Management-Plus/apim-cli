@@ -61,7 +61,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.writerWithView(JSONViews.APIAccessForExport.class).writeValue(new File(localFolder.getCanonicalPath() + "/"+app.getName()+".json"), app);
+			mapper.writerWithView(JSONViews.ApplicationForExport.class).writeValue(new File(localFolder.getCanonicalPath() + "/"+app.getName()+".json"), app);
 		} catch (Exception e) {
 			throw new AppException("Can't write Application-Configuration file for application: '"+app.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
 		}

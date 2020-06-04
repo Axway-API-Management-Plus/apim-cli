@@ -33,17 +33,21 @@ public class AppCredentialsDeserializer extends StdDeserializer<ClientAppCredent
 		JsonNode node = jp.getCodec().readTree(jp);
 		String credentialType = node.get("credentialType").asText();
 		ClientAppCredential cred = null;
-		if(credentialType.equals("oauth")) {
-			cred = objectMapper.treeToValue(node, OAuth.class);
-			cred.setId(node.get("clientId").asText());
-		} else if(credentialType.equals("extclients")) {
-			cred = objectMapper.treeToValue(node, ExtClients.class);
-			cred.setId(node.get("clientId").asText());
-		} else if(credentialType.equals("apikeys")) {
-			cred = objectMapper.treeToValue(node, APIKey.class);
-			cred.setId(node.get("apiKey").asText());
-		} else {
-			throw new RuntimeException("Unsupported credentialType: " + credentialType);
+		try {
+			if(credentialType.equals("oauth")) {
+				cred = objectMapper.treeToValue(node, OAuth.class);
+				cred.setId(node.get("clientId").asText());
+			} else if(credentialType.equals("extclients")) {
+				cred = objectMapper.treeToValue(node, ExtClients.class);
+				cred.setId(node.get("clientId").asText());
+			} else if(credentialType.equals("apikeys")) {
+				cred = objectMapper.treeToValue(node, APIKey.class);
+				cred.setId(node.get("apiKey").asText());
+			} else {
+				throw new RuntimeException("Unsupported credentialType: " + credentialType);
+			}
+		} catch (NullPointerException e) {
+			throw new IOException("Cannot parse application credential type: " + credentialType + ". Please make sure 'clientId' or 'apiKey' is given.");
 		}
 		return cred;
 	}

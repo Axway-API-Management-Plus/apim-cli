@@ -128,7 +128,7 @@ public class ManageClientApps extends AbstractAPIMTask {
 					LOG.info("Creating API-Access for application '"+app.getName()+"'");
 					APIAccess apiAccess = new APIAccess();
 					apiAccess.setApiId(apiId);
-					accessAdapter.saveOrUpdateAPIAccess(apiAccess, app.getId(), Type.applications);
+					accessAdapter.createAPIAccess(apiAccess, app.getId(), Type.applications);
 				} catch(AppException e) {
 					throw new AppException("Failure creating/deleting API-Access to/from application: '"+app.getName()+"'. Mode: 'MODE_CREATE_API_ACCESS'", 
 							ErrorCode.API_MANAGER_COMMUNICATION);

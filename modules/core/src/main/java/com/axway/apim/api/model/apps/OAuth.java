@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.apache.commons.lang.StringUtils;
 
 import com.axway.apim.adapter.apis.jackson.JSONViews;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 public class OAuth extends ClientAppCredential {
@@ -47,6 +48,8 @@ public class OAuth extends ClientAppCredential {
 		this.redirectUrls = redirectUrls;
 	}
 
+	@JsonView(JSONViews.CredentialsExport.class)
+	@JsonProperty("clientId")
 	public String getClientId() {
 		return id;
 	}

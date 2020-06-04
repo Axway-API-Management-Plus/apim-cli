@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 public abstract class ClientAppCredential {
 	
 	String credentialType = null;
-	@JsonView(JSONViews.CredentialsBase.class)
+	@JsonView(JSONViews.CredentialsForManager.class)
 	String id;
 	
 	@JsonView(JSONViews.CredentialsBase.class)

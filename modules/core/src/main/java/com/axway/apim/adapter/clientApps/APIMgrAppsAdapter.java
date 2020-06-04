@@ -280,11 +280,11 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			try {
 				RestAPICall request;
 				if(actualApp==null) {
-					String json = mapper.writerWithView(JSONViews.ApplicationBaseIncludingAPIs.class).writeValueAsString(desiredApp);
+					String json = mapper.writerWithView(JSONViews.ApplicationForAPIManager.class).writeValueAsString(desiredApp);
 					HttpEntity entity = new StringEntity(json);
 					request = new POSTRequest(entity, uri, null);
 				} else {
-					String json = mapper.writerWithView(JSONViews.ApplicationBase.class).writeValueAsString(desiredApp);
+					String json = mapper.writerWithView(JSONViews.ApplicationForAPIManager.class).writeValueAsString(desiredApp);
 					HttpEntity entity = new StringEntity(json);
 					request = new PUTRequest(entity, uri, null);
 				}
@@ -360,7 +360,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/"+endpoint).build();
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				mapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
-				String json = mapper.writerWithView(JSONViews.CredentialsBase.class).writeValueAsString(cred);
+				String json = mapper.writerWithView(JSONViews.CredentialsForAPIManager.class).writeValueAsString(cred);
 				HttpEntity entity = new StringEntity(json);
 				
 				POSTRequest postRequest = new POSTRequest(entity, uri, null);
@@ -426,9 +426,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			return;
 		}
 		APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
-		for(APIAccess access : app.getApiAccess()) {
-			accessAdapter.saveOrUpdateAPIAccess(access, app.getId(), Type.applications);
-		}
+		accessAdapter.saveAPIAccess(app.getApiAccess(), app.getId(), Type.applications);
 	}
 	
 	

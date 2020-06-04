@@ -101,7 +101,9 @@ public class APIAccess {
 		if(other instanceof APIAccess) {
 			APIAccess otherApiAccess = (APIAccess)other;
 			return 
-					StringUtils.equals(otherApiAccess.getApiId(), this.getApiId())
+					StringUtils.equals(otherApiAccess.getApiId(), this.getApiId()) &&
+					StringUtils.equals(otherApiAccess.getApiName(), this.getApiName()) &&
+					StringUtils.equals(otherApiAccess.getApiVersion(), this.getApiVersion())
 					;
 		}
 		return false;
@@ -109,7 +111,6 @@ public class APIAccess {
 
 	@Override
 	public String toString() {
-		return "APIAccess [id=" + id + ", apiId=" + apiId + ", createdBy=" + createdBy + ", state=" + state
-				+ ", createdOn=" + createdOn + ", enabled=" + enabled + "]";
+		return "APIAccess [apiName=" + apiName + ", apiVersion=" + apiVersion + ", id=" + id + ", apiId=" + apiId + "]";
 	}
 }

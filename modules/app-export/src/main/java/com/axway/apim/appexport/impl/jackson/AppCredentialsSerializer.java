@@ -43,16 +43,6 @@ public class AppCredentialsSerializer extends StdSerializer<ClientAppCredential>
 				throw new IOException("Can't write certificate file", e);
 			}
 		}
-		if(credential.getId()!=null) {
-			if(credential instanceof OAuth) {
-				((OAuth)credential).setClientId(credential.getId());
-			} else if(credential instanceof ExtClients) {
-				((ExtClients)credential).setClientId(credential.getId());
-			} else if(credential instanceof APIKey) {
-				((APIKey)credential).setApiKey(credential.getId());
-			}
-			credential.setId(null);
-		}
 		defaultSerializer.serialize(credential, jgen, provider);
 	}
 
