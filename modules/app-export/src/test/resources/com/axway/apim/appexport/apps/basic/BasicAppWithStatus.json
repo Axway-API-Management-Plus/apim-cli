@@ -1,0 +1,7 @@
+[
+	{
+		"name": "${appName}", 
+		"organization": "${orgName}",
+		"state": "${appStatus}" 
+	}
+]

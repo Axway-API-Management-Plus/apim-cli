@@ -61,6 +61,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			ClientAppFilter filter = new ClientAppFilter.Builder()
 					.hasState(AppExportParams.getInstance().getAppState())
 					.hasName(AppExportParams.getInstance().getAppName())
+					.hasOrganizationName(AppExportParams.getInstance().getOrgName())
 					.includeQuotas(true)
 					.includeCredentials(true)
 					.includeAPIAccess(true)

@@ -284,7 +284,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 					HttpEntity entity = new StringEntity(json);
 					request = new POSTRequest(entity, uri, null);
 				} else {
-					String json = mapper.writerWithView(JSONViews.ApplicationForAPIManager.class).writeValueAsString(desiredApp);
+					String json = mapper.writerWithView(JSONViews.ApplicationForAPIManagerOnUpdate.class).writeValueAsString(desiredApp);
 					HttpEntity entity = new StringEntity(json);
 					request = new PUTRequest(entity, uri, null);
 				}

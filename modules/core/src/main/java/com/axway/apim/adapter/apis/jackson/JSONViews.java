@@ -6,6 +6,8 @@ public class JSONViews {
 	
 	public static class ApplicationForAPIManager implements ApplicationBase, ApplicationAPIs {}
 	
+	public static class ApplicationForAPIManagerOnUpdate implements ApplicationBase {}
+	
 	public static class CredentialsForAPIManager implements CredentialsBase, CredentialsForManager {}
 	
 	public static interface ApplicationBase {}

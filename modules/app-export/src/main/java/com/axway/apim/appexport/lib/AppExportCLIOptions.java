@@ -22,11 +22,11 @@ public class AppExportCLIOptions extends APIMCoreCLIOptions {
 		option.setArgName("preprod");
 		options.addOption(option);
 
-		option = new  Option("state", false, "Export application with specific state: pending | approved");
+		option = new  Option("state", true, "Export application with specific state: pending | approved");
 		option.setRequired(false);
 		options.addOption(option);
 
-		option = new  Option("orgName", false, "Limit applications to this organization");
+		option = new  Option("orgName", true, "Limit applications to this organization");
 		option.setRequired(false);
 		options.addOption(option);
 

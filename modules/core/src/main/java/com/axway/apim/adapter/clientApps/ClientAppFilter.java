@@ -10,6 +10,8 @@ import org.apache.http.message.BasicNameValuePair;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 
 public class ClientAppFilter {
 	
@@ -25,7 +27,7 @@ public class ClientAppFilter {
 	
 	String state;
 	
-	String organizationId;
+	Organization organization;
 	
 	String applicationId;
 	
@@ -57,16 +59,16 @@ public class ClientAppFilter {
 		return filters;
 	}
 
-	public void setOrganizationId(String organizationId) {
-		if(organizationId==null) return;
-		this.organizationId = organizationId;
+	public void setOrganization(Organization organization) {
+		if(organization==null) return;
+		this.organization = organization;
 		filters.add(new BasicNameValuePair("field", "orgid"));
 		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", organizationId));
+		filters.add(new BasicNameValuePair("value", organization.getId()));
 	}
 
-	public String getOrganization() {
-		return organizationId;
+	public Organization getOrganization() {
+		return organization;
 	}
 
 	public void setApplicationName(String applicationName) {
@@ -112,7 +114,7 @@ public class ClientAppFilter {
 		return (
 				StringUtils.equals(other.getApplicationName(), this.getApplicationName()) && 
 				StringUtils.equals(other.getState(), this.getState()) &&
-				StringUtils.equals(other.getOrganization(), this.getOrganization())
+				(other.getOrganization()!=null || other.getOrganization().equals(this.getOrganization()))
 				);
 	}
 
@@ -143,7 +145,7 @@ public class ClientAppFilter {
 		
 		boolean includeAPIAccess;
 		
-		String organizationId;
+		Organization organization;
 		
 		/** The name of the application */
 		String applicationName;
@@ -167,7 +169,7 @@ public class ClientAppFilter {
 			ClientAppFilter filter = new ClientAppFilter();
 			filter.setApplicationId(this.applicationId);
 			filter.setApplicationName(this.applicationName);
-			filter.setOrganizationId(this.organizationId);
+			filter.setOrganization(this.organization);
 			filter.setState(this.state);
 			filter.includeQuota = this.includeQuota;
 			filter.includeCredentials = this.includeCredentials;
@@ -180,7 +182,7 @@ public class ClientAppFilter {
 			if(name==null) return this;
 			if(name.contains("|")) {
 				Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(name.substring(name.indexOf("|")+1));
-				hasOrganizationId(org.getId());
+				hasOrganization(org);
 				this.applicationName = name.substring(0, name.indexOf("|"));
 			} else {
 				this.applicationName = name;	
@@ -193,8 +195,24 @@ public class ClientAppFilter {
 			return this;
 		}
 		
-		public Builder hasOrganizationId(String organizationId) {
-			this.organizationId = organizationId;
+		public Builder hasOrganizationId(String organizationId) throws AppException {
+			Organization org = new Organization();
+			org.setId(organizationId);
+			return hasOrganization(org);
+		}
+		
+		public Builder hasOrganizationName(String organizationName) throws AppException {
+			if(organizationName==null) return this;
+			Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(organizationName);
+			if(org==null) {
+				ErrorState.getInstance().setError("The organization with name: '"+organizationName+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION, false);
+				throw new AppException("The organization with name: '"+organizationName+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
+			}
+			return hasOrganization(org);
+		}
+		
+		public Builder hasOrganization(Organization organization) throws AppException {
+			this.organization = organization;
 			return this;
 		}
 		
