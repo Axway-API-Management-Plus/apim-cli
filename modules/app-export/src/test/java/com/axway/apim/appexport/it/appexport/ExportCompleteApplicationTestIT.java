@@ -90,7 +90,7 @@ public class ExportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 		createVariable("expectedReturnCode", "0");
 		appExport.doExecute(context);
 		
-		String exportedAppConfigFile = context.getVariable("targetFolder")+"/"+context.getVariable("appName")+"/"+context.getVariable("appName")+".json";
+		String exportedAppConfigFile = context.getVariable("targetFolder")+"/"+context.getVariable("appName")+"/application-config.json";
 		
 		echo("####### Reading exported API-Config file: '"+exportedAppConfigFile+"' #######");
 		JsonNode exportedAppConfig = mapper.readTree(new FileInputStream(new File(exportedAppConfigFile)));
