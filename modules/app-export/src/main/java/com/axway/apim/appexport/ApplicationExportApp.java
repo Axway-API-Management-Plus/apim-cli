@@ -69,9 +69,13 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 					.build();
 			List<ClientApplication> apps = appAdapter.getApplications(filter);
 			if(apps.size()==0) {
-				LOG.info("No applications selected for export");
+				if(!LOG.isDebugEnabled()) {
+					LOG.info("No applications found to export using filter: " + filter);
+				} else {
+					LOG.info("No applications found to export");
+				}
 			} else {
-				LOG.info("Selected " + apps.size() + " for export.");
+				LOG.info("Selected " + apps.size() + " application for export.");
 				ApplicationExporter exporter = ApplicationExporter.create(apps, AppExportParams.getInstance().getTargetFolder());
 				exporter.export();
 				if(exporter.hasError()) {

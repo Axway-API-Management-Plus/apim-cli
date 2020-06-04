@@ -34,7 +34,7 @@ public class EnvironmentProperties implements Map<String, String> {
 		this.swaggerPromoteHome = swaggerPromoteHome;
 		if(swaggerPromoteHome==null) {
 			// Try to use SWAGGER_PROMOTE_HOME if not given by a parameter
-			this.swaggerPromoteHome = System.getenv(CommandParameters.SWAGGER_PROMOTE_HOME);
+			this.swaggerPromoteHome = System.getenv(CommandParameters.APIM_CLI_HOME);
 		}
 		if(this.swaggerPromoteHome!=null) this.swaggerPromoteHome += "/conf";
 		initProperties();

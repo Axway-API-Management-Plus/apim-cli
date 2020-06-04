@@ -66,10 +66,10 @@ public abstract class APIMCoreCLIOptions {
 		option.setArgName("true/[false]");
 		options.addOption(option);
 		
-		option = new Option("swaggerPromoteHome", true, "The absolute path to the Swagger-Promote home directory containing for instance your conf folder.\n"
-				+ "You may also set the environment variable: '"+CommandParameters.SWAGGER_PROMOTE_HOME+"'");
+		option = new Option("apimCLIHome", true, "The absolute path to the CLI home directory containing for instance your conf folder.\n"
+				+ "You may also set the environment variable: '"+CommandParameters.APIM_CLI_HOME+"'");
 		option.setRequired(false);
-		option.setArgName("/home/chris/swagger-promote");
+		option.setArgName("/home/chris/apim-cli");
 		options.addOption(option);
 		
 		option = new Option("rollback", true, "Allows to disable the rollback feature");

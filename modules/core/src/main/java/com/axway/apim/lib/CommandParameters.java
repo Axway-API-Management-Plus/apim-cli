@@ -19,7 +19,7 @@ public class CommandParameters {
 	public static String MODE_IGNORE	= "ignore";
 	public static String MODE_ADD		= "add";
 	
-	public static String SWAGGER_PROMOTE_HOME = "SWAGGER_PROMOTE_HOME";
+	public static String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
 	
 	private static CommandParameters instance;
 	

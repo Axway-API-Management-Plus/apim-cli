@@ -6,6 +6,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Organization;
@@ -14,6 +16,8 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 
 public class ClientAppFilter {
+	
+	private static Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
 	
 	boolean includeQuota;
 	
@@ -73,9 +77,16 @@ public class ClientAppFilter {
 
 	public void setApplicationName(String applicationName) {
 		if(applicationName==null) return;
+		// All applications are requested - We ignore this filter
+		if(applicationName.equals("*")) return;
 		this.applicationName = applicationName;
+		String op = "eq";
+		if(applicationName.startsWith("*") || applicationName.endsWith("*")) {
+			op = "like";
+			applicationName = applicationName.replace("*", "");
+		}
 		filters.add(new BasicNameValuePair("field", "name"));
-		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("op", op));
 		filters.add(new BasicNameValuePair("value", applicationName));
 	}
 
@@ -126,11 +137,21 @@ public class ClientAppFilter {
 		hashCode += (this.applicationName!=null) ? this.applicationName.hashCode() : 0;
 		return hashCode;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "ClientAppFilter [name=" + applicationName + ", id=" + applicationId + "]";
+		if(LOG.isDebugEnabled()) {
+			return "ClientAppFilter [includeQuota=" + includeQuota + ", includeCredentials=" + includeCredentials
+					+ ", includeAPIAccess=" + includeAPIAccess + ", includeImage=" + includeImage + ", applicationName="
+					+ applicationName + ", state=" + state + ", organization=" + organization + ", applicationId="
+					+ applicationId + ", filters=" + filters + "]";
+		} else {
+			return "ClientAppFilter [applicationName=" + applicationName + ", state=" + state + ", organization="
+					+ organization + ", applicationId=" + applicationId + "]";
+		}
 	}
+
+
 
 	/**
 	 * Build an applicationAdapter based on the given configuration

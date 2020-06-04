@@ -13,7 +13,7 @@ public class AppExportCLIOptions extends APIMCoreCLIOptions {
 	public AppExportCLIOptions(String[] args) throws ParseException {
 		super(args);
 		// Define command line options required for Application export
-		Option option = new  Option("n", "name", true, "Name of the application to export.");
+		Option option = new  Option("n", "name", true, "Name of the application to export. You may use wildcards at the end or beginning. (e.g. *App*). To export all applications just use '*'");
 		option.setRequired(true);
 		options.addOption(option);
 		
@@ -55,7 +55,7 @@ public class AppExportCLIOptions extends APIMCoreCLIOptions {
 		System.out.println(getBinaryName()+" app export -n \"Client App\" -t /tmp/exported_apps -df true -s api-env");
 		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
+		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
 	}
 
 	@Override

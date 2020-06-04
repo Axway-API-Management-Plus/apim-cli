@@ -7,10 +7,15 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.clientApps.ClientAppFilter;
 
 public class APIFilter {
+	
+	private static Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
 	
 	public static enum METHOD_TRANSLATION {
 		NONE, 
@@ -92,9 +97,16 @@ public class APIFilter {
 
 	public void setName(String name) {
 		if(name==null) return;
+		// All applications are requested - We ignore this filter
+		if(name.equals("*")) return;
 		this.name = name;
+		String op = "eq";
+		if(name.startsWith("*") || name.endsWith("*")) {
+			op = "like";
+			name = name.replace("*", "");
+		}
 		filters.add(new BasicNameValuePair("field", "name"));
-		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("op", op));
 		filters.add(new BasicNameValuePair("value", name));
 	}
 
@@ -282,8 +294,29 @@ public class APIFilter {
 
 	@Override
 	public String toString() {
-		return "APIFilter [name=" + name + ", id=" + id + "]";
+		if(LOG.isTraceEnabled()) {
+			return "APIFilter [id=" + id + ", apiId=" + apiId + ", name=" + name + ", vhost=" + vhost + ", apiPath="
+					+ apiPath + ", queryStringVersion=" + queryStringVersion + ", state=" + state + ", customProperties="
+					+ customProperties + ", deprecated=" + deprecated + ", retired=" + retired + ", apiType=" + apiType
+					+ ", translateMethodMode=" + translateMethodMode + ", useBackendAPI=" + useBackendAPI
+					+ ", includeOperations=" + includeOperations + ", includeQuotas=" + includeQuotas
+					+ ", includeClientOrganizations=" + includeClientOrganizations + ", includeClientApplications="
+					+ includeClientApplications + ", includeImage=" + includeImage + ", includeOriginalAPIDefinition="
+					+ includeOriginalAPIDefinition + ", translatePolicyMode=" + translatePolicyMode + ", filters=" + filters
+					+ "]";
+		} else if(LOG.isDebugEnabled()) {
+			return "APIFilter [id=" + id + ", name=" + name + ", vhost=" + vhost + ", apiPath=" + apiPath
+					+ ", queryStringVersion=" + queryStringVersion + ", state=" + state + ", deprecated=" + deprecated
+					+ ", retired=" + retired + ", useBackendAPI=" + useBackendAPI + "]";
+		} else {
+			return "APIFilter [id=" + id + ", name=" + name + ", vhost=" + vhost + ", apiPath=" + apiPath
+					+ ", queryStringVersion=" + queryStringVersion + "]";			
+		}
 	}
+	
+	
+	
+	
 
 
 	/**

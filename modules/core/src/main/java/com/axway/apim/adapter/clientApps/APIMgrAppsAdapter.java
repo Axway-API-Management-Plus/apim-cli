@@ -185,7 +185,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		List<NameValuePair> usedFilters = new ArrayList<>();
 		String searchForAppId = "";
 		if(appFilter!=null) {
-			if(appFilter != null && appFilter.getFilters().size()!=0) { usedFilters.addAll(appFilter.getFilters()); }
+			if(appFilter.getFilters().size()!=0) { usedFilters.addAll(appFilter.getFilters()); }
 			
 			if(appFilter.getApplicationId()!=null) {
 				searchForAppId = "/"+appFilter.getApplicationId();
