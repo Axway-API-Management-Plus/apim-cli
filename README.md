@@ -1,6 +1,18 @@
 # Axway API-Management CLI
 
-WIP
+This CLI tool allows you to control the Axway API management solution without access via the Web UI. In principle, two methods are feasible:
+## APIs as code
+They define how their APIs are to be managed in API management and the CLI replicates this desired state manually controlled or via a pipeline into the platform.  
+### The following entities can be managed as code:
+- APIs incl. Application subscriptions, Quotas
+- Applications incl. security credentials, subscription to APIs
+## Queries and administrative tasks
+You can make various requests, for example you can display APIs that have the status "Pending approval" and then approve them if appropriate. Or you can display which policies are currently available in the system and the APIs they use.
+### Supported commands
+> Part of the roadmap and will be added soon
+
+## Changelog
+See [change log](CHANGELOG.md)
 
 ## Contributing
 
