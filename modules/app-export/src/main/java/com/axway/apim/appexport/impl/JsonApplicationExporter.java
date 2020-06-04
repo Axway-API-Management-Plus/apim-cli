@@ -23,8 +23,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class JsonApplicationExporter extends ApplicationExporter {
 
-	public JsonApplicationExporter(List<ClientApplication> apps, String folderToExport) {
-		super(apps, folderToExport);
+	public JsonApplicationExporter(List<ClientApplication> apps, AppExportParams params) {
+		super(apps, params);
 	}
 
 	@Override
@@ -36,7 +36,8 @@ public class JsonApplicationExporter extends ApplicationExporter {
 	
 	private void saveApplicationLocally(ExportApplication app) throws AppException {
 		String folderName = getExportFolder(app);
-		File localFolder = new File(this.targetFolder +File.separator+ folderName);
+		String targetFolder = (params.getTargetFolder()==null) ? "." : params.getTargetFolder();
+		File localFolder = new File(targetFolder +File.separator+ folderName);
 		LOG.info("Going to export applications into folder: " + localFolder);
 		if(localFolder.exists()) {
 			if(AppExportParams.getInstance().deleteLocalFolder()) {

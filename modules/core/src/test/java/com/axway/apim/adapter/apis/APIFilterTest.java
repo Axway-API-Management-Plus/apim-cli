@@ -87,6 +87,14 @@ public class APIFilterTest {
 	}
 	
 	@Test
+	public void hasFullWildCardName() {
+		APIFilter filter = new APIFilter.Builder()
+				.hasName("*")
+				.build();
+		Assert.assertEquals(filter.getFilters().size(), 0);
+	}
+	
+	@Test
 	public void filterWithBackendApiID() {
 		APIFilter filter = new APIFilter.Builder()
 				.hasApiId("7868768768")

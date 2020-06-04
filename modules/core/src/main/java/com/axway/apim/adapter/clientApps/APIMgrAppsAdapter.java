@@ -72,16 +72,22 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	 * Returns a list of applications.
 	 * @throws AppException if applications cannot be retrieved
 	 */
-	private void readApplicationsFromAPIManager(ClientAppFilter appFilter) throws AppException {
-		if(this.apiManagerResponse !=null && this.apiManagerResponse.get(appFilter)!=null) return;
+	private void readApplicationsFromAPIManager(ClientAppFilter filter) throws AppException {
+		if(this.apiManagerResponse !=null && this.apiManagerResponse.get(filter)!=null) return;
 		HttpResponse response = null;
 		try {
-			URI uri = getApplicationsUri(appFilter);
+			String requestedId = "";
+			if(filter.getApplicationId()!=null) {
+				requestedId = "/"+filter.getApplicationId();
+			}
+			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications" + requestedId)
+					.addParameters(filter.getFilters())
+					.build();
 			LOG.debug("Sending request to find existing applications: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
 			
 			response = getRequest.execute();
-			this.apiManagerResponse.put(appFilter,EntityUtils.toString(response.getEntity(), "UTF-8"));
+			this.apiManagerResponse.put(filter,EntityUtils.toString(response.getEntity(), "UTF-8"));
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
@@ -90,6 +96,18 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 					((CloseableHttpResponse)response).close();
 			} catch (Exception ignore) {}
 		}
+	}
+	
+	URI getApplicationsUri(ClientAppFilter filter) throws URISyntaxException {		
+		String requestedId = "";
+		if(filter==null) filter = new ClientAppFilter.Builder().build();
+		if(filter.getApplicationId()!=null) {
+			requestedId = "/"+filter.getApplicationId();
+		}
+		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications" + requestedId)
+				.addParameters(filter.getFilters())
+				.build();
+		return uri;
 	}
 	
 	@Override
@@ -178,23 +196,6 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		}
 		if(apps.size()==0) return null;
 		return apps.get(0);
-	}
-	
-	URI getApplicationsUri(ClientAppFilter appFilter) throws URISyntaxException {
-		URI uri;
-		List<NameValuePair> usedFilters = new ArrayList<>();
-		String searchForAppId = "";
-		if(appFilter!=null) {
-			if(appFilter.getFilters().size()!=0) { usedFilters.addAll(appFilter.getFilters()); }
-			
-			if(appFilter.getApplicationId()!=null) {
-				searchForAppId = "/"+appFilter.getApplicationId();
-			}
-		}
-		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications"+searchForAppId)
-				.addParameters(usedFilters)
-				.build();
-		return uri;
 	}
 	
 	void addApplicationCredentials(List<ClientApplication> apps) throws Exception {

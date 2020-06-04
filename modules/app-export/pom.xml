@@ -80,5 +80,9 @@
 			<groupId>com.consol.citrus</groupId>
 			<artifactId>citrus-ws</artifactId>
 		</dependency>
+		<dependency>
+		    <groupId>com.github.freva</groupId>
+		    <artifactId>ascii-table</artifactId>
+		</dependency>
 	</dependencies>
 </project>
