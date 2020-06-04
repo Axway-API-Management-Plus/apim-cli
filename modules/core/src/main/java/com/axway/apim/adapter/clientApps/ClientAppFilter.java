@@ -196,6 +196,7 @@ public class ClientAppFilter {
 		}
 		
 		public Builder hasOrganizationId(String organizationId) throws AppException {
+			if(organizationId==null) return this;
 			Organization org = new Organization();
 			org.setId(organizationId);
 			return hasOrganization(org);
