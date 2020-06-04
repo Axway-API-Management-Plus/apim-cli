@@ -11,5 +11,4 @@ $ErrorActionPreference = 'Stop'; # stop on all errors
 
 $uninstalled = $false
 
-Uninstall-BinFile -Name "api-import"
-Uninstall-BinFile -Name "api-export"
+Uninstall-BinFile -Name "apim"
