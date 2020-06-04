@@ -1,10 +1,15 @@
 /target/
-/.settings/
 .classpath
+.settings/
 .project
 /test-output/
 
-distribution/target/
-modules/*/target/
-modules/*/test-output/
-modules/*/.settings/
+# Exclude files in all modules
+
+/modules/**/target/
+/modules/**/.project
+/modules/**/.classpath
+/modules/**/.settings/
+/modules/**/test-output/
+
+/distribution/**/target/

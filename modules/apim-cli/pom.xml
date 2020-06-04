@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+		<artifactId>parent</artifactId>
+		<version>0.0.9-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>apimcli-tool</artifactId>
+	<packaging>jar</packaging>
+	<name>Axway API-Manager CLI Command Line Interface</name>
+	<description>CLI for the Axway API-Manager</description>
+	<url>https://github.com/Axway-API-Management-Plus/apim-cli</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+		</dependency>
+	</dependencies>
+</project>

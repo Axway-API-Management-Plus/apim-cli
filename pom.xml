@@ -17,14 +17,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.github.axway-api-management-plus.swagger-promote</groupId>
-	<artifactId>axway-swagger-promote</artifactId>
-	<version>1.6.8-SNAPSHOT</version>
+	<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+	<artifactId>parent</artifactId>
+	<version>0.0.9-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Axway API-Manager CLI Swagger-Promote</name>
-	<description>Swagger-Promote provides an easy to CLI for Axway API-Manager allowing you to manage your APIs as Code.</description>
-	<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
+	<name>Axway API-Manager CLI Parent</name>
+	<description>Provides an easy to use CLI for Axway API-Manager allowing you to manage your APIs/Apps and Orgs as Code.</description>
+	<url>https://github.com/Axway-API-Management-Plus/apim-cli</url>
 
 	<licenses>
 		<license>
@@ -47,13 +47,15 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.version>3.8.1</maven.compiler.version>
+		
 		<project.scm.id>github</project.scm.id>
 	</properties>
 
 	<scm>
-		<connection>scm:git:https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote.git</connection>
-		<developerConnection>scm:git:https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote.git</developerConnection>
-		<url>https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote</url>
+		<connection>scm:git:https://github.com/Axway-API-Management-Plus/apim-cli.git</connection>
+		<developerConnection>scm:git:https://github.com/Axway-API-Management-Plus/apim-cli.git</developerConnection>
+		<url>https://github.com/Axway-API-Management-Plus/apim-cli</url>
 		<tag>@${project.version}</tag>
 	</scm>
 
@@ -69,10 +71,181 @@
 	</distributionManagement>
 
 	<modules>
-		<module>modules/swagger-promote-core</module>
-		<module>modules/swagger-promote-export</module>
-		<module>modules/distribution</module>
+		<module>modules/core</module>
+		<module>modules/apim-cli</module>
+		<module>modules/api-export</module>
+		<module>modules/api-import</module>
+		<module>modules/app-import</module>
+		<module>modules/app-export</module>
+		<module>distribution</module>
 	</modules>
+	
+	<dependencyManagement>
+		<dependencies>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-api-import</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-api-export</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-app-export</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-tool</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.5.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.9.10</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.10.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-core</artifactId>
+			<version>2.7.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-jms</artifactId>
+			<version>2.7.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-ws</artifactId>
+			<version>2.7.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-http</artifactId>
+			<version>2.7.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-java-dsl</artifactId>
+			<version>2.7.7</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>6.9.10</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
+	<build>
+		<plugins>
+		     <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+			</plugin>
+			<plugin>
+				<groupId>com.consol.citrus.mvn</groupId>
+				<artifactId>citrus-maven-plugin</artifactId>
+				<version>2.7.7</version>
+				<configuration>
+					<author>Christoph Wiechmann</author>
+					<targetPackage>com.consol.citrus</targetPackage>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19.1</version>
+				<configuration>
+					<failIfNoTests>true</failIfNoTests>
+					<workingDirectory>./target</workingDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.19.1</version>
+				<executions>
+					<execution>
+						<id>integration-tests</id>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>			
+		</plugins>
+	</build>
 
 	<profiles>
 		<profile>

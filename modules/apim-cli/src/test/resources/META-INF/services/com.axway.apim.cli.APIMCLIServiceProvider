@@ -1,0 +1,3 @@
+com.axway.apim.cli.testCLIs.APIImport
+com.axway.apim.cli.testCLIs.APIExport
+com.axway.apim.cli.testCLIs.ApplicationExport

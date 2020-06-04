@@ -1,0 +1,4 @@
+{
+	"requestPolicy": "Amazon V2 - DescribeInstances",
+	"responsePolicy": "Routing"
+}

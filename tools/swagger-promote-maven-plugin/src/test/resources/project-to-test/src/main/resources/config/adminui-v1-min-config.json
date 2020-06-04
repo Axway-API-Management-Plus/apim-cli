@@ -1,8 +1,0 @@
-{
-  "name" : "test publish",
-  "path" : "/test/publish",
-  "state": "unpublished",
-  "version": "1.0.0",
-  "organization": "Test Org",
-  "backendBasepath": "https://mrpcomplex-mrpcomplex-test.b2v-dev-cnap.customer.com"
-}

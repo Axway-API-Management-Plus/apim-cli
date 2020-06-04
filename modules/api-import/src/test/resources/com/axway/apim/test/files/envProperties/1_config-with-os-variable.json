@@ -1,0 +1,10 @@
+	
+{
+	"name": "${USER}",
+	"path": "${OS_AND_MAIN_ENV_PROPERTY}",
+	"state": "${state}",
+	"version": "${USERNAME}",
+	"organization": "Single Result Org",
+	"descriptionType": "${descriptionType}", 
+	"descriptionManual": "${OS_MAIN_AND_STAGE_ENV_PROPERTY}"
+}
