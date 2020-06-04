@@ -41,6 +41,14 @@ The automated End-2-End test suite contains of __113__ different scenarios, whic
 
 Version 7.5.3 is NOT supported.  
 
+## Get started
+
+To get started, you have several options to download the CLI and then just run the CLI as shown in the example below
+
+```
+scripts\apim api import -c samples/basic/minimal-config-api-definition.json -s api-env
+```
+This command is reading the API-Management platform configuration details from the environment file: `env.api-env.properties` and is replicates the given desired state in the configuration file: `minimal-config-api-definition.json`  into the API-Management platform. 
 
 ## Changelog
 See [change log](CHANGELOG.md)
