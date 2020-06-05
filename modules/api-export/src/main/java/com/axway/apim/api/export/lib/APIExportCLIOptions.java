@@ -19,7 +19,7 @@ public class APIExportCLIOptions extends APIMCoreCLIOptions {
 				+ "-a *                        : Export all APIs\n"
 				+ "-a /api/v1/any*             : Export all APIs with this prefix\n"
 				+ "-a */some/other/api         : Export APIs end with the same path\n");
-		option.setRequired(true);
+		option.setRequired(false);
 		option.setArgName("/api/v1/my/great/api");
 		options.addOption(option);
 		
@@ -31,6 +31,20 @@ public class APIExportCLIOptions extends APIMCoreCLIOptions {
 		option = new Option("v", "vhost", true, "Limit the export to that specific host.");
 		option.setRequired(false);
 		option.setArgName("vhost.customer.com");
+		options.addOption(option);
+		
+		option = new Option("n", "name", true, "The name of the API. Wildcards at the beginning/end are supported. Use '*' to export all APIs.");
+		option.setRequired(false);
+		option.setArgName("*MyName*");
+		options.addOption(option);
+		
+		option = new Option("n", "name", true, "The name of the API. Wildcards at the beginning/end are supported. Use '*' to export all APIs.");
+		option.setRequired(false);
+		option.setArgName("*MyName*");
+		options.addOption(option);
+		
+		option = new  Option("state", true, "Select APIs with specific state: unpublished | pending | published");
+		option.setRequired(false);
 		options.addOption(option);
 
 		option = new Option("l", "localFolder", true, "Defines the location to store API-Definitions locally. Defaults to current folder.\n"

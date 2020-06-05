@@ -67,9 +67,9 @@ public class EnvironmentProperties implements Map<String, String> {
 				is = APIMHttpClient.class.getClassLoader().getResourceAsStream(pathToUse);
 			}
 			props.load(is);
-			LOG.info("Loaded environment properties from file: " + pathToUse);
+			LOG.debug("Loaded environment properties from file: " + pathToUse);
 		} catch (Exception e) {
-			LOG.info("Trying to load environment properties from file: "+pathToUse+" ... not found.");
+			LOG.debug("Trying to load environment properties from file: "+pathToUse+" ... not found.");
 		}
 		return props;
 	}

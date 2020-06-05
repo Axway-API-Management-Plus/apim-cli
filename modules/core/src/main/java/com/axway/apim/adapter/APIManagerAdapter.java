@@ -92,9 +92,14 @@ public class APIManagerAdapter {
 	public APIManagerAPIAccessAdapter accessAdapter = new APIManagerAPIAccessAdapter();
 	public APIMgrAppsAdapter appAdapter = new APIMgrAppsAdapter();
 	
+	private CommandParameters cmd = CommandParameters.getInstance();
+	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
 			APIManagerAdapter.instance = new APIManagerAdapter();
+			if(!TestIndicator.getInstance().isTestRunning()) {
+				LOG.info("Successfully connected to API-Manager (" + getApiManagerVersion() + ") on: " + CommandParameters.getInstance().getAPIManagerURL());
+			}
 		}
 		return APIManagerAdapter.instance;
 	}
@@ -118,7 +123,6 @@ public class APIManagerAdapter {
 	
 	public void loginToAPIManager(boolean useAdminClient) throws AppException {
 		URI uri;
-		CommandParameters cmd = CommandParameters.getInstance();
 		if(cmd.ignoreAdminAccount() && useAdminClient) return;
 		if(hasAdminAccount && useAdminClient) return; // Already logged in with an Admin-Account.
 		HttpResponse response = null;
@@ -465,7 +469,6 @@ public class APIManagerAdapter {
 			return apiManagerVersion;
 		}
 		APIManagerAdapter.apiManagerVersion = APIManagerAdapter.getInstance().configAdapter.getApiManagerConfig("productVersion");
-		LOG.info("API-Manager version is: " + apiManagerVersion);
 		return APIManagerAdapter.apiManagerVersion;
 	}
 	

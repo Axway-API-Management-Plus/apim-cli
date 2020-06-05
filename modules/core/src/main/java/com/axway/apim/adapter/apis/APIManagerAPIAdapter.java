@@ -3,6 +3,7 @@ package com.axway.apim.adapter.apis;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +12,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -55,7 +58,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
-	CommandParameters params = CommandParameters.getInstance();
+	CommandParameters cmd = CommandParameters.getInstance();
 	
 	APIManagerAdapter apim; 
 
@@ -102,17 +105,10 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	 */
 	private void _readAPIsFromAPIManager(APIFilter filter) throws AppException {
 		if(this.apiManagerResponse.get(filter)!=null) return;
-		CommandParameters cmd = CommandParameters.getInstance();
 		URI uri;
 		HttpResponse httpResponse = null;
-		String requestedId = "";
-		if(filter.getId()!=null) {
-			requestedId = "/"+filter.getId();
-		}
 		try { 
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+filter.getApiType() + requestedId)
-					.addParameters(filter.getFilters())
-					.build();
+			uri = getAPIRequestUri(filter);
 			LOG.debug("Sending request to find existing APIs: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null);
 			httpResponse = getRequest.execute();
@@ -129,6 +125,18 @@ public class APIManagerAPIAdapter extends APIAdapter {
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
+	}
+	
+	URI getAPIRequestUri(APIFilter filter) throws URISyntaxException {		
+		String requestedId = "";
+		if(filter==null) filter = new APIFilter.Builder().build();
+		if(filter.getId()!=null) {
+			requestedId = "/"+filter.getId();
+		}
+		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+filter.getApiType() + requestedId)
+				.addParameters(filter.getFilters())
+				.build();
+		return uri;
 	}
 	
 	private API uniqueAPI(List<API> foundAPIs) throws AppException {
@@ -150,17 +158,17 @@ public class APIManagerAPIAdapter extends APIAdapter {
 					foundAPIs.add(api);
 					continue;
 				}
-				if(filter.getApiPath()!=null && !filter.getApiPath().equals(api.getPath())) continue;
+				// Before 7.7, we have to filter out APIs manually!
+				if(!APIManagerAdapter.hasAPIManagerVersion("7.7") && filter.getApiPath().contains("*")) {
+					Pattern pattern = Pattern.compile(filter.getApiPath().replace("*", ".*"));
+					Matcher matcher = pattern.matcher(api.getPath());
+					if(!matcher.matches()) {
+						continue;
+					}
+				}
 				if(filter.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
 					if(filter.getVhost()!=null && !filter.getVhost().equals(api.getVhost())) continue;
 					if(filter.getQueryStringVersion()!=null && !filter.getQueryStringVersion().equals(api.getApiRoutingKey())) continue;
-				}
-				if(filter.getApiType().equals(APIManagerAdapter.TYPE_BACK_END)) {
-					if(logMessage) 
-						LOG.info("Found existing Backend-API with name: '"+api.getName()+"' (ID: '" + api.getId()+"')");														
-				} else {
-					if(logMessage)
-						LOG.info("Found existing API on path: '"+api.getPath()+"' ("+api.getState()+") (ID: '" + api.getId()+"')");
 				}
 				foundAPIs.add(api);
 			}
@@ -168,7 +176,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				String dbgCrit = "";
 				if(foundAPIs.size()>1) 
 					dbgCrit = " (apiPath: '"+filter.getApiPath()+"', filter: "+filter+", vhost: '"+filter.getVhost()+"', requestedType: "+filter.getApiType()+")";
-				LOG.info("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
+				LOG.debug("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
 				return foundAPIs;
 			}
 			LOG.info("No existing API found based on filter: " + getFilterFields(filter));

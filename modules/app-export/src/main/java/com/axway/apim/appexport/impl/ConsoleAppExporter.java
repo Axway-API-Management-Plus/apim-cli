@@ -19,6 +19,7 @@ public class ConsoleAppExporter extends ApplicationExporter {
 	@Override
 	public void export() throws AppException {
 		System.out.println(AsciiTable.getTable(apps, Arrays.asList(
+				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getId()),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getName()),
 				new Column().header("State").with(app -> app.getState()),
 				new Column().header("Email").with(app -> app.getEmail()),

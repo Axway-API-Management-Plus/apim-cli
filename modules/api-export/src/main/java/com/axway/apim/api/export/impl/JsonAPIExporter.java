@@ -1,43 +1,28 @@
-package com.axway.apim.api.export;
+package com.axway.apim.api.export.impl;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIAdapter;
-import com.axway.apim.adapter.apis.APIFilter;
-import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
-import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
+import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
 import com.axway.apim.api.export.lib.APIExportParams;
-import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -45,95 +30,30 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
-public class APIExportConfigAdapter {
-	private static Logger LOG = LoggerFactory.getLogger(APIExportConfigAdapter.class);
-
-	/** Which APIs should be exported identified by the path */
-	private String exportApiPath = null;
-	
-	/** Is set if APIs only with that V-Host should be exported */
-	private String exportVhost = null;
+public class JsonAPIExporter extends APIExporter {
+	private static Logger LOG = LoggerFactory.getLogger(JsonAPIExporter.class);
 
 	/** Where to store the exported API-Definition */
 	private String givenExportFolder = null;
 
 	APIManagerAdapter apiManager;
 	
-	APIExportParams params;
-
-	public APIExportConfigAdapter(String exportApiPath, String givenExportFolder, String exportVhost) throws AppException {
-		super();
-		this.exportApiPath = exportApiPath;
-		this.exportVhost = (exportVhost!=null && !exportVhost.equals("NOT_SET")) ? exportVhost : null;
-		this.givenExportFolder = (givenExportFolder==null) ? "." : givenExportFolder;
-		LOG.debug("Constructed ExportConfigAdapter: [exportApiPath: '"+exportApiPath+"', givenExportFolder: '"+givenExportFolder+"', exportVhost: '"+exportVhost+"']");
-		apiManager = APIManagerAdapter.getInstance();
-		params = APIExportParams.getInstance();
+	public JsonAPIExporter(List<API> apis, APIExportParams params) throws AppException {
+		super(apis, params);
+		this.givenExportFolder = params.getValue("localFolder");
 	}
-
-	public void exportAPIs() throws AppException {
-		List<ExportAPI> exportAPIs = getAPIsToExport();
-		for (ExportAPI exportAPI : exportAPIs) {
+	
+	@Override
+	public void export() throws AppException {
+		for (API api : this.apis) {
+			ExportAPI exportAPI = new ExportAPI(api);
 			try {
 				saveAPILocally(exportAPI);
 			} catch (AppException e) {
 				LOG.error("Can't export API: " + e.getMessage() + " Please check in API-Manager UI the API is valid.", e);
 			}
 		}
-	}
-
-	private List<ExportAPI> getAPIsToExport() throws AppException {
-		List<ExportAPI> exportAPIList = new ArrayList<ExportAPI>();
-		if (!this.exportApiPath.contains("*")) { // Direct access with a specific API exposure path
-			API mgrAPI = APIAdapter.create(APIManagerAdapter.getInstance()).getAPI(
-					new APIFilter.Builder(Type.ACTUAL_API)
-					.hasApiPath(this.exportApiPath)
-					.hasVHost(exportVhost)
-					.build()
-			, true);
-			if(mgrAPI==null) {
-				ErrorState.getInstance().setError("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API, false);
-				throw new AppException("No API found for: '" + this.exportApiPath + "'", ErrorCode.UNKNOWN_API);
-			}
-			exportAPIList.add(new ExportAPI(mgrAPI));
-		} else if(APIManagerAdapter.hasAPIManagerVersion("7.7") // Wild-Card search on API-Manager >7.7 filtering directly
-				&& (this.exportApiPath.startsWith("*") || this.exportApiPath.endsWith("*"))) {
-			List<NameValuePair> filters = new ArrayList<NameValuePair>();
-			filters.add(new BasicNameValuePair("field", "path"));
-			filters.add(new BasicNameValuePair("op", "like"));
-			if(exportApiPath.equals("*")) {
-				LOG.info("Using '*' to export all APIs from API-Manager.");
-				filters.add(new BasicNameValuePair("value", "/"));
-			} else {
-				LOG.info("Using wildcard pattern: '"+exportApiPath+"' to export APIs from API-Manager.");
-				filters.add(new BasicNameValuePair("value", exportApiPath.replace("*", "")));
-			}
-			List<API> foundAPIs = APIAdapter.create(APIManagerAdapter.getInstance()).getAPIs(
-					new APIFilter.Builder(Type.ACTUAL_API)
-					.hasVHost(exportVhost)
-					.useFilter(filters)
-					.build()
-			, false);
-			for(API mgrAPI : foundAPIs) {
-				exportAPIList.add(new ExportAPI(mgrAPI));
-			}
-		} else { // Get all APIs and filter them out manually
-			Pattern pattern = Pattern.compile(exportApiPath.replace("*", ".*"));
-			List<API> foundAPIs = APIAdapter.create(APIManagerAdapter.getInstance()).getAPIs(
-					new APIFilter.Builder(Type.ACTUAL_API)
-					.hasVHost(exportVhost)
-					.build()
-			, false); 
-			if(foundAPIs.size()>20) LOG.info("Loading actual API state from API-Manager. This may take a while. Please wait.\n");
-			for(API mgrAPI : foundAPIs) {
-				Matcher matcher = pattern.matcher(mgrAPI.getPath());
-				if(matcher.matches()) {
-					LOG.info("Adding API with path: '"+mgrAPI.getPath()+"' based on requested path: '"+exportApiPath+"' to the export list.");
-					exportAPIList.add(new ExportAPI(mgrAPI));
-				}
-			}			
-		}
-		return exportAPIList;
+		
 	}
 
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {
@@ -241,45 +161,6 @@ public class APIExportConfigAdapter {
 			apiExposurePath = apiExposurePath.substring(0, apiExposurePath.length() - 1);
 		apiExposurePath = apiExposurePath.replace("/", "-");
 		return apiExposurePath;
-	}
-
-	/**
-	 * We need this template to enforce loading of all properties for the actual
-	 * API, without that API-ManagerAdapter will skip not defined properties.
-	 * 
-	 * @return
-	 * @throws AppException
-	 */
-	private API getAPITemplate() throws AppException {
-		API apiTemplate = new API();
-		apiTemplate.setState(API.STATE_PUBLISHED);
-		apiTemplate.setClientOrganizations(new ArrayList<Organization>());
-		// Required to force loading of actual quota!
-		apiTemplate.setApplicationQuota(new APIQuota());
-		apiTemplate.setSystemQuota(new APIQuota());
-		// Given a NOT-KNOWN organization to force the API-Manager Adapter to set the correct orgName in the actual API
-		//apiTemplate.setOrganizationId("NOT-KNOWN");
-		return apiTemplate;
-	}
-	
-	private void handleCustomProperties(API actualAPI) throws AppException {
-		JsonNode customPropconfig = APIManagerAdapter.getCustomPropertiesConfig().get("api");
-		if(customPropconfig == null) return; // No custom properties configured
-		Map<String, String> customProperties = new LinkedHashMap<String, String>();
-		JsonNode actualApiConfig = actualAPI.getApiConfiguration();
-		// Check if Custom-Properties are configured
-		Iterator<String> customPropKeys = customPropconfig.fieldNames();
-		while(customPropKeys.hasNext()) {
-			String key = customPropKeys.next();
-			if(actualApiConfig.has(key)) {
-				JsonNode value = actualApiConfig.get(key);
-				if(value==null) continue;
-					customProperties.put(key, value.asText());
-			}
-		}
-		if(customProperties.size()>0) {
-			((API)actualAPI).setCustomProperties(customProperties);
-		}
 	}
 	
 	private void prepareToSave(ExportAPI exportAPI) throws AppException {
