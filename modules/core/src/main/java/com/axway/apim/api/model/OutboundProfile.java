@@ -129,10 +129,10 @@ public class OutboundProfile extends Profile {
 				thisParameters.remove("password");
 			}
 			boolean rc = 
-				this.getFaultHandlerPolicy().equals(otherOutboundProfile.getFaultHandlerPolicy()) &&
-				this.getRequestPolicy().equals(otherOutboundProfile.getRequestPolicy()) &&
-				this.getResponsePolicy().equals(otherOutboundProfile.getResponsePolicy()) &&
-				this.getRoutePolicy().equals(otherOutboundProfile.getRoutePolicy()) &&
+				(this.getFaultHandlerPolicy()==null || this.getFaultHandlerPolicy().equals(otherOutboundProfile.getFaultHandlerPolicy())) &&
+				(this.getRequestPolicy()==null || this.getRequestPolicy().equals(otherOutboundProfile.getRequestPolicy())) &&
+				(this.getRequestPolicy()==null || this.getResponsePolicy().equals(otherOutboundProfile.getResponsePolicy())) &&
+				(this.getRoutePolicy()==null || this.getRoutePolicy().equals(otherOutboundProfile.getRoutePolicy())) &&
 				StringUtils.equals(otherOutboundProfile.getRouteType(), this.getRouteType()) &&
 				otherParameters.equals(thisParameters);
 			return rc;
