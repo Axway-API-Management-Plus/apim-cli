@@ -159,11 +159,15 @@ public class APIManagerAPIAdapter extends APIAdapter {
 					continue;
 				}
 				// Before 7.7, we have to filter out APIs manually!
-				if(!APIManagerAdapter.hasAPIManagerVersion("7.7") && filter.getApiPath().contains("*")) {
-					Pattern pattern = Pattern.compile(filter.getApiPath().replace("*", ".*"));
-					Matcher matcher = pattern.matcher(api.getPath());
-					if(!matcher.matches()) {
-						continue;
+				if(!APIManagerAdapter.hasAPIManagerVersion("7.7")) {
+					if(filter.getApiPath().contains("*")) {
+						Pattern pattern = Pattern.compile(filter.getApiPath().replace("*", ".*"));
+						Matcher matcher = pattern.matcher(api.getPath());
+						if(!matcher.matches()) {
+							continue;
+						}
+					} else {
+						if(filter.getApiPath()!=null && !filter.getApiPath().equals(api.getPath())) continue;
 					}
 				}
 				if(filter.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
@@ -176,7 +180,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				String dbgCrit = "";
 				if(foundAPIs.size()>1) 
 					dbgCrit = " (apiPath: '"+filter.getApiPath()+"', filter: "+filter+", vhost: '"+filter.getVhost()+"', requestedType: "+filter.getApiType()+")";
-				LOG.debug("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
+				LOG.info("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
 				return foundAPIs;
 			}
 			LOG.info("No existing API found based on filter: " + getFilterFields(filter));

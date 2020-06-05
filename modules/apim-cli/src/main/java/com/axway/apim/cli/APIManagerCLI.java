@@ -99,21 +99,22 @@ public class APIManagerCLI {
 	}
 	
 	void printUsage() {
-		System.out.println("The Axway API-Management CLI supports the following commands.");
-		System.out.println("To get more information for each command, please run for instance: 'apim api'");
-		System.out.println("");
-		System.out.println("Available commands and options: ");
 		if(this.selectedServiceGroup==null) {
+			System.out.println("The Axway API-Management CLI supports the following commands.");
+			System.out.println("To get more information for each group, please run for instance: 'apim api'");
+			System.out.println("");
+			System.out.println("Available command groups: ");
 			Iterator<String> it = servicesMappedByGroup.keySet().iterator();
 			while(it.hasNext()) {
 				String key = it.next();
+				System.out.printf("%-20s %s \n", APIM_CLI_CDM + " "+ key, servicesMappedByGroup.get(key).get(0).getGroupDescription());
 				// We just take the first registered service for a group to retrieve the group description
-				System.out.println(APIM_CLI_CDM + " " + key + " - " + servicesMappedByGroup.get(key).get(0).getGroupDescription());
 			}
 		} else {
+			System.out.println("Available commands: ");
 			for(APIMCLIServiceProvider service : this.selectedServiceGroup) {
 				for(Method method : this.methodsMappedByService.get(service)) {
-					System.out.println(APIM_CLI_CDM + " " + service.getGroupId()  + " " + getMethodName(method) + " - " + method.getAnnotation(CLIServiceMethod.class).description());
+					System.out.printf("%-20s %s\n", APIM_CLI_CDM + " "+ service.getGroupId() + " " + getMethodName(method), method.getAnnotation(CLIServiceMethod.class).description());
 				}
 			}
 		}
