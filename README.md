@@ -16,17 +16,18 @@ With that, an API developer is just providing the desired state configuration of
 
 ## Supported commands
 
-### APIs 
-| Command       | Comment | 
-| :---        | :---  |
-|**import**|Replicates an API into the API-Manager |  
-|**export**|Exports one or more APIs from a running API-Manager |  
+The CLI is flexible and is extended with new functions via modules. These can be accessed and discovered via the CLI on the basis of groups and their commands.  
+To get an overview about the groups just call `apim`:
+```
+Available commands and options:
+apim app - Manage your applications
+apim api - Manage your APIs
+```
+To get a list of commands for each group call for instance `apim app`:
 
-### Applications
-| Command       | Comment | 
-| :---        | :---  |
-|**import**|Replicates an application into the API-Manager |  
-|**export**|Exports one or more applications from a running API-Manager | 
+For an up-to-date list of the supported groups and commands, see the [documentation](https://github.com/Axway-API-Management-Plus/apim-cli/wiki#supported-commands).
+
+The CLI is flexible and more commands will be added. You can find a list of available commands in the .
 
 ## Quality assurance process
 By using this CLI to control your Axway API management infrastructure it becomes a key component of your CI/CD process. Product quality is therefore very important so that you can be confident this CLI is doing what it's supposed to do.  
