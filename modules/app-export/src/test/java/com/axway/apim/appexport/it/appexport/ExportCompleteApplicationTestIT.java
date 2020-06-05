@@ -48,7 +48,7 @@ public class ExportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 	public void exportComplteApplicationTest(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		description("Export complete application from API-Manager tests");
 		
-		variable("targetFolder", "citrus:systemProperty('java.io.tmpdir')");
+		variable("localFolder", "citrus:systemProperty('java.io.tmpdir')");
 		mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
@@ -90,7 +90,7 @@ public class ExportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 		createVariable("expectedReturnCode", "0");
 		appExport.doExecute(context);
 		
-		String exportedAppConfigFile = context.getVariable("targetFolder")+"/"+context.getVariable("appName")+"/application-config.json";
+		String exportedAppConfigFile = context.getVariable("localFolder")+"/"+context.getVariable("appName")+"/application-config.json";
 		
 		echo("####### Reading exported API-Config file: '"+exportedAppConfigFile+"' #######");
 		JsonNode exportedAppConfig = mapper.readTree(new FileInputStream(new File(exportedAppConfigFile)));
@@ -106,7 +106,7 @@ public class ExportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 		
 		assertEquals(exportedAppConfig.get("organization").asText(), 		context.getVariable("${orgName}"), "Organization not equal.");
 		
-		assertTrue(new File(context.getVariable("targetFolder")+"/"+context.getVariable("appName")+"/app-image.jpg").exists(), "Application image is missing");
+		assertTrue(new File(context.getVariable("localFolder")+"/"+context.getVariable("appName")+"/app-image.jpg").exists(), "Application image is missing");
 		
 		List<ClientAppCredential> importedCredentials = mapper.convertValue(importedAppConfig.get("credentials"), new TypeReference<List<ClientAppCredential>>(){});
 		List<ClientAppCredential> exportedCredentials = mapper.convertValue(exportedAppConfig.get("credentials"), new TypeReference<List<ClientAppCredential>>(){});
