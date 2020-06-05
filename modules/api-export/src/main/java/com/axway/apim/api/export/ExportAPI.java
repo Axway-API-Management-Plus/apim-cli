@@ -1,11 +1,13 @@
 package com.axway.apim.api.export;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.jackson.JSONViews.APIBaseInformation;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.model.APIQuota;
@@ -27,6 +29,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonPropertyOrder({ "name", "path", "state", "version", "organization", "apiDefinition", "summary", "descriptionType", "descriptionManual", "vhost", 
@@ -181,11 +184,12 @@ public class ExportAPI {
 		return this.actualAPIProxy.getImage();
 	}
 
-	
+	@JsonView(APIBaseInformation.class)
 	public String getName() {
 		return this.actualAPIProxy.getName();
 	}
-
+	
+	@JsonView(APIBaseInformation.class)
 	public String getOrganization() {
 		return this.actualAPIProxy.getOrganization().getName();
 	}
@@ -201,7 +205,7 @@ public class ExportAPI {
 		return ((API)this.actualAPIProxy).getDeprecated();
 	}
 
-	
+	@JsonView(APIBaseInformation.class)
 	public Map<String, String> getCustomProperties() {
 		return this.actualAPIProxy.getCustomProperties();
 	}
@@ -212,39 +216,40 @@ public class ExportAPI {
 		return ((API)this.actualAPIProxy).getAPIType();
 	}
 
-	
+	@JsonView(APIBaseInformation.class)
 	public String getDescriptionType() {
 		if(this.actualAPIProxy.getDescriptionType().equals("original")) return null;
 		return this.actualAPIProxy.getDescriptionType();
 	}
 
-	
+	@JsonView(APIBaseInformation.class)
 	public String getDescriptionManual() {
 		return this.actualAPIProxy.getDescriptionManual();
 	}
 
-	
+	@JsonView(APIBaseInformation.class)
 	public String getDescriptionMarkdown() {
 		return this.actualAPIProxy.getDescriptionMarkdown();
 	}
 
-	
+	@JsonView(APIBaseInformation.class)
 	public String getDescriptionUrl() {
 		return this.actualAPIProxy.getDescriptionUrl();
 	}
 
+	@JsonView(APIBaseInformation.class)
 	public List<CaCert> getCaCerts() {
 		if(this.actualAPIProxy.getCaCerts()==null) return null;
 		if(this.actualAPIProxy.getCaCerts().size()==0) return null;
 		return this.actualAPIProxy.getCaCerts();
 	}
 
-	
+	@JsonView(APIBaseInformation.class)
 	public APIQuota getApplicationQuota() {
 		return this.actualAPIProxy.getApplicationQuota();
 	}
 
-	
+	@JsonView(APIBaseInformation.class)
 	public APIQuota getSystemQuota() {
 		return this.actualAPIProxy.getSystemQuota();
 	}
@@ -255,17 +260,22 @@ public class ExportAPI {
 		return this.actualAPIProxy.getServiceProfiles();
 	}
 
-	
-	public List<Organization> getClientOrganizations() throws AppException {
+	@JsonView(APIBaseInformation.class)
+	public List<String> getClientOrganizations() throws AppException {
 		if(!APIManagerAdapter.hasAdminAccount()) return null; 
 		if(this.actualAPIProxy.getClientOrganizations().size()==0) return null;
 		if(this.actualAPIProxy.getClientOrganizations().size()==1 && 
 				this.actualAPIProxy.getClientOrganizations().get(0).equals(getOrganization())) 
 			return null;
-		return this.actualAPIProxy.getClientOrganizations();
+		List<String> orgs = new ArrayList<String>();
+		for(Organization org : this.actualAPIProxy.getClientOrganizations()) {
+			orgs.add(org.getName());
+		}
+		return orgs;
 	}
 
 	
+	@JsonView(APIBaseInformation.class)
 	public List<ClientApplication> getApplications() {
 		if(this.actualAPIProxy.getApplications().size()==0) return null;
 		for(ClientApplication app : this.actualAPIProxy.getApplications()) {
@@ -280,11 +290,13 @@ public class ExportAPI {
 	}
 
 	
+	@JsonView(APIBaseInformation.class)
 	@JsonProperty("apiDefinition")
 	public String getApiDefinitionImport() {
 		return this.getAPIDefinition().getApiSpecificationFile();
 	}
 	
+	@JsonView(APIBaseInformation.class)
 	@JsonIgnore
 	public String getBackendBasepath() {
 		return this.getServiceProfiles().get("_default").getBasePath();

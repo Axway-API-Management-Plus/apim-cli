@@ -66,7 +66,6 @@ public class OutboundProfile extends Profile {
 	}
 
 	public Policy getRequestPolicy() {
-		if(requestPolicy==null) return new Policy();
 		return requestPolicy;
 	}
 	
@@ -75,7 +74,6 @@ public class OutboundProfile extends Profile {
 	}
 
 	public Policy getResponsePolicy() {
-		if(responsePolicy==null) return new Policy();
 		return responsePolicy;
 	}
 
@@ -84,7 +82,6 @@ public class OutboundProfile extends Profile {
 	}
 
 	public Policy getRoutePolicy() {
-		if(routePolicy==null) return new Policy();
 		return routePolicy;
 	}
 
@@ -93,7 +90,6 @@ public class OutboundProfile extends Profile {
 	}
 
 	public Policy getFaultHandlerPolicy() {
-		if(faultHandlerPolicy==null) return new Policy();
 		return faultHandlerPolicy;
 	}
 

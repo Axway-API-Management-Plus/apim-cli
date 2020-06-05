@@ -20,4 +20,8 @@ public class APIExportParams extends CommandParameters {
 		if(getValue("deleteFolder")==null) return false;
 		return Boolean.parseBoolean(getValue("deleteFolder"));
 	}
+	
+	public String getLocalFolder() {
+		return (getValue("localFolder")==null) ? "." : getValue("localFolder");
+	}
 }

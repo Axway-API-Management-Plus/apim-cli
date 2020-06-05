@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
+import com.axway.apim.adapter.apis.jackson.JSONViews.APIForExport;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.ExportAPI;
@@ -40,7 +41,7 @@ public class JsonAPIExporter extends APIExporter {
 	
 	public JsonAPIExporter(List<API> apis, APIExportParams params) throws AppException {
 		super(apis, params);
-		this.givenExportFolder = params.getValue("localFolder");
+		this.givenExportFolder = params.getLocalFolder();
 	}
 	
 	@Override
@@ -99,7 +100,7 @@ public class JsonAPIExporter extends APIExporter {
 		try {
 			prepareToSave(exportAPI);
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/api-config.json"), exportAPI);
+			mapper.writerWithView(APIForExport.class).writeValue(new File(localFolder.getCanonicalPath() + "/api-config.json"), exportAPI);
 		} catch (Exception e) {
 			throw new AppException("Can't write API-Configuration file for API: '"+exportAPI.getName()+"' exposed on path: '"+exportAPI.getPath()+"'.", ErrorCode.UNXPECTED_ERROR, e);
 		}

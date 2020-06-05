@@ -8,6 +8,8 @@ public class JSONViews {
 	
 	public static class ApplicationForAPIManagerOnUpdate implements ApplicationBase {}
 	
+	public static class APIForExport implements APIBaseInformation, APIExportInformation {}
+	
 	public static class CredentialsForAPIManager implements CredentialsBase, CredentialsForManager {}
 	
 	public static interface ApplicationBase {}
@@ -21,4 +23,8 @@ public class JSONViews {
 	public static interface APIAccessForAPIManager {}
 	
 	public static interface APIAccessForExport {}
+	
+	public static interface APIBaseInformation {}
+	
+	public static interface APIExportInformation {}
 }

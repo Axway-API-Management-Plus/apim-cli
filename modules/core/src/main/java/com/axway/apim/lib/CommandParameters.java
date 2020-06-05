@@ -186,6 +186,8 @@ public class CommandParameters {
 		if(getValue("host")==null) errors.setError("Required parameter: 'host' is missing.", ErrorCode.MISSING_PARAMETER, false);
 		if(errors.hasError()) {
 			LOG.error("Provide at least the following parameters: username, password and host either using Command-Line-Options or in Environment.Properties");
+			LOG.error("       To get help, please use option -h");
+			LOG.error("");
 			throw new AppException("Missing required parameters.", ErrorCode.MISSING_PARAMETER);
 		}
 	}

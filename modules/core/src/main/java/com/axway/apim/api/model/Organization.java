@@ -2,13 +2,16 @@ package com.axway.apim.api.model;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Organization {
 	
 	private String id;
-	
+
+	@JsonView(JSONViews.APIExportInformation.class)
 	private String name;
 	
 	private String description;

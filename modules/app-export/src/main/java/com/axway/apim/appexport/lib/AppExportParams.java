@@ -33,7 +33,7 @@ public class AppExportParams extends CommandParameters {
 		return getValue("orgName");
 	}
 	
-	public String getTargetFolder() {
-		return getValue("targetFolder");
+	public String getLocalFolder() {
+		return (getValue("localFolder")==null) ? "." : getValue("localFolder");
 	}
 }

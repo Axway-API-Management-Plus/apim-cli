@@ -1,6 +1,7 @@
 package com.axway.apim.appexport.impl;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 	
 	private void saveApplicationLocally(ExportApplication app) throws AppException {
 		String folderName = getExportFolder(app);
-		String targetFolder = (params.getTargetFolder()==null) ? "." : params.getTargetFolder();
+		String targetFolder = params.getLocalFolder();
 		File localFolder = new File(targetFolder +File.separator+ folderName);
 		LOG.info("Going to export applications into folder: " + localFolder);
 		if(localFolder.exists()) {
@@ -82,6 +83,31 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		String appName = app.getName();
 		appName = appName.replace(" ", "-");
 		return appName;
+	}
+	
+	public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
+
+		try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {
+			fileOuputStream.write(bFile);
+		} catch (IOException e) {
+			throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
+		}
+	}
+	
+	public static void storeCaCert(File localFolder, String certBlob, String filename) throws AppException {
+		if(certBlob==null) return;
+		try {
+			writeBytesToFile(certBlob.getBytes(), localFolder + "/" + filename);
+		} catch (AppException e) {
+			throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
+		}
+	}
+	
+	protected void removeApplicationDefaultQuota(ClientApplication app) {
+		if(app.getAppQuota()==null) return;
+		if(app.getAppQuota().getId().equals(APIManagerAdapter.APPLICATION_DEFAULT_QUOTA)) {
+			app.setAppQuota(null);
+		}
 	}
 
 }

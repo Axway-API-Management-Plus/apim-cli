@@ -30,7 +30,7 @@ public class AppExportCLIOptions extends APIMCoreCLIOptions {
 		option.setRequired(false);
 		options.addOption(option);
 
-		option = new Option("t", "targetFolder", true, "Defines the location to store the application locally. Defaults to current folder.\n"
+		option = new Option("l", "localFolder", true, "Defines the local folder to store the application locally. Defaults to current folder.\n"
 				+ "For each application a new folder is created automatically.");
 		option.setRequired(false);
 		option.setArgName("my/apps");

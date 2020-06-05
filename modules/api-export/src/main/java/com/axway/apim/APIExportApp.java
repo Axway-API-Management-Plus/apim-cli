@@ -30,7 +30,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	private static Logger LOG = LoggerFactory.getLogger(APIExportApp.class);
 
 	public static void main(String args[]) { 
-		int rc = list(args);
+		int rc = export(args);
 		System.exit(rc);
 	}
 	

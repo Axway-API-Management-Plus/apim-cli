@@ -2,11 +2,13 @@ package com.axway.apim.lib;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Comparator;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -62,7 +64,7 @@ public abstract class APIMCoreCLIOptions {
 		option.setArgName("changeme");
 		options.addOption(option);
 		
-		option = new Option("f", "force", true, "Breaking changes can't be imported without this flag, unless the API is unpublished.");
+		option = new Option("f", "force", true, "Optional flag used by different modules to enforce actions. For instance import breaking change or delete an API.");
 		option.setArgName("true/[false]");
 		options.addOption(option);
 		
@@ -134,6 +136,7 @@ public abstract class APIMCoreCLIOptions {
 	
 	public void printUsage(String message, String[] args) {
 		HelpFormatter formatter = new HelpFormatter();
+		formatter.setOptionComparator(new OptionsComparator());
 		formatter.setWidth(140);
 		
 		formatter.printHelp(getAppName(), options, true);
@@ -176,5 +179,18 @@ public abstract class APIMCoreCLIOptions {
 
 	public Options getInternalOptions() {
 		return internalOptions;
+	}
+	
+	class OptionsComparator implements Comparator<Option> {
+		
+		private String[] basicOptions = {"host", "force", "username", "stage", "password", "returncodes", "port", "apimCLIHome"};
+
+		@Override
+		public int compare(Option option1, Option option2) {
+			if(Arrays.asList(basicOptions).contains(option1.getLongOpt())) {
+				return -1;
+			}
+			return 0;
+		}
 	}
 }
