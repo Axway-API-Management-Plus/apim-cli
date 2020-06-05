@@ -23,19 +23,20 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientApplication {
-	@JsonView(JSONViews.ApplicationBase.class)
+	@JsonView(JSONViews.ApplicationForManager.class)
 	private String id;
-	@JsonView(JSONViews.ApplicationBase.class)
+	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private String name;
-	@JsonView(JSONViews.ApplicationBase.class)
+	@JsonView(JSONViews.ApplicationForManager.class)
 	private String description;
-	@JsonView(JSONViews.ApplicationBase.class)
+	@JsonView(JSONViews.ApplicationForManager.class)
 	private String email;
-	@JsonView(JSONViews.ApplicationBase.class)
+	@JsonView(JSONViews.ApplicationForManager.class)
 	private String phone;
-	@JsonView(JSONViews.ApplicationBase.class)
+	@JsonView(JSONViews.ApplicationForManager.class)
 	private boolean enabled;
 
+	@JsonIgnore
 	private String state;
 
 	@JsonProperty("image")
@@ -61,7 +62,7 @@ public class ClientApplication {
 	@JsonSerialize (using = OrganizationSerializer.class)
 	@JsonProperty(value = "organizationId")
 	@JsonAlias({ "organization" })
-	@JsonView(JSONViews.ApplicationBase.class)
+	@JsonView(JSONViews.ApplicationForAPIManager.class)
 	private Organization organization;
 	
 	public String getId() {

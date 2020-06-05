@@ -24,6 +24,7 @@ import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -100,7 +101,7 @@ public class JsonAPIExporter extends APIExporter {
 		try {
 			prepareToSave(exportAPI);
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.writerWithView(APIForExport.class).writeValue(new File(localFolder.getCanonicalPath() + "/api-config.json"), exportAPI);
+			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/api-config.json"), exportAPI);
 		} catch (Exception e) {
 			throw new AppException("Can't write API-Configuration file for API: '"+exportAPI.getName()+"' exposed on path: '"+exportAPI.getPath()+"'.", ErrorCode.UNXPECTED_ERROR, e);
 		}

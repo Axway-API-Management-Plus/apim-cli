@@ -6,6 +6,8 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -36,6 +38,11 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 				return APIManagerAdapter.getInstance().orgAdapter.getOrgForId(node.asText());
 			} else {
 				// organization name is given in the config file
+				Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(node.asText());
+				if(organization==null || !organization.getDevelopment()) {
+					ErrorState.getInstance().setError("The given organization: '"+node.asText()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION, false);
+					throw new AppException("The given organization: '"+node.asText()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
+				}
 				return APIManagerAdapter.getInstance().orgAdapter.getOrgForName(node.asText());
 			}
 		} catch (AppException e) {

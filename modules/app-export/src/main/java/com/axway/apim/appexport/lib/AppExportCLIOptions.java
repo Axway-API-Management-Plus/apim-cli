@@ -14,7 +14,7 @@ public class AppExportCLIOptions extends APIMCoreCLIOptions {
 		super(args);
 		// Define command line options required for Application export
 		Option option = new  Option("n", "name", true, "Name of the application to export. You may use wildcards at the end or beginning. (e.g. *App*). To export all applications just use '*'");
-		option.setRequired(true);
+		option.setRequired(false);
 		options.addOption(option);
 		
 		option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"

@@ -15,19 +15,19 @@ public abstract class ClientAppCredential {
 	@JsonView(JSONViews.CredentialsForManager.class)
 	String id;
 	
-	@JsonView(JSONViews.CredentialsBase.class)
+	@JsonView(JSONViews.CredentialsBaseInformation.class)
 	boolean enabled;
 	
-	@JsonView(JSONViews.CredentialsBase.class)
+	@JsonView(JSONViews.CredentialsBaseInformation.class)
 	String createdBy;
 	
-	@JsonView(JSONViews.CredentialsBase.class)
+	@JsonView(JSONViews.CredentialsBaseInformation.class)
 	String createdOn;
 	
-	@JsonView(JSONViews.CredentialsBase.class)
+	@JsonView(JSONViews.CredentialsBaseInformation.class)
 	String secret;
 	
-	@JsonView(JSONViews.CredentialsBase.class)
+	@JsonView(JSONViews.CredentialsBaseInformation.class)
 	String[] corsOrigins;
 
 	public String getId() {

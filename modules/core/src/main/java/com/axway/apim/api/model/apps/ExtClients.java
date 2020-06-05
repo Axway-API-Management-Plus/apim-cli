@@ -12,7 +12,7 @@ public class ExtClients extends ClientAppCredential {
 		return "extclients";
 	}
 
-	@JsonView(JSONViews.CredentialsExport.class)
+	@JsonView(JSONViews.CredentialsForExport.class)
 	public String getClientId() {
 		return id;
 	}

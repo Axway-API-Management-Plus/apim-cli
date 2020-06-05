@@ -23,7 +23,7 @@ public class APIKey extends ClientAppCredential {
 		this.deletedOn = deletedOn;
 	}
 
-	@JsonView(JSONViews.CredentialsExport.class)
+	@JsonView(JSONViews.CredentialsForExport.class)
 	@JsonProperty("apiKey")
 	public String getApiKey() {
 		return id;
