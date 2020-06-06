@@ -62,6 +62,7 @@ public class ClientApplication {
 	
 	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	public String getOrganizationId() {
+		if(this.organization == null) return null;
 		return this.organization.getId();
 	}
 	

@@ -103,7 +103,7 @@ public class JsonAPIExporter extends APIExporter {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/api-config.json"), exportAPI);
 		} catch (Exception e) {
-			throw new AppException("Can't write API-Configuration file for API: '"+exportAPI.getName()+"' exposed on path: '"+exportAPI.getPath()+"'.", ErrorCode.UNXPECTED_ERROR, e);
+			throw new AppException("Can't create API-Configuration file for API: '"+exportAPI.getName()+"' exposed on path: '"+exportAPI.getPath()+"'.", ErrorCode.UNXPECTED_ERROR, e);
 		}
 		Image image = exportAPI.getAPIImage();
 		if(image!=null) {

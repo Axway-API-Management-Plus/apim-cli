@@ -281,6 +281,7 @@ public class ExportAPI {
 			ClientApplication exportApp = new ClientApplication();
 			exportApp.setEnabled(app.isEnabled());
 			exportApp.setName(app.getName());
+			exportApp.setOrganization(null);
 			exportApp.setCredentials(null);
 			exportApp.setApiAccess(null);
 			exportApps.add(exportApp);
