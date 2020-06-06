@@ -74,7 +74,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 				importManager.replicate();
 			}
 			LOG.info("Successfully replicated application into API-Manager");
-			return 0;
+			return errorCodeMapper.getMapedErrorCode(ErrorState.getInstance().getErrorCode()).getCode();
 		} catch (AppException ap) { 
 			ErrorState errorState = ErrorState.getInstance();
 			if(errorState.hasError()) {
