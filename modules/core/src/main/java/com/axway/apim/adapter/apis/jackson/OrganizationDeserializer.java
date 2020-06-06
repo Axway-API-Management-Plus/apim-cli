@@ -39,9 +39,9 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 			} else {
 				// organization name is given in the config file
 				Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(node.asText());
-				if(organization==null || !organization.getDevelopment()) {
-					ErrorState.getInstance().setError("The given organization: '"+node.asText()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION, false);
-					throw new AppException("The given organization: '"+node.asText()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
+				if(organization==null) {
+					ErrorState.getInstance().setError("The given organization: '"+node.asText()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION, false);
+					throw new AppException("The given organization: '"+node.asText()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
 				}
 				return APIManagerAdapter.getInstance().orgAdapter.getOrgForName(node.asText());
 			}

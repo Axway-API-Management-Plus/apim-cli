@@ -100,11 +100,15 @@ public class APIAccess {
 		if(other == null) return false;
 		if(other instanceof APIAccess) {
 			APIAccess otherApiAccess = (APIAccess)other;
+			if(otherApiAccess.getApiId()!=null) {
+				return StringUtils.equals(otherApiAccess.getApiId(), this.getApiId());
+			} else {
 			return 
 					StringUtils.equals(otherApiAccess.getApiId(), this.getApiId()) &&
 					StringUtils.equals(otherApiAccess.getApiName(), this.getApiName()) &&
 					StringUtils.equals(otherApiAccess.getApiVersion(), this.getApiVersion())
 					;
+			}
 		}
 		return false;
 	}

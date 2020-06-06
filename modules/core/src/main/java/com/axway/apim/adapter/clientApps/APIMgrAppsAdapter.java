@@ -294,7 +294,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
 				if(statusCode < 200 || statusCode > 299){
 					LOG.error("Error creating/updating application. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
-					throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+					throw new AppException("Error creating/updating application. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
 				createdApp = mapper.readValue(httpResponse.getEntity().getContent(), ClientApplication.class);
 			} catch (Exception e) {

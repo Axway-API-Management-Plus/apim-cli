@@ -25,4 +25,6 @@ public class JSONViews {
 	public static interface APIAccessForExport {}
 	public static interface APIBaseInformation {}
 	public static interface APIExportInformation {}
+	
+	public static interface OrganizationBaseInformation {}
 }

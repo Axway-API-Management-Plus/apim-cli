@@ -11,7 +11,6 @@ import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appimport.lib.AppImportCLIOptions;
 import com.axway.apim.appimport.lib.AppImportParams;
-import com.axway.apim.appimport.lib.ClientAppBuilder;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -74,6 +73,8 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 				importManager.setActualApp(actualApp);
 				importManager.replicate();
 			}
+			LOG.info("Successfully replicated application into API-Manager");
+			return 0;
 		} catch (AppException ap) { 
 			ErrorState errorState = ErrorState.getInstance();
 			if(errorState.hasError()) {
@@ -88,9 +89,11 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}
-		return errorCodeMapper.getMapedErrorCode(ErrorState.getInstance().getErrorCode()).getCode();
 	}
 	
-
+	public static void main(String args[]) { 
+		int rc = importApp(args);
+		System.exit(rc);
+	}
 
 }

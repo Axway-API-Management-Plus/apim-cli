@@ -8,7 +8,6 @@ import org.apache.commons.lang.StringUtils;
 import com.axway.apim.adapter.apis.jackson.APIAccessSerializer;
 import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
-import com.axway.apim.adapter.apis.jackson.OrganizationSerializer;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
@@ -23,20 +22,19 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientApplication {
-	@JsonView(JSONViews.ApplicationForManager.class)
+	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private String id;
 	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private String name;
-	@JsonView(JSONViews.ApplicationForManager.class)
+	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private String description;
-	@JsonView(JSONViews.ApplicationForManager.class)
+	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private String email;
-	@JsonView(JSONViews.ApplicationForManager.class)
+	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private String phone;
-	@JsonView(JSONViews.ApplicationForManager.class)
+	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private boolean enabled;
 
-	@JsonIgnore
 	private String state;
 
 	@JsonProperty("image")
@@ -59,11 +57,13 @@ public class ClientApplication {
 	private APIQuota appQuota;
 	
 	@JsonDeserialize( using = OrganizationDeserializer.class)
-	@JsonSerialize (using = OrganizationSerializer.class)
-	@JsonProperty(value = "organizationId")
-	@JsonAlias({ "organization" })
-	@JsonView(JSONViews.ApplicationForAPIManager.class)
+	@JsonAlias({ "organization", "organizationId" })	
 	private Organization organization;
+	
+	@JsonView(JSONViews.ApplicationBaseInformation.class)
+	public String getOrganizationId() {
+		return this.organization.getId();
+	}
 	
 	public String getId() {
 		return id;

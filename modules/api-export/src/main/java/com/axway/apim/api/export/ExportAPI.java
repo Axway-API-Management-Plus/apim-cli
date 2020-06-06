@@ -256,6 +256,7 @@ public class ExportAPI {
 		return this.actualAPIProxy.getSystemQuota();
 	}
 
+	@JsonIgnore
 	public Map<String, ServiceProfile> getServiceProfiles() {
 		return this.actualAPIProxy.getServiceProfiles();
 	}
