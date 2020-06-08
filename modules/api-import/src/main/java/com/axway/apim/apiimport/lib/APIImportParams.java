@@ -19,6 +19,6 @@ public class APIImportParams extends CommandParameters {
 	@Override
 	public boolean ignoreCache() {
 		// For import action we ignore the cache in all cases!
-		return true;
+		return false;
 	}
 }
