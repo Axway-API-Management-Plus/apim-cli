@@ -245,18 +245,18 @@ public class APIManagerAdapter {
 	
 	public static CacheManager getCacheManager() {
 		if(APIManagerAdapter.cacheManager!=null) {
-			if(APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) APIManagerAdapter.cacheManager.init();
-			LOG.info("Returning cachine manager: " + cacheManager.getClass().getName());
+			if(APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) 
+				APIManagerAdapter.cacheManager.init();
 			return APIManagerAdapter.cacheManager;
 		}
 		if(CommandParameters.getInstance().ignoreCache()) {
 			APIManagerAdapter.cacheManager = new DoNothingCacheManager();
+		} else {
+			URL myUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
+			XmlConfiguration xmlConfig = new XmlConfiguration(myUrl);
+			APIManagerAdapter.cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
+			APIManagerAdapter.cacheManager.init();
 		}
-		URL myUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
-		XmlConfiguration xmlConfig = new XmlConfiguration(myUrl);
-		APIManagerAdapter.cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
-		APIManagerAdapter.cacheManager.init();
-		LOG.info("Returning cachine manager: " + cacheManager.getClass().getName());
 		return cacheManager;
 	}
 	
