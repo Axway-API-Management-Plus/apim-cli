@@ -19,6 +19,6 @@ public class AppImportParams extends CommandParameters {
 	@Override
 	public boolean ignoreCache() {
 		// For import action we ignore the cache in all cases!
-		return false;
+		return true;
 	}
 }
