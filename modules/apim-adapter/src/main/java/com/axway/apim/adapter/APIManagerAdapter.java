@@ -89,18 +89,18 @@ public class APIManagerAdapter {
 	public final static String TYPE_FRONT_END = "proxies";
 	public final static String TYPE_BACK_END = "apirepo";
 	
+	private CommandParameters cmd;
+	
 	private static CacheManager cacheManager;
 	
-	public APIManagerConfigAdapter configAdapter = new APIManagerConfigAdapter();
+	public APIManagerConfigAdapter configAdapter;
 	public APIAdapter apiAdapter;
-	public APIManagerAPIMethodAdapter methodAdapter = new APIManagerAPIMethodAdapter();
-	public APIManagerPoliciesAdapter policiesAdapter = new APIManagerPoliciesAdapter();
-	public APIManagerQuotaAdapter quotaAdapter = new APIManagerQuotaAdapter();
-	public APIManagerOrganizationAdapter orgAdapter = new APIManagerOrganizationAdapter();
-	public APIManagerAPIAccessAdapter accessAdapter = new APIManagerAPIAccessAdapter();
-	public APIMgrAppsAdapter appAdapter = new APIMgrAppsAdapter();
-	
-	private CommandParameters cmd = CommandParameters.getInstance();
+	public APIManagerAPIMethodAdapter methodAdapter;
+	public APIManagerPoliciesAdapter policiesAdapter;
+	public APIManagerQuotaAdapter quotaAdapter;
+	public APIManagerOrganizationAdapter orgAdapter;
+	public APIManagerAPIAccessAdapter accessAdapter;
+	public APIMgrAppsAdapter appAdapter;
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
@@ -119,11 +119,20 @@ public class APIManagerAdapter {
 	
 	private APIManagerAdapter() throws AppException {
 		super();
+		this.cmd = CommandParameters.getInstance();
+		this.configAdapter = new APIManagerConfigAdapter();
 		this.apiAdapter = APIAdapter.create(this);
+		this.methodAdapter = new APIManagerAPIMethodAdapter();
+		this.policiesAdapter = new APIManagerPoliciesAdapter();
+		this.quotaAdapter = new APIManagerQuotaAdapter();
+		this.orgAdapter = new APIManagerOrganizationAdapter();
+		this.accessAdapter = new APIManagerAPIAccessAdapter();
+		this.appAdapter = new APIMgrAppsAdapter();
 		if(TestIndicator.getInstance().isTestRunning()) {
 			this.hasAdminAccount = true; // For unit tests we have an admin account
 			return; // No need to initialize just for Unit-Tests
 		}
+		
 		Transaction transaction = Transaction.getInstance();
 		transaction.beginTransaction();
 		loginToAPIManager(false); // Login with the provided user (might be an Org-Admin)
@@ -319,76 +328,6 @@ public class APIManagerAdapter {
 		}
 		return majorNumbers;
 	}
-	
-	/**
-	 * Creates the API-Manager API-Representation. Basically the "Actual" state of the API.
-	 *  
-	 * @param jsonConfiguration the JSON-Configuration which is returned from the API-Manager REST-API (Proxy-Endpoint)
-	 * @param desiredAPI for some tasks the desiredAPI is needed (e.g. Custom-Properties)
-	 * @return an APIManagerAPI instance, which is flagged either as valid, if the API was found or invalid, if not found!
-	 * @param apiType the class type the API representation is returned
-	 * @throws AppException when the API-Manager API-State can't be created
-	 */
-	/*public <T> API getAPIManagerAPI(T api, IAPI desiredAPI, Class<T> apiType) throws AppException {
-		if(api == null) {
-			API apiManagerAPI = new API();
-			apiManagerAPI.setValid(false);
-			return apiManagerAPI;
-		}
-		
-		T apiManagerApi;
-		try {
-			apiManagerApi = api;
-			//((API)apiManagerApi).setApiConfiguration(jsonConfiguration);
-			((API)apiManagerApi).setAPIDefinition(getOriginalAPIDefinitionFromAPIM(((API)apiManagerApi).getApiId()));
-			if(((API)apiManagerApi).getImage()!=null) {
-				URI uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+((API)apiManagerApi).getId()+"/image").build();
-				((API)apiManagerApi).setImage(getImageFromAPIM(uri, "api-image")); 
-			}
-			((API)apiManagerApi).setValid(true);
-			// As the API-Manager REST doesn't provide information about Custom-Properties, we have to setup 
-			// the Custom-Properties based on the Import API.
-			/*if(desiredAPI!=null && desiredAPI.getCustomProperties() != null) {
-				Map<String, String> customProperties = new LinkedHashMap<String, String>();
-				Iterator<String> it = desiredAPI.getCustomProperties().keySet().iterator();
-				while(it.hasNext()) {
-					String customPropKey = it.next();
-					JsonNode value = jsonConfiguration.get(customPropKey);
-					String customPropValue = (value == null) ? null : value.asText();
-					customProperties.put(customPropKey, customPropValue);
-				}
-				((API)apiManagerApi).setCustomProperties(customProperties);
-			}*/
-	/*		return (API) apiManagerApi;
-		} catch (Exception e) {
-			throw new AppException("Can't initialize API-Manager API-State.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		}
-	}*/
-	/*
-	public void addClientApplications(IAPI apiManagerApi, IAPI desiredAPI) throws AppException {
-		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
-		List<ClientApplication> apps = null;
-		// With version >7.7 we can retrieve the subscribed apps directly
-		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-			apps = getSubscribedApps(apiManagerApi.getId());
-		} else {
-			apps = getAllApps();
-		}
-		for(ClientApplication app : apps) {
-			List<APIAccess> APIAccess = getAPIAccess(app.getId(), "applications");
-			app.setApiAccess(APIAccess);
-			if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-				existingClientApps.add(app);
-			} else {
-				for(APIAccess access : APIAccess) {
-					if(access.getApiId().equals(apiManagerApi.getId())) {
-						existingClientApps.add(app);
-					}
-				}
-			}
-		}
-		apiManagerApi.setApplications(existingClientApps);
-	}*/
 	
 	/**
 	 * The actual App-ID based on the AppName. Lazy implementation.
