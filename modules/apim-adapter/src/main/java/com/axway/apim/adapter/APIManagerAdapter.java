@@ -23,11 +23,8 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.ehcache.Cache;
 import org.ehcache.CacheManager;
-import org.ehcache.PersistentCacheManager;
 import org.ehcache.Status;
-import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.xml.XmlConfiguration;
 import org.slf4j.Logger;
@@ -91,7 +88,7 @@ public class APIManagerAdapter {
 	public final static String TYPE_FRONT_END = "proxies";
 	public final static String TYPE_BACK_END = "apirepo";
 	
-	public static CacheManager cacheManager = getCacheManager();
+	private static CacheManager cacheManager = getCacheManager();
 	
 	public APIManagerConfigAdapter configAdapter = new APIManagerConfigAdapter();
 	public APIAdapter apiAdapter;

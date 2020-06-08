@@ -46,8 +46,8 @@ public class APIManagerAPIAccessAdapter {
 	private Map<Type, Cache<String, String>> caches = new HashMap<Type, Cache<String, String>>();
 
 	public APIManagerAPIAccessAdapter() {
-		caches.put(Type.applications, APIManagerAdapter.cacheManager.getCache("applicationAPIAccessCache", String.class, String.class));
-		caches.put(Type.organizations, APIManagerAdapter.cacheManager.getCache("organizationAPIAccessCache", String.class, String.class));
+		caches.put(Type.applications, APIManagerAdapter.getCacheManager().getCache("applicationAPIAccessCache", String.class, String.class));
+		caches.put(Type.organizations, APIManagerAdapter.getCacheManager().getCache("organizationAPIAccessCache", String.class, String.class));
 	}
 	
 	Map<Type, Map<String, String>> apiManagerResponse = new HashMap<Type, Map<String,String>>();
