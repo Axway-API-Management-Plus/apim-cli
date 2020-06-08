@@ -70,6 +70,9 @@ public class APIManagerAPIAccessAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
+			if(response.startsWith("{")) { // Got a single response!
+				response = "["+response+"]";
+			}
 			mappedResponse.put(id, response);
 			apiManagerResponse.put(type, mappedResponse);
 			putToCache(id, type, response);
