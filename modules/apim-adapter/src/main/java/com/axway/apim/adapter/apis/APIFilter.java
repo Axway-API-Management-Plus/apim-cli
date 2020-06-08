@@ -238,7 +238,7 @@ public class APIFilter {
 	}
 	
 	public boolean isIncludeClientAppQuota() {
-		return includeClientApplications;
+		return includeClientAppQuota;
 	}
 
 	public void setIncludeClientAppQuota(boolean includeClientAppQuota) {

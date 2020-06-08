@@ -110,7 +110,7 @@ public class APIManagerAPIAccessAdapter {
 	
 	private String getFromCache(String id, Type type) {
 		Cache<String, String> usedCache = caches.get(type);
-		if(usedCache!=null && caches.get(type).get(id)!=null) {
+		if(usedCache!=null && caches.get(type).get(id)!=null && !caches.get(type).get(id).equals("[]")) {
 			if(LOG.isDebugEnabled())
 				LOG.debug("Return APIAccess for " + type + ": " + id + " from cache.");
 			return caches.get(type).get(id);
