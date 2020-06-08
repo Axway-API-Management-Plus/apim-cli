@@ -17,11 +17,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-			<artifactId>apimcli-core</artifactId>
+			<artifactId>apimcli-apim-adapter</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-			<artifactId>apimcli-core</artifactId>
+			<artifactId>apimcli-apim-adapter</artifactId>
 			<version>${project.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
@@ -51,10 +51,6 @@
 			<artifactId>apimcli-app-import</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-			<artifactId>apimcli-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>

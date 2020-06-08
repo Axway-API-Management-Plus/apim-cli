@@ -8,9 +8,9 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>apimcli-core</artifactId>
+	<artifactId>apimcli-apim-adapter</artifactId>
 	<packaging>jar</packaging>
-	<name>Axway API-Manager CLI API-Manager Client/Core</name>
+	<name>Axway API-Manager CLI API-Manager Adapter</name>
 	<description>The core component of the CLI providing an interface to the API-Manager.</description>
 	<url>https://github.com/Axway-API-Management-Plus/apim-cli</url>
 

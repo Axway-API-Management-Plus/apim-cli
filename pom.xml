@@ -71,7 +71,7 @@
 	</distributionManagement>
 
 	<modules>
-		<module>modules/core</module>
+		<module>modules/apim-adapter</module>
 		<module>modules/apim-cli</module>
 		<module>modules/api-export</module>
 		<module>modules/api-import</module>
@@ -84,7 +84,7 @@
 		<dependencies>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-			<artifactId>apimcli-core</artifactId>
+			<artifactId>apimcli-apim-adapter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

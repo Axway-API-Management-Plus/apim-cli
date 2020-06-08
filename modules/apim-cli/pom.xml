@@ -17,7 +17,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-			<artifactId>apimcli-core</artifactId>
+			<artifactId>apimcli-apim-adapter</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
