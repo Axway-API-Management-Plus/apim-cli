@@ -246,6 +246,7 @@ public class APIManagerAdapter {
 	public static CacheManager getCacheManager() {
 		if(APIManagerAdapter.cacheManager!=null) {
 			if(APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) APIManagerAdapter.cacheManager.init();
+			LOG.info("Returning cachine manager: " + cacheManager.getClass().getName());
 			return APIManagerAdapter.cacheManager;
 		}
 		if(CommandParameters.getInstance().ignoreCache()) {
@@ -255,6 +256,7 @@ public class APIManagerAdapter {
 		XmlConfiguration xmlConfig = new XmlConfiguration(myUrl);
 		APIManagerAdapter.cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
 		APIManagerAdapter.cacheManager.init();
+		LOG.info("Returning cachine manager: " + cacheManager.getClass().getName());
 		return cacheManager;
 	}
 	
