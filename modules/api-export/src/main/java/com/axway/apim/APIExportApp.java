@@ -46,7 +46,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	private static int runExport(String[] args, ExportImpl exportImpl) {
 		try {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
-			//APIManagerAdapter.deleteInstance();
+			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
 			Transaction.deleteInstance();
