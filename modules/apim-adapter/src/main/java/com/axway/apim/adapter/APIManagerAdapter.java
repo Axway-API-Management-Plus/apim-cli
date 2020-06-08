@@ -244,12 +244,12 @@ public class APIManagerAdapter {
 	}
 	
 	public static CacheManager getCacheManager() {
-		if(CommandParameters.getInstance().ignoreCache()) {
-			APIManagerAdapter.cacheManager = new DoNothingCacheManager();
-		}
 		if(APIManagerAdapter.cacheManager!=null) {
 			if(APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) APIManagerAdapter.cacheManager.init();
 			return APIManagerAdapter.cacheManager;
+		}
+		if(CommandParameters.getInstance().ignoreCache()) {
+			APIManagerAdapter.cacheManager = new DoNothingCacheManager();
 		}
 		URL myUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
 		XmlConfiguration xmlConfig = new XmlConfiguration(myUrl);
