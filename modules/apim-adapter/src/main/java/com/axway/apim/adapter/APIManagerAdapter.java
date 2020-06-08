@@ -236,7 +236,7 @@ public class APIManagerAdapter {
 	
 	public static CacheManager getCacheManager() {
 		if(APIManagerAdapter.cacheManager!=null) {
-			if(APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) APIManagerAdapter.cacheManager.close();
+			if(APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) APIManagerAdapter.cacheManager.init();
 			return APIManagerAdapter.cacheManager;
 		}
 		URL myUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
