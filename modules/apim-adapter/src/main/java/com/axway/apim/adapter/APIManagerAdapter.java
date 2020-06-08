@@ -43,6 +43,7 @@ import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.DoNothingCacheManager;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -88,7 +89,7 @@ public class APIManagerAdapter {
 	public final static String TYPE_FRONT_END = "proxies";
 	public final static String TYPE_BACK_END = "apirepo";
 	
-	private static CacheManager cacheManager = getCacheManager();
+	private static CacheManager cacheManager;
 	
 	public APIManagerConfigAdapter configAdapter = new APIManagerConfigAdapter();
 	public APIAdapter apiAdapter;
@@ -112,8 +113,8 @@ public class APIManagerAdapter {
 	}
 	
 	public static synchronized void deleteInstance() throws AppException {
-			APIManagerAdapter.cacheManager.close();
-			APIManagerAdapter.instance = null;
+		if(APIManagerAdapter.cacheManager.getStatus()==Status.AVAILABLE) APIManagerAdapter.cacheManager.close();
+		APIManagerAdapter.instance = null;
 	}
 	
 	private APIManagerAdapter() throws AppException {
@@ -232,14 +233,17 @@ public class APIManagerAdapter {
 	}
 	
 	public static CacheManager getCacheManager() {
+		if(CommandParameters.getInstance().ignoreCache()) {
+			APIManagerAdapter.cacheManager = new DoNothingCacheManager();
+		}
 		if(APIManagerAdapter.cacheManager!=null) {
 			if(APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) APIManagerAdapter.cacheManager.init();
 			return APIManagerAdapter.cacheManager;
 		}
 		URL myUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
 		XmlConfiguration xmlConfig = new XmlConfiguration(myUrl);
-		CacheManager cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
-		cacheManager.init();
+		APIManagerAdapter.cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
+		APIManagerAdapter.cacheManager.init();
 		return cacheManager;
 	}
 	

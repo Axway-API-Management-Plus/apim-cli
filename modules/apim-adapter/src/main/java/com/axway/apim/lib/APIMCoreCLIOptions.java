@@ -88,6 +88,11 @@ public abstract class APIMCoreCLIOptions {
 		option.setRequired(false);
 		option.setArgName("true");
 		internalOptions.addOption(option);
+		
+		option = new Option("ignoreCache", true, "The cache for REST-API calls isn't used.");
+		option.setRequired(false);
+		option.setArgName("true");
+		internalOptions.addOption(option);
 
 		this.args = args;
 	}

@@ -193,6 +193,7 @@ public class APIManagerAPIAccessAdapter {
 				LOG.error("Can't delete API access requests for application. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 				throw new AppException("Can't delete API access requests for application. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
+			if(caches.get(type)!=null) caches.get(type).remove(apiAccess.getId());
 			return;
 		} catch (Exception e) {
 			throw new AppException("Can't delete API access requests for application.", ErrorCode.CANT_CREATE_API_PROXY, e);

@@ -1,36 +1,21 @@
 package com.axway.apim.apiimport.actions.tasks;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
-import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.rest.DELRequest;
-import com.axway.apim.lib.utils.rest.POSTRequest;
-import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.axway.apim.lib.utils.rest.Transaction;
-import com.fasterxml.jackson.databind.JsonNode;
 
 public class ManageClientApps extends AbstractAPIMTask {
 	
