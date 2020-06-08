@@ -380,8 +380,6 @@ public class APIFilter {
 				}
 			}
 			if(!requestedPolicyUsed) return false;
-		} else {
-			if(this.getApiPath()!=null && !this.getApiPath().equals(api.getPath())) return false;
 		}
 		if(this.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
 			if(this.getVhost()!=null && !this.getVhost().equals(api.getVhost()))  return false;
