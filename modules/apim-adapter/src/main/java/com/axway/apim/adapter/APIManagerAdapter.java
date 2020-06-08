@@ -26,6 +26,7 @@ import org.apache.http.util.EntityUtils;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.PersistentCacheManager;
+import org.ehcache.Status;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.xml.XmlConfiguration;
@@ -234,7 +235,10 @@ public class APIManagerAdapter {
 	}
 	
 	public static CacheManager getCacheManager() {
-		if(APIManagerAdapter.cacheManager!=null) return APIManagerAdapter.cacheManager;
+		if(APIManagerAdapter.cacheManager!=null) {
+			if(APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) APIManagerAdapter.cacheManager.close();
+			return APIManagerAdapter.cacheManager;
+		}
 		URL myUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
 		XmlConfiguration xmlConfig = new XmlConfiguration(myUrl);
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);

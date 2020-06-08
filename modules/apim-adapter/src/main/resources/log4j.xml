@@ -55,6 +55,10 @@
   <logger name="com.axway.apim">
 	<level value="INFO"/>
   </logger>
+  
+  <logger name="org.ehcache">
+	<level value="ERROR"/>
+  </logger>
 
   <!-- ======================= -->
   <!-- Setup the Root logger -->
