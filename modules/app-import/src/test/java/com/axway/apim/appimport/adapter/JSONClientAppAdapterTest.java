@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import org.testng.annotations.BeforeClass;
@@ -21,6 +22,7 @@ import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.OAuth;
+import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class JSONClientAppAdapterTest extends APIManagerMockBase {
@@ -29,6 +31,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 	
 	@BeforeClass
 	private void initTestIndicator() throws AppException, IOException {
+		new CommandParameters(new HashMap<String, String>());
 		setupMockData();
 	}
 
