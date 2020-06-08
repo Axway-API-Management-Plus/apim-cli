@@ -175,16 +175,12 @@ public class ClientAppFilter {
 		
 		String state;
 		
-		/**
-		 * @param config the config that is used what kind of adapter should be used
-		 */
 		public Builder() {
 			super();
 		}
 
 		/**
 		 * Creates a ClientAppAdapter based on the provided configuration using all registered Adapters
-		 * @return a valid Adapter able to handle the config or null
 		 */
 		public ClientAppFilter build() {
 			ClientAppFilter filter = new ClientAppFilter();

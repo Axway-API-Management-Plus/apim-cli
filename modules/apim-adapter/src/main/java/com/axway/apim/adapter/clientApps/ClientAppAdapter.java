@@ -28,13 +28,6 @@ public abstract class ClientAppAdapter {
 	
 	public abstract List<ClientApplication> getAllApplications() throws AppException;
 	
-	/**
-	 * Returns all applications
-	 * @return list of ClientApplications
-	 * @throws AppException when something goes wrong
-	 */
-	//public abstract List<ClientApplication> getApplications() throws AppException;
-	
 	public abstract ClientApplication getApplication(ClientAppFilter filter) throws AppException;
 	
 	public abstract ClientApplication createApplication(ClientApplication desiredApp) throws AppException;

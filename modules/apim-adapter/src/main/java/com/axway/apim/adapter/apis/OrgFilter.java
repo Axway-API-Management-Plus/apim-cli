@@ -136,9 +136,6 @@ public class OrgFilter {
 
 		List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
-		/**
-		 * @param config the config that is used what kind of adapter should be used
-		 */
 		public Builder() {
 			super();
 		}

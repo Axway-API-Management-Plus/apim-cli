@@ -396,10 +396,10 @@ public class APIFilter {
 		
 		public static enum APIType {
 			/**
-			 * APIs are created with:</br> 
-			 * - includingQuotas</br>
-			 * - Methods translated to name</br>
-			 * - Policies have the external name</br>
+			 * APIs are created with: 
+			 * - includingQuotas
+			 * - Methods translated to name
+			 * - Policies have the external name
 			 * - Client-Organizations and -Applications are initialized
 			 */
 			ACTUAL_API, 
@@ -451,17 +451,14 @@ public class APIFilter {
 		POLICY_TRANSLATION translatePolicyMode = POLICY_TRANSLATION.NONE;
 		
 		List<NameValuePair> filters = new ArrayList<NameValuePair>();
-		
-		/**
-		 * @param config the config that is used what kind of adapter should be used
-		 */
+
 		public Builder() {
 			this(Type.CUSTOM, false);
 		}
 
 		/**
 		 * Creates a ClientAppAdapter based on the provided configuration using all registered Adapters
-		 * @return a valid Adapter able to handle the config or null
+		 * @param type of the APIFilter
 		 */
 		public Builder(Type type) {
 			this(type, false);
@@ -469,7 +466,8 @@ public class APIFilter {
 		
 		/**
 		 * Creates a ClientAppAdapter based on the provided configuration using all registered Adapters
-		 * @return a valid Adapter able to handle the config or null
+		 * @param type of the APIFilter
+		 * @param search for backendendAPI if set to true 
 		 */
 		public Builder(Type type, boolean useBackendAPI) {
 			super();

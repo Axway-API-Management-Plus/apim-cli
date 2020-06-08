@@ -184,7 +184,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	 * @param <profile> An Outbound- or InboundProfile
 	 * @param apis in which the methods should be translated
 	 * @param mode translation direction 
-	 * @throws AppException
+	 * @throws AppException if methods cannot be translated
 	 */
 	public <profile> void translateMethodIds(List<API> apis, METHOD_TRANSLATION mode) throws AppException {
 		if(mode == METHOD_TRANSLATION.NONE) return;
