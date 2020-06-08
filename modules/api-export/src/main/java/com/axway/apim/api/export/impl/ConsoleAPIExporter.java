@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.model.InboundProfile;
@@ -20,12 +22,12 @@ import com.github.freva.asciitable.HorizontalAlign;
 
 public class ConsoleAPIExporter extends APIExporter {
 
-	public ConsoleAPIExporter(List<API> apis, APIExportParams params) {
-		super(apis, params);
+	public ConsoleAPIExporter(APIExportParams params) {
+		super(params);
 	}
 
 	@Override
-	public void export() throws AppException {
+	public void export(List<API> apis) throws AppException {
 		System.out.println(AsciiTable.getTable(apis, Arrays.asList(
 				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getId()),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getName()),
@@ -115,5 +117,20 @@ public class ConsoleAPIExporter extends APIExporter {
 			return "Err";
 		}
 	}
-	
+
+	@Override
+	public APIFilter getFilter() {
+		APIFilter filter = new APIFilter.Builder(Type.ACTUAL_API)
+				.hasVHost(params.getValue("vhost"))
+				.hasApiPath(params.getValue("api-path"))
+				.hasId(params.getValue("id"))
+				.hasName(params.getValue("name"))
+				.hasState(params.getValue("state"))
+				.includeQuotas(true)
+				.includeImage(false)
+				.includeOriginalAPIDefinition(false)
+				.includeClientAppQuota(false)
+				.build();
+		return filter;
+	}
 }

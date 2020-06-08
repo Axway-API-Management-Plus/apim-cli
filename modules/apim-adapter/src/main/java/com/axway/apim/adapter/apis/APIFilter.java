@@ -61,6 +61,7 @@ public class APIFilter {
 	private boolean includeQuotas = false;
 	private boolean includeClientOrganizations = false;
 	private boolean includeClientApplications = false;
+	private boolean includeClientAppQuota = false;
 	private boolean includeImage = false;
 	
 	private boolean includeOriginalAPIDefinition = false;
@@ -236,7 +237,13 @@ public class APIFilter {
 		this.includeClientApplications = includeClientApplications;
 	}
 	
-	
+	public boolean isIncludeClientAppQuota() {
+		return includeClientApplications;
+	}
+
+	public void setIncludeClientAppQuota(boolean includeClientAppQuota) {
+		this.includeClientAppQuota = includeClientAppQuota;
+	}	
 
 	public boolean isIncludeImage() {
 		return includeImage;
@@ -438,6 +445,7 @@ public class APIFilter {
 		boolean includeQuotas = false;
 		boolean includeClientOrganizations = false;
 		boolean includeClientApplications = false;
+		boolean includeClientAppQuota = false;
 		boolean includeImage = false;
 		
 		boolean includeOriginalAPIDefinition = false;
@@ -505,6 +513,7 @@ public class APIFilter {
 				this.translatePolicyMode = POLICY_TRANSLATION.TO_NAME;
 				this.includeClientOrganizations = true;
 				this.includeClientApplications = true;
+				this.includeClientAppQuota = true;
 				this.includeOriginalAPIDefinition = true;
 				this.includeImage = true;
 				break;
@@ -589,6 +598,11 @@ public class APIFilter {
 		
 		public Builder includeClientApplications(boolean includeClientApplications) {
 			this.includeClientApplications = includeClientApplications;
+			return this;
+		}
+		
+		public Builder includeClientAppQuota(boolean includeClientAppQuota) {
+			this.includeClientAppQuota = includeClientAppQuota;
 			return this;
 		}
 		

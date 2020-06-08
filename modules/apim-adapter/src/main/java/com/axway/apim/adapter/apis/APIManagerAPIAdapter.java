@@ -81,7 +81,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			translateMethodIds(apis, filter.getTranslateMethodMode());
 			addQuotaConfiguration(apis, filter.isIncludeQuotas());
 			addClientOrganizations(apis, filter.isIncludeClientOrganizations());
-			addClientApplications(apis, filter.isIncludeClientApplications());
+			addClientApplications(apis, filter);
 			addExistingClientAppQuotas(apis, filter.isIncludeQuotas());
 			addCustomProperties(apis, filter);
 			addOriginalAPIDefinitionFromAPIM(apis, filter.isIncludeOriginalAPIDefinition());
@@ -342,8 +342,8 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		}
 	}
 	
-	public void addClientApplications(List<API> apis, boolean addClientApplication) throws AppException {
-		if(!addClientApplication) return;
+	public void addClientApplications(List<API> apis, APIFilter filter) throws AppException {
+		if(!filter.isIncludeClientApplications()) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> apps = null;
 		// With version >7.7 we can retrieve the subscribed apps directly
@@ -353,7 +353,9 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				api.setApplications(apps);
 			}
 		} else {
-			apps = apim.appAdapter.getApplications(new ClientAppFilter.Builder().build());
+			apps = apim.appAdapter.getApplications(new ClientAppFilter.Builder()
+					.includeQuotas(filter.isIncludeClientAppQuota())
+					.build());
 			for(ClientApplication app : apps) {
 				List<APIAccess> APIAccess = apim.accessAdapter.getAPIAccess(app.getId(), APIManagerAPIAccessAdapter.Type.applications);
 				app.setApiAccess(APIAccess);

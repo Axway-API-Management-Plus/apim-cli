@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -14,8 +15,6 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 public abstract class APIExporter {
 
 	protected static Logger LOG = LoggerFactory.getLogger(APIExporter.class);
-	
-	List<API> apis;
 	
 	APIExportParams params;
 	
@@ -37,16 +36,15 @@ public abstract class APIExporter {
 		}
 	}
 
-	public APIExporter(List<API> apis, APIExportParams params) {
-		this.apis = apis;
+	public APIExporter(APIExportParams params) {
 		this.params = params;
 	}
 	
-	public static APIExporter create(List<API> apps, ExportImpl exportImpl, APIExportParams params) throws AppException {
+	public static APIExporter create(ExportImpl exportImpl, APIExportParams params) throws AppException {
 		try {
-			Object[] intArgs = new Object[] { apps, params };
+			Object[] intArgs = new Object[] { params };
 			Constructor<APIExporter> constructor =
-					exportImpl.getClazz().getConstructor(new Class[]{List.class, APIExportParams.class});
+					exportImpl.getClazz().getConstructor(new Class[]{APIExportParams.class});
 			APIExporter exporter = constructor.newInstance(intArgs);
 			return exporter;
 		} catch (Exception e) {
@@ -54,10 +52,11 @@ public abstract class APIExporter {
 		}
 	}
 	
-	public abstract void export() throws AppException;
+	public abstract void export(List<API> apis) throws AppException;
 	
 	public boolean hasError() {
 		return this.hasError;
 	}
-
+	
+	public abstract APIFilter getFilter();
 }

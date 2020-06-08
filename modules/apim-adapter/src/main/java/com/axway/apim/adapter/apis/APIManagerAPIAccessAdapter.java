@@ -128,6 +128,13 @@ public class APIManagerAPIAccessAdapter {
 		}
 	}
 	
+	private void removeFromCache(String id, Type type) {
+		Cache<String, String> usedCache = caches.get(type);
+		if(usedCache!=null) {
+			usedCache.remove(id);
+		}
+	}
+	
 	public List<APIAccess> saveAPIAccess(List<APIAccess> apiAccess, String parentId, Type type) throws AppException {
 		List<APIAccess> existingAPIAccess = getAPIAccess(parentId, type);
 		
@@ -166,7 +173,11 @@ public class APIManagerAPIAccessAdapter {
 				LOG.error("Error creating/updating API Access. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 				throw new AppException("Error creating/updating API Access. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
-			return mapper.readValue(httpResponse.getEntity().getContent(), APIAccess.class);
+			String response = EntityUtils.toString(httpResponse.getEntity());
+			apiAccess =  mapper.readValue(response, APIAccess.class);
+			// Clean cache for this ID (App/Org) to force reload next time
+			removeFromCache(parentId, type);
+			return apiAccess;
 		} catch (Exception e) {
 			throw new AppException("Error creating/updating API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
 		} finally {

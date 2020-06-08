@@ -11,8 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
 import com.axway.apim.adapter.apis.OrgFilter;
-import com.axway.apim.adapter.apis.jackson.JSONViews.APIForExport;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.ExportAPI;
@@ -24,7 +25,6 @@ import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -40,14 +40,14 @@ public class JsonAPIExporter extends APIExporter {
 
 	APIManagerAdapter apiManager;
 	
-	public JsonAPIExporter(List<API> apis, APIExportParams params) throws AppException {
-		super(apis, params);
+	public JsonAPIExporter(APIExportParams params) throws AppException {
+		super(params);
 		this.givenExportFolder = params.getLocalFolder();
 	}
 	
 	@Override
-	public void export() throws AppException {
-		for (API api : this.apis) {
+	public void export(List<API> apis) throws AppException {
+		for (API api : apis) {
 			ExportAPI exportAPI = new ExportAPI(api);
 			try {
 				saveAPILocally(exportAPI);
@@ -56,6 +56,20 @@ public class JsonAPIExporter extends APIExporter {
 			}
 		}
 		
+	}
+	
+	@Override
+	public APIFilter getFilter() {
+		APIFilter filter = new APIFilter.Builder(Type.ACTUAL_API)
+				.hasVHost(params.getValue("vhost"))
+				.hasApiPath(params.getValue("api-path"))
+				.hasId(params.getValue("id"))
+				.hasName(params.getValue("name"))
+				.hasState(params.getValue("state"))
+				.includeQuotas(true)
+				.includeImage(true)
+				.build();
+		return filter;
 	}
 
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {

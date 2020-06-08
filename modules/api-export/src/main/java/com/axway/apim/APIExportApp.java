@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
-import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.impl.APIExporter;
 import com.axway.apim.api.export.impl.APIExporter.ExportImpl;
@@ -54,15 +53,10 @@ public class APIExportApp implements APIMCLIServiceProvider {
 
 			APIExportParams params = new APIExportParams(new APIExportCLIOptions(args));
 			APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
-			APIFilter filter = new APIFilter.Builder(Type.ACTUAL_API)
-					.hasVHost(params.getValue("vhost"))
-					.hasApiPath(params.getValue("api-path"))
-					.hasId(params.getValue("id"))
-					.hasName(params.getValue("name"))
-					.hasState(params.getValue("state"))
-					.includeQuotas(true)
-					.includeImage(true)
-					.build();
+			
+			APIExporter exporter = APIExporter.create(exportImpl, params);
+			APIFilter filter = exporter.getFilter();
+
 			List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(filter, false);
 			if(apis.size()==0) {
 				if(LOG.isDebugEnabled()) {
@@ -72,8 +66,8 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				}
 			} else {
 				LOG.info("Found " + apis.size() + " API(s).");
-				APIExporter exporter = APIExporter.create(apis, exportImpl, APIExportParams.getInstance());
-				exporter.export();
+				
+				exporter.export(apis);
 				if(exporter.hasError()) {
 					LOG.info("Please check the log. At least one error was recorded.");
 				} else {

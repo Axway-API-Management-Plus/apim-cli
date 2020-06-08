@@ -23,6 +23,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.Status;
 import org.ehcache.config.builders.CacheManagerBuilder;
@@ -256,6 +257,14 @@ public class APIManagerAdapter {
 		APIManagerAdapter.cacheManager.init();
 		return cacheManager;
 	}
+	
+	public static void clearCache(String cacheName) {
+		if(APIManagerAdapter.cacheManager==null || APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) return;
+		Cache<Object, Object> cache = APIManagerAdapter.cacheManager.getCache(cacheName, null, null);
+		cache.clear();
+	}
+	
+	
 	
 	/**
 	 * Checks if the API-Manager has at least given version. If the given requested version is the same or lower 
