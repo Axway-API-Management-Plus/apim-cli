@@ -409,11 +409,11 @@ public class APIFilter {
 		
 		public static enum Type {
 			/**
-			 * APIs are created with:</br> 
+			 * APIs are created with: 
 			 * - including the original API-Definition
-			 * - includingQuotas</br>
-			 * - Methods are not translated and stay with ID</br>
-			 * - Policies have the external name</br>
+			 * - includingQuotas
+			 * - Methods are not translated and stay with ID
+			 * - Policies have the external name
 			 * - Client-Organizations and -Applications are initialized
 			 */
 			ACTUAL_API, 
@@ -467,7 +467,7 @@ public class APIFilter {
 		/**
 		 * Creates a ClientAppAdapter based on the provided configuration using all registered Adapters
 		 * @param type of the APIFilter
-		 * @param search for backendendAPI if set to true 
+		 * @param useBackendAPI is search backendEndAPI if set to true 
 		 */
 		public Builder(Type type, boolean useBackendAPI) {
 			super();

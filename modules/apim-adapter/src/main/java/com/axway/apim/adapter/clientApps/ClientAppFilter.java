@@ -181,6 +181,7 @@ public class ClientAppFilter {
 
 		/**
 		 * Creates a ClientAppAdapter based on the provided configuration using all registered Adapters
+		 * @return ClientAppFilter used to filder for Client-Apps
 		 */
 		public ClientAppFilter build() {
 			ClientAppFilter filter = new ClientAppFilter();
