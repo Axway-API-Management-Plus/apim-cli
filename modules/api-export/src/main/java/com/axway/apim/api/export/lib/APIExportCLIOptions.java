@@ -23,6 +23,20 @@ public class APIExportCLIOptions extends APIMCoreCLIOptions {
 		option.setArgName("/api/v1/my/great/api");
 		options.addOption(option);
 		
+		option = new Option("n", "name", true, "The name of the API. Wildcards at the beginning/end are supported. Use '*' to export all APIs.");
+		option.setRequired(false);
+		option.setArgName("*MyName*");
+		options.addOption(option);
+		
+		option = new  Option("id", true, "The ID of the API.");
+		option.setRequired(false);
+		options.addOption(option);
+		
+		option = new Option("policy", true, "Get APIs with the given policy name. This is includes all policy types.");
+		option.setRequired(false);
+		option.setArgName("*Policy1*");
+		options.addOption(option);
+		
 		option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
 				+ "Is used to lookup the stage configuration file.");
 		option.setArgName("preprod");
@@ -31,16 +45,6 @@ public class APIExportCLIOptions extends APIMCoreCLIOptions {
 		option = new Option("v", "vhost", true, "Limit the export to that specific host.");
 		option.setRequired(false);
 		option.setArgName("vhost.customer.com");
-		options.addOption(option);
-		
-		option = new Option("n", "name", true, "The name of the API. Wildcards at the beginning/end are supported. Use '*' to export all APIs.");
-		option.setRequired(false);
-		option.setArgName("*MyName*");
-		options.addOption(option);
-		
-		option = new Option("n", "name", true, "The name of the API. Wildcards at the beginning/end are supported. Use '*' to export all APIs.");
-		option.setRequired(false);
-		option.setArgName("*MyName*");
 		options.addOption(option);
 		
 		option = new  Option("state", true, "Select APIs with specific state: unpublished | pending | published");

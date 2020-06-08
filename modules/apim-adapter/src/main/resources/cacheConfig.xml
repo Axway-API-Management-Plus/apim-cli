@@ -1,0 +1,41 @@
+<ehcache:config xmlns:ehcache="http://www.ehcache.org/v3"
+	xmlns:jcache="http://www.ehcache.org/v3/jsr107">
+
+	<ehcache:persistence directory="${java.io.tmpdir}/apim-cli" />
+
+	<ehcache:cache alias="applicationAPIAccessCache">
+		<ehcache:key-type>java.lang.String</ehcache:key-type>
+		<ehcache:value-type>java.lang.String</ehcache:value-type>
+		<ehcache:expiry>
+			<ehcache:ttl unit="minutes">1</ehcache:ttl>
+		</ehcache:expiry>
+		<ehcache:resources>
+			<ehcache:heap unit="MB">10</ehcache:heap>
+			<ehcache:disk unit="MB" persistent="true">20</ehcache:disk>
+		</ehcache:resources>
+	</ehcache:cache>
+
+	<ehcache:cache alias="organizationAPIAccessCache">
+		<ehcache:key-type>java.lang.String</ehcache:key-type>
+		<ehcache:value-type>java.lang.String</ehcache:value-type>
+		<ehcache:expiry>
+			<ehcache:ttl unit="minutes">1</ehcache:ttl>
+		</ehcache:expiry>
+		<ehcache:resources>
+			<ehcache:heap unit="MB">10</ehcache:heap>
+			<ehcache:disk unit="MB" persistent="true">20</ehcache:disk>
+		</ehcache:resources>
+	</ehcache:cache>
+	
+	<ehcache:cache alias="organizationCache">
+		<ehcache:key-type>java.lang.String</ehcache:key-type>
+		<ehcache:value-type>java.lang.String</ehcache:value-type>
+		<ehcache:expiry>
+			<ehcache:ttl unit="minutes">1</ehcache:ttl>
+		</ehcache:expiry>
+		<ehcache:resources>
+			<ehcache:heap unit="MB">10</ehcache:heap>
+			<ehcache:disk unit="MB" persistent="true">20</ehcache:disk>
+		</ehcache:resources>
+	</ehcache:cache>
+</ehcache:config>

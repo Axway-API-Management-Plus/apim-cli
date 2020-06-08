@@ -40,7 +40,7 @@
               <directory>src/main/resources</directory>
               <outputDirectory>/lib</outputDirectory>
               <includes>
-                  <include>log4j.xml</include>
+                  <include>*.xml</include>
               </includes>
           </fileSet>
           <fileSet>

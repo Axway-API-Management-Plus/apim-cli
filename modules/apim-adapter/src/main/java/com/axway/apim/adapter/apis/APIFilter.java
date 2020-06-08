@@ -1,8 +1,11 @@
 package com.axway.apim.adapter.apis;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
@@ -12,6 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.api.API;
+import com.axway.apim.api.model.OutboundProfile;
+import com.axway.apim.api.model.Policy;
+import com.axway.apim.lib.errorHandling.AppException;
 
 public class APIFilter {
 	
@@ -36,6 +43,8 @@ public class APIFilter {
 	private String apiPath;
 	private String queryStringVersion;
 	private String state;
+	
+	private String policyName;
 	
 	private Map<String, String> customProperties;
 	
@@ -116,6 +125,15 @@ public class APIFilter {
 
 	public String getVhost() {
 		return vhost;
+	}
+	
+	public void setPolicyName(String policyName) {
+		if(policyName!=null) this.translatePolicyMode = POLICY_TRANSLATION.TO_NAME;
+		this.policyName = policyName;
+	}
+
+	public String getPolicyName() {
+		return policyName;
 	}
 
 	public String getApiType() {
@@ -320,8 +338,50 @@ public class APIFilter {
 	}
 	
 	
-	
-	
+	public boolean filter(API api) throws AppException {
+		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null) { // Nothing given to filter out.
+			return true;
+		}
+		// Before 7.7, we have to filter out APIs manually!
+		if(!APIManagerAdapter.hasAPIManagerVersion("7.7")) {
+			if(this.getApiPath()!=null && this.getApiPath().contains("*")) {
+				Pattern pattern = Pattern.compile(this.getApiPath().replace("*", ".*"));
+				Matcher matcher = pattern.matcher(api.getPath());
+				if(!matcher.matches()) {
+					return false;
+				}
+			} else {
+				if(this.getApiPath()!=null && !this.getApiPath().equals(api.getPath())) return false;
+			}
+		}
+		if(this.getPolicyName()!=null && this.getPolicyName().contains("*")) {
+			Pattern pattern = Pattern.compile(this.getPolicyName().replace("*", ".*"));
+			Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
+			boolean requestedPolicyUsed = false;
+			while(it.hasNext()) {
+				OutboundProfile profile = it.next();
+				for(Policy policy : profile.getAllPolices()) {
+					if(policy.getName()==null) {
+						LOG.warn("Cannot check policy: "+policy+" as policy name is empty.");
+						continue;
+					}
+					Matcher matcher = pattern.matcher(policy.getName());
+					if(matcher.matches()) {
+						requestedPolicyUsed = true;
+						break;
+					}
+				}
+			}
+			if(!requestedPolicyUsed) return false;
+		} else {
+			if(this.getApiPath()!=null && !this.getApiPath().equals(api.getPath())) return false;
+		}
+		if(this.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
+			if(this.getVhost()!=null && !this.getVhost().equals(api.getVhost()))  return false;
+			if(this.getQueryStringVersion()!=null && !this.getQueryStringVersion().equals(api.getApiRoutingKey()))  return false;
+		}
+		return true;
+	}
 
 
 	/**
@@ -360,6 +420,7 @@ public class APIFilter {
 		String apiId;
 		String name;
 		String vhost;
+		String policyName;
 		String apiPath;
 		String queryStringVersion;
 		String state;
@@ -416,6 +477,7 @@ public class APIFilter {
 			apiFilter.setQueryStringVersion(this.queryStringVersion);
 			apiFilter.setVhost(this.vhost);
 			apiFilter.setName(this.name);
+			apiFilter.setPolicyName(this.policyName);
 			apiFilter.setFilters(this.filters);
 			apiFilter.setId(this.id);
 			apiFilter.setApiId(apiId);
@@ -481,6 +543,11 @@ public class APIFilter {
 		
 		public Builder hasState(String state) {
 			this.state = state;
+			return this;
+		}
+		
+		public Builder hasPolicyName(String policyName) {
+			this.policyName = policyName;
 			return this;
 		}
 		

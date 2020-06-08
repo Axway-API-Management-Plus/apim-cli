@@ -16,6 +16,14 @@ public class APIExportParams extends CommandParameters {
 		return (APIExportParams)CommandParameters.getInstance();
 	}
 	
+	public String getAPIName() {
+		return getValue("name");
+	}
+	
+	public String getAPIId() {
+		return getValue("id");
+	}
+	
 	public boolean deleteLocalFolder() {
 		if(getValue("deleteFolder")==null) return false;
 		return Boolean.parseBoolean(getValue("deleteFolder"));

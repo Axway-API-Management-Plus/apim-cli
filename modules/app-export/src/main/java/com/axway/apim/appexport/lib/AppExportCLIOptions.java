@@ -17,6 +17,10 @@ public class AppExportCLIOptions extends APIMCoreCLIOptions {
 		option.setRequired(false);
 		options.addOption(option);
 		
+		option = new  Option("id", true, "The ID of the application.");
+		option.setRequired(false);
+		options.addOption(option);
+		
 		option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
 				+ "Will be used to lookup the stage config");
 		option.setArgName("preprod");

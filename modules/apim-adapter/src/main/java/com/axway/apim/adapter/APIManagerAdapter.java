@@ -2,6 +2,7 @@ package com.axway.apim.adapter;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +23,12 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.PersistentCacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.xml.XmlConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +90,8 @@ public class APIManagerAdapter {
 	public final static String TYPE_FRONT_END = "proxies";
 	public final static String TYPE_BACK_END = "apirepo";
 	
+	public static CacheManager cacheManager = getCacheManager();
+	
 	public APIManagerConfigAdapter configAdapter = new APIManagerConfigAdapter();
 	public APIAdapter apiAdapter;
 	public APIManagerAPIMethodAdapter methodAdapter = new APIManagerAPIMethodAdapter();
@@ -105,6 +114,7 @@ public class APIManagerAdapter {
 	}
 	
 	public static synchronized void deleteInstance() throws AppException {
+			APIManagerAdapter.cacheManager.close();
 			APIManagerAdapter.instance = null;
 	}
 	
@@ -221,6 +231,15 @@ public class APIManagerAdapter {
 				break;
 			}
 		}
+	}
+	
+	public static CacheManager getCacheManager() {
+		if(APIManagerAdapter.cacheManager!=null) return APIManagerAdapter.cacheManager;
+		URL myUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
+		XmlConfiguration xmlConfig = new XmlConfiguration(myUrl);
+		CacheManager cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
+		cacheManager.init();
+		return cacheManager;
 	}
 	
 	/**

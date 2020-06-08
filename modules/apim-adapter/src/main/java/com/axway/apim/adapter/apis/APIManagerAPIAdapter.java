@@ -12,8 +12,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -150,41 +148,22 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	private List<API> filterAPIs(APIFilter filter, boolean logMessage) throws AppException, JsonParseException, JsonMappingException, IOException {
 		List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>(){});
 		List<API> foundAPIs = new ArrayList<API>();
-		if(filter.getApiPath()==null && filter.getVhost()==null && filter.getQueryStringVersion()==null && apis.size()==1) {
+		if(filter.getApiPath()==null && filter.getVhost()==null && filter.getQueryStringVersion()==null && apis.size()==1 && filter.getPolicyName()==null) {
 			return apis;
 		}
-			for(API api : apis) {
-				if(filter.getApiPath()==null && filter.getVhost()==null && filter.getQueryStringVersion()==null) { // Nothing given to filter out.
-					foundAPIs.add(api);
-					continue;
-				}
-				// Before 7.7, we have to filter out APIs manually!
-				if(!APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-					if(filter.getApiPath().contains("*")) {
-						Pattern pattern = Pattern.compile(filter.getApiPath().replace("*", ".*"));
-						Matcher matcher = pattern.matcher(api.getPath());
-						if(!matcher.matches()) {
-							continue;
-						}
-					} else {
-						if(filter.getApiPath()!=null && !filter.getApiPath().equals(api.getPath())) continue;
-					}
-				}
-				if(filter.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
-					if(filter.getVhost()!=null && !filter.getVhost().equals(api.getVhost())) continue;
-					if(filter.getQueryStringVersion()!=null && !filter.getQueryStringVersion().equals(api.getApiRoutingKey())) continue;
-				}
-				foundAPIs.add(api);
-			}
-			if(foundAPIs.size()!=0) {
-				String dbgCrit = "";
-				if(foundAPIs.size()>1) 
-					dbgCrit = " (apiPath: '"+filter.getApiPath()+"', filter: "+filter+", vhost: '"+filter.getVhost()+"', requestedType: "+filter.getApiType()+")";
-				LOG.info("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
-				return foundAPIs;
-			}
-			LOG.info("No existing API found based on filter: " + getFilterFields(filter));
+		for(API api : apis) {
+			if(!filter.filter(api)) continue; 
+			foundAPIs.add(api);
+		}
+		if(foundAPIs.size()!=0) {
+			String dbgCrit = "";
+			if(foundAPIs.size()>1) 
+				dbgCrit = " (apiPath: '"+filter.getApiPath()+"', filter: "+filter+", vhost: '"+filter.getVhost()+"', requestedType: "+filter.getApiType()+")";
+			LOG.info("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
 			return foundAPIs;
+		}
+		LOG.info("No existing API found based on filter: " + getFilterFields(filter));
+		return foundAPIs;
 	}
 	
 	/**
@@ -347,12 +326,6 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	
 	private void addClientOrganizations(List<API> apis, boolean addClientOrganizations) throws AppException {
 		if(!addClientOrganizations || !APIManagerAdapter.hasAdminAccount()) return;
-		/*if(desiredAPI.getState().equals(IAPI.STATE_UNPUBLISHED)) {
-			LOG.info("Ignoring Client-Organizations, as desired API-State is Unpublished!");
-			return;
-		}
-		if(desiredAPI.getClientOrganizations()==null && desiredAPI.getApplications()==null 
-				&& CommandParameters.getInstance().getClientOrgsMode().equals(CommandParameters.MODE_REPLACE)) return;*/
 		List<Organization> grantedOrgs;
 		List<Organization> allOrgs = apim.orgAdapter.getAllOrgs();
 		for(API api : apis) {

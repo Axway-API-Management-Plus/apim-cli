@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
@@ -74,7 +72,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	 */
 	private void readApplicationsFromAPIManager(ClientAppFilter filter) throws AppException {
 		if(this.apiManagerResponse !=null && this.apiManagerResponse.get(filter)!=null) return;
-		HttpResponse response = null;
+		HttpResponse httpResponse = null;
 		try {
 			String requestedId = "";
 			if(filter.getApplicationId()!=null) {
@@ -85,15 +83,18 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 					.build();
 			LOG.debug("Sending request to find existing applications: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
-			
-			response = getRequest.execute();
-			this.apiManagerResponse.put(filter,EntityUtils.toString(response.getEntity(), "UTF-8"));
+			httpResponse = getRequest.execute();
+			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
+			if(response.startsWith("{")) { // Got a single response!
+				response = "["+response+"]";
+			}
+			this.apiManagerResponse.put(filter,response);
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
-				if(response!=null) 
-					((CloseableHttpResponse)response).close();
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}

@@ -12,6 +12,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.jackson.PolicyDeserializer;
 import com.axway.apim.adapter.apis.jackson.PolicySerializer;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -99,6 +100,16 @@ public class OutboundProfile extends Profile {
 
 	public List<Object> getParameters() {
 		return parameters;
+	}
+	
+	@JsonIgnore
+	public List<Policy> getAllPolices() {
+		List<Policy> usedPolicies = new ArrayList<Policy>();
+		if(this.requestPolicy!=null) usedPolicies.add(this.requestPolicy);
+		if(this.routePolicy!=null) usedPolicies.add(this.routePolicy);
+		if(this.responsePolicy!=null) usedPolicies.add(this.responsePolicy);
+		if(this.faultHandlerPolicy!=null) usedPolicies.add(this.faultHandlerPolicy);
+		return usedPolicies;
 	}
 
 	@SuppressWarnings("unchecked")

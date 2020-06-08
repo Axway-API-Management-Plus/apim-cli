@@ -29,6 +29,10 @@ public class AppExportParams extends CommandParameters {
 		return getValue("name");
 	}
 	
+	public String getAppId() {
+		return getValue("id");
+	}
+	
 	public String getOrgName() {
 		return getValue("orgName");
 	}

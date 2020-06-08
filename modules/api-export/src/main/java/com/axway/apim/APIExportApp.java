@@ -47,7 +47,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	private static int runExport(String[] args, ExportImpl exportImpl) {
 		try {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
-			APIManagerAdapter.deleteInstance();
+			//APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
 			Transaction.deleteInstance();
@@ -57,6 +57,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			APIFilter filter = new APIFilter.Builder(Type.ACTUAL_API)
 					.hasVHost(params.getValue("vhost"))
 					.hasApiPath(params.getValue("api-path"))
+					.hasId(params.getValue("id"))
 					.hasName(params.getValue("name"))
 					.hasState(params.getValue("state"))
 					.includeQuotas(true)
@@ -79,6 +80,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 					LOG.debug("Successfully selected " + apis.size() + " API(s).");
 				}
 			}
+			APIManagerAdapter.deleteInstance();
 			return 0;
 		} catch (AppException ap) {
 			ErrorState errorState = ErrorState.getInstance();

@@ -12,6 +12,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,13 +42,26 @@ public class APIManagerAPIAccessAdapter {
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerAPIAccessAdapter.class);
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
+	
+	private Map<Type, Cache<String, String>> caches = new HashMap<Type, Cache<String, String>>();
 
-	public APIManagerAPIAccessAdapter() {}
+	public APIManagerAPIAccessAdapter() {
+		caches.put(Type.applications, APIManagerAdapter.cacheManager.getCache("applicationAPIAccessCache", String.class, String.class));
+		caches.put(Type.organizations, APIManagerAdapter.cacheManager.getCache("organizationAPIAccessCache", String.class, String.class));
+	}
 	
 	Map<Type, Map<String, String>> apiManagerResponse = new HashMap<Type, Map<String,String>>();
 	
 	private void readAPIAccessFromAPIManager(Type type, String id) throws AppException {
 		if(apiManagerResponse.get(type)!=null && apiManagerResponse.get(type).get(id)!=null) return;
+		Map<String, String> mappedResponse = new HashMap<String, String>();
+		
+		String cachedResponse = getFromCache(id, type);
+		if(cachedResponse!=null) {
+			mappedResponse.put(id, cachedResponse);
+			if(cachedResponse!=null) apiManagerResponse.put(type, mappedResponse);
+			return;
+		}
 		String response = null;
 		URI uri;
 		HttpResponse httpResponse = null;
@@ -56,9 +70,9 @@ public class APIManagerAPIAccessAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
-			Map<String, String> mappedResponse = new HashMap<String, String>();
 			mappedResponse.put(id, response);
 			apiManagerResponse.put(type, mappedResponse);
+			putToCache(id, type, response);
 		} catch (Exception e) {
 			LOG.error("Error cant load API-Access for "+type+" from API-Manager. Can't parse response: " + response);
 			throw new AppException("API-Access for "+type+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -91,6 +105,26 @@ public class APIManagerAPIAccessAdapter {
 		} catch (Exception e) {
 			LOG.error("Error cant load API-Access for "+type+" from API-Manager. Can't parse response: " + apiAccessResponse);
 			throw new AppException("Error loading API-Access for "+type+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	private String getFromCache(String id, Type type) {
+		Cache<String, String> usedCache = caches.get(type);
+		if(usedCache!=null && caches.get(type).get(id)!=null) {
+			if(LOG.isDebugEnabled())
+				LOG.debug("Return APIAccess for " + type + ": " + id + " from cache.");
+			return caches.get(type).get(id);
+		} else {
+			if(LOG.isDebugEnabled())
+				LOG.debug("No cache hit for APIAccess " + type + " " + id);
+			return null;
+		}
+	}
+	
+	private void putToCache(String id, Type type, String allApiAccess) {
+		Cache<String, String> usedCache = caches.get(type);
+		if(usedCache!=null) {
+			usedCache.put(id, allApiAccess);
 		}
 	}
 	
