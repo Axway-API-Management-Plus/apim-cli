@@ -46,7 +46,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 		return "Manage your applications";
 	}
 
-	@CLIServiceMethod(name = "import", description = "Import an applications into the API-Manager")
+	@CLIServiceMethod(name = "import", description = "Import application(s) into the API-Manager")
 	public static int importApp(String[] args) {
 		try {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
