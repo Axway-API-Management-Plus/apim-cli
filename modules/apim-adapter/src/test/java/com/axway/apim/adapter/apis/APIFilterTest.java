@@ -1,7 +1,6 @@
 package com.axway.apim.adapter.apis;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -9,7 +8,6 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
-import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 
@@ -18,7 +16,6 @@ public class APIFilterTest {
 	@BeforeClass
 	public void setupTestIndicator() {
 		TestIndicator.getInstance().setTestRunning(true);
-		new CommandParameters(new HashMap<String, String>());
 	}
 	
 	@Test

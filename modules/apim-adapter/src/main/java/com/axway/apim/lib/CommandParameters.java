@@ -1,5 +1,6 @@
 package com.axway.apim.lib;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
@@ -61,7 +62,7 @@ public class CommandParameters {
 	
 	public static synchronized CommandParameters getInstance() {
 		if(CommandParameters.instance == null && TestIndicator.getInstance().isTestRunning()) {
-			return null; // Skip this, if executed as a test
+			return new CommandParameters(new HashMap<>()); // Skip this, just return an empty CommandParams to avoid NPE
 		}
 		if (CommandParameters.instance == null) {
 			LOG.error("CommandParameters has not been initialized.");

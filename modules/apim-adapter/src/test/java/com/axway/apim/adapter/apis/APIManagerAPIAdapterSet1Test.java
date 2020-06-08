@@ -3,7 +3,6 @@ package com.axway.apim.adapter.apis;
 import static org.testng.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +18,6 @@ import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.QuotaRestrictiontype;
-import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
@@ -28,7 +26,6 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	
 	@BeforeClass
 	private void initTestIndicator() throws AppException, IOException {
-		new CommandParameters(new HashMap<String, String>());
 		setupMockData();
 	}
 	
