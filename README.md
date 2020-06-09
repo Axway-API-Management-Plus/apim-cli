@@ -51,6 +51,8 @@ scripts\apim api import -c samples/basic/minimal-config-api-definition.json -s a
 ```
 This command is reading the API-Management platform configuration details from the environment file: `env.api-env.properties` and replicates the given desired API state in the configuration file: `minimal-config-api-definition.json` into the API-Management platform. 
 
+Please see the [documentation](https://github.com/Axway-API-Management-Plus/apim-cli/wikis) for more information.  
+
 ## Changelog
 See [change log](CHANGELOG.md)
 
