@@ -64,6 +64,7 @@ import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
+import com.axway.apim.api.model.OAuthClientProfile;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.QuotaRestriction;
@@ -808,10 +809,21 @@ public class APIImportConfigAdapter {
 	private void validateOutboundAuthN(API importApi) throws AppException {
 		// Request to use some specific Outbound-AuthN for this API
 		if(importApi.getAuthenticationProfiles()!=null && importApi.getAuthenticationProfiles().size()!=0) {
-			if(importApi.getAuthenticationProfiles().get(0).getType().equals(AuthType.ssl)) 
+			if(importApi.getAuthenticationProfiles().get(0).getType().equals(AuthType.ssl)) { 
 				handleOutboundSSLAuthN(importApi.getAuthenticationProfiles().get(0));
+			} else if(importApi.getAuthenticationProfiles().get(0).getType().equals(AuthType.oauth)) {
+				handleOutboundOAuthAuthN(importApi.getAuthenticationProfiles().get(0));
+			}
 		}
 		
+	}
+	
+	private void handleOutboundOAuthAuthN(AuthenticationProfile authnProfile) throws AppException {
+		if(!authnProfile.getType().equals(AuthType.oauth)) return;
+		String providerProfile = (String)authnProfile.getParameters().get("providerProfile");
+		if(providerProfile!=null && providerProfile.startsWith("<key")) return;
+		OAuthClientProfile clientProfile = APIManagerAdapter.getInstance().oauthClientAdapter.getOAuthClientProfile(providerProfile);
+		authnProfile.getParameters().put("providerProfile", clientProfile.getId());
 	}
 	
 	private void handleOutboundSSLAuthN(AuthenticationProfile authnProfile) throws AppException {

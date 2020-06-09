@@ -35,6 +35,7 @@ import com.axway.apim.adapter.apis.APIAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.adapter.apis.APIManagerConfigAdapter;
+import com.axway.apim.adapter.apis.APIManagerOAuthClientProfilesAdapter;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter;
 import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
@@ -101,6 +102,7 @@ public class APIManagerAdapter {
 	public APIManagerQuotaAdapter quotaAdapter;
 	public APIManagerOrganizationAdapter orgAdapter;
 	public APIManagerAPIAccessAdapter accessAdapter;
+	public APIManagerOAuthClientProfilesAdapter oauthClientAdapter;
 	public APIMgrAppsAdapter appAdapter;
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
@@ -132,6 +134,7 @@ public class APIManagerAdapter {
 		this.quotaAdapter = new APIManagerQuotaAdapter();
 		this.orgAdapter = new APIManagerOrganizationAdapter();
 		this.accessAdapter = new APIManagerAPIAccessAdapter();
+		this.oauthClientAdapter = new APIManagerOAuthClientProfilesAdapter();
 		this.appAdapter = new APIMgrAppsAdapter();
 		if(TestIndicator.getInstance().isTestRunning()) {
 			this.hasAdminAccount = true; // For unit tests we have an admin account
