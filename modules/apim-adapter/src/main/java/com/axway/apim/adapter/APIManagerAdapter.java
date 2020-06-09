@@ -114,8 +114,11 @@ public class APIManagerAdapter {
 	}
 	
 	public static synchronized void deleteInstance() throws AppException {
-		if(APIManagerAdapter.cacheManager!=null && APIManagerAdapter.cacheManager.getStatus()==Status.AVAILABLE) 
+		if(APIManagerAdapter.cacheManager!=null && APIManagerAdapter.cacheManager.getStatus()==Status.AVAILABLE) {
+			LOG.trace("Closing cache begin");
 			APIManagerAdapter.cacheManager.close();
+			LOG.trace("Closing cache end");
+		}
 		APIManagerAdapter.instance = null;
 	}
 	
