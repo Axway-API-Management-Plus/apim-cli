@@ -1,14 +1,14 @@
 ---
 name: Bug report
-about: Create a report to help us improve Swagger-Promote
+about: Create a report to help us to improve the API-Manager CLI
 title: "[BUG]"
 labels: bug
 assignees: cwiechmann
 
 ---
 
-**Swagger-Promote version**
-> Please make sure to use the latest Swagger-Promote version.
+**API-Mgr. CLI version**
+> Please make sure to use the latest available version before reporting a bug.
 
 **API-Manager and Service-Pack Version**
 
