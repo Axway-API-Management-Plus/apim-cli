@@ -29,7 +29,7 @@ import com.axway.apim.lib.utils.rest.Transaction;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IResponseParser {
+public class UpdateQuotaConfiguration extends AbstractAPIMTask {
 	
 	private static int QUOTA_UPDATE_SUCCESS = 1;
 	private static int QUOTA_UPDATE_FAIL = 2;
@@ -59,7 +59,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 				addOrMergeRestriction(systemQuota.getRestrictions(), desiredState.getSystemQuota().getRestrictions());
 				context.put(QUOTA_UPDATE_SUCCESS, "System-Default quota successfully updated for API: " + desiredState.getName());
 				context.put(QUOTA_UPDATE_FAIL, "System-Default quota successfully updated for API: " + desiredState.getName());
-				updateQuotaConfig(systemQuota, systemQuota.getId());
+				APIManagerAdapter.getInstance().quotaAdapter.saveQuota(systemQuota, systemQuota.getId());
 			}
 		}
 		if(desiredState.getApplicationQuota()!=null) {
@@ -75,7 +75,7 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 				addOrMergeRestriction(applicationQuota.getRestrictions(), desiredState.getApplicationQuota().getRestrictions());
 				context.put(QUOTA_UPDATE_SUCCESS, "Application-Default quota successfully updated: " + desiredState.getName());
 				context.put(QUOTA_UPDATE_FAIL, "Application-Default quota successfully updated: " + desiredState.getName());
-				updateQuotaConfig(applicationQuota, applicationQuota.getId());
+				APIManagerAdapter.getInstance().quotaAdapter.saveQuota(applicationQuota, applicationQuota.getId());
 			}
 		}
 	}
@@ -120,54 +120,5 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask implements IRespo
 		}
 		// And all new desired restrictions
 		existingRestrictions.addAll(newDesiredRestrictions);
-	}
-	
-	
-	private void updateQuotaConfig(APIQuota quotaConfig, String quotaId) throws AppException {
-		URI uri;
-		HttpEntity entity;
-		ObjectMapper objectMapper = new ObjectMapper();
-		
-		RestAPICall apiCall;
-		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/quotas/"+quotaId).build();
-			
-			entity = new StringEntity(objectMapper.writeValueAsString(quotaConfig), StandardCharsets.UTF_8);
-			
-			apiCall = new PUTRequest(entity, uri, this, true);
-			apiCall.execute();
-		} catch (Exception e) {
-			throw new AppException("Can't update Quota-Configuration in API-Manager.", ErrorCode.CANT_UPDATE_QUOTA_CONFIG, e);
-		}	
-	}
-	
-	@Override
-	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		String response = null;
-		Transaction context = Transaction.getInstance();
-		try {
-			if(context.get("responseMessage")!=null) {
-				LOG.info(""+context.get("responseMessage"));
-				return null;
-			} else {
-				try {
-					response = EntityUtils.toString(httpResponse.getEntity());
-					JsonNode jsonNode = objectMapper.readTree(response);
-					String backendAPIId = jsonNode.findPath("id").asText();
-					Transaction.getInstance().put("backendAPIId", backendAPIId);
-					// The action was successful, update the status!
-					this.actualState.setState(desiredState.getState());
-					LOG.info((String)context.get(QUOTA_UPDATE_SUCCESS));
-					return null;
-				} catch (Exception e1) {
-					throw new AppException((String)context.get(QUOTA_UPDATE_FAIL), ErrorCode.CANT_UPDATE_QUOTA_CONFIG, e1);
-				}
-			}
-		} finally {
-			try {
-				((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) { }
-		}
 	}
 }

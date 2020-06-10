@@ -39,6 +39,9 @@ The automated End-2-End test suite contains of __113__ different scenarios, whic
 | Version       | Branch               | Status | Comment | 
 | :---          | :---                 | :---:  | :--- |
 | 7.6.2 SP4     | develop  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.7.0 SP2     | test-with-7.7-SP2  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=test-with-7.7-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.7-20200130    | test-with-7.7-20200130  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=test-with-7.7-20200130)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.7-20200331    | test-with-7.7-20200331  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=test-with-7.7-20200331)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
 
 Version 7.5.3 is NOT supported.  
 
@@ -57,6 +60,8 @@ Please see the [documentation](https://github.com/Axway-API-Management-Plus/apim
 See [change log](CHANGELOG.md)
 
 ## Contributing
+
+![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen)  
 
 Please read [Contributing.md](https://github.com/Axway-API-Management-Plus/Common/blob/master/Contributing.md) for details on our code of conduct, and the process for submitting pull requests to us.  
 Also please read this page on [how to contribute](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki/7.1-Contribute-to-this-project) to this project.

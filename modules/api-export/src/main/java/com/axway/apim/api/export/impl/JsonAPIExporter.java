@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
-import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
+import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
@@ -60,7 +60,7 @@ public class JsonAPIExporter extends APIExporter {
 	
 	@Override
 	public APIFilter getFilter() {
-		APIFilter filter = new APIFilter.Builder(Type.ACTUAL_API)
+		APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API)
 				.hasVHost(params.getValue("vhost"))
 				.hasApiPath(params.getValue("api-path"))
 				.hasId(params.getValue("id"))
