@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
@@ -344,6 +345,8 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	}
 	
 	public void addClientApplications(API api, APIFilter filter) throws AppException {
+		// Ignore the cache, when loading the API-Access during import
+		boolean ignoreCache = (filter.getType().equals(APIType.ACTUAL_API_FOR_IMPORT)) ? true : false;
 		if(!filter.isIncludeClientApplications()) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> apps = null;
@@ -356,7 +359,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 					.includeQuotas(filter.isIncludeClientAppQuota())
 					.build(), false);
 			for(ClientApplication app : apps) {
-				List<APIAccess> APIAccess = apim.accessAdapter.getAPIAccess(app.getId(), APIManagerAPIAccessAdapter.Type.applications);
+				List<APIAccess> APIAccess = apim.accessAdapter.getAPIAccess(app.getId(), APIManagerAPIAccessAdapter.Type.applications, true, ignoreCache);
 				app.setApiAccess(APIAccess);
 				for(APIAccess access : APIAccess) {
 					if(access.getApiId().equals(api.getId())) {

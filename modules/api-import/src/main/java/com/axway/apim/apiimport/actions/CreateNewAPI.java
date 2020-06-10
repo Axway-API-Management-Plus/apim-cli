@@ -10,12 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
-import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
+import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.apiimport.APIImportManager;
-import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.apiimport.actions.tasks.CreateAPIProxy;
 import com.axway.apim.apiimport.actions.tasks.ImportBackendAPI;
 import com.axway.apim.apiimport.actions.tasks.ManageClientApps;
@@ -77,7 +76,7 @@ public class CreateNewAPI {
 
 		try {
 			// As we have just created an API-Manager API, we should reflect this for further processing
-			APIFilter filter = new APIFilter.Builder(Type.ACTUAL_API).build();
+			APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API_FOR_IMPORT).build();
 			createdAPI = ((APIManagerAPIAdapter)APIManagerAdapter.getInstance().apiAdapter).setAPIManagerResponse(filter, "["+context.get("lastResponse").toString()+"]").getAPI(filter, true);
 			// Register the created FE-API to be rolled back in case of an error
 			((API)rollbackAPI).setId(createdAPI.getId());
