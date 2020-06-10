@@ -16,7 +16,9 @@ import org.apache.http.util.EntityUtils;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
+import com.axway.apim.adapter.apis.jackson.PolicySerializer;
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.Policy;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -27,6 +29,7 @@ import com.axway.apim.lib.utils.rest.Transaction;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class UpdateAPIProxy extends AbstractAPIMTask {
 	
@@ -40,6 +43,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask {
 		HttpEntity entity;
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
+		objectMapper.registerModule(new SimpleModule().addSerializer(Policy.class, new PolicySerializer()));
 		HttpResponse httpResponse = null;
 		Transaction context = Transaction.getInstance();
 		
@@ -64,7 +68,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode < 200 || statusCode > 299){
 				LOG.error("Error updating API-Proxy. Response-Code: "+statusCode+". Got response: '"+response+"'");
-				LOG.debug("Request send:" + lastJsonReponse);
+				LOG.debug("Request sent:" + lastJsonReponse);
 				throw new AppException("Error updating API-Proxy. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 		} catch (Exception e) {
