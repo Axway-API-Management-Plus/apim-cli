@@ -124,6 +124,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				if(statusCode == 403 && filter.getId()!=null) {
 					ErrorState.getInstance().setError("Unable to find API with ID: "+filter.getId()+". Please have in mind during API-Update the ID is re-created!", ErrorCode.UNKNOWN_API, false);
 					apiManagerResponse.put(filter, "[]");
+					return;
 				}
 				LOG.error("Error loading APIs from API-Manager. Response-Code: "+statusCode+". Got response: '"+response+"'");
 				throw new AppException("Error loading APIs from API-Manager. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
