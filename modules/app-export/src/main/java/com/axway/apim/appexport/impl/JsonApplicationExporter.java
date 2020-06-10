@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.jackson.JSONViews;
+import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.jackson.AppExportSerializerModifier;
@@ -24,13 +25,13 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class JsonApplicationExporter extends ApplicationExporter {
 
-	public JsonApplicationExporter(List<ClientApplication> apps, AppExportParams params) {
-		super(apps, params);
+	public JsonApplicationExporter(AppExportParams params) {
+		super(params);
 	}
 
 	@Override
-	public void export() throws AppException {
-		for(ClientApplication app : this.apps) {
+	public void export(List<ClientApplication> apps) throws AppException {
+		for(ClientApplication app : apps) {
 			saveApplicationLocally(new ExportApplication(app));
 		}
 	}
@@ -110,4 +111,17 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		}
 	}
 
+	@Override
+	public ClientAppFilter getFilter() throws AppException {
+		return new ClientAppFilter.Builder()
+				.hasState(AppExportParams.getInstance().getAppState())
+				.hasName(AppExportParams.getInstance().getAppName())
+				.hasId(AppExportParams.getInstance().getAppId())
+				.hasOrganizationName(AppExportParams.getInstance().getOrgName())
+				.includeQuotas(true)
+				.includeCredentials(true)
+				.includeAPIAccess(true)
+				.includeImage(true)
+				.build();
+	}
 }

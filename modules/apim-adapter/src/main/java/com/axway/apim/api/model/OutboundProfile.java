@@ -23,19 +23,19 @@ public class OutboundProfile extends Profile {
 	String routeType;
 	
 	@JsonDeserialize( using = PolicyDeserializer.class)
-	@JsonSerialize(using = PolicySerializer.class)
+	//@JsonSerialize(using = PolicySerializer.class)
 	Policy requestPolicy;
 	
 	@JsonDeserialize( using = PolicyDeserializer.class)
-	@JsonSerialize(using = PolicySerializer.class)
+	//@JsonSerialize(using = PolicySerializer.class)
 	Policy responsePolicy;
 	
 	@JsonDeserialize( using = PolicyDeserializer.class)
-	@JsonSerialize(using = PolicySerializer.class)
+	//@JsonSerialize(using = PolicySerializer.class)
 	Policy routePolicy;
 	
 	@JsonDeserialize( using = PolicyDeserializer.class)
-	@JsonSerialize(using = PolicySerializer.class)
+	//@JsonSerialize(using = PolicySerializer.class)
 	Policy faultHandlerPolicy;
 	
 	String authenticationProfile;

@@ -95,7 +95,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
 			new APIImportManager().applyChanges(changeActions);
 			APIPropertiesExport.getInstance().store();
-			LOG.info("Successfully replicated API-State into API-Manager");
+			LOG.info("Successfully replicated API: "+desiredAPI.getName()+" ("+desiredAPI.getId()+") into API-Manager");
 			return 0;
 		} catch (AppException ap) {
 			APIPropertiesExport.getInstance().store(); // Try to create it, even 

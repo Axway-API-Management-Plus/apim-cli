@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIExportParams;
@@ -28,8 +29,46 @@ public class ConsoleAPIExporter extends APIExporter {
 
 	@Override
 	public void export(List<API> apis) throws AppException {
+		switch(params.getWide()) {
+		case standard:
+			printStandard(apis);
+			break;
+		case wide:
+			printWide(apis);
+			break;
+		case ultra:
+			printUltra(apis);
+			break;
+		}
+	}
+	
+	private void printStandard(List<API> apis) {
 		System.out.println(AsciiTable.getTable(apis, Arrays.asList(
 				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getId()),
+				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getPath(api)),
+				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getName()),
+				new Column().header("Version").with(api -> api.getVersion()
+				))));
+	}
+	
+	private void printWide(List<API> apis) {
+		System.out.println(AsciiTable.getTable(apis, Arrays.asList(
+				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getId()),
+				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getPath(api)),
+				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getName()),
+				new Column().header("Version").with(api -> api.getVersion()),
+				new Column().header("V-Host").with(api -> api.getVhost()),
+				new Column().header("State").with(api -> getState(api)),
+				new Column().header("Security").with(api -> getUsedSecurity(api)),
+				new Column().header("Policies").with(api -> getUsedPolicies(api)),
+				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()
+				))));
+	}
+	
+	private void printUltra(List<API> apis) {
+		System.out.println(AsciiTable.getTable(apis, Arrays.asList(
+				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getId()),
+				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getPath(api)),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getName()),
 				new Column().header("Version").with(api -> api.getVersion()),
 				new Column().header("V-Host").with(api -> api.getVhost()),
@@ -58,6 +97,15 @@ public class ConsoleAPIExporter extends APIExporter {
 			return api.getState();
 		} catch (AppException e) {
 			LOG.error("Error getting API state");
+			return "Err";
+		}
+	}
+	
+	private String getPath(API api) {
+		try {
+			return api.getPath();
+		} catch (AppException e) {
+			LOG.error("Error getting API path");
 			return "Err";
 		}
 	}
@@ -120,17 +168,31 @@ public class ConsoleAPIExporter extends APIExporter {
 
 	@Override
 	public APIFilter getFilter() {
-		APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API)
+		Builder builder = new APIFilter.Builder(APIType.ACTUAL_API)
 				.hasVHost(params.getValue("vhost"))
 				.hasApiPath(params.getValue("api-path"))
-				.hasId(params.getValue("id"))
 				.hasName(params.getValue("name"))
 				.hasState(params.getValue("state"))
-				.includeQuotas(true)
 				.includeImage(false)
-				.includeOriginalAPIDefinition(false)
-				.includeClientAppQuota(false)
-				.build();
+				.includeOriginalAPIDefinition(false);
+
+		switch(params.getWide()) {
+		case standard:
+		case wide:
+			builder.includeQuotas(false);
+			builder.includeClientApplications(false);
+			builder.includeClientOrganizations(false);
+			builder.includeClientAppQuota(false);
+			builder.includeQuotas(false);
+			break;
+		case ultra:
+			builder.includeQuotas(true);
+			builder.includeClientAppQuota(false);
+			builder.includeClientApplications(true);
+			builder.includeClientOrganizations(true);
+			break;
+		}		
+		APIFilter filter = builder.build();
 		return filter;
 	}
 }

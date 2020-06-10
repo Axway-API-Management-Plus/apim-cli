@@ -56,7 +56,6 @@ public class ExportAPI {
 		return this.actualAPIProxy.getAPIDefinition();
 	}
 
-
 	public Map<String, OutboundProfile> getOutboundProfiles() throws AppException {
 		if(this.actualAPIProxy.getOutboundProfiles()==null) return null;
 		if(this.actualAPIProxy.getOutboundProfiles().isEmpty()) return null;

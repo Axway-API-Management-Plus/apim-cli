@@ -68,27 +68,18 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			
 			new AppExportParams(new AppExportCLIOptions(args));
 			ClientAppAdapter appAdapter = ClientAppAdapter.create(APIManagerAdapter.getInstance());
-			ClientAppFilter filter = new ClientAppFilter.Builder()
-					.hasState(AppExportParams.getInstance().getAppState())
-					.hasName(AppExportParams.getInstance().getAppName())
-					.hasId(AppExportParams.getInstance().getAppId())
-					.hasOrganizationName(AppExportParams.getInstance().getOrgName())
-					.includeQuotas(true)
-					.includeCredentials(true)
-					.includeAPIAccess(true)
-					.includeImage(true)
-					.build();
-			List<ClientApplication> apps = appAdapter.getApplications(filter, true);
+			ApplicationExporter exporter = ApplicationExporter.create(exportImpl, AppExportParams.getInstance());
+			List<ClientApplication> apps = appAdapter.getApplications(exporter.getFilter(), true);
 			if(apps.size()==0) {
 				if(LOG.isDebugEnabled()) {
-					LOG.info("No applications found using filter: " + filter);
+					LOG.info("No applications found using filter: " + exporter.getFilter());
 				} else {
 					LOG.info("No applications found based on the given criteria.");
 				}
 			} else {
 				LOG.info("Found " + apps.size() + " application(s).");
-				ApplicationExporter exporter = ApplicationExporter.create(apps, exportImpl, AppExportParams.getInstance());
-				exporter.export();
+				
+				exporter.export(apps);
 				if(exporter.hasError()) {
 					LOG.info("Please check the log. At least one error was recorded.");
 				} else {

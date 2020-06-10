@@ -133,7 +133,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		List<ClientApplication> apps;
 		try {
 			apps = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<ClientApplication>>(){});
-			LOG.info("Found: "+apps.size() + " applications");
+			LOG.debug("Found: "+apps.size() + " applications");
 			for(int i=0; i<apps.size();i++) {
 				ClientApplication app = apps.get(i);
 				addImage(app, filter.isIncludeImage());

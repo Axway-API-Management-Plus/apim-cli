@@ -171,7 +171,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			String dbgCrit = "";
 			if(foundAPIs.size()>1) 
 				dbgCrit = " (apiPath: '"+filter.getApiPath()+"', filter: "+filter+", vhost: '"+filter.getVhost()+"', requestedType: "+filter.getApiType()+")";
-			LOG.info("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
+			LOG.debug("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
 			return foundAPIs;
 		}
 		LOG.info("No existing API found based on filter: " + getFilterFields(filter));
