@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
@@ -46,8 +47,8 @@ public class APIManagerAPIAccessAdapter {
 	private Map<Type, Cache<String, String>> caches = new HashMap<Type, Cache<String, String>>();
 
 	public APIManagerAPIAccessAdapter() {
-		caches.put(Type.applications, APIManagerAdapter.getCacheManager().getCache("applicationAPIAccessCache", String.class, String.class));
-		caches.put(Type.organizations, APIManagerAdapter.getCacheManager().getCache("organizationAPIAccessCache", String.class, String.class));
+		caches.put(Type.applications, APIManagerAdapter.getCache(CacheType.applicationAPIAccessCache, String.class, String.class));
+		caches.put(Type.organizations, APIManagerAdapter.getCache(CacheType.organizationAPIAccessCache, String.class, String.class));
 	}
 	
 	Map<Type, Map<String, String>> apiManagerResponse = new HashMap<Type, Map<String,String>>();
@@ -113,13 +114,13 @@ public class APIManagerAPIAccessAdapter {
 	
 	private String getFromCache(String id, Type type) {
 		Cache<String, String> usedCache = caches.get(type);
-		if(usedCache!=null && caches.get(type).get(id)!=null && !caches.get(type).get(id).equals("[]")) {
+		if(usedCache!=null && caches.get(type).get(id)!=null) {
 			if(LOG.isDebugEnabled())
-				LOG.debug("Return APIAccess for " + type + ": " + id + " from cache.");
+				LOG.info("Return APIAccess for " + type + ": " + id + " from cache.");
 			return caches.get(type).get(id);
 		} else {
 			if(LOG.isDebugEnabled())
-				LOG.debug("No cache hit for APIAccess " + type + " " + id);
+				LOG.info("No cache hit for APIAccess " + type + " " + id);
 			return null;
 		}
 	}

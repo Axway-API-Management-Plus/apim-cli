@@ -38,6 +38,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -58,7 +59,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	
 	CommandParameters cmd = CommandParameters.getInstance();
 	
-	APIManagerAdapter apim; 
+	APIManagerAdapter apim;
 
 	APIManagerAPIAdapter() throws AppException {
 	}
@@ -73,19 +74,24 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	}
 
 	@Override
-	public List<API> getAPIs(APIFilter filter, boolean logMessage) throws AppException {
+	public List<API> getAPIs(APIFilter filter, boolean logStatusMessage) throws AppException {
 		List<API> apis = new ArrayList<API>();
 		try {
 			_readAPIsFromAPIManager(filter);
-			apis = filterAPIs(filter, logMessage);
-			translateMethodIds(apis, filter.getTranslateMethodMode());
-			addQuotaConfiguration(apis, filter.isIncludeQuotas());
-			addClientOrganizations(apis, filter.isIncludeClientOrganizations());
-			addClientApplications(apis, filter);
-			addExistingClientAppQuotas(apis, filter.isIncludeQuotas());
+			apis = filterAPIs(filter);
+			for(int i=0;i<apis.size();i++) {
+				API api = apis.get(i);
+				translateMethodIds(api, filter.getTranslateMethodMode());
+				addQuotaConfiguration(api, filter.isIncludeQuotas());
+				addClientOrganizations(api, filter.isIncludeClientOrganizations());
+				addClientApplications(api, filter);
+				addExistingClientAppQuotas(api, filter.isIncludeQuotas());
+				addOriginalAPIDefinitionFromAPIM(api, filter.isIncludeOriginalAPIDefinition());
+				addImageFromAPIM(api, filter.isIncludeImage());
+				if(logStatusMessage) Utils.progressPercentage(i, apis.size(), "Initializing APIs");
+			}
 			addCustomProperties(apis, filter);
-			addOriginalAPIDefinitionFromAPIM(apis, filter.isIncludeOriginalAPIDefinition());
-			addImageFromAPIM(apis, filter.isIncludeImage()); 
+			if(logStatusMessage) System.out.print("\n");
 		} catch (IOException e) {
 			throw new AppException("Cant reads API from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
@@ -111,6 +117,11 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null);
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode < 200 || statusCode > 299){
+				LOG.error("Error loading APIs from API-Manager. Response-Code: "+statusCode+". Got response: '"+response+"'");
+				throw new AppException("Error loading APIs from API-Manager. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
 			if(response.startsWith("{")) { // Got a single response!
 				response = "["+response+"]";
 			}
@@ -145,7 +156,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		return foundAPIs.get(0);
 	}
 
-	private List<API> filterAPIs(APIFilter filter, boolean logMessage) throws AppException, JsonParseException, JsonMappingException, IOException {
+	private List<API> filterAPIs(APIFilter filter) throws AppException, JsonParseException, JsonMappingException, IOException {
 		List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>(){});
 		List<API> foundAPIs = new ArrayList<API>();
 		if(filter.getApiPath()==null && filter.getVhost()==null && filter.getQueryStringVersion()==null && apis.size()==1 && filter.getPolicyName()==null) {
@@ -186,12 +197,10 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	 * @param mode translation direction 
 	 * @throws AppException if methods cannot be translated
 	 */
-	public <profile> void translateMethodIds(List<API> apis, METHOD_TRANSLATION mode) throws AppException {
+	public <profile> void translateMethodIds(API api, METHOD_TRANSLATION mode) throws AppException {
 		if(mode == METHOD_TRANSLATION.NONE) return;
-		for(API api : apis) {
-			if(api.getOutboundProfiles()!=null) _translateMethodIds(api.getOutboundProfiles(), mode, Arrays.asList(api.getId()));
-			if(api.getInboundProfiles()!=null) _translateMethodIds(api.getInboundProfiles(), mode, Arrays.asList(api.getId()));
-		}
+		if(api.getOutboundProfiles()!=null) _translateMethodIds(api.getOutboundProfiles(), mode, Arrays.asList(api.getId()));
+		if(api.getInboundProfiles()!=null) _translateMethodIds(api.getInboundProfiles(), mode, Arrays.asList(api.getId()));
 	}
 	
 	public <profile> void translateMethodIds(List<API> apis, List<String> apiIds, METHOD_TRANSLATION mode) throws AppException {
@@ -202,10 +211,9 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		}
 	}
 	
-	private void addImageFromAPIM(List<API> apis, boolean includeImage) throws AppException {
+	private void addImageFromAPIM(API api, boolean includeImage) throws AppException {
 		if(!includeImage) return;
 		Image image = new Image();
-		for(API api : apis) {
 			image = new Image();
 			URI uri;
 			HttpResponse httpResponse = null;
@@ -215,7 +223,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				httpResponse = getRequest.execute();
 				if(httpResponse == null || httpResponse.getEntity() == null || httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
 					api.setImage(null);
-					continue; // no Image found in API-Manager
+					return; // no Image found in API-Manager
 				}
 				InputStream is = httpResponse.getEntity().getContent();
 				image.setImageContent(IOUtils.toByteArray(is));
@@ -233,7 +241,6 @@ public class APIManagerAPIAdapter extends APIAdapter {
 						((CloseableHttpResponse)httpResponse).close();
 				} catch (Exception ignore) {}
 			}
-		}
 	}
 	
 	private <ProfileType> void _translateMethodIds(Map<String, ProfileType> profiles, METHOD_TRANSLATION mode, List<String> apiIds) throws AppException {
@@ -270,32 +277,28 @@ public class APIManagerAPIAdapter extends APIAdapter {
 		}
 	}
 	
-	private void addQuotaConfiguration(List<API> apis, boolean addQuota) throws AppException {
+	private void addQuotaConfiguration(API api, boolean addQuota) throws AppException {
 		if(!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
 		APIQuota applicationQuota = null;
 		APIQuota sytemQuota = null;
-		for(API api : apis) {			
-			try {
-				applicationQuota = apim.quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), api.getId()); // Get the Application-Default-Quota
-				sytemQuota = apim.quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), api.getId()); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
-				api.setApplicationQuota(applicationQuota);
-				api.setSystemQuota(sytemQuota);
-			} catch (AppException e) {
-				LOG.error("Application-Default quota response: '"+applicationQuota+"'");
-				LOG.error("System-Default quota response: '"+sytemQuota+"'");
-				throw e;
-			}
+		try {
+			applicationQuota = apim.quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), api.getId()); // Get the Application-Default-Quota
+			sytemQuota = apim.quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), api.getId()); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
+			api.setApplicationQuota(applicationQuota);
+			api.setSystemQuota(sytemQuota);
+		} catch (AppException e) {
+			LOG.error("Application-Default quota response: '"+applicationQuota+"'");
+			LOG.error("System-Default quota response: '"+sytemQuota+"'");
+			throw e;
 		}
 	}
 	
-	private void addExistingClientAppQuotas(List<API> apis, boolean addQuota) throws AppException {
+	private void addExistingClientAppQuotas(API api, boolean addQuota) throws AppException {
 		if(!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
-		for(API api : apis) {
-			if(api.getApplications()==null || api.getApplications().size()==0) return;
-			for(ClientApplication app : api.getApplications()) {
-				APIQuota appQuota = apim.quotaAdapter.getQuotaForAPI(app.getId(), null);
-				app.setAppQuota(appQuota);
-			}
+		if(api.getApplications()==null || api.getApplications().size()==0) return;
+		for(ClientApplication app : api.getApplications()) {
+			APIQuota appQuota = apim.quotaAdapter.getQuotaForAPI(app.getId(), null);
+			app.setAppQuota(appQuota);
 		}
 	}
 	
@@ -324,79 +327,71 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	
 	
 	
-	private void addClientOrganizations(List<API> apis, boolean addClientOrganizations) throws AppException {
+	private void addClientOrganizations(API api, boolean addClientOrganizations) throws AppException {
 		if(!addClientOrganizations || !APIManagerAdapter.hasAdminAccount()) return;
 		List<Organization> grantedOrgs;
 		List<Organization> allOrgs = apim.orgAdapter.getAllOrgs();
-		for(API api : apis) {
-			grantedOrgs = new ArrayList<Organization>();
-			for(Organization org : allOrgs) {
-				List<APIAccess> orgAPIAccess = apim.accessAdapter.getAPIAccess(org.getId(), APIManagerAPIAccessAdapter.Type.organizations);
-				for(APIAccess access : orgAPIAccess) {
-					if(access.getApiId().equals(api.getId())) {
-						grantedOrgs.add(org);
-					}
+		grantedOrgs = new ArrayList<Organization>();
+		for(Organization org : allOrgs) {
+			List<APIAccess> orgAPIAccess = apim.accessAdapter.getAPIAccess(org.getId(), APIManagerAPIAccessAdapter.Type.organizations);
+			for(APIAccess access : orgAPIAccess) {
+				if(access.getApiId().equals(api.getId())) {
+					grantedOrgs.add(org);
 				}
 			}
-			api.setClientOrganizations(grantedOrgs);
 		}
+		api.setClientOrganizations(grantedOrgs);
 	}
 	
-	public void addClientApplications(List<API> apis, APIFilter filter) throws AppException {
+	public void addClientApplications(API api, APIFilter filter) throws AppException {
 		if(!filter.isIncludeClientApplications()) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> apps = null;
 		// With version >7.7 we can retrieve the subscribed apps directly
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-			for(API api : apis) {
-				apps = apim.appAdapter.getAppsSubscribedWithAPI(api.getId());
-				api.setApplications(apps);
-			}
+			apps = apim.appAdapter.getAppsSubscribedWithAPI(api.getId());
+			api.setApplications(apps);
 		} else {
 			apps = apim.appAdapter.getApplications(new ClientAppFilter.Builder()
 					.includeQuotas(filter.isIncludeClientAppQuota())
-					.build());
+					.build(), false);
 			for(ClientApplication app : apps) {
 				List<APIAccess> APIAccess = apim.accessAdapter.getAPIAccess(app.getId(), APIManagerAPIAccessAdapter.Type.applications);
 				app.setApiAccess(APIAccess);
-				for(API api : apis) {
-					for(APIAccess access : APIAccess) {
-						if(access.getApiId().equals(api.getId())) {
-							existingClientApps.add(app);
-						}
+				for(APIAccess access : APIAccess) {
+					if(access.getApiId().equals(api.getId())) {
+						existingClientApps.add(app);
 					}
-					api.setApplications(existingClientApps);
 				}
+				api.setApplications(existingClientApps);
 			}
 		}		
 	}
 	
-	private static void addOriginalAPIDefinitionFromAPIM(List<API> apis, boolean includeOriginalAPIDefinition) throws AppException {
+	private static void addOriginalAPIDefinitionFromAPIM(API api, boolean includeOriginalAPIDefinition) throws AppException {
 		if(!includeOriginalAPIDefinition) return;
 		URI uri;
 		APISpecification apiDefinition;
 		HttpResponse httpResponse = null;
-		for(API api : apis) {
-			try {
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
-						.setParameter("original", "true").build();
-				RestAPICall getRequest = new GETRequest(uri, null);
-				httpResponse=getRequest.execute();
-				String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
-				String origFilename = "Unkown filename";
-				if(httpResponse.containsHeader("Content-Disposition")) {
-					origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
-				}
-				apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null);
-				api.setAPIDefinition(apiDefinition);
-			} catch (Exception e) {
-				throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
-			} finally {
-				try {
-					if(httpResponse!=null) 
-						((CloseableHttpResponse)httpResponse).close();
-				} catch (Exception ignore) {}
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
+					.setParameter("original", "true").build();
+			RestAPICall getRequest = new GETRequest(uri, null);
+			httpResponse=getRequest.execute();
+			String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
+			String origFilename = "Unkown filename";
+			if(httpResponse.containsHeader("Content-Disposition")) {
+				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
 			}
+			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null);
+			api.setAPIDefinition(apiDefinition);
+		} catch (Exception e) {
+			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
+		} finally {
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
 		}
 	}
 	

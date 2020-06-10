@@ -63,13 +63,13 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	}
 	
 	@Override
-	public List<ClientApplication> getApplications(ClientAppFilter filter) throws AppException {
+	public List<ClientApplication> getApplications(ClientAppFilter filter, boolean logProgress) throws AppException {
 		LOG.trace("Filtering results is not supported for the JSON implementation. Returning all applications.");
-		return getAllApplications();
+		return getAllApplications(false);
 	}
 	
 	@Override
-	public List<ClientApplication> getAllApplications() throws AppException {
+	public List<ClientApplication> getAllApplications(boolean logProgress) throws AppException {
 		return this.apps;
 	}
 	

@@ -16,10 +16,12 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.util.EntityUtils;
+import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
 import com.axway.apim.adapter.apis.jackson.JSONViews;
@@ -34,6 +36,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.PUTRequest;
@@ -55,9 +58,15 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	CommandParameters cmd  = CommandParameters.getInstance();
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
+	
+	Cache<String, String> applicationsCache;
+	Cache<String, String> applicationsSubscriptionCache;
+	Cache<String, String> applicationsCredentialCache;
 
 	public APIMgrAppsAdapter() throws AppException {
-		
+		applicationsCache = APIManagerAdapter.getCache(CacheType.applicationsCache, String.class, String.class);
+		applicationsSubscriptionCache = APIManagerAdapter.getCache(CacheType.applicationsSubscriptionCache, String.class, String.class);
+		applicationsCredentialCache = APIManagerAdapter.getCache(CacheType.applicationsCredentialCache, String.class, String.class);
 	}
 	
 	@Override
@@ -76,6 +85,10 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		try {
 			String requestedId = "";
 			if(filter.getApplicationId()!=null) {
+				if(applicationsCache.containsKey(filter.getApplicationId())) {
+					this.apiManagerResponse.put(filter, applicationsCache.get(filter.getApplicationId()));
+					return;
+				}
 				requestedId = "/"+filter.getApplicationId();
 			}
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications" + requestedId)
@@ -89,6 +102,9 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 				response = "["+response+"]";
 			}
 			this.apiManagerResponse.put(filter,response);
+			if(filter.getApplicationId()!=null) {
+				applicationsCache.put(filter.getApplicationId(), response);
+			}
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
@@ -112,25 +128,23 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	}
 	
 	@Override
-	public List<ClientApplication> getApplications(ClientAppFilter filter) throws AppException {
+	public List<ClientApplication> getApplications(ClientAppFilter filter, boolean logProgress) throws AppException {
 		readApplicationsFromAPIManager(filter);
 		List<ClientApplication> apps;
 		try {
 			apps = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<ClientApplication>>(){});
-			if(filter.isIncludeImage()) {
-				addImage(apps);
-			}
-			if(filter.isIncludeQuota()) {
-				for(ClientApplication app : apps) {
+			LOG.info("Found: "+apps.size() + " applications");
+			for(int i=0; i<apps.size();i++) {
+				ClientApplication app = apps.get(i);
+				addImage(app, filter.isIncludeImage());
+				if(filter.isIncludeQuota()) {
 					app.setAppQuota(APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(app.getId(), null));
 				}
+				addApplicationCredentials(app, filter.isIncludeCredentials());
+				addAPIAccess(app, filter.isIncludeAPIAccess());
+				if(logProgress) Utils.progressPercentage(i, apps.size(), "Initializing Applications");
 			}
-			if(filter.isIncludeCredentials()) {
-				addApplicationCredentials(apps);
-			}
-			if(filter.isIncludeAPIAccess()) {
-				addAPIAccess(apps);
-			}
+			System.out.print("\n");
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
@@ -139,8 +153,8 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	}
 	
 	@Override
-	public List<ClientApplication> getAllApplications() throws AppException {
-		return getApplications(new ClientAppFilter.Builder().build());
+	public List<ClientApplication> getAllApplications(boolean logProgress) throws AppException {
+		return getApplications(new ClientAppFilter.Builder().build(), logProgress);
 	}
 	
 	public List<ClientApplication> getAppsSubscribedWithAPI(String apiId) throws AppException {
@@ -157,6 +171,10 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	
 	private void readAppsSubscribedFromAPIManager(String apiId) throws AppException {
 		if(this.subscribedAppAPIManagerResponse.get(apiId) !=null) return;
+		if(applicationsSubscriptionCache.containsKey(apiId)) {
+			subscribedAppAPIManagerResponse.put(apiId, applicationsSubscriptionCache.get(apiId));
+			return;
+		}
 		
 		String response = null;
 		URI uri;
@@ -170,8 +188,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			subscribedAppAPIManagerResponse.put(apiId, response);
-			
-			
+			applicationsSubscriptionCache.put(apiId, response);
 		} catch (Exception e) {
 			LOG.error("Error cant load subscribes applications from API-Manager. Can't parse response: " + response);
 			throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -186,7 +203,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 	
 	
 	public ClientApplication getApplication(ClientAppFilter filter) throws AppException {
-		List<ClientApplication> apps = getApplications(filter);
+		List<ClientApplication> apps = getApplications(filter, false);
 		return uniqueApplication(apps);
 	}
 	
@@ -199,59 +216,67 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		return apps.get(0);
 	}
 	
-	void addApplicationCredentials(List<ClientApplication> apps) throws Exception {
+	void addApplicationCredentials(ClientApplication app, boolean addCredentials) throws Exception {
+		if(!addCredentials) return;
 		URI uri;
 		HttpResponse httpResponse = null;
+		String response;
 		List<ClientAppCredential> credentials;
 		String[] types = new String[] {"extclients", "oauth", "apikeys"};
 		TypeReference[] classTypes = new TypeReference[] {new TypeReference<List<ExtClients>>(){}, new TypeReference<List<OAuth>>(){}, new TypeReference<List<APIKey>>(){}};
-		for(ClientApplication app : apps) {
-			for(int i=0; i<types.length; i++) {
-				try {
-					String type = types[i];
-					TypeReference classType = classTypes[i];
+		for(int i=0; i<types.length; i++) {
+			try {
+				String type = types[i];
+				TypeReference classType = classTypes[i];
+				if(!applicationsCredentialCache.containsKey(app.getId()+"|"+type)) {
 					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type)
 							.build();
 					RestAPICall getRequest = new GETRequest(uri, null);
 					httpResponse = getRequest.execute();
+					response = EntityUtils.toString(httpResponse.getEntity());
 					int statusCode = httpResponse.getStatusLine().getStatusCode();
 					if(statusCode != 200){
-						LOG.error("Error reading application credentials. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+						LOG.error("Error reading application credentials. Response-Code: "+statusCode+". Got response: '"+response+"'");
 						throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 					}
-					credentials = mapper.readValue(httpResponse.getEntity().getContent(), classType);
-					app.getCredentials().addAll(credentials);
-				} catch (Exception e) {
-					throw new AppException("Error reading application credentials.", ErrorCode.CANT_CREATE_API_PROXY, e);
-				} finally {
-					try {
-						((CloseableHttpResponse)httpResponse).close();
-					} catch (Exception ignore) { }
+					applicationsCredentialCache.put(app.getId()+"|"+type, response);
+				} else {
+					response = applicationsCredentialCache.get(app.getId()+"|"+type);
 				}
-			}
-		}
-	}
-	
-	void addAPIAccess(List<ClientApplication> apps) throws Exception {
-		for(ClientApplication app : apps) {			
-			try {
-				List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app.getId(), Type.applications, true);
-				app.getApiAccess().addAll(apiAccess);
+				credentials = mapper.readValue(response, classType);
+				app.getCredentials().addAll(credentials);
 			} catch (Exception e) {
-				throw new AppException("Error reading application API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
+				throw new AppException("Error reading application credentials.", ErrorCode.CANT_CREATE_API_PROXY, e);
+			} finally {
+				try {
+					((CloseableHttpResponse)httpResponse).close();
+				} catch (Exception ignore) { }
 			}
 		}
 	}
 	
-	void addImage(List<ClientApplication> apps) throws Exception {
-		URI uri;
-		for(ClientApplication app : apps) {
-			if(app.getImageUrl()==null) continue;
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/image")
-					.build();
-			Image image = APIManagerAdapter.getImageFromAPIM(uri, "app-image");
-			app.setImage(image);
+	void addAPIAccess(ClientApplication app, boolean addAPIAccess) throws Exception {
+		if(!addAPIAccess) return;
+		try {
+			List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app.getId(), Type.applications, true);
+			app.getApiAccess().addAll(apiAccess);
+		} catch (Exception e) {
+			throw new AppException("Error reading application API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
 		}
+	}
+	
+	void addImage(ClientApplication app, boolean addImage) throws Exception {
+		if(!addImage) return;
+		URI uri;
+		if(app.getImageUrl()==null) return;
+		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/image")
+				.build();
+		Image image = APIManagerAdapter.getImageFromAPIM(uri, "app-image");
+		app.setImage(image);
+	}
+	
+	void addQuota(ClientApplication app, boolean addQuota) {
+		
 	}
 	
 	@Override

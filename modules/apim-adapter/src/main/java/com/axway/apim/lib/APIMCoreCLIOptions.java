@@ -74,6 +74,12 @@ public abstract class APIMCoreCLIOptions {
 		option.setArgName("/home/chris/apim-cli");
 		options.addOption(option);
 		
+		option = new Option("clearCache", true, "Clear the cache previously created, which will force the CLI to get fresh data from the API-Manager.\n"
+				+ "Exmaples: 'ALL', '*application*', 'applicationsQuotaCache,*api*'");
+		option.setRequired(false);
+		option.setArgName("ALL");
+		options.addOption(option);
+		
 		option = new Option("rollback", true, "Allows to disable the rollback feature");
 		option.setRequired(false);
 		option.setArgName("true");

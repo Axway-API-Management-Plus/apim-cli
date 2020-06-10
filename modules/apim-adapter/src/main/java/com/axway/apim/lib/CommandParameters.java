@@ -1,12 +1,18 @@
 package com.axway.apim.lib;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -23,6 +29,8 @@ public class CommandParameters {
 	public static String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
 	
 	private static CommandParameters instance;
+	
+	private List<CacheType> cachesToClear = null;
 	
 	int port = 8075;
 	
@@ -184,7 +192,34 @@ public class CommandParameters {
 		if(getValue("ignoreCache")==null) return false;
 		return Boolean.parseBoolean(getValue("ignoreCache"));
 	}
-	
+
+	public List<CacheType> clearCaches() {
+		if(getValue("clearCache")==null) return null;
+		if(cachesToClear!=null) return cachesToClear;
+		cachesToClear = new ArrayList<CacheType>();
+		String given = getValue("clearCache");
+		for(String cacheName : given.split(",")) {
+			if(cacheName.equals("ALL")) cacheName = "*";
+			cacheName = cacheName.trim();
+			if(cacheName.contains("*")) {
+				Pattern pattern = Pattern.compile(cacheName.replace("*", ".*").toLowerCase());
+				for(CacheType cacheType : CacheType.values()) {
+					Matcher matcher = pattern.matcher(cacheType.name().toLowerCase());
+					if(matcher.matches()) {
+						cachesToClear.add(cacheType);
+					}
+				}
+			} else {
+				try {
+					cachesToClear.add(CacheType.valueOf(cacheName));
+				} catch (IllegalArgumentException e) {
+					LOG.error("Unable to clear cache: " +cacheName + " as the cache is unknown.");
+					LOG.error("Available caches: " + Arrays.asList(CacheType.values()));
+				}
+			}
+		}
+		return cachesToClear;
+	}
 	
 	
 	public void validateRequiredParameters() throws AppException {

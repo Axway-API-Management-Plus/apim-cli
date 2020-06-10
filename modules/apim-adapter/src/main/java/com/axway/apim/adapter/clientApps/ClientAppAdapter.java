@@ -24,9 +24,9 @@ public abstract class ClientAppAdapter {
 	 * @return applications according to the provided filter
 	 * @throws AppException when something goes wrong
 	 */
-	public abstract List<ClientApplication> getApplications(ClientAppFilter filter) throws AppException;
+	public abstract List<ClientApplication> getApplications(ClientAppFilter filter, boolean logProgress) throws AppException;
 	
-	public abstract List<ClientApplication> getAllApplications() throws AppException;
+	public abstract List<ClientApplication> getAllApplications(boolean logProgress) throws AppException;
 	
 	public abstract ClientApplication getApplication(ClientAppFilter filter) throws AppException;
 	

@@ -11,10 +11,12 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
+import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -32,10 +34,14 @@ public class APIManagerOrganizationAdapter {
 	public final static String APPLICATION_DEFAULT_QUOTA 		= "00000000-0000-0000-0000-000000000001";
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
-
-	public APIManagerOrganizationAdapter() {}
 	
 	Map<OrgFilter, String> apiManagerResponse = new HashMap<OrgFilter, String>();
+	
+	Cache<String, String> organizationCache;
+	
+	public APIManagerOrganizationAdapter() {
+		organizationCache = APIManagerAdapter.getCache(CacheType.organizationCache, String.class, String.class);
+	}
 	
 	private void readOrgsFromAPIManager(OrgFilter filter) throws AppException {
 		if(apiManagerResponse.get(filter) != null) return;
@@ -46,6 +52,10 @@ public class APIManagerOrganizationAdapter {
 		// In some versions (e.g. 7.6.2 - 7.6.2 SP4 confirmed) an Org-Admin can't provide it's own Org-Id to load it's own org
 		// Therefore we need to skip that here
 		if(filter.getId()!=null && APIManagerAdapter.hasAdminAccount()) {
+			if(organizationCache.containsKey(filter.getId())) {
+				apiManagerResponse.put(filter, organizationCache.get(filter.getId()));
+				return;
+			}
 			orgId = "/"+filter.getId();
 		}
 		URI uri;
@@ -63,12 +73,15 @@ public class APIManagerOrganizationAdapter {
 				LOG.error("Received Status-Code: " +httpResponse.getStatusLine().getStatusCode()+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
 				throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
+			String response = EntityUtils.toString(httpResponse.getEntity());
 			if(!orgId.equals("")) {
 				// Store it as an Array
-				apiManagerResponse.put(filter, "[" + EntityUtils.toString(httpResponse.getEntity()) + "]");
+				response = "[" + response+ "]";
+				apiManagerResponse.put(filter, response);
+				organizationCache.put(orgId, response);
 			} else {
 				// We got an Array from API-Manager
-				apiManagerResponse.put(filter, EntityUtils.toString(httpResponse.getEntity()));
+				apiManagerResponse.put(filter, response);
 			}
 		} catch (Exception e) {
 			LOG.error("Error cant read orgs from API-Manager with filter: "+filter+". Can't parse response: " + httpResponse);

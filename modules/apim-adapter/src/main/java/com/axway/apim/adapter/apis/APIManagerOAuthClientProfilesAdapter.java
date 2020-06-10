@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.api.model.OAuthClientProfile;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -31,7 +32,7 @@ public class APIManagerOAuthClientProfilesAdapter {
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
-	Cache<String, String> oauthClientCache = APIManagerAdapter.getCacheManager().getCache("oauthClientProviderCache", String.class, String.class);
+	Cache<String, String> oauthClientCache = APIManagerAdapter.getCache(CacheType.oauthClientProviderCache, String.class, String.class);
 
 	public APIManagerOAuthClientProfilesAdapter() {}
 	

@@ -78,7 +78,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 					.includeAPIAccess(true)
 					.includeImage(true)
 					.build();
-			List<ClientApplication> apps = appAdapter.getApplications(filter);
+			List<ClientApplication> apps = appAdapter.getApplications(filter, true);
 			if(apps.size()==0) {
 				if(LOG.isDebugEnabled()) {
 					LOG.info("No applications found using filter: " + filter);
@@ -95,6 +95,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 					LOG.debug("Successfully exported " + apps.size() + " application(s).");
 				}
 			}
+			APIManagerAdapter.deleteInstance();
 		} catch (AppException ap) { 
 			ErrorState errorState = ErrorState.getInstance();
 			if(errorState.hasError()) {

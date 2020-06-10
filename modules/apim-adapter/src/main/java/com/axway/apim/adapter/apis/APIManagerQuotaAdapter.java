@@ -12,10 +12,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
+import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.lib.CommandParameters;
@@ -44,9 +46,13 @@ public class APIManagerQuotaAdapter {
 		}
 	}
 	
+	Cache<String, String> applicationsQuotaCache;
+	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 
-	public APIManagerQuotaAdapter() {}
+	public APIManagerQuotaAdapter() {
+		applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
+	}
 	
 	Map<String, String> apiManagerResponse = new HashMap<String, String>();
 	
@@ -59,15 +65,23 @@ public class APIManagerQuotaAdapter {
 			if(Quota.APPLICATION_DEFAULT.getQuotaId().equals(quotaId) || Quota.SYSTEM_DEFAULT.getQuotaId().equals(quotaId)) {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+quotaId).build();
 			} else {
+				if(applicationsQuotaCache.containsKey(quotaId)) {
+					this.apiManagerResponse.put(quotaId, applicationsQuotaCache.get(quotaId));
+					return;
+				}
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+quotaId+"/quota/").build();
 			}
 			RestAPICall getRequest = new GETRequest(uri, null, true);
 			httpResponse = getRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
 			if( statusCode != 200){
 				throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
-			this.apiManagerResponse.put(quotaId,EntityUtils.toString(httpResponse.getEntity(), "UTF-8"));
+			this.apiManagerResponse.put(quotaId,response);
+			if(!Quota.APPLICATION_DEFAULT.getQuotaId().equals(quotaId) && !Quota.SYSTEM_DEFAULT.getQuotaId().equals(quotaId)) {
+				applicationsQuotaCache.put(quotaId, response);
+			}
 		} catch (URISyntaxException | UnsupportedOperationException | IOException e) {
 			throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {

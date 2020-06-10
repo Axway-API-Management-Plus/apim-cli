@@ -26,7 +26,9 @@ import org.apache.http.util.EntityUtils;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.Status;
+import org.ehcache.config.CacheConfiguration;
 import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.core.EhcacheManager;
 import org.ehcache.xml.XmlConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +107,17 @@ public class APIManagerAdapter {
 	public APIManagerOAuthClientProfilesAdapter oauthClientAdapter;
 	public APIMgrAppsAdapter appAdapter;
 	
+	public static enum CacheType {
+		applicationAPIAccessCache, 
+		organizationAPIAccessCache, 
+		oauthClientProviderCache, 
+		applicationsCache, 
+		applicationsSubscriptionCache, 
+		applicationsQuotaCache,
+		applicationsCredentialCache,
+		organizationCache;
+	}
+	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
 			APIManagerAdapter.instance = new APIManagerAdapter();
@@ -117,9 +130,9 @@ public class APIManagerAdapter {
 	
 	public static synchronized void deleteInstance() throws AppException {
 		if(APIManagerAdapter.cacheManager!=null && APIManagerAdapter.cacheManager.getStatus()==Status.AVAILABLE) {
-			LOG.trace("Closing cache begin");
+			LOG.debug("Closing cache begin");
 			APIManagerAdapter.cacheManager.close();
-			LOG.trace("Closing cache end");
+			LOG.debug("Closing cache end");
 		}
 		APIManagerAdapter.instance = null;
 	}
@@ -249,7 +262,7 @@ public class APIManagerAdapter {
 		}
 	}
 	
-	public static CacheManager getCacheManager() {
+	private static CacheManager getCacheManager() {
 		if(APIManagerAdapter.cacheManager!=null) {
 			if(APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) 
 				APIManagerAdapter.cacheManager.init();
@@ -265,6 +278,18 @@ public class APIManagerAdapter {
 		}
 		return cacheManager;
 	}
+	
+	public static <K, V> Cache<K, V> getCache(CacheType cacheType, Class<K> key, Class<V> value) {
+		getCacheManager();
+		Cache<K, V> cache = APIManagerAdapter.cacheManager.getCache(cacheType.name(), key, value);
+		if(CommandParameters.getInstance().clearCaches()!=null && CommandParameters.getInstance().clearCaches().contains(cacheType)) {
+			cache.clear();
+			LOG.info("Cache: " + cacheType.name() + " successfully cleared.");
+		}
+		return cache;
+	}
+	
+	
 	
 	public static void clearCache(String cacheName) {
 		if(APIManagerAdapter.cacheManager==null || APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) return;
@@ -360,7 +385,7 @@ public class APIManagerAdapter {
 			LOG.info("Found existing application (in cache): '"+app.getName()+"' based on credential (Type: '"+type+"'): '"+credential+"'");
 			return app;
 		}
-		List<ClientApplication> allApps = this.appAdapter.getAllApplications(); // Make sure, we loaded all apps before!
+		List<ClientApplication> allApps = this.appAdapter.getAllApplications(false); // Make sure, we loaded all apps before!
 		LOG.debug("Searching credential (Type: "+type+"): '"+credential+"' in: " + allApps.size() + " apps.");
 		Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
 		HttpResponse httpResponse = null;

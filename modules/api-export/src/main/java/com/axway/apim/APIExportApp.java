@@ -57,7 +57,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			APIExporter exporter = APIExporter.create(exportImpl, params);
 			APIFilter filter = exporter.getFilter();
 
-			List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(filter, false);
+			List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(filter, true);
 			if(apis.size()==0) {
 				if(LOG.isDebugEnabled()) {
 					LOG.info("No APIs found using filter: " + filter);
@@ -65,7 +65,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 					LOG.info("No APIs found based on the given criteria.");
 				}
 			} else {
-				LOG.info("Found " + apis.size() + " API(s).");
+				LOG.info("Selected " + apis.size() + " API(s) to export.");
 				
 				exporter.export(apis);
 				if(exporter.hasError()) {
