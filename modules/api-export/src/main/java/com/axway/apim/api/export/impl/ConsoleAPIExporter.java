@@ -62,7 +62,7 @@ public class ConsoleAPIExporter extends APIExporter {
 				new Column().header("V-Host").with(api -> api.getVhost()),
 				new Column().header("State").with(api -> getState(api)),
 				new Column().header("Security").with(api -> getUsedSecurity(api)),
-				new Column().header("Policies").maxColumnWidth(30).with(api -> getUsedPolicies(api)),
+				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getUsedPolicies(api)),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()
 				))));
 	}
@@ -76,7 +76,7 @@ public class ConsoleAPIExporter extends APIExporter {
 				new Column().header("V-Host").with(api -> api.getVhost()),
 				new Column().header("State").with(api -> getState(api)),
 				new Column().header("Security").with(api -> getUsedSecurity(api)),
-				new Column().header("Policies").maxColumnWidth(30).with(api -> getUsedPolicies(api)),
+				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getUsedPolicies(api)),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
 				new Column().header("Orgs").with(api -> getOrgCount(api)),
 				new Column().header("Apps").with(api -> Integer.toString(api.getApplications().size())),
@@ -173,6 +173,7 @@ public class ConsoleAPIExporter extends APIExporter {
 		Builder builder = new APIFilter.Builder(APIType.ACTUAL_API)
 				.hasVHost(params.getValue("vhost"))
 				.hasApiPath(params.getValue("api-path"))
+				.hasPolicyName(params.getValue("policy"))
 				.hasName(params.getValue("name"))
 				.hasState(params.getValue("state"))
 				.includeImage(false)

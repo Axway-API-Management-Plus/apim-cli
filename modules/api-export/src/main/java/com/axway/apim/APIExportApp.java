@@ -66,7 +66,6 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				}
 			} else {
 				LOG.info("Selected " + apis.size() + " API(s) to export.");
-				
 				exporter.export(apis);
 				if(exporter.hasError()) {
 					LOG.info("Please check the log. At least one error was recorded.");

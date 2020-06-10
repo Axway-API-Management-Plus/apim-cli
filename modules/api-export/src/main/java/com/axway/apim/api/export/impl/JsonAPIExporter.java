@@ -68,6 +68,7 @@ public class JsonAPIExporter extends APIExporter {
 		APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API)
 				.hasVHost(params.getValue("vhost"))
 				.hasApiPath(params.getValue("api-path"))
+				.hasPolicyName(params.getValue("policy"))
 				.hasId(params.getValue("id"))
 				.hasName(params.getValue("name"))
 				.hasState(params.getValue("state"))
