@@ -93,6 +93,10 @@ public class APIManagerAPIAccessAdapter {
 	}
 	
 	public List<APIAccess> getAPIAccess(String id, Type type, boolean includeAPIName) throws AppException {
+		return getAPIAccess(id, type, includeAPIName, false);
+	}
+	
+	public List<APIAccess> getAPIAccess(String id, Type type, boolean includeAPIName, boolean ignoreCache) throws AppException {
 		readAPIAccessFromAPIManager(type, id);
 		String apiAccessResponse = null;
 		try {
