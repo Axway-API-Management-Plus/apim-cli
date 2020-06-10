@@ -163,7 +163,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		try {
 			subscribedApps = mapper.readValue(this.subscribedAppAPIManagerResponse.get(apiId), new TypeReference<List<ClientApplication>>(){});
 		} catch (IOException e) {
-			LOG.error("Error cant load subscribes applications from API-Manager. Can't parse response: " + this.subscribedAppAPIManagerResponse.get(apiId));
+			LOG.error("Error cant load subscribes applications from API-Manager. Can't parse response: " + this.subscribedAppAPIManagerResponse.get(apiId), e);
 			throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 		return subscribedApps;
@@ -190,7 +190,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			subscribedAppAPIManagerResponse.put(apiId, response);
 			applicationsSubscriptionCache.put(apiId, response);
 		} catch (Exception e) {
-			LOG.error("Error cant load subscribes applications from API-Manager. Can't parse response: " + response);
+			LOG.error("Error cant load subscribes applications from API-Manager. Can't parse response: " + response, e);
 			throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {

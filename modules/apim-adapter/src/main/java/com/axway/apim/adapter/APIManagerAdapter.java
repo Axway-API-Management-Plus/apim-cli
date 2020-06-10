@@ -426,7 +426,7 @@ public class APIManagerAdapter {
 					}
 				}
 			} catch (Exception e) {
-				LOG.error("Can't load applications credentials. Can't parse response: " + response);
+				LOG.error("Can't load applications credentials. Can't parse response: " + response, e);
 				throw new AppException("Can't load applications credentials.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			} finally {
 				try {

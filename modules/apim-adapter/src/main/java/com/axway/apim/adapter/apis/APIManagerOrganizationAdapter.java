@@ -84,7 +84,7 @@ public class APIManagerOrganizationAdapter {
 				apiManagerResponse.put(filter, response);
 			}
 		} catch (Exception e) {
-			LOG.error("Error cant read orgs from API-Manager with filter: "+filter+". Can't parse response: " + httpResponse);
+			LOG.error("Error cant read orgs from API-Manager with filter: "+filter+". Can't parse response: " + httpResponse, e);
 			throw new AppException("Error cant read orgs from API-Manager with filter: "+filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {

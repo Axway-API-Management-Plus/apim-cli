@@ -54,7 +54,7 @@ public class APIManagerConfigAdapter {
 			
 			
 		} catch (Exception e) {
-			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + httpResponse);
+			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + httpResponse, e);
 			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
