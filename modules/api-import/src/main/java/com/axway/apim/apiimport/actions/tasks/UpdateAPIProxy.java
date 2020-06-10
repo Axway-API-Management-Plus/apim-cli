@@ -18,7 +18,6 @@ import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.apis.jackson.PolicySerializer;
 import com.axway.apim.api.API;
-import com.axway.apim.api.model.Policy;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -43,7 +42,6 @@ public class UpdateAPIProxy extends AbstractAPIMTask {
 		HttpEntity entity;
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
-		objectMapper.registerModule(new SimpleModule().addSerializer(Policy.class, new PolicySerializer()));
 		HttpResponse httpResponse = null;
 		Transaction context = Transaction.getInstance();
 		

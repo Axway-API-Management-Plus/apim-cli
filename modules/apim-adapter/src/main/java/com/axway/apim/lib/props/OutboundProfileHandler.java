@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.jackson.PolicySerializer;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.OutboundProfile;
@@ -13,6 +14,7 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class OutboundProfileHandler implements PropertyHandler {
@@ -20,6 +22,7 @@ public class OutboundProfileHandler implements PropertyHandler {
 	@Override
 	public JsonNode handleProperty(API desired, API actual, JsonNode response) throws AppException {
 		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new SimpleModule().addSerializer(new PolicySerializer()));
 		validateAuthenticationProfiles(desired);
 		if(desired.getOutboundProfiles().size()!=0) {
 			((ObjectNode)response).replace("outboundProfiles", objectMapper.valueToTree(desired.getOutboundProfiles()));

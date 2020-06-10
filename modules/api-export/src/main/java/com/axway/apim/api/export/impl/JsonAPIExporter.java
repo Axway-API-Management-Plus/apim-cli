@@ -116,7 +116,6 @@ public class JsonAPIExporter extends APIExporter {
 		
 		mapper.setFilterProvider(filters);
 		try {
-			//prepareToSave(exportAPI);
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/api-config.json"), exportAPI);
 		} catch (Exception e) {
@@ -180,13 +179,5 @@ public class JsonAPIExporter extends APIExporter {
 			apiExposurePath = apiExposurePath.substring(0, apiExposurePath.length() - 1);
 		apiExposurePath = apiExposurePath.replace("/", "-");
 		return apiExposurePath;
-	}
-	
-	private void prepareToSave(ExportAPI exportAPI) throws AppException {
-		// Clean-Up some internal fields in Outbound-Profiles
-		if(exportAPI.getOutboundProfiles()==null) return;
-		OutboundProfile profile = exportAPI.getOutboundProfiles().get("_default");
-		profile.setApiId(null);
-		profile.setApiMethodId(null);
 	}
 }
