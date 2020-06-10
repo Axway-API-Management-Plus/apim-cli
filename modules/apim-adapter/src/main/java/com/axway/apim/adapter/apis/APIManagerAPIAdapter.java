@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
@@ -88,7 +89,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				addExistingClientAppQuotas(api, filter.isIncludeQuotas());
 				addOriginalAPIDefinitionFromAPIM(api, filter.isIncludeOriginalAPIDefinition());
 				addImageFromAPIM(api, filter.isIncludeImage());
-				if(logStatusMessage) Utils.progressPercentage(i, apis.size(), "Initializing APIs");
+				if(logStatusMessage && apis.size()>1) Utils.progressPercentage(i, apis.size(), "Initializing APIs");
 			}
 			addCustomProperties(apis, filter);
 			if(logStatusMessage) System.out.print("\n");
@@ -356,7 +357,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 					.includeQuotas(filter.isIncludeClientAppQuota())
 					.build(), false);
 			for(ClientApplication app : apps) {
-				List<APIAccess> APIAccess = apim.accessAdapter.getAPIAccess(app.getId(), APIManagerAPIAccessAdapter.Type.applications);
+				List<APIAccess> APIAccess = apim.accessAdapter.getAPIAccess(app.getId(), APIManagerAPIAccessAdapter.Type.applications, true);
 				app.setApiAccess(APIAccess);
 				for(APIAccess access : APIAccess) {
 					if(access.getApiId().equals(api.getId())) {

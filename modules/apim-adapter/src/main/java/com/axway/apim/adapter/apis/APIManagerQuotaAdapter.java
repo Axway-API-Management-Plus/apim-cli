@@ -3,14 +3,17 @@ package com.axway.apim.adapter.apis;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.ehcache.Cache;
 import org.slf4j.Logger;
@@ -24,6 +27,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.rest.GETRequest;
+import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -103,6 +107,33 @@ public class APIManagerQuotaAdapter {
 			throw new AppException("Error cant load API-Methods for API: '"+apiId+"' from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 		return quotaConfig;
+	}
+	
+	public APIQuota saveQuota(APIQuota quotaConfig, String quotaId) throws AppException {
+		URI uri;
+		HttpEntity entity;
+		HttpResponse httpResponse = null;
+		try {
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/quotas/"+quotaId).build();
+			
+			entity = new StringEntity(mapper.writeValueAsString(quotaConfig), StandardCharsets.UTF_8);
+			
+			RestAPICall request = new PUTRequest(entity, uri, null, true);
+			httpResponse = request.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
+			if(statusCode < 200 || statusCode > 299){
+				throw new AppException("Can't update API-Manager Quota-Configuration.", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
+			return mapper.readValue(response, APIQuota.class);
+		} catch (URISyntaxException | UnsupportedOperationException | IOException e) {
+			throw new AppException("Can't update Quota-Configuration in API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		} finally {
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
+		}
 	}
 	
 	public APIQuota getDefaultQuota(Quota quotaType) throws AppException {
