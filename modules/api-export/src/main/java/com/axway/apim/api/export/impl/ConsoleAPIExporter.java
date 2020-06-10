@@ -114,7 +114,14 @@ public class ConsoleAPIExporter extends APIExporter {
 	}
 	
 	private String getTags(API api) {
-		return String.join(System.lineSeparator(), api.getTags().values().toString());
+		Iterator<String> it = api.getTags().keySet().iterator();
+		List<String> tags = new ArrayList<String>();
+		while(it.hasNext()) {
+			String tagGroup = it.next();
+			String[] tagValues = api.getTags().get(tagGroup);
+			tags.add(tagGroup + ": " + tagValues.toString());
+		}
+		return String.join(System.lineSeparator(), tags);
 	}
 	
 	private String getOrgCount(API api) {
