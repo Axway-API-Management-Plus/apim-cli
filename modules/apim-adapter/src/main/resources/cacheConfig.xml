@@ -1,7 +1,7 @@
 <ehcache:config xmlns:ehcache="http://www.ehcache.org/v3"
 	xmlns:jcache="http://www.ehcache.org/v3/jsr107">
 
-	<ehcache:persistence directory="${java.io.tmpdir}/apim-cli" />
+	<ehcache:persistence directory="${java.io.tmpdir}/apim-cli-cache" />
 
 	<!-- Used for the endpoint: /applications/<applicationId>/apis (Not used anymore in version >7.7) -->
 	<ehcache:cache alias="applicationAPIAccessCache">
