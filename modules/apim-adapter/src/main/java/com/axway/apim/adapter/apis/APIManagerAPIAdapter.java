@@ -89,7 +89,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				addExistingClientAppQuotas(api, filter.isIncludeQuotas());
 				addOriginalAPIDefinitionFromAPIM(api, filter.isIncludeOriginalAPIDefinition());
 				addImageFromAPIM(api, filter.isIncludeImage());
-				if(logStatusMessage) Utils.progressPercentage(i, apis.size(), "Initializing APIs");
+				if(logStatusMessage && apis.size()>1) Utils.progressPercentage(i, apis.size(), "Initializing APIs");
 			}
 			addCustomProperties(apis, filter);
 			if(logStatusMessage) System.out.print("\n");
@@ -345,8 +345,6 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	}
 	
 	public void addClientApplications(API api, APIFilter filter) throws AppException {
-		// Ignore the cache, when loading the API-Access during import
-		boolean ignoreCache = (filter.getType().equals(APIType.ACTUAL_API_FOR_IMPORT)) ? true : false;
 		if(!filter.isIncludeClientApplications()) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> apps = null;
@@ -359,7 +357,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 					.includeQuotas(filter.isIncludeClientAppQuota())
 					.build(), false);
 			for(ClientApplication app : apps) {
-				List<APIAccess> APIAccess = apim.accessAdapter.getAPIAccess(app.getId(), APIManagerAPIAccessAdapter.Type.applications, true, ignoreCache);
+				List<APIAccess> APIAccess = apim.accessAdapter.getAPIAccess(app.getId(), APIManagerAPIAccessAdapter.Type.applications, true);
 				app.setApiAccess(APIAccess);
 				for(APIAccess access : APIAccess) {
 					if(access.getApiId().equals(api.getId())) {

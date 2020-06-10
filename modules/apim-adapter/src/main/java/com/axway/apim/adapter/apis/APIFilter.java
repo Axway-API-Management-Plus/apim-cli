@@ -415,7 +415,6 @@ public class APIFilter {
 			 * - Client-Organizations and -Applications are initialized
 			 */
 			ACTUAL_API, 
-			ACTUAL_API_FOR_IMPORT,
 			DESIRED_API, 
 			CUSTOM
 		}
@@ -506,7 +505,6 @@ public class APIFilter {
 		private void initType(APIType type) {
 			switch(type) {
 			case ACTUAL_API:
-			case ACTUAL_API_FOR_IMPORT:
 				this.includeQuotas = true;
 				this.translateMethodMode = METHOD_TRANSLATION.AS_NAME;
 				this.translatePolicyMode = POLICY_TRANSLATION.TO_NAME;

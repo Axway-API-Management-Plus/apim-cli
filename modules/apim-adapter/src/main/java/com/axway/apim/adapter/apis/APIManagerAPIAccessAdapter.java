@@ -53,17 +53,15 @@ public class APIManagerAPIAccessAdapter {
 	
 	Map<Type, Map<String, String>> apiManagerResponse = new HashMap<Type, Map<String,String>>();
 	
-	private void readAPIAccessFromAPIManager(Type type, String id, boolean ignoreCache) throws AppException {
+	private void readAPIAccessFromAPIManager(Type type, String id) throws AppException {
 		if(apiManagerResponse.get(type)!=null && apiManagerResponse.get(type).get(id)!=null) return;
 		Map<String, String> mappedResponse = new HashMap<String, String>();
 		
 		String cachedResponse = getFromCache(id, type);
-		if(!ignoreCache && cachedResponse!=null) {
+		if(cachedResponse!=null) {
 			mappedResponse.put(id, cachedResponse);
 			if(cachedResponse!=null) apiManagerResponse.put(type, mappedResponse);
 			return;
-		} else {
-			LOG.info("NOT USING THE CACHE!");
 		}
 		String response = null;
 		URI uri;
@@ -95,11 +93,7 @@ public class APIManagerAPIAccessAdapter {
 	}
 	
 	public List<APIAccess> getAPIAccess(String id, Type type, boolean includeAPIName) throws AppException {
-		return getAPIAccess(id, type, includeAPIName, false);
-	}
-	
-	public List<APIAccess> getAPIAccess(String id, Type type, boolean includeAPIName, boolean ignoreCache) throws AppException {
-		readAPIAccessFromAPIManager(type, id, ignoreCache);
+		readAPIAccessFromAPIManager(type, id);
 		String apiAccessResponse = null;
 		try {
 			apiAccessResponse = apiManagerResponse.get(type).get(id);

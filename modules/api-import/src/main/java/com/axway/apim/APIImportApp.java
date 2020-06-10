@@ -79,7 +79,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 				filters.add(new BasicNameValuePair("value", "published"));
 			}
 			// Lookup an existing APIs - If found the actualAPI is valid - desiredAPI is used to control what needs to be loaded
-			APIFilter filter = new APIFilter.Builder(Builder.APIType.ACTUAL_API_FOR_IMPORT)
+			APIFilter filter = new APIFilter.Builder(Builder.APIType.ACTUAL_API)
 					.hasApiPath(desiredAPI.getPath())
 					.hasVHost(desiredAPI.getVhost())
 					.includeCustomProperties(desiredAPI.getCustomProperties())
