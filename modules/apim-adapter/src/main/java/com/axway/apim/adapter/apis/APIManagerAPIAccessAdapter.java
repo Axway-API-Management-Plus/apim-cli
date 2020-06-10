@@ -24,6 +24,7 @@ import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
@@ -71,6 +72,11 @@ public class APIManagerAPIAccessAdapter {
 			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode < 200 || statusCode > 299){
+				LOG.error("Error loading API-Access from API-Manager for "+type+". Response-Code: "+statusCode+". Got response: '"+response+"'");
+				throw new AppException("Error loading API-Access from API-Manager for "+type+". Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
 			if(response.startsWith("{")) { // Got a single response!
 				response = "["+response+"]";
 			}
@@ -78,8 +84,8 @@ public class APIManagerAPIAccessAdapter {
 			apiManagerResponse.put(type, mappedResponse);
 			putToCache(id, type, response);
 		} catch (Exception e) {
-			LOG.error("Error cant load API-Access for "+type+" from API-Manager. Can't parse response: " + response);
-			throw new AppException("API-Access for "+type+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			LOG.error("Error loading API-Access from API-Manager for "+type+" from API-Manager: " + response, e);
+			throw new AppException("Error loading API-Access from API-Manager for "+type+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 
