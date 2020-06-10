@@ -13,6 +13,8 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
 public class ConsoleAppExporter extends ApplicationExporter {
+	
+	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
 	public ConsoleAppExporter(AppExportParams params) {
 		super(params);
@@ -31,7 +33,7 @@ public class ConsoleAppExporter extends ApplicationExporter {
 	}
 	
 	private void printStandard(List<ClientApplication> apps) {
-		System.out.println(AsciiTable.getTable(apps, Arrays.asList(
+		System.out.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
 				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getId()),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getName()),
 				new Column().header("State").with(app -> app.getState()),
@@ -41,7 +43,7 @@ public class ConsoleAppExporter extends ApplicationExporter {
 	}
 	
 	private void printWide(List<ClientApplication> apps) {
-		System.out.println(AsciiTable.getTable(apps, Arrays.asList(
+		System.out.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
 				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getId()),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getName()),
 				new Column().header("State").with(app -> app.getState()),

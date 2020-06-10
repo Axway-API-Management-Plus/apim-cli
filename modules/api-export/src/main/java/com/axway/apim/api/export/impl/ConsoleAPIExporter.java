@@ -22,6 +22,8 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
 public class ConsoleAPIExporter extends APIExporter {
+	
+	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
 	public ConsoleAPIExporter(APIExportParams params) {
 		super(params);
@@ -43,7 +45,7 @@ public class ConsoleAPIExporter extends APIExporter {
 	}
 	
 	private void printStandard(List<API> apis) {
-		System.out.println(AsciiTable.getTable(apis, Arrays.asList(
+		System.out.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
 				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getId()),
 				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getPath(api)),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getName()),
@@ -52,7 +54,7 @@ public class ConsoleAPIExporter extends APIExporter {
 	}
 	
 	private void printWide(List<API> apis) {
-		System.out.println(AsciiTable.getTable(apis, Arrays.asList(
+		System.out.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
 				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getId()),
 				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getPath(api)),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getName()),
@@ -60,13 +62,13 @@ public class ConsoleAPIExporter extends APIExporter {
 				new Column().header("V-Host").with(api -> api.getVhost()),
 				new Column().header("State").with(api -> getState(api)),
 				new Column().header("Security").with(api -> getUsedSecurity(api)),
-				new Column().header("Policies").with(api -> getUsedPolicies(api)),
+				new Column().header("Policies").maxColumnWidth(30).with(api -> getUsedPolicies(api)),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()
 				))));
 	}
 	
 	private void printUltra(List<API> apis) {
-		System.out.println(AsciiTable.getTable(apis, Arrays.asList(
+		System.out.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
 				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getId()),
 				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getPath(api)),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getName()),
@@ -74,7 +76,7 @@ public class ConsoleAPIExporter extends APIExporter {
 				new Column().header("V-Host").with(api -> api.getVhost()),
 				new Column().header("State").with(api -> getState(api)),
 				new Column().header("Security").with(api -> getUsedSecurity(api)),
-				new Column().header("Policies").with(api -> getUsedPolicies(api)),
+				new Column().header("Policies").maxColumnWidth(30).with(api -> getUsedPolicies(api)),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
 				new Column().header("Orgs").with(api -> getOrgCount(api)),
 				new Column().header("Apps").with(api -> Integer.toString(api.getApplications().size())),

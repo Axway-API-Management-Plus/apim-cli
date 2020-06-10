@@ -9,18 +9,15 @@ import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.APIPropertyAnnotation;
-import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.props.PropertyHandler;
@@ -31,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser {
+public class UpdateAPIProxy extends AbstractAPIMTask {
 	
 	public UpdateAPIProxy(API desiredState, API actualState) {
 		super(desiredState, actualState);
@@ -43,7 +40,7 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 		HttpEntity entity;
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
-		
+		HttpResponse httpResponse = null;
 		Transaction context = Transaction.getInstance();
 		
 		try {
@@ -61,43 +58,24 @@ public class UpdateAPIProxy extends AbstractAPIMTask implements IResponseParser 
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+context.get("virtualAPIId")).build();
 			entity = new StringEntity(objectMapper.writeValueAsString(lastJsonReponse), StandardCharsets.UTF_8);
 			
-			RestAPICall updateAPIProxy = new PUTRequest(entity, uri, this);
-			updateAPIProxy.execute();
+			RestAPICall updateAPIProxy = new PUTRequest(entity, uri, null);
+			httpResponse = updateAPIProxy.execute();
+			String response = EntityUtils.toString(httpResponse.getEntity());
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode < 200 || statusCode > 299){
+				LOG.error("Error updating API-Proxy. Response-Code: "+statusCode+". Got response: '"+response+"'");
+				LOG.debug("Request send:" + lastJsonReponse);
+				throw new AppException("Error updating API-Proxy. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
 		} catch (Exception e) {
 			throw new AppException("Cannot update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
-		}
-	}
-	
-	@Override
-	public JsonNode parseResponse(HttpResponse httpResponse) throws AppException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		String response = null;
-		try {
-			response = EntityUtils.toString(httpResponse.getEntity());
-			if(httpResponse.getStatusLine().getStatusCode()!=200) {
-				throw new AppException("Error updating API-Proxy. "
-						+ "[Return-Code: " + httpResponse.getStatusLine().getStatusCode() + ", Response: '"+response+"'", ErrorCode.CANT_UPDATE_API_PROXY);
-			}
-			JsonNode jsonNode = objectMapper.readTree(response);
-			String backendAPIId = jsonNode.findPath("id").asText();
-			Transaction.getInstance().put("backendAPIId", backendAPIId);
-		} catch (Exception e) {
-			try {
-				Transaction context = Transaction.getInstance();
-				Object lastRequest = context.get("lastRequest");
-				LOG.error("Last request: " + EntityUtils.toString(((HttpEntityEnclosingRequestBase)lastRequest).getEntity()));
-				LOG.error("Unable to parse received response from API-Manager: '" + response + "'");
-				throw new AppException("Unable to parse received response from API-Manager", ErrorCode.UNXPECTED_ERROR, e);
-			} catch (Exception e1) {
-				throw new AppException("Unable to parse response", ErrorCode.UNXPECTED_ERROR, e1);
-			}
 		} finally {
 			try {
-				((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) { }
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
 		}
-		return null;
-	}	
+	}
 	
 	private static JsonNode handledChangedProps(JsonNode lastJsonReponse, API desired, API actual, List<String> changedProps) throws AppException {
 		Field field = null;
