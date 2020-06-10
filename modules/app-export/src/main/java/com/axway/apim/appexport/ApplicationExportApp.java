@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
 import com.axway.apim.appexport.impl.ApplicationExporter.ExportImpl;
@@ -30,7 +29,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 
 	@Override
 	public String getName() {
-		return "Export applications";
+		return "Application - E X P O R T";
 	}
 
 	@Override

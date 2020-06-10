@@ -28,7 +28,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 
 	@Override
 	public String getName() {
-		return "Import applications";
+		return "Application - I M P O R T";
 	}
 	
 	@Override

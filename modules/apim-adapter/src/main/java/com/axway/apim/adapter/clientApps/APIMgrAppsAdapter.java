@@ -142,9 +142,9 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 				}
 				addApplicationCredentials(app, filter.isIncludeCredentials());
 				addAPIAccess(app, filter.isIncludeAPIAccess());
-				if(logProgress && apps.size()>1) Utils.progressPercentage(i, apps.size(), "Initializing Applications");
+				if(logProgress && apps.size()>5) Utils.progressPercentage(i, apps.size(), "Initializing Applications");
 			}
-			System.out.print("\n");
+			if(logProgress && apps.size()>5) System.out.print("\n");
 		} catch (Exception e) {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}

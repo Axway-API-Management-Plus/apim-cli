@@ -39,6 +39,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
@@ -75,7 +76,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 	}
 
 	@Override
-	public List<API> getAPIs(APIFilter filter, boolean logStatusMessage) throws AppException {
+	public List<API> getAPIs(APIFilter filter, boolean logProgress) throws AppException {
 		List<API> apis = new ArrayList<API>();
 		try {
 			_readAPIsFromAPIManager(filter);
@@ -89,10 +90,10 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				addExistingClientAppQuotas(api, filter.isIncludeQuotas());
 				addOriginalAPIDefinitionFromAPIM(api, filter.isIncludeOriginalAPIDefinition());
 				addImageFromAPIM(api, filter.isIncludeImage());
-				if(logStatusMessage && apis.size()>1) Utils.progressPercentage(i, apis.size(), "Initializing APIs");
+				if(logProgress && apis.size()>5) Utils.progressPercentage(i, apis.size(), "Initializing APIs");
 			}
 			addCustomProperties(apis, filter);
-			if(logStatusMessage) System.out.print("\n");
+			if(logProgress && apis.size()>5) System.out.print("\n");
 		} catch (IOException e) {
 			throw new AppException("Cant reads API from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
@@ -120,6 +121,10 @@ public class APIManagerAPIAdapter extends APIAdapter {
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode < 200 || statusCode > 299){
+				if(statusCode == 403 && filter.getId()!=null) {
+					ErrorState.getInstance().setError("Unable to find API with ID: "+filter.getId()+". Please have in mind during API-Update the ID is re-created!", ErrorCode.UNKNOWN_API, false);
+					apiManagerResponse.put(filter, "[]");
+				}
 				LOG.error("Error loading APIs from API-Manager. Response-Code: "+statusCode+". Got response: '"+response+"'");
 				throw new AppException("Error loading APIs from API-Manager. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}

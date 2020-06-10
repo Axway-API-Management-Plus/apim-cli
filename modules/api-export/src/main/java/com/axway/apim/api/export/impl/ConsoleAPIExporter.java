@@ -80,7 +80,8 @@ public class ConsoleAPIExporter extends APIExporter {
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
 				new Column().header("Orgs").with(api -> getOrgCount(api)),
 				new Column().header("Apps").with(api -> Integer.toString(api.getApplications().size())),
-				new Column().header("Quotas").with(api -> Boolean.toString(hasQuota(api))
+				new Column().header("Quotas").with(api -> Boolean.toString(hasQuota(api))),
+				new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getTags(api)
 				))));
 	}
 	
@@ -110,6 +111,10 @@ public class ConsoleAPIExporter extends APIExporter {
 			LOG.error("Error getting API path");
 			return "Err";
 		}
+	}
+	
+	private String getTags(API api) {
+		return String.join(System.lineSeparator(), api.getTags().values().toString());
 	}
 	
 	private String getOrgCount(API api) {
