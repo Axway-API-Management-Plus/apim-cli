@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.adapter.apis.APIFilter;
-import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
+import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.model.InboundProfile;
@@ -120,7 +120,7 @@ public class ConsoleAPIExporter extends APIExporter {
 
 	@Override
 	public APIFilter getFilter() {
-		APIFilter filter = new APIFilter.Builder(Type.ACTUAL_API)
+		APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API)
 				.hasVHost(params.getValue("vhost"))
 				.hasApiPath(params.getValue("api-path"))
 				.hasId(params.getValue("id"))

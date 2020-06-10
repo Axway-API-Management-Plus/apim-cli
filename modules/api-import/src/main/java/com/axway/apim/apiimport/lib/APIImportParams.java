@@ -15,7 +15,7 @@ public class APIImportParams extends CommandParameters {
 	public static synchronized APIImportParams getInstance() {
 		return (APIImportParams)CommandParameters.getInstance();
 	}
-
+	
 	@Override
 	public boolean ignoreCache() {
 		// For import action we ignore the cache in all cases!

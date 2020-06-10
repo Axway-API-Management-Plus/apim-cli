@@ -7,7 +7,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIFilter.Builder.Type;
+import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 
@@ -20,7 +20,7 @@ public class APIFilterTest {
 	
 	@Test
 	public void testStandardActualAPI() {
-		APIFilter filter = new APIFilter.Builder(Type.ACTUAL_API).build();
+		APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API).build();
 		Assert.assertEquals(filter.isIncludeClientApplications(), true);
 		Assert.assertEquals(filter.isIncludeClientOrganizations(), true);
 		Assert.assertEquals(filter.isIncludeQuotas(), true);
@@ -29,7 +29,7 @@ public class APIFilterTest {
 	
 	@Test
 	public void testCustomActualAPI() {
-		APIFilter filter = new APIFilter.Builder(Type.ACTUAL_API)
+		APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API)
 				.includeClientApplications(false)
 				.includeClientOrganizations(false)
 				.includeQuotas(false)

@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.OutboundProfile;
@@ -44,6 +45,8 @@ public class APIFilter {
 	private String queryStringVersion;
 	private String state;
 	
+	private APIType type;
+	
 	private String policyName;
 	
 	private Map<String, String> customProperties;
@@ -71,6 +74,11 @@ public class APIFilter {
 	List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
 	private APIFilter() {
+		this.type = APIType.CUSTOM;
+	}
+	
+	private APIFilter(APIType type) {
+		this.type = type;
 	}
 
 	public List<NameValuePair> getFilters() {
@@ -143,6 +151,10 @@ public class APIFilter {
 		} else {
 			return APIManagerAdapter.TYPE_FRONT_END;
 		}
+	}
+
+	public APIType getType() {
+		return type;
 	}
 
 	public boolean isIncludeOriginalAPIDefinition() {
@@ -407,20 +419,6 @@ public class APIFilter {
 			CUSTOM
 		}
 		
-		public static enum Type {
-			/**
-			 * APIs are created with: 
-			 * - including the original API-Definition
-			 * - includingQuotas
-			 * - Methods are not translated and stay with ID
-			 * - Policies have the external name
-			 * - Client-Organizations and -Applications are initialized
-			 */
-			ACTUAL_API, 
-			DESIRED_API, 
-			CUSTOM
-		}
-		
 		String id;
 		String apiId;
 		String name;
@@ -429,6 +427,8 @@ public class APIFilter {
 		String apiPath;
 		String queryStringVersion;
 		String state;
+		
+		APIType apiType;
 		
 		Map<String, String> customProperties;
 		
@@ -453,14 +453,14 @@ public class APIFilter {
 		List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
 		public Builder() {
-			this(Type.CUSTOM, false);
+			this(APIType.CUSTOM, false);
 		}
 
 		/**
 		 * Creates a ClientAppAdapter based on the provided configuration using all registered Adapters
 		 * @param type of the APIFilter
 		 */
-		public Builder(Type type) {
+		public Builder(APIType type) {
 			this(type, false);
 		}
 		
@@ -469,14 +469,15 @@ public class APIFilter {
 		 * @param type of the APIFilter
 		 * @param useBackendAPI is search backendEndAPI if set to true 
 		 */
-		public Builder(Type type, boolean useBackendAPI) {
+		public Builder(APIType type, boolean useBackendAPI) {
 			super();
 			initType(type);
+			this.apiType = type;
 			this.useBackendAPI = useBackendAPI;
 		}
 		
 		public APIFilter build() {
-			APIFilter apiFilter = new APIFilter();
+			APIFilter apiFilter = new APIFilter(this.apiType);
 			apiFilter.setApiPath(this.apiPath);
 			apiFilter.setQueryStringVersion(this.queryStringVersion);
 			apiFilter.setVhost(this.vhost);
@@ -501,7 +502,7 @@ public class APIFilter {
 			return apiFilter;
 		}
 
-		private void initType(Type type) {
+		private void initType(APIType type) {
 			switch(type) {
 			case ACTUAL_API:
 				this.includeQuotas = true;
