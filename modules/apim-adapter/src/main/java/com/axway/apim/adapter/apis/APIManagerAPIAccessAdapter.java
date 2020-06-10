@@ -107,13 +107,16 @@ public class APIManagerAPIAccessAdapter {
 			if(includeAPIName) {
 				for(APIAccess apiAccess : allApiAccess) {
 					API api = APIManagerAdapter.getInstance().apiAdapter.getAPI(new APIFilter.Builder().hasId(apiAccess.getApiId()).build(), false);
+					if(api==null) {
+						throw new AppException("Unable to find API with ID: " + apiAccess.getApiId(), ErrorCode.UNKNOWN_API);
+					}
 					apiAccess.setApiName(api.getName());
 					apiAccess.setApiVersion(api.getVersion());
 				}
 			}
 			return allApiAccess;
 		} catch (Exception e) {
-			LOG.error("Error cant load API-Access for "+type+" from API-Manager. Can't parse response: " + apiAccessResponse, e);
+			LOG.error("Error loading API-Access for "+type+" from API-Manager. Can't parse response: " + apiAccessResponse, e);
 			throw new AppException("Error loading API-Access for "+type+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}

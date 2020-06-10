@@ -1,17 +1,8 @@
 package com.axway.apim.apiimport.actions.tasks;
 
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerQuotaAdapter.Quota;
@@ -20,14 +11,8 @@ import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.QuotaRestrictiontype;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.rest.PUTRequest;
-import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.axway.apim.lib.utils.rest.Transaction;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UpdateQuotaConfiguration extends AbstractAPIMTask {
 	

@@ -77,6 +77,8 @@ public class CreateNewAPI {
 		try {
 			// As we have just created an API-Manager API, we should reflect this for further processing
 			APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API).build();
+			// Force reloading the API!
+			((APIManagerAPIAdapter)APIManagerAdapter.getInstance().apiAdapter).setAPIManagerResponse(filter, null);
 			createdAPI = ((APIManagerAPIAdapter)APIManagerAdapter.getInstance().apiAdapter).setAPIManagerResponse(filter, "["+context.get("lastResponse").toString()+"]").getAPI(filter, true);
 			// Register the created FE-API to be rolled back in case of an error
 			((API)rollbackAPI).setId(createdAPI.getId());

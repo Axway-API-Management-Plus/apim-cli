@@ -2,6 +2,7 @@ package com.axway.apim;
 
 import java.util.List;
 
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,15 +36,27 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	
 	@CLIServiceMethod(name = "export", description = "Export APIs from the API-Manager")
 	public static int export(String args[]) {
-		return runExport(args, ExportImpl.JSON_EXPORTER);
+		try {
+			APIExportParams params = new APIExportParams(new APIExportCLIOptions(args));
+			return runExport(params, ExportImpl.JSON_EXPORTER);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
 	}
 	
 	@CLIServiceMethod(name = "list", description = "List APIs from the API-Manager")
 	public static int list(String args[]) {
-		return runExport(args, ExportImpl.CONSOLE_EXPORTER);
+		try {
+			APIExportParams params = new APIExportParams(new APIExportCLIOptions(args));
+			return runExport(params, ExportImpl.CONSOLE_EXPORTER);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
 	}
 	
-	private static int runExport(String[] args, ExportImpl exportImpl) {
+	private static int runExport(APIExportParams params, ExportImpl exportImpl) {
 		try {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
@@ -51,7 +64,6 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			APIMHttpClient.deleteInstance();
 			Transaction.deleteInstance();
 
-			APIExportParams params = new APIExportParams(new APIExportCLIOptions(args));
 			APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
 			
 			APIExporter exporter = APIExporter.create(exportImpl, params);
