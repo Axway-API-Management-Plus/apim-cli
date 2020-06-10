@@ -90,7 +90,7 @@ public class APIManagerAPIAdapter extends APIAdapter {
 				addExistingClientAppQuotas(api, filter.isIncludeQuotas());
 				addOriginalAPIDefinitionFromAPIM(api, filter.isIncludeOriginalAPIDefinition());
 				addImageFromAPIM(api, filter.isIncludeImage());
-				if(logProgress && apis.size()>5) Utils.progressPercentage(i, apis.size(), "Initializing APIs");
+				if(logProgress && apis.size()>5) Utils.progressPercentage(i, apis.size(), "Loading "+apis.size()+" APIs");
 			}
 			addCustomProperties(apis, filter);
 			if(logProgress && apis.size()>5) System.out.print("\n");

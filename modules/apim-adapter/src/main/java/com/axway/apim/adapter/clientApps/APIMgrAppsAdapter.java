@@ -142,7 +142,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 				}
 				addApplicationCredentials(app, filter.isIncludeCredentials());
 				addAPIAccess(app, filter.isIncludeAPIAccess());
-				if(logProgress && apps.size()>5) Utils.progressPercentage(i, apps.size(), "Initializing Applications");
+				if(logProgress && apps.size()>5) Utils.progressPercentage(i, apps.size(), "Laoding "+apps.size()+" Applications");
 			}
 			if(logProgress && apps.size()>5) System.out.print("\n");
 		} catch (Exception e) {

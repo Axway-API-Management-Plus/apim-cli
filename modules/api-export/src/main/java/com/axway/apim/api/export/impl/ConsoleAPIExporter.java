@@ -81,8 +81,8 @@ public class ConsoleAPIExporter extends APIExporter {
 				new Column().header("Orgs").with(api -> getOrgCount(api)),
 				new Column().header("Apps").with(api -> Integer.toString(api.getApplications().size())),
 				new Column().header("Quotas").with(api -> Boolean.toString(hasQuota(api))),
-				new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getTags(api)
-				))));
+				new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getTags(api))
+				)));
 	}
 	
 	private boolean hasQuota(API api) {
@@ -114,15 +114,28 @@ public class ConsoleAPIExporter extends APIExporter {
 	}
 	
 	private String getTags(API api) {
+		if(api.getTags()==null) return "";
 		Iterator<String> it = api.getTags().keySet().iterator();
 		List<String> tags = new ArrayList<String>();
 		while(it.hasNext()) {
 			String tagGroup = it.next();
 			String[] tagValues = api.getTags().get(tagGroup);
-			tags.add(tagGroup + ": " + tagValues.toString());
+			tags.add(tagGroup + ": " + Arrays.toString(tagValues));
 		}
 		return String.join(System.lineSeparator(), tags);
 	}
+	
+/*	private String getCustomProps(API api) {
+		if(api.getCustomProperties()==null) return "";
+		Iterator<String> it = api.getCustomProperties().keySet().iterator();
+		List<String> props = new ArrayList<String>();
+		while(it.hasNext()) {
+			String property = it.next();
+			String value = api.getCustomProperties().get(property);
+			props.add(property + ": " + value);
+		}
+		return String.join(System.lineSeparator(), props);
+	}*/
 	
 	private String getOrgCount(API api) {
 		try {
