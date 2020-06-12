@@ -617,8 +617,8 @@ public class APIManagerAPIAdapter {
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 201){
-				LOG.error("Error importing WSDL. Received Status-Code: " +statusCode+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
-				throw new AppException("Can't import WSDL from URL / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
+				LOG.error("Error updating API status. Received Status-Code: " +statusCode+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+				throw new AppException("Error updating API status. Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_BE_API);
 			}
 		} catch (Exception e) {
 			throw new AppException("Cannot update API-Proxy status.", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -662,8 +662,8 @@ public class APIManagerAPIAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			if(statusCode != 201){
-				LOG.error("Error importing WSDL. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
-				throw new AppException("Can't import WSDL from URL / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
+				LOG.error("Error updating retirement data of API. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
+				throw new AppException("Error updating retirement data of API.", ErrorCode.CANT_CREATE_BE_API);
 			}
 		} catch (Exception e) {
 			ErrorState.getInstance().setError("Error while updating the retirementDate.", ErrorCode.CANT_UPDATE_API_PROXY);
