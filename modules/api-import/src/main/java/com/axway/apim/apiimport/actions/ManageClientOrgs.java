@@ -1,44 +1,23 @@
 package com.axway.apim.apiimport.actions;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
-import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
-import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
-import com.axway.apim.lib.utils.rest.DELRequest;
-import com.axway.apim.lib.utils.rest.POSTRequest;
-import com.axway.apim.lib.utils.rest.RestAPICall;
-import com.axway.apim.lib.utils.rest.Transaction;
-import com.fasterxml.jackson.databind.JsonNode;
 
 public class ManageClientOrgs {
 	
 	static Logger LOG = LoggerFactory.getLogger(ManageClientOrgs.class);
-	
-	private static String MODE					= "MODE";
-	private static String MODE_GRANT_ACCESS		= "MODE_GRANT_ACCESS";
-	private static String MODE_REMOVE_ACCESS	= "MODE_REMOVE_ACCESS";
 	
 	APIManagerAdapter apiManager;
 	
@@ -88,7 +67,8 @@ public class ManageClientOrgs {
 	
 	private List<Organization> getMissingOrgs(List<Organization> orgs, List<Organization> referenceOrgs) throws AppException {
 		List<Organization> missingOrgs = new ArrayList<Organization>();
-		if(orgs==null || referenceOrgs ==null) return missingOrgs;
+		if(orgs==null) return missingOrgs;
+		if(referenceOrgs==null) return orgs; // Take over all orgs as missing
 		for(Organization org : orgs) {
 			if(referenceOrgs.contains(org)) {
 				continue;

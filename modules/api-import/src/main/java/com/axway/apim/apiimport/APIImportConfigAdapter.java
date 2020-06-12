@@ -302,8 +302,8 @@ public class APIImportConfigAdapter {
 			apiConfig.setClientOrganizations(null); // Making sure, orgs are not considered as a changed property
 			return;
 		}
-		List<Organization> allOrgs =  APIManagerAdapter.getInstance().orgAdapter.getAllOrgs();
 		if(apiConfig.getClientOrganizations().contains(new Organization().setName("ALL"))) {
+			List<Organization> allOrgs =  APIManagerAdapter.getInstance().orgAdapter.getAllOrgs();
 			apiConfig.getClientOrganizations().clear();
 			apiConfig.getClientOrganizations().addAll(allOrgs);
 			((DesiredAPI)apiConfig).setRequestForAllOrgs(true);
@@ -316,16 +316,21 @@ public class APIImportConfigAdapter {
 			// And validate each configured organization really exists in the API-Manager
 			Iterator<Organization> it = apiConfig.getClientOrganizations().iterator();
 			String invalidClientOrgs = null;
+			List<Organization> foundOrgs = new ArrayList<Organization>();
 			while(it.hasNext()) {
 				Organization desiredOrg = it.next();
-				if(!allOrgs.contains(desiredOrg)) {
+				Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(desiredOrg.getName());
+				if(org==null) {
 					LOG.warn("Unknown organization with name: '" + desiredOrg.getName() + "' configured. Ignoring this organization.");
 					invalidClientOrgs = invalidClientOrgs==null ? desiredOrg.getName() : invalidClientOrgs + ", "+desiredOrg.getName();
 					APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_ORGANIZATIONS.name(), invalidClientOrgs);
 					it.remove();
 					continue;
 				}
+				it.remove();
+				foundOrgs.add(org);
 			}
+			apiConfig.getClientOrganizations().addAll(foundOrgs);
 		}
 	}
 	

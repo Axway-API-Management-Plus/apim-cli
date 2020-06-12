@@ -146,11 +146,11 @@ public class API {
 			propHandler = CorsProfileHandler.class)
 	protected List<CorsProfile> corsProfiles;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
+	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected List<Organization> clientOrganizations;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
+	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<ClientApplication> applications = null;
