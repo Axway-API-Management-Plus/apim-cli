@@ -20,7 +20,7 @@ public class DeleteAPIHandler extends APIResultHandler {
 		APIStatusManager statusManager = new APIStatusManager();
 		System.out.println(apis.size() + " selected for deletion.");
 		if(askYesNo("Do you wish to proceed? (Y/N)")) {
-			System.out.println("Okay, going to delete: " + apis.size());
+			System.out.println("Okay, going to delete: " + apis.size() + " API(s)");
 			for(API api : apis) {
 				try {
 					statusManager.update(api, API.STATE_DELETED, true);
@@ -28,6 +28,7 @@ public class DeleteAPIHandler extends APIResultHandler {
 					LOG.error("Error deleting API: " + api.getName());
 				}
 			}
+			System.out.println("Done!");
 		} else {
 			System.out.println("Canceled.");
 		}

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
@@ -66,7 +67,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			Transaction.deleteInstance();
 			
 			new AppExportParams(new AppExportCLIOptions(args));
-			ClientAppAdapter appAdapter = ClientAppAdapter.create(APIManagerAdapter.getInstance());
+			APIMgrAppsAdapter appAdapter = new APIMgrAppsAdapter();
 			ApplicationExporter exporter = ApplicationExporter.create(exportImpl, AppExportParams.getInstance());
 			List<ClientApplication> apps = appAdapter.getApplications(exporter.getFilter(), true);
 			if(apps.size()==0) {

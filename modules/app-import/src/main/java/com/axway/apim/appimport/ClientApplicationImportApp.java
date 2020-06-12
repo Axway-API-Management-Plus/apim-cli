@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -59,11 +60,10 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the application
 			ClientAppAdapter desiredAppsAdapter = ClientAppAdapter.create(params.getValue("config"));
-			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications(new ClientAppFilter.Builder().build(), false);
-			ClientAppAdapter apimClientAppAdapter =  ClientAppAdapter.create(APIManagerAdapter.getInstance());
-			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter, apimClientAppAdapter);
+			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
+			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter);
 			for(ClientApplication desiredApp : desiredApps) {
-				ClientApplication actualApp = apimClientAppAdapter.getApplication(new ClientAppFilter.Builder()
+				ClientApplication actualApp = APIManagerAdapter.getInstance().appAdapter.getApplication(new ClientAppFilter.Builder()
 						.includeCredentials(true)
 						.includeImage(true)
 						.includeQuotas(true)

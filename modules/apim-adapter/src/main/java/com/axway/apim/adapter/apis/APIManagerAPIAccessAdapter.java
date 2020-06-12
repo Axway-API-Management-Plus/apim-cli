@@ -115,7 +115,7 @@ public class APIManagerAPIAccessAdapter {
 			}
 			return allApiAccess;
 		} catch (Exception e) {
-			LOG.error("Error loading API-Access for "+type+" from API-Manager. Can't parse response: " + apiAccessResponse, e);
+			LOG.error("Error loading API-Access for "+type+" from API-Manager. Can't process response: " + apiAccessResponse, e);
 			throw new AppException("Error loading API-Access for "+type+" from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}

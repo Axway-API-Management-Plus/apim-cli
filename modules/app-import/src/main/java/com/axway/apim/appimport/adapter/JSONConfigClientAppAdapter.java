@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
+import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
@@ -28,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-public class JSONConfigClientAppAdapter {
+public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(JSONConfigClientAppAdapter.class);
 	
@@ -65,7 +66,8 @@ public class JSONConfigClientAppAdapter {
 		return true;
 	}
 	
-	public List<ClientApplication> getAllApplications(boolean logProgress) throws AppException {
+	@Override
+	public List<ClientApplication> getApplications() throws AppException {
 		return this.apps;
 	}
 	

@@ -46,7 +46,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class APIMgrAppsAdapter extends ClientAppAdapter {
+public class APIMgrAppsAdapter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIMgrAppsAdapter.class);
 
@@ -66,12 +66,6 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		applicationsCache = APIManagerAdapter.getCache(CacheType.applicationsCache, String.class, String.class);
 		applicationsSubscriptionCache = APIManagerAdapter.getCache(CacheType.applicationsSubscriptionCache, String.class, String.class);
 		applicationsCredentialCache = APIManagerAdapter.getCache(CacheType.applicationsCredentialCache, String.class, String.class);
-	}
-	
-	@Override
-	public boolean readConfig(Object config) throws AppException {
-		if(config instanceof APIManagerAdapter && CommandParameters.getInstance()!=null) return true;
-		return false;
 	}
 
 	/**
@@ -126,7 +120,6 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		return uri;
 	}
 	
-	@Override
 	public List<ClientApplication> getApplications(ClientAppFilter filter, boolean logProgress) throws AppException {
 		readApplicationsFromAPIManager(filter);
 		List<ClientApplication> apps;
@@ -151,7 +144,6 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		return apps;
 	}
 	
-	@Override
 	public List<ClientApplication> getAllApplications(boolean logProgress) throws AppException {
 		return getApplications(new ClientAppFilter.Builder().build(), logProgress);
 	}
@@ -278,12 +270,10 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		
 	}
 	
-	@Override
 	public ClientApplication updateApplication(ClientApplication desiredApp, ClientApplication actualApp) throws AppException {
 		return createOrUpdateApplication(desiredApp, actualApp);
 	}
 	
-	@Override
 	public ClientApplication createApplication(ClientApplication desiredApp) throws AppException {
 		return createOrUpdateApplication(desiredApp, null);
 	}

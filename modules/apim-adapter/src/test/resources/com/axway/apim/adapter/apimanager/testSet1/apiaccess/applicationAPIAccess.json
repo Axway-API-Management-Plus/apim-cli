@@ -1,7 +1,7 @@
 [
     {
         "id": "89b71358-9316-4a71-a151-3a44d354e986",
-        "apiId": "7a9c69cb-668d-4887-8315-a9911fcfa120",
+        "apiId": "72745ed9-f75b-428c-959c-b483eea497a1",
         "createdBy": "f60e3e05-cdf3-4b70-affc-4cb61a10f4bb",
         "state": "approved",
         "createdOn": 1589391381288,
@@ -9,18 +9,10 @@
     },
     {
         "id": "6c4ace49-1244-4ab0-86e8-669c14c25673",
-        "apiId": "e7664c47-a18d-4081-bf24-63af009913cd",
+        "apiId": "72745ed9-f75b-428c-959c-99999999",
         "createdBy": "f60e3e05-cdf3-4b70-affc-4cb61a10f4bb",
         "state": "approved",
         "createdOn": 1589391382757,
-        "enabled": true
-    },
-    {
-        "id": "3259cb9c-940e-47d6-ac37-63e86fab63e1",
-        "apiId": "72745ed9-f75b-428c-959c-b483eea497a1",
-        "createdBy": "f60e3e05-cdf3-4b70-affc-4cb61a10f4bb",
-        "state": "approved",
-        "createdOn": 1589391336757,
         "enabled": true
     }
 ]
