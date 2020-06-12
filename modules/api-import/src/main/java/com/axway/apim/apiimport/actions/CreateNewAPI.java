@@ -7,6 +7,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
+import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.apiimport.rollback.RollbackAPIProxy;
@@ -43,6 +44,8 @@ public class CreateNewAPI {
 			changes.getDesiredAPI().setApiId(createdBEAPI.getApiId());
 			createdAPI = apiAdapter.createAPIProxy(changes.getDesiredAPI());
 		} catch (Exception e) {
+			// Try to rollback FE-API (Proxy) bases on the created BE-API
+			rollback.addRollbackAction(new RollbackAPIProxy(createdBEAPI));
 			throw e;
 		}
 		rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback
