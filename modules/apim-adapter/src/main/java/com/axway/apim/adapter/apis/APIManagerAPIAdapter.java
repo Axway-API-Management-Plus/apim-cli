@@ -591,7 +591,7 @@ public class APIManagerAPIAdapter {
 	
 	
 	public void updateAPIStatus(API api) throws AppException {
-		LOG.info("Update API-Proxy status to: " + api.getState());
+		LOG.debug("Update API-Proxy status to: " + api.getState());
 		URI uri;
 		HttpResponse httpResponse = null;
 		RestAPICall request;

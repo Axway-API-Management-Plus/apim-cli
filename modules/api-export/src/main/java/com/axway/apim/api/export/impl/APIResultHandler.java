@@ -66,17 +66,13 @@ public abstract class APIResultHandler {
 	public abstract APIFilter getFilter();
 	
 	protected Builder getBaseAPIFilterBuilder() {
-		Builder builder = new APIFilter.Builder(APIType.ACTUAL_API)
+		Builder builder = new APIFilter.Builder(APIType.CUSTOM)
 				.hasVHost(params.getValue("vhost"))
 				.hasApiPath(params.getValue("api-path"))
 				.hasPolicyName(params.getValue("policy"))
 				.hasId(params.getValue("id"))
 				.hasName(params.getValue("name"))
-				.hasState(params.getValue("state"))
-				.includeImage(false)
-				.includeClientApplications(false)
-				.includeClientOrganizations(false)
-				.includeOriginalAPIDefinition(false);
+				.hasState(params.getValue("state"));
 		return builder;
 	}
 	

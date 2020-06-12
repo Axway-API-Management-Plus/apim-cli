@@ -64,6 +64,8 @@ public class JsonAPIExporter extends APIResultHandler {
 		Builder builder = getBaseAPIFilterBuilder()
 				.includeQuotas(true)
 				.includeImage(true)
+				.includeClientApplications(true)
+				.includeClientOrganizations(true)
 				.includeOriginalAPIDefinition(true);
 		return builder.build();
 	}
