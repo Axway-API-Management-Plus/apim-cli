@@ -216,8 +216,8 @@ public class APIImportConfigAdapter {
 			addDefaultPassthroughSecurityProfile(apiConfig);
 			addDefaultCorsProfile(apiConfig);
 			addDefaultAuthenticationProfile(apiConfig);
-			addDefaultOutboundProfile(apiConfig);
-			addDefaultInboundProfile(apiConfig);
+			validateOutboundProfile(apiConfig);
+			validateInboundProfile(apiConfig);
 			APISpecification apiSpecification = APISpecificationFactory.getAPISpecification(getAPIDefinitionContent(), this.pathToAPIDefinition, ((DesiredAPI)apiConfig).getBackendBasepath());
 			apiConfig.setApiDefinition(apiSpecification);
 			addImageContent(apiConfig);
@@ -713,19 +713,37 @@ public class APIImportConfigAdapter {
 		return null;
 	}
 	
-	private API addDefaultInboundProfile(API importApi) throws AppException {
+	private API validateInboundProfile(API importApi) throws AppException {
 		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) return importApi;
 		Iterator<String> it = importApi.getInboundProfiles().keySet().iterator();
+		// Check if a default inbound profile is given
+		boolean defaultProfileFound = false;
 		while(it.hasNext()) {
 			String profileName = it.next();
-			if(profileName.equals("_default")) return importApi; // Nothing to, there is a default profile
+			if(profileName.equals("_default")) { 
+				defaultProfileFound = true;
+				continue; // No need to check for the default profile
+			}
+			// Check the referenced profiles are valid
+			InboundProfile profile = importApi.getInboundProfiles().get(profileName);
+			if(profile.getCorsProfile()!=null && getCorsProfile(importApi, profile.getCorsProfile())==null) {
+				ErrorState.getInstance().setError("InboundProfile is referencing a unknown CorsProfile: '"+profile.getCorsProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID, false);
+				throw new AppException("Inbound profile is referencing a unknown CorsProfile: '"+profile.getCorsProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
+			}
+			if(profile.getSecurityProfile()!=null && getSecurityProfile(importApi, profile.getSecurityProfile())==null) {
+				ErrorState.getInstance().setError("InboundProfile is referencing a unknown SecurityProfile: '"+profile.getSecurityProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID, false);
+				throw new AppException("Inbound profile is referencing a unknown SecurityProfile: '"+profile.getSecurityProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
+			}
 		}
-		InboundProfile defaultProfile = new InboundProfile();
-		defaultProfile.setSecurityProfile("_default");
-		defaultProfile.setCorsProfile("_default");
-		defaultProfile.setMonitorAPI(true);
-		defaultProfile.setMonitorSubject("authentication.subject.id");
-		importApi.getInboundProfiles().put("_default", defaultProfile);
+		/// If not, create a PassThrough!
+		if(!defaultProfileFound) {
+			InboundProfile defaultProfile = new InboundProfile();
+			defaultProfile.setSecurityProfile("_default");
+			defaultProfile.setCorsProfile("_default");
+			defaultProfile.setMonitorAPI(true);
+			defaultProfile.setMonitorSubject("authentication.subject.id");
+			importApi.getInboundProfiles().put("_default", defaultProfile);
+		}
 		return importApi;
 	}
 	
@@ -789,25 +807,35 @@ public class APIImportConfigAdapter {
 		return importApi;
 	}
 	
-	private API addDefaultOutboundProfile(API importApi) throws AppException {
+	private API validateOutboundProfile(API importApi) throws AppException {
 		if(importApi.getOutboundProfiles()==null || importApi.getOutboundProfiles().size()==0) return importApi;
 		Iterator<String> it = importApi.getOutboundProfiles().keySet().iterator();
+		boolean defaultProfileFound = false;
 		while(it.hasNext()) {
 			String profileName = it.next();
+			OutboundProfile profile = importApi.getOutboundProfiles().get(profileName);
 			if(profileName.equals("_default")) {
+				defaultProfileFound = true;
 				// Validate the _default Outbound-Profile has an AuthN-Profile, otherwise we must add (See isseu #133)
-				OutboundProfile profile = importApi.getOutboundProfiles().get(profileName);
+				
 				if(profile.getAuthenticationProfile()==null) {
 					LOG.warn("Provided default outboundProfile doesn't contain AuthN-Profile - Setting it to default");
 					profile.setAuthenticationProfile("_default");
 				}
+				continue;
 			}
-			return importApi;
+			// Check the referenced profiles are valid
+			if(profile.getAuthenticationProfile()!=null && getAuthNProfile(importApi, profile.getAuthenticationProfile())==null) {
+				ErrorState.getInstance().setError("OutboundProfile is referencing a unknown AuthenticationProfile: '"+profile.getAuthenticationProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID, false);
+				throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '"+profile.getAuthenticationProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
+			}
 		}
-		OutboundProfile defaultProfile = new OutboundProfile();
-		defaultProfile.setAuthenticationProfile("_default");
-		defaultProfile.setRouteType("proxy");
-		importApi.getOutboundProfiles().put("_default", defaultProfile);
+		if(!defaultProfileFound) {
+			OutboundProfile defaultProfile = new OutboundProfile();
+			defaultProfile.setAuthenticationProfile("_default");
+			defaultProfile.setRouteType("proxy");
+			importApi.getOutboundProfiles().put("_default", defaultProfile);
+		}
 		return importApi;
 	}
 	
@@ -1039,6 +1067,31 @@ public class APIImportConfigAdapter {
 		return protocols.split(",");
 	}
 	
+	/*
+	 * Refactor the following three method a Generic one
+	 */
 	
+	private CorsProfile getCorsProfile(API api, String profileName) {
+		if(api.getCorsProfiles()==null || api.getCorsProfiles().size()==0) return null;
+		for(CorsProfile cors : api.getCorsProfiles()) {
+			if(profileName.equals(cors.getName())) return cors;
+		}
+		return null;
+	}
 	
+	private AuthenticationProfile getAuthNProfile(API api, String profileName) {
+		if(api.getAuthenticationProfiles()==null || api.getAuthenticationProfiles().size()==0) return null;
+		for(AuthenticationProfile profile : api.getAuthenticationProfiles()) {
+			if(profileName.equals(profile.getName())) return profile;
+		}
+		return null;
+	}
+	
+	private SecurityProfile getSecurityProfile(API api, String profileName) throws AppException {
+		if(api.getSecurityProfiles()==null || api.getSecurityProfiles().size()==0) return null;
+		for(SecurityProfile profile : api.getSecurityProfiles()) {
+			if(profileName.equals(profile.getName())) return profile;
+		}
+		return null;
+	}
 }

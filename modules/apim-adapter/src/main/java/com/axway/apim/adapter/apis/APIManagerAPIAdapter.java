@@ -320,10 +320,9 @@ public class APIManagerAPIAdapter {
 	}
 	
 	private <ProfileType> void _translateMethodIds(Map<String, ProfileType> profiles, METHOD_TRANSLATION mode, List<String> apiIds) throws AppException {
-		Map<String, ProfileType> updatedEntries = new LinkedHashMap<String, ProfileType>();
+		Map<String, ProfileType> updatedEntries = new HashMap<String, ProfileType>();
 		
 		if(profiles!=null) {
-			//List<APIMethod> methods = apim.methodAdapter.getAllMethodsForAPI(apiId);
 			Iterator<String> keys = profiles.keySet().iterator();
 			while(keys.hasNext()) {
 				String key = keys.next();
@@ -506,9 +505,10 @@ public class APIManagerAPIAdapter {
 		HttpEntity entity;
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota"}));
+				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath"}));
 		mapper.setFilterProvider(filter);
 		HttpResponse httpResponse = null;
+		translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()).build();
 			// Proxy Update endpoint requires the original API-State! :-(
