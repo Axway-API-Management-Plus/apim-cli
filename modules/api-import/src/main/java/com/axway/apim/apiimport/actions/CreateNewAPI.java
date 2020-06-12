@@ -35,12 +35,6 @@ public class CreateNewAPI {
 		//Transaction context = Transaction.getInstance();
 		RollbackHandler rollback = RollbackHandler.getInstance();
 
-		// During Re-Creation we have to Re-Init the Application-State
-		//if(reCreation) APIManagerAdapter.getInstance().setAllApps(null);
-
-		// Force to initially update the API into the desired state!
-		//List<String> changedProps = getAllProps(changes.getDesiredAPI());
-
 		VHostManager vHostManager = new VHostManager();
 		API createdBEAPI = apiAdapter.importBackendAPI(changes.getDesiredAPI());
 		rollback.addRollbackAction(new RollbackBackendAPI(createdBEAPI));

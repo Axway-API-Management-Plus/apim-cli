@@ -149,7 +149,7 @@ public class APIManagerAPIAdapter {
 		try { 
 			uri = getAPIRequestUri(filter);
 			LOG.debug("Sending request to find existing APIs: " + uri);
-			RestAPICall getRequest = new GETRequest(uri, true);
+			RestAPICall getRequest = new GETRequest(uri, false);
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -548,8 +548,6 @@ public class APIManagerAPIAdapter {
 	
 	public void deleteAPIProxy(API api) throws AppException {
 		LOG.debug("Deleting API-Proxy");
-		// Make sure, the API is unpublished - otherwise it cant be deleted
-		new APIStatusManager().update(api, API.STATE_UNPUBLISHED, true);
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
