@@ -45,7 +45,7 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements Rollba
 				}
 			}
 		} catch (Exception e) {
-			LOG.error("Error while deleteting BE-API with ID: '"+rollbackAPI.getApiId()+"' to roll it back", e);
+			LOG.error("Error while deleting BE-API with ID: '"+rollbackAPI.getApiId()+"' to roll it back", e);
 		}
 		
 	}
