@@ -49,7 +49,6 @@ public class CreateNewAPI {
 			changes.getDesiredAPI().setApiId(createdBEAPI.getApiId());
 			createdAPI = apiAdapter.createAPIProxy(changes.getDesiredAPI());
 		} catch (Exception e) {
-			rollback.addRollbackAction(new RollbackAPIProxy(createdAPI));
 			throw e;
 		}
 		rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback

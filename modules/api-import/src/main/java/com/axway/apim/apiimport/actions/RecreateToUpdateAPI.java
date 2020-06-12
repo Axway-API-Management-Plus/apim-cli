@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.api.API;
-import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.lib.errorHandling.AppException;
