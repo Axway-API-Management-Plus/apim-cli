@@ -1,4 +1,4 @@
-package com.axway.apim.apiimport.state;
+package com.axway.apim.api.state;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.API;
-import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -79,7 +78,7 @@ public class APIChangeState {
 			ErrorState.getInstance().setError("The API you would like to register already exists for another organization.", ErrorCode.API_ALREADY_EXISTS, false);
 			throw new AppException("The API you would like to register already exists for another organization.", ErrorCode.API_ALREADY_EXISTS);
 		}
-		for (Field field : desiredAPI.getClass().getSuperclass().getDeclaredFields()) {
+		for (Field field : desiredAPI.getClass().getDeclaredFields()) {
 			try {
 				if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
 					String getterMethodName = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
@@ -127,15 +126,17 @@ public class APIChangeState {
 			String logMessage = "Updating Frontend-API (Proxy) for the following properties: ";
 			for(String fieldName : getAllChanges()) {
 				try {
-					field = this.desiredAPI.getClass().getSuperclass().getDeclaredField(fieldName);
+					field = this.desiredAPI.getClass().getDeclaredField(fieldName);
+					
 					APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
 					if(!property.copyProp()) continue;
 					if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
 						String getterMethodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
 						String setterMethodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-						Method getMethod = this.desiredAPI.getClass().getSuperclass().getMethod(getterMethodName, null);
+						Method getMethod = this.desiredAPI.getClass().getMethod(getterMethodName, null);
 						Object desiredObject = getMethod.invoke(this.desiredAPI, null);
-						Method setMethod = this.actualAPI.getClass().getMethod(setterMethodName, desiredObject.getClass());
+						
+						Method setMethod = this.actualAPI.getClass().getMethod(setterMethodName, field.getType());
 						
 						setMethod.invoke(this.actualAPI, desiredObject);
 						logMessage = logMessage + fieldName + " ";
