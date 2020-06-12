@@ -32,9 +32,6 @@ public class UpdateExistingAPI {
 		APIManagerAdapter apiManager = APIManagerAdapter.getInstance();
 		
 		try {
-		
-			VHostManager vhostManager = new VHostManager();
-			
 			apiManager.apiAdapter.updateAPIProxy(changes.getActualAPI());
 			
 			// If image is include, update it
@@ -50,8 +47,6 @@ public class UpdateExistingAPI {
 			if(changes.getNonBreakingChanges().contains("retirementDate")) {
 				apiManager.apiAdapter.updateRetirementDate(changes.getDesiredAPI());
 			}
-			
-			//vhostManager.handleVHost(changes.getDesiredAPI(), changes.getActualAPI(), statusUpdate.isUpdateVHostRequired());
 			
 			new APIQuotaManager(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 			new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute(false);

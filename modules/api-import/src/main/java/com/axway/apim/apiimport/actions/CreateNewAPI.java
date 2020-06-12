@@ -7,7 +7,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.apiimport.rollback.RollbackAPIProxy;
@@ -36,7 +35,6 @@ public class CreateNewAPI {
 		//Transaction context = Transaction.getInstance();
 		RollbackHandler rollback = RollbackHandler.getInstance();
 
-		VHostManager vHostManager = new VHostManager();
 		API createdBEAPI = apiAdapter.importBackendAPI(changes.getDesiredAPI());
 		rollback.addRollbackAction(new RollbackBackendAPI(createdBEAPI));
 
@@ -80,7 +78,7 @@ public class CreateNewAPI {
 			new ManageClientApps(changes.getDesiredAPI(), createdAPI, changes.getActualAPI()).execute(reCreation);
 
 			// V-Host must be managed almost at the end, as the status must be set already to "published"
-			vHostManager.handleVHost(changes.getDesiredAPI(), createdAPI);
+			//vHostManager.handleVHost(changes.getDesiredAPI(), createdAPI);
 		} catch (Exception e) {
 			throw e;
 		} finally {

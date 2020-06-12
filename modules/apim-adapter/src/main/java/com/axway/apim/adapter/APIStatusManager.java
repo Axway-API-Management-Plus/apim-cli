@@ -124,12 +124,12 @@ public class APIStatusManager {
 					desiredIntermediate.setState(intermediateState);
 					desiredIntermediate.setId(actualState.getId());
 					new APIStatusManager().update(desiredIntermediate, actualState, enforceBreakingChange);
+					if(desiredState.getState().equals(actualState.getState())) return;
 				}
 			} else {
 				LOG.error("The status change from: " + actualState.getState() + " to " + desiredState.getState() + " is not possible!");
 				throw new AppException("The status change from: '" + actualState.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS);
 			}
-			if(desiredState.getState().equals(actualState.getState())) return;
 			if(desiredState.getState().equals(API.STATE_DELETED)) {
 				// If an API in state unpublished or pending, also an orgAdmin can delete it
 				//boolean useAdmin = (actualState.getState().equals(API.STATE_UNPUBLISHED) || actualState.getState().equals(API.STATE_PENDING)) ? false : true; 

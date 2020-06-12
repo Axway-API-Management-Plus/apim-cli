@@ -509,7 +509,7 @@ public class APIManagerAPIAdapter {
 		HttpEntity entity;
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath"}));
+				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "vhost"}));
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new StateSerializerModifier(false)));
 		mapper.setFilterProvider(filter);
 		HttpResponse httpResponse = null;
