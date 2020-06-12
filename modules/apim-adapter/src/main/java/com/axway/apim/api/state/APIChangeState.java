@@ -34,7 +34,6 @@ public class APIChangeState {
 	private static Logger LOG = LoggerFactory.getLogger(APIChangeState.class);
 	
 	private API actualAPI;
-	private API intransitAPI;
 	private API desiredAPI;
 	
 	private boolean isBreaking = false;
@@ -179,34 +178,6 @@ public class APIChangeState {
 	 */
 	public void setDesiredAPI(API desiredAPI) {
 		this.desiredAPI = desiredAPI;
-	}
-	
-	/**
-	 * The IntransitAPI is used/set, when a new API has been created in API-Manager 
-	 * while the "old actual API" still exists. This is required for instance when 
-	 * the API must be Re-Created, before told old can be deleted.
-	 * This API basically stores the <b>actual</b> API before the real old actual API 
-	 * can be deleted.
-	 * 
-	 * @return the in TransitAPI.
-	 * @see CreateNewAPI 
-	 */
-	public API getIntransitAPI() {
-		return intransitAPI;
-	}
-
-	/**
-	 * The IntransitAPI is used/set, when a new API has been created in API-Manager 
-	 * while the "old actual API" still exists. This is required for instance when 
-	 * the API must be Re-Created, before told old can be deleted.
-	 * This API basically stores the <b>actual</b> API before the real old actual API 
-	 * can be deleted.
-	 * 
-	 * @param intransitAPI the intermediate API
-	 * @see CreateNewAPI 
-	 */
-	public void setIntransitAPI(API intransitAPI) {
-		this.intransitAPI = intransitAPI;
 	}
 
 	/**

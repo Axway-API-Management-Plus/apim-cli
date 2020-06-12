@@ -202,11 +202,11 @@ public class API {
 			propHandler = CustomPropertyHandler.class)
 	protected Map<String, String> customProperties = null;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
+	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})	
 	protected APIQuota applicationQuota = null;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
+	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected APIQuota systemQuota = null;
 	

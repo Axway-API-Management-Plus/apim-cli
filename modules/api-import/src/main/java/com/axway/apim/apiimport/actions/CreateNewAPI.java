@@ -1,29 +1,19 @@
 package com.axway.apim.apiimport.actions;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Vector;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
-import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.apiimport.rollback.RollbackAPIProxy;
 import com.axway.apim.apiimport.rollback.RollbackBackendAPI;
 import com.axway.apim.apiimport.rollback.RollbackHandler;
 import com.axway.apim.lib.APIPropertiesExport;
-import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.rest.Transaction;
 
 /**
  * This class is used by the {@link APIImportManager#applyChanges(APIChangeState)} to create a new API.
@@ -66,7 +56,6 @@ public class CreateNewAPI {
 		APIChangeState.copyRequiredPropertisFromCreatedAPI(changes.getDesiredAPI(), createdAPI);
 
 		try {
-			changes.setIntransitAPI(createdAPI);
 			// ... here we basically need to add all props to initially bring the API in sync!
 			// But without updating the Swagger, as we have just imported it!
 			createdAPI = apiAdapter.updateAPIProxy(changes.getDesiredAPI());
@@ -82,7 +71,7 @@ public class CreateNewAPI {
 
 			if(reCreation && changes.getActualAPI().getState().equals(API.STATE_PUBLISHED)) {
 				// In case, the existing API is already in use (Published), we have to grant access to our new imported API
-				apiAdapter.upgradeAccessToNewerAPI(changes.getIntransitAPI(), changes.getActualAPI());
+				apiAdapter.upgradeAccessToNewerAPI(changes.getDesiredAPI(), changes.getActualAPI());
 			}
 
 			// Is a Quota is defined we must manage it
@@ -106,30 +95,4 @@ public class CreateNewAPI {
 			}
 		}
 	}
-
-	/**
-	 * @param desiredAPI
-	 * @return
-	 * @throws AppException
-	 */
-	/*private List<String> getAllProps(API desiredAPI) throws AppException {
-		List<String> allProps = new Vector<String>();
-		try {
-			for (Field field : desiredAPI.getClass().getSuperclass().getDeclaredFields()) {
-				if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
-					String getterMethodName = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-					Method method = desiredAPI.getClass().getMethod(getterMethodName, null);
-					Object desiredValue = method.invoke(desiredAPI, null);
-					// For new APIs don't include empty properties (this includes MissingNodes)
-					if(desiredValue==null) continue;
-					// We have just inserted the Swagger-File
-					if(field.getName().equals("apiDefinition")) continue;
-					allProps.add(field.getName());
-				}
-			}
-			return allProps;
-		} catch (Exception e) {
-			throw new AppException("Can't inspect properties to create new API!", ErrorCode.CANT_UPGRADE_API_ACCESS, e);
-		}
-	}*/
 }

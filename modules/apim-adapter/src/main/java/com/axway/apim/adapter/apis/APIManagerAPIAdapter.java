@@ -49,6 +49,7 @@ import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.Profile;
+import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -505,7 +506,7 @@ public class APIManagerAPIAdapter {
 		HttpEntity entity;
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations"}));
+				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota"}));
 		mapper.setFilterProvider(filter);
 		HttpResponse httpResponse = null;
 		try {
@@ -553,6 +554,7 @@ public class APIManagerAPIAdapter {
 				LOG.error("Error deleting API-Proxy. Response-Code: "+statusCode);
 				throw new AppException("Error deleting API-Proxy. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
+			LOG.info("API: " + api.getName() + " successfully deleted");
 		} catch (Exception e) {
 			throw new AppException("Cannot delete API-Proxy.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
@@ -816,21 +818,21 @@ public class APIManagerAPIAdapter {
 		// Existing applications now got access to the new API, hence we have to update the internal state
 		// APIManagerAdapter.getInstance().addClientApplications(inTransitState, actualState);
 		// Additionally we need to preserve existing (maybe manually created) application quotas
-		/*boolean updateAppQuota = false;
-		if(actualState.getApplications().size()!=0) {
-			LOG.debug("Found: "+actualState.getApplications().size()+" subscribed applications for this API. Taking over potentially configured quota configuration.");
-			for(ClientApplication app : actualState.getApplications()) {
+		boolean updateAppQuota = false;
+		if(actualAPI.getApplications().size()!=0) {
+			LOG.debug("Found: "+actualAPI.getApplications().size()+" subscribed applications for this API. Taking over potentially configured quota configuration.");
+			for(ClientApplication app : actualAPI.getApplications()) {
 				if(app.getAppQuota()==null) continue;
 				// REST-API for App-Quota is also returning Default-Quotas, but we have to ignore them here!
 				if(app.getAppQuota().getId().equals(APIManagerAdapter.APPLICATION_DEFAULT_QUOTA) || app.getAppQuota().getId().equals(APIManagerAdapter.SYSTEM_API_QUOTA)) continue;
 				for(QuotaRestriction restriction : app.getAppQuota().getRestrictions()) {
-					if(restriction.getApi().equals(actualState.getId())) { // This application has a restriction for this specific API
+					if(restriction.getApi().equals(actualAPI.getId())) { // This application has a restriction for this specific API
 						updateAppQuota = true;
-						restriction.setApi(desiredState.getId()); // Take over the quota config to new API
+						restriction.setApi(desiredAPI.getId()); // Take over the quota config to new API
 						if(!restriction.getMethod().equals("*")) { // The restriction is for a specific method
-							String originalMethodName = methodAdapter.getMethodForId(actualState.getId(), restriction.getMethod()).getName();
+							String originalMethodName = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(actualAPI.getId(), restriction.getMethod()).getName();
 							// Try to find the same operation for the newly created API based on the name
-							String newMethodId = methodAdapter.getMethodForName(desiredState.getId(), originalMethodName).getId();
+							String newMethodId = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(desiredAPI.getId(), originalMethodName).getId();
 							restriction.setMethod(newMethodId);
 						}
 					}
@@ -839,18 +841,27 @@ public class APIManagerAPIAdapter {
 					LOG.info("Taking over existing quota config for application: '"+app.getName()+"' to newly created API.");
 					try {
 						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/quota").build();
-						entity = new StringEntity(objectMapper.writeValueAsString(app.getAppQuota()), StandardCharsets.UTF_8);
+						entity = new StringEntity(mapper.writeValueAsString(app.getAppQuota()), StandardCharsets.UTF_8);
 						
-						apiCall = new PUTRequest(entity, uri, this, true);
-						apiCall.execute();
-						EntityUtils.consume(entity);
+						request = new PUTRequest(entity, uri, true);
+						httpResponse = request.execute();
+						int statusCode = httpResponse.getStatusLine().getStatusCode();
+						if(statusCode < 200 || statusCode > 299){
+							LOG.error("Error taking over application quota to new API. Received Status-Code: " +statusCode);
+							throw new AppException("Error taking over application quota to new API. Received Status-Code: " +statusCode, ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
+						}
 					} catch (Exception e) {
 						ErrorState.getInstance().setError("Can't update application quota.", ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
 						throw new AppException("Can't update application quota.", ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
+					} finally {
+						try {
+							if(httpResponse!=null) 
+								((CloseableHttpResponse)httpResponse).close();
+						} catch (Exception ignore) {}
 					}
 				}
 			}
-		}*/
+		}
 	}
 	
 	public void grantClientOrganization(List<Organization> grantAccessToOrgs, API api, boolean allOrgs) throws AppException {

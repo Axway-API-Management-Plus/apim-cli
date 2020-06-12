@@ -117,7 +117,7 @@ public class APIStatusManager {
 			}
 			if (statusMovePossible) {
 				if(intermediateState!=null) {
-					LOG.info("Required intermediate state: "+intermediateState);
+					LOG.debug("Required intermediate state: "+intermediateState);
 					// In case, we can't process directly, we have to perform an intermediate state change
 					API desiredIntermediate = new APIBaseDefinition();
 					desiredIntermediate.setState(intermediateState);

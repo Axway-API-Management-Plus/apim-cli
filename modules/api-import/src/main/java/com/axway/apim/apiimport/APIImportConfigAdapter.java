@@ -954,16 +954,13 @@ public class APIImportConfigAdapter {
 	}
 	
 	private void validateHasQueryStringKey(API importApi) throws AppException {
-		if(1==1) return;
+		if(importApi.getApiRoutingKey()==null) return; // Nothing to check
 		if(importApi instanceof DesiredTestOnlyAPI) return; // Do nothing when unit-testing
-		if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return; // QueryStringRouting isn't supported
-		if(APIManagerAdapter.getInstance().hasAdminAccount()) {
+		if(APIManagerAdapter.hasAdminAccount()) {
 			String apiRoutingKeyEnabled = APIManagerAdapter.getInstance().configAdapter.getApiManagerConfig("apiRoutingKeyEnabled");
-			if(apiRoutingKeyEnabled.equals("true")) {
-				if(importApi.getApiRoutingKey()==null) {
-					ErrorState.getInstance().setError("API-Manager configured for Query-String option, but API doesn' declare it.", ErrorCode.API_CONFIG_REQUIRES_QUERY_STRING, false);
-					throw new AppException("API-Manager configured for Query-String option, but API doesn' declare it.", ErrorCode.API_CONFIG_REQUIRES_QUERY_STRING);
-				}
+			if(!apiRoutingKeyEnabled.equals("true")) {
+				ErrorState.getInstance().setError("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED, false);
+				throw new AppException("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED);
 			}
 		} else {
 			LOG.debug("Can't check if QueryString for API is needed without Admin-Account.");
