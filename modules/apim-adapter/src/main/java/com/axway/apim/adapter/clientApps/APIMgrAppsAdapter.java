@@ -24,7 +24,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
-import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.APIKey;
@@ -95,7 +94,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 					.addParameters(filter.getFilters())
 					.build();
 			LOG.debug("Sending request to find existing applications: " + uri);
-			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
+			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
 			if(response.startsWith("{")) { // Got a single response!
@@ -184,7 +183,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		}
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/applications").build();
-			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
+			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			subscribedAppAPIManagerResponse.put(apiId, response);
@@ -231,7 +230,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 				if(!applicationsCredentialCache.containsKey(app.getId()+"|"+type)) {
 					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type)
 							.build();
-					RestAPICall getRequest = new GETRequest(uri, null);
+					RestAPICall getRequest = new GETRequest(uri);
 					httpResponse = getRequest.execute();
 					response = EntityUtils.toString(httpResponse.getEntity());
 					int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -303,17 +302,16 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+actualApp.getId()).build();
 			}
 			mapper.setSerializationInclusion(Include.NON_NULL);
-			mapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
 			try {
 				RestAPICall request;
 				if(actualApp==null) {
-					String json = mapper.writerWithView(JSONViews.ApplicationForAPIManager.class).writeValueAsString(desiredApp);
+					String json = mapper.writeValueAsString(desiredApp);
 					HttpEntity entity = new StringEntity(json);
-					request = new POSTRequest(entity, uri, null);
+					request = new POSTRequest(entity, uri);
 				} else {
-					String json = mapper.writerWithView(JSONViews.ApplicationForAPIManagerOnUpdate.class).writeValueAsString(desiredApp);
+					String json = mapper.writeValueAsString(desiredApp);
 					HttpEntity entity = new StringEntity(json);
-					request = new PUTRequest(entity, uri, null);
+					request = new PUTRequest(entity, uri);
 				}
 				request.setContentType("application/json");
 				httpResponse = request.execute();
@@ -352,7 +350,7 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			.addBinaryBody("file", app.getImage().getInputStream(), ContentType.create("image/jpeg"), app.getImage().getBaseFilename())
 			.build();
 		try {
-			RestAPICall apiCall = new POSTRequest(entity, uri, null);
+			RestAPICall apiCall = new POSTRequest(entity, uri);
 			apiCall.setContentType(null);
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -386,11 +384,10 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 			try {
 				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/"+endpoint).build();
 				mapper.setSerializationInclusion(Include.NON_NULL);
-				mapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
-				String json = mapper.writerWithView(JSONViews.CredentialsForAPIManager.class).writeValueAsString(cred);
+				String json = mapper.writeValueAsString(cred);
 				HttpEntity entity = new StringEntity(json);
 				
-				POSTRequest postRequest = new POSTRequest(entity, uri, null);
+				POSTRequest postRequest = new POSTRequest(entity, uri);
 				postRequest.setContentType("application/json");
 				httpResponse = postRequest.execute();
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -419,15 +416,14 @@ public class APIMgrAppsAdapter extends ClientAppAdapter {
 		try {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/quota").build();
 			mapper.setSerializationInclusion(Include.NON_NULL);
-			mapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
 			String json = mapper.writeValueAsString(app.getAppQuota());
 			HttpEntity entity = new StringEntity(json);
 			// Use an admin account for this request
 			RestAPICall request;
 			if(actualApp==null) {
-				request = new POSTRequest(entity, uri, null, true);
+				request = new POSTRequest(entity, uri, true);
 			} else {
-				request = new PUTRequest(entity, uri, null, true);
+				request = new PUTRequest(entity, uri, true);
 			}
 			request.setContentType("application/json");
 			httpResponse = request.execute();

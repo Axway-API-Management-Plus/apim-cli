@@ -3,11 +3,10 @@ package com.axway.apim.apiimport.actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.apiimport.APIImportManager;
-import com.axway.apim.apiimport.DesiredAPI;
-import com.axway.apim.apiimport.actions.tasks.UpdateAPIStatus;
 import com.axway.apim.apiimport.state.APIChangeState;
 import com.axway.apim.lib.errorHandling.AppException;
 
@@ -46,7 +45,7 @@ public class RecreateToUpdateAPI {
 		LOG.info("New API created. Going to delete old API.");
 		// Delete the existing old API!
 		((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(API.STATE_DELETED);
-		new UpdateAPIStatus(tempDesiredDeletedAPI, actual).execute(true);
+		new APIStatusManager().update(tempDesiredDeletedAPI, actual, true);
 	}
 
 }

@@ -45,7 +45,7 @@ public class APIManagerOAuthClientProfilesAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/oauthclientprofiles").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
+			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if( statusCode != 200){

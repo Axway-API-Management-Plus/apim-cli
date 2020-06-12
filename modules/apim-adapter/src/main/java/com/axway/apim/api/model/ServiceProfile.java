@@ -1,6 +1,7 @@
 package com.axway.apim.api.model;
 
 public class ServiceProfile {
+
 	String apiId;
 	
 	String basePath;

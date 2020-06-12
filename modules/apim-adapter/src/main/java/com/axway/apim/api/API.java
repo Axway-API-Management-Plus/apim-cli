@@ -36,6 +36,9 @@ import com.axway.apim.lib.props.RoutingKeyPropHandler;
 import com.axway.apim.lib.props.SecurityProfileHandler;
 import com.axway.apim.lib.props.ServiceProfileHandler;
 import com.axway.apim.lib.props.VhostPropertyHandler;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -62,6 +65,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  * @author cwiechmann@axway.com
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFilter("APIFilter")
 public class API {
 	
 	public final static String STATE_PUBLISHED = "published";
@@ -78,7 +82,7 @@ public class API {
 	JsonNode apiConfiguration;
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
-	protected APISpecification APIDefinition = null;
+	protected APISpecification apiDefinition = null;
 
 	@APIPropertyAnnotation(isBreaking = true, 
 			writableStates = {API.STATE_UNPUBLISHED}, 
@@ -94,10 +98,12 @@ public class API {
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
 			propHandler = APIDescriptionPropertyHandler.class)
 	protected String descriptionManual = null;
+	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
 			propHandler = APIDescriptionPropertyHandler.class)
 	protected String descriptionMarkdown = null;
+	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
 			propHandler = APIDescriptionPropertyHandler.class)
@@ -154,9 +160,16 @@ public class API {
 			propHandler = APIPathPropertyHandler.class)
 	protected String path = null;
 
-	@APIPropertyAnnotation(isBreaking = false, 
+	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected String state = null;
+	
+	/**
+	 * The actual state must be stored as given by the API-Manager, as this state must be 
+	 * send back during API-Proxy update!
+	 */
+	@JsonIgnore
+	private String actualState;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {API.STATE_UNPUBLISHED}, 
@@ -175,6 +188,10 @@ public class API {
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_DEPRECATED}, 
 			propHandler = APISummaryPropertyHandler.class)
 	protected String summary = null;
+	
+	protected String createdOn = null;
+	
+	protected String createdBy = null;
 
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
@@ -200,11 +217,9 @@ public class API {
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {})
 	@JsonDeserialize( using = OrganizationDeserializer.class)
-	@JsonProperty(value = "organizationId")
+	@JsonAlias({"organizationId", "organization"}) // Alias to read Organization based on the id as given by the API-Manager
 	protected Organization organization = null;
-	
-	//protected String organizationId;
-	
+
 	protected String id = null;
 	
 	protected String apiId = null;
@@ -217,12 +232,12 @@ public class API {
 	
 	protected List<APIMethod> apiMethods = null;
 
-	public APISpecification getAPIDefinition() {
-		return this.APIDefinition;
+	public APISpecification getApiDefinition() {
+		return apiDefinition;
 	}
-	
-	public void setAPIDefinition(APISpecification APIDefinition) {
-		this.APIDefinition = APIDefinition;
+
+	public void setApiDefinition(APISpecification apiDefinition) {
+		this.apiDefinition = apiDefinition;
 	}
 
 	public Map<String, OutboundProfile> getOutboundProfiles() throws AppException {
@@ -281,10 +296,24 @@ public class API {
 		this.state = state;
 	}
 	
+	/**
+	 * The tool handles deprecation as an additional state (might not be best choice), but  
+	 * the API-Manager internally doesn't. In API-Manager deprecation is just a true/false toggle.
+	 * To make Desired and Actual API comparable this method is encapsulating the difference. 
+	 * @see com.axway.apim.api.API#getState()
+	 */
 	public String getState() throws AppException {
 		if(this.deprecated!=null 
 				&& this.deprecated.equals("true")) return STATE_DEPRECATED;
 		return this.state;
+	}
+
+	public String getActualState() {
+		return actualState;
+	}
+
+	public void setActualState(String actualState) {
+		this.actualState = actualState;
 	}
 
 	public String getVersion() {
@@ -321,6 +350,11 @@ public class API {
 
 	public Organization getOrganization() {
 		return organization;
+	}
+
+	public String getOrganizationId() {
+		if(organization!=null) return organization.getId();
+		return null;
 	}
 
 	public void setOrganization(Organization organization) {
@@ -437,6 +471,14 @@ public class API {
 		return serviceProfiles;
 	}
 
+	public void setTags(TagMap<String, String[]> tags) {
+		this.tags = tags;
+	}
+
+	public void setServiceProfiles(Map<String, ServiceProfile> serviceProfiles) {
+		this.serviceProfiles = serviceProfiles;
+	}
+
 	public List<Organization> getClientOrganizations() throws AppException {
 		return clientOrganizations;
 	}
@@ -474,10 +516,6 @@ public class API {
 		return this.getClass().getSimpleName() + " [path=" + path + ", id (FE-API)=" + id + ", apiId (BE-API)=" + apiId + "]";
 	}
 
-	public int getAPIType() {
-		return 0;
-	}
-
 	public String getApiDefinitionImport() {
 		return null;
 	}
@@ -488,5 +526,21 @@ public class API {
 
 	public void setApiConfiguration(JsonNode apiConfiguration) {
 		this.apiConfiguration = apiConfiguration;
+	}
+
+	public String getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(String createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
 	}
 }

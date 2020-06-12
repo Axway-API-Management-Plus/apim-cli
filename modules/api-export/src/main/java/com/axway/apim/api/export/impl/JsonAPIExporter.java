@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
@@ -22,7 +23,6 @@ import com.axway.apim.api.export.jackson.serializer.PolicyToNameSerializer;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
-public class JsonAPIExporter extends APIExporter {
+public class JsonAPIExporter extends APIResultHandler {
 	private static Logger LOG = LoggerFactory.getLogger(JsonAPIExporter.class);
 
 	/** Where to store the exported API-Definition */
@@ -47,7 +47,7 @@ public class JsonAPIExporter extends APIExporter {
 	}
 	
 	@Override
-	public void export(List<API> apis) throws AppException {
+	public void execute(List<API> apis) throws AppException {
 		for (API api : apis) {
 			ExportAPI exportAPI = new ExportAPI(api);
 			try {
@@ -61,17 +61,11 @@ public class JsonAPIExporter extends APIExporter {
 	
 	@Override
 	public APIFilter getFilter() {
-		APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API)
-				.hasVHost(params.getValue("vhost"))
-				.hasApiPath(params.getValue("api-path"))
-				.hasPolicyName(params.getValue("policy"))
-				.hasId(params.getValue("id"))
-				.hasName(params.getValue("name"))
-				.hasState(params.getValue("state"))
+		Builder builder = getBaseAPIFilterBuilder()
 				.includeQuotas(true)
 				.includeImage(true)
-				.build();
-		return filter;
+				.includeOriginalAPIDefinition(true);
+		return builder.build();
 	}
 
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {

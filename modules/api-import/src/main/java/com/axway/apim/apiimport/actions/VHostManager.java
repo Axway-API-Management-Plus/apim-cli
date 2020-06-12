@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.apiimport.actions.tasks.UpdateAPIProxy;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -31,7 +30,7 @@ public class VHostManager {
 			} else {
 				LOG.info("Updating V-Host for published API to: " + desiredAPI.getVhost());
 				List<String> vhostChange = new Vector<String>() {{ add ("vhost"); }};
-				new UpdateAPIProxy(desiredAPI, actualAPI).execute(vhostChange);
+				APIManagerAdapter.getInstance().apiAdapter.updateAPIProxy(desiredAPI);//.execute(vhostChange);
 			}
 		}
 	}

@@ -6,17 +6,16 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpUriRequest;
 
-import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class DELRequest extends RestAPICall {
 
-	public DELRequest(URI uri, IResponseParser responseParser) {
-		super(null, uri, responseParser);
+	public DELRequest(URI uri) {
+		super(null, uri);
 	}
 	
-	public DELRequest(URI uri, IResponseParser responseParser, boolean useAdmin) {
-		super(null, uri, responseParser, useAdmin);
+	public DELRequest(URI uri, boolean useAdmin) {
+		super(null, uri, useAdmin);
 	}
 
 	@Override
@@ -24,7 +23,6 @@ public class DELRequest extends RestAPICall {
 		HttpUriRequest httpDel = new HttpDelete(uri);
 		httpDel.setHeader("Content-type", this.contentType);
 		HttpResponse response = sendRequest(httpDel);
-		parseResponse(response);
 		return response;
 	}
 }

@@ -34,7 +34,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		new CommandParameters(new HashMap<String, String>());
 		setupMockData();
 	}
-
+/*
 	@Test
 	public void testSingleAppAsArray() throws AppException {
 		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/SingleClientAppAsArray.json").getPath();
@@ -105,5 +105,5 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertEquals(restr.getConfig().get("messages"), "9999");
 		assertEquals(restr.getConfig().get("period"), "week");
 		assertEquals(restr.getConfig().get("per"), "1");
-	}
+	}*/
 }

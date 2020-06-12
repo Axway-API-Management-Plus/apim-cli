@@ -6,17 +6,16 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 
-import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class POSTRequest extends RestAPICall {
 
-	public POSTRequest(HttpEntity entity, URI uri, IResponseParser responseParser) {
-		super(entity, uri, responseParser);
+	public POSTRequest(HttpEntity entity, URI uri) {
+		super(entity, uri);
 	}
 	
-	public POSTRequest(HttpEntity entity, URI uri, IResponseParser responseParser, boolean useAdmin) {
-		super(entity, uri, responseParser, useAdmin);
+	public POSTRequest(HttpEntity entity, URI uri, boolean useAdmin) {
+		super(entity, uri, useAdmin);
 	}
 
 	@Override
@@ -27,7 +26,6 @@ public class POSTRequest extends RestAPICall {
 			httpPost.setHeader("Content-type", this.contentType);
 		}
 		HttpResponse response = sendRequest(httpPost);
-		parseResponse(response);
 		return response;
 	}
 }

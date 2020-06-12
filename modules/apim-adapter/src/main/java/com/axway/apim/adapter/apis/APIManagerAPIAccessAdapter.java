@@ -18,13 +18,12 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
-import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
@@ -69,7 +68,7 @@ public class APIManagerAPIAccessAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+type+"/"+id+"/apis").build();
-			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
+			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -174,11 +173,10 @@ public class APIManagerAPIAccessAdapter {
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/"+type+"/"+parentId+"/apis").build();
 			mapper.setSerializationInclusion(Include.NON_NULL);
-			mapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
-			String json = mapper.writerWithView(JSONViews.APIAccessForAPIManager.class).writeValueAsString(apiAccess);
+			String json = mapper.writeValueAsString(apiAccess);
 			HttpEntity entity = new StringEntity(json);
 			// Use an admin account for this request
-			RestAPICall request = new POSTRequest(entity, uri, null, APIManagerAdapter.hasAdminAccount());
+			RestAPICall request = new POSTRequest(entity, uri, APIManagerAdapter.hasAdminAccount());
 			request.setContentType("application/json");
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -211,7 +209,7 @@ public class APIManagerAPIAccessAdapter {
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/"+type+"/"+parentId+"/apis/"+apiAccess.getId()).build();
 			// Use an admin account for this request
-			RestAPICall request = new DELRequest(uri, null, APIManagerAdapter.hasAdminAccount());
+			RestAPICall request = new DELRequest(uri, APIManagerAdapter.hasAdminAccount());
 			request.setContentType("application/json");
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -227,6 +225,22 @@ public class APIManagerAPIAccessAdapter {
 			try {
 				((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) { }
+		}
+	}
+	
+	public void removeClientOrganization(List<Organization> removingActualOrgs, String apiId) throws AppException {
+		for(Organization org : removingActualOrgs) {
+			List<APIAccess> orgsApis = getAPIAccess(org.getId(), Type.organizations);
+			for(APIAccess apiAccess : orgsApis) {
+				if(apiAccess.getApiId().equals(apiId)) {
+					try {
+						deleteAPIAccess(apiAccess, org.getId(), Type.organizations);
+					} catch (Exception e) {
+						LOG.error("Can't delete API-Access for organization. ");
+						throw new AppException("Can't delete API-Access for organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+					}	
+				}
+			}
 		}
 	}
 	

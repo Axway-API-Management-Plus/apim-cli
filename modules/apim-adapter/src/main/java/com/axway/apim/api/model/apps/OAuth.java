@@ -4,19 +4,14 @@ import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
 public class OAuth extends ClientAppCredential {
 	
-	@JsonView(JSONViews.CredentialsBaseInformation.class)
 	String cert;
 	
-	@JsonView(JSONViews.CredentialsBaseInformation.class)
 	String type;
 	
-	@JsonView(JSONViews.CredentialsBaseInformation.class)
 	String[] redirectUrls;
 
 	@Override
@@ -48,7 +43,6 @@ public class OAuth extends ClientAppCredential {
 		this.redirectUrls = redirectUrls;
 	}
 
-	@JsonView(JSONViews.CredentialsForExport.class)
 	@JsonProperty("clientId")
 	public String getClientId() {
 		return id;

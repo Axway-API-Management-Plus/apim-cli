@@ -26,15 +26,13 @@ import org.apache.http.util.EntityUtils;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.Status;
-import org.ehcache.config.CacheConfiguration;
 import org.ehcache.config.builders.CacheManagerBuilder;
-import org.ehcache.core.EhcacheManager;
 import org.ehcache.xml.XmlConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.apis.APIAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.adapter.apis.APIManagerConfigAdapter;
 import com.axway.apim.adapter.apis.APIManagerOAuthClientProfilesAdapter;
@@ -98,7 +96,7 @@ public class APIManagerAdapter {
 	private static CacheManager cacheManager;
 	
 	public APIManagerConfigAdapter configAdapter;
-	public APIAdapter apiAdapter;
+	public APIManagerAPIAdapter apiAdapter;
 	public APIManagerAPIMethodAdapter methodAdapter;
 	public APIManagerPoliciesAdapter policiesAdapter;
 	public APIManagerQuotaAdapter quotaAdapter;
@@ -141,7 +139,7 @@ public class APIManagerAdapter {
 		super();
 		this.cmd = CommandParameters.getInstance();
 		this.configAdapter = new APIManagerConfigAdapter();
-		this.apiAdapter = APIAdapter.create(this);
+		this.apiAdapter = new APIManagerAPIAdapter();
 		this.methodAdapter = new APIManagerAPIMethodAdapter();
 		this.policiesAdapter = new APIManagerPoliciesAdapter();
 		this.quotaAdapter = new APIManagerQuotaAdapter();
@@ -185,7 +183,7 @@ public class APIManagerAdapter {
 			APIMHttpClient client = APIMHttpClient.getInstance(useAdminClient);
 		    params.add(new BasicNameValuePair("username", username));
 		    params.add(new BasicNameValuePair("password", password));
-		    POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, null, useAdminClient);
+		    POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, useAdminClient);
 			loginRequest.setContentType(null);
 			response = loginRequest.execute();
 			int statusCode = response.getStatusLine().getStatusCode();
@@ -226,7 +224,7 @@ public class APIManagerAdapter {
 		JsonNode jsonResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/currentuser").build();
-		    GETRequest currentUserRequest = new GETRequest(uri, null, useAdminClient);
+		    GETRequest currentUserRequest = new GETRequest(uri, useAdminClient);
 		    response = currentUserRequest.execute();
 		    getCsrfToken(response, useAdminClient); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
 			String currentUser = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
@@ -396,7 +394,7 @@ public class APIManagerAdapter {
 			try {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type+"").build();
 				LOG.debug("Loading credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
-				RestAPICall getRequest = new GETRequest(uri, null, true);
+				RestAPICall getRequest = new GETRequest(uri, true);
 				httpResponse = getRequest.execute();
 				response = EntityUtils.toString(httpResponse.getEntity());
 				LOG.trace("Response: " + response);
@@ -443,7 +441,7 @@ public class APIManagerAdapter {
 		Image image = new Image();
 		HttpResponse httpResponse = null;
 		try {
-			RestAPICall getRequest = new GETRequest(uri, null);
+			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode == 404) return null; // No Image found
@@ -485,7 +483,7 @@ public class APIManagerAdapter {
 		HttpEntity httpResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
+			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute().getEntity();
 			appConfig = IOUtils.toString(httpResponse.getContent(), "UTF-8");
 			return parseAppConfig(appConfig);
@@ -540,7 +538,7 @@ public class APIManagerAdapter {
 					.addTextBody("inbound", cert.getInbound())
 					.addTextBody("outbound", cert.getOutbound())
 					.build();
-			POSTRequest postRequest = new POSTRequest(entity, uri, null);
+			POSTRequest postRequest = new POSTRequest(entity, uri);
 			postRequest.setContentType(null);
 			httpResponse = postRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -577,7 +575,7 @@ public class APIManagerAdapter {
 			HttpEntity entity = MultipartEntityBuilder.create()
 					.addBinaryBody("file", certificate, ContentType.create("application/x-pkcs12"), filename)
 					.build();
-			POSTRequest postRequest = new POSTRequest(entity, uri, null);
+			POSTRequest postRequest = new POSTRequest(entity, uri);
 			postRequest.setContentType(null);
 			httpResponse = postRequest.execute();
 			JsonNode jsonResponse = mapper.readTree(httpResponse.getEntity().getContent());

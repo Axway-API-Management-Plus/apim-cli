@@ -1,8 +1,11 @@
-package com.axway.apim.apiimport.actions.tasks;
+package com.axway.apim.apiimport.actions;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
@@ -17,24 +20,27 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.rest.Transaction;
 
-public class ManageClientApps extends AbstractAPIMTask {
+public class ManageClientApps {
+	
+	static Logger LOG = LoggerFactory.getLogger(ManageClientApps.class);
 	
 	private static String MODE						= "MODE";
 	private static String MODE_CREATE_API_ACCESS	= "MODE_CREATE_API_ACCESS";
 	private static String MODE_REMOVE_API_ACCESS	= "MODE_REMOVE_API_ACCESS";
 	
-	private static boolean hasAdminAccount;
+	private API desiredState;
+	private API actualState;
+	private API oldAPI;
 	
 	APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
 	
 	/**
 	 * In case, the API has been re-created, this is object contains the API how it was before
 	 */
-	API oldAPI;
 	
 	public ManageClientApps(API desiredState, API actualState, API oldAPI) throws AppException {
-		super(desiredState, actualState);
-		hasAdminAccount = APIManagerAdapter.hasAdminAccount();
+		this.desiredState = desiredState;
+		this.actualState = actualState;
 		this.oldAPI = oldAPI;
 	}
 	

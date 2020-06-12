@@ -11,6 +11,11 @@ public @interface APIPropertyAnnotation {
 	
 	public boolean isBreaking() default false;
 	
+	/**
+	 * @return true, if the property will be copied from the Desired to the Actual API. If false, the property is not copied.
+	 */
+	public boolean copyProp() default true;
+	
 	public String[] writableStates();
 	
 	public Class propHandler() default void.class;

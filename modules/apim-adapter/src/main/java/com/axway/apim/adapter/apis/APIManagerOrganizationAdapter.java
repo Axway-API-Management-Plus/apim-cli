@@ -64,7 +64,7 @@ public class APIManagerOrganizationAdapter {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations"+orgId)
 					.addParameters(filter.getFilters())
 					.build();
-			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
+			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			LOG.debug("Load organizations from API-Manager using filter: " + filter);
 			LOG.trace("Load organization with URI: " + uri);
 			httpResponse = getRequest.execute();

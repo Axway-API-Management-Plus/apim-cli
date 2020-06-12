@@ -219,7 +219,7 @@ public class APIImportConfigAdapter {
 			addDefaultOutboundProfile(apiConfig);
 			addDefaultInboundProfile(apiConfig);
 			APISpecification apiSpecification = APISpecificationFactory.getAPISpecification(getAPIDefinitionContent(), this.pathToAPIDefinition, ((DesiredAPI)apiConfig).getBackendBasepath());
-			apiConfig.setAPIDefinition(apiSpecification);
+			apiConfig.setApiDefinition(apiSpecification);
 			addImageContent(apiConfig);
 			validateCustomProperties(apiConfig);
 			validateDescription(apiConfig);

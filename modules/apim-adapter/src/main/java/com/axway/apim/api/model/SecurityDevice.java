@@ -64,7 +64,7 @@ public class SecurityDevice {
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/policies")
 						.setParameter("type", type).build();
 			}
-			RestAPICall getRequest = new GETRequest(uri, null);
+			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute();
 			try {
 				is = httpResponse.getEntity().getContent();

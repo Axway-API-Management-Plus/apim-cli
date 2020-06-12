@@ -9,7 +9,6 @@ import java.util.Map;
 
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
-import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.model.InboundProfile;
@@ -21,7 +20,7 @@ import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
-public class ConsoleAPIExporter extends APIExporter {
+public class ConsoleAPIExporter extends APIResultHandler {
 	
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
@@ -30,7 +29,7 @@ public class ConsoleAPIExporter extends APIExporter {
 	}
 
 	@Override
-	public void export(List<API> apis) throws AppException {
+	public void execute(List<API> apis) throws AppException {
 		switch(params.getWide()) {
 		case standard:
 			printStandard(apis);
@@ -195,14 +194,7 @@ public class ConsoleAPIExporter extends APIExporter {
 
 	@Override
 	public APIFilter getFilter() {
-		Builder builder = new APIFilter.Builder(APIType.ACTUAL_API)
-				.hasVHost(params.getValue("vhost"))
-				.hasApiPath(params.getValue("api-path"))
-				.hasPolicyName(params.getValue("policy"))
-				.hasName(params.getValue("name"))
-				.hasState(params.getValue("state"))
-				.includeImage(false)
-				.includeOriginalAPIDefinition(false);
+		Builder builder = getBaseAPIFilterBuilder();
 
 		switch(params.getWide()) {
 		case standard:

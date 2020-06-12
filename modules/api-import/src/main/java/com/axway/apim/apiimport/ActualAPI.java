@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.API;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Concrete class that is used to reflect the actual API as it's stored in the API-Manager. 
@@ -20,21 +21,23 @@ import com.axway.apim.lib.errorHandling.AppException;
 public class ActualAPI extends API {
 	
 	static Logger LOG = LoggerFactory.getLogger(ActualAPI.class);
+	
+	/**
+	 * The actual state must be stored as given by the API-Manager, as this state must be 
+	 * send back during API-Proxy update!
+	 */
+	@JsonIgnore
+	private String actualState;
 
 	public ActualAPI() throws AppException {
 		super();
 	}
-	
-	/**
-	 * The tool handles deprecation as an additional state (might not be best choice), but  
-	 * the API-Manager internally doesn't. In API-Manager deprecation is just a true/false toggle.
-	 * To make Desired and Actual API comparable this method is encapsulating the difference. 
-	 * @see com.axway.apim.api.API#getState()
-	 */
-	@Override
-	public String getState() throws AppException {
-		if(this.deprecated!=null 
-				&& this.deprecated.equals("true")) return API.STATE_DEPRECATED;
-		return super.getState();
+
+	public String getActualState() {
+		return actualState;
+	}
+
+	public void setActualState(String actualState) {
+		this.actualState = actualState;
 	}
 }

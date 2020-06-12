@@ -25,6 +25,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -43,6 +44,7 @@ public class DesiredAPI extends API {
 	
 	private String backendBasepath = null;
 	
+	@JsonIgnore
 	private boolean requestForAllOrgs = false;
 	
 	/*
@@ -52,11 +54,6 @@ public class DesiredAPI extends API {
 	 */
 	private Map<String, InboundProfile> originalInboundProfiles;
 	private Map<String, OutboundProfile> originalOutboundProfiles;
-	
-
-	@JsonDeserialize( using = OrganizationDeserializer.class)
-	@JsonProperty(value = "organization")
-	protected Organization organization = null;
 	
 	@JsonProperty("apiDefinition")
 	public String apiDefinitionImport = null;

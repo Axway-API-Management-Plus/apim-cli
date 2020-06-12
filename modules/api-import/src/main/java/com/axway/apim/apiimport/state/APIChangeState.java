@@ -2,6 +2,7 @@ package com.axway.apim.apiimport.state;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -114,6 +115,40 @@ public class APIChangeState {
 			}
 		}
 	}
+	
+	/**
+	 * Copied all changed properties of the API having APIPropertyAnnotation set to copyProp = true (default)
+	 * @throws AppException if something goes wrong
+	 */
+	public void copyChangedProps() throws AppException {
+		Field field = null;
+		
+		if(getAllChanges().size()!=0) {
+			String logMessage = "Updating Frontend-API (Proxy) for the following properties: ";
+			for(String fieldName : getAllChanges()) {
+				try {
+					field = this.desiredAPI.getClass().getSuperclass().getDeclaredField(fieldName);
+					APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
+					if(!property.copyProp()) continue;
+					if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
+						String getterMethodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+						String setterMethodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+						Method getMethod = this.desiredAPI.getClass().getSuperclass().getMethod(getterMethodName, null);
+						Object desiredObject = getMethod.invoke(this.desiredAPI, null);
+						Method setMethod = this.actualAPI.getClass().getMethod(setterMethodName, desiredObject.getClass());
+						
+						setMethod.invoke(this.actualAPI, desiredObject);
+						logMessage = logMessage + fieldName + " ";
+					}
+				} catch (Exception e) {
+					throw new AppException("Can't handle property: "+fieldName+" to update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
+				}
+			}
+			LOG.info(logMessage);
+		} else {
+			LOG.debug("API-Proxy requires no updates");
+		}
+	}
 
 	/**
 	 * @return the API-Manager API that has been given to this APIChangeState instance
@@ -215,6 +250,16 @@ public class APIChangeState {
 	}
 	
 	/**
+	 * @return list of all changes.
+	 */
+	public List<String> getAllChanges() {
+		List<String> allChanges = new ArrayList<String>();
+		allChanges.addAll(nonBreakingChanges);
+		allChanges.addAll(breakingChanges);
+		return allChanges;
+	}
+	
+	/**
 	 * Helper method to check if a certain property can be updated in the current/actual API-State.
 	 * @param property to be updated
 	 * @param actualStatus the actual state of the API
@@ -238,5 +283,20 @@ public class APIChangeState {
 		} else {
 			return actualValue.equals(desiredValue);
 		}
+	}
+	
+	public static API copyRequiredPropertisFromCreatedAPI(API desiredAPI, API createdAPI) throws AppException {
+		desiredAPI.setId(createdAPI.getId());
+		desiredAPI.setApiId(createdAPI.getApiId());
+		desiredAPI.setActualState(createdAPI.getState()); // Copy the original state into a special field used during API-Proxy update
+		desiredAPI.setCreatedBy(createdAPI.getCreatedBy());
+		desiredAPI.setCreatedOn(createdAPI.getCreatedOn());
+		if(desiredAPI.getOutboundProfiles()==null) desiredAPI.setOutboundProfiles(createdAPI.getOutboundProfiles());
+		if(desiredAPI.getInboundProfiles()==null) desiredAPI.setInboundProfiles(createdAPI.getInboundProfiles());
+		if(desiredAPI.getServiceProfiles()==null) desiredAPI.setServiceProfiles(createdAPI.getServiceProfiles());
+		if(desiredAPI.getSecurityProfiles()==null) desiredAPI.setSecurityProfiles(createdAPI.getSecurityProfiles());
+		if(desiredAPI.getAuthenticationProfiles()==null) desiredAPI.setAuthenticationProfiles(createdAPI.getAuthenticationProfiles());
+		if(desiredAPI.getCaCerts()==null) desiredAPI.setCaCerts(createdAPI.getCaCerts());
+		return desiredAPI;
 	}
 }

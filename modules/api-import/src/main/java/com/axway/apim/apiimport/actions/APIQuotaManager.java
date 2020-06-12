@@ -1,8 +1,11 @@
-package com.axway.apim.apiimport.actions.tasks;
+package com.axway.apim.apiimport.actions;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerQuotaAdapter.Quota;
@@ -14,13 +17,20 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.rest.Transaction;
 
-public class UpdateQuotaConfiguration extends AbstractAPIMTask {
+public class APIQuotaManager {
+	
+	static Logger LOG = LoggerFactory.getLogger(APIQuotaManager.class);
 	
 	private static int QUOTA_UPDATE_SUCCESS = 1;
 	private static int QUOTA_UPDATE_FAIL = 2;
+	
+	private API desiredState;
+	
+	private API actualState;
 
-	public UpdateQuotaConfiguration(API desiredState, API actualState) {
-		super(desiredState, actualState);
+	public APIQuotaManager(API desiredState, API actualState) {
+		this.desiredState = desiredState;
+		this.actualState = actualState;
 	}
 
 	public void execute() throws AppException {

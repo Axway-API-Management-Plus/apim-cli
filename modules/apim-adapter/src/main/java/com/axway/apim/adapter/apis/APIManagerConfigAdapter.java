@@ -45,7 +45,7 @@ public class APIManagerConfigAdapter {
 		HttpResponse httpResponse = null;
 		try {			
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
-			RestAPICall getRequest = new GETRequest(uri, null, useAdmin);
+			RestAPICall getRequest = new GETRequest(uri, useAdmin);
 			httpResponse = getRequest.execute();
 
 			JsonNode apiManagerConfig;

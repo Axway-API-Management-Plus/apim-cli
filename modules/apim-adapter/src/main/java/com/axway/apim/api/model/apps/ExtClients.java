@@ -2,9 +2,6 @@ package com.axway.apim.api.model.apps;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.axway.apim.adapter.apis.jackson.JSONViews;
-import com.fasterxml.jackson.annotation.JsonView;
-
 public class ExtClients extends ClientAppCredential {
 	
 	@Override
@@ -12,7 +9,6 @@ public class ExtClients extends ClientAppCredential {
 		return "extclients";
 	}
 
-	@JsonView(JSONViews.CredentialsForExport.class)
 	public String getClientId() {
 		return id;
 	}

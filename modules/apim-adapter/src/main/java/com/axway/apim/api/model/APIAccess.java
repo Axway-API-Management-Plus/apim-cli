@@ -2,34 +2,22 @@ package com.axway.apim.api.model;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.axway.apim.adapter.apis.jackson.JSONViews.APIAccessForAPIManager;
-import com.axway.apim.adapter.apis.jackson.JSONViews.APIAccessForExport;
-import com.fasterxml.jackson.annotation.JsonView;
-
 public class APIAccess {
-	@JsonView(APIAccessForAPIManager.class)
 	String id;
 	
-	@JsonView(APIAccessForAPIManager.class)
 	String apiId;
 	
-	@JsonView(APIAccessForAPIManager.class)
 	String createdBy;
 	
-	@JsonView(APIAccessForAPIManager.class)
 	String state;
 	
-	@JsonView(APIAccessForAPIManager.class)
 	String createdOn;
 	
-	@JsonView(APIAccessForExport.class)
 	String apiName;
 	
-	@JsonView(APIAccessForExport.class)
 	String apiVersion;
 	
-	@JsonView(APIAccessForAPIManager.class)
-	boolean enabled;
+	boolean enabled = true;
 
 	public String getId() {
 		return id;
