@@ -38,14 +38,10 @@ public class RecreateToUpdateAPI {
 		// But not potentially existing Subscriptions or manually created Client-Orgs
 		CreateNewAPI createNewAPI = new CreateNewAPI();
 		createNewAPI.execute(changes, true);
-		
-		// 2. Create a new temp Desired-API-Definition, which will be used to delete the old API
-		API tempDesiredDeletedAPI = new APIBaseDefinition();
 
 		LOG.info("New API created. Going to delete old API.");
 		// Delete the existing old API!
-		((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(API.STATE_DELETED);
-		new APIStatusManager().update(tempDesiredDeletedAPI, actual, true);
+		new APIStatusManager().update(actual, API.STATE_DELETED, true);
 	}
 
 }

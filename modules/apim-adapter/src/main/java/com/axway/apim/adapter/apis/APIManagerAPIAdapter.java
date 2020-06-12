@@ -149,7 +149,7 @@ public class APIManagerAPIAdapter {
 		try { 
 			uri = getAPIRequestUri(filter);
 			LOG.debug("Sending request to find existing APIs: " + uri);
-			RestAPICall getRequest = new GETRequest(uri);
+			RestAPICall getRequest = new GETRequest(uri, true);
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -439,8 +439,8 @@ public class APIManagerAPIAdapter {
 						existingClientApps.add(app);
 					}
 				}
-				api.setApplications(existingClientApps);
 			}
+			api.setApplications(existingClientApps);
 		}		
 	}
 	
@@ -617,7 +617,12 @@ public class APIManagerAPIAdapter {
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 201){
-				LOG.error("Error updating API status. Received Status-Code: " +statusCode+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+				String response = EntityUtils.toString(httpResponse.getEntity());
+				if(statusCode == 403 &&  response.contains("API is already unpublished")) {
+					LOG.warn("API: "+api.getName()+" ("+api.getId()+") is already unpublished");
+					return;
+				}
+				LOG.error("Error updating API status. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
 				throw new AppException("Error updating API status. Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_BE_API);
 			}
 		} catch (Exception e) {
