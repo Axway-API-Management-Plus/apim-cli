@@ -57,11 +57,6 @@ public class API {
 	public final static String STATE_DELETED = "deleted";
 	public final static String STATE_PENDING = "pending";
 	
-	public final static int SWAGGGER_API_12 = 1;
-	public final static int SWAGGGER_API_20 = 2;
-	public final static int OPEN_API_30 = 3;
-	public final static int WSDL_API = 4;
-	
 	JsonNode apiConfiguration;
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {})

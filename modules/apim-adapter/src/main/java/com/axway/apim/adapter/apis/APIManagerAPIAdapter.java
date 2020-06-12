@@ -44,6 +44,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.definition.APISpecificationFactory;
+import com.axway.apim.api.definition.APISpecification.APISpecType;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
@@ -680,10 +681,10 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public API importBackendAPI(API api) throws AppException {
-		LOG.info("Importing backend API (Swagger/WSDL Import)");
+		LOG.info("Importing backend API ("+api.getApiDefinition().getAPIDefinitionType().getNiceName()+")");
 		JsonNode jsonNode;
 		try {
-			if(api.getApiDefinition().getAPIDefinitionType()==API.WSDL_API) {
+			if(api.getApiDefinition().getAPIDefinitionType()==APISpecType.WSDL_API) {
 				jsonNode = importFromWSDL(api);
 			} else {
 				jsonNode =  importFromSwagger(api);
