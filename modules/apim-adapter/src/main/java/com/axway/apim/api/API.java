@@ -20,22 +20,6 @@ import com.axway.apim.api.model.TagMap;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.props.APICaCertsPropertyHandler;
-import com.axway.apim.lib.props.APIDescriptionPropertyHandler;
-import com.axway.apim.lib.props.APINamePropertyHandler;
-import com.axway.apim.lib.props.APIPathPropertyHandler;
-import com.axway.apim.lib.props.APISummaryPropertyHandler;
-import com.axway.apim.lib.props.APITagsPropertyHandler;
-import com.axway.apim.lib.props.APIVersionPropertyHandler;
-import com.axway.apim.lib.props.AuthenticationProfileHandler;
-import com.axway.apim.lib.props.CorsProfileHandler;
-import com.axway.apim.lib.props.CustomPropertyHandler;
-import com.axway.apim.lib.props.InboundProfileHandler;
-import com.axway.apim.lib.props.OutboundProfileHandler;
-import com.axway.apim.lib.props.RoutingKeyPropHandler;
-import com.axway.apim.lib.props.SecurityProfileHandler;
-import com.axway.apim.lib.props.ServiceProfileHandler;
-import com.axway.apim.lib.props.VhostPropertyHandler;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -83,70 +67,45 @@ public class API {
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
 	protected APISpecification apiDefinition = null;
 
-	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {API.STATE_UNPUBLISHED}, 
-			propHandler = APICaCertsPropertyHandler.class)
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
 	protected List<CaCert> caCerts = null;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
-			propHandler = APIDescriptionPropertyHandler.class)
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected String descriptionType = null;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
-			propHandler = APIDescriptionPropertyHandler.class)
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected String descriptionManual = null;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
-			propHandler = APIDescriptionPropertyHandler.class)
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected String descriptionMarkdown = null;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
-			propHandler = APIDescriptionPropertyHandler.class)
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected String descriptionUrl = null;
 	
-	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {API.STATE_UNPUBLISHED}, 
-			propHandler = SecurityProfileHandler.class)
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<SecurityProfile> securityProfiles = null;
 	
-	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {API.STATE_UNPUBLISHED}, 
-			propHandler = AuthenticationProfileHandler.class)
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<AuthenticationProfile> authenticationProfiles = null;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {API.STATE_UNPUBLISHED}, 
-			propHandler = APITagsPropertyHandler.class)
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED})
 	protected TagMap<String, String[]> tags = null;
 	
-	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {API.STATE_UNPUBLISHED}, 
-			propHandler = OutboundProfileHandler.class)
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
 	protected Map<String, OutboundProfile> outboundProfiles = null;
 	
-	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {API.STATE_UNPUBLISHED}, 
-			propHandler = ServiceProfileHandler.class)
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
 	protected Map<String, ServiceProfile> serviceProfiles = null;
 	
-	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {API.STATE_UNPUBLISHED}, 
-			propHandler = InboundProfileHandler.class)
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
 	protected Map<String, InboundProfile> inboundProfiles = null;
 	
-	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {API.STATE_UNPUBLISHED}, 
-			propHandler = CorsProfileHandler.class)
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
 	protected List<CorsProfile> corsProfiles;
 	
-	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
-			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+	@APIPropertyAnnotation(isBreaking = false, copyProp = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected List<Organization> clientOrganizations;
 	
 	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
@@ -154,9 +113,7 @@ public class API {
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<ClientApplication> applications = null;
 	
-	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {}, 
-			propHandler = APIPathPropertyHandler.class)
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
 	protected String path = null;
 
 	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
@@ -170,22 +127,16 @@ public class API {
 	@JsonIgnore
 	private String actualState;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {API.STATE_UNPUBLISHED}, 
-			propHandler = APIVersionPropertyHandler.class)	
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED})	
 	protected String version;
 	
-	@APIPropertyAnnotation(isBreaking = true, copyProp = false, 
-			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
-			propHandler = VhostPropertyHandler.class)
+	@APIPropertyAnnotation(isBreaking = true, copyProp = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected String vhost = null;
 	
-	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED}, propHandler = APINamePropertyHandler.class)
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED})
 	protected String name = null;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {API.STATE_UNPUBLISHED, API.STATE_DEPRECATED}, 
-			propHandler = APISummaryPropertyHandler.class)
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_DEPRECATED})
 	protected String summary = null;
 	
 	protected String createdOn = null;
@@ -197,8 +148,7 @@ public class API {
 	protected Image image = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED}, 
-			propHandler = CustomPropertyHandler.class)
+			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected Map<String, String> customProperties = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
@@ -210,7 +160,7 @@ public class API {
 	protected APIQuota systemQuota = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, 
-			writableStates = {API.STATE_UNPUBLISHED}, propHandler = RoutingKeyPropHandler.class)
+			writableStates = {API.STATE_UNPUBLISHED})
 	protected String apiRoutingKey = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
