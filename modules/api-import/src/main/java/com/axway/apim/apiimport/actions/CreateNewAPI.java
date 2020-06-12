@@ -52,22 +52,17 @@ public class CreateNewAPI {
 		//List<String> changedProps = getAllProps(changes.getDesiredAPI());
 
 		VHostManager vHostManager = new VHostManager();
-		String backendAPIId = apiAdapter.importBackendAPI(changes.getDesiredAPI());
-		// Register the created BE-API to be rolled back in case of an error
-		API rollbackAPI = new APIBaseDefinition();
-		rollbackAPI.setName(changes.getDesiredAPI().getName());
-		rollbackAPI.setApiId(backendAPIId);
-		rollback.addRollbackAction(new RollbackBackendAPI(rollbackAPI));
+		API createdBEAPI = apiAdapter.importBackendAPI(changes.getDesiredAPI());
+		rollback.addRollbackAction(new RollbackBackendAPI(createdBEAPI));
 
 		try {
-			changes.getDesiredAPI().setApiId(backendAPIId);
+			changes.getDesiredAPI().setApiId(createdBEAPI.getApiId());
 			createdAPI = apiAdapter.createAPIProxy(changes.getDesiredAPI());
-			rollbackAPI.setId(createdAPI.getId());
 		} catch (Exception e) {
-			rollback.addRollbackAction(new RollbackAPIProxy(rollbackAPI));
+			rollback.addRollbackAction(new RollbackAPIProxy(createdAPI));
 			throw e;
 		}
-		rollback.addRollbackAction(new RollbackAPIProxy(rollbackAPI)); // In any case, register the API just created for a potential rollback
+		rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback
 		APIChangeState.copyRequiredPropertisFromCreatedAPI(changes.getDesiredAPI(), createdAPI);
 
 		try {
@@ -83,7 +78,6 @@ public class CreateNewAPI {
 			// This is special, as the status is not a normal property and requires some additional actions!
 			APIStatusManager statusManager = new APIStatusManager();
 			statusManager.update(changes.getDesiredAPI(), createdAPI);
-			((API)rollbackAPI).setState(createdAPI.getState());
 			apiAdapter.updateRetirementDate(createdAPI);
 
 			if(reCreation && changes.getActualAPI().getState().equals(API.STATE_PUBLISHED)) {

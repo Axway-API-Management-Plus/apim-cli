@@ -37,6 +37,17 @@ public class APIFilter {
 		TO_NAME
 	}
 	
+	public static enum FILTER_OP {
+		eq, 
+		ne, 
+		gt, 
+		lt, 
+		ge, 
+		le, 
+		like,
+		gele;
+	}
+	
 	private String id;
 	private String apiId;
 	private String name;
@@ -44,6 +55,8 @@ public class APIFilter {
 	private String apiPath;
 	private String queryStringVersion;
 	private String state;
+	
+	private String createdOn;
 	
 	private APIType type;
 	
@@ -192,6 +205,8 @@ public class APIFilter {
 	public void setQueryStringVersion(String queryStringVersion) {
 		this.queryStringVersion = queryStringVersion;
 	}
+	
+	
 
 	public METHOD_TRANSLATION getTranslateMethodMode() {
 		return translateMethodMode;
@@ -303,6 +318,14 @@ public class APIFilter {
 		filters.add(new BasicNameValuePair("field", "state"));
 		filters.add(new BasicNameValuePair("op", "eq"));
 		filters.add(new BasicNameValuePair("value", state));
+	}
+	
+	public void setCreatedOn(String createdOn, FILTER_OP op) {
+		if(createdOn==null) return;
+		this.createdOn = createdOn;
+		filters.add(new BasicNameValuePair("field", "createdOn"));
+		filters.add(new BasicNameValuePair("op", op.name()));
+		filters.add(new BasicNameValuePair("value", createdOn));
 	}
 	
 	public Map<String, String> getCustomProperties() {
@@ -428,6 +451,9 @@ public class APIFilter {
 		String queryStringVersion;
 		String state;
 		
+		String createdOn;
+		FILTER_OP createdOnOp;
+		
 		APIType apiType;
 		
 		Map<String, String> customProperties;
@@ -499,6 +525,7 @@ public class APIFilter {
 			apiFilter.setRetired(this.retired);
 			apiFilter.setDeprecated(this.deprecated);
 			apiFilter.setCustomProperties(this.customProperties);
+			apiFilter.setCreatedOn(this.createdOn, this.createdOnOp);
 			return apiFilter;
 		}
 
@@ -564,6 +591,18 @@ public class APIFilter {
 		
 		public Builder isRetired(boolean retired) {
 			this.retired = retired;
+			return this;
+		}
+		
+		public Builder isCreatedOnBefore(String createdOn) {
+			this.createdOn = createdOn;
+			this.createdOnOp = FILTER_OP.lt;
+			return this;
+		}
+		
+		public Builder isCreatedOnAfter(String createdOn) {
+			this.createdOn = createdOn;
+			this.createdOnOp = FILTER_OP.gt;
 			return this;
 		}
 		

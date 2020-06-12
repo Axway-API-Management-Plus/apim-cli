@@ -1,11 +1,5 @@
 package com.axway.apim.apiimport.rollback;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
@@ -40,17 +34,13 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements Rollba
 				Long beAPICreatedOn = Long.parseLong( ((APIBaseDefinition)rollbackAPI).getCreatedOn() );
 				// The createdOn of the API we are looking for, should be almost created at the same time, as the code runs internally in API-Manager.
 				beAPICreatedOn = beAPICreatedOn - 1000;
-				List<NameValuePair> filters = new ArrayList<NameValuePair>();
-				filters.add(new BasicNameValuePair("field", "name"));
-				filters.add(new BasicNameValuePair("op", "like"));
-				filters.add(new BasicNameValuePair("value", rollbackAPI.getName()+ " HTTP"));
-				// Filter on the createdOn date to execlude potentially already existing APIs with the same name,
-				// as we only want to rollback the API which has been inserted by the actual tool run
-				filters.add(new BasicNameValuePair("field", "createdOn"));
-				filters.add(new BasicNameValuePair("op", "gt"));
-				filters.add(new BasicNameValuePair("value", (beAPICreatedOn).toString())); // Ignore all other APIs some time ago
-				API existingBEAPI = APIManagerAdapter.getInstance().apiAdapter.getAPI(new APIFilter.Builder(APIType.CUSTOM, true).useFilter(filters).build(), false);
+				APIFilter filter = new APIFilter.Builder(APIType.CUSTOM, true)
+						.hasName(rollbackAPI.getName().replace(" HTTPS", " HTTP"))
+						.isCreatedOnAfter((beAPICreatedOn).toString())
+						.build();
+				API existingBEAPI = APIManagerAdapter.getInstance().apiAdapter.getAPI(filter, false);
 				if(existingBEAPI!=null && existingBEAPI.getId()!=null) {
+					existingBEAPI.setApiId(existingBEAPI.getId());
 					APIManagerAdapter.getInstance().apiAdapter.deleteBackendAPI(existingBEAPI);
 				}
 			}

@@ -40,6 +40,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
+import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.definition.APISpecificationFactory;
 import com.axway.apim.api.model.APIAccess;
@@ -504,7 +505,7 @@ public class APIManagerAPIAdapter {
 		HttpEntity entity;
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications"}));
+				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image"}));
 		mapper.setFilterProvider(filter);
 		HttpResponse httpResponse = null;
 		try {
@@ -665,20 +666,26 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
-	public String importBackendAPI(API api) throws AppException {
+	public API importBackendAPI(API api) throws AppException {
 		LOG.info("Importing backend API (Swagger/WSDL Import)");
+		JsonNode jsonNode;
 		try {
 			if(api.getApiDefinition().getAPIDefinitionType()==API.WSDL_API) {
-				return importFromWSDL(api);
+				jsonNode = importFromWSDL(api);
 			} else {
-				return importFromSwagger(api);
+				jsonNode =  importFromSwagger(api);
 			}
+			API createdAPI = new APIBaseDefinition();
+			createdAPI.setApiId(jsonNode.findPath("id").asText());
+			createdAPI.setName(jsonNode.findPath("name").asText());
+			createdAPI.setCreatedOn(jsonNode.findPath("createdOn").asText());
+			return createdAPI;
 		} catch (Exception e) {
 			throw new AppException("Can't import definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
 		}
 	}
 	
-	private String importFromWSDL(API api) throws URISyntaxException, AppException, IOException {
+	private JsonNode importFromWSDL(API api) throws URISyntaxException, AppException, IOException {
 		URI uri;
 		HttpEntity entity = new StringEntity("");
 		String username=null;
@@ -715,9 +722,7 @@ public class APIManagerAPIAdapter {
 				LOG.error("Error importing WSDL. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
 				throw new AppException("Can't import WSDL from URL / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
 			}
-			JsonNode jsonNode = mapper.readTree(response);
-			String backendAPIId = jsonNode.findPath("id").asText();
-			return backendAPIId;
+			return mapper.readTree(response);
 		} catch (Exception e) {
 			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {
@@ -728,7 +733,7 @@ public class APIManagerAPIAdapter {
 		}
 	}
 
-	private String importFromSwagger(API api) throws URISyntaxException, AppException, IOException {
+	private JsonNode importFromSwagger(API api) throws URISyntaxException, AppException, IOException {
 		URI uri;
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
@@ -756,8 +761,7 @@ public class APIManagerAPIAdapter {
 				throw new AppException("Can't import Swagger-definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
 			}
 			JsonNode jsonNode = mapper.readTree(response);
-			String backendAPIId = jsonNode.findPath("id").asText();
-			return backendAPIId;
+			return jsonNode;
 		} catch (Exception e) {
 			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {
