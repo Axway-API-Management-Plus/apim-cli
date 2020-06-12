@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
@@ -540,8 +541,15 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
+	public void deleteAPI(API api) throws AppException {
+		APIStatusManager statusManager = new APIStatusManager();
+		statusManager.update(api, API.STATE_DELETED, true);
+	}
+	
 	public void deleteAPIProxy(API api) throws AppException {
 		LOG.debug("Deleting API-Proxy");
+		// Make sure, the API is unpublished - otherwise it cant be deleted
+		new APIStatusManager().update(api, API.STATE_UNPUBLISHED, true);
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
@@ -890,7 +898,8 @@ public class APIManagerAPIAdapter {
 				throw new AppException("Error granting access API. Received Status-Code: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			// Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
-			// actualState.getClientOrganizations().addAll(grantAccessToOrgs);
+			if(api.getClientOrganizations()==null) api.setClientOrganizations(new ArrayList<Organization>());
+			api.getClientOrganizations().addAll(grantAccessToOrgs);
 		} catch (Exception e) {
 			LOG.error("grantAccessToOrgs: '"+grantAccessToOrgs+"'");
 			LOG.error("allOrgs: '"+allOrgs+"'");
