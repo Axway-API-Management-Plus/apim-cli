@@ -24,9 +24,11 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -214,7 +216,6 @@ public class APIImportConfigAdapter {
 			validateOrganization(apiConfig);
 			checkForAPIDefinitionInConfiguration(apiConfig);
 			addDefaultPassthroughSecurityProfile(apiConfig);
-			addDefaultCorsProfile(apiConfig);
 			addDefaultAuthenticationProfile(apiConfig);
 			validateOutboundProfile(apiConfig);
 			validateInboundProfile(apiConfig);
@@ -224,6 +225,7 @@ public class APIImportConfigAdapter {
 			validateCustomProperties(apiConfig);
 			validateDescription(apiConfig);
 			validateOutboundAuthN(apiConfig);
+			addDefaultCorsProfile(apiConfig);
 			validateHasQueryStringKey(apiConfig);
 			completeCaCerts(apiConfig);
 			addQuotaConfiguration(apiConfig);
@@ -388,6 +390,9 @@ public class APIImportConfigAdapter {
 				defaultCorsFound = true;
 				break;
 			}
+		}
+		if(apiConfig.getCorsProfiles().size()==1) { // Make this CORS-Profile default, even if it's not named default
+			apiConfig.getInboundProfiles().get("_default").setCorsProfile(apiConfig.getCorsProfiles().get(0).getName());
 		}
 		if(!defaultCorsFound) {
 			apiConfig.getCorsProfiles().add(CorsProfile.getDefaultCorsProfile());
@@ -714,7 +719,12 @@ public class APIImportConfigAdapter {
 	}
 	
 	private API validateInboundProfile(API importApi) throws AppException {
-		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) return importApi;
+		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) {
+			Map<String, InboundProfile> def = new HashMap<String, InboundProfile>();
+			def.put("_default", InboundProfile.getDefaultInboundProfile());
+			importApi.setInboundProfiles(def);
+			return importApi;
+		}
 		Iterator<String> it = importApi.getInboundProfiles().keySet().iterator();
 		// Check if a default inbound profile is given
 		boolean defaultProfileFound = false;
