@@ -27,6 +27,7 @@ public class APIStatusManager {
 		published(new String[] { "unpublished", "deprecated" }),
 		deleted(new String[] {}), 
 		deprecated(new String[] { "unpublished", "undeprecated" }),
+		undeprecated(new String[] { "published", "unpublished" }),
 		pending(new String[] { "deleted" });
 
 		private String[] possibleStates;
@@ -128,6 +129,7 @@ public class APIStatusManager {
 				LOG.error("The status change from: " + actualState.getState() + " to " + desiredState.getState() + " is not possible!");
 				throw new AppException("The status change from: '" + actualState.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS);
 			}
+			if(desiredState.getState().equals(actualState.getState())) return;
 			if(desiredState.getState().equals(API.STATE_DELETED)) {
 				// If an API in state unpublished or pending, also an orgAdmin can delete it
 				//boolean useAdmin = (actualState.getState().equals(API.STATE_UNPUBLISHED) || actualState.getState().equals(API.STATE_PENDING)) ? false : true; 
@@ -140,6 +142,14 @@ public class APIStatusManager {
 			} 
 			// Take over the status, as it has been updated now
 			actualState.setState(desiredState.getState());
+			// When deprecation or undeprecation is requested, we have to set the actual API accordingly!
+			if(desiredState.getState().equals("undeprecated")) {
+				actualState.setDeprecated("false");
+				actualState.setState(API.STATE_PUBLISHED);
+			} else if (desiredState.getState().equals("deprecated")) {
+				actualState.setState(API.STATE_PUBLISHED);
+				actualState.setDeprecated("true");
+			}
 		} catch (Exception e) {
 			throw new AppException("The status change from: '" + actualState.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS, e);
 		}

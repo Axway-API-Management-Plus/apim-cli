@@ -39,12 +39,13 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
+import com.axway.apim.adapter.apis.jackson.StateSerializerModifier;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.definition.APISpecification;
-import com.axway.apim.api.definition.APISpecificationFactory;
 import com.axway.apim.api.definition.APISpecification.APISpecType;
+import com.axway.apim.api.definition.APISpecificationFactory;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
@@ -69,6 +70,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
@@ -508,6 +510,7 @@ public class APIManagerAPIAdapter {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
 				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath"}));
+		mapper.registerModule(new SimpleModule().setSerializerModifier(new StateSerializerModifier(false)));
 		mapper.setFilterProvider(filter);
 		HttpResponse httpResponse = null;
 		translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
@@ -598,7 +601,7 @@ public class APIManagerAPIAdapter {
 	
 	
 	public void updateAPIStatus(API api) throws AppException {
-		LOG.debug("Update API-Proxy status to: " + api.getState());
+		LOG.info("Update API-Proxy status to: " + api.getState());
 		URI uri;
 		HttpResponse httpResponse = null;
 		RestAPICall request;

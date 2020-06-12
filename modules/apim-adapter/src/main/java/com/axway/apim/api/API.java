@@ -170,7 +170,7 @@ public class API {
 	
 	protected String deprecated = null;
 
-	@APIPropertyAnnotation(isBreaking = false, 
+	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected Long retirementDate = null;
 	
