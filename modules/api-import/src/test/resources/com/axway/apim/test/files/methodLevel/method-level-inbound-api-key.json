@@ -7,9 +7,7 @@
    "inboundProfiles":{
       "findPetsByStatus":{
          "securityProfile":"${securityProfileName}",
-         "corsProfile":null,
-         "monitorAPI":true,
-         "monitorSubject":null
+         "monitorAPI":true
       }
    },
    "securityProfiles":[
