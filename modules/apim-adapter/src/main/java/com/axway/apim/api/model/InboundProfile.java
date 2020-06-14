@@ -66,4 +66,14 @@ public class InboundProfile extends Profile {
 	public String toString() {
 		return "monitorAPI: " + monitorAPI + ", monitorSubject: " + monitorSubject + ", securityProfile: " + securityProfile + ", corsProfile: " + corsProfile;
 	}
+	
+	
+	public static InboundProfile getDefaultInboundProfile() {
+		InboundProfile defaultInboundProfile = new InboundProfile();
+		defaultInboundProfile.setMonitorAPI(true);
+		defaultInboundProfile.setMonitorSubject("${authentication.subject.id}");
+		defaultInboundProfile.setSecurityProfile("_default");
+		defaultInboundProfile.setCorsProfile("_default");
+		return defaultInboundProfile;
+	}
 }

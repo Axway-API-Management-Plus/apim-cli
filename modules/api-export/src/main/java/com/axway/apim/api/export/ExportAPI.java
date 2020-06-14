@@ -53,9 +53,8 @@ public class ExportAPI {
 	
 	@JsonIgnore
 	public APISpecification getAPIDefinition() {
-		return this.actualAPIProxy.getAPIDefinition();
+		return this.actualAPIProxy.getApiDefinition();
 	}
-
 
 	public Map<String, OutboundProfile> getOutboundProfiles() throws AppException {
 		if(this.actualAPIProxy.getOutboundProfiles()==null) return null;
@@ -207,12 +206,6 @@ public class ExportAPI {
 
 	public Map<String, String> getCustomProperties() {
 		return this.actualAPIProxy.getCustomProperties();
-	}
-
-	
-	@JsonIgnore
-	public int getAPIType() {
-		return ((API)this.actualAPIProxy).getAPIType();
 	}
 
 

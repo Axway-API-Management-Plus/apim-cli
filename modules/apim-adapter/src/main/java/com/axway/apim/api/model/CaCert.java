@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 
-@JsonFilter("IgnoreImportFields")
+@JsonFilter("CaCertFilter")
 public class CaCert {
 	
 	static Logger LOG = LoggerFactory.getLogger(CaCert.class);

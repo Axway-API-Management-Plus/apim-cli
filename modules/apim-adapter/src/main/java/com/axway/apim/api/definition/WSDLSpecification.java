@@ -1,6 +1,5 @@
 package com.axway.apim.api.definition;
 
-import com.axway.apim.api.API;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,8 +13,8 @@ public class WSDLSpecification extends APISpecification {
 	}
 
 	@Override
-	public int getAPIDefinitionType() throws AppException {
-		return API.WSDL_API;
+	public APISpecType getAPIDefinitionType() throws AppException {
+		return APISpecType.WSDL_API;
 	}
 
 	@Override

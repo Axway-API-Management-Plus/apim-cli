@@ -42,11 +42,11 @@ public class APIManagerAPIMethodAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations").build();
-			RestAPICall getRequest = new GETRequest(uri, null);
+			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute();
 			this.apiManagerResponse.put(apiId,EntityUtils.toString(httpResponse.getEntity()));
 		} catch (Exception e) {
-			LOG.error("Error cant load API-Methods for API: '"+apiId+"' from API-Manager. Can't parse response: " + response);
+			LOG.error("Error cant load API-Methods for API: '"+apiId+"' from API-Manager. Can't parse response: " + response, e);
 			throw new AppException("Error cant load API-Methods for API: '"+apiId+"' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {

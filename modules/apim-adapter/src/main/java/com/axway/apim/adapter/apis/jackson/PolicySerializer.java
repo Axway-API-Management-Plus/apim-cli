@@ -23,4 +23,9 @@ public class PolicySerializer extends StdSerializer<Policy> {
 	public void serialize(Policy policy, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 		jgen.writeString(policy.getId());
 	}
+	
+	@Override
+	public Class<Policy> handledType() {
+		return Policy.class;
+	}
 }

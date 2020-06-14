@@ -5,10 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
+import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.apiimport.actions.RecreateToUpdateAPI;
 import com.axway.apim.apiimport.actions.UpdateExistingAPI;
-import com.axway.apim.apiimport.state.APIChangeState;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -49,11 +49,12 @@ public class APIImportManager {
 			createAPI.execute(changeState, false);
 		// Otherwise an existing API exists
 		} else {
+			changeState.copyChangedProps(); // From this point the Actual API contains desired changes!
 			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getName() +" (Version: "+ changeState.getActualAPI().getVersion() + ")");
 			if(!changeState.hasAnyChanges()) {
 				APIPropertiesExport.getInstance().setProperty("feApiId", changeState.getActualAPI().getId());
 				LOG.debug("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
-				error.setWarning("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE, false);
+				error.setWarning("No changes detected between Import- and API-Manager-API: '" + changeState.getActualAPI().getName() + "' ("+changeState.getActualAPI().getId()+")", ErrorCode.NO_CHANGE, false);
 				throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE);
 			}
 			LOG.info("Recognized the following changes. Potentially Breaking: " + changeState.getBreakingChanges() + 

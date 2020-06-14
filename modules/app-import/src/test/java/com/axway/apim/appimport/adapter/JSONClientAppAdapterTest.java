@@ -41,7 +41,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
 		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
-		List<ClientApplication> apps = adapter.getAllApplications(false);
+		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
 	}
 	
@@ -51,7 +51,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
 		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
-		List<ClientApplication> apps = adapter.getAllApplications(false);
+		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
 	}
 	
@@ -61,7 +61,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
 		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
-		List<ClientApplication> apps = adapter.getAllApplications(false);
+		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 2, "Expected 2 app returned from the Adapter");
 	}
 	
@@ -71,7 +71,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
 		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
-		List<ClientApplication> apps = adapter.getAllApplications(false);
+		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
 		ClientApplication app = apps.get(0);
 		assertEquals(app.getName(), "Complete application");

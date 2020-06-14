@@ -75,7 +75,7 @@ public class APIManagerQuotaAdapter {
 				}
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+quotaId+"/quota/").build();
 			}
-			RestAPICall getRequest = new GETRequest(uri, null, true);
+			RestAPICall getRequest = new GETRequest(uri, true);
 			httpResponse = getRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
@@ -118,7 +118,7 @@ public class APIManagerQuotaAdapter {
 			
 			entity = new StringEntity(mapper.writeValueAsString(quotaConfig), StandardCharsets.UTF_8);
 			
-			RestAPICall request = new PUTRequest(entity, uri, null, true);
+			RestAPICall request = new PUTRequest(entity, uri, true);
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");

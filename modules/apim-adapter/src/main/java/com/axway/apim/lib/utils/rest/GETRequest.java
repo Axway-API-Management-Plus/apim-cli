@@ -5,17 +5,16 @@ import java.net.URI;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 
-import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class GETRequest extends RestAPICall {
 
-	public GETRequest(URI uri, IResponseParser responseParser) {
-		super(null, uri,responseParser);
+	public GETRequest(URI uri) {
+		super(null, uri);
 	}
 	
-	public GETRequest(URI uri, IResponseParser responseParser, boolean useAdmin) {
-		super(null, uri,responseParser, useAdmin);
+	public GETRequest(URI uri, boolean useAdmin) {
+		super(null, uri, useAdmin);
 	}
 
 	@Override
@@ -23,7 +22,6 @@ public class GETRequest extends RestAPICall {
 		HttpGet httpGet = new HttpGet(uri);
 		httpGet.setHeader("Content-type", this.contentType);
 		HttpResponse response = sendRequest(httpGet);
-		parseResponse(response);
 		return response;
 	}
 }

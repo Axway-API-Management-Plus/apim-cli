@@ -28,6 +28,7 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Test
@@ -70,6 +71,7 @@ public class MethodLevelExportTestIT extends TestNGCitrusTestRunner {
 		String exportedAPIConfigFile = context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/api-config.json";
 		
 		echo("####### Reading exported API-Config file: '"+exportedAPIConfigFile+"' #######");
+		mapper.disable(MapperFeature.USE_ANNOTATIONS);
 		JsonNode exportedAPIConfig = mapper.readTree(new FileInputStream(new File(exportedAPIConfigFile)));
 		JsonNode importedAPIConfig = mapper.readTree(this.getClass().getResourceAsStream("/test/export/files/methodLevel/inbound-api-key-and-cors.json"));
 
@@ -82,15 +84,15 @@ public class MethodLevelExportTestIT extends TestNGCitrusTestRunner {
 		
 		Map<String, InboundProfile> importedInboundProfiles = mapper.convertValue(importedAPIConfig.get("inboundProfiles"), new TypeReference<Map<String, InboundProfile>>(){});
 		Map<String, InboundProfile> exportedInboundProfiles = mapper.convertValue(exportedAPIConfig.get("inboundProfiles"), new TypeReference<Map<String, InboundProfile>>(){});
-		assertEquals(importedInboundProfiles, exportedInboundProfiles, "InboundProfiles are not equal.");
+		assertEquals(exportedInboundProfiles, importedInboundProfiles, "InboundProfiles are not equal.");
 		
 		Map<String, OutboundProfile> importedOutboundProfiles = mapper.convertValue(importedAPIConfig.get("outboundProfiles"), new TypeReference<Map<String, OutboundProfile>>(){});
 		Map<String, OutboundProfile> exportedOutboundProfiles = mapper.convertValue(exportedAPIConfig.get("outboundProfiles"), new TypeReference<Map<String, OutboundProfile>>(){});
-		assertEquals(importedOutboundProfiles, exportedOutboundProfiles, "OutboundProfiles are not equal.");
+		assertEquals(exportedOutboundProfiles, importedOutboundProfiles, "OutboundProfiles are not equal.");
 		
 		List<SecurityProfile> importedSecurityProfiles = mapper.convertValue(importedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>(){});
 		List<SecurityProfile> exportedSecurityProfiles = mapper.convertValue(exportedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>(){});
-		assertEquals(importedSecurityProfiles, exportedSecurityProfiles, "SecurityProfiles are not equal.");
+		assertEquals(exportedSecurityProfiles, importedSecurityProfiles, "SecurityProfiles are not equal.");
 		
 		List<SecurityProfile> importedAuthenticationProfiles = mapper.convertValue(importedAPIConfig.get("authenticationProfiles"), new TypeReference<List<AuthenticationProfile>>(){});
 		List<SecurityProfile> exportedAuthenticationProfiles = mapper.convertValue(exportedAPIConfig.get("authenticationProfiles"), new TypeReference<List<AuthenticationProfile>>(){});

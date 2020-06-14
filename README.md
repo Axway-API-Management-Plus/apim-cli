@@ -1,16 +1,16 @@
 # Axway API-Management CLI
 
-This CLI tool allows you to control the Axway API management solution without access through the Web UI. You can call the CLI manually or integrate it into a CI/CD pipeline. The CLI is based on [Swagger-Promote](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote), which has been refactored to support more use-cases than only APIs.
+This CLI allows you to control the Axway API management solution without access through the Web UI. You can call the CLI manually or integrate it into a CI/CD pipeline. The CLI is based on [Swagger-Promote](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote), which has been refactored to support more use-cases than only API-Import and -Export.
 
 ## Everything as code
-The basic idea for the so-called "Everything as code" approach is that the desired state of something is declared in a configuration file which stored in your version management system. A tool is replicating that declared state to become the actual state. This is used for instance to manage a complex Cloud-Infrastructure called Infrastructure as code. You may read more here: https://hackernoon.com/everything-as-code-explained-0ibg32a3  
+The basic idea for the so-called "Everything as code" approach is that the desired state of something (API, Application, etc.) is declared in a configuration file which stored in your version management system. A tool, like this CLI, is then replicating that declared state to become the actual state in the target environment. This is used for instance to manage complex Cloud-Infrastructure called Infrastructure as code. You may read more here: https://hackernoon.com/everything-as-code-explained-0ibg32a3  
   
 This CLI is following the same approach for your APIs, Applications, etc. Everything is declared as code in a config file and stored in your version management system. The CLI transfers this desired state manually or automatically via a pipeline into the API management platform to become the actual state.  
-Additionally the CLI supports basic administrative commands for instance to display entities and perform simple tasks.  
+Additionally the CLI supports basic administrative commands for instance to list and filter entities and perform simple tasks. More will be added very soon.    
 
 Watch this video (28 min): https://youtu.be/2i8i1zMAMps to get an overview + demo.
 
-With that, an API developer is just providing the desired state configuration of the API, Application. When checked in, the [CI/CD-Pipeline](https://github.com/Axway-API-Management-Plus/apim-cli/wiki/9.-Jenkins-Integration-with-GitHub-&-Bitbucket) picks it up and replicates it into the API Manager. 
+With that, an API developer or the operations team is just providing the desired state configuration of the API, Application. When checked in, the [CI/CD-Pipeline](https://github.com/Axway-API-Management-Plus/apim-cli/wiki/9.-Jenkins-Integration-with-GitHub-&-Bitbucket) picks it up and replicates it into the API Manager. 
 
 ![API Manager Swagger-Promote overview](https://github.com/Axway-API-Management-Plus/apim-cli/blob/develop/misc/images/apimanager-swagger-promote-overview.png )
 

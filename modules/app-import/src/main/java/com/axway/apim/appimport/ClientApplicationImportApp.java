@@ -18,7 +18,6 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.lib.utils.rest.Transaction;
 
 public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 	
@@ -28,7 +27,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 
 	@Override
 	public String getName() {
-		return "Import applications";
+		return "Application - I M P O R T";
 	}
 	
 	@Override
@@ -53,17 +52,15 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
-			Transaction.deleteInstance();
 			
 			AppImportParams params = new AppImportParams(new AppImportCLIOptions(args));
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the application
 			ClientAppAdapter desiredAppsAdapter = ClientAppAdapter.create(params.getValue("config"));
-			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications(new ClientAppFilter.Builder().build(), false);
-			ClientAppAdapter apimClientAppAdapter =  ClientAppAdapter.create(APIManagerAdapter.getInstance());
-			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter, apimClientAppAdapter);
+			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
+			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter);
 			for(ClientApplication desiredApp : desiredApps) {
-				ClientApplication actualApp = apimClientAppAdapter.getApplication(new ClientAppFilter.Builder()
+				ClientApplication actualApp = APIManagerAdapter.getInstance().appAdapter.getApplication(new ClientAppFilter.Builder()
 						.includeCredentials(true)
 						.includeImage(true)
 						.includeQuotas(true)

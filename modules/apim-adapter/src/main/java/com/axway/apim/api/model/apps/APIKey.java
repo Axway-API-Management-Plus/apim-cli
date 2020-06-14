@@ -2,9 +2,7 @@ package com.axway.apim.api.model.apps;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
 public class APIKey extends ClientAppCredential {
 	
@@ -23,7 +21,6 @@ public class APIKey extends ClientAppCredential {
 		this.deletedOn = deletedOn;
 	}
 
-	@JsonView(JSONViews.CredentialsForExport.class)
 	@JsonProperty("apiKey")
 	public String getApiKey() {
 		return id;
@@ -45,5 +42,10 @@ public class APIKey extends ClientAppCredential {
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "APIKey [credentialType=" + credentialType + ", id=" + id + ", enabled=" + enabled + "]";
 	}
 }

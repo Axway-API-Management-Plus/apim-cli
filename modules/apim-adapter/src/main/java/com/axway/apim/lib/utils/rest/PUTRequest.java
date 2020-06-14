@@ -6,17 +6,16 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
 
-import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class PUTRequest extends RestAPICall {
 
-	public PUTRequest(HttpEntity entity, URI uri, IResponseParser responseParser) {
-		super(entity, uri, responseParser);
+	public PUTRequest(HttpEntity entity, URI uri) {
+		super(entity, uri);
 	}
 	
-	public PUTRequest(HttpEntity entity, URI uri, IResponseParser responseParser, boolean useAdmin) {
-		super(entity, uri, responseParser, useAdmin);
+	public PUTRequest(HttpEntity entity, URI uri, boolean useAdmin) {
+		super(entity, uri, useAdmin);
 	}
 
 	@Override
@@ -25,7 +24,6 @@ public class PUTRequest extends RestAPICall {
 		httpPut.setEntity(entity);
 		httpPut.setHeader("Content-type", this.contentType);
 		HttpResponse response = sendRequest(httpPut);
-		parseResponse(response);
 		return response;
 	}
 }

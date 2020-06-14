@@ -12,16 +12,16 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
-import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
+import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
+import com.axway.apim.api.export.jackson.serializer.PolicyToNameSerializer;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
-public class JsonAPIExporter extends APIExporter {
+public class JsonAPIExporter extends APIResultHandler {
 	private static Logger LOG = LoggerFactory.getLogger(JsonAPIExporter.class);
 
 	/** Where to store the exported API-Definition */
@@ -46,7 +46,7 @@ public class JsonAPIExporter extends APIExporter {
 	}
 	
 	@Override
-	public void export(List<API> apis) throws AppException {
+	public void execute(List<API> apis) throws AppException {
 		for (API api : apis) {
 			ExportAPI exportAPI = new ExportAPI(api);
 			try {
@@ -60,16 +60,13 @@ public class JsonAPIExporter extends APIExporter {
 	
 	@Override
 	public APIFilter getFilter() {
-		APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API)
-				.hasVHost(params.getValue("vhost"))
-				.hasApiPath(params.getValue("api-path"))
-				.hasId(params.getValue("id"))
-				.hasName(params.getValue("name"))
-				.hasState(params.getValue("state"))
+		Builder builder = getBaseAPIFilterBuilder()
 				.includeQuotas(true)
 				.includeImage(true)
-				.build();
-		return filter;
+				.includeClientApplications(true)
+				.includeClientOrganizations(true)
+				.includeOriginalAPIDefinition(true);
+		return builder.build();
 	}
 
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {
@@ -104,16 +101,14 @@ public class JsonAPIExporter extends APIExporter {
 		}
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new AIPQuotaSerializerModifier()));
+		mapper.registerModule(new SimpleModule().addSerializer(new PolicyToNameSerializer()));
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filters = new SimpleFilterProvider()
-				.addFilter("IgnoreImportFields",
+				.addFilter("CaCertFilter",
 						SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"inbound", "outbound", "certFile" }))
-				.addFilter("IgnoreApplicationFields",
-						SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"name", "oauthClientId", "extClientId", "apiKey" }));
-		
+				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {}));
 		mapper.setFilterProvider(filters);
 		try {
-			prepareToSave(exportAPI);
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/api-config.json"), exportAPI);
 		} catch (Exception e) {
@@ -177,13 +172,5 @@ public class JsonAPIExporter extends APIExporter {
 			apiExposurePath = apiExposurePath.substring(0, apiExposurePath.length() - 1);
 		apiExposurePath = apiExposurePath.replace("/", "-");
 		return apiExposurePath;
-	}
-	
-	private void prepareToSave(ExportAPI exportAPI) throws AppException {
-		// Clean-Up some internal fields in Outbound-Profiles
-		if(exportAPI.getOutboundProfiles()==null) return;
-		OutboundProfile profile = exportAPI.getOutboundProfiles().get("_default");
-		profile.setApiId(null);
-		profile.setApiMethodId(null);
 	}
 }
