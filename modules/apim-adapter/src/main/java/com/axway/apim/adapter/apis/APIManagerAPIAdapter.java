@@ -815,7 +815,7 @@ public class APIManagerAPIAdapter {
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
-				LOG.error("Error upgrading access to newer API. Received Status-Code: " +statusCode);
+				LOG.error("Error upgrading access to newer API. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
 				throw new AppException("Error upgrading access to newer API. Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_BE_API);
 			}
 			// API-Manager has now granted access to all existing orgs and give a subscription to existing app
@@ -862,7 +862,7 @@ public class APIManagerAPIAdapter {
 						httpResponse = request.execute();
 						int statusCode = httpResponse.getStatusLine().getStatusCode();
 						if(statusCode < 200 || statusCode > 299){
-							LOG.error("Error taking over application quota to new API. Received Status-Code: " +statusCode);
+							LOG.error("Error taking over application quota to new API. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
 							throw new AppException("Error taking over application quota to new API. Received Status-Code: " +statusCode, ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
 						}
 					} catch (Exception e) {
@@ -901,7 +901,7 @@ public class APIManagerAPIAdapter {
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
-				LOG.error("Error granting access API. Received Status-Code: " +statusCode);
+				LOG.error("Error granting access API. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
 				throw new AppException("Error granting access API. Received Status-Code: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			// Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
