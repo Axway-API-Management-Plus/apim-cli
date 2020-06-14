@@ -3,9 +3,10 @@ package com.axway.apim.api.export.lib;
 import com.axway.apim.lib.APIMCoreCLIOptions;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
+import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class APIExportParams extends CommandParameters {
+public class APIExportParams extends StandardExportParams {
 
 	public APIExportParams(APIMCoreCLIOptions parser)
 			throws AppException {

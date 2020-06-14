@@ -1,7 +1,8 @@
-package com.axway.apim.apiimport.state;
+package com.axway.apim.api.state;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -9,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.API;
-import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -34,7 +34,6 @@ public class APIChangeState {
 	private static Logger LOG = LoggerFactory.getLogger(APIChangeState.class);
 	
 	private API actualAPI;
-	private API intransitAPI;
 	private API desiredAPI;
 	
 	private boolean isBreaking = false;
@@ -78,7 +77,8 @@ public class APIChangeState {
 			ErrorState.getInstance().setError("The API you would like to register already exists for another organization.", ErrorCode.API_ALREADY_EXISTS, false);
 			throw new AppException("The API you would like to register already exists for another organization.", ErrorCode.API_ALREADY_EXISTS);
 		}
-		for (Field field : desiredAPI.getClass().getSuperclass().getDeclaredFields()) {
+		Field[] fields = (desiredAPI.getClass().equals(API.class)) ? desiredAPI.getClass().getDeclaredFields() :  desiredAPI.getClass().getSuperclass().getDeclaredFields();
+		for (Field field : fields) {
 			try {
 				if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
 					String getterMethodName = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
@@ -114,6 +114,43 @@ public class APIChangeState {
 			}
 		}
 	}
+	
+	/**
+	 * Copied all changed properties of the API having APIPropertyAnnotation set to copyProp = true (default)
+	 * @throws AppException if something goes wrong
+	 */
+	public void copyChangedProps() throws AppException {
+		Field field = null;
+		Class clazz = (desiredAPI.getClass().equals(API.class)) ? desiredAPI.getClass() :  desiredAPI.getClass().getSuperclass();
+		if(getAllChanges().size()!=0) {
+			String logMessage = "Updating Frontend-API (Proxy) for the following properties: ";
+			for(String fieldName : getAllChanges()) {
+				try {
+					field = clazz.getDeclaredField(fieldName);
+					
+					APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
+					if(!property.copyProp()) continue;
+					if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
+						String getterMethodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+						String setterMethodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+						Method getMethod = clazz.getMethod(getterMethodName, null);
+						Object desiredObject = getMethod.invoke(this.desiredAPI, null);
+						
+						Method setMethod = this.actualAPI.getClass().getMethod(setterMethodName, field.getType());
+						
+						setMethod.invoke(this.actualAPI, desiredObject);
+						logMessage = logMessage + fieldName + " ";
+					}
+				} catch (Exception e) {
+					throw new AppException("Can't handle property: "+fieldName+" to update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
+				}
+			}
+			copyRequiredPropertisFromCreatedAPI(desiredAPI, actualAPI);
+			LOG.info(logMessage);
+		} else {
+			LOG.debug("API-Proxy requires no updates");
+		}
+	}
 
 	/**
 	 * @return the API-Manager API that has been given to this APIChangeState instance
@@ -141,34 +178,6 @@ public class APIChangeState {
 	 */
 	public void setDesiredAPI(API desiredAPI) {
 		this.desiredAPI = desiredAPI;
-	}
-	
-	/**
-	 * The IntransitAPI is used/set, when a new API has been created in API-Manager 
-	 * while the "old actual API" still exists. This is required for instance when 
-	 * the API must be Re-Created, before told old can be deleted.
-	 * This API basically stores the <b>actual</b> API before the real old actual API 
-	 * can be deleted.
-	 * 
-	 * @return the in TransitAPI.
-	 * @see CreateNewAPI 
-	 */
-	public API getIntransitAPI() {
-		return intransitAPI;
-	}
-
-	/**
-	 * The IntransitAPI is used/set, when a new API has been created in API-Manager 
-	 * while the "old actual API" still exists. This is required for instance when 
-	 * the API must be Re-Created, before told old can be deleted.
-	 * This API basically stores the <b>actual</b> API before the real old actual API 
-	 * can be deleted.
-	 * 
-	 * @param intransitAPI the intermediate API
-	 * @see CreateNewAPI 
-	 */
-	public void setIntransitAPI(API intransitAPI) {
-		this.intransitAPI = intransitAPI;
 	}
 
 	/**
@@ -215,6 +224,16 @@ public class APIChangeState {
 	}
 	
 	/**
+	 * @return list of all changes.
+	 */
+	public List<String> getAllChanges() {
+		List<String> allChanges = new ArrayList<String>();
+		allChanges.addAll(nonBreakingChanges);
+		allChanges.addAll(breakingChanges);
+		return allChanges;
+	}
+	
+	/**
 	 * Helper method to check if a certain property can be updated in the current/actual API-State.
 	 * @param property to be updated
 	 * @param actualStatus the actual state of the API
@@ -238,5 +257,20 @@ public class APIChangeState {
 		} else {
 			return actualValue.equals(desiredValue);
 		}
+	}
+	
+	public static API copyRequiredPropertisFromCreatedAPI(API desiredAPI, API createdAPI) throws AppException {
+		desiredAPI.setId(createdAPI.getId());
+		desiredAPI.setApiId(createdAPI.getApiId());
+		desiredAPI.setActualState(createdAPI.getState()); // Copy the original state into a special field used during API-Proxy update
+		desiredAPI.setCreatedBy(createdAPI.getCreatedBy());
+		desiredAPI.setCreatedOn(createdAPI.getCreatedOn());
+		if(desiredAPI.getOutboundProfiles()==null) desiredAPI.setOutboundProfiles(createdAPI.getOutboundProfiles());
+		if(desiredAPI.getInboundProfiles()==null) desiredAPI.setInboundProfiles(createdAPI.getInboundProfiles());
+		if(desiredAPI.getServiceProfiles()==null) desiredAPI.setServiceProfiles(createdAPI.getServiceProfiles());
+		if(desiredAPI.getSecurityProfiles()==null) desiredAPI.setSecurityProfiles(createdAPI.getSecurityProfiles());
+		if(desiredAPI.getAuthenticationProfiles()==null) desiredAPI.setAuthenticationProfiles(createdAPI.getAuthenticationProfiles());
+		if(desiredAPI.getCaCerts()==null) desiredAPI.setCaCerts(createdAPI.getCaCerts());
+		return desiredAPI;
 	}
 }

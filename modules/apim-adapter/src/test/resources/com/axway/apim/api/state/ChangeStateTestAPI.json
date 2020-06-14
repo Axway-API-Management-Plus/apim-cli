@@ -1,0 +1,164 @@
+{
+    "id": "10f02b84-fa4a-4cb6-a0c9-da6974c77005",
+    "organizationId": "d9ea6280-8811-4baf-8b5b-011a97142840",
+    "apiId": "679f1e5c-4676-41ea-9b38-888c56c17b5e",
+    "name": "Check-is-Breaking-4896",
+    "version": "1.0.0",
+    "apiRoutingKey": null,
+    "vhost": null,
+    "path": "/check-is-breaking-4896",
+    "descriptionType": "original",
+    "descriptionManual": null,
+    "descriptionMarkdown": null,
+    "descriptionUrl": null,
+    "summary": null,
+    "retired": false,
+    "expired": false,
+    "image": null,
+    "retirementDate": 0,
+    "deprecated": false,
+    "state": "published",
+    "createdOn": 1591911480311,
+    "createdBy": "d6f8bfa9-d449-4086-bcdb-2aeeb3b8d96a",
+    "corsProfiles": [
+        {
+            "name": "_default",
+            "isDefault": true,
+            "origins": [
+                "*"
+            ],
+            "allowedHeaders": [],
+            "exposedHeaders": [
+                "X-CorrelationID"
+            ],
+            "supportCredentials": false,
+            "maxAgeSeconds": 0
+        }
+    ],
+    "securityProfiles": [
+        {
+            "name": "_default",
+            "isDefault": true,
+            "devices": [
+                {
+                    "name": "API Key",
+                    "type": "apiKey",
+                    "order": 0,
+                    "properties": {
+                        "apiKeyFieldName": "KeyId",
+                        "takeFrom": "QUERY",
+                        "removeCredentialsOnSuccess": "false"
+                    }
+                }
+            ]
+        }
+    ],
+    "authenticationProfiles": [
+        {
+            "name": "_default",
+            "isDefault": true,
+            "parameters": {
+                "_id_": 0
+            },
+            "type": "none"
+        }
+    ],
+    "inboundProfiles": {
+        "_default": {
+            "securityProfile": "_default",
+            "corsProfile": "_default",
+            "monitorAPI": true,
+            "monitorSubject": "authentication.subject.id"
+        }
+    },
+    "outboundProfiles": {
+        "_default": {
+            "authenticationProfile": "_default",
+            "routeType": "proxy",
+            "requestPolicy": null,
+            "responsePolicy": null,
+            "routePolicy": null,
+            "faultHandlerPolicy": null,
+            "apiId": null,
+            "apiMethodId": null,
+            "parameters": []
+        }
+    },
+    "serviceProfiles": {
+        "_default": {
+            "apiId": "679f1e5c-4676-41ea-9b38-888c56c17b5e",
+            "basePath": "https://petstore.swagger.io"
+        }
+    },
+    "caCerts": [
+        {
+            "certBlob": "MIIFYDCCBEigAwIBAgIQBHaGXD1xHK+7DIzsNpFHkjANBgkqhkiG9w0BAQsFADBGMQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRUwEwYDVQQLEwxTZXJ2ZXIgQ0EgMUIxDzANBgNVBAMTBkFtYXpvbjAeFw0yMDA0MTUwMDAwMDBaFw0yMTA1MTUxMjAwMDBaMBcxFTATBgNVBAMMDCouc3dhZ2dlci5pbzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANASN8RW6mBBxfSnwbQOANV2MbRtXYFj+RcZTCeN2GrltOKfhfpI89KNXVmHkqhUjC9FyS9XVQC5XsUGuR2BiCwYDpd13pgFqp0jQDv95IosqPLILQJZVoKerB5xsetRAA/5HYh2EKptJnPkjvj0ZDeNOW32IVzNEG+KZEwnJ0DXp7PQqJrkEmsLfbB413ZJXFFlMgGTP98nfzLewuS3AwlF96Il0BMyFa3UGAvB6LVEauqy7nxxMNmv/vKfA9fi+j7Q9heQCzihal9xUzgh1xSeu5V8M862wHNNkyDDzCYJ3aqGfUF22nnDju4U/+UhLQdshpb4qgb/skfrA3wFKvkCAwEAAaOCAncwggJzMB8GA1UdIwQYMBaAFFmkZgZSoHuVkjyjlAcnlnRb+T3QMB0GA1UdDgQWBBS8ra9FacL0+YDHMzSNEA0IhrYZzDAXBgNVHREEEDAOggwqLnN3YWdnZXIuaW8wDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjA7BgNVHR8ENDAyMDCgLqAshipodHRwOi8vY3JsLnNjYTFiLmFtYXpvbnRydXN0LmNvbS9zY2ExYi5jcmwwIAYDVR0gBBkwFzALBglghkgBhv1sAQIwCAYGZ4EMAQIBMHUGCCsGAQUFBwEBBGkwZzAtBggrBgEFBQcwAYYhaHR0cDovL29jc3Auc2NhMWIuYW1hem9udHJ1c3QuY29tMDYGCCsGAQUFBzAChipodHRwOi8vY3J0LnNjYTFiLmFtYXpvbnRydXN0LmNvbS9zY2ExYi5jcnQwDAYDVR0TAQH/BAIwADCCAQMGCisGAQQB1nkCBAIEgfQEgfEA7wB2APZclC/RdzAiFFQYCDCUVo7jTRMZM7/fDC8gC8xO8WTjAAABcXtMbIsAAAQDAEcwRQIgaRRwZ/FIuyRHVCa3nK8Ype9EIQNgvFsSnSiYmU3RE6wCIQCQ7ZZkTIW845VmjBJbj46tiGSkG0MzuCiSCPTws6GILQB1AFzcQ5L+5qtFRLFemtRW5hA3+9X6R9yhc5SyXub2xw7KAAABcXtMbLgAAAQDAEYwRAIgfuJGxXn/P2jCCcQS/Z3R2M8u1CV69urvEVQmlnILZJMCIAbd8o82SzcZnzKVYF653+CVH+N6GX2DmwMJ3b81H+MPMA0GCSqGSIb3DQEBCwUAA4IBAQABHMtwCTgDX/RfNwFgCg1Gveq1ut1jVg7jvagglF5keEhDWOVNrRbEuODPf3YmiFsXwngxn5ng7fZdi/xRSRqN4uQqc8KykGgFe7LX+SgcHGkjqfUJ5JbiW0D9Jtw5MDZpBvevBr31gW253V0mL4yAlwBy8F0X0Ny4NJJSkovwLYprM4aglEOpSQvW45pOWccGAvkgayW8zBBIrj7B2jSjBtCdjO1SeMQNLmkErz7/aCnsRSC+Kaw2kfiIrRtwDEuKCa2IgemmlUA1xvIR1GrRwz05QZlCuae6/uvvaqotFWCxdnNtnbUu13Hb7KPCcy742yODpso0R7RAGzFA6Kgo",
+            "name": "CN=*.swagger.io",
+            "alias": "CN=*.swagger.io",
+            "subject": "CN=*.swagger.io",
+            "issuer": "CN=Amazon, OU=Server CA 1B, O=Amazon, C=US",
+            "version": 3,
+            "notValidBefore": 1586908800000,
+            "notValidAfter": 1621080000000,
+            "signatureAlgorithm": "RSA (2048 bits)",
+            "sha1Fingerprint": "2E:40:92:83:A6:F5:FC:C1:1D:F3:18:3B:7A:08:0E:CA:04:72:53:B6",
+            "md5Fingerprint": "81:AD:AF:05:B1:39:ED:FF:BE:EE:79:94:28:B3:F2:10",
+            "expired": false,
+            "notYetValid": false,
+            "inbound": false,
+            "outbound": true
+        },
+        {
+            "certBlob": "MIIESTCCAzGgAwIBAgITBn+UV4WH6Kx33rJTMlu8mYtWDTANBgkqhkiG9w0BAQsFADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6b24gUm9vdCBDQSAxMB4XDTE1MTAyMjAwMDAwMFoXDTI1MTAxOTAwMDAwMFowRjELMAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEVMBMGA1UECxMMU2VydmVyIENBIDFCMQ8wDQYDVQQDEwZBbWF6b24wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDCThZn3c68asg3Wuw6MLAd5tES6BIoSMzoKcG5blPVo+sDORrMd4f2AbnZcMzPa43j4wNxhplty6aUKk4T1qe9BOwKFjwK6zmxxLVYo7bHViXsPlJ6qOMpFge5blDP+18x+B26A0piiQOuPkfyDyeR4xQghfj66Yo19V+emU3nazfvpFA+ROz6WoVmB5x+F2pV8xeKNR7u6azDdU5YVX1TawprmxRC1+WsAYmz6qP+z8ArDITC2FMVy2fw0IjKOtEXc/VfmtTFch5+AfGYMGMqqvJ6LcXiAhqG5TI+Dr0RtM88k+8XUBCeQ8IGKuANaL7TiItKZYxK1MMuTJtV9IblAgMBAAGjggE7MIIBNzASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBhjAdBgNVHQ4EFgQUWaRmBlKge5WSPKOUByeWdFv5PdAwHwYDVR0jBBgwFoAUhBjMhTTsvAyUlC4IWZzHshBOCggwewYIKwYBBQUHAQEEbzBtMC8GCCsGAQUFBzABhiNodHRwOi8vb2NzcC5yb290Y2ExLmFtYXpvbnRydXN0LmNvbTA6BggrBgEFBQcwAoYuaHR0cDovL2NydC5yb290Y2ExLmFtYXpvbnRydXN0LmNvbS9yb290Y2ExLmNlcjA/BgNVHR8EODA2MDSgMqAwhi5odHRwOi8vY3JsLnJvb3RjYTEuYW1hem9udHJ1c3QuY29tL3Jvb3RjYTEuY3JsMBMGA1UdIAQMMAowCAYGZ4EMAQIBMA0GCSqGSIb3DQEBCwUAA4IBAQCFkr41u3nPo4FCHOTjY3NTOVI159Gt/a6ZiqyJEi+752+a1U5y6iAwYfmXss2lJwJFqMp2PphKg5625kXg8kP2CN5t6G7bMQcT8C8xDZNtYTd7WPD8UZiRKAJPBXa30/AbwuZe0GaFEQ8ugcYQgSn+IGBI8/LwhBNTZTUVEWuCUUBVV18YtbAiPq3yXqMB48Oz+ctBWuZSkbvkNodPLamkB2g1upRyzQ7qDn1X8nn8N8V7YJ6y68AtkHcNSRAnpTitxBKjtKPISLMVCx7i4hncxHZSyLyKQXhw2W2Xs0qLeC1etA+jTGDK4UfLeC0SF7FSi8o5LL21L8IzApar2pR/",
+            "name": "CN=Amazon, OU=Server CA 1B, O=Amazon, C=US",
+            "alias": "CN=Amazon, OU=Server CA 1B, O=Amazon, C=US",
+            "subject": "CN=Amazon, OU=Server CA 1B, O=Amazon, C=US",
+            "issuer": "CN=Amazon Root CA 1, O=Amazon, C=US",
+            "version": 3,
+            "notValidBefore": 1445472000000,
+            "notValidAfter": 1760832000000,
+            "signatureAlgorithm": "RSA (2048 bits)",
+            "sha1Fingerprint": "91:7E:73:2D:33:0F:9A:12:40:4F:73:D8:BE:A3:69:48:B9:29:DF:FC",
+            "md5Fingerprint": "EB:26:8E:55:D4:34:FE:BD:A3:6A:97:9A:44:65:4B:6D",
+            "expired": false,
+            "notYetValid": false,
+            "inbound": false,
+            "outbound": true
+        },
+        {
+            "certBlob": "MIIEkjCCA3qgAwIBAgITBn+USionzfP6wq4rAfkI7rnExjANBgkqhkiG9w0BAQsFADCBmDELMAkGA1UEBhMCVVMxEDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxJTAjBgNVBAoTHFN0YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xOzA5BgNVBAMTMlN0YXJmaWVsZCBTZXJ2aWNlcyBSb290IENlcnRpZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTE1MDUyNTEyMDAwMFoXDTM3MTIzMTAxMDAwMFowOTELMAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEZMBcGA1UEAxMQQW1hem9uIFJvb3QgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALJ4gHHKeNXjca9HgFB0fW7Y14h29Jlo91ghYPl0hAEvrAIthtOgQ3pOsqTQNroBvo3bSMgHFzZM9O6II8c+6zf1tRn4SWiw3te5djgdYZ6k/oI2peVKVuRF4fn9tBb6dNqcmzU5L/qwIFAGbHrQgLKm+a/sRxmPUDgH3KKHOVj4utWp+UhnMJbulHheb4mjUcAwhmahRWa6VOujw5H5SNz/0egwLX0tdHA114gk957EWW67c4cX8jJGKLhD+rcdqsq08p8kDi1L93FcXmn/6pUCyziKrlA4b9v7LWIbxcceVOF34GfID5yHI9Y/QCB/IIDEgEw+OyQmjgSubJrIqg0CAwEAAaOCATEwggEtMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgGGMB0GA1UdDgQWBBSEGMyFNOy8DJSULghZnMeyEE4KCDAfBgNVHSMEGDAWgBScXwDfqgHXMCs4iKK4bUqc8hGRgzB4BggrBgEFBQcBAQRsMGowLgYIKwYBBQUHMAGGImh0dHA6Ly9vY3NwLnJvb3RnMi5hbWF6b250cnVzdC5jb20wOAYIKwYBBQUHMAKGLGh0dHA6Ly9jcnQucm9vdGcyLmFtYXpvbnRydXN0LmNvbS9yb290ZzIuY2VyMD0GA1UdHwQ2MDQwMqAwoC6GLGh0dHA6Ly9jcmwucm9vdGcyLmFtYXpvbnRydXN0LmNvbS9yb290ZzIuY3JsMBEGA1UdIAQKMAgwBgYEVR0gADANBgkqhkiG9w0BAQsFAAOCAQEAYjdCXLwQtT6LLOkMm2xF4gcAevnFWAu5CIw+7bMlPLVvUOTNNWqnkzSWMiGpSESrnO09tKpzbeR/FoCJbM8oAxiDR3mjEH4wW6w7sGDgd9QIpuEdfF7Au/maeyKdpwAJfqxGF4PcnCZXmTA5YpaP7dreqsXMGz7KQ2hsVxa81Q4gLv7/wmpdLqBKbRRYh5TmOTFffHPLkIhqhBGWJ6bt2YFGpn6jcgAKUj6DiAdjd4lpFw85hdKrCEVN0FE6/V1dN2RMfjCyVSRCnTawXZwXgWHxyvkQAiSr6w10kY17RSlQOYiypok1JR4UakcjMS9cmvqtmg5iUaQqqcT5NJ0hGA==",
+            "name": "CN=Amazon Root CA 1, O=Amazon, C=US",
+            "alias": "CN=Amazon Root CA 1, O=Amazon, C=US",
+            "subject": "CN=Amazon Root CA 1, O=Amazon, C=US",
+            "issuer": "CN=Starfield Services Root Certificate Authority - G2, O=\"Starfield Technologies, Inc.\", L=Scottsdale, ST=Arizona, C=US",
+            "version": 3,
+            "notValidBefore": 1432555200000,
+            "notValidAfter": 2145834000000,
+            "signatureAlgorithm": "RSA (2048 bits)",
+            "sha1Fingerprint": "06:B2:59:27:C4:2A:72:16:31:C1:EF:D9:43:1E:64:8F:A6:2E:1E:39",
+            "md5Fingerprint": "E8:65:A2:2A:AE:52:4D:26:86:9A:F0:44:8D:6F:D8:96",
+            "expired": false,
+            "notYetValid": false,
+            "inbound": false,
+            "outbound": true
+        },
+        {
+            "certBlob": "MIIEdTCCA12gAwIBAgIJAKcOSkw0grd/MA0GCSqGSIb3DQEBCwUAMGgxCzAJBgNVBAYTAlVTMSUwIwYDVQQKExxTdGFyZmllbGQgVGVjaG5vbG9naWVzLCBJbmMuMTIwMAYDVQQLEylTdGFyZmllbGQgQ2xhc3MgMiBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTAeFw0wOTA5MDIwMDAwMDBaFw0zNDA2MjgxNzM5MTZaMIGYMQswCQYDVQQGEwJVUzEQMA4GA1UECBMHQXJpem9uYTETMBEGA1UEBxMKU2NvdHRzZGFsZTElMCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjE7MDkGA1UEAxMyU3RhcmZpZWxkIFNlcnZpY2VzIFJvb3QgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IC0gRzIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDVDDrEKvlO4vW+GZdfjohTsR8/y8+fIBNtKTrID30892t2OGPZNmCom15cAICyL1l/9of5JUOG52kbUpqQ4XHj2C0NTm/2yEnZtvMaVq4rtnQU68/7JuMauh2WLmo7WJSJR1b/JaCTcFOD2oR0FMNnngRoOt+OQFodSk7PQ5E751bWAHDLUu57fa4657wx+UX2wmDPE1kCK4DMNEffud6QZW0CzyyRpqbn3oUYSXxmTqM6bam17jQuug0DuDPfR+uxa40l2ZvOgdFFRjKWcIfeAg5JQ4W2bHO7ZOphQazJ1FTfhy/HIrImzJ9ZVGif/L4qL8RVHHVAYBeFAlU5i38FAgMBAAGjgfAwge0wDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0OBBYEFJxfAN+qAdcwKziIorhtSpzyEZGDMB8GA1UdIwQYMBaAFL9ft9HO3R+G9FtVrNzXEMIOqYjnME8GCCsGAQUFBwEBBEMwQTAcBggrBgEFBQcwAYYQaHR0cDovL28uc3MyLnVzLzAhBggrBgEFBQcwAoYVaHR0cDovL3guc3MyLnVzL3guY2VyMCYGA1UdHwQfMB0wG6AZoBeGFWh0dHA6Ly9zLnNzMi51cy9yLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEBACMd44pXyn3pF3lM8R5V/cxTbj5HD9/GVfKyBDbtgB9TxF00KGu+x1X8Z+rLP3+QsjPNG1gQggL4+C/1E2DUBc7xgQjB3ad1l08YuW3e95ORCLp+QCztweq7dp4zBncdDQh/U90bZKuCJ/Fp1U1ervShw3WnWEQt8jxwmKy6abaVd38PMV4s/KCHOkdp8Hlf9BRUpJVeEXgSYCfOn8J3/yNTd126/+pZ59vPr5KW7ySaNRB6nJHGDn2Z9j8Z3/VyVOEVqQdZe4O/Ui5GjLIAZHYcSNPYeehuVsyuLAOQ1xk4meTKCRlb/weWsKh/NEnfVqn3sF/tM+2MR7cwA130A4w=",
+            "name": "CN=Starfield Services Root Certificate Authority - G2, O=\"Starfield Technologies, Inc.\", L=Scottsdale, ST=Arizona, C=US",
+            "alias": "CN=Starfield Services Root Certificate Authority - G2, O=\"Starfield Technologies, Inc.\", L=Scottsdale, ST=Arizona, C=US",
+            "subject": "CN=Starfield Services Root Certificate Authority - G2, O=\"Starfield Technologies, Inc.\", L=Scottsdale, ST=Arizona, C=US",
+            "issuer": "OU=Starfield Class 2 Certification Authority, O=\"Starfield Technologies, Inc.\", C=US",
+            "version": 3,
+            "notValidBefore": 1251849600000,
+            "notValidAfter": 2035129156000,
+            "signatureAlgorithm": "RSA (2048 bits)",
+            "sha1Fingerprint": "9E:99:A4:8A:99:60:B1:49:26:BB:7F:3B:02:E2:2D:A2:B0:AB:72:80",
+            "md5Fingerprint": "C6:15:09:25:CF:EA:59:41:DD:C7:FF:2A:0A:50:66:92",
+            "expired": false,
+            "notYetValid": false,
+            "inbound": false,
+            "outbound": true
+        }
+    ],
+    "tags": {}
+}

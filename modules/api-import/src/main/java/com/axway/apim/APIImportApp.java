@@ -11,14 +11,13 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
-import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
+import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.apiimport.lib.APIImportCLIOptions;
 import com.axway.apim.apiimport.lib.APIImportParams;
 import com.axway.apim.apiimport.rollback.RollbackHandler;
-import com.axway.apim.apiimport.state.APIChangeState;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.APIPropertiesExport;
@@ -27,7 +26,6 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.lib.utils.rest.Transaction;
 
 /**
  * This is the Entry-Point of program and responsible to:  
@@ -57,7 +55,6 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
-			Transaction.deleteInstance();
 			RollbackHandler.deleteInstance();
 			
 			APIImportParams params = new APIImportParams(new APIImportCLIOptions(args));
@@ -89,13 +86,13 @@ public class APIImportApp implements APIMCLIServiceProvider {
 					.includeClientApplications(true) // Client-Apps must be loaded in all cases
 					.useFilter(filters)
 					.build();
-			API actualAPI = APIManagerAPIAdapter.create(apimAdapter).getAPI(filter, true);
+			API actualAPI = apimAdapter.apiAdapter.getAPI(filter, true);
 			// Based on the actual API - fulfill/complete some elements in the desired API
 			configAdapter.completeDesiredAPI(desiredAPI, actualAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
 			new APIImportManager().applyChanges(changeActions);
 			APIPropertiesExport.getInstance().store();
-			LOG.info("Successfully replicated API-State into API-Manager");
+			LOG.info("Successfully replicated API: "+desiredAPI.getName()+" ("+desiredAPI.getId()+") into API-Manager");
 			return 0;
 		} catch (AppException ap) {
 			APIPropertiesExport.getInstance().store(); // Try to create it, even 

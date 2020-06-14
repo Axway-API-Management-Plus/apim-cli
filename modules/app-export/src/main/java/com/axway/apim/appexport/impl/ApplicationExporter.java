@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -31,17 +32,15 @@ public abstract class ApplicationExporter {
 		}
 	}
 	
-	List<ClientApplication> apps;
-	
 	AppExportParams params;
 	
 	boolean hasError = false;
 	
-	public static ApplicationExporter create(List<ClientApplication> apps, ExportImpl exportImpl, AppExportParams params) throws AppException {
+	public static ApplicationExporter create(ExportImpl exportImpl, AppExportParams params) throws AppException {
 		try {
-			Object[] intArgs = new Object[] { apps, params };
+			Object[] intArgs = new Object[] { params };
 			Constructor<ApplicationExporter> constructor =
-					exportImpl.getClazz().getConstructor(new Class[]{List.class, AppExportParams.class});
+					exportImpl.getClazz().getConstructor(new Class[]{AppExportParams.class});
 			ApplicationExporter exporter = constructor.newInstance(intArgs);
 			return exporter;
 		} catch (Exception e) {
@@ -49,14 +48,15 @@ public abstract class ApplicationExporter {
 		}
 	}
 
-	public ApplicationExporter(List<ClientApplication> apps, AppExportParams params) {
-		this.apps = apps;
+	public ApplicationExporter(AppExportParams params) {
 		this.params = params;
 	}
 	
-	public abstract void export() throws AppException;
+	public abstract void export(List<ClientApplication> apps) throws AppException;
 	
 	public boolean hasError() {
 		return this.hasError;
 	}
+	
+	public abstract ClientAppFilter getFilter() throws AppException;
 }

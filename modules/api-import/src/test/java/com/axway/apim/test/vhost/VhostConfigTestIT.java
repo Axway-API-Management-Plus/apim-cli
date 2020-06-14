@@ -55,11 +55,6 @@ public class VhostConfigTestIT extends TestNGCitrusTestRunner {
 		createVariable("enforce", "true"); // as we are going back from published to unpublished
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/vhost/1_vhost-config.json");
-		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP3")) { // Starting from version 7.6.2 SP3 it is possible to set a VHost also for unpublished APIs
-			createVariable("expectedReturnCode", "0");
-		} else {
-			createVariable("expectedReturnCode", "87");
-		}
 		swaggerImport.doExecute(context);
 		
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json"));

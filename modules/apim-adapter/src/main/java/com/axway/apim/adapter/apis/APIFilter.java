@@ -37,6 +37,17 @@ public class APIFilter {
 		TO_NAME
 	}
 	
+	public static enum FILTER_OP {
+		eq, 
+		ne, 
+		gt, 
+		lt, 
+		ge, 
+		le, 
+		like,
+		gele;
+	}
+	
 	private String id;
 	private String apiId;
 	private String name;
@@ -44,6 +55,9 @@ public class APIFilter {
 	private String apiPath;
 	private String queryStringVersion;
 	private String state;
+	
+	private String createdOn;
+	private String createdOnOp;
 	
 	private APIType type;
 	
@@ -192,6 +206,8 @@ public class APIFilter {
 	public void setQueryStringVersion(String queryStringVersion) {
 		this.queryStringVersion = queryStringVersion;
 	}
+	
+	
 
 	public METHOD_TRANSLATION getTranslateMethodMode() {
 		return translateMethodMode;
@@ -305,6 +321,23 @@ public class APIFilter {
 		filters.add(new BasicNameValuePair("value", state));
 	}
 	
+	public void setCreatedOn(String createdOn, FILTER_OP op) {
+		if(createdOn==null) return;
+		this.createdOn = createdOn;
+		this.createdOnOp = createdOnOp;
+		filters.add(new BasicNameValuePair("field", "createdOn"));
+		filters.add(new BasicNameValuePair("op", op.name()));
+		filters.add(new BasicNameValuePair("value", createdOnOp));
+	}
+	
+	public String getCreatedOn() {
+		return createdOn;
+	}
+	
+	public String getCreatedOnOp() {
+		return createdOnOp;
+	}
+
 	public Map<String, String> getCustomProperties() {
 		return customProperties;
 	}
@@ -428,6 +461,9 @@ public class APIFilter {
 		String queryStringVersion;
 		String state;
 		
+		String createdOn;
+		FILTER_OP createdOnOp;
+		
 		APIType apiType;
 		
 		Map<String, String> customProperties;
@@ -499,6 +535,7 @@ public class APIFilter {
 			apiFilter.setRetired(this.retired);
 			apiFilter.setDeprecated(this.deprecated);
 			apiFilter.setCustomProperties(this.customProperties);
+			apiFilter.setCreatedOn(this.createdOn, this.createdOnOp);
 			return apiFilter;
 		}
 
@@ -564,6 +601,18 @@ public class APIFilter {
 		
 		public Builder isRetired(boolean retired) {
 			this.retired = retired;
+			return this;
+		}
+		
+		public Builder isCreatedOnBefore(String createdOn) {
+			this.createdOn = createdOn;
+			this.createdOnOp = FILTER_OP.lt;
+			return this;
+		}
+		
+		public Builder isCreatedOnAfter(String createdOn) {
+			this.createdOn = createdOn;
+			this.createdOnOp = FILTER_OP.gt;
 			return this;
 		}
 		

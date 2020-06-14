@@ -4,30 +4,24 @@ import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.axway.apim.adapter.apis.jackson.JSONViews;
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonView;
 
 @JsonIgnoreProperties(value = {"applicationId", "createdBy", "createdOn"})
+@JsonFilter("ClientAppCredentialFilter")
 public abstract class ClientAppCredential {
 	
 	String credentialType = null;
-	@JsonView(JSONViews.CredentialsForManager.class)
 	String id;
 	
-	@JsonView(JSONViews.CredentialsBaseInformation.class)
-	boolean enabled;
+	boolean enabled = true;
 	
-	@JsonView(JSONViews.CredentialsBaseInformation.class)
 	String createdBy;
 	
-	@JsonView(JSONViews.CredentialsBaseInformation.class)
 	String createdOn;
 	
-	@JsonView(JSONViews.CredentialsBaseInformation.class)
 	String secret;
 	
-	@JsonView(JSONViews.CredentialsBaseInformation.class)
 	String[] corsOrigins;
 
 	public String getId() {

@@ -17,7 +17,7 @@ public abstract class APIManagerMockBase {
 	
 	protected APIManagerAPIAdapter apiAdapter;
 	
-	ObjectMapper mapper = new ObjectMapper();
+	protected ObjectMapper mapper = new ObjectMapper();
 
 	public APIManagerMockBase() {
 	}

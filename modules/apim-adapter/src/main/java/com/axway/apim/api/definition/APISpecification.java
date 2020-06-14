@@ -10,6 +10,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class APISpecification {
 	
+	public static enum APISpecType {
+		SWAGGGER_API_12("Swagger 1.2"),
+		SWAGGGER_API_20("Swagger 2.0"),
+		OPEN_API_30("Open API 3.0"),
+		WSDL_API ("WSDL");
+		
+		String niceName;
+		
+		public String getNiceName() {
+			return niceName;
+		}
+
+		APISpecType(String niceName) {
+			this.niceName = niceName;
+		}
+	}
+	
 	static Logger LOG = LoggerFactory.getLogger(APISpecification.class);
 	
 	protected ObjectMapper objectMapper = new ObjectMapper();
@@ -63,7 +80,7 @@ public abstract class APISpecification {
 	
 	protected abstract void configureBasepath() throws AppException;
 	
-	public abstract int getAPIDefinitionType() throws AppException;
+	public abstract APISpecType getAPIDefinitionType() throws AppException;
 	
 	public abstract boolean configure() throws AppException;
 }

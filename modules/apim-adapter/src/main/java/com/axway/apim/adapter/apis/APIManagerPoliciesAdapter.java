@@ -81,7 +81,7 @@ public class APIManagerPoliciesAdapter {
 		try {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/policies")
 					.setParameter("type", type.getRestAPIKey()).build();
-			RestAPICall getRequest = new GETRequest(uri, null);
+			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute();
 			apiManagerResponse.put(type, EntityUtils.toString(httpResponse.getEntity()));
 
@@ -102,7 +102,7 @@ public class APIManagerPoliciesAdapter {
 			List<Policy> policies = mapper.readValue(apiManagerResponse.get(type), new TypeReference<List<Policy>>(){});
 			mappedPolicies.put(type, policies);
 		} catch (Exception e) {
-			LOG.error("Error reading configured custom-policies. Can't parse response: " + apiManagerResponse.get(type));
+			LOG.error("Error reading configured custom-policies. Can't parse response: " + apiManagerResponse.get(type), e);
 			throw new AppException("Can't initialize policies for type: " + type, ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}

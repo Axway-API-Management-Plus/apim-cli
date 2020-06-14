@@ -6,33 +6,27 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 import com.axway.apim.adapter.apis.jackson.APIAccessSerializer;
-import com.axway.apim.adapter.apis.jackson.JSONViews;
 import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFilter("ApplicationFilter")
 public class ClientApplication {
-	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private String id;
-	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private String name;
-	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private String description;
-	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private String email;
-	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private String phone;
-	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	private boolean enabled;
 
 	private String state;
@@ -47,7 +41,6 @@ public class ClientApplication {
 	private String extClientId;
 	private String apiKey;
 	
-	@JsonView(JSONViews.ApplicationAPIs.class)
 	@JsonSerialize (using = APIAccessSerializer.class)
 	@JsonProperty("apis")
 	private List<APIAccess> apiAccess = new ArrayList<APIAccess>();
@@ -60,7 +53,6 @@ public class ClientApplication {
 	@JsonAlias({ "organization", "organizationId" })	
 	private Organization organization;
 	
-	@JsonView(JSONViews.ApplicationBaseInformation.class)
 	public String getOrganizationId() {
 		if(this.organization == null) return null;
 		return this.organization.getId();
