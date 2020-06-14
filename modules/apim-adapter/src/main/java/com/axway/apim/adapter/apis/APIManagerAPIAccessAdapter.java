@@ -172,7 +172,6 @@ public class APIManagerAPIAccessAdapter {
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			String json = mapper.writeValueAsString(apiAccess);
 			HttpEntity entity = new StringEntity(json);
-			// Use an admin account for this request
 			RestAPICall request = new POSTRequest(entity, uri, APIManagerAdapter.hasAdminAccount());
 			request.setContentType("application/json");
 			httpResponse = request.execute();
@@ -183,7 +182,7 @@ public class APIManagerAPIAccessAdapter {
 					LOG.warn("API Access for " + type + " with ID: " + parentId + " already exists. Ignoring this error.");
 					return apiAccess;
 				}
-				LOG.error("Error creating/updating API Access. Response-Code: "+statusCode+". Got response: '"+response+"'");
+				LOG.error("Error creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'");
 				throw new AppException("Error creating/updating API Access. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			String response = EntityUtils.toString(httpResponse.getEntity());
