@@ -26,13 +26,17 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
 		try {
 			if(rollbackAPI.getId()!=null) { // We already have an ID to the FE-API can delete it directly
 				LOG.info("Rollback FE-API: '"+this.rollbackAPI.getName()+"' (ID: '"+this.rollbackAPI.getId()+"')");
-				APIManagerAdapter.getInstance().apiAdapter.deleteAPIProxy(this.rollbackAPI);
+				new APIStatusManager().update(this.rollbackAPI, API.STATE_DELETED, true);
 			} else {
 				// As we don't have the FE-API ID, try to find the FE-API, based on the BE-API-ID
 				APIFilter filter = new APIFilter.Builder().hasApiId(rollbackAPI.getApiId()).build(); 
-				API existingAPI = APIManagerAdapter.getInstance().apiAdapter.getAPI(filter, false);// The path is not set at this point, hence we provide null 
-				LOG.info("Rollback FE-API: '"+existingAPI.getName()+"' (ID: '"+existingAPI.getId()+"')");
-				APIManagerAdapter.getInstance().apiAdapter.deleteAPIProxy(existingAPI);
+				API existingAPI = APIManagerAdapter.getInstance().apiAdapter.getAPI(filter, false);// The path is not set at this point, hence we provide null
+				if(existingAPI!=null) {
+					LOG.info("Rollback FE-API: '"+existingAPI.getName()+"' (ID: '"+existingAPI.getId()+"')");
+					new APIStatusManager().update(existingAPI, API.STATE_DELETED, true);
+				} else {
+					LOG.info("No FE-API found to rollback.");
+				}
 			}
 		} catch (Exception e) {
 			LOG.error("Error while deleting FE-API with ID: '"+this.rollbackAPI.getId()+"' to roll it back", e);
