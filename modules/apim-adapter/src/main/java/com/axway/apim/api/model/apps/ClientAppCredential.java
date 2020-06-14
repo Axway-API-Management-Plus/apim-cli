@@ -4,15 +4,17 @@ import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(value = {"applicationId", "createdBy", "createdOn"})
+@JsonFilter("ClientAppCredentialFilter")
 public abstract class ClientAppCredential {
 	
 	String credentialType = null;
 	String id;
 	
-	boolean enabled;
+	boolean enabled = true;
 	
 	String createdBy;
 	

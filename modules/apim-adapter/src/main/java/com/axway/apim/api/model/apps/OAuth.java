@@ -65,4 +65,12 @@ public class OAuth extends ClientAppCredential {
 			return false;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "OAuth [type=" + type + ", credentialType=" + credentialType + ", id=" + id + ", enabled=" + enabled
+				+ "]";
+	}
+	
+	
 }

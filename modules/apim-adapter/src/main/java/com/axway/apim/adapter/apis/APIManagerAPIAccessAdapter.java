@@ -31,6 +31,9 @@ import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class APIManagerAPIAccessAdapter {
 	
@@ -170,6 +173,9 @@ public class APIManagerAPIAccessAdapter {
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/"+type+"/"+parentId+"/apis").build();
 			mapper.setSerializationInclusion(Include.NON_NULL);
+			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiName"}));
+			mapper.setFilterProvider(filter);
 			String json = mapper.writeValueAsString(apiAccess);
 			HttpEntity entity = new StringEntity(json);
 			RestAPICall request = new POSTRequest(entity, uri, APIManagerAdapter.hasAdminAccount());

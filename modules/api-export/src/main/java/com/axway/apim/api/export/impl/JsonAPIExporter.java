@@ -105,10 +105,8 @@ public class JsonAPIExporter extends APIResultHandler {
 		mapper.registerModule(new SimpleModule().addSerializer(new PolicyToNameSerializer()));
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filters = new SimpleFilterProvider()
-				.addFilter("IgnoreImportFields",
-						SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"inbound", "outbound", "certFile" }))
-				.addFilter("IgnoreApplicationFields",
-						SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"name", "oauthClientId", "extClientId", "apiKey" }));
+				.addFilter("CaCertFilter",
+						SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"inbound", "outbound", "certFile" }));
 		
 		mapper.setFilterProvider(filters);
 		try {

@@ -21,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class JsonApplicationExporter extends ApplicationExporter {
 
@@ -60,6 +63,9 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new AppExportSerializerModifier(localFolder)));
 		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
+		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "apiId", "createdBy", "createdOn", "enabled"}));
+		mapper.setFilterProvider(filter);
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);

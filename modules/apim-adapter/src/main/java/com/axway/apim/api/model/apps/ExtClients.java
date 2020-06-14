@@ -29,4 +29,9 @@ public class ExtClients extends ClientAppCredential {
 			return false;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "ExtClients [credentialType=" + credentialType + ", id=" + id + ", enabled=" + enabled + "]";
+	}
 }

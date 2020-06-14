@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
+import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
+import com.axway.apim.adapter.apis.APIFilter.POLICY_TRANSLATION;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIExportParams;
@@ -72,7 +74,9 @@ public abstract class APIResultHandler {
 				.hasPolicyName(params.getValue("policy"))
 				.hasId(params.getValue("id"))
 				.hasName(params.getValue("name"))
-				.hasState(params.getValue("state"));
+				.hasState(params.getValue("state"))
+				.translateMethods(METHOD_TRANSLATION.AS_NAME)
+				.translatePolicies(POLICY_TRANSLATION.TO_NAME);
 		return builder;
 	}
 	

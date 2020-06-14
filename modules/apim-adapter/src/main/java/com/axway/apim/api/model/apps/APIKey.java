@@ -43,4 +43,9 @@ public class APIKey extends ClientAppCredential {
 			return false;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "APIKey [credentialType=" + credentialType + ", id=" + id + ", enabled=" + enabled + "]";
+	}
 }

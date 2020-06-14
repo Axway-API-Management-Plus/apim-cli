@@ -2,6 +2,9 @@ package com.axway.apim.api.model;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+
+@JsonFilter("APIAccessFilter")
 public class APIAccess {
 	String id;
 	

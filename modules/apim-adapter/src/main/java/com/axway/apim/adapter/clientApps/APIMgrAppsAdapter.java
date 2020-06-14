@@ -24,6 +24,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
+import com.axway.apim.adapter.apis.jackson.StateSerializerModifier;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.APIKey;
@@ -45,6 +46,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class APIMgrAppsAdapter {
 	
@@ -285,20 +290,27 @@ public class APIMgrAppsAdapter {
 			CommandParameters cmd = CommandParameters.getInstance();
 			URI uri;
 			if(actualApp==null) {
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/").build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications").build();
 			} else {
 				if(desiredApp.getApiAccess()!=null && desiredApp.getApiAccess().size()==0) desiredApp.setApiAccess(null);
 				desiredApp.setId(actualApp.getId());
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+actualApp.getId()).build();
 			}
 			mapper.setSerializationInclusion(Include.NON_NULL);
+
 			try {
 				RestAPICall request;
 				if(actualApp==null) {
+					FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+							SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentials", "appQuota", "organization", "image"}));
+					mapper.setFilterProvider(filter);
 					String json = mapper.writeValueAsString(desiredApp);
 					HttpEntity entity = new StringEntity(json);
 					request = new POSTRequest(entity, uri);
 				} else {
+					FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+							SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentials", "appQuota", "organization", "image", "apis"}));
+					mapper.setFilterProvider(filter);
 					String json = mapper.writeValueAsString(desiredApp);
 					HttpEntity entity = new StringEntity(json);
 					request = new PUTRequest(entity, uri);
@@ -373,6 +385,9 @@ public class APIMgrAppsAdapter {
 			}
 			try {
 				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/"+endpoint).build();
+				FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "clientId", "apiKey"}));
+				mapper.setFilterProvider(filter);
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				String json = mapper.writeValueAsString(cred);
 				HttpEntity entity = new StringEntity(json);
