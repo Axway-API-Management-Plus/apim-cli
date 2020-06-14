@@ -39,6 +39,8 @@ public class APIChangeState {
 	private boolean isBreaking = false;
 	private boolean updateExistingAPI = true;
 	
+	private boolean proxyUpdateRequired = false;
+	
 	private List<String> breakingChanges = new Vector<String>();
 	private List<String> nonBreakingChanges = new Vector<String>();
 
@@ -130,6 +132,7 @@ public class APIChangeState {
 					
 					APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
 					if(!property.copyProp()) continue;
+					proxyUpdateRequired = true;
 					if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
 						String getterMethodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
 						String setterMethodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
@@ -190,6 +193,8 @@ public class APIChangeState {
 			return true;
 		}
 	}
+	
+	
 
 	/**
 	 * @return true, if a Breaking-Change propery is found on an "Unpublished" API otherwise false.
@@ -223,6 +228,10 @@ public class APIChangeState {
 		return nonBreakingChanges;
 	}
 	
+	public boolean isProxyUpdateRequired() {
+		return proxyUpdateRequired;
+	}
+
 	/**
 	 * @return list of all changes.
 	 */

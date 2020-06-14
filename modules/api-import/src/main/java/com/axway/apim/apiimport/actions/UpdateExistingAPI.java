@@ -1,8 +1,5 @@
 package com.axway.apim.apiimport.actions;
 
-import java.util.List;
-import java.util.Vector;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,14 +22,14 @@ public class UpdateExistingAPI {
 
 	public void execute(APIChangeState changes) throws AppException {
 		
-		List<String> allChanges = new Vector<String>();
-		allChanges.addAll(changes.getBreakingChanges());
-		allChanges.addAll(changes.getNonBreakingChanges());
-		
 		APIManagerAdapter apiManager = APIManagerAdapter.getInstance();
 		
 		try {
-			apiManager.apiAdapter.updateAPIProxy(changes.getActualAPI());
+			changes.copyChangedProps();
+			
+			if(changes.isProxyUpdateRequired()) {
+				apiManager.apiAdapter.updateAPIProxy(changes.getActualAPI());
+			}
 			
 			// If image is include, update it
 			if(changes.getNonBreakingChanges().contains("image")) {
