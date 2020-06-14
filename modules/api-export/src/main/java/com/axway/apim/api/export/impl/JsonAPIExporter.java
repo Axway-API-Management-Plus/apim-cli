@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
-import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
@@ -106,8 +105,8 @@ public class JsonAPIExporter extends APIResultHandler {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filters = new SimpleFilterProvider()
 				.addFilter("CaCertFilter",
-						SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"inbound", "outbound", "certFile" }));
-		
+						SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"inbound", "outbound", "certFile" }))
+				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {}));
 		mapper.setFilterProvider(filters);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
