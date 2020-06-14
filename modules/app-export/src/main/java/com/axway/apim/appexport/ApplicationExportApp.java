@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
 import com.axway.apim.appexport.impl.ApplicationExporter.ExportImpl;
@@ -20,7 +19,6 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.lib.utils.rest.Transaction;
 
 public class ApplicationExportApp implements APIMCLIServiceProvider {
 
@@ -64,7 +62,6 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
-			Transaction.deleteInstance();
 			
 			new AppExportParams(new AppExportCLIOptions(args));
 			APIMgrAppsAdapter appAdapter = new APIMgrAppsAdapter();

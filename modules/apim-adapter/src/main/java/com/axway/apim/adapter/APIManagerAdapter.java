@@ -54,7 +54,6 @@ import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
-import com.axway.apim.lib.utils.rest.Transaction;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -152,8 +151,6 @@ public class APIManagerAdapter {
 			return; // No need to initialize just for Unit-Tests
 		}
 		
-		Transaction transaction = Transaction.getInstance();
-		transaction.beginTransaction();
 		loginToAPIManager(false); // Login with the provided user (might be an Org-Admin)
 		loginToAPIManager(true); // Second, login if needed with an admin account
 	}

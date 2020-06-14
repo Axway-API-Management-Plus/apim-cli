@@ -15,14 +15,10 @@ import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.QuotaRestrictiontype;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.rest.Transaction;
 
 public class APIQuotaManager {
 	
 	static Logger LOG = LoggerFactory.getLogger(APIQuotaManager.class);
-	
-	private static int QUOTA_UPDATE_SUCCESS = 1;
-	private static int QUOTA_UPDATE_FAIL = 2;
 	
 	private API desiredState;
 	
@@ -34,7 +30,6 @@ public class APIQuotaManager {
 	}
 
 	public void execute() throws AppException {
-		Transaction context = Transaction.getInstance();
 		if(desiredState.getApplicationQuota()==null && desiredState.getSystemQuota()==null) return;
 		if(CommandParameters.getInstance().isIgnoreQuotas() || CommandParameters.getInstance().getQuotaMode().equals(CommandParameters.MODE_IGNORE)) {
 			LOG.info("Configured quotas will be ignored, as ignoreQuotas is true or QuotaMode has been set to ignore.");
@@ -52,8 +47,6 @@ public class APIQuotaManager {
 					restriction.setApi(actualState.getId());
 				}
 				addOrMergeRestriction(systemQuota.getRestrictions(), desiredState.getSystemQuota().getRestrictions());
-				context.put(QUOTA_UPDATE_SUCCESS, "System-Default quota successfully updated for API: " + desiredState.getName());
-				context.put(QUOTA_UPDATE_FAIL, "System-Default quota successfully updated for API: " + desiredState.getName());
 				APIManagerAdapter.getInstance().quotaAdapter.saveQuota(systemQuota, systemQuota.getId());
 			}
 		}
@@ -68,8 +61,6 @@ public class APIQuotaManager {
 					restriction.setApi(actualState.getId());
 				}
 				addOrMergeRestriction(applicationQuota.getRestrictions(), desiredState.getApplicationQuota().getRestrictions());
-				context.put(QUOTA_UPDATE_SUCCESS, "Application-Default quota successfully updated: " + desiredState.getName());
-				context.put(QUOTA_UPDATE_FAIL, "Application-Default quota successfully updated: " + desiredState.getName());
 				APIManagerAdapter.getInstance().quotaAdapter.saveQuota(applicationQuota, applicationQuota.getId());
 			}
 		}

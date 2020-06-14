@@ -19,7 +19,6 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.lib.utils.rest.Transaction;
 
 /**
  * 
@@ -84,7 +83,6 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
-			Transaction.deleteInstance();
 
 			APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
 			
