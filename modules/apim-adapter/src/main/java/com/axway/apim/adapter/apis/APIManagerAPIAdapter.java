@@ -152,7 +152,7 @@ public class APIManagerAPIAdapter {
 		try { 
 			uri = getAPIRequestUri(filter);
 			LOG.debug("Sending request to find existing APIs: " + uri);
-			RestAPICall getRequest = new GETRequest(uri, false);
+			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
