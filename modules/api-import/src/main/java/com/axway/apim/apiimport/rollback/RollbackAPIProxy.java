@@ -1,16 +1,9 @@
 package com.axway.apim.apiimport.rollback;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class RollbackAPIProxy extends AbstractRollbackAction implements RollbackAction {
@@ -27,10 +20,8 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
 
 	@Override
 	public void rollback() throws AppException {
-		if(rollbackAPI.getState()!=null && rollbackAPI.getState().equals(API.STATE_PUBLISHED)) {
-			API tempDesiredDeletedAPI = new APIBaseDefinition();
-			((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(API.STATE_UNPUBLISHED);
-			new APIStatusManager().update(tempDesiredDeletedAPI, rollbackAPI, true);
+		if(rollbackAPI.getActualState()!=null && rollbackAPI.getActualState().equals(API.STATE_PUBLISHED)) {
+			new APIStatusManager().update(rollbackAPI, API.STATE_UNPUBLISHED, true);
 		}
 		try {
 			if(rollbackAPI.getId()!=null) { // We already have an ID to the FE-API can delete it directly

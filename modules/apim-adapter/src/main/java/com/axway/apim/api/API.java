@@ -256,6 +256,11 @@ public class API {
 		return actualState;
 	}
 
+	/**
+	 * This state must contain the actual state, as it is in the API-Manager. It is maintained by the 
+	 * tool internally, whenever the status is updated. The field state can be considered as the desired state. 
+	 * @param actualState the state of the API-Manager currently in API-Manager.
+	 */
 	public void setActualState(String actualState) {
 		this.actualState = actualState;
 	}

@@ -63,7 +63,7 @@ public class APIStatusManager {
 	}
 	
 	public void update(API api, String desiredState, boolean enforceBreakingChange) throws AppException {
-		if(api.getState().equals(desiredState)) {
+		if(api.getActualState().equals(desiredState)) {
 			LOG.debug("Desired and actual status equal. No need to update status!");
 			return;
 		}

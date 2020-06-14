@@ -57,6 +57,7 @@ public class APIFilter {
 	private String state;
 	
 	private String createdOn;
+	private String createdOnOp;
 	
 	private APIType type;
 	
@@ -323,11 +324,20 @@ public class APIFilter {
 	public void setCreatedOn(String createdOn, FILTER_OP op) {
 		if(createdOn==null) return;
 		this.createdOn = createdOn;
+		this.createdOnOp = createdOnOp;
 		filters.add(new BasicNameValuePair("field", "createdOn"));
 		filters.add(new BasicNameValuePair("op", op.name()));
-		filters.add(new BasicNameValuePair("value", createdOn));
+		filters.add(new BasicNameValuePair("value", createdOnOp));
 	}
 	
+	public String getCreatedOn() {
+		return createdOn;
+	}
+	
+	public String getCreatedOnOp() {
+		return createdOnOp;
+	}
+
 	public Map<String, String> getCustomProperties() {
 		return customProperties;
 	}
