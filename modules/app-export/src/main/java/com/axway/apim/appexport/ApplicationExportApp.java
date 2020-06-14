@@ -6,8 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
 import com.axway.apim.appexport.impl.ApplicationExporter.ExportImpl;
@@ -20,7 +19,6 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.lib.utils.rest.Transaction;
 
 public class ApplicationExportApp implements APIMCLIServiceProvider {
 
@@ -30,7 +28,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 
 	@Override
 	public String getName() {
-		return "Export applications";
+		return "Application - E X P O R T";
 	}
 
 	@Override
@@ -64,31 +62,21 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
-			Transaction.deleteInstance();
 			
 			new AppExportParams(new AppExportCLIOptions(args));
-			ClientAppAdapter appAdapter = ClientAppAdapter.create(APIManagerAdapter.getInstance());
-			ClientAppFilter filter = new ClientAppFilter.Builder()
-					.hasState(AppExportParams.getInstance().getAppState())
-					.hasName(AppExportParams.getInstance().getAppName())
-					.hasId(AppExportParams.getInstance().getAppId())
-					.hasOrganizationName(AppExportParams.getInstance().getOrgName())
-					.includeQuotas(true)
-					.includeCredentials(true)
-					.includeAPIAccess(true)
-					.includeImage(true)
-					.build();
-			List<ClientApplication> apps = appAdapter.getApplications(filter, true);
+			APIMgrAppsAdapter appAdapter = new APIMgrAppsAdapter();
+			ApplicationExporter exporter = ApplicationExporter.create(exportImpl, AppExportParams.getInstance());
+			List<ClientApplication> apps = appAdapter.getApplications(exporter.getFilter(), true);
 			if(apps.size()==0) {
 				if(LOG.isDebugEnabled()) {
-					LOG.info("No applications found using filter: " + filter);
+					LOG.info("No applications found using filter: " + exporter.getFilter());
 				} else {
 					LOG.info("No applications found based on the given criteria.");
 				}
 			} else {
 				LOG.info("Found " + apps.size() + " application(s).");
-				ApplicationExporter exporter = ApplicationExporter.create(apps, exportImpl, AppExportParams.getInstance());
-				exporter.export();
+				
+				exporter.export(apps);
 				if(exporter.hasError()) {
 					LOG.info("Please check the log. At least one error was recorded.");
 				} else {

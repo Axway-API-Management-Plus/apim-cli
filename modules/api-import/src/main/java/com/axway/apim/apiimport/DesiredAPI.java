@@ -5,28 +5,22 @@ import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
 import com.axway.apim.api.API;
-import com.axway.apim.api.model.InboundProfile;
-import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Concrete class that is used to reflect the desired API as it's defined by the API-Developer. 
@@ -43,20 +37,8 @@ public class DesiredAPI extends API {
 	
 	private String backendBasepath = null;
 	
+	@JsonIgnore
 	private boolean requestForAllOrgs = false;
-	
-	/*
-	 * Private fields to safe the original given profiles. This is required 
-	 * given methodNames must be translated into internal operationIds for comparison.  
-	 * But on Re-Creation the desired API still needs the original methodNames
-	 */
-	private Map<String, InboundProfile> originalInboundProfiles;
-	private Map<String, OutboundProfile> originalOutboundProfiles;
-	
-
-	@JsonDeserialize( using = OrganizationDeserializer.class)
-	@JsonProperty(value = "organization")
-	protected Organization organization = null;
 	
 	@JsonProperty("apiDefinition")
 	public String apiDefinitionImport = null;
@@ -122,24 +104,6 @@ public class DesiredAPI extends API {
 
 	public void setApiDefinitionImport(String apiDefinitionImport) {
 		this.apiDefinitionImport = apiDefinitionImport;
-	}
-
-	public Map<String, InboundProfile> getOriginalInboundProfiles() {
-		return originalInboundProfiles;
-	}
-
-	public void setOriginalInboundProfiles(Map<String, InboundProfile> originalInboundProfiles) {
-		if(originalInboundProfiles==null) return;
-		this.originalInboundProfiles = new HashMap<String, InboundProfile>(originalInboundProfiles);
-	}
-
-	public Map<String, OutboundProfile> getOriginalOutboundProfiles() {
-		return originalOutboundProfiles;
-	}
-
-	public void setOriginalOutboundProfiles(Map<String, OutboundProfile> originalOutboundProfiles) {
-		if(originalOutboundProfiles==null) return;
-		this.originalOutboundProfiles = new HashMap<String, OutboundProfile>(originalOutboundProfiles);
 	}
 	
 	public void setRetirementDate(String retirementDate) throws AppException {

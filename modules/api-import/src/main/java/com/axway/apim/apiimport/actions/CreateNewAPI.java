@@ -1,38 +1,19 @@
 package com.axway.apim.apiimport.actions;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Vector;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIFilter;
-import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
+import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.APIBaseDefinition;
+import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
-import com.axway.apim.apiimport.actions.tasks.CreateAPIProxy;
-import com.axway.apim.apiimport.actions.tasks.ImportBackendAPI;
-import com.axway.apim.apiimport.actions.tasks.ManageClientApps;
-import com.axway.apim.apiimport.actions.tasks.ManageClientOrgs;
-import com.axway.apim.apiimport.actions.tasks.UpdateAPIImage;
-import com.axway.apim.apiimport.actions.tasks.UpdateAPIProxy;
-import com.axway.apim.apiimport.actions.tasks.UpdateAPIStatus;
-import com.axway.apim.apiimport.actions.tasks.UpdateQuotaConfiguration;
-import com.axway.apim.apiimport.actions.tasks.UpgradeAccessToNewerAPI;
 import com.axway.apim.apiimport.rollback.RollbackAPIProxy;
 import com.axway.apim.apiimport.rollback.RollbackBackendAPI;
 import com.axway.apim.apiimport.rollback.RollbackHandler;
-import com.axway.apim.apiimport.state.APIChangeState;
 import com.axway.apim.lib.APIPropertiesExport;
-import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.rest.Transaction;
 
 /**
  * This class is used by the {@link APIImportManager#applyChanges(APIChangeState)} to create a new API.
@@ -47,62 +28,48 @@ public class CreateNewAPI {
 	public void execute(APIChangeState changes, boolean reCreation) throws AppException {
 
 		API createdAPI = null;
+		
+		APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
+		//APIManagerQuotaAdapter quotaAdapter = APIManagerAdapter.getInstance().quotaAdapter;
 
-		Transaction context = Transaction.getInstance();
+		//Transaction context = Transaction.getInstance();
 		RollbackHandler rollback = RollbackHandler.getInstance();
 
-		// During Re-Creation we have to Re-Init the Application-State
-		//if(reCreation) APIManagerAdapter.getInstance().setAllApps(null);
-
-		// Force to initially update the API into the desired state!
-		List<String> changedProps = getAllProps(changes.getDesiredAPI());
-
-		VHostManager vHostManager = new VHostManager();
-		new ImportBackendAPI(changes.getDesiredAPI(), changes.getActualAPI()).execute();
-		// Register the created BE-API to be rolled back in case of an error
-		API rollbackAPI = new APIBaseDefinition();
-		((API)rollbackAPI).setName(changes.getDesiredAPI().getName());
-		((API)rollbackAPI).setApiId((String)context.get("backendAPIId"));
-		((APIBaseDefinition)rollbackAPI).setCreatedOn((String)context.get("backendAPICreatedOn"));
-		rollback.addRollbackAction(new RollbackBackendAPI(rollbackAPI));
+		API createdBEAPI = apiAdapter.importBackendAPI(changes.getDesiredAPI());
+		rollback.addRollbackAction(new RollbackBackendAPI(createdBEAPI));
 
 		try {
-			new CreateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+			changes.getDesiredAPI().setApiId(createdBEAPI.getApiId());
+			createdAPI = apiAdapter.createAPIProxy(changes.getDesiredAPI());
 		} catch (Exception e) {
-			rollback.addRollbackAction(new RollbackAPIProxy(rollbackAPI));
+			// Try to rollback FE-API (Proxy) bases on the created BE-API
+			rollback.addRollbackAction(new RollbackAPIProxy(createdBEAPI));
 			throw e;
 		}
-		rollback.addRollbackAction(new RollbackAPIProxy(rollbackAPI)); // In any case, register the API just created for a potential rollback
+		rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback
+		APIChangeState.copyRequiredPropertisFromCreatedAPI(changes.getDesiredAPI(), createdAPI);
 
 		try {
-			// As we have just created an API-Manager API, we should reflect this for further processing
-			APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API).build();
-			createdAPI = ((APIManagerAPIAdapter)APIManagerAdapter.getInstance().apiAdapter).setAPIManagerResponse(filter, "["+context.get("lastResponse").toString()+"]").getAPI(filter, true);
-			// Register the created FE-API to be rolled back in case of an error
-			((API)rollbackAPI).setId(createdAPI.getId());
-			changes.setIntransitAPI(createdAPI);
-
 			// ... here we basically need to add all props to initially bring the API in sync!
 			// But without updating the Swagger, as we have just imported it!
-			new UpdateAPIProxy(changes.getDesiredAPI(), createdAPI).execute(changedProps);
+			createdAPI = apiAdapter.updateAPIProxy(changes.getDesiredAPI());
 
 			// If an image is included, update it
 			if(changes.getDesiredAPI().getImage()!=null) {
-				new UpdateAPIImage(changes.getDesiredAPI(), createdAPI).execute();
+				apiAdapter.updateAPIImage(changes.getDesiredAPI());
 			}
 			// This is special, as the status is not a normal property and requires some additional actions!
-			UpdateAPIStatus statusUpdate = new UpdateAPIStatus(changes.getDesiredAPI(), createdAPI);
-			statusUpdate.execute();
-			((API)rollbackAPI).setState(createdAPI.getState());
-			statusUpdate.updateRetirementDate(changes);
+			APIStatusManager statusManager = new APIStatusManager();
+			statusManager.update(changes.getDesiredAPI(), createdAPI);
+			apiAdapter.updateRetirementDate(createdAPI);
 
 			if(reCreation && changes.getActualAPI().getState().equals(API.STATE_PUBLISHED)) {
 				// In case, the existing API is already in use (Published), we have to grant access to our new imported API
-				new UpgradeAccessToNewerAPI(changes.getIntransitAPI(), changes.getActualAPI()).execute();
+				apiAdapter.upgradeAccessToNewerAPI(changes.getDesiredAPI(), changes.getActualAPI());
 			}
 
 			// Is a Quota is defined we must manage it
-			new UpdateQuotaConfiguration(changes.getDesiredAPI(), createdAPI).execute();
+			new APIQuotaManager(changes.getDesiredAPI(), createdAPI).execute();
 
 			// Grant access to the API
 			new ManageClientOrgs(changes.getDesiredAPI(), createdAPI).execute(reCreation);
@@ -111,7 +78,7 @@ public class CreateNewAPI {
 			new ManageClientApps(changes.getDesiredAPI(), createdAPI, changes.getActualAPI()).execute(reCreation);
 
 			// V-Host must be managed almost at the end, as the status must be set already to "published"
-			vHostManager.handleVHost(changes.getDesiredAPI(), createdAPI);
+			//vHostManager.handleVHost(changes.getDesiredAPI(), createdAPI);
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -120,32 +87,6 @@ public class CreateNewAPI {
 			} else {
 				APIPropertiesExport.getInstance().setProperty("feApiId", createdAPI.getId());
 			}
-		}
-	}
-
-	/**
-	 * @param desiredAPI
-	 * @return
-	 * @throws AppException
-	 */
-	private List<String> getAllProps(API desiredAPI) throws AppException {
-		List<String> allProps = new Vector<String>();
-		try {
-			for (Field field : desiredAPI.getClass().getSuperclass().getDeclaredFields()) {
-				if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
-					String getterMethodName = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-					Method method = desiredAPI.getClass().getMethod(getterMethodName, null);
-					Object desiredValue = method.invoke(desiredAPI, null);
-					// For new APIs don't include empty properties (this includes MissingNodes)
-					if(desiredValue==null) continue;
-					// We have just inserted the Swagger-File
-					if(field.getName().equals("apiDefinition")) continue;
-					allProps.add(field.getName());
-				}
-			}
-			return allProps;
-		} catch (Exception e) {
-			throw new AppException("Can't inspect properties to create new API!", ErrorCode.CANT_UPGRADE_API_ACCESS, e);
 		}
 	}
 }

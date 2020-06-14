@@ -1,17 +1,11 @@
-package com.axway.apim.apiimport.actions.tasks;
+package com.axway.apim.apiimport.actions;
 
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerQuotaAdapter.Quota;
@@ -20,26 +14,22 @@ import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.QuotaRestrictiontype;
 import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.rest.PUTRequest;
-import com.axway.apim.lib.utils.rest.RestAPICall;
-import com.axway.apim.lib.utils.rest.Transaction;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class UpdateQuotaConfiguration extends AbstractAPIMTask {
+public class APIQuotaManager {
 	
-	private static int QUOTA_UPDATE_SUCCESS = 1;
-	private static int QUOTA_UPDATE_FAIL = 2;
+	static Logger LOG = LoggerFactory.getLogger(APIQuotaManager.class);
+	
+	private API desiredState;
+	
+	private API actualState;
 
-	public UpdateQuotaConfiguration(API desiredState, API actualState) {
-		super(desiredState, actualState);
+	public APIQuotaManager(API desiredState, API actualState) {
+		this.desiredState = desiredState;
+		this.actualState = actualState;
 	}
 
 	public void execute() throws AppException {
-		Transaction context = Transaction.getInstance();
 		if(desiredState.getApplicationQuota()==null && desiredState.getSystemQuota()==null) return;
 		if(CommandParameters.getInstance().isIgnoreQuotas() || CommandParameters.getInstance().getQuotaMode().equals(CommandParameters.MODE_IGNORE)) {
 			LOG.info("Configured quotas will be ignored, as ignoreQuotas is true or QuotaMode has been set to ignore.");
@@ -57,8 +47,6 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask {
 					restriction.setApi(actualState.getId());
 				}
 				addOrMergeRestriction(systemQuota.getRestrictions(), desiredState.getSystemQuota().getRestrictions());
-				context.put(QUOTA_UPDATE_SUCCESS, "System-Default quota successfully updated for API: " + desiredState.getName());
-				context.put(QUOTA_UPDATE_FAIL, "System-Default quota successfully updated for API: " + desiredState.getName());
 				APIManagerAdapter.getInstance().quotaAdapter.saveQuota(systemQuota, systemQuota.getId());
 			}
 		}
@@ -73,8 +61,6 @@ public class UpdateQuotaConfiguration extends AbstractAPIMTask {
 					restriction.setApi(actualState.getId());
 				}
 				addOrMergeRestriction(applicationQuota.getRestrictions(), desiredState.getApplicationQuota().getRestrictions());
-				context.put(QUOTA_UPDATE_SUCCESS, "Application-Default quota successfully updated: " + desiredState.getName());
-				context.put(QUOTA_UPDATE_FAIL, "Application-Default quota successfully updated: " + desiredState.getName());
 				APIManagerAdapter.getInstance().quotaAdapter.saveQuota(applicationQuota, applicationQuota.getId());
 			}
 		}

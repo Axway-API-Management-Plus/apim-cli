@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
@@ -28,6 +31,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	
+	private static Logger LOG = LoggerFactory.getLogger(JSONConfigClientAppAdapter.class);
+	
 	private ObjectMapper mapper = new ObjectMapper();
 	
 	List<ClientApplication> apps;
@@ -35,7 +40,6 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	public JSONConfigClientAppAdapter() {
 	}
 
-	@Override
 	public boolean readConfig(Object config) throws AppException {
 		if (config==null) return false;
 		if (config instanceof String == false) return false;
@@ -63,17 +67,10 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	}
 	
 	@Override
-	public List<ClientApplication> getApplications(ClientAppFilter filter, boolean logProgress) throws AppException {
-		LOG.trace("Filtering results is not supported for the JSON implementation. Returning all applications.");
-		return getAllApplications(false);
-	}
-	
-	@Override
-	public List<ClientApplication> getAllApplications(boolean logProgress) throws AppException {
+	public List<ClientApplication> getApplications() throws AppException {
 		return this.apps;
 	}
 	
-	@Override
 	public ClientApplication getApplication(ClientAppFilter filter) throws AppException {
 		return getApplicationByName(filter.getApplicationName());
 	}
@@ -84,17 +81,6 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 			if(applicationName.equals(app.getName())) return app;
 		}
 		return null;
-	}
-
-	@Override
-	public ClientApplication createApplication(ClientApplication app) throws AppException {
-		throw new UnsupportedOperationException("createApplication not implemented for JSONConfigClientAppAdapter");
-	}
-	
-	@Override
-	public ClientApplication updateApplication(ClientApplication desiredApp, ClientApplication actualApp)
-			throws AppException {
-		throw new UnsupportedOperationException("updateApplication not implemented for JSONConfigClientAppAdapter");
 	}
 
 	private void addImage(List<ClientApplication> apps, File parentFolder) throws AppException {
@@ -125,7 +111,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	}
 	
 	private void addAPIAccess(List<ClientApplication> apps) throws AppException {
-		APIAdapter apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
+		APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
 		for(ClientApplication app : apps) {
 			if(app.getApiAccess()==null) continue;
 			Iterator<APIAccess> it = app.getApiAccess().iterator();

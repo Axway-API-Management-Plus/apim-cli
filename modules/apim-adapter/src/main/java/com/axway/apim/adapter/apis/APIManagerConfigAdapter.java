@@ -45,7 +45,7 @@ public class APIManagerConfigAdapter {
 		HttpResponse httpResponse = null;
 		try {			
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
-			RestAPICall getRequest = new GETRequest(uri, null, useAdmin);
+			RestAPICall getRequest = new GETRequest(uri, useAdmin);
 			httpResponse = getRequest.execute();
 
 			JsonNode apiManagerConfig;
@@ -54,7 +54,7 @@ public class APIManagerConfigAdapter {
 			
 			
 		} catch (Exception e) {
-			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + httpResponse);
+			LOG.error("Error cant read all orgs from API-Manager. Can't parse response: " + httpResponse, e);
 			throw new AppException("Can't read all orgs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {

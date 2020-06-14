@@ -64,7 +64,7 @@ public class APIManagerOrganizationAdapter {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations"+orgId)
 					.addParameters(filter.getFilters())
 					.build();
-			RestAPICall getRequest = new GETRequest(uri, null, APIManagerAdapter.hasAdminAccount());
+			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			LOG.debug("Load organizations from API-Manager using filter: " + filter);
 			LOG.trace("Load organization with URI: " + uri);
 			httpResponse = getRequest.execute();
@@ -84,7 +84,7 @@ public class APIManagerOrganizationAdapter {
 				apiManagerResponse.put(filter, response);
 			}
 		} catch (Exception e) {
-			LOG.error("Error cant read orgs from API-Manager with filter: "+filter+". Can't parse response: " + httpResponse);
+			LOG.error("Error cant read orgs from API-Manager with filter: "+filter+". Can't parse response: " + httpResponse, e);
 			throw new AppException("Error cant read orgs from API-Manager with filter: "+filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {

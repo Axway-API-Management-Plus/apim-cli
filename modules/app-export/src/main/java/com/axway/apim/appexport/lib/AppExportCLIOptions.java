@@ -4,9 +4,9 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
-import com.axway.apim.lib.APIMCoreCLIOptions;
+import com.axway.apim.lib.StandardExportCLIOptions;
 
-public class AppExportCLIOptions extends APIMCoreCLIOptions {
+public class AppExportCLIOptions extends StandardExportCLIOptions {
 
 	CommandLine cmd;
 

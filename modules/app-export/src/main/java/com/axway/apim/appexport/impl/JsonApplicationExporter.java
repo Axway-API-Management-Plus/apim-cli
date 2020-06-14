@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.jackson.JSONViews;
+import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.jackson.AppExportSerializerModifier;
@@ -21,16 +21,19 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class JsonApplicationExporter extends ApplicationExporter {
 
-	public JsonApplicationExporter(List<ClientApplication> apps, AppExportParams params) {
-		super(apps, params);
+	public JsonApplicationExporter(AppExportParams params) {
+		super(params);
 	}
 
 	@Override
-	public void export() throws AppException {
-		for(ClientApplication app : this.apps) {
+	public void export(List<ClientApplication> apps) throws AppException {
+		for(ClientApplication app : apps) {
 			saveApplicationLocally(new ExportApplication(app));
 		}
 	}
@@ -60,10 +63,13 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new AppExportSerializerModifier(localFolder)));
 		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
+		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "apiId", "createdBy", "createdOn", "enabled"}));
+		mapper.setFilterProvider(filter);
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.writerWithView(JSONViews.ApplicationForExport.class).writeValue(new File(localFolder.getCanonicalPath() + "/application-config.json"), app);
+			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/application-config.json"), app);
 		} catch (Exception e) {
 			throw new AppException("Can't write Application-Configuration file for application: '"+app.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
 		}
@@ -110,4 +116,17 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		}
 	}
 
+	@Override
+	public ClientAppFilter getFilter() throws AppException {
+		return new ClientAppFilter.Builder()
+				.hasState(AppExportParams.getInstance().getAppState())
+				.hasName(AppExportParams.getInstance().getAppName())
+				.hasId(AppExportParams.getInstance().getAppId())
+				.hasOrganizationName(AppExportParams.getInstance().getOrgName())
+				.includeQuotas(true)
+				.includeCredentials(true)
+				.includeAPIAccess(true)
+				.includeImage(true)
+				.build();
+	}
 }

@@ -30,7 +30,6 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 	public Organization deserialize(JsonParser jp, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
 		JsonNode node = jp.getCodec().readTree(jp);
-		OrgFilter filter;
 		try {
 			// Deserialization depends on the direction
 			if("organizationId".equals(jp.currentName())) {
@@ -43,7 +42,7 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 					ErrorState.getInstance().setError("The given organization: '"+node.asText()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION, false);
 					throw new AppException("The given organization: '"+node.asText()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
 				}
-				return APIManagerAdapter.getInstance().orgAdapter.getOrgForName(node.asText());
+				return organization;
 			}
 		} catch (AppException e) {
 			throw new IOException("Error reading organization", e);

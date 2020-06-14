@@ -11,10 +11,8 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.lib.IResponseParser;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Encapsulates logic to perform REST-API Calls to the API-Manager REST-API. For instance 
@@ -35,51 +33,29 @@ public abstract class RestAPICall {
 	
 	protected HttpHost target;
 	
-	protected IResponseParser reponseParser;
-	
 	protected String contentType = "application/json";
 	
 	protected boolean useAdmin = false;
 	
-	public RestAPICall(HttpEntity entity, URI uri, IResponseParser responseParser, boolean useAdmin) {
+	public RestAPICall(HttpEntity entity, URI uri, boolean useAdmin) {
 		super();
 		this.entity = entity;
 		this.uri = uri;
-		this.reponseParser = responseParser;
 		this.useAdmin = useAdmin;
 	}
 	
-	public RestAPICall(HttpEntity entity, URI uri, IResponseParser responseParser) {
+	public RestAPICall(HttpEntity entity, URI uri) {
 		super();
 		this.entity = entity;
 		this.uri = uri;
-		this.reponseParser = responseParser;
 	}
 
 	public abstract HttpResponse execute() throws AppException;
 	
-	public void parseResponse(HttpResponse response) throws AppException {
-		try {
-			Transaction context = Transaction.getInstance();
-			if(this.reponseParser==null) return; 
-			JsonNode lastReponse = reponseParser.parseResponse(response);
-			context.put("lastResponse", lastReponse);
-		} catch (Exception e) {
-			try {
-				RestAPICall.LOG.error("Response: '" + response.getStatusLine().toString() + "'");
-			} catch (Exception e1) {
-				throw new AppException("Unable to parse HTTP-Response", ErrorCode.CANT_PARSE_HTTP_RESPONSE, e1);
-			}
-			throw new AppException("Unable to parse HTTP-Response", ErrorCode.CANT_PARSE_HTTP_RESPONSE, e);
-		}
-	}
-	
 	protected HttpResponse sendRequest(HttpUriRequest request) throws AppException {
 		try {
-			Transaction context = Transaction.getInstance();
 			APIMHttpClient apimClient = APIMHttpClient.getInstance(this.useAdmin);
 			if(apimClient.getCsrfToken()!=null) request.addHeader("CSRF-Token", apimClient.getCsrfToken());
-			context.put("lastRequest", request.getMethod() + " " + request);
 			HttpResponse response = apimClient.getHttpClient().execute(request, apimClient.getClientContext());
 			//LOG.info("Send request: "+this.getClass().getSimpleName()+" using admin-account: " + this.useAdmin + " to: " + request.getURI());
 			return response;
