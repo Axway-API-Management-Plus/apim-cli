@@ -125,7 +125,7 @@ public class API {
 	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED})	
 	protected String version;
 	
-	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+	@APIPropertyAnnotation(isBreaking = true, copyProp = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected String vhost = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED})
