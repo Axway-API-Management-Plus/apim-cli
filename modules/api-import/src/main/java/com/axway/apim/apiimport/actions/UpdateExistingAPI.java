@@ -48,6 +48,12 @@ public class UpdateExistingAPI {
 				apiManager.apiAdapter.updateRetirementDate(changes.getDesiredAPI());
 			}
 			
+			// This is required when an API has been set back to Unpublished
+			// In that case, the V-Host is reseted to null - But we still want to use the configured V-Host
+			if(statusUpdate.isUpdateVHostRequired()) {
+				apiManager.apiAdapter.updateAPIProxy(changes.getActualAPI());
+			}
+			
 			new APIQuotaManager(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 			new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute(false);
 			// Handle subscription to applications

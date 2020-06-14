@@ -97,8 +97,7 @@ public class APIManagerAPIAdapter {
 		undeprecated("undeprecate");
 		
 		private final String endpoint;
-		
-		@SuppressWarnings({ "rawtypes", "unchecked" })
+
 		private StatusEndpoint(String endpoint) {
 			this.endpoint = endpoint;
 		}
@@ -118,6 +117,7 @@ public class APIManagerAPIAdapter {
 			apis = filterAPIs(filter);
 			for(int i=0;i<apis.size();i++) {
 				API api = apis.get(i);
+				// Save the original given state - This is used during APIProxyUpdate, as this endpoint requires the original state
 				api.setActualState(api.getState());
 				translateMethodIds(api, filter.getTranslateMethodMode());
 				addQuotaConfiguration(api, filter.isIncludeQuotas());
@@ -509,19 +509,19 @@ public class APIManagerAPIAdapter {
 		HttpEntity entity;
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "vhost"}));
+				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath"}));
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new StateSerializerModifier(false)));
 		mapper.setFilterProvider(filter);
 		HttpResponse httpResponse = null;
 		translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()).build();
-			// Proxy Update endpoint requires the original API-State! :-(
-			// Save state
+			// During APIProxyUpdate we have to send the original API-State, as it have been given by the APIManagerAPIAdapter#getAPIs
+			// We save the save 
 			String origState = api.getState();
 			api.setState(api.getActualState());
 			entity = new StringEntity(mapper.writeValueAsString(api), StandardCharsets.UTF_8);
-			// And restore
+			// And restore it
 			api.setState(origState);
 			
 			RestAPICall request = new PUTRequest(entity, uri);

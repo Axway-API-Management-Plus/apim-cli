@@ -21,6 +21,8 @@ public class APIStatusManager {
 	static Logger LOG = LoggerFactory.getLogger(APIStatusManager.class);
 	
 	private APIManagerAdapter apimAdapter;
+	
+	private boolean updateVHostRequired = false;
 
 	private static enum StatusChangeMap {
 		unpublished(new String[] { "published", "deleted" }), 
@@ -138,10 +140,15 @@ public class APIStatusManager {
 				apimAdapter.apiAdapter.deleteBackendAPI(desiredState);
 			} else {
 				apimAdapter.apiAdapter.updateAPIStatus(desiredState);
+				if (desiredState.getVhost()!=null && desiredState.getState().equals(API.STATE_UNPUBLISHED)) { 
+					this.updateVHostRequired = true; // Flag to control update of the VHost
+				}
 				
 			} 
 			// Take over the status, as it has been updated now
 			actualState.setState(desiredState.getState());
+			// This actualState is used by APIProxyUpdate to send the real actual state!
+			actualState.setActualState(desiredState.getState());
 			// When deprecation or undeprecation is requested, we have to set the actual API accordingly!
 			if(desiredState.getState().equals("undeprecated")) {
 				actualState.setDeprecated("false");
@@ -154,8 +161,11 @@ public class APIStatusManager {
 			throw new AppException("The status change from: '" + actualState.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS, e);
 		}
 	}
-/*
+
+	/**
+	 * @return true, if the API has been set to unpublished and the VHost needs to be updated
+	 */
 	public boolean isUpdateVHostRequired() {
 		return updateVHostRequired;
-	}*/
+	}
 }
