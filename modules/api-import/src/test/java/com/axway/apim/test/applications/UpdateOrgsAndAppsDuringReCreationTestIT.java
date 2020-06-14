@@ -142,7 +142,7 @@ public class UpdateOrgsAndAppsDuringReCreationTestIT extends TestNGCitrusTestRun
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.*.apiId", "${apiId}"));
 		
-		// ############## Re-Create this API and Reduce number of Org & Apps #################
+		echo("############## Re-Create this API and Reduce number of Org & Apps #################");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/applications/1_api-with-3-orgs-3-apps.json");
 		createVariable("state", "published");

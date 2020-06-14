@@ -183,7 +183,7 @@ public class APIManagerAPIAccessAdapter {
 					LOG.warn("API Access for " + type + " with ID: " + parentId + " already exists. Ignoring this error.");
 					return apiAccess;
 				}
-				LOG.error("Error creating/updating API Access. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+				LOG.error("Error creating/updating API Access. Response-Code: "+statusCode+". Got response: '"+response+"'");
 				throw new AppException("Error creating/updating API Access. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			String response = EntityUtils.toString(httpResponse.getEntity());
