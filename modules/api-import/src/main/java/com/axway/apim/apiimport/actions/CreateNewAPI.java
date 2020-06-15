@@ -42,30 +42,29 @@ public class CreateNewAPI {
 			changes.getDesiredAPI().setApiId(createdBEAPI.getApiId());
 			createdAPI = apiAdapter.createAPIProxy(changes.getDesiredAPI());
 		} catch (Exception e) {
-			// Try to rollback FE-API (Proxy) bases on the created BE-API
-			rollback.addRollbackAction(new RollbackAPIProxy(createdBEAPI));
 			throw e;
+		} finally {
+			rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback	
 		}
-		rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback
-		APIChangeState.copyRequiredPropertisFromCreatedAPI(changes.getDesiredAPI(), createdAPI);
 
 		try {
 			// ... here we basically need to add all props to initially bring the API in sync!
+			APIChangeState.initCreatedAPI(changes.getDesiredAPI(), createdAPI);
 			// But without updating the Swagger, as we have just imported it!
-			createdAPI = apiAdapter.updateAPIProxy(changes.getDesiredAPI());
+			createdAPI = apiAdapter.updateAPIProxy(createdAPI);
 
 			// If an image is included, update it
 			if(changes.getDesiredAPI().getImage()!=null) {
-				apiAdapter.updateAPIImage(changes.getDesiredAPI());
+				apiAdapter.updateAPIImage(createdAPI, changes.getDesiredAPI().getImage());
 			}
 			// This is special, as the status is not a normal property and requires some additional actions!
 			APIStatusManager statusManager = new APIStatusManager();
 			statusManager.update(changes.getDesiredAPI(), createdAPI);
-			apiAdapter.updateRetirementDate(createdAPI);
+			apiAdapter.updateRetirementDate(createdAPI, changes.getDesiredAPI().getRetirementDate());
 
 			if(reCreation && changes.getActualAPI().getState().equals(API.STATE_PUBLISHED)) {
 				// In case, the existing API is already in use (Published), we have to grant access to our new imported API
-				apiAdapter.upgradeAccessToNewerAPI(changes.getDesiredAPI(), changes.getActualAPI());
+				apiAdapter.upgradeAccessToNewerAPI(createdAPI, changes.getActualAPI());
 			}
 
 			// Is a Quota is defined we must manage it

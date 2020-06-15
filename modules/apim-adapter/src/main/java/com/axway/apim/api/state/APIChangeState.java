@@ -96,6 +96,8 @@ public class APIChangeState {
 					// desiredValue == null - This can be used to reset/clean a property! (Need to think about this!)
 					if((desiredValue!=null && actualValue==null) || !(compareValues(actualValue, desiredValue))) {
 						APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
+						// Property change requires proxy update
+						if(property.copyProp()) this.proxyUpdateRequired = true;
 						if (property.isBreaking()) {
 							this.isBreaking = true;
 							this.breakingChanges.add(field.getName());
@@ -117,42 +119,62 @@ public class APIChangeState {
 		}
 	}
 	
+	public static void initCreatedAPI(API desiredAPI, API createdAPI) throws AppException {
+		List<String> allProps = getAllAPIProperties();
+		copyProps(desiredAPI, createdAPI, allProps);
+	}
+	
+	public static void copyChangedProps(API desiredAPI, API createdAPI, List<String> changes) throws AppException {
+		copyProps(desiredAPI, createdAPI, changes);
+	}
+	
 	/**
 	 * Copied all changed properties of the API having APIPropertyAnnotation set to copyProp = true (default)
 	 * @throws AppException if something goes wrong
 	 */
-	public void copyChangedProps() throws AppException {
+	public static void copyProps(API sourceAPI, API targetAPI, List<String> propsToCopy) throws AppException {
 		Field field = null;
-		Class clazz = (desiredAPI.getClass().equals(API.class)) ? desiredAPI.getClass() :  desiredAPI.getClass().getSuperclass();
-		if(getAllChanges().size()!=0) {
+		
+		Class clazz = (sourceAPI.getClass().equals(API.class)) ? sourceAPI.getClass() :  sourceAPI.getClass().getSuperclass();
+		if(propsToCopy.size()!=0) {
 			String logMessage = "Updating Frontend-API (Proxy) for the following properties: ";
-			for(String fieldName : getAllChanges()) {
+			for(String fieldName : propsToCopy) {
 				try {
 					field = clazz.getDeclaredField(fieldName);
 					
 					APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
 					if(!property.copyProp()) continue;
-					proxyUpdateRequired = true;
 					if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {
 						String getterMethodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
 						String setterMethodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
 						Method getMethod = clazz.getMethod(getterMethodName, null);
-						Object desiredObject = getMethod.invoke(this.desiredAPI, null);
+						Object desiredObject = getMethod.invoke(sourceAPI, null);
+						if(desiredObject==null) continue;
+						Method setMethod = targetAPI.getClass().getMethod(setterMethodName, field.getType());
 						
-						Method setMethod = this.actualAPI.getClass().getMethod(setterMethodName, field.getType());
-						
-						setMethod.invoke(this.actualAPI, desiredObject);
+						setMethod.invoke(targetAPI, desiredObject);
 						logMessage = logMessage + fieldName + " ";
 					}
 				} catch (Exception e) {
 					throw new AppException("Can't handle property: "+fieldName+" to update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
 				}
 			}
-			copyRequiredPropertisFromCreatedAPI(desiredAPI, actualAPI);
+			//copyRequiredPropertisFromCreatedAPI(desiredAPI, actualAPI);
 			LOG.info(logMessage);
 		} else {
 			LOG.debug("API-Proxy requires no updates");
 		}
+	}
+	
+	private static List<String> getAllAPIProperties() {
+		List<String> allAPIProps = new ArrayList<String>();
+		Field[] fields = API.class.getDeclaredFields();
+		for (Field field : fields) {
+			if (field.isAnnotationPresent(APIPropertyAnnotation.class)) {	
+				allAPIProps.add(field.getName());
+			}
+		}
+		return allAPIProps;
 	}
 
 	/**
@@ -268,10 +290,9 @@ public class APIChangeState {
 		}
 	}
 	
-	public static API copyRequiredPropertisFromCreatedAPI(API desiredAPI, API createdAPI) throws AppException {
+/*	public static API copyRequiredPropertisFromCreatedAPI(API desiredAPI, API createdAPI) throws AppException {
 		desiredAPI.setId(createdAPI.getId());
 		desiredAPI.setApiId(createdAPI.getApiId());
-		desiredAPI.setActualState(createdAPI.getState()); // Copy the original state into a special field used during API-Proxy update
 		desiredAPI.setCreatedBy(createdAPI.getCreatedBy());
 		desiredAPI.setCreatedOn(createdAPI.getCreatedOn());
 		if(desiredAPI.getOutboundProfiles()==null) desiredAPI.setOutboundProfiles(createdAPI.getOutboundProfiles());
@@ -281,5 +302,5 @@ public class APIChangeState {
 		if(desiredAPI.getAuthenticationProfiles()==null) desiredAPI.setAuthenticationProfiles(createdAPI.getAuthenticationProfiles());
 		if(desiredAPI.getCaCerts()==null) desiredAPI.setCaCerts(createdAPI.getCaCerts());
 		return desiredAPI;
-	}
+	}*/
 }

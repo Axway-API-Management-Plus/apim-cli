@@ -49,7 +49,6 @@ public class APIImportManager {
 			createAPI.execute(changeState, false);
 		// Otherwise an existing API exists
 		} else {
-			changeState.copyChangedProps(); // From this point the Actual API contains desired changes!
 			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getName() +" (Version: "+ changeState.getActualAPI().getVersion() + ")");
 			if(!changeState.hasAnyChanges()) {
 				APIPropertiesExport.getInstance().setProperty("feApiId", changeState.getActualAPI().getId());
