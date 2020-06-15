@@ -89,6 +89,10 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 		swaggerImport.doExecute(context);
 		
 		echo("####### Check Application-Quotas have been setup as configured #######");
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+			echo("####### ############ Sleep 5 seconds ##################### #######");
+			Thread.sleep(5000); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+		}
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
@@ -98,7 +102,7 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 			
 			// These quota settings are inserted based on configuration by Swagger-Promote 
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.mb", "555")
-			//.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.period", "hour")
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.period", "hour")
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.per", "1"));
 		
 		echo("####### Check that only the configured quota remains and previouls configured are removed #######");
