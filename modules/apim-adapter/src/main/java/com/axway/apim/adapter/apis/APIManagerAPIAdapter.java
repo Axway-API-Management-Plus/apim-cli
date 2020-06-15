@@ -138,6 +138,10 @@ public class APIManagerAPIAdapter {
 		List<API> foundAPIs = getAPIs(filter, logMessage);
 		return uniqueAPI(foundAPIs, filter);
 	}
+	
+	public API getAPIWithId(String id) throws AppException {
+		return getAPI(new APIFilter.Builder().hasApiId(id).build(), false);
+	}
 
 	/**
 	 * Returns a list of requested proxies (Front-End APIs).
@@ -896,8 +900,19 @@ public class APIManagerAPIAdapter {
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
-				LOG.error("Error granting access to API: "+api.getName()+" (ID: "+api.getId()+"). Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
-				throw new AppException("Error granting API access. Received Status-Code: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+				String response = EntityUtils.toString(httpResponse.getEntity());
+				if(statusCode==403 && response.contains("Unknown API")) {
+					LOG.warn("Got error: Unknown API - Try again in 5 seconds.");
+					Thread.sleep(5000);
+					httpResponse = apiCall.execute();
+					statusCode = httpResponse.getStatusLine().getStatusCode();
+					if(statusCode != 204) {
+						LOG.error("Error granting access to API: '"+api.getName()+"' (ID: "+api.getId()+"). Received Status-Code: " +statusCode + ", Response: " + response);
+						throw new AppException("Error granting API access. Received Status-Code: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+					}
+				} else {
+					LOG.info("Retry successful!");
+				}
 			}
 			// Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
 			if(api.getClientOrganizations()==null) api.setClientOrganizations(new ArrayList<Organization>());
