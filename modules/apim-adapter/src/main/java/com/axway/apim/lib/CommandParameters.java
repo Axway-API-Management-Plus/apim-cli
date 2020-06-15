@@ -114,7 +114,8 @@ public class CommandParameters {
 		return Integer.parseInt(getValue("port"));
 	}
 
-	public boolean isEnforceBreakingChange() {
+	public boolean isForce() {
+		if(hasOption("force")) return true;
 		if(getValue("force")==null) return false;
 		return Boolean.parseBoolean(getValue("force"));
 	}
@@ -233,6 +234,13 @@ public class CommandParameters {
 			LOG.error("");
 			throw new AppException("Missing required parameters.", ErrorCode.MISSING_PARAMETER);
 		}
+	}
+	
+	public boolean hasOption(String key) {
+		return (this.cmd.hasOption(key) || 
+				this.internalCmd.hasOption(key) || 
+				(this.envProperties!=null && this.envProperties.containsKey(key)) || 
+				(this.manualParams!=null && this.manualParams.containsKey(key)));
 	}
 	
 	public String getValue(String key) {

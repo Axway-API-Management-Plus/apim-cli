@@ -64,9 +64,12 @@ public abstract class APIMCoreCLIOptions {
 		option.setArgName("changeme");
 		options.addOption(option);
 		
-		option = new Option("f", "force", true, "Optional flag used by different modules to enforce actions. For instance import breaking change or delete an API.");
-		option.setArgName("true/[false]");
+		option = new Option("force", "Optional flag used by different modules to enforce actions. For instance import breaking change or delete API(s).");
 		options.addOption(option);
+		
+		// Added for backwards compatibility
+		option = new Option("f", true, "Optional flag used by different modules to enforce actions. For instance import breaking change or delete API(s).");
+		internalOptions.addOption(option);
 		
 		option = new Option("apimCLIHome", true, "The absolute path to the CLI home directory containing for instance your conf folder.\n"
 				+ "You may also set the environment variable: '"+CommandParameters.APIM_CLI_HOME+"'");

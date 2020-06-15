@@ -21,7 +21,7 @@ public class APIImportManager {
 	
 	private ErrorState error = ErrorState.getInstance();
 	
-	private boolean enforceBreakingChange = CommandParameters.getInstance().isEnforceBreakingChange();
+	private boolean enforceBreakingChange = CommandParameters.getInstance().isForce();
 	
 	/**
 	 * This method is taking in the APIChangeState to decide about the strategy how to 
@@ -60,21 +60,21 @@ public class APIImportManager {
 					" plus Non-Breaking: " + changeState.getNonBreakingChanges());
 			if (changeState.isBreaking()) { // Make sure, breaking changes aren't applied without enforcing it.
 				if(!enforceBreakingChange) {
-					error.setError("A potentially breaking change can't be applied without enforcing it! Try option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
-					throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED);
+					error.setError("A potentially breaking change can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED, false);
+					throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
 				}
 			}
 			
 			if(changeState.isUpdateExistingAPI()) { // All changes can be applied to the existing API in current state
 				LOG.info("Update API Strategy: All changes can be applied in current state.");
-				LOG.info("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
+				LOG.debug("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
 						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase());
 				UpdateExistingAPI updateAPI = new UpdateExistingAPI();
 				updateAPI.execute(changeState);
 				return;
 			} else { // We have changes, that require a re-creation of the API
 				LOG.info("Update API Strategy: Re-Create API as changes can't be applied to existing API. ");
-				LOG.info("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
+				LOG.debug("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
 						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase());
 				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
 				recreate.execute(changeState);
