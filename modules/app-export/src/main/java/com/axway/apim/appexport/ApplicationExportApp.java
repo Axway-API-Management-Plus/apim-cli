@@ -46,26 +46,33 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		return "Manage your applications";
 	}
 	
-	@CLIServiceMethod(name = "export", description = "Export applications from the API-Manager")
-	public static int export(String[] args) {
-		return runExport(args, ExportImpl.JSON_EXPORTER);
-	}
-	
-	@CLIServiceMethod(name = "list", description = "List applications on the console")
-	public static int list(String[] args) {
-		return runExport(args, ExportImpl.CONSOLE_EXPORTER);
+	@CLIServiceMethod(name = "get", description = "Get Applications from the API-Manager in different formats")
+	public static int export(String args[]) {
+		try {
+			AppExportParams params = new AppExportParams(new AppExportCLIOptions(args));
+			switch(params.getExportFormat()) {
+			case console:
+				return runExport(params, ExportImpl.CONSOLE_EXPORTER);
+			case json:
+				return runExport(params, ExportImpl.JSON_EXPORTER);
+			default:
+				return runExport(params, ExportImpl.CONSOLE_EXPORTER);
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
 	}
 
-	private static int runExport(String[] args, ExportImpl exportImpl) {
+	private static int runExport(AppExportParams params, ExportImpl exportImpl) {
 		try {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
-			
-			new AppExportParams(new AppExportCLIOptions(args));
+
 			APIMgrAppsAdapter appAdapter = new APIMgrAppsAdapter();
-			ApplicationExporter exporter = ApplicationExporter.create(exportImpl, AppExportParams.getInstance());
+			ApplicationExporter exporter = ApplicationExporter.create(exportImpl, params);
 			List<ClientApplication> apps = appAdapter.getApplications(exporter.getFilter(), true);
 			if(apps.size()==0) {
 				if(LOG.isDebugEnabled()) {

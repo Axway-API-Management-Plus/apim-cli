@@ -33,22 +33,18 @@ public class APIExportApp implements APIMCLIServiceProvider {
 		System.exit(rc);
 	}
 	
-	@CLIServiceMethod(name = "export", description = "Export APIs from the API-Manager")
+	@CLIServiceMethod(name = "get", description = "Get APIs from the API-Manager in different formats")
 	public static int export(String args[]) {
 		try {
 			APIExportParams params = new APIExportParams(new APIExportAsFileCLIOptions(args));
-			return runExport(params, APIListImpl.JSON_EXPORTER);
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
-		}
-	}
-	
-	@CLIServiceMethod(name = "list", description = "List APIs from the API-Manager")
-	public static int list(String args[]) {
-		try {
-			APIExportParams params = new APIExportParams(new APIListCLIOptions(args));
-			return runExport(params, APIListImpl.CONSOLE_EXPORTER);
+			switch(params.getExportFormat()) {
+			case console:
+				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
+			case json:
+				return runExport(params, APIListImpl.JSON_EXPORTER);
+			default:
+				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
+			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();

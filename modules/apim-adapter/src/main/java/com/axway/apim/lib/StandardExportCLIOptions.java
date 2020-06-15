@@ -7,9 +7,17 @@ public abstract class StandardExportCLIOptions extends APIMCoreCLIOptions {
 
 	public StandardExportCLIOptions(String[] args) throws ParseException {
 		super(args);
-		Option option = new Option("w", "wide", true, "Used to control the amount of data shown in list views. Possible values: standard, wide, ultra. Requesting more data has a performance impact.");
+		Option option = new Option("wide", "A wider view of data to be returned by the export implementation. Requesting more data has a performance impact.");
 		option.setRequired(false);
-		option.setArgName("ultra");
+		options.addOption(option);
+		
+		option = new Option("ultra", "Get most of the data to be returned by the export implementation. Requesting more data has a performance impact.");
+		option.setRequired(false);
+		options.addOption(option);
+		
+		option = new Option("f", "format", true, "Controls the export format. By default the console is used. Other options: console|json (more to come)");
+		option.setRequired(false);
+		option.setArgName("console|json");
 		options.addOption(option);
 	}
 }
