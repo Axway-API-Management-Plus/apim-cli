@@ -121,6 +121,7 @@ public class CommandParameters {
 	}
 	
 	public boolean isIgnoreQuotas() {
+		if(hasOption("ignoreQuotas")) return true;
 		if(getValue("ignoreQuotas")==null) return false;
 		return Boolean.parseBoolean(getValue("ignoreQuotas"));
 	}
@@ -240,8 +241,8 @@ public class CommandParameters {
 	}
 	
 	public boolean hasOption(String key) {
-		return (this.cmd.hasOption(key) || 
-				this.internalCmd.hasOption(key) || 
+		return ((this.cmd!=null && this.cmd.hasOption(key)) || 
+				(this.cmd!=null && this.internalCmd.hasOption(key)) || 
 				(this.envProperties!=null && this.envProperties.containsKey(key)) || 
 				(this.manualParams!=null && this.manualParams.containsKey(key)));
 	}

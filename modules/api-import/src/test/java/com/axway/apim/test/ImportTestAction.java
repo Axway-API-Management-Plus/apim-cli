@@ -150,7 +150,7 @@ public class ImportTestAction extends AbstractTestAction {
 				args.add("-force");
 			}
 			if(ignoreQuotas) {
-				args.add("-ignoreQuota");
+				args.add("-ignoreQuotas");
 			}
 			if(ignoreCache) {
 				args.add("-ignoreCache");
