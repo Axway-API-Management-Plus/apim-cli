@@ -124,7 +124,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	
 	@Override
 	public String getName() {
-		return "API - E X P O R T";
+		return "API - E X P O R T / U T I L S";
 	}
 
 	@Override
