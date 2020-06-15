@@ -24,7 +24,7 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestDesigner {
 		variable("apiPath", "/app-quota-check-${apiNumber}");
 		variable("apiName", "App Quota Check ${apiNumber}");
 		
-		createVariable("appName", "Test App with quota ${orgNumber}");
+		createVariable("appName", "Test App with quota ${apiNumber}");
 		echo("####### Creating test a application: '${appName}' used to configure some sample quotas #######");
 		http().client("apiManager")
 			.send()

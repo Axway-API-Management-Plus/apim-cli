@@ -25,7 +25,7 @@ public class ApplicationSubscriptionNoOrgsTestIT extends TestNGCitrusTestDesigne
 		variable("apiName", "App Subscription No-Orgs API-${apiNumber}");
 		// ############## Creating Test-Application #################
 
-		createVariable("appName", "Consuming Test App ${orgNumber}");
+		createVariable("appName", "Consuming Test App ${apiNumber}");
 		http().client("apiManager").send().post("/applications").header("Content-Type", "application/json")
 			.payload("{\"name\":\"${appName}\",\"apis\":[],\"organizationId\":\"${orgId}\"}");
 

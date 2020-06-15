@@ -63,10 +63,10 @@ public class ReplaceOrgPermissionsWithSubscribedAppsTestIT extends TestNGCitrusT
 		echo("####### Created 4 Test-Organizations #######");
 		
 		// ############## Creating 4 Test-Applications #################
-		createVariable("appName1", "App 1 in org ${orgNumber}");
-		createVariable("appName2", "App 2 in org ${orgNumber}");
-		createVariable("appName3", "App 3 in org ${orgNumber}");
-		createVariable("appName4", "App 4 in org ${orgNumber}");
+		createVariable("appName1", "App 1 in org ${apiNumber}");
+		createVariable("appName2", "App 2 in org ${apiNumber}");
+		createVariable("appName3", "App 3 in org ${apiNumber}");
+		createVariable("appName4", "App 4 in org ${apiNumber}");
 		
 		http(builder -> builder.client("apiManager").send().post("/applications").header("Content-Type", "application/json")
 			.payload("{\"name\":\"${appName1}\",\"apis\":[],\"organizationId\":\"${orgId1}\"}"));
