@@ -64,6 +64,7 @@ public class ExportApplication {
 	
 	@JsonProperty("apis")
 	public List<APIAccess> getAPIAccess() {
+		if(clientApp.getApiAccess()==null || clientApp.getApiAccess().size()==0) return null;
 		return clientApp.getApiAccess();
 	}
 }

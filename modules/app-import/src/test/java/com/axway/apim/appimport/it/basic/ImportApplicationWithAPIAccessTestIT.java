@@ -99,8 +99,8 @@ public class ImportApplicationWithAPIAccessTestIT extends TestNGCitrusTestRunner
 		createVariable("expectedReturnCode", "0");
 		appImport.doExecute(context);
 		
-		echo("####### Validate application: '${appName}' has been imported #######");
-		http(builder -> builder.client("apiManager").send().get("/applications?field=name&op=eq&value=${appName}").header("Content-Type", "application/json"));
+		echo("####### Validate application: '${appName}' has been imported now having access to two APIs #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${appId}").header("Content-Type", "application/json"));
 		
 		// Make sure, the application id is unchanged
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
@@ -112,5 +112,24 @@ public class ImportApplicationWithAPIAccessTestIT extends TestNGCitrusTestRunner
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.apiId=='${apiId1}')].state", "approved")
 			.validate("$.[?(@.apiId=='${apiId2}')].state", "approved"));
+		
+		echo("####### Reduce access of application: '${appName}' to only ONE API #######");
+		createVariable(ApplicationImportTestAction.CONFIG,  PACKAGE + "AppWithAPIAccess.json");
+		createVariable("expectedReturnCode", "0");
+		appImport.doExecute(context);
+		
+		echo("####### Validate application: '${appName}' has been imported now having access to two APIs #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${appId}").header("Content-Type", "application/json"));
+		
+		// Make sure, the application id is unchanged
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.id=='${appId}')].name", "${appName}"));
+		
+		echo("####### Validate application: '${appName}' has access to ONLY ONE API #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/apis").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.apiId=='${apiId1}')].state", "approved")
+			.validate("$.*.id", "@assertThat(hasSize(1))@")); // We expect only ONE subscription!
 	}
 }

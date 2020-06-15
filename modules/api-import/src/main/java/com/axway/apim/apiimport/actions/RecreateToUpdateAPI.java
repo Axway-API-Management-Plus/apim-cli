@@ -3,12 +3,10 @@ package com.axway.apim.apiimport.actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.api.API;
-import com.axway.apim.api.APIBaseDefinition;
+import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
-import com.axway.apim.apiimport.DesiredAPI;
-import com.axway.apim.apiimport.actions.tasks.UpdateAPIStatus;
-import com.axway.apim.apiimport.state.APIChangeState;
 import com.axway.apim.lib.errorHandling.AppException;
 
 /**
@@ -27,26 +25,19 @@ public class RecreateToUpdateAPI {
 
 	public void execute(APIChangeState changes) throws AppException {
 		
-		API actual = changes.getActualAPI();
-		API desired = changes.getDesiredAPI();
-		
-		// On Re-Creation we need to restore the orginal given methodNames for methodLevel override
-		// desired.setInboundProfiles(((DesiredAPI)desired).getOriginalInboundProfiles());
-		// desired.setOutboundProfiles(((DesiredAPI)desired).getOriginalOutboundProfiles());
+		API actualAPI = changes.getActualAPI();
 		
 		// 1. Create BE- and FE-API (API-Proxy) / Including updating all belonging props!
 		// This also includes all CONFIGURED application subscriptions and client-orgs
 		// But not potentially existing Subscriptions or manually created Client-Orgs
+		LOG.info("Create new API to update existing: '"+actualAPI.getName()+"' (ID: "+actualAPI.getId()+")");
+		
 		CreateNewAPI createNewAPI = new CreateNewAPI();
 		createNewAPI.execute(changes, true);
-		
-		// 2. Create a new temp Desired-API-Definition, which will be used to delete the old API
-		API tempDesiredDeletedAPI = new APIBaseDefinition();
 
-		LOG.info("New API created. Going to delete old API.");
+		LOG.info("New API successfuly created. Going to delete old API: '"+actualAPI.getName()+"' "+actualAPI.getVersion()+" (ID: "+actualAPI.getId()+")");
 		// Delete the existing old API!
-		((APIBaseDefinition)tempDesiredDeletedAPI).setStatus(API.STATE_DELETED);
-		new UpdateAPIStatus(tempDesiredDeletedAPI, actual).execute(true);
+		new APIStatusManager().update(actualAPI, API.STATE_DELETED, true);
 	}
 
 }

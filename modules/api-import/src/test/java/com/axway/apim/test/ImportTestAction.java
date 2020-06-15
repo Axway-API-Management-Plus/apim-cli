@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.io.FileUtils;
@@ -63,21 +65,22 @@ public class ImportTestAction extends AbstractTestAction {
 			useEnvironmentOnly 	= Boolean.parseBoolean(context.getVariable("useEnvironmentOnly"));
 		} catch (Exception ignore) {};
 		
-		String enforce = "false";
-		String ignoreQuotas = "false";
-		String ignoreAdminAccount = "false";
+		boolean enforce = false;
+		boolean ignoreQuotas = false;
+		boolean ignoreAdminAccount = false;
+		boolean ignoreCache = false;
 		String allowOrgAdminsToPublish = "true";
-		String changeOrganization = "false";
+		boolean changeOrganization = false;
 		String clientOrgsMode = CommandParameters.MODE_ADD;
 		String clientAppsMode = CommandParameters.MODE_ADD;
 		String quotaMode = CommandParameters.MODE_ADD;
 		
 		
 		try {
-			enforce = context.getVariable("enforce");
+			enforce = Boolean.parseBoolean(context.getVariable("enforce"));
 		} catch (Exception ignore) {};
 		try {
-			ignoreQuotas = context.getVariable("ignoreQuotas");
+			ignoreQuotas = Boolean.parseBoolean(context.getVariable("ignoreQuotas"));
 		} catch (Exception ignore) {};
 		try {
 			quotaMode = context.getVariable("quotaMode");
@@ -89,13 +92,16 @@ public class ImportTestAction extends AbstractTestAction {
 			clientAppsMode = context.getVariable("clientAppsMode");
 		} catch (Exception ignore) {};
 		try {
-			ignoreAdminAccount = context.getVariable("ignoreAdminAccount");
+			ignoreAdminAccount = Boolean.parseBoolean(context.getVariable("ignoreAdminAccount"));
 		} catch (Exception ignore) {};
 		try {
 			allowOrgAdminsToPublish = context.getVariable("allowOrgAdminsToPublish");
 		} catch (Exception ignore) {};
 		try {
-			changeOrganization = context.getVariable("changeOrganization");
+			changeOrganization = Boolean.parseBoolean(context.getVariable("changeOrganization"));
+		} catch (Exception ignore) {};
+		try {
+			ignoreCache = Boolean.parseBoolean(context.getVariable("ignoreCache"));
 		} catch (Exception ignore) {};
 		
 		
@@ -110,29 +116,51 @@ public class ImportTestAction extends AbstractTestAction {
 		}
 		copyImagesAndCertificates(origConfigFile, context);
 		
-		String[] args;
+		List<String> args = new ArrayList<String>();
 		if(useEnvironmentOnly) {
-			args = new String[] {  
-					"-c", configFile, "-s", stage};
+			args.add("-c");
+			args.add(configFile);
+			args.add("-s");
+			args.add(stage);
 		} else {
-			args = new String[] { 
-					"-a", apiDefinition, 
-					"-c", configFile, 
-					"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
-					"-u", context.replaceDynamicContentInString("${oadminUsername1}"), 
-					"-p", context.replaceDynamicContentInString("${oadminPassword1}"),
-					"-s", stage, 
-					"-f", enforce, 
-					"-iq", ignoreQuotas, 
-					"-clientOrgsMode", clientOrgsMode, 
-					"-clientAppsMode", clientAppsMode,
-					"-quotaMode", quotaMode,
-					"-ignoreAdminAccount", ignoreAdminAccount, 
-					"-allowOrgAdminsToPublish", allowOrgAdminsToPublish, 
-					"-changeOrganization", changeOrganization};
+			args.add("-a");
+			args.add(apiDefinition);
+			args.add("-c");
+			args.add(configFile);
+			args.add("-h");
+			args.add(context.replaceDynamicContentInString("${apiManagerHost}"));
+			args.add("-u");
+			args.add(context.replaceDynamicContentInString("${oadminUsername1}"));
+			args.add("-p");
+			args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
+			args.add("-s");
+			args.add(stage);
+			args.add("-quotaMode");
+			args.add(quotaMode);
+			args.add("-clientOrgsMode");
+			args.add(clientOrgsMode);
+			args.add("-clientAppsMode");
+			args.add(clientAppsMode);
+			args.add("-allowOrgAdminsToPublish");
+			args.add(allowOrgAdminsToPublish);
+			if(changeOrganization) {
+				args.add("-changeOrganization");
+			}
+			if(enforce) {
+				args.add("-force");
+			}
+			if(ignoreQuotas) {
+				args.add("-ignoreQuotas");
+			}
+			if(ignoreCache) {
+				args.add("-ignoreCache");
+			}
+			if(ignoreAdminAccount) {
+				args.add("-ignoreAdminAccount");
+			}
 		}
 		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);
-		int rc = APIImportApp.importAPI(args);
+		int rc = APIImportApp.importAPI(args.toArray(new String[args.size()]));
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
 		}

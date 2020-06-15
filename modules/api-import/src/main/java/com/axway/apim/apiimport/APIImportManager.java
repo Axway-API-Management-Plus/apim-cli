@@ -5,10 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
+import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.apiimport.actions.RecreateToUpdateAPI;
 import com.axway.apim.apiimport.actions.UpdateExistingAPI;
-import com.axway.apim.apiimport.state.APIChangeState;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -21,7 +21,7 @@ public class APIImportManager {
 	
 	private ErrorState error = ErrorState.getInstance();
 	
-	private boolean enforceBreakingChange = CommandParameters.getInstance().isEnforceBreakingChange();
+	private boolean enforceBreakingChange = CommandParameters.getInstance().isForce();
 	
 	/**
 	 * This method is taking in the APIChangeState to decide about the strategy how to 
@@ -44,35 +44,38 @@ public class APIImportManager {
 		// No existing API found (means: No match for APIPath), creating a complete new
 		if(changeState.getActualAPI()==null) {
 			// --> CreateNewAPI
-			LOG.info("Strategy: No existing API found, creating new!");
+			LOG.info("No existing API found, creating new!");
 			CreateNewAPI createAPI = new CreateNewAPI();
 			createAPI.execute(changeState, false);
 		// Otherwise an existing API exists
 		} else {
-			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getName() +" (Version: "+ changeState.getActualAPI().getVersion() + ")");
+			LOG.info("Update existing API: " + changeState.getActualAPI().getName() +" Version: "+ changeState.getActualAPI().getVersion() + " ("+changeState.getActualAPI().getId()+")");
 			if(!changeState.hasAnyChanges()) {
 				APIPropertiesExport.getInstance().setProperty("feApiId", changeState.getActualAPI().getId());
 				LOG.debug("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
-				error.setWarning("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE, false);
+				error.setWarning("No changes detected between Import- and API-Manager-API: '" + changeState.getActualAPI().getName() + "' ("+changeState.getActualAPI().getId()+")", ErrorCode.NO_CHANGE, false);
 				throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE);
 			}
 			LOG.info("Recognized the following changes. Potentially Breaking: " + changeState.getBreakingChanges() + 
 					" plus Non-Breaking: " + changeState.getNonBreakingChanges());
 			if (changeState.isBreaking()) { // Make sure, breaking changes aren't applied without enforcing it.
 				if(!enforceBreakingChange) {
-					error.setError("A potentially breaking change can't be applied without enforcing it! Try option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
-					throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED);
+					error.setError("A potentially breaking change can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED, false);
+					throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
 				}
 			}
 			
 			if(changeState.isUpdateExistingAPI()) { // All changes can be applied to the existing API in current state
-				LOG.info("Strategy: Update existing API, as all changes can be applied in current state.");
+				LOG.info("Update API Strategy: All changes can be applied in current state.");
+				LOG.debug("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
+						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase());
 				UpdateExistingAPI updateAPI = new UpdateExistingAPI();
 				updateAPI.execute(changeState);
 				return;
 			} else { // We have changes, that require a re-creation of the API
-				LOG.info("Strategy: Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
-						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase()+" API by recreating it!");
+				LOG.info("Update API Strategy: Re-Create API as changes can't be applied to existing API. ");
+				LOG.debug("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
+						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase());
 				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
 				recreate.execute(changeState);
 			}

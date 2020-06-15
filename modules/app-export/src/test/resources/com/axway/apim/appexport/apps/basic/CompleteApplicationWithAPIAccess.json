@@ -36,6 +36,7 @@
     } ]
   }, 
   "apis" : [ {
-    "apiName" : "${apiName}"
+    "apiName" : "${apiName}", 
+    "apiVersion": "1.0.0"
   } ]
 }

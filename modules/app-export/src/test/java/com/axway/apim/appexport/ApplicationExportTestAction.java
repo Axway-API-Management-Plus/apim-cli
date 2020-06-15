@@ -1,5 +1,8 @@
 package com.axway.apim.appexport;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,12 +19,21 @@ public class ApplicationExportTestAction extends AbstractTestAction {
 	public void doExecute(TestContext context) {
 		
 		boolean useEnvironmentOnly	= false;
-		String ignoreAdminAccount	= "false";
+		boolean ignoreAdminAccount	= false;
 		String stage				= null;
-		String vhostToExport		= null;
+		String orgNameFilter		= null;
+		String stateFilter			= null;
 		
 		try {
 			stage 				= context.getVariable("stage");
+		} catch (CitrusRuntimeException ignore) {};
+		
+		try {
+			orgNameFilter 				= context.getVariable("orgNameFilter");
+		} catch (CitrusRuntimeException ignore) {};
+		
+		try {
+			stateFilter 				= context.getVariable("stateFilter");
 		} catch (CitrusRuntimeException ignore) {};
 		
 		int expectedReturnCode = 0;
@@ -34,30 +46,49 @@ public class ApplicationExportTestAction extends AbstractTestAction {
 		} catch (Exception ignore) {};
 		
 		try {
-			ignoreAdminAccount = context.getVariable("ignoreAdminAccount");
+			ignoreAdminAccount = Boolean.parseBoolean(context.getVariable("ignoreAdminAccount"));
 		} catch (Exception ignore) {};
 		
 		if(stage==null) {
 			stage = "NOT_SET";
 		}
-		if(vhostToExport==null) {
-			vhostToExport = "NOT_SET";
-		}
-		String[] args;
+
+		List<String> args = new ArrayList<String>();
 		if(useEnvironmentOnly) {
-			args = new String[] {  
-					"-n", context.replaceDynamicContentInString("${appName}"), "-s", stage};
+			args.add("-n");
+			args.add(context.replaceDynamicContentInString("${appName}"));
+			args.add("-s");
+			args.add(stage);
+			args.add("-f");
+			args.add("json");
 		} else {
-			args = new String[] { 
-					"-n", context.replaceDynamicContentInString("${appName}"),
-					"-t", context.replaceDynamicContentInString("${targetFolder}"), 
-					"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
-					"-p", context.replaceDynamicContentInString("${apiManagerPass}"), 
-					"-u", context.replaceDynamicContentInString("${apiManagerUser}"),
-					"-s", stage,  
-					"-ignoreAdminAccount", ignoreAdminAccount};
+			args.add("-n");
+			args.add(context.replaceDynamicContentInString("${appName}"));
+			args.add("-l");
+			args.add(context.replaceDynamicContentInString("${localFolder}"));
+			args.add("-h");
+			args.add(context.replaceDynamicContentInString("${apiManagerHost}"));
+			args.add("-p");
+			args.add(context.replaceDynamicContentInString("${apiManagerPass}"));
+			args.add("-u");
+			args.add(context.replaceDynamicContentInString("${apiManagerUser}"));
+			args.add("-s");
+			args.add(stage);
+			args.add("-f");
+			args.add("json");
+			if(orgNameFilter!=null) {
+				args.add("-orgName");
+				args.add(orgNameFilter);
+			}
+			if(stateFilter!=null) {
+				args.add("-state");
+				args.add(stateFilter);
+			}
+			if(ignoreAdminAccount) {
+				args.add("-ignoreAdminAccount");
+			}
 		}
-		int rc = ApplicationExportApp.export(args);
+		int rc = ApplicationExportApp.export(args.toArray(new String[args.size()]));
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
 		}

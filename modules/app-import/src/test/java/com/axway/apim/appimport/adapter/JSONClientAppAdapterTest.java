@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import org.testng.annotations.BeforeClass;
@@ -21,6 +22,7 @@ import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.OAuth;
+import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class JSONClientAppAdapterTest extends APIManagerMockBase {
@@ -29,6 +31,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 	
 	@BeforeClass
 	private void initTestIndicator() throws AppException, IOException {
+		new CommandParameters(new HashMap<String, String>());
 		setupMockData();
 	}
 
@@ -38,7 +41,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
 		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
-		List<ClientApplication> apps = adapter.getAllApplications();
+		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
 	}
 	
@@ -48,7 +51,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
 		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
-		List<ClientApplication> apps = adapter.getAllApplications();
+		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
 	}
 	
@@ -58,7 +61,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
 		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
-		List<ClientApplication> apps = adapter.getAllApplications();
+		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 2, "Expected 2 app returned from the Adapter");
 	}
 	
@@ -68,7 +71,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
 		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
-		List<ClientApplication> apps = adapter.getAllApplications();
+		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
 		ClientApplication app = apps.get(0);
 		assertEquals(app.getName(), "Complete application");

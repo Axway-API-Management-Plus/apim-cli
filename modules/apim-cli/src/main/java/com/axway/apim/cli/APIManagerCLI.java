@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
+import com.axway.apim.lib.errorHandling.ErrorState;
+
 /**
  * This class implements a pluggable CLI interface that allows to dynamically add new 
  * CLI services. A CLI-Service is for instance the management of Client-Apps or the KPS. Such module needs to implement 
@@ -99,21 +101,22 @@ public class APIManagerCLI {
 	}
 	
 	void printUsage() {
-		System.out.println("The Axway API-Management CLI supports the following commands.");
-		System.out.println("To get more information for each command, please run for instance: 'apim api'");
-		System.out.println("");
-		System.out.println("Available commands and options: ");
 		if(this.selectedServiceGroup==null) {
+			System.out.println("The Axway API-Management CLI supports the following commands.");
+			System.out.println("To get more information for each group, please run for instance: 'apim api'");
+			System.out.println("");
+			System.out.println("Available command groups: ");
 			Iterator<String> it = servicesMappedByGroup.keySet().iterator();
 			while(it.hasNext()) {
 				String key = it.next();
+				System.out.printf("%-20s %s \n", APIM_CLI_CDM + " "+ key, servicesMappedByGroup.get(key).get(0).getGroupDescription());
 				// We just take the first registered service for a group to retrieve the group description
-				System.out.println(APIM_CLI_CDM + " " + key + " - " + servicesMappedByGroup.get(key).get(0).getGroupDescription());
 			}
 		} else {
+			System.out.println("Available commands: ");
 			for(APIMCLIServiceProvider service : this.selectedServiceGroup) {
 				for(Method method : this.methodsMappedByService.get(service)) {
-					System.out.println(APIM_CLI_CDM + " " + service.getGroupId()  + " " + getMethodName(method) + " - " + method.getAnnotation(CLIServiceMethod.class).description());
+					System.out.printf("%-20s %s\n", APIM_CLI_CDM + " "+ service.getGroupId() + " " + getMethodName(method), method.getAnnotation(CLIServiceMethod.class).description());
 				}
 			}
 		}
@@ -124,17 +127,19 @@ public class APIManagerCLI {
 		System.out.println("API-Manager CLI: "+APIManagerCLI.class.getPackage().getImplementationVersion());
 		System.out.println("                                                                        ");
 		System.out.println("To report issues or get help, please visit: ");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote");
+		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli");
 		System.out.println("------------------------------------------------------------------------");
 		if(this.selectedMethod==null) {
 			this.printUsage();
 		} else {
-			System.out.println("Running module: " + this.selectedService.getName() + " "+this.selectedService.getVersion());
+			System.out.println("Module: " + this.selectedService.getName() + " ("+this.selectedService.getVersion()+")");
 			System.out.println("------------------------------------------------------------------------");
 			try {
 				this.selectedMethod.invoke (this.selectedService, (Object)args);
 			} catch (Exception e) {
-				e.printStackTrace();
+				if(!ErrorState.getInstance().isLogStackTrace()) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

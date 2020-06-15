@@ -6,10 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
+import com.axway.apim.appexport.impl.ApplicationExporter.ExportImpl;
 import com.axway.apim.appexport.lib.AppExportCLIOptions;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
@@ -19,7 +19,6 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.lib.utils.rest.Transaction;
 
 public class ApplicationExportApp implements APIMCLIServiceProvider {
 
@@ -29,7 +28,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 
 	@Override
 	public String getName() {
-		return "Export applications";
+		return "Application - E X P O R T / U T I L S";
 	}
 
 	@Override
@@ -46,39 +45,53 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	public String getGroupDescription() {
 		return "Manage your applications";
 	}
+	
+	@CLIServiceMethod(name = "get", description = "Get Applications from the API-Manager in different formats")
+	public static int export(String args[]) {
+		try {
+			AppExportParams params = new AppExportParams(new AppExportCLIOptions(args));
+			switch(params.getExportFormat()) {
+			case console:
+				return runExport(params, ExportImpl.CONSOLE_EXPORTER);
+			case json:
+				return runExport(params, ExportImpl.JSON_EXPORTER);
+			default:
+				return runExport(params, ExportImpl.CONSOLE_EXPORTER);
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
+	}
 
-	@CLIServiceMethod(name = "export", description = "Export applications from the API-Manager")
-	public static int export(String[] args) {
+	private static int runExport(AppExportParams params, ExportImpl exportImpl) {
 		try {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
-			Transaction.deleteInstance();
-			
-			new AppExportParams(new AppExportCLIOptions(args));
-			ClientAppAdapter appAdapter = ClientAppAdapter.create(APIManagerAdapter.getInstance());
-			ClientAppFilter filter = new ClientAppFilter.Builder()
-					.hasState(AppExportParams.getInstance().getAppState())
-					.hasName(AppExportParams.getInstance().getAppName())
-					.includeQuotas(true)
-					.includeCredentials(true)
-					.includeAPIAccess(true)
-					.includeImage(true)
-					.build();
-			List<ClientApplication> apps = appAdapter.getApplications(filter);
+
+			APIMgrAppsAdapter appAdapter = new APIMgrAppsAdapter();
+			ApplicationExporter exporter = ApplicationExporter.create(exportImpl, params);
+			List<ClientApplication> apps = appAdapter.getApplications(exporter.getFilter(), true);
 			if(apps.size()==0) {
-				LOG.info("No applications selected for export");
-			} else {
-				LOG.info("Selected " + apps.size() + " for export.");
-				ApplicationExporter exporter = ApplicationExporter.create(apps, AppExportParams.getInstance().getTargetFolder());
-				exporter.export();
-				if(exporter.hasError()) {
-					LOG.info("Please check the log. At least one error was recorded.");
+				if(LOG.isDebugEnabled()) {
+					LOG.info("No applications found using filter: " + exporter.getFilter());
 				} else {
-					LOG.info("Successfully exported " + apps.size() + " application(s).");
+					LOG.info("No applications found based on the given criteria.");
+				}
+			} else {
+				LOG.info("Found " + apps.size() + " application(s).");
+				
+				exporter.export(apps);
+				if(exporter.hasError()) {
+					LOG.info("");
+					LOG.error("Please check the log. At least one error was recorded.");
+				} else {
+					LOG.debug("Successfully exported " + apps.size() + " application(s).");
 				}
 			}
+			APIManagerAdapter.deleteInstance();
 		} catch (AppException ap) { 
 			ErrorState errorState = ErrorState.getInstance();
 			if(errorState.hasError()) {

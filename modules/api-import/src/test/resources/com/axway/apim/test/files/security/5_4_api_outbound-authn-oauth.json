@@ -1,0 +1,33 @@
+{
+   "name":"${apiName}",
+   "path":"${apiPath}",
+   "state":"${state}",
+   "version":"1.0.0",
+   "organization":"API Development ${orgNumber}",
+   "securityProfiles":[
+      {
+         "name":"_default",
+         "devices":[
+            {
+               "name":"Pass Through",
+               "type":"passThrough",
+               "order":0,
+               "properties":{
+                  "subjectIdFieldName":"Pass Through",
+                  "removeCredentialsOnSuccess":"true"
+               }
+            }
+         ]
+      }
+   ],
+   "authenticationProfiles":[
+      {
+         "name":"_default",
+         "parameters":{
+            "providerProfile":"Sample Client Authzcode App",
+            "ownerId":"TEST-SOMETHING"
+         },
+         "type":"oauth"
+      }
+   ]
+}

@@ -53,7 +53,7 @@ public class ValidateQueryStringTestIT extends TestNGCitrusTestRunner {
 		createVariable("expectedReturnCode", "54"); // Must fail!
 		swaggerImport.doExecute(context);*/
 		
-		echo("####### Register an API WITHOUT a query string enabled #######");
+		echo("####### Register an API WITHOUT Query string, but option is enabled in API-Manager #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/queryStringRouting/api_without_query_string.json");
 		createVariable("state", "published");

@@ -1,19 +1,25 @@
 package com.axway.apim;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.export.APIExportConfigAdapter;
+import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.api.API;
+import com.axway.apim.api.export.impl.APIResultHandler;
+import com.axway.apim.api.export.impl.APIResultHandler.APIListImpl;
+import com.axway.apim.api.export.lib.APIExportGetCLIOptions;
 import com.axway.apim.api.export.lib.APIExportCLIOptions;
 import com.axway.apim.api.export.lib.APIExportParams;
+import com.axway.apim.api.export.lib.APIDeleteCLIOptions;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.lib.utils.rest.Transaction;
 
 /**
  * 
@@ -24,23 +30,80 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	private static Logger LOG = LoggerFactory.getLogger(APIExportApp.class);
 
 	public static void main(String args[]) { 
-		int rc = export(args);
+		int rc = delete(args);
 		System.exit(rc);
 	}
 	
-	@CLIServiceMethod(description = "Export APIs from the API-Manager")
+	@CLIServiceMethod(name = "get", description = "Get APIs from the API-Manager in different formats")
 	public static int export(String args[]) {
+		try {
+			APIExportParams params = new APIExportParams(new APIExportGetCLIOptions(args));
+			switch(params.getExportFormat()) {
+			case console:
+				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
+			case json:
+				return runExport(params, APIListImpl.JSON_EXPORTER);
+			default:
+				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
+			}
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
+	}
+	
+	@CLIServiceMethod(name = "delete", description = "Delete the selected APIs from the API-Manager")
+	public static int delete(String args[]) {
+		try {
+			APIExportParams params = new APIExportParams(new APIDeleteCLIOptions(args));
+			return runExport(params, APIListImpl.API_DELETE_HANDLER);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
+	}
+	
+	@CLIServiceMethod(name = "unpublish", description = "Unpublish the selected APIs")
+	public static int unpublish(String args[]) {
+		try {
+			APIExportParams params = new APIExportParams(new APIDeleteCLIOptions(args));
+			return runExport(params, APIListImpl.API_UNPUBLISH_HANDLER);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
+	}
+	
+	private static int runExport(APIExportParams params, APIListImpl resultHandlerImpl) {
 		try {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstance();
-			Transaction.deleteInstance();
 
-			APIExportParams params = new APIExportParams(new APIExportCLIOptions(args));
+			APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
 			
-			APIExportConfigAdapter exportAdapter = new APIExportConfigAdapter(params.getValue("api-path"), params.getValue("localFolder"), params.getValue("vhost"));
-			exportAdapter.exportAPIs();
+			APIResultHandler resultHandler = APIResultHandler.create(resultHandlerImpl, params);
+			APIFilter filter = resultHandler.getFilter();
+
+			List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(filter, true);
+			if(apis.size()==0) {
+				if(LOG.isDebugEnabled()) {
+					LOG.info("No APIs found using filter: " + filter);
+				} else {
+					LOG.info("No APIs found based on the given criteria.");
+				}
+			} else {
+				LOG.info(apis.size() + " API(s) selected.");
+				resultHandler.execute(apis);
+				if(resultHandler.hasError()) {
+					LOG.info("");
+					LOG.error("Please check the log. At least one error was recorded.");
+				} else {
+					LOG.debug("Successfully selected " + apis.size() + " API(s).");
+				}
+			}
+			APIManagerAdapter.deleteInstance();
 			return 0;
 		} catch (AppException ap) {
 			ErrorState errorState = ErrorState.getInstance();
@@ -61,7 +124,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	
 	@Override
 	public String getName() {
-		return "API Export";
+		return "API - E X P O R T / U T I L S";
 	}
 
 	@Override

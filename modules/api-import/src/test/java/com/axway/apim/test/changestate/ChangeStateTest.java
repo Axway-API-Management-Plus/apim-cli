@@ -12,8 +12,8 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.ActualAPI;
-import com.axway.apim.apiimport.state.APIChangeState;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 

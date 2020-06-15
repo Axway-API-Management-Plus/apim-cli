@@ -12,7 +12,7 @@
     <moduleSet>
       <useAllReactorProjects>true</useAllReactorProjects>
       <includes>
-        <include>com.github.axway-api-management-plus.apim-cli:apimcli-core</include>
+        <include>com.github.axway-api-management-plus.apim-cli:apimcli-apim-adapter</include>
 		<include>com.github.axway-api-management-plus.apim-cli:apimcli-api-import</include>
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-api-export</include>
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-app-import</include>
@@ -40,7 +40,7 @@
               <directory>src/main/resources</directory>
               <outputDirectory>/lib</outputDirectory>
               <includes>
-                  <include>log4j.xml</include>
+                  <include>*.xml</include>
               </includes>
           </fileSet>
           <fileSet>

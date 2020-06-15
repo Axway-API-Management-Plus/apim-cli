@@ -15,4 +15,10 @@ public class AppImportParams extends CommandParameters {
 	public static synchronized AppImportParams getInstance() {
 		return (AppImportParams)CommandParameters.getInstance();
 	}
+	
+	@Override
+	public boolean ignoreCache() {
+		// For import action we ignore the cache in all cases!
+		return true;
+	}
 }

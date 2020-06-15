@@ -1,22 +1,15 @@
 package com.axway.apim.apiimport.actions;
 
-import java.util.List;
-import java.util.Vector;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.APIStatusManager;
+import com.axway.apim.api.API;
+import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
-import com.axway.apim.apiimport.actions.tasks.ManageClientApps;
-import com.axway.apim.apiimport.actions.tasks.ManageClientOrgs;
-import com.axway.apim.apiimport.actions.tasks.UpdateAPIImage;
-import com.axway.apim.apiimport.actions.tasks.UpdateAPIProxy;
-import com.axway.apim.apiimport.actions.tasks.UpdateAPIStatus;
-import com.axway.apim.apiimport.actions.tasks.UpdateQuotaConfiguration;
-import com.axway.apim.apiimport.state.APIChangeState;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.props.VhostPropertyHandler;
 
 /**
  * This class is used by the {@link APIImportManager#applyChanges(APIChangeState)} to update an existing API. 
@@ -30,36 +23,46 @@ public class UpdateExistingAPI {
 
 	public void execute(APIChangeState changes) throws AppException {
 		
-		List<String> allChanges = new Vector<String>();
-		allChanges.addAll(changes.getBreakingChanges());
-		allChanges.addAll(changes.getNonBreakingChanges());
+		API actualAPI = changes.getActualAPI();
+		
+		APIManagerAdapter apiManager = APIManagerAdapter.getInstance();
 		
 		try {
-		
-			VHostManager vhostManager = new VHostManager();
-	
-			new UpdateAPIProxy(changes.getDesiredAPI(), changes.getActualAPI()).execute(allChanges);
+			LOG.info("Update existing "+actualAPI.getState()+" API: '"+actualAPI.getName()+"' "+actualAPI.getVersion()+" (ID: "+actualAPI.getId()+")" );
+			// Copy all desired proxy changes into the actual API
+			APIChangeState.copyChangedProps(changes.getDesiredAPI(), changes.getActualAPI(), changes.getAllChanges());
 			
-			// If image is include, update it
-			if(changes.getNonBreakingChanges().contains("image")) {
-				new UpdateAPIImage(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+			// If a proxy update is required
+			if(changes.isProxyUpdateRequired()) {
+				// Update the proxy
+				apiManager.apiAdapter.updateAPIProxy(changes.getActualAPI());
+			}
+			
+			// If image an include, update it
+			if(changes.getDesiredAPI().getImage()!=null) {
+				apiManager.apiAdapter.updateAPIImage(changes.getActualAPI(), changes.getDesiredAPI().getImage());
 			}
 			
 			// This is special, as the status is not a property and requires some additional actions!
-			UpdateAPIStatus statusUpdate = new UpdateAPIStatus(changes.getDesiredAPI(), changes.getActualAPI());
+			APIStatusManager statusUpdate = new APIStatusManager();
 			if(changes.getNonBreakingChanges().contains("state")) {
-				statusUpdate.execute();
+				statusUpdate.update(changes.getActualAPI(), changes.getDesiredAPI().getState(), changes.getDesiredAPI().getVhost());
 			}
 			if(changes.getNonBreakingChanges().contains("retirementDate")) {
-				statusUpdate.updateRetirementDate(changes);
+				apiManager.apiAdapter.updateRetirementDate(changes.getActualAPI(), changes.getDesiredAPI().getRetirementDate());
 			}
 			
-			vhostManager.handleVHost(changes.getDesiredAPI(), changes.getActualAPI(), statusUpdate.isUpdateVHostRequired());
+			// This is required when an API has been set back to Unpublished
+			// In that case, the V-Host is reseted to null - But we still want to use the configured V-Host
+			if(statusUpdate.isUpdateVHostRequired()) {
+				apiManager.apiAdapter.updateAPIProxy(changes.getActualAPI());
+			}
 			
-			new UpdateQuotaConfiguration(changes.getDesiredAPI(), changes.getActualAPI()).execute();
+			new APIQuotaManager(changes.getDesiredAPI(), changes.getActualAPI()).execute();
 			new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute(false);
 			// Handle subscription to applications
 			new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI(), null).execute(false);
+			LOG.info("Successfully updated "+actualAPI.getState()+" API: '"+actualAPI.getName()+"' "+actualAPI.getVersion()+" (ID: "+actualAPI.getId()+")" );
 		} catch (Exception e) {
 			throw e;
 		} finally {

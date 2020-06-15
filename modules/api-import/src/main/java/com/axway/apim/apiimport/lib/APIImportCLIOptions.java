@@ -25,19 +25,14 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		option.setRequired(false);
 		option.setArgName("swagger_file.json");
 		options.addOption(option);
-		
-		option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
-				+ "Will be used to lookup stage specific configuration overrides (e.g.: api_config.preprod.json) and the stage config");
-		option.setArgName("preprod");
-		options.addOption(option);
 
 		option = new Option("c", "config", true, "This is the JSON-Formatted API-Config containing information how to expose the API");
 		option.setRequired(true);
 		option.setArgName("api_config.json");
 		options.addOption(option);
 		
-		option = new Option("iq", "ignoreQuotas", true, "Use this flag to ignore configured API quotas.");
-		option.setArgName("true/[false]");
+		option = new Option("ignoreQuotas", "Use this flag to ignore configured API quotas.");
+		option.setRequired(false);
 		options.addOption(option);
 		
 		option = new Option("clientOrgsMode", true, "Controls how configured Client-Organizations are treated. Defaults to add!");
@@ -54,7 +49,7 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		
 		option = new Option("allowOrgAdminsToPublish", true, "If set to false, OrgAdmins cannot replicate an API with desired state published. Defaults to true.");
 		option.setRequired(false);
-		option.setArgName("true");
+		option.setArgName("false");
 		internalOptions.addOption(option);
 		
 		option = new Option("replaceHostInSwagger", true, "Controls if you want to replace the host in your Swagger-File ");
@@ -62,9 +57,8 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		option.setArgName("true");
 		internalOptions.addOption(option);
 		
-		option = new Option("changeOrganization", true, "Set this flag to true to allow to change the organization of an existing API. Default is false.");
+		option = new Option("changeOrganization", "Set this flag to true to allow to change the organization of an existing API. Default is false.");
 		option.setRequired(false);
-		option.setArgName("true");
 		internalOptions.addOption(option);
 		
 		option = new Option("detailsExportFile", true, "Configure a filename, to get a Key=Value file containing information about the created API.");
@@ -77,17 +71,17 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);		
 		System.out.println("You may run one of the following examples:");
+		System.out.println("Using parameters provided in properties file stored in conf-folder:");
+		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config-api-definition.json -s api-env");
+		System.out.println();
+		System.out.println();
 		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme");
 		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme -s prod");
 		System.out.println(getBinaryName()+" api import -c samples/complex/complete-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme");
 		System.out.println();
-		System.out.println();
-		System.out.println("Using parameters provided in properties file stored in conf-folder:");
-		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config-api-definition.json -s api-env");
-		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/tree/develop/modules/swagger-promote-core/src/main/assembly/samples");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/wiki");
+		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/tree/develop/modules/api-import/assembly/samples");
+		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
 	}
 
 	@Override

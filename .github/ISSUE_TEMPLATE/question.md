@@ -1,13 +1,13 @@
 ---
 name: Question
-about: Ask a question concerning Swagger-Promote
+about: Ask a question concerning the CLI
 title: "[Help]"
 labels: help wanted
 assignees: cwiechmann
 
 ---
 
-**Swagger-Promote Version**
+**API-Manager CLI Version**
 
 
 **API-Manager and Service-Pack Version**

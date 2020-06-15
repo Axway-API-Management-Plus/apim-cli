@@ -1,13 +1,14 @@
 package com.axway.apim.appexport.impl;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.jackson.JSONViews;
+import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.jackson.AppExportSerializerModifier;
@@ -20,23 +21,27 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class JsonApplicationExporter extends ApplicationExporter {
 
-	public JsonApplicationExporter(List<ClientApplication> apps, String folderToExport) {
-		super(apps, folderToExport);
+	public JsonApplicationExporter(AppExportParams params) {
+		super(params);
 	}
 
 	@Override
-	public void export() throws AppException {
-		for(ClientApplication app : this.apps) {
+	public void export(List<ClientApplication> apps) throws AppException {
+		for(ClientApplication app : apps) {
 			saveApplicationLocally(new ExportApplication(app));
 		}
 	}
 	
 	private void saveApplicationLocally(ExportApplication app) throws AppException {
 		String folderName = getExportFolder(app);
-		File localFolder = new File(this.targetFolder +File.separator+ folderName);
+		String targetFolder = params.getLocalFolder();
+		File localFolder = new File(targetFolder +File.separator+ folderName);
 		LOG.info("Going to export applications into folder: " + localFolder);
 		if(localFolder.exists()) {
 			if(AppExportParams.getInstance().deleteLocalFolder()) {
@@ -58,10 +63,13 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new AppExportSerializerModifier(localFolder)));
 		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
+		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "apiId", "createdBy", "createdOn", "enabled"}));
+		mapper.setFilterProvider(filter);
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.writerWithView(JSONViews.APIAccessForExport.class).writeValue(new File(localFolder.getCanonicalPath() + "/"+app.getName()+".json"), app);
+			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/application-config.json"), app);
 		} catch (Exception e) {
 			throw new AppException("Can't write Application-Configuration file for application: '"+app.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
 		}
@@ -82,5 +90,43 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		appName = appName.replace(" ", "-");
 		return appName;
 	}
+	
+	public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
 
+		try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {
+			fileOuputStream.write(bFile);
+		} catch (IOException e) {
+			throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
+		}
+	}
+	
+	public static void storeCaCert(File localFolder, String certBlob, String filename) throws AppException {
+		if(certBlob==null) return;
+		try {
+			writeBytesToFile(certBlob.getBytes(), localFolder + "/" + filename);
+		} catch (AppException e) {
+			throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
+		}
+	}
+	
+	protected void removeApplicationDefaultQuota(ClientApplication app) {
+		if(app.getAppQuota()==null) return;
+		if(app.getAppQuota().getId().equals(APIManagerAdapter.APPLICATION_DEFAULT_QUOTA)) {
+			app.setAppQuota(null);
+		}
+	}
+
+	@Override
+	public ClientAppFilter getFilter() throws AppException {
+		return new ClientAppFilter.Builder()
+				.hasState(AppExportParams.getInstance().getAppState())
+				.hasName(AppExportParams.getInstance().getAppName())
+				.hasId(AppExportParams.getInstance().getAppId())
+				.hasOrganizationName(AppExportParams.getInstance().getOrgName())
+				.includeQuotas(true)
+				.includeCredentials(true)
+				.includeAPIAccess(true)
+				.includeImage(true)
+				.build();
+	}
 }

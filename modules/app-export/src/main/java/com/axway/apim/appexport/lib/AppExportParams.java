@@ -3,9 +3,10 @@ package com.axway.apim.appexport.lib;
 import com.axway.apim.lib.APIMCoreCLIOptions;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.EnvironmentProperties;
+import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class AppExportParams extends CommandParameters {
+public class AppExportParams extends StandardExportParams {
 
 	public AppExportParams(APIMCoreCLIOptions parser)
 			throws AppException {
@@ -16,11 +17,6 @@ public class AppExportParams extends CommandParameters {
 		return (AppExportParams)CommandParameters.getInstance();
 	}
 	
-	public boolean deleteLocalFolder() {
-		if(getValue("deleteFolder")==null) return false;
-		return Boolean.parseBoolean(getValue("deleteFolder"));
-	}
-	
 	public String getAppState() {
 		return getValue("state");
 	}
@@ -29,11 +25,15 @@ public class AppExportParams extends CommandParameters {
 		return getValue("name");
 	}
 	
+	public String getAppId() {
+		return getValue("id");
+	}
+	
 	public String getOrgName() {
 		return getValue("orgName");
 	}
 	
-	public String getTargetFolder() {
-		return getValue("targetFolder");
+	public String getLocalFolder() {
+		return (getValue("localFolder")==null) ? "." : getValue("localFolder");
 	}
 }

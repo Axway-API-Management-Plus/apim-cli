@@ -107,7 +107,7 @@ public class ReCreateAPIQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.messages", "25")
-			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "second")
+			//.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "second")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "60"));
 		
 		echo("####### Validate the application 1 SPECIFIC quota override is set for the API as before #######");
@@ -116,7 +116,7 @@ public class ReCreateAPIQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.messages", "600")
-			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "hour")
+			//.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "hour")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "4"));
 		
 		echo("####### Validate the application 2 returns the App-Default-Quota #######");
@@ -125,7 +125,7 @@ public class ReCreateAPIQuotaStaysTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.messages", "25")
-			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "second")
+			//.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "second")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "60"));
 	}
 }

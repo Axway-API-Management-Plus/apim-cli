@@ -24,9 +24,11 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -64,6 +66,7 @@ import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
+import com.axway.apim.api.model.OAuthClientProfile;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.QuotaRestriction;
@@ -213,16 +216,16 @@ public class APIImportConfigAdapter {
 			validateOrganization(apiConfig);
 			checkForAPIDefinitionInConfiguration(apiConfig);
 			addDefaultPassthroughSecurityProfile(apiConfig);
-			addDefaultCorsProfile(apiConfig);
 			addDefaultAuthenticationProfile(apiConfig);
-			addDefaultOutboundProfile(apiConfig);
-			addDefaultInboundProfile(apiConfig);
+			validateOutboundProfile(apiConfig);
+			validateInboundProfile(apiConfig);
 			APISpecification apiSpecification = APISpecificationFactory.getAPISpecification(getAPIDefinitionContent(), this.pathToAPIDefinition, ((DesiredAPI)apiConfig).getBackendBasepath());
-			apiConfig.setAPIDefinition(apiSpecification);
+			apiConfig.setApiDefinition(apiSpecification);
 			addImageContent(apiConfig);
 			validateCustomProperties(apiConfig);
 			validateDescription(apiConfig);
 			validateOutboundAuthN(apiConfig);
+			addDefaultCorsProfile(apiConfig);
 			validateHasQueryStringKey(apiConfig);
 			completeCaCerts(apiConfig);
 			addQuotaConfiguration(apiConfig);
@@ -235,22 +238,6 @@ public class APIImportConfigAdapter {
 			}
 			throw new AppException("Cannot validate/fulfill configuration file.", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
-	}
-	
-	/**
-	 * The purpose of this method is to translated the given Method-Names into internal 
-	 * operationId. These operationIds are created and then known, when the API has 
-	 * been inserted. 
-	 * Translating the methodNames to operationIds already during import is required for 
-	 * the comparison between the desired and actual API.
-	 * @param desiredAPI the configured desired API
-	 * @param actualAPI a potentially existing actual API
-	 * @return the desired API containing operationId in Inbound- and Outbound-Profiles
-	 * @throws AppException when something goes wrong
-	 */
-	public API completeDesiredAPI(API desiredAPI, API actualAPI) throws AppException {
-		if(actualAPI==null) return desiredAPI;
-		return desiredAPI;
 	}
 	
 	private void validateExposurePath(API apiConfig) throws AppException {
@@ -301,8 +288,8 @@ public class APIImportConfigAdapter {
 			apiConfig.setClientOrganizations(null); // Making sure, orgs are not considered as a changed property
 			return;
 		}
-		List<Organization> allOrgs =  APIManagerAdapter.getInstance().orgAdapter.getAllOrgs();
 		if(apiConfig.getClientOrganizations().contains(new Organization().setName("ALL"))) {
+			List<Organization> allOrgs =  APIManagerAdapter.getInstance().orgAdapter.getAllOrgs();
 			apiConfig.getClientOrganizations().clear();
 			apiConfig.getClientOrganizations().addAll(allOrgs);
 			((DesiredAPI)apiConfig).setRequestForAllOrgs(true);
@@ -315,16 +302,21 @@ public class APIImportConfigAdapter {
 			// And validate each configured organization really exists in the API-Manager
 			Iterator<Organization> it = apiConfig.getClientOrganizations().iterator();
 			String invalidClientOrgs = null;
+			List<Organization> foundOrgs = new ArrayList<Organization>();
 			while(it.hasNext()) {
 				Organization desiredOrg = it.next();
-				if(!allOrgs.contains(desiredOrg)) {
+				Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(desiredOrg.getName());
+				if(org==null) {
 					LOG.warn("Unknown organization with name: '" + desiredOrg.getName() + "' configured. Ignoring this organization.");
 					invalidClientOrgs = invalidClientOrgs==null ? desiredOrg.getName() : invalidClientOrgs + ", "+desiredOrg.getName();
 					APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_ORGANIZATIONS.name(), invalidClientOrgs);
 					it.remove();
 					continue;
 				}
+				it.remove();
+				foundOrgs.add(org);
 			}
+			apiConfig.getClientOrganizations().addAll(foundOrgs);
 		}
 	}
 	
@@ -382,6 +374,9 @@ public class APIImportConfigAdapter {
 				defaultCorsFound = true;
 				break;
 			}
+		}
+		if(apiConfig.getCorsProfiles().size()==1) { // Make this CORS-Profile default, even if it's not named default
+			apiConfig.getInboundProfiles().get("_default").setCorsProfile(apiConfig.getCorsProfiles().get(0).getName());
 		}
 		if(!defaultCorsFound) {
 			apiConfig.getCorsProfiles().add(CorsProfile.getDefaultCorsProfile());
@@ -707,19 +702,42 @@ public class APIImportConfigAdapter {
 		return null;
 	}
 	
-	private API addDefaultInboundProfile(API importApi) throws AppException {
-		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) return importApi;
+	private API validateInboundProfile(API importApi) throws AppException {
+		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) {
+			Map<String, InboundProfile> def = new HashMap<String, InboundProfile>();
+			def.put("_default", InboundProfile.getDefaultInboundProfile());
+			importApi.setInboundProfiles(def);
+			return importApi;
+		}
 		Iterator<String> it = importApi.getInboundProfiles().keySet().iterator();
+		// Check if a default inbound profile is given
+		boolean defaultProfileFound = false;
 		while(it.hasNext()) {
 			String profileName = it.next();
-			if(profileName.equals("_default")) return importApi; // Nothing to, there is a default profile
+			if(profileName.equals("_default")) { 
+				defaultProfileFound = true;
+				continue; // No need to check for the default profile
+			}
+			// Check the referenced profiles are valid
+			InboundProfile profile = importApi.getInboundProfiles().get(profileName);
+			if(profile.getCorsProfile()!=null && getCorsProfile(importApi, profile.getCorsProfile())==null) {
+				ErrorState.getInstance().setError("InboundProfile is referencing a unknown CorsProfile: '"+profile.getCorsProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID, false);
+				throw new AppException("Inbound profile is referencing a unknown CorsProfile: '"+profile.getCorsProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
+			}
+			if(profile.getSecurityProfile()!=null && getSecurityProfile(importApi, profile.getSecurityProfile())==null) {
+				ErrorState.getInstance().setError("InboundProfile is referencing a unknown SecurityProfile: '"+profile.getSecurityProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID, false);
+				throw new AppException("Inbound profile is referencing a unknown SecurityProfile: '"+profile.getSecurityProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
+			}
 		}
-		InboundProfile defaultProfile = new InboundProfile();
-		defaultProfile.setSecurityProfile("_default");
-		defaultProfile.setCorsProfile("_default");
-		defaultProfile.setMonitorAPI(true);
-		defaultProfile.setMonitorSubject("authentication.subject.id");
-		importApi.getInboundProfiles().put("_default", defaultProfile);
+		/// If not, create a PassThrough!
+		if(!defaultProfileFound) {
+			InboundProfile defaultProfile = new InboundProfile();
+			defaultProfile.setSecurityProfile("_default");
+			defaultProfile.setCorsProfile("_default");
+			defaultProfile.setMonitorAPI(true);
+			defaultProfile.setMonitorSubject("authentication.subject.id");
+			importApi.getInboundProfiles().put("_default", defaultProfile);
+		}
 		return importApi;
 	}
 	
@@ -783,35 +801,56 @@ public class APIImportConfigAdapter {
 		return importApi;
 	}
 	
-	private API addDefaultOutboundProfile(API importApi) throws AppException {
+	private API validateOutboundProfile(API importApi) throws AppException {
 		if(importApi.getOutboundProfiles()==null || importApi.getOutboundProfiles().size()==0) return importApi;
 		Iterator<String> it = importApi.getOutboundProfiles().keySet().iterator();
+		boolean defaultProfileFound = false;
 		while(it.hasNext()) {
 			String profileName = it.next();
+			OutboundProfile profile = importApi.getOutboundProfiles().get(profileName);
 			if(profileName.equals("_default")) {
+				defaultProfileFound = true;
 				// Validate the _default Outbound-Profile has an AuthN-Profile, otherwise we must add (See isseu #133)
-				OutboundProfile profile = importApi.getOutboundProfiles().get(profileName);
+				
 				if(profile.getAuthenticationProfile()==null) {
 					LOG.warn("Provided default outboundProfile doesn't contain AuthN-Profile - Setting it to default");
 					profile.setAuthenticationProfile("_default");
 				}
+				continue;
 			}
-			return importApi;
+			// Check the referenced profiles are valid
+			if(profile.getAuthenticationProfile()!=null && getAuthNProfile(importApi, profile.getAuthenticationProfile())==null) {
+				ErrorState.getInstance().setError("OutboundProfile is referencing a unknown AuthenticationProfile: '"+profile.getAuthenticationProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID, false);
+				throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '"+profile.getAuthenticationProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
+			}
 		}
-		OutboundProfile defaultProfile = new OutboundProfile();
-		defaultProfile.setAuthenticationProfile("_default");
-		defaultProfile.setRouteType("proxy");
-		importApi.getOutboundProfiles().put("_default", defaultProfile);
+		if(!defaultProfileFound) {
+			OutboundProfile defaultProfile = new OutboundProfile();
+			defaultProfile.setAuthenticationProfile("_default");
+			defaultProfile.setRouteType("proxy");
+			importApi.getOutboundProfiles().put("_default", defaultProfile);
+		}
 		return importApi;
 	}
 	
 	private void validateOutboundAuthN(API importApi) throws AppException {
 		// Request to use some specific Outbound-AuthN for this API
 		if(importApi.getAuthenticationProfiles()!=null && importApi.getAuthenticationProfiles().size()!=0) {
-			if(importApi.getAuthenticationProfiles().get(0).getType().equals(AuthType.ssl)) 
+			if(importApi.getAuthenticationProfiles().get(0).getType().equals(AuthType.ssl)) { 
 				handleOutboundSSLAuthN(importApi.getAuthenticationProfiles().get(0));
+			} else if(importApi.getAuthenticationProfiles().get(0).getType().equals(AuthType.oauth)) {
+				handleOutboundOAuthAuthN(importApi.getAuthenticationProfiles().get(0));
+			}
 		}
 		
+	}
+	
+	private void handleOutboundOAuthAuthN(AuthenticationProfile authnProfile) throws AppException {
+		if(!authnProfile.getType().equals(AuthType.oauth)) return;
+		String providerProfile = (String)authnProfile.getParameters().get("providerProfile");
+		if(providerProfile!=null && providerProfile.startsWith("<key")) return;
+		OAuthClientProfile clientProfile = APIManagerAdapter.getInstance().oauthClientAdapter.getOAuthClientProfile(providerProfile);
+		authnProfile.getParameters().put("providerProfile", clientProfile.getId());
 	}
 	
 	private void handleOutboundSSLAuthN(AuthenticationProfile authnProfile) throws AppException {
@@ -937,16 +976,13 @@ public class APIImportConfigAdapter {
 	}
 	
 	private void validateHasQueryStringKey(API importApi) throws AppException {
-		if(1==1) return;
+		if(importApi.getApiRoutingKey()==null) return; // Nothing to check
 		if(importApi instanceof DesiredTestOnlyAPI) return; // Do nothing when unit-testing
-		if(APIManagerAdapter.getApiManagerVersion().startsWith("7.5")) return; // QueryStringRouting isn't supported
-		if(APIManagerAdapter.getInstance().hasAdminAccount()) {
+		if(APIManagerAdapter.hasAdminAccount()) {
 			String apiRoutingKeyEnabled = APIManagerAdapter.getInstance().configAdapter.getApiManagerConfig("apiRoutingKeyEnabled");
-			if(apiRoutingKeyEnabled.equals("true")) {
-				if(importApi.getApiRoutingKey()==null) {
-					ErrorState.getInstance().setError("API-Manager configured for Query-String option, but API doesn' declare it.", ErrorCode.API_CONFIG_REQUIRES_QUERY_STRING, false);
-					throw new AppException("API-Manager configured for Query-String option, but API doesn' declare it.", ErrorCode.API_CONFIG_REQUIRES_QUERY_STRING);
-				}
+			if(!apiRoutingKeyEnabled.equals("true")) {
+				ErrorState.getInstance().setError("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED, false);
+				throw new AppException("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED);
 			}
 		} else {
 			LOG.debug("Can't check if QueryString for API is needed without Admin-Account.");
@@ -1025,6 +1061,31 @@ public class APIImportConfigAdapter {
 		return protocols.split(",");
 	}
 	
+	/*
+	 * Refactor the following three method a Generic one
+	 */
 	
+	private CorsProfile getCorsProfile(API api, String profileName) {
+		if(api.getCorsProfiles()==null || api.getCorsProfiles().size()==0) return null;
+		for(CorsProfile cors : api.getCorsProfiles()) {
+			if(profileName.equals(cors.getName())) return cors;
+		}
+		return null;
+	}
 	
+	private AuthenticationProfile getAuthNProfile(API api, String profileName) {
+		if(api.getAuthenticationProfiles()==null || api.getAuthenticationProfiles().size()==0) return null;
+		for(AuthenticationProfile profile : api.getAuthenticationProfiles()) {
+			if(profileName.equals(profile.getName())) return profile;
+		}
+		return null;
+	}
+	
+	private SecurityProfile getSecurityProfile(API api, String profileName) throws AppException {
+		if(api.getSecurityProfiles()==null || api.getSecurityProfiles().size()==0) return null;
+		for(SecurityProfile profile : api.getSecurityProfiles()) {
+			if(profileName.equals(profile.getName())) return profile;
+		}
+		return null;
+	}
 }

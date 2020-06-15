@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>axway-apim-cli</id>
+    <version>0.0.9-SNAPSHOT</version>
+    <packageSourceUrl>https://github.com/Axway-API-Management-Plus/apim-cli/tree/develop/tools/choco/axway-apim-cli</packageSourceUrl>
+    <owners>Christoph Wiechmann</owners>
+    <title>Axway API-Management CLI (Install)</title>
+    <authors>Christoph Wiechmann</authors>
+    <projectUrl>https://github.com/Axway-API-Management-Plus/apim-cli</projectUrl>
+    <iconUrl>https://github.com/Axway-API-Management-Plus/apim-cli/raw/develop/misc/images/api-manager-promote-icon.png</iconUrl>
+    <copyright>Axway</copyright>
+    <licenseUrl>https://github.com/Axway-API-Management-Plus/apim-cli/blob/develop/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <docsUrl>https://github.com/Axway-API-Management-Plus/apim-cli/wiki</docsUrl>
+    <bugTrackerUrl>https://github.com/Axway-API-Management-Plus/apim-cli/issues</bugTrackerUrl>
+    <tags>axway cli api devops apimanager</tags>
+    <summary>Axway API-Manager CLI</summary>
+    <description>Tool that simplifies your DevOps experience with the Axway API-Manager Version 7.x.</description>
+    <releaseNotes>https://github.com/Axway-API-Management-Plus/apim-cli/blob/develop/CHANGELOG.md</releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

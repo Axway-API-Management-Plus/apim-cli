@@ -1,5 +1,6 @@
 package com.axway.apim.api.export;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -52,10 +53,9 @@ public class ExportAPI {
 	
 	@JsonIgnore
 	public APISpecification getAPIDefinition() {
-		return this.actualAPIProxy.getAPIDefinition();
+		return this.actualAPIProxy.getApiDefinition();
 	}
 
-	
 	public Map<String, OutboundProfile> getOutboundProfiles() throws AppException {
 		if(this.actualAPIProxy.getOutboundProfiles()==null) return null;
 		if(this.actualAPIProxy.getOutboundProfiles().isEmpty()) return null;
@@ -84,7 +84,7 @@ public class ExportAPI {
 		return policy;
 	}
 
-	
+
 	public List<SecurityProfile> getSecurityProfiles() throws AppException {
 		if(this.actualAPIProxy.getSecurityProfiles().size()==1) {
 			if(this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().get(0).getType()==DeviceType.passThrough)
@@ -111,7 +111,7 @@ public class ExportAPI {
 		return this.actualAPIProxy.getSecurityProfiles();
 	}
 
-	
+
 	public List<AuthenticationProfile> getAuthenticationProfiles() {
 		if(this.actualAPIProxy.getAuthenticationProfiles().size()==1) {
 			if(this.actualAPIProxy.getAuthenticationProfiles().get(0).getType()==AuthType.none)
@@ -119,7 +119,7 @@ public class ExportAPI {
 		}
 		return this.actualAPIProxy.getAuthenticationProfiles();
 	}
-	
+
 	public Map<String, InboundProfile> getInboundProfiles() {
 		if(this.actualAPIProxy.getInboundProfiles()==null) return null;
 		if(this.actualAPIProxy.getInboundProfiles().isEmpty()) return null;
@@ -131,7 +131,7 @@ public class ExportAPI {
 		return this.actualAPIProxy.getInboundProfiles();
 	}
 
-	
+
 	public List<CorsProfile> getCorsProfiles() {
 		if(this.actualAPIProxy.getCorsProfiles()==null) return null;
 		if(this.actualAPIProxy.getCorsProfiles().isEmpty()) return null;
@@ -142,32 +142,33 @@ public class ExportAPI {
 		return this.actualAPIProxy.getCorsProfiles();
 	}
 
-	
+
 	public String getVhost() {
 		return this.actualAPIProxy.getVhost();
 	}
 
-	
+
 	public TagMap<String, String[]> getTags() {
 		if(this.actualAPIProxy.getTags()==null) return null;
 		if(this.actualAPIProxy.getTags().isEmpty()) return null;
 		return this.actualAPIProxy.getTags();
 	}
 
-	
+
 	public String getState() throws AppException {
 		return this.actualAPIProxy.getState();
 	}
 
-	
+
 	public String getVersion() {
 		return this.actualAPIProxy.getVersion();
 	}
 
-	
+
 	public String getSummary() {
 		return this.actualAPIProxy.getSummary();
 	}
+
 
 	public String getImage() {
 		if(this.actualAPIProxy.getImage()==null) return null;
@@ -181,10 +182,11 @@ public class ExportAPI {
 		return this.actualAPIProxy.getImage();
 	}
 
-	
+
 	public String getName() {
 		return this.actualAPIProxy.getName();
 	}
+	
 
 	public String getOrganization() {
 		return this.actualAPIProxy.getOrganization().getName();
@@ -201,37 +203,32 @@ public class ExportAPI {
 		return ((API)this.actualAPIProxy).getDeprecated();
 	}
 
-	
+
 	public Map<String, String> getCustomProperties() {
 		return this.actualAPIProxy.getCustomProperties();
 	}
 
-	
-	@JsonIgnore
-	public int getAPIType() {
-		return ((API)this.actualAPIProxy).getAPIType();
-	}
 
-	
 	public String getDescriptionType() {
 		if(this.actualAPIProxy.getDescriptionType().equals("original")) return null;
 		return this.actualAPIProxy.getDescriptionType();
 	}
 
-	
+
 	public String getDescriptionManual() {
 		return this.actualAPIProxy.getDescriptionManual();
 	}
 
-	
+
 	public String getDescriptionMarkdown() {
 		return this.actualAPIProxy.getDescriptionMarkdown();
 	}
 
-	
+
 	public String getDescriptionUrl() {
 		return this.actualAPIProxy.getDescriptionUrl();
 	}
+
 
 	public List<CaCert> getCaCerts() {
 		if(this.actualAPIProxy.getCaCerts()==null) return null;
@@ -239,53 +236,57 @@ public class ExportAPI {
 		return this.actualAPIProxy.getCaCerts();
 	}
 
-	
+
 	public APIQuota getApplicationQuota() {
 		return this.actualAPIProxy.getApplicationQuota();
 	}
 
-	
+
 	public APIQuota getSystemQuota() {
 		return this.actualAPIProxy.getSystemQuota();
 	}
 
-	
 	@JsonIgnore
 	public Map<String, ServiceProfile> getServiceProfiles() {
 		return this.actualAPIProxy.getServiceProfiles();
 	}
 
-	
-	public List<Organization> getClientOrganizations() throws AppException {
+	public List<String> getClientOrganizations() throws AppException {
 		if(!APIManagerAdapter.hasAdminAccount()) return null; 
 		if(this.actualAPIProxy.getClientOrganizations().size()==0) return null;
 		if(this.actualAPIProxy.getClientOrganizations().size()==1 && 
 				this.actualAPIProxy.getClientOrganizations().get(0).equals(getOrganization())) 
 			return null;
-		return this.actualAPIProxy.getClientOrganizations();
+		List<String> orgs = new ArrayList<String>();
+		for(Organization org : this.actualAPIProxy.getClientOrganizations()) {
+			orgs.add(org.getName());
+		}
+		return orgs;
 	}
 
-	
 	public List<ClientApplication> getApplications() {
 		if(this.actualAPIProxy.getApplications().size()==0) return null;
+		List<ClientApplication> exportApps = new ArrayList<ClientApplication>();
 		for(ClientApplication app : this.actualAPIProxy.getApplications()) {
-			app.setId(null); // Don't export the Application-ID
-			app.setOrganization(null); // Don't export the Application-ID
-			app.setAppQuota(null); // Swagger-Promote doesn't managed quotas per apps
-			app.setApiAccess(null); // Don't export API-Access
-			app.setState(null);
-			app.setCredentials(null);
+			ClientApplication exportApp = new ClientApplication();
+			exportApp.setEnabled(app.isEnabled());
+			exportApp.setName(app.getName());
+			exportApp.setOrganization(null);
+			exportApp.setCredentials(null);
+			exportApp.setApiAccess(null);
+			exportApps.add(exportApp);
 		}
-		return this.actualAPIProxy.getApplications();
+		return exportApps;
 	}
 
 	
+
 	@JsonProperty("apiDefinition")
 	public String getApiDefinitionImport() {
 		return this.getAPIDefinition().getApiSpecificationFile();
 	}
 	
-	@JsonIgnore
+
 	public String getBackendBasepath() {
 		return this.getServiceProfiles().get("_default").getBasePath();
 	}

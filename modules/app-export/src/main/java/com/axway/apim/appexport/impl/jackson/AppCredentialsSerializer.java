@@ -3,11 +3,9 @@ package com.axway.apim.appexport.impl.jackson;
 import java.io.File;
 import java.io.IOException;
 
-import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
-import com.axway.apim.api.model.apps.ExtClients;
 import com.axway.apim.api.model.apps.OAuth;
-import com.axway.apim.appexport.impl.ApplicationExporter;
+import com.axway.apim.appexport.impl.JsonApplicationExporter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -37,21 +35,13 @@ public class AppCredentialsSerializer extends StdSerializer<ClientAppCredential>
 		// Set everything to null we want to have exported
 		if(credential instanceof OAuth) {
 			try {
-				ApplicationExporter.storeCaCert(localFolder, ((OAuth)credential).getCert(), "app-oauth-cert.crt");
-				((OAuth)credential).setCert("app-oauth-cert.crt");
+				if(((OAuth)credential).getCert()!=null) {
+					JsonApplicationExporter.storeCaCert(localFolder, ((OAuth)credential).getCert(), "app-oauth-cert.crt");
+					((OAuth)credential).setCert("app-oauth-cert.crt");
+				}
 			} catch (AppException e) {
 				throw new IOException("Can't write certificate file", e);
 			}
-		}
-		if(credential.getId()!=null) {
-			if(credential instanceof OAuth) {
-				((OAuth)credential).setClientId(credential.getId());
-			} else if(credential instanceof ExtClients) {
-				((ExtClients)credential).setClientId(credential.getId());
-			} else if(credential instanceof APIKey) {
-				((APIKey)credential).setApiKey(credential.getId());
-			}
-			credential.setId(null);
 		}
 		defaultSerializer.serialize(credential, jgen, provider);
 	}
