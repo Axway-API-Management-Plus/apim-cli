@@ -56,10 +56,6 @@ public abstract class APIExportCLIOptions extends StandardExportCLIOptions {
 		option.setRequired(false);
 		option.setArgName("my/apis");
 		options.addOption(option);
-
-		option = new Option("df", "deleteFolder", true, "Controls if an existing local folder should be deleted. Defaults to false.");
-		option.setArgName("true");
-		options.addOption(option);
 	}
 
 	@Override

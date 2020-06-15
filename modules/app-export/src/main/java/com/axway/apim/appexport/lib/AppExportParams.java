@@ -17,11 +17,6 @@ public class AppExportParams extends StandardExportParams {
 		return (AppExportParams)CommandParameters.getInstance();
 	}
 	
-	public boolean deleteLocalFolder() {
-		if(getValue("deleteFolder")==null) return false;
-		return Boolean.parseBoolean(getValue("deleteFolder"));
-	}
-	
 	public String getAppState() {
 		return getValue("state");
 	}

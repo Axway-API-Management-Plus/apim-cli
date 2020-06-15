@@ -85,7 +85,8 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 				
 				exporter.export(apps);
 				if(exporter.hasError()) {
-					LOG.info("Please check the log. At least one error was recorded.");
+					LOG.info("");
+					LOG.error("Please check the log. At least one error was recorded.");
 				} else {
 					LOG.debug("Successfully exported " + apps.size() + " application(s).");
 				}

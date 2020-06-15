@@ -36,8 +36,8 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		option.setArgName("api_config.json");
 		options.addOption(option);
 		
-		option = new Option("iq", "ignoreQuotas", true, "Use this flag to ignore configured API quotas.");
-		option.setArgName("true/[false]");
+		option = new Option("ignoreQuotas", "Use this flag to ignore configured API quotas.");
+		option.setRequired(false);
 		options.addOption(option);
 		
 		option = new Option("clientOrgsMode", true, "Controls how configured Client-Organizations are treated. Defaults to add!");
@@ -52,9 +52,8 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		option.setArgName("ignore|replace|add");
 		options.addOption(option);
 		
-		option = new Option("allowOrgAdminsToPublish", true, "If set to false, OrgAdmins cannot replicate an API with desired state published. Defaults to true.");
+		option = new Option("allowOrgAdminsToPublish", "If set to false, OrgAdmins cannot replicate an API with desired state published. Defaults to true.");
 		option.setRequired(false);
-		option.setArgName("true");
 		internalOptions.addOption(option);
 		
 		option = new Option("replaceHostInSwagger", true, "Controls if you want to replace the host in your Swagger-File ");
@@ -62,9 +61,8 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		option.setArgName("true");
 		internalOptions.addOption(option);
 		
-		option = new Option("changeOrganization", true, "Set this flag to true to allow to change the organization of an existing API. Default is false.");
+		option = new Option("changeOrganization", "Set this flag to true to allow to change the organization of an existing API. Default is false.");
 		option.setRequired(false);
-		option.setArgName("true");
 		internalOptions.addOption(option);
 		
 		option = new Option("detailsExportFile", true, "Configure a filename, to get a Key=Value file containing information about the created API.");

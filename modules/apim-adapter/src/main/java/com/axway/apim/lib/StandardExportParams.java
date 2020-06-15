@@ -45,4 +45,10 @@ public class StandardExportParams extends CommandParameters {
 			return exportFormat.console;
 		}
 	}
+	
+	public boolean deleteLocalFolder() {
+		if(hasOption("deleteFolder")) return true;
+		if(getValue("deleteFolder")==null) return false;
+		return Boolean.parseBoolean(getValue("deleteFolder"));
+	}
 }
