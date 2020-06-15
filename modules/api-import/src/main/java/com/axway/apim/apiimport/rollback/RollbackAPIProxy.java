@@ -23,7 +23,7 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
 		try {
 			if(rollbackAPI.getId()!=null) { // We already have an ID to the FE-API can delete it directly
 				LOG.info("Rollback FE-API: '"+this.rollbackAPI.getName()+"' (ID: '"+this.rollbackAPI.getId()+"' / State: '"+this.rollbackAPI.getState()+"')");
-				if(rollbackAPI.getState()!=null && rollbackAPI.getState().equals(API.STATE_PUBLISHED)) {
+				if(rollbackAPI.getId()!=null) {
 					new APIStatusManager().update(rollbackAPI, API.STATE_UNPUBLISHED, true);
 				}
 				APIManagerAdapter.getInstance().apiAdapter.deleteAPIProxy(this.rollbackAPI);

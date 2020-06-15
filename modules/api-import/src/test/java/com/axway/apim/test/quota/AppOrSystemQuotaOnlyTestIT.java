@@ -51,6 +51,7 @@ public class AppOrSystemQuotaOnlyTestIT extends TestNGCitrusTestDesigner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+			echo("####### ############ Sleep 5 seconds ##################### #######");
 			Thread.sleep(5000); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
 		}
 		echo("####### Check System-Quotas have been setup as configured #######");
@@ -78,6 +79,10 @@ public class AppOrSystemQuotaOnlyTestIT extends TestNGCitrusTestDesigner {
 		createVariable("applicationPeriod", "day");
 		action(swaggerImport);
 		
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+			echo("####### ############ Sleep 5 seconds ##################### #######");
+			Thread.sleep(5000); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
+		}
 		echo("####### Check Application-Quotas have been setup as configured #######");
 		http().client("apiManager")
 			.send()

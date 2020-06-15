@@ -896,8 +896,8 @@ public class APIManagerAPIAdapter {
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
-				LOG.error("Error granting access API. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
-				throw new AppException("Error granting access API. Received Status-Code: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+				LOG.error("Error granting access to API: "+api.getName()+" (ID: "+api.getId()+"). Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
+				throw new AppException("Error granting API access. Received Status-Code: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			// Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
 			if(api.getClientOrganizations()==null) api.setClientOrganizations(new ArrayList<Organization>());
