@@ -63,7 +63,7 @@ public class APIStatusManager {
 	}
 	
 	public void update(API api, String desiredState, boolean enforceBreakingChange) throws AppException {
-		if(api.getActualState().equals(desiredState)) {
+		if(desiredState.equals(api.getState())) {
 			LOG.debug("Desired and actual status equal. No need to update status!");
 			return;
 		}
@@ -72,33 +72,33 @@ public class APIStatusManager {
 		update(api, actualApi, enforceBreakingChange);
 	}
 	
-	public void update(API desiredState, API actualState) throws AppException {
+	public void update(API desiredState, API apiToUpdate) throws AppException {
 		if(CommandParameters.getInstance().isEnforceBreakingChange()) {
-			update(desiredState, actualState, true);
+			update(desiredState, apiToUpdate, true);
 		} else {
-			update(desiredState, actualState, false);
+			update(desiredState, apiToUpdate, false);
 		}
 	}
 	
 	
-	public void update(API desiredState, API actualState, boolean enforceBreakingChange) throws AppException {
-		if(desiredState.getState().equals(actualState.getState())) {
+	public void update(API desiredState, API apiToUpdate, boolean enforceBreakingChange) throws AppException {
+		if(desiredState.getState().equals(apiToUpdate.getState())) {
 			LOG.debug("Desired and actual status equal. No need to update status!");
 			return;
 		}
-		LOG.debug("Updating API-Status from: '" + actualState.getState() + "' to '" + desiredState.getState() + "'");
+		LOG.debug("Updating API-Status from: '" + apiToUpdate.getState() + "' to '" + desiredState.getState() + "'");
 		if(!enforceBreakingChange) { 
-			if(StatusChangeRequiresEnforce.getEnum(actualState.getState())!=null && 
-					StatusChangeRequiresEnforce.valueOf(actualState.getState()).enforceRequired.contains(desiredState.getState())) {
-				ErrorState.getInstance().setError("Status change from actual status: '"+actualState.getState()+"' to desired status: '"+desiredState.getState()+"' "
+			if(StatusChangeRequiresEnforce.getEnum(apiToUpdate.getState())!=null && 
+					StatusChangeRequiresEnforce.valueOf(apiToUpdate.getState()).enforceRequired.contains(desiredState.getState())) {
+				ErrorState.getInstance().setError("Status change from actual status: '"+apiToUpdate.getState()+"' to desired status: '"+desiredState.getState()+"' "
 						+ "is breaking. Enforce change with option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED, false);
-				throw new AppException("Status change from actual status: '"+actualState.getState()+"' to desired status: '"+desiredState.getState()+"' "
+				throw new AppException("Status change from actual status: '"+apiToUpdate.getState()+"' to desired status: '"+desiredState.getState()+"' "
 						+ "is breaking. Enforce change with option: -f true", ErrorCode.BREAKING_CHANGE_DETECTED);
 			}
 		}
 		
 		try {
-			String[] possibleStatus = StatusChangeMap.valueOf(actualState.getState()).possibleStates;
+			String[] possibleStatus = StatusChangeMap.valueOf(apiToUpdate.getState()).possibleStates;
 			String intermediateState = null;
 			boolean statusMovePossible = false;
 			for(String status : possibleStatus) {
@@ -124,41 +124,40 @@ public class APIStatusManager {
 					// In case, we can't process directly, we have to perform an intermediate state change
 					API desiredIntermediate = new APIBaseDefinition();
 					desiredIntermediate.setState(intermediateState);
-					desiredIntermediate.setId(actualState.getId());
-					new APIStatusManager().update(desiredIntermediate, actualState, enforceBreakingChange);
-					if(desiredState.getState().equals(actualState.getState())) return;
+					desiredIntermediate.setId(apiToUpdate.getId());
+					new APIStatusManager().update(desiredIntermediate, apiToUpdate, enforceBreakingChange);
+					if(desiredState.getState().equals(apiToUpdate.getState())) return;
 				}
 			} else {
-				LOG.error("The status change from: " + actualState.getState() + " to " + desiredState.getState() + " is not possible!");
-				throw new AppException("The status change from: '" + actualState.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS);
+				LOG.error("The status change from: " + apiToUpdate.getState() + " to " + desiredState.getState() + " is not possible!");
+				throw new AppException("The status change from: '" + apiToUpdate.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS);
 			}
+			apiToUpdate.setState(desiredState.getState());
 			if(desiredState.getState().equals(API.STATE_DELETED)) {
 				// If an API in state unpublished or pending, also an orgAdmin can delete it
 				//boolean useAdmin = (actualState.getState().equals(API.STATE_UNPUBLISHED) || actualState.getState().equals(API.STATE_PENDING)) ? false : true; 
-				apimAdapter.apiAdapter.deleteAPIProxy(desiredState);
+				apimAdapter.apiAdapter.deleteAPIProxy(apiToUpdate);
 				// Additionally we need to delete the BE-API
-				apimAdapter.apiAdapter.deleteBackendAPI(desiredState);
+				apimAdapter.apiAdapter.deleteBackendAPI(apiToUpdate);
 			} else {
-				apimAdapter.apiAdapter.updateAPIStatus(desiredState);
+				apimAdapter.apiAdapter.updateAPIStatus(apiToUpdate, desiredState.getState(), desiredState.getVhost());
 				if (desiredState.getVhost()!=null && desiredState.getState().equals(API.STATE_UNPUBLISHED)) { 
 					this.updateVHostRequired = true; // Flag to control update of the VHost
 				}
 				
 			} 
 			// Take over the status, as it has been updated now
-			actualState.setState(desiredState.getState());
-			// This actualState is used by APIProxyUpdate to send the real actual state!
-			actualState.setActualState(desiredState.getState());
+			apiToUpdate.setState(desiredState.getState());
 			// When deprecation or undeprecation is requested, we have to set the actual API accordingly!
 			if(desiredState.getState().equals("undeprecated")) {
-				actualState.setDeprecated("false");
-				actualState.setState(API.STATE_PUBLISHED);
+				apiToUpdate.setDeprecated("false");
+				apiToUpdate.setState(API.STATE_PUBLISHED);
 			} else if (desiredState.getState().equals("deprecated")) {
-				actualState.setState(API.STATE_PUBLISHED);
-				actualState.setDeprecated("true");
+				apiToUpdate.setState(API.STATE_PUBLISHED);
+				apiToUpdate.setDeprecated("true");
 			}
 		} catch (Exception e) {
-			throw new AppException("The status change from: '" + actualState.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS, e);
+			throw new AppException("The status change from: '" + apiToUpdate.getState() + "' to '" + desiredState.getState() + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS, e);
 		}
 	}
 

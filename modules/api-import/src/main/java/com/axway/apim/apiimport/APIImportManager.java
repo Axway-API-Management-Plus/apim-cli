@@ -44,13 +44,12 @@ public class APIImportManager {
 		// No existing API found (means: No match for APIPath), creating a complete new
 		if(changeState.getActualAPI()==null) {
 			// --> CreateNewAPI
-			LOG.info("Strategy: No existing API found, creating new!");
+			LOG.info("No existing API found, creating new!");
 			CreateNewAPI createAPI = new CreateNewAPI();
 			createAPI.execute(changeState, false);
 		// Otherwise an existing API exists
 		} else {
-			changeState.copyChangedProps(); // From this point the Actual API contains desired changes!
-			LOG.info("Strategy: Going to update existing API: " + changeState.getActualAPI().getName() +" (Version: "+ changeState.getActualAPI().getVersion() + ")");
+			LOG.info("Update existing API: " + changeState.getActualAPI().getName() +" Version: "+ changeState.getActualAPI().getVersion() + " ("+changeState.getActualAPI().getId()+")");
 			if(!changeState.hasAnyChanges()) {
 				APIPropertiesExport.getInstance().setProperty("feApiId", changeState.getActualAPI().getId());
 				LOG.debug("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
@@ -67,13 +66,16 @@ public class APIImportManager {
 			}
 			
 			if(changeState.isUpdateExistingAPI()) { // All changes can be applied to the existing API in current state
-				LOG.info("Strategy: Update existing API, as all changes can be applied in current state.");
+				LOG.info("Update API Strategy: All changes can be applied in current state.");
+				LOG.info("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
+						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase());
 				UpdateExistingAPI updateAPI = new UpdateExistingAPI();
 				updateAPI.execute(changeState);
 				return;
 			} else { // We have changes, that require a re-creation of the API
-				LOG.info("Strategy: Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
-						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase()+" API by recreating it!");
+				LOG.info("Update API Strategy: Re-Create API as changes can't be applied to existing API. ");
+				LOG.info("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
+						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase());
 				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
 				recreate.execute(changeState);
 			}

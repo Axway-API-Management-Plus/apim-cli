@@ -33,7 +33,7 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 		variable("apiPath", "/app-subscription-${apiNumber}");
 		variable("apiName", "App Subscription API-${apiNumber}");
 		// ############## Creating Test-Application 1 #################
-		createVariable("app1Name", "Consuming Test App 1 ${orgNumber}");
+		createVariable("app1Name", "Test-SubApp 1 ${apiNumber}");
 		http(builder -> builder.client("apiManager").send().post("/applications").header("Content-Type", "application/json")
 			.payload("{\"name\":\"${app1Name}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
 
@@ -51,11 +51,11 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 			.messageType(MessageType.JSON)
 			.extractFromPayload("$.id", "consumingTestApp1ApiKey"));
 		
-		echo("####### Added an API-Key: '${consumingTestApp1ApiKey}' to Test-Application 1 #######");
+		echo("####### Generated API-Key: '${consumingTestApp1ApiKey}' for Test-Application 1: '${consumingTestApp1Name}' with id: '${consumingTestApp1Id}' #######");
 		
 		// ############## Creating Test-Application 2 #################
 		createVariable("extClientId", RandomNumberFunction.getRandomNumber(15, true));
-		createVariable("app2Name", "Consuming Test App 2 ${orgNumber}");
+		createVariable("app2Name", "Test-SubApp 2 ${apiNumber}");
 		http(builder -> builder.client("apiManager").send().post("/applications").header("Content-Type", "application/json")
 			.payload("{\"name\":\"${app2Name}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
 
@@ -71,10 +71,10 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.CREATED).messageType(MessageType.JSON)
 			.extractFromPayload("$.id", "consumingTestApp2ClientId"));
 		
-		echo("####### Added an Ext-ClientID: '${extClientId}' to Test-Application 2 #######");
+		echo("####### Added an Ext-ClientID: '${extClientId}' to Test-Application 2: '${consumingTestApp2Name}' with id: '${consumingTestApp2Id}' #######");
 		
 		// ############## Creating Test-Application 3 #################
-		createVariable("app3Name", "Consuming Test App 3 ${orgNumber}");
+		createVariable("app3Name", "Test-SubApp 3 ${apiNumber}");
 		http(builder -> builder.client("apiManager").send().post("/applications").header("Content-Type", "application/json")
 			.payload("{\"name\":\"${app3Name}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
 
@@ -82,7 +82,7 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 			.extractFromPayload("$.id", "consumingTestApp3Id")
 			.extractFromPayload("$.name", "consumingTestApp3Name"));
 		
-		echo("####### Created Test-Application 3: '${consumingTestApp3Name}' with id: '${consumingTestApp3Id}' #######");
+		echo("####### Created Test-Application 3: '${consumingTestApp3Name}' with id: '${consumingTestApp3Id}' withouth App-Credentials #######");
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		

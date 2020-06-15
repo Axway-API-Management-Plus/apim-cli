@@ -87,8 +87,6 @@ public class APIImportApp implements APIMCLIServiceProvider {
 					.useFilter(filters)
 					.build();
 			API actualAPI = apimAdapter.apiAdapter.getAPI(filter, true);
-			// Based on the actual API - fulfill/complete some elements in the desired API
-			configAdapter.completeDesiredAPI(desiredAPI, actualAPI);
 			APIChangeState changeActions = new APIChangeState(actualAPI, desiredAPI);
 			new APIImportManager().applyChanges(changeActions);
 			APIPropertiesExport.getInstance().store();

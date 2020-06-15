@@ -25,15 +25,18 @@ public class UpdateExistingAPI {
 		APIManagerAdapter apiManager = APIManagerAdapter.getInstance();
 		
 		try {
-			changes.copyChangedProps();
+			// Copy all desired proxy changes into the actual API
+			APIChangeState.copyChangedProps(changes.getDesiredAPI(), changes.getActualAPI(), changes.getAllChanges());
 			
+			// If a proxy update is required
 			if(changes.isProxyUpdateRequired()) {
+				// Update the proxy
 				apiManager.apiAdapter.updateAPIProxy(changes.getActualAPI());
 			}
 			
-			// If image is include, update it
-			if(changes.getNonBreakingChanges().contains("image")) {
-				apiManager.apiAdapter.updateAPIImage(changes.getActualAPI());
+			// If image an include, update it
+			if(changes.getDesiredAPI().getImage()!=null) {
+				apiManager.apiAdapter.updateAPIImage(changes.getActualAPI(), changes.getDesiredAPI().getImage());
 			}
 			
 			// This is special, as the status is not a property and requires some additional actions!
@@ -42,7 +45,7 @@ public class UpdateExistingAPI {
 				statusUpdate.update(changes.getDesiredAPI(), changes.getActualAPI());
 			}
 			if(changes.getNonBreakingChanges().contains("retirementDate")) {
-				apiManager.apiAdapter.updateRetirementDate(changes.getDesiredAPI());
+				apiManager.apiAdapter.updateRetirementDate(changes.getActualAPI(), changes.getDesiredAPI().getRetirementDate());
 			}
 			
 			// This is required when an API has been set back to Unpublished
