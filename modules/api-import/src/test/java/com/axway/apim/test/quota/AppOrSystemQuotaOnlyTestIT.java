@@ -67,7 +67,7 @@ public class AppOrSystemQuotaOnlyTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.restrictions.[?(@.api=='${apiId}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${apiId}')].method", "*")
 			.validate("$.restrictions.[?(@.api=='${apiId}')].config.messages", "345")
-			.validate("$.restrictions.[?(@.api=='${apiId}')].config.period", "hour")
+			//.validate("$.restrictions.[?(@.api=='${apiId}')].config.period", "hour")
 			.validate("$.restrictions.[?(@.api=='${apiId}')].config.per", "5");
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with Appliction-Quota only #######");		

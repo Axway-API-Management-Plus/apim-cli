@@ -10,9 +10,10 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.impl.APIResultHandler;
 import com.axway.apim.api.export.impl.APIResultHandler.APIListImpl;
-import com.axway.apim.api.export.lib.APIExportAsFileCLIOptions;
+import com.axway.apim.api.export.lib.APIExportGetCLIOptions;
+import com.axway.apim.api.export.lib.APIExportCLIOptions;
 import com.axway.apim.api.export.lib.APIExportParams;
-import com.axway.apim.api.export.lib.APIListCLIOptions;
+import com.axway.apim.api.export.lib.APIDeleteCLIOptions;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -33,22 +34,18 @@ public class APIExportApp implements APIMCLIServiceProvider {
 		System.exit(rc);
 	}
 	
-	@CLIServiceMethod(name = "export", description = "Export APIs from the API-Manager")
+	@CLIServiceMethod(name = "get", description = "Get APIs from the API-Manager in different formats")
 	public static int export(String args[]) {
 		try {
-			APIExportParams params = new APIExportParams(new APIExportAsFileCLIOptions(args));
-			return runExport(params, APIListImpl.JSON_EXPORTER);
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
-		}
-	}
-	
-	@CLIServiceMethod(name = "list", description = "List APIs from the API-Manager")
-	public static int list(String args[]) {
-		try {
-			APIExportParams params = new APIExportParams(new APIListCLIOptions(args));
-			return runExport(params, APIListImpl.CONSOLE_EXPORTER);
+			APIExportParams params = new APIExportParams(new APIExportGetCLIOptions(args));
+			switch(params.getExportFormat()) {
+			case console:
+				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
+			case json:
+				return runExport(params, APIListImpl.JSON_EXPORTER);
+			default:
+				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
+			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
@@ -58,7 +55,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "delete", description = "Delete the selected APIs from the API-Manager")
 	public static int delete(String args[]) {
 		try {
-			APIExportParams params = new APIExportParams(new APIListCLIOptions(args));
+			APIExportParams params = new APIExportParams(new APIDeleteCLIOptions(args));
 			return runExport(params, APIListImpl.API_DELETE_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -69,7 +66,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "unpublish", description = "Unpublish the selected APIs")
 	public static int unpublish(String args[]) {
 		try {
-			APIExportParams params = new APIExportParams(new APIListCLIOptions(args));
+			APIExportParams params = new APIExportParams(new APIDeleteCLIOptions(args));
 			return runExport(params, APIListImpl.API_UNPUBLISH_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -100,7 +97,8 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				LOG.info(apis.size() + " API(s) selected.");
 				resultHandler.execute(apis);
 				if(resultHandler.hasError()) {
-					LOG.info("Please check the log. At least one error was recorded.");
+					LOG.info("");
+					LOG.error("Please check the log. At least one error was recorded.");
 				} else {
 					LOG.debug("Successfully selected " + apis.size() + " API(s).");
 				}

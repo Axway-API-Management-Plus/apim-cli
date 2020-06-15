@@ -33,8 +33,13 @@ public abstract class APIMCoreCLIOptions {
 	String[] args;
 
 	public APIMCoreCLIOptions(String[] args) {
+		Option option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
+				+ "Is used to lookup the stage configuration file.");
+		option.setArgName("preprod");
+		options.addOption(option);
+		
 		// Define core command line parameters!
-		Option option = new  Option("h", "help", false, "Print the help");
+		option = new  Option("h", "help", false, "Print the help");
 		option.setRequired(false);
 		options.addOption(option);
 		
@@ -64,9 +69,12 @@ public abstract class APIMCoreCLIOptions {
 		option.setArgName("changeme");
 		options.addOption(option);
 		
-		option = new Option("f", "force", true, "Optional flag used by different modules to enforce actions. For instance import breaking change or delete an API.");
-		option.setArgName("true/[false]");
+		option = new Option("force", "Optional flag used by different modules to enforce actions. For instance import breaking change or delete API(s).");
 		options.addOption(option);
+		
+		// Added for backwards compatibility
+		option = new Option("f", true, "Optional flag used by different modules to enforce actions. For instance import breaking change or delete API(s).");
+		internalOptions.addOption(option);
 		
 		option = new Option("apimCLIHome", true, "The absolute path to the CLI home directory containing for instance your conf folder.\n"
 				+ "You may also set the environment variable: '"+CommandParameters.APIM_CLI_HOME+"'");
@@ -75,7 +83,7 @@ public abstract class APIMCoreCLIOptions {
 		options.addOption(option);
 		
 		option = new Option("clearCache", true, "Clear the cache previously created, which will force the CLI to get fresh data from the API-Manager.\n"
-				+ "Exmaples: 'ALL', '*application*', 'applicationsQuotaCache,*api*'");
+				+ "Examples: 'ALL', '*application*', 'applicationsQuotaCache,*api*'");
 		option.setRequired(false);
 		option.setArgName("ALL");
 		options.addOption(option);
@@ -85,9 +93,8 @@ public abstract class APIMCoreCLIOptions {
 		option.setArgName("true");
 		internalOptions.addOption(option);
 		
-		option = new Option("ignoreAdminAccount", true, "If set, the tool wont load the env.properties. This is used for testing only.");
+		option = new Option("ignoreAdminAccount", "If set, the tool wont load the env.properties. This is used for testing only.");
 		option.setRequired(false);
-		option.setArgName("true");
 		internalOptions.addOption(option);
 		
 		option = new Option("returnCodeMapping", true, "Optionally maps given return codes into a desired return code. Format: 10:0, 12:0");
@@ -95,9 +102,8 @@ public abstract class APIMCoreCLIOptions {
 		option.setArgName("true");
 		internalOptions.addOption(option);
 		
-		option = new Option("ignoreCache", true, "The cache for REST-API calls isn't used.");
+		option = new Option("ignoreCache", "The cache for REST-API calls isn't used.");
 		option.setRequired(false);
-		option.setArgName("true");
 		internalOptions.addOption(option);
 
 		this.args = args;

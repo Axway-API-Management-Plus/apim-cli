@@ -28,6 +28,8 @@ public class CreateNewAPI {
 	public void execute(APIChangeState changes, boolean reCreation) throws AppException {
 
 		API createdAPI = null;
+		API desiredAPI = changes.getDesiredAPI();
+		API actualAPI  = changes.getActualAPI();
 		
 		APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
 		//APIManagerQuotaAdapter quotaAdapter = APIManagerAdapter.getInstance().quotaAdapter;
@@ -35,56 +37,56 @@ public class CreateNewAPI {
 		//Transaction context = Transaction.getInstance();
 		RollbackHandler rollback = RollbackHandler.getInstance();
 
-		API createdBEAPI = apiAdapter.importBackendAPI(changes.getDesiredAPI());
+		API createdBEAPI = apiAdapter.importBackendAPI(desiredAPI);
 		rollback.addRollbackAction(new RollbackBackendAPI(createdBEAPI));
-
+		LOG.info("Create "+desiredAPI.getState()+" API: '"+desiredAPI.getName()+"' "+desiredAPI.getVersion()+" based on "+desiredAPI.getApiDefinition().getAPIDefinitionType().getNiceName() + " specification.");
 		try {
-			changes.getDesiredAPI().setApiId(createdBEAPI.getApiId());
-			createdAPI = apiAdapter.createAPIProxy(changes.getDesiredAPI());
+			desiredAPI.setApiId(createdBEAPI.getApiId());
+			createdAPI = apiAdapter.createAPIProxy(desiredAPI);
 		} catch (Exception e) {
 			// Try to rollback FE-API (Proxy) bases on the created BE-API
 			rollback.addRollbackAction(new RollbackAPIProxy(createdBEAPI));
 			throw e;	
 		}
-		
 		rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback
 
 		try {
 			// ... here we basically need to add all props to initially bring the API in sync!
-			APIChangeState.initCreatedAPI(changes.getDesiredAPI(), createdAPI);
+			APIChangeState.initCreatedAPI(desiredAPI, createdAPI);
 			// But without updating the Swagger, as we have just imported it!
 			createdAPI = apiAdapter.updateAPIProxy(createdAPI);
 
 			// If an image is included, update it
-			if(changes.getDesiredAPI().getImage()!=null) {
-				apiAdapter.updateAPIImage(createdAPI, changes.getDesiredAPI().getImage());
+			if(desiredAPI.getImage()!=null) {
+				apiAdapter.updateAPIImage(createdAPI, desiredAPI.getImage());
 			}
 			// This is special, as the status is not a normal property and requires some additional actions!
 			APIStatusManager statusManager = new APIStatusManager();
-			statusManager.update(changes.getDesiredAPI(), createdAPI);
-			apiAdapter.updateRetirementDate(createdAPI, changes.getDesiredAPI().getRetirementDate());
+			statusManager.update(createdAPI, desiredAPI.getState(), desiredAPI.getVhost());
+			apiAdapter.updateRetirementDate(createdAPI, desiredAPI.getRetirementDate());
 
-			if(reCreation && changes.getActualAPI().getState().equals(API.STATE_PUBLISHED)) {
+			if(reCreation && actualAPI.getState().equals(API.STATE_PUBLISHED)) {
 				// In case, the existing API is already in use (Published), we have to grant access to our new imported API
-				apiAdapter.upgradeAccessToNewerAPI(createdAPI, changes.getActualAPI());
+				apiAdapter.upgradeAccessToNewerAPI(createdAPI, actualAPI);
 			}
 
 			// Is a Quota is defined we must manage it
-			new APIQuotaManager(changes.getDesiredAPI(), createdAPI).execute();
+			new APIQuotaManager(desiredAPI, createdAPI).execute();
 
 			// Grant access to the API
-			new ManageClientOrgs(changes.getDesiredAPI(), createdAPI).execute(reCreation);
+			new ManageClientOrgs(desiredAPI, createdAPI).execute(reCreation);
 
 			// Handle subscription to applications
-			new ManageClientApps(changes.getDesiredAPI(), createdAPI, changes.getActualAPI()).execute(reCreation);
+			new ManageClientApps(desiredAPI, createdAPI, actualAPI).execute(reCreation);
 
-			// V-Host must be managed almost at the end, as the status must be set already to "published"
-			//vHostManager.handleVHost(changes.getDesiredAPI(), createdAPI);
+			// Provide the ID of the created API to the desired API just for logging purposes
+			changes.getDesiredAPI().setId(createdAPI.getId());
+			LOG.info("Successfully created "+createdAPI.getState()+" API: '"+createdAPI.getName()+"' "+createdAPI.getVersion()+" (ID: "+createdAPI.getId()+")" );
 		} catch (Exception e) {
 			throw e;
 		} finally {
 			if(createdAPI==null) {
-				LOG.warn("Cant create PropertiesExport as createdAPI is null");
+				LOG.warn("Can't create PropertiesExport as createdAPI is null");
 			} else {
 				APIPropertiesExport.getInstance().setProperty("feApiId", createdAPI.getId());
 			}

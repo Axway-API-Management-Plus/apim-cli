@@ -114,12 +114,14 @@ public class CommandParameters {
 		return Integer.parseInt(getValue("port"));
 	}
 
-	public boolean isEnforceBreakingChange() {
+	public boolean isForce() {
+		if(hasOption("force")) return true;
 		if(getValue("force")==null) return false;
 		return Boolean.parseBoolean(getValue("force"));
 	}
 	
 	public boolean isIgnoreQuotas() {
+		if(hasOption("ignoreQuotas")) return true;
 		if(getValue("ignoreQuotas")==null) return false;
 		return Boolean.parseBoolean(getValue("ignoreQuotas"));
 	}
@@ -154,6 +156,7 @@ public class CommandParameters {
 	}
 	
 	public boolean ignoreAdminAccount() {
+		if(hasOption("ignoreAdminAccount")) return true;
 		if(getValue("ignoreAdminAccount")==null) return false;
 		return Boolean.parseBoolean(getValue("ignoreAdminAccount"));
 	}
@@ -179,6 +182,7 @@ public class CommandParameters {
 	}
 	
 	public boolean changeOrganization() {
+		if(hasOption("changeOrganization")) return true;
 		if(getValue("changeOrganization")==null) return false;
 		return Boolean.parseBoolean(getValue("changeOrganization"));
 	}
@@ -189,6 +193,7 @@ public class CommandParameters {
 	}
 	
 	public boolean ignoreCache() {
+		if(hasOption("ignoreCache")) return true;
 		if(getValue("ignoreCache")==null) return false;
 		return Boolean.parseBoolean(getValue("ignoreCache"));
 	}
@@ -228,11 +233,19 @@ public class CommandParameters {
 		if(getValue("password")==null && getValue("admin_password")==null) errors.setError("Required parameter: 'password' or 'admin_password' is missing.", ErrorCode.MISSING_PARAMETER, false);
 		if(getValue("host")==null) errors.setError("Required parameter: 'host' is missing.", ErrorCode.MISSING_PARAMETER, false);
 		if(errors.hasError()) {
-			LOG.error("Provide at least the following parameters: username, password and host either using Command-Line-Options or in Environment.Properties");
+			LOG.error("The following parameters: username, password and host are required either using Command-Line-Options or in Environment.Properties");
 			LOG.error("       To get help, please use option -h");
 			LOG.error("");
+			ErrorState.getInstance().setError("Missing required parameters.", ErrorCode.MISSING_PARAMETER, false);
 			throw new AppException("Missing required parameters.", ErrorCode.MISSING_PARAMETER);
 		}
+	}
+	
+	public boolean hasOption(String key) {
+		return ((this.cmd!=null && this.cmd.hasOption(key)) || 
+				(this.cmd!=null && this.internalCmd.hasOption(key)) || 
+				(this.envProperties!=null && this.envProperties.containsKey(key)) || 
+				(this.manualParams!=null && this.manualParams.containsKey(key)));
 	}
 	
 	public String getValue(String key) {

@@ -121,23 +121,23 @@ public class APIChangeState {
 	
 	public static void initCreatedAPI(API desiredAPI, API createdAPI) throws AppException {
 		List<String> allProps = getAllAPIProperties();
-		copyProps(desiredAPI, createdAPI, allProps);
+		copyProps(desiredAPI, createdAPI, allProps, false);
 	}
 	
 	public static void copyChangedProps(API desiredAPI, API createdAPI, List<String> changes) throws AppException {
-		copyProps(desiredAPI, createdAPI, changes);
+		copyProps(desiredAPI, createdAPI, changes, true);
 	}
 	
 	/**
 	 * Copied all changed properties of the API having APIPropertyAnnotation set to copyProp = true (default)
 	 * @throws AppException if something goes wrong
 	 */
-	public static void copyProps(API sourceAPI, API targetAPI, List<String> propsToCopy) throws AppException {
+	public static void copyProps(API sourceAPI, API targetAPI, List<String> propsToCopy, boolean logMessage) throws AppException {
 		Field field = null;
 		
 		Class clazz = (sourceAPI.getClass().equals(API.class)) ? sourceAPI.getClass() :  sourceAPI.getClass().getSuperclass();
 		if(propsToCopy.size()!=0) {
-			String logMessage = "Updating Frontend-API (Proxy) for the following properties: ";
+			String message = "Updating Frontend-API (Proxy) for the following properties: ";
 			for(String fieldName : propsToCopy) {
 				try {
 					field = clazz.getDeclaredField(fieldName);
@@ -153,14 +153,15 @@ public class APIChangeState {
 						Method setMethod = targetAPI.getClass().getMethod(setterMethodName, field.getType());
 						
 						setMethod.invoke(targetAPI, desiredObject);
-						logMessage = logMessage + fieldName + " ";
+						message = message + fieldName + " ";
 					}
 				} catch (Exception e) {
 					throw new AppException("Can't handle property: "+fieldName+" to update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
 				}
 			}
-			//copyRequiredPropertisFromCreatedAPI(desiredAPI, actualAPI);
-			LOG.info(logMessage);
+			if(logMessage) {
+				LOG.info(message);
+			}	
 		} else {
 			LOG.debug("API-Proxy requires no updates");
 		}

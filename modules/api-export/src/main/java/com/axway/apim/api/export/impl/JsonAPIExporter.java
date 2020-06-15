@@ -82,7 +82,7 @@ public class JsonAPIExporter extends APIResultHandler {
 					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
 				}				
 			} else {
-				LOG.warn("Local export folder: " + localFolder + " already exists. API will not be exported. (You may set -df true)");
+				LOG.warn("Local export folder: " + localFolder + " already exists. API will not be exported. (You may set -deleteFolder)");
 				return;
 			}
 		}

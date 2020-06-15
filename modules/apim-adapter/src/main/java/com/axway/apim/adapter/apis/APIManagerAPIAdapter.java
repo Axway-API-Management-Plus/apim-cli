@@ -136,7 +136,7 @@ public class APIManagerAPIAdapter {
 	
 	public API getAPI(APIFilter filter, boolean logMessage) throws AppException {
 		List<API> foundAPIs = getAPIs(filter, logMessage);
-		return uniqueAPI(foundAPIs);
+		return uniqueAPI(foundAPIs, filter);
 	}
 
 	/**
@@ -189,9 +189,10 @@ public class APIManagerAPIAdapter {
 		return uri;
 	}
 	
-	private API uniqueAPI(List<API> foundAPIs) throws AppException {
+	private API uniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
 		if(foundAPIs.size()>1) {
-			throw new AppException("No unique API found", ErrorCode.UNKNOWN_API);
+			ErrorState.getInstance().setError("No unique API found. Found " + foundAPIs.size() + " APIs based on filter: " + filter, ErrorCode.UNKNOWN_API, false);
+			throw new AppException("No unique API found. ", ErrorCode.UNKNOWN_API);
 		}
 		if(foundAPIs.size()==0) return null;
 		return foundAPIs.get(0);
@@ -474,7 +475,7 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public API createAPIProxy(API api) throws AppException {
-		LOG.info("Create API-Proxy (Front-End API)");
+		LOG.debug("Create Front-End API: '"+api.getName()+"' (API-Proxy)");
 		URI uri;
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
@@ -594,7 +595,7 @@ public class APIManagerAPIAdapter {
 	
 	
 	public void updateAPIStatus(API api, String desiredState, String vhost) throws AppException {
-		LOG.info("Update API-Proxy status to: " + api.getState());
+		LOG.debug("Update API-Proxy status to: " + api.getState());
 		URI uri;
 		HttpResponse httpResponse = null;
 		RestAPICall request;
@@ -647,13 +648,14 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public void updateRetirementDate(API api, Long retirementDate) throws AppException {
-		// Ignore the retirementDate if desiredState is not deprecated as it's used nowhere
-		if(!api.getState().equals(API.STATE_DEPRECATED)) {
-			LOG.info("Ignoring given retirementDate as API-Status is not set to deprecated");
-			return;
-		}
 		HttpResponse httpResponse = null;
 		try {
+			if(retirementDate==null || retirementDate==0) return;
+			// Ignore the retirementDate if desiredState is not deprecated as it's used nowhere
+			if(!api.getState().equals(API.STATE_DEPRECATED)) {
+				LOG.info("Ignoring given retirementDate as API-Status is not set to deprecated");
+				return;
+			}
 			URI uri = new URIBuilder(cmd.getAPIManagerURL())
 					.setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/deprecate").build();
 			RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate="+formatRetirementDate(retirementDate)), uri, true);
@@ -677,7 +679,7 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public API importBackendAPI(API api) throws AppException {
-		LOG.info("Importing backend API ("+api.getApiDefinition().getAPIDefinitionType().getNiceName()+")");
+		LOG.debug("Import backend API: "+api.getName()+" based on "+api.getApiDefinition().getAPIDefinitionType().getNiceName()+" specification.");
 		JsonNode jsonNode;
 		try {
 			if(api.getApiDefinition().getAPIDefinitionType()==APISpecType.WSDL_API) {

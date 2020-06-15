@@ -12,20 +12,20 @@ Copy everything to a system having docker installed.
 Perform the following steps:
 ```
     cd $HOME
-    git clone https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote.git
-    mkdir swagger-promote-dockerimage
-    cp APIGateway_x.x.x_xxx_Install_linux-x86-64_BNxxxxxx.run swagger-promote-dockerimage
-    cp apigw-emt-scripts-2.0.0-20190409.161128-24.tar.gz swagger-promote-dockerimage
-    cd swagger-promote-dockerimage
+    git clone https://github.com/Axway-API-Management-Plus/apim-cli.git
+    mkdir apim-cli-dockerimage
+    cp APIGateway_x.x.x_xxx_Install_linux-x86-64_BNxxxxxx.run apim-cli-dockerimage
+    cp apigw-emt-scripts-2.0.0-20190409.161128-24.tar.gz apim-cli-dockerimage
+    cd apim-cli-dockerimage
     tar xvfz apigw-emt-scripts-2.0.0-20190409.161128-24.tar.gz
     cd apigw-emt-scripts-2.0.0-SNAPSHOT
     ./build_base_image.py --installer=../APIGateway_x.x.x_xxx_Install_linux-x86-64_BNxxxxxx.run --os=centos7
     ./gen_domain_cert.py --default-cert
-    ./build_gw_image.py --license=multiple.lic --default-cert --fed=$HOME/apimanager-swagger-promote/modules/swagger-promote-core/src/test/resources/apimanager/swagger-promote-7.6.2.fed --merge-dir $HOME/apimanager-swagger-promote/modules/swagger-promote-core/src/test/resources/apimanager/merge-dir/apigateway --out-image=api-gw-mgr:7.6.2-SP3
+    ./build_gw_image.py --license=../multiple.lic --default-cert --fed=$HOME/apim-cli/modules/api-import/src/test/resources/apimanager/swagger-promote-7.7-20200130.fed --merge-dir $HOME/apim-cli/modules/api-import/src/test/resources/apimanager/merge-dir/apigateway --out-image=api-gw-mgr:7.7-20200530
     docker images
-    docker tag api-gw-mgr:7.6.2-SP3 docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP3
+    docker tag api-gw-mgr:7.7-20200530 docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7-20200530
     docker login docker-registry.demo.axway.com
-    docker push docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP3
+    docker push docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7-20200530
 ```
 
 ### Added Untrusted Docker-Registry
