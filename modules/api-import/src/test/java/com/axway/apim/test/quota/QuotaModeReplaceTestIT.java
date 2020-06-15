@@ -194,8 +194,10 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "newApiId"));
 		
 		echo("####### Check System-Quotas have been setup as configured for the new API #######");
+		echo("####### ############ Sleep 5 seconds ##################### #######");
+		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
-		
+		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")
@@ -205,8 +207,10 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "2"));
 		
 		echo("####### Check Application-Quotas have been setup as configured for the new API  #######");
+		echo("####### ############ Sleep 5 seconds ##################### #######");
+		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
-		
+		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttlemb")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")
