@@ -130,10 +130,10 @@ public class APIChangeState {
 	
 	/**
 	 * Copied all changed properties of the API having APIPropertyAnnotation set to copyProp = true (default)
-	 * @sourceAPI copy the properties from this source API
-	 * @targetAPI copy the properties into this target API
-	 * @propsToCopy the list of API properties to copy
-	 * @logMessage controls if a log message is created which properties are copied
+	 * @param sourceAPI copy the properties from this source API
+	 * @param targetAPI copy the properties into this target API
+	 * @param propsToCopy the list of API properties to copy
+	 * @param logMessage controls if a log message is created which properties are copied
 	 * @throws AppException if something goes wrong
 	 */
 	public static void copyProps(API sourceAPI, API targetAPI, List<String> propsToCopy, boolean logMessage) throws AppException {

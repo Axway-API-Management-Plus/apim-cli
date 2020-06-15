@@ -241,7 +241,8 @@ public class APIManagerAPIAdapter {
 	 * Translates the methodIds of the given api. The operations are loaded from the API-Manager based on the api.getId()
 	 * @param api in which the methods should be translated
 	 * @param mode translation direction 
-	 * @throws AppException if methods cannot be translated
+	 * @param <profile> the type of the profile
+	 * @throws AppException if methods cannot be translated 
 	 */
 	public <profile> void translateMethodIds(API api, METHOD_TRANSLATION mode) throws AppException {
 		if(mode == METHOD_TRANSLATION.NONE) return;
