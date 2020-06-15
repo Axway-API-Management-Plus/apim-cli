@@ -23,11 +23,24 @@ Available commands and options:
 apim app - Manage your applications
 apim api - Manage your APIs
 ```
-To get a list of commands for each group call for instance `apim app`:
+To get for instance a `wide` list of APIs on the stage: `prod` execute the following command:
+```
+apim api get -s api-env -wide
+```
+```
+....
++--------------------------------------+-----------------+----------------+---------+---------------------+-------------+-------------+----------+----------------------+
+| API-Id                               | Path            | Name           | Version | V-Host              | State       | Security    | Policies | Organization         |
++--------------------------------------+-----------------+----------------+---------+---------------------+-------------+-------------+----------+----------------------+
+| 518b15c9-350c-47d8-9ad6-16ce02ef9dfe | /vhost-test-950 | VHost Test 950 |   1.0.0 | api123.customer.com | unpublished | passThrough | None     | API Development 5538 |
+| 39b7b2aa-7df8-44e0-b399-4e9d59dbad6d | /vhost-test-411 | VHost Test 411 |   1.0.0 | api123.customer.com |   published | passThrough | None     | API Development 5916 |
++--------------------------------------+-----------------+----------------+---------+---------------------+-------------+-------------+----------+----------------------+
+......
+```
 
-For an up-to-date list of the supported groups and commands, see the [documentation](https://github.com/Axway-API-Management-Plus/apim-cli/wiki#supported-commands).
+To get a list of commands for each group call for instance `apim app`
 
-The CLI is flexible and more commands will be added. You can find a list of available commands in the .
+The CLI is flexible and more commands will be added. For an up-to-date list of the supported groups and commands, see the [documentation](https://github.com/Axway-API-Management-Plus/apim-cli/wiki#supported-commands).
 
 ## Quality assurance process
 By using this CLI to control your Axway API management infrastructure it becomes a key component of your CI/CD process. Product quality is therefore very important so that you can be confident this CLI is doing what it's supposed to do.  
