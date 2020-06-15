@@ -25,7 +25,7 @@ apim api - Manage your APIs
 ```
 To get for instance a `wide` list of APIs on the stage: `prod` execute the following command:
 ```
-apim api get -s api-env -wide
+apim api get -s prod -wide
 ```
 ```
 ....
