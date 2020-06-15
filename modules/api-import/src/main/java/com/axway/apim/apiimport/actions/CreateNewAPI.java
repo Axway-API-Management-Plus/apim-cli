@@ -46,7 +46,6 @@ public class CreateNewAPI {
 			rollback.addRollbackAction(new RollbackAPIProxy(createdBEAPI));
 			throw e;	
 		}
-		
 		rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback
 
 		try {
@@ -78,8 +77,8 @@ public class CreateNewAPI {
 			// Handle subscription to applications
 			new ManageClientApps(changes.getDesiredAPI(), createdAPI, changes.getActualAPI()).execute(reCreation);
 
-			// V-Host must be managed almost at the end, as the status must be set already to "published"
-			//vHostManager.handleVHost(changes.getDesiredAPI(), createdAPI);
+			// Provide the ID of the created API to the desired API just for logging purposes
+			changes.getDesiredAPI().setId(createdAPI.getId());
 		} catch (Exception e) {
 			throw e;
 		} finally {

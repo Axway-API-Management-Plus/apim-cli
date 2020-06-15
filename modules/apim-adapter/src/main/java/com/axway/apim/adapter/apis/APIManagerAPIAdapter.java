@@ -474,7 +474,7 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public API createAPIProxy(API api) throws AppException {
-		LOG.info("Create API-Proxy (Front-End API)");
+		LOG.info("Create Front-End API: '"+api.getName()+"' (API-Proxy)");
 		URI uri;
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
@@ -677,7 +677,7 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public API importBackendAPI(API api) throws AppException {
-		LOG.info("Importing backend API ("+api.getApiDefinition().getAPIDefinitionType().getNiceName()+")");
+		LOG.info("Import backend API: "+api.getName()+" based on "+api.getApiDefinition().getAPIDefinitionType().getNiceName()+" specification.");
 		JsonNode jsonNode;
 		try {
 			if(api.getApiDefinition().getAPIDefinitionType()==APISpecType.WSDL_API) {
