@@ -57,7 +57,7 @@ public class APIChangeStateTest extends APIManagerMockBase {
 		Assert.assertTrue(changeState.hasAnyChanges(), "APIs should not be eqaul");
 		Assert.assertEquals(changeState.getAllChanges().size(),1,  "CaCerts is changed");
 		Assert.assertTrue(changeState.getAllChanges().contains("caCerts"), "Expect the caCert as a changed prop");
-		APIChangeState.copyChangedProps(testAPI1, testAPI1, changeState.getAllChanges());
+		APIChangeState.copyChangedProps(testAPI1, testAPI2, changeState.getAllChanges());
 		APIChangeState validatePropsAreCopied = new APIChangeState(testAPI1, testAPI2);
 		Assert.assertTrue(!validatePropsAreCopied.hasAnyChanges(), "APIs are NOW equal");
 	}
