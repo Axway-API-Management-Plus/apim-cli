@@ -69,7 +69,7 @@ public class ImportTestAction extends AbstractTestAction {
 		boolean ignoreQuotas = false;
 		boolean ignoreAdminAccount = false;
 		boolean ignoreCache = false;
-		boolean allowOrgAdminsToPublish = true;
+		String allowOrgAdminsToPublish = "true";
 		boolean changeOrganization = false;
 		String clientOrgsMode = CommandParameters.MODE_ADD;
 		String clientAppsMode = CommandParameters.MODE_ADD;
@@ -95,7 +95,7 @@ public class ImportTestAction extends AbstractTestAction {
 			ignoreAdminAccount = Boolean.parseBoolean(context.getVariable("ignoreAdminAccount"));
 		} catch (Exception ignore) {};
 		try {
-			allowOrgAdminsToPublish = Boolean.parseBoolean(context.getVariable("allowOrgAdminsToPublish"));
+			allowOrgAdminsToPublish = context.getVariable("allowOrgAdminsToPublish");
 		} catch (Exception ignore) {};
 		try {
 			changeOrganization = Boolean.parseBoolean(context.getVariable("changeOrganization"));
@@ -141,9 +141,8 @@ public class ImportTestAction extends AbstractTestAction {
 			args.add(clientAppsMode);
 			args.add("-clientAppsMode");
 			args.add(clientOrgsMode);
-			if(allowOrgAdminsToPublish) {
-				args.add("-allowOrgAdminsToPublish");
-			}
+			args.add("-allowOrgAdminsToPublish");
+			args.add(allowOrgAdminsToPublish);
 			if(changeOrganization) {
 				args.add("-changeOrganization");
 			}

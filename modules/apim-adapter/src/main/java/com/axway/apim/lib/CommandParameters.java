@@ -155,6 +155,7 @@ public class CommandParameters {
 	}
 	
 	public boolean ignoreAdminAccount() {
+		if(hasOption("ignoreAdminAccount")) return true;
 		if(getValue("ignoreAdminAccount")==null) return false;
 		return Boolean.parseBoolean(getValue("ignoreAdminAccount"));
 	}
@@ -180,6 +181,7 @@ public class CommandParameters {
 	}
 	
 	public boolean changeOrganization() {
+		if(hasOption("changeOrganization")) return true;
 		if(getValue("changeOrganization")==null) return false;
 		return Boolean.parseBoolean(getValue("changeOrganization"));
 	}
@@ -190,6 +192,7 @@ public class CommandParameters {
 	}
 	
 	public boolean ignoreCache() {
+		if(hasOption("ignoreCache")) return true;
 		if(getValue("ignoreCache")==null) return false;
 		return Boolean.parseBoolean(getValue("ignoreCache"));
 	}

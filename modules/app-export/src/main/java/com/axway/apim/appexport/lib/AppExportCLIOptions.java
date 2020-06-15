@@ -39,24 +39,20 @@ public class AppExportCLIOptions extends StandardExportCLIOptions {
 		option.setRequired(false);
 		option.setArgName("my/apps");
 		options.addOption(option);
-		
-		option = new Option("df", "deleteFolder", true, "Controls if an existing local folder should be deleted. Defaults to false.");
-		option.setArgName("true");
-		options.addOption(option);
 	}
 
 	@Override
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);		
 		System.out.println("You may run one of the following examples:");
-		System.out.println(getBinaryName()+" app export -n \"Client App\" -h localhost -u apiadmin -p changeme");
-		System.out.println(getBinaryName()+" app export -n \"App 123\" -df -h localhost -u apiadmin -p changeme -s prod");
-		System.out.println(getBinaryName()+" app export -n \"App 123\" -t /tmp/exported_apps -df true -h localhost -u apiadmin -p changeme -s prod");
+		System.out.println(getBinaryName()+" app get -n \"Client App\" -h localhost -u apiadmin -p changeme -f json");
+		System.out.println(getBinaryName()+" app get -n \"App 123\" -df -h localhost -u apiadmin -p changeme -s prod -f json");
+		System.out.println(getBinaryName()+" app get -n \"App 123\" -t /tmp/exported_apps -df true -h localhost -u apiadmin -p changeme -s prod -f json");
 		System.out.println();
 		System.out.println();
 		System.out.println("Using parameters provided in properties file stored in conf-folder:");
-		System.out.println(getBinaryName()+" app export -n \"Client App\" -s api-env");
-		System.out.println(getBinaryName()+" app export -n \"Client App\" -t /tmp/exported_apps -df true -s api-env");
+		System.out.println(getBinaryName()+" app get -n \"Client App\" -s api-env -f json");
+		System.out.println(getBinaryName()+" app get -n \"Client App\" -t /tmp/exported_apps -deleteFolder -s api-env -f json");
 		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");
 		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");

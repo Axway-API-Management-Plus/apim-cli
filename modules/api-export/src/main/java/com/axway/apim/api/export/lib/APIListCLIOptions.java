@@ -15,9 +15,9 @@ public class APIListCLIOptions extends APIExportCLIOptions {
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);		
 		System.out.println("You may run one of the following examples:");
-		System.out.println(getBinaryName()+" api list -s api-env");
-		System.out.println(getBinaryName()+" api list -s api-env -n \"*API*\"");
-		System.out.println(getBinaryName()+" api list -s api-env -policy \"*Policy ABC*\"");
+		System.out.println(getBinaryName()+" api get -s api-env");
+		System.out.println(getBinaryName()+" api get -s api-env -n \"*API*\"");
+		System.out.println(getBinaryName()+" api get -s api-env -policy \"*Policy ABC*\"");
 		System.out.println();
 		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");

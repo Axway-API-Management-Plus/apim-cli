@@ -52,8 +52,9 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		option.setArgName("ignore|replace|add");
 		options.addOption(option);
 		
-		option = new Option("allowOrgAdminsToPublish", "If set to false, OrgAdmins cannot replicate an API with desired state published. Defaults to true.");
+		option = new Option("allowOrgAdminsToPublish", true, "If set to false, OrgAdmins cannot replicate an API with desired state published. Defaults to true.");
 		option.setRequired(false);
+		option.setArgName("false");
 		internalOptions.addOption(option);
 		
 		option = new Option("replaceHostInSwagger", true, "Controls if you want to replace the host in your Swagger-File ");
