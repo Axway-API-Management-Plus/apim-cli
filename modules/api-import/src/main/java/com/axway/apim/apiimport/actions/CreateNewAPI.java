@@ -62,7 +62,7 @@ public class CreateNewAPI {
 			}
 			// This is special, as the status is not a normal property and requires some additional actions!
 			APIStatusManager statusManager = new APIStatusManager();
-			statusManager.update(createdAPI, desiredAPI.getState());
+			statusManager.update(createdAPI, desiredAPI.getState(), desiredAPI.getVhost());
 			apiAdapter.updateRetirementDate(createdAPI, desiredAPI.getRetirementDate());
 
 			if(reCreation && actualAPI.getState().equals(API.STATE_PUBLISHED)) {

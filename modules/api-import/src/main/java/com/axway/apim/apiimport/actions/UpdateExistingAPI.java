@@ -46,7 +46,7 @@ public class UpdateExistingAPI {
 			// This is special, as the status is not a property and requires some additional actions!
 			APIStatusManager statusUpdate = new APIStatusManager();
 			if(changes.getNonBreakingChanges().contains("state")) {
-				statusUpdate.update(changes.getActualAPI(), changes.getDesiredAPI().getState());
+				statusUpdate.update(changes.getActualAPI(), changes.getDesiredAPI().getState(), changes.getDesiredAPI().getVhost());
 			}
 			if(changes.getNonBreakingChanges().contains("retirementDate")) {
 				apiManager.apiAdapter.updateRetirementDate(changes.getActualAPI(), changes.getDesiredAPI().getRetirementDate());
