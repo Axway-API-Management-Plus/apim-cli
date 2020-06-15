@@ -185,7 +185,7 @@ public class APIManagerAPIAccessAdapter {
 			if(statusCode < 200 || statusCode > 299){
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				if(statusCode==409 && response.contains("resource already exists")) {
-					LOG.warn("API Access for " + type + " with ID: " + parentId + " already exists. Ignoring this error.");
+					LOG.warn("API Access: "+apiAccess+" for " + type + " with ID: " + parentId + " already exists. Ignoring this error.");
 					return apiAccess;
 				}
 				LOG.error("Error creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'");
