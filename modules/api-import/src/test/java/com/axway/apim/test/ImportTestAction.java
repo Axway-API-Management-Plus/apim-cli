@@ -135,6 +135,8 @@ public class ImportTestAction extends AbstractTestAction {
 			args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
 			args.add("-s");
 			args.add(stage);
+			args.add("-quotaMode");
+			args.add(quotaMode);
 			args.add("-clientOrgsMode");
 			args.add(clientOrgsMode);
 			args.add("-clientAppsMode");
