@@ -1,5 +1,8 @@
 package com.axway.apim.export.test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.axway.apim.APIExportApp;
 import com.consol.citrus.actions.AbstractTestAction;
 import com.consol.citrus.context.TestContext;
@@ -15,7 +18,7 @@ public class ExportTestAction extends AbstractTestAction {
 	public void doExecute(TestContext context) {
 		
 		boolean useEnvironmentOnly	= false;
-		String ignoreAdminAccount	= "false";
+		boolean ignoreAdminAccount	= false;
 		String stage				= null;
 		String vhostToExport		= null;
 		
@@ -33,7 +36,7 @@ public class ExportTestAction extends AbstractTestAction {
 		} catch (Exception ignore) {};
 		
 		try {
-			ignoreAdminAccount = context.getVariable("ignoreAdminAccount");
+			ignoreAdminAccount = Boolean.parseBoolean(context.getVariable("ignoreAdminAccount"));
 		} catch (Exception ignore) {};
 		
 		try {
@@ -46,22 +49,36 @@ public class ExportTestAction extends AbstractTestAction {
 		if(vhostToExport==null) {
 			vhostToExport = "NOT_SET";
 		}
-		String[] args;
+		List<String> args = new ArrayList<String>();
 		if(useEnvironmentOnly) {
-			args = new String[] {  
-					"-a", context.replaceDynamicContentInString("${exportApi}"), "-s", stage};
+			args.add("-a");
+			args.add(context.replaceDynamicContentInString("${exportApi}"));
+			args.add("-s");
+			args.add(stage);
+			args.add("-f");
+			args.add("json");
 		} else {
-			args = new String[] { 
-					"-a", context.replaceDynamicContentInString("${exportApi}"),
-					"-v", vhostToExport,
-					"-l", context.replaceDynamicContentInString("${exportLocation}"), 
-					"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
-					"-p", context.replaceDynamicContentInString("${apiManagerPass}"), 
-					"-u", context.replaceDynamicContentInString("${apiManagerUser}"),
-					"-s", stage,  
-					"-ignoreAdminAccount", ignoreAdminAccount};
+			args.add("-a");
+			args.add(context.replaceDynamicContentInString("${exportApi}"));
+			args.add("-v");
+			args.add(vhostToExport);
+			args.add("-l");
+			args.add(context.replaceDynamicContentInString("${exportLocation}"));
+			args.add("-h");
+			args.add(context.replaceDynamicContentInString("${apiManagerHost}"));
+			args.add("-u");
+			args.add(context.replaceDynamicContentInString("${oadminUsername1}"));
+			args.add("-p");
+			args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
+			args.add("-s");
+			args.add(stage);
+			args.add("-f");
+			args.add("json");
+			if(ignoreAdminAccount) {
+				args.add("-ignoreAdminAccount");
+			}
 		}
-		int rc = APIExportApp.export(args);
+		int rc = APIExportApp.export(args.toArray(new String[args.size()]));
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
 		}

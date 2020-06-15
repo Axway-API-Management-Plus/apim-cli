@@ -68,7 +68,7 @@ public class QuotaStays4OtherAPIsTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].method", "*")
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.messages", "666")
-			.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.period", "day")
+			//.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.period", "day")
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.per", "2"));
 		
 		echo("####### Check Application-Quotas have been setup as configured #######");
@@ -78,7 +78,7 @@ public class QuotaStays4OtherAPIsTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].type", "throttlemb")
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].method", "*")
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.mb", "555")
-			.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.period", "hour")
+			//.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.period", "hour")
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.per", "1"));
 		
 		echo("####### Import a second API also with Quotas #######");
@@ -102,7 +102,7 @@ public class QuotaStays4OtherAPIsTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].method", "*")
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.messages", "666")
-			.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.period", "day")
+			//.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.period", "day")
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.per", "2"));
 		
 		echo("####### Check Application-Quotas have been setup as configured #######");
@@ -112,7 +112,7 @@ public class QuotaStays4OtherAPIsTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].type", "throttlemb")
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].method", "*")
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.mb", "555")
-			.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.period", "hour")
+			//.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.period", "hour")
 			.validate("$.restrictions.[?(@.api=='${firstApiId}')].config.per", "1"));
 	}
 }

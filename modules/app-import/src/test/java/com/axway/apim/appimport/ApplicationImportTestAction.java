@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.io.FileUtils;
@@ -52,14 +54,14 @@ public class ApplicationImportTestAction extends AbstractTestAction {
 			useEnvironmentOnly 	= Boolean.parseBoolean(context.getVariable("useEnvironmentOnly"));
 		} catch (Exception ignore) {};
 		
-		String enforce = "false";
-		String ignoreAdminAccount = "false";
+		boolean enforce = false;
+		boolean ignoreAdminAccount = false;
 		
 		try {
-			enforce = context.getVariable("enforce");
+			enforce = Boolean.parseBoolean(context.getVariable("enforce"));
 		} catch (Exception ignore) {};
 		try {
-			ignoreAdminAccount = context.getVariable("ignoreAdminAccount");
+			ignoreAdminAccount = Boolean.parseBoolean(context.getVariable("ignoreAdminAccount"));
 		} catch (Exception ignore) {};
 		
 		if(stage==null) {
@@ -76,22 +78,32 @@ public class ApplicationImportTestAction extends AbstractTestAction {
 		
 		context.setVariable("configFile", configFile);
 
-		String[] args;
+		List<String> args = new ArrayList<String>();
 		if(useEnvironmentOnly) {
-			args = new String[] {  
-					"-c", configFile, "-s", stage};
+			args.add("-c");
+			args.add(context.replaceDynamicContentInString("${appName}"));
+			args.add("-s");
+			args.add(stage);
 		} else {
-			args = new String[] { 
-					"-c", configFile, 
-					"-h", context.replaceDynamicContentInString("${apiManagerHost}"), 
-					"-u", context.replaceDynamicContentInString("${oadminUsername1}"), 
-					"-p", context.replaceDynamicContentInString("${oadminPassword1}"),
-					"-s", stage,
-					"-f", enforce
-			};
+			args.add("-c");
+			args.add(configFile);
+			args.add("-h");
+			args.add(context.replaceDynamicContentInString("${apiManagerHost}"));
+			args.add("-u");
+			args.add(context.replaceDynamicContentInString("${oadminUsername1}"));
+			args.add("-p");
+			args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
+			args.add("-s");
+			args.add(stage);
+			if(enforce) {
+				args.add("-force");
+			}
+			if(ignoreAdminAccount) {
+				args.add("-ignoreAdminAccount");
+			}
 		}
 		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);
-		int rc = ClientApplicationImportApp.importApp(args);
+		int rc = ClientApplicationImportApp.importApp(args.toArray(new String[args.size()]));
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
 		}

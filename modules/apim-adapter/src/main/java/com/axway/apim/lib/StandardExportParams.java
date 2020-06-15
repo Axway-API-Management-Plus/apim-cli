@@ -11,6 +11,11 @@ public class StandardExportParams extends CommandParameters {
 		wide, 
 		ultra
 	}
+	
+	public static enum exportFormat {
+		console, 
+		json
+	}
 
 	public StandardExportParams(CommandLine cmd, CommandLine internalCmd, EnvironmentProperties environment)
 			throws AppException {
@@ -23,9 +28,27 @@ public class StandardExportParams extends CommandParameters {
 	
 	public Wide getWide() {
 		try {
-			return Wide.valueOf(getValue("wide"));
+			if(hasOption("wide")) {
+				return Wide.wide;
+			} 
+			if(hasOption("ultra")) {
+				return Wide.ultra;
+			}
+		} catch (Exception ignore) {}
+		return Wide.standard;
+	}
+	
+	public exportFormat getExportFormat() {
+		try {
+			return exportFormat.valueOf(getValue("format"));
 		} catch (Exception e) {
-			return Wide.standard;
+			return exportFormat.console;
 		}
+	}
+	
+	public boolean deleteLocalFolder() {
+		if(hasOption("deleteFolder")) return true;
+		if(getValue("deleteFolder")==null) return false;
+		return Boolean.parseBoolean(getValue("deleteFolder"));
 	}
 }

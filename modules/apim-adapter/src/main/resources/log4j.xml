@@ -53,7 +53,7 @@
   </logger>
   
   <logger name="com.axway.apim">
-	<level value="DEBUG"/>
+	<level value="INFO"/>
   </logger>
   
   <logger name="org.ehcache">

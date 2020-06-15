@@ -24,7 +24,7 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestDesigner {
 		variable("apiPath", "/app-quota-check-${apiNumber}");
 		variable("apiName", "App Quota Check ${apiNumber}");
 		
-		createVariable("appName", "Test App with quota ${orgNumber}");
+		createVariable("appName", "Test App with quota ${apiNumber}");
 		echo("####### Creating test a application: '${appName}' used to configure some sample quotas #######");
 		http().client("apiManager")
 			.send()
@@ -118,17 +118,17 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.type", "APPLICATION")
 			// First validate the "All methods" quota is still there
 			.validate("$.restrictions.[?(@.api=='*')].type", "throttle")
-			.validate("$.restrictions.[?(@.api=='*')].config.period", "hour")
+			//.validate("$.restrictions.[?(@.api=='*')].config.period", "hour")
 			.validate("$.restrictions.[?(@.api=='*')].config.per", "1")
 			.validate("$.restrictions.[?(@.api=='*')].config.messages", "1000")
 			// Next validate API-Specific quota is still present
 			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='*')].type", "throttle")
-			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='*')].config.period", "second")
+			//.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='*')].config.period", "second")
 			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='*')].config.per", "50")
 			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='*')].config.messages", "111")
 			// Lastly validate API-Method-Specific quota is still present
 			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='${newTestMethodId}')].type", "throttle")
-			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='${newTestMethodId}')].config.period", "day")
+			//.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='${newTestMethodId}')].config.period", "day")
 			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='${newTestMethodId}')].config.per", "2")
 			.validate("$.restrictions.[?(@.api=='${newApiId}' && @.method=='${newTestMethodId}')].config.messages", "100000");
 	}

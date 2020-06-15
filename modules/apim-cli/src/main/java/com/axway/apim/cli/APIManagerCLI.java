@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
+import com.axway.apim.lib.errorHandling.ErrorState;
+
 /**
  * This class implements a pluggable CLI interface that allows to dynamically add new 
  * CLI services. A CLI-Service is for instance the management of Client-Apps or the KPS. Such module needs to implement 
@@ -130,12 +132,14 @@ public class APIManagerCLI {
 		if(this.selectedMethod==null) {
 			this.printUsage();
 		} else {
-			System.out.println("Running module: " + this.selectedService.getName() + " ("+this.selectedService.getVersion()+")");
+			System.out.println("Module: " + this.selectedService.getName() + " ("+this.selectedService.getVersion()+")");
 			System.out.println("------------------------------------------------------------------------");
 			try {
 				this.selectedMethod.invoke (this.selectedService, (Object)args);
 			} catch (Exception e) {
-				e.printStackTrace();
+				if(!ErrorState.getInstance().isLogStackTrace()) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

@@ -31,7 +31,7 @@ public class DuplicateApplicationSubscriptionTestIT extends TestNGCitrusTestRunn
 		variable("apiPath", "/duplicate.app-subscription-${apiNumber}");
 		variable("apiName", "Duplicate-App Subscription API-${apiNumber}");
 		// ############## Creating Test-Application 1 #################
-		createVariable("app1Name", "Consuming Test App 1 ${orgNumber}");
+		createVariable("app1Name", "Consuming Test App 1 ${apiNumber}");
 		http(builder -> builder.client("apiManager").send().post("/applications").header("Content-Type", "application/json")
 			.payload("{\"name\":\"${app1Name}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
 
@@ -53,7 +53,7 @@ public class DuplicateApplicationSubscriptionTestIT extends TestNGCitrusTestRunn
 		
 		// ############## Creating the same application, having the same name, different organization #################
 		createVariable("extClientId", RandomNumberFunction.getRandomNumber(15, true));
-		createVariable("app2Name", "Consuming Test App 1 ${orgNumber}");
+		createVariable("app2Name", "Consuming Test App 1 ${apiNumber}");
 		http(builder -> builder.client("apiManager").send().post("/applications").header("Content-Type", "application/json")
 			.payload("{\"name\":\"${app2Name}\",\"apis\":[],\"organizationId\":\"${orgId2}\"}"));
 

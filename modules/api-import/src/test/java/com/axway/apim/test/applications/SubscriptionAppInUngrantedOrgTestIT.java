@@ -24,8 +24,8 @@ public class SubscriptionAppInUngrantedOrgTestIT extends TestNGCitrusTestDesigne
 		variable("apiPath", "/app-in-ungranted-org-${apiNumber}");
 		variable("apiName", "App-Subscription wrong Org-${apiNumber}");
 		// ############## Creating Test-Application 1 #################
-		createVariable("appName1", "App in granted org ${orgNumber}");
-		createVariable("appName2", "App in ungranted org ${orgNumber}");
+		createVariable("appName1", "App in granted org ${apiNumber}");
+		createVariable("appName2", "App in ungranted org ${apiNumber}");
 		http().client("apiManager")
 			.send()
 			.post("/applications")
@@ -43,8 +43,8 @@ public class SubscriptionAppInUngrantedOrgTestIT extends TestNGCitrusTestDesigne
 		echo("####### Created Test-Application: '${testAppName1}' with id: '${testAppId1}' #######");
 		
 		// ############## Creating Test-Application 2 #################
-		createVariable("appName1", "App in granted org ${orgNumber}");
-		createVariable("appName2", "App in ungranted org ${orgNumber}");
+		createVariable("appName1", "App in granted org ${apiNumber}");
+		createVariable("appName2", "App in ungranted org ${apiNumber}");
 		http().client("apiManager")
 			.send()
 			.post("/applications")

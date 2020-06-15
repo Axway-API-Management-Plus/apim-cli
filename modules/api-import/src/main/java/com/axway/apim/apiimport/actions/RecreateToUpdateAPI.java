@@ -25,22 +25,19 @@ public class RecreateToUpdateAPI {
 
 	public void execute(APIChangeState changes) throws AppException {
 		
-		API actual = changes.getActualAPI();
-		API desired = changes.getDesiredAPI();
-		
-		// On Re-Creation we need to restore the orginal given methodNames for methodLevel override
-		// desired.setInboundProfiles(((DesiredAPI)desired).getOriginalInboundProfiles());
-		// desired.setOutboundProfiles(((DesiredAPI)desired).getOriginalOutboundProfiles());
+		API actualAPI = changes.getActualAPI();
 		
 		// 1. Create BE- and FE-API (API-Proxy) / Including updating all belonging props!
 		// This also includes all CONFIGURED application subscriptions and client-orgs
 		// But not potentially existing Subscriptions or manually created Client-Orgs
+		LOG.info("Create new API to update existing: '"+actualAPI.getName()+"' (ID: "+actualAPI.getId()+")");
+		
 		CreateNewAPI createNewAPI = new CreateNewAPI();
 		createNewAPI.execute(changes, true);
 
-		LOG.info("New API created. Going to delete old API.");
+		LOG.info("New API successfuly created. Going to delete old API: '"+actualAPI.getName()+"' "+actualAPI.getVersion()+" (ID: "+actualAPI.getId()+")");
 		// Delete the existing old API!
-		new APIStatusManager().update(actual, API.STATE_DELETED, true);
+		new APIStatusManager().update(actualAPI, API.STATE_DELETED, true);
 	}
 
 }

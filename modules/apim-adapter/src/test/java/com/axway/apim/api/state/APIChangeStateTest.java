@@ -8,7 +8,6 @@ import java.util.Map;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.apis.APIManagerMockBase;
@@ -43,7 +42,6 @@ public class APIChangeStateTest extends APIManagerMockBase {
 		APIChangeState changeState = new APIChangeState(testAPI1, testAPI2);
 		Assert.assertTrue(!changeState.hasAnyChanges(), "APIs are equal");
 		Assert.assertEquals(changeState.getAllChanges().size(),0,  "No changes properties");
-		changeState.copyChangedProps();
 	}
 	
 	@Test
@@ -59,7 +57,7 @@ public class APIChangeStateTest extends APIManagerMockBase {
 		Assert.assertTrue(changeState.hasAnyChanges(), "APIs should not be eqaul");
 		Assert.assertEquals(changeState.getAllChanges().size(),1,  "CaCerts is changed");
 		Assert.assertTrue(changeState.getAllChanges().contains("caCerts"), "Expect the caCert as a changed prop");
-		changeState.copyChangedProps();
+		APIChangeState.copyChangedProps(testAPI1, testAPI2, changeState.getAllChanges());
 		APIChangeState validatePropsAreCopied = new APIChangeState(testAPI1, testAPI2);
 		Assert.assertTrue(!validatePropsAreCopied.hasAnyChanges(), "APIs are NOW equal");
 	}
@@ -73,7 +71,7 @@ public class APIChangeStateTest extends APIManagerMockBase {
 		Assert.assertEquals(changeState.getBreakingChanges().size(),0,  "Name should not be a breaking change");
 		Assert.assertEquals(changeState.getNonBreakingChanges().size(),1,  "Name is a breaking change");
 		Assert.assertTrue(changeState.getAllChanges().contains("name"), "Expect the name as a changed prop");
-		changeState.copyChangedProps();
+		APIChangeState.copyChangedProps(testAPI1, testAPI2, changeState.getAllChanges());
 		APIChangeState validatePropsAreCopied = new APIChangeState(testAPI1, testAPI2);
 		Assert.assertTrue(!validatePropsAreCopied.hasAnyChanges(), "APIs are NOW equal");
 	}
@@ -87,7 +85,7 @@ public class APIChangeStateTest extends APIManagerMockBase {
 		Assert.assertTrue(changeState.hasAnyChanges(), "APIs should not be eqaul");
 		Assert.assertEquals(changeState.getAllChanges().size(),1,  "TagMaps is changed");
 		Assert.assertTrue(changeState.getAllChanges().contains("tags"), "Expect the tags as a changed prop");
-		changeState.copyChangedProps();
+		APIChangeState.copyChangedProps(testAPI1, testAPI2, changeState.getAllChanges());
 		APIChangeState validatePropsAreCopied = new APIChangeState(testAPI1, testAPI2);
 		Assert.assertTrue(!validatePropsAreCopied.hasAnyChanges(), "APIs are NOW equal");
 	}
@@ -107,7 +105,7 @@ public class APIChangeStateTest extends APIManagerMockBase {
 		Assert.assertEquals(changeState.getAllChanges().size(),1,  "InboundProfiles are changed");
 		Assert.assertEquals(changeState.getBreakingChanges().size(),1,  "InboundProfiles are breaking");
 		Assert.assertTrue(changeState.getAllChanges().contains("inboundProfiles"), "Expect the inboundProfile as a changed prop");
-		changeState.copyChangedProps();
+		APIChangeState.copyChangedProps(testAPI1, testAPI2, changeState.getAllChanges());
 		APIChangeState validatePropsAreCopied = new APIChangeState(testAPI1, testAPI2);
 		Assert.assertTrue(!validatePropsAreCopied.hasAnyChanges(), "APIs are NOW equal");
 	}

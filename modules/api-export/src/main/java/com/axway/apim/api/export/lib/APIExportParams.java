@@ -25,11 +25,6 @@ public class APIExportParams extends StandardExportParams {
 		return getValue("id");
 	}
 	
-	public boolean deleteLocalFolder() {
-		if(getValue("deleteFolder")==null) return false;
-		return Boolean.parseBoolean(getValue("deleteFolder"));
-	}
-	
 	public String getLocalFolder() {
 		return (getValue("localFolder")==null) ? "." : getValue("localFolder");
 	}

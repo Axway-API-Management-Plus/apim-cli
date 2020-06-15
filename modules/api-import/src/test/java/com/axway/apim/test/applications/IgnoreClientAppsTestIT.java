@@ -25,7 +25,7 @@ public class IgnoreClientAppsTestIT extends TestNGCitrusTestDesigner {
 		variable("apiName", "Ignore Client-Apps-API-${apiNumber}");
 		
 		// ############## Creating Test-Application #################
-		createVariable("testAppName", "Ignored Test App-Name ${orgNumber}");
+		createVariable("testAppName", "Ignored Test App-Name ${apiNumber}");
 		http().client("apiManager")
 			.send()
 			.post("/applications")

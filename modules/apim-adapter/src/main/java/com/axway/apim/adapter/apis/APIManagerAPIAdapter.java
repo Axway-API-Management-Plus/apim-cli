@@ -117,8 +117,6 @@ public class APIManagerAPIAdapter {
 			apis = filterAPIs(filter);
 			for(int i=0;i<apis.size();i++) {
 				API api = apis.get(i);
-				// Save the original given state - This is used during APIProxyUpdate, as this endpoint requires the original state
-				api.setActualState(api.getState());
 				translateMethodIds(api, filter.getTranslateMethodMode());
 				addQuotaConfiguration(api, filter.isIncludeQuotas());
 				addClientOrganizations(api, filter.isIncludeClientOrganizations());
@@ -138,7 +136,7 @@ public class APIManagerAPIAdapter {
 	
 	public API getAPI(APIFilter filter, boolean logMessage) throws AppException {
 		List<API> foundAPIs = getAPIs(filter, logMessage);
-		return uniqueAPI(foundAPIs);
+		return uniqueAPI(foundAPIs, filter);
 	}
 
 	/**
@@ -191,9 +189,10 @@ public class APIManagerAPIAdapter {
 		return uri;
 	}
 	
-	private API uniqueAPI(List<API> foundAPIs) throws AppException {
+	private API uniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
 		if(foundAPIs.size()>1) {
-			throw new AppException("No unique API found", ErrorCode.UNKNOWN_API);
+			ErrorState.getInstance().setError("No unique API found. Found " + foundAPIs.size() + " APIs based on filter: " + filter, ErrorCode.UNKNOWN_API, false);
+			throw new AppException("No unique API found. ", ErrorCode.UNKNOWN_API);
 		}
 		if(foundAPIs.size()==0) return null;
 		return foundAPIs.get(0);
@@ -286,11 +285,12 @@ public class APIManagerAPIAdapter {
 			}
 	}
 	
-	public void updateAPIImage(API api) throws AppException {
-		if(!api.getImage().isValid()) {
+	public void updateAPIImage(API api, Image image) throws AppException {
+		if(!image.isValid()) {
 			LOG.info("No image configured, doing nothing.");
 			return;
 		}
+		api.setImage(image);
 		LOG.info("Updating API-Image from: " + api.getImage().getFilename());
 		
 		URI uri;
@@ -475,7 +475,7 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public API createAPIProxy(API api) throws AppException {
-		LOG.info("Create API-Proxy (Front-End API)");
+		LOG.debug("Create Front-End API: '"+api.getName()+"' (API-Proxy)");
 		URI uri;
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
@@ -516,13 +516,7 @@ public class APIManagerAPIAdapter {
 		translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()).build();
-			// During APIProxyUpdate we have to send the original API-State, as it have been given by the APIManagerAPIAdapter#getAPIs
-			// We save the save 
-			String origState = api.getState();
-			api.setState(api.getActualState());
 			entity = new StringEntity(mapper.writeValueAsString(api), StandardCharsets.UTF_8);
-			// And restore it
-			api.setState(origState);
 			
 			RestAPICall request = new PUTRequest(entity, uri);
 			httpResponse = request.execute();
@@ -600,17 +594,17 @@ public class APIManagerAPIAdapter {
 	}
 	
 	
-	public void updateAPIStatus(API api) throws AppException {
-		LOG.info("Update API-Proxy status to: " + api.getState());
+	public void updateAPIStatus(API api, String desiredState, String vhost) throws AppException {
+		LOG.debug("Update API-Proxy status to: " + api.getState());
 		URI uri;
 		HttpResponse httpResponse = null;
 		RestAPICall request;
 		try {
 		uri = new URIBuilder(cmd.getAPIManagerURL())
-				.setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/"+StatusEndpoint.valueOf(api.getState()).endpoint)
+				.setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/"+StatusEndpoint.valueOf(desiredState).endpoint)
 				.build();
-			if(api.getVhost()!=null && api.getState().equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
-				HttpEntity entity = new StringEntity("vhost="+api.getVhost());
+			if(vhost!=null && api.getState().equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
+				HttpEntity entity = new StringEntity("vhost="+vhost);
 				request = new POSTRequest(entity, uri, useAdminAccountForPublish());
 			} else {
 				request = new POSTRequest(null, uri, useAdminAccountForPublish());
@@ -653,17 +647,18 @@ public class APIManagerAPIAdapter {
 		return format.format(cal.getTime());
 	}
 	
-	public void updateRetirementDate(API api) throws AppException {
-		// Ignore the retirementDate if desiredState is not deprecated as it's used nowhere
-		if(!api.getState().equals(API.STATE_DEPRECATED)) {
-			LOG.info("Ignoring given retirementDate as API-Status is not set to deprecated");
-			return;
-		}
+	public void updateRetirementDate(API api, Long retirementDate) throws AppException {
 		HttpResponse httpResponse = null;
 		try {
+			if(retirementDate==null || retirementDate==0) return;
+			// Ignore the retirementDate if desiredState is not deprecated as it's used nowhere
+			if(!api.getState().equals(API.STATE_DEPRECATED)) {
+				LOG.info("Ignoring given retirementDate as API-Status is not set to deprecated");
+				return;
+			}
 			URI uri = new URIBuilder(cmd.getAPIManagerURL())
 					.setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/deprecate").build();
-			RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate="+formatRetirementDate(api.getRetirementDate())), uri, true);
+			RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate="+formatRetirementDate(retirementDate)), uri, true);
 			apiCall.setContentType("application/x-www-form-urlencoded");
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -684,7 +679,7 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public API importBackendAPI(API api) throws AppException {
-		LOG.info("Importing backend API ("+api.getApiDefinition().getAPIDefinitionType().getNiceName()+")");
+		LOG.debug("Import backend API: "+api.getName()+" based on "+api.getApiDefinition().getAPIDefinitionType().getNiceName()+" specification.");
 		JsonNode jsonNode;
 		try {
 			if(api.getApiDefinition().getAPIDefinitionType()==APISpecType.WSDL_API) {
@@ -789,8 +784,8 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
-	public void upgradeAccessToNewerAPI(API desiredAPI, API actualAPI) throws AppException {
-		if(desiredAPI.getState().equals(API.STATE_UNPUBLISHED)) {
+	public void upgradeAccessToNewerAPI(API newAPI, API oldAPI) throws AppException {
+		if(newAPI.getState().equals(API.STATE_UNPUBLISHED)) {
 			LOG.debug("No need to grant access to newly created API, as desired state of API is unpublished.");
 			return;
 		}
@@ -802,10 +797,10 @@ public class APIManagerAPIAdapter {
 		HttpResponse httpResponse = null;
 		
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/upgrade/"+actualAPI.getId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/upgrade/"+oldAPI.getId()).build();
 			
 			List<NameValuePair> params = new Vector<NameValuePair>();
-			params.add(new BasicNameValuePair("upgradeApiId", desiredAPI.getId()));
+			params.add(new BasicNameValuePair("upgradeApiId", newAPI.getId()));
 			
 			entity = new UrlEncodedFormEntity(params, "UTF-8");
 			
@@ -834,20 +829,20 @@ public class APIManagerAPIAdapter {
 		// APIManagerAdapter.getInstance().addClientApplications(inTransitState, actualState);
 		// Additionally we need to preserve existing (maybe manually created) application quotas
 		boolean updateAppQuota = false;
-		if(actualAPI.getApplications().size()!=0) {
-			LOG.debug("Found: "+actualAPI.getApplications().size()+" subscribed applications for this API. Taking over potentially configured quota configuration.");
-			for(ClientApplication app : actualAPI.getApplications()) {
+		if(oldAPI.getApplications().size()!=0) {
+			LOG.debug("Found: "+oldAPI.getApplications().size()+" subscribed applications for this API. Taking over potentially configured quota configuration.");
+			for(ClientApplication app : oldAPI.getApplications()) {
 				if(app.getAppQuota()==null) continue;
 				// REST-API for App-Quota is also returning Default-Quotas, but we have to ignore them here!
 				if(app.getAppQuota().getId().equals(APIManagerAdapter.APPLICATION_DEFAULT_QUOTA) || app.getAppQuota().getId().equals(APIManagerAdapter.SYSTEM_API_QUOTA)) continue;
 				for(QuotaRestriction restriction : app.getAppQuota().getRestrictions()) {
-					if(restriction.getApi().equals(actualAPI.getId())) { // This application has a restriction for this specific API
+					if(restriction.getApi().equals(oldAPI.getId())) { // This application has a restriction for this specific API
 						updateAppQuota = true;
-						restriction.setApi(desiredAPI.getId()); // Take over the quota config to new API
+						restriction.setApi(newAPI.getId()); // Take over the quota config to new API
 						if(!restriction.getMethod().equals("*")) { // The restriction is for a specific method
-							String originalMethodName = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(actualAPI.getId(), restriction.getMethod()).getName();
+							String originalMethodName = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(oldAPI.getId(), restriction.getMethod()).getName();
 							// Try to find the same operation for the newly created API based on the name
-							String newMethodId = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(desiredAPI.getId(), originalMethodName).getId();
+							String newMethodId = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(newAPI.getId(), originalMethodName).getId();
 							restriction.setMethod(newMethodId);
 						}
 					}
@@ -901,8 +896,8 @@ public class APIManagerAPIAdapter {
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
-				LOG.error("Error granting access API. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
-				throw new AppException("Error granting access API. Received Status-Code: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+				LOG.error("Error granting access to API: "+api.getName()+" (ID: "+api.getId()+"). Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
+				throw new AppException("Error granting API access. Received Status-Code: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			// Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
 			if(api.getClientOrganizations()==null) api.setClientOrganizations(new ArrayList<Organization>());

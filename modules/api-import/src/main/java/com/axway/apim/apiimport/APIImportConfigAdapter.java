@@ -240,22 +240,6 @@ public class APIImportConfigAdapter {
 		}
 	}
 	
-	/**
-	 * The purpose of this method is to translated the given Method-Names into internal 
-	 * operationId. These operationIds are created and then known, when the API has 
-	 * been inserted. 
-	 * Translating the methodNames to operationIds already during import is required for 
-	 * the comparison between the desired and actual API.
-	 * @param desiredAPI the configured desired API
-	 * @param actualAPI a potentially existing actual API
-	 * @return the desired API containing operationId in Inbound- and Outbound-Profiles
-	 * @throws AppException when something goes wrong
-	 */
-	public API completeDesiredAPI(API desiredAPI, API actualAPI) throws AppException {
-		if(actualAPI==null) return desiredAPI;
-		return desiredAPI;
-	}
-	
 	private void validateExposurePath(API apiConfig) throws AppException {
 		if(apiConfig.getPath()==null) {
 			ErrorState.getInstance().setError("Config-Parameter: 'path' is not given", ErrorCode.CANT_READ_CONFIG_FILE, false);
