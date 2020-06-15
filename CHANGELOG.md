@@ -6,9 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [0.0.9] 2020-04-08
+## [1.0.0] 2020-06-15
 ### Added
-- Initial version
-- Refactored Swagger-Promote to support modularized approach
+- Initial version of the APIM-CLI
+- Swagger-Promote fully refactored to support a modularized approach
 - Migrated API-Import & Export to a dedicated module
-- Added new module to manage applications
+- New module to manage applications (Import and Export)
+- Get API and Applications (Filtered, different formst
+- Delete APIs (Front and Backend)
+- Publish APIs
+- API-Management Interface
