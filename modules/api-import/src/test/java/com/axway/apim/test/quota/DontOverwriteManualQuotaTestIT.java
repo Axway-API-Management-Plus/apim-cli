@@ -97,10 +97,10 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		swaggerImport.doExecute(context);
 		
 		echo("####### Validate all APPLICATION quotas (manually configured & API-Config) do exists #######");
-		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
-			Thread.sleep(5000); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
-		}
+		echo("####### ############ Sleep 5 seconds ##################### #######");
+		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
+		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].type", "throttlemb")
 			//.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].config.period", "hour")
@@ -118,7 +118,10 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.per", "1"));
 		
 		echo("####### Validate all SYSTEM quotas (manually configured & API-Config) do exists #######");
+		echo("####### ############ Sleep 5 seconds ##################### #######");
+		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
+		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].type", "throttle")
 				//.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].config.period", "hour")
