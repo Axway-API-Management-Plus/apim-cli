@@ -903,15 +903,15 @@ public class APIManagerAPIAdapter {
 			if(statusCode != 204){
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				if(statusCode==403 && response.contains("Unknown API")) {
-					LOG.warn("Got error: Unknown API - Try again in 5 seconds.");
-					Thread.sleep(5000);
+					LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in 1 second.");
+					Thread.sleep(1000);
 					httpResponse = apiCall.execute();
 					statusCode = httpResponse.getStatusLine().getStatusCode();
 					if(statusCode != 204) {
 						LOG.error("Error granting access to API: '"+api.getName()+"' (ID: "+api.getId()+"). Received Status-Code: " +statusCode + ", Response: " + response);
 						throw new AppException("Error granting API access. Received Status-Code: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
 					} else {
-						LOG.info("Retry successful!");
+						LOG.info("Successfully created API-Access on retry. Received Status-Code: " +statusCode );
 					}
 				}
 			}
