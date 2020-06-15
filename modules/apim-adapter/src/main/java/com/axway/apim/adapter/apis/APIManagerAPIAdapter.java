@@ -647,6 +647,7 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public void updateRetirementDate(API api, Long retirementDate) throws AppException {
+		if(retirementDate==0) return;
 		// Ignore the retirementDate if desiredState is not deprecated as it's used nowhere
 		if(!api.getState().equals(API.STATE_DEPRECATED)) {
 			LOG.info("Ignoring given retirementDate as API-Status is not set to deprecated");
