@@ -12,11 +12,11 @@ Copy everything to a system having docker installed.
 Perform the following steps:
 ```
     cd $HOME
-    git clone https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote.git
-    mkdir swagger-promote-dockerimage
-    cp APIGateway_x.x.x_xxx_Install_linux-x86-64_BNxxxxxx.run swagger-promote-dockerimage
-    cp apigw-emt-scripts-2.0.0-20190409.161128-24.tar.gz swagger-promote-dockerimage
-    cd swagger-promote-dockerimage
+    git clone https://github.com/Axway-API-Management-Plus/apim-cli.git
+    mkdir apim-cli-dockerimage
+    cp APIGateway_x.x.x_xxx_Install_linux-x86-64_BNxxxxxx.run apim-cli-dockerimage
+    cp apigw-emt-scripts-2.0.0-20190409.161128-24.tar.gz apim-cli-dockerimage
+    cd apim-cli-dockerimage
     tar xvfz apigw-emt-scripts-2.0.0-20190409.161128-24.tar.gz
     cd apigw-emt-scripts-2.0.0-SNAPSHOT
     ./build_base_image.py --installer=../APIGateway_x.x.x_xxx_Install_linux-x86-64_BNxxxxxx.run --os=centos7
