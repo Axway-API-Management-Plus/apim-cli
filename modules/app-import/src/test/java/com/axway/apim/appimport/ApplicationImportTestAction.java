@@ -55,13 +55,13 @@ public class ApplicationImportTestAction extends AbstractTestAction {
 		} catch (Exception ignore) {};
 		
 		boolean enforce = false;
-		String ignoreAdminAccount = "false";
+		boolean ignoreAdminAccount = false;
 		
 		try {
 			enforce = Boolean.parseBoolean(context.getVariable("enforce"));
 		} catch (Exception ignore) {};
 		try {
-			ignoreAdminAccount = context.getVariable("ignoreAdminAccount");
+			ignoreAdminAccount = Boolean.parseBoolean(context.getVariable("ignoreAdminAccount"));
 		} catch (Exception ignore) {};
 		
 		if(stage==null) {
@@ -97,6 +97,9 @@ public class ApplicationImportTestAction extends AbstractTestAction {
 			args.add(stage);
 			if(enforce) {
 				args.add("-force");
+			}
+			if(ignoreAdminAccount) {
+				args.add("-ignoreAdminAccount");
 			}
 		}
 		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);

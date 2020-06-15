@@ -33,8 +33,13 @@ public abstract class APIMCoreCLIOptions {
 	String[] args;
 
 	public APIMCoreCLIOptions(String[] args) {
+		Option option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
+				+ "Is used to lookup the stage configuration file.");
+		option.setArgName("preprod");
+		options.addOption(option);
+		
 		// Define core command line parameters!
-		Option option = new  Option("h", "help", false, "Print the help");
+		option = new  Option("h", "help", false, "Print the help");
 		option.setRequired(false);
 		options.addOption(option);
 		
@@ -78,7 +83,7 @@ public abstract class APIMCoreCLIOptions {
 		options.addOption(option);
 		
 		option = new Option("clearCache", true, "Clear the cache previously created, which will force the CLI to get fresh data from the API-Manager.\n"
-				+ "Exmaples: 'ALL', '*application*', 'applicationsQuotaCache,*api*'");
+				+ "Examples: 'ALL', '*application*', 'applicationsQuotaCache,*api*'");
 		option.setRequired(false);
 		option.setArgName("ALL");
 		options.addOption(option);

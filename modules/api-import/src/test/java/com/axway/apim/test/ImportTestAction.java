@@ -135,8 +135,6 @@ public class ImportTestAction extends AbstractTestAction {
 			args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
 			args.add("-s");
 			args.add(stage);
-			args.add("-s");
-			args.add(stage);
 			args.add("-clientOrgsMode");
 			args.add(clientAppsMode);
 			args.add("-clientAppsMode");
@@ -154,6 +152,9 @@ public class ImportTestAction extends AbstractTestAction {
 			}
 			if(ignoreCache) {
 				args.add("-ignoreCache");
+			}
+			if(ignoreAdminAccount) {
+				args.add("-ignoreAdminAccount");
 			}
 		}
 		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);

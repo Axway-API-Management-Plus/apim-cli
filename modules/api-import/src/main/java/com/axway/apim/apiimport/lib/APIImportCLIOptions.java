@@ -25,11 +25,6 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		option.setRequired(false);
 		option.setArgName("swagger_file.json");
 		options.addOption(option);
-		
-		option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
-				+ "Will be used to lookup stage specific configuration overrides (e.g.: api_config.preprod.json) and the stage config");
-		option.setArgName("preprod");
-		options.addOption(option);
 
 		option = new Option("c", "config", true, "This is the JSON-Formatted API-Config containing information how to expose the API");
 		option.setRequired(true);

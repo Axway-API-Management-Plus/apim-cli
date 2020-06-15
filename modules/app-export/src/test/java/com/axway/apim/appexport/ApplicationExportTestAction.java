@@ -19,7 +19,7 @@ public class ApplicationExportTestAction extends AbstractTestAction {
 	public void doExecute(TestContext context) {
 		
 		boolean useEnvironmentOnly	= false;
-		String ignoreAdminAccount	= "false";
+		boolean ignoreAdminAccount	= false;
 		String stage				= null;
 		String orgNameFilter		= null;
 		String stateFilter			= null;
@@ -46,7 +46,7 @@ public class ApplicationExportTestAction extends AbstractTestAction {
 		} catch (Exception ignore) {};
 		
 		try {
-			ignoreAdminAccount = context.getVariable("ignoreAdminAccount");
+			ignoreAdminAccount = Boolean.parseBoolean(context.getVariable("ignoreAdminAccount"));
 		} catch (Exception ignore) {};
 		
 		if(stage==null) {
@@ -72,8 +72,6 @@ public class ApplicationExportTestAction extends AbstractTestAction {
 			args.add(context.replaceDynamicContentInString("${apiManagerUser}"));
 			args.add("-s");
 			args.add(stage);
-			args.add("-ignoreAdminAccount");
-			args.add(ignoreAdminAccount);
 			if(orgNameFilter!=null) {
 				args.add("-orgName");
 				args.add(orgNameFilter);
@@ -81,6 +79,9 @@ public class ApplicationExportTestAction extends AbstractTestAction {
 			if(stateFilter!=null) {
 				args.add("-state");
 				args.add(stateFilter);
+			}
+			if(ignoreAdminAccount) {
+				args.add("-ignoreAdminAccount");
 			}
 		}
 		int rc = ApplicationExportApp.export(args.toArray(new String[args.size()]));

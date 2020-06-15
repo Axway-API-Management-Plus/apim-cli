@@ -36,13 +36,8 @@ public abstract class APIExportCLIOptions extends StandardExportCLIOptions {
 		option.setRequired(false);
 		option.setArgName("*Policy1*");
 		options.addOption(option);
-		
-		option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
-				+ "Is used to lookup the stage configuration file.");
-		option.setArgName("preprod");
-		options.addOption(option);
 
-		option = new Option("v", "vhost", true, "Limit the export to that specific host.");
+		option = new Option("vhost", true, "Limit the export to that specific host.");
 		option.setRequired(false);
 		option.setArgName("vhost.customer.com");
 		options.addOption(option);

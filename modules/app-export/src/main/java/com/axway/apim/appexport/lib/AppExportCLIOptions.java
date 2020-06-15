@@ -13,17 +13,12 @@ public class AppExportCLIOptions extends StandardExportCLIOptions {
 	public AppExportCLIOptions(String[] args) throws ParseException {
 		super(args);
 		// Define command line options required for Application export
-		Option option = new  Option("n", "name", true, "Name of the application to export. You may use wildcards at the end or beginning. (e.g. *App*). To export all applications just use '*'");
+		Option option = new  Option("n", "name", true, "Name of the application to export. You may use wildcards at the end or beginning. (e.g. *App*).");
 		option.setRequired(false);
 		options.addOption(option);
 		
 		option = new  Option("id", true, "The ID of the application.");
 		option.setRequired(false);
-		options.addOption(option);
-		
-		option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
-				+ "Will be used to lookup the stage config");
-		option.setArgName("preprod");
 		options.addOption(option);
 
 		option = new  Option("state", true, "Export application with specific state: pending | approved");
