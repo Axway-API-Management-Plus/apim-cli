@@ -28,7 +28,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 
 	@Override
 	public String getName() {
-		return "Application - E X P O R T";
+		return "Application - E X P O R T / U T I L S";
 	}
 
 	@Override
