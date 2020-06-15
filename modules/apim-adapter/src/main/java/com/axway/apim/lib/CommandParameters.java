@@ -233,9 +233,10 @@ public class CommandParameters {
 		if(getValue("password")==null && getValue("admin_password")==null) errors.setError("Required parameter: 'password' or 'admin_password' is missing.", ErrorCode.MISSING_PARAMETER, false);
 		if(getValue("host")==null) errors.setError("Required parameter: 'host' is missing.", ErrorCode.MISSING_PARAMETER, false);
 		if(errors.hasError()) {
-			LOG.error("Provide at least the following parameters: username, password and host either using Command-Line-Options or in Environment.Properties");
+			LOG.error("The following parameters: username, password and host are required either using Command-Line-Options or in Environment.Properties");
 			LOG.error("       To get help, please use option -h");
 			LOG.error("");
+			ErrorState.getInstance().setError("Missing required parameters.", ErrorCode.MISSING_PARAMETER, false);
 			throw new AppException("Missing required parameters.", ErrorCode.MISSING_PARAMETER);
 		}
 	}
