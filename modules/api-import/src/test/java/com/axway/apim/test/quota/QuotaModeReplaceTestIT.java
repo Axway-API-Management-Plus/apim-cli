@@ -89,11 +89,10 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 		swaggerImport.doExecute(context);
 		
 		echo("####### Check Application-Quotas have been setup as configured #######");
-		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
-			echo("####### ############ Sleep 5 seconds ##################### #######");
-			Thread.sleep(5000); // Starting with this version, we need to wait a few milliseconds, otherwise the REST-API doesn't return the complete set of quotas
-		}
+		echo("####### ############ Sleep 5 seconds ##################### #######");
+		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
+		Thread.sleep(5000);
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			// The method specific quotas must be have been removed
@@ -106,7 +105,10 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.per", "1"));
 		
 		echo("####### Check that only the configured quota remains and previouls configured are removed #######");
+		echo("####### ############ Sleep 5 seconds ##################### #######");
+		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
+		Thread.sleep(5000);
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			// The method specific quotas must be have been removed
@@ -137,7 +139,10 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 		swaggerImport.doExecute(context);
 		
 		echo("####### Check System-Quotas have been updated #######");
+		echo("####### ############ Sleep 5 seconds ##################### #######");
+		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/00000000-0000-0000-0000-000000000000").header("Content-Type", "application/json"));
+		Thread.sleep(5000);
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${apiId}')].type", "throttle")
