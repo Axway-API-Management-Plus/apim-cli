@@ -20,7 +20,6 @@ public abstract class ClientAppAdapter {
 	
 	/**
 	 * Returns a list of application according to the provided filter
-	 * @param filter object to filter the results
 	 * @return applications according to the provided filter
 	 * @throws AppException when something goes wrong
 	 */
