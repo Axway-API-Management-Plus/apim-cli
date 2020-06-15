@@ -119,7 +119,7 @@ public class ImportTestAction extends AbstractTestAction {
 		List<String> args = new ArrayList<String>();
 		if(useEnvironmentOnly) {
 			args.add("-c");
-			args.add(context.replaceDynamicContentInString("${appName}"));
+			args.add(configFile);
 			args.add("-s");
 			args.add(stage);
 		} else {
@@ -136,9 +136,9 @@ public class ImportTestAction extends AbstractTestAction {
 			args.add("-s");
 			args.add(stage);
 			args.add("-clientOrgsMode");
-			args.add(clientAppsMode);
-			args.add("-clientAppsMode");
 			args.add(clientOrgsMode);
+			args.add("-clientAppsMode");
+			args.add(clientAppsMode);
 			args.add("-allowOrgAdminsToPublish");
 			args.add(allowOrgAdminsToPublish);
 			if(changeOrganization) {

@@ -1,14 +1,12 @@
 package com.axway.apim.test.envProperties;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
-import com.consol.citrus.message.MessageType;
 
 @Test(testName="UsingEnvironmentTestIT")
 public class UsingEnvironmentTestIT extends TestNGCitrusTestDesigner {
