@@ -45,7 +45,7 @@ public class UpdateExistingAPI {
 				statusUpdate.update(changes.getDesiredAPI(), changes.getActualAPI());
 			}
 			if(changes.getNonBreakingChanges().contains("retirementDate")) {
-				apiManager.apiAdapter.updateRetirementDate(changes.getDesiredAPI(), changes.getDesiredAPI().getRetirementDate());
+				apiManager.apiAdapter.updateRetirementDate(changes.getActualAPI(), changes.getDesiredAPI().getRetirementDate());
 			}
 			
 			// This is required when an API has been set back to Unpublished
