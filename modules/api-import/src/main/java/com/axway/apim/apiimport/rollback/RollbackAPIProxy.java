@@ -21,7 +21,7 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
 	@Override
 	public void rollback() throws AppException {
 		if(rollbackAPI!=null && rollbackAPI.getState()==null) {
-			rollbackAPI = APIManagerAdapter.getInstance().apiAdapter.getAPI(new APIFilter.Builder().hasId(rollbackAPI.getId()).build(), false);
+			rollbackAPI = APIManagerAdapter.getInstance().apiAdapter.getAPI(new APIFilter.Builder().hasId(rollbackAPI.getId()).build(), true);
 		}
 		if(rollbackAPI.getState().equals(API.STATE_PUBLISHED)) {
 			new APIStatusManager().update(rollbackAPI, API.STATE_UNPUBLISHED, true);
