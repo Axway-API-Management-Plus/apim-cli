@@ -132,7 +132,7 @@ public class APIManagerCLI {
 		if(this.selectedMethod==null) {
 			this.printUsage();
 		} else {
-			System.out.println("Running module: " + this.selectedService.getName() + " ("+this.selectedService.getVersion()+")");
+			System.out.println("Module: " + this.selectedService.getName() + " ("+this.selectedService.getVersion()+")");
 			System.out.println("------------------------------------------------------------------------");
 			try {
 				this.selectedMethod.invoke (this.selectedService, (Object)args);

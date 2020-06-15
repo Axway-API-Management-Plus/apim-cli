@@ -40,14 +40,14 @@ public class AppExportCLIOptions extends StandardExportCLIOptions {
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);		
 		System.out.println("You may run one of the following examples:");
-		System.out.println(getBinaryName()+" app get -n \"Client App\" -h localhost -u apiadmin -p changeme -f json");
-		System.out.println(getBinaryName()+" app get -n \"App 123\" -df -h localhost -u apiadmin -p changeme -s prod -f json");
-		System.out.println(getBinaryName()+" app get -n \"App 123\" -t /tmp/exported_apps -df true -h localhost -u apiadmin -p changeme -s prod -f json");
-		System.out.println();
-		System.out.println();
 		System.out.println("Using parameters provided in properties file stored in conf-folder:");
 		System.out.println(getBinaryName()+" app get -n \"Client App\" -s api-env -f json");
-		System.out.println(getBinaryName()+" app get -n \"Client App\" -t /tmp/exported_apps -deleteFolder -s api-env -f json");
+		System.out.println(getBinaryName()+" app get -n \"Client App\" -l /tmp/exported_apps -deleteFolder -s api-env -f json");
+		System.out.println(getBinaryName()+" app get -n \"App 123\" -l /tmp/exported_apps -s api-env -f json -deleteFolder");
+		System.out.println();
+		System.out.println();
+		System.out.println(getBinaryName()+" app get -n \"Client App\" -h localhost -u apiadmin -p changeme -f json");
+		System.out.println(getBinaryName()+" app get -n \"App 123\" -h localhost -u apiadmin -p changeme -s prod -f json -deleteFolder");
 		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");
 		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");

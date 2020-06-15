@@ -59,6 +59,8 @@ public class ApplicationExportTestAction extends AbstractTestAction {
 			args.add(context.replaceDynamicContentInString("${appName}"));
 			args.add("-s");
 			args.add(stage);
+			args.add("-f");
+			args.add("json");
 		} else {
 			args.add("-n");
 			args.add(context.replaceDynamicContentInString("${appName}"));
@@ -72,6 +74,8 @@ public class ApplicationExportTestAction extends AbstractTestAction {
 			args.add(context.replaceDynamicContentInString("${apiManagerUser}"));
 			args.add("-s");
 			args.add(stage);
+			args.add("-f");
+			args.add("json");
 			if(orgNameFilter!=null) {
 				args.add("-orgName");
 				args.add(orgNameFilter);
