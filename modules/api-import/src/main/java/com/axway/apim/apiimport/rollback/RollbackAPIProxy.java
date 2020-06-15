@@ -24,6 +24,7 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
 			if(rollbackAPI.getId()!=null) { // We already have an ID to the FE-API can delete it directly
 				LOG.info("Rollback FE-API: '"+this.rollbackAPI.getName()+"' (ID: '"+this.rollbackAPI.getId()+"' / State: '"+this.rollbackAPI.getState()+"')");
 				if(rollbackAPI.getId()!=null) {
+					this.rollbackAPI = APIManagerAdapter.getInstance().apiAdapter.getAPIWithId(this.rollbackAPI.getId());
 					new APIStatusManager().update(rollbackAPI, API.STATE_UNPUBLISHED, true);
 				}
 				APIManagerAdapter.getInstance().apiAdapter.deleteAPIProxy(this.rollbackAPI);
@@ -42,7 +43,7 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
 				}
 			}
 		} catch (Exception e) {
-			LOG.error("Error while deleting FE-API with ID: '"+this.rollbackAPI.getId()+"' to roll it back", e);
+			LOG.error("Error while deleting FE-API to roll it back", e);
 		}
 	}	
 }
