@@ -43,7 +43,7 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
 				}
 			}
 		} catch (Exception e) {
-			LOG.error("Error while deleting FE-API with ID: '"+this.rollbackAPI.getId()+"' to roll it back", e);
+			LOG.error("Error while deleting FE-API to roll it back", e);
 		}
 	}	
 }
