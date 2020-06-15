@@ -33,7 +33,7 @@ public class RollbackAPIProxy extends AbstractRollbackAction implements Rollback
 				API existingAPI = APIManagerAdapter.getInstance().apiAdapter.getAPI(filter, false);// The path is not set at this point, hence we provide null
 				if(existingAPI!=null) {
 					LOG.info("Rollback FE-API: '"+existingAPI.getName()+"' (ID: '"+existingAPI.getId()+"')");
-					APIManagerAdapter.getInstance().apiAdapter.deleteAPIProxy(this.rollbackAPI);
+					APIManagerAdapter.getInstance().apiAdapter.deleteAPIProxy(existingAPI);
 				} else {
 					LOG.info("No FE-API found to rollback.");
 				}

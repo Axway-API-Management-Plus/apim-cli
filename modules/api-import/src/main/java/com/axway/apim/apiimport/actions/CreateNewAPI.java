@@ -42,10 +42,12 @@ public class CreateNewAPI {
 			changes.getDesiredAPI().setApiId(createdBEAPI.getApiId());
 			createdAPI = apiAdapter.createAPIProxy(changes.getDesiredAPI());
 		} catch (Exception e) {
-			throw e;
-		} finally {
-			rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback	
+			// Try to rollback FE-API (Proxy) bases on the created BE-API
+			rollback.addRollbackAction(new RollbackAPIProxy(createdBEAPI));
+			throw e;	
 		}
+		
+		rollback.addRollbackAction(new RollbackAPIProxy(createdAPI)); // In any case, register the API just created for a potential rollback
 
 		try {
 			// ... here we basically need to add all props to initially bring the API in sync!
