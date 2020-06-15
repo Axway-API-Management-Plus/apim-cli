@@ -140,7 +140,8 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public API getAPIWithId(String id) throws AppException {
-		return getAPI(new APIFilter.Builder().hasApiId(id).build(), false);
+		if(id==null) return null;
+		return getAPI(new APIFilter.Builder().hasId(id).build(), false);
 	}
 
 	/**
@@ -909,9 +910,9 @@ public class APIManagerAPIAdapter {
 					if(statusCode != 204) {
 						LOG.error("Error granting access to API: '"+api.getName()+"' (ID: "+api.getId()+"). Received Status-Code: " +statusCode + ", Response: " + response);
 						throw new AppException("Error granting API access. Received Status-Code: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+					} else {
+						LOG.info("Retry successful!");
 					}
-				} else {
-					LOG.info("Retry successful!");
 				}
 			}
 			// Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
