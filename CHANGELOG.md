@@ -16,3 +16,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Delete APIs (Front and Backend)
 - Publish APIs
 - Introduced API-Management programming interface
+
+### Fixed
+- Cannot set Oauth authentication Profile using its name (See issue [#2](https://github.com/Axway-API-Management-Plus/apim-cli/issues/2))
