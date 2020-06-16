@@ -815,13 +815,20 @@ public class APIManagerAPIAdapter {
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
-				LOG.error("Error upgrading access to newer API. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
-				throw new AppException("Error upgrading access to newer API. Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_BE_API);
+				String response = EntityUtils.toString(httpResponse.getEntity());
+				if(statusCode==403 && response.contains("Unknown API")) {
+					LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in 1 second.");
+					Thread.sleep(1000);
+					httpResponse = request.execute();
+					statusCode = httpResponse.getStatusLine().getStatusCode();
+					if(statusCode != 204) {
+						LOG.error("Error upgrading access to newer API. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
+						throw new AppException("Error upgrading access to newer API. Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_BE_API);
+					} else {
+						LOG.info("Successfully granted access to newer API on retry. Received Status-Code: " +statusCode );
+					}
+				}
 			}
-			// API-Manager has now granted access to all existing orgs and give a subscription to existing app
-			// therefore we have to update the new Actual-State to reflect this
-			//inTransitState.setClientOrganizations(actualState.getClientOrganizations());
-			//inTransitState.setApplications(actualState.getApplications());
 		} catch (Exception e) {
 			throw new AppException("Can't upgrade access to newer API!", ErrorCode.CANT_UPGRADE_API_ACCESS, e);
 		} finally {
