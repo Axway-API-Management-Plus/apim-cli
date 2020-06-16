@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -89,6 +91,13 @@ public class APIManagerAdapter {
 	
 	public final static String TYPE_FRONT_END = "proxies";
 	public final static String TYPE_BACK_END = "apirepo";
+	
+	public static enum CUSTOM_PROP_TYPE {
+		api, 
+		user, 
+		organization, 
+		application
+	}
 	
 	private CommandParameters cmd;
 	
@@ -472,6 +481,24 @@ public class APIManagerAdapter {
 		APIManagerAdapter.apiManagerVersion = APIManagerAdapter.getInstance().configAdapter.getApiManagerConfig("productVersion");
 		return APIManagerAdapter.apiManagerVersion;
 	}
+	
+	public static Map<String, String> getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE type) {
+    	Map<String, String> allCustomProps = new HashMap<String, String>();
+    	try {
+    		JsonNode appConfig = getCustomPropertiesConfig();
+    		JsonNode apiCustomProps = appConfig.get(type.name());
+    		if(apiCustomProps==null) return null;
+    		Iterator<Entry<String, JsonNode>> it = apiCustomProps.fields();
+    		while(it.hasNext()) {
+    			Entry<String, JsonNode> entry = it.next();
+    			allCustomProps.put(entry.getKey(), null);
+    		}
+    		return allCustomProps;
+    	} catch (Exception e) {
+    		LOG.error("Error loading configured custom properties from API-Manager", e);
+    		return null;
+    	}
+    }
 	
 	public static JsonNode getCustomPropertiesConfig() throws AppException {
 		

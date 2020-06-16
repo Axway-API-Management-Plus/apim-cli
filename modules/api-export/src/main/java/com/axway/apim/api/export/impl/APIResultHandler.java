@@ -7,11 +7,13 @@ import java.util.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapter.CUSTOM_PROP_TYPE;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
+import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.apis.APIFilter.POLICY_TRANSLATION;
-import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -75,6 +77,7 @@ public abstract class APIResultHandler {
 				.hasId(params.getValue("id"))
 				.hasName(params.getValue("name"))
 				.hasState(params.getValue("state"))
+				.includeCustomProperties(APIManagerAdapter.getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE.api))
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.translatePolicies(POLICY_TRANSLATION.TO_NAME);
 		return builder;
