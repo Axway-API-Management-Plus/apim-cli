@@ -51,11 +51,11 @@ The automated End-2-End test suite contains of __113__ different scenarios, whic
 
 | Version       | Branch               | Status | Comment | 
 | :---          | :---                 | :---:  | :--- |
-| 7.6.2 SP4     | develop  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
-| 7.7.0 SP2     | test-with-7.7-SP2  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=test-with-7.7-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
-| 7.7-20200130    | test-with-7.7-20200130  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=test-with-7.7-20200130)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
-| 7.7-20200331    | test-with-7.7-20200331  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=test-with-7.7-20200331)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
-| 7.7-20200530    | test-with-7.7-20200530  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=test-with-7.7-20200530)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.6.2 SP4     | develop  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/develop)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.7.0 SP2     | test-with-7.7-SP2  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.7-20200130    | test-with-7.7-20200130  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200130)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.7-20200331    | test-with-7.7-20200331  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200331)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.7-20200530    | test-with-7.7-20200530  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200530)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
 
 Version 7.5.3 is NOT supported. Version 7.6.2 SP3 is required.  
 
