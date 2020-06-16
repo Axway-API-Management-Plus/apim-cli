@@ -51,7 +51,11 @@
          "value 2"
       ]
    },
-
+   "customProperties":{
+      "customProperty1":"Test-Input 1",
+      "customProperty2":"1",
+      "customProperty3":"true"
+   },
    "corsProfiles":[
       {
          "name":"_default",

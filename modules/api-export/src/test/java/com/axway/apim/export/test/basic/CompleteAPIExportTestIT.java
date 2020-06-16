@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
@@ -127,6 +128,10 @@ public class CompleteAPIExportTestIT extends TestNGCitrusTestRunner {
 			APIQuota exportedSystemQuota = mapper.convertValue(exportedAPIConfig.get("systemQuota"), new TypeReference<APIQuota>(){});
 			assertEquals(importedSystemQuota, exportedSystemQuota, "systemQuota are not equal.");
 		}
+		
+		Map<String, String> importedCustomProperties = mapper.convertValue(importedAPIConfig.get("customProperties"), new TypeReference<Map<String, String>>(){});
+		Map<String, String> exportedCustomProperties = mapper.convertValue(exportedAPIConfig.get("customProperties"), new TypeReference<Map<String, String>>(){});
+		assertEquals(importedCustomProperties, exportedCustomProperties, "CustomProperties are not equal.");
 
 		assertEquals(exportedAPIConfig.get("caCerts").size(), 				4);
 		
