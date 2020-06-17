@@ -181,16 +181,23 @@ public class APIManagerAPIAccessAdapter {
 			RestAPICall request = new POSTRequest(entity, uri, APIManagerAdapter.hasAdminAccount());
 			request.setContentType("application/json");
 			httpResponse = request.execute();
-			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();			
 			if(statusCode < 200 || statusCode > 299){
 				String response = EntityUtils.toString(httpResponse.getEntity());
-				if(statusCode==409 && response.contains("resource already exists")) {
-					LOG.warn("API Access: "+apiAccess+" for " + type + " with ID: " + parentId + " already exists. Ignoring this error.");
-					return apiAccess;
+				if(statusCode==403 && response.contains("Unknown API")) {
+					LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in 1 second.");
+					Thread.sleep(1000);
+					httpResponse = request.execute();
+					statusCode = httpResponse.getStatusLine().getStatusCode();
+					if(statusCode < 200 || statusCode > 299){
+						LOG.error("Error creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'");
+						throw new AppException("Error creating/updating API Access. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+					} else {
+						LOG.info("Successfully created API-Access on retry. Received Status-Code: " +statusCode );
+					}
 				}
-				LOG.error("Error creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'");
-				throw new AppException("Error creating/updating API Access. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
+			
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			apiAccess =  mapper.readValue(response, APIAccess.class);
 			// Clean cache for this ID (App/Org) to force reload next time

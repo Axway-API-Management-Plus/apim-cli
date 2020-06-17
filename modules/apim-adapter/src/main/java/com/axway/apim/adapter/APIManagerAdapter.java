@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -90,6 +92,13 @@ public class APIManagerAdapter {
 	public final static String TYPE_FRONT_END = "proxies";
 	public final static String TYPE_BACK_END = "apirepo";
 	
+	public static enum CUSTOM_PROP_TYPE {
+		api, 
+		user, 
+		organization, 
+		application
+	}
+	
 	private CommandParameters cmd;
 	
 	private static CacheManager cacheManager;
@@ -159,7 +168,7 @@ public class APIManagerAdapter {
 		URI uri;
 		if(cmd.ignoreAdminAccount() && useAdminClient) return;
 		if(hasAdminAccount && useAdminClient) return; // Already logged in with an Admin-Account.
-		HttpResponse response = null;
+		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/login").build();
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -182,12 +191,24 @@ public class APIManagerAdapter {
 		    params.add(new BasicNameValuePair("password", password));
 		    POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, useAdminClient);
 			loginRequest.setContentType(null);
-			response = loginRequest.execute();
-			int statusCode = response.getStatusLine().getStatusCode();
-			if(statusCode == 403 || statusCode == 401){
-				LOG.error("Login failed: " +statusCode+ ", Response: " + response);
-				throw new AppException("Given user: '"+username+"' can't login.", ErrorCode.API_MANAGER_COMMUNICATION);
-			} 
+			httpResponse = loginRequest.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode < 200 || statusCode > 299){
+				String response = EntityUtils.toString(httpResponse.getEntity());
+				if(statusCode==403 && response.contains("Unknown API")) {
+					LOG.warn("Login failed with statusCode: " +statusCode+ ". Got response: '"+response+"' ... Try again in 1 second.");
+					Thread.sleep(1000);
+					httpResponse = loginRequest.execute();
+					statusCode = httpResponse.getStatusLine().getStatusCode();
+					if(statusCode < 200 || statusCode > 299){
+						LOG.error("Login finally failed with statusCode: " +statusCode+ ". Got response: '"+response+"' Got response: '"+response+"'");
+						throw new AppException("Login finally failed with statusCode: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+					} else {
+						LOG.info("Successfully logged in on retry. Received Status-Code: " +statusCode );
+					}
+				}
+			}
+			
 			User user = getCurrentUser(useAdminClient);
 			if(user.getRole().equals("admin")) {
 				this.hasAdminAccount = true;
@@ -203,8 +224,8 @@ public class APIManagerAdapter {
 			throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
-				if(response!=null) 
-					((CloseableHttpResponse)response).close();
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}	
 	}
@@ -472,6 +493,24 @@ public class APIManagerAdapter {
 		APIManagerAdapter.apiManagerVersion = APIManagerAdapter.getInstance().configAdapter.getApiManagerConfig("productVersion");
 		return APIManagerAdapter.apiManagerVersion;
 	}
+	
+	public static Map<String, String> getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE type) {
+    	Map<String, String> allCustomProps = new HashMap<String, String>();
+    	try {
+    		JsonNode appConfig = getCustomPropertiesConfig();
+    		JsonNode apiCustomProps = appConfig.get(type.name());
+    		if(apiCustomProps==null) return null;
+    		Iterator<Entry<String, JsonNode>> it = apiCustomProps.fields();
+    		while(it.hasNext()) {
+    			Entry<String, JsonNode> entry = it.next();
+    			allCustomProps.put(entry.getKey(), null);
+    		}
+    		return allCustomProps;
+    	} catch (Exception e) {
+    		LOG.error("Error loading configured custom properties from API-Manager", e);
+    		return null;
+    	}
+    }
 	
 	public static JsonNode getCustomPropertiesConfig() throws AppException {
 		

@@ -5,10 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Custom-Properties missing in API-Export (See issue [#13](https://github.com/Axway-API-Management-Plus/apim-cli/issues/13))
 
-## [0.0.9] 2020-04-08
+## [1.0.0] 2020-06-15
 ### Added
-- Initial version
-- Refactored Swagger-Promote to support modularized approach
-- Migrated API-Import & Export to a dedicated module
-- Added new module to manage applications
+- Initial version of the APIM-CLI
+- Swagger-Promote completely refactored
+- Migrated API-Import & Export to dedicated modules
+- New modules to manage applications (Import and Export)
+- Get APIs and Applications (Filtered, different formats)
+- Delete APIs (Front and Backend)
+- Publish APIs
+- Introduced API-Management programming interface
+
+### Fixed
+- Cannot set Oauth authentication Profile using its name (See issue [#2](https://github.com/Axway-API-Management-Plus/apim-cli/issues/2))

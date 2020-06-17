@@ -81,7 +81,7 @@ public class CreateNewAPI {
 
 			// Provide the ID of the created API to the desired API just for logging purposes
 			changes.getDesiredAPI().setId(createdAPI.getId());
-			LOG.info("Successfully created "+createdAPI.getState()+" API: '"+createdAPI.getName()+"' "+createdAPI.getVersion()+" (ID: "+createdAPI.getId()+")" );
+			LOG.info(changes.waiting4Approval()+"Successfully created "+createdAPI.getState()+" API: '"+createdAPI.getName()+"' "+createdAPI.getVersion()+" (ID: "+createdAPI.getId()+")" );
 		} catch (Exception e) {
 			throw e;
 		} finally {
