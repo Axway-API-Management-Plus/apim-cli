@@ -23,11 +23,24 @@ Available commands and options:
 apim app - Manage your applications
 apim api - Manage your APIs
 ```
-To get a list of commands for each group call for instance `apim app`:
+To get for instance a `wide` list of APIs on the stage: `prod` execute the following command:
+```
+apim api get -s prod -wide
+```
+```
+....
++--------------------------------------+-----------------+----------------+---------+---------------------+-------------+-------------+----------+----------------------+
+| API-Id                               | Path            | Name           | Version | V-Host              | State       | Security    | Policies | Organization         |
++--------------------------------------+-----------------+----------------+---------+---------------------+-------------+-------------+----------+----------------------+
+| 518b15c9-350c-47d8-9ad6-16ce02ef9dfe | /vhost-test-950 | VHost Test 950 |   1.0.0 | api123.customer.com | unpublished | passThrough | None     | API Development 5538 |
+| 39b7b2aa-7df8-44e0-b399-4e9d59dbad6d | /vhost-test-411 | VHost Test 411 |   1.0.0 | api123.customer.com |   published | passThrough | None     | API Development 5916 |
++--------------------------------------+-----------------+----------------+---------+---------------------+-------------+-------------+----------+----------------------+
+......
+```
 
-For an up-to-date list of the supported groups and commands, see the [documentation](https://github.com/Axway-API-Management-Plus/apim-cli/wiki#supported-commands).
+To get a list of commands for each group call for instance `apim app`
 
-The CLI is flexible and more commands will be added. You can find a list of available commands in the .
+The CLI is flexible and more commands will be added. For an up-to-date list of the supported groups and commands, see the [documentation](https://github.com/Axway-API-Management-Plus/apim-cli/wiki#supported-commands).
 
 ## Quality assurance process
 By using this CLI to control your Axway API management infrastructure it becomes a key component of your CI/CD process. Product quality is therefore very important so that you can be confident this CLI is doing what it's supposed to do.  
@@ -38,11 +51,11 @@ The automated End-2-End test suite contains of __113__ different scenarios, whic
 
 | Version       | Branch               | Status | Comment | 
 | :---          | :---                 | :---:  | :--- |
-| 7.6.2 SP4     | develop  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=develop)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
-| 7.7.0 SP2     | test-with-7.7-SP2  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=test-with-7.7-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
-| 7.7-20200130    | test-with-7.7-20200130  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=test-with-7.7-20200130)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)|The release has been tested, but during automated testing, some of the quota tests are flaky.|
-| 7.7-20200331    | test-with-7.7-20200331  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=test-with-7.7-20200331)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)|The release has been tested, but during automated testing, some of the quota tests are flaky.|
-| 7.7-2020053ß    | test-with-7.7-20200530  | [![Build Status](https://travis-ci.org/Axway-API-Management-Plus/apim-cli.svg?branch=test-with-7.7-20200530)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)|The release has been tested, but during automated testing, some of the quota tests are flaky.|
+| 7.6.2 SP4     | develop  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/develop)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.7.0 SP2     | test-with-7.7-SP2  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.7-20200130    | test-with-7.7-20200130  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200130)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.7-20200331    | test-with-7.7-20200331  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200331)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.7-20200530    | test-with-7.7-20200530  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200530)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
 
 Version 7.5.3 is NOT supported. Version 7.6.2 SP3 is required.  
 

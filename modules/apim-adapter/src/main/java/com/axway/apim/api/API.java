@@ -118,7 +118,7 @@ public class API {
 	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED})	
 	protected String version;
 	
-	@APIPropertyAnnotation(isBreaking = true, copyProp = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected String vhost = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED})
@@ -238,6 +238,8 @@ public class API {
 	 * the API-Manager internally doesn't. In API-Manager deprecation is just a true/false toggle.
 	 * To make Desired and Actual API comparable this method is encapsulating the difference. 
 	 * @see com.axway.apim.api.API#getState()
+	 * @return the state of the API (unpublished, deprecated, etc.)
+	 * @throws AppException in case of an error
 	 */
 	public String getState() throws AppException {
 		if(this.deprecated!=null 
