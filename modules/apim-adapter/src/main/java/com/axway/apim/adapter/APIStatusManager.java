@@ -58,16 +58,6 @@ public class APIStatusManager {
 	public APIStatusManager() throws AppException {
 		this.apimAdapter = APIManagerAdapter.getInstance();
 	}
-	/*
-	public void update(API api, String desiredState, boolean enforceBreakingChange) throws AppException {
-		if(desiredState.equals(api.getState())) {
-			LOG.debug("Desired and actual status equal. No need to update status!");
-			return;
-		}
-		api.setState(desiredState);
-		API actualApi = apimAdapter.apiAdapter.getAPI(new APIFilter.Builder().hasId(api.getId()).build(), true);
-		update(api, actualApi, enforceBreakingChange);
-	}*/
 	
 	public void update(API apiToUpdate, String desiredState, boolean enforceBreakingChange) throws AppException {
 		update(apiToUpdate, desiredState, null, enforceBreakingChange);

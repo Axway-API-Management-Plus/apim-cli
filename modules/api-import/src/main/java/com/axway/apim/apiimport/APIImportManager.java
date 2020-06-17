@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.API;
 import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.apiimport.actions.RecreateToUpdateAPI;
@@ -31,7 +30,7 @@ public class APIImportManager {
 	 */
 	public void applyChanges(APIChangeState changeState) throws AppException {
 		CommandParameters commands = CommandParameters.getInstance();
-		if(!APIManagerAdapter.hasAdminAccount() && isAdminAccountNeeded(changeState) ) {
+		if(!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded() ) {
 			if(commands.allowOrgAdminsToPublish()) {
 				LOG.debug("Desired API-State set to published using OrgAdmin account only. Going to create a publish request. "
 						+ "Set allowOrgAdminsToPublish to false to prevent orgAdmins from creating a publishing request.");
@@ -49,7 +48,6 @@ public class APIImportManager {
 			createAPI.execute(changeState, false);
 		// Otherwise an existing API exists
 		} else {
-			LOG.info("Update existing API: " + changeState.getActualAPI().getName() +" Version: "+ changeState.getActualAPI().getVersion() + " ("+changeState.getActualAPI().getId()+")");
 			if(!changeState.hasAnyChanges()) {
 				APIPropertiesExport.getInstance().setProperty("feApiId", changeState.getActualAPI().getId());
 				LOG.debug("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
@@ -71,7 +69,6 @@ public class APIImportManager {
 						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase());
 				UpdateExistingAPI updateAPI = new UpdateExistingAPI();
 				updateAPI.execute(changeState);
-				return;
 			} else { // We have changes, that require a re-creation of the API
 				LOG.info("Update API Strategy: Re-Create API as changes can't be applied to existing API. ");
 				LOG.debug("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
@@ -80,19 +77,9 @@ public class APIImportManager {
 				recreate.execute(changeState);
 			}
 		}
-		if(!APIManagerAdapter.hasAdminAccount() && isAdminAccountNeeded(changeState) && commands.allowOrgAdminsToPublish() ) {
+		if(!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded() && commands.allowOrgAdminsToPublish() ) {
 			LOG.info("Actual API has been created and is waiting for an approval by an administrator. "
 					+ "You may update the pending API as often as you want before it is finally published.");
 		}
 	}
-	
-	private boolean isAdminAccountNeeded(APIChangeState changeState) throws AppException {
-		if(changeState.getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) && 
-				(changeState.getActualAPI()==null || changeState.getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
-			return false;
-		} else {
-			return true;
-		}		
-	}
-
 }
