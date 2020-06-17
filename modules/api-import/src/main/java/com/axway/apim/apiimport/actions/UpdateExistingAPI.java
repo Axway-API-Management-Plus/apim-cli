@@ -62,7 +62,7 @@ public class UpdateExistingAPI {
 			new ManageClientOrgs(changes.getDesiredAPI(), changes.getActualAPI()).execute(false);
 			// Handle subscription to applications
 			new ManageClientApps(changes.getDesiredAPI(), changes.getActualAPI(), null).execute(false);
-			LOG.info("Successfully updated "+actualAPI.getState()+" API: '"+actualAPI.getName()+"' "+actualAPI.getVersion()+" (ID: "+actualAPI.getId()+")" );
+			LOG.info(changes.waiting4Approval()+"Successfully updated "+actualAPI.getState()+" API: '"+actualAPI.getName()+"' "+actualAPI.getVersion()+" (ID: "+actualAPI.getId()+")" );
 		} catch (Exception e) {
 			throw e;
 		} finally {
