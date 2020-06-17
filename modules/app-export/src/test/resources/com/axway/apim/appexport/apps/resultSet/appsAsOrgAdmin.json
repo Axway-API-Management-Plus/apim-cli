@@ -1,0 +1,78 @@
+[
+  {
+    "id": "68d1b0dc-0ec6-43c0-ba70-1ac8d5c3e7fe",
+    "name": "Wearable - Sleep Tracker",
+    "description": "Smart device app monitoring patient sleep cycle",
+    "email": "plexus.sleep.contact@plexorg.com",
+    "phone": null,
+    "enabled": true,
+    "state": "approved",
+    "oauthClientId": null,
+    "extClientId": null,
+    "apiKey": null,
+    "credentials": [
+      
+    ],
+    "appQuota": null,
+    "organization": {
+      "id": "5d4dfe67-783d-4d4b-8a9a-3a08635cf579",
+      "name": "Community",
+      "description": "Unverified untrusted developer users. Not intended for production-level client applications",
+      "email": null,
+      "image": null,
+      "restricted": "true",
+      "virtualHost": null,
+      "phone": null,
+      "enabled": "true",
+      "development": false,
+      "dn": "o=Community,ou=organizations,ou=APIPortal",
+      "createdOn": "1556038716879",
+      "startTrialDate": null,
+      "endTrialDate": null,
+      "trialDuration": null,
+      "isTrial": null
+    },
+    "image": "/api/portal/v1.3/applications/68d1b0dc-0ec6-43c0-ba70-1ac8d5c3e7fe/image",
+    "apis": [
+      
+    ]
+  },
+  {
+    "id": "83d59ccd-c507-4706-b586-199ff7ab69f7",
+    "name": "Wearable - Activity Tracker",
+    "description": "Smart device app monitoring patient heart rate and activity tracking",
+    "email": "plexus.activity.contact@careconnex.com",
+    "phone": null,
+    "enabled": true,
+    "state": "approved",
+    "oauthClientId": null,
+    "extClientId": null,
+    "apiKey": null,
+    "credentials": [
+      
+    ],
+    "appQuota": null,
+    "organization": {
+      "id": "5d4dfe67-783d-4d4b-8a9a-3a08635cf579",
+      "name": "Community",
+      "description": "Unverified untrusted developer users. Not intended for production-level client applications",
+      "email": null,
+      "image": null,
+      "restricted": "true",
+      "virtualHost": null,
+      "phone": null,
+      "enabled": "true",
+      "development": false,
+      "dn": "o=Community,ou=organizations,ou=APIPortal",
+      "createdOn": "1556038716879",
+      "startTrialDate": null,
+      "endTrialDate": null,
+      "trialDuration": null,
+      "isTrial": null
+    },
+    "image": "/api/portal/v1.3/applications/83d59ccd-c507-4706-b586-199ff7ab69f7/image",
+    "apis": [
+      
+    ]
+  }
+]

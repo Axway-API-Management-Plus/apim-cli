@@ -97,6 +97,7 @@ public class APIManagerQuotaAdapter {
 	}
 	
 	public APIQuota getQuotaForAPI(String quotaId, String apiId) throws AppException {
+		if(!APIManagerAdapter.hasAdminAccount()) return null;
 		readQuotaFromAPIManager(quotaId);
 		APIQuota quotaConfig;
 		try {
@@ -110,6 +111,7 @@ public class APIManagerQuotaAdapter {
 	}
 	
 	public APIQuota saveQuota(APIQuota quotaConfig, String quotaId) throws AppException {
+		if(!APIManagerAdapter.hasAdminAccount()) return null;
 		URI uri;
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
@@ -137,6 +139,7 @@ public class APIManagerQuotaAdapter {
 	}
 	
 	public APIQuota getDefaultQuota(Quota quotaType) throws AppException {
+		if(!APIManagerAdapter.hasAdminAccount()) return null;
 		readQuotaFromAPIManager(quotaType.getQuotaId());
 		APIQuota quotaConfig;
 		try {
