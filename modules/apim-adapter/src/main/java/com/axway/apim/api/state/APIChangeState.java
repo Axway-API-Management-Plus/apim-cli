@@ -9,6 +9,7 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.CommandParameters;
@@ -311,7 +312,7 @@ public class APIChangeState {
 	
 	public String waiting4Approval() throws AppException {
 		String isWaitingMsg = "";
-		if(isAdminAccountNeeded()) {
+		if(isAdminAccountNeeded() && !APIManagerAdapter.hasAdminAccount()) {
 			isWaitingMsg = "Waiting for approval ... ";
 		}
 		return isWaitingMsg;
