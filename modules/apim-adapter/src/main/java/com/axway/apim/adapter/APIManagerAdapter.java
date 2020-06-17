@@ -168,7 +168,7 @@ public class APIManagerAdapter {
 		URI uri;
 		if(cmd.ignoreAdminAccount() && useAdminClient) return;
 		if(hasAdminAccount && useAdminClient) return; // Already logged in with an Admin-Account.
-		HttpResponse response = null;
+		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/login").build();
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -191,12 +191,24 @@ public class APIManagerAdapter {
 		    params.add(new BasicNameValuePair("password", password));
 		    POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, useAdminClient);
 			loginRequest.setContentType(null);
-			response = loginRequest.execute();
-			int statusCode = response.getStatusLine().getStatusCode();
-			if(statusCode == 403 || statusCode == 401){
-				LOG.error("Login failed: " +statusCode+ ", Response: " + response);
-				throw new AppException("Given user: '"+username+"' can't login.", ErrorCode.API_MANAGER_COMMUNICATION);
-			} 
+			httpResponse = loginRequest.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode < 200 || statusCode > 299){
+				String response = EntityUtils.toString(httpResponse.getEntity());
+				if(statusCode==403 && response.contains("Unknown API")) {
+					LOG.warn("Login failed with statusCode: " +statusCode+ ". Got response: '"+response+"' ... Try again in 1 second.");
+					Thread.sleep(1000);
+					httpResponse = loginRequest.execute();
+					statusCode = httpResponse.getStatusLine().getStatusCode();
+					if(statusCode < 200 || statusCode > 299){
+						LOG.error("Login finally failed with statusCode: " +statusCode+ ". Got response: '"+response+"' Got response: '"+response+"'");
+						throw new AppException("Login finally failed with statusCode: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+					} else {
+						LOG.info("Successfully logged in on retry. Received Status-Code: " +statusCode );
+					}
+				}
+			}
+			
 			User user = getCurrentUser(useAdminClient);
 			if(user.getRole().equals("admin")) {
 				this.hasAdminAccount = true;
@@ -212,8 +224,8 @@ public class APIManagerAdapter {
 			throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
-				if(response!=null) 
-					((CloseableHttpResponse)response).close();
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}	
 	}
