@@ -31,6 +31,23 @@ public class VhostConfigTestIT extends TestNGCitrusTestRunner {
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/vhost-test-${apiNumber}");
 		variable("apiName", "VHost Test ${apiNumber}");
+		
+		echo("####### Importing unpublised API: '${apiName}' on path: '${apiPath}' with following settings: #######");
+		createVariable("status", "unpublished");
+		createVariable("vhost", "api123.customer.com");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/vhost/1_vhost-config.json");
+		createVariable("expectedReturnCode", "0");
+		swaggerImport.doExecute(context);
+		
+		echo("####### Validate unpublished API: '${apiName}' on path: '${apiPath}' is configured with V-Host #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+			.validate("$.[?(@.path=='${apiPath}')].vhost", "api123.customer.com")
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "published");
@@ -40,14 +57,13 @@ public class VhostConfigTestIT extends TestNGCitrusTestRunner {
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 
-		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has correct settings #######");
-		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+		echo("####### Validate published API: '${apiName}' on path: '${apiPath}' has V-Host configured #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json"));
 
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "published")
-			.validate("$.[?(@.path=='${apiPath}')].vhost", "api123.customer.com")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+			.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
+			.validate("$.[?(@.id=='${apiId}')].state", "published")
+			.validate("$.[?(@.id=='${apiId}')].vhost", "api123.customer.com"));
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "unpublished");

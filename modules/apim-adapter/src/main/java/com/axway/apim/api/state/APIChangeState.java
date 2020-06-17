@@ -43,6 +43,8 @@ public class APIChangeState {
 	
 	private List<String> breakingChanges = new Vector<String>();
 	private List<String> nonBreakingChanges = new Vector<String>();
+	
+	private String isAdminAccountNeeded = null;
 
 	/**
 	 * Constructs the APIChangeState based on the given Actual- and Desired-API.
@@ -59,6 +61,7 @@ public class APIChangeState {
 			return;
 		}
 		getChanges();
+		isAdminAccountNeeded();
 	}
 	
 	/**
@@ -130,6 +133,10 @@ public class APIChangeState {
 	
 	/**
 	 * Copied all changed properties of the API having APIPropertyAnnotation set to copyProp = true (default)
+	 * @param sourceAPI copy the properties from this source API
+	 * @param targetAPI copy the properties into this target API
+	 * @param propsToCopy the list of API properties to copy
+	 * @param logMessage controls if a log message is created which properties are copied
 	 * @throws AppException if something goes wrong
 	 */
 	public static void copyProps(API sourceAPI, API targetAPI, List<String> propsToCopy, boolean logMessage) throws AppException {
@@ -291,17 +298,22 @@ public class APIChangeState {
 		}
 	}
 	
-/*	public static API copyRequiredPropertisFromCreatedAPI(API desiredAPI, API createdAPI) throws AppException {
-		desiredAPI.setId(createdAPI.getId());
-		desiredAPI.setApiId(createdAPI.getApiId());
-		desiredAPI.setCreatedBy(createdAPI.getCreatedBy());
-		desiredAPI.setCreatedOn(createdAPI.getCreatedOn());
-		if(desiredAPI.getOutboundProfiles()==null) desiredAPI.setOutboundProfiles(createdAPI.getOutboundProfiles());
-		if(desiredAPI.getInboundProfiles()==null) desiredAPI.setInboundProfiles(createdAPI.getInboundProfiles());
-		if(desiredAPI.getServiceProfiles()==null) desiredAPI.setServiceProfiles(createdAPI.getServiceProfiles());
-		if(desiredAPI.getSecurityProfiles()==null) desiredAPI.setSecurityProfiles(createdAPI.getSecurityProfiles());
-		if(desiredAPI.getAuthenticationProfiles()==null) desiredAPI.setAuthenticationProfiles(createdAPI.getAuthenticationProfiles());
-		if(desiredAPI.getCaCerts()==null) desiredAPI.setCaCerts(createdAPI.getCaCerts());
-		return desiredAPI;
-	}*/
+	public boolean isAdminAccountNeeded() throws AppException {
+		if(this.isAdminAccountNeeded!=null) return Boolean.parseBoolean(this.isAdminAccountNeeded);
+		if(getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) && 
+				(getActualAPI()==null || getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
+			this.isAdminAccountNeeded = "false";
+		} else {
+			this.isAdminAccountNeeded = "true";
+		}
+		return Boolean.parseBoolean(this.isAdminAccountNeeded);
+	}
+	
+	public String waiting4Approval() throws AppException {
+		String isWaitingMsg = "";
+		if(isAdminAccountNeeded()) {
+			isWaitingMsg = "Waiting for approval ... ";
+		}
+		return isWaitingMsg;
+	}
 }
