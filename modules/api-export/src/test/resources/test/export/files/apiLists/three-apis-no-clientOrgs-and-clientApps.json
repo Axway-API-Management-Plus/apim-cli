@@ -1,0 +1,432 @@
+[
+  {
+    "apiConfiguration": null,
+    "apiDefinition": null,
+    "caCerts": [
+      
+    ],
+    "descriptionType": "manual",
+    "descriptionManual": "Demographics and other administrative information about an individual or animal receiving care or other health-related services. For more information: https://www.hl7.org/fhir/patient.html",
+    "descriptionMarkdown": null,
+    "descriptionUrl": null,
+    "securityProfiles": [
+      {
+        "name": "_default",
+        "isDefault": true,
+        "devices": [
+          {
+            "name": "OAuth",
+            "type": "oauth",
+            "order": 1,
+            "properties": {
+              "tokenStore": "<key type='OAuth2StoresGroup'><id field='name' value='OAuth2 Stores'/><key type='AccessTokenStoreGroup'><id field='name' value='Access Token Stores'/><key type='AccessTokenPersist'><id field='name' value='OAuth Access Token Store'/></key></key></key>",
+              "accessTokenLocation": "HEADER",
+              "authorizationHeaderPrefix": "Bearer",
+              "accessTokenLocationQueryString": "",
+              "scopesMustMatch": "Any",
+              "scopes": "resource.WRITE, resource.READ",
+              "removeCredentialsOnSuccess": "true",
+              "implicitGrantEnabled": "true",
+              "implicitGrantLoginEndpointUrl": "http://localhost:8089/api/oauth/authorize",
+              "implicitGrantLoginTokenName": "access_token",
+              "authCodeGrantTypeEnabled": "true",
+              "authCodeGrantTypeRequestEndpointUrl": "http://localhost:8089/api/oauth/authorize",
+              "authCodeGrantTypeRequestClientIdName": "client_id",
+              "authCodeGrantTypeRequestSecretName": "client_secret",
+              "authCodeGrantTypeTokenEndpointUrl": "http://localhost:8089/api/oauth/token",
+              "authCodeGrantTypeTokenEndpointTokenName": "access_code"
+            }
+          }
+        ]
+      }
+    ],
+    "authenticationProfiles": [
+      {
+        "name": "_default",
+        "isDefault": true,
+        "parameters": {
+          
+        },
+        "type": "none"
+      }
+    ],
+    "tags": {
+      "Industry": [
+        "Healthcare"
+      ],
+      "Type": [
+        "Demo_FHIR"
+      ],
+      "Category": [
+        "Identification",
+        " Individuals"
+      ],
+      "Standard": [
+        "FHIR"
+      ]
+    },
+    "outboundProfiles": {
+      "_default": {
+        "apiMethodId": null,
+        "apiId": null,
+        "routeType": "proxy",
+        "requestPolicy": null,
+        "responsePolicy": null,
+        "routePolicy": null,
+        "faultHandlerPolicy": null,
+        "authenticationProfile": "_default",
+        "parameters": [
+          
+        ]
+      }
+    },
+    "serviceProfiles": {
+      "_default": {
+        "apiId": "de8f8ee5-326b-4892-b4b4-a0ad39616705",
+        "basePath": "http://fhir3.healthintersections.com.au"
+      }
+    },
+    "inboundProfiles": {
+      "_default": {
+        "monitorAPI": true,
+        "monitorSubject": "authentication.subject.id",
+        "securityProfile": "_default",
+        "corsProfile": "_default"
+      }
+    },
+    "corsProfiles": [
+      {
+        "name": "_default",
+        "isDefault": true,
+        "origins": [
+          "*"
+        ],
+        "allowedHeaders": [
+          
+        ],
+        "exposedHeaders": [
+          "X-CorrelationID"
+        ],
+        "supportCredentials": false,
+        "maxAgeSeconds": "0"
+      }
+    ],
+    "clientOrganizations": null,
+    "applications": null,
+    "path": "/patient",
+    "state": "published",
+    "version": "DSTU2",
+    "vhost": null,
+    "name": "FHIR Patient",
+    "summary": null,
+    "createdOn": "1559049611774",
+    "createdBy": "f60e3e05-cdf3-4b70-affc-4cb61a10f4bb",
+    "image": null,
+    "customProperties": {
+      "customProperty1": null,
+      "customProperty2": null,
+      "customProperty3": null
+    },
+    "applicationQuota": null,
+    "systemQuota": null,
+    "apiRoutingKey": null,
+    "organization": {
+      "id": "2efca39a-2572-4b62-8d0f-53241d93d362",
+      "name": "FHIR",
+      "description": "FHIR Focused Healtcare Providers",
+      "email": "contact@fhirfocus.com",
+      "image": "/api/portal/v1.3/organizations/2efca39a-2572-4b62-8d0f-53241d93d362/image",
+      "restricted": "false",
+      "virtualHost": null,
+      "phone": null,
+      "enabled": "true",
+      "development": true,
+      "dn": "o=FHIR,ou=organizations,ou=APIPortal",
+      "createdOn": "1556526117010",
+      "startTrialDate": null,
+      "endTrialDate": null,
+      "trialDuration": null,
+      "isTrial": null
+    },
+    "id": "c96ad9d7-b34a-4ffc-bfb4-ec7d2543bf01",
+    "apiId": "de8f8ee5-326b-4892-b4b4-a0ad39616705",
+    "deprecated": "false",
+    "retirementDate": 0,
+    "apiMethods": null
+  },
+  {
+    "apiConfiguration": null,
+    "apiDefinition": null,
+    "caCerts": [
+      
+    ],
+    "descriptionType": "original",
+    "descriptionManual": null,
+    "descriptionMarkdown": null,
+    "descriptionUrl": null,
+    "securityProfiles": [
+      {
+        "name": "_default",
+        "isDefault": true,
+        "devices": [
+          {
+            "name": "Pass Through",
+            "type": "passThrough",
+            "order": 1,
+            "properties": {
+              "subjectIdFieldName": "Pass Through",
+              "removeCredentialsOnSuccess": "true"
+            }
+          }
+        ]
+      }
+    ],
+    "authenticationProfiles": [
+      {
+        "name": "_default",
+        "isDefault": true,
+        "parameters": {
+          
+        },
+        "type": "none"
+      }
+    ],
+    "tags": {
+      "Industry": [
+        "Healthcare"
+      ],
+      "Type": [
+        "Demo_Amplify_PlexusHealth"
+      ],
+      "Category": [
+        "Patient"
+      ]
+    },
+    "outboundProfiles": {
+      "_default": {
+        "apiMethodId": null,
+        "apiId": null,
+        "routeType": "proxy",
+        "requestPolicy": null,
+        "responsePolicy": null,
+        "routePolicy": null,
+        "faultHandlerPolicy": null,
+        "authenticationProfile": "_default",
+        "parameters": [
+          
+        ]
+      }
+    },
+    "serviceProfiles": {
+      "_default": {
+        "apiId": "de6663b4-8bc9-4433-a875-80558b5e2afb",
+        "basePath": "http://emr-system:8081"
+      }
+    },
+    "inboundProfiles": {
+      "_default": {
+        "monitorAPI": true,
+        "monitorSubject": "authentication.subject.id",
+        "securityProfile": "_default",
+        "corsProfile": "_default"
+      }
+    },
+    "corsProfiles": [
+      {
+        "name": "_default",
+        "isDefault": true,
+        "origins": [
+          "*"
+        ],
+        "allowedHeaders": [
+          
+        ],
+        "exposedHeaders": [
+          "X-CorrelationID"
+        ],
+        "supportCredentials": false,
+        "maxAgeSeconds": "0"
+      }
+    ],
+    "clientOrganizations": null,
+    "applications": null,
+    "path": "/api/emr/patient",
+    "state": "published",
+    "version": "3.7",
+    "vhost": null,
+    "name": "EMR-System-Patient",
+    "summary": "Processing electronic healthcare transactions for retrieving patient records",
+    "createdOn": "1556526631380",
+    "createdBy": "f60e3e05-cdf3-4b70-affc-4cb61a10f4bb",
+    "image": null,
+    "customProperties": {
+      "customProperty1": null,
+      "customProperty2": null,
+      "customProperty3": null
+    },
+    "applicationQuota": null,
+    "systemQuota": null,
+    "apiRoutingKey": null,
+    "organization": {
+      "id": "b1a880cc-a072-47f1-9800-07fdf3f9bbfa",
+      "name": "Plexus Health",
+      "description": null,
+      "email": null,
+      "image": "/api/portal/v1.3/organizations/b1a880cc-a072-47f1-9800-07fdf3f9bbfa/image",
+      "restricted": "false",
+      "virtualHost": null,
+      "phone": null,
+      "enabled": "true",
+      "development": true,
+      "dn": "o=Plexus Health,ou=organizations,ou=APIPortal",
+      "createdOn": "1556526467536",
+      "startTrialDate": null,
+      "endTrialDate": null,
+      "trialDuration": null,
+      "isTrial": null
+    },
+    "id": "e95e229d-6ac0-43ac-9bf1-f09fb5b8f9c7",
+    "apiId": "de6663b4-8bc9-4433-a875-80558b5e2afb",
+    "deprecated": "false",
+    "retirementDate": 0,
+    "apiMethods": null
+  },
+  {
+    "apiConfiguration": null,
+    "apiDefinition": null,
+    "caCerts": [
+      
+    ],
+    "descriptionType": "original",
+    "descriptionManual": null,
+    "descriptionMarkdown": null,
+    "descriptionUrl": null,
+    "securityProfiles": [
+      {
+        "name": "_default",
+        "isDefault": true,
+        "devices": [
+          {
+            "name": "Pass Through",
+            "type": "passThrough",
+            "order": 1,
+            "properties": {
+              "subjectIdFieldName": "Pass Through",
+              "removeCredentialsOnSuccess": "true"
+            }
+          }
+        ]
+      }
+    ],
+    "authenticationProfiles": [
+      {
+        "name": "_default",
+        "isDefault": true,
+        "parameters": {
+          
+        },
+        "type": "none"
+      }
+    ],
+    "tags": {
+      "Industry": [
+        "Healthcare"
+      ],
+      "Type": [
+        "Demo_Amplify_PlexusHealth"
+      ],
+      "Category": [
+        "Auth",
+        " Security"
+      ]
+    },
+    "outboundProfiles": {
+      "_default": {
+        "apiMethodId": null,
+        "apiId": null,
+        "routeType": "proxy",
+        "requestPolicy": null,
+        "responsePolicy": null,
+        "routePolicy": null,
+        "faultHandlerPolicy": null,
+        "authenticationProfile": "_default",
+        "parameters": [
+          
+        ]
+      }
+    },
+    "serviceProfiles": {
+      "_default": {
+        "apiId": "c0110ba8-e746-4a3a-bd38-5d5c31c5f849",
+        "basePath": "http://patient-auth-service:8086"
+      }
+    },
+    "inboundProfiles": {
+      "_default": {
+        "monitorAPI": true,
+        "monitorSubject": "authentication.subject.id",
+        "securityProfile": "_default",
+        "corsProfile": "_default"
+      }
+    },
+    "corsProfiles": [
+      {
+        "name": "_default",
+        "isDefault": true,
+        "origins": [
+          "*"
+        ],
+        "allowedHeaders": [
+          
+        ],
+        "exposedHeaders": [
+          "X-CorrelationID"
+        ],
+        "supportCredentials": false,
+        "maxAgeSeconds": "0"
+      }
+    ],
+    "clientOrganizations": null,
+    "applications": null,
+    "path": "/api/sec/auth/patient",
+    "state": "published",
+    "version": "2.2",
+    "vhost": null,
+    "name": "Security-PatientAuth-Service",
+    "summary": "Security service providing patient authentication",
+    "createdOn": "1556526631881",
+    "createdBy": "f60e3e05-cdf3-4b70-affc-4cb61a10f4bb",
+    "image": null,
+    "customProperties": {
+      "customProperty1": null,
+      "customProperty2": null,
+      "customProperty3": null
+    },
+    "applicationQuota": null,
+    "systemQuota": null,
+    "apiRoutingKey": null,
+    "organization": {
+      "id": "b1a880cc-a072-47f1-9800-07fdf3f9bbfa",
+      "name": "Plexus Health",
+      "description": null,
+      "email": null,
+      "image": "/api/portal/v1.3/organizations/b1a880cc-a072-47f1-9800-07fdf3f9bbfa/image",
+      "restricted": "false",
+      "virtualHost": null,
+      "phone": null,
+      "enabled": "true",
+      "development": true,
+      "dn": "o=Plexus Health,ou=organizations,ou=APIPortal",
+      "createdOn": "1556526467536",
+      "startTrialDate": null,
+      "endTrialDate": null,
+      "trialDuration": null,
+      "isTrial": null
+    },
+    "id": "e69c03e1-d99d-4efc-bbd1-65701b20ed72",
+    "apiId": "c0110ba8-e746-4a3a-bd38-5d5c31c5f849",
+    "deprecated": "false",
+    "retirementDate": 0,
+    "apiMethods": null
+  }
+]

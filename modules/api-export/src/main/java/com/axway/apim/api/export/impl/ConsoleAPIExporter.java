@@ -78,7 +78,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getUsedPolicies(api)),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
 				new Column().header("Orgs").with(api -> getOrgCount(api)),
-				new Column().header("Apps").with(api -> Integer.toString(api.getApplications().size())),
+				new Column().header("Apps").with(api -> getAppCount(api)),
 				new Column().header("Quotas").with(api -> Boolean.toString(hasQuota(api))),
 				new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getTags(api))
 				)));
@@ -138,11 +138,17 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	
 	private String getOrgCount(API api) {
 		try {
+			if(api.getClientOrganizations()==null) return "N/A";
 			return Integer.toString(api.getClientOrganizations().size());
 		} catch (AppException e) {
 			LOG.error("Error getting API client organization");
 			return "Err";
 		}
+	}
+	
+	private String getAppCount(API api) {
+		if(api.getApplications()==null) return "N/A";
+		return Integer.toString(api.getApplications().size());
 	}
 	
 	private String getUsedPolicies(API api) {
