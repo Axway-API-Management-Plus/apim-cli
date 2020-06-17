@@ -220,7 +220,7 @@ public class APIManagerAPIAdapter {
 			LOG.debug("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
 			return foundAPIs;
 		}
-		LOG.info("No existing API found based on filter: " + getFilterFields(filter));
+		LOG.debug("No existing API found based on filter: " + getFilterFields(filter));
 		return foundAPIs;
 	}
 	
