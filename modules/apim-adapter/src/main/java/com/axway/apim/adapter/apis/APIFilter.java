@@ -413,7 +413,7 @@ public class APIFilter {
 				if(this.getApiPath()!=null && !this.getApiPath().equals(api.getPath())) return false;
 			}
 		}
-		if(this.getPolicyName()!=null && this.getPolicyName().contains("*")) {
+		if(this.getPolicyName()!=null) {
 			Pattern pattern = Pattern.compile(this.getPolicyName().replace("*", ".*"));
 			Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
 			boolean requestedPolicyUsed = false;
@@ -433,17 +433,11 @@ public class APIFilter {
 			}
 			if(!requestedPolicyUsed) return false;
 		}
-		if(this.getBackendBasepath()!=null) {
-			if(this.getBackendBasepath().contains("*")) {
-				Pattern pattern = Pattern.compile(this.getBackendBasepath().replace("*", ".*"));
-				Matcher matcher = pattern.matcher(api.getServiceProfiles().get("_default").getBasePath());
-				if(!matcher.matches()) {
-					return false;
-				}
-			} else {
-				if(!this.getBackendBasepath().equals(api.getServiceProfiles().get("_default").getBasePath())) {
-					return false;
-				}
+		if(this.getBackendBasepath()!=null) {			
+			Pattern pattern = Pattern.compile(this.getBackendBasepath().replace("*", ".*"));
+			Matcher matcher = pattern.matcher(api.getServiceProfiles().get("_default").getBasePath());
+			if(!matcher.matches()) {
+				return false;
 			}
 		}
 		if(this.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
