@@ -10,6 +10,7 @@ import java.util.Map;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.api.API;
+import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
@@ -60,6 +61,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 				new Column().header("Version").with(api -> api.getVersion()),
 				new Column().header("V-Host").with(api -> api.getVhost()),
 				new Column().header("State").with(api -> getState(api)),
+				new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getBackendPath(api)),
 				new Column().header("Security").with(api -> getUsedSecurity(api)),
 				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getUsedPolicies(api)),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()
@@ -74,6 +76,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 				new Column().header("Version").with(api -> api.getVersion()),
 				new Column().header("V-Host").with(api -> api.getVhost()),
 				new Column().header("State").with(api -> getState(api)),
+				new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getBackendPath(api)),
 				new Column().header("Security").with(api -> getUsedSecurity(api)),
 				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getUsedPolicies(api)),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
@@ -170,6 +173,11 @@ public class ConsoleAPIExporter extends APIResultHandler {
 		if(policies.size()==0) return "None";
 		String result = policies.toString().replace("[", "").replace("]", "");
 		return result;
+	}
+	
+	private String getBackendPath(API api) {
+		ExportAPI exportAPI = new ExportAPI(api);
+		return exportAPI.getBackendBasepath();
 	}
 
 	private String getUsedSecurity(API api) {

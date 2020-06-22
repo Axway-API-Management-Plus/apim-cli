@@ -77,6 +77,7 @@ public abstract class APIResultHandler {
 				.hasId(params.getValue("id"))
 				.hasName(params.getValue("name"))
 				.hasState(params.getValue("state"))
+				.hasBackendBasepath(params.getValue("backend"))
 				.includeCustomProperties(APIManagerAdapter.getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE.api))
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.translatePolicies(POLICY_TRANSLATION.TO_NAME);

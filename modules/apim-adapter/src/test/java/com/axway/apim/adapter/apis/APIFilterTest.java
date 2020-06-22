@@ -1,6 +1,10 @@
 package com.axway.apim.adapter.apis;
 
+import static org.testng.Assert.assertTrue;
+
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -8,6 +12,8 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
+import com.axway.apim.api.API;
+import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 
@@ -150,4 +156,37 @@ public class APIFilterTest {
 		
 		Assert.assertEquals(filter1, filter2, "Both filters should be equal");
 	}
+	
+	@Test
+	public void testBackendBasepathFilter() throws AppException {
+		APIFilter filter = new APIFilter.Builder()
+				.hasBackendBasepath("*emr-system*")
+				.build();
+		API testAPI = getAPIWithBackendBasepath("http://emr-system:8081");
+		assertTrue(filter.filter(testAPI), "API with base-path: http://emr-system:8081 should match to filter: *emr-system*");
+		testAPI = getAPIWithBackendBasepath("http://sec.hipaa:8086");
+		assertTrue(! filter.filter(testAPI), "API with base-path: http://sec.hipaa:8086 should NOT match to filter: *emr-system*");
+		
+		filter = new APIFilter.Builder()
+				.hasBackendBasepath("http://emr-system:8081")
+				.build();
+		
+		testAPI = getAPIWithBackendBasepath("http://emr-system:8081");
+		assertTrue(filter.filter(testAPI), "API with base-path: http://emr-system:8081 should match to filter: http://emr-system:8081");
+		
+		testAPI = getAPIWithBackendBasepath("http://fhir3.healthintersections.com.au");
+		assertTrue(! filter.filter(testAPI), "API with base-path: http://fhir3.healthintersections.com.au should NOT match to filter: http://emr-system:8081");
+		
+	}
+	
+	private API getAPIWithBackendBasepath(String basePath) {
+		API api = new API();
+		ServiceProfile serviceProfile = new ServiceProfile();
+		serviceProfile.setBasePath(basePath);
+		Map<String, ServiceProfile> serviceProfiles = new HashMap<String, ServiceProfile>();
+		serviceProfiles.put("_default", serviceProfile);
+		api.setServiceProfiles(serviceProfiles);
+		return api;
+	}
 }
+
