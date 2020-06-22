@@ -45,6 +45,12 @@ public abstract class APIExportCLIOptions extends StandardExportCLIOptions {
 		option = new  Option("state", true, "Select APIs with specific state: unpublished | pending | published");
 		option.setRequired(false);
 		options.addOption(option);
+		
+		option = new  Option("backend", true, "Filter APIs with specific backendBasepath. Wildcards are supported.");
+		option.setRequired(false);
+		options.addOption(option);
+		
+		
 
 		option = new Option("l", "localFolder", true, "Defines the location to store API-Definitions locally. Defaults to current folder.\n"
 				+ "For each API a new folder is created automatically.");

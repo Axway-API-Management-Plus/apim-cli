@@ -55,6 +55,7 @@ public class APIFilter {
 	private String apiPath;
 	private String queryStringVersion;
 	private String state;
+	private String backendBasepath;
 	
 	private String createdOn;
 	private String createdOnOp;
@@ -206,8 +207,14 @@ public class APIFilter {
 	public void setQueryStringVersion(String queryStringVersion) {
 		this.queryStringVersion = queryStringVersion;
 	}
-	
-	
+
+	public String getBackendBasepath() {
+		return backendBasepath;
+	}
+
+	public void setBackendBasepath(String backendBasepath) {
+		this.backendBasepath = backendBasepath;
+	}
 
 	public METHOD_TRANSLATION getTranslateMethodMode() {
 		return translateMethodMode;
@@ -391,7 +398,7 @@ public class APIFilter {
 	
 	
 	public boolean filter(API api) throws AppException {
-		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null) { // Nothing given to filter out.
+		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null && this.getBackendBasepath()==null) { // Nothing given to filter out.
 			return true;
 		}
 		// Before 7.7, we have to filter out APIs manually!
@@ -425,6 +432,19 @@ public class APIFilter {
 				}
 			}
 			if(!requestedPolicyUsed) return false;
+		}
+		if(this.getBackendBasepath()!=null) {
+			if(this.getBackendBasepath().contains("*")) {
+				Pattern pattern = Pattern.compile(this.getBackendBasepath().replace("*", ".*"));
+				Matcher matcher = pattern.matcher(api.getServiceProfiles().get("_default").getBasePath());
+				if(!matcher.matches()) {
+					return false;
+				}
+			} else {
+				if(!this.getBackendBasepath().equals(api.getServiceProfiles().get("_default").getBasePath())) {
+					return false;
+				}
+			}
 		}
 		if(this.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
 			if(this.getVhost()!=null && !this.getVhost().equals(api.getVhost()))  return false;
@@ -460,6 +480,7 @@ public class APIFilter {
 		String apiPath;
 		String queryStringVersion;
 		String state;
+		String backendBasepath;
 		
 		String createdOn;
 		FILTER_OP createdOnOp;
@@ -536,6 +557,7 @@ public class APIFilter {
 			apiFilter.setDeprecated(this.deprecated);
 			apiFilter.setCustomProperties(this.customProperties);
 			apiFilter.setCreatedOn(this.createdOn, this.createdOnOp);
+			apiFilter.setBackendBasepath(this.backendBasepath);
 			return apiFilter;
 		}
 
@@ -674,6 +696,11 @@ public class APIFilter {
 		
 		public Builder translateMethods(METHOD_TRANSLATION translateMethodMode) {
 			this.translateMethodMode = translateMethodMode;
+			return this;
+		}
+		
+		public Builder hasBackendBasepath(String backendBasepath) {
+			this.backendBasepath = backendBasepath;
 			return this;
 		}
 	}
