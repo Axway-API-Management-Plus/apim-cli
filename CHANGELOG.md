@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added API Backend in wide and ultra view console get view
 - Added the option to filter for specific backendBasepath
-
+- Added API detail information if only 1 API is found (See issue [#11](https://github.com/Axway-API-Management-Plus/apim-cli/issues/11))
 
 ## [1.0.1] 2020-06-17
 ### Fixed
