@@ -4,7 +4,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.api.API;
-import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class RollbackBackendAPI extends AbstractRollbackAction implements RollbackAction {
@@ -31,7 +30,7 @@ public class RollbackBackendAPI extends AbstractRollbackAction implements Rollba
 			 */
 			if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
 				rolledBack = true;
-				Long beAPICreatedOn = Long.parseLong( ((APIBaseDefinition)rollbackAPI).getCreatedOn() );
+				Long beAPICreatedOn = rollbackAPI.getCreatedOn();
 				// The createdOn of the API we are looking for, should be almost created at the same time, as the code runs internally in API-Manager.
 				beAPICreatedOn = beAPICreatedOn - 1000;
 				APIFilter filter = new APIFilter.Builder(APIType.CUSTOM, true)

@@ -299,16 +299,18 @@ public class APIChangeState {
 		}
 	}
 	
-	public boolean isAdminAccountNeeded() throws AppException {
-		if(this.isAdminAccountNeeded!=null) return Boolean.parseBoolean(this.isAdminAccountNeeded);
-		if(getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) && 
-				(getActualAPI()==null || getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
-			this.isAdminAccountNeeded = "false";
-		} else {
-			this.isAdminAccountNeeded = "true";
-		}
-		return Boolean.parseBoolean(this.isAdminAccountNeeded);
+public boolean isAdminAccountNeeded() throws AppException {
+	// Initially set, right after comparing the Desired- with Actual-state
+	if(this.isAdminAccountNeeded!=null) return Boolean.parseBoolean(this.isAdminAccountNeeded);
+	// If the desired & actual API is state Unpublished - No Admin-Account is needed
+	if(getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) && 
+			(getActualAPI()==null || getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
+		this.isAdminAccountNeeded = "false";
+	} else {
+		this.isAdminAccountNeeded = "true";
 	}
+	return Boolean.parseBoolean(this.isAdminAccountNeeded);
+}
 	
 	public String waiting4Approval() throws AppException {
 		String isWaitingMsg = "";

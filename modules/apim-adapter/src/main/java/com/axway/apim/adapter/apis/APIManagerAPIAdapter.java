@@ -361,6 +361,10 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
+	public void addQuotaConfiguration(API api) throws AppException {
+		addQuotaConfiguration(api, true);
+	}
+	
 	private void addQuotaConfiguration(API api, boolean addQuota) throws AppException {
 		if(!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
 		APIQuota applicationQuota = null;
@@ -409,7 +413,9 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
-	
+	public void addClientOrganizations(API api) throws AppException {
+		addClientOrganizations(api, true);
+	}
 	
 	private void addClientOrganizations(API api, boolean addClientOrganizations) throws AppException {
 		if(!addClientOrganizations || !APIManagerAdapter.hasAdminAccount()) return;
@@ -427,7 +433,11 @@ public class APIManagerAPIAdapter {
 		api.setClientOrganizations(grantedOrgs);
 	}
 	
-	public void addClientApplications(API api, APIFilter filter) throws AppException {
+	public void addClientApplications(API api) throws AppException {
+		addClientApplications(api, new APIFilter.Builder().includeClientApplications(true).build());
+	}
+	
+	private void addClientApplications(API api, APIFilter filter) throws AppException {
 		if(!filter.isIncludeClientApplications()) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> apps = null;
@@ -695,7 +705,7 @@ public class APIManagerAPIAdapter {
 			API createdAPI = new APIBaseDefinition();
 			createdAPI.setApiId(jsonNode.findPath("id").asText());
 			createdAPI.setName(jsonNode.findPath("name").asText());
-			createdAPI.setCreatedOn(jsonNode.findPath("createdOn").asText());
+			createdAPI.setCreatedOn(Long.parseLong(jsonNode.findPath("createdOn").asText()));
 			return createdAPI;
 		} catch (Exception e) {
 			throw new AppException("Can't import definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
