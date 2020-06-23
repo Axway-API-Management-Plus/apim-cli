@@ -248,7 +248,7 @@ public class APIManagerAdapter {
 			String currentUser = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 			int statusCode = response.getStatusLine().getStatusCode();
 			if( statusCode != 200) {
-				throw new AppException("Status-Code: "+statusCode+", Can't get current-user information on response: '" + currentUser + "'", 
+				throw new AppException("Status-Code: "+statusCode+", Can't get current-user (For admin: "+useAdminClient+") information on response: '" + currentUser + "'", 
 						ErrorCode.API_MANAGER_COMMUNICATION);				
 			}
 			User user = mapper.readValue(currentUser, User.class);
