@@ -30,7 +30,7 @@ public class YAMLFactoryExt extends YAMLFactory {
 			acc.reset();
 			// As we are supporting JSON and YAML only, we can reverse the check
 			byte b = acc.nextByte();
-			if (b != '[' && b != '{') { // This checks, that it is not JSON
+			if (b != '[' && b != '{' && b != '<') { // This checks, that it is not JSON and not XML
 				return MatchStrength.SOLID_MATCH;
 			}
 		}
