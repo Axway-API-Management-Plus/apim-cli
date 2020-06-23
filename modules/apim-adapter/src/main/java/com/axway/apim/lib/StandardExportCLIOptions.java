@@ -18,7 +18,7 @@ public abstract class StandardExportCLIOptions extends APIMCoreCLIOptions {
 		option = new Option("deleteFolder", "Controls if an existing local folder should be deleted. Defaults to false.");
 		options.addOption(option);
 		
-		option = new Option("f", "format", true, "Controls the export format. By default the console is used.");
+		option = new Option("o", "output", true, "Controls the output format. By default the console is used.");
 		option.setRequired(false);
 		option.setArgName("console|json");
 		options.addOption(option);

@@ -74,7 +74,7 @@ public class ApplicationExportTestAction extends AbstractTestAction {
 			args.add(context.replaceDynamicContentInString("${apiManagerUser}"));
 			args.add("-s");
 			args.add(stage);
-			args.add("-f");
+			args.add("-o");
 			args.add("json");
 			if(orgNameFilter!=null) {
 				args.add("-orgName");

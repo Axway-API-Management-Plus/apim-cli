@@ -51,7 +51,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	public static int export(String args[]) {
 		try {
 			AppExportParams params = new AppExportParams(new AppExportCLIOptions(args));
-			switch(params.getExportFormat()) {
+			switch(params.getOutputFormat()) {
 			case console:
 				return runExport(params, ExportImpl.CONSOLE_EXPORTER);
 			case json:

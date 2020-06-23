@@ -72,7 +72,7 @@ public class ExportTestAction extends AbstractTestAction {
 			args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
 			args.add("-s");
 			args.add(stage);
-			args.add("-f");
+			args.add("-o");
 			args.add("json");
 			if(ignoreAdminAccount) {
 				args.add("-ignoreAdminAccount");
