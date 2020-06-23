@@ -68,7 +68,7 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "${status}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		// In Version 7.6.2 SP2 (only this version) the API-Manager is able to create a FE-API based on host: https://unknown.host.com:443 for any reason

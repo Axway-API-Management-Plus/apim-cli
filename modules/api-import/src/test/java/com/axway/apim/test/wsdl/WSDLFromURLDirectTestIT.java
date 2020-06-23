@@ -70,7 +70,7 @@ public class WSDLFromURLDirectTestIT extends TestNGCitrusTestRunner {
 		echo("####### Now performing a change, which required to Re-Create the API #######");
 		createVariable(ImportTestAction.API_DEFINITION, "http://www.mnb.hu/arfolyamok.asmx?WSDL");
 		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/wsdl-minimal-config-with-tags.json");
-		createVariable("status", "published");
+		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 
