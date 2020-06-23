@@ -6,9 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
-- Added API Backend in wide and ultra view console get view
-- Added the option to filter for specific backendBasepath
-- Added API detail information if only 1 API is found (See issue [#11](https://github.com/Axway-API-Management-Plus/apim-cli/issues/11))
+- API Backend-Server information in wide and ultra view console get view
+- Option to filter for specific backendBasepath
+- Show API detail information if only 1 API is found (See issue [#11](https://github.com/Axway-API-Management-Plus/apim-cli/issues/11))
+- New feature to load the API-Definition from FE-API (See issue [#4](https://github.com/Axway-API-Management-Plus/apim-cli/issues/4))
+
+### Changed
+- API Console ultra view not longer renders API-Tags in detail. Only Tru & False as an indicator
+
+### Security
+- Bump jackson-databind from 2.9.10.4 to 2.9.10.5
 
 ## [1.0.1] 2020-06-17
 ### Fixed
