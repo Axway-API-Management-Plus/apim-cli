@@ -42,6 +42,7 @@ import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter;
 import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
+import com.axway.apim.adapter.user.APIManagerUserAdapter;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.User;
@@ -112,6 +113,7 @@ public class APIManagerAdapter {
 	public APIManagerAPIAccessAdapter accessAdapter;
 	public APIManagerOAuthClientProfilesAdapter oauthClientAdapter;
 	public APIMgrAppsAdapter appAdapter;
+	public APIManagerUserAdapter userAdapter;
 	
 	public static enum CacheType {
 		applicationAPIAccessCache, 
@@ -121,7 +123,8 @@ public class APIManagerAdapter {
 		applicationsSubscriptionCache, 
 		applicationsQuotaCache,
 		applicationsCredentialCache,
-		organizationCache;
+		organizationCache,
+		userCache;
 	}
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
@@ -155,6 +158,7 @@ public class APIManagerAdapter {
 		this.accessAdapter = new APIManagerAPIAccessAdapter();
 		this.oauthClientAdapter = new APIManagerOAuthClientProfilesAdapter();
 		this.appAdapter = new APIMgrAppsAdapter();
+		this.userAdapter = new APIManagerUserAdapter();
 		if(TestIndicator.getInstance().isTestRunning()) {
 			this.hasAdminAccount = true; // For unit tests we have an admin account
 			return; // No need to initialize just for Unit-Tests
