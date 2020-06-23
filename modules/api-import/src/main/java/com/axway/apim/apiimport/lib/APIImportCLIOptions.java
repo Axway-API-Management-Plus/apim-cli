@@ -35,7 +35,7 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		option.setRequired(false);
 		options.addOption(option);
 		
-		option = new Option("useAPIProxyAPIDefinition", "If this flag is set, the Actual-API contains the API-Definition (e.g. Swagger) from the FE-API instead of the original imported API.");
+		option = new Option("useFEAPIDefinition", "If this flag is set, the Actual-API contains the API-Definition (e.g. Swagger) from the FE-API instead of the original imported API.");
 		option.setRequired(false);
 		options.addOption(option);
 		

@@ -85,7 +85,7 @@ public class APIFilter {
 	
 	private boolean includeOriginalAPIDefinition = false;
 	
-	private boolean useAPIProxyAPIDefinition = false;
+	private boolean useFEAPIDefinition = false;
 	
 	POLICY_TRANSLATION translatePolicyMode = POLICY_TRANSLATION.NONE;
 	
@@ -183,12 +183,12 @@ public class APIFilter {
 		this.includeOriginalAPIDefinition = includeOriginalAPIDefinition;
 	}
 
-	public boolean isUseAPIProxyAPIDefinition() {
-		return useAPIProxyAPIDefinition;
+	public boolean isUseFEAPIDefinition() {
+		return useFEAPIDefinition;
 	}
 
-	public void setUseAPIProxyAPIDefinition(boolean useAPIProxyAPIDefinition) {
-		this.useAPIProxyAPIDefinition = useAPIProxyAPIDefinition;
+	public void setUseFEAPIDefinition(boolean useFEAPIDefinition) {
+		this.useFEAPIDefinition = useFEAPIDefinition;
 	}
 
 	public String getApiPath() {
@@ -510,7 +510,7 @@ public class APIFilter {
 		
 		boolean includeOriginalAPIDefinition = false;
 		
-		boolean useAPIProxyAPIDefinition = false;
+		boolean useFEAPIDefinition = false;
 		
 		POLICY_TRANSLATION translatePolicyMode = POLICY_TRANSLATION.NONE;
 		
@@ -557,7 +557,7 @@ public class APIFilter {
 			apiFilter.setIncludeClientOrganizations(this.includeClientOrganizations);
 			apiFilter.setIncludeClientApplications(this.includeClientApplications);
 			apiFilter.setIncludeOriginalAPIDefinition(this.includeOriginalAPIDefinition);
-			apiFilter.setUseAPIProxyAPIDefinition(this.useAPIProxyAPIDefinition);
+			apiFilter.setUseFEAPIDefinition(this.useFEAPIDefinition);
 			apiFilter.setIncludeImage(this.includeImage);
 			apiFilter.setLoadBackendAPI(this.loadBackendAPI);
 			apiFilter.setState(this.state);
@@ -687,8 +687,8 @@ public class APIFilter {
 			return this;
 		}
 		
-		public Builder useAPIProxyAPIDefinition(boolean useAPIProxyAPIDefinition) {
-			this.useAPIProxyAPIDefinition = useAPIProxyAPIDefinition;
+		public Builder useFEAPIDefinition(boolean useFEAPIDefinition) {
+			this.useFEAPIDefinition = useFEAPIDefinition;
 			return this;
 		}
 		

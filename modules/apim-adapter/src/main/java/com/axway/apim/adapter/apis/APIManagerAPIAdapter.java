@@ -468,7 +468,7 @@ public class APIManagerAPIAdapter {
 		APISpecification apiDefinition;
 		HttpResponse httpResponse = null;
 		try {
-			if(filter.isUseAPIProxyAPIDefinition()) {
+			if(filter.isUseFEAPIDefinition()) {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/discovery/swagger/api/id/"+api.getId())
 						.setParameter("swaggerVersion", "2.0").build();
 				LOG.debug("Loading API-Definition from FE-API: ");

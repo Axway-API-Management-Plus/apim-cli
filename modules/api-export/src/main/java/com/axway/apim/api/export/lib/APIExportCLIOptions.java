@@ -23,7 +23,7 @@ public abstract class APIExportCLIOptions extends StandardExportCLIOptions {
 		option.setArgName("/api/v1/my/great/api");
 		options.addOption(option);
 		
-		option = new Option("useAPIProxyAPIDefinition", "If this flag is set, the export API contains the API-Definition (e.g. Swagger) from the FE-API instead of the original imported API.");
+		option = new Option("useFEAPIDefinition", "If this flag is set, the export API contains the API-Definition (e.g. Swagger) from the FE-API instead of the original imported API.");
 		option.setRequired(false);
 		options.addOption(option);
 		

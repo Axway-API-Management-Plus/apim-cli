@@ -29,8 +29,8 @@ public class APIExportParams extends StandardExportParams {
 		return (getValue("localFolder")==null) ? "." : getValue("localFolder");
 	}
 	
-	public boolean isUseAPIProxyAPIDefinition() {
-		if(hasOption("useAPIProxyAPIDefinition")) return true;
+	public boolean isUseFEAPIDefinition() {
+		if(hasOption("useFEAPIDefinition")) return true;
 		return false;
 	}
 }

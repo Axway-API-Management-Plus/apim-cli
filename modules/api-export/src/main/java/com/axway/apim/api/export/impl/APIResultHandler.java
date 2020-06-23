@@ -81,7 +81,7 @@ public abstract class APIResultHandler {
 				.includeCustomProperties(APIManagerAdapter.getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE.api))
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.translatePolicies(POLICY_TRANSLATION.TO_NAME)
-				.useAPIProxyAPIDefinition(params.isUseAPIProxyAPIDefinition());
+				.useFEAPIDefinition(params.isUseFEAPIDefinition());
 		return builder;
 	}
 	

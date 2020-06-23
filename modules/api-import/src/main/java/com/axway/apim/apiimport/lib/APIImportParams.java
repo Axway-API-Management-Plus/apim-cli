@@ -22,8 +22,8 @@ public class APIImportParams extends CommandParameters {
 		return true;
 	}
 	
-	public boolean isUseAPIProxyAPIDefinition() {
-		if(getValue("useAPIProxyAPIDefinition")==null) return false;
-		return Boolean.parseBoolean(getValue("useAPIProxyAPIDefinition"));
+	public boolean isUseFEAPIDefinition() {
+		if(getValue("useFEAPIDefinition")==null) return false;
+		return Boolean.parseBoolean(getValue("useFEAPIDefinition"));
 	}
 }
