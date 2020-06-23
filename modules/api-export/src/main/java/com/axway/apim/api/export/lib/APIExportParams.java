@@ -28,4 +28,9 @@ public class APIExportParams extends StandardExportParams {
 	public String getLocalFolder() {
 		return (getValue("localFolder")==null) ? "." : getValue("localFolder");
 	}
+	
+	public boolean isUseAPIProxyAPIDefinition() {
+		if(hasOption("useAPIProxyAPIDefinition")) return true;
+		return false;
+	}
 }

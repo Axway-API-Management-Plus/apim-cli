@@ -80,7 +80,8 @@ public abstract class APIResultHandler {
 				.hasBackendBasepath(params.getValue("backend"))
 				.includeCustomProperties(APIManagerAdapter.getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE.api))
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
-				.translatePolicies(POLICY_TRANSLATION.TO_NAME);
+				.translatePolicies(POLICY_TRANSLATION.TO_NAME)
+				.useAPIProxyAPIDefinition(params.isUseAPIProxyAPIDefinition());
 		return builder;
 	}
 	

@@ -465,13 +465,12 @@ public class APIManagerAPIAdapter {
 	private static void addOriginalAPIDefinitionFromAPIM(API api, APIFilter filter) throws AppException {
 		if(!filter.isIncludeOriginalAPIDefinition()) return;
 		URI uri;
-		///discovery/swagger/api/id/3595cdef-46b7-4326-b3f8-e7bbaa531e7a?swaggerVersion=2.0
 		APISpecification apiDefinition;
 		HttpResponse httpResponse = null;
 		try {
 			if(filter.isUseAPIProxyAPIDefinition()) {
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/discovery/swagger/api/id/"+api.getId()+"?swaggerVersion=2.0")
-						.setParameter("original", "true").build();
+				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/discovery/swagger/api/id/"+api.getId())
+						.setParameter("swaggerVersion", "2.0").build();
 				LOG.debug("Loading API-Definition from FE-API: ");
 			} else {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
