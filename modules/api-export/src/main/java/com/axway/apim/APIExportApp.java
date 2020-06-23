@@ -17,6 +17,7 @@ import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 
@@ -27,6 +28,8 @@ import com.axway.apim.lib.utils.rest.APIMHttpClient;
 public class APIExportApp implements APIMCLIServiceProvider {
 
 	private static Logger LOG = LoggerFactory.getLogger(APIExportApp.class);
+	
+	private static ErrorState errorState = ErrorState.getInstance();
 
 	public static void main(String args[]) { 
 		int rc = export(args);
@@ -44,6 +47,16 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				return runExport(params, APIListImpl.JSON_EXPORTER);
 			default:
 				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
+			}
+		} catch (AppException e) {
+			
+			if(errorState.hasError()) {
+				errorState.logErrorMessages(LOG);
+				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
+				return new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode();
+			} else {
+				LOG.error(e.getMessage(), e);
+				return new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode();
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);

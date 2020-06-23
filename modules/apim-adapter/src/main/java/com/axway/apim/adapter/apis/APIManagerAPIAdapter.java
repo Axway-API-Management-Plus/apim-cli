@@ -122,7 +122,7 @@ public class APIManagerAPIAdapter {
 				addClientOrganizations(api, filter.isIncludeClientOrganizations());
 				addClientApplications(api, filter);
 				addExistingClientAppQuotas(api, filter.isIncludeQuotas());
-				addOriginalAPIDefinitionFromAPIM(api, filter.isIncludeOriginalAPIDefinition());
+				addOriginalAPIDefinitionFromAPIM(api, filter);
 				addImageFromAPIM(api, filter.isIncludeImage());
 				if(logProgress && apis.size()>5) Utils.progressPercentage(i, apis.size(), "Loading "+apis.size()+" APIs");
 			}
@@ -464,14 +464,20 @@ public class APIManagerAPIAdapter {
 		}		
 	}
 	
-	private static void addOriginalAPIDefinitionFromAPIM(API api, boolean includeOriginalAPIDefinition) throws AppException {
-		if(!includeOriginalAPIDefinition) return;
+	private static void addOriginalAPIDefinitionFromAPIM(API api, APIFilter filter) throws AppException {
+		if(!filter.isIncludeOriginalAPIDefinition()) return;
 		URI uri;
 		APISpecification apiDefinition;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
-					.setParameter("original", "true").build();
+			if(filter.isUseFEAPIDefinition()) {
+				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/discovery/swagger/api/id/"+api.getId())
+						.setParameter("swaggerVersion", "2.0").build();
+				LOG.debug("Loading API-Definition from FE-API: ");
+			} else {
+				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
+						.setParameter("original", "true").build();
+			}
 			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse=getRequest.execute();
 			String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
