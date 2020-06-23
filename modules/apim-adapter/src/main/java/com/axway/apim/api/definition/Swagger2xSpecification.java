@@ -7,6 +7,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 public class Swagger2xSpecification extends APISpecification {
 	
@@ -23,6 +24,9 @@ public class Swagger2xSpecification extends APISpecification {
 
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
+		if(this.mapper.getFactory() instanceof YAMLFactory) {
+			return APISpecType.SWAGGGER_API_20_YAML;
+		}
 		return APISpecType.SWAGGGER_API_20;
 	}
 
@@ -59,7 +63,7 @@ public class Swagger2xSpecification extends APISpecification {
 						((ObjectNode)swagger).put("basePath", url.getPath());
 					}
 				}
-				 ArrayNode newSchemes = objectMapper.createArrayNode();
+				 ArrayNode newSchemes = this.mapper.createArrayNode();
 				 newSchemes.add(url.getProtocol());
 				if(swagger.get("schemes")==null) {
 					LOG.debug("Adding protocol: '"+url.getProtocol()+"' to Swagger-Definition");
@@ -75,7 +79,7 @@ public class Swagger2xSpecification extends APISpecification {
 				if(backendBasepathAdjusted) {
 					LOG.info("Used the configured backendBasepath: '"+this.backendBasepath+"' to adjust the Swagger definition.");
 				}
-				this.apiSpecificationContent = objectMapper.writeValueAsBytes(swagger);
+				this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
 			}
 		} catch (Exception e) {
 			LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
@@ -85,7 +89,8 @@ public class Swagger2xSpecification extends APISpecification {
 	@Override
 	public boolean configure() throws AppException {
 		try {
-			swagger = objectMapper.readTree(apiSpecificationContent);
+			setMapperForDataFormat();
+			swagger = this.mapper.readTree(apiSpecificationContent);
 			if(!(swagger.has("swagger") && swagger.get("swagger").asText().startsWith("2."))) {
 				return false;
 			}

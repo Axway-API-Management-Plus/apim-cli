@@ -68,7 +68,7 @@ public class SwaggerFromURLInConfigurationDirectTestIT extends TestNGCitrusTestR
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "http://petstore.swagger.io/v2/swagger.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
-		createVariable("status", "unpublished");
+		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		swaggerImport.doExecute(context);
 	}

@@ -59,7 +59,7 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 		echo("####### Create a valid API, which will be updated later, which then fails and must be rolled back #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
-		createVariable("status", "published");
+		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0"); // Must fail!
 		swaggerImport.doExecute(context);
 		
