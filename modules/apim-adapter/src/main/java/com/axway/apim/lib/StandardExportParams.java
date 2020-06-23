@@ -12,7 +12,7 @@ public class StandardExportParams extends CommandParameters {
 		ultra
 	}
 	
-	public static enum exportFormat {
+	public static enum OutputFormat {
 		console, 
 		json
 	}
@@ -38,11 +38,11 @@ public class StandardExportParams extends CommandParameters {
 		return Wide.standard;
 	}
 	
-	public exportFormat getExportFormat() {
+	public OutputFormat getOutputFormat() {
 		try {
-			return exportFormat.valueOf(getValue("format"));
+			return OutputFormat.valueOf(getValue("output"));
 		} catch (Exception e) {
-			return exportFormat.console;
+			return OutputFormat.console;
 		}
 	}
 	
