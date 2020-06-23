@@ -53,6 +53,7 @@ public class Swagger1xSpecification extends APISpecification {
 	public boolean configure() throws AppException {
 		try {
 			setMapperForDataFormat();
+			if(this.mapper==null) return false;
 			swagger = this.mapper.readTree(apiSpecificationContent);
 			if(!(swagger.has("swaggerVersion") && swagger.get("swaggerVersion").asText().startsWith("1."))) {
 				return false;
@@ -60,11 +61,7 @@ public class Swagger1xSpecification extends APISpecification {
 			configureBasepath();
 			return true;
 		} catch (Exception e) {
-			if(LOG.isTraceEnabled()) {
-				LOG.trace("No Swager 1.x specification. Doesn't have key \"swaggerVersion\" starting with value: \"1.\"", e);
-			} else {
-				LOG.debug("No Swager 1.x specification. Doesn't have key \"swaggerVersion\" starting with value: \"1.\"");	
-			}
+			LOG.trace("No Swager 1.x specification.", e);
 			return false;
 		}
 	}

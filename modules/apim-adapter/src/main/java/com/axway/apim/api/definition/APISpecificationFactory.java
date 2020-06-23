@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 
 public class APISpecificationFactory {
 	
@@ -39,6 +40,7 @@ public class APISpecificationFactory {
 				APISpecification spec = (APISpecification) constructor.newInstance(arguments);
 				spec.setApiSpecificationFile(apiDefinitionFile);
 				if(!spec.configure()) {
+					if(ErrorState.getInstance().hasError()) break;
 					continue;			
 				} else {
 					return spec;

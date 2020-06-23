@@ -1,5 +1,6 @@
 package com.axway.apim.api.definition;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.jackson.YAMLFactoryExt;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.format.DataFormatDetector;
 import com.fasterxml.jackson.core.format.DataFormatMatcher;
@@ -95,36 +97,36 @@ public abstract class APISpecification {
 	
 	public abstract boolean configure() throws AppException;
 	
-	protected void setMapperForDataFormat() {
+	protected void setMapperForDataFormat() throws AppException {
+		YAMLFactory yamlFactory = new YAMLFactoryExt();
+		JsonFactory jsonFactory = new JsonFactory();
+		DataFormatDetector detector = new DataFormatDetector(yamlFactory, jsonFactory);
+		DataFormatMatcher formatMatcher;
 		try {
-			YAMLFactory yamlFactory = new YAMLFactoryExt();
-			JsonFactory jsonFactory = new JsonFactory();
-			DataFormatDetector detector = new DataFormatDetector(yamlFactory, jsonFactory);
-			DataFormatMatcher formatMatcher = detector.findFormat(apiSpecificationContent);
-		    if (formatMatcher.getMatchStrength() == MatchStrength.INCONCLUSIVE ||
-		            formatMatcher.getMatchStrength() == MatchStrength.NO_MATCH) {
-		    	this.mapper = new ObjectMapper();
-		    }
-			switch (formatMatcher.getMatchedFormatName().toLowerCase()) {
-			case "json":
-				this.mapper = new ObjectMapper(jsonFactory);
-				LOG.trace("JSON API-Definition detected");
-				break;
-			case "yaml":
-				this.mapper = new ObjectMapper(yamlFactory);
-				LOG.trace("YAML API-Definition detected");
-				if(!APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-					throw new AppException("YAML API-Specifcations not supported by the your API-Manager version", ErrorCode.UNSUPPORTED_FEATURE);
-				}
-				break;
-			default:
-				LOG.debug("Dataformat could not be detected. Using default.");
-				this.mapper = new ObjectMapper();
-				break;
+			formatMatcher = detector.findFormat(apiSpecificationContent);
+		} catch (IOException e) {
+			LOG.error("Error detecting dataformat", e);
+			return;
+		}
+	    if (formatMatcher.getMatchStrength() == MatchStrength.INCONCLUSIVE ||
+	            formatMatcher.getMatchStrength() == MatchStrength.NO_MATCH) {
+	    	this.mapper = new ObjectMapper();
+	    }
+		switch (formatMatcher.getMatchedFormatName().toLowerCase()) {
+		case "json":
+			this.mapper = new ObjectMapper(jsonFactory);
+			LOG.trace("JSON API-Definition detected");
+			break;
+		case "yaml":
+			this.mapper = new ObjectMapper(yamlFactory);
+			LOG.trace("YAML API-Definition detected");
+			if(!APIManagerAdapter.hasAPIManagerVersion("7.7")) {
+				ErrorState.getInstance().setError("YAML API-Definition not supported by your API-Manager version", ErrorCode.UNSUPPORTED_FEATURE, false);
+				throw new AppException("YAML API-Definition not supported by your API-Manager version", ErrorCode.UNSUPPORTED_FEATURE);
 			}
-		} catch (Exception e) {
-			this.mapper = new ObjectMapper();
-			LOG.debug("Dataformat could not be detected. Using default.");
+			break;
+		default:
+			break;
 		}
 	}
 }

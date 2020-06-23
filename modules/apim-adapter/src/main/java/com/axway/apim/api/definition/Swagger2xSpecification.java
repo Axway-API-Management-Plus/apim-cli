@@ -90,6 +90,7 @@ public class Swagger2xSpecification extends APISpecification {
 	public boolean configure() throws AppException {
 		try {
 			setMapperForDataFormat();
+			if(this.mapper==null) return false;
 			swagger = this.mapper.readTree(apiSpecificationContent);
 			if(!(swagger.has("swagger") && swagger.get("swagger").asText().startsWith("2."))) {
 				return false;
@@ -97,11 +98,7 @@ public class Swagger2xSpecification extends APISpecification {
 			configureBasepath();
 			return true;
 		} catch (Exception e) {
-			if(LOG.isTraceEnabled()) {
-				LOG.trace("No Swagger 2.x specification. Doesn't have key \"swagger\" starting with value: \"2.\"", e);
-			} else {
-				LOG.debug("No Swagger 2.x specification. Doesn't have key \"swagger\" starting with value: \"2.\"");	
-			}
+			LOG.trace("Could load specification as Swagger 2.0", e);
 			return false;
 		}
 	}

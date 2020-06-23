@@ -1,6 +1,5 @@
 package com.axway.apim.api.definition;
 
-import java.io.IOException;
 import java.net.URL;
 
 import com.axway.apim.lib.CommandParameters;
@@ -32,13 +31,6 @@ public class OAS3xSpecification extends APISpecification {
 		try {
 			if(this.backendBasepath!=null) {
 				URL backendBasepath = new URL(this.backendBasepath);
-				/*for(JsonNode server : openAPI.get("servers")) {
-					String url = server.get("url").asText();
-					if(backendBasepath.equals(url)) {
-						
-					}
-					LOG.debug("URL: " + url);
-				}*/
 				 ObjectNode newServer = this.mapper.createObjectNode();
 				 newServer.put("url", backendBasepath.toString());
 
@@ -55,18 +47,15 @@ public class OAS3xSpecification extends APISpecification {
 	public boolean configure() throws AppException {
 		try {
 			setMapperForDataFormat();
+			if(this.mapper==null) return false;
 			openAPI = this.mapper.readTree(apiSpecificationContent);
 			if(!(openAPI.has("openapi") && openAPI.get("openapi").asText().startsWith("3.0."))) {
 				return false;
 			}
 			configureBasepath();
 			return true;
-		} catch (IOException e) {
-			if(LOG.isTraceEnabled()) {
-				LOG.trace("No OpenAPI 3.0 specification. Doesn't have key \"openapi\" starting with value: \"3.0.\"", e);
-			} else {
-				LOG.debug("No OpenAPI 3.0 specification. Doesn't have key \"openapi\" starting with value: \"3.0.\"");	
-			}
+		} catch (Exception e) {
+			LOG.trace("No OpenAPI 3.0 specification.", e);
 			return false;
 		}
 	}
