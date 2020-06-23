@@ -35,6 +35,10 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		option.setRequired(false);
 		options.addOption(option);
 		
+		option = new Option("useFEAPIDefinition", "If this flag is set, the Actual-API contains the API-Definition (e.g. Swagger) from the FE-API instead of the original imported API.");
+		option.setRequired(false);
+		options.addOption(option);
+		
 		option = new Option("clientOrgsMode", true, "Controls how configured Client-Organizations are treated. Defaults to add!");
 		option.setArgName("ignore|replace|add");
 		options.addOption(option);
@@ -57,7 +61,7 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		option.setArgName("true");
 		internalOptions.addOption(option);
 		
-		option = new Option("changeOrganization", "Set this flag to true to allow to change the organization of an existing API. Default is false.");
+		option = new Option("changeOrganization", "Set this flag to allow to change the organization of an existing API.");
 		option.setRequired(false);
 		internalOptions.addOption(option);
 		
