@@ -35,7 +35,7 @@ public class ExportAppWithFiltersTestIT extends TestNGCitrusTestRunner {
 	public void tryToExportWithInvalidOrgName(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		description("Trying to export an application belonging to an invalid organization");
 		
-		variable("localFolder", "citrus:systemProperty('java.io.tmpdir')");
+		variable("targetFolder", "citrus:systemProperty('java.io.tmpdir')");
 		mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
 		
 		echo("####### Try to export an application with an invalid orgName #######");
@@ -51,7 +51,7 @@ public class ExportAppWithFiltersTestIT extends TestNGCitrusTestRunner {
 	public void pendingApplicationTest(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		description("Export complete application from API-Manager tests");
 		
-		variable("localFolder", "citrus:systemProperty('java.io.tmpdir')");
+		variable("targetFolder", "citrus:systemProperty('java.io.tmpdir')");
 		mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
 		
 		variable("appNumber", RandomNumberFunction.getRandomNumber(4, true));

@@ -122,7 +122,7 @@ public class APIManagerAPIAdapter {
 				addClientOrganizations(api, filter.isIncludeClientOrganizations());
 				addClientApplications(api, filter);
 				addExistingClientAppQuotas(api, filter.isIncludeQuotas());
-				addOriginalAPIDefinitionFromAPIM(api, filter.isIncludeOriginalAPIDefinition());
+				addOriginalAPIDefinitionFromAPIM(api, filter);
 				addImageFromAPIM(api, filter.isIncludeImage());
 				if(logProgress && apis.size()>5) Utils.progressPercentage(i, apis.size(), "Loading "+apis.size()+" APIs");
 			}
@@ -135,8 +135,10 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public API getAPI(APIFilter filter, boolean logMessage) throws AppException {
-		List<API> foundAPIs = getAPIs(filter, logMessage);
-		return uniqueAPI(foundAPIs, filter);
+		List<API> foundAPIs = getAPIs(filter, false);
+		API api = uniqueAPI(foundAPIs, filter);
+		if(logMessage && api!=null) LOG.info("Found existing API on path: '"+api.getPath()+"' ("+api.getState()+") (ID: '"+api.getId()+"'");
+		return api;
 	}
 	
 	public API getAPIWithId(String id) throws AppException {
@@ -220,7 +222,7 @@ public class APIManagerAPIAdapter {
 			LOG.debug("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
 			return foundAPIs;
 		}
-		LOG.info("No existing API found based on filter: " + getFilterFields(filter));
+		LOG.debug("No existing API found based on filter: " + getFilterFields(filter));
 		return foundAPIs;
 	}
 	
@@ -361,6 +363,10 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
+	public void addQuotaConfiguration(API api) throws AppException {
+		addQuotaConfiguration(api, true);
+	}
+	
 	private void addQuotaConfiguration(API api, boolean addQuota) throws AppException {
 		if(!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
 		APIQuota applicationQuota = null;
@@ -409,7 +415,9 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
-	
+	public void addClientOrganizations(API api) throws AppException {
+		addClientOrganizations(api, true);
+	}
 	
 	private void addClientOrganizations(API api, boolean addClientOrganizations) throws AppException {
 		if(!addClientOrganizations || !APIManagerAdapter.hasAdminAccount()) return;
@@ -427,7 +435,11 @@ public class APIManagerAPIAdapter {
 		api.setClientOrganizations(grantedOrgs);
 	}
 	
-	public void addClientApplications(API api, APIFilter filter) throws AppException {
+	public void addClientApplications(API api) throws AppException {
+		addClientApplications(api, new APIFilter.Builder().includeClientApplications(true).build());
+	}
+	
+	private void addClientApplications(API api, APIFilter filter) throws AppException {
 		if(!filter.isIncludeClientApplications()) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
 		List<ClientApplication> apps = null;
@@ -452,14 +464,20 @@ public class APIManagerAPIAdapter {
 		}		
 	}
 	
-	private static void addOriginalAPIDefinitionFromAPIM(API api, boolean includeOriginalAPIDefinition) throws AppException {
-		if(!includeOriginalAPIDefinition) return;
+	private static void addOriginalAPIDefinitionFromAPIM(API api, APIFilter filter) throws AppException {
+		if(!filter.isIncludeOriginalAPIDefinition()) return;
 		URI uri;
 		APISpecification apiDefinition;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
-					.setParameter("original", "true").build();
+			if(filter.isUseFEAPIDefinition()) {
+				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/discovery/swagger/api/id/"+api.getId())
+						.setParameter("swaggerVersion", "2.0").build();
+				LOG.debug("Loading API-Definition from FE-API: ");
+			} else {
+				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
+						.setParameter("original", "true").build();
+			}
 			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse=getRequest.execute();
 			String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
@@ -695,7 +713,7 @@ public class APIManagerAPIAdapter {
 			API createdAPI = new APIBaseDefinition();
 			createdAPI.setApiId(jsonNode.findPath("id").asText());
 			createdAPI.setName(jsonNode.findPath("name").asText());
-			createdAPI.setCreatedOn(jsonNode.findPath("createdOn").asText());
+			createdAPI.setCreatedOn(Long.parseLong(jsonNode.findPath("createdOn").asText()));
 			return createdAPI;
 		} catch (Exception e) {
 			throw new AppException("Can't import definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);

@@ -47,7 +47,7 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<finalName>apimanager-apimcli-${project.version}</finalName>
+							<finalName>axway-apimcli-${project.version}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
 								<descriptor>assembly/dist-release.xml</descriptor>

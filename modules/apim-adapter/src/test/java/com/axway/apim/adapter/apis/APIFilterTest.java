@@ -1,13 +1,24 @@
 package com.axway.apim.adapter.apis;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
+import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
+import com.axway.apim.api.API;
+import com.axway.apim.api.model.OutboundProfile;
+import com.axway.apim.api.model.Policy;
+import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 
@@ -16,6 +27,13 @@ public class APIFilterTest {
 	@BeforeClass
 	public void setupTestIndicator() {
 		TestIndicator.getInstance().setTestRunning(true);
+		APIManagerAdapter.apiManagerVersion = "7.7";
+	}
+	
+	@AfterClass
+	public void removeTestIndicator() {
+		TestIndicator.getInstance().setTestRunning(false);
+		APIManagerAdapter.apiManagerVersion = null;
 	}
 	
 	@Test
@@ -150,4 +168,109 @@ public class APIFilterTest {
 		
 		Assert.assertEquals(filter1, filter2, "Both filters should be equal");
 	}
+	
+	@Test
+	public void testBackendBasepathFilter() throws AppException {
+		APIFilter filter = new APIFilter.Builder()
+				.hasBackendBasepath("*emr-system*")
+				.build();
+		API testAPI = getAPIWithBackendBasepath("http://emr-system:8081");
+		assertTrue(filter.filter(testAPI), "API with base-path: http://emr-system:8081 should match to filter: *emr-system*");
+		testAPI = getAPIWithBackendBasepath("http://sec.hipaa:8086");
+		assertFalse(filter.filter(testAPI), "API with base-path: http://sec.hipaa:8086 should NOT match to filter: *emr-system*");
+		
+		filter = new APIFilter.Builder()
+				.hasBackendBasepath("http://emr-system:8081")
+				.build();
+		
+		testAPI = getAPIWithBackendBasepath("http://emr-system:8081");
+		assertTrue(filter.filter(testAPI), "API with base-path: http://emr-system:8081 should match to filter: http://emr-system:8081");
+		
+		testAPI = getAPIWithBackendBasepath("http://fhir3.healthintersections.com.au");
+		assertFalse(filter.filter(testAPI), "API with base-path: http://fhir3.healthintersections.com.au should NOT match to filter: http://emr-system:8081");
+	}
+	
+	@Test
+	public void testPolicyFilter() throws AppException {
+		APIFilter filter = new APIFilter.Builder()
+				.hasPolicyName("*Policy*")
+				.build();
+		API testAPI = new API();
+		addPolicy(testAPI, "Request Policy 1", PolicyType.REQUEST);
+		addPolicy(testAPI, "Routing Policy 1", PolicyType.ROUTING);
+		assertTrue(filter.filter(testAPI), "API must match to pattern '*Policy*'");
+		
+		filter = new APIFilter.Builder()
+				.hasPolicyName("*Response*")
+				.build();
+		testAPI = new API();
+		addPolicy(testAPI, "Request Policy 1", PolicyType.REQUEST);
+		addPolicy(testAPI, "Response Policy 1", PolicyType.RESPONSE);
+		assertTrue(filter.filter(testAPI), "API must match to pattern '*Response*'");
+		
+		filter = new APIFilter.Builder()
+				.hasPolicyName("*Routing*")
+				.build();
+		testAPI = new API();
+		addPolicy(testAPI, "Request Policy 1", PolicyType.REQUEST);
+		addPolicy(testAPI, "Response Policy 1", PolicyType.RESPONSE);
+		assertFalse(filter.filter(testAPI), "API must NOT match to pattern '*Response*'");
+		
+		filter = new APIFilter.Builder()
+				.hasPolicyName("Response Policy 1")
+				.build();
+		testAPI = new API();
+		addPolicy(testAPI, "Response Policy 1", PolicyType.RESPONSE);
+		assertTrue(filter.filter(testAPI), "API must match to pattern 'Response Policy 1'");
+		
+		filter = new APIFilter.Builder()
+				.hasPolicyName("Response Policy 2")
+				.build();
+		testAPI = new API();
+		addPolicy(testAPI, "Response Policy 1", PolicyType.RESPONSE);
+		assertFalse(filter.filter(testAPI), "API must NOT match to pattern 'Response Policy 2' as it is using 'Response Policy 1'");
+		
+		filter = new APIFilter.Builder()
+				.hasPolicyName("Not used policy")
+				.build();
+		testAPI = new API();
+		addPolicy(testAPI, "Response Policy 1", PolicyType.RESPONSE);
+		assertFalse(filter.filter(testAPI), "API must NOT match to pattern 'Not used policy' as it is using 'Response Policy 1'");
+	}
+	
+	private API getAPIWithBackendBasepath(String basePath) {
+		API api = new API();
+		ServiceProfile serviceProfile = new ServiceProfile();
+		serviceProfile.setBasePath(basePath);
+		Map<String, ServiceProfile> serviceProfiles = new HashMap<String, ServiceProfile>();
+		serviceProfiles.put("_default", serviceProfile);
+		api.setServiceProfiles(serviceProfiles);
+		return api;
+	}
+	
+	private API addPolicy(API api, String policyName, PolicyType type) throws AppException {
+		OutboundProfile outboundProfile = new OutboundProfile();
+		Policy policy = new Policy(policyName);
+		switch(type) {
+		case REQUEST:
+			outboundProfile.setRequestPolicy(policy);
+			break;
+		case ROUTING:
+			outboundProfile.setRoutePolicy(policy);
+			break;
+		case RESPONSE:
+			outboundProfile.setResponsePolicy(policy);
+			break;
+		case FAULT_HANDLER:
+			outboundProfile.setFaultHandlerPolicy(policy);
+			break;
+		default:
+			break;			
+		}
+		Map<String, OutboundProfile> outboundProfiles = new HashMap<String, OutboundProfile>();
+		outboundProfiles.put("_default", outboundProfile);
+		api.setOutboundProfiles(outboundProfiles);
+		return api;
+	}
 }
+
