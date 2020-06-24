@@ -92,9 +92,9 @@ public class JsonAPIExporter extends APIResultHandler {
 		APISpecification apiDef = exportAPI.getAPIDefinition();
 		String targetFile = null;
 		try {
-			targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName()+".json";
+			targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName()+apiDef.getAPIDefinitionType().getFileExtension();
 			writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
-			exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName()+".json");
+			exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName()+apiDef.getAPIDefinitionType().getFileExtension());
 		} catch (IOException e) {
 			throw new AppException("Can't save API-Definition locally to file: " + targetFile,
 					ErrorCode.UNXPECTED_ERROR, e);

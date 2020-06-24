@@ -21,22 +21,28 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 public abstract class APISpecification {
 	
 	public static enum APISpecType {
-		SWAGGGER_API_12("Swagger 1.2"),
-		SWAGGGER_API_12_YAML("Swagger 1.2 (YAML)"),
-		SWAGGGER_API_20("Swagger 2.0"),
-		SWAGGGER_API_20_YAML("Swagger 2.0 (YAML)"),
-		OPEN_API_30("Open API 3.0"),
-		OPEN_API_30_YAML("Open API 3.0 (YAML)"),
-		WSDL_API ("WSDL");
+		SWAGGGER_API_12("Swagger 1.2", ".json"),
+		SWAGGGER_API_12_YAML("Swagger 1.2 (YAML)", ".yaml"),
+		SWAGGGER_API_20("Swagger 2.0", ".json"),
+		SWAGGGER_API_20_YAML("Swagger 2.0 (YAML)", ".yaml"),
+		OPEN_API_30("Open API 3.0", ".json"),
+		OPEN_API_30_YAML("Open API 3.0 (YAML)", ".yaml"),
+		WSDL_API ("WSDL", ".xml");
 		
 		String niceName;
+		String fileExtension;
 		
 		public String getNiceName() {
 			return niceName;
 		}
 
-		APISpecType(String niceName) {
+		public String getFileExtension() {
+			return fileExtension;
+		}
+
+		APISpecType(String niceName, String fileExtension) {
 			this.niceName = niceName;
+			this.fileExtension = fileExtension;
 		}
 	}
 	
