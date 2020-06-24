@@ -183,11 +183,11 @@ public class APIManagerAdapter {
 				if(usernamePassword==null) return;
 				username = usernamePassword[0];
 				password = usernamePassword[1];
-				LOG.debug("Logging in with Admin-User: '" + username + "'");
+				LOG.info("Logging in with Admin-User: '" + username + "'");
 			} else {
 				username = cmd.getUsername();
 				password = cmd.getPassword();
-				LOG.debug("Logging in with User: '" + username + "'");
+				LOG.info("Logging in with User: '" + username + "'");
 			}
 			// This forces to create a client which is re-used based on useAdmin
 			APIMHttpClient client = APIMHttpClient.getInstance(useAdminClient);
@@ -199,17 +199,15 @@ public class APIManagerAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode < 200 || statusCode > 299){
 				String response = EntityUtils.toString(httpResponse.getEntity());
-				if(statusCode==403 && response.contains("Unknown API")) {
-					LOG.warn("Login failed with statusCode: " +statusCode+ ". Got response: '"+response+"' ... Try again in 1 second.");
-					Thread.sleep(1000);
-					httpResponse = loginRequest.execute();
-					statusCode = httpResponse.getStatusLine().getStatusCode();
-					if(statusCode < 200 || statusCode > 299){
-						LOG.error("Login finally failed with statusCode: " +statusCode+ ". Got response: '"+response+"' Got response: '"+response+"'");
-						throw new AppException("Login finally failed with statusCode: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
-					} else {
-						LOG.info("Successfully logged in on retry. Received Status-Code: " +statusCode );
-					}
+				LOG.warn("Login failed with statusCode: " +statusCode+ ". Got response: '"+response+"' ... Try again in 1 second.");
+				Thread.sleep(1000);
+				httpResponse = loginRequest.execute();
+				statusCode = httpResponse.getStatusLine().getStatusCode();
+				if(statusCode < 200 || statusCode > 299){
+					LOG.error("Login finally failed with statusCode: " +statusCode+ ". Got response: '"+response+"' Got response: '"+response+"'");
+					throw new AppException("Login finally failed with statusCode: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+				} else {
+					LOG.info("Successfully logged in on retry. Received Status-Code: " +statusCode );
 				}
 			}
 			
@@ -523,7 +521,7 @@ public class APIManagerAdapter {
 		HttpEntity httpResponse = null;
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
-			RestAPICall getRequest = new GETRequest(uri, hasAdminAccount());
+			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute().getEntity();
 			appConfig = IOUtils.toString(httpResponse.getContent(), "UTF-8");
 			return parseAppConfig(appConfig);

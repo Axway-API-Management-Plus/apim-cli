@@ -9,16 +9,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Feature to use a YAML based API-Definition for Swagger & OpenAPI (API-Manager 7.7 only)
 - API Backend-Server information in wide and ultra view console get view
 - Option to filter API having a specificied backendBasepath
-- Show API detail information if only 1 API is found (See issue [#11](https://github.com/Axway-API-Management-Plus/apim-cli/issues/11))
-- Feature to load the API-Definition from FE-API (See issue [#4](https://github.com/Axway-API-Management-Plus/apim-cli/issues/4))
-- Feature to export APIs as a CSV-File
+- Show detailed API information if only 1 API is returned (See issue [#11](https://github.com/Axway-API-Management-Plus/apim-cli/issues/11))
+- Feature to load the API-Definition from the FE-API (See issue [#4](https://github.com/Axway-API-Management-Plus/apim-cli/issues/4))
+- Feature to export APIs as a CSV-File incl. used polices and subscribed applications
 - CLI usage information for all operations improved
 
 ### Changed
 - API Console ultra view not longer renders API-Tags in detail. Only indicated with True & False
-- renamed parameter -l / --localFolder    TO  -t / --target
-- renamed parameter -df / --deleteFolder  TO  -deleteTarget
-- renamed parameter -f / --format         TO  -o --output
+- renamed parameter `-l / --localFolder`    TO  `-t / --target`
+- renamed parameter `-df / --deleteFolder`  TO  `-deleteTarget`
+- renamed parameter `-f / --format`         TO  `-o --output`
 
 ### Fixed
 - Wrong info text during deletion of an unpublished API proxy (See issue [#25](https://github.com/Axway-API-Management-Plus/apim-cli/issues/25))
