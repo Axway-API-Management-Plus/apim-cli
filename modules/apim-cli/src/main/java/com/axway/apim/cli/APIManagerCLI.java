@@ -133,7 +133,7 @@ public class APIManagerCLI {
 			this.printUsage();
 		} else {
 			System.out.println("Module: " + this.selectedService.getName() + " ("+this.selectedService.getVersion()+")");
-			System.out.println("---------------------------	-------------------------------------------------------------");
+			System.out.println("----------------------------------------------------------------------------------------");
 			try {
 				this.selectedMethod.invoke (this.selectedService, (Object)args);
 			} catch (Exception e) {

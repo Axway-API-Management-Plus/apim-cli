@@ -148,10 +148,6 @@ public abstract class APIResultHandler {
 			return "Err";
 		}
 	}
-    
-	/*protected static String getUsedPolicies(API api) {
-		return getUsedPolicies(api, false, null);
-	}*/
 	
 	protected static List<Policy> getUsedPolicies(API api, PolicyType type) {
 		return getUsedPolicies(api).get(type);

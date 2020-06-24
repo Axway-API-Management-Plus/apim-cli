@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
+import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIExportParams;
+import com.axway.apim.api.model.Policy;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -60,7 +63,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 				new Column().header("State").with(api -> getState(api)),
 				new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getBackendPath(api)),
 				new Column().header("Security").with(api -> getUsedSecurity(api)),
-				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getUsedPolicies(api).toString()),
+				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getUsedPoliciesForConsole(api).toString()),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()
 				))));
 		printDetails(apis);
@@ -76,7 +79,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 				new Column().header("State").with(api -> getState(api)),
 				new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getBackendPath(api)),
 				new Column().header("Security").with(api -> getUsedSecurity(api)),
-				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getUsedPolicies(api).toString()),
+				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getUsedPoliciesForConsole(api).toString()),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
 				new Column().header("Orgs").with(api -> getOrgCount(api)),
 				new Column().header("Apps").with(api -> getAppCount(api)),
@@ -84,6 +87,18 @@ public class ConsoleAPIExporter extends APIResultHandler {
 				new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> Boolean.toString(hasTags(api)))
 				)));
 		printDetails(apis);
+	}
+	
+	private String getUsedPoliciesForConsole(API api) {
+		List<String> usedPolicies = new ArrayList<String>();
+		Map<PolicyType, List<Policy>> allPolicies = getUsedPolicies(api);
+		for(List<Policy> policies : allPolicies.values()) {
+			for(Policy pol : policies) {
+				if(usedPolicies.contains(pol.getName())) continue;
+				usedPolicies.add(pol.getName());
+			}
+		}
+		return usedPolicies.toString().replace("[", "").replace("]", "");
 	}
 	
 	private void printDetails(List<API> apis) {

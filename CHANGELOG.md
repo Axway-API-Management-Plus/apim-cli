@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Feature to use a YAML based API-Definition for Swagger & OpenAPI (API-Manager 7.7 only)
 - API Backend-Server information in wide and ultra view console get view
-- Option to filter for specific backendBasepath
+- Option to filter API having a specificied backendBasepath
 - Show API detail information if only 1 API is found (See issue [#11](https://github.com/Axway-API-Management-Plus/apim-cli/issues/11))
 - Feature to load the API-Definition from FE-API (See issue [#4](https://github.com/Axway-API-Management-Plus/apim-cli/issues/4))
 - Feature to export APIs as a CSV-File
