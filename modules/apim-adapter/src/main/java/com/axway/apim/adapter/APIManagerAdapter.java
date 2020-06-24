@@ -197,13 +197,13 @@ public class APIManagerAdapter {
 			loginRequest.setContentType(null);
 			httpResponse = loginRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if(statusCode < 200 || statusCode > 299){
+			if(statusCode != 303){
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				LOG.warn("Login failed with statusCode: " +statusCode+ ". Got response: '"+response+"' ... Try again in 1 second.");
 				Thread.sleep(1000);
 				httpResponse = loginRequest.execute();
 				statusCode = httpResponse.getStatusLine().getStatusCode();
-				if(statusCode < 200 || statusCode > 299){
+				if(statusCode != 303){
 					LOG.error("Login finally failed with statusCode: " +statusCode+ ". Got response: '"+response+"' Got response: '"+response+"'");
 					throw new AppException("Login finally failed with statusCode: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
 				} else {
