@@ -54,7 +54,7 @@ public abstract class APIExportCLIOptions extends StandardExportCLIOptions {
 		option.setRequired(false);
 		options.addOption(option);
 
-		option = new Option("target", true, "Defines the target location for get operation creating files or directories. Defaults to current folder.\n"
+		option = new Option("t", "target", true, "Defines the target location for get operation creating files or directories. Defaults to current folder.\n"
 				+ "Required output files or directories are created automatically.");
 		option.setRequired(false);
 		option.setArgName("my/apis");

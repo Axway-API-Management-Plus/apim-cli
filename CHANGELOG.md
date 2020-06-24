@@ -14,8 +14,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - API Console ultra view not longer renders API-Tags in detail. Only indicated with True & False
-- renamed parameter -df / --deleteFolder to -deleteTarget
-- renamed parameter -f / --format to -o --output
+- renamed parameter -l / --localFolder    TO  -t / --target
+- renamed parameter -df / --deleteFolder  TO  -deleteTarget
+- renamed parameter -f / --format         TO  -o --output
 
 ### Fixed
 - Wrong info text during deletion of an unpublished API proxy (See issue [#25](https://github.com/Axway-API-Management-Plus/apim-cli/issues/25))
