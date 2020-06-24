@@ -34,7 +34,7 @@ public class WSDLFromURLDirectTestIT extends TestNGCitrusTestRunner {
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
 		createVariable(ImportTestAction.API_DEFINITION, "http://www.mnb.hu/arfolyamok.asmx?WSDL");
 		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/wsdl-minimal-config.json");
-		createVariable("status", "unpublished");
+		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 		
@@ -49,14 +49,14 @@ public class WSDLFromURLDirectTestIT extends TestNGCitrusTestRunner {
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION, "http://www.mnb.hu/arfolyamok.asmx?WSDL");
 		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/wsdl-minimal-config.json");
-		createVariable("status", "unpublished");
+		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		swaggerImport.doExecute(context);
 		
 		echo("####### Setting the status to Published #######");
 		createVariable(ImportTestAction.API_DEFINITION, "http://www.mnb.hu/arfolyamok.asmx?WSDL");
 		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/wsdl-minimal-config.json");
-		createVariable("status", "published");
+		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 		
@@ -70,7 +70,7 @@ public class WSDLFromURLDirectTestIT extends TestNGCitrusTestRunner {
 		echo("####### Now performing a change, which required to Re-Create the API #######");
 		createVariable(ImportTestAction.API_DEFINITION, "http://www.mnb.hu/arfolyamok.asmx?WSDL");
 		createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/wsdl/wsdl-minimal-config-with-tags.json");
-		createVariable("status", "published");
+		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 

@@ -36,7 +36,7 @@ public class SwaggerFromURLRefFileTestIT extends TestNGCitrusTestRunner {
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/swagger-file-with-username.url");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
-		createVariable("status", "unpublished");
+		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 		
@@ -51,7 +51,7 @@ public class SwaggerFromURLRefFileTestIT extends TestNGCitrusTestRunner {
 		echo("####### Re-Import API from URL without a change #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/swagger-file-with-username.url");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
-		createVariable("status", "unpublished");
+		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		swaggerImport.doExecute(context);
 	}

@@ -6,6 +6,7 @@ import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 public class Swagger1xSpecification extends APISpecification {
 	
@@ -17,6 +18,9 @@ public class Swagger1xSpecification extends APISpecification {
 
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
+		if(this.mapper.getFactory() instanceof YAMLFactory) {
+			return APISpecType.SWAGGGER_API_12_YAML;
+		}
 		return APISpecType.SWAGGGER_API_12;
 	}
 
@@ -38,7 +42,7 @@ public class Swagger1xSpecification extends APISpecification {
 				if(backendBasepathAdjusted) {
 					LOG.info("Used the configured backendBasepath: '"+this.backendBasepath+"' to adjust the Swagger definition.");
 				}
-				this.apiSpecificationContent = objectMapper.writeValueAsBytes(swagger);
+				this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
 			}
 		} catch (Exception e) {
 			LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
@@ -48,18 +52,16 @@ public class Swagger1xSpecification extends APISpecification {
 	@Override
 	public boolean configure() throws AppException {
 		try {
-			swagger = objectMapper.readTree(apiSpecificationContent);
+			setMapperForDataFormat();
+			if(this.mapper==null) return false;
+			swagger = this.mapper.readTree(apiSpecificationContent);
 			if(!(swagger.has("swaggerVersion") && swagger.get("swaggerVersion").asText().startsWith("1."))) {
 				return false;
 			}
 			configureBasepath();
 			return true;
 		} catch (Exception e) {
-			if(LOG.isTraceEnabled()) {
-				LOG.trace("No Swager 1.x specification. Doesn't have key \"swaggerVersion\" starting with value: \"1.\"", e);
-			} else {
-				LOG.debug("No Swager 1.x specification. Doesn't have key \"swaggerVersion\" starting with value: \"1.\"");	
-			}
+			LOG.trace("No Swager 1.x specification.", e);
 			return false;
 		}
 	}

@@ -160,7 +160,7 @@ public class AppSubscriptionUnpublishedTestIT extends TestNGCitrusTestDesigner {
 		echo("####### Trigger a Re-Create of the API: '${apiName}' - Subscription must stay  #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
-		createVariable("status", "unpublished");
+		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
