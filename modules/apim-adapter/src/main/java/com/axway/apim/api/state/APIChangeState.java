@@ -9,6 +9,7 @@ import java.util.Vector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.CommandParameters;
@@ -298,20 +299,22 @@ public class APIChangeState {
 		}
 	}
 	
-	public boolean isAdminAccountNeeded() throws AppException {
-		if(this.isAdminAccountNeeded!=null) return Boolean.parseBoolean(this.isAdminAccountNeeded);
-		if(getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) && 
-				(getActualAPI()==null || getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
-			this.isAdminAccountNeeded = "false";
-		} else {
-			this.isAdminAccountNeeded = "true";
-		}
-		return Boolean.parseBoolean(this.isAdminAccountNeeded);
+public boolean isAdminAccountNeeded() throws AppException {
+	// Initially set, right after comparing the Desired- with Actual-state
+	if(this.isAdminAccountNeeded!=null) return Boolean.parseBoolean(this.isAdminAccountNeeded);
+	// If the desired & actual API is state Unpublished - No Admin-Account is needed
+	if((getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) || getDesiredAPI().getState().equals(API.STATE_DELETED)) && 
+			(getActualAPI()==null || getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
+		this.isAdminAccountNeeded = "false";
+	} else {
+		this.isAdminAccountNeeded = "true";
 	}
+	return Boolean.parseBoolean(this.isAdminAccountNeeded);
+}
 	
 	public String waiting4Approval() throws AppException {
 		String isWaitingMsg = "";
-		if(isAdminAccountNeeded()) {
+		if(isAdminAccountNeeded() && !APIManagerAdapter.hasAdminAccount()) {
 			isWaitingMsg = "Waiting for approval ... ";
 		}
 		return isWaitingMsg;

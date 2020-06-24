@@ -12,9 +12,10 @@ public class StandardExportParams extends CommandParameters {
 		ultra
 	}
 	
-	public static enum exportFormat {
+	public static enum OutputFormat {
 		console, 
-		json
+		json, 
+		csv
 	}
 
 	public StandardExportParams(CommandLine cmd, CommandLine internalCmd, EnvironmentProperties environment)
@@ -38,17 +39,21 @@ public class StandardExportParams extends CommandParameters {
 		return Wide.standard;
 	}
 	
-	public exportFormat getExportFormat() {
+	public OutputFormat getOutputFormat() {
 		try {
-			return exportFormat.valueOf(getValue("format"));
+			return OutputFormat.valueOf(getValue("output"));
 		} catch (Exception e) {
-			return exportFormat.console;
+			return OutputFormat.console;
 		}
 	}
 	
-	public boolean deleteLocalFolder() {
-		if(hasOption("deleteFolder")) return true;
-		if(getValue("deleteFolder")==null) return false;
-		return Boolean.parseBoolean(getValue("deleteFolder"));
+	public boolean deleteTarget() {
+		if(hasOption("deleteTarget")) return true;
+		if(getValue("deleteTarget")==null) return false;
+		return Boolean.parseBoolean(getValue("deleteTarget"));
+	}
+	
+	public String getTarget() {
+		return (getValue("target")==null) ? "." : getValue("target");
 	}
 }

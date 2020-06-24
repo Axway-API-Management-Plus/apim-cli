@@ -116,8 +116,8 @@ public class ManageClientApps {
 					apiAccess.setApiId(apiId);
 					accessAdapter.createAPIAccess(apiAccess, app.getId(), Type.applications);
 				} catch(AppException e) {
-					throw new AppException("Failure creating API-Access for application: '"+app.getName()+"'", 
-							ErrorCode.API_MANAGER_COMMUNICATION);
+					throw new AppException("Failure creating API-Access for application: '"+app.getName()+"'. " + e.getMessage(), 
+							ErrorCode.API_MANAGER_COMMUNICATION, e);
 				}
 			}
 		} catch (Exception e) {

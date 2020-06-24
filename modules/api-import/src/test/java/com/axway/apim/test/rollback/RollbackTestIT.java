@@ -59,7 +59,7 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 		echo("####### Create a valid API, which will be updated later, which then fails and must be rolled back #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config.json");
-		createVariable("status", "published");
+		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0"); // Must fail!
 		swaggerImport.doExecute(context);
 		
@@ -68,7 +68,7 @@ public class RollbackTestIT extends TestNGCitrusTestRunner {
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "${status}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		// In Version 7.6.2 SP2 (only this version) the API-Manager is able to create a FE-API based on host: https://unknown.host.com:443 for any reason

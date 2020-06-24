@@ -25,6 +25,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	private static Logger LOG = LoggerFactory.getLogger(ApplicationExportApp.class);
 
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+	static ErrorState errorState = ErrorState.getInstance();
 
 	@Override
 	public String getName() {
@@ -50,13 +51,23 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	public static int export(String args[]) {
 		try {
 			AppExportParams params = new AppExportParams(new AppExportCLIOptions(args));
-			switch(params.getExportFormat()) {
+			switch(params.getOutputFormat()) {
 			case console:
 				return runExport(params, ExportImpl.CONSOLE_EXPORTER);
 			case json:
 				return runExport(params, ExportImpl.JSON_EXPORTER);
 			default:
 				return runExport(params, ExportImpl.CONSOLE_EXPORTER);
+			}
+		} catch (AppException e) {
+			
+			if(errorState.hasError()) {
+				errorState.logErrorMessages(LOG);
+				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
+				return new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode();
+			} else {
+				LOG.error(e.getMessage(), e);
+				return new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode();
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
