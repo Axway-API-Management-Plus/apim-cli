@@ -123,17 +123,17 @@ public class APIManagerCLI {
 	}
 	
 	void run(String[] args) {
-		System.out.println("------------------------------------------------------------------------");
+		System.out.println("----------------------------------------------------------------------------------------");
 		System.out.println("API-Manager CLI: "+APIManagerCLI.class.getPackage().getImplementationVersion());
 		System.out.println("                                                                        ");
 		System.out.println("To report issues or get help, please visit: ");
 		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli");
-		System.out.println("------------------------------------------------------------------------");
+		System.out.println("----------------------------------------------------------------------------------------");
 		if(this.selectedMethod==null) {
 			this.printUsage();
 		} else {
 			System.out.println("Module: " + this.selectedService.getName() + " ("+this.selectedService.getVersion()+")");
-			System.out.println("------------------------------------------------------------------------");
+			System.out.println("---------------------------	-------------------------------------------------------------");
 			try {
 				this.selectedMethod.invoke (this.selectedService, (Object)args);
 			} catch (Exception e) {

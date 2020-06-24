@@ -18,6 +18,12 @@ public abstract class StandardExportCLIOptions extends APIMCoreCLIOptions {
 		option = new Option("deleteTarget", "Controls if an existing target folder or file should be deleted. Defaults to false.");
 		options.addOption(option);
 		
+		option = new Option("t", "target", true, "Defines the target location for get operations that are creating files or directories.\n"
+				+ "Defaults to current folder. Required output files or directories are created automatically.");
+		option.setRequired(false);
+		option.setArgName("my/apis");
+		options.addOption(option);
+		
 		option = new Option("o", "output", true, "Controls the output format. By default the console is used.");
 		option.setRequired(false);
 		option.setArgName("console|json|csv");

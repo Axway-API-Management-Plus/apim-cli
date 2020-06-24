@@ -64,8 +64,8 @@ public class ApplicationExportTestAction extends AbstractTestAction {
 		} else {
 			args.add("-n");
 			args.add(context.replaceDynamicContentInString("${appName}"));
-			args.add("-l");
-			args.add(context.replaceDynamicContentInString("${localFolder}"));
+			args.add("-t");
+			args.add(context.replaceDynamicContentInString("${targetFolder}"));
 			args.add("-h");
 			args.add(context.replaceDynamicContentInString("${apiManagerHost}"));
 			args.add("-p");

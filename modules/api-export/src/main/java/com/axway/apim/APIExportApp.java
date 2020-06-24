@@ -13,6 +13,7 @@ import com.axway.apim.api.export.impl.APIResultHandler.APIListImpl;
 import com.axway.apim.api.export.lib.APIDeleteCLIOptions;
 import com.axway.apim.api.export.lib.APIExportGetCLIOptions;
 import com.axway.apim.api.export.lib.APIExportParams;
+import com.axway.apim.api.export.lib.APIUnpublishCLIOptions;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -80,7 +81,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "unpublish", description = "Unpublish the selected APIs")
 	public static int unpublish(String args[]) {
 		try {
-			APIExportParams params = new APIExportParams(new APIDeleteCLIOptions(args));
+			APIExportParams params = new APIExportParams(new APIUnpublishCLIOptions(args));
 			return runExport(params, APIListImpl.API_UNPUBLISH_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);

@@ -13,7 +13,7 @@ public class AppImportCLIOptions extends APIMCoreCLIOptions {
 	public AppImportCLIOptions(String[] args) throws ParseException {
 		super(args);
 		// Define command line options required for Application export
-		Option option = new Option("c", "config", true, "This is the JSON-Formatted Application-Config file containing the application");
+		Option option = new Option("c", "config", true, "This is the JSON-Formatted Application-Config file containing the application. You may get that config file using apim app get with output set to JSON.");
 		option.setRequired(true);
 		option.setArgName("app_config.json");
 		options.addOption(option);
@@ -22,17 +22,12 @@ public class AppImportCLIOptions extends APIMCoreCLIOptions {
 	@Override
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);		
-		System.out.println("You may run one of the following examples:");
-		System.out.println("Using parameters provided in properties file stored in conf-folder:");
-		System.out.println(getBinaryName()+" app export -n \"Client App\" -s api-env");
-		System.out.println(getBinaryName()+" app export -n \"Client App\" -l /tmp/exported_apps -s api-env -deleteTarget");
-		System.out.println(getBinaryName()+" app export -n \"Client App\" -l /tmp/exported_apps -s api-env -deleteTarget -o json");
+		System.out.println("----------------------------------------------------------------------------------------");
+		System.out.println("How to imports applications using JSON the JSON-Config format");
+		System.out.println("Import an application using enviornment properties: env.api-env.properties:");
+		System.out.println(getBinaryName()+" app import -c myApps/great-app.json -s api-env");
+		System.out.println(getBinaryName()+" app import -c myApps/another-great-app.json -h localhost -u apiadmin -p changeme");
 		System.out.println();
-		System.out.println();
-		System.out.println(getBinaryName()+" app export -n \"Client App\" -h localhost -u apiadmin -p changeme");
-		System.out.println(getBinaryName()+" app export -n \"App 123\" -h localhost -u apiadmin -p changeme -s prod -deleteTarget");
-		System.out.println(getBinaryName()+" app export -n \"App 123\" -l /tmp/exported_apps -deleteTarget -h localhost -u apiadmin -p changeme -s prod");
-
 		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");
 		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");

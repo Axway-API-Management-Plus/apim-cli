@@ -110,7 +110,7 @@ public abstract class APIResultHandler {
         negative = negative.toUpperCase();
         String answer;
         do {
-            System.out.print(question);
+            System.out.print(question+ " ");
             answer = input.next().trim().toUpperCase();
         } while (!answer.matches(positive) && !answer.matches(negative));
         input.close();

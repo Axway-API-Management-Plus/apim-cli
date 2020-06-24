@@ -13,7 +13,7 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 	public APIImportCLIOptions(String[] args) throws ParseException {
 		super(args);
 		// Define command line options required for Application export
-		Option option = new Option("a", "apidefinition", true, "(Optional) The API Definition either as Swagger (JSON-Formated) or a WSDL for SOAP-Services:\n"
+		Option option = new Option("a", "apidefinition", true, "(Optional) The API Definition either as Swagger (JSON/YAML) or a WSDL for SOAP-Services:\n"
 				+ "- in local filesystem using a relative or absolute path. Example: swagger_file.json\n"
 				+ "  Please note: Local filesystem is not supported for WSDLs. Please use direct URL or a URL-Reference-File.\n"
 				+ "- a URL providing the Swagger-File or WSDL-File. Examples:\n"
@@ -21,12 +21,12 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 				+ "  [username/password@]http://www.dneonline.com/calculator.asmx?wsdl\n"
 				+ "- a reference file called anyname-i-want.url which contains a line with the URL\n"
 				+ "  (same format as above for Swagger or WSDL)."
-				+ "  If not specified, the API Definition configuration is read directly from the JSON-Formatted API-Config");
+				+ "  If not specified, the API Definition configuration is read directly from the API-Config file.");
 		option.setRequired(false);
 		option.setArgName("swagger_file.json");
 		options.addOption(option);
 
-		option = new Option("c", "config", true, "This is the JSON-Formatted API-Config containing information how to expose the API");
+		option = new Option("c", "config", true, "This is the JSON-Formatted API-Config containing information how to expose the API. You may get that config file using apim api get with output set to JSON.");
 		option.setRequired(true);
 		option.setArgName("api_config.json");
 		options.addOption(option);
@@ -74,8 +74,9 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 	@Override
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);		
-		System.out.println("You may run one of the following examples:");
-		System.out.println("Using parameters provided in properties file stored in conf-folder:");
+		System.out.println("----------------------------------------------------------------------------------------");
+		System.out.println("How to import APIs");
+		System.out.println("Import an API including the API-Definition using environment properties file: env.api-env.properties:");
 		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config-api-definition.json -s api-env");
 		System.out.println();
 		System.out.println();
@@ -90,7 +91,7 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 
 	@Override
 	protected String getAppName() {
-		return "Application-Export";
+		return "API-Import";
 	}
 
 
