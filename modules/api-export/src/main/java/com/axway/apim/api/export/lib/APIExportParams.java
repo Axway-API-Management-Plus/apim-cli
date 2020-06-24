@@ -25,7 +25,8 @@ public class APIExportParams extends StandardExportParams {
 		return getValue("id");
 	}
 	
-	public String getLocalFolder() {
-		return (getValue("localFolder")==null) ? "." : getValue("localFolder");
+	public boolean isUseFEAPIDefinition() {
+		if(hasOption("useFEAPIDefinition")) return true;
+		return false;
 	}
 }

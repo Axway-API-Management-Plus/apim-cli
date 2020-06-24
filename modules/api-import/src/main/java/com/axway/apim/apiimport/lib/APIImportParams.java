@@ -21,4 +21,9 @@ public class APIImportParams extends CommandParameters {
 		// For import action we ignore the cache in all cases!
 		return true;
 	}
+	
+	public boolean isUseFEAPIDefinition() {
+		if(getValue("useFEAPIDefinition")==null) return false;
+		return Boolean.parseBoolean(getValue("useFEAPIDefinition"));
+	}
 }

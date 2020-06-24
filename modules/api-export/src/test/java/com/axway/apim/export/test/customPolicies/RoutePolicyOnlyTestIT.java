@@ -14,7 +14,6 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.CorsProfile;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.SecurityProfile;

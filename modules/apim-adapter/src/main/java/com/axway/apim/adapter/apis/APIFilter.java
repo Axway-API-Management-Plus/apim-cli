@@ -55,9 +55,10 @@ public class APIFilter {
 	private String apiPath;
 	private String queryStringVersion;
 	private String state;
+	private String backendBasepath;
 	
 	private String createdOn;
-	private String createdOnOp;
+	private FILTER_OP createdOnOp;
 	
 	private APIType type;
 	
@@ -72,7 +73,8 @@ public class APIFilter {
 	
 	private METHOD_TRANSLATION translateMethodMode = METHOD_TRANSLATION.NONE;
 	
-	private boolean useBackendAPI = false;
+	/** If true, the API is loaded from the apirepo endpoint instead of proxies */
+	private boolean loadBackendAPI = false;
 	
 	private boolean includeOperations = false;
 	private boolean includeQuotas = false;
@@ -82,6 +84,8 @@ public class APIFilter {
 	private boolean includeImage = false;
 	
 	private boolean includeOriginalAPIDefinition = false;
+	
+	private boolean useFEAPIDefinition = false;
 	
 	POLICY_TRANSLATION translatePolicyMode = POLICY_TRANSLATION.NONE;
 	
@@ -160,7 +164,7 @@ public class APIFilter {
 	}
 
 	public String getApiType() {
-		if(useBackendAPI) {
+		if(loadBackendAPI) {
 			return APIManagerAdapter.TYPE_BACK_END;
 		} else {
 			return APIManagerAdapter.TYPE_FRONT_END;
@@ -177,6 +181,14 @@ public class APIFilter {
 
 	public void setIncludeOriginalAPIDefinition(boolean includeOriginalAPIDefinition) {
 		this.includeOriginalAPIDefinition = includeOriginalAPIDefinition;
+	}
+
+	public boolean isUseFEAPIDefinition() {
+		return useFEAPIDefinition;
+	}
+
+	public void setUseFEAPIDefinition(boolean useFEAPIDefinition) {
+		this.useFEAPIDefinition = useFEAPIDefinition;
 	}
 
 	public String getApiPath() {
@@ -206,8 +218,14 @@ public class APIFilter {
 	public void setQueryStringVersion(String queryStringVersion) {
 		this.queryStringVersion = queryStringVersion;
 	}
-	
-	
+
+	public String getBackendBasepath() {
+		return backendBasepath;
+	}
+
+	public void setBackendBasepath(String backendBasepath) {
+		this.backendBasepath = backendBasepath;
+	}
 
 	public METHOD_TRANSLATION getTranslateMethodMode() {
 		return translateMethodMode;
@@ -225,12 +243,12 @@ public class APIFilter {
 		this.translatePolicyMode = translatePolicyMode;
 	}
 
-	public boolean isUseBackendAPI() {
-		return useBackendAPI;
+	public boolean isLoadBackendAPI() {
+		return loadBackendAPI;
 	}
 
-	public void setUseBackendAPI(boolean useBackendAPI) {
-		this.useBackendAPI = useBackendAPI;
+	public void setLoadBackendAPI(boolean loadBackendAPI) {
+		this.loadBackendAPI = loadBackendAPI;
 	}
 
 	public boolean isIncludeOperations() {
@@ -324,17 +342,17 @@ public class APIFilter {
 	public void setCreatedOn(String createdOn, FILTER_OP op) {
 		if(createdOn==null) return;
 		this.createdOn = createdOn;
-		this.createdOnOp = createdOnOp;
+		this.createdOnOp = op;
 		filters.add(new BasicNameValuePair("field", "createdOn"));
 		filters.add(new BasicNameValuePair("op", op.name()));
-		filters.add(new BasicNameValuePair("value", createdOnOp));
+		filters.add(new BasicNameValuePair("value", createdOn));
 	}
 	
 	public String getCreatedOn() {
 		return createdOn;
 	}
 	
-	public String getCreatedOnOp() {
+	public FILTER_OP getCreatedOnOp() {
 		return createdOnOp;
 	}
 
@@ -373,7 +391,7 @@ public class APIFilter {
 			return "APIFilter [id=" + id + ", apiId=" + apiId + ", name=" + name + ", vhost=" + vhost + ", apiPath="
 					+ apiPath + ", queryStringVersion=" + queryStringVersion + ", state=" + state + ", customProperties="
 					+ customProperties + ", deprecated=" + deprecated + ", retired=" + retired + ", apiType=" + apiType
-					+ ", translateMethodMode=" + translateMethodMode + ", useBackendAPI=" + useBackendAPI
+					+ ", translateMethodMode=" + translateMethodMode + ", loadBackendAPI=" + loadBackendAPI
 					+ ", includeOperations=" + includeOperations + ", includeQuotas=" + includeQuotas
 					+ ", includeClientOrganizations=" + includeClientOrganizations + ", includeClientApplications="
 					+ includeClientApplications + ", includeImage=" + includeImage + ", includeOriginalAPIDefinition="
@@ -382,7 +400,7 @@ public class APIFilter {
 		} else if(LOG.isDebugEnabled()) {
 			return "APIFilter [id=" + id + ", name=" + name + ", vhost=" + vhost + ", apiPath=" + apiPath
 					+ ", queryStringVersion=" + queryStringVersion + ", state=" + state + ", deprecated=" + deprecated
-					+ ", retired=" + retired + ", useBackendAPI=" + useBackendAPI + "]";
+					+ ", retired=" + retired + ", loadBackendAPI=" + loadBackendAPI + "]";
 		} else {
 			return "APIFilter [id=" + id + ", name=" + name + ", vhost=" + vhost + ", apiPath=" + apiPath
 					+ ", queryStringVersion=" + queryStringVersion + "]";			
@@ -391,7 +409,7 @@ public class APIFilter {
 	
 	
 	public boolean filter(API api) throws AppException {
-		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null) { // Nothing given to filter out.
+		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null && this.getBackendBasepath()==null) { // Nothing given to filter out.
 			return true;
 		}
 		// Before 7.7, we have to filter out APIs manually!
@@ -406,7 +424,7 @@ public class APIFilter {
 				if(this.getApiPath()!=null && !this.getApiPath().equals(api.getPath())) return false;
 			}
 		}
-		if(this.getPolicyName()!=null && this.getPolicyName().contains("*")) {
+		if(this.getPolicyName()!=null) {
 			Pattern pattern = Pattern.compile(this.getPolicyName().replace("*", ".*"));
 			Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
 			boolean requestedPolicyUsed = false;
@@ -425,6 +443,13 @@ public class APIFilter {
 				}
 			}
 			if(!requestedPolicyUsed) return false;
+		}
+		if(this.getBackendBasepath()!=null) {			
+			Pattern pattern = Pattern.compile(this.getBackendBasepath().replace("*", ".*"));
+			Matcher matcher = pattern.matcher(api.getServiceProfiles().get("_default").getBasePath());
+			if(!matcher.matches()) {
+				return false;
+			}
 		}
 		if(this.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
 			if(this.getVhost()!=null && !this.getVhost().equals(api.getVhost()))  return false;
@@ -460,6 +485,7 @@ public class APIFilter {
 		String apiPath;
 		String queryStringVersion;
 		String state;
+		String backendBasepath;
 		
 		String createdOn;
 		FILTER_OP createdOnOp;
@@ -473,7 +499,7 @@ public class APIFilter {
 		
 		METHOD_TRANSLATION translateMethodMode = METHOD_TRANSLATION.NONE;
 		
-		boolean useBackendAPI = false;
+		boolean loadBackendAPI = false;
 		
 		boolean includeOperations = false;
 		boolean includeQuotas = false;
@@ -483,6 +509,8 @@ public class APIFilter {
 		boolean includeImage = false;
 		
 		boolean includeOriginalAPIDefinition = false;
+		
+		boolean useFEAPIDefinition = false;
 		
 		POLICY_TRANSLATION translatePolicyMode = POLICY_TRANSLATION.NONE;
 		
@@ -503,13 +531,13 @@ public class APIFilter {
 		/**
 		 * Creates a ClientAppAdapter based on the provided configuration using all registered Adapters
 		 * @param type of the APIFilter
-		 * @param useBackendAPI is search backendEndAPI if set to true 
+		 * @param loadBackendAPI is search backendEndAPI if set to true 
 		 */
-		public Builder(APIType type, boolean useBackendAPI) {
+		public Builder(APIType type, boolean loadBackendAPI) {
 			super();
 			initType(type);
 			this.apiType = type;
-			this.useBackendAPI = useBackendAPI;
+			this.loadBackendAPI = loadBackendAPI;
 		}
 		
 		public APIFilter build() {
@@ -529,13 +557,15 @@ public class APIFilter {
 			apiFilter.setIncludeClientOrganizations(this.includeClientOrganizations);
 			apiFilter.setIncludeClientApplications(this.includeClientApplications);
 			apiFilter.setIncludeOriginalAPIDefinition(this.includeOriginalAPIDefinition);
+			apiFilter.setUseFEAPIDefinition(this.useFEAPIDefinition);
 			apiFilter.setIncludeImage(this.includeImage);
-			apiFilter.setUseBackendAPI(this.useBackendAPI);
+			apiFilter.setLoadBackendAPI(this.loadBackendAPI);
 			apiFilter.setState(this.state);
 			apiFilter.setRetired(this.retired);
 			apiFilter.setDeprecated(this.deprecated);
 			apiFilter.setCustomProperties(this.customProperties);
 			apiFilter.setCreatedOn(this.createdOn, this.createdOnOp);
+			apiFilter.setBackendBasepath(this.backendBasepath);
 			return apiFilter;
 		}
 
@@ -657,6 +687,12 @@ public class APIFilter {
 			return this;
 		}
 		
+		public Builder useFEAPIDefinition(boolean useFEAPIDefinition) {
+			this.useFEAPIDefinition = useFEAPIDefinition;
+			return this;
+		}
+		
+		
 		public Builder includeImage(boolean includeImage) {
 			this.includeImage = includeImage;
 			return this;
@@ -674,6 +710,11 @@ public class APIFilter {
 		
 		public Builder translateMethods(METHOD_TRANSLATION translateMethodMode) {
 			this.translateMethodMode = translateMethodMode;
+			return this;
+		}
+		
+		public Builder hasBackendBasepath(String backendBasepath) {
+			this.backendBasepath = backendBasepath;
 			return this;
 		}
 	}
