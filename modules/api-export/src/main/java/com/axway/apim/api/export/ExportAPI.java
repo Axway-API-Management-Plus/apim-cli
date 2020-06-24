@@ -205,6 +205,7 @@ public class ExportAPI {
 
 
 	public Map<String, String> getCustomProperties() {
+		if(this.actualAPIProxy.getCustomProperties()!=null && this.actualAPIProxy.getCustomProperties().size()==0) return null;
 		return this.actualAPIProxy.getCustomProperties();
 	}
 

@@ -44,7 +44,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		File localFolder = new File(targetFolder +File.separator+ folderName);
 		LOG.info("Going to export applications into folder: " + localFolder);
 		if(localFolder.exists()) {
-			if(AppExportParams.getInstance().deleteLocalFolder()) {
+			if(AppExportParams.getInstance().deleteTarget()) {
 				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
 				try {
 					FileUtils.deleteDirectory(localFolder);

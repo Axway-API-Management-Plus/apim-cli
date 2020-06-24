@@ -55,14 +55,16 @@ public class ExportTestAction extends AbstractTestAction {
 			args.add(context.replaceDynamicContentInString("${exportApi}"));
 			args.add("-s");
 			args.add(stage);
-			args.add("-f");
+			args.add("-t");
+			args.add(context.replaceDynamicContentInString("${exportLocation}"));
+			args.add("-o");
 			args.add("json");
 		} else {
 			args.add("-a");
 			args.add(context.replaceDynamicContentInString("${exportApi}"));
 			args.add("-v");
 			args.add(vhostToExport);
-			args.add("-l");
+			args.add("-t");
 			args.add(context.replaceDynamicContentInString("${exportLocation}"));
 			args.add("-h");
 			args.add(context.replaceDynamicContentInString("${apiManagerHost}"));
@@ -72,7 +74,7 @@ public class ExportTestAction extends AbstractTestAction {
 			args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
 			args.add("-s");
 			args.add(stage);
-			args.add("-f");
+			args.add("-o");
 			args.add("json");
 			if(ignoreAdminAccount) {
 				args.add("-ignoreAdminAccount");

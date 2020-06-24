@@ -37,7 +37,7 @@ public class SwaggerFromURLRefFileInConfigurationTestIT extends TestNGCitrusTest
 		createVariable(ImportTestAction.API_DEFINITION,  "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
 		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/basic/swagger-file-with-username.url");
-		createVariable("status", "unpublished");
+		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 		
@@ -53,7 +53,7 @@ public class SwaggerFromURLRefFileInConfigurationTestIT extends TestNGCitrusTest
 		createVariable(ImportTestAction.API_DEFINITION,  "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
 		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/basic/swagger-file-with-username.url");
-		createVariable("status", "unpublished");
+		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		swaggerImport.doExecute(context);
 	}
