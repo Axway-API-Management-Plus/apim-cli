@@ -42,7 +42,7 @@ public class JsonAPIExporter extends APIResultHandler {
 	
 	public JsonAPIExporter(APIExportParams params) throws AppException {
 		super(params);
-		this.givenExportFolder = params.getLocalFolder();
+		this.givenExportFolder = params.getTarget();
 	}
 	
 	@Override
@@ -74,7 +74,7 @@ public class JsonAPIExporter extends APIResultHandler {
 		File localFolder = new File(this.givenExportFolder +File.separator+ getVHost(exportAPI) + apiPath);
 		LOG.info("Going to export API into folder: " + localFolder);
 		if(localFolder.exists()) {
-			if(params.deleteLocalFolder()) {
+			if(params.deleteTarget()) {
 				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
 				try {
 					FileUtils.deleteDirectory(localFolder);
@@ -82,7 +82,7 @@ public class JsonAPIExporter extends APIResultHandler {
 					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
 				}				
 			} else {
-				LOG.warn("Local export folder: " + localFolder + " already exists. API will not be exported. (You may set -deleteFolder)");
+				LOG.warn("Local export folder: " + localFolder + " already exists. API will not be exported. (You may set -deleteTarget)");
 				return;
 			}
 		}

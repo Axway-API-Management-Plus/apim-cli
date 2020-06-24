@@ -14,7 +14,8 @@ public class StandardExportParams extends CommandParameters {
 	
 	public static enum OutputFormat {
 		console, 
-		json
+		json, 
+		csv
 	}
 
 	public StandardExportParams(CommandLine cmd, CommandLine internalCmd, EnvironmentProperties environment)
@@ -46,9 +47,13 @@ public class StandardExportParams extends CommandParameters {
 		}
 	}
 	
-	public boolean deleteLocalFolder() {
-		if(hasOption("deleteFolder")) return true;
-		if(getValue("deleteFolder")==null) return false;
-		return Boolean.parseBoolean(getValue("deleteFolder"));
+	public boolean deleteTarget() {
+		if(hasOption("deleteTarget")) return true;
+		if(getValue("deleteTarget")==null) return false;
+		return Boolean.parseBoolean(getValue("deleteTarget"));
+	}
+	
+	public String getTarget() {
+		return (getValue("target")==null) ? "." : getValue("target");
 	}
 }

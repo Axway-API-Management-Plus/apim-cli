@@ -55,7 +55,7 @@ public class ExportTestAction extends AbstractTestAction {
 			args.add(context.replaceDynamicContentInString("${exportApi}"));
 			args.add("-s");
 			args.add(stage);
-			args.add("-f");
+			args.add("-o");
 			args.add("json");
 		} else {
 			args.add("-a");

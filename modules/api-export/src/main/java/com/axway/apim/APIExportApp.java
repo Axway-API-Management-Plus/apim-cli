@@ -45,6 +45,8 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
 			case json:
 				return runExport(params, APIListImpl.JSON_EXPORTER);
+			case csv:
+				return runExport(params, APIListImpl.CSV_EXPORTER);
 			default:
 				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
 			}

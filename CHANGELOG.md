@@ -10,9 +10,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Option to filter for specific backendBasepath
 - Show API detail information if only 1 API is found (See issue [#11](https://github.com/Axway-API-Management-Plus/apim-cli/issues/11))
 - New feature to load the API-Definition from FE-API (See issue [#4](https://github.com/Axway-API-Management-Plus/apim-cli/issues/4))
+- New feature to export APIs as a CSV-File
 
 ### Changed
 - API Console ultra view not longer renders API-Tags in detail. Only indicated with True & False
+- renamed parameter -df / --deleteFolder to -deleteTarget
+- renamed parameter -f / --format to -o --output
 
 ### Fixed
 - Wrong info text during deletion of an unpublished API proxy (See issue [#25](https://github.com/Axway-API-Management-Plus/apim-cli/issues/25))
