@@ -13,10 +13,12 @@ import com.axway.apim.api.export.impl.APIResultHandler.APIListImpl;
 import com.axway.apim.api.export.lib.APIDeleteCLIOptions;
 import com.axway.apim.api.export.lib.APIExportGetCLIOptions;
 import com.axway.apim.api.export.lib.APIExportParams;
+import com.axway.apim.api.export.lib.APIUnpublishCLIOptions;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 
@@ -27,6 +29,8 @@ import com.axway.apim.lib.utils.rest.APIMHttpClient;
 public class APIExportApp implements APIMCLIServiceProvider {
 
 	private static Logger LOG = LoggerFactory.getLogger(APIExportApp.class);
+	
+	private static ErrorState errorState = ErrorState.getInstance();
 
 	public static void main(String args[]) { 
 		int rc = export(args);
@@ -37,13 +41,25 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int export(String args[]) {
 		try {
 			APIExportParams params = new APIExportParams(new APIExportGetCLIOptions(args));
-			switch(params.getExportFormat()) {
+			switch(params.getOutputFormat()) {
 			case console:
 				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
 			case json:
 				return runExport(params, APIListImpl.JSON_EXPORTER);
+			case csv:
+				return runExport(params, APIListImpl.CSV_EXPORTER);
 			default:
 				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
+			}
+		} catch (AppException e) {
+			
+			if(errorState.hasError()) {
+				errorState.logErrorMessages(LOG);
+				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
+				return new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode();
+			} else {
+				LOG.error(e.getMessage(), e);
+				return new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode();
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -65,7 +81,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "unpublish", description = "Unpublish the selected APIs")
 	public static int unpublish(String args[]) {
 		try {
-			APIExportParams params = new APIExportParams(new APIDeleteCLIOptions(args));
+			APIExportParams params = new APIExportParams(new APIUnpublishCLIOptions(args));
 			return runExport(params, APIListImpl.API_UNPUBLISH_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);

@@ -196,6 +196,9 @@ public class APIManagerAPIAccessAdapter {
 					} else {
 						LOG.info("Successfully created API-Access on retry. Received Status-Code: " +statusCode );
 					}
+				} else {
+					LOG.error("Error creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'");
+					throw new AppException("Error creating/updating API Access. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
 			}
 			apiAccess =  mapper.readValue(response, APIAccess.class);

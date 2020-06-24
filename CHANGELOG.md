@@ -6,13 +6,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+- Feature to use a YAML based API-Definition for Swagger & OpenAPI (API-Manager 7.7 only)
 - API Backend-Server information in wide and ultra view console get view
-- Option to filter for specific backendBasepath
+- Option to filter API having a specificied backendBasepath
 - Show API detail information if only 1 API is found (See issue [#11](https://github.com/Axway-API-Management-Plus/apim-cli/issues/11))
-- New feature to load the API-Definition from FE-API (See issue [#4](https://github.com/Axway-API-Management-Plus/apim-cli/issues/4))
+- Feature to load the API-Definition from FE-API (See issue [#4](https://github.com/Axway-API-Management-Plus/apim-cli/issues/4))
+- Feature to export APIs as a CSV-File
+- CLI usage information for all operations improved
 
 ### Changed
-- API Console ultra view not longer renders API-Tags in detail. Only Tru & False as an indicator
+- API Console ultra view not longer renders API-Tags in detail. Only indicated with True & False
+- renamed parameter -l / --localFolder    TO  -t / --target
+- renamed parameter -df / --deleteFolder  TO  -deleteTarget
+- renamed parameter -f / --format         TO  -o --output
+
+### Fixed
+- Wrong info text during deletion of an unpublished API proxy (See issue [#25](https://github.com/Axway-API-Management-Plus/apim-cli/issues/25))
 
 ### Security
 - Bump jackson-databind from 2.9.10.4 to 2.9.10.5

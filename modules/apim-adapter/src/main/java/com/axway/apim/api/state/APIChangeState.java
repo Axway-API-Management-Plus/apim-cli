@@ -303,7 +303,7 @@ public boolean isAdminAccountNeeded() throws AppException {
 	// Initially set, right after comparing the Desired- with Actual-state
 	if(this.isAdminAccountNeeded!=null) return Boolean.parseBoolean(this.isAdminAccountNeeded);
 	// If the desired & actual API is state Unpublished - No Admin-Account is needed
-	if(getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) && 
+	if((getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) || getDesiredAPI().getState().equals(API.STATE_DELETED)) && 
 			(getActualAPI()==null || getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
 		this.isAdminAccountNeeded = "false";
 	} else {

@@ -12,8 +12,11 @@ public abstract class APIExportCLIOptions extends StandardExportCLIOptions {
 
 	public APIExportCLIOptions(String[] args) throws ParseException {
 		super(args);
-		// Define command line options required for Application export
-		Option option = new Option("a", "api-path", true, "Define the APIs to be exported, based on the exposure path.\n"
+		Option option = new Option("useFEAPIDefinition", "If this flag is set, the export API contains the API-Definition (e.g. Swagger) from the FE-API instead of the original imported API.");
+		option.setRequired(false);
+		options.addOption(option);
+		
+		option = new Option("a", "api-path", true, "Filter APIs to be exported, based on the exposure path.\n"
 				+ "You can use wildcards to export multiple APIs:\n"
 				+ "-a /api/v1/my/great/api     : Export a specific API\n"
 				+ "-a *                        : Export all APIs\n"
@@ -23,39 +26,34 @@ public abstract class APIExportCLIOptions extends StandardExportCLIOptions {
 		option.setArgName("/api/v1/my/great/api");
 		options.addOption(option);
 		
-		option = new Option("n", "name", true, "The name of the API. Wildcards at the beginning/end are supported. Use '*' to export all APIs.");
+		option = new Option("n", "name", true, "Filter APIs with the given name. Wildcards at the beginning/end are supported.");
 		option.setRequired(false);
 		option.setArgName("*MyName*");
 		options.addOption(option);
 		
-		option = new  Option("id", true, "The ID of the API.");
+		option = new  Option("id", true, "Filter the API with that specific ID.");
 		option.setRequired(false);
+		option.setArgName("UUID-ID-OF-THE-API");
 		options.addOption(option);
 		
-		option = new Option("policy", true, "Get APIs with the given policy name. This is includes all policy types.");
+		option = new Option("policy", true, "Filter APIs with the given policy name. This is includes all policy types.");
 		option.setRequired(false);
 		option.setArgName("*Policy1*");
 		options.addOption(option);
 
-		option = new Option("vhost", true, "Limit the export to that specific host.");
+		option = new Option("vhost", true, "Filter APIs with that specific virtual host.");
 		option.setRequired(false);
 		option.setArgName("vhost.customer.com");
 		options.addOption(option);
 		
-		option = new  Option("state", true, "Select APIs with specific state: unpublished | pending | published");
+		option = new  Option("state", true, "Filter APIs with specific state: unpublished | pending | published");
 		option.setRequired(false);
+		option.setArgName("published");
 		options.addOption(option);
 		
 		option = new  Option("backend", true, "Filter APIs with specific backendBasepath. Wildcards are supported.");
 		option.setRequired(false);
-		options.addOption(option);
-		
-		
-
-		option = new Option("l", "localFolder", true, "Defines the location to store API-Definitions locally. Defaults to current folder.\n"
-				+ "For each API a new folder is created automatically.");
-		option.setRequired(false);
-		option.setArgName("my/apis");
+		option.setArgName("*mybackhost.com*");
 		options.addOption(option);
 	}
 
