@@ -218,10 +218,10 @@ public class CSVAPIExporter extends APIResultHandler {
 				api.getVhost(), 
 				api.getState(), 
 				getBackendPath(api), 
-				getUsedPolicies(api, PolicyType.REQUEST),
-				getUsedPolicies(api, PolicyType.ROUTING),
-				getUsedPolicies(api, PolicyType.RESPONSE),
-				getUsedPolicies(api, PolicyType.FAULT_HANDLER)
+				getUsedPolicies(api, PolicyType.REQUEST).toString().replace("[", "").replace("]", ""),
+				getUsedPolicies(api, PolicyType.ROUTING).toString().replace("[", "").replace("]", ""),
+				getUsedPolicies(api, PolicyType.RESPONSE).toString().replace("[", "").replace("]", ""),
+				getUsedPolicies(api, PolicyType.FAULT_HANDLER).toString().replace("[", "").replace("]", "")
 		);
 	}
 	
@@ -236,10 +236,10 @@ public class CSVAPIExporter extends APIResultHandler {
 				api.getState(), 
 				getBackendPath(api), 
 				getUsedSecurity(api), 
-				getUsedPolicies(api, PolicyType.REQUEST),
-				getUsedPolicies(api, PolicyType.ROUTING),
-				getUsedPolicies(api, PolicyType.RESPONSE),
-				getUsedPolicies(api, PolicyType.FAULT_HANDLER), 
+				getUsedPolicies(api, PolicyType.REQUEST).toString().replace("[", "").replace("]", ""),
+				getUsedPolicies(api, PolicyType.ROUTING).toString().replace("[", "").replace("]", ""),
+				getUsedPolicies(api, PolicyType.RESPONSE).toString().replace("[", "").replace("]", ""),
+				getUsedPolicies(api, PolicyType.FAULT_HANDLER).toString().replace("[", "").replace("]", ""), 
 				getCustomProps(api),
 				getTags(api) , 
 				org.getName(), 

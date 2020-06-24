@@ -12,7 +12,6 @@ import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIExportParams;
-import com.axway.apim.api.model.Policy;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -91,11 +90,11 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	
 	private String getUsedPoliciesForConsole(API api) {
 		List<String> usedPolicies = new ArrayList<String>();
-		Map<PolicyType, List<Policy>> allPolicies = getUsedPolicies(api);
-		for(List<Policy> policies : allPolicies.values()) {
-			for(Policy pol : policies) {
-				if(usedPolicies.contains(pol.getName())) continue;
-				usedPolicies.add(pol.getName());
+		Map<PolicyType, List<String>> allPolicies = getUsedPolicies(api);
+		for(List<String> policyNames : allPolicies.values()) {
+			for(String polName : policyNames) {
+				if(usedPolicies.contains(polName)) continue;
+				usedPolicies.add(polName);
 			}
 		}
 		return usedPolicies.toString().replace("[", "").replace("]", "");
@@ -119,7 +118,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 		System.out.println(String.format("%-25s", "Organization: ") + api.getOrganization().getName());
 		System.out.println(String.format("%-25s", "Created On: ") + new Date(api.getCreatedOn()));
 		System.out.println(String.format("%-25s", "Created By: ") + getCreatedBy(api));
-		System.out.println(String.format("%-25s", "Granted Organizations: ") + getGrantedOrganizations(api));
+		System.out.println(String.format("%-25s", "Granted Organizations: ") + getGrantedOrganizations(api).toString().replace("[", "").replace("]", ""));
 		System.out.println(String.format("%-25s", "Subscribed applications: ") + getSubscribedApplications(api));
 		System.out.println(String.format("%-25s", "Custom-Policies: ") + getUsedPolicies(api));
 		System.out.println(String.format("%-25s", "Tags: ") + getTags(api));

@@ -149,17 +149,17 @@ public abstract class APIResultHandler {
 		}
 	}
 	
-	protected static List<Policy> getUsedPolicies(API api, PolicyType type) {
+	protected static List<String> getUsedPolicies(API api, PolicyType type) {
 		return getUsedPolicies(api).get(type);
 	}
 	
-	protected static Map<PolicyType, List<Policy>> getUsedPolicies(API api) {
+	protected static Map<PolicyType, List<String>> getUsedPolicies(API api) {
 		Iterator<OutboundProfile> it;
-		Map<PolicyType, List<Policy>> result = new HashMap<PolicyType, List<Policy>>();
-		List<Policy> requestPolicies = new ArrayList<Policy>();
-		List<Policy> routingPolicies = new ArrayList<Policy>();
-		List<Policy> responsePolicies = new ArrayList<Policy>();
-		List<Policy> faultHandlerPolicies = new ArrayList<Policy>();
+		Map<PolicyType, List<String>> result = new HashMap<PolicyType, List<String>>();
+		List<String> requestPolicies = new ArrayList<String>();
+		List<String> routingPolicies = new ArrayList<String>();
+		List<String> responsePolicies = new ArrayList<String>();
+		List<String> faultHandlerPolicies = new ArrayList<String>();
 		try {
 			it = api.getOutboundProfiles().values().iterator();
 		} catch (AppException e) {
@@ -171,16 +171,16 @@ public abstract class APIResultHandler {
 			OutboundProfile profile = it.next();
 			if(profile.getRouteType().equals("proxy")) continue;
 			if(profile.getRequestPolicy()!=null && profile.getRequestPolicy().getName()!=null) {
-				requestPolicies.add(profile.getRequestPolicy());
+				requestPolicies.add(profile.getRequestPolicy().getName());
 			}
 			if(profile.getRoutePolicy()!=null && profile.getRoutePolicy().getName()!=null) {
-				routingPolicies.add(profile.getRoutePolicy());
+				routingPolicies.add(profile.getRoutePolicy().getName());
 			}
 			if(profile.getResponsePolicy()!=null && profile.getResponsePolicy().getName()!=null) {
-				responsePolicies.add(profile.getResponsePolicy());
+				responsePolicies.add(profile.getResponsePolicy().getName());
 			}
 			if(profile.getFaultHandlerPolicy()!=null && profile.getFaultHandlerPolicy().getName()!=null) {
-				faultHandlerPolicies.add(profile.getFaultHandlerPolicy());
+				faultHandlerPolicies.add(profile.getFaultHandlerPolicy().getName());
 			}
 		}
 		result.put(PolicyType.REQUEST, requestPolicies);
