@@ -25,13 +25,13 @@ public class AppImportCLIOptions extends APIMCoreCLIOptions {
 		System.out.println("You may run one of the following examples:");
 		System.out.println("Using parameters provided in properties file stored in conf-folder:");
 		System.out.println(getBinaryName()+" app export -n \"Client App\" -s api-env");
-		System.out.println(getBinaryName()+" app export -n \"Client App\" -l /tmp/exported_apps -s api-env -deleteFolder");
-		System.out.println(getBinaryName()+" app export -n \"Client App\" -l /tmp/exported_apps -s api-env -deleteFolder -f json");
+		System.out.println(getBinaryName()+" app export -n \"Client App\" -l /tmp/exported_apps -s api-env -deleteTarget");
+		System.out.println(getBinaryName()+" app export -n \"Client App\" -l /tmp/exported_apps -s api-env -deleteTarget -o json");
 		System.out.println();
 		System.out.println();
 		System.out.println(getBinaryName()+" app export -n \"Client App\" -h localhost -u apiadmin -p changeme");
-		System.out.println(getBinaryName()+" app export -n \"App 123\" -h localhost -u apiadmin -p changeme -s prod -deleteFolder");
-		System.out.println(getBinaryName()+" app export -n \"App 123\" -l /tmp/exported_apps -deleteFolder -h localhost -u apiadmin -p changeme -s prod");
+		System.out.println(getBinaryName()+" app export -n \"App 123\" -h localhost -u apiadmin -p changeme -s prod -deleteTarget");
+		System.out.println(getBinaryName()+" app export -n \"App 123\" -l /tmp/exported_apps -deleteTarget -h localhost -u apiadmin -p changeme -s prod");
 
 		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");
