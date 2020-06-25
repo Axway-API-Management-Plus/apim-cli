@@ -40,7 +40,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 	
 	private void saveApplicationLocally(ExportApplication app) throws AppException {
 		String folderName = getExportFolder(app);
-		String targetFolder = params.getLocalFolder();
+		String targetFolder = params.getTarget();
 		File localFolder = new File(targetFolder +File.separator+ folderName);
 		LOG.info("Going to export applications into folder: " + localFolder);
 		if(localFolder.exists()) {
