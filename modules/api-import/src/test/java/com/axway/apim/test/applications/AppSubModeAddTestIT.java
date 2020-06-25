@@ -10,7 +10,7 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="AppSubModeAddTestIT")
+@Test(testName="AppSubModeAddTestIT", enabled = false)
 public class AppSubModeAddTestIT extends TestNGCitrusTestDesigner {
 	
 	@Autowired
