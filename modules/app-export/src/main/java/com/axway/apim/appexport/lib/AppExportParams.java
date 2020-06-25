@@ -32,8 +32,4 @@ public class AppExportParams extends StandardExportParams {
 	public String getOrgName() {
 		return getValue("orgName");
 	}
-	
-	public String getLocalFolder() {
-		return (getValue("localFolder")==null) ? "." : getValue("localFolder");
-	}
 }
