@@ -132,4 +132,9 @@ public class APIMHttpClient {
 	public void setCsrfToken(String csrfToken) {
 		this.csrfToken = csrfToken;
 	}
+
+	@Override
+	public String toString() {
+		return "APIMHttpClient [cookieStore=" + cookieStore + ", csrfToken=" + csrfToken + "]";
+	}
 }
