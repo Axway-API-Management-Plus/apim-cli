@@ -522,6 +522,7 @@ public class APIManagerAdapter {
 		try {
 			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
 			RestAPICall getRequest = new GETRequest(uri);
+			getRequest.setLogHTTPClientInfo(true);
 			httpResponse = getRequest.execute().getEntity();
 			appConfig = IOUtils.toString(httpResponse.getContent(), "UTF-8");
 			return parseAppConfig(appConfig);
