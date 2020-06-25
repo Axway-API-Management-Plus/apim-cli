@@ -54,6 +54,7 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.TestIndicator;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
+import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
@@ -143,7 +144,11 @@ public class APIManagerAdapter {
 			APIManagerAdapter.cacheManager.close();
 			LOG.debug("Closing cache end");
 		}
-		APIManagerAdapter.instance = null;
+		if(APIManagerAdapter.instance!=null) {
+			APIManagerAdapter.instance.logoutFromAPIManager(false); // Logout potentially logged in OrgAdmin
+			APIManagerAdapter.instance.logoutFromAPIManager(true); // Logout potentially logged in Admin
+			APIManagerAdapter.instance = null;
+		}
 	}
 	
 	private APIManagerAdapter() throws AppException {
@@ -224,6 +229,29 @@ public class APIManagerAdapter {
 			}
 		} catch (Exception e) {
 			throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		} finally {
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
+		}	
+	}
+	
+	public void logoutFromAPIManager(boolean useAdminClient) throws AppException {
+		if(useAdminClient && !hasAdminAccount()) return;
+		URI uri;
+		HttpResponse httpResponse = null;
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/login").build();
+			DELRequest logoutRequest = new DELRequest(uri, useAdminClient);
+			httpResponse = logoutRequest.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode != 204){
+				String response = EntityUtils.toString(httpResponse.getEntity());
+				LOG.warn("Logout failed with statusCode: " +statusCode+ ". Got response: '"+response+"'");
+			}
+		} catch (Exception e) {
+			throw new AppException("Can't logout from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 
