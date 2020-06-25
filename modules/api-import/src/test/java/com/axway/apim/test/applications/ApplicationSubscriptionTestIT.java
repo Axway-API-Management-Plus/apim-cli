@@ -16,7 +16,7 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(enabled = false)
+@Test
 public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 	
 	private ImportTestAction swaggerImport;
