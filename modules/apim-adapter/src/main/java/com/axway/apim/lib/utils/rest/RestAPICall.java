@@ -33,6 +33,8 @@ public abstract class RestAPICall {
 	
 	protected HttpHost target;
 	
+	protected boolean logHTTPClientInfo = false;
+	
 	protected String contentType = "application/json";
 	
 	protected boolean useAdmin = false;
@@ -55,9 +57,12 @@ public abstract class RestAPICall {
 	protected HttpResponse sendRequest(HttpUriRequest request) throws AppException {
 		try {
 			APIMHttpClient apimClient = APIMHttpClient.getInstance(this.useAdmin);
+			if(logHTTPClientInfo) {
+				LOG.info("Using APIM-Manager Client: " + apimClient.toString() + " ");
+				LOG.info("Send request: "+this.getClass().getSimpleName()+" using admin-account: " + this.useAdmin + " to: " + request.getURI());
+			}
 			if(apimClient.getCsrfToken()!=null) request.addHeader("CSRF-Token", apimClient.getCsrfToken());
 			HttpResponse response = apimClient.getHttpClient().execute(request, apimClient.getClientContext());
-			//LOG.info("Send request: "+this.getClass().getSimpleName()+" using admin-account: " + this.useAdmin + " to: " + request.getURI());
 			return response;
 		} catch (ClientProtocolException e) {
 			throw new AppException("Unable to send HTTP-Request.", ErrorCode.CANT_SEND_HTTP_REQUEST, e);
@@ -70,4 +75,11 @@ public abstract class RestAPICall {
 		this.contentType = contentType;
 	}
 
+	public boolean isLogHTTPClientInfo() {
+		return logHTTPClientInfo;
+	}
+
+	public void setLogHTTPClientInfo(boolean logHTTPClientInfo) {
+		this.logHTTPClientInfo = logHTTPClientInfo;
+	}
 }
