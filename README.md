@@ -47,7 +47,7 @@ By using this CLI to control your Axway API management infrastructure it becomes
 To achieve this quality bar, the tools was developed from the beginning in a way that it can be tested fully automatically.  
 In addition to a number of executed unit-tests, sophisticated integration tests are performed. These integration tests are executed against different API-Management versions and consists of a number of different scenarios. Each scenrioa contains various __Desired__ states, which are transferred into __Actual__ state by the CLI and finally checked if the Actual State in the API-Manager is as expected. This is performed for APIs and applications.   
 
-The automated End-2-End test suite contains of __113__ different scenarios, which includes more than __250__ executions of CLI (Import & Export) following each by a validation step. The test suite is executed at Travis CI for the following versions and you may check yourself what is done by clicking on the badge icon:  
+The automated End-2-End test suite contains of __116__ different scenarios, which includes more than __284__ executions of CLI (Import & Export) following each by a validation step. The test suite is executed at Travis CI for the following versions and you may check yourself what is done by clicking on the badge icon:  
 
 | Version       | Branch               | Status | Comment | 
 | :---          | :---                 | :---:  | :--- |
@@ -61,12 +61,12 @@ Version 7.5.3 is NOT supported. Version 7.6.2 SP3 is required.
 
 ## Get started
 
-To get started, you have several options to download the CLI and then just run the CLI as shown in the example below
+To get started, you have several options to [download the CLI](https://github.com/Axway-API-Management-Plus/apim-cli/wiki/1.-How-to-get-started) and then just run the CLI as shown in the example below
 
 ```
 scripts\apim api import -c samples/basic/minimal-config-api-definition.json -s api-env
 ```
-This command is reading the API-Management platform configuration details from the environment file: `env.api-env.properties` and replicates the given desired API state in the configuration file: `minimal-config-api-definition.json` into the API-Management platform. 
+This command is reading the API-Management platform configuration details from the [environment file](https://github.com/Axway-API-Management-Plus/apim-cli/wiki/8.2.-Environment-property-files): `env.api-env.properties` and replicates the given desired API state in the configuration file: `minimal-config-api-definition.json` into the API-Management platform. 
 
 Please see the [documentation](https://github.com/Axway-API-Management-Plus/apim-cli/wikis) for more information.  
 
