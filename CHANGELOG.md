@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Feature to export APIs as a CSV-File incl. used polices and subscribed applications
 - CLI usage information for all operations improved
 - CLI now properly logs out from API-Manager after the execution
+- API Custom-Properties are exported into CSV and Console view
 
 ### Changed
 - API Console ultra view not longer renders API-Tags in detail. Only indicated with True & False
