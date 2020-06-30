@@ -39,19 +39,19 @@ public class ChangeStateTest {
 		List<Organization> managerOrgs = new ArrayList<Organization>();
 
 		
-		importOrgs.add(new Organization().setName("orgA").setId("123"));
-		importOrgs.add(new Organization().setName("orgB").setId("456"));
-		importOrgs.add(new Organization().setName("orgC").setId("789"));
+		importOrgs.add(new Organization.Builder().hasName("orgA").hasId("123").build());
+		importOrgs.add(new Organization.Builder().hasName("orgB").hasId("456").build());
+		importOrgs.add(new Organization.Builder().hasName("orgC").hasId("789").build());
 
-		managerOrgs.add(new Organization().setName("orgC").setId("123"));
-		managerOrgs.add(new Organization().setName("orgB").setId("456"));
-		managerOrgs.add(new Organization().setName("orgA").setId("789"));
+		managerOrgs.add(new Organization.Builder().hasName("orgC").hasId("123").build());
+		managerOrgs.add(new Organization.Builder().hasName("orgB").hasId("456").build());
+		managerOrgs.add(new Organization.Builder().hasName("orgA").hasId("789").build());
 
 		importAPI.setClientOrganizations(importOrgs);
-		importAPI.setOrganization(new Organization().setName("123").setId("789"));
+		importAPI.setOrganization(new Organization.Builder().hasName("123").hasId("789").build());
 
 		managerAPI.setClientOrganizations(managerOrgs);
-		managerAPI.setOrganization(new Organization().setName("123").setId("789"));
+		managerAPI.setOrganization(new Organization.Builder().hasName("123").hasId("789").build());
 
 		APIChangeState changeState = new APIChangeState(managerAPI, importAPI);
 		Assert.assertEquals(changeState.hasAnyChanges(), false);
@@ -71,7 +71,7 @@ public class ChangeStateTest {
 
 	private static API getTestAPI() throws AppException {
 		API testAPI = new ActualAPI();
-		testAPI.setOrganization(new Organization().setName("123").setId("123"));
+		testAPI.setOrganization(new Organization.Builder().hasName("123").hasId("123").build());
 		testAPI.setState(API.STATE_PUBLISHED);
 		return testAPI;
 	}

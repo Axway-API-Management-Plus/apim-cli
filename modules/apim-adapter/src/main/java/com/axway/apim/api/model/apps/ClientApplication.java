@@ -11,6 +11,7 @@ import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.model.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,10 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("ApplicationFilter")
-public class ClientApplication {
-	private String id;
-	private String name;
-	private String description;
+public class ClientApplication extends AbstractEntity {
 	private String email;
 	private String phone;
 	private boolean enabled;
@@ -56,27 +54,6 @@ public class ClientApplication {
 	public String getOrganizationId() {
 		if(this.organization == null) return null;
 		return this.organization.getId();
-	}
-	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getDescription() {
-		if(StringUtils.isEmpty(description)) return null;
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
 	}
 	
 	public String getEmail() {
@@ -185,6 +162,6 @@ public class ClientApplication {
 	}
 	@Override
 	public String toString() {
-		return "[" + name + "]";
+		return "[" + getName() + "]";
 	}
 }
