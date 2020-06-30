@@ -36,6 +36,11 @@ public class Organization extends AbstractEntity {
 	public Organization() {
 		super();
 	}
+	
+	public Organization(String name) {
+		super();
+		setName(name);
+	}
 
 	public String getEmail() {
 		return email;
