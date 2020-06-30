@@ -209,7 +209,7 @@ public class APIManagerAdapter {
 				httpResponse = loginRequest.execute();
 				statusCode = httpResponse.getStatusLine().getStatusCode();
 				if(statusCode != 303){
-					LOG.error("Login finally failed with statusCode: " +statusCode+ ". Got response: '"+response+"' Got response: '"+response+"'");
+					LOG.error("Login finally failed with statusCode: " +statusCode+ ". Got response: '"+response+"'");
 					throw new AppException("Login finally failed with statusCode: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
 				} else {
 					LOG.info("Successfully logged in on retry. Received Status-Code: " +statusCode );
