@@ -106,6 +106,8 @@ public class JsonAPIExporter extends APIResultHandler {
 		FilterProvider filters = new SimpleFilterProvider()
 				.addFilter("CaCertFilter",
 						SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"inbound", "outbound", "certFile" }))
+				.addFilter("ProfileFilter",
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiMethodId" }))
 				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {}));
 		mapper.setFilterProvider(filters);
 		try {

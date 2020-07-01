@@ -99,6 +99,7 @@ public class OutboundProfile extends Profile {
 	}
 
 	public List<Object> getParameters() {
+		if(parameters==null || parameters.size()==0) return null;
 		return parameters;
 	}
 	
