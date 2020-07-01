@@ -5,13 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Organization {
-	
-	private String id;
-
-	private String name;
-	
-	private String description;
+public class Organization extends AbstractEntity {
 	
 	private String email;
 	
@@ -45,33 +39,7 @@ public class Organization {
 	
 	public Organization(String name) {
 		super();
-		this.name = name;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public Organization setId(String id) {
-		this.id = id;
-		return this;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public Organization setName(String name) {
-		this.name = name;
-		return this;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
+		setName(name);
 	}
 
 	public String getEmail() {
@@ -189,6 +157,28 @@ public class Organization {
 
 	@Override
 	public String toString() {
-		return "'" + name + "'";
+		return "'" + getName() + "'";
+	}
+	
+	public static class Builder {
+		String name;
+		String id;
+		
+		public Organization build() {
+			Organization org = new Organization();
+			org.setName(name);
+			org.setId(id);
+			return org;
+		}
+		
+		public Builder hasName(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public Builder hasId(String id) {
+			this.id = id;
+			return this;
+		}
 	}
 }

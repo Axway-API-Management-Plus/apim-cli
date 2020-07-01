@@ -288,7 +288,7 @@ public class APIImportConfigAdapter {
 			apiConfig.setClientOrganizations(null); // Making sure, orgs are not considered as a changed property
 			return;
 		}
-		if(apiConfig.getClientOrganizations().contains(new Organization().setName("ALL"))) {
+		if(apiConfig.getClientOrganizations().contains(new Organization.Builder().hasName("ALL").build())) {
 			List<Organization> allOrgs =  APIManagerAdapter.getInstance().orgAdapter.getAllOrgs();
 			apiConfig.getClientOrganizations().clear();
 			apiConfig.getClientOrganizations().addAll(allOrgs);
