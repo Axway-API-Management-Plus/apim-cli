@@ -27,8 +27,7 @@ public class APISpecificationFactory {
 	
 	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String backendBasepath) throws AppException {
 		if(LOG.isDebugEnabled()) {
-			String contentStart = new String(apiSpecificationContent, 0, 200);
-			LOG.debug("Handle API-Specification: '" + contentStart + "...', apiDefinitionFile: '"+apiDefinitionFile+"'");	
+			LOG.debug("Handle API-Specification: '" + getContentStart(apiSpecificationContent) + "...', apiDefinitionFile: '"+apiDefinitionFile+"'");	
 		}
 		for(Class clazz : specificationTypes) {
 			try {
@@ -46,9 +45,21 @@ public class APISpecificationFactory {
 					return spec;
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				if(LOG.isDebugEnabled()) {
+					LOG.error("Can't handle API specification with class: " + clazz.getName(), e);
+				}
 			}
 		}
-		throw new AppException("Can't handle API specification. No suiteable specification implementation found.", ErrorCode.UNXPECTED_ERROR);
+		LOG.error("Can't handle API specification: '" + getContentStart(apiSpecificationContent) + "'");
+		throw new AppException("Can't handle API specification. No suiteable API-Specification implementation available.", ErrorCode.UNXPECTED_ERROR);
+	}
+	
+	private static String getContentStart(byte[] apiSpecificationContent) {
+		try {
+			if(apiSpecificationContent == null) return "API-Specificaion is null";
+			return (apiSpecificationContent.length<200) ? new String(apiSpecificationContent, 0, apiSpecificationContent.length) : new String(apiSpecificationContent, 0, 200) + "...";
+		} catch (Exception e) {
+			return "Cannot get content from API-Specification. " + e.getMessage();
+		}		
 	}
 }

@@ -488,7 +488,7 @@ public class APIManagerAPIAdapter {
 			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null);
 			api.setApiDefinition(apiDefinition);
 		} catch (Exception e) {
-			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
+			throw new AppException("Cannot parse API-Definition for API: '" + api.getName() + "' ("+api.getVersion()+") on path: '"+api.getPath()+"'", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 
