@@ -137,8 +137,8 @@ public class OutboundProfile extends Profile {
 			List<Object> thisParameters = this.getParameters();
 			if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
 				// Passwords no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
-				otherParameters.remove("password");
-				thisParameters.remove("password");
+				if(otherParameters!=null) otherParameters.remove("password");
+				if(thisParameters!=null) thisParameters.remove("password");
 			}
 			boolean rc = 
 				(this.getFaultHandlerPolicy()==null || this.getFaultHandlerPolicy().equals(otherOutboundProfile.getFaultHandlerPolicy())) &&
@@ -146,7 +146,7 @@ public class OutboundProfile extends Profile {
 				(this.getRequestPolicy()==null || this.getResponsePolicy().equals(otherOutboundProfile.getResponsePolicy())) &&
 				(this.getRoutePolicy()==null || this.getRoutePolicy().equals(otherOutboundProfile.getRoutePolicy())) &&
 				StringUtils.equals(otherOutboundProfile.getRouteType(), this.getRouteType()) &&
-				otherParameters.equals(thisParameters);
+				(thisParameters==null || thisParameters.equals(otherParameters));
 			return rc;
 		} else {
 			return false;
