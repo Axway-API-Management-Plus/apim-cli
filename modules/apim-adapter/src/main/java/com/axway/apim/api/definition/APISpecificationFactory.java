@@ -24,8 +24,11 @@ public class APISpecificationFactory {
 	    add(WSDLSpecification.class);
 	}};
 	
-	
 	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String backendBasepath) throws AppException {
+		return getAPISpecification(apiSpecificationContent, apiDefinitionFile, backendBasepath, true);
+	}
+	
+	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String backendBasepath, boolean failOnError) throws AppException {
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("Handle API-Specification: '" + getContentStart(apiSpecificationContent) + "...', apiDefinitionFile: '"+apiDefinitionFile+"'");	
 		}
@@ -49,6 +52,10 @@ public class APISpecificationFactory {
 					LOG.error("Can't handle API specification with class: " + clazz.getName(), e);
 				}
 			}
+		}
+		if(!failOnError) {
+			LOG.error("Can't handle API specification: '" + getContentStart(apiSpecificationContent) + "'");
+			return new UnknownAPISpecification(apiSpecificationContent, backendBasepath);
 		}
 		LOG.error("Can't handle API specification: '" + getContentStart(apiSpecificationContent) + "'");
 		throw new AppException("Can't handle API specification. No suiteable API-Specification implementation available.", ErrorCode.UNXPECTED_ERROR);

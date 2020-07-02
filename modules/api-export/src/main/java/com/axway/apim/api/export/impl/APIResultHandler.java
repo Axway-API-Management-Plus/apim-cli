@@ -95,7 +95,8 @@ public abstract class APIResultHandler {
 				.includeCustomProperties(APIManagerAdapter.getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE.api))
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.translatePolicies(POLICY_TRANSLATION.TO_NAME)
-				.useFEAPIDefinition(params.isUseFEAPIDefinition());
+				.useFEAPIDefinition(params.isUseFEAPIDefinition())
+				.failOnError(false);
 		return builder;
 	}
 	

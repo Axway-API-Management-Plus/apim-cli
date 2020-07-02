@@ -129,7 +129,7 @@ public class APIManagerAPIAdapter {
 			addCustomProperties(apis, filter);
 			if(logProgress && apis.size()>5) System.out.print("\n");
 		} catch (IOException e) {
-			throw new AppException("Cant reads API from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Cannot read APIs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 		return apis;
 	}
@@ -485,7 +485,7 @@ public class APIManagerAPIAdapter {
 			if(httpResponse.containsHeader("Content-Disposition")) {
 				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
 			}
-			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null);
+			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null, filter.isFailOnError());
 			api.setApiDefinition(apiDefinition);
 		} catch (Exception e) {
 			throw new AppException("Cannot parse API-Definition for API: '" + api.getName() + "' ("+api.getVersion()+") on path: '"+api.getPath()+"'", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);

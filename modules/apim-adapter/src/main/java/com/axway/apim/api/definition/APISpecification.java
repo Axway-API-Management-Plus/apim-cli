@@ -27,7 +27,8 @@ public abstract class APISpecification {
 		SWAGGGER_API_20_YAML("Swagger 2.0 (YAML)", ".yaml"),
 		OPEN_API_30("Open API 3.0", ".json"),
 		OPEN_API_30_YAML("Open API 3.0 (YAML)", ".yaml"),
-		WSDL_API ("WSDL", ".xml");
+		WSDL_API ("WSDL", ".xml"),
+		UNKNOWN ("Unknown", ".txt");
 		
 		String niceName;
 		String fileExtension;
