@@ -485,7 +485,7 @@ public class APIManagerAPIAdapter {
 			if(httpResponse.containsHeader("Content-Disposition")) {
 				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
 			}
-			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null, filter.isFailOnError());
+			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null, api.getName(), filter.isFailOnError());
 			api.setApiDefinition(apiDefinition);
 		} catch (Exception e) {
 			throw new AppException("Cannot parse API-Definition for API: '" + api.getName() + "' ("+api.getVersion()+") on path: '"+api.getPath()+"'", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);

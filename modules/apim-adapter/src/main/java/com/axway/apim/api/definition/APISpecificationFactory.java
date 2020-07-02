@@ -24,11 +24,11 @@ public class APISpecificationFactory {
 	    add(WSDLSpecification.class);
 	}};
 	
-	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String backendBasepath) throws AppException {
-		return getAPISpecification(apiSpecificationContent, apiDefinitionFile, backendBasepath, true);
+	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String backendBasepath, String apiName) throws AppException {
+		return getAPISpecification(apiSpecificationContent, apiDefinitionFile, backendBasepath, apiName, true);
 	}
 	
-	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String backendBasepath, boolean failOnError) throws AppException {
+	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String backendBasepath, String apiName, boolean failOnError) throws AppException {
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("Handle API-Specification: '" + getContentStart(apiSpecificationContent) + "...', apiDefinitionFile: '"+apiDefinitionFile+"'");	
 		}
@@ -54,14 +54,15 @@ public class APISpecificationFactory {
 			}
 		}
 		if(!failOnError) {
-			LOG.error("Can't handle API specification: '" + getContentStart(apiSpecificationContent) + "'");
-			return new UnknownAPISpecification(apiSpecificationContent, backendBasepath);
+			LOG.error("API: '"+apiName+"' has a unkown/invalid API-Specification: '" + getContentStart(apiSpecificationContent) + "'");
+			ErrorState.getInstance().setError("API: '"+apiName+"' has a unkown/invalid API-Specification. Please check the log.", ErrorCode.CANT_READ_API_DEFINITION_FILE, false);
+			return new UnknownAPISpecification(apiSpecificationContent, backendBasepath, apiName);
 		}
-		LOG.error("Can't handle API specification: '" + getContentStart(apiSpecificationContent) + "'");
-		throw new AppException("Can't handle API specification. No suiteable API-Specification implementation available.", ErrorCode.UNXPECTED_ERROR);
+		LOG.error("API: '"+apiName+"' has a unkown/invalid API-Specification: '" + getContentStart(apiSpecificationContent) + "'");
+		throw new AppException("Can't handle API specification. No suiteable API-Specification implementation available.", ErrorCode.CANT_READ_API_DEFINITION_FILE);
 	}
 	
-	private static String getContentStart(byte[] apiSpecificationContent) {
+	static String getContentStart(byte[] apiSpecificationContent) {
 		try {
 			if(apiSpecificationContent == null) return "API-Specificaion is null";
 			return (apiSpecificationContent.length<200) ? new String(apiSpecificationContent, 0, apiSpecificationContent.length) : new String(apiSpecificationContent, 0, 200) + "...";

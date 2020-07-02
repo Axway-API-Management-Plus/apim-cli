@@ -119,7 +119,10 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				}
 			}
 			APIManagerAdapter.deleteInstance();
-			return 0;
+			if(ErrorState.getInstance().hasError()) {
+				ErrorState.getInstance().logErrorMessages(LOG);
+			}
+			return ErrorState.getInstance().getErrorCode().getCode();
 		} catch (AppException ap) {
 			ErrorState errorState = ErrorState.getInstance();
 			if(errorState.hasError()) {

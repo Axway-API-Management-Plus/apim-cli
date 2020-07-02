@@ -35,7 +35,7 @@ public class APISpecificationOpenAPI3xTest {
 	public void backendHostAndBasePath() throws AppException, IOException {
 
 		byte[] content = getSwaggerContent(testPackage + "/openapi30.json");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com:8767/api/v1/myAPI");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com:8767/api/v1/myAPI", "TesAPI");
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
