@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.format.DataFormatMatcher;
 import com.fasterxml.jackson.core.format.MatchStrength;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 
 public abstract class APISpecification {
 	
@@ -105,7 +106,7 @@ public abstract class APISpecification {
 	public abstract boolean configure() throws AppException;
 	
 	protected void setMapperForDataFormat() throws AppException {
-		YAMLFactory yamlFactory = new YAMLFactoryExt();
+		YAMLFactory yamlFactory = new YAMLFactoryExt().disable(Feature.WRITE_DOC_START_MARKER);
 		JsonFactory jsonFactory = new JsonFactory();
 		DataFormatDetector detector = new DataFormatDetector(yamlFactory, jsonFactory);
 		DataFormatMatcher formatMatcher;
