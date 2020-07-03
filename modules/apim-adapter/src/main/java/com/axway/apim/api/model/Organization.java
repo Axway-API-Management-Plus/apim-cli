@@ -2,28 +2,32 @@ package com.axway.apim.api.model;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFilter("OrganizationFilter")
 public class Organization extends AbstractEntity {
 	
 	private String email;
 	
+	@JsonIgnore
 	private String image;
 	
-	private String restricted;
+	private boolean restricted;
 	
 	private String virtualHost;
 	
 	private String phone;
 	
-	private String enabled;
+	private boolean enabled;
 	
 	private boolean development;
 	
 	private String dn;
 	
-	private String createdOn;
+	private Long createdOn;
 	
 	private String startTrialDate;
 	
@@ -58,11 +62,11 @@ public class Organization extends AbstractEntity {
 		this.image = image;
 	}
 
-	public String getRestricted() {
+	public boolean isRestricted() {
 		return restricted;
 	}
 
-	public void setRestricted(String restricted) {
+	public void setRestricted(boolean restricted) {
 		this.restricted = restricted;
 	}
 
@@ -82,11 +86,11 @@ public class Organization extends AbstractEntity {
 		this.phone = phone;
 	}
 
-	public String getEnabled() {
+	public boolean isEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(String enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
@@ -106,11 +110,11 @@ public class Organization extends AbstractEntity {
 		this.dn = dn;
 	}
 
-	public String getCreatedOn() {
+	public Long getCreatedOn() {
 		return createdOn;
 	}
 
-	public void setCreatedOn(String createdOn) {
+	public void setCreatedOn(Long createdOn) {
 		this.createdOn = createdOn;
 	}
 
