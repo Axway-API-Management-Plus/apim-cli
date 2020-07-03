@@ -34,6 +34,7 @@
               </includes>
               <excludes>
               	<exclude>*.formatted</exclude>
+				<exclude>scripts/*</exclude>
               </excludes>
           </fileSet>
           <fileSet>
