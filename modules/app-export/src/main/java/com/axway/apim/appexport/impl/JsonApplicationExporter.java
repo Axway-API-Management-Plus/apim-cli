@@ -52,7 +52,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
 				}				
 			} else {
-				LOG.warn("Local export folder: " + localFolder + " already exists. Application will not be exported. (You may set -df true)");
+				LOG.warn("Local export folder: " + localFolder + " already exists. Application will not be exported. (You may set -deleteTarget)");
 				this.hasError = true;
 				return;
 			}
