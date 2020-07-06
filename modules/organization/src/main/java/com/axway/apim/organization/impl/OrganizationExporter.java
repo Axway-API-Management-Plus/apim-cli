@@ -6,14 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIManagerAdapter.CUSTOM_PROP_TYPE;
-import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.apis.OrgFilter.Builder;
-import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
-import com.axway.apim.adapter.apis.APIFilter.POLICY_TRANSLATION;
-import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;

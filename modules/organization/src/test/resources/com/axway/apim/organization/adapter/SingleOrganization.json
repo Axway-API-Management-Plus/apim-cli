@@ -4,5 +4,6 @@
   "restricted" : false,
   "enabled" : true,
   "development" : true,
-  "createdOn" : 1593700799104
+  "createdOn" : 1593700799104, 
+  "image": "test-org-image.png"
 }

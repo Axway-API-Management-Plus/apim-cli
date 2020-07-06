@@ -5,6 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("OrganizationFilter")
@@ -12,8 +13,11 @@ public class Organization extends AbstractEntity {
 	
 	private String email;
 	
+	@JsonProperty("image")
+	private String imageUrl;
+	
 	@JsonIgnore
-	private String image;
+	private Image image;
 	
 	private boolean restricted;
 	
@@ -52,13 +56,21 @@ public class Organization extends AbstractEntity {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}	
+
+	public String getImageUrl() {
+		return imageUrl;
 	}
 
-	public String getImage() {
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public Image getImage() {
 		return image;
 	}
 
-	public void setImage(String image) {
+	public void setImage(Image image) {
 		this.image = image;
 	}
 
@@ -94,7 +106,7 @@ public class Organization extends AbstractEntity {
 		this.enabled = enabled;
 	}
 
-	public boolean getDevelopment() {
+	public boolean isDevelopment() {
 		return development;
 	}
 
@@ -154,7 +166,23 @@ public class Organization extends AbstractEntity {
 	public boolean equals(Object other) {
 		if(other == null) return false;
 		if(other instanceof Organization) {
-			return StringUtils.equals(((Organization)other).getName(), this.getName());
+			Organization otherOrg = (Organization)other;
+			return StringUtils.equals(otherOrg.getName(), this.getName());
+		}
+		return false;
+	}
+	
+	public boolean deepEquals(Object other) {
+		if(other == null) return false;
+		if(other instanceof Organization) {
+			Organization otherOrg = (Organization)other;
+			return 
+					StringUtils.equals(otherOrg.getName(), this.getName()) &&
+					StringUtils.equals(otherOrg.getEmail(), this.getEmail()) && 
+					StringUtils.equals(otherOrg.getDescription(), this.getDescription()) &&
+					StringUtils.equals(otherOrg.getPhone(), this.getPhone()) &&
+					(otherOrg.getImage()==null || otherOrg.getImage().equals(this.getImage()))
+					;
 		}
 		return false;
 	}

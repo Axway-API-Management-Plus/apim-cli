@@ -8,6 +8,8 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorState;
+import com.axway.apim.organization.OrganizationExportTestAction;
 import com.axway.apim.organization.OrganizationImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -20,6 +22,7 @@ import com.consol.citrus.message.MessageType;
 public class ImportSimpleOrganizationTestIT extends TestNGCitrusTestRunner {
 
 	private OrganizationImportTestAction orgImport = new OrganizationImportTestAction();
+	private OrganizationExportTestAction orgExport = new OrganizationExportTestAction();
 	
 	private static String PACKAGE = "/com/axway/apim/organization/orgImport/";
 	
@@ -44,6 +47,17 @@ public class ImportSimpleOrganizationTestIT extends TestNGCitrusTestRunner {
 			.extractFromPayload("$.[?(@.id=='${orgName}')].id", "orgId"));
 		
 		echo("####### Re-Import same organization - Should be a No-Change #######");
+		createVariable("expectedReturnCode", "10");
+		orgImport.doExecute(context);
+		
+		echo("####### Export the organization #######");
+		ErrorState.deleteInstance();
+		variable("targetFolder", "citrus:systemProperty('java.io.tmpdir')");
+		createVariable("expectedReturnCode", "0");
+		orgExport.doExecute(context);
+		
+		echo("####### Re-Import EXPORTED organization - Should be a No-Change #######");
+		createVariable(OrganizationImportTestAction.CONFIG,  "${targetFolder}/My-Org-7163/org-config.json");
 		createVariable("expectedReturnCode", "10");
 		orgImport.doExecute(context);
 	}

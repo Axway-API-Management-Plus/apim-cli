@@ -1,6 +1,7 @@
 package com.axway.apim.organization.adapter;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
@@ -24,6 +25,8 @@ public class JSONOrganizationAdapterTest {
 		adapter.readConfig(testFile);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 1, "Expected 1 app returned from the Adapter");
+		Organization org = orgs.get(0);
+		assertNotNull(org.getImage(), "Organization should have an image attached");
 	}
 	
 	@Test

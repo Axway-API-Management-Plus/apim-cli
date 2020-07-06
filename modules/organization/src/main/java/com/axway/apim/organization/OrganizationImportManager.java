@@ -35,8 +35,6 @@ public class OrganizationImportManager {
 	}
 	
 	private static boolean orgsAreEqual(Organization desiredOrg, Organization actualOrg) {
-		return 
-				desiredOrg.equals(actualOrg);// && 
-			//(desiredOrg.getApiAccess()==null || desiredOrg.getApiAccess().equals(actualOrg.getApiAccess()));
+		return desiredOrg.deepEquals(actualOrg);
 	}
 }

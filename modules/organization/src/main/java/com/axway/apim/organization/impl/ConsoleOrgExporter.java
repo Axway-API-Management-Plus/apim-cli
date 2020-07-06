@@ -37,7 +37,7 @@ public class ConsoleOrgExporter extends OrganizationExporter {
 				new Column().header("Organization-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(org -> org.getId()),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(org -> org.getName()),
 				new Column().header("V-Host").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(org -> org.getVirtualHost()),
-				new Column().header("Dev").with(org -> Boolean.toString(org.getDevelopment())),
+				new Column().header("Dev").with(org -> Boolean.toString(org.isDevelopment())),
 				new Column().header("Email").with(org -> org.getEmail()),
 				new Column().header("Enabled").with(org -> Boolean.toString(org.isEnabled()))
 				)));
@@ -48,7 +48,7 @@ public class ConsoleOrgExporter extends OrganizationExporter {
 				new Column().header("Organization-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(org -> org.getId()),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(org -> org.getName()),
 				new Column().header("V-Host").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(org -> org.getVirtualHost()),
-				new Column().header("Dev").with(org -> Boolean.toString(org.getDevelopment())),
+				new Column().header("Dev").with(org -> Boolean.toString(org.isDevelopment())),
 				new Column().header("Email").with(org -> org.getEmail()),
 				new Column().header("Enabled").with(org -> Boolean.toString(org.isEnabled())),
 				new Column().header("Created on").with(org -> new Date(org.getCreatedOn()).toString()),

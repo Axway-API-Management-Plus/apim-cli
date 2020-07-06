@@ -4,7 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -37,6 +39,14 @@ public class JSONOrgAdapter extends OrgAdapter {
 		} catch (Exception e) {
 			throw new AppException("Cannot read organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		}
+		addImage(orgs, configFile.getParentFile());
 		return true;
+	}
+	
+	private void addImage(List<Organization> orgs, File parentFolder) throws AppException {
+		for(Organization org : orgs) {
+			if(org.getImageUrl()==null || org.getImageUrl().equals("")) continue;
+			org.setImage(Image.createImageFromFile(new File(parentFolder + File.separator + org.getImageUrl())));
+		}
 	}
 }
