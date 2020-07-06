@@ -253,7 +253,7 @@ public class APIImportConfigAdapter {
 	
 	private void validateOrganization(API apiConfig) throws AppException {
 		if(apiConfig instanceof DesiredTestOnlyAPI) return;
-		if(apiConfig.getOrganization()==null || !apiConfig.getOrganization().getDevelopment()) {
+		if(apiConfig.getOrganization()==null || !apiConfig.getOrganization().isDevelopment()) {
 			error.setError("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION, false);
 			throw new AppException("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
 		}
