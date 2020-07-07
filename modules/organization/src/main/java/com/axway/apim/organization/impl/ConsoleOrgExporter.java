@@ -12,7 +12,7 @@ import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
-public class ConsoleOrgExporter extends OrganizationExporter {
+public class ConsoleOrgExporter extends OrgResultHandler {
 	
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 

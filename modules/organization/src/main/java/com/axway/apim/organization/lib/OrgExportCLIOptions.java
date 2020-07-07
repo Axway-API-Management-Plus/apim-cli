@@ -12,7 +12,6 @@ public class OrgExportCLIOptions extends StandardExportCLIOptions {
 
 	public OrgExportCLIOptions(String[] args) throws ParseException {
 		super(args);
-		// Define command line options required for Application export
 		Option option = new  Option("n", "name", true, "Filter organizations with the specified name. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*My organization*");
@@ -21,6 +20,11 @@ public class OrgExportCLIOptions extends StandardExportCLIOptions {
 		option = new  Option("id", true, "Filter the export to an organization with that specific ID.");
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-ORG");
+		options.addOption(option);
+		
+		option = new  Option("dev", true, "Filter organizations based on the development flag: true | false");
+		option.setRequired(false);
+		option.setArgName("true|false");
 		options.addOption(option);
 	}
 

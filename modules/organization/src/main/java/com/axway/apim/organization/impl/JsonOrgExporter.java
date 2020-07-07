@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
-public class JsonOrgExporter extends OrganizationExporter {
+public class JsonOrgExporter extends OrgResultHandler {
 
 	public JsonOrgExporter(OrgExportParams params) {
 		super(params);

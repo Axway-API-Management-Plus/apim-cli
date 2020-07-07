@@ -24,4 +24,8 @@ public class OrgExportParams extends StandardExportParams {
 	public String getId() {
 		return getValue("id");
 	}
+	
+	public String getDev() {
+		return getValue("dev");
+	}
 }

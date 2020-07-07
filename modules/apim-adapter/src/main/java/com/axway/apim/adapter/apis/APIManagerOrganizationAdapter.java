@@ -26,6 +26,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.PUTRequest;
@@ -123,7 +124,7 @@ public class APIManagerOrganizationAdapter {
 			if(actualOrg==null) {
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations").build();
 			} else {
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+actualOrg.getId()).build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/"+actualOrg.getId()).build();
 			}
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
 					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image"}));
@@ -149,7 +150,7 @@ public class APIManagerOrganizationAdapter {
 				}
 				createdOrg = mapper.readValue(httpResponse.getEntity().getContent(), Organization.class);
 			} catch (Exception e) {
-				throw new AppException("Error creating/updating organization.", ErrorCode.CANT_CREATE_API_PROXY, e);
+				throw new AppException("Error creating/updating organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 			} finally {
 				try {
 					((CloseableHttpResponse)httpResponse).close();
@@ -160,7 +161,28 @@ public class APIManagerOrganizationAdapter {
 			return createdOrg;
 
 		} catch (Exception e) {
-			throw new AppException("Error creating/updating application", ErrorCode.CANT_CREATE_API_PROXY, e);
+			throw new AppException("Error creating/updating organization", ErrorCode.CANT_CREATE_API_PROXY, e);
+		}
+	}
+	
+	public void deleteOrganization(Organization org) throws AppException {
+		HttpResponse httpResponse = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/"+org.getId()).build();
+			RestAPICall request = new DELRequest(uri, true);
+			httpResponse = request.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode != 204){
+				LOG.error("Error deleting organization. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+				throw new AppException("Error deleting organization. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
+		} catch (Exception e) {
+			throw new AppException("Error creating/updating organization", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
 		}
 	}
 	

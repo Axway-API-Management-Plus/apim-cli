@@ -13,22 +13,23 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.organization.lib.OrgExportParams;
 
-public abstract class OrganizationExporter {
+public abstract class OrgResultHandler {
 	
-	protected static Logger LOG = LoggerFactory.getLogger(OrganizationExporter.class);
+	protected static Logger LOG = LoggerFactory.getLogger(OrgResultHandler.class);
 	
-	public enum ExportImpl {
+	public enum ResultHandler {
 		JSON_EXPORTER(JsonOrgExporter.class),
-		CONSOLE_EXPORTER(ConsoleOrgExporter.class);
+		CONSOLE_EXPORTER(ConsoleOrgExporter.class),
+		ORG_DELETE_HANDLER(DeleteOrgHandler.class);
 		
-		private final Class<OrganizationExporter> implClass;
+		private final Class<OrgResultHandler> implClass;
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		private ExportImpl(Class clazz) {
+		private ResultHandler(Class clazz) {
 			this.implClass = clazz;
 		}
 
-		public Class<OrganizationExporter> getClazz() {
+		public Class<OrgResultHandler> getClazz() {
 			return implClass;
 		}
 	}
@@ -37,19 +38,19 @@ public abstract class OrganizationExporter {
 	
 	boolean hasError = false;
 	
-	public static OrganizationExporter create(ExportImpl exportImpl, OrgExportParams params) throws AppException {
+	public static OrgResultHandler create(ResultHandler exportImpl, OrgExportParams params) throws AppException {
 		try {
 			Object[] intArgs = new Object[] { params };
-			Constructor<OrganizationExporter> constructor =
+			Constructor<OrgResultHandler> constructor =
 					exportImpl.getClazz().getConstructor(new Class[]{OrgExportParams.class});
-			OrganizationExporter exporter = constructor.newInstance(intArgs);
+			OrgResultHandler exporter = constructor.newInstance(intArgs);
 			return exporter;
 		} catch (Exception e) {
 			throw new AppException("Error initializing application exporter", ErrorCode.UNXPECTED_ERROR, e);
 		}
 	}
 
-	public OrganizationExporter(OrgExportParams params) {
+	public OrgResultHandler(OrgExportParams params) {
 		this.params = params;
 	}
 	
