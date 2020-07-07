@@ -170,12 +170,12 @@ public class OrganizationImportTestAction extends AbstractTestAction {
 	private File createTestDirectory(TestContext context) {
 		int randomNum = ThreadLocalRandom.current().nextInt(1, 9999 + 1);
 		String orgName = context.getVariable("orgName");
-		String testDirName = "AppImportActionTest-" + orgName.replace(" ", "") + "-" + randomNum;
+		String testDirName = "OrgImportActionTest-" + orgName.replace(" ", "") + "-" + randomNum;
 		String tmpDir = System.getProperty("java.io.tmpdir");
 		File testDir = new File(tmpDir + File.separator + testDirName);
 		if(!testDir.mkdir()) {
 			randomNum = ThreadLocalRandom.current().nextInt(1, 9999 + 1);
-			testDirName = "AppImportActionTest-" + orgName.replace(" ", "") + "-" + randomNum;
+			testDirName = "OrgImportActionTest-" + orgName.replace(" ", "") + "-" + randomNum;
 			testDir = new File(tmpDir + File.separator + testDirName);
 			if(!testDir.mkdir()) {
 				throw new RuntimeException("Failed to create Test-Directory: " + tmpDir + File.separator + testDirName);

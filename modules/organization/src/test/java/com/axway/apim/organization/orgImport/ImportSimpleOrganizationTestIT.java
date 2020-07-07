@@ -57,7 +57,7 @@ public class ImportSimpleOrganizationTestIT extends TestNGCitrusTestRunner {
 		orgExport.doExecute(context);
 		
 		echo("####### Re-Import EXPORTED organization - Should be a No-Change #######");
-		createVariable(OrganizationImportTestAction.CONFIG,  "${targetFolder}/My-Org-7163/org-config.json");
+		createVariable(OrganizationImportTestAction.CONFIG,  "${targetFolder}/${orgName}/org-config.json");
 		createVariable("expectedReturnCode", "10");
 		orgImport.doExecute(context);
 	}
