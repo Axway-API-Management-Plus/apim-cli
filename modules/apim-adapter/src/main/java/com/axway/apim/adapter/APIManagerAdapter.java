@@ -133,6 +133,9 @@ public class APIManagerAdapter {
 			APIManagerAdapter.instance = new APIManagerAdapter();
 			if(!TestIndicator.getInstance().isTestRunning()) {
 				LOG.info("Successfully connected to API-Manager (" + getApiManagerVersion() + ") on: " + CommandParameters.getInstance().getAPIManagerURL());
+			} else {
+				APIManagerAdapter.apiManagerVersion = "7.7.0";
+				LOG.info("Successfully connected to MOCKED API-Manager (" + getApiManagerVersion() + ")");
 			}
 		}
 		return APIManagerAdapter.instance;

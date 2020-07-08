@@ -22,6 +22,11 @@ public class UserExportCLIOptions extends StandardExportCLIOptions {
 		option.setArgName("*Mark*");
 		options.addOption(option);
 		
+		option = new  Option("email", true, "Filter users with the specified Email-Address. You may use wildcards at the end or beginning.");
+		option.setRequired(false);
+		option.setArgName("*@axway.com*");
+		options.addOption(option);
+		
 		option = new  Option("type", true, "Filter users with specific type. External users are managed in external system such as LDAP");
 		option.setRequired(false);
 		option.setArgName("internal|external");

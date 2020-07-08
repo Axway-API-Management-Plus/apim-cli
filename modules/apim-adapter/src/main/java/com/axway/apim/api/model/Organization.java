@@ -161,13 +161,12 @@ public class Organization extends AbstractEntity {
 	public void setIsTrial(String isTrial) {
 		this.isTrial = isTrial;
 	}
-
+	
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
 		if(other instanceof Organization) {
-			Organization otherOrg = (Organization)other;
-			return StringUtils.equals(otherOrg.getName(), this.getName());
+			return StringUtils.equals(((Organization)other).getName(), this.getName());
 		}
 		return false;
 	}
