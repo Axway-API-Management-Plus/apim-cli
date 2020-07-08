@@ -120,6 +120,9 @@ public class Image {
 
 	@Override
 	public String toString() {
+		if(this.imageContent == null) {
+			return "APIImage [bytes=N/A]";
+		}
 		return "APIImage [bytes=" + this.imageContent.length + "]";
 	}
 	

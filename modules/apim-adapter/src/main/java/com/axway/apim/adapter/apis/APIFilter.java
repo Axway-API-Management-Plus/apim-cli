@@ -736,5 +736,4 @@ public class APIFilter {
 			return this;
 		}		
 	}
-
 }

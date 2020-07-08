@@ -75,6 +75,8 @@ public class APIManagerAdapter {
 	
 	public static String apiManagerVersion = null;
 	
+	public static boolean initialized = false;
+	
 	public static ObjectMapper mapper = new ObjectMapper();
 	
 	private static Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<String, ClientApplication>();
@@ -133,8 +135,12 @@ public class APIManagerAdapter {
 			APIManagerAdapter.instance = new APIManagerAdapter();
 			if(!TestIndicator.getInstance().isTestRunning()) {
 				LOG.info("Successfully connected to API-Manager (" + getApiManagerVersion() + ") on: " + CommandParameters.getInstance().getAPIManagerURL());
+			} else {
+				APIManagerAdapter.apiManagerVersion = "7.7.0";
+				LOG.info("Successfully connected to MOCKED API-Manager (" + getApiManagerVersion() + ")");
 			}
 		}
+		APIManagerAdapter.initialized = true;
 		return APIManagerAdapter.instance;
 	}
 	
@@ -149,6 +155,8 @@ public class APIManagerAdapter {
 			APIManagerAdapter.instance.logoutFromAPIManager(true); // Logout potentially logged in Admin
 			APIManagerAdapter.instance = null;
 		}
+		APIManagerAdapter.apiManagerVersion = null;
+		APIManagerAdapter.initialized = false;
 	}
 	
 	private APIManagerAdapter() throws AppException {
@@ -489,7 +497,7 @@ public class APIManagerAdapter {
 		Image image = new Image();
 		HttpResponse httpResponse = null;
 		try {
-			RestAPICall getRequest = new GETRequest(uri);
+			RestAPICall getRequest = new GETRequest(uri, hasAdminAccount());
 			httpResponse = getRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode == 404) return null; // No Image found

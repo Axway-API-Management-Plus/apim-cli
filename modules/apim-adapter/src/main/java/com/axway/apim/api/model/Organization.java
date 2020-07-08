@@ -2,28 +2,36 @@ package com.axway.apim.api.model;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFilter("OrganizationFilter")
 public class Organization extends AbstractEntity {
 	
 	private String email;
 	
-	private String image;
+	@JsonProperty("image")
+	private String imageUrl;
 	
-	private String restricted;
+	@JsonIgnore
+	private Image image;
+	
+	private boolean restricted;
 	
 	private String virtualHost;
 	
 	private String phone;
 	
-	private String enabled;
+	private boolean enabled;
 	
 	private boolean development;
 	
 	private String dn;
 	
-	private String createdOn;
+	private Long createdOn;
 	
 	private String startTrialDate;
 	
@@ -48,21 +56,29 @@ public class Organization extends AbstractEntity {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}	
+
+	public String getImageUrl() {
+		return imageUrl;
 	}
 
-	public String getImage() {
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public Image getImage() {
 		return image;
 	}
 
-	public void setImage(String image) {
+	public void setImage(Image image) {
 		this.image = image;
 	}
 
-	public String getRestricted() {
+	public boolean isRestricted() {
 		return restricted;
 	}
 
-	public void setRestricted(String restricted) {
+	public void setRestricted(boolean restricted) {
 		this.restricted = restricted;
 	}
 
@@ -82,15 +98,15 @@ public class Organization extends AbstractEntity {
 		this.phone = phone;
 	}
 
-	public String getEnabled() {
+	public boolean isEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(String enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
-	public boolean getDevelopment() {
+	public boolean isDevelopment() {
 		return development;
 	}
 
@@ -106,11 +122,11 @@ public class Organization extends AbstractEntity {
 		this.dn = dn;
 	}
 
-	public String getCreatedOn() {
+	public Long getCreatedOn() {
 		return createdOn;
 	}
 
-	public void setCreatedOn(String createdOn) {
+	public void setCreatedOn(Long createdOn) {
 		this.createdOn = createdOn;
 	}
 
@@ -145,12 +161,27 @@ public class Organization extends AbstractEntity {
 	public void setIsTrial(String isTrial) {
 		this.isTrial = isTrial;
 	}
-
+	
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
 		if(other instanceof Organization) {
 			return StringUtils.equals(((Organization)other).getName(), this.getName());
+		}
+		return false;
+	}
+	
+	public boolean deepEquals(Object other) {
+		if(other == null) return false;
+		if(other instanceof Organization) {
+			Organization otherOrg = (Organization)other;
+			return 
+					StringUtils.equals(otherOrg.getName(), this.getName()) &&
+					StringUtils.equals(otherOrg.getEmail(), this.getEmail()) && 
+					StringUtils.equals(otherOrg.getDescription(), this.getDescription()) &&
+					StringUtils.equals(otherOrg.getPhone(), this.getPhone()) &&
+					(otherOrg.getImage()==null || otherOrg.getImage().equals(this.getImage()))
+					;
 		}
 		return false;
 	}

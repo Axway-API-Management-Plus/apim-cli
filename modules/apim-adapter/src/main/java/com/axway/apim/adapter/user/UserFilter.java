@@ -1,35 +1,44 @@
 package com.axway.apim.adapter.user;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.axway.apim.api.model.OutboundProfile;
+import com.axway.apim.api.model.Policy;
+import com.axway.apim.api.model.User;
+import com.axway.apim.lib.errorHandling.AppException;
+
 public class UserFilter {
+	
+	public static enum USER_TYPE {
+		internal, 
+		external
+	}
 
 	private String id;
-	String apiId;
-	String appId;
 	String description;
 	String email;
 	boolean enabled;
 	String name;
 	String loginName;
 	String phone;
+	String role;
+	String type;
+	
+	String organizationName;
+	
+	boolean includeImage;
 
 	private List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
 	private UserFilter() { }
-
-	public void setApiId(String apiId) {
-		if(apiId==null) return;
-		this.apiId = apiId;
-		filters.add(new BasicNameValuePair("field", "apiid"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", apiId));
-	}
 
 	public void setDescription(String description) {
 		if(description==null) return;
@@ -41,14 +50,19 @@ public class UserFilter {
 
 	public void setEmail(String email) {
 		if(email==null) return;
+		if(email.equals("*")) return;
 		this.email = email;
+		String op = "eq";
+		if(email.startsWith("*") || email.endsWith("*")) {
+			op = "like";
+			email = email.replace("*", "");
+		}
 		filters.add(new BasicNameValuePair("field", "email"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", email));
+		filters.add(new BasicNameValuePair("op", op));
+		filters.add(new BasicNameValuePair("value", email.toLowerCase()));
 	}
 
 	public void setEnabled(boolean enabled) {
-		if(this.enabled==enabled) return;
 		this.enabled = enabled;
 		filters.add(new BasicNameValuePair("field", "enabled"));
 		filters.add(new BasicNameValuePair("op", "eq"));
@@ -57,17 +71,29 @@ public class UserFilter {
 
 	public void setName(String name) {
 		if(name==null) return;
+		if(name.equals("*")) return;
 		this.name = name;
+		String op = "eq";
+		if(name.startsWith("*") || name.endsWith("*")) {
+			op = "like";
+			name = name.replace("*", "");
+		}
 		filters.add(new BasicNameValuePair("field", "name"));
-		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("op", op));
 		filters.add(new BasicNameValuePair("value", name));
 	}
 	
-	public void setLoginName(String loginName) {
+	public void setLoginName(String loginName) {		
 		if(loginName==null) return;
+		if(loginName.equals("*")) return;
 		this.loginName = loginName;
+		String op = "eq";
+		if(loginName.startsWith("*") || loginName.endsWith("*")) {
+			op = "like";
+			loginName = loginName.replace("*", "");
+		}
 		filters.add(new BasicNameValuePair("field", "loginName"));
-		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("op", op));
 		filters.add(new BasicNameValuePair("value", loginName));
 	}
 
@@ -77,6 +103,23 @@ public class UserFilter {
 		filters.add(new BasicNameValuePair("field", "phone"));
 		filters.add(new BasicNameValuePair("op", "eq"));
 		filters.add(new BasicNameValuePair("value", phone));
+	}
+	
+	public void setRole(String role) {
+		if(role==null) return;
+		this.role = role;
+		filters.add(new BasicNameValuePair("field", "role"));
+		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("value", role));
+	}
+	
+	public void setType(String type) {
+		if(type==null) return;
+		this.type = type;
+	}
+
+	public String getType() {
+		return type;
 	}
 
 	public List<NameValuePair> getFilters() {
@@ -91,6 +134,14 @@ public class UserFilter {
 		return loginName;
 	}
 
+	public String getOrganizationName() {
+		return organizationName;
+	}
+
+	public void setOrganizationName(String organizationName) {
+		this.organizationName = organizationName;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -99,12 +150,12 @@ public class UserFilter {
 		this.id = id;
 	}
 
-	public String getApiId() {
-		return apiId;
-	}
-
 	public boolean isEnabled() {
 		return enabled;
+	}
+	
+	public boolean isIncludeImage() {
+		return includeImage;
 	}
 
 	@Override
@@ -115,9 +166,8 @@ public class UserFilter {
 		UserFilter other = (UserFilter)obj;
 		return (
 				StringUtils.equals(other.getId(), this.getId()) && 
-				StringUtils.equals(other.getName(), this.getName()) &&
-				other.isEnabled() == this.isEnabled() &&
-				StringUtils.equals(other.getApiId(), this.getApiId())
+				StringUtils.equals(other.getLoginName(), this.getLoginName()) &&
+				other.isEnabled() == this.isEnabled()
 				);
 	}
 
@@ -133,6 +183,22 @@ public class UserFilter {
 	public String toString() {
 		return "UserFilter [name=" + name + ", id=" + id + "]";
 	}
+	
+	public boolean filter(User user) throws AppException {
+		if(this.getType()==null && this.getOrganizationName()==null) { // Nothing given to filter out.
+			return true;
+		}
+		// Before 7.7, we have to filter out APIs manually!
+		if(this.getType()!=null && !this.getType().equals(user.getType())) {
+			return false;
+		}
+		if(this.getOrganizationName()!=null && this.getOrganizationName()!=null) {
+			Pattern pattern = Pattern.compile(this.getOrganizationName().replace("*", ".*"));
+			Matcher matcher = pattern.matcher(user.getOrganization().getName());
+			if(!matcher.matches()) return false;
+		}
+		return true;
+	}
 
 
 	/**
@@ -141,13 +207,18 @@ public class UserFilter {
 	public static class Builder {
 
 		String id;
-		String apiId;
 		String description;
 		String email;
 		boolean enabled;
+		boolean useEnabledFilter = false;
 		String name;
 		String loginName;
 		String phone;
+		String role;
+		String type;
+		String organizationName;
+		
+		boolean includeImage;
 
 		List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
@@ -158,23 +229,21 @@ public class UserFilter {
 		public UserFilter build() {
 			UserFilter filter = new UserFilter();
 			filter.setId(this.id);
-			filter.setApiId(this.apiId);
 			filter.setDescription(this.description);
 			filter.setEmail(this.email);
-			filter.setEnabled(this.enabled);
+			if(useEnabledFilter) filter.setEnabled(this.enabled);
 			filter.setName(this.name);
 			filter.setLoginName(this.loginName);
 			filter.setPhone(this.phone);
+			filter.setRole(this.role);
+			filter.setType(this.type);
+			filter.setOrganizationName(this.organizationName);
+			filter.includeImage = this.includeImage;
 			return filter;
 		}
 
 		public Builder hasId(String id) {
 			this.id = id;
-			return this;
-		}
-
-		public Builder hasApiId(String apiId) {
-			this.apiId = apiId;
 			return this;
 		}
 
@@ -193,6 +262,11 @@ public class UserFilter {
 			return this;
 		}
 		
+		public Builder hasType(String type) {
+			this.type = type;
+			return this;
+		}
+		
 		public Builder hasLoginName(String loginName) {
 			this.loginName = loginName;
 			return this;
@@ -202,9 +276,26 @@ public class UserFilter {
 			this.phone = phone;
 			return this;
 		}
+		
+		public Builder hasRole(String role) {
+			this.role = role;
+			return this;
+		}
+		
+		public Builder hasOrganization(String organizationName) {
+			this.organizationName = organizationName;
+			return this;
+		}
 
-		public Builder inEnabled(boolean enabled) {
-			this.enabled = enabled;
+		public Builder isEnabled(String enabled) {
+			if(enabled==null) return this;
+			this.useEnabledFilter = true;
+			this.enabled = Boolean.parseBoolean(enabled);
+			return this;
+		}
+		
+		public Builder includeImage(boolean includeImage) {
+			this.includeImage = includeImage;
 			return this;
 		}
 	}

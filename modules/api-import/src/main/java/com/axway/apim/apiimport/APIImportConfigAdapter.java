@@ -253,12 +253,12 @@ public class APIImportConfigAdapter {
 	
 	private void validateOrganization(API apiConfig) throws AppException {
 		if(apiConfig instanceof DesiredTestOnlyAPI) return;
-		if(apiConfig.getOrganization()==null || !apiConfig.getOrganization().getDevelopment()) {
+		if(apiConfig.getOrganization()==null || !apiConfig.getOrganization().isDevelopment()) {
 			error.setError("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION, false);
 			throw new AppException("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
 		}
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
-			apiConfig.getOrganization().setId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
+			apiConfig.getOrganization().setId(APIManagerAdapter.getCurrentUser(false).getOrganization().getId());
 		}
 	}
 
@@ -322,7 +322,7 @@ public class APIImportConfigAdapter {
 	
 	private void addQuotaConfiguration(API apiConfig) throws AppException {
 		if(apiConfig.getState()==API.STATE_UNPUBLISHED) return;
-		DesiredAPI importAPI = (DesiredAPI)apiConfig;
+		API importAPI = apiConfig;
 		initQuota(importAPI.getSystemQuota());
 		initQuota(importAPI.getApplicationQuota());
 	}

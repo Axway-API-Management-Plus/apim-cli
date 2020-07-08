@@ -36,21 +36,32 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 			throws IOException, JsonProcessingException {
 		JsonNode node = jp.getCodec().readTree(jp);
 		try {
+			Organization organization;
 			// Deserialization depends on the direction
 			if("organizationId".equals(jp.currentName())) {
+				// APIManagerAdapter is not yet initialized
+				if(!APIManagerAdapter.initialized) {
+					organization = new Organization();
+					organization.setId(node.asText());
+					return organization;
+				}				
 				// organizationId is given by API-Manager
 				return APIManagerAdapter.getInstance().orgAdapter.getOrgForId(node.asText());
 			} else {
-				Organization organization;
+				// APIManagerAdapter is not yet initialized
+				if(APIManagerAdapter.apiManagerVersion==null) {
+					organization = new Organization();
+					organization.setName(node.asText());
+					return organization;
+				}
 				// organization name is given in the config file
 				// If we don't have an Admin-Account don't try to load the organization!
 				if(!APIManagerAdapter.hasAdminAccount()) {
 					User user = APIManagerAdapter.getCurrentUser(false);
-					organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForId(user.getOrganizationId());
-					if(!node.asText().equals(organization.getName())) {
-						LOG.warn("The given API-Organization is invalid as OrgAdmin user: '"+user.getName()+"' belongs to organization: '" + organization.getName() + "'. API will be registered with OrgAdmin organization.");
+					if(!node.asText().equals(user.getOrganization().getName())) {
+						LOG.warn("The given API-Organization is invalid as OrgAdmin user: '"+user.getName()+"' belongs to organization: '" + user.getOrganization().getName() + "'. API will be registered with OrgAdmin organization.");
 					}
-					return organization;
+					return user.getOrganization();
 				}
 				// Otherwise make sure the organization exists and try to load it
 				organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(node.asText());

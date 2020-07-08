@@ -1,9 +1,9 @@
 <assembly>
   <id>release</id>
   <formats>
+	<format>dir</format>
     <format>tar.gz</format>
     <format>zip</format>
-    <format>dir</format>
   </formats>
   <includeBaseDirectory>true</includeBaseDirectory>
   <includeSiteDirectory>false</includeSiteDirectory>
@@ -17,6 +17,8 @@
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-api-export</include>
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-app-import</include>
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-app-export</include>
+        <include>com.github.axway-api-management-plus.apim-cli:apimcli-organizations</include>
+		<include>com.github.axway-api-management-plus.apim-cli:apimcli-users</include>
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-tool</include>
       </includes>
       <binaries>

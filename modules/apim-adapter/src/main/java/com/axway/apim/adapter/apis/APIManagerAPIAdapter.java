@@ -261,7 +261,10 @@ public class APIManagerAPIAdapter {
 	}
 	
 	private void addImageFromAPIM(API api, boolean includeImage) throws AppException {
-		if(!includeImage) return;
+		if(!includeImage) {
+			api.setImage(null);
+			return;
+		}
 		Image image = new Image();
 			image = new Image();
 			URI uri;
@@ -393,7 +396,9 @@ public class APIManagerAPIAdapter {
 	}
 	
 	private void addCustomProperties(List<API> apis, APIFilter filter) throws IOException {
-		if(filter.getCustomProperties() == null) return;
+		if(filter.getCustomProperties() == null) {
+			return;
+		}
 		Map<String, String> customProperties = new LinkedHashMap<String, String>();
 		Iterator<String> it = filter.getCustomProperties().keySet().iterator();
 		Map<String, JsonNode> apiAsJsonMappedWithId = new HashMap<String, JsonNode>();
@@ -411,7 +416,7 @@ public class APIManagerAPIAdapter {
 				String customPropValue = (value == null) ? null : value.asText();
 				customProperties.put(customPropKey, customPropValue);
 			}
-			api.setCustomProperties(customProperties);
+			api.setCustomProperties((customProperties.size()==0) ? null : customProperties);
 		}
 	}
 	

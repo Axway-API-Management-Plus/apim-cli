@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,16 +16,15 @@ import com.axway.apim.adapter.APIManagerAdapter.CUSTOM_PROP_TYPE;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
-import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.apis.APIFilter.POLICY_TRANSLATION;
+import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
-import com.axway.apim.api.model.Policy;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -45,7 +43,9 @@ public abstract class APIResultHandler {
 		CONSOLE_EXPORTER(ConsoleAPIExporter.class),
 		CSV_EXPORTER(CSVAPIExporter.class),
 		API_DELETE_HANDLER(DeleteAPIHandler.class),
-		API_UNPUBLISH_HANDLER(UnpublishAPIHandler.class);
+		API_PUBLISH_HANDLER(PublishAPIHandler.class),
+		API_UNPUBLISH_HANDLER(UnpublishAPIHandler.class), 
+		API_CHANGE_HANDLER(APIChangeHandler.class);
 		
 		private final Class<APIResultHandler> implClass;
 		
@@ -99,25 +99,6 @@ public abstract class APIResultHandler {
 				.failOnError(false);
 		return builder;
 	}
-	
-    protected static boolean askYesNo(String question) {
-        return askYesNo(question, "[Y]", "[N]");
-    }
-
-    protected static boolean askYesNo(String question, String positive, String negative) {
-        Scanner input = new Scanner(System.in);
-        // Convert everything to upper case for simplicity...
-        positive = positive.toUpperCase();
-        negative = negative.toUpperCase();
-        String answer;
-        do {
-            System.out.print(question+ " ");
-            answer = input.next().trim().toUpperCase();
-        } while (!answer.matches(positive) && !answer.matches(negative));
-        input.close();
-        // Assess if we match a positive response
-        return answer.matches(positive);
-    }
     
     protected static String getBackendPath(API api) {
 		ExportAPI exportAPI = new ExportAPI(api);

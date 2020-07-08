@@ -9,6 +9,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.Utils;
 
 public class DeleteAPIHandler extends APIResultHandler {
 
@@ -23,7 +24,7 @@ public class DeleteAPIHandler extends APIResultHandler {
 		if(CommandParameters.getInstance().isForce()) {
 			System.out.println("Force flag given to delete: "+apis.size()+" API(s)");
 		} else {
-			if(askYesNo("Do you wish to proceed? (Y/N)")) {
+			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
 			} else {
 				System.out.println("Canceled.");
 				return;

@@ -2,6 +2,7 @@ package com.axway.apim.lib.utils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Scanner;
 
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -43,4 +44,23 @@ public class Utils {
 	        System.out.print("\n");
 	    }
 	}
+	
+	public static boolean askYesNo(String question) {
+        return Utils.askYesNo(question, "[Y]", "[N]");
+    }
+	
+    public static boolean askYesNo(String question, String positive, String negative) {
+        Scanner input = new Scanner(System.in);
+        // Convert everything to upper case for simplicity...
+        positive = positive.toUpperCase();
+        negative = negative.toUpperCase();
+        String answer;
+        do {
+            System.out.print(question+ " ");
+            answer = input.next().trim().toUpperCase();
+        } while (!answer.matches(positive) && !answer.matches(negative));
+        input.close();
+        // Assess if we match a positive response
+        return answer.matches(positive);
+    }
 }
