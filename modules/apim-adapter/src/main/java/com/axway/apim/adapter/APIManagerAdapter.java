@@ -75,6 +75,8 @@ public class APIManagerAdapter {
 	
 	public static String apiManagerVersion = null;
 	
+	public static boolean initialized = false;
+	
 	public static ObjectMapper mapper = new ObjectMapper();
 	
 	private static Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<String, ClientApplication>();
@@ -138,6 +140,7 @@ public class APIManagerAdapter {
 				LOG.info("Successfully connected to MOCKED API-Manager (" + getApiManagerVersion() + ")");
 			}
 		}
+		APIManagerAdapter.initialized = true;
 		return APIManagerAdapter.instance;
 	}
 	
@@ -151,8 +154,9 @@ public class APIManagerAdapter {
 			APIManagerAdapter.instance.logoutFromAPIManager(false); // Logout potentially logged in OrgAdmin
 			APIManagerAdapter.instance.logoutFromAPIManager(true); // Logout potentially logged in Admin
 			APIManagerAdapter.instance = null;
-			APIManagerAdapter.apiManagerVersion = null;
 		}
+		APIManagerAdapter.apiManagerVersion = null;
+		APIManagerAdapter.initialized = false;
 	}
 	
 	private APIManagerAdapter() throws AppException {

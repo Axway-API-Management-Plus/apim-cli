@@ -40,7 +40,7 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 			// Deserialization depends on the direction
 			if("organizationId".equals(jp.currentName())) {
 				// APIManagerAdapter is not yet initialized
-				if(APIManagerAdapter.apiManagerVersion==null) {
+				if(!APIManagerAdapter.initialized) {
 					organization = new Organization();
 					organization.setId(node.asText());
 					return organization;
