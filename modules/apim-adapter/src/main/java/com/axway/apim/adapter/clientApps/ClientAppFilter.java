@@ -2,6 +2,8 @@ package com.axway.apim.adapter.clientApps;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
@@ -11,6 +13,12 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.model.User;
+import com.axway.apim.api.model.apps.APIKey;
+import com.axway.apim.api.model.apps.ClientAppCredential;
+import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.api.model.apps.ExtClients;
+import com.axway.apim.api.model.apps.OAuth;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -27,13 +35,17 @@ public class ClientAppFilter {
 	
 	boolean includeImage;
 	
-	String applicationName;
+	private String credential;
 	
-	String state;
+	private String redirectUrl;
 	
-	Organization organization;
+	private String applicationName;
 	
-	String applicationId;
+	private String state;
+	
+	private Organization organization;
+	
+	private String applicationId;
 	
 	List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
@@ -53,6 +65,22 @@ public class ClientAppFilter {
 	
 	public boolean isIncludeAPIAccess() {
 		return includeAPIAccess;
+	}
+
+	public void setIncludeQuota(boolean includeQuota) {
+		this.includeQuota = includeQuota;
+	}
+
+	public void setIncludeCredentials(boolean includeCredentials) {
+		this.includeCredentials = includeCredentials;
+	}
+
+	public void setIncludeAPIAccess(boolean includeAPIAccess) {
+		this.includeAPIAccess = includeAPIAccess;
+	}
+
+	public void setIncludeImage(boolean includeImage) {
+		this.includeImage = includeImage;
 	}
 
 	public String getApplicationId() {
@@ -98,7 +126,21 @@ public class ClientAppFilter {
 		this.applicationId = applicationId;
 	}
 
+	public String getCredential() {
+		return credential;
+	}
 
+	public void setCredential(String credential) {
+		this.credential = credential;
+	}
+
+	public String getRedirectUrl() {
+		return redirectUrl;
+	}
+
+	public void setRedirectUrl(String redirectUrl) {
+		this.redirectUrl = redirectUrl;
+	}
 
 	public void setState(String state) {
 		if(state==null) return;
@@ -151,6 +193,49 @@ public class ClientAppFilter {
 		}
 	}
 
+	public boolean filter(ClientApplication app) throws AppException {
+		if(this.getCredential()==null && this.getRedirectUrl()==null) { // Nothing given to filter out.
+			return true;
+		}
+		boolean match = false;
+		for(ClientAppCredential cred : app.getCredentials()) {
+			switch(cred.getCredentialType()) {
+			case "oauth":
+				match = filterCredential(((OAuth)cred).getClientId(), ((OAuth)cred).getRedirectUrls());
+				break;
+			case "extclients":
+				match = filterCredential(((ExtClients)cred).getClientId(), null);
+				break;
+			case "apikeys":
+				match = filterCredential(((APIKey)cred).getApiKey(), null);
+				break;
+			}
+			if(match) break;
+		}
+		return match;
+	}
+	
+	private boolean filterCredential(String appCredential, String[] appRedirectUrls) {
+		if(this.credential!=null) {
+			Pattern pattern = Pattern.compile(this.credential.replace("*", ".*"));
+			Matcher matcher = pattern.matcher(appCredential);
+			if(!matcher.matches()) return false;
+		}
+		if(this.redirectUrl!=null) {
+			if(appRedirectUrls==null || appRedirectUrls.length==0) return false;
+			Pattern pattern = Pattern.compile(this.redirectUrl.replace("*", ".*"));
+			boolean redirectUrlMatch = false;
+			for(String appRedirectUrl : appRedirectUrls) {
+				Matcher matcher = pattern.matcher(appRedirectUrl);
+				if(matcher.matches()) {
+					redirectUrlMatch = true;
+					break;
+				}
+			}
+			if(!redirectUrlMatch) return false;
+		}
+		return true;
+	}
 
 
 	/**
@@ -158,22 +243,26 @@ public class ClientAppFilter {
 	 */
 	public static class Builder {
 		
-		boolean includeQuota;
+		private boolean includeQuota;
 		
-		boolean includeCredentials;
+		private boolean includeCredentials;
 		
-		boolean includeImage;
+		private boolean includeImage;
 		
-		boolean includeAPIAccess;
+		private boolean includeAPIAccess;
 		
-		Organization organization;
+		private Organization organization;
 		
 		/** The name of the application */
-		String applicationName;
+		private String applicationName;
 		
-		String applicationId;
+		private String applicationId;
 		
-		String state;
+		private String state;
+		
+		private String credential;
+		
+		private String redirectUrl;
 		
 		public Builder() {
 			super();
@@ -189,10 +278,12 @@ public class ClientAppFilter {
 			filter.setApplicationName(this.applicationName);
 			filter.setOrganization(this.organization);
 			filter.setState(this.state);
-			filter.includeQuota = this.includeQuota;
-			filter.includeCredentials = this.includeCredentials;
-			filter.includeImage = this.includeImage;
-			filter.includeAPIAccess = this.includeAPIAccess;
+			filter.setIncludeQuota(this.includeQuota);
+			filter.setIncludeCredentials(this.includeCredentials);
+			filter.setIncludeImage(this.includeImage);
+			filter.setIncludeAPIAccess(this.includeAPIAccess);
+			filter.setCredential(this.credential);
+			filter.setRedirectUrl(this.redirectUrl);
 			return filter;
 		}
 		
@@ -237,6 +328,16 @@ public class ClientAppFilter {
 		
 		public Builder hasState(String state) {
 			this.state = state;
+			return this;
+		}
+		
+		public Builder hasCredential(String credential) {
+			this.credential = credential;
+			return this;
+		}
+		
+		public Builder hasRedirectUrl(String redirectUrl) {
+			this.redirectUrl = redirectUrl;
 			return this;
 		}
 		

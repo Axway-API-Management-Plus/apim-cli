@@ -30,7 +30,17 @@ public class AppExportCLIOptions extends StandardExportCLIOptions {
 
 		option = new  Option("orgName", true, "Filter applications to this organization");
 		option.setRequired(false);
-		option.setArgName("Partners");
+		option.setArgName("*Partners*");
+		options.addOption(option);
+		
+		option = new  Option("credential", true, "Filter applications having this credential information. Client-ID and API-Key is considered here.");
+		option.setRequired(false);
+		option.setArgName("*9877979779*");
+		options.addOption(option);
+		
+		option = new  Option("redirectUrl", true, "Filter applications having this Redirect-URL. Only OAuth-Credentials are considered.");
+		option.setRequired(false);
+		option.setArgName("*localhost*");
 		options.addOption(option);
 	}
 
@@ -49,6 +59,8 @@ public class AppExportCLIOptions extends StandardExportCLIOptions {
 		System.out.println(getBinaryName()+" api get -s api-env -n \"Client App\" -o json");
 		System.out.println(getBinaryName()+" app get -s api-env -n \"Client App\" -t /tmp/exported_apps -o json -deleteTarget ");
 		System.out.println(getBinaryName()+" app get -s api-env -n \"App 123\" -t /tmp/exported_apps -o json -deleteTarget");
+		System.out.println(getBinaryName()+" app get -s api-env -redirectUrl \"localhost\"");
+		System.out.println(getBinaryName()+" app get -s api-env -credential 16378192");
 		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");
 		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");

@@ -1,7 +1,6 @@
 package com.axway.apim.adapter.user;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,8 +9,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.axway.apim.api.model.OutboundProfile;
-import com.axway.apim.api.model.Policy;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.errorHandling.AppException;
 
@@ -188,7 +185,6 @@ public class UserFilter {
 		if(this.getType()==null && this.getOrganizationName()==null) { // Nothing given to filter out.
 			return true;
 		}
-		// Before 7.7, we have to filter out APIs manually!
 		if(this.getType()!=null && !this.getType().equals(user.getType())) {
 			return false;
 		}

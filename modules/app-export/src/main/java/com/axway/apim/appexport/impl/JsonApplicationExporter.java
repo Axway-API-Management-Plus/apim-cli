@@ -118,11 +118,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 
 	@Override
 	public ClientAppFilter getFilter() throws AppException {
-		return new ClientAppFilter.Builder()
-				.hasState(AppExportParams.getInstance().getAppState())
-				.hasName(AppExportParams.getInstance().getAppName())
-				.hasId(AppExportParams.getInstance().getAppId())
-				.hasOrganizationName(AppExportParams.getInstance().getOrgName())
+		return getBaseFilterBuilder()
 				.includeQuotas(true)
 				.includeCredentials(true)
 				.includeAPIAccess(true)
