@@ -147,7 +147,7 @@ public class OrganizationCLIApp implements APIMCLIServiceProvider {
 						.build());
 				importManager.replicate(desiredOrg, actualOrg);
 			}
-			LOG.info("Successfully replicated organization into API-Manager");
+			LOG.info("Successfully replicated organization(s) into API-Manager");
 			return errorCodeMapper.getMapedErrorCode(ErrorState.getInstance().getErrorCode()).getCode();
 		} catch (AppException ap) { 
 			ErrorState errorState = ErrorState.getInstance();

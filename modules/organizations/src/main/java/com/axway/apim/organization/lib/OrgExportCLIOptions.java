@@ -35,7 +35,7 @@ public class OrgExportCLIOptions extends StandardExportCLIOptions {
 		System.out.println("How to get/export organizations with different output formats");
 		System.out.println("Get all organizations on console using environment properties: env.api-env.properties:");
 		System.out.println(getBinaryName()+" org get -s api-env");
-		System.out.println("Same as before, but with output format JSON - As it is used to import applications");
+		System.out.println("Same as before, but with output format JSON - As it is used to import organizations");
 		System.out.println(getBinaryName()+" org get -s api-env -o json");
 		System.out.println();
 		System.out.println();

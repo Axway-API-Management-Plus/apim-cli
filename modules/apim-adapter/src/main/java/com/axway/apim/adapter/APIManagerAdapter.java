@@ -148,6 +148,7 @@ public class APIManagerAdapter {
 			APIManagerAdapter.instance.logoutFromAPIManager(false); // Logout potentially logged in OrgAdmin
 			APIManagerAdapter.instance.logoutFromAPIManager(true); // Logout potentially logged in Admin
 			APIManagerAdapter.instance = null;
+			APIManagerAdapter.apiManagerVersion = null;
 		}
 	}
 	
@@ -489,7 +490,7 @@ public class APIManagerAdapter {
 		Image image = new Image();
 		HttpResponse httpResponse = null;
 		try {
-			RestAPICall getRequest = new GETRequest(uri);
+			RestAPICall getRequest = new GETRequest(uri, hasAdminAccount());
 			httpResponse = getRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode == 404) return null; // No Image found

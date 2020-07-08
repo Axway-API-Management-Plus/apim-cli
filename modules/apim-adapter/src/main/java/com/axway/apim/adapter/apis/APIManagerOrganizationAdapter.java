@@ -178,7 +178,7 @@ public class APIManagerOrganizationAdapter {
 				throw new AppException("Error deleting organization. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 		} catch (Exception e) {
-			throw new AppException("Error creating/updating organization", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+			throw new AppException("Error deleting organization", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		} finally {
 			try {
 				((CloseableHttpResponse)httpResponse).close();

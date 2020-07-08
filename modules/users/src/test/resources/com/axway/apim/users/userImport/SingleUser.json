@@ -1,0 +1,16 @@
+{
+  "loginName" : "${loginName}",
+  "name" : "User Chris",
+  "organization": "API Development",
+  "description" : "An API-Management user",
+  "email" : "${loginName}@company.com",
+  "phone" : "+006856778789",
+  "mobile" : "+007867678891",
+  "role": "oadmin",
+  "image": "user-image.png",
+  "state": "approved",
+  "type": "external",
+  "enabled" : true,
+  "createdOn" : 1593700799104, 
+  "lastSeen": 1593700799104
+}

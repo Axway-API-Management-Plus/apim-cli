@@ -258,7 +258,7 @@ public class APIImportConfigAdapter {
 			throw new AppException("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
 		}
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
-			apiConfig.getOrganization().setId(APIManagerAdapter.getCurrentUser(false).getOrganizationId());
+			apiConfig.getOrganization().setId(APIManagerAdapter.getCurrentUser(false).getOrganization().getId());
 		}
 	}
 
