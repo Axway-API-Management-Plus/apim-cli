@@ -1,7 +1,7 @@
 {
   "loginName" : "${loginName}",
   "name" : "User Chris",
-  "organization": "API Development",
+  "organization": "API Development ${orgNumber}",
   "description" : "An API-Management user",
   "email" : "${loginName}@company.com",
   "phone" : "+006856778789",
