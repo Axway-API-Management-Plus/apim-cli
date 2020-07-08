@@ -43,7 +43,9 @@ public abstract class APIResultHandler {
 		CONSOLE_EXPORTER(ConsoleAPIExporter.class),
 		CSV_EXPORTER(CSVAPIExporter.class),
 		API_DELETE_HANDLER(DeleteAPIHandler.class),
-		API_UNPUBLISH_HANDLER(UnpublishAPIHandler.class);
+		API_PUBLISH_HANDLER(PublishAPIHandler.class),
+		API_UNPUBLISH_HANDLER(UnpublishAPIHandler.class), 
+		API_CHANGE_HANDLER(APIChangeHandler.class);
 		
 		private final Class<APIResultHandler> implClass;
 		

@@ -322,7 +322,7 @@ public class APIImportConfigAdapter {
 	
 	private void addQuotaConfiguration(API apiConfig) throws AppException {
 		if(apiConfig.getState()==API.STATE_UNPUBLISHED) return;
-		DesiredAPI importAPI = (DesiredAPI)apiConfig;
+		API importAPI = apiConfig;
 		initQuota(importAPI.getSystemQuota());
 		initQuota(importAPI.getApplicationQuota());
 	}

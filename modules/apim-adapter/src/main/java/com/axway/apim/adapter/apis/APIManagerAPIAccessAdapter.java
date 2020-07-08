@@ -204,7 +204,7 @@ public class APIManagerAPIAccessAdapter {
 						LOG.info("Successfully created API-Access on retry. Received Status-Code: " +statusCode );
 					}
 				} else if(statusCode==409 && response.contains("resource already exists")) {
-					LOG.warn("Unexpected response while creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'. Ignoring this error.");
+					LOG.debug("Unexpected response while creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'. Ignoring this error.");
 					return apiAccess;
 				} else {
 					LOG.error("Error creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'");
