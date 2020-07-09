@@ -16,6 +16,8 @@ public class OrgFilter {
 	boolean enabled;
 	String name;
 	String phone;
+	
+	boolean includeImage;
 
 	private List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
@@ -55,9 +57,15 @@ public class OrgFilter {
 
 	public void setName(String name) {
 		if(name==null) return;
+		if(name.equals("*")) return;
 		this.name = name;
+		String op = "eq";
+		if(name.startsWith("*") || name.endsWith("*")) {
+			op = "like";
+			name = name.replace("*", "");
+		}
 		filters.add(new BasicNameValuePair("field", "name"));
-		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("op", op));
 		filters.add(new BasicNameValuePair("value", name));
 	}
 
@@ -91,6 +99,10 @@ public class OrgFilter {
 
 	public boolean isEnabled() {
 		return enabled;
+	}
+	
+	public boolean isIncludeImage() {
+		return includeImage;
 	}
 
 	@Override
@@ -133,6 +145,8 @@ public class OrgFilter {
 		boolean enabled;
 		String name;
 		String phone;
+		
+		boolean includeImage;
 
 		List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
@@ -149,6 +163,7 @@ public class OrgFilter {
 			filter.setEnabled(this.enabled);
 			filter.setName(this.name);
 			filter.setPhone(this.phone);
+			filter.includeImage = this.includeImage;
 			return filter;
 		}
 
@@ -184,6 +199,11 @@ public class OrgFilter {
 
 		public Builder inEnabled(boolean enabled) {
 			this.enabled = enabled;
+			return this;
+		}
+		
+		public Builder includeImage(boolean includeImage) {
+			this.includeImage = includeImage;
 			return this;
 		}
 	}

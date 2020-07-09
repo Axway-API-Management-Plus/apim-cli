@@ -2,14 +2,20 @@ package com.axway.apim.adapter.user;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.util.EntityUtils;
 import org.ehcache.Cache;
 import org.slf4j.Logger;
@@ -17,16 +23,27 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
+import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
+import com.axway.apim.lib.utils.rest.POSTRequest;
+import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class APIManagerUserAdapter {
+	
+	CommandParameters cmd = CommandParameters.getInstance();
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerUserAdapter.class);
 	
@@ -94,10 +111,30 @@ public class APIManagerUserAdapter {
 		readUsersFromAPIManager(filter);
 		try {
 			List<User> allUsers = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<User>>(){});
-			return allUsers;
+			List<User> foundUsers = new ArrayList<User>();
+			for(User user : allUsers) {
+				if(!filter.filter(user)) continue; 
+				addImage(user, filter.isIncludeImage());
+				foundUsers.add(user);
+			}
+			return foundUsers;
 		} catch (IOException e) {
 			LOG.error("Error cant read users from API-Manager with filter: "+filter+". Returned response: " + apiManagerResponse);
 			throw new AppException("Error cant read users from API-Manager with filter: "+filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	void addImage(User user, boolean addImage) throws AppException {
+		if(!addImage) return;
+		URI uri;
+		if(user.getImageUrl()==null) return;
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/users/"+user.getId()+"/image")
+					.build();
+			Image image = APIManagerAdapter.getImageFromAPIM(uri, "user-image");
+			user.setImage(image);
+		} catch (URISyntaxException e) {
+			throw new AppException("Error loading image for user: " + user.getLoginName(), ErrorCode.UNXPECTED_ERROR, e);
 		}
 	}
 	
@@ -121,10 +158,117 @@ public class APIManagerUserAdapter {
 			throw new AppException("No unique user found", ErrorCode.UNKNOWN_USER);
 		}
 		if(users.size()==0) {
-			LOG.info("No user found using filter: " + filter);
+			LOG.debug("No user found using filter: " + filter);
 			return null;
 		}
 		return users.get(0);
+	}
+	
+	public User updateUser(User desiredUser, User actualUser) throws AppException {
+		return createOrUpdateUser(desiredUser, actualUser);
+	}
+	
+	public User createUser(User desiredUser) throws AppException {
+		return createOrUpdateUser(desiredUser, null);
+	}
+	
+	public User createOrUpdateUser(User desiredUser, User actualUser) throws AppException {
+		HttpResponse httpResponse = null;
+		User createdUser;
+		FilterProvider filter;
+		try {
+			URI uri;
+			if(actualUser==null) {
+				filter = new SimpleFilterProvider().setDefaultFilter(
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image", "organization"}));
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/users").build();
+			} else {
+				desiredUser.setId(actualUser.getId());
+				filter = new SimpleFilterProvider().setDefaultFilter(
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image", "organization", "createdOn"}));
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/users/"+actualUser.getId()).build();
+			}
+			mapper.setFilterProvider(filter);
+			mapper.setSerializationInclusion(Include.NON_NULL);
+			try {
+				RestAPICall request;
+				if(actualUser==null) {
+					String json = mapper.writeValueAsString(desiredUser);
+					HttpEntity entity = new StringEntity(json);
+					request = new POSTRequest(entity, uri, true);
+				} else {
+					String json = mapper.writeValueAsString(desiredUser);
+					HttpEntity entity = new StringEntity(json);
+					request = new PUTRequest(entity, uri, true);
+				}
+				request.setContentType("application/json");
+				httpResponse = request.execute();
+				int statusCode = httpResponse.getStatusLine().getStatusCode();
+				if(statusCode < 200 || statusCode > 299){
+					LOG.error("Error creating/updating user. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+					throw new AppException("Error creating/updating user. Response-Code: "+statusCode+"", ErrorCode.UNXPECTED_ERROR);
+				}
+				createdUser = mapper.readValue(httpResponse.getEntity().getContent(), User.class);
+				desiredUser.setId(createdUser.getId());
+				saveImage(desiredUser, actualUser);
+			} catch (Exception e) {
+				throw new AppException("Error creating/updating user.", ErrorCode.UNXPECTED_ERROR, e);
+			} finally {
+				try {
+					((CloseableHttpResponse)httpResponse).close();
+				} catch (Exception ignore) { }
+			}
+			return createdUser;
+
+		} catch (Exception e) {
+			throw new AppException("Error creating/updating user", ErrorCode.UNXPECTED_ERROR, e);
+		}
+	}
+	
+	public void deleteUser(User user) throws AppException {
+		HttpResponse httpResponse = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/users/"+user.getId()).build();
+			RestAPICall request = new DELRequest(uri, true);
+			httpResponse = request.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode != 204){
+				LOG.error("Error deleting user. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+				throw new AppException("Error deleting user. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
+		} catch (Exception e) {
+			throw new AppException("Error deleting user", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
+		}
+	}
+	
+	private void saveImage(User user, User actualUser) throws URISyntaxException, AppException {
+		if(user.getImage()==null) return;
+		if(actualUser!=null && user.getImage().equals(actualUser.getImage())) return;
+		HttpResponse httpResponse = null;
+		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/users/"+user.getId()+"/image/").build();
+		HttpEntity entity = MultipartEntityBuilder.create()
+			.addBinaryBody("file", user.getImage().getInputStream(), ContentType.create("image/jpeg"), user.getImage().getBaseFilename())
+			.build();
+		try {
+			RestAPICall apiCall = new POSTRequest(entity, uri, true);
+			apiCall.setContentType(null);
+			httpResponse = apiCall.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode < 200 || statusCode > 299){
+				LOG.error("Error saving/updating user image. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+			}
+		} catch (Exception e) {
+			throw new AppException("Error uploading user image", ErrorCode.CANT_CREATE_API_PROXY, e);
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
+		}
 	}
 	
 	public void setAPIManagerTestResponse(UserFilter key, String response) {

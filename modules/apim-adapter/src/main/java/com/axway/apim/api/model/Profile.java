@@ -1,7 +1,9 @@
 package com.axway.apim.api.model;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+@JsonFilter("ProfileFilter")
 public abstract class Profile {
 	String apiMethodId;
 
