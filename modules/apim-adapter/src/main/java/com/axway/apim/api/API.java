@@ -22,6 +22,7 @@ import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
@@ -57,6 +58,9 @@ public class API {
 	public final static String STATE_PENDING = "pending";
 	
 	JsonNode apiConfiguration;
+	
+	@JsonIgnore
+	private boolean requestForAllOrgs = false;
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
 	protected APISpecification apiDefinition = null;
@@ -135,7 +139,7 @@ public class API {
 	protected Image image = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
+			writableStates = {API.STATE_UNPUBLISHED})
 	protected Map<String, String> customProperties = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
@@ -472,5 +476,27 @@ public class API {
 
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
+	}
+	
+	/**
+	 * requestForAllOrgs is used to decide if an API should grant access to ALL organizations. 
+	 * That means, when an API-Developer is defining ALL as the organization name this flag 
+	 * is set to true and it becomes the desired state.
+	 * @return true, if the developer wants to have permissions to this API for all Orgs.
+	 */
+	public boolean isRequestForAllOrgs() {
+		return requestForAllOrgs;
+	}
+
+	/**
+	 * requestForAllOrgs is used to decide if an API should grant access to ALL organizations. 
+	 * That means, when an API-Developer is defining ALL as the organization name this flag 
+	 * is set to true and it becomes the desired state.
+	 * This method is used during creation of APIImportDefinition in  APIImportConfig#handleAllOrganizations()
+	 * @see APIImportConfigAdapter
+	 * @param requestForAllOrgs when set to true, the APIs will be granted to ALL organizations.
+	 */
+	public void setRequestForAllOrgs(boolean requestForAllOrgs) {
+		this.requestForAllOrgs = requestForAllOrgs;
 	}
 }

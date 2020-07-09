@@ -1,8 +1,8 @@
 ---
 name: Question
 about: Ask a question concerning the CLI
-title: "[Help]"
-labels: help wanted
+title: ""
+labels: question
 assignees: cwiechmann
 
 ---

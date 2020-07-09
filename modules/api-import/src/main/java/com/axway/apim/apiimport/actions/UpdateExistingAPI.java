@@ -39,7 +39,7 @@ public class UpdateExistingAPI {
 			}
 			
 			// If image an include, update it
-			if(changes.getDesiredAPI().getImage()!=null) {
+			if(changes.getAllChanges().contains("image")) {
 				apiManager.apiAdapter.updateAPIImage(changes.getActualAPI(), changes.getDesiredAPI().getImage());
 			}
 			

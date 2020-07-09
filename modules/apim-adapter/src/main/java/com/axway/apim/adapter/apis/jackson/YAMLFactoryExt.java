@@ -28,8 +28,16 @@ public class YAMLFactoryExt extends YAMLFactory {
 		// The standard Yaml-Factory doesn't accept Yaml-Files without the optional start-marker ---
 		if(matchStrength.equals(MatchStrength.INCONCLUSIVE)) {
 			acc.reset();
-			// As we are supporting JSON and YAML only, we can reverse the check
 			byte b = acc.nextByte();
+			while(acc.hasMoreBytes()) {
+				// Ignore newlines at the beginning of the file
+				if(b == '\n' || b == '\r') {
+					b = acc.nextByte();
+					continue;
+				}
+				break;
+			}
+			// As we are supporting JSON and YAML only, we can reverse the check
 			if (b != '[' && b != '{' && b != '<') { // This checks, that it is not JSON and not XML
 				return MatchStrength.SOLID_MATCH;
 			}

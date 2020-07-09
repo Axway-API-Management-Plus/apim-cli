@@ -1,6 +1,7 @@
 package com.axway.apim.export.test.methodLevel;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
@@ -89,6 +90,7 @@ public class MethodLevelExportTestIT extends TestNGCitrusTestRunner {
 		Map<String, OutboundProfile> importedOutboundProfiles = mapper.convertValue(importedAPIConfig.get("outboundProfiles"), new TypeReference<Map<String, OutboundProfile>>(){});
 		Map<String, OutboundProfile> exportedOutboundProfiles = mapper.convertValue(exportedAPIConfig.get("outboundProfiles"), new TypeReference<Map<String, OutboundProfile>>(){});
 		assertEquals(exportedOutboundProfiles, importedOutboundProfiles, "OutboundProfiles are not equal.");
+		assertNull(exportedOutboundProfiles.get("getOrderById").getApiMethodId(), "The OutboundProfile.methodId should be NULL in the exported API.");
 		
 		List<SecurityProfile> importedSecurityProfiles = mapper.convertValue(importedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>(){});
 		List<SecurityProfile> exportedSecurityProfiles = mapper.convertValue(exportedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>(){});

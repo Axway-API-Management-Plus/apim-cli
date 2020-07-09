@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Tell us what you need and why in the API-Mgr. CLI
-title: "[Feature]"
+title: ""
 labels: enhancement
 assignees: cwiechmann
 

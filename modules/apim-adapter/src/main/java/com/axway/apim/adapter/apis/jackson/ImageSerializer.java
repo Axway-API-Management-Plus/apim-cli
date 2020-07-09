@@ -1,4 +1,4 @@
-package com.axway.apim.appexport.impl.jackson;
+package com.axway.apim.adapter.apis.jackson;
 
 import java.io.IOException;
 

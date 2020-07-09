@@ -31,7 +31,7 @@ public class APISpecificationWSDLTest {
 	public void isWSDLSpecification() throws AppException, IOException {
 
 		byte[] content = getSwaggerContent(testPackage + "/sample-wsdl.xml");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "http://www.mnb.hu/arfolyamok.asmx?WSDL", "https://myhost.customer.com:8767/api/v1/myAPI");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "http://www.mnb.hu/arfolyamok.asmx?WSDL", "https://myhost.customer.com:8767/api/v1/myAPI", "Test-API");
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof WSDLSpecification);

@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.1.0] 2020-06-25
 ### Added
 - Feature to use a YAML based API-Definition for Swagger & OpenAPI (API-Manager 7.7 only)
 - API Backend-Server information in wide and ultra view console get view
@@ -13,6 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Feature to load the API-Definition from the FE-API (See issue [#4](https://github.com/Axway-API-Management-Plus/apim-cli/issues/4))
 - Feature to export APIs as a CSV-File incl. used polices and subscribed applications
 - CLI usage information for all operations improved
+- CLI now properly logs out from API-Manager after the execution
+- API Custom-Properties are exported into CSV and Console view
 
 ### Changed
 - API Console ultra view not longer renders API-Tags in detail. Only indicated with True & False
