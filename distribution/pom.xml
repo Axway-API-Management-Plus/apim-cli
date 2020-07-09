@@ -22,15 +22,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-			<artifactId>apimcli-api-export</artifactId>
+			<artifactId>apimcli-apis</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-			<artifactId>apimcli-api-import</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-			<artifactId>apimcli-app-export</artifactId>
+			<artifactId>apimcli-apps</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
