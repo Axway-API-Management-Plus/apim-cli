@@ -42,6 +42,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "get", description = "Get APIs from the API-Manager in different formats")
 	public static int export(String args[]) {
 		try {
+			deleteInstances();
 			APIExportParams params = new APIExportParams(new APIExportGetCLIOptions(args));
 			switch(params.getOutputFormat()) {
 			case console:
