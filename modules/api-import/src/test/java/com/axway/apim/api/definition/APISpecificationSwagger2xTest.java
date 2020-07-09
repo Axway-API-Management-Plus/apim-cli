@@ -32,7 +32,7 @@ public class APISpecificationSwagger2xTest {
 	public void backendHostAndBasePath() throws AppException, IOException {
 
 		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com:8767/api/v1/myAPI");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com:8767/api/v1/myAPI", "Test-API");
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
@@ -46,7 +46,7 @@ public class APISpecificationSwagger2xTest {
 	@Test
 	public void backendHostOnly() throws AppException, IOException {
 		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "http://myhost.customer.com:8767");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "http://myhost.customer.com:8767", "Test-API");
 
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -59,7 +59,7 @@ public class APISpecificationSwagger2xTest {
 	@Test
 	public void backendHostBasisBasePath() throws AppException, IOException {
 		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com/");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com/", "Test-API");
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -72,7 +72,7 @@ public class APISpecificationSwagger2xTest {
 	@Test
 	public void swaggerWithoutSchemes() throws AppException, IOException {
 		byte[] content = getSwaggerContent("/api_definition_1/petstore-without-schemes.json");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com/");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com/", "Test-API");
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -85,7 +85,7 @@ public class APISpecificationSwagger2xTest {
 	@Test
 	public void backendBasepathChangesNothing() throws AppException, IOException {
 		byte[] content = getSwaggerContent("/api_definition_1/petstore-only-https-scheme.json");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://petstore.swagger.io");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://petstore.swagger.io", "Test-API");
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -99,7 +99,7 @@ public class APISpecificationSwagger2xTest {
 	public void testWithoutBackendBasepath() throws AppException, IOException {
 
 		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", null);
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", null, "Test-API");
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);

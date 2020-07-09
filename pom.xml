@@ -19,7 +19,7 @@
 
 	<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Axway API-Manager CLI Parent</name>
@@ -48,7 +48,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.version>3.8.1</maven.compiler.version>
-		
+
 		<project.scm.id>github</project.scm.id>
 	</properties>
 
@@ -77,9 +77,11 @@
 		<module>modules/api-import</module>
 		<module>modules/app-import</module>
 		<module>modules/app-export</module>
+		<module>modules/organizations</module>
+		<module>modules/users</module>
 		<module>distribution</module>
 	</modules>
-	
+
 	<dependencyManagement>
 		<dependencies>
 		<dependency>
@@ -100,6 +102,16 @@
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
 			<artifactId>apimcli-app-export</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-organizations</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-users</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -211,7 +223,7 @@
 		</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<build>
 		<plugins>
 		     <plugin>
@@ -262,7 +274,7 @@
 						</manifest>
 					</archive>
 				</configuration>
-			</plugin>			
+			</plugin>
 		</plugins>
 	</build>
 

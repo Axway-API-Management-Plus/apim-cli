@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -40,13 +39,13 @@ public class ManageClientOrgs {
 		// The API isn't Re-Created (to take over manually created ClientOrgs) and there are no orgs configured - We can skip the rest
 		if(desiredState.getClientOrganizations()==null && !reCreation) return;
 		// From here, the assumption is that existing Org-Access has been upgraded already - We only have to take care about additional orgs
-		if(((DesiredAPI)desiredState).isRequestForAllOrgs()) {
+		if((desiredState).isRequestForAllOrgs()) {
 			LOG.info("Granting permission to all organizations");
 			apiManager.apiAdapter.grantClientOrganization(getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations()), actualState, true);
 		} else {
 			List<Organization> missingDesiredOrgs = getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations());
 			List<Organization> removingActualOrgs = getMissingOrgs(actualState.getClientOrganizations(), desiredState.getClientOrganizations());
-			if(removingActualOrgs.remove( ((API)desiredState).getOrganization())); // Don't try to remove the Owning-Organization
+			if(removingActualOrgs.remove( desiredState.getOrganization())); // Don't try to remove the Owning-Organization
 			if(missingDesiredOrgs.size()==0) {
 				if(desiredState.getClientOrganizations()!=null) {
 					LOG.info("All desired organizations: "+desiredState.getClientOrganizations()+" have already access. Nothing to do.");

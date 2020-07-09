@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us to improve the API-Manager CLI
-title: "[BUG]"
+title: ""
 labels: bug
 assignees: cwiechmann
 

@@ -106,6 +106,8 @@ public class JsonAPIExporter extends APIResultHandler {
 		FilterProvider filters = new SimpleFilterProvider()
 				.addFilter("CaCertFilter",
 						SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"inbound", "outbound", "certFile" }))
+				.addFilter("ProfileFilter",
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiMethodId" }))
 				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {}));
 		mapper.setFilterProvider(filters);
 		try {
@@ -121,7 +123,7 @@ public class JsonAPIExporter extends APIResultHandler {
 		if(exportAPI.getCaCerts()!=null && !exportAPI.getCaCerts().isEmpty()) {
 			storeCaCerts(localFolder, exportAPI.getCaCerts());
 		}
-		LOG.info("Successfully export API to folder: " + localFolder);
+		LOG.info("Successfully exported API into folder: " + localFolder);
 		if(!APIManagerAdapter.hasAdminAccount()) {
 			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
 			LOG.warn("- No Quotas has been exported for the API");

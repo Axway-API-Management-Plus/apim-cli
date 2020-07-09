@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.adapter.clientApps.ClientAppFilter.Builder;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -59,4 +60,17 @@ public abstract class ApplicationExporter {
 	}
 	
 	public abstract ClientAppFilter getFilter() throws AppException;
+	
+	protected Builder getBaseFilterBuilder() throws AppException {
+		Builder builder = new ClientAppFilter.Builder()
+				.hasState(params.getAppState())
+				.hasName(params.getAppName())
+				.hasId(params.getAppId())
+				.hasCredential(params.getCredential())
+				.hasRedirectUrl(params.getRedirectUrl())
+				.hasOrganizationName(params.getOrgName())
+				.includeImage(false);
+		if(params.getCredential()!=null || params.getRedirectUrl()!=null) builder.includeCredentials(true);
+		return builder;
+	}
 }

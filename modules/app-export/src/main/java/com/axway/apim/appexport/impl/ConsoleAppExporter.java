@@ -63,23 +63,18 @@ public class ConsoleAppExporter extends ApplicationExporter {
 
 	@Override
 	public ClientAppFilter getFilter() throws AppException {
-		Builder builder = new ClientAppFilter.Builder()
-				.hasState(AppExportParams.getInstance().getAppState())
-				.hasName(AppExportParams.getInstance().getAppName())
-				.hasId(AppExportParams.getInstance().getAppId())
-				.hasOrganizationName(AppExportParams.getInstance().getOrgName())
-				.includeImage(false);
+		Builder builder = getBaseFilterBuilder();
 		
 		switch(params.getWide()) {
 		case standard:
 			builder.includeQuotas(false);
-			builder.includeCredentials(false);
+			if(params.getCredential()==null && params.getRedirectUrl()==null) builder.includeCredentials(false);
 			builder.includeAPIAccess(false);
 			break;
 		case wide:
 		case ultra:
 			builder.includeQuotas(true);
-			builder.includeCredentials(true);
+			if(params.getCredential()==null && params.getRedirectUrl()==null) builder.includeCredentials(true);
 			builder.includeAPIAccess(true);
 			break;
 		}

@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.format.DataFormatMatcher;
 import com.fasterxml.jackson.core.format.MatchStrength;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 
 public abstract class APISpecification {
 	
@@ -27,7 +28,8 @@ public abstract class APISpecification {
 		SWAGGGER_API_20_YAML("Swagger 2.0 (YAML)", ".yaml"),
 		OPEN_API_30("Open API 3.0", ".json"),
 		OPEN_API_30_YAML("Open API 3.0 (YAML)", ".yaml"),
-		WSDL_API ("WSDL", ".xml");
+		WSDL_API ("WSDL", ".xml"),
+		UNKNOWN ("Unknown", ".txt");
 		
 		String niceName;
 		String fileExtension;
@@ -104,7 +106,7 @@ public abstract class APISpecification {
 	public abstract boolean configure() throws AppException;
 	
 	protected void setMapperForDataFormat() throws AppException {
-		YAMLFactory yamlFactory = new YAMLFactoryExt();
+		YAMLFactory yamlFactory = new YAMLFactoryExt().disable(Feature.WRITE_DOC_START_MARKER);
 		JsonFactory jsonFactory = new JsonFactory();
 		DataFormatDetector detector = new DataFormatDetector(yamlFactory, jsonFactory);
 		DataFormatMatcher formatMatcher;
