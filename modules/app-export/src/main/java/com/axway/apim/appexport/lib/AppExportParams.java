@@ -32,4 +32,12 @@ public class AppExportParams extends StandardExportParams {
 	public String getOrgName() {
 		return getValue("orgName");
 	}
+	
+	public String getCredential() {
+		return getValue("credential");
+	}
+	
+	public String getRedirectUrl() {
+		return getValue("redirectUrl");
+	}
 }

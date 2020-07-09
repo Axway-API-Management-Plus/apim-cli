@@ -33,9 +33,10 @@ public class OAS3xSpecification extends APISpecification {
 				URL backendBasepath = new URL(this.backendBasepath);
 				 ObjectNode newServer = this.mapper.createObjectNode();
 				 newServer.put("url", backendBasepath.toString());
-
-				((ArrayNode) openAPI.get("servers")).removeAll();
-				((ArrayNode) openAPI.get("servers")).add(newServer);
+				 if(openAPI.has("servers")) {
+					((ArrayNode) openAPI.get("servers")).removeAll();
+				 }
+				 ((ObjectNode)openAPI).set("servers", mapper.createArrayNode().add(newServer));
 				this.apiSpecificationContent = this.mapper.writeValueAsBytes(openAPI);
 			}
 		} catch (Exception e) {

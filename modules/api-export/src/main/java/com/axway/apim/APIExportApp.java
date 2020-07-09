@@ -10,10 +10,12 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.impl.APIResultHandler;
 import com.axway.apim.api.export.impl.APIResultHandler.APIListImpl;
+import com.axway.apim.api.export.lib.APIChangeParams;
 import com.axway.apim.api.export.lib.APIDeleteCLIOptions;
 import com.axway.apim.api.export.lib.APIExportGetCLIOptions;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.export.lib.APIUnpublishCLIOptions;
+import com.axway.apim.api.export.lib.ChangeAPICLIOptions;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -33,7 +35,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	private static ErrorState errorState = ErrorState.getInstance();
 
 	public static void main(String args[]) { 
-		int rc = export(args);
+		int rc = change(args);
 		System.exit(rc);
 	}
 	
@@ -43,13 +45,13 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			APIExportParams params = new APIExportParams(new APIExportGetCLIOptions(args));
 			switch(params.getOutputFormat()) {
 			case console:
-				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
+				return execute(params, APIListImpl.CONSOLE_EXPORTER);
 			case json:
-				return runExport(params, APIListImpl.JSON_EXPORTER);
+				return execute(params, APIListImpl.JSON_EXPORTER);
 			case csv:
-				return runExport(params, APIListImpl.CSV_EXPORTER);
+				return execute(params, APIListImpl.CSV_EXPORTER);
 			default:
-				return runExport(params, APIListImpl.CONSOLE_EXPORTER);
+				return execute(params, APIListImpl.CONSOLE_EXPORTER);
 			}
 		} catch (AppException e) {
 			
@@ -71,7 +73,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int delete(String args[]) {
 		try {
 			APIExportParams params = new APIExportParams(new APIDeleteCLIOptions(args));
-			return runExport(params, APIListImpl.API_DELETE_HANDLER);
+			return execute(params, APIListImpl.API_DELETE_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
@@ -82,14 +84,36 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int unpublish(String args[]) {
 		try {
 			APIExportParams params = new APIExportParams(new APIUnpublishCLIOptions(args));
-			return runExport(params, APIListImpl.API_UNPUBLISH_HANDLER);
+			return execute(params, APIListImpl.API_UNPUBLISH_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}
 	}
 	
-	private static int runExport(APIExportParams params, APIListImpl resultHandlerImpl) {
+	@CLIServiceMethod(name = "publish", description = "Publish the selected APIs")
+	public static int publish(String args[]) {
+		try {
+			APIExportParams params = new APIExportParams(new APIUnpublishCLIOptions(args));
+			return execute(params, APIListImpl.API_PUBLISH_HANDLER);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
+	}
+	
+	@CLIServiceMethod(name = "change", description = "Changes the selected APIs according to given parameters")
+	public static int change(String args[]) {
+		try {
+			APIChangeParams params = new APIChangeParams(new ChangeAPICLIOptions(args));
+			return execute(params, APIListImpl.API_CHANGE_HANDLER);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
+	}
+	
+	private static int execute(APIExportParams params, APIListImpl resultHandlerImpl) {
 		try {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
@@ -119,7 +143,10 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				}
 			}
 			APIManagerAdapter.deleteInstance();
-			return 0;
+			if(ErrorState.getInstance().hasError()) {
+				ErrorState.getInstance().logErrorMessages(LOG);
+			}
+			return ErrorState.getInstance().getErrorCode().getCode();
 		} catch (AppException ap) {
 			ErrorState errorState = ErrorState.getInstance();
 			if(errorState.hasError()) {

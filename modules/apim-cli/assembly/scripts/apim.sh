@@ -4,7 +4,7 @@ if [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]
 then
         #### echo "Using java given in JAVA_HOME"
         _java=$JAVA_HOME/bin/java
-elif type -p java
+elif command -v java
 then
         #### echo "Using java found in the PATH"
         _java=java

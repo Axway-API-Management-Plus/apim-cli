@@ -114,7 +114,7 @@ public class ManageClientApps {
 					LOG.info("Creating API-Access for application '"+app.getName()+"'");
 					APIAccess apiAccess = new APIAccess();
 					apiAccess.setApiId(apiId);
-					accessAdapter.createAPIAccess(apiAccess, app.getId(), Type.applications);
+					accessAdapter.createAPIAccess(apiAccess, app, Type.applications);
 				} catch(AppException e) {
 					throw new AppException("Failure creating API-Access for application: '"+app.getName()+"'. " + e.getMessage(), 
 							ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -133,7 +133,7 @@ public class ManageClientApps {
 			LOG.debug("Removing API-Access for application '"+app.getName()+"'");
 			try { 
 				for(APIAccess apiAccess: app.getApiAccess()) {
-					accessAdapter.deleteAPIAccess(apiAccess, app.getId(), Type.applications);
+					accessAdapter.deleteAPIAccess(apiAccess, app, Type.applications);
 				}
 			} catch (Exception e) {
 				LOG.error("Can't delete API access requests for application.");
