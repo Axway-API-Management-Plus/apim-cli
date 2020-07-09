@@ -1,4 +1,4 @@
-package com.axway.apim.adapter.apis.jackson;
+package com.axway.apim.adapter.jackson;
 
 import java.util.List;
 

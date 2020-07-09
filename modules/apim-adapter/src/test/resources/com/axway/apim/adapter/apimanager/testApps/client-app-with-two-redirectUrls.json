@@ -1,6 +1,6 @@
 {
   "name" : "Client App",
-  "organization" : "Community",
+  "organization" : "API Development",
   "description" : "Sample Client Application, registered for use in the Client Demo",
   "state" : "approved",
   "enabled" : true,

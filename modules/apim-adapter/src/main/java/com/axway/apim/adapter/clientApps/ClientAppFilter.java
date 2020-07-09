@@ -196,6 +196,7 @@ public class ClientAppFilter {
 		if(this.getCredential()==null && this.getRedirectUrl()==null) { // Nothing given to filter out.
 			return true;
 		}
+		if(app.getCredentials()==null) return false;
 		boolean match = false;
 		for(ClientAppCredential cred : app.getCredentials()) {
 			switch(cred.getCredentialType()) {

@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.jackson.PolicyDeserializer;
-import com.axway.apim.adapter.apis.jackson.PolicySerializer;
+import com.axway.apim.adapter.jackson.PolicyDeserializer;
+import com.axway.apim.adapter.jackson.PolicySerializer;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
