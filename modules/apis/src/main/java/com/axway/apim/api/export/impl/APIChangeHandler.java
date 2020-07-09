@@ -14,8 +14,10 @@ import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
+import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.Utils;
 
 public class APIChangeHandler extends APIResultHandler {
@@ -46,6 +48,7 @@ public class APIChangeHandler extends APIResultHandler {
 				}
 				if(changeState.isBreaking() && !params.isForce()) {
 					LOG.error("Changing API: '"+api.getName()+"' is a potentially breaking change which can't be applied without enforcing it! Try option: -force");
+					ErrorState.getInstance().setError("Changing API: '"+api.getName()+"' is a potentially breaking change which can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED, false);
 					continue;
 				}
 				LOG.info("Planned changes for API: '" + api.getName() + "': " + changeState.getAllChanges());
@@ -58,19 +61,26 @@ public class APIChangeHandler extends APIResultHandler {
 			System.out.println("No changes required for the selected APIs.");
 			return;
 		}
-		System.out.println("Okay, going to change: " + apisToChange.size() + " API(s)");
-		if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
-			APIImportManager importManager = new APIImportManager();
-			for(APIChangeState changeState : apisToChange) {
-				LOG.info("Apply changes for API: '" + changeState.getDesiredAPI().getName() +"'");
-				try {
-					importManager.applyChanges(changeState);
-				} catch(Exception e) {
-					LOG.error("Error applying changes for API: " + changeState.getDesiredAPI().getName(), e);
-				}
+		if(CommandParameters.getInstance().isForce()) {
+			System.out.println("Force flag given to change: "+apis.size()+" API(s)");
+		} else {
+			System.out.println("Okay, going to change: " + apisToChange.size() + " API(s)");
+			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
+			} else {
+				System.out.println("Canceled.");
+				return;
 			}
-			System.out.println("Done!");
 		}
+		APIImportManager importManager = new APIImportManager();
+		for(APIChangeState changeState : apisToChange) {
+			LOG.info("Apply changes for API: '" + changeState.getDesiredAPI().getName() +"'");
+			try {
+				importManager.applyChanges(changeState);
+			} catch(Exception e) {
+				LOG.error("Error applying changes for API: " + changeState.getDesiredAPI().getName(), e);
+			}
+		}
+		System.out.println("Done!");
 	}
 
 	@Override

@@ -72,6 +72,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "delete", description = "Delete the selected APIs from the API-Manager")
 	public static int delete(String args[]) {
 		try {
+			deleteInstances();
 			APIExportParams params = new APIExportParams(new APIDeleteCLIOptions(args));
 			return execute(params, APIListImpl.API_DELETE_HANDLER);
 		} catch (Exception e) {
@@ -83,6 +84,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "unpublish", description = "Unpublish the selected APIs")
 	public static int unpublish(String args[]) {
 		try {
+			deleteInstances();
 			APIExportParams params = new APIExportParams(new APIUnpublishCLIOptions(args));
 			return execute(params, APIListImpl.API_UNPUBLISH_HANDLER);
 		} catch (Exception e) {
@@ -94,6 +96,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "publish", description = "Publish the selected APIs")
 	public static int publish(String args[]) {
 		try {
+			deleteInstances();
 			APIExportParams params = new APIExportParams(new APIUnpublishCLIOptions(args));
 			return execute(params, APIListImpl.API_PUBLISH_HANDLER);
 		} catch (Exception e) {
@@ -105,6 +108,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "change", description = "Changes the selected APIs according to given parameters")
 	public static int change(String args[]) {
 		try {
+			deleteInstances();
 			APIChangeParams params = new APIChangeParams(new ChangeAPICLIOptions(args));
 			return execute(params, APIListImpl.API_CHANGE_HANDLER);
 		} catch (Exception e) {
@@ -115,10 +119,6 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	
 	private static int execute(APIExportParams params, APIListImpl resultHandlerImpl) {
 		try {
-			// We need to clean some Singleton-Instances, as tests are running in the same JVM
-			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
-			APIMHttpClient.deleteInstance();
 
 			APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
 			
@@ -162,6 +162,13 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}
+	}
+	
+	private static void deleteInstances() throws AppException {
+		// We need to clean some Singleton-Instances, as tests are running in the same JVM
+		APIManagerAdapter.deleteInstance();
+		ErrorState.deleteInstance();
+		APIMHttpClient.deleteInstance();
 	}
 	
 	@Override

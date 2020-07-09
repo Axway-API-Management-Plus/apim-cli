@@ -170,6 +170,5 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestRunner {
 			//.validate("$.restrictions.[?(@.api=='${newApiId}')].config.period", "hour")
 			.validate("$.restrictions[*].api", "@assertThat(not(containsString(${apiId})))@") // Make sure, the old API-ID has been removed
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "1"));
-		
 	}
 }

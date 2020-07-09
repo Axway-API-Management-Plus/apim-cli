@@ -19,7 +19,7 @@ public class APIImportInitializationTestIT extends TestDesignerBeforeSuiteSuppor
 		designer.createVariable("orgName2", "API Test-Org 2 ${orgNumber2}");
 		designer.createVariable("orgName3", "API Test-Org 3 ${orgNumber2}");
 		
-		designer.echo("####### Create Test Org 2: 'API Development ${orgNumber2}' with Non-Development flag #######");
+		designer.echo("####### Create Test Org 2: '${orgName2}' with Non-Development flag #######");
 		
 		designer.http().client("apiManager")
 			.send()
@@ -39,7 +39,7 @@ public class APIImportInitializationTestIT extends TestDesignerBeforeSuiteSuppor
 	
 		designer.echo("####### Extracted Non-Dev organization id: ${orgId2} as attribute: orgId2 #######");
 		
-		designer.echo("####### Create Test Org 3: 'API Development ${orgNumber3}' with Development flag #######");
+		designer.echo("####### Create Test Org 3: '${orgName3}' with Development flag #######");
 		
 		designer.http().client("apiManager")
 			.send()

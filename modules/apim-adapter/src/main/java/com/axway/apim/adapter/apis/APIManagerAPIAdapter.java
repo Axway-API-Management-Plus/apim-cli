@@ -483,7 +483,7 @@ public class APIManagerAPIAdapter {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
 						.setParameter("original", "true").build();
 			}
-			RestAPICall getRequest = new GETRequest(uri);
+			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse=getRequest.execute();
 			String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
 			String origFilename = "Unkown filename";
