@@ -2,7 +2,7 @@ package com.axway.apim.adapter.jackson;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.fasterxml.jackson.core.JsonParser;

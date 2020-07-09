@@ -19,9 +19,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Library Apache httpclient Version: 4.5.6 to 4.5.12
 - Library Apache commons-io Version: 2.6 to 2.7
 - Library Apache commons-text Version: 1.7 to 1.8
+- Library Apache commons-lang 2.6 to commons-lang3 3.10
 - Library Apache httpmime Version: 4.5.6 to 4.5.12
 - Library slf4j-log4j12 Version: 1.7.25 to 1.7.30
-- Test library testng Version: 6.9.10 ti 6.9.13.6
+- Test library testng Version: 6.9.10 to 6.9.13.6
 
 ### Fixed
 - Fixed NPE when API has no security configured (See issue [#46](https://github.com/Axway-API-Management-Plus/apim-cli/issues/46))

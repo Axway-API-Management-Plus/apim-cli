@@ -2,7 +2,7 @@ package com.axway.apim.adapter.jackson;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;

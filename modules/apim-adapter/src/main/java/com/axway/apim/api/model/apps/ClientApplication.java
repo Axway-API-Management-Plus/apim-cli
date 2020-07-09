@@ -3,7 +3,7 @@ package com.axway.apim.api.model.apps;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.axway.apim.adapter.jackson.APIAccessSerializer;
 import com.axway.apim.adapter.jackson.OrganizationDeserializer;
