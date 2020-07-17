@@ -117,6 +117,16 @@ public class ExportAPI {
 			if(this.actualAPIProxy.getAuthenticationProfiles().get(0).getType()==AuthType.none)
 			return null;
 		}
+		for(AuthenticationProfile profile : this.actualAPIProxy.getAuthenticationProfiles()) {
+			if(profile.getType()==AuthType.oauth) {
+				String providerProfile = (String)profile.getParameters().get("providerProfile");
+				if(providerProfile.startsWith("<key")) {
+					providerProfile = providerProfile.substring(providerProfile.indexOf("<key type='OAuthAppProfile'>"));
+					providerProfile = providerProfile.substring(providerProfile.indexOf("value='")+7, providerProfile.lastIndexOf("'/></key>"));
+				}
+				profile.getParameters().put("providerProfile", providerProfile);
+			}
+		}
 		return this.actualAPIProxy.getAuthenticationProfiles();
 	}
 

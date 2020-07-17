@@ -1,6 +1,7 @@
 package com.axway.apim.export.test.customPolicies;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
@@ -106,6 +107,8 @@ public class CustomPoliciesTestIT extends TestNGCitrusTestRunner {
 		Map<String, OutboundProfile> importedOutboundProfiles = mapper.convertValue(importedAPIConfig.get("outboundProfiles"), new TypeReference<Map<String, OutboundProfile>>(){});
 		Map<String, OutboundProfile> exportedOutboundProfiles = mapper.convertValue(exportedAPIConfig.get("outboundProfiles"), new TypeReference<Map<String, OutboundProfile>>(){});
 		assertEquals(importedOutboundProfiles, exportedOutboundProfiles, "OutboundProfiles are not equal.");
+		assertFalse(exportedAPIConfig.get("outboundProfiles").get("_default").get("requestPolicy").asText().startsWith("<key"), "Request policy should not start with <key");
+		assertFalse(exportedAPIConfig.get("outboundProfiles").get("_default").get("responsePolicy").asText().startsWith("<key"), "Request policy should not start with <key");
 		
 		TagMap<String, String[]> importedTags = mapper.convertValue(importedAPIConfig.get("tags"), new TypeReference<TagMap<String, String[]>>(){});
 		TagMap<String, String[]> exportedTags = mapper.convertValue(exportedAPIConfig.get("tags"), new TypeReference<TagMap<String, String[]>>(){});
