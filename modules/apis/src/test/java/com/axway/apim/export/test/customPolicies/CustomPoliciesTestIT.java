@@ -130,7 +130,7 @@ public class CustomPoliciesTestIT extends TestNGCitrusTestRunner {
 		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("inbound").asBoolean(), 			false);
 		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("outbound").asBoolean(), 			true);
 
-		assertEquals(exportedAPIConfig.get("caCerts").get(1).get("certFile").asText(), 				"Sample'EncryptAuthority.crt");
+		assertEquals(exportedAPIConfig.get("caCerts").get(1).get("certFile").asText(), 				"SampleEncryptAuthority.crt");
 		assertEquals(exportedAPIConfig.get("caCerts").get(1).get("inbound").asBoolean(), 			false);
 		assertEquals(exportedAPIConfig.get("caCerts").get(1).get("outbound").asBoolean(), 			true);
 
@@ -139,7 +139,7 @@ public class CustomPoliciesTestIT extends TestNGCitrusTestRunner {
 		assertEquals(exportedAPIConfig.get("caCerts").get(2).get("outbound").asBoolean(), 			true);
 		
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/sample-certificate.crt").exists(), "Certificate sample-certificate.crt is missing");
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/Sample'EncryptAuthority.crt").exists(), "Certificate Sample'EncryptAuthority.crt is missing");
+		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/SampleEncryptAuthority.crt").exists(), "Certificate SampleEncryptAuthority.crt is missing");
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/SampleRootCA.crt").exists(), "Certificate SampleRootCA.crt is missing");
 		
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/"+context.getVariable("exportAPIName")).exists(), "Exported Swagger-File is missing");
