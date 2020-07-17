@@ -4,17 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.jackson.PolicyDeserializer;
-import com.axway.apim.adapter.apis.jackson.PolicySerializer;
+import com.axway.apim.adapter.jackson.PolicyDeserializer;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class OutboundProfile extends Profile {
 	
@@ -23,19 +21,15 @@ public class OutboundProfile extends Profile {
 	String routeType;
 	
 	@JsonDeserialize( using = PolicyDeserializer.class)
-	@JsonSerialize ( using = PolicySerializer.class)
 	Policy requestPolicy;
 	
 	@JsonDeserialize( using = PolicyDeserializer.class)
-	@JsonSerialize ( using = PolicySerializer.class)
 	Policy responsePolicy;
 	
 	@JsonDeserialize( using = PolicyDeserializer.class)
-	@JsonSerialize ( using = PolicySerializer.class)
 	Policy routePolicy;
 	
 	@JsonDeserialize( using = PolicyDeserializer.class)
-	@JsonSerialize ( using = PolicySerializer.class)
 	Policy faultHandlerPolicy;
 	
 	String authenticationProfile;

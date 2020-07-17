@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.jackson.ImageSerializer;
+import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;

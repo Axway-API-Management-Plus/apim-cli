@@ -1,0 +1,51 @@
+{
+  "name": "${apiName}",
+  "path": "${apiPath}",
+  "state": "${state}",
+  "version": "v1",
+  "organization": "API Development ${orgNumber}",
+  "securityProfiles" : [ {
+    "name" : "_default",
+    "isDefault" : true,
+    "devices" : [ {
+      "name" : "Invoke Policy",
+      "type" : "authPolicy",
+      "order" : 1,
+      "properties" : {
+        "authenticationPolicy" : "Inbound security policy 1",
+        "useClientRegistry" : "false",
+        "subjectSelector" : "${//authentication.subject.id//}",
+        "descriptionType" : "original",
+        "descriptionUrl" : "",
+        "descriptionMarkdown" : "",
+        "description" : ""
+      }
+    } ]
+  } ],
+  "outboundProfiles": {
+    "_default": {
+      "routePolicy": "${routePolicy}"
+    }
+  },
+  "caCerts" : [ {
+    "certFile" : "sample-certificate.crt",
+    "inbound" : "false",
+    "outbound" : "true"
+  }, {
+    "certFile" : "Sample'EncryptAuthority.crt",
+    "inbound" : "false",
+    "outbound" : "true"
+  }, {
+    "certFile" : "SampleRootCA.crt",
+    "inbound" : "false",
+    "outbound" : "true"
+  } ],
+  "tags": {
+    "ping_ai": [
+      "true"
+    ],
+    "ping_blocking": [
+      "true"
+    ]
+  }
+}

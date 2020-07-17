@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -197,6 +196,7 @@ public class ClientAppFilter {
 		if(this.getCredential()==null && this.getRedirectUrl()==null) { // Nothing given to filter out.
 			return true;
 		}
+		if(app.getCredentials()==null) return false;
 		boolean match = false;
 		for(ClientAppCredential cred : app.getCredentials()) {
 			switch(cred.getCredentialType()) {
