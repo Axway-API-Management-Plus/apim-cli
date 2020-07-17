@@ -1,8 +1,8 @@
 package com.axway.apim.api.model;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
+import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;

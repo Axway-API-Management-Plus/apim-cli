@@ -3,10 +3,10 @@ package com.axway.apim.api.model.apps;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import com.axway.apim.adapter.apis.jackson.APIAccessSerializer;
-import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
+import com.axway.apim.adapter.jackson.APIAccessSerializer;
+import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;

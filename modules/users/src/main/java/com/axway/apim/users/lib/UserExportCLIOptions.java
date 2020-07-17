@@ -17,7 +17,7 @@ public class UserExportCLIOptions extends StandardExportCLIOptions {
 		option.setArgName("*mark24*");
 		options.addOption(option);
 		
-		option = new  Option("name", true, "Filter users with the specified name. You may use wildcards at the end or beginning.");
+		option = new  Option("n", "name", true, "Filter users with the specified name. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*Mark*");
 		options.addOption(option);
