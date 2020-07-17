@@ -28,15 +28,15 @@
     }
   },
   "caCerts" : [ {
-    "certFile" : "risequipmentservicedev.nov.cloud.crt",
+    "certFile" : "sample-certificate.crt",
     "inbound" : "false",
     "outbound" : "true"
   }, {
-    "certFile" : "Let'sEncryptAuthorityX3.crt",
+    "certFile" : "Sample'EncryptAuthority.crt",
     "inbound" : "false",
     "outbound" : "true"
   }, {
-    "certFile" : "DSTRootCAX3.crt",
+    "certFile" : "SampleRootCA.crt",
     "inbound" : "false",
     "outbound" : "true"
   } ],
