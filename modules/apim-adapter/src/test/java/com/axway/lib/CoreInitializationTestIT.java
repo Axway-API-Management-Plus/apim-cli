@@ -38,7 +38,7 @@ public class CoreInitializationTestIT extends TestDesignerBeforeSuiteSupport {
 			.header("Content-Type", "application/json")
 			.payload("{\"name\": \"${orgName}\", \"description\": \"Test Org ${orgNumber}\", \"enabled\": true, \"development\": true }");
 		
-		designer.echo("####### Validating Test-Organisation: API Development ${orgNumber} has been created #######");
+		designer.echo("####### Validating Test-Organisation: ${orgName} has been created #######");
 		
 		designer.http().client("apiManager")
 			.receive()
@@ -88,7 +88,7 @@ public class CoreInitializationTestIT extends TestDesignerBeforeSuiteSupport {
 			.extractFromPayload("$.id", "testAppId")
 			.extractFromPayload("$.name", "testAppName");
 		
-		designer.echo("####### Created a application: '${testAppName}' ID: '${testAppId}' #######");
+		designer.echo("####### Created a application: '${testAppName}' ID: '${testAppId}' (testAppName/testAppId) #######");
 		
 		// Adjusting the API-Manager config in preparation to run integration tests
 		designer.echo("Turn off changePasswordOnFirstLogin and passwordExpiryEnabled validation to run integration tests");

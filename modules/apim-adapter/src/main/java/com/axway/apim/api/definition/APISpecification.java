@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.jackson.YAMLFactoryExt;
+import com.axway.apim.adapter.jackson.YAMLFactoryExt;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -22,8 +22,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 public abstract class APISpecification {
 	
 	public static enum APISpecType {
-		SWAGGGER_API_12("Swagger 1.2", ".json"),
-		SWAGGGER_API_12_YAML("Swagger 1.2 (YAML)", ".yaml"),
+		SWAGGGER_API_1x("Swagger 1.x", ".json"),
+		SWAGGGER_API_1x_YAML("Swagger 1.x (YAML)", ".yaml"),
 		SWAGGGER_API_20("Swagger 2.0", ".json"),
 		SWAGGGER_API_20_YAML("Swagger 2.0 (YAML)", ".yaml"),
 		OPEN_API_30("Open API 3.0", ".json"),

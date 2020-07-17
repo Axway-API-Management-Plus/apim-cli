@@ -3,7 +3,7 @@ package com.axway.apim.api;
 import java.util.List;
 import java.util.Map;
 
-import com.axway.apim.adapter.apis.jackson.OrganizationDeserializer;
+import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;

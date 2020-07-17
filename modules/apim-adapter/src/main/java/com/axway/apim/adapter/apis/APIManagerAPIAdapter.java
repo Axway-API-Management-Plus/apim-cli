@@ -39,8 +39,8 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
-import com.axway.apim.adapter.apis.jackson.StateSerializerModifier;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.adapter.jackson.APIImportSerializerModifier;
 import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.definition.APISpecification;
@@ -483,7 +483,7 @@ public class APIManagerAPIAdapter {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
 						.setParameter("original", "true").build();
 			}
-			RestAPICall getRequest = new GETRequest(uri);
+			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse=getRequest.execute();
 			String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
 			String origFilename = "Unkown filename";
@@ -538,7 +538,7 @@ public class APIManagerAPIAdapter {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
 				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath"}));
-		mapper.registerModule(new SimpleModule().setSerializerModifier(new StateSerializerModifier(false)));
+		mapper.registerModule(new SimpleModule().setSerializerModifier(new APIImportSerializerModifier(false)));
 		mapper.setFilterProvider(filter);
 		HttpResponse httpResponse = null;
 		translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);

@@ -168,7 +168,7 @@ public class UserCLIApp implements APIMCLIServiceProvider {
 		}
 	}
 	
-	@CLIServiceMethod(name = "delete", description = "Delete selected organizatio(s) from the API-Manager")
+	@CLIServiceMethod(name = "delete", description = "Delete selected user(s) from the API-Manager")
 	public static int delete(String args[]) {
 		try {
 			UserExportParams params = new UserExportParams(new UserDeleteCLIOptions(args));
