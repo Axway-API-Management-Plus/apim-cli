@@ -9,10 +9,13 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 public class PolicySerializer extends StdSerializer<Policy> {
 	
+	boolean serializeAsName = false;
+	
 	private static final long serialVersionUID = 1L;
 	
-	public PolicySerializer() {
+	public PolicySerializer(boolean serializeAsName) {
 		this(null);
+		this.serializeAsName = serializeAsName;
 	}
 
 	public PolicySerializer(Class<Policy> policy) {
@@ -21,7 +24,11 @@ public class PolicySerializer extends StdSerializer<Policy> {
 
 	@Override
 	public void serialize(Policy policy, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-		jgen.writeString(policy.getId());
+		if(serializeAsName) {
+			jgen.writeString(policy.getName());
+		} else {
+			jgen.writeString(policy.getId());
+		}
 	}
 	
 	@Override

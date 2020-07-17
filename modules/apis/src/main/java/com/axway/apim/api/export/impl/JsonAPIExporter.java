@@ -17,8 +17,7 @@ import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.ExportAPI;
-import com.axway.apim.api.export.jackson.serializer.AIPQuotaSerializerModifier;
-import com.axway.apim.api.export.jackson.serializer.PolicyToNameSerializer;
+import com.axway.apim.api.export.jackson.serializer.APIExportSerializerModifier;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
@@ -100,8 +99,8 @@ public class JsonAPIExporter extends APIResultHandler {
 					ErrorCode.UNXPECTED_ERROR, e);
 		}
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(new SimpleModule().setSerializerModifier(new AIPQuotaSerializerModifier()));
-		mapper.registerModule(new SimpleModule().addSerializer(new PolicyToNameSerializer()));
+		mapper.registerModule(new SimpleModule().setSerializerModifier(new APIExportSerializerModifier()));
+		//mapper.registerModule(new SimpleModule().addSerializer(new PolicyToNameSerializer()));
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filters = new SimpleFilterProvider()
 				.addFilter("CaCertFilter",

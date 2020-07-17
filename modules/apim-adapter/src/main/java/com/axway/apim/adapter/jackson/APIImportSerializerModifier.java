@@ -2,16 +2,18 @@ package com.axway.apim.adapter.jackson;
 
 import java.util.List;
 
+import com.axway.apim.api.model.Policy;
 import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
-public class StateSerializerModifier extends BeanSerializerModifier {
+public class APIImportSerializerModifier extends BeanSerializerModifier {
 	
 	boolean serializeAsDeprecated = true;
 
-	public StateSerializerModifier(boolean serializeAsDeprecated) {
+	public APIImportSerializerModifier(boolean serializeAsDeprecated) {
 		super();
 		this.serializeAsDeprecated = serializeAsDeprecated;
 	}
@@ -27,5 +29,13 @@ public class StateSerializerModifier extends BeanSerializerModifier {
 			}
 		}
 		return beanProperties;
+	}
+
+	@Override
+	public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+		if (beanDesc.getBeanClass() == Policy.class) {
+			return new PolicySerializer(false);
+		}
+		return super.modifySerializer(config, beanDesc, serializer);
 	}
 }
