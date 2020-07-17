@@ -2,8 +2,7 @@ package com.axway.apim.api.model;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-
-import org.apache.commons.lang.ArrayUtils;
+import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,7 +38,7 @@ public class TagMap<K, V> extends LinkedHashMap<String, String[]> {
 			if(!otherTagMap.containsKey(tagName)) return false;
 			String[] myTags = this.get(tagName);
 			String[] otherTags = otherTagMap.get(tagName);
-			if(!ArrayUtils.isEquals(myTags, otherTags)) return false;
+			if(!Objects.deepEquals(myTags, otherTags)) return false;
 		}
 		return true;
 	}

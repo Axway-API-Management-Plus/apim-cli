@@ -13,12 +13,10 @@
       <useAllReactorProjects>true</useAllReactorProjects>
       <includes>
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-apim-adapter</include>
-		<include>com.github.axway-api-management-plus.apim-cli:apimcli-api-import</include>
-        <include>com.github.axway-api-management-plus.apim-cli:apimcli-api-export</include>
-        <include>com.github.axway-api-management-plus.apim-cli:apimcli-app-import</include>
-        <include>com.github.axway-api-management-plus.apim-cli:apimcli-app-export</include>
+        <include>com.github.axway-api-management-plus.apim-cli:apimcli-apis</include>
+        <include>com.github.axway-api-management-plus.apim-cli:apimcli-apps</include>
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-organizations</include>
-		<include>com.github.axway-api-management-plus.apim-cli:apimcli-users</include>
+        <include>com.github.axway-api-management-plus.apim-cli:apimcli-users</include>
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-tool</include>
       </includes>
       <binaries>
