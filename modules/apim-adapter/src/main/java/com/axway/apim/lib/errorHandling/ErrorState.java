@@ -65,7 +65,7 @@ public class ErrorState {
 			} else {
 				LOG.error(intend + message[0]);
 			}
-			intend = intend + "   ";
+			intend = intend + "";
 		}
 	}
 

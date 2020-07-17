@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,9 +125,9 @@ public class APIMgrAppsAdapter {
 	
 	public List<ClientApplication> getApplications(ClientAppFilter filter, boolean logProgress) throws AppException {
 		readApplicationsFromAPIManager(filter);
-		List<ClientApplication> apps;
+		List<ClientApplication> filteredApps = new ArrayList<ClientApplication>();
 		try {
-			apps = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<ClientApplication>>(){});
+			List<ClientApplication> apps = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<ClientApplication>>(){});
 			LOG.debug("Found: "+apps.size() + " applications");
 			for(int i=0; i<apps.size();i++) {
 				ClientApplication app = apps.get(i);
@@ -136,6 +137,8 @@ public class APIMgrAppsAdapter {
 				}
 				addApplicationCredentials(app, filter.isIncludeCredentials());
 				addAPIAccess(app, filter.isIncludeAPIAccess());
+				if(!filter.filter(app)) continue;
+				filteredApps.add(app);
 				if(logProgress && apps.size()>5) Utils.progressPercentage(i, apps.size(), "Laoding "+apps.size()+" Applications");
 			}
 			if(logProgress && apps.size()>5) System.out.print("\n");
@@ -143,7 +146,7 @@ public class APIMgrAppsAdapter {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 
-		return apps;
+		return filteredApps;
 	}
 	
 	public List<ClientApplication> getAllApplications(boolean logProgress) throws AppException {
@@ -251,7 +254,7 @@ public class APIMgrAppsAdapter {
 	void addAPIAccess(ClientApplication app, boolean addAPIAccess) throws Exception {
 		if(!addAPIAccess) return;
 		try {
-			List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app.getId(), Type.applications, true);
+			List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app, Type.applications, true);
 			app.getApiAccess().addAll(apiAccess);
 		} catch (Exception e) {
 			throw new AppException("Error reading application API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
@@ -451,7 +454,7 @@ public class APIMgrAppsAdapter {
 			return;
 		}
 		APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
-		accessAdapter.saveAPIAccess(app.getApiAccess(), app.getId(), Type.applications);
+		accessAdapter.saveAPIAccess(app.getApiAccess(), app, Type.applications);
 	}
 	
 	

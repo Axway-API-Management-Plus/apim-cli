@@ -39,8 +39,8 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
-import com.axway.apim.adapter.apis.jackson.StateSerializerModifier;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.adapter.jackson.APIImportSerializerModifier;
 import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.definition.APISpecification;
@@ -129,7 +129,7 @@ public class APIManagerAPIAdapter {
 			addCustomProperties(apis, filter);
 			if(logProgress && apis.size()>5) System.out.print("\n");
 		} catch (IOException e) {
-			throw new AppException("Cant reads API from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Cannot read APIs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 		return apis;
 	}
@@ -261,7 +261,10 @@ public class APIManagerAPIAdapter {
 	}
 	
 	private void addImageFromAPIM(API api, boolean includeImage) throws AppException {
-		if(!includeImage) return;
+		if(!includeImage) {
+			api.setImage(null);
+			return;
+		}
 		Image image = new Image();
 			image = new Image();
 			URI uri;
@@ -393,7 +396,9 @@ public class APIManagerAPIAdapter {
 	}
 	
 	private void addCustomProperties(List<API> apis, APIFilter filter) throws IOException {
-		if(filter.getCustomProperties() == null) return;
+		if(filter.getCustomProperties() == null) {
+			return;
+		}
 		Map<String, String> customProperties = new LinkedHashMap<String, String>();
 		Iterator<String> it = filter.getCustomProperties().keySet().iterator();
 		Map<String, JsonNode> apiAsJsonMappedWithId = new HashMap<String, JsonNode>();
@@ -411,7 +416,7 @@ public class APIManagerAPIAdapter {
 				String customPropValue = (value == null) ? null : value.asText();
 				customProperties.put(customPropKey, customPropValue);
 			}
-			api.setCustomProperties(customProperties);
+			api.setCustomProperties((customProperties.size()==0) ? null : customProperties);
 		}
 	}
 	
@@ -425,7 +430,7 @@ public class APIManagerAPIAdapter {
 		List<Organization> allOrgs = APIManagerAdapter.getInstance().orgAdapter.getAllOrgs();
 		grantedOrgs = new ArrayList<Organization>();
 		for(Organization org : allOrgs) {
-			List<APIAccess> orgAPIAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(org.getId(), APIManagerAPIAccessAdapter.Type.organizations);
+			List<APIAccess> orgAPIAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(org, APIManagerAPIAccessAdapter.Type.organizations);
 			for(APIAccess access : orgAPIAccess) {
 				if(access.getApiId().equals(api.getId())) {
 					grantedOrgs.add(org);
@@ -452,7 +457,7 @@ public class APIManagerAPIAdapter {
 					.includeQuotas(filter.isIncludeClientAppQuota())
 					.build(), false);
 			for(ClientApplication app : apps) {
-				List<APIAccess> APIAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app.getId(), APIManagerAPIAccessAdapter.Type.applications, true);
+				List<APIAccess> APIAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app, APIManagerAPIAccessAdapter.Type.applications, true);
 				app.setApiAccess(APIAccess);
 				for(APIAccess access : APIAccess) {
 					if(access.getApiId().equals(api.getId())) {
@@ -478,17 +483,17 @@ public class APIManagerAPIAdapter {
 				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
 						.setParameter("original", "true").build();
 			}
-			RestAPICall getRequest = new GETRequest(uri);
+			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse=getRequest.execute();
 			String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
 			String origFilename = "Unkown filename";
 			if(httpResponse.containsHeader("Content-Disposition")) {
 				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
 			}
-			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null);
+			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null, api.getName(), filter.isFailOnError());
 			api.setApiDefinition(apiDefinition);
 		} catch (Exception e) {
-			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
+			throw new AppException("Cannot parse API-Definition for API: '" + api.getName() + "' ("+api.getVersion()+") on path: '"+api.getPath()+"'", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 
@@ -533,7 +538,7 @@ public class APIManagerAPIAdapter {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
 				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath"}));
-		mapper.registerModule(new SimpleModule().setSerializerModifier(new StateSerializerModifier(false)));
+		mapper.registerModule(new SimpleModule().setSerializerModifier(new APIImportSerializerModifier(false)));
 		mapper.setFilterProvider(filter);
 		HttpResponse httpResponse = null;
 		translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);

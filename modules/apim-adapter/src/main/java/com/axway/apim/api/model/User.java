@@ -1,11 +1,23 @@
 package com.axway.apim.api.model;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.axway.apim.adapter.jackson.OrganizationDeserializer;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonFilter("UserFilter")
 public class User {
 	String id;
-	String organizationId;
+	
+	@JsonDeserialize( using = OrganizationDeserializer.class)
+	@JsonAlias({"organizationId", "organization"}) // Alias to read Organization based on the id as given by the API-Manager
+	Organization organization;
 	String name;
 	String description;
 	String loginName;
@@ -15,7 +27,18 @@ public class User {
 	Long createdOn;
 	String state;
 	String type;
+	String phone;
+	String mobile;
+	
+	AuthenticatedUserAttributes authNUserAttributes;
+	
 	String dn;
+	
+	@JsonProperty("image")
+	private String imageUrl;
+	
+	@JsonIgnore
+	private Image image;
 	
 	public String getId() {
 		return id;
@@ -23,12 +46,16 @@ public class User {
 	public void setId(String id) {
 		this.id = id;
 	}
+	public Organization getOrganization() {
+		return organization;
+	}
+	public void setOrganization(Organization organization) {
+		this.organization = organization;
+	}
 	public String getOrganizationId() {
-		return organizationId;
+		return this.organization.getId();
 	}
-	public void setOrganizationId(String organizationId) {
-		this.organizationId = organizationId;
-	}
+	
 	public String getName() {
 		return name;
 	}
@@ -88,5 +115,57 @@ public class User {
 	}
 	public void setDn(String dn) {
 		this.dn = dn;
+	}
+	public Image getImage() {
+		return image;
+	}
+	public void setImage(Image image) {
+		this.image = image;
+	}
+	
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	public String getMobile() {
+		return mobile;
+	}
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+	public AuthenticatedUserAttributes getAuthNUserAttributes() {
+		return authNUserAttributes;
+	}
+	public void setAuthNUserAttributes(AuthenticatedUserAttributes authNUserAttributes) {
+		this.authNUserAttributes = authNUserAttributes;
+	}
+	
+	public boolean deepEquals(Object other) {
+		if(other == null) return false;
+		if(other instanceof User) {
+			User otherUser = (User)other;
+			return 
+					StringUtils.equals(otherUser.getName(), this.getName()) &&
+					StringUtils.equals(otherUser.getLoginName(), this.getLoginName()) &&
+					StringUtils.equals(otherUser.getMobile(), this.getMobile()) &&
+					otherUser.getOrganization().equals(this.getOrganization()) &&
+					StringUtils.equals(otherUser.getPhone(), this.getPhone()) &&
+					StringUtils.equals(otherUser.getType(), this.getType()) &&
+					StringUtils.equals(otherUser.getEmail().toLowerCase(), this.getEmail().toLowerCase()) &&
+					(otherUser.isEnabled()==this.isEnabled()) && 
+					StringUtils.equals(otherUser.getDescription(), this.getDescription()) &&
+					(this.getImage()==null || this.getImage().equals(otherUser.getImage()))
+					;
+		}
+		return false;
 	}
 }

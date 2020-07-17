@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -86,6 +86,8 @@ public class APIFilter {
 	private boolean includeOriginalAPIDefinition = false;
 	
 	private boolean useFEAPIDefinition = false;
+	
+	private boolean failOnError = true;
 	
 	POLICY_TRANSLATION translatePolicyMode = POLICY_TRANSLATION.NONE;
 	
@@ -364,6 +366,14 @@ public class APIFilter {
 		this.customProperties = customProperties;
 	}
 
+	public boolean isFailOnError() {
+		return failOnError;
+	}
+
+	public void setFailOnError(boolean failOnError) {
+		this.failOnError = failOnError;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
@@ -512,6 +522,8 @@ public class APIFilter {
 		
 		boolean useFEAPIDefinition = false;
 		
+		boolean failOnError = true;
+		
 		POLICY_TRANSLATION translatePolicyMode = POLICY_TRANSLATION.NONE;
 		
 		List<NameValuePair> filters = new ArrayList<NameValuePair>();
@@ -566,6 +578,7 @@ public class APIFilter {
 			apiFilter.setCustomProperties(this.customProperties);
 			apiFilter.setCreatedOn(this.createdOn, this.createdOnOp);
 			apiFilter.setBackendBasepath(this.backendBasepath);
+			apiFilter.setFailOnError(this.failOnError);
 			return apiFilter;
 		}
 
@@ -717,6 +730,10 @@ public class APIFilter {
 			this.backendBasepath = backendBasepath;
 			return this;
 		}
+		
+		public Builder failOnError(boolean failOnError) {
+			this.failOnError = failOnError;
+			return this;
+		}		
 	}
-
 }

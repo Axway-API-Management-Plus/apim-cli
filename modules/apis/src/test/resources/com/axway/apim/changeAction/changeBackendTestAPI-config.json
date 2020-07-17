@@ -1,0 +1,60 @@
+{
+  "name": "${apiName}",
+  "path": "${apiPath}",
+  "state": "${state}",
+  "version": "1.0.0",
+  "organization": "${orgName}",
+  "securityProfiles": [
+    {
+      "name": "_default",
+      "isDefault": true,
+      "devices": [
+        {
+          "name": "API Key",
+          "type": "apiKey",
+          "order": 0,
+          "properties": {
+            "apiKeyFieldName": "KeyId",
+            "takeFrom": "HEADER",
+            "removeCredentialsOnSuccess": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "applicationQuota": {
+    "restrictions": [
+      {
+        "method": "*",
+        "type": "throttlemb",
+        "config": {
+          "period": "day",
+          "mb": 1000,
+          "per": 1
+        }
+      }
+    ]
+  },
+  "systemQuota": {
+    "restrictions": [
+      {
+        "method": "*",
+        "type": "throttle",
+        "config": {
+          "period": "week",
+          "messages": 1000,
+          "per": 2
+        }
+      }
+    ]
+  },
+  "clientOrganizations": [
+    "${orgName}",
+    "${orgName2}"
+  ],
+  "applications": [
+    {
+      "name": "${testAppName}"
+    }
+  ]
+}

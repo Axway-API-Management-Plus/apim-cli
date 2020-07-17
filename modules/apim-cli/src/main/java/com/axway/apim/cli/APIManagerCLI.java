@@ -1,5 +1,6 @@
 package com.axway.apim.cli;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 
 /**
@@ -73,7 +75,7 @@ public class APIManagerCLI {
 
 	public static void main(String[] args) {
 		APIManagerCLI cli = new APIManagerCLI(args);
-		cli.run(args);
+		System.exit(cli.run(args));
 	}
 	
 	private void parseArguments(String[] args) {
@@ -122,7 +124,8 @@ public class APIManagerCLI {
 		}
 	}
 	
-	void run(String[] args) {
+	int run(String[] args) {
+		int rc = 0;
 		System.out.println("----------------------------------------------------------------------------------------");
 		System.out.println("API-Manager CLI: "+APIManagerCLI.class.getPackage().getImplementationVersion());
 		System.out.println("                                                                        ");
@@ -131,17 +134,21 @@ public class APIManagerCLI {
 		System.out.println("----------------------------------------------------------------------------------------");
 		if(this.selectedMethod==null) {
 			this.printUsage();
+			return rc;
 		} else {
 			System.out.println("Module: " + this.selectedService.getName() + " ("+this.selectedService.getVersion()+")");
 			System.out.println("----------------------------------------------------------------------------------------");
 			try {
-				this.selectedMethod.invoke (this.selectedService, (Object)args);
-			} catch (Exception e) {
+				rc = (int)this.selectedMethod.invoke (this.selectedService, (Object)args);
+				return rc;
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				if(!ErrorState.getInstance().isLogStackTrace()) {
 					e.printStackTrace();
+					return ErrorCode.UNXPECTED_ERROR.getCode();
 				}
 			}
 		}
+		return rc;
 	}
 	
 	private String getMethodName(Method m) {

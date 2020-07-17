@@ -4,17 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.jackson.PolicyDeserializer;
-import com.axway.apim.adapter.apis.jackson.PolicySerializer;
+import com.axway.apim.adapter.jackson.PolicyDeserializer;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class OutboundProfile extends Profile {
 	
@@ -23,19 +21,15 @@ public class OutboundProfile extends Profile {
 	String routeType;
 	
 	@JsonDeserialize( using = PolicyDeserializer.class)
-	@JsonSerialize ( using = PolicySerializer.class)
 	Policy requestPolicy;
 	
 	@JsonDeserialize( using = PolicyDeserializer.class)
-	@JsonSerialize ( using = PolicySerializer.class)
 	Policy responsePolicy;
 	
 	@JsonDeserialize( using = PolicyDeserializer.class)
-	@JsonSerialize ( using = PolicySerializer.class)
 	Policy routePolicy;
 	
 	@JsonDeserialize( using = PolicyDeserializer.class)
-	@JsonSerialize ( using = PolicySerializer.class)
 	Policy faultHandlerPolicy;
 	
 	String authenticationProfile;
@@ -99,6 +93,7 @@ public class OutboundProfile extends Profile {
 	}
 
 	public List<Object> getParameters() {
+		if(parameters==null || parameters.size()==0) return null;
 		return parameters;
 	}
 	
@@ -136,8 +131,8 @@ public class OutboundProfile extends Profile {
 			List<Object> thisParameters = this.getParameters();
 			if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
 				// Passwords no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
-				otherParameters.remove("password");
-				thisParameters.remove("password");
+				if(otherParameters!=null) otherParameters.remove("password");
+				if(thisParameters!=null) thisParameters.remove("password");
 			}
 			boolean rc = 
 				(this.getFaultHandlerPolicy()==null || this.getFaultHandlerPolicy().equals(otherOutboundProfile.getFaultHandlerPolicy())) &&
@@ -145,7 +140,7 @@ public class OutboundProfile extends Profile {
 				(this.getRequestPolicy()==null || this.getResponsePolicy().equals(otherOutboundProfile.getResponsePolicy())) &&
 				(this.getRoutePolicy()==null || this.getRoutePolicy().equals(otherOutboundProfile.getRoutePolicy())) &&
 				StringUtils.equals(otherOutboundProfile.getRouteType(), this.getRouteType()) &&
-				otherParameters.equals(thisParameters);
+				(thisParameters==null || thisParameters.equals(otherParameters));
 			return rc;
 		} else {
 			return false;

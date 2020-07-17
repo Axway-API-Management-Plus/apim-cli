@@ -21,6 +21,7 @@ import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.model.AbstractEntity;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -38,8 +39,14 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 public class APIManagerAPIAccessAdapter {
 	
 	public static enum Type {
-		organizations, 
-		applications
+		organizations("Organization"), 
+		applications("Application");
+		
+		String niceName;
+
+		private Type(String niceName) {
+			this.niceName = niceName;
+		}
 	}
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerAPIAccessAdapter.class);
@@ -95,21 +102,21 @@ public class APIManagerAPIAccessAdapter {
 		}
 	}
 	
-	public List<APIAccess> getAPIAccess(String id, Type type) throws AppException {
-		return getAPIAccess(id, type, false);
+	public List<APIAccess> getAPIAccess(AbstractEntity entity, Type type) throws AppException {
+		return getAPIAccess(entity, type, false);
 	}
 	
-	public List<APIAccess> getAPIAccess(String id, Type type, boolean includeAPIName) throws AppException {
-		readAPIAccessFromAPIManager(type, id);
+	public List<APIAccess> getAPIAccess(AbstractEntity entity, Type type, boolean includeAPIName) throws AppException {
+		readAPIAccessFromAPIManager(type, entity.getId());
 		String apiAccessResponse = null;
 		try {
-			apiAccessResponse = apiManagerResponse.get(type).get(id);
+			apiAccessResponse = apiManagerResponse.get(type).get(entity.getId());
 			List<APIAccess> allApiAccess = mapper.readValue(apiAccessResponse, new TypeReference<List<APIAccess>>(){});
 			if(includeAPIName) {
 				for(APIAccess apiAccess : allApiAccess) {
 					API api = APIManagerAdapter.getInstance().apiAdapter.getAPI(new APIFilter.Builder().hasId(apiAccess.getApiId()).build(), false);
 					if(api==null) {
-						throw new AppException("Unable to find API with ID: " + apiAccess.getApiId(), ErrorCode.UNKNOWN_API);
+						throw new AppException("Unable to find API with ID: " + apiAccess.getApiId() + " referenced by "+type.niceName+": " + entity.getName(), ErrorCode.UNKNOWN_API);
 					}
 					apiAccess.setApiName(api.getName());
 					apiAccess.setApiVersion(api.getVersion());
@@ -147,23 +154,23 @@ public class APIManagerAPIAccessAdapter {
 		}
 	}
 	
-	public List<APIAccess> saveAPIAccess(List<APIAccess> apiAccess, String parentId, Type type) throws AppException {
-		List<APIAccess> existingAPIAccess = getAPIAccess(parentId, type);
+	public List<APIAccess> saveAPIAccess(List<APIAccess> apiAccess, AbstractEntity entity, Type type) throws AppException {
+		List<APIAccess> existingAPIAccess = getAPIAccess(entity, type);
 		
 		List<APIAccess> toBeRemovedAccesses = getMissingAPIAccesses(existingAPIAccess, apiAccess);
 		List<APIAccess> toBeAddeddAccesses = getMissingAPIAccesses(apiAccess, existingAPIAccess);
 
 		for(APIAccess access : toBeRemovedAccesses) {
-			deleteAPIAccess(access, parentId, type);
+			deleteAPIAccess(access, entity, type);
 		}
 		for(APIAccess access : toBeAddeddAccesses) {
-			createAPIAccess(access, parentId, type);
+			createAPIAccess(access, entity, type);
 		}
 		return apiAccess;
 	}
 	
-	public APIAccess createAPIAccess(APIAccess apiAccess, String parentId, Type type) throws AppException {
-		List<APIAccess> existingAPIAccess = getAPIAccess(parentId, type);
+	public APIAccess createAPIAccess(APIAccess apiAccess, AbstractEntity parentEntity, Type type) throws AppException {
+		List<APIAccess> existingAPIAccess = getAPIAccess(parentEntity, type);
 		if(existingAPIAccess!=null && existingAPIAccess.contains(apiAccess)) {
 			apiAccess.setId(existingAPIAccess.get(0).getId());
 			return apiAccess;
@@ -171,7 +178,7 @@ public class APIManagerAPIAccessAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/"+type+"/"+parentId+"/apis").build();
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/"+type+"/"+parentEntity.getId()+"/apis").build();
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
 					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiName"}));
@@ -197,7 +204,7 @@ public class APIManagerAPIAccessAdapter {
 						LOG.info("Successfully created API-Access on retry. Received Status-Code: " +statusCode );
 					}
 				} else if(statusCode==409 && response.contains("resource already exists")) {
-					LOG.warn("Unexpected response while creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'. Ignoring this error.");
+					LOG.debug("Unexpected response while creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'. Ignoring this error.");
 					return apiAccess;
 				} else {
 					LOG.error("Error creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'");
@@ -206,7 +213,7 @@ public class APIManagerAPIAccessAdapter {
 			}
 			apiAccess =  mapper.readValue(response, APIAccess.class);
 			// Clean cache for this ID (App/Org) to force reload next time
-			removeFromCache(parentId, type);
+			removeFromCache(parentEntity.getId(), type);
 			return apiAccess;
 		} catch (Exception e) {
 			throw new AppException("Error creating/updating API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
@@ -217,8 +224,8 @@ public class APIManagerAPIAccessAdapter {
 		}
 	}
 	
-	public void deleteAPIAccess(APIAccess apiAccess, String parentId, Type type) throws AppException {
-		List<APIAccess> existingAPIAccess = getAPIAccess(parentId, type);
+	public void deleteAPIAccess(APIAccess apiAccess, AbstractEntity parentEntity, Type type) throws AppException {
+		List<APIAccess> existingAPIAccess = getAPIAccess(parentEntity, type);
 		// Nothing to delete
 		if(existingAPIAccess!=null && !existingAPIAccess.contains(apiAccess)) {
 			return;
@@ -226,7 +233,7 @@ public class APIManagerAPIAccessAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/"+type+"/"+parentId+"/apis/"+apiAccess.getId()).build();
+			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/"+type+"/"+parentEntity.getId()+"/apis/"+apiAccess.getId()).build();
 			// Use an admin account for this request
 			RestAPICall request = new DELRequest(uri, APIManagerAdapter.hasAdminAccount());
 			request.setContentType("application/json");
@@ -236,7 +243,7 @@ public class APIManagerAPIAccessAdapter {
 				LOG.error("Can't delete API access requests for application. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 				throw new AppException("Can't delete API access requests for application. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
-			removeFromCache(parentId, type);
+			removeFromCache(parentEntity.getId(), type);
 			return;
 		} catch (Exception e) {
 			throw new AppException("Can't delete API access requests for application.", ErrorCode.CANT_CREATE_API_PROXY, e);
@@ -249,11 +256,11 @@ public class APIManagerAPIAccessAdapter {
 	
 	public void removeClientOrganization(List<Organization> removingActualOrgs, String apiId) throws AppException {
 		for(Organization org : removingActualOrgs) {
-			List<APIAccess> orgsApis = getAPIAccess(org.getId(), Type.organizations);
+			List<APIAccess> orgsApis = getAPIAccess(org, Type.organizations);
 			for(APIAccess apiAccess : orgsApis) {
 				if(apiAccess.getApiId().equals(apiId)) {
 					try {
-						deleteAPIAccess(apiAccess, org.getId(), Type.organizations);
+						deleteAPIAccess(apiAccess, org, Type.organizations);
 					} catch (Exception e) {
 						LOG.error("Can't delete API-Access for organization. ");
 						throw new AppException("Can't delete API-Access for organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
