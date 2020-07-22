@@ -6,8 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.2.1] 2020-07-22
+### Fixed
+- Outbound Method-Configuration not working (See issue [#50](https://github.com/Axway-API-Management-Plus/apim-cli/issues/50))
 
-## [1.2.0] 2020-06-17
+## [1.2.0] 2020-07-17
 ### Added
 - Support to import and export organizations
 - Support to import and export users
