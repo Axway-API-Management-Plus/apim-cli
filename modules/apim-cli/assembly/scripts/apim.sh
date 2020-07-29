@@ -16,7 +16,7 @@ fi
 #programDir="${0%/*}"
 programDir="$( cd "$(dirname "$0")" ; pwd -P )"
 
-cd $programDir/..
+cd "$programDir/.."
 
 CP=lib:conf
 for jars in lib/*
