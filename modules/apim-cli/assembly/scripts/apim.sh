@@ -13,18 +13,21 @@ else
         exit 1
 fi
 
-#programDir="${0%/*}"
 programDir="$( cd "$(dirname "$0")" ; pwd -P )"
+
+currentDir=$PWD
 
 cd "$programDir/.."
 
-CP=lib:conf
-for jars in lib/*
+CP=$PWD/lib:$PWD/conf
+for jar in lib/*
 do
-        CP=$CP:$jars
+        CP=$CP:$PWD/$jar
 done
 
 echo ""
+
+cd $currentDir
 
 "$_java" -Xms64m -Xmx256m -Dlog4j.configuration=../lib/log4j.xml -classpath "$CP" com.axway.apim.cli.APIManagerCLI "${@}"
 rc=$?
