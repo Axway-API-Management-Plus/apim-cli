@@ -216,7 +216,7 @@ public class ClientAppFilter {
 	}
 	
 	private boolean filterCredential(String appCredential, String[] appRedirectUrls, String appName) {
-		if(appCredential==null || appRedirectUrls==null) {
+		if(appCredential==null) {
 			LOG.warn("Inconsistent application: '"+appName+"' found. API-Key/Client-ID is NULL for credential.");
 			return false;
 		}
