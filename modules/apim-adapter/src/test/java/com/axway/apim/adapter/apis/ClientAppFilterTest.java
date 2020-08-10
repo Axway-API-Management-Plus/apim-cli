@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.AppCredentialsDeserializer;
+import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -97,6 +98,17 @@ public class ClientAppFilterTest extends APIManagerMockBase {
 		
 		filter = new ClientAppFilter.Builder()
 				.hasRedirectUrl("*anything*")
+				.build();
+		assertFalse(filter.filter(testApp), "App SHOULD NOT match as there are no credentials");
+	}
+	
+	@Test
+	public void testAppHavingAPIKeyButNoClientID() throws AppException, JsonParseException, JsonMappingException, IOException {
+		ClientApplication testApp = getTestApp("client-app-with-two-api-key-only.json");
+		((APIKey)testApp.getCredentials().get(0)).setApiKey(null);
+		
+		ClientAppFilter filter = new ClientAppFilter.Builder()
+				.hasCredential("Does-not-exists")
 				.build();
 		assertFalse(filter.filter(testApp), "App SHOULD NOT match as there are no credentials");
 	}
