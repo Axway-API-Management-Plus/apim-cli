@@ -21,8 +21,8 @@ public class IgnoreClientOrgsTestIT extends TestNGCitrusTestDesigner {
 		description("This test makes sure, no organizations have been granted permission.");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/grant_invalid_org-api-${apiNumber}");
-		variable("apiName", "Grant to invalid orgs API-${apiNumber}");
+		variable("apiPath", "/ignore_client_orgs-api-${apiNumber}");
+		variable("apiName", "Ignore Client orgs API-${apiNumber}");
 		
 		variable("testOrgName", "Org without permission ${apiNumber}");
 
