@@ -63,4 +63,12 @@ public class Utils {
         // Assess if we match a positive response
         return answer.matches(positive);
     }
+    
+	public static String getExternalPolicyName(String policy) {
+		if(policy.startsWith("<key")) {
+			policy = policy.substring(policy.indexOf("<key type='FilterCircuit'>"));
+			policy = policy.substring(policy.indexOf("value='")+7, policy.lastIndexOf("'/></key>"));
+		}
+		return policy;
+	}
 }
