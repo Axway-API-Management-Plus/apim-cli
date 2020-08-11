@@ -17,9 +17,14 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.DeviceType;
+import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.Policy;
+import com.axway.apim.api.model.SecurityDevice;
+import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.Utils;
 
 public class APIFilter {
 	
@@ -435,20 +440,43 @@ public class APIFilter {
 			}
 		}
 		if(this.getPolicyName()!=null) {
-			Pattern pattern = Pattern.compile(this.getPolicyName().replace("*", ".*"));
-			Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
 			boolean requestedPolicyUsed = false;
-			while(it.hasNext()) {
-				OutboundProfile profile = it.next();
-				for(Policy policy : profile.getAllPolices()) {
-					if(policy.getName()==null) {
-						LOG.warn("Cannot check policy: "+policy+" as policy name is empty.");
-						continue;
+			Pattern pattern = Pattern.compile(this.getPolicyName().replace("*", ".*"));
+			if(api.getOutboundProfiles()!=null) {
+				Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
+				while(it.hasNext()) {
+					OutboundProfile profile = it.next();
+					for(Policy policy : profile.getAllPolices()) {
+						if(policy.getName()==null) {
+							LOG.warn("Cannot check policy: "+policy+" as policy name is empty.");
+							continue;
+						}
+						Matcher matcher = pattern.matcher(policy.getName());
+						if(matcher.matches()) {
+							requestedPolicyUsed = true;
+							break;
+						}
 					}
-					Matcher matcher = pattern.matcher(policy.getName());
-					if(matcher.matches()) {
-						requestedPolicyUsed = true;
-						break;
+				}
+			}
+			if(api.getInboundProfiles()!=null) {
+				Iterator<InboundProfile> it = api.getInboundProfiles().values().iterator();
+				while(it.hasNext()) {
+					InboundProfile profile = it.next();
+					if(profile.getSecurityProfile()!=null) {
+						for(SecurityProfile securityProfile : api.getSecurityProfiles()) {
+							if(securityProfile.getName().equals(profile.getSecurityProfile())) {
+								for(SecurityDevice device : securityProfile.getDevices()) {
+									if(device.getType()!=DeviceType.authPolicy) continue;
+									String securityPolicy = device.getProperties().get("authenticationPolicy");
+									Matcher matcher = pattern.matcher(Utils.getExternalPolicyName(securityPolicy));
+									if(matcher.matches()) {
+										requestedPolicyUsed = true;
+										break;
+									}
+								}
+							}
+						}
 					}
 				}
 			}

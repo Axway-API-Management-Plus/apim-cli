@@ -85,6 +85,10 @@ public abstract class APIMCoreCLIOptions {
 		option.setArgName("ALL");
 		options.addOption(option);
 		
+		option = new Option("ignoreCache", "The cache for REST-API calls against the API-Manager isn't used at all.");
+		option.setRequired(false);
+		options.addOption(option);
+		
 		option = new Option("rollback", true, "Allows to disable the rollback feature");
 		option.setRequired(false);
 		option.setArgName("true");
@@ -97,10 +101,6 @@ public abstract class APIMCoreCLIOptions {
 		option = new Option("returnCodeMapping", true, "Optionally maps given return codes into a desired return code. Format: 10:0, 12:0");
 		option.setRequired(false);
 		option.setArgName("true");
-		internalOptions.addOption(option);
-		
-		option = new Option("ignoreCache", "The cache for REST-API calls isn't used.");
-		option.setRequired(false);
 		internalOptions.addOption(option);
 
 		this.args = args;

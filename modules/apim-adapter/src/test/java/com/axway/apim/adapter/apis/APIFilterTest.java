@@ -4,7 +4,9 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.testng.Assert;
@@ -16,8 +18,12 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.DeviceType;
+import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.Policy;
+import com.axway.apim.api.model.SecurityDevice;
+import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
@@ -238,6 +244,17 @@ public class APIFilterTest {
 		assertFalse(filter.filter(testAPI), "API must NOT match to pattern 'Not used policy' as it is using 'Response Policy 1'");
 	}
 	
+	@Test
+	public void testInboundSecurityPolicyFilter() throws AppException {
+		API testAPI = new API();
+		addInboundSecurityPolicy(testAPI, "Inbound Security Policy 1");
+		
+		APIFilter filter = new APIFilter.Builder()
+				.hasPolicyName("Inbound Security*")
+				.build();
+		assertTrue(filter.filter(testAPI), "API must match to pattern 'Inbound Security*'");
+	}
+	
 	private API getAPIWithBackendBasepath(String basePath) {
 		API api = new API();
 		ServiceProfile serviceProfile = new ServiceProfile();
@@ -272,5 +289,42 @@ public class APIFilterTest {
 		api.setOutboundProfiles(outboundProfiles);
 		return api;
 	}
+	
+	private API addInboundSecurityPolicy(API api, String policyName) throws AppException {
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put("authenticationPolicy", "<key type='CircuitContainer'><id field='name' value='API Keys'/><key type='FilterCircuit'><id field='name' value='"+policyName+"'/></key></key>");
+		SecurityDevice securityDevice = new SecurityDevice();
+		securityDevice.setType(DeviceType.authPolicy);
+		securityDevice.setConvertPolicies(false);
+		securityDevice.setProperties(properties);
+		List<SecurityDevice> devices = new ArrayList<SecurityDevice>();
+		devices.add(securityDevice);
+		SecurityProfile securityProfile = new SecurityProfile();
+		securityProfile.setName("_default");
+		securityProfile.setDevices(devices);
+		List<SecurityProfile> securityProfiles = new ArrayList<SecurityProfile>();
+		securityProfiles.add(securityProfile);
+		api.setSecurityProfiles(securityProfiles);
+		
+		InboundProfile inboundProfile = new InboundProfile();
+		inboundProfile.setSecurityProfile("_default");
+		Map<String, InboundProfile> inboundProfiles = new HashMap<String, InboundProfile>();
+		inboundProfiles.put("_default", inboundProfile);
+		api.setInboundProfiles(inboundProfiles);
+		return api;
+	}
 }
+
+/**
+ *    "inboundProfiles":{
+      "findPetsByStatus":{
+         "securityProfile":"Yet another API-Key profile"
+      },
+      "_default":{
+         "securityProfile":"_default"
+      }
+   },
+   
+   
+ */
 

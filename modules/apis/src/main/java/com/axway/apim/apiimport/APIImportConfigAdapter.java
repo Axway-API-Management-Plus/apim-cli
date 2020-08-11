@@ -175,7 +175,7 @@ public class APIImportConfigAdapter {
 			if(configFile.exists()) return configFile.getCanonicalPath();
 			throw new AppException("Unable to find given Config-File: '"+apiConfigFile+"'", ErrorCode.CANT_READ_CONFIG_FILE);
 		} catch (Exception e) {
-			throw new AppException("Unable to find given Config-File: '"+apiConfigFile+"'", ErrorCode.CANT_READ_CONFIG_FILE);
+			throw new AppException("Unable to find given Config-File: '"+apiConfigFile+"'", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
 	}
 	
