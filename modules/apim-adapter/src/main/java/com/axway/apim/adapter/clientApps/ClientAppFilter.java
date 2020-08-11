@@ -201,13 +201,13 @@ public class ClientAppFilter {
 		for(ClientAppCredential cred : app.getCredentials()) {
 			switch(cred.getCredentialType()) {
 			case "oauth":
-				match = filterCredential(((OAuth)cred).getClientId(), ((OAuth)cred).getRedirectUrls());
+				match = filterCredential(((OAuth)cred).getClientId(), ((OAuth)cred).getRedirectUrls(), app.getName());
 				break;
 			case "extclients":
-				match = filterCredential(((ExtClients)cred).getClientId(), null);
+				match = filterCredential(((ExtClients)cred).getClientId(), null, app.getName());
 				break;
 			case "apikeys":
-				match = filterCredential(((APIKey)cred).getApiKey(), null);
+				match = filterCredential(((APIKey)cred).getApiKey(), null, app.getName());
 				break;
 			}
 			if(match) break;
@@ -215,7 +215,11 @@ public class ClientAppFilter {
 		return match;
 	}
 	
-	private boolean filterCredential(String appCredential, String[] appRedirectUrls) {
+	private boolean filterCredential(String appCredential, String[] appRedirectUrls, String appName) {
+		if(appCredential==null) {
+			LOG.warn("Inconsistent application: '"+appName+"' found. API-Key/Client-ID is NULL for credential.");
+			return false;
+		}
 		if(this.credential!=null) {
 			Pattern pattern = Pattern.compile(this.credential.replace("*", ".*"));
 			Matcher matcher = pattern.matcher(appCredential);

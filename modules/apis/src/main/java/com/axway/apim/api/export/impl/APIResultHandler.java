@@ -22,6 +22,7 @@ import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.lib.APIExportParams;
+import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
@@ -29,6 +30,7 @@ import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 
 public abstract class APIResultHandler {
 
@@ -120,7 +122,12 @@ public abstract class APIResultHandler {
 			InboundProfile profile = it.next();
 			SecurityProfile usedSecProfile = secProfilesMappedByName.get(profile.getSecurityProfile());
 			for(SecurityDevice device : usedSecProfile.getDevices()) {
-				usedSecurity.add(""+device.getType());
+				if(device.getType()==DeviceType.authPolicy) {
+					String authenticationPolicy = device.getProperties().get("authenticationPolicy");
+					usedSecurity.add(Utils.getExternalPolicyName(authenticationPolicy));
+				} else {
+					usedSecurity.add(""+device.getType());
+				}
 			}
 		}
 		String result = usedSecurity.toString().replace("[", "").replace("]", "");

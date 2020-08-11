@@ -25,6 +25,7 @@ import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.api.model.TagMap;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -75,14 +76,6 @@ public class ExportAPI {
 		}
 		return this.actualAPIProxy.getOutboundProfiles();
 	}
-	
-	private static String getExternalPolicyName(String policy) {
-		if(policy.startsWith("<key")) {
-			policy = policy.substring(policy.indexOf("<key type='FilterCircuit'>"));
-			policy = policy.substring(policy.indexOf("value='")+7, policy.lastIndexOf("'/></key>"));
-		}
-		return policy;
-	}
 
 
 	public List<SecurityProfile> getSecurityProfiles() throws AppException {
@@ -97,12 +90,12 @@ public class ExportAPI {
 				if(device.getType().equals(DeviceType.oauthExternal)) {
 					String tokenStore = device.getProperties().get("tokenStore");
 					if(tokenStore!=null) {
-						device.getProperties().put("tokenStore", getExternalPolicyName(tokenStore));
+						device.getProperties().put("tokenStore", Utils.getExternalPolicyName(tokenStore));
 					}
 				} else if(device.getType().equals(DeviceType.authPolicy)) {
 					String authenticationPolicy = device.getProperties().get("authenticationPolicy");
 					if(authenticationPolicy!=null) {
-						device.getProperties().put("authenticationPolicy", getExternalPolicyName(authenticationPolicy));
+						device.getProperties().put("authenticationPolicy", Utils.getExternalPolicyName(authenticationPolicy));
 					}
 				}
 				device.setConvertPolicies(false);

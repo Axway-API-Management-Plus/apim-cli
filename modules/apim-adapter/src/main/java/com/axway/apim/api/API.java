@@ -493,7 +493,6 @@ public class API {
 	 * That means, when an API-Developer is defining ALL as the organization name this flag 
 	 * is set to true and it becomes the desired state.
 	 * This method is used during creation of APIImportDefinition in  APIImportConfig#handleAllOrganizations()
-	 * @see APIImportConfigAdapter
 	 * @param requestForAllOrgs when set to true, the APIs will be granted to ALL organizations.
 	 */
 	public void setRequestForAllOrgs(boolean requestForAllOrgs) {
