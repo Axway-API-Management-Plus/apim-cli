@@ -26,4 +26,13 @@ public class APIImportParams extends CommandParameters {
 		if(getValue("useFEAPIDefinition")==null) return false;
 		return Boolean.parseBoolean(getValue("useFEAPIDefinition"));
 	}
+	
+	public boolean isForceUpdate() {
+		try {
+			if(hasOption("forceUpdate")) {
+				return true;
+			} 
+		} catch (Exception ignore) {}
+		return false;
+	}
 }
