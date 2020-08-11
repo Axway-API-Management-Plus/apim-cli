@@ -51,6 +51,7 @@ import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.Profile;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -352,9 +353,15 @@ public class APIManagerAPIAdapter {
 				}
 				ProfileType profileWithType = profiles.get(key);
 				Profile profile = (Profile)profileWithType;
-				profile.setApiMethodId(method.getId());
-				profile.setApiMethodName(method.getName());
-				profile.setApiId(method.getVirtualizedApiId());
+				if(profile instanceof OutboundProfile) {
+					profile.setApiMethodId(method.getApiMethodId());
+					profile.setApiMethodName(method.getName());
+					profile.setApiId(method.getApiId());
+				} else {
+					profile.setApiMethodId(method.getId());
+					profile.setApiMethodName(method.getName());
+					profile.setApiId(method.getVirtualizedApiId());
+				}
 				if(mode==METHOD_TRANSLATION.AS_NAME) {
 					updatedEntries.put(method.getName(), profileWithType);
 				} else {

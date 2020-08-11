@@ -51,8 +51,8 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 		Map<String, OutboundProfile> outboundProfiles = api.getOutboundProfiles();
 		Assert.assertNotNull(outboundProfiles.get("_default"), "Expected to find default outbound profile");
 		Assert.assertNotNull(outboundProfiles.get("deletePet").getApiMethodId(), "deletePet");
-		Assert.assertEquals(outboundProfiles.get("deletePet").getApiId(), "72745ed9-f75b-428c-959c-b483eea497a1");
-		Assert.assertEquals(outboundProfiles.get("deletePet").getApiMethodId(), "132712e4-c132-4298-bfa0-f6f5c811ad65");
+		Assert.assertEquals(outboundProfiles.get("deletePet").getApiId(), "10f02b84-fa4a-4cb6-a0c9-da6974c77005");
+		Assert.assertEquals(outboundProfiles.get("deletePet").getApiMethodId(), "db89e373-f678-4990-88ca-891e434c34db");
 		Assert.assertEquals(outboundProfiles.get("deletePet").getApiMethodName(), "deletePet");
 		
 		Assert.assertEquals(api.getInboundProfiles().size(), 2);

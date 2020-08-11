@@ -45,7 +45,9 @@ public class OutboundMethodLevelTestIT extends TestNGCitrusTestRunner {
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
 			.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[?(@.name=='${outboundProfileName}')].type", "http_basic")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId")
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].apiId", "backendApiId")
+			);
 		
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}/operations").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
@@ -53,7 +55,9 @@ public class OutboundMethodLevelTestIT extends TestNGCitrusTestRunner {
 		
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.id=='${apiId}')].outboundProfiles.${apiMethodId}.authenticationProfile", "${outboundProfileName}"));
+			.validate("$.[?(@.id=='${apiId}')].outboundProfiles.${apiMethodId}.authenticationProfile", "${outboundProfileName}")
+			.validate("$.[?(@.id=='${apiId}')].outboundProfiles.${apiMethodId}.apiId", "${backendApiId}")
+			);
 		
 		echo("####### Perform a No-Change #######");		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");

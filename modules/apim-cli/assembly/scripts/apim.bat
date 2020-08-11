@@ -19,10 +19,10 @@ SET currentDir=%cd%
 SET programDir=%~dp0
 SET bkpClassPath=%CLASSPATH%
 
-CD %programDir%\..
-SET CLASSPATH=%programDir%..\lib;%programDir%..\conf
+CD "%programDir%\.."
+SET CLASSPATH="%programDir%..\lib";"%programDir%..\conf"
 
-FOR /R ./lib %%a in (*.jar) DO CALL :AddToPath %%a
+FOR /R ./lib %%a in (*.jar) DO CALL :AddToPath "%%a"
 
 GOTO :OkClassPath
 
@@ -37,9 +37,9 @@ GOTO :END
 
 :OkClassPath
 
-CD %currentDir%
+CD "%currentDir%"
 
-%_java% -Xms64m -Xmx256m -Dlog4j.configuration=../lib/log4j.xml -classpath "%CLASSPATH%" com.axway.apim.cli.APIManagerCLI %*
+%_java% -Xms64m -Xmx256m -Dlog4j.configuration=../lib/log4j.xml -classpath %CLASSPATH% com.axway.apim.cli.APIManagerCLI %*
 SET ERRNO=%ERRORLEVEL%
 IF %ERRNO% EQU 10 (
   ECHO "No changes detected. Existing with RC: 0"
