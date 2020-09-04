@@ -14,7 +14,7 @@ public class APIAccess {
 	
 	String state;
 	
-	String createdOn;
+	Long createdOn;
 	
 	String apiName;
 	
@@ -54,11 +54,11 @@ public class APIAccess {
 		this.state = state;
 	}
 
-	public String getCreatedOn() {
+	public Long getCreatedOn() {
 		return createdOn;
 	}
 
-	public void setCreatedOn(String createdOn) {
+	public void setCreatedOn(Long createdOn) {
 		this.createdOn = createdOn;
 	}
 

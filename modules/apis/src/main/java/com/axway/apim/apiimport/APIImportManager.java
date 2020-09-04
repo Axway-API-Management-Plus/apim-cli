@@ -8,6 +8,7 @@ import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.apiimport.actions.RecreateToUpdateAPI;
 import com.axway.apim.apiimport.actions.UpdateExistingAPI;
+import com.axway.apim.apiimport.lib.APIImportParams;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CommandParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -29,7 +30,7 @@ public class APIImportManager {
 	 * @throws AppException is the desired state can't be replicated into the API-Manager.
 	 */
 	public void applyChanges(APIChangeState changeState) throws AppException {
-		CommandParameters commands = CommandParameters.getInstance();
+		APIImportParams commands = APIImportParams.getInstance();
 		if(!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded() ) {
 			if(commands.allowOrgAdminsToPublish()) {
 				LOG.debug("Desired API-State set to published using OrgAdmin account only. Going to create a publish request. "
@@ -47,6 +48,10 @@ public class APIImportManager {
 			CreateNewAPI createAPI = new CreateNewAPI();
 			createAPI.execute(changeState, false);
 		// Otherwise an existing API exists
+		} else if(commands.isForceUpdate()) {
+			LOG.info("Re-Creating API as the ForceUpdate flag is set");
+			RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
+			recreate.execute(changeState);
 		} else {
 			if(!changeState.hasAnyChanges()) {
 				APIPropertiesExport.getInstance().setProperty("feApiId", changeState.getActualAPI().getId());

@@ -69,6 +69,10 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 		option.setRequired(false);
 		option.setArgName("APIDetails.properties");
 		options.addOption(option);
+		
+		option = new Option("forceUpdate", "If set, the API is Re-Created even if the Desired- and Actual-State are equal.");
+		option.setRequired(false);
+		options.addOption(option);
 	}
 
 	@Override
