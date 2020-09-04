@@ -1,6 +1,6 @@
 {
   "name" : "${orgName}",
-  "description" : "Test Org 6425",
+  "description" : "${orgDescription}",
   "restricted" : false,
   "enabled" : true,
   "development" : true,

@@ -309,7 +309,7 @@ public class APIManagerAdapter {
 	
 	private static void getCsrfToken(HttpResponse response, boolean useAdminClient) throws AppException {
 		for (Header header : response.getAllHeaders()) {
-			if(header.getName().equals("CSRF-Token")) {
+			if(header.getName().equalsIgnoreCase("csrf-token")) {
 				APIMHttpClient.getInstance(useAdminClient).setCsrfToken(header.getValue());
 				break;
 			}
