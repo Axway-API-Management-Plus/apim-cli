@@ -21,11 +21,11 @@ Perform the following steps:
     cd apigw-emt-scripts-2.0.0-SNAPSHOT
     ./build_base_image.py --installer=../APIGateway_x.x.x_xxx_Install_linux-x86-64_BNxxxxxx.run --os=centos7
     ./gen_domain_cert.py --default-cert
-    ./build_gw_image.py --license=multiple.lic --default-cert --fed=$HOME/apimanager-swagger-promote/modules/swagger-promote-core/src/test/resources/apimanager/swagger-promote-7.6.2.fed --merge-dir $HOME/apimanager-swagger-promote/modules/swagger-promote-core/src/test/resources/apimanager/merge-dir/apigateway --out-image=api-gw-mgr:7.6.2-SP3
+    ./build_gw_image.py --license=multiple.lic --default-cert --fed=$HOME/apim-cli/modules/apis/src/test/resources/apimanager/swagger-promote-7.6.2.fed --merge-dir $HOME/apim-cli/modules/apis/src/test/resources/apimanager/merge-dir --out-image=api-gw-mgr:7.6.2-SP5
     docker images
-    docker tag api-gw-mgr:7.6.2-SP3 docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP3
+    docker tag api-gw-mgr:7.6.2-SP5 docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP5
     docker login docker-registry.demo.axway.com
-    docker push docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP3
+    docker push docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP5
 ```
 
 ### Added Untrusted Docker-Registry
