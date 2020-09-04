@@ -64,16 +64,30 @@ public class AuthenticationProfile {
 			Map<String, Object> thisParameters = this.getParameters();
 			otherParameters.remove("_id_");
 			thisParameters.remove("_id_");
+			// Passwords are no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
+			Object otherPassword = null;
+			Object thisPassword = null;
 			if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
-				// Password no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
-				otherParameters.remove("password");
-				thisParameters.remove("password");
+				// Empty password handling - Make sure, there is a password set
+				if(!thisParameters.containsKey("password") || thisParameters.get("password")==null) thisParameters.put("password", "");
+				if(!otherParameters.containsKey("password") || otherParameters.get("password")==null) otherParameters.put("password", "");
+				if(otherParameters.containsKey("password")) {
+					otherPassword = otherParameters.get("password");
+					otherParameters.remove("password");
+				}
+				if(thisParameters.containsKey("password")) {
+					thisPassword = thisParameters.get("password");
+					thisParameters.remove("password");
+				}
 			}
 
 			boolean rc = StringUtils.equals(authenticationProfile.getName(), this.getName())
 					&& authenticationProfile.getIsDefault() == this.getIsDefault() 
 					&& StringUtils.equals(authenticationProfile.getType().name(),this.getType().name())
 					&& otherParameters.equals(thisParameters);
+			// Restore that password, that have been removed
+			if(otherPassword!=null) otherParameters.put("password", otherPassword);
+			if(thisPassword!=null) thisParameters.put("password", thisPassword);
 			return rc;
 		} else {
 			return false;

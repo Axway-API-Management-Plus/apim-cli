@@ -19,7 +19,8 @@ public abstract class ApplicationExporter {
 	
 	public enum ExportImpl {
 		JSON_EXPORTER(JsonApplicationExporter.class),
-		CONSOLE_EXPORTER(ConsoleAppExporter.class);
+		CONSOLE_EXPORTER(ConsoleAppExporter.class),
+		CSV_EXPORTER(CSVAppExporter.class);
 		
 		private final Class<ApplicationExporter> implClass;
 		
