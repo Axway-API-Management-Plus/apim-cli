@@ -33,6 +33,10 @@ public class ImportSimpleOrganizationTestIT extends TestNGCitrusTestRunner {
 		
 		variable("orgNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("orgName", "My-Org-${orgNumber}");
+		variable("orgDescription", "A description for my org");
+		// This test must be executed with an Admin-Account as we need to create a new organization
+		variable("oadminUsername1", "apiadmin"); 
+		variable("oadminPassword1", "changeme");
 
 		echo("####### Import organization: '${orgName}' #######");		
 		createVariable(OrganizationImportTestAction.CONFIG,  PACKAGE + "SingleOrganization.json");
@@ -48,6 +52,11 @@ public class ImportSimpleOrganizationTestIT extends TestNGCitrusTestRunner {
 		
 		echo("####### Re-Import same organization - Should be a No-Change #######");
 		createVariable("expectedReturnCode", "10");
+		orgImport.doExecute(context);
+		
+		echo("####### Change the description and import it again #######");
+		variable("orgDescription", "My changed org description");
+		createVariable("expectedReturnCode", "0");
 		orgImport.doExecute(context);
 		
 		echo("####### Export the organization #######");
