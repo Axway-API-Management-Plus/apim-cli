@@ -44,7 +44,7 @@ public class APIMHttpClient {
 	
 	private String csrfToken;
 	
-	public static void deleteInstance() {
+	public static void deleteInstances() {
 		instances = new HashMap<Boolean, APIMHttpClient>();
 	}
 	
