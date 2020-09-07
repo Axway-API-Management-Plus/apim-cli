@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.2.2] 2020-09-09
 ### Added
 - Added new CSV-Export for applications (See issue [#70](https://github.com/Axway-API-Management-Plus/apim-cli/issues/70))
+- Toggle ignoreCache added to the usage (See issue [#52](https://github.com/Axway-API-Management-Plus/apim-cli/issues/52))
+- Added new forceUpdate flag to force re-creation (See issue [#56](https://github.com/Axway-API-Management-Plus/apim-cli/issues/56))
 
 ### Fixed
 - apim.sh now starts the CLI in the current directory (See issue [#60](https://github.com/Axway-API-Management-Plus/apim-cli/issues/60))
@@ -22,8 +24,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - apim.sh & apim.bat script now support path with blanks. Thanks to [@cbrowet-axway](https://github.com/cbrowet-axway)  
 - Handling NPE for Application credential search (See issue [#57](https://github.com/Axway-API-Management-Plus/apim-cli/issues/57))
 - If FE-Security is a Custom-Policy, the name of the Custom-Policy is now exported (See issue [#61](https://github.com/Axway-API-Management-Plus/apim-cli/issues/61))
-- Toggle ignoreCache added to the usage (See issue [#52](https://github.com/Axway-API-Management-Plus/apim-cli/issues/52))
-- Added new forceUpdate flag to force re-creation (See issue [#56](https://github.com/Axway-API-Management-Plus/apim-cli/issues/56))
 
 ## [1.2.1] 2020-07-22
 ### Fixed
