@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Error when updating organization (See issue [#69](https://github.com/Axway-API-Management-Plus/apim-cli/issues/69))
 
 ### Changed
-- Added 7.7-July release to the list of tested releases
+- Added 7.7-July and 7.6.2-SP5 releases to the list of tested releases
 - apim.sh & apim.bat script now support path with blanks. Thanks to [@cbrowet-axway](https://github.com/cbrowet-axway)  
 - Handling NPE for Application credential search (See issue [#57](https://github.com/Axway-API-Management-Plus/apim-cli/issues/57))
 - If FE-Security is a Custom-Policy, the name of the Custom-Policy is now exported (See issue [#61](https://github.com/Axway-API-Management-Plus/apim-cli/issues/61))
