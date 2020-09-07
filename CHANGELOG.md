@@ -5,15 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Added new CSV-Export for applications (See issue [#70](https://github.com/Axway-API-Management-Plus/apim-cli/issues/70))
+
 ### Fixed
 - apim.sh now starts the CLI in the current directory (See issue [#60](https://github.com/Axway-API-Management-Plus/apim-cli/issues/60))
+- ErrorHandling improved when API-Config file can't be found
+- HTTP-Basic Outbound handling fixed, if no password is given
+- CSRF-Token handling improved (See issue [#67](https://github.com/Axway-API-Management-Plus/apim-cli/issues/67))
+- Error when updating organization (See issue [#69](https://github.com/Axway-API-Management-Plus/apim-cli/issues/69))
 
 ### Changed
-- Added 7.7-July release to the list of tested releases
+- Added 7.7-July and 7.6.2-SP5 releases to the list of tested releases
 - apim.sh & apim.bat script now support path with blanks. Thanks to [@cbrowet-axway](https://github.com/cbrowet-axway)  
 - Handling NPE for Application credential search (See issue [#57](https://github.com/Axway-API-Management-Plus/apim-cli/issues/57))
 - If FE-Security is a Custom-Policy, the name of the Custom-Policy is now exported (See issue [#61](https://github.com/Axway-API-Management-Plus/apim-cli/issues/61))
 - Toggle ignoreCache added to the usage (See issue [#52](https://github.com/Axway-API-Management-Plus/apim-cli/issues/52))
+- Added new forceUpdate flag to force re-creation (See issue [#56](https://github.com/Axway-API-Management-Plus/apim-cli/issues/56))
 
 ## [1.2.1] 2020-07-22
 ### Fixed
