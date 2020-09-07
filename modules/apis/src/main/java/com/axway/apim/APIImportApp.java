@@ -54,7 +54,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
-			APIMHttpClient.deleteInstance();
+			APIMHttpClient.deleteInstances();
 			RollbackHandler.deleteInstance();
 			
 			APIImportParams params = new APIImportParams(new APIImportCLIOptions(args));
@@ -63,7 +63,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			
 			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params.getValue("config"), 
-					params.getValue("stage"), params.getValue("apidefinition"), apimAdapter.isUsingOrgAdmin());
+					params.getValue("stage"), params.getValue("apidefinition"), APIManagerAdapter.hasOrgAdmin());
 			// Creates an API-Representation of the desired API
 			API desiredAPI = configAdapter.getDesiredAPI();
 			// 

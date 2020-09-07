@@ -85,7 +85,7 @@ public class UserCLIApp implements APIMCLIServiceProvider {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
-			APIMHttpClient.deleteInstance();
+			APIMHttpClient.deleteInstances();
 			
 			APIManagerAdapter adapter = APIManagerAdapter.getInstance();
 
@@ -132,7 +132,7 @@ public class UserCLIApp implements APIMCLIServiceProvider {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
-			APIMHttpClient.deleteInstance();
+			APIMHttpClient.deleteInstances();
 			
 			UserImportParams params = new UserImportParams(new UserImportCLIOptions(args));
 			APIManagerAdapter.getInstance();
