@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.axway.apim.adapter.APIManagerAdapter;
 
 public class AuthenticationProfile {
-	
+
 	private String name;
 
 	private boolean isDefault;
@@ -85,7 +85,6 @@ public class AuthenticationProfile {
 					&& authenticationProfile.getIsDefault() == this.getIsDefault() 
 					&& StringUtils.equals(authenticationProfile.getType().name(),this.getType().name())
 					&& otherParameters.equals(thisParameters);
-
 			// Restore that password, that have been removed
 			if(otherPassword!=null) otherParameters.put("password", otherPassword);
 			if(thisPassword!=null) thisParameters.put("password", thisPassword);
