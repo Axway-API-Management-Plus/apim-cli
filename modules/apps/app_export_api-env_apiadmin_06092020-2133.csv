@@ -1,0 +1,14 @@
+sep=,
+ID,Organization,Name,Email,Phone,State,Enabled,API-Name,API-Version,Access created by,Access created on
+7c7c26f9-ddd2-4af0-b85e-4409a5b9795e,FHIR,FHIR - Everything Health,,,approved,true,FHIR Appointment,DSTU2,apiadmin,Fri Aug 28 08:51:18 CEST 2020
+7c7c26f9-ddd2-4af0-b85e-4409a5b9795e,FHIR,FHIR - Everything Health,,,approved,true,FHIR CarePlan,DSTU2,apiadmin,Fri Aug 28 08:53:38 CEST 2020
+7c7c26f9-ddd2-4af0-b85e-4409a5b9795e,FHIR,FHIR - Everything Health,,,approved,true,FHIR Condition,DSTU2,apiadmin,Fri Aug 28 08:49:55 CEST 2020
+7c7c26f9-ddd2-4af0-b85e-4409a5b9795e,FHIR,FHIR - Everything Health,,,approved,true,FHIR Device,DSTU2,apiadmin,Fri Aug 28 08:49:56 CEST 2020
+7c7c26f9-ddd2-4af0-b85e-4409a5b9795e,FHIR,FHIR - Everything Health,,,approved,true,FHIR Encounter,DSTU2,apiadmin,Fri Aug 28 08:49:58 CEST 2020
+7c7c26f9-ddd2-4af0-b85e-4409a5b9795e,FHIR,FHIR - Everything Health,,,approved,true,FHIR Location,DSTU2,apiadmin,Fri Aug 28 08:49:59 CEST 2020
+7c7c26f9-ddd2-4af0-b85e-4409a5b9795e,FHIR,FHIR - Everything Health,,,approved,true,FHIR Observation,DSTU2,apiadmin,Fri Aug 28 08:50:02 CEST 2020
+7c7c26f9-ddd2-4af0-b85e-4409a5b9795e,FHIR,FHIR - Everything Health,,,approved,true,FHIR Organization,DSTU2,apiadmin,Fri Aug 28 08:50:03 CEST 2020
+7c7c26f9-ddd2-4af0-b85e-4409a5b9795e,FHIR,FHIR - Everything Health,,,approved,true,FHIR Patient,DSTU2,apiadmin,Fri Aug 28 08:50:07 CEST 2020
+7c7c26f9-ddd2-4af0-b85e-4409a5b9795e,FHIR,FHIR - Everything Health,,,approved,true,FHIR Practitioner,DSTU2,apiadmin,Fri Aug 28 08:50:08 CEST 2020
+7c7c26f9-ddd2-4af0-b85e-4409a5b9795e,FHIR,FHIR - Everything Health,,,approved,true,FHIR Procedure,DSTU2,apiadmin,Fri Aug 28 08:50:10 CEST 2020
+7c7c26f9-ddd2-4af0-b85e-4409a5b9795e,FHIR,FHIR - Everything Health,,,approved,true,FHIR Resource (Any),DSTU2,apiadmin,Fri Aug 28 08:50:11 CEST 2020

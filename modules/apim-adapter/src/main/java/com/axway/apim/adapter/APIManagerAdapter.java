@@ -151,8 +151,8 @@ public class APIManagerAdapter {
 			LOG.debug("Closing cache end");
 		}
 		if(APIManagerAdapter.instance!=null) {
-			APIManagerAdapter.instance.logoutFromAPIManager(false); // Logout potentially logged in OrgAdmin
-			APIManagerAdapter.instance.logoutFromAPIManager(true); // Logout potentially logged in Admin
+			if(hasOrgAdmin()) APIManagerAdapter.instance.logoutFromAPIManager(false); // Logout potentially logged in OrgAdmin
+			if(hasAdminAccount()) APIManagerAdapter.instance.logoutFromAPIManager(true); // Logout potentially logged in Admin
 			APIManagerAdapter.instance = null;
 		}
 		APIManagerAdapter.apiManagerVersion = null;
@@ -245,13 +245,12 @@ public class APIManagerAdapter {
 		}	
 	}
 	
-	public void logoutFromAPIManager(boolean useAdminClient) throws AppException {
-		if(useAdminClient && !hasAdminAccount()) return;
+	public void logoutFromAPIManager(boolean orgAdmin) throws AppException {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/login").build();
-			DELRequest logoutRequest = new DELRequest(uri, useAdminClient);
+			DELRequest logoutRequest = new DELRequest(uri, orgAdmin);
 			httpResponse = logoutRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
@@ -674,8 +673,9 @@ public class APIManagerAdapter {
 	
 	/**
 	 * @return true, if an OrgAdmin is the primary user (additional Admin-Credentials may have provided anyway)
+	 * @throws AppException when the API-Manager instance is not initialized
 	 */
-	public boolean isUsingOrgAdmin() {
-		return usingOrgAdmin;
+	public static boolean hasOrgAdmin() throws AppException {
+		return APIManagerAdapter.getInstance().usingOrgAdmin;
 	}
 }
