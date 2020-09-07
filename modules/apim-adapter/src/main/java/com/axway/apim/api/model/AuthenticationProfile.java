@@ -4,15 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 
 public class AuthenticationProfile {
 	
-	private static Logger LOG = LoggerFactory.getLogger(AuthenticationProfile.class);
-
 	private String name;
 
 	private boolean isDefault;
@@ -72,13 +68,11 @@ public class AuthenticationProfile {
 			Object otherPassword = null;
 			Object thisPassword = null;
 			if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
-				LOG.debug(" #### GWA 1 #### ");
 				// Empty password handling - Make sure, there is a password set
 				if(!thisParameters.containsKey("password") || thisParameters.get("password")==null) thisParameters.put("password", "");
 				if(!otherParameters.containsKey("password") || otherParameters.get("password")==null) otherParameters.put("password", "");
 				if(otherParameters.containsKey("password")) otherPassword = otherParameters.get("password");
 				if(thisParameters.containsKey("password")) thisPassword = thisParameters.get("password");			
-
 				// Keep comparing passwords only if both have values (possible only if com.axway.apimanager.api.model.disable.confidential.fields=false in API Gateway)
 				// If at least one password is missing, skip comparison
 				if ( thisPassword.equals("") || otherPassword.equals("")) {
@@ -91,17 +85,10 @@ public class AuthenticationProfile {
 					&& authenticationProfile.getIsDefault() == this.getIsDefault() 
 					&& StringUtils.equals(authenticationProfile.getType().name(),this.getType().name())
 					&& otherParameters.equals(thisParameters);
-			LOG.debug(" RC = " + rc);
+
 			// Restore that password, that have been removed
-			if(otherPassword!=null) {
-				LOG.debug("otherPassword = " + otherPassword);
-				otherParameters.put("password", otherPassword);
-			}
-			if(thisPassword!=null) {
-				LOG.debug("thisPassword = " + thisPassword);
-				thisParameters.put("password", thisPassword);
-			}
-				
+			if(otherPassword!=null) otherParameters.put("password", otherPassword);
+			if(thisPassword!=null) thisParameters.put("password", thisPassword);
 			return rc;
 		} else {
 			return false;
