@@ -56,6 +56,8 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 				return runExport(params, ExportImpl.CONSOLE_EXPORTER);
 			case json:
 				return runExport(params, ExportImpl.JSON_EXPORTER);
+			case csv:
+				return runExport(params, ExportImpl.CSV_EXPORTER);
 			default:
 				return runExport(params, ExportImpl.CONSOLE_EXPORTER);
 			}
@@ -80,7 +82,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
-			APIMHttpClient.deleteInstance();
+			APIMHttpClient.deleteInstances();
 
 			APIMgrAppsAdapter appAdapter = new APIMgrAppsAdapter();
 			ApplicationExporter exporter = ApplicationExporter.create(exportImpl, params);

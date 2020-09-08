@@ -122,12 +122,15 @@ public class APIManagerOrganizationAdapter {
 		try {
 			URI uri;
 			if(actualOrg==null) {
+				if(!APIManagerAdapter.hasAdminAccount()) {
+					throw new AppException("Admin account is required to create a new organization", ErrorCode.NO_ADMIN_ROLE_USER);
+				}
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations").build();
 			} else {
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/"+actualOrg.getId()).build();
 			}
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image"}));
+					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image", "createdOn"}));
 			mapper.setFilterProvider(filter);
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			try {
@@ -137,6 +140,7 @@ public class APIManagerOrganizationAdapter {
 					HttpEntity entity = new StringEntity(json);
 					request = new POSTRequest(entity, uri, true);
 				} else {
+					desiredOrg.setId(actualOrg.getId());
 					String json = mapper.writeValueAsString(desiredOrg);
 					HttpEntity entity = new StringEntity(json);
 					request = new PUTRequest(entity, uri, true);

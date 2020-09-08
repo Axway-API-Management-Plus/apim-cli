@@ -55,10 +55,14 @@ public class Swagger2xSpecification extends APISpecification {
 					}
 				}
 				if(url.getPath()!=null && !url.getPath().equals("")) {
-					if(swagger.get("basePath").asText().equals(url.getPath())) {
+					if(swagger.get("basePath")!=null && swagger.get("basePath").asText().equals(url.getPath())) {
 						LOG.debug("Swagger basePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasepath: '"+url.getPath()+"'. Nothing to do.");
 					} else {
-						LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.getPath()+"' based on configured backendBasepath: '"+this.backendBasepath+"'");
+						if(swagger.get("basePath")!=null) {
+							LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.getPath()+"' based on configured backendBasepath: '"+this.backendBasepath+"'");
+						} else {
+							LOG.debug("Setup basePath in Swagger-File to '"+url.getPath()+"' based on configured backendBasepath: '"+this.backendBasepath+"'");
+						}
 						backendBasepathAdjusted = true;
 						((ObjectNode)swagger).put("basePath", url.getPath());
 					}

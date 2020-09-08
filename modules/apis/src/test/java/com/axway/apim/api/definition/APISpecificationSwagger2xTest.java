@@ -29,6 +29,21 @@ public class APISpecificationSwagger2xTest {
 	}
 	
 	@Test
+	public void testAirportsAPI() throws AppException, IOException {
+
+		byte[] content = getSwaggerContent("/api_definition_1/airports_swagger_20.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "airports_swagger_20.json", "https://myhost.customer.com:8767/api/v1/myAPI", "Test-API");
+		
+		// Check if the Swagger-File has been changed
+		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
+		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
+		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com:8767");
+		Assert.assertEquals(swagger.get("basePath").asText(), "/api/v1/myAPI");
+		Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
+		Assert.assertEquals(swagger.get("schemes").size(), 1);
+	}
+	
+	@Test
 	public void backendHostAndBasePath() throws AppException, IOException {
 
 		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
