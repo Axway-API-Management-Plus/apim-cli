@@ -461,7 +461,7 @@ public class APIManagerAPIAdapter {
 			api.setApplications(apps);
 		} else {
 			apps = APIManagerAdapter.getInstance().appAdapter.getApplications(new ClientAppFilter.Builder()
-					.includeQuotas(filter.isIncludeClientAppQuota())
+					.includeQuotas(filter.isIncludeClientAppQuota()).includeOauthResources(true)
 					.build(), false);
 			for(ClientApplication app : apps) {
 				List<APIAccess> APIAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app, APIManagerAPIAccessAdapter.Type.applications, true);
