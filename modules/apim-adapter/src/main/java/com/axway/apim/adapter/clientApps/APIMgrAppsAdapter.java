@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -29,6 +30,7 @@ import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
+import com.axway.apim.api.model.apps.ClientAppOauthResource;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.ExtClients;
 import com.axway.apim.api.model.apps.OAuth;
@@ -136,6 +138,7 @@ public class APIMgrAppsAdapter {
 					app.setAppQuota(APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(app.getId(), null));
 				}
 				addApplicationCredentials(app, filter.isIncludeCredentials());
+				addOauthResources(app,filter.isIncludeOauthResources());
 				addAPIAccess(app, filter.isIncludeAPIAccess());
 				if(!filter.filter(app)) continue;
 				filteredApps.add(app);
@@ -148,7 +151,7 @@ public class APIMgrAppsAdapter {
 
 		return filteredApps;
 	}
-	
+
 	public List<ClientApplication> getAllApplications(boolean logProgress) throws AppException {
 		return getApplications(new ClientAppFilter.Builder().build(), logProgress);
 	}
@@ -251,6 +254,38 @@ public class APIMgrAppsAdapter {
 		}
 	}
 	
+	private void addOauthResources(ClientApplication app, boolean includeOauthResources) throws AppException {
+		if(!includeOauthResources) return;
+		URI uri;
+		HttpResponse httpResponse = null;
+		String response;
+		List<ClientAppOauthResource> oauthResources;
+		String endpoint = "oauthresource";
+
+			try {
+					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+endpoint)
+							.build();
+					RestAPICall getRequest = new GETRequest(uri);
+					httpResponse = getRequest.execute();
+					response = EntityUtils.toString(httpResponse.getEntity());
+					int statusCode = httpResponse.getStatusLine().getStatusCode();
+					if(statusCode != 200){
+						LOG.error("Error reading application oauth resources. Response-Code: "+statusCode+". Got response: '"+response+"'");
+						throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+					}
+					TypeReference classType = new TypeReference<List<ClientAppOauthResource>>() {};
+					oauthResources = mapper.readValue(response, classType);
+					app.getOauthResources().addAll(oauthResources);
+			} catch (Exception e) {
+				throw new AppException("Error reading application oauth resources.", ErrorCode.CANT_CREATE_API_PROXY, e);
+			} finally {
+				try {
+					((CloseableHttpResponse)httpResponse).close();
+				} catch (Exception ignore) { }
+			}
+		
+	}
+	
 	void addAPIAccess(ClientApplication app, boolean addAPIAccess) throws Exception {
 		if(!addAPIAccess) return;
 		try {
@@ -302,14 +337,14 @@ public class APIMgrAppsAdapter {
 				RestAPICall request;
 				if(actualApp==null) {
 					FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-							SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentials", "appQuota", "organization", "image"}));
+							SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentials", "appQuota", "organization", "image","oauthResources"}));
 					mapper.setFilterProvider(filter);
 					String json = mapper.writeValueAsString(desiredApp);
 					HttpEntity entity = new StringEntity(json);
 					request = new POSTRequest(entity, uri);
 				} else {
 					FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-							SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentials", "appQuota", "organization", "image", "apis"}));
+							SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentials", "appQuota", "organization", "image", "apis","oauthResources"}));
 					mapper.setFilterProvider(filter);
 					String json = mapper.writeValueAsString(desiredApp);
 					HttpEntity entity = new StringEntity(json);
@@ -335,6 +370,7 @@ public class APIMgrAppsAdapter {
 			saveImage(desiredApp, actualApp);
 			saveAPIAccess(desiredApp, actualApp);
 			saveCredentials(desiredApp, actualApp);
+			saveOauthResources(desiredApp, actualApp);
 			saveQuota(desiredApp, actualApp);
 			return createdApp;
 
@@ -373,6 +409,7 @@ public class APIMgrAppsAdapter {
 		String endpoint = "";
 		HttpResponse httpResponse = null;
 		for(ClientAppCredential cred : app.getCredentials()) {
+			
 			if(actualApp!=null && actualApp.getCredentials().contains(cred)) continue;
 			if(cred instanceof OAuth) {
 				endpoint = "oauth";
@@ -457,6 +494,58 @@ public class APIMgrAppsAdapter {
 		accessAdapter.saveAPIAccess(app.getApiAccess(), app, Type.applications);
 	}
 	
+	private void saveOauthResources(ClientApplication desiredApp, ClientApplication actualApp) throws AppException {
+		if(desiredApp.getOauthResources()==null || desiredApp.getOauthResources().size()==0) return;
+
+		HttpResponse httpResponse = null;
+		for(ClientAppOauthResource res : desiredApp.getOauthResources()) {
+			String endpoint = "oauthresource";
+			if(actualApp!=null && actualApp.getOauthResources().contains(res)) //nothing to do
+				continue;
+			
+			try {
+				boolean update = false;
+				if (actualApp!=null && actualApp.getOauthResources()!=null) {
+					Optional<ClientAppOauthResource> opt = actualApp.getOauthResources().stream().filter(o -> o.getScope().equals(res.getScope())).findFirst();
+					if (opt.isPresent()) {
+					//I found an oauth resource with same scope name but different in some properties, I have to update it		
+						String oauthResourceId = opt.get().getId();
+						endpoint += "/"+oauthResourceId;
+						res.setId(oauthResourceId);
+						res.setApplicationId(opt.get().getApplicationId());
+						res.setUriprefix(opt.get().getUriprefix());
+						update = true;
+						LOG.debug("Oauth resource already exists, updating");
+					} else {
+						LOG.debug("Oauth resource not found, creating");
+					}
+				} else {
+					LOG.debug("Oauth resource not found, creating");
+				}
+				FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] { "scopes","enabled" }));
+				mapper.setFilterProvider(filter);
+				mapper.setSerializationInclusion(Include.NON_NULL);
+				String json = mapper.writeValueAsString(res);
+				HttpEntity entity = new StringEntity(json);
+				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+desiredApp.getId()+"/"+endpoint).build();
+				RestAPICall request = (update ? new PUTRequest(entity,uri) : new POSTRequest(entity, uri));
+				request.setContentType("application/json");
+				httpResponse = request.execute();
+				int statusCode = httpResponse.getStatusLine().getStatusCode();
+				if(statusCode < 200 || statusCode > 299){
+					LOG.error("Error saving/updating application oauth resource. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+					throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+				}
+			} catch (Exception e) {
+				throw new AppException("Error creating application", ErrorCode.CANT_CREATE_API_PROXY, e);
+			} finally {
+				try {
+					((CloseableHttpResponse)httpResponse).close();
+				} catch (Exception ignore) { }
+			}
+		}
+	}	
 	
 	
 	public void setTestApiManagerResponse(ClientAppFilter filter, String apiManagerResponse) {

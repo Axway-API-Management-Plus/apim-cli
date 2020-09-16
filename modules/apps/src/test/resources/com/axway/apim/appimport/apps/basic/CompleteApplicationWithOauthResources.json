@@ -1,0 +1,28 @@
+{
+  "name" : "${appName}",
+  "organization" : "${orgName}",
+  "description" : "${description}",
+  "state" : "${state}",
+  "image" : "${appImage}",
+  "enabled" : true,
+  "email" : "${email}",
+  "phone" : "${phone}",
+  "credentials" : [ {
+    "credentialType" : "oauth",
+    "enabled" : true,
+    "secret" : "9cb76d80-1bc2-48d3-8d31-edeec0fddf6c",
+    "corsOrigins" : [ ],
+    "cert" : "app-oauth-cert.crt",
+    "type" : "confidential",
+    "clientId" : "ClientConfidentialApp-${appNumber}",
+    "redirectUrls" : [ "https://localhost:8088/client/apigateway/callback", "https://oauthclient:8088/client/apigateway/callback" ]
+  }],
+  "oauthResources" : [{
+	  "scope": "${scope1}",
+	  "isDefault": ${isDefault1}  
+	  },
+	  {
+		  "scope": "${scope2}",
+		  "isDefault": ${isDefault2}    }
+	  ]
+}
