@@ -220,6 +220,7 @@ public class APIManagerOrganizationAdapter {
 		readOrgsFromAPIManager(filter);
 		try {
 			List<Organization> allOrgs = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<Organization>>(){});
+			allOrgs.removeIf(org -> filter.filter(org));
 			for(int i=0; i<allOrgs.size();i++) {
 				Organization org = allOrgs.get(i);
 				addImage(org, filter.isIncludeImage());
