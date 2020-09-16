@@ -411,19 +411,24 @@ public class APIMgrAppsAdapter {
 		for(ClientAppCredential cred : app.getCredentials()) {
 			
 			if(actualApp!=null && actualApp.getCredentials().contains(cred)) continue;
+			FilterProvider filter;
 			if(cred instanceof OAuth) {
 				endpoint = "oauth";
+				filter = new SimpleFilterProvider().setDefaultFilter(
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "clientId", "apiKey"}));
 			} else if (cred instanceof ExtClients) {
 				endpoint = "extclients";
+				filter = new SimpleFilterProvider().setDefaultFilter(
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "apiKey"}));
 			} else if (cred instanceof APIKey) {
 				endpoint = "apikeys";
+				filter = new SimpleFilterProvider().setDefaultFilter(
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "clientId", "apiKey"}));
 			} else {
 				throw new AppException("Unsupported credential: " + cred.getClass().getName(), ErrorCode.UNXPECTED_ERROR);
 			}
 			try {
 				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/"+endpoint).build();
-				FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "clientId", "apiKey"}));
 				mapper.setFilterProvider(filter);
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				String json = mapper.writeValueAsString(cred);
