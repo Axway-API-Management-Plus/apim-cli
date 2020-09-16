@@ -6,6 +6,9 @@ import java.util.Map;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.axway.apim.api.model.Organization;
+import com.axway.apim.lib.errorHandling.AppException;
+
 public class OrgFilterTest {
 	@Test
 	public void emptyOrgFilter() {
@@ -121,12 +124,26 @@ public class OrgFilterTest {
 	@Test
 	public void filterOrgEnabledTrue() {
 		OrgFilter filter = new OrgFilter.Builder()
-				.inEnabled(true)
+				.isEnabled(true)
 				.build();
 		Assert.assertEquals(filter.getFilters().size(), 3);
 		Assert.assertEquals(filter.getFilters().get(0).getValue(), "enabled");
 		Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
 		Assert.assertEquals(filter.getFilters().get(2).getValue(), "enabled");
+	}
+	
+	@Test
+	public void testFilterOrgDevelopment() throws AppException {
+		OrgFilter orgFilter = new OrgFilter.Builder()
+				.hasDevelopment("true")
+				.build();
+		Organization testOrg = new Organization();
+		testOrg.setDevelopment(false);
+		Assert.assertTrue(orgFilter.filter(testOrg), "This organization should be filtered as it's a non dev org");
+
+		// Switch organization to be a development organization
+		testOrg.setDevelopment(true);
+		Assert.assertFalse(orgFilter.filter(testOrg), "A development organization should stay.");
 	}
 	
 	@Test

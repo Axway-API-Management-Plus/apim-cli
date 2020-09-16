@@ -141,6 +141,7 @@ public class APIManagerOrganizationAdapter {
 					request = new POSTRequest(entity, uri, true);
 				} else {
 					desiredOrg.setId(actualOrg.getId());
+					if (desiredOrg.getDn()==null) desiredOrg.setDn(actualOrg.getDn());
 					String json = mapper.writeValueAsString(desiredOrg);
 					HttpEntity entity = new StringEntity(json);
 					request = new PUTRequest(entity, uri, true);
@@ -219,6 +220,7 @@ public class APIManagerOrganizationAdapter {
 		readOrgsFromAPIManager(filter);
 		try {
 			List<Organization> allOrgs = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<Organization>>(){});
+			allOrgs.removeIf(org -> filter.filter(org));
 			for(int i=0; i<allOrgs.size();i++) {
 				Organization org = allOrgs.get(i);
 				addImage(org, filter.isIncludeImage());
