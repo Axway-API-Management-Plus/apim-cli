@@ -62,7 +62,8 @@ public abstract class OrgResultHandler {
 	
 	protected Builder getBaseOrgFilterBuilder() {
 		Builder builder = new OrgFilter.Builder()
-				.hasApiId(params.getValue("id"))
+				.hasId(params.getValue("id"))
+				.hasDevelopment(params.getDev())
 				.hasName(params.getValue("name"));
 		return builder;
 	}

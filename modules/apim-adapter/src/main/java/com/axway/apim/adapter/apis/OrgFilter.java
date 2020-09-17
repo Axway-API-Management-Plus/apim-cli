@@ -7,6 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.axway.apim.api.model.Organization;
+
 public class OrgFilter {
 
 	private String id;
@@ -16,7 +18,7 @@ public class OrgFilter {
 	boolean enabled;
 	String name;
 	String phone;
-	
+	String development;
 	boolean includeImage;
 
 	private List<NameValuePair> filters = new ArrayList<NameValuePair>();
@@ -101,6 +103,14 @@ public class OrgFilter {
 		return enabled;
 	}
 	
+	public void setDevelopment(String development) {
+		this.development = development;
+	}
+	
+	public String getDevelopment() {
+		return development;
+	}
+	
 	public boolean isIncludeImage() {
 		return includeImage;
 	}
@@ -131,6 +141,13 @@ public class OrgFilter {
 	public String toString() {
 		return "OrgFilter [name=" + name + ", id=" + id + "]";
 	}
+	
+	public boolean filter(Organization org) {
+		if(this.development!=null && Boolean.parseBoolean(this.development)!=org.isDevelopment()) { 
+			return true;
+		}
+		return false;
+	}
 
 
 	/**
@@ -145,6 +162,7 @@ public class OrgFilter {
 		boolean enabled;
 		String name;
 		String phone;
+		String development;
 		
 		boolean includeImage;
 
@@ -164,6 +182,7 @@ public class OrgFilter {
 			filter.setName(this.name);
 			filter.setPhone(this.phone);
 			filter.includeImage = this.includeImage;
+			filter.setDevelopment(this.development);
 			return filter;
 		}
 
@@ -197,8 +216,13 @@ public class OrgFilter {
 			return this;
 		}
 
-		public Builder inEnabled(boolean enabled) {
+		public Builder isEnabled(boolean enabled) {
 			this.enabled = enabled;
+			return this;
+		}
+		
+		public Builder hasDevelopment(String development) {
+			this.development = development;
 			return this;
 		}
 		
