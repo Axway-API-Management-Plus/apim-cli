@@ -64,6 +64,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 						.includeCredentials(true)
 						.includeImage(true)
 						.includeQuotas(true)
+						.includeOauthResources(true)
 						.hasName(desiredApp.getName())
 						.build());
 				importManager.setDesiredApp(desiredApp);

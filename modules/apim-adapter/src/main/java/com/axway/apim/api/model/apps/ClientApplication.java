@@ -1,9 +1,14 @@
 package com.axway.apim.api.model.apps;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ehcache.core.util.CollectionUtil;
 
 import com.axway.apim.adapter.jackson.APIAccessSerializer;
 import com.axway.apim.adapter.jackson.OrganizationDeserializer;
@@ -20,6 +25,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+/**
+ * @author ADMIN
+ *
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("ApplicationFilter")
 public class ClientApplication extends AbstractEntity {
@@ -46,6 +55,8 @@ public class ClientApplication extends AbstractEntity {
 	private List<ClientAppCredential> credentials = new ArrayList<ClientAppCredential>(); 
 	
 	private APIQuota appQuota;
+	
+	private List<ClientAppOauthResource> oauthResources = new ArrayList<ClientAppOauthResource>();
 	
 	@JsonDeserialize( using = OrganizationDeserializer.class)
 	@JsonAlias({ "organization", "organizationId" })	
@@ -143,6 +154,15 @@ public class ClientApplication extends AbstractEntity {
 	public void setCredentials(List<ClientAppCredential> credentials) {
 		this.credentials = credentials;
 	}
+	
+	public List<ClientAppOauthResource> getOauthResources() {
+		return oauthResources;
+	}
+
+	public void setOauthResources(List<ClientAppOauthResource> oauthResources) {
+		this.oauthResources = oauthResources;
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
@@ -155,6 +175,7 @@ public class ClientApplication extends AbstractEntity {
 					StringUtils.equals(otherApp.getPhone(), this.getPhone()) &&
 					StringUtils.equals(otherApp.getState(), this.getState()) &&
 					(otherApp.getCredentials()==null || otherApp.getCredentials().equals(this.getCredentials())) &&
+					(otherApp.getOauthResources()==null || otherApp.getOauthResources().stream().sorted(Comparator.comparing(ClientAppOauthResource::getScope)).collect(Collectors.toList()).equals(this.getOauthResources().stream().sorted(Comparator.comparing(ClientAppOauthResource::getScope)).collect(Collectors.toList()))) &&
 					(otherApp.getImage()==null || otherApp.getImage().equals(this.getImage()))
 					;
 		}
