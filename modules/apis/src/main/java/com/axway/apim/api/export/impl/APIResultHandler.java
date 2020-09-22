@@ -92,6 +92,7 @@ public abstract class APIResultHandler {
 				.hasPolicyName(params.getPolicy())
 				.hasId(params.getId())
 				.hasName(params.getName())
+				.hasTag(params.getTag())
 				.hasState(params.getState())
 				.hasBackendBasepath(params.getBackend())
 				.includeCustomProperties(APIManagerAdapter.getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE.api))

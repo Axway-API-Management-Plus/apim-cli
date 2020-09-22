@@ -523,8 +523,7 @@ public class APIFilter {
 					if(getTag().contains("=")) break;
 				} else {
 					// Filter match on the group
-					match = true;
-					break; // No need to go further, as we have a match
+					if(!getTag().contains("=")) match = true;
 				}
 				String[] tagValues = api.getTags().get(tagGroup);
 				for(String tagValue : tagValues) {

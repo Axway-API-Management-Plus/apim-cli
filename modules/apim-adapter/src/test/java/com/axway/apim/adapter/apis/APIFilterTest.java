@@ -252,7 +252,7 @@ public class APIFilterTest {
 		tags.put("group1", new String[] {"tagValue1", "tagValue2"});
 		tags.put("group2", new String[] {"tagValue3", "tagValue4"});
 		testAPI.setTags(tags);
-		
+
 		APIFilter filter = new APIFilter.Builder().hasTag("*tagValue3*").build();
 		assertTrue(filter.filter(testAPI), "API must match to pattern '*TAGValue3*'");
 		
@@ -271,6 +271,9 @@ public class APIFilterTest {
 		
 		filter = new APIFilter.Builder().hasTag("GROUP2=*VALUE2").build();
 		assertFalse(filter.filter(testAPI), "API must NOT match to pattern 'GROUP2=*VALUE2'");
+		
+		filter = new APIFilter.Builder().hasTag("GROUP1=*VALUE3").build();
+		assertFalse(filter.filter(testAPI), "API must NOT match to pattern 'GROUP1=*VALUE3'");
 	}
 	
 	@Test

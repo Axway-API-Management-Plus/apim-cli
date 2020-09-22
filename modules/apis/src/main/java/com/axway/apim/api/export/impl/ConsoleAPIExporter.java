@@ -163,7 +163,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	}
 	
 	private boolean hasTags(API api) {
-		return (api.getTags()!=null);
+		return (api.getTags()!=null && api.getTags().size()!=0);
 	}
 	
 	private String getOrgCount(API api) {
