@@ -19,14 +19,14 @@ import com.axway.apim.lib.utils.TestIndicator;
 public class APIMgrAppsAdapterTest {
 	
 	private String testHostname = "api-manager-host";
-	private String testPort = "8088";
+	private int testPort = 8088;
 	
 	@BeforeClass
 	private void initTestIndicator() {
 		TestIndicator.getInstance().setTestRunning(true);
 		CoreParameters params = new CoreParameters();
 		params.setHostname(testHostname);
-		params.setHostname(testPort);
+		params.setPort(testPort);
 	}
 	
 	@Test
