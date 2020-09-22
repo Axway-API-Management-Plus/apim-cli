@@ -55,13 +55,13 @@ public class CoreParameters {
 	
 	private String password;
 	
-	private boolean ignoreAdminAccount = false;
+	private Boolean ignoreAdminAccount = false;
 	
-	private boolean allowOrgAdminsToPublish = true;
+	private Boolean allowOrgAdminsToPublish = true;
 	
-	private boolean force;
+	private Boolean force;
 	
-	private boolean ignoreQuotas;
+	private Boolean ignoreQuotas;
 	
 	private String quotaMode = MODE_ADD;
 	private String clientAppsMode = MODE_ADD;
@@ -69,13 +69,13 @@ public class CoreParameters {
 	
 	private String detailsExportFile;
 	
-	private boolean replaceHostInSwagger = true;
+	private Boolean replaceHostInSwagger = true;
 	
-	private boolean rollback = false;
+	private Boolean rollback = false;
 	
 	private String confDir;
 	
-	private boolean ignoreCache = false;
+	private Boolean ignoreCache = false;
 	
 	private String apimCLIHome;
 	
@@ -178,19 +178,21 @@ public class CoreParameters {
 		this.adminPassword = adminPassword;
 	}
 	
-	public boolean isForce() {
+	public Boolean isForce() {
 		return force;
 	}
 
-	public void setForce(boolean force) {
+	public void setForce(Boolean force) {
+		if(force==null) return;
 		this.force = force;
 	}
 
-	public void setIgnoreQuotas(boolean ignoreQuotas) {
+	public void setIgnoreQuotas(Boolean ignoreQuotas) {
+		if(ignoreQuotas==null) return;
 		this.ignoreQuotas = ignoreQuotas;
 	}
 	
-	public boolean isIgnoreQuotas() {
+	public Boolean isIgnoreQuotas() {
 		return ignoreQuotas;
 	}
 
@@ -202,7 +204,7 @@ public class CoreParameters {
 		this.quotaMode = quotaMode;
 	}
 
-	public boolean isIgnoreClientApps() {
+	public Boolean isIgnoreClientApps() {
 		if(clientAppsMode.equals(MODE_IGNORE)) return true;
 		return false;
 	}
@@ -216,7 +218,7 @@ public class CoreParameters {
 		this.clientAppsMode = clientAppsMode;
 	}
 
-	public boolean isIgnoreClientOrgs() {
+	public Boolean isIgnoreClientOrgs() {
 		if(getClientOrgsMode().equals(MODE_IGNORE)) return true;
 		return false;
 	}
@@ -234,19 +236,21 @@ public class CoreParameters {
 		return "https://"+this.getHostname()+":"+this.getPort();
 	}
 	
-	public boolean isIgnoreAdminAccount() {
+	public Boolean isIgnoreAdminAccount() {
 		return ignoreAdminAccount;
 	}
 
-	public void setIgnoreAdminAccount(boolean ignoreAdminAccount) {
+	public void setIgnoreAdminAccount(Boolean ignoreAdminAccount) {
+		if(ignoreAdminAccount==null)
 		this.ignoreAdminAccount = ignoreAdminAccount;
 	}
 	
-	public boolean isAllowOrgAdminsToPublish() {
+	public Boolean isAllowOrgAdminsToPublish() {
 		return allowOrgAdminsToPublish;
 	}
 
-	public void setAllowOrgAdminsToPublish(boolean allowOrgAdminsToPublish) {
+	public void setAllowOrgAdminsToPublish(Boolean allowOrgAdminsToPublish) {
+		if(allowOrgAdminsToPublish==null) return;
 		this.allowOrgAdminsToPublish = allowOrgAdminsToPublish;
 	}
 	
@@ -262,7 +266,8 @@ public class CoreParameters {
 		return replaceHostInSwagger;
 	}
 
-	public void setReplaceHostInSwagger(boolean replaceHostInSwagger) {
+	public void setReplaceHostInSwagger(Boolean replaceHostInSwagger) {
+		if(replaceHostInSwagger==null) return;
 		this.replaceHostInSwagger = replaceHostInSwagger;
 	}
 	
@@ -286,7 +291,8 @@ public class CoreParameters {
 		return ignoreCache;
 	}
 
-	public void setIgnoreCache(boolean ignoreCache) {
+	public void setIgnoreCache(Boolean ignoreCache) {
+		if(ignoreCache==null) return;
 		this.ignoreCache = ignoreCache;
 	}
 

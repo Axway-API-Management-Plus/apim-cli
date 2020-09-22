@@ -50,7 +50,7 @@ public class UserCLIOptionsTest {
 		Assert.assertEquals(params.getOrg(), "*Partner*");
 		Assert.assertEquals(params.getRole(), "oadmin");
 		Assert.assertEquals(params.getState(), "pending");
-		Assert.assertEquals(params.isEnabled(), false);
+		Assert.assertFalse(params.isEnabled());
 	}
 	
 	
