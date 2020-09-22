@@ -84,8 +84,7 @@ public class UserExportParams extends StandardExportParams {
 	}
 
 	public Boolean isEnabled() {
-		if(enabled==null) return false;
-		return enabled.booleanValue();
+		return enabled;
 	}
 
 	public void setEnabled(Boolean enabled) {

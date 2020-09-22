@@ -59,7 +59,7 @@ public class UserCLIOptionsTest {
 		String[] args = {"-s", "prod"};
 		UserExportCLIOptions options = new UserExportCLIOptions(args);
 		UserExportParams params = options.getUserExportParams();
-		Assert.assertTrue(params.isEnabled(), "Enabled must be true, as it's not given!");
+		Assert.assertNull(params.isEnabled(), "Should be null, if not given");
 	}
 
 }
