@@ -12,7 +12,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.api.API;
-import com.axway.apim.api.state.APIChangeState;
+import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.apiimport.lib.APIImportCLIOptions;
@@ -57,13 +57,13 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			APIMHttpClient.deleteInstances();
 			RollbackHandler.deleteInstance();
 			
-			APIImportParams params = new APIImportParams(new APIImportCLIOptions(args));
-			errorCodeMapper.setMapConfiguration(params.getValue("returnCodeMapping"));
+			APIImportParams params = new APIImportCLIOptions(args).getAPIImportParams();
+			errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			
-			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params.getValue("config"), 
-					params.getValue("stage"), params.getValue("apidefinition"), APIManagerAdapter.hasOrgAdmin());
+			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params.getConfig(), 
+					params.getStage(), params.getApiDefintion(), APIManagerAdapter.hasOrgAdmin());
 			// Creates an API-Representation of the desired API
 			API desiredAPI = configAdapter.getDesiredAPI();
 			// 

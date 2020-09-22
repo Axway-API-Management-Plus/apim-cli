@@ -5,6 +5,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
 import com.axway.apim.lib.StandardExportCLIOptions;
+import com.axway.apim.lib.errorHandling.AppException;
 
 public class UserExportCLIOptions extends StandardExportCLIOptions {
 
@@ -81,5 +82,20 @@ public class UserExportCLIOptions extends StandardExportCLIOptions {
 	@Override
 	protected String getAppName() {
 		return "Application-Export";
+	}
+	
+	public UserExportParams getUserExportParams() throws AppException {
+		UserExportParams params = new UserExportParams();
+		super.addStandardExportParameters(params);
+		params.setId(getValue("id"));
+		params.setLoginName(getValue("loginName"));
+		params.setName(getValue("name"));
+		params.setEmail(getValue("email"));
+		params.setType(getValue("type"));
+		params.setOrg(getValue("org"));
+		params.setRole(getValue("role"));
+		params.setState(getValue("state"));
+		params.setEnabled(Boolean.parseBoolean(getValue("enabled")));
+		return params;
 	}
 }

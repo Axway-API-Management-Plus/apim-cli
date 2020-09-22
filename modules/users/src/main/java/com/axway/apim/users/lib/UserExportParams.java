@@ -1,55 +1,93 @@
 package com.axway.apim.users.lib;
 
-import com.axway.apim.lib.APIMCoreCLIOptions;
-import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.EnvironmentProperties;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.StandardExportParams;
-import com.axway.apim.lib.errorHandling.AppException;
 
 public class UserExportParams extends StandardExportParams {
-
-	public UserExportParams(APIMCoreCLIOptions parser)
-			throws AppException {
-		super(parser.getCmd(), parser.getInternalCmd(), new EnvironmentProperties(parser.getCmd().getOptionValue("stage"), parser.getCmd().getOptionValue("swaggerPromoteHome")));
-	}
+	
+	private String loginName;
+	private String name;
+	private String email;
+	private String id;
+	private String org;
+	private String type;
+	private String role;
+	private String state;
+	private boolean enabled;
 	
 	public static synchronized UserExportParams getInstance() {
-		return (UserExportParams)CommandParameters.getInstance();
+		return (UserExportParams)CoreParameters.getInstance();
 	}
-	
+
 	public String getLoginName() {
-		return getValue("loginName");
+		return loginName;
 	}
-	
+
+	public void setLoginName(String loginName) {
+		this.loginName = loginName;
+	}
+
 	public String getName() {
-		return getValue("name");
+		return name;
 	}
-	
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public String getEmail() {
-		return getValue("email");
+		return email;
 	}
-	
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	public String getId() {
-		return getValue("id");
+		return id;
 	}
-	
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public String getOrg() {
-		return getValue("org");
+		return org;
 	}
-	
+
+	public void setOrg(String org) {
+		this.org = org;
+	}
+
 	public String getType() {
-		return getValue("type");
+		return type;
 	}
-	
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	public String getRole() {
-		return getValue("role");
+		return role;
 	}
-	
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
 	public String getState() {
-		return getValue("state");
+		return state;
 	}
-	
-	public String isEnabled() {
-		return getValue("enabled");
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 }

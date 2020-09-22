@@ -4,9 +4,10 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
-import com.axway.apim.lib.APIMCoreCLIOptions;
+import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.errorHandling.AppException;
 
-public class APIImportCLIOptions extends APIMCoreCLIOptions {
+public class APIImportCLIOptions extends CoreCLIOptions {
 
 	CommandLine cmd;
 
@@ -97,6 +98,20 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 	protected String getAppName() {
 		return "API-Import";
 	}
-
-
+	
+	public APIImportParams getAPIImportParams() throws AppException {
+		APIImportParams params = new APIImportParams();
+		super.addCoreParameters(params);
+		params.setConfig(getValue("config"));
+		params.setForceUpdate(hasOption("forceUpdate"));
+		params.setChangeOrganization(hasOption("changeOrganization"));
+		params.setReplaceHostInSwagger(Boolean.parseBoolean(getValue("replaceHostInSwagger")));
+		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
+		params.setIgnoreQuotas(hasOption("ignoreQuotas"));
+		params.setClientOrgsMode(getValue("clientOrgsMode"));
+		params.setClientAppsMode(getValue("clientAppsMode"));
+		params.setQuotaMode(getValue("quotaMode"));
+		params.setDetailsExportFile(getValue("detailsExportFile"));
+		return params;
+	}
 }

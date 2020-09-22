@@ -22,7 +22,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 
@@ -65,7 +65,7 @@ public class APIMHttpClient {
 	}
 	
 	private APIMHttpClient(boolean adminInstance) throws AppException {
-		CommandParameters params = CommandParameters.getInstance();
+		CoreParameters params = CoreParameters.getInstance();
 		if(adminInstance) {
 			
 			createConnection("https://"+params.getHostname()+":"+params.getPort());

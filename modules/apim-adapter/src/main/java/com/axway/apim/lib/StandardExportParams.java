@@ -1,10 +1,6 @@
 package com.axway.apim.lib;
 
-import org.apache.commons.cli.CommandLine;
-
-import com.axway.apim.lib.errorHandling.AppException;
-
-public class StandardExportParams extends CommandParameters {
+public class StandardExportParams extends CoreParameters {
 	
 	public static enum Wide {
 		standard, 
@@ -15,45 +11,58 @@ public class StandardExportParams extends CommandParameters {
 	public static enum OutputFormat {
 		console, 
 		json, 
-		csv
-	}
-
-	public StandardExportParams(CommandLine cmd, CommandLine internalCmd, EnvironmentProperties environment)
-			throws AppException {
-		super(cmd, internalCmd, environment);
-	}
-	
-	public static synchronized StandardExportParams getInstance() {
-		return (StandardExportParams)CommandParameters.getInstance();
-	}
-	
-	public Wide getWide() {
-		try {
-			if(hasOption("wide")) {
-				return Wide.wide;
-			} 
-			if(hasOption("ultra")) {
-				return Wide.ultra;
-			}
-		} catch (Exception ignore) {}
-		return Wide.standard;
-	}
-	
-	public OutputFormat getOutputFormat() {
-		try {
-			return OutputFormat.valueOf(getValue("output"));
-		} catch (Exception e) {
-			return OutputFormat.console;
+		csv;
+		
+		public static OutputFormat getFormat(String name) {
+			if(name==null || valueOf(name)==null) return console;
+			return valueOf(name);
 		}
 	}
 	
-	public boolean deleteTarget() {
-		if(hasOption("deleteTarget")) return true;
-		if(getValue("deleteTarget")==null) return false;
-		return Boolean.parseBoolean(getValue("deleteTarget"));
+	private Wide wide;
+	
+	private boolean deleteTarget;
+	
+	private String target;
+	
+	private OutputFormat outputFormat;
+	
+	public static synchronized StandardExportParams getInstance() {
+		return (StandardExportParams)CoreParameters.getInstance();
 	}
 	
+	public Wide getWide() {
+		if(wide==null) return Wide.standard;
+		return wide;
+	}
+
+	public void setWide(Wide wide) {
+		this.wide = wide;
+	}
+
+	public OutputFormat getOutputFormat() {
+		if(outputFormat==null) return OutputFormat.console;
+		return outputFormat;
+	}
+
+	public void setOutputFormat(OutputFormat outputFormat) {
+		this.outputFormat = outputFormat;
+	}
+
+	public boolean isDeleteTarget() {
+		return deleteTarget;
+	}
+
+	public void setDeleteTarget(boolean deleteTarget) {
+		this.deleteTarget = deleteTarget;
+	}
+
 	public String getTarget() {
-		return (getValue("target")==null) ? "." : getValue("target");
+		if(this.target==null) return ".";
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
 	}
 }

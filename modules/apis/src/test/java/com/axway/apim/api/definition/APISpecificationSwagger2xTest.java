@@ -11,7 +11,8 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.definition.APISpecificationFactory;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.apiimport.lib.APIImportParams;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,9 +24,8 @@ public class APISpecificationSwagger2xTest {
 	
 	@BeforeClass
 	private void initTestIndicator() {
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("replaceHostInSwagger", "true");
-		new CommandParameters(params);
+		APIImportParams params = new APIImportParams();
+		params.setReplaceHostInSwagger(true);
 	}
 	
 	@Test

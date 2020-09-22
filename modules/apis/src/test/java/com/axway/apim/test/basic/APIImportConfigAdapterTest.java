@@ -18,7 +18,7 @@ import org.testng.annotations.Test;
 import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.DesiredAPI;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -41,9 +41,9 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 	@Test
 	public void withoutStage() throws AppException, ParseException {
 		try {
-			EnvironmentProperties props = new EnvironmentProperties(null);
+			/*EnvironmentProperties props = new EnvironmentProperties(null);
 			CommandLine cmd = new DefaultParser().parse(new Options(), new String[]{});
-			new CommandParameters(cmd, null, props, false);
+			new CommandParameters(cmd, null, props, false);*/
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 			
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
@@ -58,9 +58,9 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 	@Test
 	public void withStage() throws AppException, ParseException {
 		try {
-			EnvironmentProperties props = new EnvironmentProperties("variabletest");
+			/*EnvironmentProperties props = new EnvironmentProperties("variabletest");
 			CommandLine cmd = new DefaultParser().parse(new Options(), new String[]{});
-			new CommandParameters(cmd, null, props, false);
+			new CommandParameters(cmd, null, props, false);*/
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 			
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
@@ -75,9 +75,9 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 	@Test
 	public void usingOSEnvVariable() throws AppException, ParseException {
 		try {
-			EnvironmentProperties props = new EnvironmentProperties(null);
+			/*EnvironmentProperties props = new EnvironmentProperties(null);
 			CommandLine cmd = new DefaultParser().parse(new Options(), new String[]{});
-			new CommandParameters(cmd, null, props, false);
+			new CommandParameters(cmd, null, props, false);*/
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 			
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
@@ -93,9 +93,9 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 	@Test
 	public void notDeclaredVariable() throws AppException, ParseException {
 		try {
-			EnvironmentProperties props = new EnvironmentProperties(null);
+			/*EnvironmentProperties props = new EnvironmentProperties(null);
 			CommandLine cmd = new DefaultParser().parse(new Options(), new String[]{});
-			new CommandParameters(cmd, null, props, false);
+			new CommandParameters(cmd, null, props, false);*/
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 			
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
@@ -110,9 +110,9 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 	@Test
 	public void configFileWithSpaces() throws AppException, ParseException {
 		try {
-			EnvironmentProperties props = new EnvironmentProperties(null);
+			/*EnvironmentProperties props = new EnvironmentProperties(null);
 			CommandLine cmd = new DefaultParser().parse(new Options(), new String[]{});
-			new CommandParameters(cmd, null, props, false);
+			new CommandParameters(cmd, null, props, false);*/
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api config with spaces.json").getFile();
 			
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
@@ -127,9 +127,9 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 	@Test
 	public void stageConfigInSubDirectory() throws AppException, ParseException {
 		try {
-			EnvironmentProperties props = new EnvironmentProperties(null);
+			/*EnvironmentProperties props = new EnvironmentProperties(null);
 			CommandLine cmd = new DefaultParser().parse(new Options(), new String[]{});
-			new CommandParameters(cmd, null, props, false);
+			new CommandParameters(cmd, null, props, false);*/
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 			
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "notRelavantForThis Test", false);

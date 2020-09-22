@@ -44,7 +44,7 @@ public class JsonUserExporter extends UserResultHandler {
 		File localFolder = new File(targetFolder +File.separator+ folderName);
 		LOG.info("Going to export users into folder: " + localFolder);
 		if(localFolder.exists()) {
-			if(UserExportParams.getInstance().deleteTarget()) {
+			if(UserExportParams.getInstance().isDeleteTarget()) {
 				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
 				try {
 					FileUtils.deleteDirectory(localFolder);

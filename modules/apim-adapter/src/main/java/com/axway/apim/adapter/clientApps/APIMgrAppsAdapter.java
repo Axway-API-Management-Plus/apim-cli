@@ -34,7 +34,7 @@ import com.axway.apim.api.model.apps.ClientAppOauthResource;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.ExtClients;
 import com.axway.apim.api.model.apps.OAuth;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -59,7 +59,7 @@ public class APIMgrAppsAdapter {
 	
 	Map<String, String> subscribedAppAPIManagerResponse = new HashMap<String, String>();
 	
-	CommandParameters cmd  = CommandParameters.getInstance();
+	CoreParameters cmd  = CoreParameters.getInstance();
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
@@ -182,7 +182,7 @@ public class APIMgrAppsAdapter {
 			throw new AppException("API-Manager: " + APIManagerAdapter.apiManagerVersion + " doesn't support /proxies/<apiId>/applications", ErrorCode.UNXPECTED_ERROR);
 		}
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/applications").build();
+			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/applications").build();
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
@@ -322,7 +322,7 @@ public class APIMgrAppsAdapter {
 		HttpResponse httpResponse = null;
 		ClientApplication createdApp;
 		try {
-			CommandParameters cmd = CommandParameters.getInstance();
+			CoreParameters cmd = CoreParameters.getInstance();
 			URI uri;
 			if(actualApp==null) {
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications").build();

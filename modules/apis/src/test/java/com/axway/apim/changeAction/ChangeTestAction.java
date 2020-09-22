@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.APIExportApp;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.consol.citrus.actions.AbstractTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.CitrusRuntimeException;
@@ -43,9 +43,9 @@ public class ChangeTestAction extends AbstractTestAction {
 		boolean ignoreCache = false;
 		String allowOrgAdminsToPublish = "true";
 		boolean changeOrganization = false;
-		String clientOrgsMode = CommandParameters.MODE_ADD;
-		String clientAppsMode = CommandParameters.MODE_ADD;
-		String quotaMode = CommandParameters.MODE_ADD;
+		String clientOrgsMode = CoreParameters.MODE_ADD;
+		String clientAppsMode = CoreParameters.MODE_ADD;
+		String quotaMode = CoreParameters.MODE_ADD;
 		
 		String newBackend = null;
 		String oldBackend = null;

@@ -1,30 +1,25 @@
 package com.axway.lib;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 
-public class CommandParametersTest {
+public class CoreParametersTest {
 
 	@Test
 	public void testclearCacheAll() {
-		Map<String, String> manualParams = new HashMap<String, String>();
-		manualParams.put("clearCache", "ALL");
-		CommandParameters params = new CommandParameters(manualParams);
+		CoreParameters params = new CoreParameters();
+		params.setClearCache("ALL");
 
 		Assert.assertEquals(params.clearCaches().size(), CacheType.values().length);
 	}
 	
 	@Test
 	public void testCleanSpecificCache() {
-		Map<String, String> manualParams = new HashMap<String, String>();
-		manualParams.put("clearCache", CacheType.applicationsQuotaCache.name());
-		CommandParameters params = new CommandParameters(manualParams);
+		CoreParameters params = new CoreParameters();
+		params.setClearCache(CacheType.applicationsQuotaCache.name());
 
 		Assert.assertEquals(params.clearCaches().size(), 1);
 		Assert.assertEquals(params.clearCaches().get(0), CacheType.applicationsQuotaCache);
@@ -32,9 +27,8 @@ public class CommandParametersTest {
 	
 	@Test
 	public void testCleanOneWildcardCache() {
-		Map<String, String> manualParams = new HashMap<String, String>();
-		manualParams.put("clearCache", "*App*");
-		CommandParameters params = new CommandParameters(manualParams);
+		CoreParameters params = new CoreParameters();
+		params.setClearCache("*App*");
 
 		Assert.assertEquals(params.clearCaches().size(), 5);
 		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationsQuotaCache));
@@ -46,9 +40,8 @@ public class CommandParametersTest {
 	
 	@Test
 	public void testclearCacheCombined() {
-		Map<String, String> manualParams = new HashMap<String, String>();
-		manualParams.put("clearCache", "*Quota*, applicationAPIAccessCache");
-		CommandParameters params = new CommandParameters(manualParams);
+		CoreParameters params = new CoreParameters();
+		params.setClearCache("*Quota*, applicationAPIAccessCache");
 
 		Assert.assertEquals(params.clearCaches().size(), 2);
 		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationsQuotaCache));

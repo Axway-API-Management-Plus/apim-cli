@@ -1,38 +1,65 @@
 package com.axway.apim.apiimport.lib;
 
-import com.axway.apim.lib.APIMCoreCLIOptions;
-import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.StandardImportParams;
 
-public class APIImportParams extends CommandParameters {
-
-	public APIImportParams(APIMCoreCLIOptions parser)
-			throws AppException {
-		super(parser.getCmd(), parser.getInternalCmd(), new EnvironmentProperties(parser.getCmd().getOptionValue("stage"), parser.getCmd().getOptionValue("swaggerPromoteHome")));
-	}
+public class APIImportParams extends StandardImportParams {
+	
+	private boolean forceUpdate;
+	private boolean useFEAPIDefinition;
+	private boolean replaceHostInSwagger;
+	
+	private boolean changeOrganization = false; 
+	
+	private String apiDefintion;
 	
 	public static synchronized APIImportParams getInstance() {
-		return (APIImportParams)CommandParameters.getInstance();
+		return (APIImportParams)CoreParameters.getInstance();
 	}
 	
 	@Override
-	public boolean ignoreCache() {
+	public boolean isIgnoreCache() {
 		// For import action we ignore the cache in all cases!
 		return true;
 	}
-	
+
 	public boolean isUseFEAPIDefinition() {
-		if(getValue("useFEAPIDefinition")==null) return false;
-		return Boolean.parseBoolean(getValue("useFEAPIDefinition"));
+		return useFEAPIDefinition;
 	}
-	
+
+	public void setUseFEAPIDefinition(boolean useFEAPIDefinition) {
+		this.useFEAPIDefinition = useFEAPIDefinition;
+	}
+
 	public boolean isForceUpdate() {
-		try {
-			if(hasOption("forceUpdate")) {
-				return true;
-			} 
-		} catch (Exception ignore) {}
-		return false;
+		return forceUpdate;
+	}
+
+	public void setForceUpdate(boolean forceUpdate) {
+		this.forceUpdate = forceUpdate;
+	}
+
+	public String getApiDefintion() {
+		return apiDefintion;
+	}
+
+	public void setApiDefintion(String apiDefintion) {
+		this.apiDefintion = apiDefintion;
+	}
+
+	public boolean isReplaceHostInSwagger() {
+		return replaceHostInSwagger;
+	}
+
+	public void setReplaceHostInSwagger(boolean replaceHostInSwagger) {
+		this.replaceHostInSwagger = replaceHostInSwagger;
+	}
+
+	public boolean isChangeOrganization() {
+		return changeOrganization;
+	}
+
+	public void setChangeOrganization(boolean changeOrganization) {
+		this.changeOrganization = changeOrganization;
 	}
 }

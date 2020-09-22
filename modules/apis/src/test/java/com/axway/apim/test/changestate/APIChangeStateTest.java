@@ -1,4 +1,4 @@
-package com.axway.apim.api.state;
+package com.axway.apim.test.changestate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +15,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.TagMap;
+import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;

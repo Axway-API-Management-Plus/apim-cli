@@ -53,10 +53,10 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			
-			AppImportParams params = new AppImportParams(new AppImportCLIOptions(args));
+			AppImportParams params = new AppImportCLIOptions(args).getAppImportParams();
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the application
-			ClientAppAdapter desiredAppsAdapter = ClientAppAdapter.create(params.getValue("config"));
+			ClientAppAdapter desiredAppsAdapter = ClientAppAdapter.create(params.getConfig());
 			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
 			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter);
 			for(ClientApplication desiredApp : desiredApps) {
