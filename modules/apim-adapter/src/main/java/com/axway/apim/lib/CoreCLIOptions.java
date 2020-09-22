@@ -128,7 +128,7 @@ public abstract class CoreCLIOptions {
 		params.setForce(hasOption("force"));
 		params.setIgnoreAdminAccount(hasOption("ignoreAdminAccount"));
 		params.setIgnoreCache(hasOption("ignoreCache"));
-		params.setRollback(Boolean.parseBoolean(getValue("rollback")));
+		if(getValue("rollback")!=null) params.setRollback(Boolean.parseBoolean(getValue("rollback")));
 		
 		// Also support -f for backwards compatibility
 		if(!params.isForce()) params.setForce(Boolean.parseBoolean(getValue("f")));

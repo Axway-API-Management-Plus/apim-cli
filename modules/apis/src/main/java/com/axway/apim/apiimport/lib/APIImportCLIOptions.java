@@ -106,14 +106,14 @@ public class APIImportCLIOptions extends CoreCLIOptions {
 		params.setApiDefintion(getValue("apidefinition"));
 		params.setForceUpdate(hasOption("forceUpdate"));
 		params.setChangeOrganization(hasOption("changeOrganization"));
-		params.setReplaceHostInSwagger(Boolean.parseBoolean(getValue("replaceHostInSwagger")));
+		if(getValue("replaceHostInSwagger")!=null) params.setReplaceHostInSwagger(Boolean.parseBoolean(getValue("replaceHostInSwagger")));
 		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
 		params.setIgnoreQuotas(hasOption("ignoreQuotas"));
 		params.setClientOrgsMode(getValue("clientOrgsMode"));
 		params.setClientAppsMode(getValue("clientAppsMode"));
 		params.setQuotaMode(getValue("quotaMode"));
 		params.setDetailsExportFile(getValue("detailsExportFile"));
-		params.setAllowOrgAdminsToPublish(Boolean.getBoolean(getValue("allowOrgAdminsToPublish")));
+		if(getValue("allowOrgAdminsToPublish")!=null) params.setAllowOrgAdminsToPublish(Boolean.parseBoolean(getValue("allowOrgAdminsToPublish")));
 		return params;
 	}
 }

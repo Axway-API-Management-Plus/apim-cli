@@ -95,7 +95,7 @@ public class UserExportCLIOptions extends StandardExportCLIOptions {
 		params.setOrg(getValue("org"));
 		params.setRole(getValue("role"));
 		params.setState(getValue("state"));
-		params.setEnabled(Boolean.parseBoolean(getValue("enabled")));
+		if(getValue("enabled")!=null) params.setEnabled(Boolean.parseBoolean(getValue("enabled")));
 		return params;
 	}
 }

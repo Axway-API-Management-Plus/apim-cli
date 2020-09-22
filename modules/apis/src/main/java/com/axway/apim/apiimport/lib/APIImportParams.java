@@ -7,7 +7,6 @@ public class APIImportParams extends StandardImportParams {
 	
 	private boolean forceUpdate;
 	private boolean useFEAPIDefinition;
-	private boolean replaceHostInSwagger;
 	
 	private boolean changeOrganization = false; 
 	
@@ -45,14 +44,6 @@ public class APIImportParams extends StandardImportParams {
 
 	public void setApiDefintion(String apiDefintion) {
 		this.apiDefintion = apiDefintion;
-	}
-
-	public boolean isReplaceHostInSwagger() {
-		return replaceHostInSwagger;
-	}
-
-	public void setReplaceHostInSwagger(boolean replaceHostInSwagger) {
-		this.replaceHostInSwagger = replaceHostInSwagger;
 	}
 
 	public boolean isChangeOrganization() {
