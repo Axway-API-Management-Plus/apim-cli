@@ -21,7 +21,7 @@ public class StandardExportParams extends CoreParameters {
 	
 	private Wide wide;
 	
-	private boolean deleteTarget;
+	private Boolean deleteTarget;
 	
 	private String target;
 	
@@ -49,11 +49,13 @@ public class StandardExportParams extends CoreParameters {
 		this.outputFormat = outputFormat;
 	}
 
-	public boolean isDeleteTarget() {
-		return deleteTarget;
+	public Boolean isDeleteTarget() {
+		if(deleteTarget==null) return false;
+		return deleteTarget.booleanValue();
 	}
 
-	public void setDeleteTarget(boolean deleteTarget) {
+	public void setDeleteTarget(Boolean deleteTarget) {
+		if(deleteTarget==null) return;
 		this.deleteTarget = deleteTarget;
 	}
 

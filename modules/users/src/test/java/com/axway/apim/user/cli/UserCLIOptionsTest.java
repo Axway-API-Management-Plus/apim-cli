@@ -52,5 +52,14 @@ public class UserCLIOptionsTest {
 		Assert.assertEquals(params.getState(), "pending");
 		Assert.assertEquals(params.isEnabled(), false);
 	}
+	
+	
+	@Test
+	public void testEnabledToggleDefault() throws ParseException, AppException {
+		String[] args = {"-s", "prod"};
+		UserExportCLIOptions options = new UserExportCLIOptions(args);
+		UserExportParams params = options.getUserExportParams();
+		Assert.assertTrue(params.isEnabled(), "Enabled must be true, as it's not given!");
+	}
 
 }

@@ -13,7 +13,7 @@ public class UserExportParams extends StandardExportParams {
 	private String type;
 	private String role;
 	private String state;
-	private boolean enabled;
+	private Boolean enabled;
 	
 	public static synchronized UserExportParams getInstance() {
 		return (UserExportParams)CoreParameters.getInstance();
@@ -83,11 +83,13 @@ public class UserExportParams extends StandardExportParams {
 		this.state = state;
 	}
 
-	public boolean isEnabled() {
-		return enabled;
+	public Boolean isEnabled() {
+		if(enabled==null) return false;
+		return enabled.booleanValue();
 	}
 
-	public void setEnabled(boolean enabled) {
+	public void setEnabled(Boolean enabled) {
+		if(enabled==null) return; // We stay with the default
 		this.enabled = enabled;
 	}
 }

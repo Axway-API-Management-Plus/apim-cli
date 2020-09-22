@@ -5,10 +5,10 @@ import com.axway.apim.lib.StandardImportParams;
 
 public class APIImportParams extends StandardImportParams {
 	
-	private boolean forceUpdate;
-	private boolean useFEAPIDefinition;
+	private Boolean forceUpdate;
+	private Boolean useFEAPIDefinition;
 	
-	private boolean changeOrganization = false; 
+	private Boolean changeOrganization = false; 
 	
 	private String apiDefintion;
 	
@@ -22,19 +22,23 @@ public class APIImportParams extends StandardImportParams {
 		return true;
 	}
 
-	public boolean isUseFEAPIDefinition() {
+	public Boolean isUseFEAPIDefinition() {
+		if(useFEAPIDefinition==null) return false;
 		return useFEAPIDefinition;
 	}
 
-	public void setUseFEAPIDefinition(boolean useFEAPIDefinition) {
+	public void setUseFEAPIDefinition(Boolean useFEAPIDefinition) {
+		if(useFEAPIDefinition==null) return;
 		this.useFEAPIDefinition = useFEAPIDefinition;
 	}
 
-	public boolean isForceUpdate() {
+	public Boolean isForceUpdate() {
+		if(forceUpdate==null) return false;
 		return forceUpdate;
 	}
 
-	public void setForceUpdate(boolean forceUpdate) {
+	public void setForceUpdate(Boolean forceUpdate) {
+		if(forceUpdate==null) return;
 		this.forceUpdate = forceUpdate;
 	}
 
@@ -46,11 +50,12 @@ public class APIImportParams extends StandardImportParams {
 		this.apiDefintion = apiDefintion;
 	}
 
-	public boolean isChangeOrganization() {
+	public Boolean isChangeOrganization() {
 		return changeOrganization;
 	}
 
-	public void setChangeOrganization(boolean changeOrganization) {
+	public void setChangeOrganization(Boolean changeOrganization) {
+		if(changeOrganization==null) return;
 		this.changeOrganization = changeOrganization;
 	}
 }

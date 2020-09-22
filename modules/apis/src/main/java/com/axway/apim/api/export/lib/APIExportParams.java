@@ -9,7 +9,7 @@ public class APIExportParams extends StandardExportParams {
 	
 	private String id;
 	
-	private boolean useFEAPIDefinition;
+	private Boolean useFEAPIDefinition;
 	
 	private String vhost;
 	
@@ -82,10 +82,12 @@ public class APIExportParams extends StandardExportParams {
 	}
 
 	public boolean isUseFEAPIDefinition() {
-		return useFEAPIDefinition;
+		if(useFEAPIDefinition==null) return false;
+		return useFEAPIDefinition.booleanValue();
 	}
 
-	public void setUseFEAPIDefinition(boolean useFEAPIDefinition) {
+	public void setUseFEAPIDefinition(Boolean useFEAPIDefinition) {
+		if(useFEAPIDefinition==null) return;
 		this.useFEAPIDefinition = useFEAPIDefinition;
 	}
 }
