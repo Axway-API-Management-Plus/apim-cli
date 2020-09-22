@@ -241,7 +241,7 @@ public class CoreParameters {
 	}
 
 	public void setIgnoreAdminAccount(Boolean ignoreAdminAccount) {
-		if(ignoreAdminAccount==null)
+		if(ignoreAdminAccount==null) return;
 		this.ignoreAdminAccount = ignoreAdminAccount;
 	}
 	
