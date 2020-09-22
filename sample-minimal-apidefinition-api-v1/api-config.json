@@ -1,0 +1,28 @@
+{
+  "name" : "Sample Minimal API",
+  "path" : "/sample/minimal/apidefinition/api/v1",
+  "state" : "unpublished",
+  "version" : "1.0.0",
+  "organization" : "API Development",
+  "apiDefinition" : "Sample Minimal API.json",
+  "backendBasepath" : "https://petstore.swagger.io",
+  "customProperties" : { },
+  "caCerts" : [ {
+    "certFile" : "swagger.io.crt",
+    "inbound" : "false",
+    "outbound" : "true"
+  }, {
+    "certFile" : "Amazon.crt",
+    "inbound" : "false",
+    "outbound" : "true"
+  }, {
+    "certFile" : "AmazonRootCA1.crt",
+    "inbound" : "false",
+    "outbound" : "true"
+  }, {
+    "certFile" : "StarfieldServicesRootCertificateAuthority-G2.crt",
+    "inbound" : "false",
+    "outbound" : "true"
+  } ],
+  "clientOrganizations" : [ "API Development" ]
+}

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -31,7 +31,7 @@ public class ManageClientOrgs {
 	}
 
 	public void execute(boolean reCreation) throws AppException {
-		if(CommandParameters.getInstance().isIgnoreClientOrgs()) {
+		if(CoreParameters.getInstance().isIgnoreClientOrgs()) {
 			LOG.info("Configured client organizations are ignored, as flag ignoreClientOrgs has been set.");
 			return;
 		}
@@ -54,7 +54,7 @@ public class ManageClientOrgs {
 				apiManager.apiAdapter.grantClientOrganization(missingDesiredOrgs, actualState, false);
 			}
 			if(removingActualOrgs.size()>0) {
-				if(CommandParameters.getInstance().getClientOrgsMode().equals(CommandParameters.MODE_REPLACE)) {
+				if(CoreParameters.getInstance().getClientOrgsMode().equals(CoreParameters.MODE_REPLACE)) {
 					LOG.info("Removing access for orgs: "+removingActualOrgs+" from API: " + actualState.getName());
 					apiManager.accessAdapter.removeClientOrganization(removingActualOrgs, actualState.getId());
 				} else {

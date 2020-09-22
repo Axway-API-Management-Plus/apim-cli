@@ -4,13 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.state.APIChangeState;
 import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.apiimport.actions.RecreateToUpdateAPI;
 import com.axway.apim.apiimport.actions.UpdateExistingAPI;
 import com.axway.apim.apiimport.lib.APIImportParams;
 import com.axway.apim.lib.APIPropertiesExport;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -21,7 +20,7 @@ public class APIImportManager {
 	
 	private ErrorState error = ErrorState.getInstance();
 	
-	private boolean enforceBreakingChange = CommandParameters.getInstance().isForce();
+	private boolean enforceBreakingChange = CoreParameters.getInstance().isForce();
 	
 	/**
 	 * This method is taking in the APIChangeState to decide about the strategy how to 
@@ -32,7 +31,7 @@ public class APIImportManager {
 	public void applyChanges(APIChangeState changeState) throws AppException {
 		APIImportParams commands = APIImportParams.getInstance();
 		if(!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded() ) {
-			if(commands.allowOrgAdminsToPublish()) {
+			if(commands.isAllowOrgAdminsToPublish()) {
 				LOG.debug("Desired API-State set to published using OrgAdmin account only. Going to create a publish request. "
 						+ "Set allowOrgAdminsToPublish to false to prevent orgAdmins from creating a publishing request.");
 			} else {
@@ -82,7 +81,7 @@ public class APIImportManager {
 				recreate.execute(changeState);
 			}
 		}
-		if(!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded() && commands.allowOrgAdminsToPublish() ) {
+		if(!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded() && commands.isAllowOrgAdminsToPublish() ) {
 			LOG.info("Actual API has been created and is waiting for an approval by an administrator. "
 					+ "You may update the pending API as often as you want before it is finally published.");
 		}

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.ServiceProfile;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -61,7 +61,7 @@ public class DesiredAPI extends API {
 	public void setBackendBasepath(String backendBasepath) {
 		// If the backendBasePath has been changed already in the Swagger-File, don't to it here again
 		// as it would duplicate the basePath
-		if(backendBasepath!=null && !CommandParameters.getInstance().replaceHostInSwagger()) {
+		if(backendBasepath!=null && !CoreParameters.getInstance().isReplaceHostInSwagger()) {
 			ServiceProfile serviceProfile = new ServiceProfile();
 			serviceProfile.setBasePath(backendBasepath);
 			if(this.serviceProfiles == null) {

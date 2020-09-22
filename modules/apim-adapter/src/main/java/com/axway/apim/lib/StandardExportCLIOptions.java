@@ -3,7 +3,11 @@ package com.axway.apim.lib;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
-public abstract class StandardExportCLIOptions extends APIMCoreCLIOptions {
+import com.axway.apim.lib.StandardExportParams.OutputFormat;
+import com.axway.apim.lib.StandardExportParams.Wide;
+import com.axway.apim.lib.errorHandling.AppException;
+
+public abstract class StandardExportCLIOptions extends CoreCLIOptions {
 
 	public StandardExportCLIOptions(String[] args) throws ParseException {
 		super(args);
@@ -28,5 +32,14 @@ public abstract class StandardExportCLIOptions extends APIMCoreCLIOptions {
 		option.setRequired(false);
 		option.setArgName("console|json|csv");
 		options.addOption(option);
+	}
+	
+	public void addStandardExportParameters(StandardExportParams params) throws AppException {
+		super.addCoreParameters(params);
+		if(hasOption("wide")) params.setWide(Wide.wide);
+		if(hasOption("ultra")) params.setWide(Wide.ultra);
+		params.setDeleteTarget(hasOption("deleteTarget"));
+		params.setTarget(getValue("target"));
+		params.setOutputFormat(OutputFormat.getFormat(getValue("o")));
 	}
 }

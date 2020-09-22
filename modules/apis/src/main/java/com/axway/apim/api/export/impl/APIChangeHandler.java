@@ -12,9 +12,9 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIChangeParams;
 import com.axway.apim.api.export.lib.APIExportParams;
 import com.axway.apim.api.model.ServiceProfile;
-import com.axway.apim.api.state.APIChangeState;
+import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -61,7 +61,7 @@ public class APIChangeHandler extends APIResultHandler {
 			System.out.println("No changes required for the selected APIs.");
 			return;
 		}
-		if(CommandParameters.getInstance().isForce()) {
+		if(CoreParameters.getInstance().isForce()) {
 			System.out.println("Force flag given to change: "+apis.size()+" API(s)");
 		} else {
 			System.out.println("Okay, going to change: " + apisToChange.size() + " API(s)");

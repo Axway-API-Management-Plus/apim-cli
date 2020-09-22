@@ -11,9 +11,10 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 
-public abstract class APIMCoreCLIOptions {
+public abstract class CoreCLIOptions {
 
 	protected Options options = new Options();
 	protected Options internalOptions = new Options();
@@ -26,10 +27,12 @@ public abstract class APIMCoreCLIOptions {
 	protected CommandLine cmd;
 	/** This CommandLine contains support, but hidden commands. Some of them are used to control testing */
 	protected CommandLine internalCmd = null;
+	
+	protected EnvironmentProperties envProperties;
 
 	String[] args;
 
-	public APIMCoreCLIOptions(String[] args) {
+	public CoreCLIOptions(String[] args) {
 		Option option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
 				+ "Is used to lookup the stage configuration file.");
 		option.setArgName("preprod");
@@ -74,7 +77,7 @@ public abstract class APIMCoreCLIOptions {
 		internalOptions.addOption(option);
 		
 		option = new Option("apimCLIHome", true, "The absolute path to the CLI home directory containing for instance your conf folder.\n"
-				+ "You may also set the environment variable: '"+CommandParameters.APIM_CLI_HOME+"'");
+				+ "You may also set the environment variable: '"+CoreParameters.APIM_CLI_HOME+"'");
 		option.setRequired(false);
 		option.setArgName("/home/chris/apim-cli");
 		options.addOption(option);
@@ -105,6 +108,32 @@ public abstract class APIMCoreCLIOptions {
 
 		this.args = args;
 	}
+	
+	public void addCoreParameters(CoreParameters params) throws AppException {
+		if(this.cmd==null) parse();
+		params.setProperties(this.envProperties);
+		
+		params.setApimCLIHome(getValue("apimCLIHome"));
+		params.setStage(getValue("stage"));
+		params.setHostname(getValue("host"));
+		params.setPort((getValue("port")!=null) ? Integer.parseInt(getValue("port")) : -1);
+		params.setUsername(getValue("username"));
+		params.setPassword(getValue("password"));
+		params.setAdminUsername(getValue("admin_username"));
+		params.setAdminPassword(getValue("admin_password"));
+		params.setClearCache(getValue("clearCache"));
+		
+		params.setReturnCodeMapping(getValue("returnCodeMapping"));
+		//
+		params.setForce(hasOption("force"));
+		params.setIgnoreAdminAccount(hasOption("ignoreAdminAccount"));
+		params.setIgnoreCache(hasOption("ignoreCache"));
+		if(getValue("rollback")!=null) params.setRollback(Boolean.parseBoolean(getValue("rollback")));
+		
+		// Also support -f for backwards compatibility
+		if(!params.isForce()) params.setForce(Boolean.parseBoolean(getValue("f")));
+		
+	}
 
 	/**
 	 * Parse will use all declared options to create the cmd 
@@ -116,7 +145,8 @@ public abstract class APIMCoreCLIOptions {
 		try {
 			cmd = parser.parse(options, args);
 			internalCmd = parser.parse( internalOptions, args);
-		} catch (ParseException e) {
+			this.envProperties = new EnvironmentProperties(cmd.getOptionValue("stage"), getValue("apimCLIHome"));
+		} catch (Exception e) {
 			printUsage(e.getMessage(), args);
 			System.exit(99);
 		}
@@ -176,22 +206,40 @@ public abstract class APIMCoreCLIOptions {
 		}
 		return binary;
 	}
+	
+	protected boolean hasOption(String key) {
+		return ((this.cmd!=null && this.cmd.hasOption(key)) || 
+				(this.cmd!=null && this.internalCmd.hasOption(key)) || 
+				(this.envProperties!=null && this.envProperties.containsKey(key)));
+	}
+	
+	protected String getValue(String key) {
+		if(this.cmd!=null && this.cmd.getOptionValue(key)!=null) {
+			return this.cmd.getOptionValue(key);
+		} else if(this.internalCmd!=null && this.internalCmd.getOptionValue(key)!=null) {
+			return this.internalCmd.getOptionValue(key);
+		} else if(this.envProperties!=null && this.envProperties.containsKey(key)) {
+			return this.envProperties.get(key);
+		} else {
+			return null;
+		}
+	}
 
-	public CommandLine getCmd() {
+	private CommandLine getCmd() {
 		if(this.cmd==null) parse();
 		return cmd;
 	}
 
-	public CommandLine getInternalCmd() {
+	private CommandLine getInternalCmd() {
 		if(this.internalCmd==null) parse();
 		return internalCmd;
 	}
 
-	public Options getOptions() {
+	private Options getOptions() {
 		return options;
 	}
 
-	public Options getInternalOptions() {
+	private Options getInternalOptions() {
 		return internalOptions;
 	}
 	

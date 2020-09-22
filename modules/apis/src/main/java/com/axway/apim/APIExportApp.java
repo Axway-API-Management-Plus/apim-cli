@@ -43,7 +43,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int export(String args[]) {
 		try {
 			deleteInstances();
-			APIExportParams params = new APIExportParams(new APIExportGetCLIOptions(args));
+			APIExportParams params = new APIExportGetCLIOptions(args).getAPIExportParams();
 			switch(params.getOutputFormat()) {
 			case console:
 				return execute(params, APIListImpl.CONSOLE_EXPORTER);
@@ -74,7 +74,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int delete(String args[]) {
 		try {
 			deleteInstances();
-			APIExportParams params = new APIExportParams(new APIDeleteCLIOptions(args));
+			APIExportParams params = new APIDeleteCLIOptions(args).getAPIExportParams();
 			return execute(params, APIListImpl.API_DELETE_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -86,7 +86,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int unpublish(String args[]) {
 		try {
 			deleteInstances();
-			APIExportParams params = new APIExportParams(new APIUnpublishCLIOptions(args));
+			APIExportParams params = new APIUnpublishCLIOptions(args).getAPIExportParams();
 			return execute(params, APIListImpl.API_UNPUBLISH_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -98,7 +98,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int publish(String args[]) {
 		try {
 			deleteInstances();
-			APIExportParams params = new APIExportParams(new APIUnpublishCLIOptions(args));
+			APIExportParams params = new APIUnpublishCLIOptions(args).getAPIExportParams();
 			return execute(params, APIListImpl.API_PUBLISH_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -110,7 +110,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int change(String args[]) {
 		try {
 			deleteInstances();
-			APIChangeParams params = new APIChangeParams(new ChangeAPICLIOptions(args));
+			APIChangeParams params = new ChangeAPICLIOptions(args).getAPIChangeParams();
 			return execute(params, APIListImpl.API_CHANGE_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);

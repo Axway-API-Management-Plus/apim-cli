@@ -55,7 +55,7 @@ public class UserCLIApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "get", description = "Get users from API-Manager in different formats")
 	public static int export(String args[]) {
 		try {
-			UserExportParams params = new UserExportParams(new UserExportCLIOptions(args));
+			UserExportParams params = new UserExportCLIOptions(args).getUserExportParams();
 			switch(params.getOutputFormat()) {
 			case console:
 				return runExport(params, ResultHandler.CONSOLE_EXPORTER);
@@ -134,11 +134,11 @@ public class UserCLIApp implements APIMCLIServiceProvider {
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			
-			UserImportParams params = new UserImportParams(new UserImportCLIOptions(args));
+			UserImportParams params = new UserImportCLIOptions(args).getUserImportParams();
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the organization
 			UserAdapter userAdapter = new JSONUserAdapter();
-			userAdapter.readConfig(params.getValue("config"));
+			userAdapter.readConfig(params.getConfig());
 			List<User> desiredUsers = userAdapter.getUsers();
 			UserImportManager importManager = new UserImportManager();
 			for(User desiredUser : desiredUsers) {
@@ -171,7 +171,7 @@ public class UserCLIApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "delete", description = "Delete selected user(s) from the API-Manager")
 	public static int delete(String args[]) {
 		try {
-			UserExportParams params = new UserExportParams(new UserDeleteCLIOptions(args));
+			UserExportParams params = new UserDeleteCLIOptions(args).getUserExportParams();
 			return runExport(params, ResultHandler.ORG_DELETE_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
