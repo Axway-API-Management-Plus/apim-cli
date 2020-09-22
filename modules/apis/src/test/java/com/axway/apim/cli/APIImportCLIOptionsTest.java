@@ -49,13 +49,13 @@ public class APIImportCLIOptionsTest {
 	
 	@Test
 	public void testToggles() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-allowOrgAdminsToPublish", "true", "-replaceHostInSwagger", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreAdminAccount", "-ignoreQuotas"};
+		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-allowOrgAdminsToPublish", "false", "-replaceHostInSwagger", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreAdminAccount", "-ignoreQuotas"};
 		APIImportCLIOptions options = new APIImportCLIOptions(args);
 		APIImportParams params = options.getAPIImportParams();
 		Assert.assertTrue(params.isForce());
 		Assert.assertTrue(params.isForceUpdate());
 		Assert.assertTrue(params.isIgnoreCache());
-		Assert.assertTrue(params.isAllowOrgAdminsToPublish());
+		Assert.assertFalse(params.isAllowOrgAdminsToPublish());
 		Assert.assertTrue(params.isChangeOrganization());
 		Assert.assertTrue(params.isReplaceHostInSwagger());
 		Assert.assertTrue(params.isUseFEAPIDefinition());

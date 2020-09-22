@@ -113,6 +113,7 @@ public class APIImportCLIOptions extends CoreCLIOptions {
 		params.setClientAppsMode(getValue("clientAppsMode"));
 		params.setQuotaMode(getValue("quotaMode"));
 		params.setDetailsExportFile(getValue("detailsExportFile"));
+		params.setAllowOrgAdminsToPublish(Boolean.getBoolean(getValue("allowOrgAdminsToPublish")));
 		return params;
 	}
 }
