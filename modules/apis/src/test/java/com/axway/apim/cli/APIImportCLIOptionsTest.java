@@ -73,4 +73,14 @@ public class APIImportCLIOptionsTest {
 		Assert.assertFalse(params.isIgnoreClientApps(), "Should be false, as the default is add");
 		Assert.assertFalse(params.isIgnoreClientOrgs(), "Should be false, as the default is add");
 	}
+	
+	@Test
+	public void testAPIDefinitionAsCLIArg() throws ParseException, AppException {
+		String[] args = {"-s", "prod", "-c", "myConfig.json", "-a", "thisIsMyAPIDefinition"};
+		APIImportCLIOptions options = new APIImportCLIOptions(args);
+		APIImportParams params = options.getAPIImportParams();
+		options.addCoreParameters(params);
+		Assert.assertEquals(params.getConfig(), "myConfig.json");
+		Assert.assertEquals(params.getApiDefintion(), "thisIsMyAPIDefinition");
+	}
 }

@@ -103,6 +103,7 @@ public class APIImportCLIOptions extends CoreCLIOptions {
 		APIImportParams params = new APIImportParams();
 		super.addCoreParameters(params);
 		params.setConfig(getValue("config"));
+		params.setApiDefintion(getValue("apidefinition"));
 		params.setForceUpdate(hasOption("forceUpdate"));
 		params.setChangeOrganization(hasOption("changeOrganization"));
 		params.setReplaceHostInSwagger(Boolean.parseBoolean(getValue("replaceHostInSwagger")));
