@@ -121,12 +121,14 @@ public abstract class APIResultHandler {
 		while(it.hasNext()) {
 			InboundProfile profile = it.next();
 			SecurityProfile usedSecProfile = secProfilesMappedByName.get(profile.getSecurityProfile());
+			// If Security-Profile null only happens for method overrides, then they are using the API-Default --> Skip this InboundProfile
+			if(usedSecProfile==null) continue;
 			for(SecurityDevice device : usedSecProfile.getDevices()) {
 				if(device.getType()==DeviceType.authPolicy) {
 					String authenticationPolicy = device.getProperties().get("authenticationPolicy");
 					usedSecurity.add(Utils.getExternalPolicyName(authenticationPolicy));
 				} else {
-					usedSecurity.add(""+device.getType());
+					usedSecurity.add(""+device.getType().getName());
 				}
 			}
 		}
