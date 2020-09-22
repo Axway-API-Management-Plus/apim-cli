@@ -21,6 +21,8 @@ public class APIExportParams extends StandardExportParams {
 	
 	private String backend;
 	
+	private String tag;
+	
 	public static synchronized APIExportParams getInstance() {
 		return (APIExportParams)CoreParameters.getInstance();
 	}
@@ -79,6 +81,14 @@ public class APIExportParams extends StandardExportParams {
 
 	public void setBackend(String backend) {
 		this.backend = backend;
+	}
+
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 
 	public boolean isUseFEAPIDefinition() {

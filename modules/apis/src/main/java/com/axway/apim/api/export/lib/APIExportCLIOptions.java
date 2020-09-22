@@ -56,6 +56,11 @@ public class APIExportCLIOptions extends StandardExportCLIOptions {
 		option.setRequired(false);
 		option.setArgName("*mybackhost.com*");
 		options.addOption(option);
+		
+		option = new  Option("tag", true, "Filter APIs with a specific tag. Use either \"*myTagValueOrGroup*\" or \"tagGroup=*myTagValue*\"");
+		option.setRequired(false);
+		option.setArgName("tagGroup=*myTagValue*");
+		options.addOption(option);
 	}
 
 	@Override
@@ -78,6 +83,7 @@ public class APIExportCLIOptions extends StandardExportCLIOptions {
 		params.setVhost(getValue("vhost"));
 		params.setState(getValue("state"));
 		params.setBackend(getValue("backend"));
+		params.setTag(getValue("tag"));
 		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
 		return;
 	}

@@ -15,7 +15,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 public class APIExportCLIOptionsTest {
 	@Test
 	public void testAPIExportParams() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-n", "*MyAPIName*", "-id", "412378923", "-policy", "*PolicyName*", "-vhost", "custom.host.com", "-state", "approved", "-backend", "backend.customer.com", "-t", "myTarget", "-o", "csv", "-useFEAPIDefinition", "-wide", "-deleteTarget"};
+		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-n", "*MyAPIName*", "-id", "412378923", "-policy", "*PolicyName*", "-vhost", "custom.host.com", "-state", "approved", "-backend", "backend.customer.com", "-tag", "*myTag*", "-t", "myTarget", "-o", "csv", "-useFEAPIDefinition", "-wide", "-deleteTarget"};
 		APIExportCLIOptions options = new APIExportCLIOptions(args);
 		APIExportParams params = options.getAPIExportParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
@@ -25,6 +25,7 @@ public class APIExportCLIOptionsTest {
 		Assert.assertEquals(params.getWide(), Wide.wide);
 		Assert.assertTrue(params.isDeleteTarget());
 		Assert.assertEquals(params.getTarget(), "myTarget");
+		Assert.assertEquals(params.getTag(), "*myTag*");
 		Assert.assertEquals(params.getOutputFormat(), OutputFormat.csv);
 		
 		Assert.assertTrue(params.isUseFEAPIDefinition());
@@ -72,6 +73,5 @@ public class APIExportCLIOptionsTest {
 		// Validate the change parameters are included
 		Assert.assertEquals(params.getNewBackend(), "http://my.new.backend");
 		Assert.assertEquals(params.getOldBackend(), "http://my.old.backend");
-		
 	}
 }

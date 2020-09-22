@@ -25,6 +25,7 @@ import com.axway.apim.api.model.Policy;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.ServiceProfile;
+import com.axway.apim.api.model.TagMap;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 
@@ -245,6 +246,34 @@ public class APIFilterTest {
 	}
 	
 	@Test
+	public void testTagFilter() throws AppException {
+		API testAPI = new API();
+		TagMap<String, String[]> tags = new TagMap<>();
+		tags.put("group1", new String[] {"tagValue1", "tagValue2"});
+		tags.put("group2", new String[] {"tagValue3", "tagValue4"});
+		testAPI.setTags(tags);
+		
+		APIFilter filter = new APIFilter.Builder().hasTag("*tagValue3*").build();
+		assertTrue(filter.filter(testAPI), "API must match to pattern '*TAGValue3*'");
+		
+		filter = new APIFilter.Builder().hasTag("*unknownTag*").build();
+		assertFalse(filter.filter(testAPI), "API must NOT match to pattern '*unknownTag*'");
+		
+		filter = new APIFilter.Builder().hasTag("GROUP1").build();
+		assertTrue(filter.filter(testAPI), "API must match to pattern 'GROUP1'");
+		
+		filter = new APIFilter.Builder().hasTag("*OUP*").build();
+		assertTrue(filter.filter(testAPI), "API must match to pattern '*OUP2'");
+		
+		// Testing Group specific tag filtering
+		filter = new APIFilter.Builder().hasTag("GROUP1=*VALUE2").build();
+		assertTrue(filter.filter(testAPI), "API must match to pattern 'GROUP1=*VALUE2'");
+		
+		filter = new APIFilter.Builder().hasTag("GROUP2=*VALUE2").build();
+		assertFalse(filter.filter(testAPI), "API must NOT match to pattern 'GROUP2=*VALUE2'");
+	}
+	
+	@Test
 	public void testInboundSecurityPolicyFilter() throws AppException {
 		API testAPI = new API();
 		addInboundSecurityPolicy(testAPI, "Inbound Security Policy 1");
@@ -314,17 +343,4 @@ public class APIFilterTest {
 		return api;
 	}
 }
-
-/**
- *    "inboundProfiles":{
-      "findPetsByStatus":{
-         "securityProfile":"Yet another API-Key profile"
-      },
-      "_default":{
-         "securityProfile":"_default"
-      }
-   },
-   
-   
- */
 
