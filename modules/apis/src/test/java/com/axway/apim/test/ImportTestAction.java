@@ -71,9 +71,9 @@ public class ImportTestAction extends AbstractTestAction {
 		boolean ignoreCache = false;
 		String allowOrgAdminsToPublish = "true";
 		boolean changeOrganization = false;
-		String clientOrgsMode = CoreParameters.MODE_ADD;
-		String clientAppsMode = CoreParameters.MODE_ADD;
-		String quotaMode = CoreParameters.MODE_ADD;
+		String clientOrgsMode = null;
+		String clientAppsMode = null;
+		String quotaMode = null;
 		
 		
 		try {

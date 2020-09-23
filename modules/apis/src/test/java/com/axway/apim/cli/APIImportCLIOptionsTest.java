@@ -8,6 +8,7 @@ import com.axway.apim.apiimport.lib.APIImportCLIOptions;
 import com.axway.apim.apiimport.lib.APIImportParams;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class APIImportCLIOptionsTest {
@@ -41,9 +42,9 @@ public class APIImportCLIOptionsTest {
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
 		Assert.assertEquals(params.getHostname(), "api-env");
-		Assert.assertEquals(params.getClientOrgsMode(), "replace");
-		Assert.assertEquals(params.getClientAppsMode(), "replace");
-		Assert.assertEquals(params.getQuotaMode(), "replace");
+		Assert.assertEquals(params.getClientOrgsMode(), Mode.replace);
+		Assert.assertEquals(params.getClientAppsMode(), Mode.replace);
+		Assert.assertEquals(params.getQuotaMode(), Mode.replace);
 		Assert.assertEquals(params.getDetailsExportFile(), "myExportFile.txt");
 	}
 	

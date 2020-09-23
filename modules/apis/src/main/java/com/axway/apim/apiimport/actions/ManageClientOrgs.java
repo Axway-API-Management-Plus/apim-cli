@@ -54,7 +54,7 @@ public class ManageClientOrgs {
 				apiManager.apiAdapter.grantClientOrganization(missingDesiredOrgs, actualState, false);
 			}
 			if(removingActualOrgs.size()>0) {
-				if(CoreParameters.getInstance().getClientOrgsMode().equals(CoreParameters.MODE_REPLACE)) {
+				if(CoreParameters.getInstance().getClientOrgsMode().equals(CoreParameters.Mode.replace)) {
 					LOG.info("Removing access for orgs: "+removingActualOrgs+" from API: " + actualState.getName());
 					apiManager.accessAdapter.removeClientOrganization(removingActualOrgs, actualState.getId());
 				} else {

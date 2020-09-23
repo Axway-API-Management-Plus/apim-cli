@@ -53,6 +53,6 @@ public class CoreParametersTest {
 		CoreParameters params = new CoreParameters();
 		params.setQuotaMode(null);
 		
-		Assert.assertEquals(params.getQuotaMode(), CoreParameters.MODE_ADD);
+		Assert.assertEquals(params.getQuotaMode(), CoreParameters.Mode.add);
 	}
 }

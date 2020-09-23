@@ -52,7 +52,7 @@ public class ManageClientApps {
 		List<ClientApplication> recreateActualApps = null;
 		// If an UNPUBLISHED API has been re-created, we have to create App-Subscriptions manually, as API-Manager Upgrade only works on PUBLISHED APIs
 		// But we only need to do this, if existing App-Subscriptions should be preserved (MODE_ADD).
-		if(reCreation && actualState.getState().equals(API.STATE_UNPUBLISHED) && CoreParameters.getInstance().getClientAppsMode().equals(CoreParameters.MODE_ADD)) {
+		if(reCreation && actualState.getState().equals(API.STATE_UNPUBLISHED) && CoreParameters.getInstance().getClientAppsMode().equals(CoreParameters.Mode.add)) {
 			removeNonGrantedClientApps(oldAPI.getApplications());
 			recreateActualApps = getMissingApps(oldAPI.getApplications(), actualState.getApplications());
 			// Create previously existing App-Subscriptions
@@ -69,7 +69,7 @@ public class ManageClientApps {
 			createAppSubscription(missingDesiredApps, actualState.getId());
 		}
 		if(revomingActualApps.size()>0) {
-			if(CoreParameters.getInstance().getClientAppsMode().equals(CoreParameters.MODE_REPLACE)) {
+			if(CoreParameters.getInstance().getClientAppsMode().equals(CoreParameters.Mode.replace)) {
 				LOG.info("Removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName());
 				removeAppSubscription(revomingActualApps, actualState.getId());
 			} else {

@@ -20,9 +20,11 @@ public class CoreParameters {
 	
 	private static Logger LOG = LoggerFactory.getLogger(CoreParameters.class);
 	
-	public static String MODE_REPLACE	= "replace";
-	public static String MODE_IGNORE	= "ignore";
-	public static String MODE_ADD		= "add";
+	public enum Mode {
+		replace, 
+		ignore, 
+		add;
+	}
 	
 	public static String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
 	
@@ -63,9 +65,9 @@ public class CoreParameters {
 	
 	private Boolean ignoreQuotas;
 	
-	private String quotaMode = MODE_ADD;
-	private String clientAppsMode = MODE_ADD;
-	private String clientOrgsMode = MODE_ADD;
+	private Mode quotaMode = Mode.add;
+	private Mode clientAppsMode = Mode.add;
+	private Mode clientOrgsMode = Mode.add;
 	
 	private String detailsExportFile;
 	
@@ -193,39 +195,39 @@ public class CoreParameters {
 		return ignoreQuotas;
 	}
 
-	public String getQuotaMode() {
+	public Mode getQuotaMode() {
 		return quotaMode;
 	}
 
-	public void setQuotaMode(String quotaMode) {
+	public void setQuotaMode(Mode quotaMode) {
 		if(quotaMode==null) return;
 		this.quotaMode = quotaMode;
 	}
 
 	public Boolean isIgnoreClientApps() {
-		if(clientAppsMode.equals(MODE_IGNORE)) return true;
+		if(clientAppsMode==Mode.ignore) return true;
 		return false;
 	}
 	
-	public String getClientAppsMode() {
+	public Mode getClientAppsMode() {
 		return clientAppsMode;
 	}
 
-	public void setClientAppsMode(String clientAppsMode) {
+	public void setClientAppsMode(Mode clientAppsMode) {
 		if(clientAppsMode==null) return; // Stick with the default
 		this.clientAppsMode = clientAppsMode;
 	}
 
 	public Boolean isIgnoreClientOrgs() {
-		if(getClientOrgsMode().equals(MODE_IGNORE)) return true;
+		if(clientOrgsMode==Mode.ignore) return true;
 		return false;
 	}
 	
-	public String getClientOrgsMode() {
+	public Mode getClientOrgsMode() {
 		return clientOrgsMode;
 	}
 
-	public void setClientOrgsMode(String clientOrgsMode) {
+	public void setClientOrgsMode(Mode clientOrgsMode) {
 		if(clientOrgsMode==null) return; // Stick with the default
 		this.clientOrgsMode = clientOrgsMode;
 	}

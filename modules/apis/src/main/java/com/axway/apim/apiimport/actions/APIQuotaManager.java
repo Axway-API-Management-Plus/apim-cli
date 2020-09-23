@@ -31,7 +31,7 @@ public class APIQuotaManager {
 
 	public void execute() throws AppException {
 		if(desiredState.getApplicationQuota()==null && desiredState.getSystemQuota()==null) return;
-		if(CoreParameters.getInstance().isIgnoreQuotas() || CoreParameters.getInstance().getQuotaMode().equals(CoreParameters.MODE_IGNORE)) {
+		if(CoreParameters.getInstance().isIgnoreQuotas() || CoreParameters.getInstance().getQuotaMode().equals(CoreParameters.Mode.ignore)) {
 			LOG.info("Configured quotas will be ignored, as ignoreQuotas is true or QuotaMode has been set to ignore.");
 			return;
 		}
@@ -70,7 +70,7 @@ public class APIQuotaManager {
 		List<QuotaRestriction> newDesiredRestrictions = new ArrayList<QuotaRestriction>();
 		boolean existingRestrictionFound = false;
 		Iterator<QuotaRestriction> it;
-		if(CoreParameters.getInstance().getQuotaMode().equals(CoreParameters.MODE_REPLACE)) {
+		if(CoreParameters.getInstance().getQuotaMode().equals(CoreParameters.Mode.replace)) {
 			LOG.info("Removing existing Quotas for API: '"+this.actualState.getName()+"' as quotaMode is set to replace.");
 			it = existingRestrictions.iterator();
 			// Remove actual existing restrictions for that API
