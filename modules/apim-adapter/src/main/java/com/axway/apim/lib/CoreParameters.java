@@ -329,13 +329,22 @@ public class CoreParameters {
 	
 	
 	public void validateRequiredParameters() throws AppException {
-		ErrorState errors  = ErrorState.getInstance();
-		if(getUsername()==null && getAdminUsername()==null) errors.setError("Required parameter: 'username' or 'admin_username' is missing.", ErrorCode.MISSING_PARAMETER, false);
-		if(getPassword()==null && getAdminPassword()==null) errors.setError("Required parameter: 'password' or 'admin_password' is missing.", ErrorCode.MISSING_PARAMETER, false);
-		if(getHostname()==null) errors.setError("Required parameter: 'host' is missing.", ErrorCode.MISSING_PARAMETER, false);
-		if(errors.hasError()) {
-			LOG.error("The following parameters: username, password and host are required either using Command-Line-Options or in Environment.Properties");
-			LOG.error("       To get help, please use option -h");
+		boolean parameterMissing = false;
+		if(getUsername()==null && getAdminUsername()==null) {
+			parameterMissing = true;
+			LOG.error("Required parameter: 'username' or 'admin_username' is missing.");
+		}
+		if(getPassword()==null && getAdminPassword()==null) {
+			parameterMissing = true;
+			LOG.error("Required parameter: 'password' or 'admin_password' is missing.");
+		}
+		if(getHostname()==null) {
+			parameterMissing = true;
+			LOG.error("Required parameter: 'host' is missing.");
+		}
+		if(parameterMissing) {
+			LOG.error("Missing required parameters. Use either Command-Line-Options or Environment.Properties to provided required parameters.");
+			LOG.error("Get help with option -h");
 			LOG.error("");
 			ErrorState.getInstance().setError("Missing required parameters.", ErrorCode.MISSING_PARAMETER, false);
 			throw new AppException("Missing required parameters.", ErrorCode.MISSING_PARAMETER);
