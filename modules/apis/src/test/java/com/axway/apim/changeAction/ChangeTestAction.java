@@ -107,12 +107,18 @@ public class ChangeTestAction extends AbstractTestAction {
 			args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
 			args.add("-s");
 			args.add(stage);
-			args.add("-quotaMode");
-			args.add(quotaMode);
-			args.add("-clientOrgsMode");
-			args.add(clientOrgsMode);
-			args.add("-clientAppsMode");
-			args.add(clientAppsMode);
+			if(quotaMode!=null) {
+				args.add("-quotaMode");
+				args.add(quotaMode);
+			}
+			if(clientOrgsMode!=null) {
+				args.add("-clientOrgsMode");
+				args.add(clientOrgsMode);
+			}
+			if(clientAppsMode!=null) {
+				args.add("-clientAppsMode");
+				args.add(clientAppsMode);
+			}
 			args.add("-allowOrgAdminsToPublish");
 			args.add(allowOrgAdminsToPublish);
 			if(newBackend!=null) {
