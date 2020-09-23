@@ -198,6 +198,7 @@ public class CoreParameters {
 	}
 
 	public void setQuotaMode(String quotaMode) {
+		if(quotaMode==null) return;
 		this.quotaMode = quotaMode;
 	}
 

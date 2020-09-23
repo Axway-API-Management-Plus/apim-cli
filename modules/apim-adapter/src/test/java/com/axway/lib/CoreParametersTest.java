@@ -47,4 +47,12 @@ public class CoreParametersTest {
 		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationsQuotaCache));
 		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationAPIAccessCache));
 	}
+	
+	@Test
+	public void testDefaultQuotaModeStays() {
+		CoreParameters params = new CoreParameters();
+		params.setQuotaMode(null);
+		
+		Assert.assertEquals(params.getQuotaMode(), CoreParameters.MODE_ADD);
+	}
 }
