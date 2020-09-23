@@ -75,7 +75,7 @@ public class APIChangeHandler extends APIResultHandler {
 		for(APIChangeState changeState : apisToChange) {
 			LOG.info("Apply changes for API: '" + changeState.getDesiredAPI().getName() +"'");
 			try {
-				importManager.applyChanges(changeState);
+				importManager.applyChanges(changeState, true);
 			} catch(Exception e) {
 				LOG.error("Error applying changes for API: " + changeState.getDesiredAPI().getName(), e);
 			}

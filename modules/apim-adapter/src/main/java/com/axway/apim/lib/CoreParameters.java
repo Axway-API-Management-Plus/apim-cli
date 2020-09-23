@@ -189,6 +189,7 @@ public class CoreParameters {
 	}
 	
 	public Boolean isIgnoreQuotas() {
+		if(ignoreQuotas==null) return false;
 		return ignoreQuotas;
 	}
 

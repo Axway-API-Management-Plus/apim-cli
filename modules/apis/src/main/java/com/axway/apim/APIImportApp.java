@@ -103,7 +103,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 					.build();
 			API actualAPI = apimAdapter.apiAdapter.getAPI(filter, true);
 			APIChangeState changes = new APIChangeState(actualAPI, desiredAPI);
-			new APIImportManager().applyChanges(changes);
+			new APIImportManager().applyChanges(changes, params.isForceUpdate());
 			APIPropertiesExport.getInstance().store();
 			return 0;
 		} catch (AppException ap) {

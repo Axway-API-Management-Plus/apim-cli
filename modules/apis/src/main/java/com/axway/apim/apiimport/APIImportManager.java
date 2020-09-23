@@ -7,7 +7,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.apiimport.actions.RecreateToUpdateAPI;
 import com.axway.apim.apiimport.actions.UpdateExistingAPI;
-import com.axway.apim.apiimport.lib.APIImportParams;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -28,8 +27,8 @@ public class APIImportManager {
 	 * @param changeState containing the desired and actual API
 	 * @throws AppException is the desired state can't be replicated into the API-Manager.
 	 */
-	public void applyChanges(APIChangeState changeState) throws AppException {
-		APIImportParams commands = APIImportParams.getInstance();
+	public void applyChanges(APIChangeState changeState, boolean forceUpdate) throws AppException {
+		CoreParameters commands = CoreParameters.getInstance();
 		if(!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded() ) {
 			if(commands.isAllowOrgAdminsToPublish()) {
 				LOG.debug("Desired API-State set to published using OrgAdmin account only. Going to create a publish request. "
@@ -47,7 +46,7 @@ public class APIImportManager {
 			CreateNewAPI createAPI = new CreateNewAPI();
 			createAPI.execute(changeState, false);
 		// Otherwise an existing API exists
-		} else if(commands.isForceUpdate()) {
+		} else if(forceUpdate) {
 			LOG.info("Re-Creating API as the ForceUpdate flag is set");
 			RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
 			recreate.execute(changeState);
