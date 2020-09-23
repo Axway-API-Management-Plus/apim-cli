@@ -110,9 +110,9 @@ public class APIImportCLIOptions extends CoreCLIOptions {
 		if(getValue("replaceHostInSwagger")!=null) params.setReplaceHostInSwagger(Boolean.parseBoolean(getValue("replaceHostInSwagger")));
 		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
 		params.setIgnoreQuotas(hasOption("ignoreQuotas"));
-		params.setClientOrgsMode(Mode.valueOf(getValue("clientOrgsMode")));
-		params.setClientAppsMode(Mode.valueOf(getValue("clientAppsMode")));
-		params.setQuotaMode(Mode.valueOf(getValue("quotaMode")));
+		params.setClientOrgsMode(Mode.valueOfDefault(getValue("clientOrgsMode")));
+		params.setClientAppsMode(Mode.valueOfDefault(getValue("clientAppsMode")));
+		params.setQuotaMode(Mode.valueOfDefault(getValue("quotaMode")));
 		params.setDetailsExportFile(getValue("detailsExportFile"));
 		if(getValue("allowOrgAdminsToPublish")!=null) params.setAllowOrgAdminsToPublish(Boolean.parseBoolean(getValue("allowOrgAdminsToPublish")));
 		return params;

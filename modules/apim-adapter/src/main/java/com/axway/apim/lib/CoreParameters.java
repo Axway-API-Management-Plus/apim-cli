@@ -24,6 +24,15 @@ public class CoreParameters {
 		replace, 
 		ignore, 
 		add;
+		
+		public static Mode valueOfDefault(String key) {
+			for (Mode e : values()) {
+		        if (e.name().equals(key)) {
+		            return e;
+		        }
+		    }
+			return Mode.add;
+		}
 	}
 	
 	public static String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
