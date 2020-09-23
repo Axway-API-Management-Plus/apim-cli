@@ -131,7 +131,7 @@ public abstract class CoreCLIOptions {
 		
 		// Also support -f for backwards compatibility
 		if(!params.isForce()) params.setForce(Boolean.parseBoolean(getValue("f")));
-		
+		params.validateRequiredParameters();
 	}
 
 	/**

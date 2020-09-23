@@ -88,10 +88,6 @@ public class CoreParameters {
 		if(CoreParameters.instance == null && TestIndicator.getInstance().isTestRunning()) {
 			return new CoreParameters(); // Skip this, just return an empty CommandParams to avoid NPE
 		}
-		if (CoreParameters.instance == null) {
-			LOG.error("Parameters have not been initialized.");
-			throw new RuntimeException("Parameters have not been initialized.");
-		}
 		return CoreParameters.instance;
 	}
 

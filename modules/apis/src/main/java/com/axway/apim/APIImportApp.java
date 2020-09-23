@@ -52,25 +52,26 @@ public class APIImportApp implements APIMCLIServiceProvider {
 		APIImportParams params;
 		try {
 			params = new APIImportCLIOptions(args).getAPIImportParams();
-			return importAPI(params);
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		} catch (ParseException e) {
+			LOG.error("Error " + e.getMessage());
+			return ErrorCode.MISSING_PARAMETER.getCode();
 		}
+		APIImportApp apiImportApp = new APIImportApp();
+		return apiImportApp.importAPI(params);
 	}
-	
 
-	public static int importAPI(APIImportParams params) {
+	public int importAPI(APIImportParams params) {
 		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
-		try {
-			
-			// We need to clean some Singleton-Instances, as tests are running in the same JVM
+		try {			
+			// Clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			RollbackHandler.deleteInstance();
-			
-			
+
 			errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();

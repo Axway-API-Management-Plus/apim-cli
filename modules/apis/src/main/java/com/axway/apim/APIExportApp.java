@@ -2,6 +2,7 @@ package com.axway.apim;
 
 import java.util.List;
 
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,10 +41,25 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	}
 	
 	@CLIServiceMethod(name = "get", description = "Get APIs from the API-Manager in different formats")
-	public static int export(String args[]) {
+	public static int exportAPI(String args[]) {
+		APIExportParams params;
+		try {
+			params = new APIExportGetCLIOptions(args).getAPIExportParams();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		} catch (ParseException e) {
+			LOG.error("Error " + e.getMessage());
+			return ErrorCode.MISSING_PARAMETER.getCode();
+		}
+		APIExportApp apiExportApp = new APIExportApp();
+		return apiExportApp.exportAPI(params);
+	}
+
+	public int exportAPI(APIExportParams params) {
 		try {
 			deleteInstances();
-			APIExportParams params = new APIExportGetCLIOptions(args).getAPIExportParams();
+
 			switch(params.getOutputFormat()) {
 			case console:
 				return execute(params, APIListImpl.CONSOLE_EXPORTER);
