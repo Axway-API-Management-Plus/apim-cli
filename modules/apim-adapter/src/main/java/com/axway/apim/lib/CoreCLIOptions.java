@@ -9,7 +9,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -223,24 +222,6 @@ public abstract class CoreCLIOptions {
 		} else {
 			return null;
 		}
-	}
-
-	private CommandLine getCmd() {
-		if(this.cmd==null) parse();
-		return cmd;
-	}
-
-	private CommandLine getInternalCmd() {
-		if(this.internalCmd==null) parse();
-		return internalCmd;
-	}
-
-	private Options getOptions() {
-		return options;
-	}
-
-	private Options getInternalOptions() {
-		return internalOptions;
 	}
 	
 	class OptionsComparator implements Comparator<Option> {

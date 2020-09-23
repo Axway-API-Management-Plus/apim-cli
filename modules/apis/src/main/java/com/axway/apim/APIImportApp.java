@@ -3,6 +3,7 @@ package com.axway.apim;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.cli.ParseException;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -48,6 +49,18 @@ public class APIImportApp implements APIMCLIServiceProvider {
 	
 	@CLIServiceMethod(name = "import", description = "Import APIs into the API-Manager")
 	public static int importAPI(String args[]) {
+		APIImportParams params;
+		try {
+			params = new APIImportCLIOptions(args).getAPIImportParams();
+			return importAPI(params);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
+	}
+	
+
+	public static int importAPI(APIImportParams params) {
 		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 		try {
 			
@@ -57,7 +70,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			APIMHttpClient.deleteInstances();
 			RollbackHandler.deleteInstance();
 			
-			APIImportParams params = new APIImportCLIOptions(args).getAPIImportParams();
+			
 			errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
