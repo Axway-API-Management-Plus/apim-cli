@@ -31,6 +31,9 @@ public class ManageClientApps {
 	
 	/**
 	 * In case, the API has been re-created, this is object contains the API how it was before
+	 * @param desiredState the desired state of the API
+	 * @param actualState the actual state of the API incl. intermediate changes already performed so far
+	 * @param oldAPI the actual state of the API how it was loaded initially
 	 */
 	
 	public ManageClientApps(API desiredState, API actualState, API oldAPI) throws AppException {

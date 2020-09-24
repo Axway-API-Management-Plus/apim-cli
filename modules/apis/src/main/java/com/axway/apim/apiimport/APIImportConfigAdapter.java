@@ -121,7 +121,7 @@ public class APIImportConfigAdapter {
 	 * Constructor just for testing. Don't use it!
 	 * @param apiConfig the desired API to test with
 	 * @param apiConfigFile this is the given config file
-	 * @throws AppException 
+	 * @throws AppException if the API import configuration cannot be loaded/initialized
 	 */
 	public APIImportConfigAdapter(API apiConfig, String apiConfigFile) throws AppException {
 		this.apiConfig = apiConfig;
