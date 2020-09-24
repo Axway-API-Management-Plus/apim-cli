@@ -15,7 +15,7 @@ import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.DesiredTestOnlyAPI;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.apiimport.lib.APIImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class PrivateKeystoreLoadTest {
@@ -24,8 +24,7 @@ public class PrivateKeystoreLoadTest {
 	
 	@BeforeClass
 	private void initTestIndicator() {
-		Map<String, String> params = new HashMap<String, String>();
-		new CommandParameters(params);
+		APIImportParams params = new APIImportParams();
 	}
 	
 	@BeforeMethod(alwaysRun = true)

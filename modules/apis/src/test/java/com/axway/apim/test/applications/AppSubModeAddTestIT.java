@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
@@ -124,7 +125,7 @@ public class AppSubModeAddTestIT extends TestNGCitrusTestDesigner {
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/applications/1_api-with-1-org-1-app.json");
 		createVariable("state", "published");
 		createVariable("orgName2", "${orgName2}");
-		createVariable("clientAppsMode", "add");
+		createVariable("clientAppsMode", String.valueOf(Mode.add));
 		createVariable("testAppName", "${appName3}"); // An additional subscription must be created for this app
 		action(swaggerImport);
 		

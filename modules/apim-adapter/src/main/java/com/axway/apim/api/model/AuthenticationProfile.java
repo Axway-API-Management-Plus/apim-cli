@@ -71,13 +71,13 @@ public class AuthenticationProfile {
 				// Empty password handling - Make sure, there is a password set
 				if(!thisParameters.containsKey("password") || thisParameters.get("password")==null) thisParameters.put("password", "");
 				if(!otherParameters.containsKey("password") || otherParameters.get("password")==null) otherParameters.put("password", "");
-				if(otherParameters.containsKey("password")) {
-					otherPassword = otherParameters.get("password");
-					otherParameters.remove("password");
-				}
-				if(thisParameters.containsKey("password")) {
-					thisPassword = thisParameters.get("password");
+				if(otherParameters.containsKey("password")) otherPassword = otherParameters.get("password");
+				if(thisParameters.containsKey("password")) thisPassword = thisParameters.get("password");			
+				// Keep comparing passwords only if both have values (possible only if com.axway.apimanager.api.model.disable.confidential.fields=false in API Gateway)
+				// If at least one password is missing, skip comparison
+				if ( thisPassword.equals("") || otherPassword.equals("")) {
 					thisParameters.remove("password");
+					otherParameters.remove("password");
 				}
 			}
 

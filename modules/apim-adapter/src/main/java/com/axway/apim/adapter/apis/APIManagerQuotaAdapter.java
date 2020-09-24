@@ -23,7 +23,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.rest.GETRequest;
@@ -67,13 +67,13 @@ public class APIManagerQuotaAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			if(Quota.APPLICATION_DEFAULT.getQuotaId().equals(quotaId) || Quota.SYSTEM_DEFAULT.getQuotaId().equals(quotaId)) {
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+quotaId).build();
+				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+quotaId).build();
 			} else {
 				if(applicationsQuotaCache.containsKey(quotaId)) {
 					this.apiManagerResponse.put(quotaId, applicationsQuotaCache.get(quotaId));
 					return;
 				}
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+quotaId+"/quota/").build();
+				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+quotaId+"/quota/").build();
 			}
 			RestAPICall getRequest = new GETRequest(uri, true);
 			httpResponse = getRequest.execute();
@@ -116,7 +116,7 @@ public class APIManagerQuotaAdapter {
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/quotas/"+quotaId).build();
+			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/quotas/"+quotaId).build();
 			
 			entity = new StringEntity(mapper.writeValueAsString(quotaConfig), StandardCharsets.UTF_8);
 			

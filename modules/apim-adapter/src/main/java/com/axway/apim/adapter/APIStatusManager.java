@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.API;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -68,7 +68,7 @@ public class APIStatusManager {
 	}
 	
 	public void update(API apiToUpdate, String desiredState, String vhost) throws AppException {
-		if(CommandParameters.getInstance().isForce()) {
+		if(CoreParameters.getInstance().isForce()) {
 			update(apiToUpdate, desiredState, vhost, true);
 		} else {
 			update(apiToUpdate, desiredState, vhost, false);

@@ -126,12 +126,12 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	}
 	
 	private boolean hasQuota(API api) {
-		return (api.getApplicationQuota()!=null) && 
+		return (api.getApplicationQuota()!=null && 
 				api.getApplicationQuota().getRestrictions()!=null &&
-				api.getApplicationQuota().getRestrictions().size()>0 && 
-				api.getSystemQuota()!=null && 
+				api.getApplicationQuota().getRestrictions().size()>0) || 
+				(api.getSystemQuota()!=null && 
 				api.getSystemQuota().getRestrictions()!=null &&
-				api.getSystemQuota().getRestrictions().size()>0
+				api.getSystemQuota().getRestrictions().size()>0)
 				;
 	}
 	
@@ -163,7 +163,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	}
 	
 	private boolean hasTags(API api) {
-		return (api.getTags()==null);
+		return (api.getTags()!=null && api.getTags().size()!=0);
 	}
 	
 	private String getOrgCount(API api) {

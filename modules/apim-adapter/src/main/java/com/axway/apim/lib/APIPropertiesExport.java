@@ -38,12 +38,12 @@ public class APIPropertiesExport {
 	
 	public void store() {
 		if(properties.isEmpty()) return;
-		String exportFile = CommandParameters.getInstance().getDetailsExportFile();
+		String exportFile = CoreParameters.getInstance().getDetailsExportFile();
 		if(exportFile==null) return;
 		File file = new File(exportFile);
 		try {
 			if(!file.isAbsolute()) {
-				String configFile = CommandParameters.getInstance().getValue("contract");
+				String configFile = StandardImportParams.getInstance().getConfig();
 				String baseDir = new File(configFile).getCanonicalFile().getParent();
 				file = new File(baseDir + File.separator + exportFile);
 			}
