@@ -519,6 +519,10 @@ public class APIImportConfigAdapter {
 	
 	private void validateCustomProperties(API apiConfig) throws AppException {
 		if(apiConfig.getCustomProperties()!=null) {
+			if(apiConfig.getCustomProperties().size()==0) { // If no custom properties are given, we reset them to null and skip any validation
+				apiConfig.setCustomProperties(null);
+				return;
+			}
 			JsonNode configuredProps = APIManagerAdapter.getCustomPropertiesConfig();
 			Iterator<String> props = apiConfig.getCustomProperties().keySet().iterator();
 			while(props.hasNext()) {
