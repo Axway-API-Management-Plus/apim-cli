@@ -82,7 +82,7 @@ public class CoreParameters {
 	
 	private Boolean replaceHostInSwagger = true;
 	
-	private Boolean rollback = false;
+	private Boolean rollback = true;
 	
 	private String confDir;
 	
@@ -280,11 +280,12 @@ public class CoreParameters {
 		this.replaceHostInSwagger = replaceHostInSwagger;
 	}
 	
-	public boolean isRollback() {
+	public Boolean isRollback() {
 		return rollback;
 	}
 
-	public void setRollback(boolean rollback) {
+	public void setRollback(Boolean rollback) {
+		if(rollback==null) return;
 		this.rollback = rollback;
 	}
 	

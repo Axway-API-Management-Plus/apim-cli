@@ -533,6 +533,10 @@ public class APIImportConfigAdapter {
 				if(propType!=null && ( propType.asText().equals("select") || propType.asText().equals("switch") )) {
 					boolean valueFound = false;
 					ArrayNode selectOptions = (ArrayNode)configuredProp.get("options");
+					if(selectOptions==null) {
+						LOG.warn("Skipping custom property validation, as the custom-property: '" + propertyKey + "' with type: " + propType.asText() + " has no options configured. Please check your custom properties configuration.");
+						break;
+					}
 					for(JsonNode option : selectOptions) {
 						if(option.at("/value").asText().equals(propertyValue)) {
 							valueFound = true;
@@ -540,8 +544,8 @@ public class APIImportConfigAdapter {
 						}
 					}
 					if(!valueFound) {
-						ErrorState.getInstance().setError("The value: '" + propertyValue + "' isn't configured for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE, false);
-						throw new AppException("The value: '" + propertyValue + "' isn't configured for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE);
+						ErrorState.getInstance().setError("The value: '" + propertyValue + "' is not a valid option for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE, false);
+						throw new AppException("The value: '" + propertyValue + "' is not a valid option for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE);
 					}
 				}
 			}
