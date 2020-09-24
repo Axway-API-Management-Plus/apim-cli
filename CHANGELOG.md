@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Search for APIs based on configured tags (See issue [#82](https://github.com/Axway-API-Management-Plus/apim-cli/issues/82))
+- Error handling improved if custom properties configuration is invalid (Switch or Select without configured options)
+- Added support to import application scopes (See PR [#77](https://github.com/Axway-API-Management-Plus/apim-cli/pull/77))
+- Leverage "com.axway.apimanager.api.model.disable.confidential.fields" option (See PR [#71](https://github.com/Axway-API-Management-Plus/apim-cli/pull/71))
+
+### Fixed
+- Changing an APIs fails due to a ClassCastException (See issue [#85](https://github.com/Axway-API-Management-Plus/apim-cli/issues/85))
+- NullPointerException when retrieving APIs on console with mode ultra (See issue [#80](https://github.com/Axway-API-Management-Plus/apim-cli/issues/80))
+- Quota- and Tag-Information always shown as false in console view, even if configured for an API (See issue [#81](https://github.com/Axway-API-Management-Plus/apim-cli/issues/81))
+- Handling of ExtClient configuration fixed when importing applications (See PR [#78](https://github.com/Axway-API-Management-Plus/apim-cli/pull/78))
+- Error when updating an organization (See issue [#73](https://github.com/Axway-API-Management-Plus/apim-cli/issues/73))
+- NPE when updating backendBasepath in a Swagger not having a host configured (See issue [#72](https://github.com/Axway-API-Management-Plus/apim-cli/issues/72))
+
+### Changed
+- Internal parameter handling refactore to make it easier to integrate the CLI into other Java-Programs (See PR [#83](https://github.com/Axway-API-Management-Plus/apim-cli/pull/83))
 
 ## [1.2.2] 2020-09-09
 ### Added
