@@ -8,6 +8,7 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
@@ -31,7 +32,7 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/quota-replace-api-${apiNumber}");
 		variable("apiName", "Quota-${apiNumber}-Replace-API");
-		variable("quotaMode", "replace");
+		variable("quotaMode", String.valueOf(Mode.replace));
 		
 		
 		echo("####### Import a very basic API without any quota #######");

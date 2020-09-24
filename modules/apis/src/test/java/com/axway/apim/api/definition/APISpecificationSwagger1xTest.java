@@ -1,17 +1,13 @@
 package com.axway.apim.api.definition;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.axway.apim.api.definition.APISpecification;
-import com.axway.apim.api.definition.APISpecificationFactory;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.apiimport.lib.APIImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,9 +21,8 @@ public class APISpecificationSwagger1xTest {
 	
 	@BeforeClass
 	private void initTestIndicator() {
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("replaceHostInSwagger", "true");
-		new CommandParameters(params);
+		APIImportParams params = new APIImportParams();
+		params.setReplaceHostInSwagger(true);
 	}
 	
 	@Test

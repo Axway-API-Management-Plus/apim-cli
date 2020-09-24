@@ -83,6 +83,12 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 				.validate("$[0].id", "6cd55c27-675a-444a-9bc7-ae9a7869184d-${appNumber}")
 				.validate("$[0].secret", "34f2b2d6-0334-4dcc-8442-e0e7009b8950"));
 		
+		echo("####### Validate application: '${appName}' with id: ${appId} Ext client id has been imported #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/extclients").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.clientId=='ClientConfidentialClientID-${appNumber}')].clientId", "ClientConfidentialClientID-${appNumber}")
+				.validate("$.[?(@.clientId=='ClientConfidentialClientID-${appNumber}')].enabled", "true"));
+		
 		echo("####### Re-Import same application - Should be a No-Change #######");
 		createVariable("expectedReturnCode", "10");
 		appImport.doExecute(context);

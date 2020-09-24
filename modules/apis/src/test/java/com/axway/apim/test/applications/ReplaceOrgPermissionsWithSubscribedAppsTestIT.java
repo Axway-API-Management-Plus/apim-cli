@@ -6,6 +6,7 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -28,8 +29,8 @@ public class ReplaceOrgPermissionsWithSubscribedAppsTestIT extends TestNGCitrusT
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/replace-org-permissions-with-subscribed-apps-${apiNumber}");
 		variable("apiName", "Replace Org-Permissions with subscribed Apps-${apiNumber}");
-		variable("clientAppsMode", "replace");
-		variable("clientOrgsMode", "replace");
+		variable("clientAppsMode", String.valueOf(Mode.replace));
+		variable("clientOrgsMode", String.valueOf(Mode.replace));
 		// ############## Create 4 Consuming organizations #################
 		createVariable("orgName1", "1 Client-Org ${orgNumber}");
 		createVariable("orgName2", "2 Client-Org ${orgNumber}");

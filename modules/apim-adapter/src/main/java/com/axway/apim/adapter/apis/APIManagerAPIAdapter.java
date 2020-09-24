@@ -55,7 +55,7 @@ import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.Profile;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -86,7 +86,7 @@ public class APIManagerAPIAdapter {
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
-	CommandParameters cmd = CommandParameters.getInstance();
+	CoreParameters cmd = CoreParameters.getInstance();
 	
 	/**
 	 * Maps the provided status to the REST-API endpoint to change the status!
@@ -271,7 +271,7 @@ public class APIManagerAPIAdapter {
 			URI uri;
 			HttpResponse httpResponse = null;
 			try {
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+api.getId()+"/image").build();
+				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+api.getId()+"/image").build();
 				RestAPICall getRequest = new GETRequest(uri);
 				httpResponse = getRequest.execute();
 				if(httpResponse == null || httpResponse.getEntity() == null || httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
@@ -461,7 +461,7 @@ public class APIManagerAPIAdapter {
 			api.setApplications(apps);
 		} else {
 			apps = APIManagerAdapter.getInstance().appAdapter.getApplications(new ClientAppFilter.Builder()
-					.includeQuotas(filter.isIncludeClientAppQuota())
+					.includeQuotas(filter.isIncludeClientAppQuota()).includeOauthResources(true)
 					.build(), false);
 			for(ClientApplication app : apps) {
 				List<APIAccess> APIAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app, APIManagerAPIAccessAdapter.Type.applications, true);
@@ -483,11 +483,11 @@ public class APIManagerAPIAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			if(filter.isUseFEAPIDefinition()) {
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/discovery/swagger/api/id/"+api.getId())
+				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/discovery/swagger/api/id/"+api.getId())
 						.setParameter("swaggerVersion", "2.0").build();
 				LOG.debug("Loading API-Definition from FE-API: ");
 			} else {
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
+				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
 						.setParameter("original", "true").build();
 			}
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
@@ -669,7 +669,7 @@ public class APIManagerAPIAdapter {
 	private boolean useAdminAccountForPublish() throws AppException {
 		if(APIManagerAdapter.hasAdminAccount()) return true;
 		// This flag can be set to false to stop OrgAdmin from a Publishing request (means Pending approval)
-		if(CommandParameters.getInstance().allowOrgAdminsToPublish()) return false;
+		if(CoreParameters.getInstance().isAllowOrgAdminsToPublish()) return false;
 		// In all other cases, we use the Admin-Account
 		return true;
 	}

@@ -75,7 +75,7 @@ import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.APIPropertiesExport;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -187,7 +187,7 @@ public class APIImportConfigAdapter {
 	 * @throws IOException if the file can't be found
 	 */
 	private String substitueVariables(File inputFile) throws IOException {
-		StringSubstitutor substitutor = new StringSubstitutor(CommandParameters.getInstance().getEnvironmentProperties());
+		StringSubstitutor substitutor = new StringSubstitutor(CoreParameters.getInstance().getProperties());
 		String givenConfig = new String(Files.readAllBytes(inputFile.toPath()), StandardCharsets.UTF_8);
 		givenConfig = StringSubstitutor.replace(givenConfig, System.getenv());
 		return substitutor.replace(givenConfig);
@@ -393,7 +393,7 @@ public class APIImportConfigAdapter {
 	 * @throws AppException
 	 */
 	private void completeClientApplications(API apiConfig) throws AppException {
-		if(CommandParameters.getInstance().isIgnoreClientApps()) return;
+		if(CoreParameters.getInstance().isIgnoreClientApps()) return;
 		if(apiConfig.getState()==API.STATE_UNPUBLISHED) return;
 		ClientApplication loadedApp = null;
 		ClientApplication app;
@@ -533,6 +533,10 @@ public class APIImportConfigAdapter {
 				if(propType!=null && ( propType.asText().equals("select") || propType.asText().equals("switch") )) {
 					boolean valueFound = false;
 					ArrayNode selectOptions = (ArrayNode)configuredProp.get("options");
+					if(selectOptions==null) {
+						LOG.warn("Skipping custom property validation, as the custom-property: '" + propertyKey + "' with type: " + propType.asText() + " has no options configured. Please check your custom properties configuration.");
+						break;
+					}
 					for(JsonNode option : selectOptions) {
 						if(option.at("/value").asText().equals(propertyValue)) {
 							valueFound = true;
@@ -540,8 +544,8 @@ public class APIImportConfigAdapter {
 						}
 					}
 					if(!valueFound) {
-						ErrorState.getInstance().setError("The value: '" + propertyValue + "' isn't configured for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE, false);
-						throw new AppException("The value: '" + propertyValue + "' isn't configured for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE);
+						ErrorState.getInstance().setError("The value: '" + propertyValue + "' is not a valid option for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE, false);
+						throw new AppException("The value: '" + propertyValue + "' is not a valid option for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE);
 					}
 				}
 			}

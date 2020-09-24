@@ -2,7 +2,7 @@ package com.axway.apim.api.definition;
 
 import java.net.URL;
 
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -26,7 +26,7 @@ public class Swagger1xSpecification extends APISpecification {
 
 	@Override
 	protected void configureBasepath() throws AppException {
-		if(!CommandParameters.getInstance().replaceHostInSwagger()) return;
+		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		try {
 			if(this.backendBasepath!=null) {
 				boolean backendBasepathAdjusted = false;

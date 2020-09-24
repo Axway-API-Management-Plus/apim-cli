@@ -69,6 +69,8 @@ public class APIFilter {
 	
 	private String policyName;
 	
+	private String tag;
+	
 	private Map<String, String> customProperties;
 	
 	private boolean deprecated;
@@ -168,6 +170,14 @@ public class APIFilter {
 
 	public String getPolicyName() {
 		return policyName;
+	}
+	
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
+	public String getTag() {
+		return tag;
 	}
 
 	public String getApiType() {
@@ -424,7 +434,7 @@ public class APIFilter {
 	
 	
 	public boolean filter(API api) throws AppException {
-		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null && this.getBackendBasepath()==null) { // Nothing given to filter out.
+		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null && this.getBackendBasepath()==null && this.getTag()==null) { // Nothing given to filter out.
 			return true;
 		}
 		// Before 7.7, we have to filter out APIs manually!
@@ -482,7 +492,7 @@ public class APIFilter {
 			}
 			if(!requestedPolicyUsed) return false;
 		}
-		if(this.getBackendBasepath()!=null) {			
+		if(this.getBackendBasepath()!=null) {
 			Pattern pattern = Pattern.compile(this.getBackendBasepath().replace("*", ".*"));
 			Matcher matcher = pattern.matcher(api.getServiceProfiles().get("_default").getBasePath());
 			if(!matcher.matches()) {
@@ -492,6 +502,41 @@ public class APIFilter {
 		if(this.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
 			if(this.getVhost()!=null && !this.getVhost().equals(api.getVhost()))  return false;
 			if(this.getQueryStringVersion()!=null && !this.getQueryStringVersion().equals(api.getApiRoutingKey()))  return false;
+		}
+		if(this.getTag()!=null) {
+			// Simple filter format tag: "tagValue*"
+			String tagGroupFilter = this.getTag();
+			String tagValueFilter = this.getTag();
+			if(this.getTag().contains("=")) { // Group specific format: "tagGroup=tagValue*"
+				tagGroupFilter = this.getTag().split("=")[0];
+				tagValueFilter = this.getTag().split("=")[1];
+			} 
+			Pattern groupPattern = Pattern.compile(tagGroupFilter.toLowerCase().replace("*", ".*"));
+			Pattern valuePattern = Pattern.compile(tagValueFilter.toLowerCase().replace("*", ".*"));
+			Iterator<String> it = api.getTags().keySet().iterator();
+			boolean match = false;
+			while(it.hasNext()) {
+				String tagGroup = it.next();
+				Matcher matcher = groupPattern.matcher(tagGroup.toLowerCase());
+				if(!matcher.matches()) {
+					// Search for specific group - No match - Ignore this group
+					if(getTag().contains("=")) break;
+				} else {
+					// Filter match on the group
+					if(!getTag().contains("=")) match = true;
+				}
+				String[] tagValues = api.getTags().get(tagGroup);
+				for(String tagValue : tagValues) {
+					matcher = valuePattern.matcher(tagValue.toLowerCase());
+					if(matcher.matches()) {
+						match=true;
+						break;
+					}
+				}
+				if(match) break;
+			}
+			// If none of the tags match, filter out this API
+			if(!match) return false;
 		}
 		return true;
 	}
@@ -520,6 +565,7 @@ public class APIFilter {
 		String name;
 		String vhost;
 		String policyName;
+		String tag;
 		String apiPath;
 		String queryStringVersion;
 		String state;
@@ -587,6 +633,7 @@ public class APIFilter {
 			apiFilter.setVhost(this.vhost);
 			apiFilter.setName(this.name);
 			apiFilter.setPolicyName(this.policyName);
+			apiFilter.setTag(this.tag);
 			apiFilter.setFilters(this.filters);
 			apiFilter.setId(this.id);
 			apiFilter.setApiId(apiId);
@@ -662,6 +709,11 @@ public class APIFilter {
 		
 		public Builder hasPolicyName(String policyName) {
 			this.policyName = policyName;
+			return this;
+		}
+		
+		public Builder hasTag(String tag) {
+			this.tag = tag;
 			return this;
 		}
 		

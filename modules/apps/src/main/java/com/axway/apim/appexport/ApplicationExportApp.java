@@ -50,7 +50,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "get", description = "Get Applications from the API-Manager in different formats")
 	public static int export(String args[]) {
 		try {
-			AppExportParams params = new AppExportParams(new AppExportCLIOptions(args));
+			AppExportParams params = new AppExportCLIOptions(args).getAppExportParams();
 			switch(params.getOutputFormat()) {
 			case console:
 				return runExport(params, ExportImpl.CONSOLE_EXPORTER);

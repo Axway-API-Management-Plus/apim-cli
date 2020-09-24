@@ -1,7 +1,9 @@
 package com.axway.apim.api.model.apps;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,9 +11,9 @@ import com.axway.apim.adapter.jackson.APIAccessSerializer;
 import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
+import com.axway.apim.api.model.AbstractEntity;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.AbstractEntity;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,9 +22,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+/**
+ * @author ADMIN
+ *
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("ApplicationFilter")
 public class ClientApplication extends AbstractEntity {
+
+	
 	private String email;
 	private String phone;
 	private boolean enabled;
@@ -46,6 +54,8 @@ public class ClientApplication extends AbstractEntity {
 	private List<ClientAppCredential> credentials = new ArrayList<ClientAppCredential>(); 
 	
 	private APIQuota appQuota;
+	
+	private List<ClientAppOauthResource> oauthResources = new ArrayList<ClientAppOauthResource>();
 	
 	@JsonDeserialize( using = OrganizationDeserializer.class)
 	@JsonAlias({ "organization", "organizationId" })	
@@ -143,18 +153,29 @@ public class ClientApplication extends AbstractEntity {
 	public void setCredentials(List<ClientAppCredential> credentials) {
 		this.credentials = credentials;
 	}
+	
+	public List<ClientAppOauthResource> getOauthResources() {
+		return oauthResources;
+	}
+
+	public void setOauthResources(List<ClientAppOauthResource> oauthResources) {
+		this.oauthResources = oauthResources;
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
 		if(other instanceof ClientApplication) {
 			ClientApplication otherApp = (ClientApplication)other;
+			Comparator c = Comparator.comparing(ClientAppCredential::getCredentialType).thenComparing(ClientAppCredential::getId);
 			return 
 					StringUtils.equals(otherApp.getName(), this.getName()) &&
 					StringUtils.equals(otherApp.getEmail(), this.getEmail()) && 
 					StringUtils.equals(otherApp.getDescription(), this.getDescription()) &&
 					StringUtils.equals(otherApp.getPhone(), this.getPhone()) &&
 					StringUtils.equals(otherApp.getState(), this.getState()) &&
-					(otherApp.getCredentials()==null || otherApp.getCredentials().equals(this.getCredentials())) &&
+					(otherApp.getCredentials()==null || otherApp.getCredentials().stream().sorted(c).collect(Collectors.toList()).equals(this.getCredentials().stream().sorted(c).collect(Collectors.toList()))) &&
+					(otherApp.getOauthResources()==null || otherApp.getOauthResources().stream().sorted(Comparator.comparing(ClientAppOauthResource::getScope)).collect(Collectors.toList()).equals(this.getOauthResources().stream().sorted(Comparator.comparing(ClientAppOauthResource::getScope)).collect(Collectors.toList()))) &&
 					(otherApp.getImage()==null || otherApp.getImage().equals(this.getImage()))
 					;
 		}
@@ -164,4 +185,5 @@ public class ClientApplication extends AbstractEntity {
 	public String toString() {
 		return "[" + getName() + "]";
 	}
+
 }

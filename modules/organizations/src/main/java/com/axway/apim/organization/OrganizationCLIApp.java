@@ -55,7 +55,7 @@ public class OrganizationCLIApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "get", description = "Get Organizations from API-Manager in different formats")
 	public static int export(String args[]) {
 		try {
-			OrgExportParams params = new OrgExportParams(new OrgExportCLIOptions(args));
+			OrgExportParams params = new OrgExportCLIOptions(args).getOrgExportParams();
 			switch(params.getOutputFormat()) {
 			case console:
 				return runExport(params, ResultHandler.CONSOLE_EXPORTER);
@@ -134,11 +134,11 @@ public class OrganizationCLIApp implements APIMCLIServiceProvider {
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			
-			OrgImportParams params = new OrgImportParams(new OrgImportCLIOptions(args));
+			OrgImportParams params = new OrgImportCLIOptions(args).getOrgImportParams();
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the organization
 			OrgAdapter orgAdapter = new JSONOrgAdapter();
-			orgAdapter.readConfig(params.getValue("config"));
+			orgAdapter.readConfig(params.getConfig());
 			List<Organization> desiredOrgs = orgAdapter.getOrganizations();
 			OrganizationImportManager importManager = new OrganizationImportManager();
 			for(Organization desiredOrg : desiredOrgs) {
@@ -168,7 +168,7 @@ public class OrganizationCLIApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "delete", description = "Delete selected organizatio(s) from the API-Manager")
 	public static int delete(String args[]) {
 		try {
-			OrgExportParams params = new OrgExportParams(new OrgDeleteCLIOptions(args));
+			OrgExportParams params = new OrgDeleteCLIOptions(args).getOrgExportParams();
 			return runExport(params, ResultHandler.ORG_DELETE_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);

@@ -73,7 +73,7 @@ public class JsonAPIExporter extends APIResultHandler {
 		File localFolder = new File(this.givenExportFolder +File.separator+ getVHost(exportAPI) + apiPath);
 		LOG.info("Going to export API into folder: " + localFolder);
 		if(localFolder.exists()) {
-			if(params.deleteTarget()) {
+			if(params.isDeleteTarget()) {
 				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
 				try {
 					FileUtils.deleteDirectory(localFolder);

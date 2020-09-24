@@ -36,7 +36,7 @@ public class ConsoleAPIExportTest extends APIManagerMockBase {
 	public void runStandardConsoleAPIExport() throws JsonParseException, JsonMappingException, IOException, AppException, ParseException  {
 		List<API> apis = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + "three-apis-no-clientOrgs-and-clientApps.json"), new TypeReference<List<API>>(){});
 		
-		APIExportParams cmdParams = new APIExportParams(new APIExportGetCLIOptions(new String[] {}));
+		APIExportParams cmdParams = new APIExportGetCLIOptions(new String[] {}).getAPIExportParams();
 		ConsoleAPIExporter consoleExp = new ConsoleAPIExporter(cmdParams);
 		consoleExp.execute(apis);
 	}
@@ -45,7 +45,7 @@ public class ConsoleAPIExportTest extends APIManagerMockBase {
 	public void runWideConsoleAPIExport() throws JsonParseException, JsonMappingException, IOException, AppException, ParseException  {
 		List<API> apis = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + "three-apis-no-clientOrgs-and-clientApps.json"), new TypeReference<List<API>>(){});
 		
-		APIExportParams cmdParams = new APIExportParams(new APIExportGetCLIOptions(new String[] {"-wide"}));
+		APIExportParams cmdParams = new APIExportGetCLIOptions(new String[] {"-wide"}).getAPIExportParams();
 		ConsoleAPIExporter consoleExp = new ConsoleAPIExporter(cmdParams);
 		consoleExp.execute(apis);
 	}
@@ -54,7 +54,7 @@ public class ConsoleAPIExportTest extends APIManagerMockBase {
 	public void runUltraConsoleAPIExport() throws JsonParseException, JsonMappingException, IOException, AppException, ParseException  {
 		List<API> apis = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + "three-apis-no-clientOrgs-and-clientApps.json"), new TypeReference<List<API>>(){});
 		
-		APIExportParams cmdParams = new APIExportParams(new APIExportGetCLIOptions(new String[] {"-ultra"}));
+		APIExportParams cmdParams = new APIExportGetCLIOptions(new String[] {"-ultra"}).getAPIExportParams();
 		ConsoleAPIExporter consoleExp = new ConsoleAPIExporter(cmdParams);
 		consoleExp.execute(apis);
 	}
