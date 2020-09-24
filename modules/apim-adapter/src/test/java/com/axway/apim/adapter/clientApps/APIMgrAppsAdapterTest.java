@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -14,22 +12,21 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 
 public class APIMgrAppsAdapterTest {
 	
 	private String testHostname = "api-manager-host";
-	private String testPort = "8088";
+	private int testPort = 8088;
 	
 	@BeforeClass
 	private void initTestIndicator() {
 		TestIndicator.getInstance().setTestRunning(true);
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("host", testHostname);
-		params.put("port", testPort);
-		new CommandParameters(params);
+		CoreParameters params = new CoreParameters();
+		params.setHostname(testHostname);
+		params.setPort(testPort);
 	}
 	
 	@Test

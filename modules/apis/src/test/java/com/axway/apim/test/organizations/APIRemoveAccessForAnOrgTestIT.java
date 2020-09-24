@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
@@ -83,7 +84,7 @@ public class APIRemoveAccessForAnOrgTestIT extends TestNGCitrusTestDesigner {
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-1-org.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
-		createVariable("clientOrgsMode", "replace");
+		createVariable("clientOrgsMode", String.valueOf(Mode.replace));
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

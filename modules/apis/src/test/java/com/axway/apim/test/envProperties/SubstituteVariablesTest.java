@@ -1,21 +1,17 @@
 package com.axway.apim.test.envProperties;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.testng.reporters.Files;
 
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerMockBase;
-import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.apiimport.lib.APIImportParams;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
@@ -26,9 +22,8 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 	private void initCommandParameters() throws AppException, IOException {
 		setupMockData();
 		TestIndicator.getInstance().setTestRunning(true);
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("replaceHostInSwagger", "true");
-		new CommandParameters(params);
+		APIImportParams params = new APIImportParams();
+		params.setReplaceHostInSwagger(true);
 	}
 	
 	@Test
@@ -55,7 +50,7 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 		props.setProperty("OS_AND_MAIN_ENV_PROPERTY", "valueFromOS");
 		
 		EnvironmentProperties envProps = new EnvironmentProperties(null);
-		CommandParameters.getInstance().setEnvProperties(envProps);
+		CoreParameters.getInstance().setProperties(envProps);
 		
 		String configFile = "com/axway/apim/test/files/envProperties/1_config-with-os-variable.json";
 		String pathToConfigFile = this.getClass().getClassLoader().getResource(configFile).getFile();
@@ -74,7 +69,7 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 		props.setProperty("OS_MAIN_AND_STAGE_ENV_PROPERTY", "valueFromOS");
 		
 		EnvironmentProperties envProps = new EnvironmentProperties("anyOtherStage");
-		CommandParameters.getInstance().setEnvProperties(envProps);
+		CoreParameters.getInstance().setProperties(envProps);
 		
 		String configFile = "com/axway/apim/test/files/envProperties/1_config-with-os-variable.json";
 		String pathToConfigFile = this.getClass().getClassLoader().getResource(configFile).getFile();

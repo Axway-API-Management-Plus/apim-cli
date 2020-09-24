@@ -6,7 +6,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.apis.OrgFilter.Builder;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.organization.lib.OrgExportParams;
@@ -20,7 +20,7 @@ public class DeleteOrgHandler extends OrgResultHandler {
 	@Override
 	public void export(List<Organization> orgs) throws AppException {
 		System.out.println(orgs.size() + " selected for deletion.");
-		if(CommandParameters.getInstance().isForce()) {
+		if(CoreParameters.getInstance().isForce()) {
 			System.out.println("Force flag given to delete: "+orgs.size()+" Organization(s)");
 		} else {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {

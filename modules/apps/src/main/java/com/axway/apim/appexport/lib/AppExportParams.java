@@ -1,43 +1,68 @@
 package com.axway.apim.appexport.lib;
 
-import com.axway.apim.lib.APIMCoreCLIOptions;
-import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.EnvironmentProperties;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.StandardExportParams;
-import com.axway.apim.lib.errorHandling.AppException;
 
 public class AppExportParams extends StandardExportParams {
-
-	public AppExportParams(APIMCoreCLIOptions parser)
-			throws AppException {
-		super(parser.getCmd(), parser.getInternalCmd(), new EnvironmentProperties(parser.getCmd().getOptionValue("stage"), parser.getCmd().getOptionValue("swaggerPromoteHome")));
-	}
+	
+	private String state;
+	private String name;
+	private String id;
+	private String orgName;
+	private String credential;
+	private String redirectUrl;
 	
 	public static synchronized AppExportParams getInstance() {
-		return (AppExportParams)CommandParameters.getInstance();
+		return (AppExportParams)CoreParameters.getInstance();
 	}
-	
-	public String getAppState() {
-		return getValue("state");
+
+	public String getState() {
+		return state;
 	}
-	
-	public String getAppName() {
-		return getValue("name");
+
+	public void setState(String state) {
+		this.state = state;
 	}
-	
-	public String getAppId() {
-		return getValue("id");
+
+	public String getName() {
+		return name;
 	}
-	
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public String getOrgName() {
-		return getValue("orgName");
+		return orgName;
 	}
-	
+
+	public void setOrgName(String orgName) {
+		this.orgName = orgName;
+	}
+
 	public String getCredential() {
-		return getValue("credential");
+		return credential;
+	}
+
+	public void setCredential(String credential) {
+		this.credential = credential;
+	}
+
+	public String getRedirectUrl() {
+		return redirectUrl;
+	}
+
+	public void setRedirectUrl(String redirectUrl) {
+		this.redirectUrl = redirectUrl;
 	}
 	
-	public String getRedirectUrl() {
-		return getValue("redirectUrl");
-	}
+	
 }

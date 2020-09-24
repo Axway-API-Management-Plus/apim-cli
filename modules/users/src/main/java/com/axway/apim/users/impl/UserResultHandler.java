@@ -62,7 +62,7 @@ public abstract class UserResultHandler {
 	
 	protected Builder getBaseFilterBuilder() {
 		Builder builder = new UserFilter.Builder()
-				.hasId(params.getValue("id"))
+				.hasId(params.getId())
 				.hasLoginName(params.getLoginName())
 				.hasName(params.getName())
 				.hasOrganization(params.getOrg())

@@ -4,9 +4,10 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
-import com.axway.apim.lib.APIMCoreCLIOptions;
+import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.errorHandling.AppException;
 
-public class AppImportCLIOptions extends APIMCoreCLIOptions {
+public class AppImportCLIOptions extends CoreCLIOptions {
 
 	CommandLine cmd;
 
@@ -38,5 +39,11 @@ public class AppImportCLIOptions extends APIMCoreCLIOptions {
 		return "Application-Export";
 	}
 
-
+	
+	public AppImportParams getAppImportParams() throws AppException {
+		AppImportParams params = new AppImportParams();
+		super.addCoreParameters(params);
+		params.setConfig(getValue("c"));
+		return params;
+	}
 }

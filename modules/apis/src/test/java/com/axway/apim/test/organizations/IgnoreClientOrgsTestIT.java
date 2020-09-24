@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
@@ -47,7 +48,7 @@ public class IgnoreClientOrgsTestIT extends TestNGCitrusTestDesigner {
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("orgName2", "${testOrgName}");
-		createVariable("clientOrgsMode", "ignore");
+		createVariable("clientOrgsMode", String.valueOf(Mode.ignore));
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		

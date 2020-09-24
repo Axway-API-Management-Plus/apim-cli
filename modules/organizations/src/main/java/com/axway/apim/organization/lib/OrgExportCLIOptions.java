@@ -5,6 +5,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
 import com.axway.apim.lib.StandardExportCLIOptions;
+import com.axway.apim.lib.errorHandling.AppException;
 
 public class OrgExportCLIOptions extends StandardExportCLIOptions {
 
@@ -51,6 +52,13 @@ public class OrgExportCLIOptions extends StandardExportCLIOptions {
 	protected String getAppName() {
 		return "Application-Export";
 	}
-
-
+	
+	public OrgExportParams getOrgExportParams() throws AppException {
+		OrgExportParams params = new OrgExportParams();
+		super.addStandardExportParameters(params);
+		params.setName(getValue("name"));
+		params.setId(getValue("id"));
+		params.setDev(getValue("dev"));
+		return params;
+	}
 }

@@ -87,13 +87,14 @@ public abstract class APIResultHandler {
 	
 	protected Builder getBaseAPIFilterBuilder() {
 		Builder builder = new APIFilter.Builder(APIType.CUSTOM)
-				.hasVHost(params.getValue("vhost"))
-				.hasApiPath(params.getValue("api-path"))
-				.hasPolicyName(params.getValue("policy"))
-				.hasId(params.getValue("id"))
-				.hasName(params.getValue("name"))
-				.hasState(params.getValue("state"))
-				.hasBackendBasepath(params.getValue("backend"))
+				.hasVHost(params.getVhost())
+				.hasApiPath(params.getApiPath())
+				.hasPolicyName(params.getPolicy())
+				.hasId(params.getId())
+				.hasName(params.getName())
+				.hasTag(params.getTag())
+				.hasState(params.getState())
+				.hasBackendBasepath(params.getBackend())
 				.includeCustomProperties(APIManagerAdapter.getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE.api))
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.translatePolicies(POLICY_TRANSLATION.TO_NAME)
@@ -121,12 +122,14 @@ public abstract class APIResultHandler {
 		while(it.hasNext()) {
 			InboundProfile profile = it.next();
 			SecurityProfile usedSecProfile = secProfilesMappedByName.get(profile.getSecurityProfile());
+			// If Security-Profile null only happens for method overrides, then they are using the API-Default --> Skip this InboundProfile
+			if(usedSecProfile==null) continue;
 			for(SecurityDevice device : usedSecProfile.getDevices()) {
 				if(device.getType()==DeviceType.authPolicy) {
 					String authenticationPolicy = device.getProperties().get("authenticationPolicy");
 					usedSecurity.add(Utils.getExternalPolicyName(authenticationPolicy));
 				} else {
-					usedSecurity.add(""+device.getType());
+					usedSecurity.add(""+device.getType().getName());
 				}
 			}
 		}

@@ -23,7 +23,7 @@ public class OrgAdminTriesToPublishTestIT extends TestNGCitrusTestRunner {
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+	public void allowOrgAdminsToPublishFalse(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		swaggerImport = new ImportTestAction();
 		
 		description("But OrgAdmins should not being allowed to register published APIs.");
