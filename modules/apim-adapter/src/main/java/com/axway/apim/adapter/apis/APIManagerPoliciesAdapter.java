@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Policy;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -76,7 +76,7 @@ public class APIManagerPoliciesAdapter {
 	
 	private void readPoliciesFromAPIManager(PolicyType type) throws AppException { 
 		if(apiManagerResponse.get(type)!=null) return;
-		CommandParameters cmd = CommandParameters.getInstance();
+		CoreParameters cmd = CoreParameters.getInstance();
 		HttpResponse httpResponse = null;
 		try {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/policies")

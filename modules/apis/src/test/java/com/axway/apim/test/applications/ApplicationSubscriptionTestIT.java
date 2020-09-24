@@ -7,6 +7,7 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
@@ -144,7 +145,7 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("enforce", "true");
-		createVariable("clientAppsMode", "replace");
+		createVariable("clientAppsMode", String.valueOf(Mode.replace));
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 		
@@ -174,7 +175,7 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/applications/1_api-with-1-org-some-apps.json");
 		createVariable("state", "unpublished");
 		createVariable("enforce", "true");
-		createVariable("clientAppsMode", "add");
+		createVariable("clientAppsMode", String.valueOf(Mode.add));
 		createVariable("orgName", "${orgName}");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);

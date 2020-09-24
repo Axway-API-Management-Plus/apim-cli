@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.APIImportApp;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.consol.citrus.actions.AbstractTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.CitrusRuntimeException;
@@ -71,9 +71,9 @@ public class ImportTestAction extends AbstractTestAction {
 		boolean ignoreCache = false;
 		String allowOrgAdminsToPublish = "true";
 		boolean changeOrganization = false;
-		String clientOrgsMode = CommandParameters.MODE_ADD;
-		String clientAppsMode = CommandParameters.MODE_ADD;
-		String quotaMode = CommandParameters.MODE_ADD;
+		String clientOrgsMode = null;
+		String clientAppsMode = null;
+		String quotaMode = null;
 		
 		
 		try {
@@ -135,12 +135,18 @@ public class ImportTestAction extends AbstractTestAction {
 			args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
 			args.add("-s");
 			args.add(stage);
-			args.add("-quotaMode");
-			args.add(quotaMode);
-			args.add("-clientOrgsMode");
-			args.add(clientOrgsMode);
-			args.add("-clientAppsMode");
-			args.add(clientAppsMode);
+			if(quotaMode!=null) {
+				args.add("-quotaMode");
+				args.add(quotaMode);
+			}
+			if(clientOrgsMode!=null) {
+				args.add("-clientOrgsMode");
+				args.add(clientOrgsMode);				
+			}
+			if(clientAppsMode!=null) {
+				args.add("-clientAppsMode");
+				args.add(clientAppsMode);
+			}
 			args.add("-allowOrgAdminsToPublish");
 			args.add(allowOrgAdminsToPublish);
 			if(changeOrganization) {

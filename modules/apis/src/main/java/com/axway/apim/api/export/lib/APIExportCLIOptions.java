@@ -5,8 +5,9 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
 import com.axway.apim.lib.StandardExportCLIOptions;
+import com.axway.apim.lib.errorHandling.AppException;
 
-public abstract class APIExportCLIOptions extends StandardExportCLIOptions {
+public class APIExportCLIOptions extends StandardExportCLIOptions {
 
 	CommandLine cmd;
 
@@ -55,6 +56,11 @@ public abstract class APIExportCLIOptions extends StandardExportCLIOptions {
 		option.setRequired(false);
 		option.setArgName("*mybackhost.com*");
 		options.addOption(option);
+		
+		option = new  Option("tag", true, "Filter APIs with a specific tag. Use either \"*myTagValueOrGroup*\" or \"tagGroup=*myTagValue*\"");
+		option.setRequired(false);
+		option.setArgName("tagGroup=*myTagValue*");
+		options.addOption(option);
 	}
 
 	@Override
@@ -62,5 +68,23 @@ public abstract class APIExportCLIOptions extends StandardExportCLIOptions {
 		return "Application-Export";
 	}
 
-
+	public APIExportParams getAPIExportParams() throws AppException {
+		APIExportParams params = new APIExportParams();
+		addAPIExportParams(params);
+		return params;
+	}
+	
+	protected void addAPIExportParams(APIExportParams params) throws AppException {
+		super.addStandardExportParameters(params);
+		params.setApiPath(getValue("a"));
+		params.setName(getValue("n"));
+		params.setId(getValue("id"));
+		params.setPolicy(getValue("policy"));
+		params.setVhost(getValue("vhost"));
+		params.setState(getValue("state"));
+		params.setBackend(getValue("backend"));
+		params.setTag(getValue("tag"));
+		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
+		return;
+	}
 }

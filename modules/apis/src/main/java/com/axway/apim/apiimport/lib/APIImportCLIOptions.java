@@ -4,9 +4,11 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
-import com.axway.apim.lib.APIMCoreCLIOptions;
+import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.CoreParameters.Mode;
+import com.axway.apim.lib.errorHandling.AppException;
 
-public class APIImportCLIOptions extends APIMCoreCLIOptions {
+public class APIImportCLIOptions extends CoreCLIOptions {
 
 	CommandLine cmd;
 
@@ -97,6 +99,22 @@ public class APIImportCLIOptions extends APIMCoreCLIOptions {
 	protected String getAppName() {
 		return "API-Import";
 	}
-
-
+	
+	public APIImportParams getAPIImportParams() throws AppException {
+		APIImportParams params = new APIImportParams();
+		super.addCoreParameters(params);
+		params.setConfig(getValue("config"));
+		params.setApiDefintion(getValue("apidefinition"));
+		params.setForceUpdate(hasOption("forceUpdate"));
+		params.setChangeOrganization(hasOption("changeOrganization"));
+		if(getValue("replaceHostInSwagger")!=null) params.setReplaceHostInSwagger(Boolean.parseBoolean(getValue("replaceHostInSwagger")));
+		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
+		params.setIgnoreQuotas(hasOption("ignoreQuotas"));
+		params.setClientOrgsMode(Mode.valueOfDefault(getValue("clientOrgsMode")));
+		params.setClientAppsMode(Mode.valueOfDefault(getValue("clientAppsMode")));
+		params.setQuotaMode(Mode.valueOfDefault(getValue("quotaMode")));
+		params.setDetailsExportFile(getValue("detailsExportFile"));
+		if(getValue("allowOrgAdminsToPublish")!=null) params.setAllowOrgAdminsToPublish(Boolean.parseBoolean(getValue("allowOrgAdminsToPublish")));
+		return params;
+	}
 }

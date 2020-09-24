@@ -80,7 +80,7 @@ public class ExportTestAction extends AbstractTestAction {
 				args.add("-ignoreAdminAccount");
 			}
 		}
-		int rc = APIExportApp.export(args.toArray(new String[args.size()]));
+		int rc = APIExportApp.exportAPI(args.toArray(new String[args.size()]));
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
 		}

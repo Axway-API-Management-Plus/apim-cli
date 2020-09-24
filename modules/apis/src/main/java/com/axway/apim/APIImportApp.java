@@ -3,6 +3,7 @@ package com.axway.apim;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.cli.ParseException;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -12,7 +13,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.api.API;
-import com.axway.apim.api.state.APIChangeState;
+import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.apiimport.lib.APIImportCLIOptions;
@@ -48,22 +49,35 @@ public class APIImportApp implements APIMCLIServiceProvider {
 	
 	@CLIServiceMethod(name = "import", description = "Import APIs into the API-Manager")
 	public static int importAPI(String args[]) {
-		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+		APIImportParams params;
 		try {
-			
-			// We need to clean some Singleton-Instances, as tests are running in the same JVM
+			params = new APIImportCLIOptions(args).getAPIImportParams();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		} catch (ParseException e) {
+			LOG.error("Error " + e.getMessage());
+			return ErrorCode.MISSING_PARAMETER.getCode();
+		}
+		APIImportApp apiImportApp = new APIImportApp();
+		return apiImportApp.importAPI(params);
+	}
+
+	public int importAPI(APIImportParams params) {
+		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+		try {			
+			// Clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			RollbackHandler.deleteInstance();
-			
-			APIImportParams params = new APIImportParams(new APIImportCLIOptions(args));
-			errorCodeMapper.setMapConfiguration(params.getValue("returnCodeMapping"));
+
+			errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			
-			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params.getValue("config"), 
-					params.getValue("stage"), params.getValue("apidefinition"), APIManagerAdapter.hasOrgAdmin());
+			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params.getConfig(), 
+					params.getStage(), params.getApiDefintion(), APIManagerAdapter.hasOrgAdmin());
 			// Creates an API-Representation of the desired API
 			API desiredAPI = configAdapter.getDesiredAPI();
 			// 
@@ -89,7 +103,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 					.build();
 			API actualAPI = apimAdapter.apiAdapter.getAPI(filter, true);
 			APIChangeState changes = new APIChangeState(actualAPI, desiredAPI);
-			new APIImportManager().applyChanges(changes);
+			new APIImportManager().applyChanges(changes, params.isForceUpdate());
 			APIPropertiesExport.getInstance().store();
 			return 0;
 		} catch (AppException ap) {

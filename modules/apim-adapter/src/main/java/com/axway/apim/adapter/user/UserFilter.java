@@ -283,10 +283,10 @@ public class UserFilter {
 			return this;
 		}
 
-		public Builder isEnabled(String enabled) {
+		public Builder isEnabled(Boolean enabled) {
 			if(enabled==null) return this;
 			this.useEnabledFilter = true;
-			this.enabled = Boolean.parseBoolean(enabled);
+			this.enabled = enabled;
 			return this;
 		}
 		

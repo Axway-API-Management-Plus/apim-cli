@@ -14,7 +14,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -52,7 +52,7 @@ public class SecurityDevice {
 	private static Map<String, String> initCustomPolicies(String type) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
 		HashMap<String, String> policyMap = new HashMap<String, String>();
-		CommandParameters cmd = CommandParameters.getInstance();
+		CoreParameters cmd = CoreParameters.getInstance();
 		HttpResponse httpResponse = null;
 		InputStream is = null;
 		JsonNode jsonResponse = null;

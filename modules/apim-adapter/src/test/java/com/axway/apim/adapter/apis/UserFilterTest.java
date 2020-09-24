@@ -156,7 +156,7 @@ public class UserFilterTest {
 	@Test
 	public void filterUserEnabledTrue() {
 		UserFilter filter = new UserFilter.Builder()
-				.isEnabled("true")
+				.isEnabled(true)
 				.build();
 		Assert.assertEquals(filter.getFilters().size(), 3);
 		Assert.assertEquals(filter.getFilters().get(0).getValue(), "enabled");
@@ -200,7 +200,7 @@ public class UserFilterTest {
 	@Test
 	public void filterEnabledUsers() {
 		UserFilter filter = new UserFilter.Builder()
-				.isEnabled("true")
+				.isEnabled(true)
 				.build();
 		Assert.assertEquals(filter.getFilters().size(), 3);
 		Assert.assertEquals(filter.getFilters().get(0).getValue(), "enabled");
@@ -211,7 +211,7 @@ public class UserFilterTest {
 	@Test
 	public void filterDisabledUsers() {
 		UserFilter filter = new UserFilter.Builder()
-				.isEnabled("false")
+				.isEnabled(false)
 				.build();
 		Assert.assertEquals(filter.getFilters().size(), 3);
 		Assert.assertEquals(filter.getFilters().get(0).getValue(), "enabled");

@@ -1,32 +1,103 @@
 package com.axway.apim.api.export.lib;
 
-import com.axway.apim.lib.APIMCoreCLIOptions;
-import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.EnvironmentProperties;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.StandardExportParams;
-import com.axway.apim.lib.errorHandling.AppException;
 
 public class APIExportParams extends StandardExportParams {
-
-	public APIExportParams(APIMCoreCLIOptions parser)
-			throws AppException {
-		super(parser.getCmd(), parser.getInternalCmd(), new EnvironmentProperties(parser.getCmd().getOptionValue("stage"), parser.getCmd().getOptionValue("swaggerPromoteHome")));
-	}
+	
+	private String name;
+	
+	private String id;
+	
+	private Boolean useFEAPIDefinition;
+	
+	private String vhost;
+	
+	private String apiPath;
+	
+	private String policy;
+	
+	private String state;
+	
+	private String backend;
+	
+	private String tag;
 	
 	public static synchronized APIExportParams getInstance() {
-		return (APIExportParams)CommandParameters.getInstance();
+		return (APIExportParams)CoreParameters.getInstance();
 	}
-	
-	public String getAPIName() {
-		return getValue("name");
+
+	public String getName() {
+		return name;
 	}
-	
-	public String getAPIId() {
-		return getValue("id");
+
+	public void setName(String name) {
+		this.name = name;
 	}
-	
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getVhost() {
+		return vhost;
+	}
+
+	public void setVhost(String vhost) {
+		this.vhost = vhost;
+	}
+
+	public String getApiPath() {
+		return apiPath;
+	}
+
+	public void setApiPath(String apiPath) {
+		this.apiPath = apiPath;
+	}
+
+	public String getPolicy() {
+		return policy;
+	}
+
+	public void setPolicy(String policy) {
+		this.policy = policy;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getBackend() {
+		return backend;
+	}
+
+	public void setBackend(String backend) {
+		this.backend = backend;
+	}
+
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
 	public boolean isUseFEAPIDefinition() {
-		if(hasOption("useFEAPIDefinition")) return true;
-		return false;
+		if(useFEAPIDefinition==null) return false;
+		return useFEAPIDefinition.booleanValue();
+	}
+
+	public void setUseFEAPIDefinition(Boolean useFEAPIDefinition) {
+		if(useFEAPIDefinition==null) return;
+		this.useFEAPIDefinition = useFEAPIDefinition;
 	}
 }

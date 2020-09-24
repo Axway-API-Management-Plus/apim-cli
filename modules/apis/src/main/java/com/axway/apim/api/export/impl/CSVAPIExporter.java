@@ -97,7 +97,7 @@ public class CSVAPIExporter extends APIResultHandler {
 			if(target.isDirectory()) {
 				target = new File(givenTarget + File.separator + createFileName());
 			}
-			if(target.exists() && !params.deleteTarget()) {
+			if(target.exists() && !params.isDeleteTarget()) {
 				ErrorState.getInstance().setError("Targetfile: " + target.getCanonicalPath() + " already exists. You may set the flag -deleteTarget if you wish to overwrite it.", ErrorCode.EXPORT_FOLDER_EXISTS, false);
 				throw new AppException("Targetfile: " + target.getCanonicalPath() + " already exists.", ErrorCode.EXPORT_FOLDER_EXISTS);
 			}
@@ -122,8 +122,8 @@ public class CSVAPIExporter extends APIResultHandler {
 		DateFormat df = new SimpleDateFormat("ddMMyyyy-HHmm");
 		String dateTime = df.format(new Date());
 		String host = params.getHostname();
-		if(params.getValue("stage")!=null) {
-			host = params.getValue("stage");
+		if(params.getStage()!=null) {
+			host = params.getStage();
 		}
 		return "api_export_"+host+"_"+APIManagerAdapter.getCurrentUser(false).getLoginName()+"_"+dateTime+".csv";
 	}

@@ -11,7 +11,8 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.definition.APISpecificationFactory;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.apiimport.lib.APIImportParams;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,9 +24,23 @@ public class APISpecificationSwagger2xTest {
 	
 	@BeforeClass
 	private void initTestIndicator() {
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("replaceHostInSwagger", "true");
-		new CommandParameters(params);
+		APIImportParams params = new APIImportParams();
+		params.setReplaceHostInSwagger(true);
+	}
+	
+	@Test
+	public void testAirportsAPI() throws AppException, IOException {
+
+		byte[] content = getSwaggerContent("/api_definition_1/airports_swagger_20.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "airports_swagger_20.json", "https://myhost.customer.com:8767/api/v1/myAPI", "Test-API");
+		
+		// Check if the Swagger-File has been changed
+		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
+		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
+		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com:8767");
+		Assert.assertEquals(swagger.get("basePath").asText(), "/api/v1/myAPI");
+		Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
+		Assert.assertEquals(swagger.get("schemes").size(), 1);
 	}
 	
 	@Test

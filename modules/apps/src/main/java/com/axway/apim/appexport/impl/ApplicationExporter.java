@@ -64,9 +64,9 @@ public abstract class ApplicationExporter {
 	
 	protected Builder getBaseFilterBuilder() throws AppException {
 		Builder builder = new ClientAppFilter.Builder()
-				.hasState(params.getAppState())
-				.hasName(params.getAppName())
-				.hasId(params.getAppId())
+				.hasState(params.getState())
+				.hasName(params.getName())
+				.hasId(params.getId())
 				.hasCredential(params.getCredential())
 				.hasRedirectUrl(params.getRedirectUrl())
 				.hasOrganizationName(params.getOrgName())
