@@ -46,6 +46,8 @@ public class ClientAppFilter {
 	
 	private String applicationId;
 	
+	boolean includeOauthResources;
+	
 	List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
 	private ClientAppFilter() {	}
@@ -80,6 +82,15 @@ public class ClientAppFilter {
 
 	public void setIncludeImage(boolean includeImage) {
 		this.includeImage = includeImage;
+	}
+	
+
+	public boolean isIncludeOauthResources() {
+		return includeOauthResources;
+	}
+
+	public void setIncludeOauthResources(boolean includeOauthResources) {
+		this.includeOauthResources = includeOauthResources;
 	}
 
 	public String getApplicationId() {
@@ -268,6 +279,8 @@ public class ClientAppFilter {
 		
 		private String redirectUrl;
 		
+		private boolean includeOauthResources;
+		
 		public Builder() {
 			super();
 		}
@@ -288,6 +301,7 @@ public class ClientAppFilter {
 			filter.setIncludeAPIAccess(this.includeAPIAccess);
 			filter.setCredential(this.credential);
 			filter.setRedirectUrl(this.redirectUrl);
+			filter.setIncludeOauthResources(this.includeOauthResources);
 			return filter;
 		}
 		
@@ -364,5 +378,12 @@ public class ClientAppFilter {
 			this.includeAPIAccess = includeAPIAccess;
 			return this;
 		}
+		
+		public Builder includeOauthResources(boolean includeOauthResources) {
+			this.includeOauthResources = includeOauthResources;
+			return this;
+		}
+		
+		
 	}
 }

@@ -1,24 +1,30 @@
 package com.axway.apim.api.export.lib;
 
-import com.axway.apim.lib.APIMCoreCLIOptions;
-import com.axway.apim.lib.CommandParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.CoreParameters;
 
 public class APIChangeParams extends APIExportParams {
 	
-	public APIChangeParams(APIMCoreCLIOptions parser) throws AppException {
-		super(parser);
-	}
+	private String newBackend;
+	
+	private String oldBackend;
 
 	public static synchronized APIChangeParams getInstance() {
-		return (APIChangeParams)CommandParameters.getInstance();
+		return (APIChangeParams)CoreParameters.getInstance();
 	}
-	
+
 	public String getNewBackend() {
-		return getValue("newBackend");
+		return newBackend;
 	}
-	
+
+	public void setNewBackend(String newBackend) {
+		this.newBackend = newBackend;
+	}
+
 	public String getOldBackend() {
-		return getValue("oldBackend");
+		return oldBackend;
+	}
+
+	public void setOldBackend(String oldBackend) {
+		this.oldBackend = oldBackend;
 	}
 }

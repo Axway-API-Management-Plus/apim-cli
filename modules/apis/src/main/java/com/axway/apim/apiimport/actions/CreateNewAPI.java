@@ -7,7 +7,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.state.APIChangeState;
+import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.apiimport.rollback.RollbackAPIProxy;
 import com.axway.apim.apiimport.rollback.RollbackBackendAPI;

@@ -13,7 +13,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.QuotaRestrictiontype;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class APIQuotaManager {
@@ -31,7 +31,7 @@ public class APIQuotaManager {
 
 	public void execute() throws AppException {
 		if(desiredState.getApplicationQuota()==null && desiredState.getSystemQuota()==null) return;
-		if(CommandParameters.getInstance().isIgnoreQuotas() || CommandParameters.getInstance().getQuotaMode().equals(CommandParameters.MODE_IGNORE)) {
+		if(CoreParameters.getInstance().isIgnoreQuotas() || CoreParameters.getInstance().getQuotaMode().equals(CoreParameters.Mode.ignore)) {
 			LOG.info("Configured quotas will be ignored, as ignoreQuotas is true or QuotaMode has been set to ignore.");
 			return;
 		}
@@ -70,7 +70,7 @@ public class APIQuotaManager {
 		List<QuotaRestriction> newDesiredRestrictions = new ArrayList<QuotaRestriction>();
 		boolean existingRestrictionFound = false;
 		Iterator<QuotaRestriction> it;
-		if(CommandParameters.getInstance().getQuotaMode().equals(CommandParameters.MODE_REPLACE)) {
+		if(CoreParameters.getInstance().getQuotaMode().equals(CoreParameters.Mode.replace)) {
 			LOG.info("Removing existing Quotas for API: '"+this.actualState.getName()+"' as quotaMode is set to replace.");
 			it = existingRestrictions.iterator();
 			// Remove actual existing restrictions for that API

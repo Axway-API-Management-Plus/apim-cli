@@ -6,7 +6,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.adapter.user.UserFilter.Builder;
 import com.axway.apim.api.model.User;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.users.lib.UserExportParams;
@@ -20,7 +20,7 @@ public class DeleteUserHandler extends UserResultHandler {
 	@Override
 	public void export(List<User> users) throws AppException {
 		System.out.println(users.size() + " selected for deletion.");
-		if(CommandParameters.getInstance().isForce()) {
+		if(CoreParameters.getInstance().isForce()) {
 			System.out.println("Force flag given to delete: "+users.size()+" User(s)");
 		} else {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {

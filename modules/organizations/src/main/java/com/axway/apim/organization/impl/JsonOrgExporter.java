@@ -43,7 +43,7 @@ public class JsonOrgExporter extends OrgResultHandler {
 		File localFolder = new File(targetFolder +File.separator+ folderName);
 		LOG.info("Going to export organizations into folder: " + localFolder);
 		if(localFolder.exists()) {
-			if(OrgExportParams.getInstance().deleteTarget()) {
+			if(OrgExportParams.getInstance().isDeleteTarget()) {
 				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
 				try {
 					FileUtils.deleteDirectory(localFolder);

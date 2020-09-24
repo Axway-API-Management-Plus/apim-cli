@@ -8,7 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class RollbackHandler {
@@ -40,7 +40,7 @@ public class RollbackHandler {
 	}
 	
 	public void executeRollback() {
-		if(!CommandParameters.getInstance().rollback()) {
+		if(!CoreParameters.getInstance().isRollback()) {
 			LOG.info("Rollback is disabled.");
 			return;
 		}

@@ -47,7 +47,7 @@ import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.DoNothingCacheManager;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -103,7 +103,7 @@ public class APIManagerAdapter {
 		application
 	}
 	
-	private CommandParameters cmd;
+	private CoreParameters cmd;
 	
 	private static CacheManager cacheManager;
 	
@@ -134,7 +134,7 @@ public class APIManagerAdapter {
 		if (APIManagerAdapter.instance == null) {
 			APIManagerAdapter.instance = new APIManagerAdapter();
 			if(!TestIndicator.getInstance().isTestRunning()) {
-				LOG.info("Successfully connected to API-Manager (" + getApiManagerVersion() + ") on: " + CommandParameters.getInstance().getAPIManagerURL());
+				LOG.info("Successfully connected to API-Manager (" + getApiManagerVersion() + ") on: " + CoreParameters.getInstance().getAPIManagerURL());
 			} else {
 				APIManagerAdapter.apiManagerVersion = "7.7.0";
 				LOG.info("Successfully connected to MOCKED API-Manager (" + getApiManagerVersion() + ")");
@@ -161,7 +161,7 @@ public class APIManagerAdapter {
 	
 	private APIManagerAdapter() throws AppException {
 		super();
-		this.cmd = CommandParameters.getInstance();
+		this.cmd = CoreParameters.getInstance();
 		this.configAdapter = new APIManagerConfigAdapter();
 		this.apiAdapter = new APIManagerAPIAdapter();
 		this.methodAdapter = new APIManagerAPIMethodAdapter();
@@ -183,7 +183,7 @@ public class APIManagerAdapter {
 	
 	public void loginToAPIManager(boolean useAdminClient) throws AppException {
 		URI uri;
-		if(cmd.ignoreAdminAccount() && useAdminClient) return;
+		if(cmd.isIgnoreAdminAccount() && useAdminClient) return;
 		if(hasAdminAccount && useAdminClient) return; // Already logged in with an Admin-Account.
 		HttpResponse httpResponse = null;
 		try {
@@ -268,8 +268,8 @@ public class APIManagerAdapter {
 	}
 	
 	private String[] getAdminUsernamePassword() throws AppException {
-		if(CommandParameters.getInstance().getAdminUsername()==null) return null;
-		String[] usernamePassword =  {CommandParameters.getInstance().getAdminUsername(), CommandParameters.getInstance().getAdminPassword()};
+		if(CoreParameters.getInstance().getAdminUsername()==null) return null;
+		String[] usernamePassword =  {CoreParameters.getInstance().getAdminUsername(), CoreParameters.getInstance().getAdminPassword()};
 		return usernamePassword;
 	}
 	
@@ -278,7 +278,7 @@ public class APIManagerAdapter {
 		HttpResponse response = null;
 		JsonNode jsonResponse = null;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/currentuser").build();
+			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/currentuser").build();
 		    GETRequest currentUserRequest = new GETRequest(uri, useAdminClient);
 		    response = currentUserRequest.execute();
 		    getCsrfToken(response, useAdminClient); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
@@ -321,7 +321,7 @@ public class APIManagerAdapter {
 				APIManagerAdapter.cacheManager.init();
 			return APIManagerAdapter.cacheManager;
 		}
-		if(CommandParameters.getInstance().ignoreCache()) {
+		if(CoreParameters.getInstance().isIgnoreCache()) {
 			APIManagerAdapter.cacheManager = new DoNothingCacheManager();
 		} else {
 			URL myUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
@@ -335,7 +335,7 @@ public class APIManagerAdapter {
 	public static <K, V> Cache<K, V> getCache(CacheType cacheType, Class<K> key, Class<V> value) {
 		getCacheManager();
 		Cache<K, V> cache = APIManagerAdapter.cacheManager.getCache(cacheType.name(), key, value);
-		if(CommandParameters.getInstance().clearCaches()!=null && CommandParameters.getInstance().clearCaches().contains(cacheType)) {
+		if(CoreParameters.getInstance().clearCaches()!=null && CoreParameters.getInstance().clearCaches().contains(cacheType)) {
 			cache.clear();
 			LOG.info("Cache: " + cacheType.name() + " successfully cleared.");
 		}
@@ -447,7 +447,7 @@ public class APIManagerAdapter {
 			String response = null;
 			URI uri;
 			try {
-				uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type+"").build();
+				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type+"").build();
 				LOG.debug("Loading credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
 				RestAPICall getRequest = new GETRequest(uri, true);
 				httpResponse = getRequest.execute();
@@ -555,7 +555,7 @@ public class APIManagerAdapter {
 		URI uri;
 		HttpEntity httpResponse = null;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
+			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
 			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute().getEntity();
 			appConfig = IOUtils.toString(httpResponse.getContent(), "UTF-8");
@@ -604,7 +604,7 @@ public class APIManagerAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/certinfo/").build();
+			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/certinfo/").build();
 			
 			HttpEntity entity = MultipartEntityBuilder.create()
 					.addBinaryBody("file", IOUtils.toByteArray(certFile), ContentType.create("application/x-x509-ca-cert"), cert.getCertFile())
@@ -643,7 +643,7 @@ public class APIManagerAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/filedata/").build();
+			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/filedata/").build();
 			
 			HttpEntity entity = MultipartEntityBuilder.create()
 					.addBinaryBody("file", certificate, ContentType.create("application/x-pkcs12"), filename)

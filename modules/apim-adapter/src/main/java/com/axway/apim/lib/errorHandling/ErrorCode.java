@@ -1,5 +1,8 @@
 package com.axway.apim.lib.errorHandling;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum ErrorCode {
 	
 	SUCCESS								(0,  "Replication of the API was successful."),
@@ -46,6 +49,21 @@ public enum ErrorCode {
 
 	private final int code;
 	private final String description;
+	
+	private static Map<Integer, ErrorCode> rcToErrorCodeMapping = null;
+	
+	public static ErrorCode getErrorCodeForRC(int rc) {
+		if(rcToErrorCodeMapping==null)
+			initMapping();
+		return rcToErrorCodeMapping.get(rc);
+	}
+	
+	private static void initMapping() {
+		rcToErrorCodeMapping = new HashMap<Integer, ErrorCode>();
+		for(ErrorCode type : values()) {
+			rcToErrorCodeMapping.put(type.getCode(), type);
+		}
+	}
 	
 	private ErrorCode(int code, String description) {
 		this.code = code;

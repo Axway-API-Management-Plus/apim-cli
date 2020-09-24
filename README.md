@@ -51,7 +51,7 @@ The automated End-2-End test suite contains of __116__ different scenarios, whic
 
 | Version       | Branch               | Status | Comment | 
 | :---          | :---                 | :---:  | :--- |
-| 7.6.2 SP4     | develop  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/develop)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.6.2 SP5     | develop  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/develop)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
 | 7.7.0 SP2     | test-with-7.7-SP2  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-SP2)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
 | 7.7-20200130    | test-with-7.7-20200130  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200130)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||
 | 7.7-20200331    | test-with-7.7-20200331  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200331)](https://travis-ci.org/Axway-API-Management-Plus/apim-cli/branches)||

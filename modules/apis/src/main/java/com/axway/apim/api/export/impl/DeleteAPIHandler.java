@@ -7,7 +7,7 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIExportParams;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 
@@ -21,7 +21,7 @@ public class DeleteAPIHandler extends APIResultHandler {
 	public void execute(List<API> apis) throws AppException {
 		APIStatusManager statusManager = new APIStatusManager();
 		System.out.println(apis.size() + " selected for deletion.");
-		if(CommandParameters.getInstance().isForce()) {
+		if(CoreParameters.getInstance().isForce()) {
 			System.out.println("Force flag given to delete: "+apis.size()+" API(s)");
 		} else {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {

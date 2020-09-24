@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.api.model.OAuthClientProfile;
-import com.axway.apim.lib.CommandParameters;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.rest.GETRequest;
@@ -44,7 +44,7 @@ public class APIManagerOAuthClientProfilesAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CommandParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/oauthclientprofiles").build();
+			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/oauthclientprofiles").build();
 			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
