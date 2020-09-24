@@ -20,8 +20,10 @@ The CLI is flexible and is extended with new functions via modules. These can be
 To get an overview about the groups just call `apim`:
 ```
 Available commands and options:
-apim app - Manage your applications
-apim api - Manage your APIs
+apim app             Manage your applications 
+apim org             Manage your organizations
+apim api             Manage your APIs 
+apim user            Manage your users 
 ```
 To get for instance a `wide` list of APIs on the stage: `prod` execute the following command:
 ```
