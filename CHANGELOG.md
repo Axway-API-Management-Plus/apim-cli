@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Disabled applications not created as disabled (See issue [#89](https://github.com/Axway-API-Management-Plus/apim-cli/issues/89))
+
+## [1.2.3] 2020-09-24
 ### Added
 - Search for APIs based on configured tags (See issue [#82](https://github.com/Axway-API-Management-Plus/apim-cli/issues/82))
 - Error handling improved if custom properties configuration is invalid (Switch or Select without configured options)

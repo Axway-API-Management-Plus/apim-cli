@@ -358,6 +358,10 @@ public class APIMgrAppsAdapter {
 					throw new AppException("Error creating/updating application. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
 				createdApp = mapper.readValue(httpResponse.getEntity().getContent(), ClientApplication.class);
+				// enabled=false for a new application is ignore during initial creation, hence an update is required
+				if(actualApp==null && !desiredApp.isEnabled()) {
+					createOrUpdateApplication(desiredApp, createdApp);
+				}
 			} catch (Exception e) {
 				throw new AppException("Error creating/updating application.", ErrorCode.CANT_CREATE_API_PROXY, e);
 			} finally {

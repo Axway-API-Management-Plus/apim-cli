@@ -75,4 +75,30 @@ public class ImportSimpleApplicationTestIT extends TestNGCitrusTestRunner {
 		createVariable("expectedReturnCode", "10");
 		appImport.doExecute(context);		
 	}
+	
+	@CitrusTest
+	@Test @Parameters("context")
+	public void importDisabledApplication(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+		description("Import application into API-Manager which is disabled");
+		
+		variable("appNumber", RandomNumberFunction.getRandomNumber(4, true));
+		variable("appName", "Disabled-App-${appNumber}");
+
+		echo("####### Import application: '${appName}' #######");		
+		createVariable(ApplicationImportTestAction.CONFIG,  PACKAGE + "DisabledApplication.json");
+		createVariable("expectedReturnCode", "0");
+		appImport.doExecute(context);
+		
+		echo("####### Validate disabled application: '${appName}' has been imported #######");
+		http(builder -> builder.client("apiManager").send().get("/applications?field=name&op=eq&value=${appName}").header("Content-Type", "application/json"));
+
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
+			.validate("$.[?(@.name=='${appName}')].enabled", "false")
+			.extractFromPayload("$.[?(@.id=='${appName}')].id", "appId"));
+		
+		echo("####### Re-Import same application - Should be a No-Change #######");
+		createVariable("expectedReturnCode", "10");
+		appImport.doExecute(context);
+	}
 }
