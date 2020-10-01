@@ -340,14 +340,14 @@ public class APIMgrAppsAdapter {
 							SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentials", "appQuota", "organization", "image","oauthResources"}));
 					mapper.setFilterProvider(filter);
 					String json = mapper.writeValueAsString(desiredApp);
-					HttpEntity entity = new StringEntity(json);
+					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new POSTRequest(entity, uri);
 				} else {
 					FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
 							SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentials", "appQuota", "organization", "image", "apis","oauthResources"}));
 					mapper.setFilterProvider(filter);
 					String json = mapper.writeValueAsString(desiredApp);
-					HttpEntity entity = new StringEntity(json);
+					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new PUTRequest(entity, uri);
 				}
 				request.setContentType("application/json");
@@ -436,7 +436,7 @@ public class APIMgrAppsAdapter {
 				mapper.setFilterProvider(filter);
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				String json = mapper.writeValueAsString(cred);
-				HttpEntity entity = new StringEntity(json);
+				HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 				
 				POSTRequest postRequest = new POSTRequest(entity, uri);
 				postRequest.setContentType("application/json");
@@ -468,7 +468,7 @@ public class APIMgrAppsAdapter {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/quota").build();
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			String json = mapper.writeValueAsString(app.getAppQuota());
-			HttpEntity entity = new StringEntity(json);
+			HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 			// Use an admin account for this request
 			RestAPICall request;
 			if(actualApp==null) {
@@ -536,7 +536,7 @@ public class APIMgrAppsAdapter {
 				mapper.setFilterProvider(filter);
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				String json = mapper.writeValueAsString(res);
-				HttpEntity entity = new StringEntity(json);
+				HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+desiredApp.getId()+"/"+endpoint).build();
 				RestAPICall request = (update ? new PUTRequest(entity,uri) : new POSTRequest(entity, uri));
 				request.setContentType("application/json");

@@ -194,11 +194,11 @@ public class APIManagerUserAdapter {
 				RestAPICall request;
 				if(actualUser==null) {
 					String json = mapper.writeValueAsString(desiredUser);
-					HttpEntity entity = new StringEntity(json);
+					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new POSTRequest(entity, uri, true);
 				} else {
 					String json = mapper.writeValueAsString(desiredUser);
-					HttpEntity entity = new StringEntity(json);
+					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new PUTRequest(entity, uri, true);
 				}
 				request.setContentType("application/json");

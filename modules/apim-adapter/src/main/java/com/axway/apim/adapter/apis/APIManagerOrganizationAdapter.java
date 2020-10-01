@@ -137,13 +137,13 @@ public class APIManagerOrganizationAdapter {
 				RestAPICall request;
 				if(actualOrg==null) {
 					String json = mapper.writeValueAsString(desiredOrg);
-					HttpEntity entity = new StringEntity(json);
+					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new POSTRequest(entity, uri, true);
 				} else {
 					desiredOrg.setId(actualOrg.getId());
 					if (desiredOrg.getDn()==null) desiredOrg.setDn(actualOrg.getDn());
 					String json = mapper.writeValueAsString(desiredOrg);
-					HttpEntity entity = new StringEntity(json);
+					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new PUTRequest(entity, uri, true);
 				}
 				request.setContentType("application/json");

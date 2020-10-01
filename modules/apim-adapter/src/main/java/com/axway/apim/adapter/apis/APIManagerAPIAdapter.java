@@ -551,7 +551,7 @@ public class APIManagerAPIAdapter {
 		translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()).build();
-			entity = new StringEntity(mapper.writeValueAsString(api), StandardCharsets.UTF_8);
+			entity = new StringEntity(mapper.writeValueAsString(api), ContentType.APPLICATION_JSON);
 			
 			RestAPICall request = new PUTRequest(entity, uri);
 			httpResponse = request.execute();
@@ -639,7 +639,7 @@ public class APIManagerAPIAdapter {
 				.setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/"+StatusEndpoint.valueOf(desiredState).endpoint)
 				.build();
 			if(vhost!=null && api.getState().equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
-				HttpEntity entity = new StringEntity("vhost="+vhost);
+				HttpEntity entity = new StringEntity("vhost="+vhost, ContentType.APPLICATION_JSON);
 				request = new POSTRequest(entity, uri, useAdminAccountForPublish());
 			} else {
 				request = new POSTRequest(null, uri, useAdminAccountForPublish());
@@ -893,7 +893,7 @@ public class APIManagerAPIAdapter {
 					LOG.info("Taking over existing quota config for application: '"+app.getName()+"' to newly created API.");
 					try {
 						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/quota").build();
-						entity = new StringEntity(mapper.writeValueAsString(app.getAppQuota()), StandardCharsets.UTF_8);
+						entity = new StringEntity(mapper.writeValueAsString(app.getAppQuota()), ContentType.APPLICATION_JSON);
 						
 						request = new PUTRequest(entity, uri, true);
 						httpResponse = request.execute();
