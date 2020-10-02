@@ -209,6 +209,7 @@ public class ExportAPI {
 
 	public Map<String, String> getCustomProperties() {
 		if(this.actualAPIProxy.getCustomProperties()!=null && this.actualAPIProxy.getCustomProperties().size()==0) return null;
+		if(this.actualAPIProxy.getCustomProperties().values()==null) return null; // See issue: #90
 		Iterator<String> it = this.actualAPIProxy.getCustomProperties().values().iterator();
 		boolean propertyFound = false;
 		while(it.hasNext()) {
