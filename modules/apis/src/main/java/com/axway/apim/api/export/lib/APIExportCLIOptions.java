@@ -57,6 +57,16 @@ public class APIExportCLIOptions extends StandardExportCLIOptions {
 		option.setArgName("*mybackhost.com*");
 		options.addOption(option);
 		
+		option = new  Option("security", true, "Filter APIs with specific Inbound-Security. Wildcards are supported when filtering for policies.");
+		option.setRequired(false);
+		option.setArgName("oauth-ext|api-key|http-basic|...");
+		options.addOption(option);
+		
+		option = new  Option("auth", true, "Filter APIs with specific Outbound-Authentication. Wildcards are supported when filtering for OAuth-Client-App");
+		option.setRequired(false);
+		option.setArgName("oauth|api-key|http-basic|...");
+		options.addOption(option);
+		
 		option = new  Option("tag", true, "Filter APIs with a specific tag. Use either \"*myTagValueOrGroup*\" or \"tagGroup=*myTagValue*\"");
 		option.setRequired(false);
 		option.setArgName("tagGroup=*myTagValue*");
