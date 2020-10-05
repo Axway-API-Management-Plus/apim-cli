@@ -32,7 +32,7 @@ public enum ErrorCode {
 	INVALID_CLIENT_ORGANIZATIONS			(61, "At least one configured organization is invalid. Check the log file for more information."),
 	INVALID_CLIENT_APPLICATIONS			(62, "At least one configured application is invalid. Check the log file for more information."),
 	NO_API_DEFINITION_CONFIGURED		(64, "No API Definition configured."),
-	CANT_READ_API_DEFINITION_FILE		(65, "Can't read the given Swagger-File."),
+	CANT_READ_API_DEFINITION_FILE		(65, "Can't read the given API-Definition"),
 	CANT_READ_WSDL_FILE					(66, "Can't read the given WSDL-File."),
 	CANT_READ_CONFIG_FILE				(70, "Can't read the API Config-File."),
 	INVALID_QUOTA_CONFIG				(71, "The given Quota-Configuration is invalid."),
