@@ -474,6 +474,7 @@ public class APIFilter {
 			if(!isPolicyUsed(api, this.getPolicyName())) return false;
 		}
 		if(this.getInboundSecurity()!=null) {
+			boolean match = false;
 			if(api.getInboundProfiles()!=null) {
 				Iterator<InboundProfile> it = api.getInboundProfiles().values().iterator();
 				while(it.hasNext()) {
@@ -483,15 +484,18 @@ public class APIFilter {
 							for(SecurityDevice securityDevice : securityProfile.getDevices()) {
 								List<String> deviceNames = Arrays.asList(securityDevice.getType().getAlternativeNames());
 								if(deviceNames.contains(this.getInboundSecurity().toLowerCase())) {
-									return true;
+									match = true;
+									break;
 								}
 							}
 						}
 					}
 				}
-			} 
-			if(isPolicyUsed(api, this.getInboundSecurity())) return true;
-			return false;
+			}
+			if(!match) { // No match found so, check the policy names
+				match = isPolicyUsed(api, this.getInboundSecurity());
+			}
+			if(!match) return false; // Requested security is finally not found, return false
 		}
 		if(this.getBackendBasepath()!=null) {
 			Pattern pattern = Pattern.compile(this.getBackendBasepath().replace("*", ".*"));
@@ -540,6 +544,7 @@ public class APIFilter {
 			if(!match) return false;
 		}
 		if(this.getOutboundAuthentication()!=null) {
+			boolean match = false;
 			if(api.getOutboundProfiles()!=null) {
 				Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
 				while(it.hasNext()) {
@@ -549,14 +554,16 @@ public class APIFilter {
 							if(authnProfile.getName().equals(profile.getAuthenticationProfile())) {
 								List<String> authnNames = Arrays.asList(authnProfile.getType().getAlternativeNames());
 								if(authnNames.contains(this.getOutboundAuthentication().toLowerCase())) {
-									return true;
+									match=true;
+									break;
 								}
 								if(authnProfile.getType()==AuthType.oauth) {
 									String providerProfile = (String)authnProfile.getParameters().get("providerProfile");
 									Pattern pattern = Pattern.compile(this.getOutboundAuthentication().toLowerCase().replace("*", ".*"));
 									Matcher matcher = pattern.matcher(providerProfile.toLowerCase());
 									if(matcher.matches()) {
-										return true;
+										match=true;
+										break;
 									}
 								}
 							}
@@ -564,7 +571,7 @@ public class APIFilter {
 					}
 				}
 			}
-			return false;
+			if(!match) return false;
 		}
 		return true;
 	}
