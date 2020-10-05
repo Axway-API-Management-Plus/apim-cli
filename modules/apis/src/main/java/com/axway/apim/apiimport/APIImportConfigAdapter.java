@@ -140,16 +140,24 @@ public class APIImportConfigAdapter {
 		SimpleModule module = new SimpleModule();
 		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer());
 		mapper.registerModule(module);
+		
 		API baseConfig;
 		try {
 			this.pathToAPIDefinition = pathToAPIDefinition;
 			this.usingOrgAdmin = usingOrgAdmin;
 			this.apiConfigFile = locateAPIConfigFile(apiConfigFile);
-			baseConfig = mapper.readValue(substitueVariables(new File(this.apiConfigFile)), DesiredAPI.class);
-			if(getStageConfig(stage, this.apiConfigFile)!=null) {
+			String stageConfig = getStageConfig(stage, this.apiConfigFile);
+			// Validate organization for the base config, if no staged-config is given
+			boolean validateOrganization = (stageConfig==null) ? true : false;
+			ObjectReader reader = mapper.reader();
+			baseConfig = reader.withAttribute("validateOrganization", validateOrganization).forType(DesiredAPI.class).readValue(substitueVariables(new File(this.apiConfigFile)));
+			if(stageConfig!=null) {
 				try {
-					ObjectReader updater = mapper.readerForUpdating(baseConfig);
-					apiConfig = updater.readValue(substitueVariables(new File(getStageConfig(stage, this.apiConfigFile))));
+					// If the baseConfig doesn't have a valid organization, the stage config must
+					validateOrganization = (baseConfig.getOrganization()==null) ? true : false;
+					ObjectReader updater = mapper.readerForUpdating(baseConfig).withAttribute("validateOrganization", validateOrganization);
+					// Organization must be valid in staged configuration
+					apiConfig = updater.withAttribute("validateOrganization", true).readValue(substitueVariables(new File(getStageConfig(stage, this.apiConfigFile))));
 					LOG.info("Loaded stage API-Config from file: " + getStageConfig(stage, this.apiConfigFile));
 				} catch (FileNotFoundException e) {
 					LOG.warn("No config file found for stage: '"+stage+"'");
