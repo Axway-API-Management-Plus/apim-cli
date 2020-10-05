@@ -21,6 +21,10 @@ public class APIExportParams extends StandardExportParams {
 	
 	private String backend;
 	
+	private String inboundSecurity;
+	
+	private String outboundAuthentication;
+	
 	private String tag;
 	
 	public static synchronized APIExportParams getInstance() {
@@ -81,6 +85,22 @@ public class APIExportParams extends StandardExportParams {
 
 	public void setBackend(String backend) {
 		this.backend = backend;
+	}
+
+	public String getInboundSecurity() {
+		return inboundSecurity;
+	}
+
+	public void setInboundSecurity(String inboundSecurity) {
+		this.inboundSecurity = inboundSecurity;
+	}
+
+	public String getOutboundAuthentication() {
+		return outboundAuthentication;
+	}
+
+	public void setOutboundAuthentication(String outboundAuthentication) {
+		this.outboundAuthentication = outboundAuthentication;
 	}
 
 	public String getTag() {
