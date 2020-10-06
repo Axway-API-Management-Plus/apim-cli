@@ -62,9 +62,9 @@ public class APIExportCLIOptions extends StandardExportCLIOptions {
 		option.setArgName("oauth-ext|api-key|*my-security-pol*|...");
 		options.addOption(option);
 		
-		option = new  Option("outboundauthn", true, "Filter APIs with specific Outbound-Authentication. Wildcards are supported when filtering for specific OAuth Provider profile.");
+		option = new  Option("outboundauthn", true, "Filter APIs with specific Outbound-Authentication. Wildcards are supported when filtering for an OAuth Provider profile.");
 		option.setRequired(false);
-		option.setArgName("oauth|api-key|*Oauth-Client-App*|...");
+		option.setArgName("oauth|api-key|My provider profile*|...");
 		options.addOption(option);
 		
 		option = new  Option("tag", true, "Filter APIs with a specific tag. Use either \"*myTagValueOrGroup*\" or \"tagGroup=*myTagValue*\"");
