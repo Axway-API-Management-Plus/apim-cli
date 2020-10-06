@@ -335,11 +335,14 @@ public class APIFilterTest {
 		addOutboundSecurityToAPI(testAPI, AuthType.oauth);
 		
 		Map<String, Object> parameters = new HashMap<String, Object>();
-		parameters.put("providerProfile", "Sample Client Authzcode App");
+		parameters.put("providerProfile", "<key type='AuthProfilesGroup'><id field='name' value='Auth Profiles'/><key type='OAuthGroup'><id field='name' value='OAuth2'/><key type='OAuthProviderProfile'><id field='name' value='API Gateway'/><key type='OAuthAppProfile'><id field='name' value='Sample Client Authzcode App'/></key></key></key></key>");
 		testAPI.getAuthenticationProfiles().get(0).setParameters(parameters);
 		filter = new APIFilter.Builder().hasOutboundAuthentication("oauth").build();
 		assertTrue(filter.filter(testAPI), "API must match as outbound AuthN is OAuth");
-		filter = new APIFilter.Builder().hasOutboundAuthentication("*Sample*").build();
+		filter = new APIFilter.Builder().hasOutboundAuthentication("Sample*").build();
+		assertTrue(filter.filter(testAPI), "API must match also match based on the selected OAuth-Client App");
+		parameters.put("providerProfile", "Sample Client Authzcode App");
+		filter = new APIFilter.Builder().hasOutboundAuthentication("Sample*").build();
 		assertTrue(filter.filter(testAPI), "API must match also match based on the selected OAuth-Client App");
 	}
 	
