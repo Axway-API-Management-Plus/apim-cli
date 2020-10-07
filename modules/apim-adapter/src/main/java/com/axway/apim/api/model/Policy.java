@@ -51,6 +51,6 @@ public class Policy {
 
 	@Override
 	public String toString() {
-		return "Policy [name=" + name + "]";
+		return (name!=null) ? name : "N/A";
 	}
 }

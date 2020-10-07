@@ -99,10 +99,12 @@ public class ConsoleConfigExporter extends ConfigResultHandler {
 			PropertyDescriptor pd = new PropertyDescriptor(fieldName, config.getClass());
 			Method getter = pd.getReadMethod();
 			Object value = getter.invoke(config);
-			return value.toString();
+			return (value==null) ? "N/A" : value.toString();
 		} catch (Exception e) {
-			LOG.error(e.getMessage());
-			return "N/A";
+			if(LOG.isDebugEnabled()) {
+				LOG.error(e.getMessage(), e);
+			}
+			return "Err";
 		}
 	}
 

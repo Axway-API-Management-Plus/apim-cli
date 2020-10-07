@@ -1,8 +1,12 @@
 package com.axway.apim.api.model;
 
+import com.axway.apim.adapter.jackson.PolicyDeserializer;
 import com.axway.apim.lib.APIManagerConfigAnnotation;
 import com.axway.apim.lib.APIManagerConfigAnnotation.ConfigType;
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+@JsonFilter("APIManagerConfigFilter")
 public class APIManagerConfig {
 	
 	@APIManagerConfigAnnotation(
@@ -153,13 +157,15 @@ public class APIManagerConfig {
 			configType = ConfigType.GlobalPolicies,
 			name = "Global request policy",
 			description = "The Global Request Policy to be executed for all Frontend API calls. Must be a valid policy ID. Can be null to indicate no policy.")
-	private String globalRequestPolicy;
+	@JsonDeserialize( using = PolicyDeserializer.class)
+	private Policy globalRequestPolicy;
 	
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.GlobalPolicies,
 			name = "Global response policy",
 			description = "The Global Response Policy to be executed for all Frontend API calls. Must be a valid policy ID. Can be null to indicate no policy.")
-	private String globalResponsePolicy;
+	@JsonDeserialize( using = PolicyDeserializer.class)
+	private Policy globalResponsePolicy;
 	
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.FaultHandlers,
@@ -171,7 +177,8 @@ public class APIManagerConfig {
 			configType = ConfigType.FaultHandlers,
 			name = "Global Fault Handler Policy",
 			description = "The Global Fault Handler Policy to be used by all Frontend APIs in the event of an error. Must be a valid policy ID. Can be null to indicate no policy.")
-	private String globalFaultHandlerPolicy;
+	@JsonDeserialize( using = PolicyDeserializer.class)
+	private Policy globalFaultHandlerPolicy;
 	
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIImport,
@@ -476,19 +483,19 @@ public class APIManagerConfig {
 		this.globalPoliciesEnabled = globalPoliciesEnabled;
 	}
 
-	public String getGlobalRequestPolicy() {
+	public Policy getGlobalRequestPolicy() {
 		return globalRequestPolicy;
 	}
 
-	public void setGlobalRequestPolicy(String globalRequestPolicy) {
+	public void setGlobalRequestPolicy(Policy globalRequestPolicy) {
 		this.globalRequestPolicy = globalRequestPolicy;
 	}
 
-	public String getGlobalResponsePolicy() {
+	public Policy getGlobalResponsePolicy() {
 		return globalResponsePolicy;
 	}
 
-	public void setGlobalResponsePolicy(String globalResponsePolicy) {
+	public void setGlobalResponsePolicy(Policy globalResponsePolicy) {
 		this.globalResponsePolicy = globalResponsePolicy;
 	}
 
@@ -500,11 +507,11 @@ public class APIManagerConfig {
 		this.faultHandlersEnabled = faultHandlersEnabled;
 	}
 
-	public String getGlobalFaultHandlerPolicy() {
+	public Policy getGlobalFaultHandlerPolicy() {
 		return globalFaultHandlerPolicy;
 	}
 
-	public void setGlobalFaultHandlerPolicy(String globalFaultHandlerPolicy) {
+	public void setGlobalFaultHandlerPolicy(Policy globalFaultHandlerPolicy) {
 		this.globalFaultHandlerPolicy = globalFaultHandlerPolicy;
 	}
 

@@ -12,9 +12,14 @@ import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.setup.config.ConfigExportParams;
+import com.axway.apim.setup.config.lib.APIManagerConfigExportSerializerModifier;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class JsonConfigExporter extends ConfigResultHandler {
 
@@ -49,6 +54,10 @@ public class JsonConfigExporter extends ConfigResultHandler {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
+			mapper.registerModule(new SimpleModule().setSerializerModifier(new APIManagerConfigExportSerializerModifier()));
+			FilterProvider filters = new SimpleFilterProvider()
+					.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"os", "architecture", "productVersion", "baseOAuth"}));
+			mapper.setFilterProvider(filters);
 			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/apimanager-config.json"), config);
 		} catch (Exception e) {
 			throw new AppException("Can't create configuration export", ErrorCode.UNXPECTED_ERROR, e);
