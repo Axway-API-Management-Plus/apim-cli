@@ -995,8 +995,8 @@ public class APIImportConfigAdapter {
 		if(importApi.getApiRoutingKey()==null) return; // Nothing to check
 		if(importApi instanceof DesiredTestOnlyAPI) return; // Do nothing when unit-testing
 		if(APIManagerAdapter.hasAdminAccount()) {
-			String apiRoutingKeyEnabled = APIManagerAdapter.getInstance().configAdapter.getApiManagerConfig("apiRoutingKeyEnabled");
-			if(!apiRoutingKeyEnabled.equals("true")) {
+			Boolean apiRoutingKeyEnabled = APIManagerAdapter.getInstance().configAdapter.getConfig(true).getApiRoutingKeyEnabled();
+			if(apiRoutingKeyEnabled) {
 				ErrorState.getInstance().setError("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED, false);
 				throw new AppException("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED);
 			}

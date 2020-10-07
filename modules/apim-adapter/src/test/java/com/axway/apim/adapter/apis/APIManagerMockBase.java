@@ -25,8 +25,8 @@ public abstract class APIManagerMockBase {
 	protected void setupMockData() throws AppException, IOException {
 		TestIndicator.getInstance().setTestRunning(true);
 		APIManagerAdapter apim = APIManagerAdapter.getInstance();
-		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream(testPackage+"config/configAsAdmin.json")), true);
-		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(mapper.readTree(this.getClass().getClassLoader().getResourceAsStream(testPackage+"config/configAsOrgAdmin.json")), false);
+		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage+"config/configAsAdmin.json")), true);
+		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage+"config/configAsOrgAdmin.json")), false);
 		apiAdapter = (APIManagerAPIAdapter) APIManagerAdapter.getInstance().apiAdapter;
 		
 		apim.configAdapter.setAPIManagerTestResponse("{ \"productVersion\": \"7.7.20200130\" }", false);

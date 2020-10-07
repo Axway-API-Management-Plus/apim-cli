@@ -40,7 +40,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 		System.exit(rc);
 	}
 	
-	@CLIServiceMethod(name = "get", description = "Get APIs from the API-Manager in different formats")
+	@CLIServiceMethod(name = "get", description = "Get APIs from API-Manager in different formats")
 	public static int exportAPI(String args[]) {
 		APIExportParams params;
 		try {

@@ -77,6 +77,7 @@
 		<module>modules/apps</module>
 		<module>modules/organizations</module>
 		<module>modules/users</module>
+		<module>modules/setup</module>
 		<module>distribution</module>
 	</modules>
 
@@ -110,6 +111,11 @@
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
 			<artifactId>apimcli-tool</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-setup</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

@@ -527,7 +527,7 @@ public class APIManagerAdapter {
 		if(APIManagerAdapter.apiManagerVersion!=null) {
 			return apiManagerVersion;
 		}
-		APIManagerAdapter.apiManagerVersion = APIManagerAdapter.getInstance().configAdapter.getApiManagerConfig("productVersion");
+		APIManagerAdapter.apiManagerVersion = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getProductVersion();
 		return APIManagerAdapter.apiManagerVersion;
 	}
 	
