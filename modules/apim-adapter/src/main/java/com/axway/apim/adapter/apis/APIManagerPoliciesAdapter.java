@@ -30,6 +30,7 @@ public class APIManagerPoliciesAdapter {
 		REQUEST ("request", "requestPolicy"),
 		RESPONSE ("response", "responsePolicy"),
 		FAULT_HANDLER ("faulthandler", "faultHandlerPolicy"), 
+		GLOBAL_FAULT_HANDLER("faulthandler", "globalFaultHandlerPolicy"),
 		UNKNOWN ("unknown", "Unknown");
 		
 		private final String restAPIKey;

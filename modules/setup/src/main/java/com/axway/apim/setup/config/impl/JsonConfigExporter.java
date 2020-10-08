@@ -8,11 +8,11 @@ import org.apache.commons.io.FileUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
+import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.setup.config.ConfigExportParams;
-import com.axway.apim.setup.config.lib.APIManagerConfigExportSerializerModifier;
+import com.axway.apim.setup.config.lib.ConfigExportParams;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -54,7 +54,7 @@ public class JsonConfigExporter extends ConfigResultHandler {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.registerModule(new SimpleModule().setSerializerModifier(new APIManagerConfigExportSerializerModifier()));
+			mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(true)));
 			FilterProvider filters = new SimpleFilterProvider()
 					.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"os", "architecture", "productVersion", "baseOAuth"}));
 			mapper.setFilterProvider(filters);

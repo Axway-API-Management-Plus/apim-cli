@@ -1,4 +1,4 @@
-package com.axway.apim.setup.config;
+package com.axway.apim.setup.config.lib;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;

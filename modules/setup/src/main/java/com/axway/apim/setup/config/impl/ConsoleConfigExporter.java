@@ -10,7 +10,7 @@ import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.lib.APIManagerConfigAnnotation;
 import com.axway.apim.lib.APIManagerConfigAnnotation.ConfigType;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.setup.config.ConfigExportParams;
+import com.axway.apim.setup.config.lib.ConfigExportParams;
 import com.github.freva.asciitable.AsciiTable;
 
 public class ConsoleConfigExporter extends ConfigResultHandler {

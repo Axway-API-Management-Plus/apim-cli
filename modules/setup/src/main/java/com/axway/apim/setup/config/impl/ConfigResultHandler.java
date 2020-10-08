@@ -10,7 +10,7 @@ import com.axway.apim.adapter.apis.OrgFilter.Builder;
 import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.setup.config.ConfigExportParams;
+import com.axway.apim.setup.config.lib.ConfigExportParams;
 
 public abstract class ConfigResultHandler {
 	
