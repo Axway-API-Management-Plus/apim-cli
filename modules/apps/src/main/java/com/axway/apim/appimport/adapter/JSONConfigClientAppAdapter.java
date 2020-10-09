@@ -1,6 +1,7 @@
 package com.axway.apim.appimport.adapter;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,11 +22,14 @@ import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.OAuth;
+import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
@@ -35,40 +39,55 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	
 	private ObjectMapper mapper = new ObjectMapper();
 	
-	List<ClientApplication> apps;
+	AppImportParams importParams;
 
-	public JSONConfigClientAppAdapter() {
+	public JSONConfigClientAppAdapter(AppImportParams params) {
+		this.importParams = params;
 	}
+	
+	@Override
+	protected void readConfig() throws AppException {
+		String config = importParams.getConfig();
+		String stage = importParams.getStage();
 
-	public boolean readConfig(Object config) throws AppException {
-		if (config==null) return false;
-		if (config instanceof String == false) return false;
-		String myConfig = (String)config;
-		File configFile = new File(myConfig);
-		if(!configFile.exists()) return false;
+		File configFile = Utils.locateConfigFile(config);
+		if(!configFile.exists()) return;
+		File stageConfig = Utils.getStageConfig(stage, configFile);
+		List<ClientApplication> baseApps;
+		// Try to read a list of applications
 		try {
 			mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
-			this.apps = mapper.readValue(configFile, new TypeReference<List<ClientApplication>>(){});
+			baseApps = mapper.readValue(Utils.substitueVariables(configFile), new TypeReference<List<ClientApplication>>(){});
+			if(stageConfig!=null) {
+				ErrorState.getInstance().setError("Stage overrides are not supported for application lists.", ErrorCode.CANT_READ_CONFIG_FILE, false);
+				throw new AppException("Stage overrides are not supported for application lists.", ErrorCode.CANT_READ_CONFIG_FILE);
+			} else {
+				this.apps = baseApps;
+			}
+		// Try to read single application
 		} catch (MismatchedInputException me) {
 			try {
-				ClientApplication app = mapper.readValue(configFile, ClientApplication.class);
+				ClientApplication app = mapper.readValue(Utils.substitueVariables(configFile), ClientApplication.class);
+				if(stageConfig!=null) {
+					try {
+						ObjectReader updater = mapper.readerForUpdating(app);
+						app = updater.readValue(Utils.substitueVariables(stageConfig));
+					} catch (FileNotFoundException e) {
+						LOG.warn("No config file found for stage: '"+stage+"'");
+					}
+				}
 				this.apps = new ArrayList<ClientApplication>();
 				this.apps.add(app);
 			} catch (Exception pe) {
-				throw new AppException("Cannot read apps from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, pe);
+				throw new AppException("Cannot read organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, pe);
 			}
 		} catch (Exception e) {
-			throw new AppException("Cannot read apps from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+			throw new AppException("Cannot read organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		}
 		addImage(apps, configFile.getParentFile());
 		addOAuthCertificate(apps, configFile.getParentFile());
 		addAPIAccess(apps);
-		return true;
-	}
-	
-	@Override
-	public List<ClientApplication> getApplications() throws AppException {
-		return this.apps;
+		return;
 	}
 	
 	public ClientApplication getApplication(ClientAppFilter filter) throws AppException {

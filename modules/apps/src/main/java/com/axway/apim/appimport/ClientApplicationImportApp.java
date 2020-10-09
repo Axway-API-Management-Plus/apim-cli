@@ -9,6 +9,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.appimport.adapter.JSONConfigClientAppAdapter;
 import com.axway.apim.appimport.lib.AppImportCLIOptions;
 import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
@@ -56,7 +57,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			AppImportParams params = new AppImportCLIOptions(args).getAppImportParams();
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the application
-			ClientAppAdapter desiredAppsAdapter = ClientAppAdapter.create(params.getConfig());
+			ClientAppAdapter desiredAppsAdapter = new JSONConfigClientAppAdapter(params);
 			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
 			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter);
 			for(ClientApplication desiredApp : desiredApps) {
