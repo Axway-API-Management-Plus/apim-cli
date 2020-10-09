@@ -70,7 +70,7 @@ public class OrganizationExportTestAction extends AbstractTestAction {
 				args.add("-ignoreAdminAccount");
 			}
 		}
-		int rc = OrganizationCLIApp.export(args.toArray(new String[args.size()]));
+		int rc = OrganizationApp.exportOrgs(args.toArray(new String[args.size()]));
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
 		}

@@ -108,7 +108,7 @@ public class APIManagerConfigApp implements APIMCLIServiceProvider {
 				LOG.info("");
 				LOG.error("Please check the log. At least one error was recorded.");
 			} else {
-				LOG.debug("API-Manager configuration successfully exported.");
+				LOG.info("API-Manager configuration successfully exported.");
 			}
 			APIManagerAdapter.deleteInstance();
 		} catch (AppException ap) { 
@@ -144,6 +144,7 @@ public class APIManagerConfigApp implements APIMCLIServiceProvider {
 
 			APIManagerConfig actualConfig = apimAdapter.configAdapter.getConfig(APIManagerAdapter.hasAdminAccount());
 			apimAdapter.configAdapter.updateConfiguration(desiredConfig, actualConfig);
+			LOG.info("API-Manager configuration successfully updated.");
 			return 0;
 		} catch (AppException ap) { 
 			ErrorState errorState = ErrorState.getInstance();

@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyManagementException;
@@ -32,7 +31,6 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringSubstitutor;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -106,7 +104,7 @@ public class APIImportConfigAdapter {
 	private String pathToAPIDefinition;
 	
 	/** The API-Config-File given by the user with -c parameter */
-	private String apiConfigFile;
+	private File apiConfigFile;
 	
 	/** The APIConfig instance created by the APIConfigImporter */
 	private API apiConfig;
@@ -120,22 +118,20 @@ public class APIImportConfigAdapter {
 	/**
 	 * Constructor just for testing. Don't use it!
 	 * @param apiConfig the desired API to test with
-	 * @param apiConfigFile this is the given config file
 	 * @throws AppException if the API import configuration cannot be loaded/initialized
 	 */
-	public APIImportConfigAdapter(API apiConfig, String apiConfigFile) throws AppException {
+	public APIImportConfigAdapter(API apiConfig) throws AppException {
 		this.apiConfig = apiConfig;
-		this.apiConfigFile = apiConfigFile;
 	}
 	/**
 	 * Constructs the APIImportConfig 
-	 * @param apiConfigFile the API-Config given by the user
+	 * @param apiConfigFileName the API-Config given by the user
 	 * @param stage an optional stage used to load overrides and stage specific environment properties
 	 * @param pathToAPIDefinition an optional path to the API-Definition (Swagger / WSDL), can be in the config-file as well.
 	 * @param usingOrgAdmin access to API-Manager should be limited to the Org-Admin account
 	 * @throws AppException if the config-file can't be parsed for some reason
 	 */
-	public APIImportConfigAdapter(String apiConfigFile, String stage, String pathToAPIDefinition, boolean usingOrgAdmin) throws AppException {
+	public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, boolean usingOrgAdmin) throws AppException {
 		super();
 		SimpleModule module = new SimpleModule();
 		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer());
@@ -145,20 +141,20 @@ public class APIImportConfigAdapter {
 		try {
 			this.pathToAPIDefinition = pathToAPIDefinition;
 			this.usingOrgAdmin = usingOrgAdmin;
-			this.apiConfigFile = locateAPIConfigFile(apiConfigFile);
-			String stageConfig = getStageConfig(stage, this.apiConfigFile);
+			this.apiConfigFile = Utils.locateConfigFile(apiConfigFileName);
+			File stageConfig = Utils.getStageConfig(stage, this.apiConfigFile);
 			// Validate organization for the base config, if no staged-config is given
 			boolean validateOrganization = (stageConfig==null) ? true : false;
 			ObjectReader reader = mapper.reader();
-			baseConfig = reader.withAttribute("validateOrganization", validateOrganization).forType(DesiredAPI.class).readValue(substitueVariables(new File(this.apiConfigFile)));
+			baseConfig = reader.withAttribute("validateOrganization", validateOrganization).forType(DesiredAPI.class).readValue(Utils.substitueVariables(this.apiConfigFile));
 			if(stageConfig!=null) {
 				try {
 					// If the baseConfig doesn't have a valid organization, the stage config must
 					validateOrganization = (baseConfig.getOrganization()==null) ? true : false;
 					ObjectReader updater = mapper.readerForUpdating(baseConfig).withAttribute("validateOrganization", validateOrganization);
 					// Organization must be valid in staged configuration
-					apiConfig = updater.withAttribute("validateOrganization", true).readValue(substitueVariables(new File(getStageConfig(stage, this.apiConfigFile))));
-					LOG.info("Loaded stage API-Config from file: " + getStageConfig(stage, this.apiConfigFile));
+					apiConfig = updater.withAttribute("validateOrganization", true).readValue(Utils.substitueVariables(Utils.getStageConfig(stage, this.apiConfigFile)));
+					LOG.info("Loaded stage API-Config from file: " + Utils.getStageConfig(stage, this.apiConfigFile));
 				} catch (FileNotFoundException e) {
 					LOG.warn("No config file found for stage: '"+stage+"'");
 					apiConfig = baseConfig;
@@ -170,35 +166,6 @@ public class APIImportConfigAdapter {
 			error.setError("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE);
 			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
-	}
-	
-	private static String locateAPIConfigFile(String apiConfigFile) throws AppException {
-		try {
-			apiConfigFile = URLDecoder.decode(apiConfigFile, "UTF-8");
-			File configFile = new File(apiConfigFile);
-			if(configFile.exists()) return configFile.getCanonicalPath();
-			// This is mainly to load the samples sitting inside the package!
-			String installFolder = new File(APIImportConfigAdapter.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getParent();
-			configFile = new File(installFolder + File.separator + apiConfigFile);
-			if(configFile.exists()) return configFile.getCanonicalPath();
-			throw new AppException("Unable to find given Config-File: '"+apiConfigFile+"'", ErrorCode.CANT_READ_CONFIG_FILE);
-		} catch (Exception e) {
-			throw new AppException("Unable to find given Config-File: '"+apiConfigFile+"'", ErrorCode.CANT_READ_CONFIG_FILE, e);
-		}
-	}
-	
-	/**
-	 * This method is replacing variables such as ${TokenEndpoint} with declared variables coming from either 
-	 * the Environment-Variables or from system-properties.
-	 * @param inputFile The API-Config file to be replaced and returned as String
-	 * @return a String representation of the API-Config-File
-	 * @throws IOException if the file can't be found
-	 */
-	private String substitueVariables(File inputFile) throws IOException {
-		StringSubstitutor substitutor = new StringSubstitutor(CoreParameters.getInstance().getProperties());
-		String givenConfig = new String(Files.readAllBytes(inputFile.toPath()), StandardCharsets.UTF_8);
-		givenConfig = StringSubstitutor.replace(givenConfig, System.getenv());
-		return substitutor.replace(givenConfig);
 	}
 
 	public API getApiConfig() {
@@ -497,7 +464,7 @@ public class APIImportConfigAdapter {
 		}
 		String baseDir;
 		try {
-			baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
+			baseDir = this.apiConfigFile.getCanonicalFile().getParent();
 		} catch (IOException e1) {
 			error.setError("Can't read certificate file.", ErrorCode.CANT_READ_CONFIG_FILE);
 			throw new AppException("Can't read certificate file.", ErrorCode.CANT_READ_CONFIG_FILE, e1);
@@ -592,7 +559,7 @@ public class APIImportConfigAdapter {
 					LOG.info("Reading API-Definition (Swagger/WSDL) from file: '" + pathToAPIDefinition + "' (relative path)");
 					is = new FileInputStream(pathToAPIDefinition);
 				} else {
-					String baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
+					String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
 					inputFile= new File(baseDir + File.separator + this.pathToAPIDefinition);
 					LOG.info("Reading API-Definition (Swagger/WSDL) from file: '" + inputFile.getCanonicalFile() + "' (absolute path)"); 
 					if(inputFile.exists()) { 
@@ -695,27 +662,6 @@ public class APIImportConfigAdapter {
 	
 	public static boolean isHttpsUri(String uri) {
 		return( uri.startsWith("https://") );
-	}
-	
-	private String getStageConfig(String stage, String apiConfig) {
-		if(stage == null) return null;
-		File stageFile = new File(stage);
-		if(stageFile.exists()) { // This is to support testing with dynamic created files!
-			return stageFile.getAbsolutePath();
-		}
-		if(!stage.equals("NOT_SET")) {
-			stageFile = new File(apiConfig.substring(0, apiConfig.lastIndexOf(".")+1) + stage + apiConfig.substring(apiConfig.lastIndexOf(".")));
-			File subDirStageFile = new File(stageFile.getParentFile()+"/"+stage+"/"+stageFile.getName());
-			if(stageFile.exists()) {
-				return stageFile.getAbsolutePath();
-			} else if(subDirStageFile.exists()) {
-				return subDirStageFile.getAbsolutePath();
-			} else {
-				return null;
-			}
-		}
-		LOG.debug("No stage provided");
-		return null;
 	}
 	
 	private API validateInboundProfile(API importApi) throws AppException {
@@ -881,7 +827,7 @@ public class APIImportConfigAdapter {
 		try {
 			if(!clientCertFile.exists()) {
 				// Try to find file using a relative path to the config file
-				String baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
+				String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
 				clientCertFile = new File(baseDir + "/" + clientCert);
 			}
 			if(!clientCertFile.exists()) {
@@ -1013,7 +959,7 @@ public class APIImportConfigAdapter {
 			try {
 				file = new File(importApi.getImage().getFilename());
 				if(!file.exists()) { // The image isn't provided with an absolute path, try to read it relativ to the config file
-					String baseDir = new File(this.apiConfigFile).getCanonicalFile().getParent();
+					String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
 					file = new File(baseDir + "/" + importApi.getImage().getFilename());
 				}
 				importApi.getImage().setBaseFilename(file.getName());

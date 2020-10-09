@@ -19,7 +19,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.organization.OrganizationCLIApp;
+import com.axway.apim.organization.OrganizationApp;
 import com.consol.citrus.actions.AbstractTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.CitrusRuntimeException;
@@ -104,7 +104,7 @@ public class OrganizationImportTestAction extends AbstractTestAction {
 			}
 		}
 		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);
-		int rc = OrganizationCLIApp.importOrganization(args.toArray(new String[args.size()]));
+		int rc = OrganizationApp.importOrganization(args.toArray(new String[args.size()]));
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
 		}

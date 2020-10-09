@@ -2,6 +2,7 @@ package com.axway.apim.organization;
 
 import java.util.List;
 
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +26,9 @@ import com.axway.apim.organization.lib.OrgExportParams;
 import com.axway.apim.organization.lib.OrgImportCLIOptions;
 import com.axway.apim.organization.lib.OrgImportParams;
 
-public class OrganizationCLIApp implements APIMCLIServiceProvider {
+public class OrganizationApp implements APIMCLIServiceProvider {
 
-	private static Logger LOG = LoggerFactory.getLogger(OrganizationCLIApp.class);
+	private static Logger LOG = LoggerFactory.getLogger(OrganizationApp.class);
 
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 	static ErrorState errorState = ErrorState.getInstance();
@@ -39,7 +40,7 @@ public class OrganizationCLIApp implements APIMCLIServiceProvider {
 
 	@Override
 	public String getVersion() {
-		return OrganizationCLIApp.class.getPackage().getImplementationVersion();
+		return OrganizationApp.class.getPackage().getImplementationVersion();
 	}
 
 	@Override
@@ -53,16 +54,17 @@ public class OrganizationCLIApp implements APIMCLIServiceProvider {
 	}
 	
 	@CLIServiceMethod(name = "get", description = "Get Organizations from API-Manager in different formats")
-	public static int export(String args[]) {
+	public static int exportOrgs(String args[]) {
 		try {
 			OrgExportParams params = new OrgExportCLIOptions(args).getOrgExportParams();
+			OrganizationApp orgApp = new OrganizationApp();
 			switch(params.getOutputFormat()) {
 			case console:
-				return runExport(params, ResultHandler.CONSOLE_EXPORTER);
+				return orgApp.exportOrgs(params, ResultHandler.CONSOLE_EXPORTER);
 			case json:
-				return runExport(params, ResultHandler.JSON_EXPORTER);
+				return orgApp.exportOrgs(params, ResultHandler.JSON_EXPORTER);
 			default:
-				return runExport(params, ResultHandler.CONSOLE_EXPORTER);
+				return orgApp.exportOrgs(params, ResultHandler.CONSOLE_EXPORTER);
 			}
 		} catch (AppException e) {
 			
@@ -80,7 +82,7 @@ public class OrganizationCLIApp implements APIMCLIServiceProvider {
 		}
 	}
 
-	private static int runExport(OrgExportParams params, ResultHandler exportImpl) {
+	public int exportOrgs(OrgExportParams params, ResultHandler exportImpl) {
 		try {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
@@ -128,17 +130,29 @@ public class OrganizationCLIApp implements APIMCLIServiceProvider {
 	
 	@CLIServiceMethod(name = "import", description = "Import organizatio(s) into the API-Manager")
 	public static int importOrganization(String[] args) {
+		OrgImportParams params;
 		try {
-			// We need to clean some Singleton-Instances, as tests are running in the same JVM
+			params = new OrgImportCLIOptions(args).getOrgImportParams();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		} catch (ParseException e) {
+			LOG.error("Error " + e.getMessage());
+			return ErrorCode.MISSING_PARAMETER.getCode();
+		}
+		OrganizationApp orgApp = new OrganizationApp();
+		return orgApp.importOrganization(params);
+	}
+	
+	public int importOrganization(OrgImportParams params) {
+		try {
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			
-			OrgImportParams params = new OrgImportCLIOptions(args).getOrgImportParams();
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the organization
-			OrgAdapter orgAdapter = new JSONOrgAdapter();
-			orgAdapter.readConfig(params.getConfig());
+			OrgAdapter orgAdapter = new JSONOrgAdapter(params);
 			List<Organization> desiredOrgs = orgAdapter.getOrganizations();
 			OrganizationImportManager importManager = new OrganizationImportManager();
 			for(Organization desiredOrg : desiredOrgs) {
@@ -169,7 +183,8 @@ public class OrganizationCLIApp implements APIMCLIServiceProvider {
 	public static int delete(String args[]) {
 		try {
 			OrgExportParams params = new OrgDeleteCLIOptions(args).getOrgExportParams();
-			return runExport(params, ResultHandler.ORG_DELETE_HANDLER);
+			OrganizationApp orgApp = new OrganizationApp();
+			return orgApp.exportOrgs(params, ResultHandler.ORG_DELETE_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
@@ -177,7 +192,7 @@ public class OrganizationCLIApp implements APIMCLIServiceProvider {
 	}
 
 	public static void main(String args[]) { 
-		int rc = export(args);
+		int rc = exportOrgs(args);
 		System.exit(rc);
 	}
 

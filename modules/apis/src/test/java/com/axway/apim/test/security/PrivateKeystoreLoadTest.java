@@ -1,5 +1,6 @@
 package com.axway.apim.test.security;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class PrivateKeystoreLoadTest {
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
 		
-		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI, "justSomething");
+		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI);
 		// This triggers all post-processing of the DesiredAPI and should not throw an Exception
 		importConfig.getDesiredAPI();
 	}
@@ -61,7 +62,7 @@ public class PrivateKeystoreLoadTest {
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
 		
-		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI, "justSomething");
+		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI);
 		// This triggers all post-processing of the DesiredAPI and should not throw an Exception
 		try {
 			importConfig.getDesiredAPI();
@@ -79,7 +80,7 @@ public class PrivateKeystoreLoadTest {
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
 		
-		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI, "justSomething");
+		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI);
 		try {
 			importConfig.getDesiredAPI();
 		} catch(AppException e) {
@@ -96,7 +97,7 @@ public class PrivateKeystoreLoadTest {
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
 		
-		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI, "justSomething");
+		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI);
 		// This triggers all post-processing of the DesiredAPI and should not throw an Exception
 		importConfig.getDesiredAPI();
 	}
