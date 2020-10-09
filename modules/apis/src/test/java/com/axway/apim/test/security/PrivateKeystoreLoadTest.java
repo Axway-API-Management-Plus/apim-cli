@@ -49,7 +49,7 @@ public class PrivateKeystoreLoadTest {
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
 		
-		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI);
+		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI, new File("justSomething"));
 		// This triggers all post-processing of the DesiredAPI and should not throw an Exception
 		importConfig.getDesiredAPI();
 	}
@@ -62,7 +62,7 @@ public class PrivateKeystoreLoadTest {
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
 		
-		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI);
+		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI, new File("justSomething"));
 		// This triggers all post-processing of the DesiredAPI and should not throw an Exception
 		try {
 			importConfig.getDesiredAPI();
@@ -80,7 +80,7 @@ public class PrivateKeystoreLoadTest {
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
 		
-		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI);
+		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI, new File("justSomething"));
 		try {
 			importConfig.getDesiredAPI();
 		} catch(AppException e) {
@@ -97,7 +97,7 @@ public class PrivateKeystoreLoadTest {
 		authnProfiles.add(profile);
 		testAPI.setAuthenticationProfiles(authnProfiles);
 		
-		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI);
+		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(testAPI, new File("justSomething"));
 		// This triggers all post-processing of the DesiredAPI and should not throw an Exception
 		importConfig.getDesiredAPI();
 	}

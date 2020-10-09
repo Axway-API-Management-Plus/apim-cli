@@ -120,8 +120,9 @@ public class APIImportConfigAdapter {
 	 * @param apiConfig the desired API to test with
 	 * @throws AppException if the API import configuration cannot be loaded/initialized
 	 */
-	public APIImportConfigAdapter(API apiConfig) throws AppException {
+	public APIImportConfigAdapter(API apiConfig, File apiConfigFile) throws AppException {
 		this.apiConfig = apiConfig;
+		this.apiConfigFile = apiConfigFile;
 	}
 	/**
 	 * Constructs the APIImportConfig 
