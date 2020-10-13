@@ -209,7 +209,8 @@ public class User {
 				user = APIManagerAdapter.getInstance().userAdapter.getUserForLoginName(this.loginName);
 			}
 			if(user==null) {
-				throw new AppException("Error initializing user. ", ErrorCode.UNXPECTED_ERROR);
+				// No user found in API-Manager
+				return;
 			}
 			user.setIntialized(true);
 			this.id = user.getId();
@@ -230,7 +231,7 @@ public class User {
 			this.mobile = user.getMobile();
 		} catch (AppException e) {
 			ErrorState.getInstance().setError("Error initializing user. " + e.getMessage(), ErrorCode.UNXPECTED_ERROR);
-			LOG.error("Error initializing user. ", e);
+			LOG.error("Error initializing user. " + e.getMessage(), e);
 		} finally {
 			this.intialized = true;
 		}
