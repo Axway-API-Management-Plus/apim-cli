@@ -3,7 +3,6 @@ package com.axway.apim.api.model;
 import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.axway.apim.adapter.jackson.OrganizationSerializer;
 import com.axway.apim.adapter.jackson.UserDeserializer;
-import com.axway.apim.adapter.jackson.UserSerializer;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

@@ -9,7 +9,6 @@ import org.apache.commons.io.FileUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.RemoteHostFilter;
-import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.adapter.jackson.UserSerializerModifier;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -59,7 +58,7 @@ public class JsonRemoteHostsExporter extends RemoteHostsResultHandler {
 				mapper.enable(SerializationFeature.INDENT_OUTPUT);
 				mapper.registerModule(new SimpleModule().setSerializerModifier(new UserSerializerModifier(true)));
 				FilterProvider filters = new SimpleFilterProvider()
-						.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id"}));
+						.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "organizationId"}));
 				mapper.setFilterProvider(filters);
 				mapper.writeValue(new File(localFolder.getCanonicalPath() + "/remote-host.json"), remotehost);
 			} catch (Exception e) {

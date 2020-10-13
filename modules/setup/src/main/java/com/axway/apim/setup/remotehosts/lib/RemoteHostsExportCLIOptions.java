@@ -44,7 +44,7 @@ public class RemoteHostsExportCLIOptions extends StandardExportCLIOptions {
 		return "Remote-Hosts Export";
 	}
 	
-	public RemoteHostsExportParams getConfigExportParams() throws AppException {
+	public RemoteHostsExportParams getParams() throws AppException {
 		RemoteHostsExportParams params = new RemoteHostsExportParams();
 		super.addStandardExportParameters(params);
 		params.setName(getValue("name"));

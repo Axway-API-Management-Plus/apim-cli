@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.RemoteHostFilter;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
@@ -54,7 +53,7 @@ public class APIManagerRemoteHostApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "get", description = "Get API-Manager remote hosts in different formats")
 	public static int export(String args[]) {
 		try {
-			RemoteHostsExportParams params = new RemoteHostsExportCLIOptions(args).getConfigExportParams();
+			RemoteHostsExportParams params = new RemoteHostsExportCLIOptions(args).getParams();
 			switch(params.getOutputFormat()) {
 			case console:
 				return runExport(params, ResultHandler.CONSOLE_EXPORTER);
@@ -91,8 +90,8 @@ public class APIManagerRemoteHostApp implements APIMCLIServiceProvider {
 			LOG.error("Error " + e.getMessage());
 			return ErrorCode.MISSING_PARAMETER.getCode();
 		}
-		APIManagerRemoteHostApp managerConfigApp = new APIManagerRemoteHostApp();
-		return managerConfigApp.importConfig(params);
+		APIManagerRemoteHostApp remoteHostApp = new APIManagerRemoteHostApp();
+		return remoteHostApp.importRemoteHosts(params);
 	}
 
 	private static int runExport(RemoteHostsExportParams params, ResultHandler exportImpl) {
@@ -131,7 +130,7 @@ public class APIManagerRemoteHostApp implements APIMCLIServiceProvider {
 		return ErrorState.getInstance().getErrorCode().getCode();
 	}
 	
-	public int importConfig(StandardImportParams params) {
+	public int importRemoteHosts(StandardImportParams params) {
 		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 		try {			
 			// Clean some Singleton-Instances, as tests are running in the same JVM
