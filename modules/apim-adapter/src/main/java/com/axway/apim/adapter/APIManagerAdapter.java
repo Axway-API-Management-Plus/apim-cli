@@ -41,6 +41,7 @@ import com.axway.apim.adapter.apis.APIManagerOAuthClientProfilesAdapter;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter;
 import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
+import com.axway.apim.adapter.apis.APIManagerRemoteHostsAdapter;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.adapter.user.APIManagerUserAdapter;
 import com.axway.apim.api.model.CaCert;
@@ -108,6 +109,7 @@ public class APIManagerAdapter {
 	private static CacheManager cacheManager;
 	
 	public APIManagerConfigAdapter configAdapter;
+	public APIManagerRemoteHostsAdapter remoteHostsAdapter;
 	public APIManagerAPIAdapter apiAdapter;
 	public APIManagerAPIMethodAdapter methodAdapter;
 	public APIManagerPoliciesAdapter policiesAdapter;
@@ -163,6 +165,7 @@ public class APIManagerAdapter {
 		super();
 		this.cmd = CoreParameters.getInstance();
 		this.configAdapter = new APIManagerConfigAdapter();
+		this.remoteHostsAdapter = new APIManagerRemoteHostsAdapter();
 		this.apiAdapter = new APIManagerAPIAdapter();
 		this.methodAdapter = new APIManagerAPIMethodAdapter();
 		this.policiesAdapter = new APIManagerPoliciesAdapter();

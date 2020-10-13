@@ -1,4 +1,4 @@
-package com.axway.apim.setup.config;
+package com.axway.apim.setup;
 
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;

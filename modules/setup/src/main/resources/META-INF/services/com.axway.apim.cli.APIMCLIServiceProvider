@@ -1,1 +1,2 @@
-com.axway.apim.setup.config.APIManagerConfigApp
+com.axway.apim.setup.APIManagerConfigApp
+com.axway.apim.setup.APIManagerRemoteHostApp
