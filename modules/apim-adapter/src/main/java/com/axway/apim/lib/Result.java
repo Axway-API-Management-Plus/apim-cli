@@ -7,7 +7,8 @@ public class Result {
 		return rc;
 	}
 
-	public void setRc(int rc) {
+	public Result setRc(int rc) {
 		this.rc = rc;
+		return this;
 	}
 }

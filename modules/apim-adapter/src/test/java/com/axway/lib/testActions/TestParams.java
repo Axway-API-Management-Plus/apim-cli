@@ -17,6 +17,7 @@ public interface TestParams {
 	
 	public static String PARAM_TARGET			= "target";
 	public static String PARAM_NAME				= "name";
+	public static String PARAM_LOGINNAME		= "loginName";
 	public static String PARAM_ID				= "id";
 	
 	public static String PARAM_OUTPUT_FORMAT	= "outputFormat";

@@ -2,6 +2,7 @@ package com.axway.apim.users;
 
 import java.util.List;
 
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +11,8 @@ import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.User;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
+import com.axway.apim.lib.ExportResult;
+import com.axway.apim.lib.ImportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
@@ -25,9 +28,9 @@ import com.axway.apim.users.lib.UserExportParams;
 import com.axway.apim.users.lib.UserImportCLIOptions;
 import com.axway.apim.users.lib.UserImportParams;
 
-public class UserCLIApp implements APIMCLIServiceProvider {
+public class UserApp implements APIMCLIServiceProvider {
 
-	private static Logger LOG = LoggerFactory.getLogger(UserCLIApp.class);
+	private static Logger LOG = LoggerFactory.getLogger(UserApp.class);
 
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 	static ErrorState errorState = ErrorState.getInstance();
@@ -39,7 +42,7 @@ public class UserCLIApp implements APIMCLIServiceProvider {
 
 	@Override
 	public String getVersion() {
-		return UserCLIApp.class.getPackage().getImplementationVersion();
+		return UserApp.class.getPackage().getImplementationVersion();
 	}
 
 	@Override
@@ -54,87 +57,105 @@ public class UserCLIApp implements APIMCLIServiceProvider {
 	
 	@CLIServiceMethod(name = "get", description = "Get users from API-Manager in different formats")
 	public static int export(String args[]) {
+		UserExportParams params;
 		try {
-			UserExportParams params = new UserExportCLIOptions(args).getUserExportParams();
+			params = new UserExportCLIOptions(args).getUserExportParams();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		} catch (ParseException e) {
+			LOG.error("Error " + e.getMessage());
+			return ErrorCode.MISSING_PARAMETER.getCode();
+		}
+		UserApp app = new UserApp();
+		return app.export(params).getRc();
+	}
+
+	public ExportResult export(UserExportParams params) {
+		ExportResult result = new ExportResult();
+		try {
 			switch(params.getOutputFormat()) {
 			case console:
-				return runExport(params, ResultHandler.CONSOLE_EXPORTER);
+				return runExport(params, ResultHandler.CONSOLE_EXPORTER, result);
 			case json:
-				return runExport(params, ResultHandler.JSON_EXPORTER);
+				return runExport(params, ResultHandler.JSON_EXPORTER, result);
 			default:
-				return runExport(params, ResultHandler.CONSOLE_EXPORTER);
+				return runExport(params, ResultHandler.CONSOLE_EXPORTER, result);
 			}
 		} catch (AppException e) {
 			
 			if(errorState.hasError()) {
 				errorState.logErrorMessages(LOG);
 				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
-				return new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode();
+				result.setRc(new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode());
 			} else {
 				LOG.error(e.getMessage(), e);
-				return new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode();
+				result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode());
 			}
+			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			return result;
 		}
 	}
 
-	private static int runExport(UserExportParams params, ResultHandler exportImpl) {
-		try {
-			// We need to clean some Singleton-Instances, as tests are running in the same JVM
-			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
-			APIMHttpClient.deleteInstances();
-			
-			APIManagerAdapter adapter = APIManagerAdapter.getInstance();
+	private ExportResult runExport(UserExportParams params, ResultHandler exportImpl, ExportResult result) throws AppException {
+		// We need to clean some Singleton-Instances, as tests are running in the same JVM
+		APIManagerAdapter.deleteInstance();
+		ErrorState.deleteInstance();
+		APIMHttpClient.deleteInstances();
+		
+		APIManagerAdapter adapter = APIManagerAdapter.getInstance();
 
-			UserResultHandler exporter = UserResultHandler.create(exportImpl, params);
-			List<User> users = adapter.userAdapter.getUsers(exporter.getFilter());
-			if(users.size()==0) {
-				if(LOG.isDebugEnabled()) {
-					LOG.info("No users found using filter: " + exporter.getFilter());
-				} else {
-					LOG.info("No users found based on the given criteria.");
-				}
+		UserResultHandler exporter = UserResultHandler.create(exportImpl, params, result);
+		List<User> users = adapter.userAdapter.getUsers(exporter.getFilter());
+		if(users.size()==0) {
+			if(LOG.isDebugEnabled()) {
+				LOG.info("No users found using filter: " + exporter.getFilter());
 			} else {
-				LOG.info("Found " + users.size() + " user(s).");
-				
-				exporter.export(users);
-				if(exporter.hasError()) {
-					LOG.info("");
-					LOG.error("Please check the log. At least one error was recorded.");
-				} else {
-					LOG.debug("Successfully exported " + users.size() + " organization(s).");
-				}
+				LOG.info("No users found based on the given criteria.");
 			}
-			APIManagerAdapter.deleteInstance();
-		} catch (AppException ap) { 
-			ErrorState errorState = ErrorState.getInstance();
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
+		} else {
+			LOG.info("Found " + users.size() + " user(s).");
+			
+			exporter.export(users);
+			if(exporter.hasError()) {
+				LOG.info("");
+				LOG.error("Please check the log. At least one error was recorded.");
 			} else {
-				LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode();
+				LOG.debug("Successfully exported " + users.size() + " organization(s).");
 			}
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}
-		return ErrorState.getInstance().getErrorCode().getCode();
+		APIManagerAdapter.deleteInstance();
+		result.setRc(ErrorState.getInstance().getErrorCode().getCode());
+		return result;
 	}
 	
 	@CLIServiceMethod(name = "import", description = "Import user(s) into the API-Manager")
-	public static int importUsers(String[] args) {
+	public static int importUsers(String[] args) {		
+		UserImportParams params;
+		try {
+			params = new UserImportCLIOptions(args).getUserImportParams();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		} catch (ParseException e) {
+			LOG.error("Error " + e.getMessage());
+			return ErrorCode.MISSING_PARAMETER.getCode();
+		}
+		UserApp app = new UserApp();
+		return app.importUsers(params).getRc();
+	}
+	
+	public ImportResult importUsers(UserImportParams params) {
+		ImportResult result = new ImportResult();
 		try {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			
-			UserImportParams params = new UserImportCLIOptions(args).getUserImportParams();
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the organization
 			UserAdapter userAdapter = new JSONUserAdapter();
@@ -151,31 +172,50 @@ public class UserCLIApp implements APIMCLIServiceProvider {
 				importManager.replicate(desiredUser, actualUser);
 			}
 			LOG.info("Successfully replicated user(s) into API-Manager");
-			return errorCodeMapper.getMapedErrorCode(ErrorState.getInstance().getErrorCode()).getCode();
+			result.setRc(errorCodeMapper.getMapedErrorCode(ErrorState.getInstance().getErrorCode()).getCode());
+			return result;
 		} catch (AppException ap) { 
 			ErrorState errorState = ErrorState.getInstance();
 			if(errorState.hasError()) {
 				errorState.logErrorMessages(LOG);
 				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
+				result.setRc(errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode());
 			} else {
 				LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode();
+				result.setRc(errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode());
 			}
+			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			return result;
 		}
 	}
 	
 	@CLIServiceMethod(name = "delete", description = "Delete selected user(s) from the API-Manager")
 	public static int delete(String args[]) {
+		UserExportParams params;
 		try {
-			UserExportParams params = new UserDeleteCLIOptions(args).getUserExportParams();
-			return runExport(params, ResultHandler.ORG_DELETE_HANDLER);
+			params = new UserDeleteCLIOptions(args).getUserExportParams();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		} catch (ParseException e) {
+			LOG.error("Error " + e.getMessage());
+			return ErrorCode.MISSING_PARAMETER.getCode();
+		}
+		UserApp app = new UserApp();
+		return app.delete(params).getRc();
+	}
+	
+	public ExportResult delete(UserExportParams params) {
+		ExportResult result = new ExportResult();
+		try {
+			return runExport(params, ResultHandler.ORG_DELETE_HANDLER, result);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			return result;
 		}
 	}
 
