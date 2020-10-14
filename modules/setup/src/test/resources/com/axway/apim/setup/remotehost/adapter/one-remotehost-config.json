@@ -1,0 +1,30 @@
+{
+    "name": "my-remotehost.com",
+    "port": 8280,
+    "createdOn": 1602573545412,
+    "createdBy": "fred",
+    "organization": "FHIR",
+    "maxConnections": -1,
+    "allowHTTP11": false,
+    "includeContentLengthRequest": false,
+    "includeContentLengthResponse": false,
+    "offerTLSServerName": false,
+    "verifyServerHostname": true,
+    "connectionTimeout": 30000,
+    "activeTimeout": 30000,
+    "transactionTimeout": 240000,
+    "idleTimeout": 15000,
+    "maxReceiveBytes": 20971520,
+    "maxSendBytes": 20971520,
+    "inputBufferSize": 8192,
+    "outputBufferSize": 8192,
+    "addressCacheTimeout": 300000,
+    "sslSessionCacheSize": 32,
+    "inputEncodings": [
+        ".inherit"
+    ],
+    "outputEncodings": [
+        ".inherit"
+    ],
+    "exportCorrelationId": true
+}

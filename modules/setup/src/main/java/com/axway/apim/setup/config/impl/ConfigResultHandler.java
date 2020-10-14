@@ -59,8 +59,7 @@ public abstract class ConfigResultHandler {
 	}
 	
 	protected Builder getBaseConfigFilterBuilder() {
-		Builder builder = new OrgFilter.Builder()
-				.hasId(params.getFieldName());
+		Builder builder = new OrgFilter.Builder();
 		return builder;
 	}
 	

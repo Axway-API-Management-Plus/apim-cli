@@ -1,7 +1,6 @@
 package com.axway.apim.setup.config.lib;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 
 import com.axway.apim.lib.StandardExportCLIOptions;
@@ -13,10 +12,6 @@ public class ConfigExportCLIOptions extends StandardExportCLIOptions {
 
 	public ConfigExportCLIOptions(String[] args) throws ParseException {
 		super(args);
-		Option option = new  Option("n", "fieldName", true, "Limit export the the given fieldName. Wildcards are supported.");
-		option.setRequired(false);
-		option.setArgName("*password*");
-		options.addOption(option);
 	}
 
 	@Override
@@ -39,10 +34,9 @@ public class ConfigExportCLIOptions extends StandardExportCLIOptions {
 		return "Configuration-Export";
 	}
 	
-	public ConfigExportParams getConfigExportParams() throws AppException {
+	public ConfigExportParams getParams() throws AppException {
 		ConfigExportParams params = new ConfigExportParams();
 		super.addStandardExportParameters(params);
-		params.setFieldName(getValue("fieldName"));
 		return params;
 	}
 }

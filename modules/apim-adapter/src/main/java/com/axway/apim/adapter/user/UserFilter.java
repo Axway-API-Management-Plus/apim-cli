@@ -172,13 +172,13 @@ public class UserFilter {
 	public int hashCode() {
 		int hashCode = 0;
 		hashCode += (this.id!=null) ? this.id.hashCode() : 0;
-		hashCode += (this.name!=null) ? this.name.hashCode() : 0;
+		hashCode += (this.loginName!=null) ? this.loginName.hashCode() : 0;
 		return hashCode;
 	}
 
 	@Override
 	public String toString() {
-		return "UserFilter [name=" + name + ", id=" + id + "]";
+		return "UserFilter [loginName=" + loginName + ", id=" + id + "]";
 	}
 	
 	public boolean filter(User user) throws AppException {

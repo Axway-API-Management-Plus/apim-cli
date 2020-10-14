@@ -15,4 +15,9 @@ public class StandardImportParams extends CoreParameters {
 	public static synchronized StandardImportParams getInstance() {
 		return (StandardImportParams)CoreParameters.getInstance();
 	}
+
+	@Override
+	public String toString() {
+		return "[" + super.toString() + ", config=" + config + "]";
+	}
 }

@@ -22,6 +22,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.PUTRequest;
@@ -96,6 +97,10 @@ public class APIManagerConfigAdapter {
 		HttpResponse httpResponse = null;
 		APIManagerConfig updatedConfig;
 		try {
+			if(!APIManagerAdapter.hasAdminAccount()) {
+				ErrorState.getInstance().setError("An Admin Account is required to update the API-Manager configuration.", ErrorCode.NO_ADMIN_ROLE_USER, false);
+				throw new AppException("An Admin Account is required to update the API-Manager configuration.", ErrorCode.NO_ADMIN_ROLE_USER);
+			}
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/config").build();
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
 					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {}));

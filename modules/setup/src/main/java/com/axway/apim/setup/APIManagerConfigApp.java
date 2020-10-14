@@ -51,7 +51,7 @@ public class APIManagerConfigApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "get", description = "Get API-Manager configuration in different formats")
 	public static int export(String args[]) {
 		try {
-			ConfigExportParams params = new ConfigExportCLIOptions(args).getConfigExportParams();
+			ConfigExportParams params = new ConfigExportCLIOptions(args).getParams();
 			switch(params.getOutputFormat()) {
 			case console:
 				return runExport(params, ResultHandler.CONSOLE_EXPORTER);
