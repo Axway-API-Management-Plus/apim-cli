@@ -115,6 +115,7 @@ public class RemoteHost {
 	}
 	
 	public String getOrganizationId() {
+		if(organization==null) return null;
 		return organization.getId();
 	}
 
