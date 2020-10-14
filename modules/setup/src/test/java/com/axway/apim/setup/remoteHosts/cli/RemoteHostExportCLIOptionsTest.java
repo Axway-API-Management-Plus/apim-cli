@@ -19,7 +19,6 @@ public class RemoteHostExportCLIOptionsTest {
 		// This make sure staging is working
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "api-env");
 		
 		Assert.assertEquals(params.getWide(), Wide.wide);
 		Assert.assertTrue(params.isDeleteTarget());
@@ -36,7 +35,6 @@ public class RemoteHostExportCLIOptionsTest {
 		RemoteHostsExportParams params = options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "api-env");
 		
 		Assert.assertEquals(params.getWide(), Wide.ultra);
 		// Validate target is current directory if not given
