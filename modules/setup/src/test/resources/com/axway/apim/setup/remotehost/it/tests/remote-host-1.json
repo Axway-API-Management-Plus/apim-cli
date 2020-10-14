@@ -2,7 +2,7 @@
   "name" : "${remoteHostName}",
   "port" : "${remoteHostPort}",
   "createdOn" : 1602512009574,
-  "organization" : "API Development",
+  "organization" : "${orgName}",
   "maxConnections" : -1,
   "allowHTTP11" : false,
   "includeContentLengthRequest" : false,

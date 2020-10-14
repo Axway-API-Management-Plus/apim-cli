@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.ImportResult;
 import com.axway.apim.lib.StandardImportParams;
-import com.axway.apim.setup.APIManagerRemoteHostApp;
+import com.axway.apim.setup.APIManagerConfigApp;
 import com.axway.lib.testActions.CLIAbstractImportTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.ValidationException;
@@ -24,11 +24,11 @@ public class ImportConfigTestAction extends CLIAbstractImportTestAction {
 		addParameters(params, context);
 		params.setConfig(this.configFile.getPath());
 		
-		APIManagerRemoteHostApp app = new APIManagerRemoteHostApp();
+		APIManagerConfigApp app = new APIManagerConfigApp();
 		
 		LOG.info("Running "+app.getClass().getSimpleName()+" with params: "+params);
 		
-		ImportResult result = app.importRemoteHosts(params);
+		ImportResult result = app.importConfig(params);
 		if(this.getExpectedReturnCode(context)!=result.getRc()) {
 			throw new ValidationException("Expected RC was: " + this.getExpectedReturnCode(context) + " but got: " + result.getRc());
 		}

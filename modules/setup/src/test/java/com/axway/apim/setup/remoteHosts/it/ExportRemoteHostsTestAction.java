@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.setup.APIManagerRemoteHostApp;
+import com.axway.apim.setup.RemoteHostApp;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportParams;
 import com.axway.lib.testActions.CLIAbstractExportTestAction;
 import com.axway.lib.testActions.TestParams;
@@ -25,7 +25,7 @@ public class ExportRemoteHostsTestAction extends CLIAbstractExportTestAction imp
 		addParameters(params, context);
 		params.setName(context.getVariable(PARAM_NAME));
 		
-		APIManagerRemoteHostApp app = new APIManagerRemoteHostApp();
+		RemoteHostApp app = new RemoteHostApp();
 		LOG.info("Running "+app.getClass().getSimpleName()+" with params: "+params);
 		
 		ExportResult result = app.exportRemoteHosts(params);

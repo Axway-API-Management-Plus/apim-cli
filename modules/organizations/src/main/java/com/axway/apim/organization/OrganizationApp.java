@@ -11,6 +11,7 @@ import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
@@ -55,77 +56,79 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	
 	@CLIServiceMethod(name = "get", description = "Get Organizations from API-Manager in different formats")
 	public static int exportOrgs(String args[]) {
+		OrgExportParams params;
 		try {
-			OrgExportParams params = new OrgExportCLIOptions(args).getOrgExportParams();
-			OrganizationApp orgApp = new OrganizationApp();
+			params = new OrgExportCLIOptions(args).getOrgExportParams();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		} catch (ParseException e) {
+			LOG.error("Error " + e.getMessage());
+			return ErrorCode.MISSING_PARAMETER.getCode();
+		}
+		OrganizationApp app = new OrganizationApp();
+		return app.exportOrgs(params).getRc();
+	}
+	
+	public ExportResult exportOrgs(OrgExportParams params) {
+		ExportResult result = new ExportResult();
+		try {
 			switch(params.getOutputFormat()) {
 			case console:
-				return orgApp.exportOrgs(params, ResultHandler.CONSOLE_EXPORTER);
+				return exportOrgs(params, ResultHandler.CONSOLE_EXPORTER, result);
 			case json:
-				return orgApp.exportOrgs(params, ResultHandler.JSON_EXPORTER);
+				return exportOrgs(params, ResultHandler.JSON_EXPORTER, result);
 			default:
-				return orgApp.exportOrgs(params, ResultHandler.CONSOLE_EXPORTER);
+				return exportOrgs(params, ResultHandler.CONSOLE_EXPORTER, result);
 			}
 		} catch (AppException e) {
 			
 			if(errorState.hasError()) {
 				errorState.logErrorMessages(LOG);
 				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
-				return new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode();
+				result.setRc(new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode());
 			} else {
 				LOG.error(e.getMessage(), e);
-				return new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode();
+				result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode());
 			}
+			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			return result;
 		}
 	}
 
-	public int exportOrgs(OrgExportParams params, ResultHandler exportImpl) {
-		try {
-			// We need to clean some Singleton-Instances, as tests are running in the same JVM
-			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
-			APIMHttpClient.deleteInstances();
-			
-			APIManagerAdapter adapter = APIManagerAdapter.getInstance();
+	private ExportResult exportOrgs(OrgExportParams params, ResultHandler exportImpl, ExportResult result) throws AppException {
+		// We need to clean some Singleton-Instances, as tests are running in the same JVM
+		APIManagerAdapter.deleteInstance();
+		ErrorState.deleteInstance();
+		APIMHttpClient.deleteInstances();
+		
+		APIManagerAdapter adapter = APIManagerAdapter.getInstance();
 
-			OrgResultHandler exporter = OrgResultHandler.create(exportImpl, params);
-			List<Organization> orgs = adapter.orgAdapter.getOrgs(exporter.getFilter());
-			if(orgs.size()==0) {
-				if(LOG.isDebugEnabled()) {
-					LOG.info("No organizations found using filter: " + exporter.getFilter());
-				} else {
-					LOG.info("No organizations found based on the given criteria.");
-				}
+		OrgResultHandler exporter = OrgResultHandler.create(exportImpl, params);
+		List<Organization> orgs = adapter.orgAdapter.getOrgs(exporter.getFilter());
+		if(orgs.size()==0) {
+			if(LOG.isDebugEnabled()) {
+				LOG.info("No organizations found using filter: " + exporter.getFilter());
 			} else {
-				LOG.info("Found " + orgs.size() + " organization(s).");
-				
-				exporter.export(orgs);
-				if(exporter.hasError()) {
-					LOG.info("");
-					LOG.error("Please check the log. At least one error was recorded.");
-				} else {
-					LOG.debug("Successfully exported " + orgs.size() + " organization(s).");
-				}
+				LOG.info("No organizations found based on the given criteria.");
 			}
-			APIManagerAdapter.deleteInstance();
-		} catch (AppException ap) { 
-			ErrorState errorState = ErrorState.getInstance();
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
+		} else {
+			LOG.info("Found " + orgs.size() + " organization(s).");
+			
+			exporter.export(orgs);
+			if(exporter.hasError()) {
+				LOG.info("");
+				LOG.error("Please check the log. At least one error was recorded.");
 			} else {
-				LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode();
+				LOG.debug("Successfully exported " + orgs.size() + " organization(s).");
 			}
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}
-		return ErrorState.getInstance().getErrorCode().getCode();
+		APIManagerAdapter.deleteInstance();
+		result.setRc(ErrorState.getInstance().getErrorCode().getCode());
+		return result;
 	}
 	
 	@CLIServiceMethod(name = "import", description = "Import organizatio(s) into the API-Manager")
@@ -182,12 +185,37 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "delete", description = "Delete selected organizatio(s) from the API-Manager")
 	public static int delete(String args[]) {
 		try {
+			
 			OrgExportParams params = new OrgDeleteCLIOptions(args).getOrgExportParams();
 			OrganizationApp orgApp = new OrganizationApp();
-			return orgApp.exportOrgs(params, ResultHandler.ORG_DELETE_HANDLER);
+			return orgApp.delete(params).getRc();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		} catch (ParseException e) {
+			LOG.error("Error " + e.getMessage());
+			return ErrorCode.MISSING_PARAMETER.getCode();
+		}
+	}
+	
+	public ExportResult delete(OrgExportParams params) {
+		ExportResult result = new ExportResult();
+		try {
+			return exportOrgs(params, ResultHandler.ORG_DELETE_HANDLER, result);
+		} catch (AppException e) {
+			if(errorState.hasError()) {
+				errorState.logErrorMessages(LOG);
+				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
+				result.setRc(new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode());
+			} else {
+				LOG.error(e.getMessage(), e);
+				result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode());
+			}
+			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			return result;
 		}
 	}
 

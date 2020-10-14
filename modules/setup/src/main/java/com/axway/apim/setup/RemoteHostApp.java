@@ -25,9 +25,9 @@ import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportCLIOptions;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportParams;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsImportCLIOptions;
 
-public class APIManagerRemoteHostApp implements APIMCLIServiceProvider {
+public class RemoteHostApp implements APIMCLIServiceProvider {
 
-	private static Logger LOG = LoggerFactory.getLogger(APIManagerRemoteHostApp.class);
+	private static Logger LOG = LoggerFactory.getLogger(RemoteHostApp.class);
 
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 	static ErrorState errorState = ErrorState.getInstance();
@@ -39,7 +39,7 @@ public class APIManagerRemoteHostApp implements APIMCLIServiceProvider {
 
 	@Override
 	public String getVersion() {
-		return APIManagerRemoteHostApp.class.getPackage().getImplementationVersion();
+		return RemoteHostApp.class.getPackage().getImplementationVersion();
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class APIManagerRemoteHostApp implements APIMCLIServiceProvider {
 			LOG.error("Error " + e.getMessage());
 			return ErrorCode.MISSING_PARAMETER.getCode();
 		}
-		APIManagerRemoteHostApp app = new APIManagerRemoteHostApp();
+		RemoteHostApp app = new RemoteHostApp();
 		return app.exportRemoteHosts(params).getRc();
 	}
 
@@ -108,7 +108,7 @@ public class APIManagerRemoteHostApp implements APIMCLIServiceProvider {
 			LOG.error("Error " + e.getMessage());
 			return ErrorCode.MISSING_PARAMETER.getCode();
 		}
-		APIManagerRemoteHostApp remoteHostApp = new APIManagerRemoteHostApp();
+		RemoteHostApp remoteHostApp = new RemoteHostApp();
 		return remoteHostApp.importRemoteHosts(params).getRc();
 	}
 
