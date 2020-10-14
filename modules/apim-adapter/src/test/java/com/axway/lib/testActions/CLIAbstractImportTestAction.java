@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -16,12 +17,14 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.ValidationException;
 
 public abstract class CLIAbstractImportTestAction extends CLIAbstractTestAction implements TestParams {
-	
+
 	protected File configFile;
 	
 	protected File srcConfigFileName;
 
-	public CLIAbstractImportTestAction() { }
+	public CLIAbstractImportTestAction(TestContext context) {
+		super(context);
+	}
 	
 	@Override
 	public void doExecute(TestContext context, File testDirectory) {

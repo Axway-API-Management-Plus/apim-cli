@@ -10,6 +10,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.api.model.APIManagerConfig;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.setup.config.lib.ConfigExportParams;
@@ -23,8 +24,8 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class JsonConfigExporter extends ConfigResultHandler {
 
-	public JsonConfigExporter(ConfigExportParams params) {
-		super(params);
+	public JsonConfigExporter(ConfigExportParams params, ExportResult result) {
+		super(params, result);
 	}
 
 	@Override
@@ -62,14 +63,15 @@ public class JsonConfigExporter extends ConfigResultHandler {
 		} catch (Exception e) {
 			throw new AppException("Can't create configuration export", ErrorCode.UNXPECTED_ERROR, e);
 		}
-		LOG.info("Successfully exported API-Manager configuration into folder: " + localFolder);
+		LOG.info("Successfully exported API-Manager configuration into: " + localFolder + File.separator + "apimanager-config.json");
+		result.addExportedFile(localFolder + File.separator + "apimanager-config.json");
 		if(!APIManagerAdapter.hasAdminAccount()) {
 			LOG.warn("Export has been done with an Org-Admin account only. Export of configuration restricted.");
 		}
 	}
 	
 	private String getExportFolder(APIManagerConfig config) {
-		String name = config.getPortalName();
+		String name = config.getPortalName().toLowerCase();
 		name = name.replace(" ", "-");
 		return name;
 	}

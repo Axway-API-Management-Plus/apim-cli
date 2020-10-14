@@ -11,6 +11,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.RemoteHostFilter;
 import com.axway.apim.adapter.jackson.UserSerializerModifier;
 import com.axway.apim.api.model.RemoteHost;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportParams;
@@ -24,8 +25,8 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class JsonRemoteHostsExporter extends RemoteHostsResultHandler {
 
-	public JsonRemoteHostsExporter(RemoteHostsExportParams params) {
-		super(params);
+	public JsonRemoteHostsExporter(RemoteHostsExportParams params, ExportResult result) {
+		super(params, result);
 	}
 
 	@Override
@@ -60,7 +61,9 @@ public class JsonRemoteHostsExporter extends RemoteHostsResultHandler {
 				FilterProvider filters = new SimpleFilterProvider()
 						.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "organizationId"}));
 				mapper.setFilterProvider(filters);
+				File exportFile =  new File(localFolder.getCanonicalPath() + "/remote-host.json");
 				mapper.writeValue(new File(localFolder.getCanonicalPath() + "/remote-host.json"), remotehost);
+				result.addExportedFile(exportFile.getPath());
 			} catch (Exception e) {
 				throw new AppException("Can't create Remote-Host export", ErrorCode.UNXPECTED_ERROR, e);
 			}

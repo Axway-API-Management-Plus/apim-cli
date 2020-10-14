@@ -10,6 +10,8 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
+import com.axway.apim.lib.ExportResult;
+import com.axway.apim.lib.ImportResult;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -52,29 +54,45 @@ public class APIManagerRemoteHostApp implements APIMCLIServiceProvider {
 	
 	@CLIServiceMethod(name = "get", description = "Get API-Manager remote hosts in different formats")
 	public static int export(String args[]) {
+		RemoteHostsExportParams params;
 		try {
-			RemoteHostsExportParams params = new RemoteHostsExportCLIOptions(args).getParams();
+			params = new RemoteHostsExportCLIOptions(args).getParams();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		} catch (ParseException e) {
+			LOG.error("Error " + e.getMessage());
+			return ErrorCode.MISSING_PARAMETER.getCode();
+		}
+		APIManagerRemoteHostApp app = new APIManagerRemoteHostApp();
+		return app.exportRemoteHosts(params).getRc();
+	}
+
+	public ExportResult exportRemoteHosts(RemoteHostsExportParams params) {
+		ExportResult result = new ExportResult();
+		try {
 			switch(params.getOutputFormat()) {
 			case console:
-				return runExport(params, ResultHandler.CONSOLE_EXPORTER);
+				return runExport(params, ResultHandler.CONSOLE_EXPORTER, result);
 			case json:
-				return runExport(params, ResultHandler.JSON_EXPORTER);
+				return runExport(params, ResultHandler.JSON_EXPORTER, result);
 			default:
-				return runExport(params, ResultHandler.CONSOLE_EXPORTER);
+				return runExport(params, ResultHandler.CONSOLE_EXPORTER, result);
 			}
 		} catch (AppException e) {
-			
 			if(errorState.hasError()) {
 				errorState.logErrorMessages(LOG);
 				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
-				return new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode();
+				result.setRc(new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode());
 			} else {
 				LOG.error(e.getMessage(), e);
-				return new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode();
+				result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode());
 			}
+			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			return result;
 		}
 	}
 	
@@ -91,47 +109,34 @@ public class APIManagerRemoteHostApp implements APIMCLIServiceProvider {
 			return ErrorCode.MISSING_PARAMETER.getCode();
 		}
 		APIManagerRemoteHostApp remoteHostApp = new APIManagerRemoteHostApp();
-		return remoteHostApp.importRemoteHosts(params);
+		return remoteHostApp.importRemoteHosts(params).getRc();
 	}
 
-	private static int runExport(RemoteHostsExportParams params, ResultHandler exportImpl) {
-		try {
-			// We need to clean some Singleton-Instances, as tests are running in the same JVM
-			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
-			APIMHttpClient.deleteInstances();
-			
-			APIManagerAdapter adapter = APIManagerAdapter.getInstance();
+	private ExportResult runExport(RemoteHostsExportParams params, ResultHandler exportImpl, ExportResult result) throws AppException {
+		// We need to clean some Singleton-Instances, as tests are running in the same JVM
+		APIManagerAdapter.deleteInstance();
+		ErrorState.deleteInstance();
+		APIMHttpClient.deleteInstances();
+		
+		APIManagerAdapter adapter = APIManagerAdapter.getInstance();
 
-			RemoteHostsResultHandler exporter = RemoteHostsResultHandler.create(exportImpl, params);
-			List<RemoteHost> remoteHosts = adapter.remoteHostsAdapter.getRemoteHosts(exporter.getFilter());
-			exporter.export(remoteHosts);
-			if(exporter.hasError()) {
-				LOG.info("");
-				LOG.error("Please check the log. At least one error was recorded.");
-			} else {
-				LOG.info("API-Manager remote hosts successfully exported.");
-			}
-			APIManagerAdapter.deleteInstance();
-		} catch (AppException ap) { 
-			ErrorState errorState = ErrorState.getInstance();
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
-			} else {
-				LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode();
-			}
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+		RemoteHostsResultHandler exporter = RemoteHostsResultHandler.create(exportImpl, params, result);
+		List<RemoteHost> remoteHosts = adapter.remoteHostsAdapter.getRemoteHosts(exporter.getFilter());
+		exporter.export(remoteHosts);
+		if(exporter.hasError()) {
+			LOG.info("");
+			LOG.error("Please check the log. At least one error was recorded.");
+		} else {
+			LOG.info("API-Manager remote hosts successfully exported.");
 		}
-		return ErrorState.getInstance().getErrorCode().getCode();
+		APIManagerAdapter.deleteInstance();
+		result.setRc(ErrorState.getInstance().getErrorCode().getCode());
+		return result;
 	}
 	
-	public int importRemoteHosts(StandardImportParams params) {
+	public ImportResult importRemoteHosts(StandardImportParams params) {
 		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+		ImportResult result = new ImportResult();
 		try {			
 			// Clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
@@ -149,20 +154,23 @@ public class APIManagerRemoteHostApp implements APIMCLIServiceProvider {
 				apimAdapter.remoteHostsAdapter.createOrUpdateRemoteHost(desiredRemoteHost, actualRemoteHost);				
 			}
 			LOG.info("API-Manager remote host(s) successfully updated.");
-			return 0;
+			return result;
 		} catch (AppException ap) { 
 			ErrorState errorState = ErrorState.getInstance();
 			if(errorState.hasError()) {
 				errorState.logErrorMessages(LOG);
 				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
+				result.setRc(errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode());
+				return result;
 			} else {
 				LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode();
+				result.setRc(errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode());
+				return result;
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			return result;
 		}
 	}
 

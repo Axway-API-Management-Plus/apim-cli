@@ -8,6 +8,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.lib.APIManagerConfigAnnotation;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.APIManagerConfigAnnotation.ConfigType;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.setup.config.lib.ConfigExportParams;
@@ -51,8 +52,8 @@ public class ConsoleConfigExporter extends ConfigResultHandler {
 			ConfigType.AdvisoryBanner, 
 	};
 
-	public ConsoleConfigExporter(ConfigExportParams params) {
-		super(params);
+	public ConsoleConfigExporter(ConfigExportParams params, ExportResult result) {
+		super(params, result);
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {

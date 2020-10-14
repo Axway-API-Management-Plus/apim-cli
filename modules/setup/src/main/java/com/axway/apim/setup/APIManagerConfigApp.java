@@ -8,6 +8,8 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
+import com.axway.apim.lib.ExportResult;
+import com.axway.apim.lib.ImportResult;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -49,35 +51,23 @@ public class APIManagerConfigApp implements APIMCLIServiceProvider {
 	}
 	
 	@CLIServiceMethod(name = "get", description = "Get API-Manager configuration in different formats")
-	public static int export(String args[]) {
+	public static int exportConfig(String args[]) {
+		ConfigExportParams params;
 		try {
-			ConfigExportParams params = new ConfigExportCLIOptions(args).getParams();
-			switch(params.getOutputFormat()) {
-			case console:
-				return runExport(params, ResultHandler.CONSOLE_EXPORTER);
-			case json:
-				return runExport(params, ResultHandler.JSON_EXPORTER);
-			default:
-				return runExport(params, ResultHandler.CONSOLE_EXPORTER);
-			}
+			params = new ConfigExportCLIOptions(args).getParams();
 		} catch (AppException e) {
-			
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
-				return new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode();
-			} else {
-				LOG.error(e.getMessage(), e);
-				return new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode();
-			}
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		} catch (ParseException e) {
+			LOG.error("Error " + e.getMessage());
+			return ErrorCode.MISSING_PARAMETER.getCode();
 		}
+		APIManagerConfigApp apiExportApp = new APIManagerConfigApp();
+		return apiExportApp.exportConfig(params).getRc();
 	}
 	
 	@CLIServiceMethod(name = "import", description = "Import configuration into API-Manager")
-	public static int importAPI(String args[]) {
+	public static int importConfig(String args[]) {
 		StandardImportParams params;
 		try {
 			params = new ConfigImportCLIOptions(args).getImportParams();
@@ -89,47 +79,63 @@ public class APIManagerConfigApp implements APIMCLIServiceProvider {
 			return ErrorCode.MISSING_PARAMETER.getCode();
 		}
 		APIManagerConfigApp managerConfigApp = new APIManagerConfigApp();
-		return managerConfigApp.importConfig(params);
+		return managerConfigApp.importConfig(params).getRc();
 	}
 
-	private static int runExport(ConfigExportParams params, ResultHandler exportImpl) {
+	public ExportResult exportConfig(ConfigExportParams params) {
+		ExportResult result = new ExportResult();
 		try {
-			// We need to clean some Singleton-Instances, as tests are running in the same JVM
-			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
-			APIMHttpClient.deleteInstances();
-			
-			APIManagerAdapter adapter = APIManagerAdapter.getInstance();
-
-			ConfigResultHandler exporter = ConfigResultHandler.create(exportImpl, params);
-			APIManagerConfig config = adapter.configAdapter.getConfig(APIManagerAdapter.hasAdminAccount());
-			exporter.export(config);
-			if(exporter.hasError()) {
-				LOG.info("");
-				LOG.error("Please check the log. At least one error was recorded.");
-			} else {
-				LOG.info("API-Manager configuration successfully exported.");
+			switch(params.getOutputFormat()) {
+			case console:
+				return exportConfig(params, ResultHandler.CONSOLE_EXPORTER, result);
+			case json:
+				return exportConfig(params, ResultHandler.JSON_EXPORTER, result);
+			default:
+				return exportConfig(params, ResultHandler.CONSOLE_EXPORTER, result);
 			}
-			APIManagerAdapter.deleteInstance();
-		} catch (AppException ap) { 
-			ErrorState errorState = ErrorState.getInstance();
+		} catch (AppException e) {
 			if(errorState.hasError()) {
 				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
+				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
+				result.setRc(new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode());
+				return result;
 			} else {
-				LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode();
+				LOG.error(e.getMessage(), e);
+				result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode());
+				return result;
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			return result;
 		}
-		return ErrorState.getInstance().getErrorCode().getCode();
+	}
+
+	private ExportResult exportConfig(ConfigExportParams params, ResultHandler exportImpl, ExportResult result) throws AppException {
+		// We need to clean some Singleton-Instances, as tests are running in the same JVM
+		APIManagerAdapter.deleteInstance();
+		ErrorState.deleteInstance();
+		APIMHttpClient.deleteInstances();
+		
+		APIManagerAdapter adapter = APIManagerAdapter.getInstance();
+
+		ConfigResultHandler exporter = ConfigResultHandler.create(exportImpl, params, result);
+		APIManagerConfig config = adapter.configAdapter.getConfig(APIManagerAdapter.hasAdminAccount());
+		exporter.export(config);
+		if(exporter.hasError()) {
+			LOG.info("");
+			LOG.error("Please check the log. At least one error was recorded.");
+		} else {
+			LOG.info("API-Manager configuration successfully exported.");
+		}
+		APIManagerAdapter.deleteInstance();
+		result.setRc(ErrorState.getInstance().getErrorCode().getCode());
+		return result;
 	}
 	
-	public int importConfig(StandardImportParams params) {
+	public ImportResult importConfig(StandardImportParams params) {
 		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+		ImportResult result = new ImportResult();
 		try {			
 			// Clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
@@ -145,25 +151,28 @@ public class APIManagerConfigApp implements APIMCLIServiceProvider {
 			APIManagerConfig actualConfig = apimAdapter.configAdapter.getConfig(APIManagerAdapter.hasAdminAccount());
 			apimAdapter.configAdapter.updateConfiguration(desiredConfig, actualConfig);
 			LOG.info("API-Manager configuration successfully updated.");
-			return 0;
+			return result;
 		} catch (AppException ap) { 
 			ErrorState errorState = ErrorState.getInstance();
 			if(errorState.hasError()) {
 				errorState.logErrorMessages(LOG);
 				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
+				result.setRc(errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode());
+				return result;
 			} else {
 				LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode();
+				result.setRc(errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode());
+				return result;
 			}
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			return result;
 		}
 	}
 
 	public static void main(String args[]) { 
-		int rc = importAPI(args);
+		int rc = importConfig(args);
 		System.exit(rc);
 	}
 

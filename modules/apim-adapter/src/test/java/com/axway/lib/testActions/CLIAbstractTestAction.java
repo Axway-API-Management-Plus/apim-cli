@@ -1,6 +1,7 @@
 package com.axway.lib.testActions;
 
 import java.io.File;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +18,19 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 	
 	protected File testDirectory;
 
-	public CLIAbstractTestAction() { }
+	public TestContext context;
+	
+	public int randomNum;
+	
+	public CLIAbstractTestAction(TestContext context) {
+		super();
+		this.context = context;
+		this.randomNum = ThreadLocalRandom.current().nextInt(1, 9999 + 1);
+		this.testDirectory = createTestDirectory(this.context);
+	}
 
 	@Override
 	public void doExecute(TestContext context) {
-		this.testDirectory = createTestDirectory(context);
 		doExecute(context, testDirectory);
 	}
 
@@ -46,10 +55,12 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 		}
 		return testDir;
 	}
+
+	protected String getTestDirName(TestContext context) {
+		return this.getClass().getSimpleName() + "-" + randomNum;
+	}
 	
-	protected abstract String getTestDirName(TestContext context);
-	
-	protected void addCoreParameter(CoreParameters params, TestContext context) {
+	protected void addParameters(CoreParameters params, TestContext context) {
 		params.setHostname(getHostname(context));
 		params.setUsername(getUsername(context));
 		params.setPassword(getPassword(context));
@@ -107,5 +118,13 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 			return Boolean.parseBoolean(context.getVariable(PARAM_IGNORE_ADMIN_ACC));
 		} catch (Exception e) {}
 		return false;
+	}
+
+	public File getTestDirectory() {
+		return testDirectory;
+	}
+
+	public int getRandomNum() {
+		return randomNum;
 	}
 }

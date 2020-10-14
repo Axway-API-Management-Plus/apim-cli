@@ -1,4 +1,4 @@
-package com.axway.apim.setup.config.it;
+package com.axway.apim.setup.remoteHosts.it;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,11 +10,11 @@ import com.axway.lib.testActions.CLIAbstractImportTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.ValidationException;
 
-public class ImportConfigTestAction extends CLIAbstractImportTestAction {
+public class ImportRemoteHostsTestAction extends CLIAbstractImportTestAction {
 
-	private static Logger LOG = LoggerFactory.getLogger(ImportConfigTestAction.class);
+	private static Logger LOG = LoggerFactory.getLogger(ImportRemoteHostsTestAction.class);
 	
-	public ImportConfigTestAction(TestContext context) {
+	public ImportRemoteHostsTestAction(TestContext context) {
 		super(context);
 	}
 

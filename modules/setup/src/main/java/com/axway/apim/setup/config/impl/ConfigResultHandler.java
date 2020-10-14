@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.apis.OrgFilter.Builder;
 import com.axway.apim.api.model.APIManagerConfig;
+import com.axway.apim.lib.ExportResult;
+import com.axway.apim.lib.Result;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.setup.config.lib.ConfigExportParams;
@@ -33,14 +35,15 @@ public abstract class ConfigResultHandler {
 	}
 	
 	ConfigExportParams params;
+	ExportResult result;
 	
 	boolean hasError = false;
 	
-	public static ConfigResultHandler create(ResultHandler exportImpl, ConfigExportParams params) throws AppException {
+	public static ConfigResultHandler create(ResultHandler exportImpl, ConfigExportParams params, Result result) throws AppException {
 		try {
-			Object[] intArgs = new Object[] { params };
+			Object[] intArgs = new Object[] { params, result };
 			Constructor<ConfigResultHandler> constructor =
-					exportImpl.getClazz().getConstructor(new Class[]{ConfigExportParams.class});
+					exportImpl.getClazz().getConstructor(new Class[]{ConfigExportParams.class, ExportResult.class});
 			ConfigResultHandler exporter = constructor.newInstance(intArgs);
 			return exporter;
 		} catch (Exception e) {
@@ -48,8 +51,9 @@ public abstract class ConfigResultHandler {
 		}
 	}
 
-	public ConfigResultHandler(ConfigExportParams params) {
+	public ConfigResultHandler(ConfigExportParams params, ExportResult result) {
 		this.params = params;
+		this.result = result;
 	}
 	
 	public abstract void export(APIManagerConfig config) throws AppException;

@@ -2,19 +2,15 @@ package com.axway.apim.setup.remotehosts.impl;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
-import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.apis.RemoteHostFilter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.RemoteHost;
-import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.lib.StandardExportParams.Wide;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportParams;
 import com.github.freva.asciitable.AsciiTable;
@@ -30,8 +26,8 @@ public class ConsoleRemoteHostsExporter extends RemoteHostsResultHandler {
 	
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
-	public ConsoleRemoteHostsExporter(RemoteHostsExportParams params) {
-		super(params);
+	public ConsoleRemoteHostsExporter(RemoteHostsExportParams params, ExportResult result) {
+		super(params, result);
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {

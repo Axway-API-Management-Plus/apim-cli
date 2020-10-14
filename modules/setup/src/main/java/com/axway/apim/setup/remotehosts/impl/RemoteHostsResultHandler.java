@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.apis.RemoteHostFilter;
 import com.axway.apim.adapter.apis.RemoteHostFilter.Builder;
 import com.axway.apim.api.model.RemoteHost;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportParams;
@@ -18,6 +19,7 @@ public abstract class RemoteHostsResultHandler {
 	protected static Logger LOG = LoggerFactory.getLogger(RemoteHostsResultHandler.class);
 	
 	RemoteHostsExportParams params;
+	ExportResult result;
 	
 	boolean hasError = false;
 	
@@ -37,11 +39,11 @@ public abstract class RemoteHostsResultHandler {
 		}
 	}
 	
-	public static RemoteHostsResultHandler create(ResultHandler exportImpl, RemoteHostsExportParams params) throws AppException {
+	public static RemoteHostsResultHandler create(ResultHandler exportImpl, RemoteHostsExportParams params, ExportResult result) throws AppException {
 		try {
-			Object[] intArgs = new Object[] { params };
+			Object[] intArgs = new Object[] { params, result };
 			Constructor<RemoteHostsResultHandler> constructor =
-					exportImpl.getClazz().getConstructor(new Class[]{RemoteHostsExportParams.class});
+					exportImpl.getClazz().getConstructor(new Class[]{RemoteHostsExportParams.class, ExportResult.class});
 			RemoteHostsResultHandler exporter = constructor.newInstance(intArgs);
 			return exporter;
 		} catch (Exception e) {
@@ -49,8 +51,9 @@ public abstract class RemoteHostsResultHandler {
 		}
 	}
 
-	public RemoteHostsResultHandler(RemoteHostsExportParams params) {
+	public RemoteHostsResultHandler(RemoteHostsExportParams params, ExportResult result) {
 		this.params = params;
+		this.result = result;
 	}
 	
 	public abstract void export(List<RemoteHost> remoteHosts) throws AppException;
