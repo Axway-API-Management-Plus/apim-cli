@@ -2,6 +2,7 @@ package com.axway.apim.appimport;
 
 import java.util.List;
 
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,7 @@ import com.axway.apim.appimport.lib.AppImportCLIOptions;
 import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
+import com.axway.apim.lib.ImportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
@@ -45,16 +47,31 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 	public String getGroupDescription() {
 		return "Manage your applications";
 	}
-
+	
 	@CLIServiceMethod(name = "import", description = "Import application(s) into the API-Manager")
 	public static int importApp(String[] args) {
+		AppImportParams params;
+		try {
+			params = new AppImportCLIOptions(args).getAppImportParams();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		} catch (ParseException e) {
+			LOG.error("Error " + e.getMessage());
+			return ErrorCode.MISSING_PARAMETER.getCode();
+		}
+		ClientApplicationImportApp app = new ClientApplicationImportApp();
+		return app.importApp(params).getRc();
+	}
+
+	public ImportResult importApp(AppImportParams params) {
+		ImportResult result = new ImportResult();
 		try {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			
-			AppImportParams params = new AppImportCLIOptions(args).getAppImportParams();
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the application
 			ClientAppAdapter desiredAppsAdapter = new JSONConfigClientAppAdapter(params);
@@ -73,20 +90,23 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 				importManager.replicate();
 			}
 			LOG.info("Successfully replicated application into API-Manager");
-			return errorCodeMapper.getMapedErrorCode(ErrorState.getInstance().getErrorCode()).getCode();
+			result.setRc(errorCodeMapper.getMapedErrorCode(ErrorState.getInstance().getErrorCode()).getCode());
+			return result;
 		} catch (AppException ap) { 
 			ErrorState errorState = ErrorState.getInstance();
 			if(errorState.hasError()) {
 				errorState.logErrorMessages(LOG);
 				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
+				result.setRc(errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode());
 			} else {
 				LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode();
+				result.setRc(errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode());
 			}
+			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
+			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			return result;
 		}
 	}
 	

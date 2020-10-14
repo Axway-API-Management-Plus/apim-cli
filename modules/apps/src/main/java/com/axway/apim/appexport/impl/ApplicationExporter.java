@@ -10,6 +10,7 @@ import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter.Builder;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.lib.AppExportParams;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 
@@ -35,14 +36,15 @@ public abstract class ApplicationExporter {
 	}
 	
 	AppExportParams params;
+	ExportResult result;
 	
 	boolean hasError = false;
 	
-	public static ApplicationExporter create(ExportImpl exportImpl, AppExportParams params) throws AppException {
+	public static ApplicationExporter create(ExportImpl exportImpl, AppExportParams params, ExportResult result) throws AppException {
 		try {
-			Object[] intArgs = new Object[] { params };
+			Object[] intArgs = new Object[] { params, result };
 			Constructor<ApplicationExporter> constructor =
-					exportImpl.getClazz().getConstructor(new Class[]{AppExportParams.class});
+					exportImpl.getClazz().getConstructor(new Class[]{AppExportParams.class, ExportResult.class});
 			ApplicationExporter exporter = constructor.newInstance(intArgs);
 			return exporter;
 		} catch (Exception e) {
@@ -50,8 +52,9 @@ public abstract class ApplicationExporter {
 		}
 	}
 
-	public ApplicationExporter(AppExportParams params) {
+	public ApplicationExporter(AppExportParams params, ExportResult result) {
 		this.params = params;
+		this.result = result;
 	}
 	
 	public abstract void export(List<ClientApplication> apps) throws AppException;
