@@ -1,5 +1,6 @@
 package com.axway.apim.adapter.apis;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -196,8 +197,9 @@ public class APIManagerOrganizationAdapter {
 		if(actualOrg!=null && org.getImage().equals(actualOrg.getImage())) return;
 		HttpResponse httpResponse = null;
 		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/"+org.getId()+"/image").build();
+		InputStream is = org.getImage().getInputStream();
 		HttpEntity entity = MultipartEntityBuilder.create()
-			.addBinaryBody("file", org.getImage().getInputStream(), ContentType.create("image/jpeg"), org.getImage().getBaseFilename())
+			.addBinaryBody("file", is, ContentType.create("image/jpeg"), org.getImage().getBaseFilename())
 			.build();
 		try {
 			RestAPICall apiCall = new POSTRequest(entity, uri);
@@ -213,6 +215,9 @@ public class APIManagerOrganizationAdapter {
 			try {
 				((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) { }
+			try {
+				is.close();
+			} catch (Exception ignore) { } 
 		}
 	}
 	

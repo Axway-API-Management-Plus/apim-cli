@@ -1,28 +1,26 @@
-package com.axway.apim.organization.orgImport;
+package com.axway.apim.organization.it.tests;
 
 import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
+import org.testng.Assert;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorState;
-import com.axway.apim.organization.OrganizationExportTestAction;
-import com.axway.apim.organization.OrganizationImportTestAction;
+import com.axway.apim.organization.it.ExportOrganizationTestAction;
+import com.axway.apim.organization.it.ImportOrganizationTestAction;
+import com.axway.lib.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
 @Test
-public class ImportSimpleOrganizationTestIT extends TestNGCitrusTestRunner {
-
-	private OrganizationImportTestAction orgImport = new OrganizationImportTestAction();
-	private OrganizationExportTestAction orgExport = new OrganizationExportTestAction();
+public class ImportSimpleOrganizationTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
 	private static String PACKAGE = "/com/axway/apim/organization/orgImport/";
 	
@@ -30,18 +28,18 @@ public class ImportSimpleOrganizationTestIT extends TestNGCitrusTestRunner {
 	@Test @Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		description("Import organization into API-Manager");
-		
-		variable("orgNumber", RandomNumberFunction.getRandomNumber(4, true));
-		variable("orgName", "My-Org-${orgNumber}");
+		ExportOrganizationTestAction exportApp = new ExportOrganizationTestAction(context);
+		ImportOrganizationTestAction importApp = new ImportOrganizationTestAction(context);
+
+		variable("orgName", "My-Org-"+importApp.getRandomNum());
 		variable("orgDescription", "A description for my org");
 		// This test must be executed with an Admin-Account as we need to create a new organization
-		variable("oadminUsername1", "apiadmin"); 
-		variable("oadminPassword1", "changeme");
+		//createVariable(PARAM_IGNORE_ADMIN_ACC, "fals");
 
 		echo("####### Import organization: '${orgName}' #######");		
-		createVariable(OrganizationImportTestAction.CONFIG,  PACKAGE + "SingleOrganization.json");
-		createVariable("expectedReturnCode", "0");
-		orgImport.doExecute(context);
+		createVariable(PARAM_CONFIGFILE,  PACKAGE + "SingleOrganization.json");
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
 		
 		echo("####### Validate organization: '${orgName}' has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/organizations?field=name&op=eq&value=${orgName}").header("Content-Type", "application/json"));
@@ -51,23 +49,28 @@ public class ImportSimpleOrganizationTestIT extends TestNGCitrusTestRunner {
 			.extractFromPayload("$.[?(@.id=='${orgName}')].id", "orgId"));
 		
 		echo("####### Re-Import same organization - Should be a No-Change #######");
-		createVariable("expectedReturnCode", "10");
-		orgImport.doExecute(context);
+		createVariable(PARAM_EXPECTED_RC, "10");
+		importApp.doExecute(context);
 		
 		echo("####### Change the description and import it again #######");
-		variable("orgDescription", "My changed org description");
-		createVariable("expectedReturnCode", "0");
-		orgImport.doExecute(context);
+		createVariable("orgDescription", "My changed org description");
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
 		
 		echo("####### Export the organization #######");
 		ErrorState.deleteInstance();
-		variable("targetFolder", "citrus:systemProperty('java.io.tmpdir')");
-		createVariable("expectedReturnCode", "0");
-		orgExport.doExecute(context);
+		createVariable(PARAM_TARGET, exportApp.getTestDirectory().getPath());
+		createVariable(PARAM_EXPECTED_RC, "0");
+		createVariable(PARAM_OUTPUT_FORMAT, "json");
+		createVariable(PARAM_NAME, "${orgName}");
+		exportApp.doExecute(context);
+		
+		Assert.assertEquals(exportApp.getLastResult().getExportedFiles().size(), 1, "Expected to have one organization exported");
+		String exportedConfig = exportApp.getLastResult().getExportedFiles().get(0);
 		
 		echo("####### Re-Import EXPORTED organization - Should be a No-Change #######");
-		createVariable(OrganizationImportTestAction.CONFIG,  "${targetFolder}/${orgName}/org-config.json");
+		createVariable(PARAM_CONFIGFILE,  exportedConfig);
 		createVariable("expectedReturnCode", "10");
-		orgImport.doExecute(context);
+		importApp.doExecute(context);
 	}
 }

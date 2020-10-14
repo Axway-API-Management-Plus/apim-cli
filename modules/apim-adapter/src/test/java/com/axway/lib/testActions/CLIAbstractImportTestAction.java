@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -86,9 +85,9 @@ public abstract class CLIAbstractImportTestAction extends CLIAbstractTestAction 
 		FileFilter filter = new WildcardFileFilter(new String[] {"*.crt", "*.jpg", "*.png", "*.pem"});
 		try {
 			LOG.info("Copy *.crt, *.jpg, *.png, *.pem from source: "+sourceDir+" into test-dir: '"+testDir+"'");
-			FileUtils.copyDirectory(sourceDir, testDir, filter);
+			FileUtils.copyDirectory(sourceDir, testDir, filter, true);
 		} catch (IOException e) {
-			LOG.error("Unable to test assets from source: '"+sourceDir+"' into test directory: '"+testDir+"'", e);
+			LOG.error("Unable to copy test assets from source: '"+sourceDir+"' into test directory: '"+testDir+"'", e);
 		}
 	}
 }

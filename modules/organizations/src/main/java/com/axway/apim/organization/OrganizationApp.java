@@ -107,7 +107,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		
 		APIManagerAdapter adapter = APIManagerAdapter.getInstance();
 
-		OrgResultHandler exporter = OrgResultHandler.create(exportImpl, params);
+		OrgResultHandler exporter = OrgResultHandler.create(exportImpl, params, result);
 		List<Organization> orgs = adapter.orgAdapter.getOrgs(exporter.getFilter());
 		if(orgs.size()==0) {
 			if(LOG.isDebugEnabled()) {
