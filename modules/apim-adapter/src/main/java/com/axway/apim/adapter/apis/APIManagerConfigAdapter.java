@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -18,13 +19,11 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.api.model.APIManagerConfig;
-import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.GETRequest;
-import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -48,12 +47,39 @@ public class APIManagerConfigAdapter {
 	
 	Map<Boolean, APIManagerConfig> managerConfig = new HashMap<Boolean, APIManagerConfig>();
 	
-	/*private static final Map<String, Boolean> configFieldRequiresAdmin;
-    static {
-        Map<String, Boolean> temp = new HashMap<String, Boolean>();
-        temp.put("apiRoutingKeyEnabled", true);
-        configFieldRequiresAdmin = Collections.unmodifiableMap(temp);
-    }*/
+	
+	private static enum ConfigFields {
+		version77 ("7.7.0", new String[] {"userNameRegex", "apiImportTimeout", "apiImportMimeValidation", "apiImportEditable", "lockUserAccount" }),
+		version762 ("7.6.2", new String[] {
+				"changePasswordOnFirstLogin", "passwordExpiryEnabled", "passwordLifetimeDays", "applicationScopeRestrictions", "strictCertificateChecking", 
+				"serverCertificateVerification", "advisoryBannerEnabled", "advisoryBannerText"
+				});
+		
+		private String[] ignoreFields;
+		private String managerVersion;
+		
+		ConfigFields(String managerVersion, String[] ignoreFields) {
+			this.ignoreFields = ignoreFields;
+			this.managerVersion = managerVersion;
+		}
+		
+		public String getManagerVersion() {
+			return managerVersion;
+		}
+		
+		public static String[] getIgnoredFields() {
+			String[] restrictedFields = new String[] {};
+			for(ConfigFields fields : values()) {
+				restrictedFields = ArrayUtils.addAll(restrictedFields, fields.ignoreFields);
+				// Add all ignore fields until we reached the used API-Manager version
+				if(APIManagerAdapter.hasAPIManagerVersion(fields.getManagerVersion())) {
+					break;
+				}
+			}
+			return restrictedFields;
+		}
+		
+	}
 	
 	private void readConfigFromAPIManager(boolean useAdmin) throws AppException {
 		if(apiManagerResponse.get(useAdmin) != null) return;
@@ -103,7 +129,7 @@ public class APIManagerConfigAdapter {
 			}
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/config").build();
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {}));
+					SimpleBeanPropertyFilter.serializeAllExcept(ConfigFields.getIgnoredFields()));
 			mapper.setFilterProvider(filter);
 			mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(false)));
 			mapper.setSerializationInclusion(Include.NON_NULL);
