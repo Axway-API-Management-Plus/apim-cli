@@ -75,7 +75,6 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
 			throw new AppException("Can't create configuration export", ErrorCode.UNXPECTED_ERROR, e);
 		}
 		LOG.info("Successfully exported API-Manager configuration into: " + localFolder + File.separator + "apimanager-config.json");
-		result.addExportedFile(localFolder + File.separator + "apimanager-config.json");
 		if(!APIManagerAdapter.hasAdminAccount()) {
 			LOG.warn("Export has been done with an Org-Admin account only. Export of configuration restricted.");
 		}
