@@ -23,7 +23,7 @@ public class ExportAppTestAction extends CLIAbstractExportTestAction implements 
 	public ExportResult runTest(TestContext context) {
 		AppExportParams params = new AppExportParams();
 		addParameters(params, context);
-		params.setName(getParamName(context));
+		params.setName(getVariable(context, PARAM_NAME));
 		
 		ApplicationExportApp app = new ApplicationExportApp();
 		LOG.info("Running "+app.getClass().getSimpleName()+" with params: "+params);
@@ -33,12 +33,5 @@ public class ExportAppTestAction extends CLIAbstractExportTestAction implements 
 			throw new ValidationException("Expected RC was: " + this.getExpectedReturnCode(context) + " but got: " + result.getRc());
 		}
 		return result;
-	}
-	
-	private String getParamName(TestContext context) {
-		try {
-			return context.getVariable(PARAM_NAME);
-		} catch (Exception ignore) {}
-		return null;
 	}
 }

@@ -61,54 +61,19 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 	}
 	
 	protected void addParameters(CoreParameters params, TestContext context) {
-		params.setHostname(getHostname(context));
-		params.setUsername(getUsername(context));
-		params.setPassword(getPassword(context));
-		params.setAdminUsername(getAdminUsername(context));
-		params.setAdminUsername(getAdminPassword(context));
+		params.setHostname(getVariable(context, PARAM_HOSTNAME));
+		params.setUsername(getVariable(context, PARAM_OADMIN_USERNAME));
+		params.setPassword(getVariable(context, PARAM_OADMIN_PASSWORD));
+		params.setAdminUsername(getVariable(context, PARAM_ADMIN_USERNAME));
+		params.setAdminUsername(getVariable(context, PARAM_ADMIN_PASSWORD));
 		params.setIgnoreAdminAccount(getIgnoreAdminAccount(context));
-		params.setStage(getStage(context));
+		params.setStage(getVariable(context, PARAM_STAGE));
 		params.setProperties(new EnvironmentProperties(params.getStage(), null));
 	}
-
-	public String getStage(TestContext context) {
-		try {
-			return context.getVariable(PARAM_STAGE);
-		} catch (Exception e) {}
-		return null;
-	}
-
-	public String getHostname(TestContext context) {
-		try {
-			return context.getVariable(PARAM_HOSTNAME);
-		} catch (Exception e) {}
-		return null;
-	}
-
-	public String getUsername(TestContext context) {
-		try {
-			return context.getVariable(PARAM_OADMIN_USERNAME);
-		} catch (Exception e) {}
-		return null;
-	}
-
-	public String getPassword(TestContext context) {
-		try {
-			return context.getVariable(PARAM_OADMIN_PASSWORD);
-		} catch (Exception e) {}
-		return null;
-	}
 	
-	public String getAdminUsername(TestContext context) {
+	public String getVariable(TestContext context, String varname) {
 		try {
-			return context.getVariable(PARAM_ADMIN_USERNAME);
-		} catch (Exception e) {}
-		return null;
-	}
-
-	public String getAdminPassword(TestContext context) {
-		try {
-			return context.getVariable(PARAM_ADMIN_PASSWORD);
+			return context.getVariable(varname);
 		} catch (Exception e) {}
 		return null;
 	}

@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.setup.APIManagerSetupApp;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
 import com.axway.lib.testActions.CLIAbstractExportTestAction;
@@ -24,8 +23,8 @@ public class ExportManagerConfigTestAction extends CLIAbstractExportTestAction i
 	public ExportResult runTest(TestContext context) {
 		APIManagerSetupExportParams params = new APIManagerSetupExportParams();
 		addParameters(params, context);
-		params.setTarget(context.getVariable(PARAM_TARGET));
-		params.setOutputFormat(OutputFormat.valueOf(context.getVariable(PARAM_OUTPUT_FORMAT)));
+		params.setRemoteHostName(getVariable(context, PARAM_NAME));
+		params.setRemoteHostId(getVariable(context, PARAM_ID));
 		
 		APIManagerSetupApp app = new APIManagerSetupApp();
 		LOG.info("Running "+app.getClass().getSimpleName()+" with params: "+params);

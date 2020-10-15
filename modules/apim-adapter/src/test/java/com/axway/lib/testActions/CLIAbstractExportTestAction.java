@@ -24,8 +24,8 @@ public abstract class CLIAbstractExportTestAction extends CLIAbstractTestAction 
 	@Override
 	protected void addParameters(CoreParameters params, TestContext context) {
 		super.addParameters(params, context);
-		((StandardExportParams)params).setTarget(context.getVariable(PARAM_TARGET));
-		((StandardExportParams)params).setOutputFormat(OutputFormat.valueOf(context.getVariable(PARAM_OUTPUT_FORMAT)));
+		((StandardExportParams)params).setTarget(getVariable(context, PARAM_TARGET));
+		((StandardExportParams)params).setOutputFormat(OutputFormat.valueOf(getVariable(context, PARAM_OUTPUT_FORMAT)));
 	}
 
 	public abstract ExportResult runTest(TestContext context);

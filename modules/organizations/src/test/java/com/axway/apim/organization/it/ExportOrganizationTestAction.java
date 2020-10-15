@@ -23,7 +23,7 @@ public class ExportOrganizationTestAction extends CLIAbstractExportTestAction im
 	public ExportResult runTest(TestContext context) {
 		OrgExportParams params = new OrgExportParams();
 		addParameters(params, context);
-		params.setName(getParamName(context));
+		params.setName(getVariable(context, PARAM_NAME));
 		
 		OrganizationApp app = new OrganizationApp();
 		LOG.info("Running "+app.getClass().getSimpleName()+" with params: "+params);
@@ -33,12 +33,5 @@ public class ExportOrganizationTestAction extends CLIAbstractExportTestAction im
 			throw new ValidationException("Expected RC was: " + this.getExpectedReturnCode(context) + " but got: " + result.getRc());
 		}
 		return result;
-	}
-	
-	private String getParamName(TestContext context) {
-		try {
-			return context.getVariable(PARAM_NAME);
-		} catch (Exception ignore) {}
-		return null;
 	}
 }
