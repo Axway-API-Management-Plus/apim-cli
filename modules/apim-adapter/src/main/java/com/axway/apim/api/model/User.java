@@ -53,6 +53,7 @@ public class User {
 		this.organization = organization;
 	}
 	public String getOrganizationId() {
+		if(this.organization==null) return null; 
 		return this.organization.getId();
 	}
 	

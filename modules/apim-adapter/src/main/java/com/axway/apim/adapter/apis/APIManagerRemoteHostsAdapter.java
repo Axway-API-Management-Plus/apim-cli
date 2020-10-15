@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.jackson.OrganizationSerializerModifier;
-import com.axway.apim.adapter.jackson.PolicySerializerModifier;
-import com.axway.apim.adapter.jackson.UserSerializerModifier;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -75,11 +73,15 @@ public class APIManagerRemoteHostsAdapter {
 		}
 	}
 	
-	public List<RemoteHost> getRemoteHosts(RemoteHostFilter filter) throws AppException {
+	public Map<String, RemoteHost> getRemoteHosts(RemoteHostFilter filter) throws AppException {
 		readRemotehostsFromAPIManager(filter);
 		try {
-			List<RemoteHost> remoteHosts = mapper.readValue(apiManagerResponse.get(filter), new TypeReference<List<RemoteHost>>(){});
-			remoteHosts.removeIf(remoteHost -> filter.filter(remoteHost));
+			List<RemoteHost> remoteHostsList = mapper.readValue(apiManagerResponse.get(filter), new TypeReference<List<RemoteHost>>(){});
+			remoteHostsList.removeIf(remoteHost -> filter.filter(remoteHost));
+			Map<String, RemoteHost> remoteHosts = new HashMap<String, RemoteHost>();
+			for(RemoteHost remoteHost : remoteHostsList) {
+				remoteHosts.put(remoteHost.getName(), remoteHost);
+			}
 			return remoteHosts;
 		} catch (Exception e) {
 			throw new AppException("Error parsing API-Manager remote hosts", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -88,17 +90,17 @@ public class APIManagerRemoteHostsAdapter {
 	
 	public RemoteHost getRemoteHost(String name, Integer port) throws AppException {
 		RemoteHostFilter remoteHostFilter = new RemoteHostFilter.Builder().hasName(name).hasPort(port).build();
-		List<RemoteHost> remoteHosts = getRemoteHosts(remoteHostFilter);
+		Map<String, RemoteHost> remoteHosts = getRemoteHosts(remoteHostFilter);
 		return uniqueRemoteHost(remoteHosts, remoteHostFilter);
 	}
 	
-	private RemoteHost uniqueRemoteHost(List<RemoteHost> remoteHosts, RemoteHostFilter filter) throws AppException {
+	private RemoteHost uniqueRemoteHost(Map<String, RemoteHost> remoteHosts, RemoteHostFilter filter) throws AppException {
 		if(remoteHosts.size()>1) {
 			ErrorState.getInstance().setError("No unique Remote host found. Found " + remoteHosts.size() + " remote hosts based on filter: " + filter, ErrorCode.UNXPECTED_ERROR, false);
 			throw new AppException("No unique Remote-Hosts found. ", ErrorCode.UNKNOWN_API);
 		}
 		if(remoteHosts.size()==0) return null;
-		return remoteHosts.get(0);
+		return remoteHosts.values().iterator().next();
 	}
 	
 	public RemoteHost createOrUpdateRemoteHost(RemoteHost desiredRemoteHost, RemoteHost actualRemoteHost) throws AppException {

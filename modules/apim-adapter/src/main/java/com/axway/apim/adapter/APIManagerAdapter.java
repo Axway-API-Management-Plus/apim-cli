@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
+import com.axway.apim.adapter.apis.APIManagerAlertsAdapter;
 import com.axway.apim.adapter.apis.APIManagerConfigAdapter;
 import com.axway.apim.adapter.apis.APIManagerOAuthClientProfilesAdapter;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
@@ -75,6 +76,7 @@ public class APIManagerAdapter {
 	private static APIManagerAdapter instance;
 	
 	public static String apiManagerVersion = null;
+	public static String apiManagerName = null;
 	
 	public static boolean initialized = false;
 	
@@ -109,6 +111,7 @@ public class APIManagerAdapter {
 	private static CacheManager cacheManager;
 	
 	public APIManagerConfigAdapter configAdapter;
+	public APIManagerAlertsAdapter alertsAdapter;
 	public APIManagerRemoteHostsAdapter remoteHostsAdapter;
 	public APIManagerAPIAdapter apiAdapter;
 	public APIManagerAPIMethodAdapter methodAdapter;
@@ -165,6 +168,7 @@ public class APIManagerAdapter {
 		super();
 		this.cmd = CoreParameters.getInstance();
 		this.configAdapter = new APIManagerConfigAdapter();
+		this.alertsAdapter = new APIManagerAlertsAdapter();
 		this.remoteHostsAdapter = new APIManagerRemoteHostsAdapter();
 		this.apiAdapter = new APIManagerAPIAdapter();
 		this.methodAdapter = new APIManagerAPIMethodAdapter();
@@ -185,7 +189,7 @@ public class APIManagerAdapter {
 	}
 	
 	public void loginToAPIManager(boolean useAdminClient) throws AppException {
-		URI uri;
+		URI uri = null;
 		if(cmd.isIgnoreAdminAccount() && useAdminClient) return;
 		if(hasAdminAccount && useAdminClient) return; // Already logged in with an Admin-Account.
 		HttpResponse httpResponse = null;
@@ -239,7 +243,7 @@ public class APIManagerAdapter {
 				throw new AppException("Not supported user-role: "+user.getRole()+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 		} catch (Exception e) {
-			throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Can't login to API-Manager " + uri, ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 
@@ -532,6 +536,14 @@ public class APIManagerAdapter {
 		}
 		APIManagerAdapter.apiManagerVersion = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getProductVersion();
 		return APIManagerAdapter.apiManagerVersion;
+	}
+	
+	public static String getApiManagerName() throws AppException {
+		if(APIManagerAdapter.apiManagerName!=null) {
+			return apiManagerName;
+		}
+		APIManagerAdapter.apiManagerName = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getPortalName();
+		return APIManagerAdapter.apiManagerName;
 	}
 	
 	public static Map<String, String> getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE type) {

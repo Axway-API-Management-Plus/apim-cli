@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.jackson.PolicySerializerModifier;
-import com.axway.apim.api.model.APIManagerConfig;
+import com.axway.apim.api.model.Config;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -45,7 +45,7 @@ public class APIManagerConfigAdapter {
 	
 	Map<Boolean, String> apiManagerResponse = new HashMap<Boolean, String>();
 	
-	Map<Boolean, APIManagerConfig> managerConfig = new HashMap<Boolean, APIManagerConfig>();
+	Map<Boolean, Config> managerConfig = new HashMap<Boolean, Config>();
 	
 	
 	private static enum ConfigFields {
@@ -107,11 +107,11 @@ public class APIManagerConfigAdapter {
 		}
 	}
 	
-	public APIManagerConfig getConfig(boolean useAdmin) throws AppException {
+	public Config getConfig(boolean useAdmin) throws AppException {
 		if(managerConfig.get(useAdmin)!=null) return managerConfig.get(useAdmin);
 		readConfigFromAPIManager(useAdmin);
 		try {
-			APIManagerConfig config = mapper.readValue(apiManagerResponse.get(useAdmin), APIManagerConfig.class);
+			Config config = mapper.readValue(apiManagerResponse.get(useAdmin), Config.class);
 			managerConfig.put(useAdmin, config);
 			return config;
 		} catch (IOException e) {
@@ -119,9 +119,9 @@ public class APIManagerConfigAdapter {
 		}
 	}
 	
-	public APIManagerConfig updateConfiguration(APIManagerConfig desiredConfig, APIManagerConfig actualConfig) throws AppException {
+	public Config updateConfiguration(Config desiredConfig) throws AppException {
 		HttpResponse httpResponse = null;
-		APIManagerConfig updatedConfig;
+		Config updatedConfig;
 		try {
 			if(!APIManagerAdapter.hasAdminAccount()) {
 				ErrorState.getInstance().setError("An Admin Account is required to update the API-Manager configuration.", ErrorCode.NO_ADMIN_ROLE_USER, false);
@@ -145,7 +145,7 @@ public class APIManagerConfigAdapter {
 					LOG.error("Error updating API-Manager configuration. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 					throw new AppException("Error updating API-Manager configuration. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
-				updatedConfig = mapper.readValue(httpResponse.getEntity().getContent(), APIManagerConfig.class);
+				updatedConfig = mapper.readValue(httpResponse.getEntity().getContent(), Config.class);
 			} catch (Exception e) {
 				throw new AppException("Error updating API-Manager configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			} finally {

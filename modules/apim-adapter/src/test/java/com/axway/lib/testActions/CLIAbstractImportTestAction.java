@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.FileUtils;
@@ -40,10 +41,11 @@ public abstract class CLIAbstractImportTestAction extends CLIAbstractTestAction 
 		String configFileName = context.getVariable(PARAM_CONFIGFILE);
 		File configFile = new File(configFileName);
 		if(!configFile.exists()) {
-			configFile = new File(this.getClass().getResource(configFileName).getFile());
-			if(!configFile.exists()) {
+			URL filename = this.getClass().getResource(configFileName);
+			if(filename==null) {
 				throw new ValidationException("Configuration file : "+configFileName+" not found.");
 			}
+			configFile = new File(filename.getFile());
 		}
 		return configFile;
 	}
