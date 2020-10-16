@@ -12,8 +12,8 @@ public class Swagger1xSpecification extends APISpecification {
 	
 	JsonNode swagger = null;
 	
-	public Swagger1xSpecification(byte[] apiSpecificationContent, String backendBasepath) throws AppException {
-		super(apiSpecificationContent, backendBasepath);
+	public Swagger1xSpecification(byte[] apiSpecificationContent) throws AppException {
+		super(apiSpecificationContent);
 	}
 
 	@Override
@@ -25,22 +25,22 @@ public class Swagger1xSpecification extends APISpecification {
 	}
 
 	@Override
-	protected void configureBasepath() throws AppException {
+	public void configureBasepath(URL backendBasepath) throws AppException {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		try {
-			if(this.backendBasepath!=null) {
+			if(backendBasepath!=null) {
 				boolean backendBasepathAdjusted = false;
-				URL url = new URL(this.backendBasepath);
+				URL url = backendBasepath;
 				
 				if(swagger.get("basePath").asText().equals(url.toString())) {
 					LOG.debug("Swagger resourcePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasepath: '"+url.getPath()+"'. Nothing to do.");
 				} else {
-					LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.toString()+"' based on configured backendBasepath: '"+this.backendBasepath+"'");
+					LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.toString()+"' based on configured backendBasepath: '"+backendBasepath+"'");
 					backendBasepathAdjusted = true;
 					((ObjectNode)swagger).put("basePath", url.toString());
 				}
 				if(backendBasepathAdjusted) {
-					LOG.info("Used the configured backendBasepath: '"+this.backendBasepath+"' to adjust the Swagger definition.");
+					LOG.info("Used the configured backendBasepath: '"+backendBasepath+"' to adjust the Swagger definition.");
 				}
 				this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
 			}
@@ -58,7 +58,6 @@ public class Swagger1xSpecification extends APISpecification {
 			if(!(swagger.has("swaggerVersion") && swagger.get("swaggerVersion").asText().startsWith("1."))) {
 				return false;
 			}
-			configureBasepath();
 			return true;
 		} catch (Exception e) {
 			LOG.trace("No Swager 1.x specification.", e);

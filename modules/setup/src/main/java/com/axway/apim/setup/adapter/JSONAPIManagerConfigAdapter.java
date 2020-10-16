@@ -7,6 +7,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.jackson.RemotehostDeserializer;
 import com.axway.apim.adapter.jackson.UserDeserializer;
 import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.lib.StandardImportParams;
@@ -40,7 +41,8 @@ public class JSONAPIManagerConfigAdapter {
 		try {
 			mapper.configOverride(Map.class).setMergeable(true);
 			baseConfig = mapper.reader()
-					.withAttribute(UserDeserializer.DeserializeParams.useLoginName, true)
+					.withAttribute(UserDeserializer.Params.useLoginName, true)
+					.withAttribute(RemotehostDeserializer.Params.validateRemoteHost, true)
 					.forType(APIManagerConfig.class)
 					.readValue(Utils.substitueVariables(configFile));
 			if(stageConfig!=null) {

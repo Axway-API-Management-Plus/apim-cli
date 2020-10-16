@@ -36,7 +36,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	private static ErrorState errorState = ErrorState.getInstance();
 
 	public static void main(String args[]) { 
-		int rc = change(args);
+		int rc = exportAPI(args);
 		System.exit(rc);
 	}
 	

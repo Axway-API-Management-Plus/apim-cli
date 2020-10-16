@@ -5,6 +5,7 @@
 	"state": "unpublished",
 	"version": "1.0.0",
 	"organization": "API Development ${orgNumber}",
+	"remoteHost": "${remoteHostName}:${remoteHostPort}",
 	"inboundProfiles": {
 		"_default": {
 			"securityProfile": "_default",

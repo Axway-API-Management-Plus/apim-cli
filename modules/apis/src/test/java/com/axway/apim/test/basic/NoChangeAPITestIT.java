@@ -31,10 +31,24 @@ public class NoChangeAPITestIT extends TestNGCitrusTestRunner {
 		variable("apiPath", "/my-no-change-${apiNumber}");
 		variable("apiName", "No-Change-${apiNumber}");
 
-		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
+		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with an unknown RemoteHost #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/1_no-change-config.json");
-		createVariable("expectedReturnCode", "0");
+		createVariable("expectedReturnCode", "63"); // Must fail, as the RemoteHost is unknown
+		createVariable("remoteHostName", "my.host-${apiNumber}.com");
+		createVariable("remoteHostPort", "8786");
+		swaggerImport.doExecute(context);
+		
+		echo("####### Create the remote host! #######");
+		http(builder -> builder.client("apiManager").send().post("/remotehosts").header("Content-Type", "application/json")
+				.payload("{\"name\":\"${remoteHostName}\",\"port\":\"${remoteHostPort}\",\"organizationId\":\"${orgId}\"}"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.CREATED).messageType(MessageType.JSON));
+		
+		echo("####### Importing API: '${apiName}' on path: '${apiPath}' incl. a RemoteHost #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/1_no-change-config.json");
+		createVariable("expectedReturnCode", "0"); // Must fail, as the RemoteHost is unknown
 		swaggerImport.doExecute(context);
 
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");

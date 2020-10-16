@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 public class UserDeserializer extends StdDeserializer<User> {
 	
-	public static enum DeserializeParams {
+	public static enum Params {
 		useLoginName
 	}
 	
@@ -68,7 +68,7 @@ public class UserDeserializer extends StdDeserializer<User> {
 	}
 	
 	private Boolean isUseLoginName(DeserializationContext ctxt) {
-		if(ctxt.getAttribute(DeserializeParams.useLoginName)==null) return false;
-		return (Boolean)ctxt.getAttribute(DeserializeParams.useLoginName);
+		if(ctxt.getAttribute(Params.useLoginName)==null) return false;
+		return (Boolean)ctxt.getAttribute(Params.useLoginName);
 	}
 }

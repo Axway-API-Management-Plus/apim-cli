@@ -80,13 +80,16 @@ public class RemoteHostFilter {
 	}
 	
 	public boolean filter(RemoteHost remoteHost) {
-		if(this.getName()==null && this.getOrganization()==null && this.getId()==null) { // Nothing given to filter out.
+		if(this.getName()==null && this.getPort()==null && this.getOrganization()==null && this.getId()==null) { // Nothing given to filter out.
 			return false;
 		}
 		if(this.getName()!=null) {
 			Pattern pattern = Pattern.compile(this.getName().replace("*", ".*"));
 			Matcher matcher = pattern.matcher(remoteHost.getName());
 			if(!matcher.matches()) return true;
+		}
+		if(this.getPort()!=null) {
+			if(this.getPort() != remoteHost.getPort()) return true;
 		}
 		if(this.getId()!=null) {
 			if(!this.getId().equals(remoteHost.getId())) return true;

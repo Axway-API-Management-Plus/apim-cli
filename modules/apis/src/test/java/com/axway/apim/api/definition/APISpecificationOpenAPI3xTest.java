@@ -1,8 +1,7 @@
 package com.axway.apim.api.definition;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
@@ -10,10 +9,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.definition.APISpecification;
-import com.axway.apim.api.definition.APISpecificationFactory;
 import com.axway.apim.apiimport.lib.APIImportParams;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,7 +34,8 @@ public class APISpecificationOpenAPI3xTest {
 	public void backendHostAndBasePath() throws AppException, IOException {
 
 		byte[] content = getSwaggerContent(testPackage + "/openapi30.json");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com:8767/api/v1/myAPI", "TestAPI");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
+		apiDefinition.configureBasepath(new URL("https://myhost.customer.com:8767/api/v1/myAPI"));
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
@@ -51,7 +48,8 @@ public class APISpecificationOpenAPI3xTest {
 	public void testBerlinGroupYAM_API() throws AppException, IOException {
 		APIManagerAdapter.apiManagerVersion="7.7.0";
 		byte[] content = getSwaggerContent(testPackage + "/psd2-api_1.3.6_errata20200327.yaml");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "https://myhost.customer.com:8767/api/v1/myAPI", "TestAPI");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
+		apiDefinition.configureBasepath(new URL("https://myhost.customer.com:8767/api/v1/myAPI"));
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
