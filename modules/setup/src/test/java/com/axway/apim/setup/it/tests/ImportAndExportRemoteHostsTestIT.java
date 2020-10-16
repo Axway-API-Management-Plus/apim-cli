@@ -60,11 +60,11 @@ public class ImportAndExportRemoteHostsTestIT extends TestNGCitrusTestRunner imp
 		createVariable("${remoteHostPort}", "5555");
 		importApp.doExecute(context);
 		
-		echo("####### Validate remote host has 2 been updated correctly #######");
+		echo("####### Validate a new Remote-Host has been added #######");
 		http(builder -> builder.client("apiManager").send().get("/remotehosts").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-				.validate("$.[?(@.id=='${remoteHostId}')].name", "${remoteHostName}")
-				.validate("$.[?(@.id=='${remoteHostId}')].port", "${remoteHostPort}"));
+				.validate("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].name", "${remoteHostName}")
+				.validate("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].port", "${remoteHostPort}"));
 		
 		echo("####### Export remote host 2 #######");
 		createVariable(PARAM_EXPECTED_RC, "0");

@@ -164,12 +164,12 @@ public class APIManagerSetupApp implements APIMCLIServiceProvider {
 			APIManagerConfig desiredConfig = new JSONAPIManagerConfigAdapter(params).getManagerConfig();
 			if(desiredConfig.getConfig()!=null) {
 				apimAdapter.configAdapter.updateConfiguration(desiredConfig.getConfig());
-				updatedAssets+="Config";
+				updatedAssets+="Config ";
 				LOG.debug("API-Manager configuration successfully updated.");
 			}
 			if(desiredConfig.getAlerts()!=null) {
 				apimAdapter.alertsAdapter.updateAlerts(desiredConfig.getAlerts());
-				updatedAssets+=", Alerts";
+				updatedAssets+="Alerts ";
 				LOG.debug("API-Manager alerts successfully updated.");
 			}
 
@@ -180,7 +180,7 @@ public class APIManagerSetupApp implements APIMCLIServiceProvider {
 					RemoteHost actualRemoteHost = apimAdapter.remoteHostsAdapter.getRemoteHost(desiredRemoteHost.getName(), desiredRemoteHost.getPort());
 					apimAdapter.remoteHostsAdapter.createOrUpdateRemoteHost(desiredRemoteHost, actualRemoteHost);
 				}
-				updatedAssets+=", Remote-Hosts";
+				updatedAssets+="Remote-Hosts";
 				LOG.debug("API-Manager remote host(s) successfully updated.");
 			}
 			LOG.info("API-Manager configuration ("+updatedAssets+") successfully updated.");
