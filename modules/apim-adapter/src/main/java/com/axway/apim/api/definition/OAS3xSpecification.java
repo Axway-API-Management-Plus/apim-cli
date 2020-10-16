@@ -1,7 +1,5 @@
 package com.axway.apim.api.definition;
 
-import java.net.URL;
-
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,12 +24,12 @@ public class OAS3xSpecification extends APISpecification {
 	}
 
 	@Override
-	public void configureBasepath(URL backendBasepath) throws AppException {
+	public void configureBasepath(String backendBasepath) throws AppException {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		try {
 			if(backendBasepath!=null) {
 				 ObjectNode newServer = this.mapper.createObjectNode();
-				 newServer.put("url", backendBasepath.toString());
+				 newServer.put("url", backendBasepath);
 				 if(openAPI.has("servers")) {
 					((ArrayNode) openAPI.get("servers")).removeAll();
 				 }

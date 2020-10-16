@@ -1,7 +1,5 @@
 package com.axway.apim.api.definition;
 
-import java.net.URL;
-
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,7 +18,7 @@ public class WSDLSpecification extends APISpecification {
 	}
 
 	@Override
-	public void configureBasepath(URL backendBasepath) throws AppException {
+	public void configureBasepath(String backendBasepath) throws AppException {
 		
 	}
 	

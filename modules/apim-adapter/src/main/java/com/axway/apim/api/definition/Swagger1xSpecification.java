@@ -25,12 +25,12 @@ public class Swagger1xSpecification extends APISpecification {
 	}
 
 	@Override
-	public void configureBasepath(URL backendBasepath) throws AppException {
+	public void configureBasepath(String backendBasepath) throws AppException {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		try {
 			if(backendBasepath!=null) {
 				boolean backendBasepathAdjusted = false;
-				URL url = backendBasepath;
+				URL url = new URL(backendBasepath);
 				
 				if(swagger.get("basePath").asText().equals(url.toString())) {
 					LOG.debug("Swagger resourcePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasepath: '"+url.getPath()+"'. Nothing to do.");

@@ -33,7 +33,7 @@ public class Swagger2xSpecification extends APISpecification {
 	}
 
 	@Override
-	public void configureBasepath(URL backendBasepath) throws AppException {
+	public void configureBasepath(String backendBasepath) throws AppException {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		if(backendBasepath==null && swagger.get("host")==null) {
 			ErrorState.getInstance().setError("The API specification doesn't contain a host and no backend basepath is given.", ErrorCode.CANT_READ_API_DEFINITION_FILE, false);
@@ -42,7 +42,7 @@ public class Swagger2xSpecification extends APISpecification {
 		try {
 			if(backendBasepath!=null) {
 				boolean backendBasepathAdjusted = false;
-				URL url = backendBasepath;
+				URL url = new URL(backendBasepath);
 				String port = url.getPort()==-1 ? ":"+String.valueOf(url.getDefaultPort()) : ":"+String.valueOf(url.getPort());
 				if(port.equals(":443") || port.equals(":80")) port = "";
 				

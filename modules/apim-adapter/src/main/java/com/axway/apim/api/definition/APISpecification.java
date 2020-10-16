@@ -1,7 +1,6 @@
 package com.axway.apim.api.definition;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 
 import org.slf4j.Logger;
@@ -97,7 +96,7 @@ public abstract class APISpecification {
 		}
 	}
 	
-	public abstract void configureBasepath(URL backendBasepath) throws AppException;
+	public abstract void configureBasepath(String backendBasepath) throws AppException;
 	
 	public abstract APISpecType getAPIDefinitionType() throws AppException;
 	

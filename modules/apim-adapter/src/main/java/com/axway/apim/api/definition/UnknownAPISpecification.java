@@ -1,7 +1,5 @@
 package com.axway.apim.api.definition;
 
-import java.net.URL;
-
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class UnknownAPISpecification extends APISpecification {
@@ -17,7 +15,7 @@ public class UnknownAPISpecification extends APISpecification {
 	}
 
 	@Override
-	public void configureBasepath(URL backendBasepath) throws AppException {
+	public void configureBasepath(String backendBasepath) throws AppException {
 	}
 
 	@Override

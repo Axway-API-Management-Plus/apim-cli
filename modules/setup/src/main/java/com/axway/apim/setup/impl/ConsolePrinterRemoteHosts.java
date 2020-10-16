@@ -60,7 +60,8 @@ public class ConsolePrinterRemoteHosts {
 				new Column().header("Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> remoteHost.getId()),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> remoteHost.getName()),
 				new Column().header("Port").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getPort())),
-				new Column().header("Organization").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> remoteHost.getOrganization().getName())
+				new Column().header("Organization").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> remoteHost.getOrganization().getName()),
+				new Column().header("Related APIs").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> getNumberOfRelatedAPIs(remoteHost.getName(), remoteHost.getPort()))
 				)));
 		printDetails(remoteHosts);
 	}
@@ -73,7 +74,8 @@ public class ConsolePrinterRemoteHosts {
 				new Column().header("Organization").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> remoteHost.getOrganization().getName()),
 				new Column().header("HTTP 1.1").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Boolean.toString(remoteHost.getAllowHTTP11())),
 				new Column().header("Verify cert. hostname").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Boolean.toString(remoteHost.getVerifyServerHostname())),
-				new Column().header("Send SNI").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Boolean.toString(remoteHost.getOfferTLSServerName()))
+				new Column().header("Send SNI").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Boolean.toString(remoteHost.getOfferTLSServerName())),
+				new Column().header("Related APIs").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> getNumberOfRelatedAPIs(remoteHost.getName(), remoteHost.getPort()))
 				)));
 		printDetails(remoteHosts);
 	}
