@@ -270,4 +270,9 @@ public class RemoteHost {
 	public void setOutputEncodings(String[] outputEncodings) {
 		this.outputEncodings = outputEncodings;
 	}
+
+	@Override
+	public String toString() {
+		return "RemoteHost [name=" + name + ", port=" + port + "]";
+	}
 }

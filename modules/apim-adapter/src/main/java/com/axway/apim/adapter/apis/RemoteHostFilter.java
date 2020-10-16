@@ -89,7 +89,7 @@ public class RemoteHostFilter {
 			if(!matcher.matches()) return true;
 		}
 		if(this.getPort()!=null) {
-			if(this.getPort() != remoteHost.getPort()) return true;
+			if(!this.getPort().equals(remoteHost.getPort())) return true;
 		}
 		if(this.getId()!=null) {
 			if(!this.getId().equals(remoteHost.getId())) return true;
