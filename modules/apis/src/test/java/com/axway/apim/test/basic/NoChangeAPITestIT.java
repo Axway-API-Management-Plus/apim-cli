@@ -39,7 +39,7 @@ public class NoChangeAPITestIT extends TestNGCitrusTestRunner {
 		createVariable("remoteHostPort", "8786");
 		swaggerImport.doExecute(context);
 		
-		echo("####### Create the remote host! #######");
+		echo("####### Creating remote host ${remoteHostName}:${remoteHostPort} #######");
 		http(builder -> builder.client("apiManager").send().post("/remotehosts").header("Content-Type", "application/json")
 				.payload("{\"name\":\"${remoteHostName}\",\"port\":\"${remoteHostPort}\",\"organizationId\":\"${orgId}\"}"));
 		
