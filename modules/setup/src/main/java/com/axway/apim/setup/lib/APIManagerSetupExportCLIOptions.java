@@ -13,17 +13,17 @@ public class APIManagerSetupExportCLIOptions extends StandardExportCLIOptions {
 
 	public APIManagerSetupExportCLIOptions(String[] args) throws ParseException {
 		super(args);
-		Option option = new Option("type", true, "Limit the configuration with a comma separated list. (config|alerts|remotehosts). If not given everything is exported. Policies are printed on console only.");
+		Option option = new Option("type", true, "Limit the configuration with a comma separated list. (config|alerts|remotehosts|policies). If not given everything is exported. Policies are printed on console only.");
 		option.setRequired(false);
 		option.setArgName("config,alerts,remotehosts,policies");
 		options.addOption(option);
 		
-		option = new  Option("n", "remoteHost", true, "Filter Remote-Hosts based on their names. Wildcards are supported. Is ignored when no remote hosts should be exported.");
+		option = new  Option("n", "name", true, "Filter based on the name. Wildcards are supported. Actually only remote hosts are using this filter.");
 		option.setRequired(false);
 		option.setArgName("*backendhost.com");
 		options.addOption(option);
 		
-		option = new  Option("remoteHostId", true, "Filter Remote-Host with that specific ID. Is ignored when no remote hosts should be exported.");
+		option = new  Option("id", true, "Filter on given ID. Actually only remote hosts are using this filter.");
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-REMOTE-HOST");
 		options.addOption(option);
@@ -40,6 +40,8 @@ public class APIManagerSetupExportCLIOptions extends StandardExportCLIOptions {
 		System.out.println(getBinaryName()+" setup get -s api-env -o json");
 		System.out.println("Export configuration and alerts into JSON");
 		System.out.println(getBinaryName()+" setup get -s api-env -o json -type alerts,config");
+		System.out.println("Export remote hosts with specified name");
+		System.out.println(getBinaryName()+" setup get -s api-env -type remotehosts -name \"*.host.com*\"");
 		System.out.println();
 		System.out.println();
 		System.out.println("For more information please visit:");
@@ -55,8 +57,8 @@ public class APIManagerSetupExportCLIOptions extends StandardExportCLIOptions {
 		APIManagerSetupExportParams params = new APIManagerSetupExportParams();
 		super.addStandardExportParameters(params);
 		params.setConfigType(getValue("type"));
-		params.setRemoteHostName(getValue("remoteHost"));
-		params.setRemoteHostId(getValue("remoteHostId"));
+		params.setRemoteHostName(getValue("name"));
+		params.setRemoteHostId(getValue("id"));
 		return params;
 	}
 }
