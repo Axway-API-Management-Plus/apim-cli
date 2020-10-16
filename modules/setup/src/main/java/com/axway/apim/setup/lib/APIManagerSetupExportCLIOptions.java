@@ -13,9 +13,9 @@ public class APIManagerSetupExportCLIOptions extends StandardExportCLIOptions {
 
 	public APIManagerSetupExportCLIOptions(String[] args) throws ParseException {
 		super(args);
-		Option option = new Option("type", true, "Limit the configuration with a comma separated list. (config|alerts|remotehosts). If not given everything is exported.");
+		Option option = new Option("type", true, "Limit the configuration with a comma separated list. (config|alerts|remotehosts). If not given everything is exported. Policies are printed on console only.");
 		option.setRequired(false);
-		option.setArgName("config,alerts,remotehosts");
+		option.setArgName("config,alerts,remotehosts,policies");
 		options.addOption(option);
 		
 		option = new  Option("n", "remoteHost", true, "Filter Remote-Hosts based on their names. Wildcards are supported. Is ignored when no remote hosts should be exported.");

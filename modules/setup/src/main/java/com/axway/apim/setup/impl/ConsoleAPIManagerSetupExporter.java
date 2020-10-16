@@ -28,22 +28,24 @@ public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler
 
 	@Override
 	public void export(APIManagerConfig config) throws AppException {
-		System.out.println();
-		System.out.println("Setup for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
-		System.out.println();
-		if(config.getConfig()!=null) {
+		if(params.isExportConfig()) {
 			ConsolePrinterConfig configExporter = new ConsolePrinterConfig(params);
 			configExporter.export(config.getConfig());
 		}
 
-		if(config.getAlerts()!=null) {
+		if(params.isExportAlerts()) {
 			ConsolePrinterAlerts alertsExporter = new ConsolePrinterAlerts(params);
 			alertsExporter.export(config.getAlerts());
 		}
 		
-		if(config.getRemoteHosts()!=null) {
+		if(params.isExportRemoteHosts()) {
 			ConsolePrinterRemoteHosts remoteHostsExporter = new ConsolePrinterRemoteHosts(params);
 			remoteHostsExporter.export(config.getRemoteHosts());
+		}
+		
+		if(params.isExportPolicies()) {
+			ConsolePrinterPolicies policiesPrinter = new ConsolePrinterPolicies();
+			policiesPrinter.export(adapter.policiesAdapter.getAllPolicies());
 		}
 	}
 }

@@ -8,12 +8,14 @@ public class APIManagerSetupExportParams extends StandardExportParams {
 	public enum Type {
 		config, 
 		alerts, 
-		remotehosts
+		remotehosts, 
+		policies
 	}
 	
 	private Boolean exportConfig = true;
 	private Boolean exportAlerts = true;
 	private Boolean exportRemoteHosts = true;
+	private Boolean exportPolicies = true;
 	
 	private String RemoteHostName;
 	private String RemoteHostId;
@@ -35,6 +37,10 @@ public class APIManagerSetupExportParams extends StandardExportParams {
 
 	public Boolean isExportRemoteHosts() {
 		return exportRemoteHosts;
+	}
+	
+	public Boolean isExportPolicies() {
+		return exportPolicies;
 	}
 
 	public String getRemoteHostName() {
@@ -71,6 +77,7 @@ public class APIManagerSetupExportParams extends StandardExportParams {
 		exportConfig = false;
 		exportAlerts = false;
 		exportRemoteHosts = false;
+		exportPolicies = false;
 		String[] givenTypes = configType.split(",");
 		for(String givenType : givenTypes) {
 			Type type = Type.valueOf(givenType.trim().toLowerCase());
@@ -83,6 +90,9 @@ public class APIManagerSetupExportParams extends StandardExportParams {
 				break;
 			case remotehosts:
 				exportRemoteHosts = true;
+				break;
+			case policies:
+				exportPolicies = true;
 				break;
 			}
 		}

@@ -25,9 +25,6 @@ public class ConsolePrinterRemoteHosts {
 	
 	APIManagerAdapter adapter;
 	
-	Map<String, Integer> apiCountPerOrg = null;
-	Map<String, Integer> appCountPerOrg = null;
-	
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 	
 	private StandardExportParams params;
