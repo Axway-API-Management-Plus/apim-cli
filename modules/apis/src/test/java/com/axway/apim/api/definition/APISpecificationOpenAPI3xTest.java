@@ -1,7 +1,6 @@
 package com.axway.apim.api.definition;
 
 import java.io.IOException;
-import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
@@ -35,7 +34,7 @@ public class APISpecificationOpenAPI3xTest {
 
 		byte[] content = getSwaggerContent(testPackage + "/openapi30.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		apiDefinition.configureBasepath(new URL("https://myhost.customer.com:8767/api/v1/myAPI"));
+		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
@@ -49,7 +48,7 @@ public class APISpecificationOpenAPI3xTest {
 		APIManagerAdapter.apiManagerVersion="7.7.0";
 		byte[] content = getSwaggerContent(testPackage + "/psd2-api_1.3.6_errata20200327.yaml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		apiDefinition.configureBasepath(new URL("https://myhost.customer.com:8767/api/v1/myAPI"));
+		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);

@@ -1,7 +1,6 @@
 package com.axway.apim.api.definition;
 
 import java.io.IOException;
-import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
@@ -30,7 +29,7 @@ public class APISpecificationWSDLTest {
 
 		byte[] content = getSwaggerContent(testPackage + "/sample-wsdl.xml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "http://www.mnb.hu/arfolyamok.asmx?WSDL", "Test-API");
-		apiDefinition.configureBasepath(new URL("https://myhost.customer.com:8767/api/v1/myAPI"));
+		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof WSDLSpecification);

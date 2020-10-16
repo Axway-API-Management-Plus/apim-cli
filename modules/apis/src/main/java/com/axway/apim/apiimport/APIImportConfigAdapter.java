@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -196,7 +195,7 @@ public class APIImportConfigAdapter {
 			validateOutboundProfile(apiConfig);
 			validateInboundProfile(apiConfig);
 			APISpecification apiSpecification = APISpecificationFactory.getAPISpecification(getAPIDefinitionContent(), this.pathToAPIDefinition, apiConfig.getName());
-			apiSpecification.configureBasepath(new URL(((DesiredAPI)apiConfig).getBackendBasepath()));
+			apiSpecification.configureBasepath(((DesiredAPI)apiConfig).getBackendBasepath());
 			apiConfig.setApiDefinition(apiSpecification);
 			addImageContent(apiConfig);
 			validateCustomProperties(apiConfig);

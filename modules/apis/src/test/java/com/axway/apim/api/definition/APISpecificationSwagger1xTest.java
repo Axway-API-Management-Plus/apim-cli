@@ -1,7 +1,6 @@
 package com.axway.apim.api.definition;
 
 import java.io.IOException;
-import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
@@ -30,7 +29,7 @@ public class APISpecificationSwagger1xTest {
 	public void standardPort() throws AppException, IOException {
 		byte[] content = getSwaggerContent(testPackage + "/swagger12.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath(new URL("https://petstore.swagger.io"));
+		apiDefinition.configureBasepath("https://petstore.swagger.io");
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger1xSpecification, "Specification must be an Swagger12Specification");
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -41,7 +40,7 @@ public class APISpecificationSwagger1xTest {
 	public void specificPort() throws AppException, IOException {
 		byte[] content = getSwaggerContent(testPackage + "/swagger12.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath(new URL("https://petstore.swagger.io:8180"));
+		apiDefinition.configureBasepath("https://petstore.swagger.io:8180");
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger1xSpecification, "Specification must be an Swagger12Specification");
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -52,7 +51,7 @@ public class APISpecificationSwagger1xTest {
 	public void standardPortGiven() throws AppException, IOException {
 		byte[] content = getSwaggerContent(testPackage + "/swagger12.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath(new URL("https://petstore.swagger.io:443"));
+		apiDefinition.configureBasepath("https://petstore.swagger.io:443");
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger1xSpecification, "Specification must be an Swagger12Specification");
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -63,7 +62,7 @@ public class APISpecificationSwagger1xTest {
 	public void includingBasePath() throws AppException, IOException {
 		byte[] content = getSwaggerContent(testPackage + "/swagger12.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath(new URL("https://petstore.swagger.io:443/myapi"));
+		apiDefinition.configureBasepath("https://petstore.swagger.io:443/myapi");
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger1xSpecification, "Specification must be an Swagger12Specification");
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -74,7 +73,7 @@ public class APISpecificationSwagger1xTest {
 	public void testSwagger11Specification() throws AppException, IOException {
 		byte[] content = getSwaggerContent(testPackage + "/swagger11.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath(new URL("https://petstore.swagger.io:443/myapi"));
+		apiDefinition.configureBasepath("https://petstore.swagger.io:443/myapi");
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger1xSpecification, "Specification must be an Swagger12Specification");
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
