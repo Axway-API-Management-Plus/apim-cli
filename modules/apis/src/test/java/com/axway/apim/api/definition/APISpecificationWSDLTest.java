@@ -1,8 +1,6 @@
 package com.axway.apim.api.definition;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
@@ -10,7 +8,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.axway.apim.apiimport.lib.APIImportParams;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,7 +28,8 @@ public class APISpecificationWSDLTest {
 	public void isWSDLSpecification() throws AppException, IOException {
 
 		byte[] content = getSwaggerContent(testPackage + "/sample-wsdl.xml");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "http://www.mnb.hu/arfolyamok.asmx?WSDL", "https://myhost.customer.com:8767/api/v1/myAPI", "Test-API");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "http://www.mnb.hu/arfolyamok.asmx?WSDL", "Test-API");
+		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof WSDLSpecification);

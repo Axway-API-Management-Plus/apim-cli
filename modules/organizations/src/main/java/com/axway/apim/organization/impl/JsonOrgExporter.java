@@ -12,6 +12,7 @@ import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.organization.lib.ExportOrganization;
@@ -26,8 +27,8 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class JsonOrgExporter extends OrgResultHandler {
 
-	public JsonOrgExporter(OrgExportParams params) {
-		super(params);
+	public JsonOrgExporter(OrgExportParams params, ExportResult result) {
+		super(params, result);
 	}
 
 	@Override
@@ -70,6 +71,7 @@ public class JsonOrgExporter extends OrgResultHandler {
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/org-config.json"), org);
+			this.result.addExportedFile(localFolder.getCanonicalPath() + "/org-config.json");
 		} catch (Exception e) {
 			throw new AppException("Can't write configuration file for organization: '"+org.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
 		}
@@ -94,11 +96,16 @@ public class JsonOrgExporter extends OrgResultHandler {
 	}
 	
 	public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
-
-		try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {
+		FileOutputStream fileOuputStream = null;
+		try {
+			fileOuputStream = new FileOutputStream(fileDest);
 			fileOuputStream.write(bFile);
 		} catch (IOException e) {
 			throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
+		} finally {
+			try {
+				fileOuputStream.close();
+			} catch (Exception ignore) { }
 		}
 	}
 }

@@ -7,6 +7,7 @@ import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter.Builder;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.lib.AppExportParams;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
@@ -16,8 +17,8 @@ public class ConsoleAppExporter extends ApplicationExporter {
 	
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
-	public ConsoleAppExporter(AppExportParams params) {
-		super(params);
+	public ConsoleAppExporter(AppExportParams params, ExportResult result) {
+		super(params, result);
 	}
 
 	@Override

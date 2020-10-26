@@ -95,6 +95,7 @@ public class APIFilter {
 	private boolean includeClientApplications = false;
 	private boolean includeClientAppQuota = false;
 	private boolean includeImage = false;
+	private boolean includeRemoteHost = false;
 	
 	private boolean includeOriginalAPIDefinition = false;
 	
@@ -336,6 +337,14 @@ public class APIFilter {
 
 	public void setIncludeImage(boolean includeImage) {
 		this.includeImage = includeImage;
+	}
+	
+	public boolean isIncludeRemoteHost() {
+		return includeRemoteHost;
+	}
+
+	public void setIncludeRemoteHost(boolean includeRemoteHost) {
+		this.includeRemoteHost = includeRemoteHost;
 	}
 
 	public void setApiType(String apiType) {
@@ -629,6 +638,7 @@ public class APIFilter {
 		boolean includeClientApplications = false;
 		boolean includeClientAppQuota = false;
 		boolean includeImage = false;
+		boolean includeRemoteHost = false;
 		
 		boolean includeOriginalAPIDefinition = false;
 		
@@ -684,6 +694,7 @@ public class APIFilter {
 			apiFilter.setIncludeOriginalAPIDefinition(this.includeOriginalAPIDefinition);
 			apiFilter.setUseFEAPIDefinition(this.useFEAPIDefinition);
 			apiFilter.setIncludeImage(this.includeImage);
+			apiFilter.setIncludeRemoteHost(this.includeRemoteHost);
 			apiFilter.setLoadBackendAPI(this.loadBackendAPI);
 			apiFilter.setState(this.state);
 			apiFilter.setRetired(this.retired);
@@ -823,11 +834,15 @@ public class APIFilter {
 		public Builder useFEAPIDefinition(boolean useFEAPIDefinition) {
 			this.useFEAPIDefinition = useFEAPIDefinition;
 			return this;
-		}
-		
+		}	
 		
 		public Builder includeImage(boolean includeImage) {
 			this.includeImage = includeImage;
+			return this;
+		}
+		
+		public Builder includeRemoteHost(boolean includeRemoteHost) {
+			this.includeRemoteHost = includeRemoteHost;
 			return this;
 		}
 		

@@ -74,9 +74,9 @@ public class CoreParameters {
 	
 	private Boolean ignoreQuotas;
 	
-	private Mode quotaMode = Mode.add;
-	private Mode clientAppsMode = Mode.add;
-	private Mode clientOrgsMode = Mode.add;
+	private Mode quotaMode;
+	private Mode clientAppsMode;
+	private Mode clientOrgsMode;
 	
 	private String detailsExportFile;
 	
@@ -111,7 +111,8 @@ public class CoreParameters {
 	}
 
 	public String getReturnCodeMapping() {
-		return returnCodeMapping;
+		if(returnCodeMapping!=null) return returnCodeMapping;
+		return getFromProperties("returnCodeMapping");
 	}
 
 	public void setReturnCodeMapping(String returnCodeMapping) {
@@ -119,7 +120,8 @@ public class CoreParameters {
 	}
 
 	public String getClearCache() {
-		return clearCache;
+		if(clearCache!=null) return clearCache;
+		return getFromProperties("clearCache");
 	}
 
 	public void setClearCache(String clearCache) {
@@ -131,7 +133,8 @@ public class CoreParameters {
 	}
 
 	public String getHostname() {
-		return hostname;
+		if(hostname!=null) return hostname;
+		return getFromProperties("host");
 	}
 
 	public void setPort(int port) {
@@ -139,7 +142,13 @@ public class CoreParameters {
 	}
 	
 	public int getPort() {
-		if(port==-1) return defaultPort;
+		if(port==-1) {
+			if(getFromProperties("port")!=null) {
+				return Integer.parseInt(getFromProperties("port"));
+			} else {
+				return defaultPort;
+			}
+		}
 		return port;
 	}
 
@@ -147,6 +156,9 @@ public class CoreParameters {
 		if(username!=null) {
 			return username;
 		} else {
+			if(getFromProperties("username")!=null) {
+				return getFromProperties("username");
+			};
 			// Perhaps the admin_username is given
 			return getAdminUsername();
 		}
@@ -160,6 +172,9 @@ public class CoreParameters {
 		if(password!=null) {
 			return password;
 		} else {
+			if(getFromProperties("password")!=null) {
+				return getFromProperties("password");
+			};
 			// Perhaps the admin_password is given (hopefully in combination with the admin_username)
 			return getAdminPassword();
 		}
@@ -170,7 +185,11 @@ public class CoreParameters {
 	}
 
 	public String getAdminUsername() {
-		return adminUsername;
+		if(adminUsername!=null) return adminUsername;
+		if(this.properties!=null) {
+			return this.properties.get("admin_username");
+		}
+		return  null;
 	}
 
 	public void setAdminUsername(String adminUsername) {
@@ -178,7 +197,11 @@ public class CoreParameters {
 	}
 
 	public String getAdminPassword() {
-		return adminPassword;
+		if(adminPassword!=null) return adminPassword;
+		if(this.properties!=null) {
+			return this.properties.get("admin_password");
+		}
+		return  null;
 	}
 
 	public void setAdminPassword(String adminPassword) {
@@ -186,7 +209,8 @@ public class CoreParameters {
 	}
 	
 	public Boolean isForce() {
-		return force;
+		if(force!=null) return force;
+		return Boolean.parseBoolean(getFromProperties("force"));
 	}
 
 	public void setForce(Boolean force) {
@@ -200,12 +224,16 @@ public class CoreParameters {
 	}
 	
 	public Boolean isIgnoreQuotas() {
-		if(ignoreQuotas==null) return false;
-		return ignoreQuotas;
+		if(ignoreQuotas!=null) return ignoreQuotas;
+		return Boolean.parseBoolean(getFromProperties("ignoreQuotas"));
 	}
 
 	public Mode getQuotaMode() {
-		return quotaMode;
+		if(quotaMode!=null) return quotaMode;
+		if(getFromProperties("quotaMode")!=null) {
+			return Mode.valueOf(getFromProperties("quotaMode"));
+		}
+		return Mode.add;
 	}
 
 	public void setQuotaMode(Mode quotaMode) {
@@ -215,11 +243,18 @@ public class CoreParameters {
 
 	public Boolean isIgnoreClientApps() {
 		if(clientAppsMode==Mode.ignore) return true;
+		if(getFromProperties("clientAppsMode")!=null) {
+			return Boolean.parseBoolean(getFromProperties("clientAppsMode"));
+		}
 		return false;
 	}
 	
 	public Mode getClientAppsMode() {
-		return clientAppsMode;
+		if(clientAppsMode!=null) return clientAppsMode;
+		if(getFromProperties("clientAppsMode")!=null) {
+			return Mode.valueOf(getFromProperties("clientAppsMode"));
+		}
+		return Mode.add;
 	}
 
 	public void setClientAppsMode(Mode clientAppsMode) {
@@ -229,11 +264,18 @@ public class CoreParameters {
 
 	public Boolean isIgnoreClientOrgs() {
 		if(clientOrgsMode==Mode.ignore) return true;
+		if(getFromProperties("clientOrgsMode")!=null) {
+			return Boolean.parseBoolean(getFromProperties("clientOrgsMode"));
+		}
 		return false;
 	}
 	
 	public Mode getClientOrgsMode() {
-		return clientOrgsMode;
+		if(clientOrgsMode!=null) return clientOrgsMode;
+		if(getFromProperties("clientOrgsMode")!=null) {
+			return Mode.valueOf(getFromProperties("clientOrgsMode"));
+		}
+		return Mode.add;
 	}
 
 	public void setClientOrgsMode(Mode clientOrgsMode) {
@@ -371,5 +413,15 @@ public class CoreParameters {
 
 	public void setProperties(Map<String, String> properties) {
 		this.properties = properties;
+	}
+	
+	private String getFromProperties(String key) {
+		if(this.properties==null) return null;
+		return this.properties.get(key);
+	}
+
+	@Override
+	public String toString() {
+		return "[hostname=" + hostname + ", username=" + username + ", stage=" + stage + "]";
 	}
 }

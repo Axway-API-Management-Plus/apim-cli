@@ -94,7 +94,7 @@ public class APIFilterTest {
 	public void filterWithPathOn762() throws IOException, AppException {
 		// For this test, we must simulate API-Manager version >7.7
 		APIManagerAdapter.apiManagerVersion = null;
-		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse("{ \"productVersion\": \"7.6.2 SP4\" }", false);
+		APIManagerAdapter.apiManagerVersion = "7.6.2 SP4";
 		APIFilter filter = new APIFilter.Builder()
 				.hasApiPath("/v1/api")
 				.build();
