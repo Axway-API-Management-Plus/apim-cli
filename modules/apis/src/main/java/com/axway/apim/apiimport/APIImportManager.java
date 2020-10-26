@@ -54,10 +54,14 @@ public class APIImportManager {
 			recreate.execute(changeState);
 		} else {
 			if(!changeState.hasAnyChanges()) {
-				APIPropertiesExport.getInstance().setProperty("feApiId", changeState.getActualAPI().getId());
-				LOG.debug("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
-				error.setWarning("No changes detected between Import- and API-Manager-API: '" + changeState.getActualAPI().getName() + "' ("+changeState.getActualAPI().getId()+")", ErrorCode.NO_CHANGE, false);
-				throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE);
+				if(forceUpdate) {
+					
+				} else {
+					APIPropertiesExport.getInstance().setProperty("feApiId", changeState.getActualAPI().getId());
+					LOG.debug("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
+					error.setWarning("No changes detected between Import- and API-Manager-API: '" + changeState.getActualAPI().getName() + "' ("+changeState.getActualAPI().getId()+")", ErrorCode.NO_CHANGE, false);
+					throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE);
+				}
 			}
 			LOG.info("Recognized the following changes. Potentially Breaking: " + changeState.getBreakingChanges() + 
 					" plus Non-Breaking: " + changeState.getNonBreakingChanges());
