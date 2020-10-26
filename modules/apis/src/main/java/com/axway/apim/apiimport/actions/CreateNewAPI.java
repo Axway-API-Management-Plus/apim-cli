@@ -16,7 +16,7 @@ import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.errorHandling.AppException;
 
 /**
- * This class is used by the {@link APIImportManager#applyChanges(APIChangeState)} to create a new API.
+ * This class is used by the {@link APIImportManager#applyChanges(APIChangeState, boolean)} to create a new API.
  * It's called, when an existing API can't be found.
  *
  * @author cwiechmann@axway.com

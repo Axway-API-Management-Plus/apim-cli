@@ -1,0 +1,9 @@
+	
+{
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"state": "published",
+	"version": "1.0.0",
+	"organization": "This is wrong!",
+	"clientOrganizations" : [ "API Development ${orgNumber}" ]
+}

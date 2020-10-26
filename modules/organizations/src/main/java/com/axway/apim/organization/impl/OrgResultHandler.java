@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.apis.OrgFilter.Builder;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.organization.lib.OrgExportParams;
@@ -35,14 +36,15 @@ public abstract class OrgResultHandler {
 	}
 	
 	OrgExportParams params;
+	ExportResult result;
 	
 	boolean hasError = false;
 	
-	public static OrgResultHandler create(ResultHandler exportImpl, OrgExportParams params) throws AppException {
+	public static OrgResultHandler create(ResultHandler exportImpl, OrgExportParams params, ExportResult result) throws AppException {
 		try {
-			Object[] intArgs = new Object[] { params };
+			Object[] intArgs = new Object[] { params, result };
 			Constructor<OrgResultHandler> constructor =
-					exportImpl.getClazz().getConstructor(new Class[]{OrgExportParams.class});
+					exportImpl.getClazz().getConstructor(new Class[]{OrgExportParams.class, ExportResult.class});
 			OrgResultHandler exporter = constructor.newInstance(intArgs);
 			return exporter;
 		} catch (Exception e) {
@@ -50,8 +52,9 @@ public abstract class OrgResultHandler {
 		}
 	}
 
-	public OrgResultHandler(OrgExportParams params) {
+	public OrgResultHandler(OrgExportParams params, ExportResult result) {
 		this.params = params;
+		this.result = result;
 	}
 	
 	public abstract void export(List<Organization> apps) throws AppException;

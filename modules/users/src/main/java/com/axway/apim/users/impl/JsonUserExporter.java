@@ -11,8 +11,8 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.User;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.users.lib.ExportUser;
@@ -27,8 +27,8 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class JsonUserExporter extends UserResultHandler {
 
-	public JsonUserExporter(UserExportParams params) {
-		super(params);
+	public JsonUserExporter(UserExportParams params, ExportResult result) {
+		super(params, result);
 	}
 
 	@Override
@@ -71,6 +71,7 @@ public class JsonUserExporter extends UserResultHandler {
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/user-config.json"), user);
+			this.result.addExportedFile(localFolder.getCanonicalPath() + "/user-config.json");
 		} catch (Exception e) {
 			throw new AppException("Can't write configuration file for user: '"+user.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
 		}

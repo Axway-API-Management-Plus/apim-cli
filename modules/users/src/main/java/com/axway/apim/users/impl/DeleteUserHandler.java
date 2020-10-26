@@ -7,14 +7,15 @@ import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.adapter.user.UserFilter.Builder;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.users.lib.UserExportParams;
 
 public class DeleteUserHandler extends UserResultHandler {
 
-	public DeleteUserHandler(UserExportParams params) {
-		super(params);
+	public DeleteUserHandler(UserExportParams params, ExportResult result) {
+		super(params, result);
 	}
 
 	@Override

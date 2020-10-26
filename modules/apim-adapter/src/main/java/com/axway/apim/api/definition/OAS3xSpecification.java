@@ -1,7 +1,5 @@
 package com.axway.apim.api.definition;
 
-import java.net.URL;
-
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,8 +11,8 @@ public class OAS3xSpecification extends APISpecification {
 	
 	JsonNode openAPI = null;
 	
-	public OAS3xSpecification(byte[] apiSpecificationContent, String backendBasepath) throws AppException {
-		super(apiSpecificationContent, backendBasepath);
+	public OAS3xSpecification(byte[] apiSpecificationContent) throws AppException {
+		super(apiSpecificationContent);
 	}
 
 	@Override
@@ -26,13 +24,12 @@ public class OAS3xSpecification extends APISpecification {
 	}
 
 	@Override
-	protected void configureBasepath() throws AppException {
+	public void configureBasepath(String backendBasepath) throws AppException {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		try {
-			if(this.backendBasepath!=null) {
-				URL backendBasepath = new URL(this.backendBasepath);
+			if(backendBasepath!=null) {
 				 ObjectNode newServer = this.mapper.createObjectNode();
-				 newServer.put("url", backendBasepath.toString());
+				 newServer.put("url", backendBasepath);
 				 if(openAPI.has("servers")) {
 					((ArrayNode) openAPI.get("servers")).removeAll();
 				 }
@@ -53,7 +50,6 @@ public class OAS3xSpecification extends APISpecification {
 			if(!(openAPI.has("openapi") && openAPI.get("openapi").asText().startsWith("3.0."))) {
 				return false;
 			}
-			configureBasepath();
 			return true;
 		} catch (Exception e) {
 			LOG.trace("No OpenAPI 3.0 specification.", e);

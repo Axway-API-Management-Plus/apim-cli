@@ -14,5 +14,6 @@
 	
 	<import resource="classpath:core-citrus-context.xml" />
     
-    <bean class="com.axway.apim.user.UserImportTestAction"/>
+    <bean class="com.axway.apim.user.it.ImportUserTestAction"/>
+    <bean class="com.axway.apim.user.it.ExportUserTestAction"/>
 </beans>

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.adapter.user.UserFilter.Builder;
 import com.axway.apim.api.model.User;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.users.lib.UserExportParams;
@@ -35,14 +36,15 @@ public abstract class UserResultHandler {
 	}
 	
 	UserExportParams params;
+	ExportResult result;
 	
 	boolean hasError = false;
 	
-	public static UserResultHandler create(ResultHandler exportImpl, UserExportParams params) throws AppException {
+	public static UserResultHandler create(ResultHandler exportImpl, UserExportParams params, ExportResult result) throws AppException {
 		try {
-			Object[] intArgs = new Object[] { params };
+			Object[] intArgs = new Object[] { params, result };
 			Constructor<UserResultHandler> constructor =
-					exportImpl.getClazz().getConstructor(new Class[]{UserExportParams.class});
+					exportImpl.getClazz().getConstructor(new Class[]{UserExportParams.class, ExportResult.class});
 			UserResultHandler exporter = constructor.newInstance(intArgs);
 			return exporter;
 		} catch (Exception e) {
@@ -50,8 +52,9 @@ public abstract class UserResultHandler {
 		}
 	}
 
-	public UserResultHandler(UserExportParams params) {
+	public UserResultHandler(UserExportParams params, ExportResult result) {
 		this.params = params;
+		this.result = result;
 	}
 	
 	public abstract void export(List<User> users) throws AppException;
