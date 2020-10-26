@@ -64,7 +64,7 @@ public class API {
 	@JsonIgnore
 	private boolean requestForAllOrgs = false;
 	
-	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {}, isRecreate = true)
 	protected APISpecification apiDefinition = null;
 
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
@@ -156,8 +156,7 @@ public class API {
 			writableStates = {API.STATE_UNPUBLISHED})
 	protected String apiRoutingKey = null;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {})
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {}, isRecreate = true)
 	@JsonDeserialize( using = OrganizationDeserializer.class)
 	@JsonAlias({"organizationId", "organization"}) // Alias to read Organization based on the id as given by the API-Manager
 	protected Organization organization = null;
