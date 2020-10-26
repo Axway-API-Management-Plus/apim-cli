@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.apiimport.actions.RecreateToUpdateAPI;
+import com.axway.apim.apiimport.actions.RepublishToUpdateAPI;
 import com.axway.apim.apiimport.actions.UpdateExistingAPI;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
@@ -40,7 +41,7 @@ public class APIImportManager {
 				throw new AppException("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER);
 			}
 		}
-		// No existing API found (means: No match for APIPath), creating a complete new
+		// No existing API found (means: No match for APIPath/V-Host & Query-Version), creating a complete new
 		if(changeState.getActualAPI()==null) {
 			// --> CreateNewAPI
 			LOG.info("No existing API found, creating new!");
@@ -66,19 +67,24 @@ public class APIImportManager {
 					throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
 				}
 			}
-			
-			if(changeState.isUpdateExistingAPI()) { // All changes can be applied to the existing API in current state
+			if(changeState.isRecreateAPI()) {
+				LOG.info("Update API Strategy: Re-Create API as changes can't be applied to existing API. ");
+				LOG.debug("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
+						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase());				
+				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
+				recreate.execute(changeState);
+			} else if(changeState.isUpdateExistingAPI()) { // All changes can be applied to the existing API in current state
 				LOG.info("Update API Strategy: All changes can be applied in current state.");
 				LOG.debug("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
 						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase());
 				UpdateExistingAPI updateAPI = new UpdateExistingAPI();
 				updateAPI.execute(changeState);
 			} else { // We have changes, that require a re-creation of the API
-				LOG.info("Update API Strategy: Re-Create API as changes can't be applied to existing API. ");
+				LOG.info("Update API Strategy: Re-Publish API to apply changes");
 				LOG.debug("Apply breaking changes: "+changeState.getBreakingChanges()+" & and "
 						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase());
-				RecreateToUpdateAPI recreate = new RecreateToUpdateAPI();
-				recreate.execute(changeState);
+				RepublishToUpdateAPI republish = new RepublishToUpdateAPI();
+				republish.execute(changeState);
 			}
 		}
 		if(!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded() && commands.isAllowOrgAdminsToPublish() ) {

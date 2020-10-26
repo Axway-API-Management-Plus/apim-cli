@@ -64,7 +64,7 @@ public class API {
 	@JsonIgnore
 	private boolean requestForAllOrgs = false;
 	
-	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {}, isRecreate = true)
 	protected APISpecification apiDefinition = null;
 
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
