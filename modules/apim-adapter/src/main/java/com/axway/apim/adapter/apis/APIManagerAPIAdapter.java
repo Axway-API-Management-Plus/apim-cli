@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
@@ -41,6 +42,7 @@ import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.APIImportSerializerModifier;
+import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.api.API;
 import com.axway.apim.api.APIBaseDefinition;
 import com.axway.apim.api.definition.APISpecification;
@@ -54,6 +56,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.Profile;
 import com.axway.apim.api.model.QuotaRestriction;
+import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -125,6 +128,7 @@ public class APIManagerAPIAdapter {
 				addExistingClientAppQuotas(api, filter.isIncludeQuotas());
 				addOriginalAPIDefinitionFromAPIM(api, filter);
 				addImageFromAPIM(api, filter.isIncludeImage());
+				addRemoteHost(api, filter.isIncludeRemoteHost());
 				if(logProgress && apis.size()>5) Utils.progressPercentage(i, apis.size(), "Loading "+apis.size()+" APIs");
 			}
 			addCustomProperties(apis, filter);
@@ -209,9 +213,6 @@ public class APIManagerAPIAdapter {
 	private List<API> filterAPIs(APIFilter filter) throws AppException, JsonParseException, JsonMappingException, IOException {
 		List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>(){});
 		List<API> foundAPIs = new ArrayList<API>();
-		if(filter.getApiPath()==null && filter.getVhost()==null && filter.getQueryStringVersion()==null && apis.size()==1 && filter.getPolicyName()==null) {
-			return apis;
-		}
 		for(API api : apis) {
 			if(!filter.filter(api)) continue; 
 			foundAPIs.add(api);
@@ -294,6 +295,21 @@ public class APIManagerAPIAdapter {
 						((CloseableHttpResponse)httpResponse).close();
 				} catch (Exception ignore) {}
 			}
+	}
+	
+	private void addRemoteHost(API api, boolean includeRemoteHost) throws AppException {
+		if(!includeRemoteHost) return;
+		String backendBasePath = null;
+		try {
+			backendBasePath = api.getServiceProfiles().get("_default").getBasePath();
+			URL url = new URL(backendBasePath);
+			RemoteHost remoteHost = APIManagerAdapter.getInstance().remoteHostsAdapter.getRemoteHost(url.getHost(), url.getPort());
+			api.setRemotehost(remoteHost);
+		} catch (Exception e) {
+			if(LOG.isDebugEnabled()) {
+				LOG.error("Error setting remote host for API based on backendBasePath: " + backendBasePath, e);
+			}
+		}
 	}
 	
 	public void updateAPIImage(API api, Image image) throws AppException {
@@ -497,7 +513,7 @@ public class APIManagerAPIAdapter {
 			if(httpResponse.containsHeader("Content-Disposition")) {
 				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
 			}
-			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), null, api.getName(), filter.isFailOnError());
+			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), api.getName(), filter.isFailOnError());
 			api.setApiDefinition(apiDefinition);
 		} catch (Exception e) {
 			throw new AppException("Cannot parse API-Definition for API: '" + api.getName() + "' ("+api.getVersion()+") on path: '"+api.getPath()+"'", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
@@ -544,14 +560,15 @@ public class APIManagerAPIAdapter {
 		HttpEntity entity;
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath"}));
+				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"}));
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new APIImportSerializerModifier(false)));
 		mapper.setFilterProvider(filter);
+		mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(false)));
 		HttpResponse httpResponse = null;
 		translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()).build();
-			entity = new StringEntity(mapper.writeValueAsString(api), StandardCharsets.UTF_8);
+			entity = new StringEntity(mapper.writeValueAsString(api), ContentType.APPLICATION_JSON);
 			
 			RestAPICall request = new PUTRequest(entity, uri);
 			httpResponse = request.execute();
@@ -639,7 +656,7 @@ public class APIManagerAPIAdapter {
 				.setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/"+StatusEndpoint.valueOf(desiredState).endpoint)
 				.build();
 			if(vhost!=null && api.getState().equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
-				HttpEntity entity = new StringEntity("vhost="+vhost);
+				HttpEntity entity = new StringEntity("vhost="+vhost, ContentType.APPLICATION_JSON);
 				request = new POSTRequest(entity, uri, useAdminAccountForPublish());
 			} else {
 				request = new POSTRequest(null, uri, useAdminAccountForPublish());
@@ -893,7 +910,7 @@ public class APIManagerAPIAdapter {
 					LOG.info("Taking over existing quota config for application: '"+app.getName()+"' to newly created API.");
 					try {
 						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/quota").build();
-						entity = new StringEntity(mapper.writeValueAsString(app.getAppQuota()), StandardCharsets.UTF_8);
+						entity = new StringEntity(mapper.writeValueAsString(app.getAppQuota()), ContentType.APPLICATION_JSON);
 						
 						request = new PUTRequest(entity, uri, true);
 						httpResponse = request.execute();

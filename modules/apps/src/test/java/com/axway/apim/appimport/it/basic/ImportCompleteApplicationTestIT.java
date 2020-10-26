@@ -7,8 +7,9 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.appimport.ApplicationImportTestAction;
+import com.axway.apim.appimport.it.ImportAppTestAction;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.lib.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
@@ -17,9 +18,7 @@ import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
 @Test
-public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
-
-	private ApplicationImportTestAction appImport = new ApplicationImportTestAction();
+public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
 	private static String PACKAGE = "/com/axway/apim/appimport/apps/basic/";
 	
@@ -27,6 +26,8 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 	@Test @Parameters("context")
 	public void importApplicationBasicTest(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		description("Import application into API-Manager");
+		
+		ImportAppTestAction importApp = new ImportAppTestAction(context);
 		
 		variable("appNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("appName", "Complete-App-${appNumber}");
@@ -39,9 +40,9 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 		variable("appImage", "app-image.jpg");
 
 		echo("####### Import application: '${appName}' #######");		
-		createVariable(ApplicationImportTestAction.CONFIG,  PACKAGE + "CompleteApplication.json");
-		createVariable("expectedReturnCode", "0");
-		appImport.doExecute(context);
+		createVariable(PARAM_CONFIGFILE,  PACKAGE + "CompleteApplication.json");
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
 		
 		echo("####### Validate application: '${appName}' has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/applications?field=name&op=eq&value=${appName}").header("Content-Type", "application/json"));
@@ -90,16 +91,16 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 				.validate("$.[?(@.clientId=='ClientConfidentialClientID-${appNumber}')].enabled", "true"));
 		
 		echo("####### Re-Import same application - Should be a No-Change #######");
-		createVariable("expectedReturnCode", "10");
-		appImport.doExecute(context);
+		createVariable(PARAM_EXPECTED_RC, "10");
+		importApp.doExecute(context);
 		
 		echo("####### Re-Import slightly modified application - Existing App should be updated #######");
 		variable("email", "newemail-${appNumber}@customer.com");
 		variable("quotaMessages", "1111");
 		variable("quotaPeriod", "day");
 		
-		createVariable("expectedReturnCode", "0");
-		appImport.doExecute(context);
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
 		
 		echo("####### Validate application: '${appName}' (${appId}) has been updated #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}").header("Content-Type", "application/json"));
@@ -129,7 +130,7 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner {
 		echo("####### Update the application image only #######");
 		variable("appImage", "other-app-image.jpg");
 		
-		createVariable("expectedReturnCode", "0");
-		appImport.doExecute(context);
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
 	}
 }

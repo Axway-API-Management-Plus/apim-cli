@@ -1,0 +1,9 @@
+[	
+	{
+	  "name": "${appName}",
+	  "organization": "${orgName}",
+	  "description": "test",
+	  "state": "approved",
+	  "enabled": false
+	}
+]

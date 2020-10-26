@@ -4,5 +4,6 @@
 	"path": "${apiPath}",
 	"state": "published",
 	"version": "1.0.0",
-	"organization": "API Development ${orgNumber}"
+	"organization": "API Development ${orgNumber}",
+	"clientOrganizations" : [ "API Development ${orgNumber}" ]
 }

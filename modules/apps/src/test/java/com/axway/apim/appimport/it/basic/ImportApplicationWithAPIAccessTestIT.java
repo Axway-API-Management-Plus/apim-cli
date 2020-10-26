@@ -7,9 +7,10 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.appimport.ApplicationImportTestAction;
+import com.axway.apim.appimport.it.ImportAppTestAction;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
+import com.axway.lib.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
@@ -18,9 +19,7 @@ import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
 @Test
-public class ImportApplicationWithAPIAccessTestIT extends TestNGCitrusTestRunner {
-
-	private ApplicationImportTestAction appImport = new ApplicationImportTestAction();
+public class ImportApplicationWithAPIAccessTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
 	private ImportTestAction apiImport = new ImportTestAction();
 	
@@ -30,6 +29,8 @@ public class ImportApplicationWithAPIAccessTestIT extends TestNGCitrusTestRunner
 	@Test @Parameters("context")
 	public void importApplicationBasicTest(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		description("Import application that has a subscription to an API");
+
+		ImportAppTestAction importApp = new ImportAppTestAction(context);
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		
@@ -77,9 +78,9 @@ public class ImportApplicationWithAPIAccessTestIT extends TestNGCitrusTestRunner
 		variable("appName", "Complete-App-${appNumber}");
 
 		echo("####### Import application: '${appName}' with access to ONE API #######");
-		createVariable(ApplicationImportTestAction.CONFIG,  PACKAGE + "AppWithAPIAccess.json");
-		createVariable("expectedReturnCode", "0");
-		appImport.doExecute(context);
+		createVariable(PARAM_CONFIGFILE,  PACKAGE + "AppWithAPIAccess.json");
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
 		
 		echo("####### Validate application: '${appName}' has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/applications?field=name&op=eq&value=${appName}").header("Content-Type", "application/json"));
@@ -95,9 +96,9 @@ public class ImportApplicationWithAPIAccessTestIT extends TestNGCitrusTestRunner
 			.validate("$.[?(@.apiId=='${apiId1}')].state", "approved"));
 		
 		echo("####### Import application: '${appName}' with access to TWO APIs #######");
-		createVariable(ApplicationImportTestAction.CONFIG,  PACKAGE + "AppWithAPITwoAccesses.json");
-		createVariable("expectedReturnCode", "0");
-		appImport.doExecute(context);
+		createVariable(PARAM_CONFIGFILE,  PACKAGE + "AppWithAPITwoAccesses.json");
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
 		
 		echo("####### Validate application: '${appName}' has been imported now having access to two APIs #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}").header("Content-Type", "application/json"));
@@ -114,9 +115,9 @@ public class ImportApplicationWithAPIAccessTestIT extends TestNGCitrusTestRunner
 			.validate("$.[?(@.apiId=='${apiId2}')].state", "approved"));
 		
 		echo("####### Reduce access of application: '${appName}' to only ONE API #######");
-		createVariable(ApplicationImportTestAction.CONFIG,  PACKAGE + "AppWithAPIAccess.json");
-		createVariable("expectedReturnCode", "0");
-		appImport.doExecute(context);
+		createVariable(PARAM_CONFIGFILE,  PACKAGE + "AppWithAPIAccess.json");
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
 		
 		echo("####### Validate application: '${appName}' has been imported now having access to two APIs #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}").header("Content-Type", "application/json"));

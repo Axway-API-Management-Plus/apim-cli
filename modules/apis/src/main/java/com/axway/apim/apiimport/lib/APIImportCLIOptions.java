@@ -63,6 +63,11 @@ public class APIImportCLIOptions extends CoreCLIOptions {
 		option.setArgName("true");
 		internalOptions.addOption(option);
 		
+		option = new Option("validateRemoteHost", true, "Disables the remote host validation which is turned on by default if a remote host is given");
+		option.setRequired(false);
+		option.setArgName("false");
+		internalOptions.addOption(option);
+		
 		option = new Option("changeOrganization", "Set this flag to allow to change the organization of an existing API.");
 		option.setRequired(false);
 		internalOptions.addOption(option);
@@ -114,6 +119,7 @@ public class APIImportCLIOptions extends CoreCLIOptions {
 		params.setClientAppsMode(Mode.valueOfDefault(getValue("clientAppsMode")));
 		params.setQuotaMode(Mode.valueOfDefault(getValue("quotaMode")));
 		params.setDetailsExportFile(getValue("detailsExportFile"));
+		params.setValidateRemoteHost(Boolean.parseBoolean(getValue("validateRemoteHost")));
 		if(getValue("allowOrgAdminsToPublish")!=null) params.setAllowOrgAdminsToPublish(Boolean.parseBoolean(getValue("allowOrgAdminsToPublish")));
 		return params;
 	}

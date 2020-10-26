@@ -112,7 +112,7 @@ public class CustomPoliciesTestIT extends TestNGCitrusTestRunner {
 		
 		TagMap<String, String[]> importedTags = mapper.convertValue(importedAPIConfig.get("tags"), new TypeReference<TagMap<String, String[]>>(){});
 		TagMap<String, String[]> exportedTags = mapper.convertValue(exportedAPIConfig.get("tags"), new TypeReference<TagMap<String, String[]>>(){});
-		assertEquals(importedTags, exportedTags, "Tags are not equal.");
+		assertTrue(importedTags.equals(exportedTags), "Tags are not equal.");
 		
 		List<CorsProfile> importedCorsProfiles = mapper.convertValue(importedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>(){});
 		List<CorsProfile> exportedCorsProfiles = mapper.convertValue(exportedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>(){});

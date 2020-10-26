@@ -65,7 +65,7 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 				}
 				// Otherwise make sure the organization exists and try to load it
 				organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(node.asText());
-				if(organization==null) {
+				if(organization==null && validateOrganization(ctxt)) {
 					ErrorState.getInstance().setError("The given organization: '"+node.asText()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION, false);
 					throw new AppException("The given organization: '"+node.asText()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
 				}
@@ -74,5 +74,11 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 		} catch (AppException e) {
 			throw new IOException("Error reading organization", e);
 		}
+	}
+	
+	private boolean validateOrganization(DeserializationContext ctxt) {
+		// By default the organization should be validated
+		if(ctxt.getAttribute("validateOrganization")==null) return true;
+		return (Boolean)ctxt.getAttribute("validateOrganization");
 	}
 }

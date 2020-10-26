@@ -7,8 +7,9 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.appimport.ApplicationImportTestAction;
+import com.axway.apim.appimport.it.ImportAppTestAction;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.lib.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
@@ -17,9 +18,7 @@ import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
 @Test
-public class ImportCompleteApplicationWithOauthResourcesTestIT extends TestNGCitrusTestRunner {
-
-	private ApplicationImportTestAction appImport = new ApplicationImportTestAction();
+public class ImportCompleteApplicationWithOauthResourcesTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
 	private static String PACKAGE = "/com/axway/apim/appimport/apps/basic/";
 	
@@ -28,10 +27,12 @@ public class ImportCompleteApplicationWithOauthResourcesTestIT extends TestNGCit
 	public void importApplicationBasicTest(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		description("Import application into API-Manager");
 		
+		ImportAppTestAction importApp = new ImportAppTestAction(context);
+		
 		variable("appNumber", RandomNumberFunction.getRandomNumber(4, true));
-		variable("appName", "Complete-App-${appNumber}");
-		variable("phone", "123456789-${appNumber}");
-		variable("description", "My App-Description ${appNumber}");
+		variable("appName", "Complete-App-"+importApp.getRandomNum());
+		variable("phone", "123456789-"+importApp.getRandomNum());
+		variable("description", "My App-Description "+importApp.getRandomNum());
 		variable("email", "email-${appNumber}@customer.com");
 		variable("quotaMessages", "9999");
 		variable("quotaPeriod", "week");
@@ -43,9 +44,9 @@ public class ImportCompleteApplicationWithOauthResourcesTestIT extends TestNGCit
 		variable("isDefault2",false);
 
 		echo("####### Import application: '${appName}' #######");		
-		createVariable(ApplicationImportTestAction.CONFIG,  PACKAGE + "CompleteApplicationWithOauthResources.json");
-		createVariable("expectedReturnCode", "0");
-		appImport.doExecute(context);
+		createVariable(PARAM_CONFIGFILE,  PACKAGE + "CompleteApplicationWithOauthResources.json");
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
 		
 		echo("####### Validate application: '${appName}' has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/applications?field=name&op=eq&value=${appName}").header("Content-Type", "application/json"));
@@ -74,13 +75,13 @@ public class ImportCompleteApplicationWithOauthResourcesTestIT extends TestNGCit
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/oauth").header("Content-Type", "application/json"));
 				
 		echo("####### Re-Import same application - Should be a No-Change #######");
-		createVariable("expectedReturnCode", "10");
-		appImport.doExecute(context);
+		createVariable(PARAM_EXPECTED_RC, "10");
+		importApp.doExecute(context);
 		
 		echo("####### Re-Import with change in oauth resource isDefaultFlag - Existing App should be updated #######");
 		variable("isDefault2",true);
-		createVariable("expectedReturnCode", "0");
-		appImport.doExecute(context);
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
 		
 		echo("####### Validate application: '${appName}' with id: ${appId} oauth resources has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/oauthresource").header("Content-Type", "application/json"));
@@ -95,8 +96,8 @@ public class ImportCompleteApplicationWithOauthResourcesTestIT extends TestNGCit
 		
 		echo("####### Re-Import change in scope name - Existing App should be updated #######");
 		variable("scope2","WRITE2");
-		createVariable("expectedReturnCode", "0");
-		appImport.doExecute(context);
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
 		
 		echo("####### Validate application: '${appName}' (${appId}) has been updated #######");
 		echo("####### Validate application: '${appName}' with id: ${appId} oauth resources has been imported #######");

@@ -65,23 +65,16 @@ public class UnpublishedPublishedApiKeyTestIT extends TestNGCitrusTestDesigner {
 		action(swaggerImport);
 		
 		echo("####### Validate the Security-Settings have been changed (without changing the API-ID) #######");
-		http().client("apiManager")
-			.send()
-			.get("/proxies/${apiId}")
-			.name("api")
-			.header("Content-Type", "application/json");
+		http().client("apiManager").send().get("/proxies/${apiId}").name("api").header("Content-Type", "application/json");
 
-		http().client("apiManager")
-			.receive()
-			.response(HttpStatus.OK)
-			.messageType(MessageType.JSON)
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.id=='${apiId}')].id", "${apiId}")
 			.validate("$.[?(@.id=='${apiId}')].securityProfiles[0].devices[0].properties.takeFrom", "${takeFrom}")
 			.validate("$.[?(@.id=='${apiId}')].securityProfiles[0].devices[0].properties.apiKeyFieldName", "${apiKeyFieldName}")
 			.validate("$.[?(@.id=='${apiId}')].securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", "${removeCredentialsOnSuccess}")
 			.validate("$.[?(@.id=='${apiId}')].state", "published");
 		
-		echo("####### Change some settings of the PUBLISHED API, which leads to a new API-ID #######");
+		echo("####### Change some settings of the PUBLISHED API - Handled with a Re-Publish action #######");
 		createVariable("apiKeyFieldName", "KeyId-Test-Published");
 		createVariable("takeFrom", "HEADER");
 		createVariable("removeCredentialsOnSuccess", "false");
@@ -93,28 +86,15 @@ public class UnpublishedPublishedApiKeyTestIT extends TestNGCitrusTestDesigner {
 		action(swaggerImport);
 		
 		echo("####### Validate the Security-Settings have been changed (without changing the API-ID) #######");
-		http().client("apiManager")
-			.send()
-			.get("/proxies")
-			.name("api")
-			.header("Content-Type", "application/json");
+		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
 
-		http().client("apiManager")
-			.receive()
-			.response(HttpStatus.OK)
-			.messageType(MessageType.JSON)
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
 			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].type", "apiKey")
 			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.takeFrom", "${takeFrom}")
 			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.apiKeyFieldName", "${apiKeyFieldName}")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", "${removeCredentialsOnSuccess}")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "newApiId")
-			.validate("$.[?(@.path=='${apiPath}')].id", "@assertThat(not(equalTo(${apiId})))@");
-		
-		echo("First API-ID: ${apiId}");
-		echo("New   API-ID: ${newApiId}");
-		
+			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", "${removeCredentialsOnSuccess}");		
 	}
 
 }
