@@ -213,9 +213,6 @@ public class APIManagerAPIAdapter {
 	private List<API> filterAPIs(APIFilter filter) throws AppException, JsonParseException, JsonMappingException, IOException {
 		List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>(){});
 		List<API> foundAPIs = new ArrayList<API>();
-		if(filter.getApiPath()==null && filter.getVhost()==null && filter.getQueryStringVersion()==null && apis.size()==1 && filter.getPolicyName()==null) {
-			return apis;
-		}
 		for(API api : apis) {
 			if(!filter.filter(api)) continue; 
 			foundAPIs.add(api);

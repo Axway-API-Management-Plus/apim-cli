@@ -19,7 +19,23 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class Utils {
 	
+
 	private static Logger LOG = LoggerFactory.getLogger(Utils.class);
+
+	public static enum FedKeyType {
+		FilterCircuit("<key type='FilterCircuit'>"), 
+		OAuthAppProfile("<key type='OAuthAppProfile'>");
+		
+		private String keyType;
+		
+		FedKeyType(String keyType) {
+			this.keyType = keyType;
+		}
+
+		public String getKeyType() {
+			return keyType;
+		}
+	}
 	
 	public static String getAPIDefinitionUriFromFile(String pathToAPIDefinition) throws AppException {
 		String uriToAPIDefinition = null;
@@ -77,9 +93,14 @@ public class Utils {
         return answer.matches(positive);
     }
     
-	public static String getExternalPolicyName(String policy) {
+    public static String getExternalPolicyName(String policy) {
+    	return getExternalPolicyName(policy, null);
+    }
+    
+	public static String getExternalPolicyName(String policy, FedKeyType keyType) {
+		if(keyType==null) keyType = FedKeyType.FilterCircuit;
 		if(policy.startsWith("<key")) {
-			policy = policy.substring(policy.indexOf("<key type='FilterCircuit'>"));
+			policy = policy.substring(policy.indexOf(keyType.getKeyType()));
 			policy = policy.substring(policy.indexOf("value='")+7, policy.lastIndexOf("'/></key>"));
 		}
 		return policy;

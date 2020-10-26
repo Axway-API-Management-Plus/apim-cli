@@ -28,6 +28,7 @@ import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.Utils.FedKeyType;
 
 public class APIFilter {
 	
@@ -568,6 +569,7 @@ public class APIFilter {
 								}
 								if(authnProfile.getType()==AuthType.oauth) {
 									String providerProfile = (String)authnProfile.getParameters().get("providerProfile");
+									providerProfile = Utils.getExternalPolicyName(providerProfile, FedKeyType.OAuthAppProfile); 
 									Pattern pattern = Pattern.compile(this.getOutboundAuthentication().toLowerCase().replace("*", ".*"));
 									Matcher matcher = pattern.matcher(providerProfile.toLowerCase());
 									if(matcher.matches()) {
