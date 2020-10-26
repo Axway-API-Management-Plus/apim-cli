@@ -38,7 +38,7 @@ public class CoreInitializationTestIT extends TestDesignerBeforeSuiteSupport {
 			.header("Content-Type", "application/json")
 			.payload("{\"name\": \"${orgName}\", \"description\": \"Test Org ${orgNumber}\", \"enabled\": true, \"development\": true }");
 		
-		designer.echo("####### Validating Test-Organisation: ${orgName} has been created #######");
+		designer.echo("####### Validate Test-Organisation: ${orgName} has been created #######");
 		
 		designer.http().client("apiManager")
 			.receive()

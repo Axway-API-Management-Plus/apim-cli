@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.axway.apim.adapter.jackson.OrganizationDeserializer;
+import com.axway.apim.adapter.jackson.RemotehostDeserializer;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
@@ -14,6 +15,7 @@ import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
+import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.api.model.TagMap;
@@ -62,7 +64,7 @@ public class API {
 	@JsonIgnore
 	private boolean requestForAllOrgs = false;
 	
-	@APIPropertyAnnotation(isBreaking = true, writableStates = {})
+	@APIPropertyAnnotation(isBreaking = true, writableStates = {}, isRecreate = true)
 	protected APISpecification apiDefinition = null;
 
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
@@ -154,8 +156,7 @@ public class API {
 			writableStates = {API.STATE_UNPUBLISHED})
 	protected String apiRoutingKey = null;
 	
-	@APIPropertyAnnotation(isBreaking = false, 
-			writableStates = {})
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {}, isRecreate = true)
 	@JsonDeserialize( using = OrganizationDeserializer.class)
 	@JsonAlias({"organizationId", "organization"}) // Alias to read Organization based on the id as given by the API-Manager
 	protected Organization organization = null;
@@ -169,6 +170,9 @@ public class API {
 	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected Long retirementDate = null;
+	
+	@JsonDeserialize( using = RemotehostDeserializer.class)
+	protected RemoteHost remoteHost = null;
 	
 	protected List<APIMethod> apiMethods = null;
 
@@ -478,6 +482,14 @@ public class API {
 		this.createdBy = createdBy;
 	}
 	
+	public RemoteHost getRemotehost() {
+		return remoteHost;
+	}
+
+	public void setRemotehost(RemoteHost remotehost) {
+		this.remoteHost = remotehost;
+	}
+
 	/**
 	 * requestForAllOrgs is used to decide if an API should grant access to ALL organizations. 
 	 * That means, when an API-Developer is defining ALL as the organization name this flag 

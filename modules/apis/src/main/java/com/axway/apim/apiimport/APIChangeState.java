@@ -13,7 +13,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.lib.APIImportParams;
 import com.axway.apim.lib.APIPropertyAnnotation;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -40,6 +39,7 @@ public class APIChangeState {
 	
 	private boolean isBreaking = false;
 	private boolean updateExistingAPI = true;
+	private boolean recreateAPI = false;
 	
 	private boolean proxyUpdateRequired = false;
 	
@@ -103,11 +103,14 @@ public class APIChangeState {
 						APIPropertyAnnotation property = field.getAnnotation(APIPropertyAnnotation.class);
 						// Property change requires proxy update
 						if(property.copyProp()) this.proxyUpdateRequired = true;
-						if (property.isBreaking()) {
+						if(property.isBreaking()) {
 							this.isBreaking = true;
 							this.breakingChanges.add(field.getName());
 						} else {
 							this.nonBreakingChanges.add(field.getName());
+						}
+						if(property.isRecreate()) {
+							this.recreateAPI = true;
 						}
 						if (!isWritable(property, this.actualAPI.getState())) {
 							this.updateExistingAPI = false; // Found a NON-Changeable property, can't update the existing API
@@ -247,6 +250,13 @@ public class APIChangeState {
 	}
 
 	/**
+	 * @return true, if the API needs to be re-created (e.g. the API-Definition has changed)
+	 */
+	public boolean isRecreateAPI() {
+		return recreateAPI;
+	}
+
+	/**
 	 * @return list of breaking changes
 	 */
 	public List<String> getBreakingChanges() {
@@ -300,18 +310,18 @@ public class APIChangeState {
 		}
 	}
 	
-public boolean isAdminAccountNeeded() throws AppException {
-	// Initially set, right after comparing the Desired- with Actual-state
-	if(this.isAdminAccountNeeded!=null) return Boolean.parseBoolean(this.isAdminAccountNeeded);
-	// If the desired & actual API is state Unpublished - No Admin-Account is needed
-	if((getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) || getDesiredAPI().getState().equals(API.STATE_DELETED)) && 
-			(getActualAPI()==null || getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
-		this.isAdminAccountNeeded = "false";
-	} else {
-		this.isAdminAccountNeeded = "true";
+	public boolean isAdminAccountNeeded() throws AppException {
+		// Initially set, right after comparing the Desired- with Actual-state
+		if(this.isAdminAccountNeeded!=null) return Boolean.parseBoolean(this.isAdminAccountNeeded);
+		// If the desired & actual API is state Unpublished - No Admin-Account is needed
+		if((getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) || getDesiredAPI().getState().equals(API.STATE_DELETED)) && 
+				(getActualAPI()==null || getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
+			this.isAdminAccountNeeded = "false";
+		} else {
+			this.isAdminAccountNeeded = "true";
+		}
+		return Boolean.parseBoolean(this.isAdminAccountNeeded);
 	}
-	return Boolean.parseBoolean(this.isAdminAccountNeeded);
-}
 	
 	public String waiting4Approval() throws AppException {
 		String isWaitingMsg = "";

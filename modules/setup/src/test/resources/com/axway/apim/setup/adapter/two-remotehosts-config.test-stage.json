@@ -1,0 +1,9 @@
+{
+  "remoteHosts": {
+  "My-First-Remote-Host": 
+    {
+      "name": "staged-remotehost.com",
+      "port": 9999
+    }
+  }
+}

@@ -9,7 +9,18 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD) //can use in method only.
 public @interface APIPropertyAnnotation {
 	
+	/**
+	 * Controls if an API-Property would potentially lead to a breaking change.
+	 * @return true, if the API property can break client applications.
+	 */
 	public boolean isBreaking() default false;
+	
+	/**
+	 * If set to true, a change to this API-Property will force the API to be re-created. 
+	 * For instance, when the OpenAPI/Swagger spec is changed.
+	 * @return true if a change to this API-Property must re-create the API. Defaults to false
+	 */
+	public boolean isRecreate() default false;
 	
 	/**
 	 * This property should be set to false for all properties, not managed directly by the API-Proxy endpoint. For instance 
@@ -20,8 +31,8 @@ public @interface APIPropertyAnnotation {
 	 */
 	public boolean copyProp() default true;
 	
+	/**
+	 * @return an Array of states this API property can be changed
+	 */
 	public String[] writableStates();
-	
-	public Class propHandler() default void.class;
-
 }

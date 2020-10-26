@@ -8,8 +8,8 @@ public class WSDLSpecification extends APISpecification {
 	
 	JsonNode wsdl = null;
 	
-	public WSDLSpecification(byte[] apiSpecificationContent, String backendBasepath) throws AppException {
-		super(apiSpecificationContent, backendBasepath);
+	public WSDLSpecification(byte[] apiSpecificationContent) throws AppException {
+		super(apiSpecificationContent);
 	}
 
 	@Override
@@ -18,7 +18,7 @@ public class WSDLSpecification extends APISpecification {
 	}
 
 	@Override
-	protected void configureBasepath() throws AppException {
+	public void configureBasepath(String backendBasepath) throws AppException {
 		
 	}
 	
