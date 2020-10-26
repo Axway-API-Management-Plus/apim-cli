@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Error handling improved if custom properties configuration is invalid (Switch or Select without configured options)
 - Added support to import application scopes (See PR [#77](https://github.com/Axway-API-Management-Plus/apim-cli/pull/77))
 - Leverage "com.axway.apimanager.api.model.disable.confidential.fields" option (See PR [#71](https://github.com/Axway-API-Management-Plus/apim-cli/pull/71))
+- Support for Stage-Config & Variable substitution for Orgs, Client-Apps and Users
+- Support to export & import API-Manager configuration
 
 ### Fixed
 - Changing an APIs fails due to a ClassCastException (See issue [#85](https://github.com/Axway-API-Management-Plus/apim-cli/issues/85))

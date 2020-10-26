@@ -7,6 +7,7 @@ public class APIImportParams extends StandardImportParams {
 	
 	private Boolean forceUpdate;
 	private Boolean useFEAPIDefinition;
+	private Boolean validateRemoteHost;
 	
 	private Boolean changeOrganization = false; 
 	
@@ -40,6 +41,14 @@ public class APIImportParams extends StandardImportParams {
 	public void setForceUpdate(Boolean forceUpdate) {
 		if(forceUpdate==null) return;
 		this.forceUpdate = forceUpdate;
+	}
+
+	public Boolean isValidateRemoteHost() {
+		return validateRemoteHost;
+	}
+
+	public void setValidateRemoteHost(Boolean validateRemoteHost) {
+		this.validateRemoteHost = validateRemoteHost;
 	}
 
 	public String getApiDefintion() {

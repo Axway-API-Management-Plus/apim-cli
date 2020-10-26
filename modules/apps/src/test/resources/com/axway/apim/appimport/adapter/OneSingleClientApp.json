@@ -1,3 +1,9 @@
 {
-	"name": "Application 1 Test" 
+	"name": "Application 1 Test",
+	"description" : "Sample Client Application, registered for use in the Client Demo",
+	"state" : "approved",
+	"image" : "app-image.jpg",
+	"enabled" : true,
+	"email" : "sample@sampleapp.com",
+	"phone" : "012345678"
 }

@@ -23,7 +23,7 @@ public class User {
 	String loginName;
 	String email;
 	String role;
-	boolean enabled;
+	Boolean enabled;
 	Long createdOn;
 	String state;
 	String type;
@@ -53,6 +53,7 @@ public class User {
 		this.organization = organization;
 	}
 	public String getOrganizationId() {
+		if(this.organization==null) return null; 
 		return this.organization.getId();
 	}
 	
@@ -86,10 +87,10 @@ public class User {
 	public void setRole(String role) {
 		this.role = role;
 	}
-	public boolean isEnabled() {
+	public Boolean isEnabled() {
 		return enabled;
 	}
-	public void setEnabled(boolean enabled) {
+	public void setEnabled(Boolean enabled) {
 		this.enabled = enabled;
 	}
 	public Long getCreatedOn() {

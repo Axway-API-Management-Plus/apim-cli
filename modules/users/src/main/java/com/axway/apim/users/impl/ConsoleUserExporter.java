@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.User;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.users.lib.UserExportParams;
 import com.github.freva.asciitable.AsciiTable;
@@ -16,8 +17,8 @@ public class ConsoleUserExporter extends UserResultHandler {
 	
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
-	public ConsoleUserExporter(UserExportParams params) {
-		super(params);
+	public ConsoleUserExporter(UserExportParams params, ExportResult result) {
+		super(params, result);
 	}
 
 	@Override

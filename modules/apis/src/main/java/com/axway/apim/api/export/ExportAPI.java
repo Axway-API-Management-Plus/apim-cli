@@ -19,6 +19,7 @@ import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
+import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.ServiceProfile;
@@ -31,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@JsonPropertyOrder({ "name", "path", "state", "version", "organization", "apiDefinition", "summary", "descriptionType", "descriptionManual", "vhost", 
+@JsonPropertyOrder({ "name", "path", "state", "version", "organization", "apiDefinition", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost", 
 	"backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties", 
 	"corsProfiles", "caCerts", "applicationQuota", "systemQuota" })
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
@@ -149,6 +150,16 @@ public class ExportAPI {
 	public String getVhost() {
 		return this.actualAPIProxy.getVhost();
 	}
+	
+	public String getRemoteHost() {
+		if(this.actualAPIProxy.getRemotehost()==null) return null;
+		RemoteHost remoteHost = this.actualAPIProxy.getRemotehost();
+		if(remoteHost.getPort()==443 || remoteHost.getPort()==80) {
+			return remoteHost.getName();
+		} else {
+			return remoteHost.getName()+":"+remoteHost.getPort();
+		}
+	}
 
 
 	public TagMap<String, String[]> getTags() {
@@ -208,7 +219,7 @@ public class ExportAPI {
 
 
 	public Map<String, String> getCustomProperties() {
-		if(this.actualAPIProxy.getCustomProperties()!=null && this.actualAPIProxy.getCustomProperties().size()==0) return null;
+		if(this.actualAPIProxy.getCustomProperties()==null || this.actualAPIProxy.getCustomProperties().size()==0) return null;
 		if(this.actualAPIProxy.getCustomProperties().values()==null) return null; // See issue: #90
 		Iterator<String> it = this.actualAPIProxy.getCustomProperties().values().iterator();
 		boolean propertyFound = false;
