@@ -4,5 +4,6 @@
 	"path": "${apiPath}",
 	"state": "unpublished",
 	"version": "1.0.0",
-	"organization": "API Development ${orgNumber}"
+	"organization": "This org is invalid",
+	"clientOrganizations" : [ "This should never be used" ]
 }

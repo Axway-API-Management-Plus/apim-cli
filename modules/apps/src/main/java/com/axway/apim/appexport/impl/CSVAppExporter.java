@@ -23,6 +23,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.lib.APIAccessComparator;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.appexport.lib.ApplicationComparator;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -76,8 +77,8 @@ public class CSVAppExporter extends ApplicationExporter {
 
 	APIManagerAdapter apiManager;
 	
-	public CSVAppExporter(AppExportParams params) throws AppException {
-		super(params);
+	public CSVAppExporter(AppExportParams params, ExportResult result) throws AppException {
+		super(params, result);
 		apiManager = APIManagerAdapter.getInstance();
 	}
 	

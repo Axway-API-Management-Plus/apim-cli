@@ -7,14 +7,15 @@ import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.apis.OrgFilter.Builder;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.organization.lib.OrgExportParams;
 
 public class DeleteOrgHandler extends OrgResultHandler {
 
-	public DeleteOrgHandler(OrgExportParams params) {
-		super(params);
+	public DeleteOrgHandler(OrgExportParams params, ExportResult result) {
+		super(params, result);
 	}
 
 	@Override

@@ -54,7 +54,6 @@ public class JsonAPIExporter extends APIResultHandler {
 				LOG.error("Can't export API: " + e.getMessage() + " Please check in API-Manager UI the API is valid.", e);
 			}
 		}
-		
 	}
 	
 	@Override
@@ -64,7 +63,8 @@ public class JsonAPIExporter extends APIResultHandler {
 				.includeImage(true)
 				.includeClientApplications(true)
 				.includeClientOrganizations(true)
-				.includeOriginalAPIDefinition(true);
+				.includeOriginalAPIDefinition(true)
+				.includeRemoteHost(true);
 		return builder.build();
 	}
 

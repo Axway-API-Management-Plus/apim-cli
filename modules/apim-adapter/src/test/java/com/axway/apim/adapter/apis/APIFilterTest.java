@@ -18,6 +18,8 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.AuthType;
+import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
@@ -92,7 +94,7 @@ public class APIFilterTest {
 	public void filterWithPathOn762() throws IOException, AppException {
 		// For this test, we must simulate API-Manager version >7.7
 		APIManagerAdapter.apiManagerVersion = null;
-		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse("{ \"productVersion\": \"7.6.2 SP4\" }", false);
+		APIManagerAdapter.apiManagerVersion = "7.6.2 SP4";
 		APIFilter filter = new APIFilter.Builder()
 				.hasApiPath("/v1/api")
 				.build();
@@ -287,6 +289,63 @@ public class APIFilterTest {
 		assertTrue(filter.filter(testAPI), "API must match to pattern 'Inbound Security*'");
 	}
 	
+	@Test
+	public void testInboundSecurity() throws AppException {
+		API testAPI = new API();
+		addInboundSecurityPolicy(testAPI, "Inbound Security Policy 1");
+		
+		APIFilter filter = new APIFilter.Builder().hasInboundSecurity("inbound security*").build();
+		assertTrue(filter.filter(testAPI), "API must match to pattern 'Inbound Security*'");
+		
+		filter = new APIFilter.Builder().hasInboundSecurity("*Test-Policy*").build();
+		assertFalse(filter.filter(testAPI), "API must match to pattern 'Inbound Security*'");
+		
+		testAPI = new API();
+		addInboundSecurityToAPI(testAPI, DeviceType.apiKey);
+		
+		filter = new APIFilter.Builder().hasInboundSecurity("apikey").build();
+		assertTrue(filter.filter(testAPI), "API has API-Key secured");
+		filter = new APIFilter.Builder().hasInboundSecurity("api-KEY").build();
+		assertTrue(filter.filter(testAPI), "API has API-Key secured");
+		
+		testAPI = new API();
+		addInboundSecurityToAPI(testAPI, DeviceType.oauthExternal);
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put("tokenStore", "My Token information policy");
+
+		filter = new APIFilter.Builder().hasInboundSecurity("oauth-ext").build();
+		assertTrue(filter.filter(testAPI), "API is OAUth external secured");
+		// Cannot be UNIT-Tested for now, as SecurityDevice.getProperties requires a running API-Manager
+		// Needs to be re-worked to an adapter
+		/*filter = new APIFilter.Builder().hasInboundSecurity("oauth").build();
+		assertFalse(filter.filter(testAPI), "API is not OAuth secured");
+		filter = new APIFilter.Builder().hasInboundSecurity("*TOKEN information*").build();
+		assertTrue(filter.filter(testAPI), "Should match, as the policy i");*/
+	}
+	
+	@Test
+	public void testOutboundSecurity() throws AppException {
+		API testAPI = new API();
+		addOutboundSecurityToAPI(testAPI, AuthType.http_basic);
+		
+		APIFilter filter = new APIFilter.Builder().hasOutboundAuthentication("HTTP-basic").build();
+		assertTrue(filter.filter(testAPI), "API must match as outbound AuthN is HTTP-Basic");
+		
+		testAPI = new API();
+		addOutboundSecurityToAPI(testAPI, AuthType.oauth);
+		
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("providerProfile", "<key type='AuthProfilesGroup'><id field='name' value='Auth Profiles'/><key type='OAuthGroup'><id field='name' value='OAuth2'/><key type='OAuthProviderProfile'><id field='name' value='API Gateway'/><key type='OAuthAppProfile'><id field='name' value='Sample Client Authzcode App'/></key></key></key></key>");
+		testAPI.getAuthenticationProfiles().get(0).setParameters(parameters);
+		filter = new APIFilter.Builder().hasOutboundAuthentication("oauth").build();
+		assertTrue(filter.filter(testAPI), "API must match as outbound AuthN is OAuth");
+		filter = new APIFilter.Builder().hasOutboundAuthentication("Sample*").build();
+		assertTrue(filter.filter(testAPI), "API must match also match based on the selected OAuth-Client App");
+		parameters.put("providerProfile", "Sample Client Authzcode App");
+		filter = new APIFilter.Builder().hasOutboundAuthentication("Sample*").build();
+		assertTrue(filter.filter(testAPI), "API must match also match based on the selected OAuth-Client App");
+	}
+	
 	private API getAPIWithBackendBasepath(String basePath) {
 		API api = new API();
 		ServiceProfile serviceProfile = new ServiceProfile();
@@ -343,6 +402,43 @@ public class APIFilterTest {
 		Map<String, InboundProfile> inboundProfiles = new HashMap<String, InboundProfile>();
 		inboundProfiles.put("_default", inboundProfile);
 		api.setInboundProfiles(inboundProfiles);
+		return api;
+	}
+	
+	private API addInboundSecurityToAPI(API api, DeviceType deviceType) throws AppException {
+		SecurityDevice securityDevice = new SecurityDevice();
+		securityDevice.setType(deviceType);
+		List<SecurityDevice> devices = new ArrayList<SecurityDevice>();
+		devices.add(securityDevice);
+		SecurityProfile securityProfile = new SecurityProfile();
+		securityProfile.setName("_default");
+		securityProfile.setDevices(devices);
+		List<SecurityProfile> securityProfiles = new ArrayList<SecurityProfile>();
+		securityProfiles.add(securityProfile);
+		api.setSecurityProfiles(securityProfiles);
+		
+		InboundProfile inboundProfile = new InboundProfile();
+		inboundProfile.setSecurityProfile("_default");
+		Map<String, InboundProfile> inboundProfiles = new HashMap<String, InboundProfile>();
+		inboundProfiles.put("_default", inboundProfile);
+		api.setInboundProfiles(inboundProfiles);
+		return api;
+	}
+	
+	private API addOutboundSecurityToAPI(API api, AuthType authType) throws AppException {
+		List<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
+		AuthenticationProfile authNProfile = new AuthenticationProfile();
+		authNProfile.setName("_default");
+		authNProfile.setType(authType);
+		authnProfiles.add(authNProfile);
+		
+		Map<String, OutboundProfile> outboundProfiles = new HashMap<String, OutboundProfile>();
+		OutboundProfile outboundProfile = new OutboundProfile();
+		outboundProfile.setAuthenticationProfile("_default");
+		
+		outboundProfiles.put("_default", outboundProfile);
+		api.setAuthenticationProfiles(authnProfiles);
+		api.setOutboundProfiles(outboundProfiles);
 		return api;
 	}
 }

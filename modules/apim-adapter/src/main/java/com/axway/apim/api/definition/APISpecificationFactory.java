@@ -24,21 +24,21 @@ public class APISpecificationFactory {
 	    add(WSDLSpecification.class);
 	}};
 	
-	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String backendBasepath, String apiName) throws AppException {
-		return getAPISpecification(apiSpecificationContent, apiDefinitionFile, backendBasepath, apiName, true);
+	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName) throws AppException {
+		return getAPISpecification(apiSpecificationContent, apiDefinitionFile, apiName, true);
 	}
 	
-	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String backendBasepath, String apiName, boolean failOnError) throws AppException {
+	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName, boolean failOnError) throws AppException {
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("Handle API-Specification: '" + getContentStart(apiSpecificationContent) + "...', apiDefinitionFile: '"+apiDefinitionFile+"'");	
 		}
 		for(Class clazz : specificationTypes) {
 			try {
-	            Class<?>[] argTypes = {byte[].class, String.class};
+	            Class<?>[] argTypes = {byte[].class};
 	            Constructor<?> constructor;
 				
 				constructor = clazz.getDeclaredConstructor(argTypes);
-	            Object[] arguments = {apiSpecificationContent, backendBasepath};
+	            Object[] arguments = {apiSpecificationContent};
 				APISpecification spec = (APISpecification) constructor.newInstance(arguments);
 				spec.setApiSpecificationFile(apiDefinitionFile);
 				if(!spec.configure()) {
@@ -56,7 +56,7 @@ public class APISpecificationFactory {
 		if(!failOnError) {
 			LOG.error("API: '"+apiName+"' has a unkown/invalid API-Specification: '" + getContentStart(apiSpecificationContent) + "'");
 			ErrorState.getInstance().setError("API: '"+apiName+"' has a unkown/invalid API-Specification. Please check the log.", ErrorCode.CANT_READ_API_DEFINITION_FILE, false);
-			return new UnknownAPISpecification(apiSpecificationContent, backendBasepath, apiName);
+			return new UnknownAPISpecification(apiSpecificationContent, apiName);
 		}
 		LOG.error("API: '"+apiName+"' has a unkown/invalid API-Specification: '" + getContentStart(apiSpecificationContent) + "'");
 		throw new AppException("Can't handle API specification. No suiteable API-Specification implementation available.", ErrorCode.CANT_READ_API_DEFINITION_FILE);

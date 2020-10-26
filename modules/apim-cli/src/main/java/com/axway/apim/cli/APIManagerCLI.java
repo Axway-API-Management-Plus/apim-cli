@@ -118,7 +118,7 @@ public class APIManagerCLI {
 			System.out.println("Available commands: ");
 			for(APIMCLIServiceProvider service : this.selectedServiceGroup) {
 				for(Method method : this.methodsMappedByService.get(service)) {
-					System.out.printf("%-20s %s\n", APIM_CLI_CDM + " "+ service.getGroupId() + " " + getMethodName(method), method.getAnnotation(CLIServiceMethod.class).description());
+					System.out.printf("%-24s %s\n", APIM_CLI_CDM + " "+ service.getGroupId() + " " + getMethodName(method), method.getAnnotation(CLIServiceMethod.class).description());
 				}
 			}
 		}

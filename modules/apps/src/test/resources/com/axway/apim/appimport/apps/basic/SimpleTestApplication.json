@@ -1,6 +1,7 @@
 [
 	{
 		"name": "${appName}", 
-		"organization": "${orgName}" 
+		"organization": "${orgName}",
+		"description": "Accès aux API spécifiques" 
 	}
 ]

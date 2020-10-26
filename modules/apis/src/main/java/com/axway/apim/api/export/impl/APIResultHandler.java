@@ -95,6 +95,8 @@ public abstract class APIResultHandler {
 				.hasTag(params.getTag())
 				.hasState(params.getState())
 				.hasBackendBasepath(params.getBackend())
+				.hasInboundSecurity(params.getInboundSecurity())
+				.hasOutboundAuthentication(params.getOutboundAuthentication())
 				.includeCustomProperties(APIManagerAdapter.getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE.api))
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.translatePolicies(POLICY_TRANSLATION.TO_NAME)

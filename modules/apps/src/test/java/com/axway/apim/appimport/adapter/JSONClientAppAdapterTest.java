@@ -21,6 +21,7 @@ import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.OAuth;
+import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 
@@ -38,38 +39,73 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 	public void testSingleAppAsArray() throws AppException {
 		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/SingleClientAppAsArray.json").getPath();
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
-		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
-		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
+		AppImportParams importParams = new AppImportParams();
+		importParams.setConfig(testFile);
+		ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+		List<ClientApplication> apps = adapter.getApplications();
+		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
+	}
+
+	@Test
+	public void testSingleApp() throws AppException {
+		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/OneSingleClientApp.json").getPath();
+		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
+		AppImportParams importParams = new AppImportParams();
+		importParams.setConfig(testFile);
+		
+		ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
 		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
 	}
 	
 	@Test
-	public void testSingleApp() throws AppException {
+	public void testSingleAppWithStage() throws AppException {
 		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/OneSingleClientApp.json").getPath();
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
-		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
-		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
+		AppImportParams importParams = new AppImportParams();
+		importParams.setConfig(testFile);
+		importParams.setStage("test-stage");
+		
+		ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
 		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
+		ClientApplication app = apps.get(0);
+		assertEquals(app.getName(), "Staged Application");
+		
 	}
 	
 	@Test
 	public void testMultipleApps() throws AppException {
 		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/MulitpleTestApplications.json").getPath();
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
-		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
-		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
+		AppImportParams importParams = new AppImportParams();
+		importParams.setConfig(testFile);
+		
+		ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
 		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 2, "Expected 2 app returned from the Adapter");
+	}
+	
+	@Test(expectedExceptions = AppException.class)
+	public void testMultipleAppsWithStage() throws AppException {
+		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/MulitpleTestApplications.json").getPath();
+		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
+		AppImportParams importParams = new AppImportParams();
+		importParams.setConfig(testFile);
+		importParams.setStage("test-stage");
+		
+		ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+		adapter.getApplications();
 	}
 	
 	@Test
 	public void testCompleteApp() throws AppException {
 		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/CompleteApplication.json").getPath();
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
-		ClientAppAdapter adapter = ClientAppAdapter.create(testFile);
-		assertTrue(adapter instanceof JSONConfigClientAppAdapter, "Adapter is not a JSONConfigClientAppAdapter");
+		AppImportParams importParams = new AppImportParams();
+		importParams.setConfig(testFile);
+		ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+
 		List<ClientApplication> apps = adapter.getApplications();
 		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
 		ClientApplication app = apps.get(0);

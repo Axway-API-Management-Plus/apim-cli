@@ -6,18 +6,16 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.appimport.ApplicationImportTestAction;
+import com.axway.apim.appimport.it.ImportAppTestAction;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.lib.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
-import com.consol.citrus.functions.core.RandomNumberFunction;
 
 @Test
-public class ImportAppInvalidAPITestIT extends TestNGCitrusTestRunner {
-
-	private ApplicationImportTestAction appImport = new ApplicationImportTestAction();
+public class ImportAppInvalidAPITestIT extends TestNGCitrusTestRunner implements TestParams {
 	
 	private static String PACKAGE = "/com/axway/apim/appimport/apps/basic/";
 	
@@ -25,14 +23,14 @@ public class ImportAppInvalidAPITestIT extends TestNGCitrusTestRunner {
 	@Test @Parameters("context")
 	public void importApplicationBasicTest(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		description("Trying to import an application that requests access to an unknown API");
+		ImportAppTestAction importApp = new ImportAppTestAction(context);
 		
-		variable("appNumber", RandomNumberFunction.getRandomNumber(4, true));
-		variable("appName", "Complete-App-${appNumber}");
+		variable("appName", "Complete-App-"+importApp.getRandomNum());
 		variable("apiName1", "This-API-is-unkown");
 
 		echo("####### Import application: '${appName}' with access to ONE UNKNOWN API #######");
-		createVariable(ApplicationImportTestAction.CONFIG,  PACKAGE + "AppWithAPIAccess.json");
-		createVariable("expectedReturnCode", "56");
-		appImport.doExecute(context);
+		createVariable(PARAM_CONFIGFILE,  PACKAGE + "AppWithAPIAccess.json");
+		createVariable(PARAM_EXPECTED_RC, "56");
+		importApp.doExecute(context);
 	}
 }

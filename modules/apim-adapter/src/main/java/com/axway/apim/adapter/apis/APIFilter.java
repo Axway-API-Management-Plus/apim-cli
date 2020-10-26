@@ -1,6 +1,7 @@
 package com.axway.apim.adapter.apis;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,8 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.AuthType;
+import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
@@ -25,6 +28,7 @@ import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.Utils.FedKeyType;
 
 public class APIFilter {
 	
@@ -61,6 +65,8 @@ public class APIFilter {
 	private String queryStringVersion;
 	private String state;
 	private String backendBasepath;
+	private String inboundSecurity;
+	private String outboundAuthentication;
 	
 	private String createdOn;
 	private FILTER_OP createdOnOp;
@@ -89,6 +95,7 @@ public class APIFilter {
 	private boolean includeClientApplications = false;
 	private boolean includeClientAppQuota = false;
 	private boolean includeImage = false;
+	private boolean includeRemoteHost = false;
 	
 	private boolean includeOriginalAPIDefinition = false;
 	
@@ -244,6 +251,22 @@ public class APIFilter {
 		this.backendBasepath = backendBasepath;
 	}
 
+	public String getInboundSecurity() {
+		return inboundSecurity;
+	}
+
+	public void setInboundSecurity(String inboundSecurity) {
+		this.inboundSecurity = inboundSecurity;
+	}
+
+	public String getOutboundAuthentication() {
+		return outboundAuthentication;
+	}
+
+	public void setOutboundAuthentication(String outboundAuthentication) {
+		this.outboundAuthentication = outboundAuthentication;
+	}
+
 	public METHOD_TRANSLATION getTranslateMethodMode() {
 		return translateMethodMode;
 	}
@@ -314,6 +337,14 @@ public class APIFilter {
 
 	public void setIncludeImage(boolean includeImage) {
 		this.includeImage = includeImage;
+	}
+	
+	public boolean isIncludeRemoteHost() {
+		return includeRemoteHost;
+	}
+
+	public void setIncludeRemoteHost(boolean includeRemoteHost) {
+		this.includeRemoteHost = includeRemoteHost;
 	}
 
 	public void setApiType(String apiType) {
@@ -434,7 +465,7 @@ public class APIFilter {
 	
 	
 	public boolean filter(API api) throws AppException {
-		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null && this.getBackendBasepath()==null && this.getTag()==null) { // Nothing given to filter out.
+		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null && this.getBackendBasepath()==null && this.getTag()==null && this.getInboundSecurity()==null && this.getOutboundAuthentication()==null) { // Nothing given to filter out.
 			return true;
 		}
 		// Before 7.7, we have to filter out APIs manually!
@@ -450,47 +481,31 @@ public class APIFilter {
 			}
 		}
 		if(this.getPolicyName()!=null) {
-			boolean requestedPolicyUsed = false;
-			Pattern pattern = Pattern.compile(this.getPolicyName().replace("*", ".*"));
-			if(api.getOutboundProfiles()!=null) {
-				Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
-				while(it.hasNext()) {
-					OutboundProfile profile = it.next();
-					for(Policy policy : profile.getAllPolices()) {
-						if(policy.getName()==null) {
-							LOG.warn("Cannot check policy: "+policy+" as policy name is empty.");
-							continue;
-						}
-						Matcher matcher = pattern.matcher(policy.getName());
-						if(matcher.matches()) {
-							requestedPolicyUsed = true;
-							break;
-						}
-					}
-				}
-			}
+			if(!isPolicyUsed(api, this.getPolicyName())) return false;
+		}
+		if(this.getInboundSecurity()!=null) {
+			boolean match = false;
 			if(api.getInboundProfiles()!=null) {
 				Iterator<InboundProfile> it = api.getInboundProfiles().values().iterator();
 				while(it.hasNext()) {
 					InboundProfile profile = it.next();
 					if(profile.getSecurityProfile()!=null) {
 						for(SecurityProfile securityProfile : api.getSecurityProfiles()) {
-							if(securityProfile.getName().equals(profile.getSecurityProfile())) {
-								for(SecurityDevice device : securityProfile.getDevices()) {
-									if(device.getType()!=DeviceType.authPolicy) continue;
-									String securityPolicy = device.getProperties().get("authenticationPolicy");
-									Matcher matcher = pattern.matcher(Utils.getExternalPolicyName(securityPolicy));
-									if(matcher.matches()) {
-										requestedPolicyUsed = true;
-										break;
-									}
+							for(SecurityDevice securityDevice : securityProfile.getDevices()) {
+								List<String> deviceNames = Arrays.asList(securityDevice.getType().getAlternativeNames());
+								if(deviceNames.contains(this.getInboundSecurity().toLowerCase())) {
+									match = true;
+									break;
 								}
 							}
 						}
 					}
 				}
 			}
-			if(!requestedPolicyUsed) return false;
+			if(!match) { // No match found so, check the policy names
+				match = isPolicyUsed(api, this.getInboundSecurity());
+			}
+			if(!match) return false; // Requested security is finally not found, return false
 		}
 		if(this.getBackendBasepath()!=null) {
 			Pattern pattern = Pattern.compile(this.getBackendBasepath().replace("*", ".*"));
@@ -538,9 +553,39 @@ public class APIFilter {
 			// If none of the tags match, filter out this API
 			if(!match) return false;
 		}
+		if(this.getOutboundAuthentication()!=null) {
+			boolean match = false;
+			if(api.getOutboundProfiles()!=null) {
+				Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
+				while(it.hasNext()) {
+					OutboundProfile profile = it.next();
+					if(profile.getAuthenticationProfile()!=null) {
+						for(AuthenticationProfile authnProfile : api.getAuthenticationProfiles()) {
+							if(authnProfile.getName().equals(profile.getAuthenticationProfile())) {
+								List<String> authnNames = Arrays.asList(authnProfile.getType().getAlternativeNames());
+								if(authnNames.contains(this.getOutboundAuthentication().toLowerCase())) {
+									match=true;
+									break;
+								}
+								if(authnProfile.getType()==AuthType.oauth) {
+									String providerProfile = (String)authnProfile.getParameters().get("providerProfile");
+									providerProfile = Utils.getExternalPolicyName(providerProfile, FedKeyType.OAuthAppProfile); 
+									Pattern pattern = Pattern.compile(this.getOutboundAuthentication().toLowerCase().replace("*", ".*"));
+									Matcher matcher = pattern.matcher(providerProfile.toLowerCase());
+									if(matcher.matches()) {
+										match=true;
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			if(!match) return false;
+		}
 		return true;
 	}
-
 
 	/**
 	 * Build an applicationAdapter based on the given configuration
@@ -570,6 +615,8 @@ public class APIFilter {
 		String queryStringVersion;
 		String state;
 		String backendBasepath;
+		String inboundSecurity;
+		String outboundAuthentication;
 		
 		String createdOn;
 		FILTER_OP createdOnOp;
@@ -591,6 +638,7 @@ public class APIFilter {
 		boolean includeClientApplications = false;
 		boolean includeClientAppQuota = false;
 		boolean includeImage = false;
+		boolean includeRemoteHost = false;
 		
 		boolean includeOriginalAPIDefinition = false;
 		
@@ -646,6 +694,7 @@ public class APIFilter {
 			apiFilter.setIncludeOriginalAPIDefinition(this.includeOriginalAPIDefinition);
 			apiFilter.setUseFEAPIDefinition(this.useFEAPIDefinition);
 			apiFilter.setIncludeImage(this.includeImage);
+			apiFilter.setIncludeRemoteHost(this.includeRemoteHost);
 			apiFilter.setLoadBackendAPI(this.loadBackendAPI);
 			apiFilter.setState(this.state);
 			apiFilter.setRetired(this.retired);
@@ -653,6 +702,8 @@ public class APIFilter {
 			apiFilter.setCustomProperties(this.customProperties);
 			apiFilter.setCreatedOn(this.createdOn, this.createdOnOp);
 			apiFilter.setBackendBasepath(this.backendBasepath);
+			apiFilter.setInboundSecurity(this.inboundSecurity);
+			apiFilter.setOutboundAuthentication(this.outboundAuthentication);
 			apiFilter.setFailOnError(this.failOnError);
 			return apiFilter;
 		}
@@ -783,11 +834,15 @@ public class APIFilter {
 		public Builder useFEAPIDefinition(boolean useFEAPIDefinition) {
 			this.useFEAPIDefinition = useFEAPIDefinition;
 			return this;
-		}
-		
+		}	
 		
 		public Builder includeImage(boolean includeImage) {
 			this.includeImage = includeImage;
+			return this;
+		}
+		
+		public Builder includeRemoteHost(boolean includeRemoteHost) {
+			this.includeRemoteHost = includeRemoteHost;
 			return this;
 		}
 		
@@ -811,9 +866,70 @@ public class APIFilter {
 			return this;
 		}
 		
+		public Builder hasOutboundAuthentication(String outboundAuthentication) {
+			this.outboundAuthentication = outboundAuthentication;
+			return this;
+		}
+		
+		public Builder hasInboundSecurity(String inboundSecurity) {
+			this.inboundSecurity = inboundSecurity;
+			return this;
+		}
+		
 		public Builder failOnError(boolean failOnError) {
 			this.failOnError = failOnError;
 			return this;
 		}		
+	}
+	
+	private static boolean isPolicyUsed(API api, String policyName) throws AppException {
+		Pattern pattern = Pattern.compile(policyName.toLowerCase().replace("*", ".*"));
+		if(api.getOutboundProfiles()!=null) {
+			Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
+			while(it.hasNext()) {
+				OutboundProfile profile = it.next();
+				for(Policy policy : profile.getAllPolices()) {
+					if(policy.getName()==null) {
+						LOG.warn("Cannot check policy: "+policy+" as policy name is empty.");
+						continue;
+					}
+					Matcher matcher = pattern.matcher(policy.getName().toLowerCase());
+					if(matcher.matches()) {
+						return true;
+					}
+				}
+			}
+		}
+		if(api.getInboundProfiles()!=null) {
+			Iterator<InboundProfile> it = api.getInboundProfiles().values().iterator();
+			while(it.hasNext()) {
+				InboundProfile profile = it.next();
+				if(profile.getSecurityProfile()!=null) {
+					for(SecurityProfile securityProfile : api.getSecurityProfiles()) {
+						if(securityProfile.getName().equals(profile.getSecurityProfile())) {
+							for(SecurityDevice device : securityProfile.getDevices()) {
+								if(device.getType()==DeviceType.authPolicy) {
+									String securityPolicy = device.getProperties().get("authenticationPolicy");
+									if(securityPolicy==null) return false;
+									Matcher matcher = pattern.matcher(Utils.getExternalPolicyName(securityPolicy).toLowerCase());
+									if(matcher.matches()) {
+										return true;
+									}
+								} else if(device.getType()==DeviceType.oauthExternal) {
+									String tokenInfoPolicy = device.getProperties().get("tokenStore");
+									if(tokenInfoPolicy!=null) {
+										Matcher matcher = pattern.matcher(Utils.getExternalPolicyName(tokenInfoPolicy).toLowerCase());
+										if(matcher.matches()) {
+											return true;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 }

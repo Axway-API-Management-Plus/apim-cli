@@ -1,6 +1,7 @@
 package com.axway.apim.adapter.apis;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,20 +27,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class APIManagerPoliciesAdapter {
 	
 	public enum PolicyType {
-		ROUTING ("routing", "routePolicy"), 
-		REQUEST ("request", "requestPolicy"),
-		RESPONSE ("response", "responsePolicy"),
-		FAULT_HANDLER ("faulthandler", "faultHandlerPolicy"), 
-		UNKNOWN ("unknown", "Unknown");
+		ROUTING ("routing", "routePolicy", "Routing policy"), 
+		REQUEST ("request", "requestPolicy", "Request policy"),
+		RESPONSE ("response", "responsePolicy", "Response policy"),
+		FAULT_HANDLER ("faulthandler", "faultHandlerPolicy", "Fault-Handler"), 
+		GLOBAL_FAULT_HANDLER("faulthandler", "globalFaultHandlerPolicy", "Global Fault-Handler");
 		
 		private final String restAPIKey;
 		private final String jsonKey;
+		private final String niceName;
 		
 		private static Map<String, PolicyType> jsonKeyToTypeMapping = null;
 		
-		private PolicyType(String restAPIKey, String jsonKey) {
+		private PolicyType(String restAPIKey, String jsonKey, String niceName) {
 			this.restAPIKey = restAPIKey;
 			this.jsonKey = jsonKey;
+			this.niceName = niceName;
 		}
 
 		public String getRestAPIKey() {
@@ -48,6 +51,10 @@ public class APIManagerPoliciesAdapter {
 
 		public String getJsonKey() {
 			return jsonKey;
+		}
+		
+		public String getNiceName() {
+			return niceName;
 		}
 		
 		private static void initMapping() {
@@ -73,6 +80,7 @@ public class APIManagerPoliciesAdapter {
 	Map<PolicyType, String> apiManagerResponse = new HashMap<PolicyType, String>();
 	
 	Map<PolicyType, List<Policy>> mappedPolicies = new HashMap<PolicyType, List<Policy>>();
+	List<Policy> allPolicies = new ArrayList<Policy>();
 	
 	private void readPoliciesFromAPIManager(PolicyType type) throws AppException { 
 		if(apiManagerResponse.get(type)!=null) return;
@@ -100,7 +108,11 @@ public class APIManagerPoliciesAdapter {
 		}
 		try {
 			List<Policy> policies = mapper.readValue(apiManagerResponse.get(type), new TypeReference<List<Policy>>(){});
+			for(Policy policy : policies) {
+				policy.setType(type);
+			}
 			mappedPolicies.put(type, policies);
+			allPolicies.addAll(policies);
 		} catch (Exception e) {
 			LOG.error("Error reading configured custom-policies. Can't parse response: " + apiManagerResponse.get(type), e);
 			throw new AppException("Can't initialize policies for type: " + type, ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -133,5 +145,12 @@ public class APIManagerPoliciesAdapter {
 		LOG.error("Available "+type+" policies: " + policies);
 		ErrorState.getInstance().setError("The policy: '" + key + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
 		throw new AppException("The policy: '" + key + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
+	}
+	
+	public List<Policy> getAllPolicies() throws AppException {
+		for(PolicyType type : PolicyType.values()) {
+			initPoliciesType(type);
+		}
+		return allPolicies;
 	}
 }

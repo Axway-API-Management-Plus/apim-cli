@@ -28,7 +28,7 @@ public class EnvironmentProperties implements Map<String, String> {
 		this(stage, null);
 	}
 	
-	public EnvironmentProperties(String stage, String swaggerPromoteHome) throws AppException {
+	public EnvironmentProperties(String stage, String swaggerPromoteHome) {
 		super();
 		this.stage = stage;
 		this.swaggerPromoteHome = swaggerPromoteHome;
@@ -40,7 +40,7 @@ public class EnvironmentProperties implements Map<String, String> {
 		initProperties();
 	}
 	
-	private void initProperties() throws AppException {
+	private void initProperties() {
 		mainProperties = loadProperties(null);
 
 		if(stage!=null && !stage.equals("NOT_SET")) {
