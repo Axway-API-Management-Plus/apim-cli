@@ -15,6 +15,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.jackson.AppExportSerializerModifier;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.appexport.model.ExportApplication;
+import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -27,8 +28,8 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class JsonApplicationExporter extends ApplicationExporter {
 
-	public JsonApplicationExporter(AppExportParams params) {
-		super(params);
+	public JsonApplicationExporter(AppExportParams params, ExportResult result) {
+		super(params, result);
 	}
 
 	@Override
@@ -70,6 +71,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/application-config.json"), app);
+			this.result.addExportedFile(localFolder.getCanonicalPath() + "/application-config.json");
 		} catch (Exception e) {
 			throw new AppException("Can't write Application-Configuration file for application: '"+app.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
 		}

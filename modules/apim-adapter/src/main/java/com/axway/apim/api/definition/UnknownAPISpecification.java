@@ -6,8 +6,8 @@ public class UnknownAPISpecification extends APISpecification {
 	
 	String apiName;
 
-	public UnknownAPISpecification(byte[] apiSpecificationContent, String backendBasepath, String apiName) throws AppException {
-		super(apiSpecificationContent, backendBasepath);
+	public UnknownAPISpecification(byte[] apiSpecificationContent, String apiName) throws AppException {
+		super(apiSpecificationContent);
 		this.apiName = apiName;
 	}
 
@@ -15,7 +15,7 @@ public class UnknownAPISpecification extends APISpecification {
 	}
 
 	@Override
-	protected void configureBasepath() throws AppException {
+	public void configureBasepath(String backendBasepath) throws AppException {
 	}
 
 	@Override

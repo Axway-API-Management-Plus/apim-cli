@@ -3,7 +3,9 @@ package com.axway.apim.api.model;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
@@ -128,15 +130,17 @@ public class Image {
 	
 	public static Image createImageFromFile(File file) throws AppException {
 		Image image = new Image();
+		InputStream is = null;
 		try {
 			image.setBaseFilename(file.getName());
-			InputStream is = Image.class.getClass().getResourceAsStream(file.getCanonicalPath());
+			is = Image.class.getClass().getResourceAsStream(file.getCanonicalPath());
+			URL imageFromClasspath = Image.class.getClass().getResource(file.getCanonicalPath());
 			if(file.exists()) {
-				//LOG.debug("Loading image from: '"+file.getCanonicalFile()+"'");
-				image.setImageContent(IOUtils.toByteArray(new FileInputStream(file)));
+				is = new FileInputStream(file);
+				image.setImageContent(IOUtils.toByteArray(is));
 				return image;
-			} else if(is!=null) {
-				//LOG.debug("Trying to load image from classpath");
+			} else if(imageFromClasspath!=null) {
+				is = new FileInputStream(new File(imageFromClasspath.getFile()));
 				// Try to read it from classpath
 				image.setImageContent(IOUtils.toByteArray(is));
 				return image;
@@ -145,6 +149,10 @@ public class Image {
 			}
 		} catch (Exception e) {
 			throw new AppException("Can't read image-file: "+file+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
+		} finally {
+			try {
+				is.close();
+			} catch (Exception ignore) { }
 		}
 	}
 }

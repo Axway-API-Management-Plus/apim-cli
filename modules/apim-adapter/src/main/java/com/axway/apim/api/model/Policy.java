@@ -2,11 +2,15 @@ package com.axway.apim.api.model;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
+
 public class Policy {
 	
 	String name;
 	
 	String id;
+	
+	PolicyType type;
 
 	public Policy() {
 		
@@ -32,6 +36,14 @@ public class Policy {
 		this.id = id;
 	}
 
+	public PolicyType getType() {
+		return type;
+	}
+
+	public void setType(PolicyType type) {
+		this.type = type;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if(obj == null) return false;
@@ -51,6 +63,6 @@ public class Policy {
 
 	@Override
 	public String toString() {
-		return "Policy [name=" + name + "]";
+		return (name!=null) ? name : "N/A";
 	}
 }

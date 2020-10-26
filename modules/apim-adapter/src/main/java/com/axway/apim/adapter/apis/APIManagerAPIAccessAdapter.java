@@ -10,6 +10,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.ehcache.Cache;
@@ -184,7 +185,7 @@ public class APIManagerAPIAccessAdapter {
 					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiName"}));
 			mapper.setFilterProvider(filter);
 			String json = mapper.writeValueAsString(apiAccess);
-			HttpEntity entity = new StringEntity(json);
+			HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 			RestAPICall request = new POSTRequest(entity, uri, APIManagerAdapter.hasAdminAccount());
 			request.setContentType("application/json");
 			httpResponse = request.execute();

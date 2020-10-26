@@ -1,4 +1,4 @@
-# How to build a Swagger-Promote release package
+# How to build a APIM-CLI release package
 
 With that, Release-Package is created and Swagger-Promote-Core is deployed to Maven-Central.
 
@@ -6,7 +6,7 @@ With that, Release-Package is created and Swagger-Promote-Core is deployed to Ma
 1. When the develop branch is stable and a new release should be created, merge everything from develop into master branch (e.g. using Pull-Request)  
 2. Checkout the master branch  
 3. Open the main project directory  
-`cd C:\workspaces\api-management\apimanager-swagger-promote`
+`cd C:\workspaces\apim-cli`
 4. Validate a clean state on master (no uncommited changes)  
 `git branch -avv`
 6. Prepare the release  
@@ -21,7 +21,7 @@ No need to run the tests, as they have been automatically executed already on Tr
 - Accept or change the proposed version numbers.  
 - The SCM-Release-Tag label should be the version number. E.g. `1.6.2`  
 Use the built Pre-Release from folder:  
-`apimanager-swagger-promote\modules\distribution\target`  
+`apim-cli\modules\distribution\target`  
 to perform some final tests.  
 If you are not happy with the actual build for any reason, you need to rollback the actual release prepare:
 `mvn release:rollback`  
@@ -42,8 +42,8 @@ Copy the generated checksum and insert it into the file: `tools\chocolateyinstal
 `choco pack`  
 Test the installation of this package:  
 `choco install axway-swagger-promote -s .`  
-Execute the Swagger-Promote as shown:  
-`api-import` or `api-export`  
+Execute the CLI as shown:  
+`apim api import` or `apim api get`  
 Finally push the package to Chocolatey:  
 `choco push --api-key <api-key-goes-here> axway-swagger-promote.1.6.2.nupkg`
 Lastly make sure to merge all changes from master branch back into develop  

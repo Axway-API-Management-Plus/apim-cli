@@ -13,6 +13,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.ehcache.Cache;
@@ -118,7 +119,7 @@ public class APIManagerQuotaAdapter {
 		try {
 			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/quotas/"+quotaId).build();
 			
-			entity = new StringEntity(mapper.writeValueAsString(quotaConfig), StandardCharsets.UTF_8);
+			entity = new StringEntity(mapper.writeValueAsString(quotaConfig), ContentType.APPLICATION_JSON);
 			
 			RestAPICall request = new PUTRequest(entity, uri, true);
 			httpResponse = request.execute();

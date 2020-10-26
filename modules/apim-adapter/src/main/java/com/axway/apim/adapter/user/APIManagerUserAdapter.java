@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -194,11 +193,11 @@ public class APIManagerUserAdapter {
 				RestAPICall request;
 				if(actualUser==null) {
 					String json = mapper.writeValueAsString(desiredUser);
-					HttpEntity entity = new StringEntity(json);
+					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new POSTRequest(entity, uri, true);
 				} else {
 					String json = mapper.writeValueAsString(desiredUser);
-					HttpEntity entity = new StringEntity(json);
+					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new PUTRequest(entity, uri, true);
 				}
 				request.setContentType("application/json");

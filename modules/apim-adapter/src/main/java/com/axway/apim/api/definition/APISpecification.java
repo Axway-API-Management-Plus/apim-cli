@@ -55,13 +55,10 @@ public abstract class APISpecification {
 	protected String apiSpecificationFile = null;
 	
 	protected byte[] apiSpecificationContent = null;
-	
-	protected String backendBasepath;
 
-	public APISpecification(byte[] apiSpecificationContent, String backendBasepath) throws AppException {
+	public APISpecification(byte[] apiSpecificationContent) throws AppException {
 		super();
 		this.apiSpecificationContent = apiSpecificationContent;
-		this.backendBasepath = backendBasepath;
 	}
 	
 	public APISpecification() {
@@ -99,7 +96,7 @@ public abstract class APISpecification {
 		}
 	}
 	
-	protected abstract void configureBasepath() throws AppException;
+	public abstract void configureBasepath(String backendBasepath) throws AppException;
 	
 	public abstract APISpecType getAPIDefinitionType() throws AppException;
 	
