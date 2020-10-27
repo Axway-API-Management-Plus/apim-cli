@@ -184,7 +184,7 @@ public class API {
 		this.apiDefinition = apiDefinition;
 	}
 
-	public Map<String, OutboundProfile> getOutboundProfiles() throws AppException {
+	public Map<String, OutboundProfile> getOutboundProfiles() {
 		return this.outboundProfiles;
 	}
 	
@@ -192,7 +192,7 @@ public class API {
 		this.outboundProfiles = outboundProfiles;
 	}
 
-	public List<SecurityProfile> getSecurityProfiles() throws AppException {
+	public List<SecurityProfile> getSecurityProfiles() {
 		return this.securityProfiles;
 	}
 	
@@ -248,7 +248,7 @@ public class API {
 	 * @return the state of the API (unpublished, deprecated, etc.)
 	 * @throws AppException in case of an error
 	 */
-	public String getState() throws AppException {
+	public String getState() {
 		if(this.deprecated!=null 
 				&& this.deprecated.equals("true")) return STATE_DEPRECATED;
 		return this.state;
@@ -299,7 +299,7 @@ public class API {
 		this.organization = organization;
 	}
 
-	public String getPath() throws AppException {
+	public String getPath() {
 		return path;
 	}
 
@@ -417,7 +417,7 @@ public class API {
 		this.serviceProfiles = serviceProfiles;
 	}
 
-	public List<Organization> getClientOrganizations() throws AppException {
+	public List<Organization> getClientOrganizations() {
 		return clientOrganizations;
 	}
 

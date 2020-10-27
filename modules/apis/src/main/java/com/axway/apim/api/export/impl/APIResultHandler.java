@@ -154,12 +154,7 @@ public abstract class APIResultHandler {
 		List<String> routingPolicies = new ArrayList<String>();
 		List<String> responsePolicies = new ArrayList<String>();
 		List<String> faultHandlerPolicies = new ArrayList<String>();
-		try {
-			it = api.getOutboundProfiles().values().iterator();
-		} catch (AppException e) {
-			LOG.error("Error getting policy information for API", e);
-			return result;
-		}
+		it = api.getOutboundProfiles().values().iterator();
 		
 		while(it.hasNext()) {
 			OutboundProfile profile = it.next();

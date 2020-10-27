@@ -212,20 +212,17 @@ public class APIManagerAPIAdapter {
 
 	private List<API> filterAPIs(APIFilter filter) throws AppException, JsonParseException, JsonMappingException, IOException {
 		List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>(){});
-		List<API> foundAPIs = new ArrayList<API>();
-		for(API api : apis) {
-			if(!filter.filter(api)) continue; 
-			foundAPIs.add(api);
-		}
-		if(foundAPIs.size()!=0) {
+		apis.removeIf(api -> filter.filter(api));
+		
+		if(apis.size()!=0) {
 			String dbgCrit = "";
-			if(foundAPIs.size()>1) 
+			if(apis.size()>1) 
 				dbgCrit = " (apiPath: '"+filter.getApiPath()+"', filter: "+filter+", vhost: '"+filter.getVhost()+"', requestedType: "+filter.getApiType()+")";
-			LOG.debug("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
-			return foundAPIs;
+			LOG.debug("Found: "+apis.size()+" exposed API(s)" + dbgCrit);
+			return apis;
 		}
 		LOG.debug("No existing API found based on filter: " + getFilterFields(filter));
-		return foundAPIs;
+		return apis;
 	}
 	
 	/**
