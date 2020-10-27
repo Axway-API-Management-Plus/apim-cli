@@ -7,6 +7,8 @@ public class APIExportParams extends StandardExportParams {
 	
 	private String name;
 	
+	private String organization;
+	
 	private String id;
 	
 	private Boolean useFEAPIDefinition;
@@ -37,6 +39,14 @@ public class APIExportParams extends StandardExportParams {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getOrganization() {
+		return organization;
+	}
+
+	public void setOrganization(String organization) {
+		this.organization = organization;
 	}
 
 	public String getId() {

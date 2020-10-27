@@ -32,6 +32,11 @@ public class APIExportCLIOptions extends StandardExportCLIOptions {
 		option.setArgName("*MyName*");
 		options.addOption(option);
 		
+		option = new Option("org", true, "Filter APIs with the given organization. Wildcards at the beginning/end are supported.");
+		option.setRequired(false);
+		option.setArgName("*MyOrg*");
+		options.addOption(option);
+		
 		option = new  Option("id", true, "Filter the API with that specific ID.");
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-API");
@@ -88,6 +93,7 @@ public class APIExportCLIOptions extends StandardExportCLIOptions {
 		super.addStandardExportParameters(params);
 		params.setApiPath(getValue("a"));
 		params.setName(getValue("n"));
+		params.setOrganization(getValue("org"));
 		params.setId(getValue("id"));
 		params.setPolicy(getValue("policy"));
 		params.setVhost(getValue("vhost"));

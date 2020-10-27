@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added support for API-Manager Config/Alerts/Remote-Hosts (See issue [#68](https://github.com/Axway-API-Management-Plus/apim-cli/issues/68))
 - APIs now updated without Re-Creating them if possible (See issue [#95](https://github.com/Axway-API-Management-Plus/apim-cli/issues/95))
 - Support to manage the full Remote-Host introduced with the API-Manager September/2020 release
+- Capability to filter APIs based on their organization
 
 ### Fixed
 - Avoid NPE during API-Export if custom-properties config is inconsistent (See issue [#90](https://github.com/Axway-API-Management-Plus/apim-cli/issues/90))
