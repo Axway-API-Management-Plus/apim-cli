@@ -1,0 +1,69 @@
+[
+  {
+    "id": "69d89087-7bf7-4e05-916c-9a61a2af0925",
+    "alias": "Host-ABC",
+    "name": "host.abc.com",
+    "port": 8081,
+    "createdOn": 1603792803423,
+    "createdBy": "f60e3e05-cdf3-4b70-affc-4cb61a10f4bb",
+    "organizationId": "d9ea6280-8811-4baf-8b5b-011a97142840",
+    "maxConnections": -1,
+    "allowHTTP11": false,
+    "includeContentLengthRequest": false,
+    "includeContentLengthResponse": false,
+    "offerTLSServerName": false,
+    "verifyServerHostname": true,
+    "connectionTimeout": 30000,
+    "activeTimeout": 30000,
+    "transactionTimeout": 240000,
+    "idleTimeout": 15000,
+    "maxReceiveBytes": 20971520,
+    "maxSendBytes": 20971520,
+    "inputBufferSize": 8192,
+    "outputBufferSize": 8192,
+    "addressCacheTimeout": 300000,
+    "sslSessionCacheSize": 32,
+    "inputEncodings": [
+      ".inherit"
+    ],
+    "outputEncodings": [
+      ".inherit"
+    ],
+    "exportCorrelationId": true,
+    "loadBalancing": "responseTime",
+    "responseTimeDecay": 60000,
+    "addressing": {
+      "highestPriority": [
+        "host123.com",
+        "host456.com"
+      ],
+      "highPriority": [
+        
+      ],
+      "mediumPriority": [
+        
+      ],
+      "lowestPriority": [
+        
+      ]
+    },
+    "watchdog": {
+      "responseCodes": [
+        {
+          "start": 300,
+          "end": 999
+        },
+        {
+          "start": 100,
+          "end": 200
+        }
+      ],
+      "httpRequest": {
+        "method": "OPTIONS",
+        "uri": "*"
+      },
+      "pollTimeout": 60000,
+      "pollIfUp": false
+    }
+  }
+]
