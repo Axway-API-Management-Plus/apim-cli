@@ -28,7 +28,7 @@ public abstract class StandardExportCLIOptions extends CoreCLIOptions {
 		option.setArgName("my/apis");
 		options.addOption(option);
 		
-		option = new Option("o", "output", true, "Controls the output format. By default the console is used.");
+		option = new Option("o", "output", true, "Controls the output format. By default the console is used. CSV is not supported for all entities.");
 		option.setRequired(false);
 		option.setArgName("console|json|csv");
 		options.addOption(option);

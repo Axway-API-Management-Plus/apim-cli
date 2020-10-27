@@ -80,6 +80,12 @@ public class APIImportCLIOptions extends CoreCLIOptions {
 		option = new Option("forceUpdate", "If set, the API is Re-Created even if the Desired- and Actual-State are equal.");
 		option.setRequired(false);
 		options.addOption(option);
+		
+		option = new Option("zeroDowntimeUpdate", "Always update a published APIs by creating a new API and switch clients to it. Defaults to false");
+		option.setRequired(false);
+		internalOptions.addOption(option);
+		
+		
 	}
 
 	@Override
@@ -120,6 +126,7 @@ public class APIImportCLIOptions extends CoreCLIOptions {
 		params.setQuotaMode(Mode.valueOfDefault(getValue("quotaMode")));
 		params.setDetailsExportFile(getValue("detailsExportFile"));
 		params.setValidateRemoteHost(Boolean.parseBoolean(getValue("validateRemoteHost")));
+		params.setZeroDowntimeUpdate(Boolean.parseBoolean(getValue("zeroDowntimeUpdate")));
 		if(getValue("allowOrgAdminsToPublish")!=null) params.setAllowOrgAdminsToPublish(Boolean.parseBoolean(getValue("allowOrgAdminsToPublish")));
 		return params;
 	}
