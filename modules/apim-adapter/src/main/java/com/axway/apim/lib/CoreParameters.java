@@ -387,6 +387,7 @@ public class CoreParameters implements Parameters {
 	
 	
 	public void validateRequiredParameters() throws AppException {
+		if(TestIndicator.getInstance().isTestRunning()) return;
 		boolean parameterMissing = false;
 		if(getUsername()==null && getAdminUsername()==null) {
 			parameterMissing = true;
