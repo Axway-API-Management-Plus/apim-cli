@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Support for special characters like an accent (See issue [#88](https://github.com/Axway-API-Management-Plus/apim-cli/issues/88))
 - Organizations now validated based on given stage (See issue [#58](https://github.com/Axway-API-Management-Plus/apim-cli/issues/58))
 - API-Import is now stopped if host and backendBasepath is missing (See issue [#53](https://github.com/Axway-API-Management-Plus/apim-cli/issues/53))
+- Command-Line option with or without arguments can now be given interchangeable (See issue [#102](https://github.com/Axway-API-Management-Plus/apim-cli/issues/102))
+
+### Changed
+- APIs no longer Re-Created if not needed (See issue [#95](https://github.com/Axway-API-Management-Plus/apim-cli/issues/95))
+- CLI Options parser refactored to be more flexible and support future requirements (See PR [#103](https://github.com/Axway-API-Management-Plus/apim-cli/pull/103))
 
 ## [1.2.3] 2020-09-24
 ### Added
