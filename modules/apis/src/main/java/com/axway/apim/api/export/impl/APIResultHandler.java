@@ -21,7 +21,7 @@ import com.axway.apim.adapter.apis.APIFilter.POLICY_TRANSLATION;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.ExportAPI;
-import com.axway.apim.api.export.lib.APIExportParams;
+import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.Organization;

@@ -4,23 +4,20 @@ import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.lib.utils.SampleCLIOptions;
 
 public class CoreCLIOptionsTest {
 	@Test
 	public void testCoreParameters() throws AppException {
-		CoreParameters params = new CoreParameters();
 		String[] args = {"-h", "api-env", "-u", "apiadmin", "-p", "changeme", "-port", "8888", "-apimCLIHome", "My-home-is-my-castle", "-clearCache", "ALL", "-returnCodeMapping", "10:0", "-rollback", "false", "-force", "-ignoreCache", "-ignoreAdminAccount"};
-		CoreCLIOptions options = new CoreCLIOptions(args) {
-			
-			@Override
-			protected String getAppName() {
-				return "TEST";
-			}
-		};
-		options.addCoreParameters(params);
+		CLIOptions options = SampleCLIOptions.create(args);
+		CoreParameters params = (CoreParameters) options.getParams();
+		
 		Assert.assertEquals(params.getHostname(), "api-env");
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
@@ -36,31 +33,18 @@ public class CoreCLIOptionsTest {
 	
 	@Test
 	public void testOldForceParameter() throws AppException {
-		CoreParameters params = new CoreParameters();
 		String[] args = {"-s", "api-env", "-f", "true"};
-		CoreCLIOptions options = new CoreCLIOptions(args) {
-			
-			@Override
-			protected String getAppName() {
-				return "TEST";
-			}
-		};
-		options.addCoreParameters(params);
+		CLIOptions options = SampleCLIOptions.create(args);
+		CoreParameters params = (CoreParameters) options.getParams();
 		Assert.assertTrue(params.isForce());
 	}
 	
 	@Test
 	public void testStagePropertyFiles() throws ParseException, AppException {
-		CoreParameters params = new CoreParameters();
 		String[] args = {"-s", "yetAnotherStage"};
-		CoreCLIOptions options = new CoreCLIOptions(args) {
-			
-			@Override
-			protected String getAppName() {
-				return "TEST";
-			}
-		};
-		options.addCoreParameters(params);
+		CLIOptions options = SampleCLIOptions.create(args);
+		CoreParameters params = (CoreParameters) options.getParams();
+		
 		Assert.assertEquals(params.getAdminUsername(), "yetanotherUser");
 		Assert.assertEquals(params.getAdminPassword(), "yetanotherPassword");
 		Assert.assertEquals(params.getProperties().get("yetAnotherProperty"), "HellImHere"); // from env.yetAnotherStage.properties
@@ -69,16 +53,10 @@ public class CoreCLIOptionsTest {
 	
 	@Test
 	public void testPropertyFileWithoutStage() throws ParseException, AppException {
-		CoreParameters params = new CoreParameters();
 		String[] args = {};
-		CoreCLIOptions options = new CoreCLIOptions(args) {
-			
-			@Override
-			protected String getAppName() {
-				return "TEST";
-			}
-		};
-		options.addCoreParameters(params);
+		CLIOptions options = SampleCLIOptions.create(args);
+		CoreParameters params = (CoreParameters) options.getParams();
+		
 		Assert.assertEquals(params.getHostname(), "localhost");
 		Assert.assertEquals(params.getProperties().get("myTestVariable"), "resolvedToSomething"); // from env.properties
 	}

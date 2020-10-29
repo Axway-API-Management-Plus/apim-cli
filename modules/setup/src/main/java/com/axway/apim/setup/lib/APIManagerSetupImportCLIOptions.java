@@ -1,23 +1,32 @@
 package com.axway.apim.setup.lib;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.ParseException;
 
+import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class APIManagerSetupImportCLIOptions extends CoreCLIOptions {
+public class APIManagerSetupImportCLIOptions extends CLIOptions {
 
-	CommandLine cmd;
-
-	public APIManagerSetupImportCLIOptions(String[] args) throws ParseException {
+	private APIManagerSetupImportCLIOptions(String[] args) {
 		super(args);
+	}
+	
+	public static CLIOptions create(String[] args) {
+		CLIOptions cliOptions = new APIManagerSetupImportCLIOptions(args);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
+	}
+
+	@Override
+	public void addOptions() {
 		Option option = new Option("c", "config", true, "This is the JSON-Formatted API-Manager configuration. You may get that config file using apim config get with output set to JSON.");
 		option.setRequired(true);
 		option.setArgName("api-manager.json");
-		options.addOption(option);
+		addOption(option);
 	}
 
 	@Override
@@ -38,10 +47,12 @@ public class APIManagerSetupImportCLIOptions extends CoreCLIOptions {
 		return "API-Manager Config-Import";
 	}
 	
+	@Override
 	public StandardImportParams getParams() throws AppException {
 		StandardImportParams params = new StandardImportParams();
-		super.addCoreParameters(params);
 		params.setConfig(getValue("config"));
 		return params;
 	}
+
+
 }

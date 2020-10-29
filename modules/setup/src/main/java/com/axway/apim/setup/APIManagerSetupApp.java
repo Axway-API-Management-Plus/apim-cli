@@ -2,7 +2,6 @@ package com.axway.apim.setup;
 
 import java.util.Iterator;
 
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,13 +56,13 @@ public class APIManagerSetupApp implements APIMCLIServiceProvider {
 	public static int exportConfig(String args[]) {
 		APIManagerSetupExportParams params;
 		try {
-			params = new APIManagerSetupExportCLIOptions(args).getParams();
+			params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		APIManagerSetupApp app = new APIManagerSetupApp();
 		return app.runExport(params).getRc();
@@ -73,13 +72,13 @@ public class APIManagerSetupApp implements APIMCLIServiceProvider {
 	public static int importConfig(String args[]) {
 		StandardImportParams params;
 		try {
-			params = new APIManagerSetupImportCLIOptions(args).getParams();
+			params = (StandardImportParams) APIManagerSetupImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		APIManagerSetupApp managerConfigApp = new APIManagerSetupApp();
 		return managerConfigApp.importConfig(params).getRc();

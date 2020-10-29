@@ -4,6 +4,7 @@ import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -14,8 +15,8 @@ public class RemoteHostExportCLIOptionsTest {
 	@Test
 	public void testRemoteHostExportParams() throws ParseException, AppException {
 		String[] args = {"-s", "mytest", "-n", "*MyHost*", "-id", "MyRemoteHostID", "-t", "myTarget", "-o", "json", "-wide", "-deleteTarget"};
-		RemoteHostsExportCLIOptions options = new RemoteHostsExportCLIOptions(args);
-		RemoteHostsExportParams params = options.getParams();
+		CLIOptions options = RemoteHostsExportCLIOptions.create(args);
+		RemoteHostsExportParams params = (RemoteHostsExportParams) options.getParams();
 		// This make sure staging is working
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
@@ -31,8 +32,8 @@ public class RemoteHostExportCLIOptionsTest {
 	@Test
 	public void testUltra() throws ParseException, AppException {
 		String[] args = {"-s", "mytest", "-ultra"};
-		RemoteHostsExportCLIOptions options = new RemoteHostsExportCLIOptions(args);
-		RemoteHostsExportParams params = options.getParams();
+		CLIOptions options = RemoteHostsExportCLIOptions.create(args);
+		RemoteHostsExportParams params = (RemoteHostsExportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
 		

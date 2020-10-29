@@ -1,9 +1,10 @@
 package com.axway.apim.appexport.lib;
 
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportParams;
 
-public class AppExportParams extends StandardExportParams {
+public class AppExportParams extends StandardExportParams implements Parameters {
 	
 	private String state;
 	private String name;

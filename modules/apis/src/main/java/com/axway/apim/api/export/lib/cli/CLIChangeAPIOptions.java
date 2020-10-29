@@ -1,26 +1,38 @@
-package com.axway.apim.api.export.lib;
+package com.axway.apim.api.export.lib.cli;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.ParseException;
 
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.api.export.lib.params.APIChangeParams;
+import com.axway.apim.lib.CLIOptions;
+import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.Parameters;
 
-public class ChangeAPICLIOptions extends APIExportCLIOptions {
+public class CLIChangeAPIOptions extends CLIOptions {
 
-	CommandLine cmd;
-
-	public ChangeAPICLIOptions(String[] args) throws ParseException {
+	private CLIChangeAPIOptions(String[] args) {
 		super(args);
+	}
+	
+	public static CLIOptions create(String[] args) {
+		CLIOptions cliOptions = new CLIChangeAPIOptions(args);
+		cliOptions = new CLIAPIFilterOptions(cliOptions);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
+	}
+
+	@Override
+	public void addOptions() {
 		Option option = new Option("newBackend", true, "The new backend you would like to change to.");
 		option.setRequired(false);
 		option.setArgName("https://new.server.com:8080/api");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new Option("oldBackend", true, "If given, only APIs matching to this backend will be changed");
 		option.setRequired(false);
 		option.setArgName("https://old.server.com:8080/api");
-		options.addOption(option);
+		addOption(option);
 	}
 
 	@Override
@@ -43,10 +55,10 @@ public class ChangeAPICLIOptions extends APIExportCLIOptions {
 	protected String getAppName() {
 		return "Application-Export";
 	}
-
-	public APIChangeParams getAPIChangeParams() throws AppException {
+	
+	@Override
+	public Parameters getParams() {
 		APIChangeParams params = new APIChangeParams();
-		super.addAPIExportParams(params);
 		params.setNewBackend(getValue("newBackend"));
 		params.setOldBackend(getValue("oldBackend"));
 		return params;

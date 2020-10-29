@@ -16,8 +16,8 @@ import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.APIImportManager;
-import com.axway.apim.apiimport.lib.APIImportCLIOptions;
-import com.axway.apim.apiimport.lib.APIImportParams;
+import com.axway.apim.apiimport.lib.cli.CLIAPIImportOptions;
+import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.apiimport.rollback.RollbackHandler;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
@@ -51,13 +51,14 @@ public class APIImportApp implements APIMCLIServiceProvider {
 	public static int importAPI(String args[]) {
 		APIImportParams params;
 		try {
-			params = new APIImportCLIOptions(args).getAPIImportParams();
+			params = (APIImportParams)CLIAPIImportOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+			
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		APIImportApp apiImportApp = new APIImportApp();
 		return apiImportApp.importAPI(params);

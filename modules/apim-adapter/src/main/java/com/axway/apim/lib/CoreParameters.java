@@ -16,7 +16,7 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.TestIndicator;
 
-public class CoreParameters {
+public class CoreParameters implements Parameters {
 	
 	private static Logger LOG = LoggerFactory.getLogger(CoreParameters.class);
 	
@@ -97,7 +97,9 @@ public class CoreParameters {
 
 	public static synchronized CoreParameters getInstance() {
 		if(CoreParameters.instance == null && TestIndicator.getInstance().isTestRunning()) {
-			return new CoreParameters(); // Skip this, just return an empty CommandParams to avoid NPE
+			try {
+				return new CoreParameters(); // Skip this, just return an empty CommandParams to avoid NPE
+			} catch (Exception ignore) {}
 		}
 		return CoreParameters.instance;
 	}

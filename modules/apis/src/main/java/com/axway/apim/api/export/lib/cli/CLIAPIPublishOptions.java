@@ -1,14 +1,23 @@
-package com.axway.apim.api.export.lib;
+package com.axway.apim.api.export.lib.cli;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.ParseException;
+import com.axway.apim.api.export.lib.params.APIExportParams;
+import com.axway.apim.lib.CLIOptions;
+import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.Parameters;
 
-public class APIPublishCLIOptions extends APIExportCLIOptions {
-
-	CommandLine cmd;
-
-	public APIPublishCLIOptions(String[] args) throws ParseException {
+public class CLIAPIPublishOptions extends CLIOptions {
+	
+	private CLIAPIPublishOptions(String[] args) {
 		super(args);
+	}
+	
+	public static CLIOptions create(String[] args) {
+		CLIOptions cliOptions = new CLIAPIPublishOptions(args);
+		cliOptions = new CLIAPIFilterOptions(cliOptions);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
 	}
 
 	@Override
@@ -32,5 +41,14 @@ public class APIPublishCLIOptions extends APIExportCLIOptions {
 		return "API-Export";
 	}
 
+	@Override
+	public Parameters getParams() {
+		return new APIExportParams();
+	}
 
+	@Override
+	public void addOptions() {
+		return;
+		
+	}
 }

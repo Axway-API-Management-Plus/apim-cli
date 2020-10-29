@@ -4,10 +4,12 @@ import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.axway.apim.api.export.lib.APIChangeParams;
-import com.axway.apim.api.export.lib.APIExportCLIOptions;
-import com.axway.apim.api.export.lib.APIExportParams;
-import com.axway.apim.api.export.lib.ChangeAPICLIOptions;
+import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
+import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
+import com.axway.apim.api.export.lib.cli.CLINewChangeOptions;
+import com.axway.apim.api.export.lib.params.APIChangeParams;
+import com.axway.apim.api.export.lib.params.APIExportParams;
+import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -16,8 +18,8 @@ public class APIExportCLIOptionsTest {
 	@Test
 	public void testAPIExportParams() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-n", "*MyAPIName*", "-id", "412378923", "-policy", "*PolicyName*", "-vhost", "custom.host.com", "-state", "approved", "-backend", "backend.customer.com", "-tag", "*myTag*", "-t", "myTarget", "-o", "csv", "-useFEAPIDefinition", "-wide", "-deleteTarget"};
-		APIExportCLIOptions options = new APIExportCLIOptions(args);
-		APIExportParams params = options.getAPIExportParams();
+		CLIOptions options = CLIAPIExportOptions.create(args);
+		APIExportParams params = (APIExportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
 		Assert.assertEquals(params.getHostname(), "api-env");
@@ -41,8 +43,8 @@ public class APIExportCLIOptionsTest {
 	@Test
 	public void testUltra() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-ultra"};
-		APIExportCLIOptions options = new APIExportCLIOptions(args);
-		APIExportParams params = options.getAPIExportParams();
+		CLIOptions options = CLIAPIExportOptions.create(args);
+		APIExportParams params = (APIExportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
 		Assert.assertEquals(params.getHostname(), "api-env");
@@ -55,8 +57,8 @@ public class APIExportCLIOptionsTest {
 	@Test
 	public void testChangeAPIParameters() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-newBackend", "http://my.new.backend", "-oldBackend", "http://my.old.backend"};
-		ChangeAPICLIOptions options = new ChangeAPICLIOptions(args);
-		APIChangeParams params = options.getAPIChangeParams();
+		CLIOptions options = CLIChangeAPIOptions.create(args);
+		APIChangeParams params = (APIChangeParams) options.getParams();
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
@@ -68,6 +70,30 @@ public class APIExportCLIOptionsTest {
 		Assert.assertEquals(params.getOutputFormat(), OutputFormat.console);
 		
 		// Validate an API-Export parameter is include
+		Assert.assertEquals(params.getApiPath(), "/api/v1/greet");
+		
+		// Validate the change parameters are included
+		Assert.assertEquals(params.getNewBackend(), "http://my.new.backend");
+		Assert.assertEquals(params.getOldBackend(), "http://my.old.backend");
+	}
+	
+	@Test
+	public void testNewAPIParameters() throws ParseException, AppException {
+		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-newBackend", "http://my.new.backend", "-oldBackend", "http://my.old.backend"};
+		CLIOptions cliOptions = CLINewChangeOptions.create(args);
+		APIChangeParams params = (APIChangeParams)cliOptions.getParams();
+		
+		// Validate core parameters are included
+		Assert.assertEquals(params.getUsername(), "apiadmin");
+		Assert.assertEquals(params.getPassword(), "changeme");
+		Assert.assertEquals(params.getHostname(), "api-env");
+		
+		// Validate wide is is using standard as default
+		Assert.assertEquals(params.getWide(), Wide.standard);
+		// Validate the output-format is Console as the default
+		Assert.assertEquals(params.getOutputFormat(), OutputFormat.console);
+		
+		// Validate an API-Filter parameter is included
 		Assert.assertEquals(params.getApiPath(), "/api/v1/greet");
 		
 		// Validate the change parameters are included

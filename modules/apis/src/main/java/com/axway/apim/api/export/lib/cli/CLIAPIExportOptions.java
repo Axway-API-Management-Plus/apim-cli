@@ -1,16 +1,43 @@
-package com.axway.apim.api.export.lib;
+package com.axway.apim.api.export.lib.cli;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.Option;
 
-public class APIExportGetCLIOptions extends APIExportCLIOptions {
+import com.axway.apim.api.export.lib.params.APIExportParams;
+import com.axway.apim.lib.CLIOptions;
+import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.Parameters;
+import com.axway.apim.lib.StandardExportCLIOptions;
 
-	CommandLine cmd;
-
-	public APIExportGetCLIOptions(String[] args) throws ParseException {
+public class CLIAPIExportOptions extends CLIOptions {
+	
+	private CLIAPIExportOptions(String[] args) {
 		super(args);
 	}
+	
+	public static CLIOptions create(String[] args) {
+		CLIOptions cliOptions = new CLIAPIExportOptions(args);
+		cliOptions = new CLIAPIFilterOptions(cliOptions);
+		cliOptions = new StandardExportCLIOptions(cliOptions);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
+	}
+	
+	@Override
+	public Parameters getParams() {
+		APIExportParams params = new APIExportParams();
+		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
+		return params;
+	}
 
+	@Override
+	public void addOptions() {
+		Option option = new Option("useFEAPIDefinition", "If this flag is set, the export API contains the API-Definition (e.g. Swagger) from the FE-API instead of the original imported API.");
+		option.setRequired(false);
+		addOption(option);
+	}
+	
 	@Override
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);

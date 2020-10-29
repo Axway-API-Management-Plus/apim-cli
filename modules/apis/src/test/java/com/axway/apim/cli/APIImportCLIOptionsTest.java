@@ -4,8 +4,9 @@ import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.axway.apim.apiimport.lib.APIImportCLIOptions;
-import com.axway.apim.apiimport.lib.APIImportParams;
+import com.axway.apim.apiimport.lib.cli.CLIAPIImportOptions;
+import com.axway.apim.apiimport.lib.params.APIImportParams;
+import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.CoreParameters.Mode;
@@ -15,8 +16,8 @@ public class APIImportCLIOptionsTest {
 	@Test
 	public void testWithoutAdminUser() throws ParseException, AppException {
 		String[] args = {"-u", "myUser", "-p", "myPassword", "-port", "8175", "-c", "myConfig.json"};
-		APIImportCLIOptions options = new APIImportCLIOptions(args);
-		APIImportParams params = options.getAPIImportParams();
+		CLIOptions options = CLIAPIImportOptions.create(args);
+		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "myUser");        // Taken from cmd directly
 		Assert.assertEquals(params.getPassword(), "myPassword");    // Taken from cmd directly
 		Assert.assertEquals(params.getAdminUsername(), "apiadmin"); // Loaded from env.properties
@@ -27,8 +28,8 @@ public class APIImportCLIOptionsTest {
 	@Test
 	public void testUserDetailsFromStage() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json"};
-		APIImportCLIOptions options = new APIImportCLIOptions(args);
-		APIImportParams params = options.getAPIImportParams();
+		CLIOptions options = CLIAPIImportOptions.create(args);
+		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
 		Assert.assertEquals(params.getHostname(), "api-env");
@@ -37,8 +38,8 @@ public class APIImportCLIOptionsTest {
 	@Test
 	public void testAPIImportParameter() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json", "-clientOrgsMode", "replace", "-clientAppsMode", "replace", "-quotaMode", "replace", "-detailsExportFile", "myExportFile.txt"};
-		APIImportCLIOptions options = new APIImportCLIOptions(args);
-		APIImportParams params = options.getAPIImportParams();
+		CLIOptions options = CLIAPIImportOptions.create(args);
+		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
 		Assert.assertEquals(params.getHostname(), "api-env");
@@ -51,8 +52,8 @@ public class APIImportCLIOptionsTest {
 	@Test
 	public void testToggles() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-allowOrgAdminsToPublish", "false", "-replaceHostInSwagger", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreAdminAccount", "-ignoreQuotas"};
-		APIImportCLIOptions options = new APIImportCLIOptions(args);
-		APIImportParams params = options.getAPIImportParams();
+		CLIOptions options = CLIAPIImportOptions.create(args);
+		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertTrue(params.isForce());
 		Assert.assertTrue(params.isForceUpdate());
 		Assert.assertTrue(params.isIgnoreCache());
@@ -68,9 +69,8 @@ public class APIImportCLIOptionsTest {
 	@Test
 	public void testModeParameterDefaults() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json"};
-		APIImportCLIOptions options = new APIImportCLIOptions(args);
-		APIImportParams params = options.getAPIImportParams();
-		options.addCoreParameters(params);
+		CLIOptions options = CLIAPIImportOptions.create(args);
+		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertFalse(params.isIgnoreClientApps(), "Should be false, as the default is add");
 		Assert.assertFalse(params.isIgnoreClientOrgs(), "Should be false, as the default is add");
 	}
@@ -78,9 +78,8 @@ public class APIImportCLIOptionsTest {
 	@Test
 	public void testAPIDefinitionAsCLIArg() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json", "-a", "thisIsMyAPIDefinition"};
-		APIImportCLIOptions options = new APIImportCLIOptions(args);
-		APIImportParams params = options.getAPIImportParams();
-		options.addCoreParameters(params);
+		CLIOptions options = CLIAPIImportOptions.create(args);
+		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getConfig(), "myConfig.json");
 		Assert.assertEquals(params.getApiDefintion(), "thisIsMyAPIDefinition");
 	}

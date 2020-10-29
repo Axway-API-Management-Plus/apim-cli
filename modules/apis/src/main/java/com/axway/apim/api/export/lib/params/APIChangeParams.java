@@ -1,8 +1,9 @@
-package com.axway.apim.api.export.lib;
+package com.axway.apim.api.export.lib.params;
 
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.Parameters;
 
-public class APIChangeParams extends APIExportParams {
+public class APIChangeParams extends APIExportParams implements Parameters {
 	
 	private String newBackend;
 	
