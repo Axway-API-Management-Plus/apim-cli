@@ -2,7 +2,6 @@ package com.axway.apim.users;
 
 import java.util.List;
 
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,13 +58,13 @@ public class UserApp implements APIMCLIServiceProvider {
 	public static int export(String args[]) {
 		UserExportParams params;
 		try {
-			params = new UserExportCLIOptions(args).getUserExportParams();
+			params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		UserApp app = new UserApp();
 		return app.export(params).getRc();
@@ -136,13 +135,13 @@ public class UserApp implements APIMCLIServiceProvider {
 	public static int importUsers(String[] args) {		
 		UserImportParams params;
 		try {
-			params = new UserImportCLIOptions(args).getUserImportParams();
+			params = (UserImportParams) UserImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		UserApp app = new UserApp();
 		return app.importUsers(params).getRc();
@@ -196,13 +195,13 @@ public class UserApp implements APIMCLIServiceProvider {
 	public static int delete(String args[]) {
 		UserExportParams params;
 		try {
-			params = new UserDeleteCLIOptions(args).getUserExportParams();
+			params = (UserExportParams) UserDeleteCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		UserApp app = new UserApp();
 		return app.delete(params).getRc();

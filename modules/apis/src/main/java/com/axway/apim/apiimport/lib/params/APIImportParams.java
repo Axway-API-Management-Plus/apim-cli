@@ -1,9 +1,10 @@
-package com.axway.apim.apiimport.lib;
+package com.axway.apim.apiimport.lib.params;
 
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardImportParams;
 
-public class APIImportParams extends StandardImportParams {
+public class APIImportParams extends StandardImportParams implements Parameters {
 	
 	private Boolean forceUpdate;
 	private Boolean useFEAPIDefinition;

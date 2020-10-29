@@ -1,9 +1,10 @@
-package com.axway.apim.api.export.lib;
+package com.axway.apim.api.export.lib.params;
 
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportParams;
 
-public class APIExportParams extends StandardExportParams {
+public class APIExportParams extends StandardExportParams implements APIFilterParams, Parameters {
 	
 	private String name;
 	

@@ -1,14 +1,22 @@
 package com.axway.apim.users.lib;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.ParseException;
+import com.axway.apim.lib.CLIOptions;
+import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.Parameters;
+import com.axway.apim.lib.errorHandling.AppException;
 
-public class UserDeleteCLIOptions extends UserExportCLIOptions {
+public class UserDeleteCLIOptions extends CLIOptions {
 
-	CommandLine cmd;
-
-	public UserDeleteCLIOptions(String[] args) throws ParseException {
+	private UserDeleteCLIOptions(String[] args) {
 		super(args);
+	}
+	
+	public static CLIOptions create(String[] args) {
+		CLIOptions cliOptions = new UserDeleteCLIOptions(args);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
 	}
 
 	@Override
@@ -30,5 +38,14 @@ public class UserDeleteCLIOptions extends UserExportCLIOptions {
 		return "Organization-Export";
 	}
 
+	@Override
+	public Parameters getParams() throws AppException {
+		return new UserExportParams();
+	}
 
+	@Override
+	public void addOptions() {
+		// No additional options to add
+		return;
+	}
 }

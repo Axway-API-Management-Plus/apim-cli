@@ -4,6 +4,7 @@ import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -16,8 +17,8 @@ public class UserCLIOptionsTest {
 	@Test
 	public void testAppImportParameters() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-c", "myUserConfig.json"};
-		UserImportCLIOptions options = new UserImportCLIOptions(args);
-		UserImportParams params = options.getUserImportParams();
+		CLIOptions options = UserImportCLIOptions.create(args);
+		UserImportParams params = (UserImportParams) options.getParams();
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
@@ -30,8 +31,8 @@ public class UserCLIOptionsTest {
 	@Test
 	public void testExportApplicationParameters() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-id", "UUID-ID-OF-THE-USER", "-loginName", "*mark24*", "-n", "*Mark*", "-email", "*@axway.com*", "-type", "external", "-org", "*Partner*", "-role", "oadmin", "-state", "pending", "-enabled", "false", "-o", "json"};
-		UserExportCLIOptions options = new UserExportCLIOptions(args);
-		UserExportParams params = options.getUserExportParams();
+		CLIOptions options = UserExportCLIOptions.create(args);
+		UserExportParams params = (UserExportParams) options.getParams();
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
@@ -57,8 +58,8 @@ public class UserCLIOptionsTest {
 	@Test
 	public void testEnabledToggleDefault() throws ParseException, AppException {
 		String[] args = {"-s", "prod"};
-		UserExportCLIOptions options = new UserExportCLIOptions(args);
-		UserExportParams params = options.getUserExportParams();
+		CLIOptions options = UserExportCLIOptions.create(args);
+		UserExportParams params = (UserExportParams) options.getParams();
 		Assert.assertNull(params.isEnabled(), "Should be null, if not given");
 	}
 

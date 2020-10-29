@@ -1,27 +1,38 @@
 package com.axway.apim.setup.remotehosts.lib;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.ParseException;
 
+import com.axway.apim.lib.CLIOptions;
+import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.StandardExportCLIOptions;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class RemoteHostsExportCLIOptions extends StandardExportCLIOptions {
+public class RemoteHostsExportCLIOptions extends CLIOptions {
 
-	CommandLine cmd;
-
-	public RemoteHostsExportCLIOptions(String[] args) throws ParseException {
+	private RemoteHostsExportCLIOptions(String[] args) {
 		super(args);
+	}
+	
+	public static CLIOptions create(String[] args) {
+		CLIOptions cliOptions = new RemoteHostsExportCLIOptions(args);
+		cliOptions = new StandardExportCLIOptions(cliOptions);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
+	}
+
+	@Override
+	public void addOptions() {
 		Option option = new  Option("n", "name", true, "Filter remote hosts based on the name. Wildcards are supported.");
 		option.setRequired(false);
 		option.setArgName("*backendhost.com");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new  Option("id", true, "Filter Remote-Host with that specific ID.");
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-REMOTE-HOST");
-		options.addOption(option);
+		addOption(option);
 	}
 
 	@Override
@@ -46,7 +57,6 @@ public class RemoteHostsExportCLIOptions extends StandardExportCLIOptions {
 	
 	public RemoteHostsExportParams getParams() throws AppException {
 		RemoteHostsExportParams params = new RemoteHostsExportParams();
-		super.addStandardExportParameters(params);
 		params.setName(getValue("name"));
 		params.setId(getValue("id"));
 		return params;

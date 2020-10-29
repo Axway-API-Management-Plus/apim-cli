@@ -1,23 +1,33 @@
 package com.axway.apim.setup.remotehosts.lib;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.ParseException;
 
+import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class RemoteHostsImportCLIOptions extends CoreCLIOptions {
+public class RemoteHostsImportCLIOptions extends CLIOptions {
 
-	CommandLine cmd;
-
-	public RemoteHostsImportCLIOptions(String[] args) throws ParseException {
+	private RemoteHostsImportCLIOptions(String[] args) {
 		super(args);
+	}
+	
+	public static CLIOptions create(String[] args) {
+		CLIOptions cliOptions = new RemoteHostsImportCLIOptions(args);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
+	}
+
+	@Override
+	public void addOptions() {
 		Option option = new Option("c", "config", true, "This is the JSON-Formatted remote host. You may get that config file using apim remotehost get with output set to JSON.");
 		option.setRequired(true);
 		option.setArgName("remote-host.json");
-		options.addOption(option);
+		addOption(option);
 	}
 
 	@Override
@@ -38,9 +48,9 @@ public class RemoteHostsImportCLIOptions extends CoreCLIOptions {
 		return "API-Manager Config-Import";
 	}
 	
-	public StandardImportParams getImportParams() throws AppException {
+	@Override
+	public Parameters getParams() throws AppException {
 		StandardImportParams params = new StandardImportParams();
-		super.addCoreParameters(params);
 		params.setConfig(getValue("config"));
 		return params;
 	}

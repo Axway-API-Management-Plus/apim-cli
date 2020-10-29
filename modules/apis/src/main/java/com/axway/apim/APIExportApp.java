@@ -2,7 +2,6 @@ package com.axway.apim;
 
 import java.util.List;
 
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,12 +10,12 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.impl.APIResultHandler;
 import com.axway.apim.api.export.impl.APIResultHandler.APIListImpl;
-import com.axway.apim.api.export.lib.APIChangeParams;
-import com.axway.apim.api.export.lib.APIDeleteCLIOptions;
-import com.axway.apim.api.export.lib.APIExportGetCLIOptions;
-import com.axway.apim.api.export.lib.APIExportParams;
-import com.axway.apim.api.export.lib.APIUnpublishCLIOptions;
-import com.axway.apim.api.export.lib.ChangeAPICLIOptions;
+import com.axway.apim.api.export.lib.cli.CLIAPIDeleteOptions;
+import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
+import com.axway.apim.api.export.lib.cli.CLIAPIUnpublishOptions;
+import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
+import com.axway.apim.api.export.lib.params.APIChangeParams;
+import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -44,13 +43,13 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int exportAPI(String args[]) {
 		APIExportParams params;
 		try {
-			params = new APIExportGetCLIOptions(args).getAPIExportParams();
+			params = (APIExportParams) CLIAPIExportOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		APIExportApp apiExportApp = new APIExportApp();
 		return apiExportApp.exportAPI(params);
@@ -90,7 +89,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int delete(String args[]) {
 		try {
 			deleteInstances();
-			APIExportParams params = new APIDeleteCLIOptions(args).getAPIExportParams();
+			APIExportParams params = (APIExportParams) CLIAPIDeleteOptions.create(args).getParams();
 			return execute(params, APIListImpl.API_DELETE_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -102,7 +101,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int unpublish(String args[]) {
 		try {
 			deleteInstances();
-			APIExportParams params = new APIUnpublishCLIOptions(args).getAPIExportParams();
+			APIExportParams params = (APIExportParams) CLIAPIUnpublishOptions.create(args).getParams();
 			return execute(params, APIListImpl.API_UNPUBLISH_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -114,7 +113,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int publish(String args[]) {
 		try {
 			deleteInstances();
-			APIExportParams params = new APIUnpublishCLIOptions(args).getAPIExportParams();
+			APIExportParams params = (APIExportParams) CLIAPIUnpublishOptions.create(args).getParams();
 			return execute(params, APIListImpl.API_PUBLISH_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -126,7 +125,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	public static int change(String args[]) {
 		try {
 			deleteInstances();
-			APIChangeParams params = new ChangeAPICLIOptions(args).getAPIChangeParams();
+			APIChangeParams params = (APIChangeParams) CLIChangeAPIOptions.create(args).getParams();
 			return execute(params, APIListImpl.API_CHANGE_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);

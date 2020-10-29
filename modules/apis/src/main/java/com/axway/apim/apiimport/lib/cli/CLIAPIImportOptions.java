@@ -1,19 +1,30 @@
-package com.axway.apim.apiimport.lib;
+package com.axway.apim.apiimport.lib.cli;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.ParseException;
 
+import com.axway.apim.apiimport.lib.params.APIImportParams;
+import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.CoreParameters.Mode;
+import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class APIImportCLIOptions extends CoreCLIOptions {
+public class CLIAPIImportOptions extends CLIOptions {
 
-	CommandLine cmd;
-
-	public APIImportCLIOptions(String[] args) throws ParseException {
+	private CLIAPIImportOptions(String[] args) {
 		super(args);
+	}
+	
+	public static CLIOptions create(String[] args) throws AppException {
+		CLIOptions cliOptions = new CLIAPIImportOptions(args);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
+	}
+
+	@Override
+	public void addOptions() {
 		// Define command line options required for Application export
 		Option option = new Option("a", "apidefinition", true, "(Optional) The API Definition either as Swagger (JSON/YAML) or a WSDL for SOAP-Services:\n"
 				+ "- in local filesystem using a relative or absolute path. Example: swagger_file.json\n"
@@ -26,66 +37,64 @@ public class APIImportCLIOptions extends CoreCLIOptions {
 				+ "  If not specified, the API Definition configuration is read directly from the API-Config file.");
 		option.setRequired(false);
 		option.setArgName("swagger_file.json");
-		options.addOption(option);
+		addOption(option);
 
 		option = new Option("c", "config", true, "This is the JSON-Formatted API-Config containing information how to expose the API. You may get that config file using apim api get with output set to JSON.");
 		option.setRequired(true);
 		option.setArgName("api_config.json");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new Option("ignoreQuotas", "Use this flag to ignore configured API quotas.");
 		option.setRequired(false);
-		options.addOption(option);
+		addOption(option);
 		
 		option = new Option("useFEAPIDefinition", "If this flag is set, the Actual-API contains the API-Definition (e.g. Swagger) from the FE-API instead of the original imported API.");
 		option.setRequired(false);
-		options.addOption(option);
+		addOption(option);
 		
 		option = new Option("clientOrgsMode", true, "Controls how configured Client-Organizations are treated. Defaults to add!");
 		option.setArgName("ignore|replace|add");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new Option("clientAppsMode", true, "Controls how configured Client-Applications are treated. Defaults to add!");
 		option.setArgName("ignore|replace|add");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new Option("quotaMode", true, "Controls how quotas are managed in API-Manager. Defaults to add!");
 		option.setArgName("ignore|replace|add");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new Option("allowOrgAdminsToPublish", true, "If set to false, OrgAdmins cannot replicate an API with desired state published. Defaults to true.");
 		option.setRequired(false);
 		option.setArgName("false");
-		internalOptions.addOption(option);
+		addInternalOption(option);
 		
 		option = new Option("replaceHostInSwagger", true, "Controls if you want to replace the host in your Swagger-File ");
 		option.setRequired(false);
 		option.setArgName("true");
-		internalOptions.addOption(option);
+		addInternalOption(option);
 		
 		option = new Option("validateRemoteHost", true, "Disables the remote host validation which is turned on by default if a remote host is given");
 		option.setRequired(false);
 		option.setArgName("false");
-		internalOptions.addOption(option);
+		addInternalOption(option);
 		
 		option = new Option("changeOrganization", "Set this flag to allow to change the organization of an existing API.");
 		option.setRequired(false);
-		internalOptions.addOption(option);
+		addInternalOption(option);
 		
 		option = new Option("detailsExportFile", true, "Configure a filename, to get a Key=Value file containing information about the created API.");
 		option.setRequired(false);
 		option.setArgName("APIDetails.properties");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new Option("forceUpdate", "If set, the API is Re-Created even if the Desired- and Actual-State are equal.");
 		option.setRequired(false);
-		options.addOption(option);
+		addOption(option);
 		
 		option = new Option("zeroDowntimeUpdate", "Always update a published APIs by creating a new API and switch clients to it. Defaults to false");
 		option.setRequired(false);
-		internalOptions.addOption(option);
-		
-		
+		addInternalOption(option);
 	}
 
 	@Override
@@ -111,9 +120,9 @@ public class APIImportCLIOptions extends CoreCLIOptions {
 		return "API-Import";
 	}
 	
-	public APIImportParams getAPIImportParams() throws AppException {
+	@Override
+	public Parameters getParams() {
 		APIImportParams params = new APIImportParams();
-		super.addCoreParameters(params);
 		params.setConfig(getValue("config"));
 		params.setApiDefintion(getValue("apidefinition"));
 		params.setForceUpdate(hasOption("forceUpdate"));

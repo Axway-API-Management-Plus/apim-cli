@@ -1,62 +1,74 @@
 package com.axway.apim.users.lib;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.ParseException;
 
+import com.axway.apim.lib.CLIOptions;
+import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportCLIOptions;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class UserExportCLIOptions extends StandardExportCLIOptions {
+public class UserExportCLIOptions extends CLIOptions {
 
-	CommandLine cmd;
-
-	public UserExportCLIOptions(String[] args) throws ParseException {
+	private UserExportCLIOptions(String[] args) {
 		super(args);
+	}
+	
+	public static CLIOptions create(String[] args) {
+		CLIOptions cliOptions = new UserExportCLIOptions(args);
+		cliOptions = new StandardExportCLIOptions(cliOptions);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
+	}
+
+	@Override
+	public void addOptions() {
 		Option option = new  Option("loginName", true, "Filter users with the specified login-name. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*mark24*");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new  Option("n", "name", true, "Filter users with the specified name. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*Mark*");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new  Option("email", true, "Filter users with the specified Email-Address. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*@axway.com*");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new  Option("type", true, "Filter users with specific type. External users are managed in external system such as LDAP");
 		option.setRequired(false);
 		option.setArgName("internal|external");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new  Option("org", true, "Filter users belonging to specified organization. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*Partner*");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new  Option("role", true, "Filter users with the given role. ");
 		option.setRequired(false);
 		option.setArgName("user|oadmin|admin");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new  Option("state", true, "Filter users with the given state. ");
 		option.setRequired(false);
 		option.setArgName("approved|pending");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new  Option("enabled", true, "Filter users based on the enablement flag. By default enabled users are include by default.");
 		option.setRequired(false);
 		option.setArgName("true|false");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new  Option("id", true, "Filter users with that specific ID.");
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-USER");
-		options.addOption(option);
+		addOption(option);
 	}
 
 	@Override
@@ -84,9 +96,10 @@ public class UserExportCLIOptions extends StandardExportCLIOptions {
 		return "Application-Export";
 	}
 	
-	public UserExportParams getUserExportParams() throws AppException {
+	@Override
+	public Parameters getParams() throws AppException {
 		UserExportParams params = new UserExportParams();
-		super.addStandardExportParameters(params);
+
 		params.setId(getValue("id"));
 		params.setLoginName(getValue("loginName"));
 		params.setName(getValue("name"));
