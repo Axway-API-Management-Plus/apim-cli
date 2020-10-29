@@ -10,10 +10,12 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.impl.APIResultHandler;
 import com.axway.apim.api.export.impl.APIResultHandler.APIListImpl;
+import com.axway.apim.api.export.lib.cli.CLIAPIApproveOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIDeleteOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIUnpublishOptions;
 import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
+import com.axway.apim.api.export.lib.params.APIApproveParams;
 import com.axway.apim.api.export.lib.params.APIChangeParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
@@ -35,7 +37,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	private static ErrorState errorState = ErrorState.getInstance();
 
 	public static void main(String args[]) { 
-		int rc = exportAPI(args);
+		int rc = approve(args);
 		System.exit(rc);
 	}
 	
@@ -133,6 +135,20 @@ public class APIExportApp implements APIMCLIServiceProvider {
 		}
 	}
 	
+	@CLIServiceMethod(name = "approve", description = "Approves selected APIs that are in pending state")
+	public static int approve(String args[]) {
+		try {
+			deleteInstances();
+			
+			APIApproveParams params = (APIApproveParams) CLIAPIApproveOptions.create(args).getParams();
+			
+			return execute(params, APIListImpl.API_APPROVE_HANDLER);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
+	}
+	
 	private static int execute(APIExportParams params, APIListImpl resultHandlerImpl) {
 		try {
 
@@ -146,7 +162,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				if(LOG.isDebugEnabled()) {
 					LOG.info("No APIs found using filter: " + filter);
 				} else {
-					LOG.info("No APIs found based on the given criteria.");
+					LOG.info("No APIs found based on the given filters.");
 				}
 			} else {
 				LOG.info(apis.size() + " API(s) selected.");

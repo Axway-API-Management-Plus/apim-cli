@@ -402,7 +402,7 @@ public class CoreParameters implements Parameters {
 		}
 		if(parameterMissing) {
 			LOG.error("Missing required parameters. Use either Command-Line-Options or Environment.Properties to provided required parameters.");
-			LOG.error("Get help with option -h");
+			LOG.error("Get help with option -help");
 			LOG.error("");
 			ErrorState.getInstance().setError("Missing required parameters.", ErrorCode.MISSING_PARAMETER, false);
 			throw new AppException("Missing required parameters.", ErrorCode.MISSING_PARAMETER);

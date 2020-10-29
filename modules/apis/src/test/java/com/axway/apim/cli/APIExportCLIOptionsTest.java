@@ -4,9 +4,11 @@ import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.axway.apim.api.export.lib.cli.CLIAPIApproveOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
 import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
 import com.axway.apim.api.export.lib.cli.CLINewChangeOptions;
+import com.axway.apim.api.export.lib.params.APIApproveParams;
 import com.axway.apim.api.export.lib.params.APIChangeParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.CLIOptions;
@@ -69,7 +71,7 @@ public class APIExportCLIOptionsTest {
 		// Validate the output-format is Console as the default
 		Assert.assertEquals(params.getOutputFormat(), OutputFormat.console);
 		
-		// Validate an API-Export parameter is include
+		// Validate an API-Filter parameters are included
 		Assert.assertEquals(params.getApiPath(), "/api/v1/greet");
 		
 		// Validate the change parameters are included
@@ -78,26 +80,19 @@ public class APIExportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testNewAPIParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-newBackend", "http://my.new.backend", "-oldBackend", "http://my.old.backend"};
-		CLIOptions cliOptions = CLINewChangeOptions.create(args);
-		APIChangeParams params = (APIChangeParams)cliOptions.getParams();
+	public void testApproveAPIParameters() throws ParseException, AppException {
+		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-publishVHost", "my.api-host.com"};
+		CLIOptions cliOptions = CLIAPIApproveOptions.create(args);
+		APIApproveParams params = (APIApproveParams)cliOptions.getParams();
 		
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
 		Assert.assertEquals(params.getHostname(), "api-env");
 		
-		// Validate wide is is using standard as default
-		Assert.assertEquals(params.getWide(), Wide.standard);
-		// Validate the output-format is Console as the default
-		Assert.assertEquals(params.getOutputFormat(), OutputFormat.console);
-		
-		// Validate an API-Filter parameter is included
+		// Validate an API-Filter parameters are included
 		Assert.assertEquals(params.getApiPath(), "/api/v1/greet");
 		
-		// Validate the change parameters are included
-		Assert.assertEquals(params.getNewBackend(), "http://my.new.backend");
-		Assert.assertEquals(params.getOldBackend(), "http://my.old.backend");
+		Assert.assertEquals(params.getPublishVhost(), "my.api-host.com");
 	}
 }

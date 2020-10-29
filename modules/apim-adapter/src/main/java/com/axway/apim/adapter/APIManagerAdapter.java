@@ -167,6 +167,7 @@ public class APIManagerAdapter {
 	private APIManagerAdapter() throws AppException {
 		super();
 		this.cmd = CoreParameters.getInstance();
+		cmd.validateRequiredParameters();
 		this.configAdapter = new APIManagerConfigAdapter();
 		this.alertsAdapter = new APIManagerAlertsAdapter();
 		this.remoteHostsAdapter = new APIManagerRemoteHostsAdapter();

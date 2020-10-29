@@ -131,6 +131,7 @@ public class CoreCLIOptions extends CLIOptions {
 	@Override
 	public void parse() {
 		cliOptions.parse();
+		
 	}
 
 	@Override

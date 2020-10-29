@@ -47,7 +47,8 @@ public abstract class APIResultHandler {
 		API_DELETE_HANDLER(DeleteAPIHandler.class),
 		API_PUBLISH_HANDLER(PublishAPIHandler.class),
 		API_UNPUBLISH_HANDLER(UnpublishAPIHandler.class), 
-		API_CHANGE_HANDLER(APIChangeHandler.class);
+		API_CHANGE_HANDLER(APIChangeHandler.class),
+		API_APPROVE_HANDLER(ApproveAPIHandler.class);
 		
 		private final Class<APIResultHandler> implClass;
 		
@@ -73,7 +74,7 @@ public abstract class APIResultHandler {
 			APIResultHandler exporter = constructor.newInstance(intArgs);
 			return exporter;
 		} catch (Exception e) {
-			throw new AppException("Error initializing application exporter", ErrorCode.UNXPECTED_ERROR, e);
+			throw new AppException("Error initializing API export handler", ErrorCode.UNXPECTED_ERROR, e);
 		}
 	}
 	

@@ -607,7 +607,7 @@ public class APIManagerAPIAdapter {
 				LOG.error("Error deleting API-Proxy. Response-Code: "+statusCode + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
 				throw new AppException("Error deleting API-Proxy. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
-			LOG.info("API: " + api.getName() + " successfully deleted");
+			LOG.info("API: "+api.getName()+" "+api.getVersion()+" ("+api.getId()+")" + " successfully deleted");
 		} catch (Exception e) {
 			throw new AppException("Cannot delete API-Proxy.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
@@ -642,6 +642,13 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
+	public void publishAPI(API api, String vhost) throws AppException {
+		if(API.STATE_PUBLISHED.equals(api.getState())) {
+			LOG.info("API is already published");
+			return;
+		}
+		updateAPIStatus(api, API.STATE_PUBLISHED, vhost);
+	}
 	
 	public void updateAPIStatus(API api, String desiredState, String vhost) throws AppException {
 		LOG.debug("Update API-Proxy status to: " + api.getState());
@@ -652,7 +659,7 @@ public class APIManagerAPIAdapter {
 		uri = new URIBuilder(cmd.getAPIManagerURL())
 				.setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/"+StatusEndpoint.valueOf(desiredState).endpoint)
 				.build();
-			if(vhost!=null && api.getState().equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
+			if(vhost!=null && desiredState.equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
 				HttpEntity entity = new StringEntity("vhost="+vhost, ContentType.APPLICATION_JSON);
 				request = new POSTRequest(entity, uri, useAdminAccountForPublish());
 			} else {
@@ -664,7 +671,7 @@ public class APIManagerAPIAdapter {
 			if(statusCode != 201){
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				if(statusCode == 403 &&  response.contains("API is already unpublished")) {
-					LOG.warn("API: "+api.getName()+" ("+api.getId()+") is already unpublished");
+					LOG.warn("API: "+api.getName()+" "+api.getVersion()+" ("+api.getId()+") is already unpublished");
 					return;
 				}
 				LOG.error("Error updating API status. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
