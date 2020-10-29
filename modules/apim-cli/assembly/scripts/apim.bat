@@ -16,10 +16,15 @@ IF DEFINED JAVA_HOME IF EXIST "%JAVA_HOME%\bin\java.exe" (
 )
 
 SET currentDir=%cd%
-SET programDir=%~dp0
+
+IF DEFINED AXWAY_APIM_CLI_HOME (
+	SET programDir=%AXWAY_APIM_CLI_HOME%\
+) ELSE (
+	SET programDir=%~dp0..
+)
 SET bkpClassPath=%CLASSPATH%
 
-CD "%programDir%\.."
+CD "%programDir%"
 SET CLASSPATH="%programDir%..\lib";"%programDir%..\conf"
 
 FOR /R ./lib %%a in (*.jar) DO CALL :AddToPath "%%a"
