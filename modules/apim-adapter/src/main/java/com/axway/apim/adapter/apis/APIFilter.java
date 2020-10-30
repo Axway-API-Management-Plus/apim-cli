@@ -20,6 +20,7 @@ import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
+import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
@@ -78,7 +79,7 @@ public class APIFilter {
 	
 	private String tag;
 	
-	private Map<String, String> customProperties;
+	private Map<String, CustomProperty> customProperties;
 	
 	private boolean deprecated;
 	private boolean retired;
@@ -413,11 +414,11 @@ public class APIFilter {
 		return createdOnOp;
 	}
 
-	public Map<String, String> getCustomProperties() {
+	public Map<String, CustomProperty> getCustomProperties() {
 		return customProperties;
 	}
 
-	public void setCustomProperties(Map<String, String> customProperties) {
+	public void setCustomProperties(Map<String, CustomProperty> customProperties) {
 		this.customProperties = customProperties;
 	}
 
@@ -649,7 +650,7 @@ public class APIFilter {
 		
 		APIType apiType;
 		
-		Map<String, String> customProperties;
+		Map<String, CustomProperty> customProperties;
 		
 		boolean deprecated;
 		boolean retired;
@@ -873,7 +874,7 @@ public class APIFilter {
 			return this;
 		}
 		
-		public Builder includeCustomProperties(Map<String, String> customProperties) {
+		public Builder includeCustomProperties(Map<String, CustomProperty> customProperties) {
 			this.customProperties = customProperties;
 			return this;
 		}

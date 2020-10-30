@@ -51,6 +51,7 @@ import com.axway.apim.api.definition.APISpecificationFactory;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
+import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
@@ -416,25 +417,36 @@ public class APIManagerAPIAdapter {
 	}
 	
 	private void addCustomProperties(List<API> apis, APIFilter filter) throws IOException {
+		// Custom-Properties will be added depending on the given Properties in the filter
 		if(filter.getCustomProperties() == null) {
 			return;
 		}
-		Map<String, String> customProperties = new LinkedHashMap<String, String>();
-		Iterator<String> it = filter.getCustomProperties().keySet().iterator();
 		Map<String, JsonNode> apiAsJsonMappedWithId = new HashMap<String, JsonNode>();
 		JsonNode jsonPayload = mapper.readTree(this.apiManagerResponse.get(filter));
-		// Create a map for each API containing the JSON-Payload
+		// Create a map based on the API-ID containing the original JSON-Payload received from API-Manager
 		for(JsonNode node : jsonPayload) {
 			String apiId = node.get("id").asText();
 			apiAsJsonMappedWithId.put(apiId, node);
 		}
+		Map<String, CustomProperty> customProperties = new LinkedHashMap<String, CustomProperty>();
+		// Iterate over all APIs not yet having the custom-properties serialized
 		for(API api : apis) {
+			// Get the original JSON-Payload for the current API
 			JsonNode node = apiAsJsonMappedWithId.get(api.getId());
+			// Iteralte over all custom-properties that should be returned based on the key
+			Iterator<String> it = filter.getCustomProperties().keySet().iterator();
 			while(it.hasNext()) {
+				// Get the custom property key
 				String customPropKey = it.next();
+				// Get the value for that custom property from the JSON-Payload
 				JsonNode value = node.get(customPropKey);
-				String customPropValue = (value == null) ? null : value.asText();
-				customProperties.put(customPropKey, customPropValue);
+				// If there is a value found ...
+				if(value == null) continue;// ? null : value.asText();
+				// Create a Custom-Property
+				CustomProperty prop = filter.getCustomProperties().get(customPropKey);
+				prop.setValue(value.asText());
+				// Add it to the map of custom properties that will be attached to the API
+				customProperties.put(customPropKey, prop);
 			}
 			api.setCustomProperties((customProperties.size()==0) ? null : customProperties);
 		}

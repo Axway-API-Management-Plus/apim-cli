@@ -1,6 +1,7 @@
 package com.axway.apim.api.export;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -14,6 +15,7 @@ import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
+import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.InboundProfile;
@@ -220,18 +222,15 @@ public class ExportAPI {
 
 	public Map<String, String> getCustomProperties() {
 		if(this.actualAPIProxy.getCustomProperties()==null || this.actualAPIProxy.getCustomProperties().size()==0) return null;
-		if(this.actualAPIProxy.getCustomProperties().values()==null) return null; // See issue: #90
-		Iterator<String> it = this.actualAPIProxy.getCustomProperties().values().iterator();
-		boolean propertyFound = false;
+		Iterator<String> it = this.actualAPIProxy.getCustomProperties().keySet().iterator();
+		Map<String, String> customProps = new HashMap<String,String>();
 		while(it.hasNext()) {
-			String propValue = it.next();
-			if(propValue!=null) {
-				propertyFound = true;
-				break;
-			}
+			String customPropKey = it.next();
+			CustomProperty prop = this.actualAPIProxy.getCustomProperties().get(customPropKey);
+			if(prop.getValue()==null) continue;
+			customProps.put(customPropKey, prop.getValue());
 		}
-		if(!propertyFound) return null; // If no property is declared for this API return null
-		return this.actualAPIProxy.getCustomProperties();
+		return customProps;
 	}
 
 

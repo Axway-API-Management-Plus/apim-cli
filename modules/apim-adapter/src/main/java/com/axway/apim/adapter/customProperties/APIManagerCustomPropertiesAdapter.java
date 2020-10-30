@@ -1,0 +1,81 @@
+package com.axway.apim.adapter.customProperties;
+
+import java.io.IOException;
+import java.net.URI;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.model.CustomProperties;
+import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.rest.GETRequest;
+import com.axway.apim.lib.utils.rest.RestAPICall;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class APIManagerCustomPropertiesAdapter {
+	
+	private static Logger LOG = LoggerFactory.getLogger(APIManagerCustomPropertiesAdapter.class);
+	
+	ObjectMapper mapper = APIManagerAdapter.mapper;
+	
+	CoreParameters cmd = CoreParameters.getInstance();
+
+	public APIManagerCustomPropertiesAdapter() {}
+	
+	String apiManagerResponse;
+	
+	CustomProperties customProperties;
+	
+	private void readCustomPropertiesFromAPIManager() throws AppException {
+		if(apiManagerResponse != null) return;
+		URI uri;
+		HttpResponse httpResponse = null;
+		try {			
+			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config/customproperties").build();
+			RestAPICall getRequest = new GETRequest(uri);
+			httpResponse = getRequest.execute();
+			String response = EntityUtils.toString(httpResponse.getEntity());
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode < 200 || statusCode > 299){
+				LOG.error("Error loading custom-properties from API-Manager. Response-Code: "+statusCode+". Got response: '"+response+"'");
+				throw new AppException("Error loading custom-properties from API-Manager. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
+			apiManagerResponse = response;
+		} catch (Exception e) {
+			LOG.error("Error cant read configuration from API-Manager. Can't parse response: " + httpResponse, e);
+			throw new AppException("Can't read configuration from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		} finally {
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
+		}
+	}
+	
+	public CustomProperties getCustomProperties() throws AppException {
+		if(customProperties!=null) return customProperties;
+		readCustomPropertiesFromAPIManager();
+		try {
+			CustomProperties props = mapper.readValue(apiManagerResponse, CustomProperties.class);
+			customProperties = props;
+			return props;
+		} catch (IOException e) {
+			throw new AppException("Error parsing API-Manager custom properties", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
+	void setAPIManagerTestResponse(String jsonResponse) {
+		if(jsonResponse==null) {
+			LOG.error("Test-Response is empty. Ignoring!");
+			return;
+		}
+		this.apiManagerResponse = jsonResponse;
+	}
+}

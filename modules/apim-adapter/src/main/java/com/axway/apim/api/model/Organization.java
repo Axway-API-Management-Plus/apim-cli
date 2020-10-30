@@ -1,5 +1,7 @@
 package com.axway.apim.api.model;
 
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
@@ -40,6 +42,8 @@ public class Organization extends AbstractEntity {
 	private String trialDuration;
 	
 	private String isTrial;
+
+	private Map<String, String> customProperties = null;
 	
 	public Organization() {
 		super();
@@ -162,6 +166,14 @@ public class Organization extends AbstractEntity {
 		this.isTrial = isTrial;
 	}
 	
+	public Map<String, String> getCustomProperties() {
+		return customProperties;
+	}
+
+	public void setCustomProperties(Map<String, String> customProperties) {
+		this.customProperties = customProperties;
+	}
+	
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
@@ -180,7 +192,8 @@ public class Organization extends AbstractEntity {
 					StringUtils.equals(otherOrg.getEmail(), this.getEmail()) && 
 					StringUtils.equals(otherOrg.getDescription(), this.getDescription()) &&
 					StringUtils.equals(otherOrg.getPhone(), this.getPhone()) &&
-					(otherOrg.getImage()==null || otherOrg.getImage().equals(this.getImage()))
+					(otherOrg.getImage()==null || otherOrg.getImage().equals(this.getImage())) &&
+					(otherOrg.getCustomProperties()==null || otherOrg.getCustomProperties().equals(this.getCustomProperties()))
 					;
 		}
 		return false;

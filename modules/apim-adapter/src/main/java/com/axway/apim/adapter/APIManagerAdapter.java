@@ -8,10 +8,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -44,6 +42,8 @@ import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter;
 import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
 import com.axway.apim.adapter.apis.APIManagerRemoteHostsAdapter;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
+import com.axway.apim.adapter.customProperties.APIManager762CustomPropertiesAdapter;
+import com.axway.apim.adapter.customProperties.APIManagerCustomPropertiesAdapter;
 import com.axway.apim.adapter.user.APIManagerUserAdapter;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
@@ -60,7 +60,6 @@ import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -111,6 +110,7 @@ public class APIManagerAdapter {
 	private static CacheManager cacheManager;
 	
 	public APIManagerConfigAdapter configAdapter;
+	public APIManagerCustomPropertiesAdapter customPropertiesAdapter;
 	public APIManagerAlertsAdapter alertsAdapter;
 	public APIManagerRemoteHostsAdapter remoteHostsAdapter;
 	public APIManagerAPIAdapter apiAdapter;
@@ -168,7 +168,13 @@ public class APIManagerAdapter {
 		super();
 		this.cmd = CoreParameters.getInstance();
 		cmd.validateRequiredParameters();
+		loginToAPIManager(false); // Login with the provided user (might be an Org-Admin)
+		loginToAPIManager(true); // Second, login if needed with an admin account
+		
+		
 		this.configAdapter = new APIManagerConfigAdapter();
+		// For now this okay, may be replaced with a Factory later
+		this.customPropertiesAdapter = (hasAPIManagerVersion("7.7")) ? new APIManagerCustomPropertiesAdapter() : new APIManager762CustomPropertiesAdapter();
 		this.alertsAdapter = new APIManagerAlertsAdapter();
 		this.remoteHostsAdapter = new APIManagerRemoteHostsAdapter();
 		this.apiAdapter = new APIManagerAPIAdapter();
@@ -184,9 +190,6 @@ public class APIManagerAdapter {
 			this.hasAdminAccount = true; // For unit tests we have an admin account
 			return; // No need to initialize just for Unit-Tests
 		}
-		
-		loginToAPIManager(false); // Login with the provided user (might be an Org-Admin)
-		loginToAPIManager(true); // Second, login if needed with an admin account
 	}
 	
 	public void loginToAPIManager(boolean useAdminClient) throws AppException {
@@ -545,67 +548,6 @@ public class APIManagerAdapter {
 		}
 		APIManagerAdapter.apiManagerName = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getPortalName();
 		return APIManagerAdapter.apiManagerName;
-	}
-	
-	public static Map<String, String> getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE type) {
-    	Map<String, String> allCustomProps = new HashMap<String, String>();
-    	try {
-    		JsonNode appConfig = getCustomPropertiesConfig();
-    		JsonNode apiCustomProps = appConfig.get(type.name());
-    		if(apiCustomProps==null) return null;
-    		Iterator<Entry<String, JsonNode>> it = apiCustomProps.fields();
-    		while(it.hasNext()) {
-    			Entry<String, JsonNode> entry = it.next();
-    			allCustomProps.put(entry.getKey(), null);
-    		}
-    		return allCustomProps;
-    	} catch (Exception e) {
-    		LOG.error("Error loading configured custom properties from API-Manager", e);
-    		return null;
-    	}
-    }
-	
-	public static JsonNode getCustomPropertiesConfig() throws AppException {
-		
-		String appConfig = null;
-		URI uri;
-		HttpEntity httpResponse = null;
-		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
-			RestAPICall getRequest = new GETRequest(uri);
-			httpResponse = getRequest.execute().getEntity();
-			appConfig = IOUtils.toString(httpResponse.getContent(), "UTF-8");
-			return parseAppConfig(appConfig);
-		} catch (Exception e) {
-			throw new AppException("Can't read app.config from API-Manager: '" + appConfig + "'", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
-	/**
-	 * Helper method to validate that configured Custom-Properties are really configured 
-	 * in the API-Manager configuration.<br>
-	 * Will become obsolete sine the API-Manager REST-API provides an endpoint for that.
-	 * @param appConfig from the API-Manager (which isn't JSON)
-	 * @return JSON-Configuration with the custom-properties section
-	 * @throws AppException if the app.config can't be parsed
-	 */
-	public static JsonNode parseAppConfig(String appConfig) throws AppException {
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			appConfig = appConfig.substring(appConfig.indexOf("customPropertiesConfig:")+23, appConfig.indexOf("wizardModels"));
-			//appConfig = appConfig.substring(0, appConfig.length()-1); // Remove the tail comma
-			mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-			mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-			mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-			return mapper.readTree(appConfig);
-		} catch (Exception e) {
-			throw new AppException("Can't parse API-Manager app.config.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		}
 	}
 	
 	/**

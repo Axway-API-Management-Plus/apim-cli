@@ -61,6 +61,9 @@ import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
+import com.axway.apim.api.model.CustomProperties;
+import com.axway.apim.api.model.CustomProperty;
+import com.axway.apim.api.model.CustomProperty.Option;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OAuthClientProfile;
@@ -82,8 +85,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 
 /**
  * The APIConfig reflects the given API-Configuration plus the API-Definition, which is either a 
@@ -499,33 +500,32 @@ public class APIImportConfigAdapter {
 				apiConfig.setCustomProperties(null);
 				return;
 			}
-			JsonNode configuredProps = APIManagerAdapter.getCustomPropertiesConfig();
-			Iterator<String> props = apiConfig.getCustomProperties().keySet().iterator();
-			while(props.hasNext()) {
-				String propertyKey = props.next();
-				String propertyValue = apiConfig.getCustomProperties().get(propertyKey);
-				JsonNode configuredProp = configuredProps.at("/api/"+propertyKey);
-				if(configuredProp instanceof MissingNode) {
-					ErrorState.getInstance().setError("The custom-property: '" + propertyKey + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE, false);
-					throw new AppException("The custom-property: '" + propertyKey + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);
+			CustomProperties knownCustomProps = APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperties();
+			Iterator<String> desiredCustomProps = apiConfig.getCustomProperties().keySet().iterator();
+			while(desiredCustomProps.hasNext()) {
+				String desiredCustomPropertyKey = desiredCustomProps.next();
+				CustomProperty desiredCustomProperty = apiConfig.getCustomProperties().get(desiredCustomPropertyKey);
+				if(!knownCustomProps.getApi().containsKey(desiredCustomPropertyKey)) {
+					ErrorState.getInstance().setError("The custom-property: '" + desiredCustomPropertyKey + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE, false);
+					throw new AppException("The custom-property: '" + desiredCustomPropertyKey + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
-				JsonNode propType = configuredProp.get("type");
-				if(propType!=null && ( propType.asText().equals("select") || propType.asText().equals("switch") )) {
+				CustomProperty knownProp = knownCustomProps.getApi().get(desiredCustomPropertyKey);
+				if(knownProp.getType()!=null && ( knownProp.getType().equals("select") || knownProp.getType().equals("switch") )) {
 					boolean valueFound = false;
-					ArrayNode selectOptions = (ArrayNode)configuredProp.get("options");
-					if(selectOptions==null) {
-						LOG.warn("Skipping custom property validation, as the custom-property: '" + propertyKey + "' with type: " + propType.asText() + " has no options configured. Please check your custom properties configuration.");
+					List<Option> knownOptions = knownProp.getOptions();
+					if(knownOptions==null) {
+						LOG.warn("Skipping custom property validation, as the custom-property: '" + desiredCustomPropertyKey + "' with type: " + knownProp.getType() + " has no options configured. Please check your custom properties configuration.");
 						break;
 					}
-					for(JsonNode option : selectOptions) {
-						if(option.at("/value").asText().equals(propertyValue)) {
+					for(Option knownOption : knownOptions) {
+						if(knownOption.getValue().equals(desiredCustomProperty.getValue())) {
 							valueFound = true;
 							break;
 						}
 					}
 					if(!valueFound) {
-						ErrorState.getInstance().setError("The value: '" + propertyValue + "' is not a valid option for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE, false);
-						throw new AppException("The value: '" + propertyValue + "' is not a valid option for custom property: '" + propertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE);
+						ErrorState.getInstance().setError("The value: '" + desiredCustomProperty.getValue() + "' is not a valid option for custom property: '" + desiredCustomPropertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE, false);
+						throw new AppException("The value: '" + desiredCustomProperty.getValue() + "' is not a valid option for custom property: '" + desiredCustomPropertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE);
 					}
 				}
 			}

@@ -1,5 +1,7 @@
 package com.axway.apim.api.model;
 
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.axway.apim.adapter.jackson.OrganizationDeserializer;
@@ -33,6 +35,8 @@ public class User {
 	AuthenticatedUserAttributes authNUserAttributes;
 	
 	String dn;
+	
+	Map<String, String> customProperties = null;
 	
 	@JsonProperty("image")
 	private String imageUrl;
@@ -150,6 +154,13 @@ public class User {
 		this.authNUserAttributes = authNUserAttributes;
 	}
 	
+	public Map<String, String> getCustomProperties() {
+		return customProperties;
+	}
+	public void setCustomProperties(Map<String, String> customProperties) {
+		this.customProperties = customProperties;
+	}
+
 	public boolean deepEquals(Object other) {
 		if(other == null) return false;
 		if(other instanceof User) {
@@ -164,7 +175,8 @@ public class User {
 					StringUtils.equals(otherUser.getEmail().toLowerCase(), this.getEmail().toLowerCase()) &&
 					(otherUser.isEnabled()==this.isEnabled()) && 
 					StringUtils.equals(otherUser.getDescription(), this.getDescription()) &&
-					(this.getImage()==null || this.getImage().equals(otherUser.getImage()))
+					(this.getImage()==null || this.getImage().equals(otherUser.getImage())) &&
+					(this.getCustomProperties()==null || this.getCustomProperties().equals(otherUser.getCustomProperties()))
 					;
 		}
 		return false;

@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIManagerAdapter.CUSTOM_PROP_TYPE;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
@@ -22,6 +21,7 @@ import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.lib.params.APIExportParams;
+import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.Organization;
@@ -99,12 +99,21 @@ public abstract class APIResultHandler {
 				.hasBackendBasepath(params.getBackend())
 				.hasInboundSecurity(params.getInboundSecurity())
 				.hasOutboundAuthentication(params.getOutboundAuthentication())
-				.includeCustomProperties(APIManagerAdapter.getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE.api))
+				.includeCustomProperties(getAPICustomProperties())
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.translatePolicies(POLICY_TRANSLATION.TO_NAME)
 				.useFEAPIDefinition(params.isUseFEAPIDefinition())
 				.failOnError(false);
 		return builder;
+	}
+	
+	protected Map<String, CustomProperty> getAPICustomProperties() {
+		try {
+			return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperties().getApi();
+		} catch (AppException e) {
+			LOG.error("Error reading custom properties configuration from API-Manager");
+			return null;
+		}
 	}
     
     protected static String getBackendPath(API api) {
@@ -186,9 +195,9 @@ public abstract class APIResultHandler {
 		Iterator<String> it = api.getCustomProperties().keySet().iterator();
 		List<String> props = new ArrayList<String>();
 		while(it.hasNext()) {
-			String property = it.next();
-			String value = api.getCustomProperties().get(property);
-			props.add(property + ": " + value);
+			String propertyKey = it.next();
+			CustomProperty property = api.getCustomProperties().get(propertyKey);
+			props.add(propertyKey + ": " + property.getValue());
 		}
 		return props.toString().replace("[", "").replace("]", "");
 	}
