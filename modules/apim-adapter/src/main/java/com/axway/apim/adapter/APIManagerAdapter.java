@@ -178,6 +178,7 @@ public class APIManagerAdapter {
 		}
 		
 		this.configAdapter = new APIManagerConfigAdapter();
+		APIManagerAdapter.apiManagerVersion = configAdapter.getConfig(false).getProductVersion();
 		// For now this okay, may be replaced with a Factory later
 		this.customPropertiesAdapter = (hasAPIManagerVersion("7.7")) ? new APIManagerCustomPropertiesAdapter() : new APIManager762CustomPropertiesAdapter();
 		this.alertsAdapter = new APIManagerAlertsAdapter();
