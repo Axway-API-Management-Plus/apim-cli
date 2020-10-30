@@ -169,16 +169,17 @@ public class APIManagerAdapter {
 		this.cmd = CoreParameters.getInstance();
 		cmd.validateRequiredParameters();
 		
+		this.configAdapter = new APIManagerConfigAdapter();
+
 		if(TestIndicator.getInstance().isTestRunning()) {
 			this.hasAdminAccount = true; // For unit tests we have an admin account
 		} else {
 			// No need to login, when running unit tests
 			loginToAPIManager(false); // Login with the provided user (might be an Org-Admin)
 			loginToAPIManager(true); // Second, login if needed with an admin account
+			APIManagerAdapter.apiManagerVersion = configAdapter.getConfig(false).getProductVersion();
 		}
-		
-		this.configAdapter = new APIManagerConfigAdapter();
-		APIManagerAdapter.apiManagerVersion = configAdapter.getConfig(false).getProductVersion();
+
 		// For now this okay, may be replaced with a Factory later
 		this.customPropertiesAdapter = (hasAPIManagerVersion("7.7")) ? new APIManagerCustomPropertiesAdapter() : new APIManager762CustomPropertiesAdapter();
 		this.alertsAdapter = new APIManagerAlertsAdapter();
