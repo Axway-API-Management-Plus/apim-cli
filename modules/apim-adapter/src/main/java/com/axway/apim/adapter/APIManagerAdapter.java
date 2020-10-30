@@ -168,9 +168,14 @@ public class APIManagerAdapter {
 		super();
 		this.cmd = CoreParameters.getInstance();
 		cmd.validateRequiredParameters();
-		loginToAPIManager(false); // Login with the provided user (might be an Org-Admin)
-		loginToAPIManager(true); // Second, login if needed with an admin account
 		
+		if(TestIndicator.getInstance().isTestRunning()) {
+			this.hasAdminAccount = true; // For unit tests we have an admin account
+		} else {
+			// No need to login, when running unit tests
+			loginToAPIManager(false); // Login with the provided user (might be an Org-Admin)
+			loginToAPIManager(true); // Second, login if needed with an admin account
+		}
 		
 		this.configAdapter = new APIManagerConfigAdapter();
 		// For now this okay, may be replaced with a Factory later
@@ -186,10 +191,6 @@ public class APIManagerAdapter {
 		this.oauthClientAdapter = new APIManagerOAuthClientProfilesAdapter();
 		this.appAdapter = new APIMgrAppsAdapter();
 		this.userAdapter = new APIManagerUserAdapter();
-		if(TestIndicator.getInstance().isTestRunning()) {
-			this.hasAdminAccount = true; // For unit tests we have an admin account
-			return; // No need to initialize just for Unit-Tests
-		}
 	}
 	
 	public void loginToAPIManager(boolean useAdminClient) throws AppException {
