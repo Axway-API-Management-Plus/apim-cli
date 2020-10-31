@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,7 +19,6 @@ import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
-import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
@@ -79,7 +77,7 @@ public class APIFilter {
 	
 	private String tag;
 	
-	private Map<String, CustomProperty> customProperties;
+	private List<String> customProperties;
 	
 	private boolean deprecated;
 	private boolean retired;
@@ -414,11 +412,11 @@ public class APIFilter {
 		return createdOnOp;
 	}
 
-	public Map<String, CustomProperty> getCustomProperties() {
+	public List<String> getCustomProperties() {
 		return customProperties;
 	}
 
-	public void setCustomProperties(Map<String, CustomProperty> customProperties) {
+	public void setCustomProperties(List<String> customProperties) {
 		this.customProperties = customProperties;
 	}
 
@@ -650,7 +648,7 @@ public class APIFilter {
 		
 		APIType apiType;
 		
-		Map<String, CustomProperty> customProperties;
+		List<String> customProperties;
 		
 		boolean deprecated;
 		boolean retired;
@@ -874,7 +872,7 @@ public class APIFilter {
 			return this;
 		}
 		
-		public Builder includeCustomProperties(Map<String, CustomProperty> customProperties) {
+		public Builder includeCustomProperties(List<String> customProperties) {
 			this.customProperties = customProperties;
 			return this;
 		}

@@ -21,6 +21,7 @@ import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.lib.params.APIExportParams;
+import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
@@ -107,9 +108,9 @@ public abstract class APIResultHandler {
 		return builder;
 	}
 	
-	protected Map<String, CustomProperty> getAPICustomProperties() {
+	protected List<String> getAPICustomProperties() {
 		try {
-			return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperties().getApi();
+			return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.api);
 		} catch (AppException e) {
 			LOG.error("Error reading custom properties configuration from API-Manager");
 			return null;
@@ -195,9 +196,9 @@ public abstract class APIResultHandler {
 		Iterator<String> it = api.getCustomProperties().keySet().iterator();
 		List<String> props = new ArrayList<String>();
 		while(it.hasNext()) {
-			String propertyKey = it.next();
-			CustomProperty property = api.getCustomProperties().get(propertyKey);
-			props.add(propertyKey + ": " + property.getValue());
+			String property = it.next();
+			String value = api.getCustomProperties().get(property);
+			props.add(property + ": " + value);
 		}
 		return props.toString().replace("[", "").replace("]", "");
 	}

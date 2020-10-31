@@ -42,4 +42,11 @@ public class CustomProperties {
 	public void setApi(Map<String, CustomProperty> api) {
 		this.api = api;
 	}
+	
+	public static enum Type {
+		api, 
+		user, 
+		organization, 
+		application
+	}
 }

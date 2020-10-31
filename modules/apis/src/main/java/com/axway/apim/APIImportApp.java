@@ -3,7 +3,6 @@ package com.axway.apim;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.cli.ParseException;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -94,7 +93,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			APIFilter filter = new APIFilter.Builder(Builder.APIType.ACTUAL_API)
 					.hasApiPath(desiredAPI.getPath())
 					.hasVHost(desiredAPI.getVhost())
-					.includeCustomProperties(desiredAPI.getCustomProperties())
+					.includeCustomProperties(new ArrayList<String>(desiredAPI.getCustomProperties().keySet()))
 					.hasQueryStringVersion(desiredAPI.getApiRoutingKey())
 					.includeClientOrganizations(desiredAPI.getClientOrganizations()!=null) // For performance reasons don't load ClientOrgs
 					.includeQuotas(desiredAPI.getApplicationQuota()!=null) // and Quotas if not given in the Desired-API

@@ -98,13 +98,6 @@ public class APIManagerAdapter {
 	public final static String TYPE_FRONT_END = "proxies";
 	public final static String TYPE_BACK_END = "apirepo";
 	
-	public static enum CUSTOM_PROP_TYPE {
-		api, 
-		user, 
-		organization, 
-		application
-	}
-	
 	private CoreParameters cmd;
 	
 	private static CacheManager cacheManager;

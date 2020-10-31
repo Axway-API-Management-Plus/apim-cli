@@ -11,7 +11,6 @@ import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
-import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.Organization;
@@ -143,7 +142,7 @@ public class API {
 	
 	@APIPropertyAnnotation(isBreaking = false, 
 			writableStates = {API.STATE_UNPUBLISHED})
-	protected Map<String, CustomProperty> customProperties = null;
+	protected Map<String, String> customProperties = null;
 	
 	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})	
@@ -340,11 +339,11 @@ public class API {
 		this.retirementDate = retirementDate;
 	}
 
-	public Map<String, CustomProperty> getCustomProperties() {
+	public Map<String, String> getCustomProperties() {
 		return customProperties;
 	}
 
-	public void setCustomProperties(Map<String, CustomProperty> customProperties) {
+	public void setCustomProperties(Map<String, String> customProperties) {
 		this.customProperties = customProperties;
 	}
 

@@ -61,7 +61,7 @@ import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
-import com.axway.apim.api.model.CustomProperties;
+import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.CustomProperty.Option;
 import com.axway.apim.api.model.DeviceType;
@@ -500,32 +500,31 @@ public class APIImportConfigAdapter {
 				apiConfig.setCustomProperties(null);
 				return;
 			}
-			CustomProperties knownCustomProps = APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperties();
 			Iterator<String> desiredCustomProps = apiConfig.getCustomProperties().keySet().iterator();
 			while(desiredCustomProps.hasNext()) {
-				String desiredCustomPropertyKey = desiredCustomProps.next();
-				CustomProperty desiredCustomProperty = apiConfig.getCustomProperties().get(desiredCustomPropertyKey);
-				if(!knownCustomProps.getApi().containsKey(desiredCustomPropertyKey)) {
-					ErrorState.getInstance().setError("The custom-property: '" + desiredCustomPropertyKey + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE, false);
-					throw new AppException("The custom-property: '" + desiredCustomPropertyKey + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);
+				String desiredCustomProperty = desiredCustomProps.next();
+				String desiredCustomPropertyValue = apiConfig.getCustomProperties().get(desiredCustomProperty);
+				CustomProperty configuredCustomProperty = APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperty(Type.api, desiredCustomProperty);
+				if(configuredCustomProperty==null) {
+					ErrorState.getInstance().setError("The custom-property: '" + desiredCustomProperty + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE, false);
+					throw new AppException("The custom-property: '" + desiredCustomProperty + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
-				CustomProperty knownProp = knownCustomProps.getApi().get(desiredCustomPropertyKey);
-				if(knownProp.getType()!=null && ( knownProp.getType().equals("select") || knownProp.getType().equals("switch") )) {
+				if(configuredCustomProperty.getType()!=null && ( configuredCustomProperty.getType().equals("select") || configuredCustomProperty.getType().equals("switch") )) {
 					boolean valueFound = false;
-					List<Option> knownOptions = knownProp.getOptions();
+					List<Option> knownOptions = configuredCustomProperty.getOptions();
 					if(knownOptions==null) {
-						LOG.warn("Skipping custom property validation, as the custom-property: '" + desiredCustomPropertyKey + "' with type: " + knownProp.getType() + " has no options configured. Please check your custom properties configuration.");
+						LOG.warn("Skipping custom property validation, as the custom-property: '" + desiredCustomProperty + "' with type: " + configuredCustomProperty.getType() + " has no options configured. Please check your custom properties configuration.");
 						break;
 					}
 					for(Option knownOption : knownOptions) {
-						if(knownOption.getValue().equals(desiredCustomProperty.getValue())) {
+						if(knownOption.getValue().equals(desiredCustomPropertyValue)) {
 							valueFound = true;
 							break;
 						}
 					}
 					if(!valueFound) {
-						ErrorState.getInstance().setError("The value: '" + desiredCustomProperty.getValue() + "' is not a valid option for custom property: '" + desiredCustomPropertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE, false);
-						throw new AppException("The value: '" + desiredCustomProperty.getValue() + "' is not a valid option for custom property: '" + desiredCustomPropertyKey + "'", ErrorCode.CANT_READ_CONFIG_FILE);
+						ErrorState.getInstance().setError("The value: '" + desiredCustomPropertyValue + "' is not a valid option for custom property: '" + desiredCustomProperty + "'", ErrorCode.CANT_READ_CONFIG_FILE, false);
+						throw new AppException("The value: '" + desiredCustomPropertyValue + "' is not a valid option for custom property: '" + desiredCustomProperty + "'", ErrorCode.CANT_READ_CONFIG_FILE);
 					}
 				}
 			}

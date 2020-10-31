@@ -1,7 +1,6 @@
 package com.axway.apim.api.export;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -15,7 +14,6 @@ import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
-import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.InboundProfile;
@@ -220,7 +218,7 @@ public class ExportAPI {
 	}
 
 
-	public Map<String, String> getCustomProperties() {
+	/*public Map<String, String> getCustomProperties() {
 		if(this.actualAPIProxy.getCustomProperties()==null || this.actualAPIProxy.getCustomProperties().size()==0) return null;
 		Iterator<String> it = this.actualAPIProxy.getCustomProperties().keySet().iterator();
 		Map<String, String> customProps = new HashMap<String,String>();
@@ -231,7 +229,7 @@ public class ExportAPI {
 			customProps.put(customPropKey, prop.getValue());
 		}
 		return customProps;
-	}
+	}*/
 
 
 	public String getDescriptionType() {
