@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -874,6 +875,12 @@ public class APIFilter {
 		
 		public Builder includeCustomProperties(List<String> customProperties) {
 			this.customProperties = customProperties;
+			return this;
+		}
+		
+		public Builder includeCustomProperties(Map<String, String> customProperties) {
+			if(customProperties==null) return this;
+			this.customProperties = new ArrayList<String>(customProperties.keySet());
 			return this;
 		}
 		
