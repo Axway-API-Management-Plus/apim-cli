@@ -217,20 +217,20 @@ public class ExportAPI {
 		return ((API)this.actualAPIProxy).getDeprecated();
 	}
 
-
-	/*public Map<String, String> getCustomProperties() {
+	public Map<String, String> getCustomProperties() {
 		if(this.actualAPIProxy.getCustomProperties()==null || this.actualAPIProxy.getCustomProperties().size()==0) return null;
-		Iterator<String> it = this.actualAPIProxy.getCustomProperties().keySet().iterator();
-		Map<String, String> customProps = new HashMap<String,String>();
+		Iterator<String> it = this.actualAPIProxy.getCustomProperties().values().iterator();
+		boolean propertyFound = false;
 		while(it.hasNext()) {
-			String customPropKey = it.next();
-			CustomProperty prop = this.actualAPIProxy.getCustomProperties().get(customPropKey);
-			if(prop.getValue()==null) continue;
-			customProps.put(customPropKey, prop.getValue());
+			String propValue = it.next();
+			if(propValue!=null) {
+				propertyFound = true;
+				break;
+			}
 		}
-		return customProps;
-	}*/
-
+		if(!propertyFound) return null; // If no property is declared for this API return null
+		return this.actualAPIProxy.getCustomProperties();
+	}
 
 	public String getDescriptionType() {
 		if(this.actualAPIProxy.getDescriptionType().equals("original")) return null;

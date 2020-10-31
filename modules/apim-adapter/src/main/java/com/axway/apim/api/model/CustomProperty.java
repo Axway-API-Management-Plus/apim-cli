@@ -168,26 +168,32 @@ public class CustomProperty {
 		}
 	}
 	public static class Permissions {
-		private String read;
-		private String write;
-		
-		public String getRead() {
+		private Boolean read;
+		private Boolean write;
+		private Boolean visible;
+		public Boolean getRead() {
 			return read;
 		}
-		public void setRead(String read) {
+		public void setRead(Boolean read) {
 			this.read = read;
 		}
-		public String getWrite() {
+		public Boolean getWrite() {
 			return write;
 		}
-		public void setWrite(String write) {
+		public void setWrite(Boolean write) {
 			this.write = write;
 		}
+		public Boolean getVisible() {
+			return visible;
+		}
+		public void setVisible(Boolean visible) {
+			this.visible = visible;
+		} 
 	}
 	
 	public static class Option {
-		String value;
-		String label;
+		private String value;
+		private String label;
 		public String getValue() {
 			return value;
 		}
