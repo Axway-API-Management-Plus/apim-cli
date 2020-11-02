@@ -28,7 +28,7 @@ IF DEFINED AXWAY_APIM_CLI_HOME (
 SET bkpClassPath=%CLASSPATH%
 
 CD "%programDir%"
-SET CLASSPATH="%programDir%..\lib";"%programDir%..\conf"
+SET CLASSPATH="%programDir%\lib";"%programDir%\conf"
 
 FOR /R ./lib %%a in (*.jar) DO CALL :AddToPath "%%a"
 
