@@ -46,6 +46,11 @@ public class AppExportCLIOptions extends CLIOptions {
 		option.setArgName("*Partners*");
 		addOption(option);
 		
+		option = new  Option("api", true, "Filter applications having access to this API. You may use wildcards at the end or beginning.");
+		option.setRequired(false);
+		option.setArgName("*MyAPI*");
+		addOption(option);
+		
 		option = new  Option("credential", true, "Filter applications having this credential information. Client-ID and API-Key is considered here.");
 		option.setRequired(false);
 		option.setArgName("*9877979779*");
@@ -94,6 +99,7 @@ public class AppExportCLIOptions extends CLIOptions {
 		params.setOrgName(getValue("orgName"));
 		params.setCredential(getValue("credential"));
 		params.setRedirectUrl(getValue("redirectUrl"));
+		params.setApiName(getValue("api"));
 		return params;
 	}
 }

@@ -128,7 +128,7 @@ public class APIManagerAPIAdapter {
 				addOriginalAPIDefinitionFromAPIM(api, filter);
 				addImageFromAPIM(api, filter.isIncludeImage());
 				addRemoteHost(api, filter.isIncludeRemoteHost());
-				if(logProgress && apis.size()>5) Utils.progressPercentage(i, apis.size(), "Loading "+apis.size()+" APIs");
+				if(logProgress && apis.size()>5) Utils.progressPercentage(i, apis.size(), "Loading details of "+apis.size()+" APIs");
 			}
 			Utils.addCustomPropertiesForEntity(apis, this.apiManagerResponse.get(filter), filter);
 			if(logProgress && apis.size()>5) System.out.print("\n");

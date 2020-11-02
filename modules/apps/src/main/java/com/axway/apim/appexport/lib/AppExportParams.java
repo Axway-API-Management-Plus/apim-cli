@@ -12,6 +12,7 @@ public class AppExportParams extends StandardExportParams implements Parameters 
 	private String orgName;
 	private String credential;
 	private String redirectUrl;
+	private String apiName;
 	
 	public static synchronized AppExportParams getInstance() {
 		return (AppExportParams)CoreParameters.getInstance();
@@ -64,6 +65,12 @@ public class AppExportParams extends StandardExportParams implements Parameters 
 	public void setRedirectUrl(String redirectUrl) {
 		this.redirectUrl = redirectUrl;
 	}
-	
-	
+
+	public String getApiName() {
+		return apiName;
+	}
+
+	public void setApiName(String apiName) {
+		this.apiName = apiName;
+	}
 }
