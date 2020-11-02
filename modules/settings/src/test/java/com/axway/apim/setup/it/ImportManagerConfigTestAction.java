@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.ImportResult;
 import com.axway.apim.lib.StandardImportParams;
-import com.axway.apim.setup.APIManagerSetupApp;
+import com.axway.apim.setup.APIManagerSettingsApp;
 import com.axway.lib.testActions.CLIAbstractImportTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.ValidationException;
@@ -24,7 +24,7 @@ public class ImportManagerConfigTestAction extends CLIAbstractImportTestAction {
 		addParameters(params, context);
 		params.setConfig(this.configFile.getPath());
 		
-		APIManagerSetupApp app = new APIManagerSetupApp();
+		APIManagerSettingsApp app = new APIManagerSettingsApp();
 		
 		LOG.info("Running "+app.getClass().getSimpleName()+" with params: "+params);
 		

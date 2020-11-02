@@ -8,10 +8,10 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>apimcli-setup</artifactId>
+	<artifactId>apimcli-settings</artifactId>
 	<packaging>jar</packaging>
-	<name>Axway API-Manager CLI Setup tool</name>
-	<description>Setup module</description>
+	<name>Axway API-Manager CLI Settings tool</name>
+	<description>API-Manager settings module</description>
 	<url>https://github.com/Axway-API-Management-Plus/apim-cli</url>
 
 	<dependencies>

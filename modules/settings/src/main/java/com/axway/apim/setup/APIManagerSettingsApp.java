@@ -25,26 +25,26 @@ import com.axway.apim.setup.lib.APIManagerSetupExportCLIOptions;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
 import com.axway.apim.setup.lib.APIManagerSetupImportCLIOptions;
 
-public class APIManagerSetupApp implements APIMCLIServiceProvider {
+public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 
-	private static Logger LOG = LoggerFactory.getLogger(APIManagerSetupApp.class);
+	private static Logger LOG = LoggerFactory.getLogger(APIManagerSettingsApp.class);
 
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 	static ErrorState errorState = ErrorState.getInstance();
 
 	@Override
 	public String getName() {
-		return "API-Manager - S E T U P";
+		return "API-Manager - S E T T I N G S";
 	}
 
 	@Override
 	public String getVersion() {
-		return APIManagerSetupApp.class.getPackage().getImplementationVersion();
+		return APIManagerSettingsApp.class.getPackage().getImplementationVersion();
 	}
 
 	@Override
 	public String getGroupId() {
-		return "setup";
+		return "settings";
 	}
 
 	@Override
@@ -60,11 +60,8 @@ public class APIManagerSetupApp implements APIMCLIServiceProvider {
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		/*} catch (ParseException e) {
-			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
-		APIManagerSetupApp app = new APIManagerSetupApp();
+		APIManagerSettingsApp app = new APIManagerSettingsApp();
 		return app.runExport(params).getRc();
 	}
 	
@@ -76,11 +73,8 @@ public class APIManagerSetupApp implements APIMCLIServiceProvider {
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		/*} catch (ParseException e) {
-			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
-		APIManagerSetupApp managerConfigApp = new APIManagerSetupApp();
+		APIManagerSettingsApp managerConfigApp = new APIManagerSettingsApp();
 		return managerConfigApp.importConfig(params).getRc();
 	}
 
@@ -207,6 +201,4 @@ public class APIManagerSetupApp implements APIMCLIServiceProvider {
 		int rc = exportConfig(args);
 		System.exit(rc);
 	}
-
-
 }
