@@ -229,7 +229,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 		if(this.getCredential()==null && this.getRedirectUrl()==null && this.getApiName()==null) { // Nothing given to filter out.
 			return false;
 		}
-		if(this.getCredential()!=null) {
+		if(this.getCredential()!=null || this.getRedirectUrl()!=null) {
 			// Filter this app, as it doesn't have any credentials
 			if(app.getCredentials()==null) return true;
 			boolean match = false;
