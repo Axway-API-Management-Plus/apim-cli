@@ -27,6 +27,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
@@ -230,6 +231,7 @@ public class APIManagerOrganizationAdapter {
 				Organization org = allOrgs.get(i);
 				addImage(org, filter.isIncludeImage());
 			}
+			Utils.addCustomPropertiesForEntity(allOrgs, this.apiManagerResponse.get(filter), filter);
 			return allOrgs;
 		} catch (Exception e) {
 			LOG.error("Error cant read orgs from API-Manager with filter: "+filter+". Returned response: " + apiManagerResponse);

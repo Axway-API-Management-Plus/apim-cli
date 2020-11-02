@@ -6,9 +6,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.apis.OrgFilter.Builder;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -67,8 +69,18 @@ public abstract class OrgResultHandler {
 		Builder builder = new OrgFilter.Builder()
 				.hasId(params.getId())
 				.hasDevelopment(params.getDev())
+				.includeCustomProperties(getCustomProperties())
 				.hasName(params.getName());
 		return builder;
+	}
+	
+	protected List<String> getCustomProperties() {
+		try {
+			return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.organization);
+		} catch (AppException e) {
+			LOG.error("Error reading custom properties configuration for organization from API-Manager");
+			return null;
+		}
 	}
 	
 	public abstract OrgFilter getFilter() throws AppException;

@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -11,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("OrganizationFilter")
-public class Organization extends AbstractEntity {
+public class Organization extends AbstractEntity implements CustomPropertiesEntity {
 	
 	private String email;
 	
@@ -166,10 +168,14 @@ public class Organization extends AbstractEntity {
 		this.isTrial = isTrial;
 	}
 	
+	// This avoids, that custom properties are wrapped within customProperties { ... }
+	// See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+	@JsonAnyGetter
 	public Map<String, String> getCustomProperties() {
 		return customProperties;
 	}
 
+	@JsonAnySetter
 	public void setCustomProperties(Map<String, String> customProperties) {
 		this.customProperties = customProperties;
 	}

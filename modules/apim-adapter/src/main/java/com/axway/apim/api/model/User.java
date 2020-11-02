@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -14,7 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("UserFilter")
-public class User {
+public class User implements CustomPropertiesEntity {
 	String id;
 	
 	@JsonDeserialize( using = OrganizationDeserializer.class)
@@ -154,9 +156,16 @@ public class User {
 		this.authNUserAttributes = authNUserAttributes;
 	}
 	
+	// This avoids, that custom properties are wrapped within customProperties { ... }
+	// See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+	@JsonAnyGetter
 	public Map<String, String> getCustomProperties() {
 		return customProperties;
 	}
+	
+	// This avoids, that custom properties are wrapped within customProperties { ... }
+	// See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+	@JsonAnySetter
 	public void setCustomProperties(Map<String, String> customProperties) {
 		this.customProperties = customProperties;
 	}

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.user.UserFilter;
+import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.User;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
@@ -161,8 +162,14 @@ public class UserApp implements APIMCLIServiceProvider {
 			userAdapter.readConfig(params.getConfig());
 			List<User> desiredUsers = userAdapter.getUsers();
 			UserImportManager importManager = new UserImportManager();
+			
 			for(User desiredUser : desiredUsers) {
-				User actualUser = APIManagerAdapter.getInstance().userAdapter.getUser(new UserFilter.Builder().hasLoginName(desiredUser.getLoginName()).includeImage(true).build());
+				User actualUser = APIManagerAdapter.getInstance().userAdapter.getUser(
+						new UserFilter.Builder()
+						.hasLoginName(desiredUser.getLoginName())
+						.includeImage(true)
+						.includeCustomProperties(APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.user))
+						.build());
 				User actualUserWithEmail = APIManagerAdapter.getInstance().userAdapter.getUser(new UserFilter.Builder().hasEmail(desiredUser.getEmail()).build());
 				if(actualUserWithEmail!=null && actualUser!=null && !actualUser.getId().equals(actualUserWithEmail.getId())) {
 					LOG.error("A different user: '"+actualUserWithEmail.getLoginName()+"' with the supplied email address: '"+desiredUser.getEmail()+"' already exists. ");
