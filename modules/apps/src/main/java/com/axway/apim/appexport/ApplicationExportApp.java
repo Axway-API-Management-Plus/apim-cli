@@ -107,7 +107,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			if(LOG.isDebugEnabled()) {
 				LOG.info("No applications found using filter: " + exporter.getFilter());
 			} else {
-				LOG.info("No applications found based on the given criteria.");
+				LOG.info("No applications found based on the given filters.");
 			}
 		} else {
 			LOG.info("Found " + apps.size() + " application(s).");

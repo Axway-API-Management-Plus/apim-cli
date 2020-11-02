@@ -1,0 +1,16 @@
+{
+  "name" : "Client App",
+  "organization" : "API Development",
+  "description" : "Sample Client Application, registered for use in the Client Demo",
+  "state" : "approved",
+  "enabled" : true,
+  "email" : "sample@sampleapp.com",
+  "phone" : "012345678",
+  "apis" : [ {
+    "apiName" : "Security-HIPAA-Control",
+    "apiVersion" : "1.0"
+  }, {
+    "apiName" : "EMR-HealthCatalog",
+    "apiVersion" : "3.7"
+  }]
+}

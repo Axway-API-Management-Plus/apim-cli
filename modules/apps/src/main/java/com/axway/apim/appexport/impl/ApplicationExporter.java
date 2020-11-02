@@ -76,8 +76,10 @@ public abstract class ApplicationExporter {
 				.hasRedirectUrl(params.getRedirectUrl())
 				.hasOrganizationName(params.getOrgName())
 				.includeCustomProperties(getCustomProperties())
+				.hasApiName(params.getApiName())
 				.includeImage(false);
 		if(params.getCredential()!=null || params.getRedirectUrl()!=null) builder.includeCredentials(true);
+		if(params.getApiName()!=null) builder.includeAPIAccess(true);
 		return builder;
 	}
 	

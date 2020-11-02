@@ -8,11 +8,10 @@ import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({ "name", "organization", "description", "state", "image", "enabled", "email", "phone", "credentials", "appQuota", "apis" })
+@JsonPropertyOrder({ "name", "organization", "description", "state", "image", "enabled", "email", "phone", "credentials", "appQuota", "apis", "customProperties" })
 public class ExportApplication {
 	
 	ClientApplication clientApp;
