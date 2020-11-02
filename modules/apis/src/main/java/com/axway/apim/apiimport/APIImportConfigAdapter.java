@@ -62,8 +62,6 @@ import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
 import com.axway.apim.api.model.CustomProperties.Type;
-import com.axway.apim.api.model.CustomProperty;
-import com.axway.apim.api.model.CustomProperty.Option;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OAuthClientProfile;
@@ -199,7 +197,7 @@ public class APIImportConfigAdapter {
 			apiSpecification.configureBasepath(((DesiredAPI)apiConfig).getBackendBasepath());
 			apiConfig.setApiDefinition(apiSpecification);
 			addImageContent(apiConfig);
-			validateCustomProperties(apiConfig);
+			Utils.validateCustomProperties(apiConfig.getCustomProperties(), Type.api);
 			validateDescription(apiConfig);
 			validateOutboundAuthN(apiConfig);
 			addDefaultCorsProfile(apiConfig);
@@ -492,43 +490,6 @@ public class APIImportConfigAdapter {
 			throw new AppException("Can't read certificate: "+cert.getCertFile()+" from file or classpath.", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 		return is;
-	}
-	
-	private void validateCustomProperties(API apiConfig) throws AppException {
-		if(apiConfig.getCustomProperties()!=null) {
-			if(apiConfig.getCustomProperties().size()==0) { // If no custom properties are given, we reset them to null and skip any validation
-				apiConfig.setCustomProperties(null);
-				return;
-			}
-			Iterator<String> desiredCustomProps = apiConfig.getCustomProperties().keySet().iterator();
-			while(desiredCustomProps.hasNext()) {
-				String desiredCustomProperty = desiredCustomProps.next();
-				String desiredCustomPropertyValue = apiConfig.getCustomProperties().get(desiredCustomProperty);
-				CustomProperty configuredCustomProperty = APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperty(Type.api, desiredCustomProperty);
-				if(configuredCustomProperty==null) {
-					ErrorState.getInstance().setError("The custom-property: '" + desiredCustomProperty + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE, false);
-					throw new AppException("The custom-property: '" + desiredCustomProperty + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);
-				}
-				if(configuredCustomProperty.getType()!=null && ( configuredCustomProperty.getType().equals("select") || configuredCustomProperty.getType().equals("switch") )) {
-					boolean valueFound = false;
-					List<Option> knownOptions = configuredCustomProperty.getOptions();
-					if(knownOptions==null) {
-						LOG.warn("Skipping custom property validation, as the custom-property: '" + desiredCustomProperty + "' with type: " + configuredCustomProperty.getType() + " has no options configured. Please check your custom properties configuration.");
-						break;
-					}
-					for(Option knownOption : knownOptions) {
-						if(knownOption.getValue().equals(desiredCustomPropertyValue)) {
-							valueFound = true;
-							break;
-						}
-					}
-					if(!valueFound) {
-						ErrorState.getInstance().setError("The value: '" + desiredCustomPropertyValue + "' is not a valid option for custom property: '" + desiredCustomProperty + "'", ErrorCode.CANT_READ_CONFIG_FILE, false);
-						throw new AppException("The value: '" + desiredCustomPropertyValue + "' is not a valid option for custom property: '" + desiredCustomProperty + "'", ErrorCode.CANT_READ_CONFIG_FILE);
-					}
-				}
-			}
-		}
 	}
 	
 	private byte[] getAPIDefinitionContent() throws AppException {

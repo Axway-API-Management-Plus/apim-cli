@@ -26,11 +26,12 @@ import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.Policy;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
+import com.axway.apim.lib.CustomPropertiesFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.Utils.FedKeyType;
 
-public class APIFilter {
+public class APIFilter implements CustomPropertiesFilter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
 	

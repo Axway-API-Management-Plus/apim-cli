@@ -11,6 +11,7 @@ import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
+import com.axway.apim.api.model.CustomPropertiesEntity;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.Organization;
@@ -51,7 +52,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("APIFilter")
-public class API {
+public class API implements CustomPropertiesEntity {
 	
 	public final static String STATE_PUBLISHED = "published";
 	public final static String STATE_UNPUBLISHED = "unpublished";

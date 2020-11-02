@@ -35,6 +35,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.ExtClients;
 import com.axway.apim.api.model.apps.OAuth;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.CustomPropertiesFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -142,6 +143,7 @@ public class APIMgrAppsAdapter {
 				addAPIAccess(app, filter.isIncludeAPIAccess());
 				if(!filter.filter(app)) continue;
 				filteredApps.add(app);
+				Utils.addCustomPropertiesForEntity(apps, this.apiManagerResponse.get(filter), (CustomPropertiesFilter)filter);
 				if(logProgress && apps.size()>5) Utils.progressPercentage(i, apps.size(), "Loading "+apps.size()+" Applications");
 			}
 			if(logProgress && apps.size()>5) System.out.print("\n");
@@ -332,7 +334,6 @@ public class APIMgrAppsAdapter {
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+actualApp.getId()).build();
 			}
 			mapper.setSerializationInclusion(Include.NON_NULL);
-
 			try {
 				RestAPICall request;
 				if(actualApp==null) {

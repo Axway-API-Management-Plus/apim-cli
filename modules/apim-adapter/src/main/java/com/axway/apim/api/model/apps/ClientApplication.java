@@ -13,9 +13,12 @@ import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AbstractEntity;
+import com.axway.apim.api.model.CustomPropertiesEntity;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -29,7 +32,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("ApplicationFilter")
-public class ClientApplication extends AbstractEntity {
+public class ClientApplication extends AbstractEntity implements CustomPropertiesEntity {
 
 	
 	private String email;
@@ -165,10 +168,14 @@ public class ClientApplication extends AbstractEntity {
 		this.oauthResources = oauthResources;
 	}
 
+	// This avoids, that custom properties are wrapped within customProperties { ... }
+	// See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+	@JsonAnyGetter
 	public Map<String, String> getCustomProperties() {
 		return customProperties;
 	}
 
+	@JsonAnySetter
 	public void setCustomProperties(Map<String, String> customProperties) {
 		this.customProperties = customProperties;
 	}

@@ -18,11 +18,12 @@ import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.ExtClients;
 import com.axway.apim.api.model.apps.OAuth;
+import com.axway.apim.lib.CustomPropertiesFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 
-public class ClientAppFilter {
+public class ClientAppFilter implements CustomPropertiesFilter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
 	
@@ -47,6 +48,8 @@ public class ClientAppFilter {
 	private String applicationId;
 	
 	boolean includeOauthResources;
+	
+	private List<String> customProperties;
 	
 	List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
@@ -111,6 +114,14 @@ public class ClientAppFilter {
 
 	public Organization getOrganization() {
 		return organization;
+	}
+
+	public List<String> getCustomProperties() {
+		return customProperties;
+	}
+
+	public void setCustomProperties(List<String> customProperties) {
+		this.customProperties = customProperties;
 	}
 
 	public void setApplicationName(String applicationName) {
@@ -281,6 +292,8 @@ public class ClientAppFilter {
 		
 		private boolean includeOauthResources;
 		
+		private List<String> customProperties;
+		
 		public Builder() {
 			super();
 		}
@@ -302,6 +315,7 @@ public class ClientAppFilter {
 			filter.setCredential(this.credential);
 			filter.setRedirectUrl(this.redirectUrl);
 			filter.setIncludeOauthResources(this.includeOauthResources);
+			filter.setCustomProperties(this.customProperties);
 			return filter;
 		}
 		
@@ -384,6 +398,9 @@ public class ClientAppFilter {
 			return this;
 		}
 		
-		
+		public Builder includeCustomProperties(List<String> customProperties) {
+			this.customProperties = customProperties;
+			return this;
+		}
 	}
 }

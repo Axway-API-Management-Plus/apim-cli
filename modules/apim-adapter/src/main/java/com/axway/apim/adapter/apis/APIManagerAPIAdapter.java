@@ -14,7 +14,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -131,7 +130,7 @@ public class APIManagerAPIAdapter {
 				addRemoteHost(api, filter.isIncludeRemoteHost());
 				if(logProgress && apis.size()>5) Utils.progressPercentage(i, apis.size(), "Loading "+apis.size()+" APIs");
 			}
-			addCustomProperties(apis, filter);
+			Utils.addCustomPropertiesForEntity(apis, this.apiManagerResponse.get(filter), filter);
 			if(logProgress && apis.size()>5) System.out.print("\n");
 		} catch (IOException e) {
 			throw new AppException("Cannot read APIs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -412,36 +411,6 @@ public class APIManagerAPIAdapter {
 		for(ClientApplication app : api.getApplications()) {
 			APIQuota appQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(app.getId(), null);
 			app.setAppQuota(appQuota);
-		}
-	}
-	
-	private void addCustomProperties(List<API> apis, APIFilter filter) throws IOException {
-		// Custom-Properties will be added depending on the given Properties in the filter
-		if(filter.getCustomProperties() == null) {
-			return;
-		}
-		Map<String, JsonNode> apiAsJsonMappedWithId = new HashMap<String, JsonNode>();
-		JsonNode jsonPayload = mapper.readTree(this.apiManagerResponse.get(filter));
-		// Create a map based on the API-ID containing the original JSON-Payload received from API-Manager
-		for(JsonNode node : jsonPayload) {
-			String apiId = node.get("id").asText();
-			apiAsJsonMappedWithId.put(apiId, node);
-		}
-		Map<String, String> customProperties = new LinkedHashMap<String, String>();
-		// Iterate over all APIs (at this point not yet having the custom-properties serialized)
-		for(API api : apis) {
-			// Get the original JSON-Payload for the current API fetched from API-Manager
-			JsonNode node = apiAsJsonMappedWithId.get(api.getId());
-			// Iterate over all requested Custom-Properties that should be returned 
-			for(String customPropKey : filter.getCustomProperties()) {
-				// Try to get the value for that custom property from the JSON-Payload
-				JsonNode value = node.get(customPropKey);
-				// If there is nothing found - skip it.
-				if(value == null) continue;
-				// Add it to the map of custom properties that will be attached to the API
-				customProperties.put(customPropKey, value.asText());
-			}
-			api.setCustomProperties((customProperties.size()==0) ? null : customProperties);
 		}
 	}
 	
