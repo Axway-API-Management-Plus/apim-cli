@@ -24,7 +24,7 @@ public class APIManagerSetupExportCLIOptions extends CLIOptions {
 
 	@Override
 	public void addOptions() {
-		Option option = new Option("type", true, "Limit the configuration with a comma separated list. (config|alerts|remotehosts|policies). If not given everything is exported. Policies are printed on console only.");
+		Option option = new Option("type", true, "Limit the configuration with a comma separated list. (config|alerts|remotehosts|policies|customProperties). If not given everything is exported. Policies and Custom-Properties configuration are printed on console only.");
 		option.setRequired(false);
 		option.setArgName("config,alerts,remotehosts,policies");
 		addOption(option);

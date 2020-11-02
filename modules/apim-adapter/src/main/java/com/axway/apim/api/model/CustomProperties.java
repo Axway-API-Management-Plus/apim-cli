@@ -9,7 +9,7 @@ public class CustomProperties {
 	
 	private Map<String, CustomProperty> application;
 	
-	private Map<String, CustomProperty> api;
+	private Map<String, CustomProperty> api; 
 
 	public Map<String, CustomProperty> getUser() {
 		return user;
@@ -44,9 +44,15 @@ public class CustomProperties {
 	}
 	
 	public static enum Type {
-		api, 
-		user, 
-		organization, 
-		application
+		api("API"), 
+		user("User"), 
+		organization("Organization"), 
+		application("Application");
+		
+		public String niceName;
+
+		private Type(String niceName) {
+			this.niceName = niceName;
+		}
 	}
 }
