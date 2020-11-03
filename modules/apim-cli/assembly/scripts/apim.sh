@@ -13,11 +13,16 @@ else
         exit 1
 fi
 
-programDir="$( cd "$(dirname "$0")" ; pwd -P )"
+if [ -n "$AXWAY_APIM_CLI_HOME" ] 
+then
+	programDir="$AXWAY_APIM_CLI_HOME"
+else 
+	programDir="$( cd "$(dirname "$0")"; cd .. ; pwd -P )"
+fi
 
 currentDir=$PWD
 
-cd "$programDir/.."
+cd "$programDir"
 
 CP=$PWD/lib:$PWD/conf
 for jar in lib/*

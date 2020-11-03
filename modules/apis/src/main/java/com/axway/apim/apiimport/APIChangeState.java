@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.apiimport.lib.APIImportParams;
+import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;

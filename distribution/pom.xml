@@ -38,7 +38,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-			<artifactId>apimcli-setup</artifactId>
+			<artifactId>apimcli-settings</artifactId>
 		</dependency>
 	</dependencies>
 

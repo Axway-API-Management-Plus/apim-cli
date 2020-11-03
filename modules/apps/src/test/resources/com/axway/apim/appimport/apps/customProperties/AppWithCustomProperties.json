@@ -1,0 +1,13 @@
+{
+  "name" : "${appName}",
+  "organization" : "${orgName}",
+  "state" : "approved",
+  "enabled" : true,
+  "email" : "user@domain.com",
+  "phone" : "654654646234",
+  "customProperties": {
+  	"appCustomProperty1": "Custom value 1",
+  	"appCustomProperty2": "2",
+  	"appCustomProperty3": "true"  
+  }
+}

@@ -2,12 +2,12 @@ package com.axway.apim.users;
 
 import java.util.List;
 
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.user.UserFilter;
+import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.User;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
@@ -59,13 +59,13 @@ public class UserApp implements APIMCLIServiceProvider {
 	public static int export(String args[]) {
 		UserExportParams params;
 		try {
-			params = new UserExportCLIOptions(args).getUserExportParams();
+			params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		UserApp app = new UserApp();
 		return app.export(params).getRc();
@@ -136,13 +136,13 @@ public class UserApp implements APIMCLIServiceProvider {
 	public static int importUsers(String[] args) {		
 		UserImportParams params;
 		try {
-			params = new UserImportCLIOptions(args).getUserImportParams();
+			params = (UserImportParams) UserImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		UserApp app = new UserApp();
 		return app.importUsers(params).getRc();
@@ -162,8 +162,14 @@ public class UserApp implements APIMCLIServiceProvider {
 			userAdapter.readConfig(params.getConfig());
 			List<User> desiredUsers = userAdapter.getUsers();
 			UserImportManager importManager = new UserImportManager();
+			
 			for(User desiredUser : desiredUsers) {
-				User actualUser = APIManagerAdapter.getInstance().userAdapter.getUser(new UserFilter.Builder().hasLoginName(desiredUser.getLoginName()).includeImage(true).build());
+				User actualUser = APIManagerAdapter.getInstance().userAdapter.getUser(
+						new UserFilter.Builder()
+						.hasLoginName(desiredUser.getLoginName())
+						.includeImage(true)
+						.includeCustomProperties(APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.user))
+						.build());
 				User actualUserWithEmail = APIManagerAdapter.getInstance().userAdapter.getUser(new UserFilter.Builder().hasEmail(desiredUser.getEmail()).build());
 				if(actualUserWithEmail!=null && actualUser!=null && !actualUser.getId().equals(actualUserWithEmail.getId())) {
 					LOG.error("A different user: '"+actualUserWithEmail.getLoginName()+"' with the supplied email address: '"+desiredUser.getEmail()+"' already exists. ");
@@ -196,13 +202,13 @@ public class UserApp implements APIMCLIServiceProvider {
 	public static int delete(String args[]) {
 		UserExportParams params;
 		try {
-			params = new UserDeleteCLIOptions(args).getUserExportParams();
+			params = (UserExportParams) UserDeleteCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		UserApp app = new UserApp();
 		return app.delete(params).getRc();

@@ -17,16 +17,7 @@ Perform the following steps:
     cp APIGateway_x.x.x_xxx_Install_linux-x86-64_BNxxxxxx.run apim-cli-dockerimage
     cp APIGateway_7.7.20200130-1_DockerScripts.tar.gz apim-cli-dockerimage
     cp multiple.lic apim-cli-dockerimage
-    cd apim-cli-dockerimage
-    tar xvfz APIGateway_7.7.20200130-1_DockerScripts.tar.gz
-    cd apigw-emt-scripts-2.1.0-SNAPSHOT
-    ./build_base_image.py --installer=../APIGateway_x.x.x_xxx_Install_linux-x86-64_BNxxxxxx.run --os=centos7
-    ./gen_domain_cert.py --default-cert
-    ./build_gw_image.py --license=../multiple.lic --default-cert --fed=$HOME/apim-cli/modules/apis/src/test/resources/apimanager/swagger-promote-7.7.fed --merge-dir $HOME/apim-cli/modules/apis/src/test/resources/apimanager/merge-dir/apigateway --out-image=api-gw-mgr:7.7-20200930
-    docker images
-    docker tag api-gw-mgr:7.7-20200930 docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7-20200930
-    docker login docker-registry.demo.axway.com
-    docker push docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7-20200930
+    $HOME/apim-cli/modules/apim-adapter/src/test/resources/apimanager/buildDockerImage.sh 7.7-20200930
 ```
 
 ### Added Untrusted Docker-Registry

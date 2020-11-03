@@ -19,6 +19,7 @@ import com.axway.apim.adapter.jackson.AppCredentialsDeserializer;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.OAuth;
@@ -87,6 +88,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		addImage(apps, configFile.getParentFile());
 		addOAuthCertificate(apps, configFile.getParentFile());
 		addAPIAccess(apps);
+		validateCustomProperties(apps);
 		return;
 	}
 	
@@ -155,6 +157,12 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 				API api = apis.get(0);
 				apiAccess.setApiId(api.getId());
 			}
+		}
+	}
+	
+	private void validateCustomProperties(List<ClientApplication> apps) throws AppException {
+		for(ClientApplication app : apps) {
+			Utils.validateCustomProperties(app.getCustomProperties(), Type.application);
 		}
 	}
 }

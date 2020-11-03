@@ -3,6 +3,7 @@ package com.axway.apim.api.model.apps;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,9 +13,12 @@ import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AbstractEntity;
+import com.axway.apim.api.model.CustomPropertiesEntity;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -28,7 +32,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("ApplicationFilter")
-public class ClientApplication extends AbstractEntity {
+public class ClientApplication extends AbstractEntity implements CustomPropertiesEntity {
 
 	
 	private String email;
@@ -60,6 +64,8 @@ public class ClientApplication extends AbstractEntity {
 	@JsonDeserialize( using = OrganizationDeserializer.class)
 	@JsonAlias({ "organization", "organizationId" })	
 	private Organization organization;
+	
+	private Map<String, String> customProperties = null;
 	
 	public String getOrganizationId() {
 		if(this.organization == null) return null;
@@ -162,6 +168,18 @@ public class ClientApplication extends AbstractEntity {
 		this.oauthResources = oauthResources;
 	}
 
+	// This avoids, that custom properties are wrapped within customProperties { ... }
+	// See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+	@JsonAnyGetter
+	public Map<String, String> getCustomProperties() {
+		return customProperties;
+	}
+
+	@JsonAnySetter
+	public void setCustomProperties(Map<String, String> customProperties) {
+		this.customProperties = customProperties;
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
@@ -176,7 +194,8 @@ public class ClientApplication extends AbstractEntity {
 					StringUtils.equals(otherApp.getState(), this.getState()) &&
 					(otherApp.getCredentials()==null || otherApp.getCredentials().stream().sorted(c).collect(Collectors.toList()).equals(this.getCredentials().stream().sorted(c).collect(Collectors.toList()))) &&
 					(otherApp.getOauthResources()==null || otherApp.getOauthResources().stream().sorted(Comparator.comparing(ClientAppOauthResource::getScope)).collect(Collectors.toList()).equals(this.getOauthResources().stream().sorted(Comparator.comparing(ClientAppOauthResource::getScope)).collect(Collectors.toList()))) &&
-					(otherApp.getImage()==null || otherApp.getImage().equals(this.getImage()))
+					(otherApp.getImage()==null || otherApp.getImage().equals(this.getImage())) &&
+					(otherApp.getCustomProperties()==null || otherApp.getCustomProperties().equals(this.getCustomProperties()))
 					;
 		}
 		return false;

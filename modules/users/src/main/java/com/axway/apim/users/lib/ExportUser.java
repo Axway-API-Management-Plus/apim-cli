@@ -1,5 +1,7 @@
 package com.axway.apim.users.lib;
 
+import java.util.Map;
+
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.User;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -67,5 +69,9 @@ public class ExportUser {
 	
 	public Long lastSeen() {
 		return this.user.getAuthNUserAttributes().getLastSeen();
+	}
+	
+	public Map<String, String> getCustomProperties() {
+		return this.user.getCustomProperties();
 	}
 }
