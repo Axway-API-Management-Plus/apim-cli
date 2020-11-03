@@ -1,14 +1,22 @@
 package com.axway.apim.organization.lib;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.ParseException;
+import com.axway.apim.lib.CLIOptions;
+import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.Parameters;
+import com.axway.apim.lib.errorHandling.AppException;
 
-public class OrgDeleteCLIOptions extends OrgExportCLIOptions {
+public class OrgDeleteCLIOptions extends CLIOptions {
 
-	CommandLine cmd;
-
-	public OrgDeleteCLIOptions(String[] args) throws ParseException {
+	private OrgDeleteCLIOptions(String[] args) {
 		super(args);
+	}
+	
+	public static CLIOptions create(String[] args) {
+		CLIOptions cliOptions = new OrgDeleteCLIOptions(args);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
 	}
 
 	@Override
@@ -28,6 +36,17 @@ public class OrgDeleteCLIOptions extends OrgExportCLIOptions {
 	@Override
 	protected String getAppName() {
 		return "Organization-Export";
+	}
+
+	@Override
+	public Parameters getParams() throws AppException {
+		return new OrgExportParams();
+	}
+
+	@Override
+	public void addOptions() {
+		// No additional options
+		return;
 	}
 
 

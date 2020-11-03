@@ -6,8 +6,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter.Builder;
+import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.lib.ExportResult;
@@ -73,8 +75,20 @@ public abstract class ApplicationExporter {
 				.hasCredential(params.getCredential())
 				.hasRedirectUrl(params.getRedirectUrl())
 				.hasOrganizationName(params.getOrgName())
+				.includeCustomProperties(getCustomProperties())
+				.hasApiName(params.getApiName())
 				.includeImage(false);
 		if(params.getCredential()!=null || params.getRedirectUrl()!=null) builder.includeCredentials(true);
+		if(params.getApiName()!=null) builder.includeAPIAccess(true);
 		return builder;
+	}
+	
+	protected List<String> getCustomProperties() {
+		try {
+			return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.application);
+		} catch (AppException e) {
+			LOG.error("Error reading custom properties configuration for applications from API-Manager");
+			return null;
+		}
 	}
 }

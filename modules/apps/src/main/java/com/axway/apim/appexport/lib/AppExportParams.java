@@ -1,9 +1,10 @@
 package com.axway.apim.appexport.lib;
 
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportParams;
 
-public class AppExportParams extends StandardExportParams {
+public class AppExportParams extends StandardExportParams implements Parameters {
 	
 	private String state;
 	private String name;
@@ -11,6 +12,7 @@ public class AppExportParams extends StandardExportParams {
 	private String orgName;
 	private String credential;
 	private String redirectUrl;
+	private String apiName;
 	
 	public static synchronized AppExportParams getInstance() {
 		return (AppExportParams)CoreParameters.getInstance();
@@ -63,6 +65,12 @@ public class AppExportParams extends StandardExportParams {
 	public void setRedirectUrl(String redirectUrl) {
 		this.redirectUrl = redirectUrl;
 	}
-	
-	
+
+	public String getApiName() {
+		return apiName;
+	}
+
+	public void setApiName(String apiName) {
+		this.apiName = apiName;
+	}
 }

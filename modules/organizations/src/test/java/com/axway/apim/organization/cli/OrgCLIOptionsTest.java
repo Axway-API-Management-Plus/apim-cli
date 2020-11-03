@@ -4,6 +4,7 @@ import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -16,8 +17,8 @@ public class OrgCLIOptionsTest {
 	@Test
 	public void testAppImportParameters() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-c", "myOrgConfig.json"};
-		OrgImportCLIOptions options = new OrgImportCLIOptions(args);
-		OrgImportParams params = options.getOrgImportParams();
+		CLIOptions options = OrgImportCLIOptions.create(args);
+		OrgImportParams params = (OrgImportParams) options.getParams();
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
@@ -30,8 +31,8 @@ public class OrgCLIOptionsTest {
 	@Test
 	public void testExportApplicationParameters() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-n", "*My organization*", "-id", "UUID-ID-OF-THE-ORG", "-dev", "true", "-o", "csv", "-ultra"};
-		OrgExportCLIOptions options = new OrgExportCLIOptions(args);
-		OrgExportParams params = options.getOrgExportParams();
+		CLIOptions options = OrgExportCLIOptions.create(args);
+		OrgExportParams params = (OrgExportParams) options.getParams();
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");

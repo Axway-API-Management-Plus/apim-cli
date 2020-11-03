@@ -45,45 +45,45 @@ public class ClientAppFilterTest extends APIManagerMockBase {
 		ClientAppFilter filter = new ClientAppFilter.Builder()
 				.hasCredential("6cd55c27-675a-444a-9bc7-ae9a7869184d")
 				.build();
-		assertTrue(filter.filter(testApp), "App must match with API-Key: 6cd55c27-675a-444a-9bc7-ae9a7869184d");
+		assertFalse(filter.filter(testApp), "App must match with API-Key: 6cd55c27-675a-444a-9bc7-ae9a7869184d");
 
 		filter = new ClientAppFilter.Builder()
 				.hasCredential("*675a*")
 				.build();
-		assertTrue(filter.filter(testApp), "App must match with wildcard search for API-Key: 6cd55c27-675a-444a-9bc7-ae9a7869184d");
+		assertFalse(filter.filter(testApp), "App must match with wildcard search for API-Key: 6cd55c27-675a-444a-9bc7-ae9a7869184d");
 		
 		filter = new ClientAppFilter.Builder()
 				.hasCredential("*XXXXX*")
 				.build();
-		assertFalse(filter.filter(testApp), "App SHOULD NOT match with wildcard search *XXXXX*");
+		assertTrue(filter.filter(testApp), "App SHOULD NOT match with wildcard search *XXXXX*");
 		
 		filter = new ClientAppFilter.Builder()
 				.hasCredential("*XXXXX*")
 				.hasRedirectUrl("*ZZZZZ*")
 				.build();
-		assertFalse(filter.filter(testApp), "App SHOULD NOT match");
+		assertTrue(filter.filter(testApp), "App SHOULD NOT match");
 		
 		filter = new ClientAppFilter.Builder()
 				.hasCredential("*XXXXX*")
 				.hasRedirectUrl("*oauthclient:8088*")
 				.build();
-		assertFalse(filter.filter(testApp), "App SHOULD NOT match as a wrong credential is given");
+		assertTrue(filter.filter(testApp), "App SHOULD NOT match as a wrong credential is given");
 		
 		filter = new ClientAppFilter.Builder()
 				.hasCredential("ClientConfidentialApp")
 				.hasRedirectUrl("*oauthclient:8088*")
 				.build();
-		assertTrue(filter.filter(testApp), "App SHOULD match with correct credential and redirect url");
+		assertFalse(filter.filter(testApp), "App SHOULD match with correct credential and redirect url");
 		
 		filter = new ClientAppFilter.Builder()
 				.hasRedirectUrl("*oauthclient:8088*")
 				.build();
-		assertTrue(filter.filter(testApp), "App SHOULD match with correct wildcard redirect url");
+		assertFalse(filter.filter(testApp), "App SHOULD match with correct wildcard redirect url");
 		
 		filter = new ClientAppFilter.Builder()
 				.hasRedirectUrl("https://oauthclient:8088/client/apigateway/callback")
 				.build();
-		assertTrue(filter.filter(testApp), "App SHOULD match with correct redirect url");
+		assertFalse(filter.filter(testApp), "App SHOULD match with correct redirect url");
 	}
 	
 	@Test
@@ -94,12 +94,12 @@ public class ClientAppFilterTest extends APIManagerMockBase {
 		ClientAppFilter filter = new ClientAppFilter.Builder()
 				.hasCredential("6cd55c27-675a-444a-9bc7-ae9a7869184d")
 				.build();
-		assertFalse(filter.filter(testApp), "App SHOULD NOT match as there are no credentials");
+		assertTrue(filter.filter(testApp), "App SHOULD NOT match as there are no credentials");
 		
 		filter = new ClientAppFilter.Builder()
 				.hasRedirectUrl("*anything*")
 				.build();
-		assertFalse(filter.filter(testApp), "App SHOULD NOT match as there are no credentials");
+		assertTrue(filter.filter(testApp), "App SHOULD NOT match as there are no credentials");
 	}
 	
 	@Test
@@ -110,7 +110,27 @@ public class ClientAppFilterTest extends APIManagerMockBase {
 		ClientAppFilter filter = new ClientAppFilter.Builder()
 				.hasCredential("Does-not-exists")
 				.build();
-		assertFalse(filter.filter(testApp), "App SHOULD NOT match as there are no credentials");
+		assertTrue(filter.filter(testApp), "App SHOULD NOT match as there are no credentials");
+	}
+	
+	@Test
+	public void testAppHavingAccessToAPI() throws AppException, JsonParseException, JsonMappingException, IOException {
+		ClientApplication testApp = getTestApp("client-app-with-apis.json");
+		
+		ClientAppFilter filter = new ClientAppFilter.Builder()
+				.hasApiName("This API does not exists")
+				.build();
+		assertTrue(filter.filter(testApp), "App SHOULD NOT match as the given API doesn't exists.");
+		
+		filter = new ClientAppFilter.Builder()
+				.hasApiName("*HIPAA*")
+				.build();
+		assertFalse(filter.filter(testApp), "App SHOULD match as the given API exists.");
+		
+		filter = new ClientAppFilter.Builder()
+				.hasApiName("EMR-HealthCatalog")
+				.build();
+		assertFalse(filter.filter(testApp), "App SHOULD match as the given API exists.");
 	}
 	
 	private ClientApplication getTestApp(String appConfig) throws JsonParseException, JsonMappingException, IOException {

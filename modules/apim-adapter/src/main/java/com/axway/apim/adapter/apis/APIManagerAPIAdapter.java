@@ -14,7 +14,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -129,9 +128,9 @@ public class APIManagerAPIAdapter {
 				addOriginalAPIDefinitionFromAPIM(api, filter);
 				addImageFromAPIM(api, filter.isIncludeImage());
 				addRemoteHost(api, filter.isIncludeRemoteHost());
-				if(logProgress && apis.size()>5) Utils.progressPercentage(i, apis.size(), "Loading "+apis.size()+" APIs");
+				if(logProgress && apis.size()>5) Utils.progressPercentage(i, apis.size(), "Loading details of "+apis.size()+" APIs");
 			}
-			addCustomProperties(apis, filter);
+			Utils.addCustomPropertiesForEntity(apis, this.apiManagerResponse.get(filter), filter);
 			if(logProgress && apis.size()>5) System.out.print("\n");
 		} catch (IOException e) {
 			throw new AppException("Cannot read APIs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -212,20 +211,17 @@ public class APIManagerAPIAdapter {
 
 	private List<API> filterAPIs(APIFilter filter) throws AppException, JsonParseException, JsonMappingException, IOException {
 		List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>(){});
-		List<API> foundAPIs = new ArrayList<API>();
-		for(API api : apis) {
-			if(!filter.filter(api)) continue; 
-			foundAPIs.add(api);
-		}
-		if(foundAPIs.size()!=0) {
+		apis.removeIf(api -> filter.filter(api));
+		
+		if(apis.size()!=0) {
 			String dbgCrit = "";
-			if(foundAPIs.size()>1) 
+			if(apis.size()>1) 
 				dbgCrit = " (apiPath: '"+filter.getApiPath()+"', filter: "+filter+", vhost: '"+filter.getVhost()+"', requestedType: "+filter.getApiType()+")";
-			LOG.debug("Found: "+foundAPIs.size()+" exposed API(s)" + dbgCrit);
-			return foundAPIs;
+			LOG.debug("Found: "+apis.size()+" exposed API(s)" + dbgCrit);
+			return apis;
 		}
 		LOG.debug("No existing API found based on filter: " + getFilterFields(filter));
-		return foundAPIs;
+		return apis;
 	}
 	
 	/**
@@ -418,31 +414,6 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
-	private void addCustomProperties(List<API> apis, APIFilter filter) throws IOException {
-		if(filter.getCustomProperties() == null) {
-			return;
-		}
-		Map<String, String> customProperties = new LinkedHashMap<String, String>();
-		Iterator<String> it = filter.getCustomProperties().keySet().iterator();
-		Map<String, JsonNode> apiAsJsonMappedWithId = new HashMap<String, JsonNode>();
-		JsonNode jsonPayload = mapper.readTree(this.apiManagerResponse.get(filter));
-		// Create a map for each API containing the JSON-Payload
-		for(JsonNode node : jsonPayload) {
-			String apiId = node.get("id").asText();
-			apiAsJsonMappedWithId.put(apiId, node);
-		}
-		for(API api : apis) {
-			JsonNode node = apiAsJsonMappedWithId.get(api.getId());
-			while(it.hasNext()) {
-				String customPropKey = it.next();
-				JsonNode value = node.get(customPropKey);
-				String customPropValue = (value == null) ? null : value.asText();
-				customProperties.put(customPropKey, customPropValue);
-			}
-			api.setCustomProperties((customProperties.size()==0) ? null : customProperties);
-		}
-	}
-	
 	public void addClientOrganizations(API api) throws AppException {
 		addClientOrganizations(api, true);
 	}
@@ -610,7 +581,7 @@ public class APIManagerAPIAdapter {
 				LOG.error("Error deleting API-Proxy. Response-Code: "+statusCode + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
 				throw new AppException("Error deleting API-Proxy. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
-			LOG.info("API: " + api.getName() + " successfully deleted");
+			LOG.info("API: "+api.getName()+" "+api.getVersion()+" ("+api.getId()+")" + " successfully deleted");
 		} catch (Exception e) {
 			throw new AppException("Cannot delete API-Proxy.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
@@ -645,6 +616,13 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
+	public void publishAPI(API api, String vhost) throws AppException {
+		if(API.STATE_PUBLISHED.equals(api.getState())) {
+			LOG.info("API is already published");
+			return;
+		}
+		updateAPIStatus(api, API.STATE_PUBLISHED, vhost);
+	}
 	
 	public void updateAPIStatus(API api, String desiredState, String vhost) throws AppException {
 		LOG.debug("Update API-Proxy status to: " + api.getState());
@@ -655,7 +633,7 @@ public class APIManagerAPIAdapter {
 		uri = new URIBuilder(cmd.getAPIManagerURL())
 				.setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/"+StatusEndpoint.valueOf(desiredState).endpoint)
 				.build();
-			if(vhost!=null && api.getState().equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
+			if(vhost!=null && desiredState.equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
 				HttpEntity entity = new StringEntity("vhost="+vhost, ContentType.APPLICATION_JSON);
 				request = new POSTRequest(entity, uri, useAdminAccountForPublish());
 			} else {
@@ -667,7 +645,7 @@ public class APIManagerAPIAdapter {
 			if(statusCode != 201){
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				if(statusCode == 403 &&  response.contains("API is already unpublished")) {
-					LOG.warn("API: "+api.getName()+" ("+api.getId()+") is already unpublished");
+					LOG.warn("API: "+api.getName()+" "+api.getVersion()+" ("+api.getId()+") is already unpublished");
 					return;
 				}
 				LOG.error("Error updating API status. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");

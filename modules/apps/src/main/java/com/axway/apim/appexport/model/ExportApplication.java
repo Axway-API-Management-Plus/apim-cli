@@ -1,6 +1,7 @@
 package com.axway.apim.appexport.model;
 
 import java.util.List;
+import java.util.Map;
 
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
@@ -10,7 +11,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({ "name", "organization", "description", "state", "image", "enabled", "email", "phone", "credentials", "appQuota", "apis" })
+@JsonPropertyOrder({ "name", "organization", "description", "state", "image", "enabled", "email", "phone", "credentials", "appQuota", "apis", "customProperties" })
 public class ExportApplication {
 	
 	ClientApplication clientApp;
@@ -66,5 +67,9 @@ public class ExportApplication {
 	public List<APIAccess> getAPIAccess() {
 		if(clientApp.getApiAccess()==null || clientApp.getApiAccess().size()==0) return null;
 		return clientApp.getApiAccess();
+	}
+
+	public Map<String, String> getCustomProperties() {
+		return clientApp.getCustomProperties();
 	}
 }

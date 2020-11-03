@@ -1,5 +1,7 @@
 package com.axway.apim.organization.lib;
 
+import java.util.Map;
+
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 
@@ -41,5 +43,9 @@ public class ExportOrganization {
 	
 	public Image getImage() {
 		return this.org.getImage();
+	}
+	
+	public Map<String, String> getCustomProperties() {
+		return this.org.getCustomProperties();
 	}
 }

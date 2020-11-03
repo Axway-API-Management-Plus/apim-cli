@@ -12,17 +12,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.ExtClients;
 import com.axway.apim.api.model.apps.OAuth;
+import com.axway.apim.lib.CustomPropertiesFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 
-public class ClientAppFilter {
+public class ClientAppFilter implements CustomPropertiesFilter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
 	
@@ -46,7 +48,11 @@ public class ClientAppFilter {
 	
 	private String applicationId;
 	
+	private String apiName;
+	
 	boolean includeOauthResources;
+	
+	private List<String> customProperties;
 	
 	List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
@@ -97,6 +103,14 @@ public class ClientAppFilter {
 		return applicationId;
 	}
 
+	public String getApiName() {
+		return apiName;
+	}
+
+	public void setApiName(String apiName) {
+		this.apiName = apiName;
+	}
+
 	public List<NameValuePair> getFilters() {
 		return filters;
 	}
@@ -111,6 +125,14 @@ public class ClientAppFilter {
 
 	public Organization getOrganization() {
 		return organization;
+	}
+
+	public List<String> getCustomProperties() {
+		return customProperties;
+	}
+
+	public void setCustomProperties(List<String> customProperties) {
+		this.customProperties = customProperties;
 	}
 
 	public void setApplicationName(String applicationName) {
@@ -203,27 +225,48 @@ public class ClientAppFilter {
 		}
 	}
 
-	public boolean filter(ClientApplication app) throws AppException {
-		if(this.getCredential()==null && this.getRedirectUrl()==null) { // Nothing given to filter out.
-			return true;
+	public boolean filter(ClientApplication app) {
+		if(this.getCredential()==null && this.getRedirectUrl()==null && this.getApiName()==null) { // Nothing given to filter out.
+			return false;
 		}
-		if(app.getCredentials()==null) return false;
-		boolean match = false;
-		for(ClientAppCredential cred : app.getCredentials()) {
-			switch(cred.getCredentialType()) {
-			case "oauth":
-				match = filterCredential(((OAuth)cred).getClientId(), ((OAuth)cred).getRedirectUrls(), app.getName());
-				break;
-			case "extclients":
-				match = filterCredential(((ExtClients)cred).getClientId(), null, app.getName());
-				break;
-			case "apikeys":
-				match = filterCredential(((APIKey)cred).getApiKey(), null, app.getName());
-				break;
+		if(this.getCredential()!=null || this.getRedirectUrl()!=null) {
+			// Filter this app, as it doesn't have any credentials
+			if(app.getCredentials()==null) return true;
+			boolean match = false;
+			for(ClientAppCredential cred : app.getCredentials()) {
+				switch(cred.getCredentialType()) {
+				case "oauth":
+					match = filterCredential(((OAuth)cred).getClientId(), ((OAuth)cred).getRedirectUrls(), app.getName());
+					break;
+				case "extclients":
+					match = filterCredential(((ExtClients)cred).getClientId(), null, app.getName());
+					break;
+				case "apikeys":
+					match = filterCredential(((APIKey)cred).getApiKey(), null, app.getName());
+					break;
+				}
+				if(match) break;
 			}
-			if(match) break;
+			// Not match found, filter this app
+			if(!match) return true;
 		}
-		return match;
+		if(this.getApiName()!=null) {
+			// App has no access to any API
+			if(app.getApiAccess()==null || app.getApiAccess().size()==0) return true;
+			boolean apiAccessNameMatch = false;
+			Pattern pattern = Pattern.compile(this.apiName.replace("*", ".*"));
+			for(APIAccess apiAccess : app.getApiAccess()) {
+				Matcher matcher = pattern.matcher(apiAccess.getApiName());
+				if(matcher.matches()) {
+					apiAccessNameMatch = true;
+					break;
+				}
+			}
+			// None of the APIs matches
+			if(!apiAccessNameMatch) return true;
+		}
+		// Nothing filtered this application!
+		return false;
 	}
 	
 	private boolean filterCredential(String appCredential, String[] appRedirectUrls, String appName) {
@@ -281,6 +324,10 @@ public class ClientAppFilter {
 		
 		private boolean includeOauthResources;
 		
+		private String apiName;
+		
+		private List<String> customProperties;
+		
 		public Builder() {
 			super();
 		}
@@ -302,6 +349,8 @@ public class ClientAppFilter {
 			filter.setCredential(this.credential);
 			filter.setRedirectUrl(this.redirectUrl);
 			filter.setIncludeOauthResources(this.includeOauthResources);
+			filter.setCustomProperties(this.customProperties);
+			filter.setApiName(this.apiName);
 			return filter;
 		}
 		
@@ -384,6 +433,14 @@ public class ClientAppFilter {
 			return this;
 		}
 		
+		public Builder includeCustomProperties(List<String> customProperties) {
+			this.customProperties = customProperties;
+			return this;
+		}
 		
+		public Builder hasApiName(String apiName) {
+			this.apiName = apiName;
+			return this;
+		}
 	}
 }

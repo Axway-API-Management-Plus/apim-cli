@@ -6,9 +6,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.adapter.user.UserFilter.Builder;
 import com.axway.apim.api.model.User;
+import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -72,8 +74,18 @@ public abstract class UserResultHandler {
 				.hasType(params.getType())
 				.hasEmail(params.getEmail())
 				.hasRole(params.getRole())
+				.includeCustomProperties(getAPICustomProperties())
 				.isEnabled(params.isEnabled());
 		return builder;
+	}
+	
+	protected List<String> getAPICustomProperties() {
+		try {
+			return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.user);
+		} catch (AppException e) {
+			LOG.error("Error reading custom properties user configuration from API-Manager");
+			return null;
+		}
 	}
 	
 	public abstract UserFilter getFilter() throws AppException;

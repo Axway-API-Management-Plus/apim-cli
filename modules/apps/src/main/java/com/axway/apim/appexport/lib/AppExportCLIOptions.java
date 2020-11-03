@@ -1,48 +1,65 @@
 package com.axway.apim.appexport.lib;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.ParseException;
 
+import com.axway.apim.lib.CLIOptions;
+import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportCLIOptions;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class AppExportCLIOptions extends StandardExportCLIOptions {
+public class AppExportCLIOptions extends CLIOptions {
 
-	CommandLine cmd;
-
-	public AppExportCLIOptions(String[] args) throws ParseException {
+	private AppExportCLIOptions(String[] args) {
 		super(args);
+	}
+	
+	public static CLIOptions create(String[] args) {
+		CLIOptions cliOptions = new AppExportCLIOptions(args);
+		cliOptions = new StandardExportCLIOptions(cliOptions);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
+	}
+
+	@Override
+	public void addOptions() {
 		// Define command line options required for Application export
 		Option option = new  Option("n", "name", true, "Filter applications with the specified name. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*My Great App*");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new  Option("id", true, "Filter the export to an application with that specific ID.");
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-APP");
-		options.addOption(option);
+		addOption(option);
 
 		option = new  Option("state", true, "Filter applications to the specificied state: pending | approved");
 		option.setRequired(false);
 		option.setArgName("pending");
-		options.addOption(option);
+		addOption(option);
 
 		option = new  Option("orgName", true, "Filter applications to this organization");
 		option.setRequired(false);
 		option.setArgName("*Partners*");
-		options.addOption(option);
+		addOption(option);
+		
+		option = new  Option("api", true, "Filter applications having access to this API. You may use wildcards at the end or beginning.");
+		option.setRequired(false);
+		option.setArgName("*MyAPI*");
+		addOption(option);
 		
 		option = new  Option("credential", true, "Filter applications having this credential information. Client-ID and API-Key is considered here.");
 		option.setRequired(false);
 		option.setArgName("*9877979779*");
-		options.addOption(option);
+		addOption(option);
 		
 		option = new  Option("redirectUrl", true, "Filter applications having this Redirect-URL. Only OAuth-Credentials are considered.");
 		option.setRequired(false);
 		option.setArgName("*localhost*");
-		options.addOption(option);
+		addOption(option);
 	}
 
 	@Override
@@ -72,16 +89,17 @@ public class AppExportCLIOptions extends StandardExportCLIOptions {
 		return "Application-Export";
 	}
 	
-	public AppExportParams getAppExportParams() throws AppException  {
+	@Override
+	public Parameters getParams() throws AppException {
 		AppExportParams params = new AppExportParams();
-		super.addStandardExportParameters(params);
+
 		params.setName(getValue("name"));
 		params.setId(getValue("id"));
 		params.setState(getValue("state"));
 		params.setOrgName(getValue("orgName"));
 		params.setCredential(getValue("credential"));
 		params.setRedirectUrl(getValue("redirectUrl"));
+		params.setApiName(getValue("api"));
 		return params;
 	}
-
 }

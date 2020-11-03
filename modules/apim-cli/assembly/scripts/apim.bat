@@ -6,7 +6,8 @@ SET javaFound=%errorlevel%
 IF DEFINED JAVA_HOME IF EXIST "%JAVA_HOME%\bin\java.exe" (
 	REM ECHO Using Java from JAVA_HOME
 	SET _java="%JAVA_HOME%\bin\java.exe"
-) ELSE (
+)
+IF NOT DEFINED _java (
 	IF %javaFound%==0 (
 		REM ECHO "Using Java runtime from search path."
 		SET _java=java
@@ -16,11 +17,18 @@ IF DEFINED JAVA_HOME IF EXIST "%JAVA_HOME%\bin\java.exe" (
 )
 
 SET currentDir=%cd%
-SET programDir=%~dp0
+
+IF DEFINED AXWAY_APIM_CLI_HOME (
+	SET programDir=%AXWAY_APIM_CLI_HOME%\
+	REM ECHO Using AXWAY_APIM_CLI_HOME
+) ELSE (
+	SET programDir=%~dp0..
+	REM ECHO Using Relative programDir
+)
 SET bkpClassPath=%CLASSPATH%
 
-CD "%programDir%\.."
-SET CLASSPATH="%programDir%..\lib";"%programDir%..\conf"
+CD /D "%programDir%"
+SET CLASSPATH="%programDir%\lib";"%programDir%\conf"
 
 FOR /R ./lib %%a in (*.jar) DO CALL :AddToPath "%%a"
 
