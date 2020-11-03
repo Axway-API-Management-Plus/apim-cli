@@ -10,9 +10,10 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.axway.apim.api.model.User;
+import com.axway.apim.lib.CustomPropertiesFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class UserFilter {
+public class UserFilter implements CustomPropertiesFilter {
 	
 	public static enum USER_TYPE {
 		internal, 
@@ -32,6 +33,8 @@ public class UserFilter {
 	String organizationName;
 	
 	boolean includeImage;
+	
+	private List<String> customProperties;
 
 	private List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
@@ -154,6 +157,14 @@ public class UserFilter {
 	public boolean isIncludeImage() {
 		return includeImage;
 	}
+	
+	public List<String> getCustomProperties() {
+		return customProperties;
+	}
+
+	public void setCustomProperties(List<String> customProperties) {
+		this.customProperties = customProperties;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -215,6 +226,8 @@ public class UserFilter {
 		String organizationName;
 		
 		boolean includeImage;
+		
+		private List<String> customProperties;
 
 		List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
@@ -235,6 +248,7 @@ public class UserFilter {
 			filter.setType(this.type);
 			filter.setOrganizationName(this.organizationName);
 			filter.includeImage = this.includeImage;
+			filter.setCustomProperties(this.customProperties);
 			return filter;
 		}
 
@@ -294,6 +308,10 @@ public class UserFilter {
 			this.includeImage = includeImage;
 			return this;
 		}
+		
+		public Builder includeCustomProperties(List<String> customProperties) {
+			this.customProperties = customProperties;
+			return this;
+		}
 	}
-
 }

@@ -16,7 +16,7 @@ import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.DesiredTestOnlyAPI;
-import com.axway.apim.apiimport.lib.APIImportParams;
+import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class PrivateKeystoreLoadTest {

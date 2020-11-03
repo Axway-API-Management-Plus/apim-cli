@@ -217,10 +217,8 @@ public class ExportAPI {
 		return ((API)this.actualAPIProxy).getDeprecated();
 	}
 
-
 	public Map<String, String> getCustomProperties() {
 		if(this.actualAPIProxy.getCustomProperties()==null || this.actualAPIProxy.getCustomProperties().size()==0) return null;
-		if(this.actualAPIProxy.getCustomProperties().values()==null) return null; // See issue: #90
 		Iterator<String> it = this.actualAPIProxy.getCustomProperties().values().iterator();
 		boolean propertyFound = false;
 		while(it.hasNext()) {
@@ -233,7 +231,6 @@ public class ExportAPI {
 		if(!propertyFound) return null; // If no property is declared for this API return null
 		return this.actualAPIProxy.getCustomProperties();
 	}
-
 
 	public String getDescriptionType() {
 		if(this.actualAPIProxy.getDescriptionType().equals("original")) return null;

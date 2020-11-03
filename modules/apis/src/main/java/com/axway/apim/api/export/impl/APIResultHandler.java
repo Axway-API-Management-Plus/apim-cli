@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIManagerAdapter.CUSTOM_PROP_TYPE;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
@@ -21,7 +20,9 @@ import com.axway.apim.adapter.apis.APIFilter.POLICY_TRANSLATION;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.ExportAPI;
-import com.axway.apim.api.export.lib.APIExportParams;
+import com.axway.apim.api.export.lib.params.APIExportParams;
+import com.axway.apim.api.model.CustomProperties.Type;
+import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.Organization;
@@ -47,7 +48,8 @@ public abstract class APIResultHandler {
 		API_DELETE_HANDLER(DeleteAPIHandler.class),
 		API_PUBLISH_HANDLER(PublishAPIHandler.class),
 		API_UNPUBLISH_HANDLER(UnpublishAPIHandler.class), 
-		API_CHANGE_HANDLER(APIChangeHandler.class);
+		API_CHANGE_HANDLER(APIChangeHandler.class),
+		API_APPROVE_HANDLER(ApproveAPIHandler.class);
 		
 		private final Class<APIResultHandler> implClass;
 		
@@ -73,7 +75,7 @@ public abstract class APIResultHandler {
 			APIResultHandler exporter = constructor.newInstance(intArgs);
 			return exporter;
 		} catch (Exception e) {
-			throw new AppException("Error initializing application exporter", ErrorCode.UNXPECTED_ERROR, e);
+			throw new AppException("Error initializing API export handler", ErrorCode.UNXPECTED_ERROR, e);
 		}
 	}
 	
@@ -92,17 +94,27 @@ public abstract class APIResultHandler {
 				.hasPolicyName(params.getPolicy())
 				.hasId(params.getId())
 				.hasName(params.getName())
+				.hasOrganization(params.getOrganization())
 				.hasTag(params.getTag())
 				.hasState(params.getState())
 				.hasBackendBasepath(params.getBackend())
 				.hasInboundSecurity(params.getInboundSecurity())
 				.hasOutboundAuthentication(params.getOutboundAuthentication())
-				.includeCustomProperties(APIManagerAdapter.getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE.api))
+				.includeCustomProperties(getAPICustomProperties())
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.translatePolicies(POLICY_TRANSLATION.TO_NAME)
 				.useFEAPIDefinition(params.isUseFEAPIDefinition())
 				.failOnError(false);
 		return builder;
+	}
+	
+	protected List<String> getAPICustomProperties() {
+		try {
+			return APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.api);
+		} catch (AppException e) {
+			LOG.error("Error reading custom properties configuration from API-Manager");
+			return null;
+		}
 	}
     
     protected static String getBackendPath(API api) {
@@ -154,12 +166,7 @@ public abstract class APIResultHandler {
 		List<String> routingPolicies = new ArrayList<String>();
 		List<String> responsePolicies = new ArrayList<String>();
 		List<String> faultHandlerPolicies = new ArrayList<String>();
-		try {
-			it = api.getOutboundProfiles().values().iterator();
-		} catch (AppException e) {
-			LOG.error("Error getting policy information for API", e);
-			return result;
-		}
+		it = api.getOutboundProfiles().values().iterator();
 		
 		while(it.hasNext()) {
 			OutboundProfile profile = it.next();

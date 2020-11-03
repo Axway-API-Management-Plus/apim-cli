@@ -5,12 +5,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIManagerAdapter.CUSTOM_PROP_TYPE;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.api.API;
-import com.axway.apim.api.export.lib.APIChangeParams;
-import com.axway.apim.api.export.lib.APIExportParams;
+import com.axway.apim.api.export.lib.params.APIChangeParams;
+import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
@@ -88,7 +87,7 @@ public class APIChangeHandler extends APIResultHandler {
 		// We need to load the complete API, as this becomes the desired API 
 		// hence, all App, Orgs, Quotas, etc. must be taken over the new API
 		return getBaseAPIFilterBuilder()
-				.includeCustomProperties(APIManagerAdapter.getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE.api))
+				.includeCustomProperties(getAPICustomProperties())
 				.includeOriginalAPIDefinition(true)
 				.includeClientApplications(true)
 				.includeClientAppQuota(true)

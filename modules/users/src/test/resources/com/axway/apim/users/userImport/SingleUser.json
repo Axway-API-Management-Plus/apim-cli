@@ -12,5 +12,10 @@
   "type": "external",
   "enabled" : true,
   "createdOn" : 1593700799104, 
-  "lastSeen": 1593700799104
+  "lastSeen": 1593700799104, 
+  "customProperties": {
+  	"userCustomProperty1": "User custom value 1",
+  	"userCustomProperty2": "2",
+  	"userCustomProperty3": "true"  
+  }
 }

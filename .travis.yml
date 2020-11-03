@@ -30,11 +30,9 @@ before_install:
   #- sudo apt-get install curl
   # All files in this folder will be cached for the next build
   - mkdir -p $CACHE_DIR
-  # Login to the Docker-Registry
-  - if [ ! -f $CACHE_FILE_APIM ]; then docker login --username $AXWAY_DOCKER_REG_USER --password $AXWAY_DOCKER_REG_PASS docker-registry.demo.axway.com; fi
   # Downloading the APIM-Docker-Image takes too long (Timeout 10 minutes) - Externalized to make use of travis_wait
   # In this script, we are either using the cached version or download a new Docker-Image
-  - travis_wait build/pull_apim_docker_image.sh $CACHE_FILE_APIM
+  - travis_wait build/pull_apim_docker_image.sh
   # Now it's time to safe the downloaded API-Management Docker-Image into the cache folder
   - if [ ! -f $CACHE_FILE_APIM ]; then docker save $APIM_DOCKER_IMAGE | gzip > $CACHE_FILE_APIM; fi
   # Pull Cassandra Image or use the cache

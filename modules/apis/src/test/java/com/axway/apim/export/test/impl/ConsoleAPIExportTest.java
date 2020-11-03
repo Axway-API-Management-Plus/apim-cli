@@ -10,8 +10,8 @@ import org.testng.annotations.Test;
 import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.impl.ConsoleAPIExporter;
-import com.axway.apim.api.export.lib.APIExportGetCLIOptions;
-import com.axway.apim.api.export.lib.APIExportParams;
+import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
+import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -36,7 +36,7 @@ public class ConsoleAPIExportTest extends APIManagerMockBase {
 	public void runStandardConsoleAPIExport() throws JsonParseException, JsonMappingException, IOException, AppException, ParseException  {
 		List<API> apis = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + "three-apis-no-clientOrgs-and-clientApps.json"), new TypeReference<List<API>>(){});
 		
-		APIExportParams cmdParams = new APIExportGetCLIOptions(new String[] {}).getAPIExportParams();
+		APIExportParams cmdParams = (APIExportParams) CLIAPIExportOptions.create(new String[] {}).getParams();
 		ConsoleAPIExporter consoleExp = new ConsoleAPIExporter(cmdParams);
 		consoleExp.execute(apis);
 	}
@@ -45,7 +45,7 @@ public class ConsoleAPIExportTest extends APIManagerMockBase {
 	public void runWideConsoleAPIExport() throws JsonParseException, JsonMappingException, IOException, AppException, ParseException  {
 		List<API> apis = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + "three-apis-no-clientOrgs-and-clientApps.json"), new TypeReference<List<API>>(){});
 		
-		APIExportParams cmdParams = new APIExportGetCLIOptions(new String[] {"-wide"}).getAPIExportParams();
+		APIExportParams cmdParams = (APIExportParams) CLIAPIExportOptions.create(new String[] {"-wide"}).getParams();
 		ConsoleAPIExporter consoleExp = new ConsoleAPIExporter(cmdParams);
 		consoleExp.execute(apis);
 	}
@@ -54,7 +54,7 @@ public class ConsoleAPIExportTest extends APIManagerMockBase {
 	public void runUltraConsoleAPIExport() throws JsonParseException, JsonMappingException, IOException, AppException, ParseException  {
 		List<API> apis = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + "three-apis-no-clientOrgs-and-clientApps.json"), new TypeReference<List<API>>(){});
 		
-		APIExportParams cmdParams = new APIExportGetCLIOptions(new String[] {"-ultra"}).getAPIExportParams();
+		APIExportParams cmdParams = (APIExportParams) CLIAPIExportOptions.create(new String[] {"-ultra"}).getParams();
 		ConsoleAPIExporter consoleExp = new ConsoleAPIExporter(cmdParams);
 		consoleExp.execute(apis);
 	}

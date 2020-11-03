@@ -28,6 +28,7 @@ import com.axway.apim.api.model.User;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
@@ -116,6 +117,7 @@ public class APIManagerUserAdapter {
 				addImage(user, filter.isIncludeImage());
 				foundUsers.add(user);
 			}
+			Utils.addCustomPropertiesForEntity(foundUsers, this.apiManagerResponse.get(filter), filter);
 			return foundUsers;
 		} catch (IOException e) {
 			LOG.error("Error cant read users from API-Manager with filter: "+filter+". Returned response: " + apiManagerResponse);

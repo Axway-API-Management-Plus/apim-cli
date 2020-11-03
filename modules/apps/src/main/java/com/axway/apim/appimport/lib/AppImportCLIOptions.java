@@ -1,23 +1,33 @@
 package com.axway.apim.appimport.lib;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.ParseException;
 
+import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class AppImportCLIOptions extends CoreCLIOptions {
+public class AppImportCLIOptions extends CLIOptions {
 
-	CommandLine cmd;
-
-	public AppImportCLIOptions(String[] args) throws ParseException {
+	private AppImportCLIOptions(String[] args) {
 		super(args);
+	}
+	
+	public static CLIOptions create(String[] args) {
+		CLIOptions cliOptions = new AppImportCLIOptions(args);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
+	}
+
+	@Override
+	public void addOptions() {
 		// Define command line options required for Application export
 		Option option = new Option("c", "config", true, "This is the JSON-Formatted Application-Config file containing the application. You may get that config file using apim app get with output set to JSON.");
 		option.setRequired(true);
 		option.setArgName("app_config.json");
-		options.addOption(option);
+		addOption(option);
 	}
 
 	@Override
@@ -40,9 +50,10 @@ public class AppImportCLIOptions extends CoreCLIOptions {
 	}
 
 	
-	public AppImportParams getAppImportParams() throws AppException {
+	@Override
+	public Parameters getParams() throws AppException {
 		AppImportParams params = new AppImportParams();
-		super.addCoreParameters(params);
+		
 		params.setConfig(getValue("c"));
 		return params;
 	}

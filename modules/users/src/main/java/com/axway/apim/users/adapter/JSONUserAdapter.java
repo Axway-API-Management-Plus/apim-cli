@@ -4,11 +4,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
@@ -40,6 +41,7 @@ public class JSONUserAdapter extends UserAdapter {
 			throw new AppException("Cannot read user(s) from config file: " + config, ErrorCode.UNKNOWN_USER, e);
 		}
 		addImage(users, configFile.getParentFile());
+		validateCustomProperties(users);
 		return true;
 	}
 	
@@ -47,6 +49,12 @@ public class JSONUserAdapter extends UserAdapter {
 		for(User user : users) {
 			if(user.getImageUrl()==null || user.getImageUrl().equals("")) continue;
 			user.setImage(Image.createImageFromFile(new File(parentFolder + File.separator + user.getImageUrl())));
+		}
+	}
+	
+	private void validateCustomProperties(List<User> users) throws AppException {
+		for(User user : users) {
+			Utils.validateCustomProperties(user.getCustomProperties(), Type.user);
 		}
 	}
 }
