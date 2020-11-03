@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
-import com.axway.apim.apiimport.lib.APIImportParams;
+import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;

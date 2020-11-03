@@ -16,7 +16,7 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.TestIndicator;
 
-public class CoreParameters {
+public class CoreParameters implements Parameters {
 	
 	private static Logger LOG = LoggerFactory.getLogger(CoreParameters.class);
 	
@@ -97,7 +97,9 @@ public class CoreParameters {
 
 	public static synchronized CoreParameters getInstance() {
 		if(CoreParameters.instance == null && TestIndicator.getInstance().isTestRunning()) {
-			return new CoreParameters(); // Skip this, just return an empty CommandParams to avoid NPE
+			try {
+				return new CoreParameters(); // Skip this, just return an empty CommandParams to avoid NPE
+			} catch (Exception ignore) {}
 		}
 		return CoreParameters.instance;
 	}
@@ -385,6 +387,7 @@ public class CoreParameters {
 	
 	
 	public void validateRequiredParameters() throws AppException {
+		if(TestIndicator.getInstance().isTestRunning()) return;
 		boolean parameterMissing = false;
 		if(getUsername()==null && getAdminUsername()==null) {
 			parameterMissing = true;
@@ -400,7 +403,7 @@ public class CoreParameters {
 		}
 		if(parameterMissing) {
 			LOG.error("Missing required parameters. Use either Command-Line-Options or Environment.Properties to provided required parameters.");
-			LOG.error("Get help with option -h");
+			LOG.error("Get help with option -help");
 			LOG.error("");
 			ErrorState.getInstance().setError("Missing required parameters.", ErrorCode.MISSING_PARAMETER, false);
 			throw new AppException("Missing required parameters.", ErrorCode.MISSING_PARAMETER);

@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.model.CustomProperties.Type;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
@@ -65,6 +67,7 @@ public class JSONOrgAdapter extends OrgAdapter {
 			throw new AppException("Cannot read organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		}
 		addImage(orgs, configFile.getParentFile());
+		validateCustomProperties(orgs);
 		return;
 	}
 	
@@ -72,6 +75,12 @@ public class JSONOrgAdapter extends OrgAdapter {
 		for(Organization org : orgs) {
 			if(org.getImageUrl()==null || org.getImageUrl().equals("")) continue;
 			org.setImage(Image.createImageFromFile(new File(parentFolder + File.separator + org.getImageUrl())));
+		}
+	}
+	
+	private void validateCustomProperties(List<Organization> orgs) throws AppException {
+		for(Organization org : orgs) {
+			Utils.validateCustomProperties(org.getCustomProperties(), Type.organization);
 		}
 	}
 }

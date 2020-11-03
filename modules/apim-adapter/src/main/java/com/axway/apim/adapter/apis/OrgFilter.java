@@ -8,8 +8,9 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.lib.CustomPropertiesFilter;
 
-public class OrgFilter {
+public class OrgFilter implements CustomPropertiesFilter {
 
 	private String id;
 	String apiId;
@@ -20,6 +21,8 @@ public class OrgFilter {
 	String phone;
 	String development;
 	boolean includeImage;
+	
+	private List<String> customProperties;
 
 	private List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
@@ -115,6 +118,14 @@ public class OrgFilter {
 		return includeImage;
 	}
 
+	public List<String> getCustomProperties() {
+		return customProperties;
+	}
+
+	public void setCustomProperties(List<String> customProperties) {
+		this.customProperties = customProperties;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
@@ -165,6 +176,8 @@ public class OrgFilter {
 		String development;
 		
 		boolean includeImage;
+		
+		private List<String> customProperties;
 
 		List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
@@ -183,6 +196,7 @@ public class OrgFilter {
 			filter.setPhone(this.phone);
 			filter.includeImage = this.includeImage;
 			filter.setDevelopment(this.development);
+			filter.setCustomProperties(this.customProperties);
 			return filter;
 		}
 
@@ -230,6 +244,11 @@ public class OrgFilter {
 			this.includeImage = includeImage;
 			return this;
 		}
+		
+		public Builder includeCustomProperties(List<String> customProperties) {
+			this.customProperties = customProperties;
+			return this;
+		}		
 	}
 
 }

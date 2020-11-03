@@ -1,5 +1,7 @@
 package com.axway.apim.api.model;
 
+import java.util.Map;
+
 import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.axway.apim.adapter.jackson.OrganizationSerializer;
 import com.axway.apim.adapter.jackson.UserDeserializer;
@@ -12,7 +14,15 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("RemoteHostFilter")
 public class RemoteHost {
+	
+	public enum LoadBalancing {
+		roundRobin, 
+		responseTime
+	}
+	
 	String id;
+	
+	String alias;
 	
 	String name;
 	
@@ -65,6 +75,14 @@ public class RemoteHost {
 	String[] inputEncodings;
 	
 	String[] outputEncodings;
+	
+	LoadBalancing loadBalancing;
+	
+	Integer responseTimeDecay;
+	
+	Map<String, String[]> addressing;
+	
+	WatchDog watchdog;
 
 	public String getId() {
 		return id;
@@ -72,6 +90,14 @@ public class RemoteHost {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(String alias) {
+		this.alias = alias;
 	}
 
 	public String getName() {
@@ -269,6 +295,38 @@ public class RemoteHost {
 
 	public void setOutputEncodings(String[] outputEncodings) {
 		this.outputEncodings = outputEncodings;
+	}
+
+	public LoadBalancing getLoadBalancing() {
+		return loadBalancing;
+	}
+
+	public void setLoadBalancing(LoadBalancing loadBalancing) {
+		this.loadBalancing = loadBalancing;
+	}
+
+	public Integer getResponseTimeDecay() {
+		return responseTimeDecay;
+	}
+
+	public void setResponseTimeDecay(Integer responseTimeDecay) {
+		this.responseTimeDecay = responseTimeDecay;
+	}
+
+	public Map<String, String[]> getAddressing() {
+		return addressing;
+	}
+
+	public void setAddressing(Map<String, String[]> addressing) {
+		this.addressing = addressing;
+	}
+
+	public WatchDog getWatchdog() {
+		return watchdog;
+	}
+
+	public void setWatchdog(WatchDog watchdog) {
+		this.watchdog = watchdog;
 	}
 
 	@Override

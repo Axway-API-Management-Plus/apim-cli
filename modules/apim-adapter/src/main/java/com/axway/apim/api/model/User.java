@@ -1,9 +1,13 @@
 package com.axway.apim.api.model;
 
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,7 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("UserFilter")
-public class User {
+public class User implements CustomPropertiesEntity {
 	String id;
 	
 	@JsonDeserialize( using = OrganizationDeserializer.class)
@@ -33,6 +37,8 @@ public class User {
 	AuthenticatedUserAttributes authNUserAttributes;
 	
 	String dn;
+	
+	Map<String, String> customProperties = null;
 	
 	@JsonProperty("image")
 	private String imageUrl;
@@ -150,6 +156,20 @@ public class User {
 		this.authNUserAttributes = authNUserAttributes;
 	}
 	
+	// This avoids, that custom properties are wrapped within customProperties { ... }
+	// See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+	@JsonAnyGetter
+	public Map<String, String> getCustomProperties() {
+		return customProperties;
+	}
+	
+	// This avoids, that custom properties are wrapped within customProperties { ... }
+	// See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
+	@JsonAnySetter
+	public void setCustomProperties(Map<String, String> customProperties) {
+		this.customProperties = customProperties;
+	}
+
 	public boolean deepEquals(Object other) {
 		if(other == null) return false;
 		if(other instanceof User) {
@@ -164,7 +184,8 @@ public class User {
 					StringUtils.equals(otherUser.getEmail().toLowerCase(), this.getEmail().toLowerCase()) &&
 					(otherUser.isEnabled()==this.isEnabled()) && 
 					StringUtils.equals(otherUser.getDescription(), this.getDescription()) &&
-					(this.getImage()==null || this.getImage().equals(otherUser.getImage()))
+					(this.getImage()==null || this.getImage().equals(otherUser.getImage())) &&
+					(this.getCustomProperties()==null || this.getCustomProperties().equals(otherUser.getCustomProperties()))
 					;
 		}
 		return false;

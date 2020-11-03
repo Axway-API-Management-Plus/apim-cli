@@ -1,23 +1,33 @@
 package com.axway.apim.organization.lib;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.ParseException;
 
+import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class OrgImportCLIOptions extends CoreCLIOptions {
+public class OrgImportCLIOptions extends CLIOptions {
 
-	CommandLine cmd;
-
-	public OrgImportCLIOptions(String[] args) throws ParseException {
+	private OrgImportCLIOptions(String[] args) {
 		super(args);
+	}
+	
+	public static CLIOptions create(String[] args) {
+		CLIOptions cliOptions = new OrgImportCLIOptions(args);
+		cliOptions = new CoreCLIOptions(cliOptions);
+		cliOptions.addOptions();
+		cliOptions.parse();
+		return cliOptions;
+	}
+
+	@Override
+	public void addOptions() {
 		// Define command line options required for Application export
 		Option option = new Option("c", "config", true, "This is the JSON-Formatted Organization-Config file containing the organization. You may get that config file using apim org get with output set to JSON.");
 		option.setRequired(true);
 		option.setArgName("org_config.json");
-		options.addOption(option);
+		addOption(option);
 	}
 
 	@Override
@@ -39,9 +49,9 @@ public class OrgImportCLIOptions extends CoreCLIOptions {
 		return "Organization-Import";
 	}
 	
-	public OrgImportParams getOrgImportParams() throws AppException {
+	@Override
+	public Parameters getParams() throws AppException {
 		OrgImportParams params = new OrgImportParams();
-		super.addCoreParameters(params);
 		params.setConfig(getValue("config"));
 		return params;
 	}
