@@ -2,7 +2,6 @@ package com.axway.apim.appexport;
 
 import java.util.List;
 
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,13 +52,13 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	public static int export(String args[]) {
 		AppExportParams params;
 		try {
-			params = new AppExportCLIOptions(args).getAppExportParams();
+			params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		ApplicationExportApp app = new ApplicationExportApp();
 		return app.export(params).getRc();
@@ -108,7 +107,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			if(LOG.isDebugEnabled()) {
 				LOG.info("No applications found using filter: " + exporter.getFilter());
 			} else {
-				LOG.info("No applications found based on the given criteria.");
+				LOG.info("No applications found based on the given filters.");
 			}
 		} else {
 			LOG.info("Found " + apps.size() + " application(s).");

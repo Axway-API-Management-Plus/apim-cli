@@ -11,7 +11,7 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
-import com.axway.apim.api.export.lib.APIExportParams;
+import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -136,12 +136,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	}
 	
 	private String getState(API api) {
-		try {
-			return api.getState();
-		} catch (AppException e) {
-			LOG.error("Error getting API state");
-			return "Err";
-		}
+		return api.getState();
 	}
 	
 	private String getCreatedBy(API api) {
@@ -154,12 +149,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	}
 	
 	private String getPath(API api) {
-		try {
-			return api.getPath();
-		} catch (AppException e) {
-			LOG.error("Error getting API path");
-			return "Err";
-		}
+		return api.getPath();
 	}
 	
 	private boolean hasTags(API api) {
@@ -167,13 +157,8 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	}
 	
 	private String getOrgCount(API api) {
-		try {
-			if(api.getClientOrganizations()==null) return "N/A";
-			return Integer.toString(api.getClientOrganizations().size());
-		} catch (AppException e) {
-			LOG.error("Error getting API client organization");
-			return "Err";
-		}
+		if(api.getClientOrganizations()==null) return "N/A";
+		return Integer.toString(api.getClientOrganizations().size());
 	}
 	
 	private String getAppCount(API api) {

@@ -26,11 +26,12 @@ import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.Policy;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
+import com.axway.apim.lib.CustomPropertiesFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.Utils.FedKeyType;
 
-public class APIFilter {
+public class APIFilter implements CustomPropertiesFilter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
 	
@@ -67,6 +68,7 @@ public class APIFilter {
 	private String backendBasepath;
 	private String inboundSecurity;
 	private String outboundAuthentication;
+	private String organization;
 	
 	private String createdOn;
 	private FILTER_OP createdOnOp;
@@ -77,7 +79,7 @@ public class APIFilter {
 	
 	private String tag;
 	
-	private Map<String, String> customProperties;
+	private List<String> customProperties;
 	
 	private boolean deprecated;
 	private boolean retired;
@@ -267,6 +269,14 @@ public class APIFilter {
 		this.outboundAuthentication = outboundAuthentication;
 	}
 
+	public String getOrganization() {
+		return organization;
+	}
+
+	public void setOrganization(String organization) {
+		this.organization = organization;
+	}
+
 	public METHOD_TRANSLATION getTranslateMethodMode() {
 		return translateMethodMode;
 	}
@@ -404,11 +414,11 @@ public class APIFilter {
 		return createdOnOp;
 	}
 
-	public Map<String, String> getCustomProperties() {
+	public List<String> getCustomProperties() {
 		return customProperties;
 	}
 
-	public void setCustomProperties(Map<String, String> customProperties) {
+	public void setCustomProperties(List<String> customProperties) {
 		this.customProperties = customProperties;
 	}
 
@@ -464,9 +474,10 @@ public class APIFilter {
 	}
 	
 	
-	public boolean filter(API api) throws AppException {
-		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null && this.getBackendBasepath()==null && this.getTag()==null && this.getInboundSecurity()==null && this.getOutboundAuthentication()==null) { // Nothing given to filter out.
-			return true;
+	public boolean filter(API api) {
+		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null && this.getBackendBasepath()==null 
+				&& this.getTag()==null && this.getInboundSecurity()==null && this.getOutboundAuthentication()==null && this.getOrganization()==null) { // Nothing given to filter out.
+			return false;
 		}
 		// Before 7.7, we have to filter out APIs manually!
 		if(!APIManagerAdapter.hasAPIManagerVersion("7.7")) {
@@ -474,14 +485,18 @@ public class APIFilter {
 				Pattern pattern = Pattern.compile(this.getApiPath().replace("*", ".*"));
 				Matcher matcher = pattern.matcher(api.getPath());
 				if(!matcher.matches()) {
-					return false;
+					return true;
 				}
 			} else {
-				if(this.getApiPath()!=null && !this.getApiPath().equals(api.getPath())) return false;
+				if(this.getApiPath()!=null && !this.getApiPath().equals(api.getPath())) return true;
 			}
 		}
 		if(this.getPolicyName()!=null) {
-			if(!isPolicyUsed(api, this.getPolicyName())) return false;
+			try {
+				if(!isPolicyUsed(api, this.getPolicyName())) return true;
+			} catch (AppException e) {
+				LOG.error("Error filtering API policies", e);
+			}
 		}
 		if(this.getInboundSecurity()!=null) {
 			boolean match = false;
@@ -502,21 +517,25 @@ public class APIFilter {
 					}
 				}
 			}
-			if(!match) { // No match found so, check the policy names
-				match = isPolicyUsed(api, this.getInboundSecurity());
+			if(!match) { // No match found so far, check policy names
+				try {
+					match = isPolicyUsed(api, this.getInboundSecurity());
+				} catch (AppException e) {
+					LOG.error("Error filtering API policies", e);
+				}
 			}
-			if(!match) return false; // Requested security is finally not found, return false
+			if(!match) return true; // Requested security is finally not found, return true
 		}
 		if(this.getBackendBasepath()!=null) {
 			Pattern pattern = Pattern.compile(this.getBackendBasepath().replace("*", ".*"));
 			Matcher matcher = pattern.matcher(api.getServiceProfiles().get("_default").getBasePath());
 			if(!matcher.matches()) {
-				return false;
+				return true;
 			}
 		}
 		if(this.getApiType().equals(APIManagerAdapter.TYPE_FRONT_END)) {
-			if(this.getVhost()!=null && !this.getVhost().equals(api.getVhost()))  return false;
-			if(this.getQueryStringVersion()!=null && !this.getQueryStringVersion().equals(api.getApiRoutingKey()))  return false;
+			if(this.getVhost()!=null && !this.getVhost().equals(api.getVhost()))  return true;
+			if(this.getQueryStringVersion()!=null && !this.getQueryStringVersion().equals(api.getApiRoutingKey())) return true;
 		}
 		if(this.getTag()!=null) {
 			// Simple filter format tag: "tagValue*"
@@ -551,7 +570,7 @@ public class APIFilter {
 				if(match) break;
 			}
 			// If none of the tags match, filter out this API
-			if(!match) return false;
+			if(!match) return true;
 		}
 		if(this.getOutboundAuthentication()!=null) {
 			boolean match = false;
@@ -582,9 +601,16 @@ public class APIFilter {
 					}
 				}
 			}
-			if(!match) return false;
+			if(!match) return true;
 		}
-		return true;
+		if(this.getOrganization()!=null) {
+			Pattern pattern = Pattern.compile(this.getOrganization().toLowerCase().replace("*", ".*"));
+			Matcher matcher = pattern.matcher(api.getOrganization().getName().toLowerCase());
+			if(!matcher.matches()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -617,13 +643,14 @@ public class APIFilter {
 		String backendBasepath;
 		String inboundSecurity;
 		String outboundAuthentication;
+		String organization;
 		
 		String createdOn;
 		FILTER_OP createdOnOp;
 		
 		APIType apiType;
 		
-		Map<String, String> customProperties;
+		List<String> customProperties;
 		
 		boolean deprecated;
 		boolean retired;
@@ -705,6 +732,7 @@ public class APIFilter {
 			apiFilter.setInboundSecurity(this.inboundSecurity);
 			apiFilter.setOutboundAuthentication(this.outboundAuthentication);
 			apiFilter.setFailOnError(this.failOnError);
+			apiFilter.setOrganization(organization);
 			return apiFilter;
 		}
 
@@ -846,8 +874,14 @@ public class APIFilter {
 			return this;
 		}
 		
-		public Builder includeCustomProperties(Map<String, String> customProperties) {
+		public Builder includeCustomProperties(List<String> customProperties) {
 			this.customProperties = customProperties;
+			return this;
+		}
+		
+		public Builder includeCustomProperties(Map<String, String> customProperties) {
+			if(customProperties==null) return this;
+			this.customProperties = new ArrayList<String>(customProperties.keySet());
 			return this;
 		}
 		
@@ -873,6 +907,11 @@ public class APIFilter {
 		
 		public Builder hasInboundSecurity(String inboundSecurity) {
 			this.inboundSecurity = inboundSecurity;
+			return this;
+		}
+		
+		public Builder hasOrganization(String organization) {
+			this.organization = organization;
 			return this;
 		}
 		

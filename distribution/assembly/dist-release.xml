@@ -17,7 +17,7 @@
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-apps</include>
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-organizations</include>
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-users</include>
-		<include>com.github.axway-api-management-plus.apim-cli:apimcli-setup</include>
+		<include>com.github.axway-api-management-plus.apim-cli:apimcli-settings</include>
         <include>com.github.axway-api-management-plus.apim-cli:apimcli-tool</include>
       </includes>
       <binaries>

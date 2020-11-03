@@ -7,15 +7,29 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.model.CustomProperties.Type;
+import com.axway.apim.api.model.CustomPropertiesEntity;
+import com.axway.apim.api.model.CustomProperty;
+import com.axway.apim.api.model.CustomProperty.Option;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.CustomPropertiesFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.errorHandling.ErrorState;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Utils {
 	
@@ -160,6 +174,69 @@ public class Utils {
 			throw new AppException("Unable to find given Config-File: '"+configFileName+"'", ErrorCode.CANT_READ_CONFIG_FILE);
 		} catch (Exception e) {
 			throw new AppException("Unable to find given Config-File: '"+configFileName+"'", ErrorCode.CANT_READ_CONFIG_FILE, e);
+		}
+	}
+	
+	public static void validateCustomProperties(Map<String, String> customProperties, Type type) throws AppException {
+		if(customProperties==null) return; // Nothing to validate	
+		Iterator<String> desiredCustomProps = customProperties.keySet().iterator();
+		while(desiredCustomProps.hasNext()) {
+			String desiredCustomProperty = desiredCustomProps.next();
+			String desiredCustomPropertyValue = customProperties.get(desiredCustomProperty);
+			CustomProperty configuredCustomProperty = APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperty(type, desiredCustomProperty);
+			if(configuredCustomProperty==null) {
+				ErrorState.getInstance().setError("The custom-property: '" + desiredCustomProperty + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE, false);
+				throw new AppException("The custom-property: '" + desiredCustomProperty + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);
+			}
+			if(configuredCustomProperty.getType()!=null && ( configuredCustomProperty.getType().equals("select") || configuredCustomProperty.getType().equals("switch") )) {
+				boolean valueFound = false;
+				List<Option> knownOptions = configuredCustomProperty.getOptions();
+				if(knownOptions==null) {
+					LOG.warn("Skipping custom property validation, as the custom-property: '" + desiredCustomProperty + "' with type: " + configuredCustomProperty.getType() + " has no options configured. Please check your custom properties configuration.");
+					break;
+				}
+				for(Option knownOption : knownOptions) {
+					if(knownOption.getValue().equals(desiredCustomPropertyValue)) {
+						valueFound = true;
+						break;
+					}
+				}
+				if(!valueFound) {
+					ErrorState.getInstance().setError("The value: '" + desiredCustomPropertyValue + "' is not a valid option for custom property: '" + desiredCustomProperty + "'", ErrorCode.CANT_READ_CONFIG_FILE, false);
+					throw new AppException("The value: '" + desiredCustomPropertyValue + "' is not a valid option for custom property: '" + desiredCustomProperty + "'", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+			}
+		}
+	}
+	
+	public static void addCustomPropertiesForEntity(List<? extends CustomPropertiesEntity> entities, String json, CustomPropertiesFilter filter) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		// Custom-Properties will be added depending on the given Properties in the filter
+		if(filter.getCustomProperties() == null) {
+			return;
+		}
+		Map<String, JsonNode> enitityAsJsonMappedWithId = new HashMap<String, JsonNode>();
+		JsonNode jsonPayload = mapper.readTree(json);
+		// Create a map based on the API-ID containing the original JSON-Payload received from API-Manager
+		for(JsonNode node : jsonPayload) {
+			String apiId = node.get("id").asText();
+			enitityAsJsonMappedWithId.put(apiId, node);
+		}
+		Map<String, String> customProperties = new LinkedHashMap<String, String>();
+		// Iterate over all APIs (at this point not yet having the custom-properties serialized)
+		for(CustomPropertiesEntity entity : entities) {
+			// Get the original JSON-Payload for the current API fetched from API-Manager
+			JsonNode node = enitityAsJsonMappedWithId.get(entity.getId());
+			// Iterate over all requested Custom-Properties that should be returned 
+			for(String customPropKey : filter.getCustomProperties()) {
+				// Try to get the value for that custom property from the JSON-Payload
+				JsonNode value = node.get(customPropKey);
+				// If there is nothing found - skip it.
+				if(value == null) continue;
+				// Add it to the map of custom properties that will be attached to the API
+				customProperties.put(customPropKey, value.asText());
+			}
+			entity.setCustomProperties((customProperties.size()==0) ? null : customProperties);
 		}
 	}
 }

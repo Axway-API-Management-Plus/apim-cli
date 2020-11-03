@@ -8,6 +8,7 @@ import com.axway.apim.appexport.lib.AppExportCLIOptions;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.appimport.lib.AppImportCLIOptions;
 import com.axway.apim.appimport.lib.AppImportParams;
+import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -16,8 +17,8 @@ public class AppCLIOptionsTest {
 	@Test
 	public void testAppImportParameters() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-c", "myAppConfig.json"};
-		AppImportCLIOptions options = new AppImportCLIOptions(args);
-		AppImportParams params = options.getAppImportParams();
+		CLIOptions options = AppImportCLIOptions.create(args);
+		AppImportParams params = (AppImportParams) options.getParams();
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
@@ -30,8 +31,8 @@ public class AppCLIOptionsTest {
 	@Test
 	public void testExportApplicationParameters() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-n", "*My Great App*", "-id", "UUID-ID-OF-THE-APP", "-state", "pending", "-orgName", "*Partners*", "-credential", "*9877979779*", "-redirectUrl", "*localhost*", "-o", "json", "-wide"};
-		AppExportCLIOptions options = new AppExportCLIOptions(args);
-		AppExportParams params = options.getAppExportParams();
+		CLIOptions options = AppExportCLIOptions.create(args);
+		AppExportParams params = (AppExportParams) options.getParams();
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");

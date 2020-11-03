@@ -70,7 +70,7 @@ public class ConsoleAppExporter extends ApplicationExporter {
 		case standard:
 			builder.includeQuotas(false);
 			if(params.getCredential()==null && params.getRedirectUrl()==null) builder.includeCredentials(false);
-			builder.includeAPIAccess(false);
+			if(params.getApiName()==null) builder.includeAPIAccess(false);
 			break;
 		case wide:
 		case ultra:

@@ -18,7 +18,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.jackson.serializer.APIExportSerializerModifier;
-import com.axway.apim.api.export.lib.APIExportParams;
+import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.lib.errorHandling.AppException;

@@ -2,7 +2,6 @@ package com.axway.apim.organization;
 
 import java.util.List;
 
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,13 +57,13 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	public static int exportOrgs(String args[]) {
 		OrgExportParams params;
 		try {
-			params = new OrgExportCLIOptions(args).getOrgExportParams();
+			params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		OrganizationApp app = new OrganizationApp();
 		return app.exportOrgs(params).getRc();
@@ -135,13 +134,13 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	public static int importOrganization(String[] args) {
 		OrgImportParams params;
 		try {
-			params = new OrgImportCLIOptions(args).getOrgImportParams();
+			params = (OrgImportParams) OrgImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		OrganizationApp orgApp = new OrganizationApp();
 		return orgApp.importOrganization(params);
@@ -186,15 +185,15 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	public static int delete(String args[]) {
 		try {
 			
-			OrgExportParams params = new OrgDeleteCLIOptions(args).getOrgExportParams();
+			OrgExportParams params = (OrgExportParams) OrgDeleteCLIOptions.create(args).getParams();
 			OrganizationApp orgApp = new OrganizationApp();
 			return orgApp.delete(params).getRc();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		} catch (ParseException e) {
+		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();
+			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 	}
 	
