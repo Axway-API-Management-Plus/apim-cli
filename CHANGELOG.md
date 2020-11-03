@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Support to manage the full Remote-Host introduced with the API-Manager September/2020 release
 - Capability to filter APIs based on their organization
 - New command to approve one or more APIs that are in pending state (See issue [#97](https://github.com/Axway-API-Management-Plus/apim-cli/issues/97))
-- Script apim.sh and apim.bar are now considering AXWAY_APIM_CLI_HOME to setup the classpath (See issue [#100](https://github.com/Axway-API-Management-Plus/apim-cli/issues/100))
+- Script apim.sh and apim.bat now optionally use AXWAY_APIM_CLI_HOME to setup the classpath (See issue [#100](https://github.com/Axway-API-Management-Plus/apim-cli/issues/100))
 - Staging support for applications, users and organizations
 - Support for custom properties for applications, users and organizations (See issue [#93](https://github.com/Axway-API-Management-Plus/apim-cli/issues/93))
 
@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Organizations now validated based on given stage (See issue [#58](https://github.com/Axway-API-Management-Plus/apim-cli/issues/58))
 - API-Import is now stopped if host and backendBasepath is missing (See issue [#53](https://github.com/Axway-API-Management-Plus/apim-cli/issues/53))
 - Command-Line option with or without arguments can now be given interchangeable (See issue [#102](https://github.com/Axway-API-Management-Plus/apim-cli/issues/102))
+- apim.bat now works with or without JAVA_HOME set (See issue [#105](https://github.com/Axway-API-Management-Plus/apim-cli/issues/105))
 
 ### Changed
 - APIs no longer Re-Created if not needed (See issue [#95](https://github.com/Axway-API-Management-Plus/apim-cli/issues/95))
