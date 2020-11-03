@@ -2,7 +2,7 @@
 
 set -x
 
-if [ -f $CACHE_FILE_APIM -a ! $SKIP_CACHE="true" ]
+if [ -f $CACHE_FILE_APIM -a "$SKIP_CACHE"!="true" ]
 then
 	echo "Loading API-Manager docker image: $APIM_DOCKER_IMAGE from $CACHE_FILE_APIM"
 	gunzip -c $CACHE_FILE_APIM | docker load
