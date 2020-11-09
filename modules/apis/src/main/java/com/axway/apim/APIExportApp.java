@@ -49,9 +49,6 @@ public class APIExportApp implements APIMCLIServiceProvider {
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		/*} catch (ParseException e) {
-			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		APIExportApp apiExportApp = new APIExportApp();
 		return apiExportApp.exportAPI(params);
@@ -59,6 +56,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 
 	public int exportAPI(APIExportParams params) {
 		try {
+			params.validateRequiredParameters();
 			deleteInstances();
 
 			switch(params.getOutputFormat()) {

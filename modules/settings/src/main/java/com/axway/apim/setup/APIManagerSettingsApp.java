@@ -81,6 +81,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 	public ExportResult runExport(APIManagerSetupExportParams params) {
 		ExportResult result = new ExportResult();
 		try {
+			params.validateRequiredParameters();
 			switch(params.getOutputFormat()) {
 			case console:
 				return exportAPIManagerSetup(params, ResultHandler.CONSOLE_EXPORTER, result);
@@ -144,7 +145,8 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 		ImportResult result = new ImportResult();
 		String updatedAssets = "";
-		try {			
+		try {
+			params.validateRequiredParameters();
 			// Clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();

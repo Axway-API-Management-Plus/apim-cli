@@ -47,7 +47,6 @@ cd /opt && \
         /opt/Axway/apigateway/system/lib/ibmmq \
         /opt/Axway/apigateway/system/conf/sql \
         /opt/Axway/apigateway/system/conf/snmp \
-        /opt/Axway/apigateway/system/conf/templates/* \
         /opt/Axway/apigateway/system/conf/threat-protection/SpiderLabs-owasp-modsecurity-crs-2.2.9-7-g3e6782b.zip \
         /opt/Axway/apigateway/system/conf/oracle-em \
         /opt/Axway/apigateway/system/conf/migrate \
