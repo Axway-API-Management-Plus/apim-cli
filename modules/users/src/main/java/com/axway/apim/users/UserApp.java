@@ -63,9 +63,6 @@ public class UserApp implements APIMCLIServiceProvider {
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		/*} catch (ParseException e) {
-			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		UserApp app = new UserApp();
 		return app.export(params).getRc();
@@ -74,6 +71,7 @@ public class UserApp implements APIMCLIServiceProvider {
 	public ExportResult export(UserExportParams params) {
 		ExportResult result = new ExportResult();
 		try {
+			params.validateRequiredParameters();
 			switch(params.getOutputFormat()) {
 			case console:
 				return runExport(params, ResultHandler.CONSOLE_EXPORTER, result);
@@ -151,6 +149,7 @@ public class UserApp implements APIMCLIServiceProvider {
 	public ImportResult importUsers(UserImportParams params) {
 		ImportResult result = new ImportResult();
 		try {
+			params.validateRequiredParameters();
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
