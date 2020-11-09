@@ -55,9 +55,6 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		/*} catch (ParseException e) {
-			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		ClientApplicationImportApp app = new ClientApplicationImportApp();
 		return app.importApp(params).getRc();
@@ -66,6 +63,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 	public ImportResult importApp(AppImportParams params) {
 		ImportResult result = new ImportResult();
 		try {
+			params.validateRequiredParameters();
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
