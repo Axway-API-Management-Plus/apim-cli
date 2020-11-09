@@ -47,3 +47,6 @@ install:
   - docker-compose run --rm start_apimgmt
   # Give API-Manager a moment to start
   - docker-compose logs --tail 30 apimgmt
+
+after_failure:
+  - docker-compose logs --tail 1000 apimgmt
