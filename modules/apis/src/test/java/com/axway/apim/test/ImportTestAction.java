@@ -255,7 +255,7 @@ public class ImportTestAction extends AbstractTestAction {
 				return;
 			}
 		}
-		FileFilter filter = new WildcardFileFilter(new String[] {"*.crt", "*.jpg", "*.png", "*.pem"});
+		FileFilter filter = new WildcardFileFilter(new String[] {"*.crt", "*.jpg", "*.png", "*.pem", "*.md"});
 		try {
 			LOG.info("Copy certificates and images from source: "+sourceDir+" into test-dir: '"+testDir+"'");
 			FileUtils.copyDirectory(sourceDir, testDir, filter);

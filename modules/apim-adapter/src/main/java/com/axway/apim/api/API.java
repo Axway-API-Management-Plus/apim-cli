@@ -83,6 +83,8 @@ public class API implements CustomPropertiesEntity {
 	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected String descriptionUrl = null;
 	
+	protected String markdownLocal = null;
+	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
 	@JsonSetter(nulls=Nulls.SKIP)
 	protected List<SecurityProfile> securityProfiles = null;
@@ -378,6 +380,14 @@ public class API implements CustomPropertiesEntity {
 
 	public void setDescriptionUrl(String descriptionUrl) {
 		this.descriptionUrl = descriptionUrl;
+	}
+
+	public String getMarkdownLocal() {
+		return markdownLocal;
+	}
+
+	public void setMarkdownLocal(String markdownLocal) {
+		this.markdownLocal = markdownLocal;
 	}
 
 	public List<CaCert> getCaCerts() {

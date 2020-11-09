@@ -22,6 +22,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.CustomPropertiesEntity;
 import com.axway.apim.api.model.CustomProperty;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.CustomProperty.Option;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.CustomPropertiesFilter;
@@ -170,6 +171,9 @@ public class Utils {
 			// This is mainly to load the samples sitting inside the package!
 			String installFolder = new File(Utils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getParent();
 			configFile = new File(installFolder + File.separator + configFileName);
+			if(configFile.exists()) return configFile;
+			// Finally try to load it from the classpath (mainly used for testing)
+			configFile = new File(Utils.class.getClass().getResource(configFileName).getPath());
 			if(configFile.exists()) return configFile;
 			throw new AppException("Unable to find given Config-File: '"+configFileName+"'", ErrorCode.CANT_READ_CONFIG_FILE);
 		} catch (Exception e) {

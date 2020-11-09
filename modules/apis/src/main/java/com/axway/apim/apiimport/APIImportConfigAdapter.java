@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyManagementException;
@@ -331,10 +332,23 @@ public class APIImportConfigAdapter {
 			if(!apiConfig.getDescriptionMarkdown().startsWith("${env.")) {
 				throw new AppException("descriptionMarkdown must start with an environment variable", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
+		} else if(descriptionType.equals("markdownLocal")) {
+			if(apiConfig.getMarkdownLocal()==null) {
+				throw new AppException("markdownLocal can't be null with descriptionType set to 'markdownLocal'", ErrorCode.CANT_READ_CONFIG_FILE);
+			}
+			try {
+				File markdownFile = Utils.locateConfigFile(apiConfig.getMarkdownLocal());
+				LOG.debug("Reading local markdown description file: " + markdownFile.getPath());
+				String markdownDescription = new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8);
+				apiConfig.setDescriptionManual(markdownDescription);
+				apiConfig.setDescriptionType("manual");
+			} catch (AppException | IOException e) {
+				throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE);
+			}
 		} else if(descriptionType.equals("original")) {
 			return;
 		} else {
-			throw new AppException("Unknown descriptionType: '"+descriptionType.equals("manual")+"'", ErrorCode.CANT_READ_CONFIG_FILE);
+			throw new AppException("Unknown descriptionType: '"+descriptionType+"'", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 	}
 	
