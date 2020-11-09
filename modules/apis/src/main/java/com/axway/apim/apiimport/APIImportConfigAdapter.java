@@ -339,10 +339,12 @@ public class APIImportConfigAdapter {
 			try {
 				File markdownFile = new File(apiConfig.getMarkdownLocal());
 				if(!markdownFile.exists()) { // The image isn't provided with an absolute path, try to read it relative to the config file
+					LOG.info("Error reading markdown description file (absolute): '" + markdownFile.getCanonicalPath() + "'");
 					String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
 					markdownFile = new File(baseDir + "/" + apiConfig.getMarkdownLocal());
 				}
 				if(!markdownFile.exists()) {
+					LOG.info("Error reading markdown description file (relative): '" + markdownFile.getCanonicalPath() + "'");
 					throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE);
 				}
 				LOG.debug("Reading local markdown description file: " + markdownFile.getPath());
