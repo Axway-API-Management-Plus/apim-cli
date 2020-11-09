@@ -56,9 +56,6 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		/*} catch (ParseException e) {
-			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		ApplicationExportApp app = new ApplicationExportApp();
 		return app.export(params).getRc();
@@ -67,6 +64,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	public ExportResult export(AppExportParams params) {
 		ExportResult result = new ExportResult();
 		try {
+			params.validateRequiredParameters();
 			switch(params.getOutputFormat()) {
 			case console:
 				return runExport(params, ExportImpl.CONSOLE_EXPORTER, result);

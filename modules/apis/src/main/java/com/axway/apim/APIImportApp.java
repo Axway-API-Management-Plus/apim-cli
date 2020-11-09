@@ -54,10 +54,6 @@ public class APIImportApp implements APIMCLIServiceProvider {
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-			
-		/*} catch (ParseException e) {
-			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		APIImportApp apiImportApp = new APIImportApp();
 		return apiImportApp.importAPI(params);
@@ -65,7 +61,8 @@ public class APIImportApp implements APIMCLIServiceProvider {
 
 	public int importAPI(APIImportParams params) {
 		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
-		try {			
+		try {		
+			params.validateRequiredParameters();
 			// Clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
