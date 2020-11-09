@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -171,11 +170,6 @@ public class Utils {
 			// This is mainly to load the samples sitting inside the package!
 			String installFolder = new File(Utils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getParent();
 			configFile = new File(installFolder + File.separator + configFileName);
-			if(configFile.exists()) return configFile;
-			// Finally try to load it from the classpath (mainly used for testing)
-			URL resoureURL = Utils.class.getClass().getResource(configFileName);
-			if(resoureURL==null) throw new AppException("Unable to find given Config-File: '"+configFileName+"' in classpath.", ErrorCode.CANT_READ_CONFIG_FILE);
-			configFile = new File(resoureURL.getPath());
 			if(configFile.exists()) return configFile;
 			throw new AppException("Unable to find given Config-File: '"+configFileName+"'", ErrorCode.CANT_READ_CONFIG_FILE);
 		} catch (Exception e) {

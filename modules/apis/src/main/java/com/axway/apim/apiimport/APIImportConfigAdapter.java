@@ -337,7 +337,14 @@ public class APIImportConfigAdapter {
 				throw new AppException("markdownLocal can't be null with descriptionType set to 'markdownLocal'", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
 			try {
-				File markdownFile = Utils.locateConfigFile(apiConfig.getMarkdownLocal());
+				File markdownFile = new File(apiConfig.getMarkdownLocal());
+				if(!markdownFile.exists()) { // The image isn't provided with an absolute path, try to read it relative to the config file
+					String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
+					markdownFile = new File(baseDir + "/" + apiConfig.getMarkdownLocal());
+				}
+				if(!markdownFile.exists()) {
+					throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE);
+				}
 				LOG.debug("Reading local markdown description file: " + markdownFile.getPath());
 				String markdownDescription = new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8);
 				apiConfig.setDescriptionManual(markdownDescription);
