@@ -343,7 +343,7 @@ public class APIImportConfigAdapter {
 				apiConfig.setDescriptionManual(markdownDescription);
 				apiConfig.setDescriptionType("manual");
 			} catch (AppException | IOException e) {
-				throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE);
+				throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE, e);
 			}
 		} else if(descriptionType.equals("original")) {
 			return;
