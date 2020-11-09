@@ -61,9 +61,6 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
 			return e.getErrorCode().getCode();
-		/*} catch (ParseException e) {
-			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		OrganizationApp app = new OrganizationApp();
 		return app.exportOrgs(params).getRc();
@@ -72,6 +69,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	public ExportResult exportOrgs(OrgExportParams params) {
 		ExportResult result = new ExportResult();
 		try {
+			params.validateRequiredParameters();
 			switch(params.getOutputFormat()) {
 			case console:
 				return exportOrgs(params, ResultHandler.CONSOLE_EXPORTER, result);
@@ -148,6 +146,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	
 	public int importOrganization(OrgImportParams params) {
 		try {
+			params.validateRequiredParameters();
 			APIManagerAdapter.deleteInstance();
 			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
