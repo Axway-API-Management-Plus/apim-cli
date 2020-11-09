@@ -30,7 +30,7 @@ public class LocalMarkdownDescriptionTestIT extends TestNGCitrusTestDesigner {
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/description/1_api_with_local_mark_down.json");
 		createVariable("state", "unpublished");
 		createVariable("descriptionType", "markdownLocal");
-		createVariable("markdownLocal", "/com/axway/apim/test/files/description/MyLocalMarkdown.md");
+		createVariable("markdownLocal", "/com/axway/apim/test/files/description/MyLocalMarkdown.txt");
 		createVariable("expectedReturnCode", "0");
 		action(swaggerImport);
 		
