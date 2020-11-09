@@ -1,5 +1,8 @@
 #!/bin/sh
 
+echo "CACHE_FILE_APIM: $CACHE_FILE_APIM"
+echo "SKIP_CACHE: $SKIP_CACHE"
+
 if [ -f $CACHE_FILE_APIM -a "$SKIP_CACHE" != "true" ]
 then
 	echo "Using cached API-Manager docker image: $APIM_DOCKER_IMAGE from $CACHE_FILE_APIM"
