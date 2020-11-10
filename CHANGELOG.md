@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.3.0] 2020-11-10
 ### Added
 - Search for APIs based on configured Inbound- and Outbound-Security (See issue [#86](https://github.com/Axway-API-Management-Plus/apim-cli/issues/86))
 - Added support for API-Manager Config/Alerts/Remote-Hosts (See issue [#68](https://github.com/Axway-API-Management-Plus/apim-cli/issues/68))
