@@ -29,6 +29,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - APIs no longer Re-Created if not needed (See issue [#95](https://github.com/Axway-API-Management-Plus/apim-cli/issues/95))
 - CLI Options parser refactored to be more flexible and support future requirements (See PR [#103](https://github.com/Axway-API-Management-Plus/apim-cli/pull/103))
+- Updated Commons-text from version 1.8 to version 1.9
+- Updated Jackson-Databind from version 2.9.10.5 to 2.9.10.6
+- Updated commons-lang3 from version 3.10 to 3.11
+- Updated commons-io from version 2.7 to 2.8.0
+- Updated org.apache.httpcomponents httpclient from version 4.5.12 to 4.5.13
+- Updated Jackson from 2.9.10 to 2.11.3
 
 ## [1.2.3] 2020-09-24
 ### Added
