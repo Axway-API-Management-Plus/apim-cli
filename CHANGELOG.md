@@ -18,8 +18,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Support to read the API-Description from  a local markdown file See issue [#110](https://github.com/Axway-API-Management-Plus/apim-cli/issues/110))
 
 ### Fixed
-- Avoid NPE during API-Export if custom-properties config is inconsistent (See issue [#90](https://github.com/Axway-API-Management-Plus/apim-cli/issues/90))
-- Disabled applications not created as disabled (See issue [#89](https://github.com/Axway-API-Management-Plus/apim-cli/issues/89))
+- Avoid NPE during API-Export if API-Custom-properties are not configured (See issue [#90](https://github.com/Axway-API-Management-Plus/apim-cli/issues/90))
+- Disabled applications not created as disabled in API-Manager (See issue [#89](https://github.com/Axway-API-Management-Plus/apim-cli/issues/89))
 - Support for special characters like an accent (See issue [#88](https://github.com/Axway-API-Management-Plus/apim-cli/issues/88))
 - Organizations now validated based on given stage (See issue [#58](https://github.com/Axway-API-Management-Plus/apim-cli/issues/58))
 - API-Import is now stopped if host and backendBasepath is missing (See issue [#53](https://github.com/Axway-API-Management-Plus/apim-cli/issues/53))
