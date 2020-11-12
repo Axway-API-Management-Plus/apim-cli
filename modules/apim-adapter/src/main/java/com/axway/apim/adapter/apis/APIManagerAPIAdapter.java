@@ -718,9 +718,9 @@ public class APIManagerAPIAdapter {
 				jsonNode =  importFromSwagger(api);
 			}
 			API createdAPI = new APIBaseDefinition();
-			createdAPI.setApiId(jsonNode.findPath("id").asText());
-			createdAPI.setName(jsonNode.findPath("name").asText());
-			createdAPI.setCreatedOn(Long.parseLong(jsonNode.findPath("createdOn").asText()));
+			createdAPI.setApiId(jsonNode.get("id").asText());
+			createdAPI.setName(jsonNode.get("name").asText());
+			createdAPI.setCreatedOn(Long.parseLong(jsonNode.get("createdOn").asText()));
 			return createdAPI;
 		} catch (Exception e) {
 			throw new AppException("Can't import definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);

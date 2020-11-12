@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+- Created BE-API response was parsing the response wrong. This could lead to an issue, if the API contains a createdOn field. (See issue [#112](https://github.com/Axway-API-Management-Plus/apim-cli/issues/112))
+
 ## [1.3.0] 2020-11-10
 ### Added
 - Search for APIs based on configured Inbound- and Outbound-Security (See issue [#86](https://github.com/Axway-API-Management-Plus/apim-cli/issues/86))
