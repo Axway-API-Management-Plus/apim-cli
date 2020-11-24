@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.3.1] 2020-11-24
 ### Fixed
 - Created BE-API response was parsing the response wrong. This could lead to an issue, if the API contains a createdOn field. (See issue [#112](https://github.com/Axway-API-Management-Plus/apim-cli/issues/112))
 - Unicode API-Name was not shown correctly in the Backend-API overview (See issue [#113](https://github.com/Axway-API-Management-Plus/apim-cli/issues/113))
