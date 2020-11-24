@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Created BE-API response was parsing the response wrong. This could lead to an issue, if the API contains a createdOn field. (See issue [#112](https://github.com/Axway-API-Management-Plus/apim-cli/issues/112))
+- Unicode API-Name was not shown correctly in the Backend-API overview (See issue [#113](https://github.com/Axway-API-Management-Plus/apim-cli/issues/113))
+- Application-Subscription not restored, when API is Republished to be updated (See issue [#114](https://github.com/Axway-API-Management-Plus/apim-cli/issues/114))
+
+### Added
+- Support to use a proxy for the API-Manager communication (See issue [#109](https://github.com/Axway-API-Management-Plus/apim-cli/issues/109))
+
+## [1.3.0] 2020-11-10
 ### Added
 - Search for APIs based on configured Inbound- and Outbound-Security (See issue [#86](https://github.com/Axway-API-Management-Plus/apim-cli/issues/86))
 - Added support for API-Manager Config/Alerts/Remote-Hosts (See issue [#68](https://github.com/Axway-API-Management-Plus/apim-cli/issues/68))
@@ -12,14 +21,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Support to manage the full Remote-Host introduced with the API-Manager September/2020 release
 - Capability to filter APIs based on their organization
 - New command to approve one or more APIs that are in pending state (See issue [#97](https://github.com/Axway-API-Management-Plus/apim-cli/issues/97))
-- Script apim.sh and apim.bat now optionally use AXWAY_APIM_CLI_HOME to setup the classpath (See issue [#100](https://github.com/Axway-API-Management-Plus/apim-cli/issues/100))
+- Scripts apim.sh and apim.bat now optionally use AXWAY_APIM_CLI_HOME to setup the classpath (See issue [#100](https://github.com/Axway-API-Management-Plus/apim-cli/issues/100))
 - Staging support for applications, users and organizations
 - Support for custom properties for applications, users and organizations (See issue [#93](https://github.com/Axway-API-Management-Plus/apim-cli/issues/93))
-- Support to read API-Description from  a local markdown See issue [#110](https://github.com/Axway-API-Management-Plus/apim-cli/issues/110))
+- Support to read the API-Description from  a local markdown file See issue [#110](https://github.com/Axway-API-Management-Plus/apim-cli/issues/110))
 
 ### Fixed
-- Avoid NPE during API-Export if custom-properties config is inconsistent (See issue [#90](https://github.com/Axway-API-Management-Plus/apim-cli/issues/90))
-- Disabled applications not created as disabled (See issue [#89](https://github.com/Axway-API-Management-Plus/apim-cli/issues/89))
+- Avoid NPE during API-Export if API-Custom-properties are not configured (See issue [#90](https://github.com/Axway-API-Management-Plus/apim-cli/issues/90))
+- Disabled applications not created as disabled in API-Manager (See issue [#89](https://github.com/Axway-API-Management-Plus/apim-cli/issues/89))
 - Support for special characters like an accent (See issue [#88](https://github.com/Axway-API-Management-Plus/apim-cli/issues/88))
 - Organizations now validated based on given stage (See issue [#58](https://github.com/Axway-API-Management-Plus/apim-cli/issues/58))
 - API-Import is now stopped if host and backendBasepath is missing (See issue [#53](https://github.com/Axway-API-Management-Plus/apim-cli/issues/53))
@@ -29,6 +38,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - APIs no longer Re-Created if not needed (See issue [#95](https://github.com/Axway-API-Management-Plus/apim-cli/issues/95))
 - CLI Options parser refactored to be more flexible and support future requirements (See PR [#103](https://github.com/Axway-API-Management-Plus/apim-cli/pull/103))
+- Updated Commons-text from version 1.8 to version 1.9
+- Updated Jackson-Databind from version 2.9.10.5 to 2.9.10.6
+- Updated commons-lang3 from version 3.10 to 3.11
+- Updated commons-io from version 2.7 to 2.8.0
+- Updated org.apache.httpcomponents httpclient from version 4.5.12 to 4.5.13
+- Updated Jackson from 2.9.10 to 2.11.3
 
 ## [1.2.3] 2020-09-24
 ### Added
