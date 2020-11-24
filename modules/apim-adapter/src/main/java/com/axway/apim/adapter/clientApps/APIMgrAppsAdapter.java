@@ -225,7 +225,7 @@ public class APIMgrAppsAdapter {
 		for(int i=0; i<types.length; i++) {
 			try {
 				String type = types[i];
-				TypeReference classType = classTypes[i];
+				TypeReference<List<ClientAppCredential>> classType = classTypes[i];
 				if(!applicationsCredentialCache.containsKey(app.getId()+"|"+type)) {
 					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type)
 							.build();
@@ -272,7 +272,7 @@ public class APIMgrAppsAdapter {
 						LOG.error("Error reading application oauth resources. Response-Code: "+statusCode+". Got response: '"+response+"'");
 						throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 					}
-					TypeReference classType = new TypeReference<List<ClientAppOauthResource>>() {};
+					TypeReference<List<ClientAppOauthResource>> classType = new TypeReference<List<ClientAppOauthResource>>() {};
 					oauthResources = mapper.readValue(response, classType);
 					app.getOauthResources().addAll(oauthResources);
 			} catch (Exception e) {

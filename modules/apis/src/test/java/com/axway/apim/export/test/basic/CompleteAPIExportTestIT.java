@@ -107,8 +107,8 @@ public class CompleteAPIExportTestIT extends TestNGCitrusTestRunner {
 		List<SecurityProfile> exportedSecurityProfiles = mapper.convertValue(exportedAPIConfig.get("securityProfiles"), new TypeReference<List<SecurityProfile>>(){});
 		assertEquals(importedSecurityProfiles, exportedSecurityProfiles, "SecurityProfiles are not equal.");
 		
-		List<SecurityProfile> importedAuthenticationProfiles = mapper.convertValue(importedAPIConfig.get("authenticationProfiles"), new TypeReference<List<AuthenticationProfile>>(){});
-		List<SecurityProfile> exportedAuthenticationProfiles = mapper.convertValue(exportedAPIConfig.get("authenticationProfiles"), new TypeReference<List<AuthenticationProfile>>(){});
+		List<AuthenticationProfile> importedAuthenticationProfiles = mapper.convertValue(importedAPIConfig.get("authenticationProfiles"), new TypeReference<List<AuthenticationProfile>>(){});
+		List<AuthenticationProfile> exportedAuthenticationProfiles = mapper.convertValue(exportedAPIConfig.get("authenticationProfiles"), new TypeReference<List<AuthenticationProfile>>(){});
 		assertEquals(importedAuthenticationProfiles, exportedAuthenticationProfiles, "AuthenticationProfiles are not equal.");
 		
 		TagMap<String, String[]> importedTags = mapper.convertValue(importedAPIConfig.get("tags"), new TypeReference<TagMap<String, String[]>>(){});
