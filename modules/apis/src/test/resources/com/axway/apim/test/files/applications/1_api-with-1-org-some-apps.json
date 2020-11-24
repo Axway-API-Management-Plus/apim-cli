@@ -2,7 +2,7 @@
    "name":"${apiName}",
    "path":"${apiPath}",
    "state":"${state}",
-   "version":"1.0.1",
+   "version":"${version}",
    "organization":"API Development ${orgNumber}",
    "clientOrganizations":[
       "${orgName2}" 

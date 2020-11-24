@@ -718,9 +718,9 @@ public class APIManagerAPIAdapter {
 				jsonNode =  importFromSwagger(api);
 			}
 			API createdAPI = new APIBaseDefinition();
-			createdAPI.setApiId(jsonNode.findPath("id").asText());
-			createdAPI.setName(jsonNode.findPath("name").asText());
-			createdAPI.setCreatedOn(Long.parseLong(jsonNode.findPath("createdOn").asText()));
+			createdAPI.setApiId(jsonNode.get("id").asText());
+			createdAPI.setName(jsonNode.get("name").asText());
+			createdAPI.setCreatedOn(Long.parseLong(jsonNode.get("createdOn").asText()));
 			return createdAPI;
 		} catch (Exception e) {
 			throw new AppException("Can't import definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
@@ -788,10 +788,10 @@ public class APIManagerAPIAdapter {
 		}
 		try {
 			entity = MultipartEntityBuilder.create()
-					.addTextBody("name", api.getName())
+					.addTextBody("name", api.getName(), ContentType.create("text/plain", StandardCharsets.UTF_8))
 					.addTextBody("type", "swagger")
 					.addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/json"), "filename")
-					.addTextBody("fileName", "XYZ").addTextBody("organizationId", api.getOrganization().getId())
+					.addTextBody("fileName", "XYZ").addTextBody("organizationId", api.getOrganization().getId(), ContentType.create("text/plain", StandardCharsets.UTF_8))
 					.addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
 			RestAPICall importSwagger = new POSTRequest(entity, uri);
 			importSwagger.setContentType(null);

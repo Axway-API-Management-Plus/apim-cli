@@ -1,0 +1,189 @@
+{
+  "id": "abce245d-de7c-4b2b-b61b-66521535388c",
+  "name": "OAuth??API",
+  "summary": "",
+  "description": "提供銀行身份認證整合 Axway APIM OAuth Authorization Code Grant Flow\n",
+  "version": "1.0",
+  "basePath": "http://localhost:8080",
+  "resourcePath": "/api/oauth/integrate",
+  "models": {
+    "ResponseError": {
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "code": {
+          "type": "number",
+          "example": 1.0
+        },
+        "message": {
+          "type": "string",
+          "example": "something wrong."
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "redirect_uri": {
+              "type": "string",
+              "example": "https://localhost:3333/callback?error=invalid_scope&state=KOT8CiYlFKvbRJ0ryf5SCuJjuxYu6sii9gY6ufhEsno"
+            }
+          },
+          "required": [
+            "redirect_uri"
+          ]
+        }
+      }
+    },
+    "RedirectResponse": {
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "code": {
+          "type": "number",
+          "example": 0.0
+        },
+        "message": {
+          "type": "string",
+          "example": "OK"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "redirect_uri": {
+              "type": "string",
+              "example": "https://localhost:3333/callback?code=YfVvy9d75C56xhjdKbXBkzzAJmA3l5&state=KOT8CiYlFKvbRJ0ryf5SCuJjuxYu6sii9gY6ufhEsno"
+            }
+          },
+          "required": [
+            "redirect_uri"
+          ]
+        }
+      }
+    },
+    "TSPDataForConsent": {
+      "required": [
+        "data"
+      ],
+      "properties": {
+        "code": {
+          "type": "number",
+          "example": 0.0
+        },
+        "message": {
+          "type": "string",
+          "example": "OK"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "organizationId": {
+              "type": "string",
+              "example": "947f6b5d-9a4e-4fcd-83c7-be69cd5b9214",
+              "description": "組織識別"
+            },
+            "image": {
+              "type": "string",
+              "example": "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",
+              "description": "TSP圖標"
+            },
+            "createdBy": {
+              "type": "string",
+              "example": "501ac3c7-6728-4d79-8837-a5f358c485e8"
+            },
+            "name": {
+              "type": "string",
+              "example": "此地無銀三百兩",
+              "description": "TSP名稱"
+            },
+            "quotaId": {
+              "type": "string",
+              "example": "00000000-0000-0000-0000-000000000001"
+            },
+            "id": {
+              "type": "string",
+              "example": "b4bd36e2-900b-4dad-bfe0-30f0b0316558"
+            },
+            "createdOn": {
+              "type": "number",
+              "example": 1.553047705126E12,
+              "description": "TSP註冊時間"
+            },
+            "enabled": {
+              "type": "boolean",
+              "example": true,
+              "description": "是否啟用"
+            }
+          },
+          "required": [
+            "createdBy",
+            "createdOn",
+            "enabled",
+            "id",
+            "image",
+            "name",
+            "organizationId",
+            "quotaId"
+          ]
+        }
+      }
+    },
+    "OAuthAuthorization": {
+      "type": "object",
+      "properties": {
+        "scopes": {
+          "type": "array",
+          "description": "授權範圍清單",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "example": "openid"
+          }
+        },
+        "created": {
+          "type": "number",
+          "format": "date-time",
+          "example": 1.574826934177E12,
+          "description": "建立時間戳，九十天過期"
+        },
+        "applicationID": {
+          "type": "string",
+          "example": "3c82acfc-26c2-11e4-a149-a6c5e4d22fb7",
+          "description": "TSP識別(AppID)"
+        },
+        "subject": {
+          "type": "string",
+          "example": "A123456789",
+          "description": "客戶識別(身分證)"
+        },
+        "id": {
+          "type": "string",
+          "example": "b76a3e23-deca-49ab-9682-79cd503b7e3a",
+          "description": "授權唯一序號"
+        }
+      },
+      "description": "An OAuth Authorization"
+    }
+  },
+  "consumes": [
+    
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "integral": true,
+  "createdOn": 1605099396581,
+  "createdBy": "f60e3e05-cdf3-4b70-affc-4cb61a10f4bb",
+  "organizationId": "439ec2bd-0350-459c-8df3-bb6d14da6bc8",
+  "serviceType": "rest",
+  "hasOriginalDefinition": true,
+  "importUrl": "file:///opt/Axway/APIM/apigateway/system/conf/55c52763a1c4440ba499f3add28e016a/OAuth%3F%3FAPI",
+  "properties": {
+    "ResourceUri": "file:///opt/Axway/APIM/apigateway/system/conf/55c52763a1c4440ba499f3add28e016a/OAuth%3F%3FAPI",
+    "ResourceIdentifier": "53Z7TVMLGX6D4OLL7QBITRMJPOA2JUSC",
+    "contact.email": "yo_chao@gss.com.tw",
+    "ResourceType": "swagger20",
+    "info.title": "Axway APIM OAuth 2.0 身份認證整合 APIs",
+    "contact.name": "Galaxy Software Service Co."
+  }
+}
