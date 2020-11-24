@@ -249,7 +249,6 @@ public class API implements CustomPropertiesEntity {
 	 * To make Desired and Actual API comparable this method is encapsulating the difference. 
 	 * @see com.axway.apim.api.API#getState()
 	 * @return the state of the API (unpublished, deprecated, etc.)
-	 * @throws AppException in case of an error
 	 */
 	public String getState() {
 		if(this.deprecated!=null 
