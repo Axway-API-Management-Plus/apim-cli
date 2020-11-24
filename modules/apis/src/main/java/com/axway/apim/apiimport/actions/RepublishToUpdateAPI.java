@@ -1,7 +1,6 @@
 package com.axway.apim.apiimport.actions;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +25,12 @@ public class RepublishToUpdateAPI {
 		Mode clientAppsMode = CoreParameters.getInstance().getClientAppsMode();
 		Mode clientOrgsMode =  CoreParameters.getInstance().getClientOrgsMode();
 		// Get existing Orgs and Apps, as they will be lost when the API gets unpublished
-		if(clientAppsMode==Mode.add && actualAPI.getApplications()!=null) { 
+		if(clientAppsMode==Mode.add && actualAPI.getApplications()!=null && changes.getDesiredAPI().getApplications()!=null) { 
 			changes.getDesiredAPI().getApplications().addAll(actualAPI.getApplications());
 			// Reset the applications to have them re-created 
 			actualAPI.setApplications(new ArrayList<ClientApplication>());
 		}
-		if(clientOrgsMode==Mode.add && actualAPI.getClientOrganizations()!=null) {
+		if(clientOrgsMode==Mode.add && actualAPI.getClientOrganizations()!=null && changes.getDesiredAPI().getClientOrganizations()!=null) {
 			// Take over existing organizations
 			changes.getDesiredAPI().getClientOrganizations().addAll(actualAPI.getClientOrganizations());
 			// Delete them, so that they are re-created
