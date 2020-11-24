@@ -12,7 +12,7 @@ Watch this video (28 min): https://youtu.be/2i8i1zMAMps to get an overview + dem
 
 With that, an API developer or the operations team is just providing the desired state configuration of the API, Application. When checked in, the [CI/CD-Pipeline](https://github.com/Axway-API-Management-Plus/apim-cli/wiki/7.-Pipeline-integration) picks it up and replicates it into the API Manager. 
 
-![API Manager Swagger-Promote overview](https://github.com/Axway-API-Management-Plus/apim-cli/blob/develop/misc/images/apimanager-swagger-promote-overview.png )
+![API Manager CLI overview](https://github.com/Axway-API-Management-Plus/apim-cli/blob/develop/misc/images/apim-cli-overview.png )
 
 ## Supported commands
 

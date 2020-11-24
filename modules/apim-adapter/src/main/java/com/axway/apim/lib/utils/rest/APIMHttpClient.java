@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -12,13 +15,16 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 
@@ -104,13 +110,27 @@ public class APIMHttpClient {
 			// We have make sure, that cookies are correclty parsed!
 			RequestConfig defaultRequestConfig = RequestConfig.custom()
 			        .setCookieSpec(CookieSpecs.STANDARD).build();
-			
-			this.httpClient = HttpClientBuilder.create()
+			CoreParameters params = CoreParameters.getInstance();
+
+			HttpClientBuilder clientBuilder = HttpClientBuilder.create()
 					.disableRedirectHandling()
 					.setConnectionManager(cm)
 					.useSystemProperties()
-					.setDefaultRequestConfig(defaultRequestConfig)
-					.build();
+					.setDefaultRequestConfig(defaultRequestConfig);
+			
+			// Check if a proxy is configured
+			if(params.getProxyHost()!=null) {
+				HttpHost proxyHost = new HttpHost(params.getProxyHost(), params.getProxyPort());
+				HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
+				clientBuilder.setRoutePlanner(routePlanner);
+				if(params.getProxyUsername()!=null) {
+					CredentialsProvider credentialsPovider = new BasicCredentialsProvider();
+					credentialsPovider.setCredentials(new AuthScope(params.getProxyHost(), params.getPort()), new UsernamePasswordCredentials(params.getProxyUsername(), params.getProxyPassword()));
+					clientBuilder.setDefaultCredentialsProvider(credentialsPovider);
+				}
+			}
+			
+			this.httpClient = clientBuilder.build();
 		} catch (Exception e) {
 			throw new AppException("Can't create connection to API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
 		}

@@ -38,6 +38,11 @@ public class CoreCLIOptions extends CLIOptions {
 		// Also support -f for backwards compatibility
 		if(!params.isForce()) params.setForce(Boolean.parseBoolean(getValue("f")));
 		
+		params.setProxyHost(getValue("httpProxyHost"));
+		params.setProxyPort((getValue("httpProxyPort")!=null) ? Integer.valueOf(getValue("httpProxyPort")) : null);
+		params.setProxyUsername(getValue("httpProxyUsername"));
+		params.setProxyPassword(getValue("httpProxyPassword"));
+		
 		return (Parameters) params;
 	}
 
@@ -113,6 +118,26 @@ public class CoreCLIOptions extends CLIOptions {
 		cliOptions.addInternalOption(option);
 		
 		option = new Option("returnCodeMapping", true, "Optionally maps given return codes into a desired return code. Format: 10:0, 12:0");
+		option.setRequired(false);
+		option.setArgName("true");
+		cliOptions.addInternalOption(option);
+		
+		option = new Option("httpProxyHost", true, "Name of the proxy host");
+		option.setRequired(false);
+		option.setArgName("true");
+		cliOptions.addInternalOption(option);
+		
+		option = new Option("httpProxyPort", true, "The proxy port");
+		option.setRequired(false);
+		option.setArgName("true");
+		cliOptions.addInternalOption(option);
+		
+		option = new Option("httpProxyUsername", true, "The proxy username");
+		option.setRequired(false);
+		option.setArgName("true");
+		cliOptions.addInternalOption(option);
+		
+		option = new Option("httpProxyPassword", true, "The proxy username");
 		option.setRequired(false);
 		option.setArgName("true");
 		cliOptions.addInternalOption(option);
