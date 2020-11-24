@@ -60,4 +60,44 @@ public class CoreCLIOptionsTest {
 		Assert.assertEquals(params.getHostname(), "localhost");
 		Assert.assertEquals(params.getProperties().get("myTestVariable"), "resolvedToSomething"); // from env.properties
 	}
+	
+	@Test
+	public void testProxyParametersFromStage() throws ParseException, AppException {
+		String[] args = {"-s", "stageWithProxy"};
+		CLIOptions options = SampleCLIOptions.create(args);
+		CoreParameters params = (CoreParameters) options.getParams();
+		
+		Assert.assertEquals(params.getProxyHost(), "proxyHost");
+		Assert.assertTrue(params.getProxyPort() == 8987);
+		Assert.assertEquals(params.getProxyUsername(), "proxyUser");
+		Assert.assertEquals(params.getProxyPassword(), "proxyPassword");
+	}
+	
+	@Test
+	public void testProxyParams() throws ParseException, AppException {
+		String[] args = {"-httpProxyHost", "myProxyHost", "-httpProxyPort", "6767", "-httpProxyUsername", "myProxyUser", "-httpProxyPassword", "myProxyPW"};
+		CLIOptions options = SampleCLIOptions.create(args);
+		CoreParameters params = (CoreParameters) options.getParams();
+		
+		Assert.assertEquals(params.getProxyHost(), "myProxyHost");
+		Assert.assertTrue(params.getProxyPort() == 6767);
+		Assert.assertEquals(params.getProxyUsername(), "myProxyUser");
+		Assert.assertEquals(params.getProxyPassword(), "myProxyPW");
+		
+		// Test if port is not given
+		String[] args2 = {"-httpProxyHost", "myProxyHost", "-httpProxyUsername", "myProxyUser", "-httpProxyPassword", "myProxyPW"};
+		options = SampleCLIOptions.create(args2);
+		params = (CoreParameters) options.getParams();
+		Assert.assertTrue(params.getProxyPort() == -1);
+		
+		// Test if Username  / Password is not given
+		String[] args3 = {"-httpProxyHost", "myProxyHost3", "-httpProxyPort", "1234"};
+		options = SampleCLIOptions.create(args3);
+		params = (CoreParameters) options.getParams();
+		Assert.assertEquals(params.getProxyHost(), "myProxyHost3");
+		Assert.assertTrue(params.getProxyPort() == 1234);
+		Assert.assertNull(params.getProxyUsername());
+		Assert.assertNull(params.getProxyPassword());
+		
+	}
 }

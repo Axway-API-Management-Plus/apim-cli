@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Unicode API-Name was not shown correctly in the Backend-API overview (See issue [#113](https://github.com/Axway-API-Management-Plus/apim-cli/issues/113))
 - Application-Subscription not restored, when API is Republished to be updated (See issue [#114](https://github.com/Axway-API-Management-Plus/apim-cli/issues/114))
 
+### Added
+- Support to use a proxy for the API-Manager communication (See issue [#109](https://github.com/Axway-API-Management-Plus/apim-cli/issues/109))
+
 ## [1.3.0] 2020-11-10
 ### Added
 - Search for APIs based on configured Inbound- and Outbound-Security (See issue [#86](https://github.com/Axway-API-Management-Plus/apim-cli/issues/86))

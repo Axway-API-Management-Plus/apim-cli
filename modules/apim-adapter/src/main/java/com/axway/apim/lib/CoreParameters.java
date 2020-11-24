@@ -90,6 +90,14 @@ public class CoreParameters implements Parameters {
 	
 	private String apimCLIHome;
 	
+	private String proxyHost;
+	
+	private Integer proxyPort;
+	
+	private String proxyUsername;
+	
+	private String proxyPassword;
+	
 	public CoreParameters() {
 		super();
 		CoreParameters.instance = this;
@@ -356,6 +364,39 @@ public class CoreParameters implements Parameters {
 
 	public void setApimCLIHome(String apimCLIHome) {
 		this.apimCLIHome = apimCLIHome;
+	}
+
+	public String getProxyHost() {
+		return proxyHost;
+	}
+
+	public void setProxyHost(String proxyHost) {
+		this.proxyHost = proxyHost;
+	}
+
+	public Integer getProxyPort() {
+		if(proxyPort == null) return -1;
+		return proxyPort;
+	}
+
+	public void setProxyPort(Integer proxyPort) {
+		this.proxyPort = proxyPort;
+	}
+
+	public String getProxyUsername() {
+		return proxyUsername;
+	}
+
+	public void setProxyUsername(String proxyUsername) {
+		this.proxyUsername = proxyUsername;
+	}
+
+	public String getProxyPassword() {
+		return proxyPassword;
+	}
+
+	public void setProxyPassword(String proxyPassword) {
+		this.proxyPassword = proxyPassword;
 	}
 
 	public List<CacheType> clearCaches() {
