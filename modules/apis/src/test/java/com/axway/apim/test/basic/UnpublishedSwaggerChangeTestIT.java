@@ -36,6 +36,7 @@ public class UnpublishedSwaggerChangeTestIT extends TestNGCitrusTestRunner {
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("state", "unpublished");
+		createVariable("version", "1.0.0");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 
