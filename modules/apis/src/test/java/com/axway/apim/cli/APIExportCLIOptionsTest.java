@@ -8,7 +8,6 @@ import com.axway.apim.api.export.lib.cli.CLIAPIApproveOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIUpgradeOptions;
 import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
-import com.axway.apim.api.export.lib.cli.CLINewChangeOptions;
 import com.axway.apim.api.export.lib.params.APIApproveParams;
 import com.axway.apim.api.export.lib.params.APIChangeParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
@@ -100,7 +99,7 @@ public class APIExportCLIOptionsTest {
 	
 	@Test
 	public void testUpgradeAPIParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-a", "/api/v1/to/be/upgraded", "-refAPIID", "123456", "-refAPIName", "myRefOldAPI", "-refAPIVersion", "1.2.3", "-refAPIOrg", "RefOrg", "-refAPIDeprecate", "true", "-refAPIRetire", "true", "-refAPIRetireDate", "31.12.2021"};
+		String[] args = {"-s", "prod", "-a", "/api/v1/to/be/upgraded", "-refAPIId", "123456", "-refAPIName", "myRefOldAPI", "-refAPIVersion", "1.2.3", "-refAPIOrg", "RefOrg", "-refAPIDeprecate", "true", "-refAPIRetire", "true", "-refAPIRetireDate", "31.12.2021"};
 		CLIOptions cliOptions = CLIAPIUpgradeOptions.create(args);
 		APIUpgradeParams params = (APIUpgradeParams)cliOptions.getParams();
 		
