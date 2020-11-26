@@ -49,14 +49,14 @@ public class APIManagerConfigAdapter {
 	
 	
 	/**
-	 * Config fields that are introduced with a certain API-Manager version. 
+	 * Config fields that were introduced with a certain API-Manager version. 
 	 * This list is mainly used to filter out fields, when using an older API-Manager version.
 	 */
 	protected static enum ConfigFields {
-		version77 ("7.7.0", new String[] {"userNameRegex", "apiImportTimeout", "apiImportMimeValidation", "apiImportEditable", "lockUserAccount" }),
-		version762 ("7.6.2", new String[] {
-				"changePasswordOnFirstLogin", "passwordExpiryEnabled", "passwordLifetimeDays", "applicationScopeRestrictions", "strictCertificateChecking", 
-				"serverCertificateVerification", "advisoryBannerEnabled", "advisoryBannerText"
+		version7720200130 ("7.7.20200130", new String[] {"apiImportTimeout", "apiImportMimeValidation", "apiImportEditable", "lockUserAccount" }),
+		version77 ("7.7.0", new String[] {
+				"userNameRegex", "changePasswordOnFirstLogin", "passwordExpiryEnabled", "passwordLifetimeDays",  
+				"applicationScopeRestrictions", "strictCertificateChecking", "serverCertificateVerification", "advisoryBannerEnabled", "advisoryBannerText"
 				});
 		
 		private String[] ignoreFields;
