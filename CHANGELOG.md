@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+- New API-Manager 7.7-September release settings are ignored during import (See issue [#119](https://github.com/Axway-API-Management-Plus/apim-cli/issues/119))
+
 ## [1.3.2] 2020-11-25
 ### Fixed
 - Application-Subscription not restored, when API is Republished to be updated and no applications given the API-Config (See issue [#117](https://github.com/Axway-API-Management-Plus/apim-cli/issues/113))
