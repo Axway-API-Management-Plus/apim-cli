@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.3.3] 2020-11-27
 ### Fixed
 - New API-Manager 7.7-September release settings are ignored during import (See issue [#119](https://github.com/Axway-API-Management-Plus/apim-cli/issues/119))
 - Policies not shown in console view if API is not using a Routing-Policy (See issue [#121](https://github.com/Axway-API-Management-Plus/apim-cli/issues/121))
