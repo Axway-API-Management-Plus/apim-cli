@@ -42,6 +42,7 @@ public class BackToPublishedFromDeprecatedTestIT extends TestNGCitrusTestRunner 
 		createVariable("state", "published");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("expectedReturnCode", "0");
+		createVariable("version", "1.0.0");
 		swaggerImport.doExecute(context);
 		
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' with Status Published #######");

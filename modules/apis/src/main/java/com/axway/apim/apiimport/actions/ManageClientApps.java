@@ -110,6 +110,7 @@ public class ManageClientApps {
 
 	private void createAppSubscription(List<ClientApplication> missingDesiredApps, String apiId) throws AppException {
 		if(missingDesiredApps.size()==0) return;
+		//List<ClientApplication> realMissingDesiredApps = missingDesiredApps.stream().distinct().collect(Collectors.toList());
 		LOG.info("Creating API-Access for the following apps: '"+missingDesiredApps.toString()+"'");
 		try {
 			for(ClientApplication app : missingDesiredApps) {
