@@ -814,72 +814,30 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
-	public void upgradeAccessToNewerAPI(API newAPI, API oldAPI) throws AppException {
-		if(newAPI.getState().equals(API.STATE_UNPUBLISHED)) {
-			LOG.debug("No need to grant access to newly created API, as desired state of API is unpublished.");
-			return;
-		}
-		LOG.info("Upgrade access & subscriptions to newly created API.");
-		
+	public void upgradeAccessToNewerAPI(API apiToUpgrade, API referenceAPI) throws AppException {
+		upgradeAccessToNewerAPI(apiToUpgrade, referenceAPI, null, null, null);
+		// Existing applications now got access to the new API, hence we have to update the internal state
+		// APIManagerAdapter.getInstance().addClientApplications(inTransitState, actualState);
+		// Additionally we need to preserve existing (maybe manually created) application quotas
 		URI uri;
 		HttpEntity entity;
 		RestAPICall request;
 		HttpResponse httpResponse = null;
-		
-		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/upgrade/"+oldAPI.getId()).build();
-			
-			List<NameValuePair> params = new Vector<NameValuePair>();
-			params.add(new BasicNameValuePair("upgradeApiId", newAPI.getId()));
-			
-			entity = new UrlEncodedFormEntity(params, "UTF-8");
-			
-			request = new POSTRequest(entity, uri, true);
-			request.setContentType("application/x-www-form-urlencoded");
-			
-			httpResponse = request.execute();
-			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if(statusCode != 204){
-				String response = EntityUtils.toString(httpResponse.getEntity());
-				if(statusCode==403 && response.contains("Unknown API")) {
-					LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in 1 second.");
-					Thread.sleep(1000);
-					httpResponse = request.execute();
-					statusCode = httpResponse.getStatusLine().getStatusCode();
-					if(statusCode != 204) {
-						LOG.error("Error upgrading access to newer API. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
-						throw new AppException("Error upgrading access to newer API. Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_BE_API);
-					} else {
-						LOG.info("Successfully granted access to newer API on retry. Received Status-Code: " +statusCode );
-					}
-				}
-			}
-		} catch (Exception e) {
-			throw new AppException("Can't upgrade access to newer API!", ErrorCode.CANT_UPGRADE_API_ACCESS, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-		// Existing applications now got access to the new API, hence we have to update the internal state
-		// APIManagerAdapter.getInstance().addClientApplications(inTransitState, actualState);
-		// Additionally we need to preserve existing (maybe manually created) application quotas
 		boolean updateAppQuota = false;
-		if(oldAPI.getApplications().size()!=0) {
-			LOG.debug("Found: "+oldAPI.getApplications().size()+" subscribed applications for this API. Taking over potentially configured quota configuration.");
-			for(ClientApplication app : oldAPI.getApplications()) {
+		if(referenceAPI.getApplications().size()!=0) {
+			LOG.debug("Found: "+referenceAPI.getApplications().size()+" subscribed applications for this API. Taking over potentially configured quota configuration.");
+			for(ClientApplication app : referenceAPI.getApplications()) {
 				if(app.getAppQuota()==null) continue;
 				// REST-API for App-Quota is also returning Default-Quotas, but we have to ignore them here!
 				if(app.getAppQuota().getId().equals(APIManagerAdapter.APPLICATION_DEFAULT_QUOTA) || app.getAppQuota().getId().equals(APIManagerAdapter.SYSTEM_API_QUOTA)) continue;
 				for(QuotaRestriction restriction : app.getAppQuota().getRestrictions()) {
-					if(restriction.getApi().equals(oldAPI.getId())) { // This application has a restriction for this specific API
+					if(restriction.getApi().equals(referenceAPI.getId())) { // This application has a restriction for this specific API
 						updateAppQuota = true;
-						restriction.setApi(newAPI.getId()); // Take over the quota config to new API
+						restriction.setApi(apiToUpgrade.getId()); // Take over the quota config to new API
 						if(!restriction.getMethod().equals("*")) { // The restriction is for a specific method
-							String originalMethodName = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(oldAPI.getId(), restriction.getMethod()).getName();
+							String originalMethodName = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(referenceAPI.getId(), restriction.getMethod()).getName();
 							// Try to find the same operation for the newly created API based on the name
-							String newMethodId = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(newAPI.getId(), originalMethodName).getId();
+							String newMethodId = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(apiToUpgrade.getId(), originalMethodName).getId();
 							restriction.setMethod(newMethodId);
 						}
 					}
@@ -908,6 +866,67 @@ public class APIManagerAPIAdapter {
 					}
 				}
 			}
+		}
+	}
+	
+	public boolean upgradeAccessToNewerAPI(API apiToUpgrade, API referenceAPI, Boolean deprecateRefApi, Boolean retireRefApi, Long retirementDateRefAPI) throws AppException {
+		if(apiToUpgrade.getState().equals(API.STATE_UNPUBLISHED)) {
+			LOG.info("API to upgrade has state unpublished.");
+			return false;
+		}
+		if(apiToUpgrade.getId().equals(referenceAPI.getId())) {
+			LOG.warn("API to upgrade: "+Utils.getAPILogString(apiToUpgrade)+" and "
+					+ "reference/old API: "+Utils.getAPILogString(referenceAPI)+" are the same. Skip upgrade access to newer API.");
+			return false;
+		}
+		LOG.debug("Upgrade access & subscriptions to API: " + apiToUpgrade.getName() + " " + apiToUpgrade.getVersion() + "("+apiToUpgrade.getId()+")");
+		
+		URI uri;
+		HttpEntity entity;
+		RestAPICall request;
+		HttpResponse httpResponse = null;
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/upgrade/"+referenceAPI.getId()).build();
+			
+			List<NameValuePair> params = new Vector<NameValuePair>();
+			params.add(new BasicNameValuePair("upgradeApiId", apiToUpgrade.getId()));
+			if(deprecateRefApi != null) 		params.add(new BasicNameValuePair("deprecate", deprecateRefApi.toString()));
+			if(retireRefApi != null) 			params.add(new BasicNameValuePair("retire", retireRefApi.toString()));
+			if(retirementDateRefAPI != null)	params.add(new BasicNameValuePair("retirementDate", formatRetirementDate(retirementDateRefAPI)));
+			
+			entity = new UrlEncodedFormEntity(params, "UTF-8");
+			
+			request = new POSTRequest(entity, uri, true);
+			request.setContentType("application/x-www-form-urlencoded");
+			
+			httpResponse = request.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode != 204){
+				String response = EntityUtils.toString(httpResponse.getEntity());
+				if(statusCode==403 && response.contains("Unknown API")) {
+					LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in 1 second.");
+					Thread.sleep(1000);
+					httpResponse = request.execute();
+					statusCode = httpResponse.getStatusLine().getStatusCode();
+					if(statusCode != 204) {
+						LOG.error("Error upgrading access to newer API. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
+						throw new AppException("Error upgrading access to newer API. Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_BE_API);
+					} else {
+						LOG.info("Successfully granted access to newer API on retry. Received Status-Code: " +statusCode );
+					}
+				} else {
+					LOG.error("Error upgrading access to newer API. Received Status-Code: " +statusCode + ", Response: " + response);
+					throw new AppException("Error upgrading access to newer API. Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_BE_API);					
+				}
+			}
+			return true;
+		} catch (Exception e) {
+			throw new AppException("Can't upgrade access to newer API!", ErrorCode.CANT_UPGRADE_API_ACCESS, e);
+		} finally {
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
 		}
 	}
 	

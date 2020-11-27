@@ -3,7 +3,7 @@
 	"name": "${apiName}",
 	"path": "${apiPath}",
 	"state": "${state}",
-	"version": "1.0.0",
+	"version": "${version}",
 	"organization": "API Development ${orgNumber}",
 	"inboundProfiles": {
 		"_default": {
