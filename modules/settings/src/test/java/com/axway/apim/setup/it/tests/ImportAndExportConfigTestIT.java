@@ -5,6 +5,7 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.setup.it.ExportManagerConfigTestAction;
 import com.axway.apim.setup.it.ImportManagerConfigTestAction;
@@ -55,9 +56,16 @@ public class ImportAndExportConfigTestIT extends TestNGCitrusTestRunner implemen
 		
 		echo("####### Validate configuration has been applied #######");
 		http(builder -> builder.client("apiManager").send().get("/config").header("Content-Type", "application/json"));
-		
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-				.validate("$.portalName", "${portalName}"));
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+					.validate("$.portalName", "${portalName}")
+					.validate("$.apiImportEditable", "true")
+					);
+		} else {
+			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+					.validate("$.portalName", "${portalName}"));
+		}
+
 		
 		echo("####### Import configuration #######");
 		createVariable(PARAM_CONFIGFILE,  PACKAGE + "apimanager-config.json");

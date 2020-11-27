@@ -1,12 +1,11 @@
 package com.axway.apim.organization.lib;
 
-import org.apache.commons.cli.Option;
-
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportCLIOptions;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.organization.lib.cli.CLIOrgFilterOptions;
 
 public class OrgExportCLIOptions extends CLIOptions {
 
@@ -16,29 +15,12 @@ public class OrgExportCLIOptions extends CLIOptions {
 	
 	public static CLIOptions create(String[] args) {
 		CLIOptions cliOptions = new OrgExportCLIOptions(args);
+		cliOptions = new CLIOrgFilterOptions(cliOptions);
 		cliOptions = new StandardExportCLIOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);
 		cliOptions.addOptions();
 		cliOptions.parse();
 		return cliOptions;
-	}
-
-	@Override
-	public void addOptions() {
-		Option option = new  Option("n", "name", true, "Filter organizations with the specified name. You may use wildcards at the end or beginning.");
-		option.setRequired(false);
-		option.setArgName("*My organization*");
-		addOption(option);
-		
-		option = new  Option("id", true, "Filter the export to an organization with that specific ID.");
-		option.setRequired(false);
-		option.setArgName("UUID-ID-OF-THE-ORG");
-		addOption(option);
-		
-		option = new  Option("dev", true, "Filter organizations based on the development flag: true | false");
-		option.setRequired(false);
-		option.setArgName("true|false");
-		addOption(option);
 	}
 
 	@Override
@@ -73,5 +55,11 @@ public class OrgExportCLIOptions extends CLIOptions {
 		params.setId(getValue("id"));
 		params.setDev(getValue("dev"));
 		return params;
+	}
+	
+	@Override
+	public void addOptions() {
+		// No additional options
+		return;
 	}
 }

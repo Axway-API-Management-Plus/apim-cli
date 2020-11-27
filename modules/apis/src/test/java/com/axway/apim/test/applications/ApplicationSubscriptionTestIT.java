@@ -189,12 +189,45 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.*.apiId", "${apiId}"));
 		
+		echo("####### Slightly modify the API: '${apiName}' - Without applications given in the config and mode add (which is the default) (See issue: #117) #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
+		createVariable("state", "published");
+		createVariable("orgName", "${orgName}");
+		createVariable("enforce", "true");
+		createVariable("version", "3.0.0");
+		createVariable("expectedReturnCode", "0");
+		swaggerImport.doExecute(context);
+		
+		echo("####### Validate previous application subscriptions have been restored after the API has been unpublished/updated/published #######");
+		
+		echo("####### Validate Application 3 still has an active subscription to the API (Based on the name) #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestApp3Id}/apis").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.*.apiId", "${apiId}"));
+		
+		echo("####### Validate Application 1 still has an active subscription to the API (based on the API-Key) #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestApp1Id}/apis").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.*.apiId", "${apiId}"));
+		
+		echo("####### Validate Application 2 still has an active subscription to the API (based on the Ext-Client-Id) #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${consumingTestApp2Id}/apis")
+			.header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.*.apiId", "${apiId}"));
+		
+		
 		echo("####### Re-Importing same API: '${apiName}' - Without applications subscriptions and mode replace #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
 		createVariable("state", "published");
 		createVariable("orgName", "${orgName}");
 		createVariable("enforce", "true");
+		createVariable("version", "4.0.0");
 		createVariable("clientAppsMode", String.valueOf(Mode.replace));
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);

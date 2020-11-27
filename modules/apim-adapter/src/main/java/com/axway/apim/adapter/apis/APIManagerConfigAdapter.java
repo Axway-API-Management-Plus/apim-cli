@@ -48,11 +48,15 @@ public class APIManagerConfigAdapter {
 	Map<Boolean, Config> managerConfig = new HashMap<Boolean, Config>();
 	
 	
-	private static enum ConfigFields {
-		version77 ("7.7.0", new String[] {"userNameRegex", "apiImportTimeout", "apiImportMimeValidation", "apiImportEditable", "lockUserAccount" }),
-		version762 ("7.6.2", new String[] {
-				"changePasswordOnFirstLogin", "passwordExpiryEnabled", "passwordLifetimeDays", "applicationScopeRestrictions", "strictCertificateChecking", 
-				"serverCertificateVerification", "advisoryBannerEnabled", "advisoryBannerText"
+	/**
+	 * Config fields that were introduced with a certain API-Manager version. 
+	 * This list is mainly used to filter out fields, when using an older API-Manager version.
+	 */
+	protected static enum ConfigFields {
+		version7720200130 ("7.7.20200130", new String[] {"apiImportTimeout", "apiImportMimeValidation", "apiImportEditable", "lockUserAccount" }),
+		version77 ("7.7.0", new String[] {
+				"userNameRegex", "changePasswordOnFirstLogin", "passwordExpiryEnabled", "passwordLifetimeDays",  
+				"applicationScopeRestrictions", "strictCertificateChecking", "serverCertificateVerification", "advisoryBannerEnabled", "advisoryBannerText"
 				});
 		
 		private String[] ignoreFields;
@@ -70,11 +74,11 @@ public class APIManagerConfigAdapter {
 		public static String[] getIgnoredFields() {
 			String[] restrictedFields = new String[] {};
 			for(ConfigFields fields : values()) {
-				restrictedFields = ArrayUtils.addAll(restrictedFields, fields.ignoreFields);
 				// Add all ignore fields until we reached the used API-Manager version
 				if(APIManagerAdapter.hasAPIManagerVersion(fields.getManagerVersion())) {
 					break;
 				}
+				restrictedFields = ArrayUtils.addAll(restrictedFields, fields.ignoreFields);
 			}
 			return restrictedFields;
 		}
