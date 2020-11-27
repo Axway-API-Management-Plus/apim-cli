@@ -3,7 +3,7 @@ package com.axway.apim.organization.lib;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.StandardExportParams;
 
-public class OrgExportParams extends StandardExportParams {
+public class OrgExportParams extends StandardExportParams implements OrgFilterParams {
 	
 	private String name;
 	private String id;

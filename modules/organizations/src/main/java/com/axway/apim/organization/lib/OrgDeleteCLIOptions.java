@@ -4,6 +4,7 @@ import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.organization.lib.cli.CLIOrgFilterOptions;
 
 public class OrgDeleteCLIOptions extends CLIOptions {
 
@@ -13,6 +14,7 @@ public class OrgDeleteCLIOptions extends CLIOptions {
 	
 	public static CLIOptions create(String[] args) {
 		CLIOptions cliOptions = new OrgDeleteCLIOptions(args);
+		cliOptions = new CLIOrgFilterOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);
 		cliOptions.addOptions();
 		cliOptions.parse();
@@ -48,6 +50,4 @@ public class OrgDeleteCLIOptions extends CLIOptions {
 		// No additional options
 		return;
 	}
-
-
 }
