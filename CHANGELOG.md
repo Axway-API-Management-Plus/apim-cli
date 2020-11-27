@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
 - New API-Manager 7.7-September release settings are ignored during import (See issue [#119](https://github.com/Axway-API-Management-Plus/apim-cli/issues/119))
+- Policies not shown in console view if API is not using a Routing-Policy (See issue [#121](https://github.com/Axway-API-Management-Plus/apim-cli/issues/121))
 
 ### Added
 - Support to upgrade one or multiple APIs (See issue [#120](https://github.com/Axway-API-Management-Plus/apim-cli/issues/120))
