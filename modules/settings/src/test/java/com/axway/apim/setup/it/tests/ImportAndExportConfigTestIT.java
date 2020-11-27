@@ -56,7 +56,7 @@ public class ImportAndExportConfigTestIT extends TestNGCitrusTestRunner implemen
 		
 		echo("####### Validate configuration has been applied #######");
 		http(builder -> builder.client("apiManager").send().get("/config").header("Content-Type", "application/json"));
-		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200530")) {
 			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 					.validate("$.portalName", "${portalName}")
 					.validate("$.apiImportEditable", "true")
