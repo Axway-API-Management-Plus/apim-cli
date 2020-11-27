@@ -7,12 +7,19 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.TimeZone;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
@@ -20,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.CustomProperties.Type;
+import com.axway.apim.api.API;
 import com.axway.apim.api.model.CustomPropertiesEntity;
 import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.CustomProperty.Option;
@@ -238,5 +246,32 @@ public class Utils {
 			}
 			entity.setCustomProperties((customProperties.size()==0) ? null : customProperties);
 		}
+	}
+	
+	public static Long getParsedDate(String date) throws AppException {
+		List<String> dateFormats = Arrays.asList("dd.MM.yyyy", "dd/MM/yyyy", "yyyy-MM-dd", "dd-MM-yyyy");
+		SimpleDateFormat format;
+		Date retDate = null;
+		for (String dateFormat : dateFormats) {
+			format = new SimpleDateFormat(dateFormat, Locale.US);
+			format.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Z")));
+			try {
+				retDate = format.parse(date);
+			} catch (ParseException e) { }
+			if(retDate!=null && retDate.after(new Date())) {
+				LOG.info("Parsed retirementDate: '"+date+"' using format: '"+dateFormat+"' to: '"+retDate+"'");
+				break;
+			}
+		}
+		if(retDate==null || retDate.before(new Date())) {
+			ErrorState.getInstance().setError("Unable to parse the given retirementDate using the following formats: " + dateFormats, ErrorCode.CANT_READ_CONFIG_FILE, false);
+			throw new AppException("Cannnot parse given retirementDate", ErrorCode.CANT_READ_CONFIG_FILE);
+		}
+		return retDate.getTime();
+	}
+	
+	public static String getAPILogString(API api) {
+		if(api==null) return "N/A";
+		return api.getName() + " " + api.getVersion() + " ("+api.getVersion()+")";
 	}
 }
