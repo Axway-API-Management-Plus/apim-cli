@@ -22,7 +22,6 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.CustomProperties.Type;
-import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.Organization;
@@ -49,7 +48,8 @@ public abstract class APIResultHandler {
 		API_PUBLISH_HANDLER(PublishAPIHandler.class),
 		API_UNPUBLISH_HANDLER(UnpublishAPIHandler.class), 
 		API_CHANGE_HANDLER(APIChangeHandler.class),
-		API_APPROVE_HANDLER(ApproveAPIHandler.class);
+		API_APPROVE_HANDLER(ApproveAPIHandler.class),
+		API_UPGRADE_HANDLE(UpgradeAPIHandler.class);
 		
 		private final Class<APIResultHandler> implClass;
 		

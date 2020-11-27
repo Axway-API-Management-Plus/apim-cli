@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - New API-Manager 7.7-September release settings are ignored during import (See issue [#119](https://github.com/Axway-API-Management-Plus/apim-cli/issues/119))
 
+### Added
+- Support to upgrade one or multiple APIs (See issue [#120](https://github.com/Axway-API-Management-Plus/apim-cli/issues/120))
+
 ## [1.3.2] 2020-11-25
 ### Fixed
-- Application-Subscription not restored, when API is Republished to be updated and no applications given the API-Config (See issue [#117](https://github.com/Axway-API-Management-Plus/apim-cli/issues/113))
+- Application-Subscription not restored, when API is Republished to be updated and no applications given the API-Config (See issue [#117](https://github.com/Axway-API-Management-Plus/apim-cli/issues/117))
 
 ## [1.3.1] 2020-11-24
 ### Fixed

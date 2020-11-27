@@ -22,7 +22,6 @@ import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.api.model.TagMap;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.APIPropertyAnnotation;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
