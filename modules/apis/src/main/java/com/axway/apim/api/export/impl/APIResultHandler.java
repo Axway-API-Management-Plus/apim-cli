@@ -170,11 +170,10 @@ public abstract class APIResultHandler {
 		
 		while(it.hasNext()) {
 			OutboundProfile profile = it.next();
-			if(profile.getRouteType().equals("proxy")) continue;
 			if(profile.getRequestPolicy()!=null && profile.getRequestPolicy().getName()!=null) {
 				requestPolicies.add(profile.getRequestPolicy().getName());
 			}
-			if(profile.getRoutePolicy()!=null && profile.getRoutePolicy().getName()!=null) {
+			if(profile.getRouteType().equals("policy") && profile.getRoutePolicy()!=null && profile.getRoutePolicy().getName()!=null) {
 				routingPolicies.add(profile.getRoutePolicy().getName());
 			}
 			if(profile.getResponsePolicy()!=null && profile.getResponsePolicy().getName()!=null) {
