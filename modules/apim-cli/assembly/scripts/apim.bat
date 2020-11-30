@@ -45,7 +45,7 @@ GOTO :END
 
 :OkClassPath
 
-CD "%currentDir%"
+CD /D "%currentDir%"
 
 %_java% -Xms64m -Xmx256m -Dlog4j.configuration=../lib/log4j.xml -classpath %CLASSPATH% com.axway.apim.cli.APIManagerCLI %*
 SET ERRNO=%ERRORLEVEL%
