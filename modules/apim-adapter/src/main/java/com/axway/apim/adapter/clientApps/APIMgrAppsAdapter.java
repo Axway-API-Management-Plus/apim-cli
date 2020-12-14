@@ -412,23 +412,60 @@ public class APIMgrAppsAdapter {
 		HttpResponse httpResponse = null;
 		for(ClientAppCredential cred : app.getCredentials()) {
 			
-			if(actualApp!=null && actualApp.getCredentials().contains(cred)) continue;
+			if(actualApp!=null && actualApp.getCredentials().contains(cred)) 
+				continue; //nothing to do
+			
+			boolean update = false;
 			FilterProvider filter;
 			if(cred instanceof OAuth) {
+				
 				endpoint = "oauth";
 				filter = new SimpleFilterProvider().setDefaultFilter(
 						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "clientId", "apiKey"}));
+				final String credentialId = ((OAuth)cred).getClientId();
+				Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
+				if (opt.isPresent()) {
+					LOG.info("Found oauth credential with same ID for application {}",actualApp.getId());
+					//I found a credential with same id name but different in some properties, I have to update it		
+					endpoint += "/"+credentialId;
+					update = true;
+					cred.setId(credentialId);
+					cred.setApplicationId(actualApp.getId());
+				}
 			} else if (cred instanceof ExtClients) {
+				final String credentialId = ((ExtClients)cred).getClientId();
 				endpoint = "extclients";
 				filter = new SimpleFilterProvider().setDefaultFilter(
-						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "apiKey"}));
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "apiKey","applicationId"}));
+				Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
+				if (opt.isPresent()) {
+					LOG.info("Found extclients credential with same ID");
+					//I found a credential with same id name but different in some properties, I have to update it		
+					endpoint += "/"+((ExtClients)cred).getId();
+					update = true;
+					cred.setId(credentialId);
+				}
 			} else if (cred instanceof APIKey) {
+				final String credentialId = ((APIKey)cred).getApiKey();
 				endpoint = "apikeys";
 				filter = new SimpleFilterProvider().setDefaultFilter(
 						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "clientId", "apiKey"}));
+				Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
+				if (opt.isPresent()) {
+					LOG.info("Found apikey credential with same ID");
+					//I found a credential with same id name but different in some properties, I have to update it		
+					endpoint += "/"+((APIKey)cred).getApiKey();
+					update = true;
+					cred.setId(opt.get().getId());
+					cred.setApplicationId(opt.get().getApplicationId());
+					cred.setSecret(opt.get().getSecret());
+					cred.setCreatedBy(opt.get().getCreatedBy());
+					cred.setCreatedOn(opt.get().getCreatedOn());
+				}
 			} else {
 				throw new AppException("Unsupported credential: " + cred.getClass().getName(), ErrorCode.UNXPECTED_ERROR);
 			}
+			
 			try {
 				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/"+endpoint).build();
 				mapper.setFilterProvider(filter);
@@ -436,9 +473,9 @@ public class APIMgrAppsAdapter {
 				String json = mapper.writeValueAsString(cred);
 				HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 				
-				POSTRequest postRequest = new POSTRequest(entity, uri);
-				postRequest.setContentType("application/json");
-				httpResponse = postRequest.execute();
+				RestAPICall request = (update ? new PUTRequest(entity,uri) : new POSTRequest(entity, uri));
+				request.setContentType("application/json");
+				httpResponse = request.execute();
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
 				if(statusCode < 200 || statusCode > 299){
 					LOG.error("Error saving/updating application credentials. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
@@ -452,6 +489,25 @@ public class APIMgrAppsAdapter {
 				} catch (Exception ignore) { }
 			}
 		}
+	}
+
+	protected Optional<ClientAppCredential> searchForExistingCredential(ClientApplication actualApp,
+			final String credentialId) {
+		if (actualApp!=null) {
+			Optional<ClientAppCredential> opt = actualApp.getCredentials().stream().filter(o -> {
+				if (o instanceof OAuth) 
+					return ((OAuth)o).getClientId().equals(credentialId);
+				if (o instanceof ExtClients) 
+					return ((ExtClients)o).getId().equals(credentialId);
+				if (o instanceof APIKey) 
+					return ((APIKey)o).getId().equals(credentialId);
+				return false;
+			}).findFirst();
+			return opt;
+		} else {
+			return Optional.empty();
+		}
+		
 	}
 	
 	private void saveQuota(ClientApplication app, ClientApplication actualApp) throws AppException {
