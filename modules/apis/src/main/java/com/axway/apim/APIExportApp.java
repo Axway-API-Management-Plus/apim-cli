@@ -10,11 +10,13 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.impl.APIResultHandler;
 import com.axway.apim.api.export.impl.APIResultHandler.APIListImpl;
+import com.axway.apim.api.export.lib.cli.CLIAPIApproveOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIDeleteOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIUnpublishOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIUpgradeOptions;
 import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
+import com.axway.apim.api.export.lib.params.APIApproveParams;
 import com.axway.apim.api.export.lib.params.APIChangeParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.export.lib.params.APIUpgradeParams;
@@ -141,7 +143,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 		try {
 			deleteInstances();
 			
-			APIUpgradeParams params = (APIUpgradeParams) CLIAPIUpgradeOptions.create(args).getParams();
+			APIApproveParams params = (APIApproveParams) CLIAPIApproveOptions.create(args).getParams();
 			
 			return execute(params, APIListImpl.API_APPROVE_HANDLER);
 		} catch (Exception e) {
