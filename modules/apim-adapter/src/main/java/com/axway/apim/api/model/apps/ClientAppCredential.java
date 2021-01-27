@@ -7,11 +7,13 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties(value = {"applicationId", "createdBy", "createdOn"})
 @JsonFilter("ClientAppCredentialFilter")
 public abstract class ClientAppCredential {
 	
 	String credentialType = null;
+	
+	String applicationId;
+	
 	String id;
 	
 	boolean enabled = true;
@@ -71,6 +73,14 @@ public abstract class ClientAppCredential {
 	public void setCorsOrigins(String[] corsOrigins) {
 		this.corsOrigins = corsOrigins;
 	}
+	
+	public String getApplicationId() {
+		return applicationId;
+	}
+
+	public void setApplicationId(String applicationId) {
+		this.applicationId = applicationId;
+	}
 
 	public abstract String getCredentialType();
 
@@ -86,5 +96,7 @@ public abstract class ClientAppCredential {
 					Arrays.equals(otherAppCredential.getCorsOrigins(), this.getCorsOrigins());
 		}
 		return false;
-	}	
+	}
+	
+	
 }
