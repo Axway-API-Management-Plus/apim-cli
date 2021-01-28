@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.4] 2020-11-27
+### Fixed
+- java.lang.ClassCastException when trying to change an API (See issue [#131](https://github.com/Axway-API-Management-Plus/apim-cli/issues/131))
+- apim api publish command outputs misleading error messages (See issue [#134](https://github.com/Axway-API-Management-Plus/apim-cli/issues/134))
+- Existing App-Credentials should be updated and not always replaced (See issue [#138](https://github.com/Axway-API-Management-Plus/apim-cli/issues/138))
+- When publish an API using the APIM CLI, events logs generated have null values for client, app & org (See issue [#136](https://github.com/Axway-API-Management-Plus/apim-cli/issues/136))
+- When publish an API using the APIM CLI, events logs generated have null values for client, app & org (See issue [#136](https://github.com/Axway-API-Management-Plus/apim-cli/issues/136))
+- API export to csv fails if API-Version is missing (See issue [#130](https://github.com/Axway-API-Management-Plus/apim-cli/issues/130))
+- Bug on api approve without providing retirement date, working on v 1.3.2 (See issue [#132](https://github.com/Axway-API-Management-Plus/apim-cli/issues/132))
+
+### Changed
+- Renamed command "api upgrade" to "api upgrade-access" (See issue [#139](https://github.com/Axway-API-Management-Plus/apim-cli/issues/139))
+
 ## [1.3.3] 2020-11-27
 ### Fixed
 - New API-Manager 7.7-September release settings are ignored during import (See issue [#119](https://github.com/Axway-API-Management-Plus/apim-cli/issues/119))
