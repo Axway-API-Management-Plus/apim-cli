@@ -642,7 +642,7 @@ public class APIManagerAPIAdapter {
 			request.setContentType("application/x-www-form-urlencoded");
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if(statusCode != 201){
+			if(statusCode != 201 && statusCode != 200){ // See issue: #134 The API-Manager also returns 200 on this request
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				if(statusCode == 403 &&  response.contains("API is already unpublished")) {
 					LOG.warn("API: "+api.getName()+" "+api.getVersion()+" ("+api.getId()+") is already unpublished");
