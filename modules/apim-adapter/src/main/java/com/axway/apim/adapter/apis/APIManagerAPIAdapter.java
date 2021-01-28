@@ -814,8 +814,8 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
-	public void upgradeAccessToNewerAPI(API apiToUpgrade, API referenceAPI) throws AppException {
-		upgradeAccessToNewerAPI(apiToUpgrade, referenceAPI, null, null, null);
+	public void upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI) throws AppException {
+		upgradeAccessToNewerAPI(apiToUpgradeAccess, referenceAPI, null, null, null);
 		// Existing applications now got access to the new API, hence we have to update the internal state
 		// APIManagerAdapter.getInstance().addClientApplications(inTransitState, actualState);
 		// Additionally we need to preserve existing (maybe manually created) application quotas
@@ -833,11 +833,11 @@ public class APIManagerAPIAdapter {
 				for(QuotaRestriction restriction : app.getAppQuota().getRestrictions()) {
 					if(restriction.getApi().equals(referenceAPI.getId())) { // This application has a restriction for this specific API
 						updateAppQuota = true;
-						restriction.setApi(apiToUpgrade.getId()); // Take over the quota config to new API
+						restriction.setApi(apiToUpgradeAccess.getId()); // Take over the quota config to new API
 						if(!restriction.getMethod().equals("*")) { // The restriction is for a specific method
 							String originalMethodName = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(referenceAPI.getId(), restriction.getMethod()).getName();
 							// Try to find the same operation for the newly created API based on the name
-							String newMethodId = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(apiToUpgrade.getId(), originalMethodName).getId();
+							String newMethodId = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(apiToUpgradeAccess.getId(), originalMethodName).getId();
 							restriction.setMethod(newMethodId);
 						}
 					}
@@ -869,17 +869,17 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
-	public boolean upgradeAccessToNewerAPI(API apiToUpgrade, API referenceAPI, Boolean deprecateRefApi, Boolean retireRefApi, Long retirementDateRefAPI) throws AppException {
-		if(apiToUpgrade.getState().equals(API.STATE_UNPUBLISHED)) {
-			LOG.info("API to upgrade has state unpublished.");
+	public boolean upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI, Boolean deprecateRefApi, Boolean retireRefApi, Long retirementDateRefAPI) throws AppException {
+		if(apiToUpgradeAccess.getState().equals(API.STATE_UNPUBLISHED)) {
+			LOG.info("API to upgrade access has state unpublished.");
 			return false;
 		}
-		if(apiToUpgrade.getId().equals(referenceAPI.getId())) {
-			LOG.warn("API to upgrade: "+Utils.getAPILogString(apiToUpgrade)+" and "
+		if(apiToUpgradeAccess.getId().equals(referenceAPI.getId())) {
+			LOG.warn("API to upgrade access: "+Utils.getAPILogString(apiToUpgradeAccess)+" and "
 					+ "reference/old API: "+Utils.getAPILogString(referenceAPI)+" are the same. Skip upgrade access to newer API.");
 			return false;
 		}
-		LOG.debug("Upgrade access & subscriptions to API: " + apiToUpgrade.getName() + " " + apiToUpgrade.getVersion() + "("+apiToUpgrade.getId()+")");
+		LOG.debug("Upgrade access & subscriptions to API: " + apiToUpgradeAccess.getName() + " " + apiToUpgradeAccess.getVersion() + "("+apiToUpgradeAccess.getId()+")");
 		
 		URI uri;
 		HttpEntity entity;
@@ -889,7 +889,7 @@ public class APIManagerAPIAdapter {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/upgrade/"+referenceAPI.getId()).build();
 			
 			List<NameValuePair> params = new Vector<NameValuePair>();
-			params.add(new BasicNameValuePair("upgradeApiId", apiToUpgrade.getId()));
+			params.add(new BasicNameValuePair("upgradeApiId", apiToUpgradeAccess.getId()));
 			if(deprecateRefApi != null) 		params.add(new BasicNameValuePair("deprecate", deprecateRefApi.toString()));
 			if(retireRefApi != null) 			params.add(new BasicNameValuePair("retire", retireRefApi.toString()));
 			if(retirementDateRefAPI != null)	params.add(new BasicNameValuePair("retirementDate", formatRetirementDate(retirementDateRefAPI)));

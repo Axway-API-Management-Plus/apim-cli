@@ -14,12 +14,12 @@ import com.axway.apim.api.export.lib.cli.CLIAPIApproveOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIDeleteOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIUnpublishOptions;
-import com.axway.apim.api.export.lib.cli.CLIAPIUpgradeOptions;
+import com.axway.apim.api.export.lib.cli.CLIAPIUpgradeAccessOptions;
 import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
 import com.axway.apim.api.export.lib.params.APIApproveParams;
 import com.axway.apim.api.export.lib.params.APIChangeParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
-import com.axway.apim.api.export.lib.params.APIUpgradeParams;
+import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
@@ -42,7 +42,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	private static ErrorState errorState = ErrorState.getInstance();
 
 	public static void main(String args[]) { 
-		int rc = approve(args);
+		int rc = change(args);
 		System.exit(rc);
 	}
 	
@@ -152,15 +152,15 @@ public class APIExportApp implements APIMCLIServiceProvider {
 		}
 	}
 	
-	@CLIServiceMethod(name = "upgrade", description = "Upgrades one or more APIs based on a given 'old/reference' API.")
-	public static int upgrade(String args[]) {
+	@CLIServiceMethod(name = "upgrade-access", description = "Upgrades access for one or more APIs based on a given 'old/reference' API.")
+	public static int upgradeAccess(String args[]) {
 		try {
 			deleteInstances();
 			
-			APIUpgradeParams params = (APIUpgradeParams) CLIAPIUpgradeOptions.create(args).getParams();
+			APIUpgradeAccessParams params = (APIUpgradeAccessParams) CLIAPIUpgradeAccessOptions.create(args).getParams();
 			
 			APIExportApp app = new APIExportApp();
-			ExportResult result = app.uprgradeAPI(params, APIListImpl.API_UPGRADE_HANDLE);
+			ExportResult result = app.uprgradeAPI(params, APIListImpl.API_UPGRADE_ACCESS_HANDLE);
 			return result.getRc();
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -215,7 +215,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 		}
 	}
 	
-	public ExportResult uprgradeAPI(APIUpgradeParams params, APIListImpl resultHandlerImpl) {
+	public ExportResult uprgradeAPI(APIUpgradeAccessParams params, APIListImpl resultHandlerImpl) {
 		ExportResult result = new ExportResult();
 		try {
 			params.validateRequiredParameters();
@@ -233,7 +233,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			// Get the reference API from API-Manager
 			API referenceAPI = apimanagerAdapter.apiAdapter.getAPI(params.getReferenceAPIFilter(), true);
 			if(referenceAPI == null) {
-				LOG.info("Published reference API for upgrade not found using filter: " + params.getReferenceAPIFilter());
+				LOG.info("Published reference API for upgrade access not found using filter: " + params.getReferenceAPIFilter());
 				return result;
 			}
 			params.setReferenceAPI(referenceAPI);

@@ -6,12 +6,12 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.api.export.lib.cli.CLIAPIApproveOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
-import com.axway.apim.api.export.lib.cli.CLIAPIUpgradeOptions;
+import com.axway.apim.api.export.lib.cli.CLIAPIUpgradeAccessOptions;
 import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
 import com.axway.apim.api.export.lib.params.APIApproveParams;
 import com.axway.apim.api.export.lib.params.APIChangeParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
-import com.axway.apim.api.export.lib.params.APIUpgradeParams;
+import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
@@ -98,10 +98,10 @@ public class APIExportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testUpgradeAPIParameters() throws ParseException, AppException {
+	public void testUpgradeAccessAPIParameters() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-a", "/api/v1/to/be/upgraded", "-refAPIId", "123456", "-refAPIName", "myRefOldAPI", "-refAPIVersion", "1.2.3", "-refAPIOrg", "RefOrg", "-refAPIDeprecate", "true", "-refAPIRetire", "true", "-refAPIRetireDate", "31.12.2021"};
-		CLIOptions cliOptions = CLIAPIUpgradeOptions.create(args);
-		APIUpgradeParams params = (APIUpgradeParams)cliOptions.getParams();
+		CLIOptions cliOptions = CLIAPIUpgradeAccessOptions.create(args);
+		APIUpgradeAccessParams params = (APIUpgradeAccessParams)cliOptions.getParams();
 		
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
@@ -121,8 +121,8 @@ public class APIExportCLIOptionsTest {
 		
 		// Make sure, the default handling works for deprecate / and retire
 		String[] args2 = {"-s", "prod", "-a", "/api/v1/to/be/upgraded"};
-		cliOptions = CLIAPIUpgradeOptions.create(args2);
-		params = (APIUpgradeParams)cliOptions.getParams();
+		cliOptions = CLIAPIUpgradeAccessOptions.create(args2);
+		params = (APIUpgradeAccessParams)cliOptions.getParams();
 		Assert.assertFalse(params.getReferenceAPIRetire());
 		Assert.assertFalse(params.getReferenceAPIDeprecate());
 	}

@@ -2,20 +2,20 @@ package com.axway.apim.api.export.lib.cli;
 
 import org.apache.commons.cli.Option;
 
-import com.axway.apim.api.export.lib.params.APIUpgradeParams;
+import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class CLIAPIUpgradeOptions extends CLIOptions {
+public class CLIAPIUpgradeAccessOptions extends CLIOptions {
 	
-	private CLIAPIUpgradeOptions(String[] args) {
+	private CLIAPIUpgradeAccessOptions(String[] args) {
 		super(args);
 	}
 	
 	public static CLIOptions create(String[] args) {
-		CLIOptions cliOptions = new CLIAPIUpgradeOptions(args);
+		CLIOptions cliOptions = new CLIAPIUpgradeAccessOptions(args);
 		cliOptions = new CLIAPIFilterOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);
 		cliOptions.addOptions();
@@ -84,7 +84,7 @@ public class CLIAPIUpgradeOptions extends CLIOptions {
 
 	@Override
 	public Parameters getParams() throws AppException {
-		APIUpgradeParams params = new APIUpgradeParams();
+		APIUpgradeAccessParams params = new APIUpgradeAccessParams();
 		params.setReferenceAPIId(getValue("refAPIId"));
 		params.setReferenceAPIName(getValue("refAPIName"));
 		params.setReferenceAPIVersion(getValue("refAPIVersion"));

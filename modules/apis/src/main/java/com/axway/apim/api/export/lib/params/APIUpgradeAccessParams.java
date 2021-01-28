@@ -8,7 +8,7 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.Utils;
 
-public class APIUpgradeParams extends APIExportParams implements Parameters, APIFilterParams {
+public class APIUpgradeAccessParams extends APIExportParams implements Parameters, APIFilterParams {
 	
 	private String referenceAPIId;
 	private String referenceAPIName;
