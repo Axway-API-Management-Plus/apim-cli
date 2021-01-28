@@ -74,6 +74,8 @@ public class CoreParameters implements Parameters {
 	
 	private Boolean ignoreQuotas;
 	
+	private Boolean zeroDowntimeUpdate;
+	
 	private Mode quotaMode;
 	private Mode clientAppsMode;
 	private Mode clientOrgsMode;
@@ -397,6 +399,15 @@ public class CoreParameters implements Parameters {
 
 	public void setProxyPassword(String proxyPassword) {
 		this.proxyPassword = proxyPassword;
+	}
+	
+	public Boolean isZeroDowntimeUpdate() {
+		if(zeroDowntimeUpdate==null) return false;
+		return zeroDowntimeUpdate;
+	}
+
+	public void setZeroDowntimeUpdate(Boolean zeroDowntimeUpdate) {
+		this.zeroDowntimeUpdate = zeroDowntimeUpdate;
 	}
 
 	public List<CacheType> clearCaches() {
