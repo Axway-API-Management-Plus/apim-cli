@@ -65,12 +65,12 @@ public class CLIAPIUpgradeAccessOptions extends CLIOptions {
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);		
 		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("Upgrade one or more APIs based on the given reference API.");
+		System.out.println("Upgrade access for one or more APIs based on the given reference API.");
 		System.out.println("App-Subscriptions and Granted orgs are taken over to all selected APIs based on the reference API.");
 		System.out.println("The reference API must be unique. APIs must be published to be considered.");
-		System.out.println(getBinaryName()+" api upgrade -s api-env -refAPIId <UUID-ID-OF-THE-REF-API> -id <UUID-ID-OF-THE-API>");
-		System.out.println(getBinaryName()+" api upgrade -s api-env -n \"*APIs-to-be-upgraded*\" -refAPIName \"*Name of Ref-API*\"");
-		System.out.println(getBinaryName()+" api upgrade -s api-env -n \"*APIs-to-be-upgraded*\" -refAPIName \"*Name of Ref-API*\" -refAPIDeprecate true");
+		System.out.println(getBinaryName()+" api upgrade-access -s api-env -refAPIId <UUID-ID-OF-THE-REF-API> -id <UUID-ID-OF-THE-API>");
+		System.out.println(getBinaryName()+" api upgrade-access -s api-env -n \"*APIs-to-be-upgraded*\" -refAPIName \"*Name of Ref-API*\"");
+		System.out.println(getBinaryName()+" api upgrade-access -s api-env -n \"*APIs-to-be-upgraded*\" -refAPIName \"*Name of Ref-API*\" -refAPIDeprecate true");
 		System.out.println();
 		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");
