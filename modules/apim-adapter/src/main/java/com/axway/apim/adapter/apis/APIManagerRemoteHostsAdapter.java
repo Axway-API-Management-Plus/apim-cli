@@ -52,7 +52,7 @@ public class APIManagerRemoteHostsAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/remotehosts").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/remotehosts").build();
 			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());
@@ -109,9 +109,9 @@ public class APIManagerRemoteHostsAdapter {
 		try {
 			URI uri;
 			if(actualRemoteHost==null) {
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/remotehosts").build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/remotehosts").build();
 			} else {
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/remotehosts/"+actualRemoteHost.getId()).build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/remotehosts/"+actualRemoteHost.getId()).build();
 			}
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"createdBy", "organization"}));
 			mapper.setFilterProvider(filter);
@@ -156,7 +156,7 @@ public class APIManagerRemoteHostsAdapter {
 		HttpResponse httpResponse = null;
 		URI uri;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/remotehosts/"+remoteHost.getId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/remotehosts/"+remoteHost.getId()).build();
 			RestAPICall request = new DELRequest(uri, true);
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();

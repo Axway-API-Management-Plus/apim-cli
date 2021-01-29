@@ -87,7 +87,7 @@ public class APIManagerPoliciesAdapter {
 		CoreParameters cmd = CoreParameters.getInstance();
 		HttpResponse httpResponse = null;
 		try {
-			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/policies")
+			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/policies")
 					.setParameter("type", type.getRestAPIKey()).build();
 			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute();

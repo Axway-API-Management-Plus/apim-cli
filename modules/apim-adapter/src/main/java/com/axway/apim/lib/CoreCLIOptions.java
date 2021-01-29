@@ -21,6 +21,7 @@ public class CoreCLIOptions extends CLIOptions {
 		params.setApimCLIHome(getValue("apimCLIHome"));
 		params.setStage(getValue("stage"));
 		params.setHostname(getValue("host"));
+		params.setApiBasepath(getValue("apiBasepath"));
 		params.setPort((getValue("port")!=null) ? Integer.parseInt(getValue("port")) : -1);
 		params.setUsername(getValue("username"));
 		params.setPassword(getValue("password"));
@@ -138,6 +139,11 @@ public class CoreCLIOptions extends CLIOptions {
 		cliOptions.addInternalOption(option);
 		
 		option = new Option("httpProxyPassword", true, "The proxy username");
+		option.setRequired(false);
+		option.setArgName("true");
+		cliOptions.addInternalOption(option);
+		
+		option = new Option("apiBasepath", true, "The API-Manager REST-API base path. Defaults to: " + CoreParameters.DEFAULT_API_BASEPATH);
 		option.setRequired(false);
 		option.setArgName("true");
 		cliOptions.addInternalOption(option);

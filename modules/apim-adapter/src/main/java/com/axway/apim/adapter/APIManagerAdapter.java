@@ -98,7 +98,7 @@ public class APIManagerAdapter {
 	public final static String TYPE_FRONT_END = "proxies";
 	public final static String TYPE_BACK_END = "apirepo";
 	
-	private CoreParameters cmd;
+	private static CoreParameters cmd;
 	
 	private static CacheManager cacheManager;
 	
@@ -194,7 +194,7 @@ public class APIManagerAdapter {
 		if(hasAdminAccount && useAdminClient) return; // Already logged in with an Admin-Account.
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/login").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/login").build();
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 			String username;
 			String password;
@@ -256,7 +256,7 @@ public class APIManagerAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/login").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/login").build();
 			DELRequest logoutRequest = new DELRequest(uri, orgAdmin);
 			httpResponse = logoutRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -285,7 +285,7 @@ public class APIManagerAdapter {
 		HttpResponse response = null;
 		JsonNode jsonResponse = null;
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/currentuser").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/currentuser").build();
 		    GETRequest currentUserRequest = new GETRequest(uri, useAdminClient);
 		    response = currentUserRequest.execute();
 		    getCsrfToken(response, useAdminClient); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
@@ -454,7 +454,7 @@ public class APIManagerAdapter {
 			String response = null;
 			URI uri;
 			try {
-				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type+"").build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/"+app.getId()+"/"+type+"").build();
 				LOG.debug("Loading credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
 				RestAPICall getRequest = new GETRequest(uri, true);
 				httpResponse = getRequest.execute();
@@ -558,7 +558,7 @@ public class APIManagerAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/certinfo/").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfo/").build();
 			
 			HttpEntity entity = MultipartEntityBuilder.create()
 					.addBinaryBody("file", IOUtils.toByteArray(certFile), ContentType.create("application/x-x509-ca-cert"), cert.getCertFile())
@@ -597,7 +597,7 @@ public class APIManagerAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/filedata/").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/filedata/").build();
 			
 			HttpEntity entity = MultipartEntityBuilder.create()
 					.addBinaryBody("file", certificate, ContentType.create("application/x-pkcs12"), filename)

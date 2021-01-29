@@ -90,7 +90,7 @@ public class APIManagerConfigAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {			
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/config").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/config").build();
 			RestAPICall getRequest = new GETRequest(uri, useAdmin);
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());
@@ -131,7 +131,7 @@ public class APIManagerConfigAdapter {
 				ErrorState.getInstance().setError("An Admin Account is required to update the API-Manager configuration.", ErrorCode.NO_ADMIN_ROLE_USER, false);
 				throw new AppException("An Admin Account is required to update the API-Manager configuration.", ErrorCode.NO_ADMIN_ROLE_USER);
 			}
-			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/config").build();
+			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/config").build();
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
 					SimpleBeanPropertyFilter.serializeAllExcept(ConfigFields.getIgnoredFields()));
 			mapper.setFilterProvider(filter);

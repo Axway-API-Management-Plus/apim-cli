@@ -32,6 +32,8 @@ public class APIManagerOAuthClientProfilesAdapter {
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
+	CoreParameters cmd = CoreParameters.getInstance();
+	
 	Cache<String, String> oauthClientCache = APIManagerAdapter.getCache(CacheType.oauthClientProviderCache, String.class, String.class);
 
 	public APIManagerOAuthClientProfilesAdapter() {}
@@ -44,7 +46,7 @@ public class APIManagerOAuthClientProfilesAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/oauthclientprofiles").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/oauthclientprofiles").build();
 			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();

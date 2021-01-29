@@ -37,6 +37,8 @@ public class CoreParameters implements Parameters {
 	
 	public static String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
 	
+	public static String DEFAULT_API_BASEPATH = "/api/portal/v1.3";
+	
 	private static CoreParameters instance;
 	
 	private List<CacheType> cachesToClear = null;
@@ -55,6 +57,8 @@ public class CoreParameters implements Parameters {
 	private String clearCache;
 	
 	private String hostname;
+	
+	private String apiBasepath;
 	
 	private int port = -1;
 	
@@ -162,6 +166,15 @@ public class CoreParameters implements Parameters {
 			}
 		}
 		return port;
+	}
+
+	public void setApiBasepath(String apiBasepath) {
+		this.apiBasepath = apiBasepath;
+	}
+	
+	public String getApiBasepath() {
+		if(apiBasepath==null) return DEFAULT_API_BASEPATH;
+		return apiBasepath;
 	}
 
 	public String getUsername() {

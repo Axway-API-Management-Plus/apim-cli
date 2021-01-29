@@ -88,7 +88,7 @@ public class APIManagerAPIAdapter {
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
-	CoreParameters cmd = CoreParameters.getInstance();
+	static CoreParameters cmd = CoreParameters.getInstance();
 	
 	/**
 	 * Maps the provided status to the REST-API endpoint to change the status!
@@ -194,7 +194,7 @@ public class APIManagerAPIAdapter {
 		if(filter.getId()!=null) {
 			requestedId = "/"+filter.getId();
 		}
-		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+filter.getApiType() + requestedId)
+		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/"+filter.getApiType() + requestedId)
 				.addParameters(filter.getFilters())
 				.build();
 		return uri;
@@ -268,7 +268,7 @@ public class APIManagerAPIAdapter {
 			URI uri;
 			HttpResponse httpResponse = null;
 			try {
-				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+api.getId()+"/image").build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/"+api.getId()+"/image").build();
 				RestAPICall getRequest = new GETRequest(uri);
 				httpResponse = getRequest.execute();
 				if(httpResponse == null || httpResponse.getEntity() == null || httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
@@ -321,7 +321,7 @@ public class APIManagerAPIAdapter {
 		HttpResponse httpResponse = null;
 		
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/image").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()+"/image").build();
 			
 			entity = MultipartEntityBuilder.create()
 						.addBinaryBody("file", api.getImage().getInputStream(), ContentType.create("image/jpeg"), api.getImage().getBaseFilename())
@@ -470,11 +470,11 @@ public class APIManagerAPIAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			if(filter.isUseFEAPIDefinition()) {
-				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/discovery/swagger/api/id/"+api.getId())
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/discovery/swagger/api/id/"+api.getId())
 						.setParameter("swaggerVersion", "2.0").build();
 				LOG.debug("Loading API-Definition from FE-API: ");
 			} else {
-				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/"+api.getApiId()+"/download")
 						.setParameter("original", "true").build();
 			}
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
@@ -502,7 +502,7 @@ public class APIManagerAPIAdapter {
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/").build();
 			entity = new StringEntity("{\"apiId\":\"" + api.getApiId() + "\",\"organizationId\":\"" + api.getOrganization().getId() + "\"}");
 			
 			RestAPICall request = new POSTRequest(entity, uri);
@@ -538,7 +538,7 @@ public class APIManagerAPIAdapter {
 		HttpResponse httpResponse = null;
 		translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()).build();
 			entity = new StringEntity(mapper.writeValueAsString(api), ContentType.APPLICATION_JSON);
 			
 			RestAPICall request = new PUTRequest(entity, uri);
@@ -572,7 +572,7 @@ public class APIManagerAPIAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()).build();
 			
 			RestAPICall request = new DELRequest(uri);
 			httpResponse = request.execute();
@@ -597,7 +597,7 @@ public class APIManagerAPIAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/"+api.getApiId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/apirepo/"+api.getApiId()).build();
 			
 			RestAPICall request = new DELRequest(uri);
 			httpResponse = request.execute();
@@ -631,7 +631,7 @@ public class APIManagerAPIAdapter {
 		RestAPICall request;
 		try {
 		uri = new URIBuilder(cmd.getAPIManagerURL())
-				.setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/"+StatusEndpoint.valueOf(desiredState).endpoint)
+				.setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()+"/"+StatusEndpoint.valueOf(desiredState).endpoint)
 				.build();
 			if(vhost!=null && desiredState.equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
 				HttpEntity entity = new StringEntity("vhost="+vhost, ContentType.APPLICATION_JSON);
@@ -687,7 +687,7 @@ public class APIManagerAPIAdapter {
 				return;
 			}
 			URI uri = new URIBuilder(cmd.getAPIManagerURL())
-					.setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/deprecate").build();
+					.setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()+"/deprecate").build();
 			RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate="+formatRetirementDate(retirementDate)), uri, true);
 			apiCall.setContentType("application/x-www-form-urlencoded");
 			httpResponse = apiCall.execute();
@@ -745,7 +745,7 @@ public class APIManagerAPIAdapter {
 		pass=extractPassword(completeWsdlUrl);
 
 		try {
-			URIBuilder uriBuilder = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/importFromUrl/")
+			URIBuilder uriBuilder = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/apirepo/importFromUrl/")
 					.setParameter("organizationId", api.getOrganization().getId())
 					.setParameter("type", "wsdl")
 					.setParameter("url", wsdlUrl)
@@ -780,10 +780,10 @@ public class APIManagerAPIAdapter {
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
 		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2")) {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/import/").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/apirepo/import/").build();
 		} else {
 			// Not sure, if 7.5.3 still needs it that way!
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/import/")
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/apirepo/import/")
 					.setParameter("field", "name").setParameter("op", "eq").setParameter("value", "API Development").build();
 		}
 		try {
@@ -845,7 +845,7 @@ public class APIManagerAPIAdapter {
 				if(updateAppQuota) {
 					LOG.info("Taking over existing quota config for application: '"+app.getName()+"' to newly created API.");
 					try {
-						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/quota").build();
+						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+app.getId()+"/quota").build();
 						entity = new StringEntity(mapper.writeValueAsString(app.getAppQuota()), ContentType.APPLICATION_JSON);
 						
 						request = new PUTRequest(entity, uri, true);
@@ -886,7 +886,7 @@ public class APIManagerAPIAdapter {
 		RestAPICall request;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/upgrade/"+referenceAPI.getId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/upgrade/"+referenceAPI.getId()).build();
 			
 			List<NameValuePair> params = new Vector<NameValuePair>();
 			params.add(new BasicNameValuePair("upgradeApiId", apiToUpgradeAccess.getId()));
@@ -945,7 +945,7 @@ public class APIManagerAPIAdapter {
 			}
 		}
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/grantaccess").build();			
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/grantaccess").build();			
 			entity = new StringEntity(formBody);
 			apiCall = new POSTRequest(entity, uri, true);
 			apiCall.setContentType("application/x-www-form-urlencoded");
