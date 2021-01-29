@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.5] 2020-11-29
+### Added
+- Support set the API-Manager REST-API basepath (See issue [#141](https://github.com/Axway-API-Management-Plus/apim-cli/issues/141))
+
 ## [1.3.4] 2020-11-27
 ### Fixed
 - java.lang.ClassCastException when trying to change an API (See issue [#131](https://github.com/Axway-API-Management-Plus/apim-cli/issues/131))

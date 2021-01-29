@@ -63,10 +63,7 @@ public class CoreParametersTest {
 		params.setHostname("manager.host");
 		Assert.assertEquals(params.getApiBasepath(), CoreParameters.DEFAULT_API_BASEPATH);
 		
-		params.setPort(443);
-		Assert.assertEquals(params.getAPIManagerURL(), "https://manager.host:443"+CoreParameters.DEFAULT_API_BASEPATH);
-		
 		params.setApiBasepath("/fr/apim/v13/portal");
-		Assert.assertEquals(params.getAPIManagerURL(), "https://manager.host:443/fr/apim/v13/portal");
+		Assert.assertEquals(params.getApiBasepath(), "/fr/apim/v13/portal");
 	}
 }

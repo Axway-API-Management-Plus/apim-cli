@@ -104,6 +104,6 @@ public class CoreCLIOptionsTest {
 		CLIOptions options = SampleCLIOptions.create(args);
 		CoreParameters params = (CoreParameters) options.getParams();
 		
-		Assert.assertEquals(params.getAPIManagerURL(), "https://my-manager:8075/fr/apim/v13/portal");
+		Assert.assertEquals(params.getApiBasepath(), "/fr/apim/v13/portal");
 	}
 }
