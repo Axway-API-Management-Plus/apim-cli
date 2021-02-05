@@ -136,4 +136,43 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			throw e;
 		}
 	}
+	
+	@Test
+	public void outboundOAuthValidConfig() throws AppException, ParseException {
+		try {
+			EnvironmentProperties props = new EnvironmentProperties(null);  
+			props.put("myOAuthProfileName", "Sample OAuth Client Profile");
+			APIImportParams params = new APIImportParams();
+			params.setProperties(props);
+			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound-oauth-config.json").getFile();
+			
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "petstore.json", false);
+			adapter.getDesiredAPI();
+			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+			Assert.assertEquals(apiConfig.getVersion(), "kk1");
+			Assert.assertEquals(apiConfig.getName(), "My OAuth API");
+		} catch (Exception e) {
+			LOG.error("Error running test: notDeclaredVariable", e);
+			throw e;
+		}
+	}
+	
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Cannot validate/fulfill configuration file.")
+	public void outboundOAuthInValidConfig() throws AppException, ParseException {
+		try {
+			EnvironmentProperties props = new EnvironmentProperties(null);
+			props.put("myOAuthProfileName", "Invalid profile name");
+			APIImportParams params = new APIImportParams();
+			params.setProperties(props);
+			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound-oauth-config.json").getFile();
+			
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false);
+			adapter.getDesiredAPI();
+			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+			Assert.assertEquals(apiConfig.getVersion(), "kk1");
+			Assert.assertEquals(apiConfig.getName(), "My OAuth API");
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 }
