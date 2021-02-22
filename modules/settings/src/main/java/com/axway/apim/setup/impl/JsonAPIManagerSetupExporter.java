@@ -81,9 +81,20 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
 	}
 	
 	private String getExportFolder(Config config) {
-		String name = config.getPortalName().toLowerCase();
-		name = name.replace(" ", "-");
-		return name;
+		try {
+			if(config==null) {
+				config = APIManagerAdapter.getInstance().configAdapter.getConfig(APIManagerAdapter.hasAdminAccount());
+			}
+			String name = config.getPortalName().toLowerCase();
+			name = name.replace(" ", "-");
+			return name;
+		} catch (Exception e) {
+			LOG.warn("Error defining export folder. Error message: " + e.getMessage());
+			if(LOG.isDebugEnabled()) {
+				LOG.error("Error defining export folder.", e);
+			}
+			return "";
+		}
 	}
 	
 	public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
