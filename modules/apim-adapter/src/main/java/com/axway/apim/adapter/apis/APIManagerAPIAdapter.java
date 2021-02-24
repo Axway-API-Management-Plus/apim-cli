@@ -140,7 +140,7 @@ public class APIManagerAPIAdapter {
 	
 	public API getAPI(APIFilter filter, boolean logMessage) throws AppException {
 		List<API> foundAPIs = getAPIs(filter, false);
-		API api = uniqueAPI(foundAPIs, filter);
+		API api = getUniqueAPI(foundAPIs, filter);
 		if(logMessage && api!=null) LOG.info("Found existing API on path: '"+api.getPath()+"' ("+api.getState()+") (ID: '"+api.getId()+"'");
 		return api;
 	}
@@ -200,12 +200,34 @@ public class APIManagerAPIAdapter {
 		return uri;
 	}
 	
-	private API uniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
+	API getUniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
+		if(foundAPIs.size()==0) return null;
+		// If filtered resultSet contains more than one API, here we try to find a unique API based on the logical 
+		// criteria (apiPath, VHost and QueryVersion)
+		// This can occur if the DesiredAPI does not define a QueryStringVersion and/or VHost. Then it will filter 
+		// without QueryString and return all APIs with the same path. 
+		// With or without QueryStringVersion/Vhost. It is then the API unique that has no QueryVersion 
+		// defined, which is the actual API according to the desiredAPI. The same applies to the VHost.
 		if(foundAPIs.size()>1) {
+			Map<String, List<API>> apisPerKey = new HashMap<String, List<API>>();
+			// Create a List of APIs based on the logical keys
+			for(API api : foundAPIs) {
+				String key = api.getPath() + "###" + api.getVhost() + "###" + api.getApiRoutingKey();
+				if(apisPerKey.containsKey(key)) {
+					apisPerKey.get(key).add(api);
+				} else {
+					List<API> apiWithKey = new ArrayList<API>();
+					apiWithKey.add(api);
+					apisPerKey.put(key, apiWithKey);
+				}
+			}
+			String filterKey = filter.getApiPath()+"###"+filter.getVhost()+"###"+filter.getQueryStringVersion();
+			if(apisPerKey.get(filterKey)!=null && apisPerKey.get(filterKey).size() ==1) {
+				return apisPerKey.get(filterKey).get(0);
+			}
 			ErrorState.getInstance().setError("No unique API found. Found " + foundAPIs.size() + " APIs based on filter: " + filter, ErrorCode.UNKNOWN_API, false);
 			throw new AppException("No unique API found. ", ErrorCode.UNKNOWN_API);
 		}
-		if(foundAPIs.size()==0) return null;
 		return foundAPIs.get(0);
 	}
 
