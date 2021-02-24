@@ -59,7 +59,6 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
 			throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 			mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(true)));
