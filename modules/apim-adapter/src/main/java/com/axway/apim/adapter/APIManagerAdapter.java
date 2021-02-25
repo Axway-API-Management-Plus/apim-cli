@@ -159,7 +159,7 @@ public class APIManagerAdapter {
 	
 	private APIManagerAdapter() throws AppException {
 		super();
-		this.cmd = CoreParameters.getInstance();
+		cmd = CoreParameters.getInstance();
 		cmd.validateRequiredParameters();
 		
 		this.configAdapter = new APIManagerConfigAdapter();
@@ -217,7 +217,7 @@ public class APIManagerAdapter {
 			loginRequest.setContentType(null);
 			httpResponse = loginRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if(statusCode != 303){
+			if(statusCode != 303 && (statusCode < 200 || statusCode > 299)) {
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				LOG.warn("Login failed with statusCode: " +statusCode+ ". Got response: '"+response+"' ... Try again in 1 second.");
 				Thread.sleep(1000);
