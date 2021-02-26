@@ -2,6 +2,7 @@
 .classpath
 .settings/
 .project
+.metadata
 /test-output/
 
 # Exclude files in all modules
