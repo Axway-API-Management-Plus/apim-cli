@@ -462,6 +462,10 @@ public class API implements CustomPropertiesEntity {
 	public String toString() {
 		return this.getClass().getSimpleName() + " [path=" + path + ", id (FE-API)=" + id + ", apiId (BE-API)=" + apiId + ", vhost=" + vhost + ", apiRoutingKey=" + apiRoutingKey + "]";
 	}
+	
+	public String toStringHuman() {
+		return getName() + " ("+getVersion()+") exposed on path: " + getPath();
+	}
 
 	public String getApiDefinitionImport() {
 		return null;

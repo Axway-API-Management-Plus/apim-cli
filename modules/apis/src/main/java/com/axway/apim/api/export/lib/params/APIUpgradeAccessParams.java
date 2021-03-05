@@ -74,6 +74,7 @@ public class APIUpgradeAccessParams extends APIExportParams implements Parameter
 	public APIFilter getReferenceAPIFilter() {
 		return new APIFilter.Builder()
 				.hasApiId(getReferenceAPIId())
+				.hasApiPath(getApiPath())
 				.hasName(getReferenceAPIName())
 				.hasVHost(getReferenceAPIVersion())
 				.hasOrganization(getReferenceAPIOrganization())

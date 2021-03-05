@@ -13,13 +13,16 @@ import com.axway.apim.api.export.impl.APIResultHandler.APIListImpl;
 import com.axway.apim.api.export.lib.cli.CLIAPIApproveOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIDeleteOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
+import com.axway.apim.api.export.lib.cli.CLIAPIGrantAccessOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIUnpublishOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIUpgradeAccessOptions;
 import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
 import com.axway.apim.api.export.lib.params.APIApproveParams;
 import com.axway.apim.api.export.lib.params.APIChangeParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
+import com.axway.apim.api.export.lib.params.APIGrantAccessParams;
 import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
@@ -42,7 +45,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	private static ErrorState errorState = ErrorState.getInstance();
 
 	public static void main(String args[]) { 
-		int rc = change(args);
+		int rc = grantAccess(args);
 		System.exit(rc);
 	}
 	
@@ -168,6 +171,22 @@ public class APIExportApp implements APIMCLIServiceProvider {
 		}
 	}
 	
+	@CLIServiceMethod(name = "grant-access", description = "Grant access to selected APIs to the given organization.")
+	public static int grantAccess(String args[]) {
+		try {
+			deleteInstances();
+			
+			APIGrantAccessParams params = (APIGrantAccessParams) CLIAPIGrantAccessOptions.create(args).getParams();
+			
+			APIExportApp app = new APIExportApp();
+			ExportResult result = app.grantAccessToAPI(params, APIListImpl.API_GRANT_ACCESS_HANDLER);
+			return result.getRc();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
+	}
+	
 	private static int execute(APIExportParams params, APIListImpl resultHandlerImpl) {
 		try {
 
@@ -253,6 +272,63 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				} else {
 					LOG.debug("Successfully selected " + apis.size() + " API(s).");
 				}
+			}
+			return result;
+		} catch (AppException ap) { 
+			ErrorState errorState = ErrorState.getInstance();
+			if(errorState.hasError()) {
+				errorState.logErrorMessages(LOG);
+				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
+				result.setRc(errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode());
+			} else {
+				LOG.error(ap.getMessage(), ap);
+				result.setRc(errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode());
+			}
+			return result;
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			return result;
+		}
+	}
+	
+	public ExportResult grantAccessToAPI(APIGrantAccessParams params, APIListImpl resultHandlerImpl) {
+		ExportResult result = new ExportResult();
+		try {
+			params.validateRequiredParameters();
+			// We need to clean some Singleton-Instances, as tests are running in the same JVM
+			APIManagerAdapter.deleteInstance();
+			ErrorState.deleteInstance();
+			APIMHttpClient.deleteInstances();
+			
+			APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
+			if(!APIManagerAdapter.hasAdminAccount()) {
+				LOG.error("Upgrading API-Access needs admin access.");
+				result.setRc(ErrorCode.NO_ADMIN_ROLE_USER.getCode());
+				return result;
+			}
+			// Get all organizations that should be granted
+			List<Organization> orgs = apimanagerAdapter.orgAdapter.getOrgs(params.getOrganizationFilter());
+			if(orgs == null || orgs.size() == 0) {
+				LOG.info("No organization found to grant access to using filter: " + params.getOrganizationFilter());
+				return result;
+			}
+			// Get all APIs that should be granted access
+			List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(params.getAPIFilter(), true);
+			if(apis == null || apis.size() == 0) {
+				LOG.info("No published APIs to grant access to found using filter: " + params.getAPIFilter());
+				return result;
+			}
+			LOG.info(apis.size() + " API(s) and " + orgs.size() + " Organization(s) selected.");
+			params.setOrgs(orgs);
+			params.setApis(apis);
+			APIResultHandler resultHandler = APIResultHandler.create(resultHandlerImpl, params);
+			resultHandler.execute(apis);
+			if(resultHandler.hasError()) {
+				LOG.info("");
+				LOG.error("Please check the log. At least one error was recorded.");
+			} else {
+				LOG.debug("Successfully selected " + apis.size() + " API(s).");
 			}
 			return result;
 		} catch (AppException ap) { 
