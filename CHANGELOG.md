@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Exported API-Manager settings now include Null-Values for not set properties (See issue [#150](https://github.com/Axway-API-Management-Plus/apim-cli/issues/150))
 - Now Login to API-Manager is considered as successul if Status-Code is between 200-299 or 301 (See issue [#148](https://github.com/Axway-API-Management-Plus/apim-cli/issues/148))
+- New api grant-access command allowing to grant access to multiple APIs & Orgs with one command (See issue [#153](https://github.com/Axway-API-Management-Plus/apim-cli/issues/153))
 
 ## [1.3.5] 2020-11-29
 ### Added

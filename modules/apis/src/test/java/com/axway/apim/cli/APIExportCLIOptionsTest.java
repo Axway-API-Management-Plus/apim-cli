@@ -6,11 +6,13 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.api.export.lib.cli.CLIAPIApproveOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
+import com.axway.apim.api.export.lib.cli.CLIAPIGrantAccessOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIUpgradeAccessOptions;
 import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
 import com.axway.apim.api.export.lib.params.APIApproveParams;
 import com.axway.apim.api.export.lib.params.APIChangeParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
+import com.axway.apim.api.export.lib.params.APIGrantAccessParams;
 import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
@@ -125,5 +127,26 @@ public class APIExportCLIOptionsTest {
 		params = (APIUpgradeAccessParams)cliOptions.getParams();
 		Assert.assertFalse(params.getReferenceAPIRetire());
 		Assert.assertFalse(params.getReferenceAPIDeprecate());
+	}
+	
+	@Test
+	public void testGrantAccessAPIParameters() throws ParseException, AppException {
+		String[] args = {"-s", "prod", "-a", "/api/v1/some", "-orgName", "OrgName", "-orgId", "OrgId", "-n", "MyAPIName", "-org", "MyAPIOrg", "-id", "API-ID", "-vhost", "api.chost.com", "-backend", "backend.host"};
+		CLIOptions cliOptions = CLIAPIGrantAccessOptions.create(args);
+		APIGrantAccessParams params = (APIGrantAccessParams)cliOptions.getParams();
+		
+		// Validate core parameters are included
+		Assert.assertEquals(params.getUsername(), "apiadmin");
+		Assert.assertEquals(params.getPassword(), "changeme");
+		Assert.assertEquals(params.getHostname(), "api-env");
+		
+		// Validate an API-Filter parameters are included
+		Assert.assertEquals(params.getApiPath(), "/api/v1/some");
+		Assert.assertEquals(params.getName(), "MyAPIName");
+		Assert.assertEquals(params.getBackend(), "backend.host");
+		
+		// Validate Grant-Access params are included
+		Assert.assertEquals(params.getOrgId(), "OrgId");
+		Assert.assertEquals(params.getOrgName(), "OrgName");
 	}
 }

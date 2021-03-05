@@ -49,7 +49,8 @@ public abstract class APIResultHandler {
 		API_UNPUBLISH_HANDLER(UnpublishAPIHandler.class), 
 		API_CHANGE_HANDLER(APIChangeHandler.class),
 		API_APPROVE_HANDLER(ApproveAPIHandler.class),
-		API_UPGRADE_ACCESS_HANDLE(UpgradeAccessAPIHandler.class);
+		API_UPGRADE_ACCESS_HANDLE(UpgradeAccessAPIHandler.class),
+		API_GRANT_ACCESS_HANDLER(GrantAccessAPIHandler.class);
 		
 		private final Class<APIResultHandler> implClass;
 		
@@ -70,8 +71,7 @@ public abstract class APIResultHandler {
 	public static APIResultHandler create(APIListImpl exportImpl, APIExportParams params) throws AppException {
 		try {
 			Object[] intArgs = new Object[] { params };
-			Constructor<APIResultHandler> constructor =
-					exportImpl.getClazz().getConstructor(new Class[]{APIExportParams.class});
+			Constructor<APIResultHandler> constructor = exportImpl.getClazz().getConstructor(new Class[]{APIExportParams.class});
 			APIResultHandler exporter = constructor.newInstance(intArgs);
 			return exporter;
 		} catch (Exception e) {
