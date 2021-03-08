@@ -485,7 +485,7 @@ public class APIManagerAPIAdapter {
 		}		
 	}
 	
-	private static void addOriginalAPIDefinitionFromAPIM(API api, APIFilter filter) throws AppException {
+	private void addOriginalAPIDefinitionFromAPIM(API api, APIFilter filter) throws AppException {
 		if(!filter.isIncludeOriginalAPIDefinition()) return;
 		URI uri;
 		APISpecification apiDefinition;
@@ -507,9 +507,40 @@ public class APIManagerAPIAdapter {
 				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
 			}
 			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), api.getName(), filter.isFailOnError());
+			if(filter.isUseFEAPIDefinition()) {
+				addBackendResourcePath(api, apiDefinition);
+			}
 			api.setApiDefinition(apiDefinition);
 		} catch (Exception e) {
 			throw new AppException("Cannot parse API-Definition for API: '" + api.getName() + "' ("+api.getVersion()+") on path: '"+api.getPath()+"'", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
+		} finally {
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
+		}
+	}
+	
+	private void addBackendResourcePath(API api, APISpecification apiDefinition) throws AppException {
+		URI uri;
+		HttpResponse httpResponse = null;
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/"+api.getApiId()).build();
+			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+			httpResponse=getRequest.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			String response = EntityUtils.toString(httpResponse.getEntity());
+			if(statusCode != 200){
+				LOG.error("Error reading backend API in order to update API-Specification. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
+				throw new AppException("Error reading backend API in order to update API-Specification. ", ErrorCode.UNXPECTED_ERROR);
+			}
+			JsonNode jsonNode = mapper.readTree(response);
+			String resourcePath = jsonNode.get("resourcePath").asText();
+			String basePath = jsonNode.get("basePath").asText();
+			apiDefinition.configureBasepath(basePath + resourcePath);
+			return;
+		} catch (Exception e) {
+			throw new AppException("Cannot parse Backend-API for API: '" + api.toStringHuman()+"' in order to change API-Specification", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 

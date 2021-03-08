@@ -122,7 +122,7 @@ public class JsonAPIExporter extends APIResultHandler {
 		if(exportAPI.getCaCerts()!=null && !exportAPI.getCaCerts().isEmpty()) {
 			storeCaCerts(localFolder, exportAPI.getCaCerts());
 		}
-		LOG.info("Successfully exported API into folder: " + localFolder);
+		LOG.info("Successfully exported API into folder: " + localFolder.getAbsolutePath());
 		if(!APIManagerAdapter.hasAdminAccount()) {
 			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
 			LOG.warn("- No Quotas has been exported for the API");

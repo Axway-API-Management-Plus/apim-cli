@@ -48,12 +48,12 @@ public class Swagger2xSpecification extends APISpecification {
 				
 				
 				if(swagger.get("host")==null) {
-					LOG.debug("Adding new host '"+url.getHost()+port+"' to Swagger-File based on configured backendBasepath: '"+backendBasepath+"'");
+					LOG.debug("Adding new host '"+url.getHost()+port+"' to Swagger-File based on backendBasepath: '"+backendBasepath+"'");
 					backendBasepathAdjusted = true;
 					((ObjectNode)swagger).put("host", url.getHost()+port);
 				} else {
 					if(swagger.get("host").asText().equals(url.getHost()+port)) {
-						LOG.debug("Swagger Host: '"+swagger.get("host").asText()+"' already matches configured backendBasepath: '"+backendBasepath+"'. Nothing to do.");
+						LOG.debug("Swagger Host: '"+swagger.get("host").asText()+"' already matches backendBasepath: '"+backendBasepath+"'. Nothing to do.");
 					} else {
 						LOG.debug("Replacing existing host: '"+swagger.get("host").asText()+"' in Swagger-File to '"+url.getHost()+port+"' based on configured backendBasepath: '"+backendBasepath+"'");
 						backendBasepathAdjusted = true;
@@ -62,12 +62,12 @@ public class Swagger2xSpecification extends APISpecification {
 				}
 				if(url.getPath()!=null && !url.getPath().equals("")) {
 					if(swagger.get("basePath")!=null && swagger.get("basePath").asText().equals(url.getPath())) {
-						LOG.debug("Swagger basePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasepath: '"+url.getPath()+"'. Nothing to do.");
+						LOG.debug("Swagger basePath: '"+swagger.get("basePath").asText()+"' already matches backendBasepath: '"+url.getPath()+"'. Nothing to do.");
 					} else {
 						if(swagger.get("basePath")!=null) {
 							LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.getPath()+"' based on configured backendBasepath: '"+backendBasepath+"'");
 						} else {
-							LOG.debug("Setup basePath in Swagger-File to '"+url.getPath()+"' based on configured backendBasepath: '"+backendBasepath+"'");
+							LOG.debug("Setup basePath in Swagger-File to '"+url.getPath()+"' based on backendBasepath: '"+backendBasepath+"'");
 						}
 						backendBasepathAdjusted = true;
 						((ObjectNode)swagger).put("basePath", url.getPath());
@@ -81,13 +81,13 @@ public class Swagger2xSpecification extends APISpecification {
 					((ObjectNode)swagger).set("schemes", newSchemes);
 				} else {
 					if(swagger.get("schemes").size()!=1 || !swagger.get("schemes").get(0).asText().equals(url.getProtocol())) {
-						LOG.debug("Replacing existing protocol(s): '"+swagger.get("schemes")+"' with '"+url.getProtocol()+"' according to configured backendBasePath: '"+backendBasepath+"'.");
+						LOG.debug("Replacing existing protocol(s): '"+swagger.get("schemes")+"' with '"+url.getProtocol()+"' according to backendBasePath: '"+backendBasepath+"'.");
 						backendBasepathAdjusted = true;
 						((ObjectNode)swagger).replace("schemes", newSchemes);
 					}
 				}
 				if(backendBasepathAdjusted) {
-					LOG.info("Used the configured backendBasepath: '"+backendBasepath+"' to adjust the Swagger definition.");
+					LOG.info("Used the backendBasepath: '"+backendBasepath+"' to adjust the API-Specification.");
 				}
 				this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
 			}
