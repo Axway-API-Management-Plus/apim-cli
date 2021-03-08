@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Avoid NPE if given OAuth-Provider Profile is invalid (See issue [#143](https://github.com/Axway-API-Management-Plus/apim-cli/issues/143))
 - Actual API-Lookup when using additional criteria V-Host and QueryRoutingVersion (See issue [#151](https://github.com/Axway-API-Management-Plus/apim-cli/issues/151))
 
+### Changed
+- Retry request at API access endpoint also for return code 404 (See issue [#157](https://github.com/Axway-API-Management-Plus/apim-cli/issues/157))
+
 ### Added
 - Exported API-Manager settings now include Null-Values for not set properties (See issue [#150](https://github.com/Axway-API-Management-Plus/apim-cli/issues/150))
 - Now Login to API-Manager is considered as successul if Status-Code is between 200-299 or 301 (See issue [#148](https://github.com/Axway-API-Management-Plus/apim-cli/issues/148))
