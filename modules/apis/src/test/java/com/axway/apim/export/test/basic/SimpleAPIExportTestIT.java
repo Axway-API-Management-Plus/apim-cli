@@ -53,8 +53,9 @@ public class SimpleAPIExportTestIT extends TestNGCitrusTestRunner {
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 
-		echo("####### Export the API from the API-Manager #######");
+		echo("####### Export the API from the API-Manager using useFEAPIDefinition #######");
 		createVariable("expectedReturnCode", "0");
+		createVariable("useFEAPIDefinition", "true"); // In this case we simulate to export the FE-API-Definition instead of the backend
 		swaggerExport.doExecute(context);
 		
 		String exportedAPIConfigFile = context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/api-config.json";
@@ -79,6 +80,15 @@ public class SimpleAPIExportTestIT extends TestNGCitrusTestRunner {
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/AmazonRootCA1.crt").exists(), "Certificate AmazonRootCA1.crt is missing");
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/Amazon.crt").exists(), "Certificate Amazon.crt is missing");
 		
-		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/"+context.getVariable("exportAPIName")).exists(), "Exported Swagger-File is missing");
+		File exportedAPISpecFile = new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/"+context.getVariable("exportAPIName"));
+		assertTrue(exportedAPISpecFile.exists(), "Exported API-Specification is missing");
+		
+		// Read the export Swagger-File
+		JsonNode exportedAPISpec = mapper.readTree(new FileInputStream(exportedAPISpecFile));
+		// Check the original basePath is set (See issue https://github.com/Axway-API-Management-Plus/apim-cli/issues/158)
+		assertEquals(exportedAPISpec.get("basePath").asText(), 			"/v2");
+		assertEquals(exportedAPISpec.get("host").asText(), 				"petstore.swagger.io");
+		assertEquals(exportedAPISpec.get("schemes").get(0).asText(), 	"https");
+		
 	}
 }

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Retry request at API access endpoint also for return code 404 (See issue [#157](https://github.com/Axway-API-Management-Plus/apim-cli/issues/157))
+- If the useFEAPIDefinition flag is set, then the exported API specification is updated with the backend API information (host, basePath, schemes). (See issue [#158](https://github.com/Axway-API-Management-Plus/apim-cli/issues/158))
 
 ### Added
 - Exported API-Manager settings now include Null-Values for not set properties (See issue [#150](https://github.com/Axway-API-Management-Plus/apim-cli/issues/150))

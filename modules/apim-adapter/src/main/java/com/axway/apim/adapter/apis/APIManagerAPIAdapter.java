@@ -526,13 +526,27 @@ public class APIManagerAPIAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/"+api.getApiId()).build();
-			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
-			httpResponse=getRequest.execute();
+			RestAPICall request = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+			httpResponse=request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			if(statusCode != 200){
-				LOG.error("Error reading backend API in order to update API-Specification. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
-				throw new AppException("Error reading backend API in order to update API-Specification. ", ErrorCode.UNXPECTED_ERROR);
+				if((statusCode >= 400 && statusCode<=499) && response.contains("Unknown API")) {
+					LOG.warn("Got unexpected error: 'Unknown API' while trying to read Backend-API ... Try again in 1 second.");
+					Thread.sleep(1000);
+					httpResponse = request.execute();
+					statusCode = httpResponse.getStatusLine().getStatusCode();
+					if(statusCode != 200) {
+						LOG.error("Error reading backend API in order to update API-Specification. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
+						throw new AppException("Error reading backend API in order to update API-Specification. Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_BE_API);
+					} else {
+						LOG.info("Successfully retrieved backend API information on second request.");
+						response = EntityUtils.toString(httpResponse.getEntity());
+					}
+				} else {
+					LOG.error("Error reading backend API in order to update API-Specification. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
+					throw new AppException("Error reading backend API in order to update API-Specification. ", ErrorCode.UNXPECTED_ERROR);
+				}
 			}
 			JsonNode jsonNode = mapper.readTree(response);
 			String resourcePath = jsonNode.get("resourcePath").asText();
