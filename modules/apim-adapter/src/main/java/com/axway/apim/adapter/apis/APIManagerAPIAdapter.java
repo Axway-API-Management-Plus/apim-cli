@@ -507,9 +507,7 @@ public class APIManagerAPIAdapter {
 				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
 			}
 			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), api.getName(), filter.isFailOnError());
-			if(filter.isUseFEAPIDefinition()) {
-				addBackendResourcePath(api, apiDefinition);
-			}
+			addBackendResourcePath(api, apiDefinition, filter.isUseFEAPIDefinition());
 			api.setApiDefinition(apiDefinition);
 		} catch (Exception e) {
 			throw new AppException("Cannot parse API-Definition for API: '" + api.getName() + "' ("+api.getVersion()+") on path: '"+api.getPath()+"'", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
@@ -521,7 +519,7 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
-	private void addBackendResourcePath(API api, APISpecification apiDefinition) throws AppException {
+	private void addBackendResourcePath(API api, APISpecification apiDefinition, boolean exportFEAPIDefinition) throws AppException {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
@@ -551,7 +549,12 @@ public class APIManagerAPIAdapter {
 			JsonNode jsonNode = mapper.readTree(response);
 			String resourcePath = jsonNode.get("resourcePath").asText();
 			String basePath = jsonNode.get("basePath").asText();
-			apiDefinition.configureBasepath(basePath + resourcePath);
+			// Only adjust the API-Specification when exporting the FE-API-Spec otherwise we need the originally imported API-Spec
+			if(exportFEAPIDefinition) {
+				apiDefinition.configureBasepath(basePath + resourcePath);
+			}
+			// In any case, we save the backend resource path, as it is necessary for the full backendBasepath in the exported API config. 
+			api.setBackendResourcePath(resourcePath);
 			return;
 		} catch (Exception e) {
 			throw new AppException("Cannot parse Backend-API for API: '" + api.toStringHuman()+"' in order to change API-Specification", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);

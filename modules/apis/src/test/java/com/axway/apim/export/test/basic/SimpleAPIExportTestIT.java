@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.springframework.http.HttpStatus;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -18,8 +19,10 @@ import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
+import com.consol.citrus.message.MessageType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Test
 public class SimpleAPIExportTestIT extends TestNGCitrusTestRunner {
@@ -52,6 +55,26 @@ public class SimpleAPIExportTestIT extends TestNGCitrusTestRunner {
 		createVariable(ImportTestAction.API_CONFIG,  "/test/export/files/basic/minimal-config.json");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
+		
+		echo("####### Validate the API has been imported #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+		
+		echo("####### Manually configure the backend to https://yet.another.petstore/another/path --> https://yet.another.petstore/another/path/v2 #######");
+		// Get the API-Proxy object
+		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON).extractFromPayload("$", "apiProxy"));
+		// Manually set another backend host and path
+		JsonNode config = mapper.readTree(context.getVariable("apiProxy"));
+		((ObjectNode) config.get("serviceProfiles").get("_default")).put("basePath", "https://yet.another.petstore/another/path");
+		variable("updatedAPIProxy", mapper.writeValueAsString(config));
+		// Update the API-Proxy
+		http(builder -> builder.client("apiManager").send().put("/proxies/${apiId}").header("Content-Type", "application/json")
+				.payload("${updatedAPIProxy}"));
 
 		echo("####### Export the API from the API-Manager using useFEAPIDefinition #######");
 		createVariable("expectedReturnCode", "0");
@@ -65,10 +88,10 @@ public class SimpleAPIExportTestIT extends TestNGCitrusTestRunner {
 		
 		assertEquals(exportedAPIConfig.get("version").asText(), 			"2.0.0");
 		assertEquals(exportedAPIConfig.get("organization").asText(),		"API Development "+context.getVariable("orgNumber"));
-		//assertEquals(exportedAPIConfig.get("backendBasepath").asText(), 	"https://petstore.swagger.io");
 		assertEquals(exportedAPIConfig.get("state").asText(), 				"unpublished");
 		assertEquals(exportedAPIConfig.get("path").asText(), 				context.getVariable("apiPath"));
 		assertEquals(exportedAPIConfig.get("name").asText(), 				context.getVariable("apiName"));
+		assertEquals(exportedAPIConfig.get("backendBasepath").asText(), 	"https://yet.another.petstore/another/path/v2");
 		assertEquals(exportedAPIConfig.get("caCerts").size(), 				4);
 		
 		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("certFile").asText(), 				"swagger.io.crt");
