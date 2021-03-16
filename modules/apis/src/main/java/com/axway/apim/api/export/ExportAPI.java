@@ -311,6 +311,18 @@ public class ExportAPI {
 	
 
 	public String getBackendBasepath() {
-		return this.getServiceProfiles().get("_default").getBasePath();
+		if(this.actualAPIProxy.getResourcePath()!=null) {
+			// The API Manager composes the actual backend path from the host + path and backend resource path 
+			// specified in the frontend. 
+			// So if the backend was imported with the resourcepath /v2 and the backend is configured with 
+			// https://my.backend.host.com/another/path, the following backend results: https://my.backend.host.com/another/path/v2. 
+			// So, in order for the exported backendBasepath to exactly match the configured backend, it must be 
+			// composed of both properties.
+			// See issue: https://github.com/Axway-API-Management-Plus/apim-cli/issues/158
+			// https://github.com/Axway-API-Management-Plus/apim-cli/blob/develop/misc/images/behavior-useFEAPIDefinition.png
+			return this.getServiceProfiles().get("_default").getBasePath() + this.actualAPIProxy.getResourcePath();
+		} else {
+			return this.getServiceProfiles().get("_default").getBasePath();	
+		}
 	}
 }

@@ -59,9 +59,9 @@ public class SecurityDevice {
 		URI uri;
 		try {
 			if(type.equals("tokenstores")) {
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/tokenstores").build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/tokenstores").build();
 			} else {
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/policies")
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/policies")
 						.setParameter("type", type).build();
 			}
 			RestAPICall getRequest = new GETRequest(uri);

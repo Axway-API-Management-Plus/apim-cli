@@ -26,8 +26,6 @@ public abstract class RestAPICall {
 	
 	static Logger LOG = LoggerFactory.getLogger(RestAPICall.class);
 	
-	public final static String API_VERSION = "/api/portal/v1.3";
-	
 	protected HttpEntity entity;
 	protected URI uri;
 	
