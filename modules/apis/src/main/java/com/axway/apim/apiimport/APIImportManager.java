@@ -8,7 +8,6 @@ import com.axway.apim.apiimport.actions.CreateNewAPI;
 import com.axway.apim.apiimport.actions.RecreateToUpdateAPI;
 import com.axway.apim.apiimport.actions.RepublishToUpdateAPI;
 import com.axway.apim.apiimport.actions.UpdateExistingAPI;
-import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -74,7 +73,7 @@ public class APIImportManager {
 						+ "Non-Breaking: "+changeState.getNonBreakingChanges()+", for "+changeState.getActualAPI().getState().toUpperCase());
 				UpdateExistingAPI updateAPI = new UpdateExistingAPI();
 				updateAPI.execute(changeState);
-			} else if(changeState.isRecreateAPI() || APIImportParams.getInstance().isZeroDowntimeUpdate()) {
+			} else if(changeState.isRecreateAPI() || CoreParameters.getInstance().isZeroDowntimeUpdate()) {
 				if(changeState.isRecreateAPI()) {
 					LOG.info("Update API Strategy: Re-Create API as changes can't be applied to existing API.");
 				} else {

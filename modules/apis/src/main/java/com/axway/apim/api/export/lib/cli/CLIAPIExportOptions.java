@@ -33,7 +33,8 @@ public class CLIAPIExportOptions extends CLIOptions {
 
 	@Override
 	public void addOptions() {
-		Option option = new Option("useFEAPIDefinition", "If this flag is set, the export API contains the API-Definition (e.g. Swagger) from the FE-API instead of the original imported API.");
+		Option option = new Option("useFEAPIDefinition", "If this flag is set, the exported API contains the API-Specification (e.g. Swagger-File) "
+				+ "from the FE-API instead of the original imported API. But the specification contains the host, basePath and scheme from the backend.");
 		option.setRequired(false);
 		addOption(option);
 	}

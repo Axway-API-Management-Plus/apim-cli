@@ -19,6 +19,7 @@ public class ExportTestAction extends AbstractTestAction {
 		
 		boolean useEnvironmentOnly	= false;
 		boolean ignoreAdminAccount	= false;
+		boolean useFEAPIDefinition	= false;
 		String stage				= null;
 		String vhostToExport		= null;
 		
@@ -37,6 +38,9 @@ public class ExportTestAction extends AbstractTestAction {
 		
 		try {
 			ignoreAdminAccount = Boolean.parseBoolean(context.getVariable("ignoreAdminAccount"));
+		} catch (Exception ignore) {};
+		try {
+			useFEAPIDefinition = Boolean.parseBoolean(context.getVariable("useFEAPIDefinition"));
 		} catch (Exception ignore) {};
 		
 		try {
@@ -78,6 +82,9 @@ public class ExportTestAction extends AbstractTestAction {
 			args.add("json");
 			if(ignoreAdminAccount) {
 				args.add("-ignoreAdminAccount");
+			}
+			if(useFEAPIDefinition) {
+				args.add("-useFEAPIDefinition");
 			}
 		}
 		int rc = APIExportApp.exportAPI(args.toArray(new String[args.size()]));

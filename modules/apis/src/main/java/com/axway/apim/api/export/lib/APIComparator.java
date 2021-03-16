@@ -17,7 +17,7 @@ public class APIComparator implements Comparator<API> {
 		int rc = api1.getName().compareTo(api2.getName());
 		if(rc!=0) return rc; // If the name is different, the version doesn't matter
 		// If one, doesn't have a version - it also doesn't matter
-		if(api1.getVersion()==null || api1.getVersion()==null) return rc;
+		if(api1.getVersion()==null || api2.getVersion()==null) return rc;
 		// Next line isn't perfect and must be improved!
 		return api1.getVersion().compareTo(api2.getVersion());
 	}

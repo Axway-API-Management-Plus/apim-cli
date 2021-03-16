@@ -77,7 +77,7 @@ public class APIManagerOrganizationAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations"+orgId)
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations"+orgId)
 					.addParameters(filter.getFilters())
 					.build();
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
@@ -127,9 +127,9 @@ public class APIManagerOrganizationAdapter {
 				if(!APIManagerAdapter.hasAdminAccount()) {
 					throw new AppException("Admin account is required to create a new organization", ErrorCode.NO_ADMIN_ROLE_USER);
 				}
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations").build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/organizations").build();
 			} else {
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/"+actualOrg.getId()).build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/organizations/"+actualOrg.getId()).build();
 			}
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
 					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image", "createdOn"}));
@@ -176,7 +176,7 @@ public class APIManagerOrganizationAdapter {
 		HttpResponse httpResponse = null;
 		URI uri;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/"+org.getId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/organizations/"+org.getId()).build();
 			RestAPICall request = new DELRequest(uri, true);
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -197,7 +197,7 @@ public class APIManagerOrganizationAdapter {
 		if(org.getImage()==null) return;
 		if(actualOrg!=null && org.getImage().equals(actualOrg.getImage())) return;
 		HttpResponse httpResponse = null;
-		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/organizations/"+org.getId()+"/image").build();
+		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/organizations/"+org.getId()+"/image").build();
 		InputStream is = org.getImage().getInputStream();
 		HttpEntity entity = MultipartEntityBuilder.create()
 			.addBinaryBody("file", is, ContentType.create("image/jpeg"), org.getImage().getBaseFilename())
@@ -269,7 +269,7 @@ public class APIManagerOrganizationAdapter {
 		if(!addImage) return;
 		URI uri;
 		if(org.getImageUrl()==null) return;
-		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/organizations/"+org.getId()+"/image")
+		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations/"+org.getId()+"/image")
 				.build();
 		Image image = APIManagerAdapter.getImageFromAPIM(uri, "org-image");
 		org.setImage(image);

@@ -66,7 +66,8 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
 		FilterProvider filter = new SimpleFilterProvider()
 				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "apiId", "createdBy", "createdOn", "enabled"}))
-				.addFilter("APIAccessFilter", SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"apiName", "apiVersion"}));
+				.addFilter("APIAccessFilter", SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"apiName", "apiVersion"}))
+				.addFilter("ClientAppOauthResourceFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"applicationId", "id"}));
 		mapper.setFilterProvider(filter);
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
@@ -126,6 +127,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 				.includeCredentials(true)
 				.includeAPIAccess(true)
 				.includeImage(true)
+				.includeOauthResources(true)
 				.build();
 	}
 }

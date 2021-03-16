@@ -4,7 +4,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## Unreleased
+### Fixed
+- Avoid NPE if given OAuth-Provider Profile is invalid (See issue [#143](https://github.com/Axway-API-Management-Plus/apim-cli/issues/143))
+- Actual API-Lookup when using additional criteria V-Host and QueryRoutingVersion (See issue [#151](https://github.com/Axway-API-Management-Plus/apim-cli/issues/151))
+
+### Changed
+- Retry request at API access endpoint also for return code 404 (See issue [#157](https://github.com/Axway-API-Management-Plus/apim-cli/issues/157))
+- If the useFEAPIDefinition flag is set, then the exported API specification is updated with the backend API information (host, basePath, schemes). (See issue [#158](https://github.com/Axway-API-Management-Plus/apim-cli/issues/158))
+
+### Added
+- Exported API-Manager settings now include Null-Values for not set properties (See issue [#150](https://github.com/Axway-API-Management-Plus/apim-cli/issues/150))
+- Now Login to API-Manager is considered as successul if Status-Code is between 200-299 or 301 (See issue [#148](https://github.com/Axway-API-Management-Plus/apim-cli/issues/148))
+- New api grant-access command allowing to grant access to multiple APIs & Orgs with one command (See issue [#153](https://github.com/Axway-API-Management-Plus/apim-cli/issues/153))
+
+## [1.3.5] 2020-11-29
+### Added
+- Support set the API-Manager REST-API basepath (See issue [#141](https://github.com/Axway-API-Management-Plus/apim-cli/issues/141))
+
+## [1.3.4] 2020-11-27
+### Fixed
+- java.lang.ClassCastException when trying to change an API (See issue [#131](https://github.com/Axway-API-Management-Plus/apim-cli/issues/131))
+- apim api publish command outputs misleading error messages (See issue [#134](https://github.com/Axway-API-Management-Plus/apim-cli/issues/134))
+- Existing App-Credentials should be updated and not always replaced (See issue [#138](https://github.com/Axway-API-Management-Plus/apim-cli/issues/138))
+- When publish an API using the APIM CLI, events logs generated have null values for client, app & org (See issue [#136](https://github.com/Axway-API-Management-Plus/apim-cli/issues/136))
+- When publish an API using the APIM CLI, events logs generated have null values for client, app & org (See issue [#136](https://github.com/Axway-API-Management-Plus/apim-cli/issues/136))
+- API export to csv fails if API-Version is missing (See issue [#130](https://github.com/Axway-API-Management-Plus/apim-cli/issues/130))
+- Bug on api approve without providing retirement date, working on v 1.3.2 (See issue [#132](https://github.com/Axway-API-Management-Plus/apim-cli/issues/132))
+
+### Changed
+- Renamed command "api upgrade" to "api upgrade-access" (See issue [#139](https://github.com/Axway-API-Management-Plus/apim-cli/issues/139))
+
+## [1.3.3] 2020-11-27
 ### Fixed
 - New API-Manager 7.7-September release settings are ignored during import (See issue [#119](https://github.com/Axway-API-Management-Plus/apim-cli/issues/119))
 - Policies not shown in console view if API is not using a Routing-Policy (See issue [#121](https://github.com/Axway-API-Management-Plus/apim-cli/issues/121))

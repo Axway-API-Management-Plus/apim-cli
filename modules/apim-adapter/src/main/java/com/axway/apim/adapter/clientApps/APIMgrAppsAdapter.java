@@ -89,7 +89,7 @@ public class APIMgrAppsAdapter {
 				}
 				requestedId = "/"+filter.getApplicationId();
 			}
-			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications" + requestedId)
+			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications" + requestedId)
 					.addParameters(filter.getFilters())
 					.build();
 			LOG.debug("Sending request to find existing applications: " + uri);
@@ -119,7 +119,7 @@ public class APIMgrAppsAdapter {
 		if(filter.getApplicationId()!=null) {
 			requestedId = "/"+filter.getApplicationId();
 		}
-		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications" + requestedId)
+		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications" + requestedId)
 				.addParameters(filter.getFilters())
 				.build();
 		return uri;
@@ -181,7 +181,7 @@ public class APIMgrAppsAdapter {
 			throw new AppException("API-Manager: " + APIManagerAdapter.apiManagerVersion + " doesn't support /proxies/<apiId>/applications", ErrorCode.UNXPECTED_ERROR);
 		}
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/applications").build();
+			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/"+apiId+"/applications").build();
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
@@ -227,7 +227,7 @@ public class APIMgrAppsAdapter {
 				String type = types[i];
 				TypeReference<List<ClientAppCredential>> classType = classTypes[i];
 				if(!applicationsCredentialCache.containsKey(app.getId()+"|"+type)) {
-					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+type)
+					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/"+app.getId()+"/"+type)
 							.build();
 					RestAPICall getRequest = new GETRequest(uri);
 					httpResponse = getRequest.execute();
@@ -262,7 +262,7 @@ public class APIMgrAppsAdapter {
 		String endpoint = "oauthresource";
 
 			try {
-					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/"+endpoint)
+					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/"+app.getId()+"/"+endpoint)
 							.build();
 					RestAPICall getRequest = new GETRequest(uri);
 					httpResponse = getRequest.execute();
@@ -299,7 +299,7 @@ public class APIMgrAppsAdapter {
 		if(!addImage) return;
 		URI uri;
 		if(app.getImageUrl()==null) return;
-		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+app.getId()+"/image")
+		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/"+app.getId()+"/image")
 				.build();
 		Image image = APIManagerAdapter.getImageFromAPIM(uri, "app-image");
 		app.setImage(image);
@@ -324,11 +324,11 @@ public class APIMgrAppsAdapter {
 			CoreParameters cmd = CoreParameters.getInstance();
 			URI uri;
 			if(actualApp==null) {
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications").build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications").build();
 			} else {
 				if(desiredApp.getApiAccess()!=null && desiredApp.getApiAccess().size()==0) desiredApp.setApiAccess(null);
 				desiredApp.setId(actualApp.getId());
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+actualApp.getId()).build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+actualApp.getId()).build();
 			}
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			try {
@@ -385,7 +385,7 @@ public class APIMgrAppsAdapter {
 		if(app.getImage()==null) return;
 		if(actualApp!=null && app.getImage().equals(actualApp.getImage())) return;
 		HttpResponse httpResponse = null;
-		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/image").build();
+		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+app.getId()+"/image").build();
 		HttpEntity entity = MultipartEntityBuilder.create()
 			.addBinaryBody("file", app.getImage().getInputStream(), ContentType.create("image/jpeg"), app.getImage().getBaseFilename())
 			.build();
@@ -412,33 +412,70 @@ public class APIMgrAppsAdapter {
 		HttpResponse httpResponse = null;
 		for(ClientAppCredential cred : app.getCredentials()) {
 			
-			if(actualApp!=null && actualApp.getCredentials().contains(cred)) continue;
+			if(actualApp!=null && actualApp.getCredentials().contains(cred)) 
+				continue; //nothing to do
+			
+			boolean update = false;
 			FilterProvider filter;
 			if(cred instanceof OAuth) {
+				
 				endpoint = "oauth";
 				filter = new SimpleFilterProvider().setDefaultFilter(
 						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "clientId", "apiKey"}));
+				final String credentialId = ((OAuth)cred).getClientId();
+				Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
+				if (opt.isPresent()) {
+					LOG.info("Found oauth credential with same ID for application {}",actualApp.getId());
+					//I found a credential with same id name but different in some properties, I have to update it		
+					endpoint += "/"+credentialId;
+					update = true;
+					cred.setId(credentialId);
+					cred.setApplicationId(actualApp.getId());
+				}
 			} else if (cred instanceof ExtClients) {
+				final String credentialId = ((ExtClients)cred).getClientId();
 				endpoint = "extclients";
 				filter = new SimpleFilterProvider().setDefaultFilter(
-						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "apiKey"}));
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "apiKey","applicationId"}));
+				Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
+				if (opt.isPresent()) {
+					LOG.info("Found extclients credential with same ID");
+					//I found a credential with same id name but different in some properties, I have to update it		
+					endpoint += "/"+((ExtClients)cred).getId();
+					update = true;
+					cred.setId(credentialId);
+				}
 			} else if (cred instanceof APIKey) {
+				final String credentialId = ((APIKey)cred).getApiKey();
 				endpoint = "apikeys";
 				filter = new SimpleFilterProvider().setDefaultFilter(
 						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentialType", "clientId", "apiKey"}));
+				Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
+				if (opt.isPresent()) {
+					LOG.info("Found apikey credential with same ID");
+					//I found a credential with same id name but different in some properties, I have to update it		
+					endpoint += "/"+((APIKey)cred).getApiKey();
+					update = true;
+					cred.setId(opt.get().getId());
+					cred.setApplicationId(opt.get().getApplicationId());
+					cred.setSecret(opt.get().getSecret());
+					cred.setCreatedBy(opt.get().getCreatedBy());
+					cred.setCreatedOn(opt.get().getCreatedOn());
+				}
 			} else {
 				throw new AppException("Unsupported credential: " + cred.getClass().getName(), ErrorCode.UNXPECTED_ERROR);
 			}
+			
 			try {
-				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/"+endpoint).build();
+				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+app.getId()+"/"+endpoint).build();
 				mapper.setFilterProvider(filter);
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				String json = mapper.writeValueAsString(cred);
 				HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 				
-				POSTRequest postRequest = new POSTRequest(entity, uri);
-				postRequest.setContentType("application/json");
-				httpResponse = postRequest.execute();
+				RestAPICall request = (update ? new PUTRequest(entity,uri) : new POSTRequest(entity, uri));
+				request.setContentType("application/json");
+				httpResponse = request.execute();
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
 				if(statusCode < 200 || statusCode > 299){
 					LOG.error("Error saving/updating application credentials. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
@@ -453,6 +490,25 @@ public class APIMgrAppsAdapter {
 			}
 		}
 	}
+
+	protected Optional<ClientAppCredential> searchForExistingCredential(ClientApplication actualApp,
+			final String credentialId) {
+		if (actualApp!=null) {
+			Optional<ClientAppCredential> opt = actualApp.getCredentials().stream().filter(o -> {
+				if (o instanceof OAuth) 
+					return ((OAuth)o).getClientId().equals(credentialId);
+				if (o instanceof ExtClients) 
+					return ((ExtClients)o).getId().equals(credentialId);
+				if (o instanceof APIKey) 
+					return ((APIKey)o).getId().equals(credentialId);
+				return false;
+			}).findFirst();
+			return opt;
+		} else {
+			return Optional.empty();
+		}
+		
+	}
 	
 	private void saveQuota(ClientApplication app, ClientApplication actualApp) throws AppException {
 		if(app.getAppQuota()==null || app.getAppQuota().getRestrictions().size()==0) return;
@@ -463,7 +519,7 @@ public class APIMgrAppsAdapter {
 		}
 		HttpResponse httpResponse = null;
 		try {
-			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/quota").build();
+			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+app.getId()+"/quota").build();
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			String json = mapper.writeValueAsString(app.getAppQuota());
 			HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
@@ -535,7 +591,7 @@ public class APIMgrAppsAdapter {
 				mapper.setSerializationInclusion(Include.NON_NULL);
 				String json = mapper.writeValueAsString(res);
 				HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+desiredApp.getId()+"/"+endpoint).build();
+				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+desiredApp.getId()+"/"+endpoint).build();
 				RestAPICall request = (update ? new PUTRequest(entity,uri) : new POSTRequest(entity, uri));
 				request.setContentType("application/json");
 				httpResponse = request.execute();

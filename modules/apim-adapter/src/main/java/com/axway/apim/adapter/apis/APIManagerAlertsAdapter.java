@@ -47,7 +47,7 @@ public class APIManagerAlertsAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {			
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/alerts").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/alerts").build();
 			RestAPICall getRequest = new GETRequest(uri, true);
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());
@@ -88,7 +88,7 @@ public class APIManagerAlertsAdapter {
 				ErrorState.getInstance().setError("An Admin Account is required to update the API-Manager alerts configuration.", ErrorCode.NO_ADMIN_ROLE_USER, false);
 				throw new AppException("An Admin Account is required to update the API-Manager alerts configuration.", ErrorCode.NO_ADMIN_ROLE_USER);
 			}
-			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/alerts").build();
+			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/alerts").build();
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
 					SimpleBeanPropertyFilter.serializeAllExcept());
 			mapper.setFilterProvider(filter);
