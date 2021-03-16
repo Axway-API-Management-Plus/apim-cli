@@ -38,6 +38,7 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 		variable("quotaPeriod", "week");
 		variable("state", "approved");
 		variable("appImage", "app-image.jpg");
+		variable("oauthCorsOrigins","");
 
 		echo("####### Import application: '${appName}' #######");		
 		createVariable(PARAM_CONFIGFILE,  PACKAGE + "CompleteApplication.json");
@@ -75,20 +76,23 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$[0].id", "ClientConfidentialApp-${appNumber}")
 				.validate("$[0].cert", "@assertThat(containsString(-----BEGIN CERTIFICATE-----))@")
-				.validate("$[0].secret", "9cb76d80-1bc2-48d3-8d31-edeec0fddf6c"));
+				.validate("$[0].secret", "9cb76d80-1bc2-48d3-8d31-edeec0fddf6c")
+				.validate("$[0].corsOrigins[0]", ""));
 		
 		echo("####### Validate application: '${appName}' with id: ${appId} API-Key has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/apikeys").header("Content-Type", "application/json"));
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$[0].id", "6cd55c27-675a-444a-9bc7-ae9a7869184d-${appNumber}")
-				.validate("$[0].secret", "34f2b2d6-0334-4dcc-8442-e0e7009b8950"));
+				.validate("$[0].secret", "34f2b2d6-0334-4dcc-8442-e0e7009b8950")
+				.validate("$[0].corsOrigins[0]", ""));
 		
 		echo("####### Validate application: '${appName}' with id: ${appId} Ext client id has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/extclients").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.clientId=='ClientConfidentialClientID-${appNumber}')].clientId", "ClientConfidentialClientID-${appNumber}")
-				.validate("$.[?(@.clientId=='ClientConfidentialClientID-${appNumber}')].enabled", "true"));
+				.validate("$.[?(@.clientId=='ClientConfidentialClientID-${appNumber}')].enabled", "true")
+				.validate("$[0].corsOrigins[0]", ""));
 		
 		echo("####### Re-Import same application - Should be a No-Change #######");
 		createVariable(PARAM_EXPECTED_RC, "10");
@@ -132,5 +136,36 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 		
 		createVariable(PARAM_EXPECTED_RC, "0");
 		importApp.doExecute(context);
+		
+		
+		
+		echo("####### Re-Import change corsorigins (oauth) - Existing App should be updated #######");
+		variable("oauthCorsOrigins","*");
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
+		
+		echo("####### Validate application: '${appName}' with id: ${appId} OAuth has been changed #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/oauth").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$[0].id", "ClientConfidentialApp-${appNumber}")
+				.validate("$[0].cert", "@assertThat(containsString(-----BEGIN CERTIFICATE-----))@")
+				.validate("$[0].secret", "9cb76d80-1bc2-48d3-8d31-edeec0fddf6c")
+				.validate("$[0].corsOrigins[0]", "*"));
+		
+		echo("####### Validate application: '${appName}' with id: ${appId} API-Key has been changed #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/apikeys").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$[0].id", "6cd55c27-675a-444a-9bc7-ae9a7869184d-${appNumber}")
+				.validate("$[0].secret", "34f2b2d6-0334-4dcc-8442-e0e7009b8950")
+				.validate("$[0].corsOrigins[0]", "*"));
+		
+		echo("####### Validate application: '${appName}' with id: ${appId} Ext client id has been changed #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/extclients").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.clientId=='ClientConfidentialClientID-${appNumber}')].clientId", "ClientConfidentialClientID-${appNumber}")
+				.validate("$.[?(@.clientId=='ClientConfidentialClientID-${appNumber}')].enabled", "true")
+				.validate("$[0].corsOrigins[0]", "*"));
 	}
 }

@@ -17,7 +17,7 @@ import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
 @Test
-public class PublishedSubscribeUpgradeAPITestIT extends TestNGCitrusTestRunner {
+public class PublishedSubscribeUpgradeAccessAPITestIT extends TestNGCitrusTestRunner {
 
 	private ImportTestAction swaggerImport;
 	

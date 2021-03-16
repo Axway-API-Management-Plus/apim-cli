@@ -30,6 +30,8 @@ public class APIManagerAPIMethodAdapter {
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerAPIMethodAdapter.class);
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
+	
+	CoreParameters cmd = CoreParameters.getInstance();
 
 	public APIManagerAPIMethodAdapter() {}
 	
@@ -41,7 +43,7 @@ public class APIManagerAPIMethodAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+apiId+"/operations").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/"+apiId+"/operations").build();
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			this.apiManagerResponse.put(apiId,EntityUtils.toString(httpResponse.getEntity()));

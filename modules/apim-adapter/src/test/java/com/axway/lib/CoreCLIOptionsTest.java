@@ -5,9 +5,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.CLIOptions;
-import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.lib.utils.SampleCLIOptions;
 
@@ -98,6 +96,14 @@ public class CoreCLIOptionsTest {
 		Assert.assertTrue(params.getProxyPort() == 1234);
 		Assert.assertNull(params.getProxyUsername());
 		Assert.assertNull(params.getProxyPassword());
+	}
+	
+	@Test
+	public void testAPIBasePathParam() throws ParseException, AppException {
+		String[] args = {"-h", "my-manager", "-apiBasepath", "/fr/apim/v13/portal"};
+		CLIOptions options = SampleCLIOptions.create(args);
+		CoreParameters params = (CoreParameters) options.getParams();
 		
+		Assert.assertEquals(params.getApiBasepath(), "/fr/apim/v13/portal");
 	}
 }

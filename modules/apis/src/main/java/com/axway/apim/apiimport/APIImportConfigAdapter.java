@@ -796,6 +796,10 @@ public class APIImportConfigAdapter {
 		String providerProfile = (String)authnProfile.getParameters().get("providerProfile");
 		if(providerProfile!=null && providerProfile.startsWith("<key")) return;
 		OAuthClientProfile clientProfile = APIManagerAdapter.getInstance().oauthClientAdapter.getOAuthClientProfile(providerProfile);
+		if(clientProfile==null) {
+			ErrorState.getInstance().setError("The OAuth provider profile is unkown: '"+providerProfile+"'", ErrorCode.REFERENCED_PROFILE_INVALID, false);
+			throw new AppException("The OAuth provider profile is unkown: '"+providerProfile+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
+		}
 		authnProfile.getParameters().put("providerProfile", clientProfile.getId());
 	}
 	
