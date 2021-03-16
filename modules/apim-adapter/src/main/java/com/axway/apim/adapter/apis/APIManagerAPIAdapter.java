@@ -485,7 +485,7 @@ public class APIManagerAPIAdapter {
 		}		
 	}
 	
-	private static void addOriginalAPIDefinitionFromAPIM(API api, APIFilter filter) throws AppException {
+	private void addOriginalAPIDefinitionFromAPIM(API api, APIFilter filter) throws AppException {
 		if(!filter.isIncludeOriginalAPIDefinition()) return;
 		URI uri;
 		APISpecification apiDefinition;
@@ -507,9 +507,57 @@ public class APIManagerAPIAdapter {
 				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
 			}
 			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), api.getName(), filter.isFailOnError());
+			addBackendResourcePath(api, apiDefinition, filter.isUseFEAPIDefinition());
 			api.setApiDefinition(apiDefinition);
 		} catch (Exception e) {
 			throw new AppException("Cannot parse API-Definition for API: '" + api.getName() + "' ("+api.getVersion()+") on path: '"+api.getPath()+"'", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
+		} finally {
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
+		}
+	}
+	
+	private void addBackendResourcePath(API api, APISpecification apiDefinition, boolean exportFEAPIDefinition) throws AppException {
+		URI uri;
+		HttpResponse httpResponse = null;
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/"+api.getApiId()).build();
+			RestAPICall request = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+			httpResponse=request.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			String response = EntityUtils.toString(httpResponse.getEntity());
+			if(statusCode != 200){
+				if((statusCode >= 400 && statusCode<=499) && response.contains("Unknown API")) {
+					LOG.warn("Got unexpected error: 'Unknown API' while trying to read Backend-API ... Try again in 1 second.");
+					Thread.sleep(1000);
+					httpResponse = request.execute();
+					statusCode = httpResponse.getStatusLine().getStatusCode();
+					if(statusCode != 200) {
+						LOG.error("Error reading backend API in order to update API-Specification. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
+						throw new AppException("Error reading backend API in order to update API-Specification. Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_BE_API);
+					} else {
+						LOG.info("Successfully retrieved backend API information on second request.");
+						response = EntityUtils.toString(httpResponse.getEntity());
+					}
+				} else {
+					LOG.error("Error reading backend API in order to update API-Specification. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
+					throw new AppException("Error reading backend API in order to update API-Specification. ", ErrorCode.UNXPECTED_ERROR);
+				}
+			}
+			JsonNode jsonNode = mapper.readTree(response);
+			String resourcePath = jsonNode.get("resourcePath").asText();
+			String basePath = jsonNode.get("basePath").asText();
+			// Only adjust the API-Specification when exporting the FE-API-Spec otherwise we need the originally imported API-Spec
+			if(exportFEAPIDefinition) {
+				apiDefinition.configureBasepath(basePath + resourcePath);
+			}
+			// In any case, we save the backend resource path, as it is necessary for the full backendBasepath in the exported API config. 
+			api.setBackendResourcePath(resourcePath);
+			return;
+		} catch (Exception e) {
+			throw new AppException("Cannot parse Backend-API for API: '" + api.toStringHuman()+"' in order to change API-Specification", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 
