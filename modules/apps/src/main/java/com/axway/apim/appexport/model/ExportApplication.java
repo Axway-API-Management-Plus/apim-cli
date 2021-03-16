@@ -7,6 +7,7 @@ import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.apps.ClientAppCredential;
+import com.axway.apim.api.model.apps.ClientAppOauthResource;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -71,5 +72,11 @@ public class ExportApplication {
 
 	public Map<String, String> getCustomProperties() {
 		return clientApp.getCustomProperties();
+	}
+	
+	@JsonProperty("appScopes")
+	public List<ClientAppOauthResource> getOauthResources() {
+		if(clientApp.getOauthResources()==null || clientApp.getOauthResources().size()==0) return null;
+		return clientApp.getOauthResources();
 	}
 }

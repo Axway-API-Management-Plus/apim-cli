@@ -52,8 +52,10 @@ public abstract class APIManagerMockBase {
 		String fhirOrganization = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(			testPackage + "organizations/fhir-organization.json"));
 		String singleOrganization = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(		testPackage + "organizations/singleOrg.json"));
 		String testOrgsAPIAccess = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(			testPackage + "apiaccess/organizationAPIAccess.json"));
-		String userApiAdmin = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(					testPackage + "users/user-apiadmin.json"));
+		String userApiAdmin = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(				testPackage + "users/user-apiadmin.json"));
 		String userFred = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(					testPackage + "users/user-fred.json"));
+		String oauthClientProfile = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(		testPackage + "clientProfiles/OAuthClientProfile.json"));
+		
 
 		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().hasId("72745ed9-f75b-428c-959c-b483eea497a1").build(), testAPI1);
 		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().hasId("72745ed9-f75b-428c-959c-99999999").build(), testAPI2);
@@ -86,7 +88,8 @@ public abstract class APIManagerMockBase {
 		// User: fred
 		apim.userAdapter.setAPIManagerTestResponse(new UserFilter.Builder().hasId("c888af4e-0728-4e82-880c-7cf490138220").build(), userFred);
 		apim.userAdapter.setAPIManagerTestResponse(new UserFilter.Builder().hasLoginName("fred").build(), userFred);
-		
+		// OAuth Client Profile: Sample OAuth Client Profile
+		apim.oauthClientAdapter.setAPIManagerTestResponse(oauthClientProfile);
 	}
 
 }

@@ -54,6 +54,8 @@ public class APIManagerAPIAccessAdapter {
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
+	CoreParameters cmd = CoreParameters.getInstance();
+	
 	private Map<Type, Cache<String, String>> caches = new HashMap<Type, Cache<String, String>>();
 
 	public APIManagerAPIAccessAdapter() {
@@ -77,7 +79,7 @@ public class APIManagerAPIAccessAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+type+"/"+id+"/apis").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/"+type+"/"+id+"/apis").build();
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
@@ -179,7 +181,7 @@ public class APIManagerAPIAccessAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/"+type+"/"+parentEntity.getId()+"/apis").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/"+type+"/"+parentEntity.getId()+"/apis").build();
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
 					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiName"}));
@@ -192,7 +194,7 @@ public class APIManagerAPIAccessAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			if(statusCode < 200 || statusCode > 299){
-				if(statusCode==403 && response.contains("Unknown API")) {
+				if((statusCode==403 || statusCode==404) && response.contains("Unknown API")) {
 					LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in 1 second.");
 					Thread.sleep(1000);
 					httpResponse = request.execute();
@@ -234,7 +236,7 @@ public class APIManagerAPIAccessAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/"+type+"/"+parentEntity.getId()+"/apis/"+apiAccess.getId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/"+type+"/"+parentEntity.getId()+"/apis/"+apiAccess.getId()).build();
 			// Use an admin account for this request
 			RestAPICall request = new DELRequest(uri, APIManagerAdapter.hasAdminAccount());
 			request.setContentType("application/json");

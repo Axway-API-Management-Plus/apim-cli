@@ -168,6 +168,9 @@ public class API implements CustomPropertiesEntity {
 	protected String apiId = null;
 	
 	protected String deprecated = null;
+	
+	@JsonIgnore
+	protected String resourcePath = null;
 
 	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
@@ -460,7 +463,11 @@ public class API implements CustomPropertiesEntity {
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + " [path=" + path + ", id (FE-API)=" + id + ", apiId (BE-API)=" + apiId + "]";
+		return this.getClass().getSimpleName() + " [path=" + path + ", id (FE-API)=" + id + ", apiId (BE-API)=" + apiId + ", vhost=" + vhost + ", apiRoutingKey=" + apiRoutingKey + "]";
+	}
+	
+	public String toStringHuman() {
+		return getName() + " ("+getVersion()+") exposed on path: " + getPath();
 	}
 
 	public String getApiDefinitionImport() {
@@ -497,6 +504,20 @@ public class API implements CustomPropertiesEntity {
 
 	public void setRemotehost(RemoteHost remotehost) {
 		this.remoteHost = remotehost;
+	}
+	
+	/**
+	 * @return path of the resource registered for the belonging backend API or null if not set
+	 */
+	public String getResourcePath() {
+		return resourcePath;
+	}
+
+	/**
+	 * @param resourcePath is the path of the resource registered for the belonging backend API
+	 */
+	public void setBackendResourcePath(String resourcePath) {
+		this.resourcePath = resourcePath;
 	}
 
 	/**

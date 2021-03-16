@@ -26,7 +26,7 @@ public class APIExportParams extends StandardExportParams implements APIFilterPa
 	
 	private String inboundSecurity;
 	
-	private String outboundAuthentication;
+	private String outboundAuthentication ;
 	
 	private String tag;
 	

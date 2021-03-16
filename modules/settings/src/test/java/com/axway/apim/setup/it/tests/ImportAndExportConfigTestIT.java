@@ -1,6 +1,9 @@
 package com.axway.apim.setup.it.tests;
 
+import java.io.File;
+
 import org.springframework.http.HttpStatus;
+import org.testng.Assert;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -15,9 +18,13 @@ import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.message.MessageType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Test
 public class ImportAndExportConfigTestIT extends TestNGCitrusTestRunner implements TestParams {
+	
+	private ObjectMapper mapper = new ObjectMapper();
 	
 	private static String PACKAGE = "/com/axway/apim/setup/it/tests/";
 	
@@ -35,6 +42,12 @@ public class ImportAndExportConfigTestIT extends TestNGCitrusTestRunner implemen
 		configExport.doExecute(context);
 		
 		String exportedConfig = (String)configExport.getLastResult().getExportedFiles().get(0);
+		
+		JsonNode config = mapper.readTree(new File(exportedConfig));
+		
+		Assert.assertEquals(config.get("config").get("registrationEnabled").asBoolean(), true);
+		Assert.assertEquals(config.get("config").get("apiDefaultVirtualHost").asText(), "");
+		Assert.assertTrue(config.get("config").get("apiRoutingKeyLocation").isEmpty());
 		
 		echo("####### Re-Import unchanged exported configuration: "+exportedConfig+" #######");
 		createVariable(PARAM_CONFIGFILE, exportedConfig);

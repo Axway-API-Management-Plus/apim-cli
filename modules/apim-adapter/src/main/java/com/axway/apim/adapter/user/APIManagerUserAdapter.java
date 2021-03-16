@@ -74,7 +74,7 @@ public class APIManagerUserAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/users"+userId)
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/users"+userId)
 					.addParameters(filter.getFilters())
 					.build();
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
@@ -130,7 +130,7 @@ public class APIManagerUserAdapter {
 		URI uri;
 		if(user.getImageUrl()==null) return;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/users/"+user.getId()+"/image")
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/users/"+user.getId()+"/image")
 					.build();
 			Image image = APIManagerAdapter.getImageFromAPIM(uri, "user-image");
 			user.setImage(image);
@@ -182,12 +182,12 @@ public class APIManagerUserAdapter {
 			if(actualUser==null) {
 				filter = new SimpleFilterProvider().setDefaultFilter(
 						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image", "organization"}));
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/users").build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/users").build();
 			} else {
 				desiredUser.setId(actualUser.getId());
 				filter = new SimpleFilterProvider().setDefaultFilter(
 						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image", "organization", "createdOn"}));
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/users/"+actualUser.getId()).build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/users/"+actualUser.getId()).build();
 			}
 			mapper.setFilterProvider(filter);
 			mapper.setSerializationInclusion(Include.NON_NULL);
@@ -230,7 +230,7 @@ public class APIManagerUserAdapter {
 		HttpResponse httpResponse = null;
 		URI uri;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/users/"+user.getId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/users/"+user.getId()).build();
 			RestAPICall request = new DELRequest(uri, true);
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -251,7 +251,7 @@ public class APIManagerUserAdapter {
 		if(user.getImage()==null) return;
 		if(actualUser!=null && user.getImage().equals(actualUser.getImage())) return;
 		HttpResponse httpResponse = null;
-		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/users/"+user.getId()+"/image/").build();
+		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/users/"+user.getId()+"/image/").build();
 		HttpEntity entity = MultipartEntityBuilder.create()
 			.addBinaryBody("file", user.getImage().getInputStream(), ContentType.create("image/jpeg"), user.getImage().getBaseFilename())
 			.build();
