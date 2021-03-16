@@ -88,7 +88,7 @@ public class APIManagerAPIAdapter {
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
-	CoreParameters cmd = CoreParameters.getInstance();
+	static CoreParameters cmd = CoreParameters.getInstance();
 	
 	/**
 	 * Maps the provided status to the REST-API endpoint to change the status!
@@ -140,7 +140,7 @@ public class APIManagerAPIAdapter {
 	
 	public API getAPI(APIFilter filter, boolean logMessage) throws AppException {
 		List<API> foundAPIs = getAPIs(filter, false);
-		API api = uniqueAPI(foundAPIs, filter);
+		API api = getUniqueAPI(foundAPIs, filter);
 		if(logMessage && api!=null) LOG.info("Found existing API on path: '"+api.getPath()+"' ("+api.getState()+") (ID: '"+api.getId()+"'");
 		return api;
 	}
@@ -194,18 +194,40 @@ public class APIManagerAPIAdapter {
 		if(filter.getId()!=null) {
 			requestedId = "/"+filter.getId();
 		}
-		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/"+filter.getApiType() + requestedId)
+		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/"+filter.getApiType() + requestedId)
 				.addParameters(filter.getFilters())
 				.build();
 		return uri;
 	}
 	
-	private API uniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
+	API getUniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
+		if(foundAPIs.size()==0) return null;
+		// If filtered resultSet contains more than one API, here we try to find a unique API based on the logical 
+		// criteria (apiPath, VHost and QueryVersion)
+		// This can occur if the DesiredAPI does not define a QueryStringVersion and/or VHost. Then it will filter 
+		// without QueryString and return all APIs with the same path. 
+		// With or without QueryStringVersion/Vhost. It is then the API unique that has no QueryVersion 
+		// defined, which is the actual API according to the desiredAPI. The same applies to the VHost.
 		if(foundAPIs.size()>1) {
+			Map<String, List<API>> apisPerKey = new HashMap<String, List<API>>();
+			// Create a List of APIs based on the logical keys
+			for(API api : foundAPIs) {
+				String key = api.getPath() + "###" + api.getVhost() + "###" + api.getApiRoutingKey();
+				if(apisPerKey.containsKey(key)) {
+					apisPerKey.get(key).add(api);
+				} else {
+					List<API> apiWithKey = new ArrayList<API>();
+					apiWithKey.add(api);
+					apisPerKey.put(key, apiWithKey);
+				}
+			}
+			String filterKey = filter.getApiPath()+"###"+filter.getVhost()+"###"+filter.getQueryStringVersion();
+			if(apisPerKey.get(filterKey)!=null && apisPerKey.get(filterKey).size() ==1) {
+				return apisPerKey.get(filterKey).get(0);
+			}
 			ErrorState.getInstance().setError("No unique API found. Found " + foundAPIs.size() + " APIs based on filter: " + filter, ErrorCode.UNKNOWN_API, false);
 			throw new AppException("No unique API found. ", ErrorCode.UNKNOWN_API);
 		}
-		if(foundAPIs.size()==0) return null;
 		return foundAPIs.get(0);
 	}
 
@@ -268,7 +290,7 @@ public class APIManagerAPIAdapter {
 			URI uri;
 			HttpResponse httpResponse = null;
 			try {
-				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/proxies/"+api.getId()+"/image").build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/"+api.getId()+"/image").build();
 				RestAPICall getRequest = new GETRequest(uri);
 				httpResponse = getRequest.execute();
 				if(httpResponse == null || httpResponse.getEntity() == null || httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
@@ -321,7 +343,7 @@ public class APIManagerAPIAdapter {
 		HttpResponse httpResponse = null;
 		
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/image").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()+"/image").build();
 			
 			entity = MultipartEntityBuilder.create()
 						.addBinaryBody("file", api.getImage().getInputStream(), ContentType.create("image/jpeg"), api.getImage().getBaseFilename())
@@ -470,11 +492,11 @@ public class APIManagerAPIAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			if(filter.isUseFEAPIDefinition()) {
-				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/discovery/swagger/api/id/"+api.getId())
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/discovery/swagger/api/id/"+api.getId())
 						.setParameter("swaggerVersion", "2.0").build();
 				LOG.debug("Loading API-Definition from FE-API: ");
 			} else {
-				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/apirepo/"+api.getApiId()+"/download")
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/"+api.getApiId()+"/download")
 						.setParameter("original", "true").build();
 			}
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
@@ -502,7 +524,7 @@ public class APIManagerAPIAdapter {
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/").build();
 			entity = new StringEntity("{\"apiId\":\"" + api.getApiId() + "\",\"organizationId\":\"" + api.getOrganization().getId() + "\"}");
 			
 			RestAPICall request = new POSTRequest(entity, uri);
@@ -538,7 +560,7 @@ public class APIManagerAPIAdapter {
 		HttpResponse httpResponse = null;
 		translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()).build();
 			entity = new StringEntity(mapper.writeValueAsString(api), ContentType.APPLICATION_JSON);
 			
 			RestAPICall request = new PUTRequest(entity, uri);
@@ -572,7 +594,7 @@ public class APIManagerAPIAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()).build();
 			
 			RestAPICall request = new DELRequest(uri);
 			httpResponse = request.execute();
@@ -597,7 +619,7 @@ public class APIManagerAPIAdapter {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/"+api.getApiId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/apirepo/"+api.getApiId()).build();
 			
 			RestAPICall request = new DELRequest(uri);
 			httpResponse = request.execute();
@@ -631,7 +653,7 @@ public class APIManagerAPIAdapter {
 		RestAPICall request;
 		try {
 		uri = new URIBuilder(cmd.getAPIManagerURL())
-				.setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/"+StatusEndpoint.valueOf(desiredState).endpoint)
+				.setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()+"/"+StatusEndpoint.valueOf(desiredState).endpoint)
 				.build();
 			if(vhost!=null && desiredState.equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
 				HttpEntity entity = new StringEntity("vhost="+vhost, ContentType.APPLICATION_JSON);
@@ -642,7 +664,7 @@ public class APIManagerAPIAdapter {
 			request.setContentType("application/x-www-form-urlencoded");
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if(statusCode != 201){
+			if(statusCode != 201 && statusCode != 200){ // See issue: #134 The API-Manager also returns 200 on this request
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				if(statusCode == 403 &&  response.contains("API is already unpublished")) {
 					LOG.warn("API: "+api.getName()+" "+api.getVersion()+" ("+api.getId()+") is already unpublished");
@@ -687,7 +709,7 @@ public class APIManagerAPIAdapter {
 				return;
 			}
 			URI uri = new URIBuilder(cmd.getAPIManagerURL())
-					.setPath(RestAPICall.API_VERSION+"/proxies/"+api.getId()+"/deprecate").build();
+					.setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()+"/deprecate").build();
 			RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate="+formatRetirementDate(retirementDate)), uri, true);
 			apiCall.setContentType("application/x-www-form-urlencoded");
 			httpResponse = apiCall.execute();
@@ -745,7 +767,7 @@ public class APIManagerAPIAdapter {
 		pass=extractPassword(completeWsdlUrl);
 
 		try {
-			URIBuilder uriBuilder = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/importFromUrl/")
+			URIBuilder uriBuilder = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/apirepo/importFromUrl/")
 					.setParameter("organizationId", api.getOrganization().getId())
 					.setParameter("type", "wsdl")
 					.setParameter("url", wsdlUrl)
@@ -780,10 +802,10 @@ public class APIManagerAPIAdapter {
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
 		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2")) {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/import/").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/apirepo/import/").build();
 		} else {
 			// Not sure, if 7.5.3 still needs it that way!
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/apirepo/import/")
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/apirepo/import/")
 					.setParameter("field", "name").setParameter("op", "eq").setParameter("value", "API Development").build();
 		}
 		try {
@@ -814,8 +836,8 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
-	public void upgradeAccessToNewerAPI(API apiToUpgrade, API referenceAPI) throws AppException {
-		upgradeAccessToNewerAPI(apiToUpgrade, referenceAPI, null, null, null);
+	public void upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI) throws AppException {
+		upgradeAccessToNewerAPI(apiToUpgradeAccess, referenceAPI, null, null, null);
 		// Existing applications now got access to the new API, hence we have to update the internal state
 		// APIManagerAdapter.getInstance().addClientApplications(inTransitState, actualState);
 		// Additionally we need to preserve existing (maybe manually created) application quotas
@@ -833,11 +855,11 @@ public class APIManagerAPIAdapter {
 				for(QuotaRestriction restriction : app.getAppQuota().getRestrictions()) {
 					if(restriction.getApi().equals(referenceAPI.getId())) { // This application has a restriction for this specific API
 						updateAppQuota = true;
-						restriction.setApi(apiToUpgrade.getId()); // Take over the quota config to new API
+						restriction.setApi(apiToUpgradeAccess.getId()); // Take over the quota config to new API
 						if(!restriction.getMethod().equals("*")) { // The restriction is for a specific method
 							String originalMethodName = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(referenceAPI.getId(), restriction.getMethod()).getName();
 							// Try to find the same operation for the newly created API based on the name
-							String newMethodId = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(apiToUpgrade.getId(), originalMethodName).getId();
+							String newMethodId = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(apiToUpgradeAccess.getId(), originalMethodName).getId();
 							restriction.setMethod(newMethodId);
 						}
 					}
@@ -845,7 +867,7 @@ public class APIManagerAPIAdapter {
 				if(updateAppQuota) {
 					LOG.info("Taking over existing quota config for application: '"+app.getName()+"' to newly created API.");
 					try {
-						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/applications/"+app.getId()+"/quota").build();
+						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+app.getId()+"/quota").build();
 						entity = new StringEntity(mapper.writeValueAsString(app.getAppQuota()), ContentType.APPLICATION_JSON);
 						
 						request = new PUTRequest(entity, uri, true);
@@ -869,27 +891,27 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
-	public boolean upgradeAccessToNewerAPI(API apiToUpgrade, API referenceAPI, Boolean deprecateRefApi, Boolean retireRefApi, Long retirementDateRefAPI) throws AppException {
-		if(apiToUpgrade.getState().equals(API.STATE_UNPUBLISHED)) {
-			LOG.info("API to upgrade has state unpublished.");
+	public boolean upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI, Boolean deprecateRefApi, Boolean retireRefApi, Long retirementDateRefAPI) throws AppException {
+		if(apiToUpgradeAccess.getState().equals(API.STATE_UNPUBLISHED)) {
+			LOG.info("API to upgrade access has state unpublished.");
 			return false;
 		}
-		if(apiToUpgrade.getId().equals(referenceAPI.getId())) {
-			LOG.warn("API to upgrade: "+Utils.getAPILogString(apiToUpgrade)+" and "
+		if(apiToUpgradeAccess.getId().equals(referenceAPI.getId())) {
+			LOG.warn("API to upgrade access: "+Utils.getAPILogString(apiToUpgradeAccess)+" and "
 					+ "reference/old API: "+Utils.getAPILogString(referenceAPI)+" are the same. Skip upgrade access to newer API.");
 			return false;
 		}
-		LOG.debug("Upgrade access & subscriptions to API: " + apiToUpgrade.getName() + " " + apiToUpgrade.getVersion() + "("+apiToUpgrade.getId()+")");
+		LOG.debug("Upgrade access & subscriptions to API: " + apiToUpgradeAccess.getName() + " " + apiToUpgradeAccess.getVersion() + "("+apiToUpgradeAccess.getId()+")");
 		
 		URI uri;
 		HttpEntity entity;
 		RestAPICall request;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/upgrade/"+referenceAPI.getId()).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/upgrade/"+referenceAPI.getId()).build();
 			
 			List<NameValuePair> params = new Vector<NameValuePair>();
-			params.add(new BasicNameValuePair("upgradeApiId", apiToUpgrade.getId()));
+			params.add(new BasicNameValuePair("upgradeApiId", apiToUpgradeAccess.getId()));
 			if(deprecateRefApi != null) 		params.add(new BasicNameValuePair("deprecate", deprecateRefApi.toString()));
 			if(retireRefApi != null) 			params.add(new BasicNameValuePair("retire", retireRefApi.toString()));
 			if(retirementDateRefAPI != null)	params.add(new BasicNameValuePair("retirementDate", formatRetirementDate(retirementDateRefAPI)));
@@ -903,7 +925,7 @@ public class APIManagerAPIAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
 				String response = EntityUtils.toString(httpResponse.getEntity());
-				if(statusCode==403 && response.contains("Unknown API")) {
+				if((statusCode==403 || statusCode==404) && response.contains("Unknown API")) {
 					LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in 1 second.");
 					Thread.sleep(1000);
 					httpResponse = request.execute();
@@ -945,7 +967,7 @@ public class APIManagerAPIAdapter {
 			}
 		}
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/proxies/grantaccess").build();			
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/grantaccess").build();			
 			entity = new StringEntity(formBody);
 			apiCall = new POSTRequest(entity, uri, true);
 			apiCall.setContentType("application/x-www-form-urlencoded");
@@ -953,7 +975,7 @@ public class APIManagerAPIAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
 				String response = EntityUtils.toString(httpResponse.getEntity());
-				if(statusCode==403 && response.contains("Unknown API")) {
+				if((statusCode==403 || statusCode==404) && response.contains("Unknown API")) {
 					LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in 1 second.");
 					Thread.sleep(1000);
 					httpResponse = apiCall.execute();

@@ -122,7 +122,8 @@ public class EnvironmentProperties implements Map<String, String> {
 
 	@Override
 	public String put(String key, String value) {
-		throw new UnsupportedOperationException();
+		this.mainProperties.put(key, value);
+		return key;
 	}
 
 	@Override

@@ -9,7 +9,6 @@ public class APIImportParams extends StandardImportParams implements Parameters 
 	private Boolean forceUpdate;
 	private Boolean useFEAPIDefinition;
 	private Boolean validateRemoteHost;
-	private Boolean zeroDowntimeUpdate;
 	
 	private Boolean changeOrganization = false; 
 	
@@ -51,14 +50,6 @@ public class APIImportParams extends StandardImportParams implements Parameters 
 
 	public void setValidateRemoteHost(Boolean validateRemoteHost) {
 		this.validateRemoteHost = validateRemoteHost;
-	}
-
-	public Boolean isZeroDowntimeUpdate() {
-		return zeroDowntimeUpdate;
-	}
-
-	public void setZeroDowntimeUpdate(Boolean zeroDowntimeUpdate) {
-		this.zeroDowntimeUpdate = zeroDowntimeUpdate;
 	}
 
 	public String getApiDefintion() {

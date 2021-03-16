@@ -2,20 +2,20 @@ package com.axway.apim.api.export.lib.cli;
 
 import org.apache.commons.cli.Option;
 
-import com.axway.apim.api.export.lib.params.APIUpgradeParams;
+import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class CLIAPIUpgradeOptions extends CLIOptions {
+public class CLIAPIUpgradeAccessOptions extends CLIOptions {
 	
-	private CLIAPIUpgradeOptions(String[] args) {
+	private CLIAPIUpgradeAccessOptions(String[] args) {
 		super(args);
 	}
 	
 	public static CLIOptions create(String[] args) {
-		CLIOptions cliOptions = new CLIAPIUpgradeOptions(args);
+		CLIOptions cliOptions = new CLIAPIUpgradeAccessOptions(args);
 		cliOptions = new CLIAPIFilterOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);
 		cliOptions.addOptions();
@@ -65,12 +65,12 @@ public class CLIAPIUpgradeOptions extends CLIOptions {
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);		
 		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("Upgrade one or more APIs based on the given reference API.");
+		System.out.println("Upgrade access for one or more APIs based on the given reference API.");
 		System.out.println("App-Subscriptions and Granted orgs are taken over to all selected APIs based on the reference API.");
 		System.out.println("The reference API must be unique. APIs must be published to be considered.");
-		System.out.println(getBinaryName()+" api upgrade -s api-env -refAPIId <UUID-ID-OF-THE-REF-API> -id <UUID-ID-OF-THE-API>");
-		System.out.println(getBinaryName()+" api upgrade -s api-env -n \"*APIs-to-be-upgraded*\" -refAPIName \"*Name of Ref-API*\"");
-		System.out.println(getBinaryName()+" api upgrade -s api-env -n \"*APIs-to-be-upgraded*\" -refAPIName \"*Name of Ref-API*\" -refAPIDeprecate true");
+		System.out.println(getBinaryName()+" api upgrade-access -s api-env -refAPIId <UUID-ID-OF-THE-REF-API> -id <UUID-ID-OF-THE-API>");
+		System.out.println(getBinaryName()+" api upgrade-access -s api-env -n \"*APIs-to-be-upgraded*\" -refAPIName \"*Name of Ref-API*\"");
+		System.out.println(getBinaryName()+" api upgrade-access -s api-env -n \"*APIs-to-be-upgraded*\" -refAPIName \"*Name of Ref-API*\" -refAPIDeprecate true");
 		System.out.println();
 		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");
@@ -84,7 +84,7 @@ public class CLIAPIUpgradeOptions extends CLIOptions {
 
 	@Override
 	public Parameters getParams() throws AppException {
-		APIUpgradeParams params = new APIUpgradeParams();
+		APIUpgradeAccessParams params = new APIUpgradeAccessParams();
 		params.setReferenceAPIId(getValue("refAPIId"));
 		params.setReferenceAPIName(getValue("refAPIName"));
 		params.setReferenceAPIVersion(getValue("refAPIVersion"));

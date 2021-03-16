@@ -9,21 +9,21 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
-import com.axway.apim.api.export.lib.params.APIUpgradeParams;
+import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 
-public class UpgradeAPIHandler extends APIResultHandler {
+public class UpgradeAccessAPIHandler extends APIResultHandler {
 
-	public UpgradeAPIHandler(APIExportParams params) {
+	public UpgradeAccessAPIHandler(APIExportParams params) {
 		super(params);
 	}
 
 	@Override
 	public void execute(List<API> apis) throws AppException {
-		APIUpgradeParams upgradeParams = (APIUpgradeParams) params;
+		APIUpgradeAccessParams upgradeParams = (APIUpgradeAccessParams) params;
 		API referenceAPI = upgradeParams.getReferenceAPI();
 		if(referenceAPI == null) {
 			throw new AppException("Reference API for upgrade is missing.", ErrorCode.UNKNOWN_API);

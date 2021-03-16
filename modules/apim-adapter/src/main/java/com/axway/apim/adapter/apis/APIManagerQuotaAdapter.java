@@ -54,6 +54,8 @@ public class APIManagerQuotaAdapter {
 	Cache<String, String> applicationsQuotaCache;
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
+	
+	CoreParameters cmd = CoreParameters.getInstance();
 
 	public APIManagerQuotaAdapter() {
 		applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
@@ -68,13 +70,13 @@ public class APIManagerQuotaAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			if(Quota.APPLICATION_DEFAULT.getQuotaId().equals(quotaId) || Quota.SYSTEM_DEFAULT.getQuotaId().equals(quotaId)) {
-				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/quotas/"+quotaId).build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/quotas/"+quotaId).build();
 			} else {
 				if(applicationsQuotaCache.containsKey(quotaId)) {
 					this.apiManagerResponse.put(quotaId, applicationsQuotaCache.get(quotaId));
 					return;
 				}
-				uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION + "/applications/"+quotaId+"/quota/").build();
+				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/"+quotaId+"/quota/").build();
 			}
 			RestAPICall getRequest = new GETRequest(uri, true);
 			httpResponse = getRequest.execute();
@@ -117,7 +119,7 @@ public class APIManagerQuotaAdapter {
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(RestAPICall.API_VERSION+"/quotas/"+quotaId).build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/quotas/"+quotaId).build();
 			
 			entity = new StringEntity(mapper.writeValueAsString(quotaConfig), ContentType.APPLICATION_JSON);
 			

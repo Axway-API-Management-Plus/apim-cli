@@ -55,4 +55,15 @@ public class CoreParametersTest {
 		
 		Assert.assertEquals(params.getQuotaMode(), CoreParameters.Mode.add);
 	}
+	
+	@Test
+	public void testAPIBasepath() {
+		CoreParameters params = new CoreParameters();
+		
+		params.setHostname("manager.host");
+		Assert.assertEquals(params.getApiBasepath(), CoreParameters.DEFAULT_API_BASEPATH);
+		
+		params.setApiBasepath("/fr/apim/v13/portal");
+		Assert.assertEquals(params.getApiBasepath(), "/fr/apim/v13/portal");
+	}
 }
