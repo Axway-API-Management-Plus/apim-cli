@@ -32,7 +32,7 @@ done
 
 echo ""
 
-cd $currentDir
+cd "$currentDir"
 
 "$_java" -Xms64m -Xmx256m -Dlog4j.configuration=../lib/log4j.xml -classpath "$CP" com.axway.apim.cli.APIManagerCLI "${@}"
 rc=$?
