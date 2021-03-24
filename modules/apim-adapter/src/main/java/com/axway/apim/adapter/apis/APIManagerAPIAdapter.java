@@ -336,7 +336,7 @@ public class APIManagerAPIAdapter {
 			return;
 		}
 		api.setImage(image);
-		LOG.info("Updating API-Image from: " + api.getImage().getFilename());
+		LOG.debug("Updating API-Proxy-Image from file: " + api.getImage().getFilename());
 		
 		URI uri;
 		HttpEntity entity;

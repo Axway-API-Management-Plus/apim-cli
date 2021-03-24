@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 ### Fixed
 - apim.sh fails if CWD has a space (See issue [#160](https://github.com/Axway-API-Management-Plus/apim-cli/issues/160))
+- Streams not closed bring to a FileSystemException (See issue [#161](https://github.com/Axway-API-Management-Plus/apim-cli/issues/161))
 
 ## [1.3.6] 2020-03-16
 ### Fixed
