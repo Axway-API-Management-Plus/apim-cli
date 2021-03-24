@@ -46,7 +46,7 @@ public class BackendBasepathChangeInSwaggerTestIT extends TestNGCitrusTestRunner
 				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 				.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
 				.validate("$.[?(@.path=='${apiPath}')].serviceProfiles._default.basePath", "${backendBasepath}")
-				.validate("$.[?(@.path=='${apiPath}')].caCerts[?(@.md5Fingerprint=='81:AD:AF:05:B1:39:ED:FF:BE:EE:79:94:28:B3:F2:10')].name", "@assertThat(containsString(*.swagger.io))@")
+				.validate("$.[?(@.path=='${apiPath}')].caCerts[?(@.sha1Fingerprint=='85:58:3C:71:FD:02:C0:E7:6B:60:4A:D5:DD:55:52:A9:28:DB:43:66')].name", "@assertThat(containsString(*.swagger.io))@")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		echo("####### Perform a no change to make sure, the API-Definition is not considered as changed because we change the host on-the-fly #######");
