@@ -3,7 +3,7 @@ name: API-Manager CLI tests
 on: [push, pull_request]
 
 jobs:
-  run-unit-tests:
+  Run-Unit-tests:
     if: "!contains(github.event.head_commit.message, 'skip ci')"
 
     runs-on: ubuntu-latest
@@ -25,7 +25,7 @@ jobs:
     - name: Run Unit tests
       run: mvn clean test
 
-  Run-Integration tests:
+  Run-Integration-tests:
     needs: [run-unit-tests]
     if: "!contains(github.event.head_commit.message, 'skip ci')"
 
