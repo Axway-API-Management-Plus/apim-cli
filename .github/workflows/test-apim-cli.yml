@@ -42,5 +42,5 @@ jobs:
       with:
         username: ${{ secrets.AXWAY_DOCKER_REG_USER }}
         password: ${{ secrets.AXWAY_DOCKER_REG_PASS }}
-        registry: docker-registry.demo.axway.com/swagger-promote
-        image: api-mgr-with-policies:7.6.2-SP5
+        registry: docker-registry.demo.axway.com
+        image: docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP5
