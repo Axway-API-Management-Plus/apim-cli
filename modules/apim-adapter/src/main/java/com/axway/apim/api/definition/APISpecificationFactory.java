@@ -48,9 +48,9 @@ public class APISpecificationFactory {
 					return spec;
 				}
 			} catch (Exception e) {
-				if(LOG.isDebugEnabled()) {
+				//if(LOG.isDebugEnabled()) {
 					LOG.error("Can't handle API specification with class: " + clazz.getName(), e);
-				}
+				//}
 			}
 		}
 		if(!failOnError) {
