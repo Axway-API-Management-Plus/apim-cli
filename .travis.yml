@@ -7,9 +7,9 @@ services:
 env:
   global:
     - CACHE_DIR=$HOME/docker
-    - APIM_DOCKER_IMAGE=docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.6.2-SP5
+    - APIM_DOCKER_IMAGE=docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7-20210330
     - CASSANDRA_DOCKER_IMAGE=cassandra:2.2.12
-    - CACHE_FILE_APIM=$CACHE_DIR/api-manager_7_6_2_SP5-1.cache.tar.gz
+    - CACHE_FILE_APIM=$CACHE_DIR/api-manager_7_7_20210330.cache.tar.gz
     - CACHE_FILE_CASSANDRA=$CACHE_DIR/cassandra_2_2_12.cache.tar.gz
     - counter=0
 
