@@ -210,6 +210,8 @@ public class Config {
 			description = "Idle session timeout (minutes).")
 	private Integer sessionIdleTimeout;
 	
+	private Integer sessionTimeout;
+	
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.General,
 			name = "Login name validation regex",
@@ -290,6 +292,8 @@ public class Config {
 	private String externalUserRole;
 	
 	private Boolean externalUserEnabled;
+	
+	private Boolean regTokenEmailEnabled;
 
 	public String getPortalName() {
 		return portalName;
@@ -713,5 +717,21 @@ public class Config {
 
 	public void setLockUserAccount(LockUserAccount lockUserAccount) {
 		this.lockUserAccount = lockUserAccount;
+	}
+
+	public Boolean getRegTokenEmailEnabled() {
+		return regTokenEmailEnabled;
+	}
+
+	public void setRegTokenEmailEnabled(Boolean regTokenEmailEnabled) {
+		this.regTokenEmailEnabled = regTokenEmailEnabled;
+	}
+
+	public Integer getSessionTimeout() {
+		return sessionTimeout;
+	}
+
+	public void setSessionTimeout(Integer sessionTimeout) {
+		this.sessionTimeout = sessionTimeout;
 	}
 }
