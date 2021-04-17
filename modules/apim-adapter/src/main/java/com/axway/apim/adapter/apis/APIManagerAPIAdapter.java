@@ -923,8 +923,8 @@ public class APIManagerAPIAdapter {
 						int statusCode = httpResponse.getStatusLine().getStatusCode();
 						if(statusCode < 200 || statusCode > 299){
 							String response = EntityUtils.toString(httpResponse.getEntity());
-							if((statusCode==403 || statusCode==404)) {
-								LOG.warn("Got unexpected error: while taking over application quota to newer API ... Try again in 1 second.");
+							if((statusCode==403 || statusCode==404)) { // Response-Code: 400. Got response: '{"errors":[{"code":102,"message":"Invalid createdBy"}]}'
+								LOG.warn("Got unexpected error '" + response + " ("+statusCode+")' while taking over application quota to newer API ... Try again in 1 second.");
 								Thread.sleep(1000);
 								httpResponse = request.execute();
 								statusCode = httpResponse.getStatusLine().getStatusCode();
