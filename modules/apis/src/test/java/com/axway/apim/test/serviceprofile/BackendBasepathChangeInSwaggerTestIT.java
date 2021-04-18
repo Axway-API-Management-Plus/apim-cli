@@ -46,7 +46,7 @@ public class BackendBasepathChangeInSwaggerTestIT extends TestNGCitrusTestRunner
 				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 				.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
 				.validate("$.[?(@.path=='${apiPath}')].serviceProfiles._default.basePath", "${backendBasepath}")
-				.validate("$.[?(@.path=='${apiPath}')].caCerts[?(@.md5Fingerprint=='81:AD:AF:05:B1:39:ED:FF:BE:EE:79:94:28:B3:F2:10')].name", "@assertThat(containsString(*.swagger.io))@")
+				.validate("$.[?(@.path=='${apiPath}')].caCerts[?(@.md5Fingerprint=='54:63:34:53:9D:71:2A:96:B7:D6:53:26:93:25:1B:16')].name", "@assertThat(containsString(*.swagger.io))@")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		echo("####### Perform a no change to make sure, the API-Definition is not considered as changed because we change the host on-the-fly #######");
@@ -74,6 +74,6 @@ public class BackendBasepathChangeInSwaggerTestIT extends TestNGCitrusTestRunner
 				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 				.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
 				.validate("$.[?(@.path=='${apiPath}')].serviceProfiles._default.basePath", "${backendBasepath}")
-				.validate("$.[?(@.path=='${apiPath}')].caCerts[?(@.md5Fingerprint=='81:AD:AF:05:B1:39:ED:FF:BE:EE:79:94:28:B3:F2:10')].name", "@assertThat(containsString(*.swagger.io))@"));
+				.validate("$.[?(@.path=='${apiPath}')].caCerts[?(@.md5Fingerprint=='54:63:34:53:9D:71:2A:96:B7:D6:53:26:93:25:1B:16')].name", "@assertThat(containsString(*.swagger.io))@"));
 	}
 }

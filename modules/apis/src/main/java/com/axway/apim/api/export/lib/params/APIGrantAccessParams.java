@@ -38,9 +38,14 @@ public class APIGrantAccessParams extends APIExportParams implements Parameters,
 	public APIFilter getAPIFilter() {
 		return new APIFilter.Builder()
 				.hasApiId(getId())
+				.hasApiPath(getApiPath())
 				.hasName(getName())
 				.hasVHost(getVhost())
 				.hasOrganization(getOrganization())
+				.hasBackendBasepath(getBackend())
+				.hasPolicyName(getPolicy())
+				.hasInboundSecurity(getInboundSecurity())
+				.hasTag(getTag())
 				.hasState(API.STATE_PUBLISHED) // Only published APIs are considered
 				.build();
 	}

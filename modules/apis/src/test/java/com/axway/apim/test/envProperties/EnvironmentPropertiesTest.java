@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
 
-public class EnvPropertiesTest {
+public class EnvironmentPropertiesTest {
 
 	@Test
 	public void testNoStage() throws AppException, IOException {
@@ -35,7 +35,7 @@ public class EnvPropertiesTest {
 	@Test
 	public void testNoStageFromConfDir() throws AppException, IOException, URISyntaxException {
 		// A given path should be used to load the Environent-Config file from
-		String path = EnvPropertiesTest.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+		String path = EnvironmentPropertiesTest.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 		path += "envPropertiesTest/swaggerPromoteHome";
 
 		EnvironmentProperties properties = new EnvironmentProperties(null, path);
@@ -50,8 +50,8 @@ public class EnvPropertiesTest {
 
 	@Test
 	public void testStageFromConfDir() throws AppException, IOException, URISyntaxException {
-		// A given path should be used to load the Environent-Config file from
-		String path = EnvPropertiesTest.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+		// A given path should be used to load the Environment-Config file from
+		String path = EnvironmentPropertiesTest.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 		path += "envPropertiesTest/swaggerPromoteHome";
 
 		EnvironmentProperties properties = new EnvironmentProperties("fromSwaggerPromoteHome", path);
@@ -62,5 +62,14 @@ public class EnvPropertiesTest {
 		
 		Assert.assertEquals(properties.get("admin_username"), "stageUserFromSwaggerPromoteHome");
 		Assert.assertEquals(properties.get("admin_password"), "stageUasswordFromSwaggerPromoteHome");
+	}
+	
+	@Test
+	public void testEnvironementWithOSEnvVariables() throws AppException, IOException {
+		// For this test to run, the system must provide the environment properties CI & JAVA_HOME
+		EnvironmentProperties properties = new EnvironmentProperties("NOT_SET");
+		
+		Assert.assertNotEquals(properties.get("variableFromOSEnvironmentVariable"), "${JAVA_HOME}");
+		Assert.assertEquals(properties.get("variablePartiallyFromOSEnvironmentVariable"), "Fixed value and true some dynamic parts");		
 	}
 }
