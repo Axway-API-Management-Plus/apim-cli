@@ -130,11 +130,12 @@ public class APIManagerAdapter {
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
 		if (APIManagerAdapter.instance == null) {
-			APIManagerAdapter.instance = new APIManagerAdapter();
 			if(!TestIndicator.getInstance().isTestRunning()) {
+				APIManagerAdapter.instance = new APIManagerAdapter();
 				LOG.info("Successfully connected to API-Manager (" + getApiManagerVersion() + ") on: " + CoreParameters.getInstance().getAPIManagerURL());
 			} else {
 				APIManagerAdapter.apiManagerVersion = "7.7.0";
+				APIManagerAdapter.instance = new APIManagerAdapter();
 				LOG.info("Successfully connected to MOCKED API-Manager (" + getApiManagerVersion() + ")");
 			}
 		}

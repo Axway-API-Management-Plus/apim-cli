@@ -38,6 +38,9 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 		if(System.getenv("TRAVIS")!=null && System.getenv("TRAVIS").equals("true")) {
 			// At Travis an environment-variable USER exists which should have been replaced
 			Assert.assertNotEquals(testAPI.getName(), "${USER}");			
+		} else if(System.getenv("GITHUB_ACTIONS")!=null && System.getenv("GITHUB_ACTIONS").equals("true")) {
+			// When running at GitHub actions
+			Assert.assertNotEquals(testAPI.getVhost(), "${GITHUB_ACTION}");
 		} else {
 			// On Windows use USERNAME in the version
 			Assert.assertNotEquals(testAPI.getVersion(), "${USERNAME}");

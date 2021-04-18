@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 ### Fixed
+- apim.sh fails if CWD has a space (See issue [#160](https://github.com/Axway-API-Management-Plus/apim-cli/issues/160))
+- Streams not closed bring to a FileSystemException (See issue [#161](https://github.com/Axway-API-Management-Plus/apim-cli/issues/161))
+
+## [1.3.6] 2020-03-16
+### Fixed
 - Avoid NPE if given OAuth-Provider Profile is invalid (See issue [#143](https://github.com/Axway-API-Management-Plus/apim-cli/issues/143))
 - Actual API-Lookup when using additional criteria V-Host and QueryRoutingVersion (See issue [#151](https://github.com/Axway-API-Management-Plus/apim-cli/issues/151))
 
