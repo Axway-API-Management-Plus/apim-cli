@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,17 +79,37 @@ public class EnvironmentProperties implements Map<String, String> {
 	@Override
 	public String get(Object key) {
 		if(stageProperties!=null && stageProperties.containsKey(key)) {
-			return stageProperties.getProperty((String)key);
+			return resolveValueWithEnvVars(stageProperties.getProperty((String)key));
 		} else if(this.mainProperties!=null && mainProperties.containsKey(key)) {
-			return mainProperties.getProperty((String)key);
+			return resolveValueWithEnvVars(mainProperties.getProperty((String)key));
 		} else if(this.systemProperties!=null && systemProperties.containsKey(key)) {
-			return systemProperties.getProperty((String)key);
+			return resolveValueWithEnvVars(systemProperties.getProperty((String)key));
 		} else {
 			LOG.debug("Property: '" + key + "' not found.");
 			return null;
 		}
 	}
 	
+	private static String resolveValueWithEnvVars(String value) {
+		if (null == value) {
+			return null;
+		}
+		if(value.indexOf("${")==-1) {
+			return value;
+		}
+
+		Pattern p = Pattern.compile("\\$\\{(\\w+)\\}|\\$(\\w+)");
+		Matcher m = p.matcher(value);
+		StringBuffer sb = new StringBuffer();
+		while (m.find()) {
+			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
+			String envVarValue = System.getenv(envVarName);
+			m.appendReplacement(sb, null == envVarValue ? "" : Matcher.quoteReplacement(envVarValue));
+		}
+		m.appendTail(sb);
+		return sb.toString();
+	}
+
 	@Override
 	public boolean containsKey(Object key) {
 		return (this.mainProperties.containsKey(key) || this.stageProperties.containsKey(key) || this.systemProperties.containsKey(key));

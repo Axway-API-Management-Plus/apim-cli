@@ -922,11 +922,25 @@ public class APIManagerAPIAdapter {
 						httpResponse = request.execute();
 						int statusCode = httpResponse.getStatusLine().getStatusCode();
 						if(statusCode < 200 || statusCode > 299){
-							LOG.error("Error taking over application quota to new API. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
-							throw new AppException("Error taking over application quota to new API. Received Status-Code: " +statusCode, ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
+							String response = EntityUtils.toString(httpResponse.getEntity());
+							if((statusCode==403 || statusCode==404)) { // Response-Code: 400. Got response: '{"errors":[{"code":102,"message":"Invalid createdBy"}]}'
+								LOG.warn("Got unexpected error '" + response + " ("+statusCode+")' while taking over application quota to newer API ... Try again in 1 second.");
+								Thread.sleep(1000);
+								httpResponse = request.execute();
+								statusCode = httpResponse.getStatusLine().getStatusCode();
+								if(statusCode < 200 || statusCode > 299){
+									LOG.error("Error taking over application quota to new API. Received Status-Code: " +statusCode + ", Response: " + response);
+									throw new AppException("Error taking over application quota to new API. Received Status-Code: " +statusCode, ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
+								} else {
+									LOG.info("Successfully took over application quota to newer API on retry. Received Status-Code: " +statusCode );
+								}
+							} else {
+								LOG.error("Error taking over application quota to new API. Received Status-Code: " +statusCode + ", Response: " + response);
+								throw new AppException("Error taking over application quota to new API. Received Status-Code: " +statusCode, ErrorCode.CANT_UPDATE_QUOTA_CONFIG);					
+							}
 						}
 					} catch (Exception e) {
-						ErrorState.getInstance().setError("Can't update application quota.", ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
+						ErrorState.getInstance().setError("Can't update application quota. Error message: " + e.getMessage(), ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
 						throw new AppException("Can't update application quota.", ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
 					} finally {
 						try {
