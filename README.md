@@ -60,6 +60,7 @@ The automated End-2-End test suite contains of __116__ different scenarios, whic
 | 7.7-20200530    | test-with-7.7-20200530  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200530)](https://travis-ci.com/Axway-API-Management-Plus/apim-cli/branches)||
 | 7.7-20200730    | test-with-7.7-20200730  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200730)](https://travis-ci.com/Axway-API-Management-Plus/apim-cli/branches)||
 | 7.7-20200930    | test-with-7.7-20200930  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200930)](https://travis-ci.com/Axway-API-Management-Plus/apim-cli/branches)|Multi-Org is not yet supported|
+| 7.7-20210330    | test-with-7.7-20210330  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20210330)](https://travis-ci.com/Axway-API-Management-Plus/apim-cli/branches)|Multi-Org is not yet supported|
 
 Version 7.5.3 is NOT supported. Version 7.6.2 SP3 is required.  
 
