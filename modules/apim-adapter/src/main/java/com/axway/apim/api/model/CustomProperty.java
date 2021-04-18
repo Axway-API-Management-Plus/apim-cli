@@ -28,7 +28,7 @@ public class CustomProperty {
 	
 	private String error;
 	
-	private String custom;
+	private Object custom;
 	
 	private CustomPropertyPermission permissions;
 
@@ -128,11 +128,11 @@ public class CustomProperty {
 		this.error = error;
 	}
 
-	public String getCustom() {
+	public Object getCustom() {
 		return custom;
 	}
 
-	public void setCustom(String custom) {
+	public void setCustom(Object custom) {
 		this.custom = custom;
 	}
 	

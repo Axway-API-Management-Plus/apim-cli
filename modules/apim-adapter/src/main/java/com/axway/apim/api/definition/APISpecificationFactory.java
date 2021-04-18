@@ -29,6 +29,7 @@ public class APISpecificationFactory {
 	}
 	
 	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName, boolean failOnError) throws AppException {
+		ErrorState.deleteInstance(); // TODO: Needs to be reworked
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("Handle API-Specification: '" + getContentStart(apiSpecificationContent) + "...', apiDefinitionFile: '"+apiDefinitionFile+"'");	
 		}
@@ -42,7 +43,7 @@ public class APISpecificationFactory {
 				APISpecification spec = (APISpecification) constructor.newInstance(arguments);
 				spec.setApiSpecificationFile(apiDefinitionFile);
 				if(!spec.configure()) {
-					if(ErrorState.getInstance().hasError()) break;
+					if(ErrorState.getInstance().hasError()) break; // TODO: Needs to be reworked - Using another object to be returned for error handling
 					continue;			
 				} else {
 					return spec;

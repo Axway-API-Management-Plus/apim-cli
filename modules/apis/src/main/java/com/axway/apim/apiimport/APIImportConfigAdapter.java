@@ -458,8 +458,8 @@ public class APIImportConfigAdapter {
 			List<CaCert> completedCaCerts = new ArrayList<CaCert>();
 			for(CaCert cert :apiConfig.getCaCerts()) {
 				if(cert.getCertBlob()==null) {
-					JsonNode certInfo = APIManagerAdapter.getCertInfo(getInputStreamForCertFile(cert), cert);
-					try {
+					try(InputStream is = getInputStreamForCertFile(cert)) {
+						JsonNode certInfo = APIManagerAdapter.getCertInfo(is, cert);
 						CaCert completedCert = mapper.readValue(certInfo.get(0).toString(), CaCert.class);
 						completedCaCerts.add(completedCert);
 					} catch (Exception e) {
@@ -516,8 +516,7 @@ public class APIImportConfigAdapter {
 	}
 	
 	private byte[] getAPIDefinitionContent() throws AppException {
-		try {
-			InputStream stream = getAPIDefinitionAsStream();
+		try(InputStream stream = getAPIDefinitionAsStream()) {
 			Reader reader = new InputStreamReader(stream,StandardCharsets.UTF_8);
 			return IOUtils.toByteArray(reader,StandardCharsets.UTF_8);
 		} catch (IOException e) {
@@ -939,36 +938,37 @@ public class APIImportConfigAdapter {
 		}
 	}
 	
-	
-	
 	private API addImageContent(API importApi) throws AppException {
+		// No image declared do nothing
+		if(importApi.getImage()==null) return importApi;
 		File file = null;
-		if(importApi.getImage()!=null) { // An image is declared
-			try {
-				file = new File(importApi.getImage().getFilename());
-				if(!file.exists()) { // The image isn't provided with an absolute path, try to read it relativ to the config file
-					String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
-					file = new File(baseDir + "/" + importApi.getImage().getFilename());
-				}
-				importApi.getImage().setBaseFilename(file.getName());
-				InputStream is = this.getClass().getResourceAsStream(importApi.getImage().getFilename());
-				if(file.exists()) {
-					LOG.debug("Loading image from: '"+file.getCanonicalFile()+"'");
-					importApi.getImage().setImageContent(IOUtils.toByteArray(new FileInputStream(file)));
-					return importApi;
-				} else if(is!=null) {
-					LOG.debug("Trying to load image from classpath");
-					// Try to read it from classpath
+		try {
+			file = new File(importApi.getImage().getFilename());
+			if(!file.exists()) { // The image isn't provided with an absolute path, try to read it relative to the config file
+				String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
+				file = new File(baseDir + "/" + importApi.getImage().getFilename());
+			}
+			importApi.getImage().setBaseFilename(file.getName());
+			if(file.exists()) {
+				LOG.info("Loading image from: '"+file.getCanonicalFile()+"'");
+				try(InputStream is = new FileInputStream(file)) {
 					importApi.getImage().setImageContent(IOUtils.toByteArray(is));
 					return importApi;
-				} else {
-					throw new AppException("Image not found in filesystem ('"+file+"') or Classpath.", ErrorCode.UNXPECTED_ERROR);
 				}
-			} catch (Exception e) {
-				throw new AppException("Can't read image-file: "+importApi.getImage().getFilename()+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
 			}
+			// Try to read it from classpath
+			try(InputStream is = this.getClass().getResourceAsStream(importApi.getImage().getFilename())) {
+				if(is!=null) {
+					LOG.debug("Trying to load image from classpath");
+					importApi.getImage().setImageContent(IOUtils.toByteArray(is));
+					return importApi;
+				}
+			}
+			// An image is configured, but not found
+			throw new AppException("Configured image: '"+importApi.getImage().getFilename()+"' not found in filesystem (Relative/Absolute) or classpath.", ErrorCode.UNXPECTED_ERROR);
+		} catch (Exception e) {
+			throw new AppException("Can't read configured image-file: "+importApi.getImage().getFilename()+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
 		}
-		return importApi;
 	}
 
 	public String getPathToAPIDefinition() {
