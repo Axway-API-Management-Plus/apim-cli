@@ -356,7 +356,7 @@ public class APIMgrAppsAdapter {
 					throw new AppException("Error creating/updating application. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
 				createdApp = mapper.readValue(httpResponse.getEntity().getContent(), ClientApplication.class);
-				// enabled=false for a new application is ignore during initial creation, hence an update is required
+				// enabled=false for a new application is ignored during initial creation, hence another update of the just created app is required
 				if(actualApp==null && !desiredApp.isEnabled()) {
 					createOrUpdateApplication(desiredApp, createdApp);
 				}
@@ -431,6 +431,8 @@ public class APIMgrAppsAdapter {
 					update = true;
 					cred.setId(credentialId);
 					cred.setApplicationId(actualApp.getId());
+					cred.setCreatedBy(opt.get().getCreatedBy());
+					cred.setCreatedOn(opt.get().getCreatedOn());
 				}
 			} else if (cred instanceof ExtClients) {
 				final String credentialId = ((ExtClients)cred).getClientId();
@@ -444,6 +446,8 @@ public class APIMgrAppsAdapter {
 					endpoint += "/"+((ExtClients)cred).getId();
 					update = true;
 					cred.setId(credentialId);
+					cred.setCreatedBy(opt.get().getCreatedBy());
+					cred.setCreatedOn(opt.get().getCreatedOn());
 				}
 			} else if (cred instanceof APIKey) {
 				final String credentialId = ((APIKey)cred).getApiKey();

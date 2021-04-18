@@ -96,16 +96,10 @@ public class JsonOrgExporter extends OrgResultHandler {
 	}
 	
 	public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
-		FileOutputStream fileOuputStream = null;
-		try {
-			fileOuputStream = new FileOutputStream(fileDest);
+		try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {
 			fileOuputStream.write(bFile);
 		} catch (IOException e) {
 			throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
-		} finally {
-			try {
-				fileOuputStream.close();
-			} catch (Exception ignore) { }
 		}
 	}
 }

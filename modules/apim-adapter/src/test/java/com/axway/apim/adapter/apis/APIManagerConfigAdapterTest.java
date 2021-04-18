@@ -1,9 +1,13 @@
 package com.axway.apim.adapter.apis;
 
+import java.io.IOException;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.reporters.Files;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.lib.errorHandling.AppException;
 
 public class APIManagerConfigAdapterTest {
 	
@@ -38,5 +42,13 @@ public class APIManagerConfigAdapterTest {
 		Assert.assertNotNull(ignoreFields);
 		// 7.6.2 doesn't support all of the new fields
 		Assert.assertEquals(ignoreFields.length, 13);
+	}
+	
+	@Test
+	public void testAPIManager77March2021Config() throws IOException, AppException {
+		APIManagerConfigAdapter configAdapter = new APIManagerConfigAdapter();
+		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream("apimanager/config/apimanager-config-77-2021-March.json"));
+		configAdapter.setAPIManagerTestResponse(apiManagerResponse, true);
+		configAdapter.getConfig(true);
 	}
 }

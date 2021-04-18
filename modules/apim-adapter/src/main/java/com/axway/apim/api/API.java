@@ -168,6 +168,9 @@ public class API implements CustomPropertiesEntity {
 	protected String apiId = null;
 	
 	protected String deprecated = null;
+	
+	@JsonIgnore
+	protected String resourcePath = null;
 
 	@APIPropertyAnnotation(isBreaking = false, copyProp = false, 
 			writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
@@ -501,6 +504,20 @@ public class API implements CustomPropertiesEntity {
 
 	public void setRemotehost(RemoteHost remotehost) {
 		this.remoteHost = remotehost;
+	}
+	
+	/**
+	 * @return path of the resource registered for the belonging backend API or null if not set
+	 */
+	public String getResourcePath() {
+		return resourcePath;
+	}
+
+	/**
+	 * @param resourcePath is the path of the resource registered for the belonging backend API
+	 */
+	public void setBackendResourcePath(String resourcePath) {
+		this.resourcePath = resourcePath;
 	}
 
 	/**
