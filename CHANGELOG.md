@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - apim.sh fails if CWD has a space (See issue [#160](https://github.com/Axway-API-Management-Plus/apim-cli/issues/160))
 - Streams not closed bring to a FileSystemException (See issue [#161](https://github.com/Axway-API-Management-Plus/apim-cli/issues/161))
+- Streams not closed bring to a FileSystemException (See issue [#165](https://github.com/Axway-API-Management-Plus/apim-cli/issues/165))
+- Command grant access ignores given api path (See issue [#164](https://github.com/Axway-API-Management-Plus/apim-cli/issues/1654)
+- Export-Error when using a Custom-Properties-Model for APIs/Apps/Orgs (See issue [#163](https://github.com/Axway-API-Management-Plus/apim-cli/issues/163))
+
+### Added
+- Resolve system environment variables in property files (See issue [#166](https://github.com/Axway-API-Management-Plus/apim-cli/issues/166))
+- Support for API-Management 7.7-2021-March release (See issue [#167](https://github.com/Axway-API-Management-Plus/apim-cli/issues/167))
 
 ## [1.3.6] 2020-03-16
 ### Fixed
