@@ -79,26 +79,26 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class APIManagerAPIAdapter {
-	
+
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerAPIAdapter.class);
 
 	Map<APIFilter, String> apiManagerResponse = new HashMap<APIFilter, String>();
-	
+
 	Map<String, Image> imagesResponse = new HashMap<String, Image>();
-	
+
 	ObjectMapper mapper = new ObjectMapper();
-	
+
 	static CoreParameters cmd = CoreParameters.getInstance();
-	
+
 	/**
 	 * Maps the provided status to the REST-API endpoint to change the status!
 	 */
 	public static enum StatusEndpoint {
 		unpublished("unpublish"),
-		published("publish"), 
-		deprecated("deprecate"), 
+		published("publish"),
+		deprecated("deprecate"),
 		undeprecated("undeprecate");
-		
+
 		private final String endpoint;
 
 		private StatusEndpoint(String endpoint) {
@@ -137,14 +137,14 @@ public class APIManagerAPIAdapter {
 		}
 		return apis;
 	}
-	
+
 	public API getAPI(APIFilter filter, boolean logMessage) throws AppException {
 		List<API> foundAPIs = getAPIs(filter, false);
 		API api = getUniqueAPI(foundAPIs, filter);
 		if(logMessage && api!=null) LOG.info("Found existing API on path: '"+api.getPath()+"' ("+api.getState()+") (ID: '"+api.getId()+"'");
 		return api;
 	}
-	
+
 	public API getAPIWithId(String id) throws AppException {
 		if(id==null) return null;
 		return getAPI(new APIFilter.Builder().hasId(id).build(), false);
@@ -158,7 +158,7 @@ public class APIManagerAPIAdapter {
 		if(this.apiManagerResponse.get(filter)!=null) return;
 		URI uri;
 		HttpResponse httpResponse = null;
-		try { 
+		try {
 			uri = getAPIRequestUri(filter);
 			LOG.debug("Sending request to find existing APIs: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
@@ -182,13 +182,13 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
-	URI getAPIRequestUri(APIFilter filter) throws URISyntaxException {		
+
+	URI getAPIRequestUri(APIFilter filter) throws URISyntaxException {
 		String requestedId = "";
 		if(filter==null) filter = new APIFilter.Builder().build();
 		if(filter.getId()!=null) {
@@ -199,14 +199,14 @@ public class APIManagerAPIAdapter {
 				.build();
 		return uri;
 	}
-	
+
 	API getUniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
 		if(foundAPIs.size()==0) return null;
-		// If filtered resultSet contains more than one API, here we try to find a unique API based on the logical 
+		// If filtered resultSet contains more than one API, here we try to find a unique API based on the logical
 		// criteria (apiPath, VHost and QueryVersion)
-		// This can occur if the DesiredAPI does not define a QueryStringVersion and/or VHost. Then it will filter 
-		// without QueryString and return all APIs with the same path. 
-		// With or without QueryStringVersion/Vhost. It is then the API unique that has no QueryVersion 
+		// This can occur if the DesiredAPI does not define a QueryStringVersion and/or VHost. Then it will filter
+		// without QueryString and return all APIs with the same path.
+		// With or without QueryStringVersion/Vhost. It is then the API unique that has no QueryVersion
 		// defined, which is the actual API according to the desiredAPI. The same applies to the VHost.
 		if(foundAPIs.size()>1) {
 			Map<String, List<API>> apisPerKey = new HashMap<String, List<API>>();
@@ -234,10 +234,10 @@ public class APIManagerAPIAdapter {
 	private List<API> filterAPIs(APIFilter filter) throws AppException, JsonParseException, JsonMappingException, IOException {
 		List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>(){});
 		apis.removeIf(api -> filter.filter(api));
-		
+
 		if(apis.size()!=0) {
 			String dbgCrit = "";
-			if(apis.size()>1) 
+			if(apis.size()>1)
 				dbgCrit = " (apiPath: '"+filter.getApiPath()+"', filter: "+filter+", vhost: '"+filter.getVhost()+"', requestedType: "+filter.getApiType()+")";
 			LOG.debug("Found: "+apis.size()+" exposed API(s)" + dbgCrit);
 			return apis;
@@ -245,41 +245,41 @@ public class APIManagerAPIAdapter {
 		LOG.debug("No existing API found based on filter: " + getFilterFields(filter));
 		return apis;
 	}
-	
+
 	/**
 	 * Translates the methodIds of the given api. The operations are loaded from the API-Manager based on the apiId
 	 * @param <profile> An Outbound- or InboundProfile
 	 * @param api in which the methods should be translated
-	 * @param apiId the methods are loaded based on this API-ID (this might be a another referenced API 
-	 * @param mode translation direction 
+	 * @param apiId the methods are loaded based on this API-ID (this might be a another referenced API
+	 * @param mode translation direction
 	 * @throws AppException when something goes wrong
 	 */
 	public <profile> void translateMethodIds(API api, String apiId, METHOD_TRANSLATION mode) throws AppException {
-		if(mode == METHOD_TRANSLATION.NONE) return; 
+		if(mode == METHOD_TRANSLATION.NONE) return;
 		translateMethodIds(Arrays.asList(api), Arrays.asList(apiId), mode);
 	}
-	
+
 	/**
 	 * Translates the methodIds of the given api. The operations are loaded from the API-Manager based on the api.getId()
 	 * @param api in which the methods should be translated
-	 * @param mode translation direction 
+	 * @param mode translation direction
 	 * @param <profile> the type of the profile
-	 * @throws AppException if methods cannot be translated 
+	 * @throws AppException if methods cannot be translated
 	 */
 	public <profile> void translateMethodIds(API api, METHOD_TRANSLATION mode) throws AppException {
 		if(mode == METHOD_TRANSLATION.NONE) return;
 		if(api.getOutboundProfiles()!=null) _translateMethodIds(api.getOutboundProfiles(), mode, Arrays.asList(api.getId()));
 		if(api.getInboundProfiles()!=null) _translateMethodIds(api.getInboundProfiles(), mode, Arrays.asList(api.getId()));
 	}
-	
+
 	public <profile> void translateMethodIds(List<API> apis, List<String> apiIds, METHOD_TRANSLATION mode) throws AppException {
-		if(mode == METHOD_TRANSLATION.NONE) return; 
+		if(mode == METHOD_TRANSLATION.NONE) return;
 		for(API api : apis) {
 			if(api.getOutboundProfiles()!=null) _translateMethodIds(api.getOutboundProfiles(), mode, apiIds);
 			if(api.getInboundProfiles()!=null) _translateMethodIds(api.getInboundProfiles(), mode, apiIds);
 		}
 	}
-	
+
 	private void addImageFromAPIM(API api, boolean includeImage) throws AppException {
 		if(!includeImage) {
 			api.setImage(null);
@@ -309,12 +309,12 @@ public class APIManagerAPIAdapter {
 				throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			} finally {
 				try {
-					if(httpResponse!=null) 
+					if(httpResponse!=null)
 						((CloseableHttpResponse)httpResponse).close();
 				} catch (Exception ignore) {}
 			}
 	}
-	
+
 	private void addRemoteHost(API api, boolean includeRemoteHost) throws AppException {
 		if(!includeRemoteHost) return;
 		String backendBasePath = null;
@@ -329,7 +329,7 @@ public class APIManagerAPIAdapter {
 			}
 		}
 	}
-	
+
 	public void updateAPIImage(API api, Image image) throws AppException {
 		if(!image.isValid()) {
 			LOG.info("No image configured, doing nothing.");
@@ -337,18 +337,18 @@ public class APIManagerAPIAdapter {
 		}
 		api.setImage(image);
 		LOG.debug("Updating API-Proxy-Image from file: " + api.getImage().getFilename());
-		
+
 		URI uri;
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
-		
+
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()+"/image").build();
-			
+
 			entity = MultipartEntityBuilder.create()
 						.addBinaryBody("file", api.getImage().getInputStream(), ContentType.create("image/jpeg"), api.getImage().getBaseFilename())
 					.build();
-			
+
 			RestAPICall apiCall = new POSTRequest(entity, uri);
 			apiCall.setContentType(null);
 			httpResponse = apiCall.execute();
@@ -362,15 +362,15 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Can't update API-Image.", ErrorCode.UNXPECTED_ERROR, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	private <ProfileType> void _translateMethodIds(Map<String, ProfileType> profiles, METHOD_TRANSLATION mode, List<String> apiIds) throws AppException {
 		Map<String, ProfileType> updatedEntries = new HashMap<String, ProfileType>();
-		
+
 		if(profiles!=null) {
 			Iterator<String> keys = profiles.keySet().iterator();
 			while(keys.hasNext()) {
@@ -406,11 +406,11 @@ public class APIManagerAPIAdapter {
 			profiles.putAll(updatedEntries);
 		}
 	}
-	
+
 	public void addQuotaConfiguration(API api) throws AppException {
 		addQuotaConfiguration(api, true);
 	}
-	
+
 	private void addQuotaConfiguration(API api, boolean addQuota) throws AppException {
 		if(!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
 		APIQuota applicationQuota = null;
@@ -426,7 +426,7 @@ public class APIManagerAPIAdapter {
 			throw e;
 		}
 	}
-	
+
 	private void addExistingClientAppQuotas(API api, boolean addQuota) throws AppException {
 		if(!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
 		if(api.getApplications()==null || api.getApplications().size()==0) return;
@@ -435,11 +435,11 @@ public class APIManagerAPIAdapter {
 			app.setAppQuota(appQuota);
 		}
 	}
-	
+
 	public void addClientOrganizations(API api) throws AppException {
 		addClientOrganizations(api, true);
 	}
-	
+
 	private void addClientOrganizations(API api, boolean addClientOrganizations) throws AppException {
 		if(!addClientOrganizations || !APIManagerAdapter.hasAdminAccount()) return;
 		List<Organization> grantedOrgs;
@@ -455,11 +455,11 @@ public class APIManagerAPIAdapter {
 		}
 		api.setClientOrganizations(grantedOrgs);
 	}
-	
+
 	public void addClientApplications(API api) throws AppException {
 		addClientApplications(api, new APIFilter.Builder().includeClientApplications(true).build());
 	}
-	
+
 	private void addClientApplications(API api, APIFilter filter) throws AppException {
 		if(!filter.isIncludeClientApplications()) return;
 		List<ClientApplication> existingClientApps = new ArrayList<ClientApplication>();
@@ -482,9 +482,9 @@ public class APIManagerAPIAdapter {
 				}
 			}
 			api.setApplications(existingClientApps);
-		}		
+		}
 	}
-	
+
 	private void addOriginalAPIDefinitionFromAPIM(API api, APIFilter filter) throws AppException {
 		if(!filter.isIncludeOriginalAPIDefinition()) return;
 		URI uri;
@@ -513,12 +513,12 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Cannot parse API-Definition for API: '" + api.getName() + "' ("+api.getVersion()+") on path: '"+api.getPath()+"'", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	private void addBackendResourcePath(API api, APISpecification apiDefinition, boolean exportFEAPIDefinition) throws AppException {
 		URI uri;
 		HttpResponse httpResponse = null;
@@ -553,19 +553,19 @@ public class APIManagerAPIAdapter {
 			if(exportFEAPIDefinition) {
 				apiDefinition.configureBasepath(basePath + resourcePath);
 			}
-			// In any case, we save the backend resource path, as it is necessary for the full backendBasepath in the exported API config. 
+			// In any case, we save the backend resource path, as it is necessary for the full backendBasepath in the exported API config.
 			api.setBackendResourcePath(resourcePath);
 			return;
 		} catch (Exception e) {
 			throw new AppException("Cannot parse Backend-API for API: '" + api.toStringHuman()+"' in order to change API-Specification", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	public API createAPIProxy(API api) throws AppException {
 		LOG.debug("Create Front-End API: '"+api.getName()+"' (API-Proxy)");
 		URI uri;
@@ -574,7 +574,7 @@ public class APIManagerAPIAdapter {
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/").build();
 			entity = new StringEntity("{\"apiId\":\"" + api.getApiId() + "\",\"organizationId\":\"" + api.getOrganization().getId() + "\"}");
-			
+
 			RestAPICall request = new POSTRequest(entity, uri);
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -589,12 +589,12 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Can't create API-Proxy.", ErrorCode.CANT_CREATE_API_PROXY, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	public API updateAPIProxy(API api) throws AppException {
 		LOG.debug("Updating API-Proxy");
 		URI uri;
@@ -610,7 +610,7 @@ public class APIManagerAPIAdapter {
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()).build();
 			entity = new StringEntity(mapper.writeValueAsString(api), ContentType.APPLICATION_JSON);
-			
+
 			RestAPICall request = new PUTRequest(entity, uri);
 			httpResponse = request.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());
@@ -626,24 +626,24 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Cannot update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	public void deleteAPI(API api) throws AppException {
 		APIStatusManager statusManager = new APIStatusManager();
 		statusManager.update(api, API.STATE_DELETED, true);
 	}
-	
+
 	public void deleteAPIProxy(API api) throws AppException {
 		LOG.debug("Deleting API-Proxy");
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()).build();
-			
+
 			RestAPICall request = new DELRequest(uri);
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -656,19 +656,19 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Cannot delete API-Proxy.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	public void deleteBackendAPI(API api) throws AppException {
 		LOG.debug("Deleting API-Proxy");
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/apirepo/"+api.getApiId()).build();
-			
+
 			RestAPICall request = new DELRequest(uri);
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -680,12 +680,12 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Cannot delete Backend-API.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	public void publishAPI(API api, String vhost) throws AppException {
 		if(API.STATE_PUBLISHED.equals(api.getState())) {
 			LOG.info("API is already published");
@@ -693,7 +693,7 @@ public class APIManagerAPIAdapter {
 		}
 		updateAPIStatus(api, API.STATE_PUBLISHED, vhost);
 	}
-	
+
 	public void updateAPIStatus(API api, String desiredState, String vhost) throws AppException {
 		LOG.debug("Update API-Proxy status to: " + api.getState());
 		URI uri;
@@ -725,12 +725,12 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Cannot update API-Proxy status.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	private boolean useAdminAccountForPublish() throws AppException {
 		if(APIManagerAdapter.hasAdminAccount()) return true;
 		// This flag can be set to false to stop OrgAdmin from a Publishing request (means Pending approval)
@@ -738,7 +738,7 @@ public class APIManagerAPIAdapter {
 		// In all other cases, we use the Admin-Account
 		return true;
 	}
-	
+
 	private String formatRetirementDate(Long retirementDate) {
 		Calendar cal = GregorianCalendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Z")));
 		cal.setTimeInMillis(retirementDate);
@@ -746,7 +746,7 @@ public class APIManagerAPIAdapter {
 		format.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Z")));
 		return format.format(cal.getTime());
 	}
-	
+
 	public void updateRetirementDate(API api, Long retirementDate) throws AppException {
 		HttpResponse httpResponse = null;
 		try {
@@ -772,12 +772,12 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Error while updating the retirementDate", ErrorCode.CANT_UPDATE_API_PROXY);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	public API importBackendAPI(API api) throws AppException {
 		LOG.debug("Import backend API: "+api.getName()+" based on "+api.getApiDefinition().getAPIDefinitionType().getNiceName()+" specification.");
 		JsonNode jsonNode;
@@ -796,7 +796,7 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Can't import definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API, e);
 		}
 	}
-	
+
 	private JsonNode importFromWSDL(API api) throws URISyntaxException, AppException, IOException {
 		URI uri;
 		HttpEntity entity = new StringEntity("");
@@ -839,7 +839,7 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
@@ -878,12 +878,12 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	public void upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI) throws AppException {
 		upgradeAccessToNewerAPI(apiToUpgradeAccess, referenceAPI, null, null, null);
 		// Existing applications now got access to the new API, hence we have to update the internal state
@@ -917,13 +917,13 @@ public class APIManagerAPIAdapter {
 					try {
 						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+app.getId()+"/quota").build();
 						entity = new StringEntity(mapper.writeValueAsString(app.getAppQuota()), ContentType.APPLICATION_JSON);
-						
+
 						request = new PUTRequest(entity, uri, true);
 						httpResponse = request.execute();
 						int statusCode = httpResponse.getStatusLine().getStatusCode();
 						if(statusCode < 200 || statusCode > 299){
 							String response = EntityUtils.toString(httpResponse.getEntity());
-							if((statusCode==403 || statusCode==404)) { // Response-Code: 400. Got response: '{"errors":[{"code":102,"message":"Invalid createdBy"}]}'
+							if((statusCode==404 || statusCode==400)) { // Status-Code 400 is returned by 7.7-20200331 ?!
 								LOG.warn("Got unexpected error '" + response + " ("+statusCode+")' while taking over application quota to newer API ... Try again in 1 second.");
 								Thread.sleep(1000);
 								httpResponse = request.execute();
@@ -936,7 +936,7 @@ public class APIManagerAPIAdapter {
 								}
 							} else {
 								LOG.error("Error taking over application quota to new API. Received Status-Code: " +statusCode + ", Response: " + response);
-								throw new AppException("Error taking over application quota to new API. Received Status-Code: " +statusCode, ErrorCode.CANT_UPDATE_QUOTA_CONFIG);					
+								throw new AppException("Error taking over application quota to new API. Received Status-Code: " +statusCode, ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
 							}
 						}
 					} catch (Exception e) {
@@ -944,7 +944,7 @@ public class APIManagerAPIAdapter {
 						throw new AppException("Can't update application quota.", ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
 					} finally {
 						try {
-							if(httpResponse!=null) 
+							if(httpResponse!=null)
 								((CloseableHttpResponse)httpResponse).close();
 						} catch (Exception ignore) {}
 					}
@@ -952,7 +952,7 @@ public class APIManagerAPIAdapter {
 			}
 		}
 	}
-	
+
 	public boolean upgradeAccessToNewerAPI(API apiToUpgradeAccess, API referenceAPI, Boolean deprecateRefApi, Boolean retireRefApi, Long retirementDateRefAPI) throws AppException {
 		if(apiToUpgradeAccess.getState().equals(API.STATE_UNPUBLISHED)) {
 			LOG.info("API to upgrade access has state unpublished.");
@@ -964,25 +964,25 @@ public class APIManagerAPIAdapter {
 			return false;
 		}
 		LOG.debug("Upgrade access & subscriptions to API: " + apiToUpgradeAccess.getName() + " " + apiToUpgradeAccess.getVersion() + "("+apiToUpgradeAccess.getId()+")");
-		
+
 		URI uri;
 		HttpEntity entity;
 		RestAPICall request;
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/upgrade/"+referenceAPI.getId()).build();
-			
+
 			List<NameValuePair> params = new Vector<NameValuePair>();
 			params.add(new BasicNameValuePair("upgradeApiId", apiToUpgradeAccess.getId()));
 			if(deprecateRefApi != null) 		params.add(new BasicNameValuePair("deprecate", deprecateRefApi.toString()));
 			if(retireRefApi != null) 			params.add(new BasicNameValuePair("retire", retireRefApi.toString()));
 			if(retirementDateRefAPI != null)	params.add(new BasicNameValuePair("retirementDate", formatRetirementDate(retirementDateRefAPI)));
-			
+
 			entity = new UrlEncodedFormEntity(params, "UTF-8");
-			
+
 			request = new POSTRequest(entity, uri, true);
 			request.setContentType("application/x-www-form-urlencoded");
-			
+
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
@@ -1000,7 +1000,7 @@ public class APIManagerAPIAdapter {
 					}
 				} else {
 					LOG.error("Error upgrading access to newer API. Received Status-Code: " +statusCode + ", Response: " + response);
-					throw new AppException("Error upgrading access to newer API. Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_BE_API);					
+					throw new AppException("Error upgrading access to newer API. Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_BE_API);
 				}
 			}
 			return true;
@@ -1008,12 +1008,12 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Can't upgrade access to newer API!", ErrorCode.CANT_UPGRADE_API_ACCESS, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	public void grantClientOrganization(List<Organization> grantAccessToOrgs, API api, boolean allOrgs) throws AppException {
 		URI uri;
 		HttpEntity entity;
@@ -1029,7 +1029,7 @@ public class APIManagerAPIAdapter {
 			}
 		}
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/grantaccess").build();			
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/grantaccess").build();
 			entity = new StringEntity(formBody);
 			apiCall = new POSTRequest(entity, uri, true);
 			apiCall.setContentType("application/x-www-form-urlencoded");
@@ -1059,12 +1059,12 @@ public class APIManagerAPIAdapter {
 			throw new AppException("Can't grant access to organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		} finally {
 			try {
-				if(httpResponse!=null) 
+				if(httpResponse!=null)
 					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	private String getFilterFields(APIFilter filter) {
 		String filterFields = "[";
 		if(filter.getApiPath()!=null) filterFields += "apiPath=" + filter.getApiPath();
@@ -1074,7 +1074,7 @@ public class APIManagerAPIAdapter {
 		filterFields += "]";
 		return filterFields;
 	}
-	
+
 	private String extractUsername(String url) {
 		String[] temp = url.split("@");
 		if(temp.length==2) {
@@ -1082,7 +1082,7 @@ public class APIManagerAPIAdapter {
 		}
 		return null;
 	}
-	
+
 	private String extractPassword(String url) {
 		String[] temp = url.split("@");
 		if(temp.length==2) {
@@ -1090,7 +1090,7 @@ public class APIManagerAPIAdapter {
 		}
 		return null;
 	}
-	
+
 	private String extractURI(String url) throws AppException
 	{
 		String[] temp = url.split("@");
@@ -1102,12 +1102,12 @@ public class APIManagerAPIAdapter {
 			throw new AppException("WSDL-URL has an invalid format. ", ErrorCode.CANT_READ_WSDL_FILE);
 		}
 	}
-	
+
 	public APIManagerAPIAdapter setAPIManagerResponse(APIFilter filter, String apiManagerResponse) {
 		this.apiManagerResponse.put(filter, apiManagerResponse);
 		return this;
 	}
-	
+
 	public APIManagerAPIAdapter setAPIManagerResponse(String apiId, Image image) {
 		this.imagesResponse.put(apiId, image);
 		return this;
