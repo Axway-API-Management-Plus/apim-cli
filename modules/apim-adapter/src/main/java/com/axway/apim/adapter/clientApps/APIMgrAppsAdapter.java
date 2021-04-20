@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +96,12 @@ public class APIMgrAppsAdapter {
 			LOG.debug("Sending request to find existing applications: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode == 404) {
+				// Nothing found - Simulate a empty response
+				this.apiManagerResponse.put(filter,"[]");
+				return;
+			}
 			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
 			if(response.startsWith("{")) { // Got a single response!
 				response = "["+response+"]";
@@ -129,6 +136,7 @@ public class APIMgrAppsAdapter {
 		readApplicationsFromAPIManager(filter);
 		List<ClientApplication> apps = null;
 		try {
+			if(this.apiManagerResponse.get(filter) == null) return apps;
 			apps = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<ClientApplication>>(){});
 			LOG.debug("Found: "+apps.size() + " applications");
 			for(int i=0; i<apps.size();i++) {

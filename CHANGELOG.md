@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+- API-ManagerApps Adpater now handles 404 if searching for an Application based on the ID that does not exists
+
 ## [1.3.7] 2021-04-19
 ### Fixed
 - apim.sh fails if CWD has a space (See issue [#160](https://github.com/Axway-API-Management-Plus/apim-cli/issues/160))

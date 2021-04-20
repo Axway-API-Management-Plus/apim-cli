@@ -220,7 +220,7 @@ public class Utils {
 	public static void addCustomPropertiesForEntity(List<? extends CustomPropertiesEntity> entities, String json, CustomPropertiesFilter filter) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		// Custom-Properties will be added depending on the given Properties in the filter
-		if(filter.getCustomProperties() == null) {
+		if(filter.getCustomProperties() == null || entities.size() == 0) {
 			return;
 		}
 		Map<String, JsonNode> enitityAsJsonMappedWithId = new HashMap<String, JsonNode>();
