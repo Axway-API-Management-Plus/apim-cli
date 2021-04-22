@@ -175,4 +175,18 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			throw e;
 		}
 	}
+	
+	@Test
+	public void emptyVHostTest() throws AppException, ParseException {
+		try {
+			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/empty-vhost-api-config.json").getFile();
+			
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false);
+			adapter.getDesiredAPI();
+			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+			Assert.assertNull(apiConfig.getVhost(), "Empty VHost should be considered as not set (null), as an empty VHost is logically not possible to have.");
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 }

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
 - API-ManagerApps Adpater now handles 404 if searching for an Application based on the ID that does not exists
+- vhost="" no longer creates a new API each time (See issue [#169](https://github.com/Axway-API-Management-Plus/apim-cli/issues/169))
 
 ## [1.3.7] 2021-04-19
 ### Fixed

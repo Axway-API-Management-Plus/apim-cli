@@ -207,6 +207,7 @@ public class APIImportConfigAdapter {
 			addQuotaConfiguration(apiConfig);
 			handleAllOrganizations(apiConfig);
 			completeClientApplications(apiConfig);
+			handleVhost(apiConfig);
 			return apiConfig;
 		} catch (Exception e) {
 			if(e.getCause() instanceof AppException) {
@@ -1037,5 +1038,13 @@ public class APIImportConfigAdapter {
 			if(profileName.equals(profile.getName())) return profile;
 		}
 		return null;
+	}
+	
+	private void handleVhost(API apiConfig) {
+		if(apiConfig.getVhost() == null) return;
+		// Consider an empty VHost as not set, as it is logically not possible to have an empty VHost.
+		if("".equals(apiConfig.getVhost()) ) {
+			apiConfig.setVhost(null);
+		}
 	}
 }
