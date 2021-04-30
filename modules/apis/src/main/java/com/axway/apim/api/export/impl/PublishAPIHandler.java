@@ -20,7 +20,7 @@ public class PublishAPIHandler extends APIResultHandler {
 		System.out.println("Going to publish: " + apis.size() + " API(s)");
 		for(API api : apis) {
 			try {
-				statusManager.update(api, API.STATE_PUBLISHED, true);
+				statusManager.update(api, API.STATE_PUBLISHED, api.getVhost(), true);
 			} catch(Exception e) {
 				LOG.error("Error publishing API: " + api.getName());
 			}
