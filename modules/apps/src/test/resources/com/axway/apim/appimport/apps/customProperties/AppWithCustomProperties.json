@@ -7,7 +7,7 @@
   "phone" : "654654646234",
   "customProperties": {
   	"appCustomProperty1": "Custom value 1",
-  	"appCustomProperty2": "2",
+  	"appCustomProperty2": "${customProp2}",
   	"appCustomProperty3": "true"  
   }
 }
