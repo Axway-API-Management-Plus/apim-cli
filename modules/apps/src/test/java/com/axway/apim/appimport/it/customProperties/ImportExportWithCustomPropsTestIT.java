@@ -86,6 +86,8 @@ public class ImportExportWithCustomPropsTestIT extends TestNGCitrusTestRunner im
 		createVariable(PARAM_EXPECTED_RC, "0");
 		variable("customProp2", "3");
 		importApp.doExecute(context);
+		echo("####### Validate application: '${appName}' - custom property has been changed #######");
+		http(builder -> builder.client("apiManager").send().get("/applications?field=name&op=eq&value=${appName}").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 		  .validate("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
 		  .validate("$.[?(@.name=='${appName}')].appCustomProperty1", "Custom value 1")

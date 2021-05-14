@@ -77,13 +77,12 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter);
 			for(ClientApplication desiredApp : desiredApps) {
 				//I'm reading customProps from desiredApp, what if the desiredApp has no customProps and actualApp has many?
-				List<String> customProps = getCustomPropsFromDesiderdApp(desiredApp);
 				ClientApplication actualApp = APIManagerAdapter.getInstance().appAdapter.getApplication(new ClientAppFilter.Builder()
 						.includeCredentials(true)
 						.includeImage(true)
 						.includeQuotas(true)
 						.includeOauthResources(true)
-						.includeCustomProperties(customProps)
+						.includeCustomProperties(desiredApp.getCustomPropertiesKeys())
 						.hasName(desiredApp.getName())
 						.build());
 				importManager.setDesiredApp(desiredApp);
@@ -114,12 +113,6 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 	public static void main(String args[]) { 
 		int rc = importApp(args);
 		System.exit(rc);
-	}
-	private List<String> getCustomPropsFromDesiderdApp(ClientApplication desiredApp) {
-		if (desiredApp.getCustomProperties()!=null){
-			return (List<String>)desiredApp.getCustomProperties().keySet().stream().collect(Collectors.toList());
-			}
-		return null;
 	}
 
 
