@@ -1,6 +1,7 @@
 package com.axway.apim.appimport;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,11 +76,13 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
 			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter);
 			for(ClientApplication desiredApp : desiredApps) {
+				//I'm reading customProps from desiredApp, what if the desiredApp has no customProps and actualApp has many?
 				ClientApplication actualApp = APIManagerAdapter.getInstance().appAdapter.getApplication(new ClientAppFilter.Builder()
 						.includeCredentials(true)
 						.includeImage(true)
 						.includeQuotas(true)
 						.includeOauthResources(true)
+						.includeCustomProperties(desiredApp.getCustomPropertiesKeys())
 						.hasName(desiredApp.getName())
 						.build());
 				importManager.setDesiredApp(desiredApp);
@@ -111,5 +114,6 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 		int rc = importApp(args);
 		System.exit(rc);
 	}
+
 
 }
