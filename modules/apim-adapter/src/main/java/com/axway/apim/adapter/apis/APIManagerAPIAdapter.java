@@ -350,7 +350,6 @@ public class APIManagerAPIAdapter {
 					.build();
 			
 			RestAPICall apiCall = new POSTRequest(entity, uri);
-			apiCall.setContentType(null);
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
@@ -704,12 +703,11 @@ public class APIManagerAPIAdapter {
 				.setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()+"/"+StatusEndpoint.valueOf(desiredState).endpoint)
 				.build();
 			if(vhost!=null && desiredState.equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
-				HttpEntity entity = new StringEntity("vhost="+vhost, ContentType.APPLICATION_JSON);
+				HttpEntity entity = new StringEntity("vhost="+vhost, ContentType.APPLICATION_FORM_URLENCODED);
 				request = new POSTRequest(entity, uri, useAdminAccountForPublish());
 			} else {
 				request = new POSTRequest(null, uri, useAdminAccountForPublish());
 			}
-			request.setContentType("application/x-www-form-urlencoded");
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 201 && statusCode != 200){ // See issue: #134 The API-Manager also returns 200 on this request
@@ -758,8 +756,7 @@ public class APIManagerAPIAdapter {
 			}
 			URI uri = new URIBuilder(cmd.getAPIManagerURL())
 					.setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()+"/deprecate").build();
-			RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate="+formatRetirementDate(retirementDate)), uri, true);
-			apiCall.setContentType("application/x-www-form-urlencoded");
+			RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate="+formatRetirementDate(retirementDate), ContentType.APPLICATION_FORM_URLENCODED), uri, true);
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
@@ -799,7 +796,7 @@ public class APIManagerAPIAdapter {
 	
 	private JsonNode importFromWSDL(API api) throws URISyntaxException, AppException, IOException {
 		URI uri;
-		HttpEntity entity = new StringEntity("");
+		HttpEntity entity = new StringEntity("", ContentType.APPLICATION_FORM_URLENCODED);
 		String username=null;
 		String pass=null;
 		String wsdlUrl=null;
@@ -826,7 +823,6 @@ public class APIManagerAPIAdapter {
 			}
 			uri=uriBuilder.build();
 			RestAPICall importWSDL = new POSTRequest(entity, uri);
-			importWSDL.setContentType("application/x-www-form-urlencoded");
 			httpResponse = importWSDL.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
@@ -864,7 +860,6 @@ public class APIManagerAPIAdapter {
 					.addTextBody("fileName", "XYZ").addTextBody("organizationId", api.getOrganization().getId(), ContentType.create("text/plain", StandardCharsets.UTF_8))
 					.addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
 			RestAPICall importSwagger = new POSTRequest(entity, uri);
-			importSwagger.setContentType(null);
 			httpResponse = importSwagger.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
@@ -978,10 +973,9 @@ public class APIManagerAPIAdapter {
 			if(retireRefApi != null) 			params.add(new BasicNameValuePair("retire", retireRefApi.toString()));
 			if(retirementDateRefAPI != null)	params.add(new BasicNameValuePair("retirementDate", formatRetirementDate(retirementDateRefAPI)));
 			
-			entity = new UrlEncodedFormEntity(params, "UTF-8");
+			entity = new UrlEncodedFormEntity (params, "UTF-8");
 			
 			request = new POSTRequest(entity, uri, true);
-			request.setContentType("application/x-www-form-urlencoded");
 			
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -1030,9 +1024,8 @@ public class APIManagerAPIAdapter {
 		}
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/grantaccess").build();			
-			entity = new StringEntity(formBody);
+			entity = new StringEntity(formBody, ContentType.APPLICATION_FORM_URLENCODED);
 			apiCall = new POSTRequest(entity, uri, true);
-			apiCall.setContentType("application/x-www-form-urlencoded");
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){

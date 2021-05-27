@@ -25,6 +25,7 @@ public class User implements CustomPropertiesEntity {
 	String name;
 	String description;
 	String loginName;
+	String password;
 	String email;
 	String role;
 	Boolean enabled;
@@ -80,6 +81,12 @@ public class User implements CustomPropertiesEntity {
 	}
 	public void setLoginName(String loginName) {
 		this.loginName = loginName;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	public String getEmail() {
 		return email;
@@ -180,7 +187,6 @@ public class User implements CustomPropertiesEntity {
 					StringUtils.equals(otherUser.getMobile(), this.getMobile()) &&
 					otherUser.getOrganization().equals(this.getOrganization()) &&
 					StringUtils.equals(otherUser.getPhone(), this.getPhone()) &&
-					StringUtils.equals(otherUser.getType(), this.getType()) &&
 					StringUtils.equals(otherUser.getEmail().toLowerCase(), this.getEmail().toLowerCase()) &&
 					(otherUser.isEnabled()==this.isEnabled()) && 
 					StringUtils.equals(otherUser.getDescription(), this.getDescription()) &&

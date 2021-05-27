@@ -37,13 +37,14 @@ public class ImportExportUserTestIT extends TestNGCitrusTestRunner implements Te
 		ExportUserTestAction exportApp = new ExportUserTestAction(context);
 		
 		variable("loginName", "My-User-"+importApp.getRandomNum());
+		variable("password", "changeme");
 
-		echo("####### Import user: '${loginName}' having custom properties #######");		
+		echo("####### Import user: '${loginName}' having custom properties and a password #######");		
 		createVariable(PARAM_CONFIGFILE,  PACKAGE + "SingleUser.json");
 		createVariable(PARAM_EXPECTED_RC, "0");
 		importApp.doExecute(context);
 		
-		echo("####### Validate user: '${loginName}' has been imported incl. custom properties #######");
+		echo("####### Validate user: '${loginName}' has been imported incl. custom properties and the given password #######");
 		http(builder -> builder.client("apiManager").send().get("/users?field=loginName&op=eq&value=${loginName}").header("Content-Type", "application/json"));
 
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
@@ -52,6 +53,9 @@ public class ImportExportUserTestIT extends TestNGCitrusTestRunner implements Te
 			.validate("$.[?(@.loginName=='${loginName}')].userCustomProperty2", "2")
 			.validate("$.[?(@.loginName=='${loginName}')].userCustomProperty3", "true")
 			.extractFromPayload("$.[?(@.id=='${loginName}')].id", "userId"));
+		
+		echo("####### Try to login with created user #######");
+		http(builder -> builder.client("apiManager").send().post("/login").payload("username=${loginName}&password=${password}&success=/title").header("Content-Type", "application/x-www-form-urlencoded"));
 		
 		echo("####### Re-Import same user - Should be a No-Change #######");
 		createVariable(PARAM_EXPECTED_RC, "10");

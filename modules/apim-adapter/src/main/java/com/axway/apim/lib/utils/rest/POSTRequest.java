@@ -22,9 +22,9 @@ public class POSTRequest extends RestAPICall {
 	public HttpResponse execute() throws AppException {
 		HttpPost httpPost = new HttpPost(uri);
 		httpPost.setEntity(entity);
-		if(this.contentType!=null) {
+		/*if(this.contentType!=null) {
 			httpPost.setHeader("Content-type", this.contentType);
-		}
+		}*/
 		HttpResponse response = sendRequest(httpPost);
 		return response;
 	}

@@ -215,7 +215,6 @@ public class APIManagerAdapter {
 		    params.add(new BasicNameValuePair("username", username));
 		    params.add(new BasicNameValuePair("password", password));
 		    POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, useAdminClient);
-			loginRequest.setContentType(null);
 			httpResponse = loginRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 303 && (statusCode < 200 || statusCode > 299)) {
@@ -567,7 +566,6 @@ public class APIManagerAdapter {
 					.addTextBody("outbound", cert.getOutbound())
 					.build();
 			POSTRequest postRequest = new POSTRequest(entity, uri);
-			postRequest.setContentType(null);
 			httpResponse = postRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if( statusCode != 200){
@@ -604,7 +602,6 @@ public class APIManagerAdapter {
 					.addBinaryBody("file", certificate, ContentType.create("application/x-pkcs12"), filename)
 					.build();
 			POSTRequest postRequest = new POSTRequest(entity, uri);
-			postRequest.setContentType(null);
 			httpResponse = postRequest.execute();
 			JsonNode jsonResponse = mapper.readTree(httpResponse.getEntity().getContent());
 			return jsonResponse;
