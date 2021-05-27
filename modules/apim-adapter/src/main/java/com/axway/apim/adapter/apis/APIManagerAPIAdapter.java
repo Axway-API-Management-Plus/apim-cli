@@ -28,6 +28,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -706,7 +707,8 @@ public class APIManagerAPIAdapter {
 				HttpEntity entity = new StringEntity("vhost="+vhost, ContentType.APPLICATION_FORM_URLENCODED);
 				request = new POSTRequest(entity, uri, useAdminAccountForPublish());
 			} else {
-				request = new POSTRequest(null, uri, useAdminAccountForPublish());
+				HttpEntity entity = new StringEntity("", ContentType.APPLICATION_FORM_URLENCODED);
+				request = new POSTRequest(entity, uri, useAdminAccountForPublish());
 			}
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
