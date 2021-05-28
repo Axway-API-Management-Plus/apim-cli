@@ -38,6 +38,11 @@ public class ImportExportUserTestIT extends TestNGCitrusTestRunner implements Te
 		
 		variable("loginName", "My-User-"+importApp.getRandomNum());
 		variable("password", "changeme");
+		variable("phone", "+006856778789");
+		variable("mobile", "+534534534435");
+		variable("userCustomProperty1", "User custom value 1");
+		variable("userCustomProperty2", "2");
+		variable("userCustomProperty3", "true");
 
 		echo("####### Import user: '${loginName}' having custom properties and a password #######");		
 		createVariable(PARAM_CONFIGFILE,  PACKAGE + "SingleUser.json");
@@ -46,16 +51,34 @@ public class ImportExportUserTestIT extends TestNGCitrusTestRunner implements Te
 		
 		echo("####### Validate user: '${loginName}' has been imported incl. custom properties and the given password #######");
 		http(builder -> builder.client("apiManager").send().get("/users?field=loginName&op=eq&value=${loginName}").header("Content-Type", "application/json"));
-
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.loginName=='${loginName}')].loginName", "@assertThat(hasSize(1))@")
 			.validate("$.[?(@.loginName=='${loginName}')].userCustomProperty1", "User custom value 1")
 			.validate("$.[?(@.loginName=='${loginName}')].userCustomProperty2", "2")
 			.validate("$.[?(@.loginName=='${loginName}')].userCustomProperty3", "true")
-			.extractFromPayload("$.[?(@.id=='${loginName}')].id", "userId"));
+			.validate("$.[?(@.loginName=='${loginName}')].phone", "+006856778789")
+			.validate("$.[?(@.loginName=='${loginName}')].mobile", "+534534534435")
+			.extractFromPayload("$.[?(@.loginName=='${loginName}')].id", "userId"));
 		
 		echo("####### Try to login with created user #######");
 		http(builder -> builder.client("apiManager").send().post("/login").payload("username=${loginName}&password=${password}&success=/title").header("Content-Type", "application/x-www-form-urlencoded"));
+		
+		echo("####### Change some user details #######");
+		variable("phone", "+1111111111111");
+		variable("mobile", "+2222222222222");
+		variable("userCustomProperty1", "Changed custom value 1");
+		variable("userCustomProperty2", "3");
+		variable("userCustomProperty3", "false");
+		importApp.doExecute(context);
+		
+		echo("####### Validate details of user: '${loginName}' (ID: ${userId}) have changed #######");
+		http(builder -> builder.client("apiManager").send().get("/users/${userId}").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.loginName=='${loginName}')].userCustomProperty1", "Changed custom value 1")
+			.validate("$.[?(@.loginName=='${loginName}')].userCustomProperty2", "3")
+			.validate("$.[?(@.loginName=='${loginName}')].userCustomProperty3", "false")
+			.validate("$.[?(@.loginName=='${loginName}')].phone", "+1111111111111")
+			.validate("$.[?(@.loginName=='${loginName}')].mobile", "+2222222222222"));
 		
 		echo("####### Re-Import same user - Should be a No-Change #######");
 		createVariable(PARAM_EXPECTED_RC, "10");
@@ -77,9 +100,9 @@ public class ImportExportUserTestIT extends TestNGCitrusTestRunner implements Te
 		
 		Assert.assertNotNull(exportedUser.getCustomProperties(), "Exported user must have custom properties");
 		Assert.assertEquals(exportedUser.getCustomProperties().size(), 3, "Exported user must have 3 custom properties");
-		Assert.assertEquals(exportedUser.getCustomProperties().get("userCustomProperty1"), "User custom value 1");
-		Assert.assertEquals(exportedUser.getCustomProperties().get("userCustomProperty2"), "2");
-		Assert.assertEquals(exportedUser.getCustomProperties().get("userCustomProperty3"), "true");
+		Assert.assertEquals(exportedUser.getCustomProperties().get("userCustomProperty1"), "Changed custom value 1");
+		Assert.assertEquals(exportedUser.getCustomProperties().get("userCustomProperty2"), "3");
+		Assert.assertEquals(exportedUser.getCustomProperties().get("userCustomProperty3"), "false");
 		
 		echo("####### Re-Import EXPORTED user - Should be a No-Change #######");
 		createVariable(PARAM_CONFIGFILE,  exportedConfig);

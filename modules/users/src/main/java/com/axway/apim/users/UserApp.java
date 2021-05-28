@@ -22,11 +22,13 @@ import com.axway.apim.users.adapter.JSONUserAdapter;
 import com.axway.apim.users.adapter.UserAdapter;
 import com.axway.apim.users.impl.UserResultHandler;
 import com.axway.apim.users.impl.UserResultHandler.ResultHandler;
-import com.axway.apim.users.lib.UserDeleteCLIOptions;
-import com.axway.apim.users.lib.UserExportCLIOptions;
-import com.axway.apim.users.lib.UserExportParams;
-import com.axway.apim.users.lib.UserImportCLIOptions;
 import com.axway.apim.users.lib.UserImportParams;
+import com.axway.apim.users.lib.cli.UserChangePasswordCLIOptions;
+import com.axway.apim.users.lib.cli.UserDeleteCLIOptions;
+import com.axway.apim.users.lib.cli.UserExportCLIOptions;
+import com.axway.apim.users.lib.cli.UserImportCLIOptions;
+import com.axway.apim.users.lib.params.UserChangePasswordParams;
+import com.axway.apim.users.lib.params.UserExportParams;
 
 public class UserApp implements APIMCLIServiceProvider {
 
@@ -37,7 +39,7 @@ public class UserApp implements APIMCLIServiceProvider {
 
 	@Override
 	public String getName() {
-		return "User - E X P O R T / U T I L S";
+		return "User - Management";
 	}
 
 	@Override
@@ -216,7 +218,31 @@ public class UserApp implements APIMCLIServiceProvider {
 	public ExportResult delete(UserExportParams params) {
 		ExportResult result = new ExportResult();
 		try {
-			return runExport(params, ResultHandler.ORG_DELETE_HANDLER, result);
+			return runExport(params, ResultHandler.USER_DELETE_HANDLER, result);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			return result;
+		}
+	}
+	
+	@CLIServiceMethod(name = "changepassword", description = "Changes the password of the selected users.")
+	public static int changePassword(String args[]) {
+		UserChangePasswordParams params;
+		try {
+			params = (UserChangePasswordParams) UserChangePasswordCLIOptions.create(args).getParams();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getErrorCode().getCode();
+		}
+		UserApp app = new UserApp();
+		return app.changePassword(params).getRc();
+	}
+	
+	public ExportResult changePassword(UserExportParams params) {
+		ExportResult result = new ExportResult();
+		try {
+			return runExport(params, ResultHandler.USER_CHANGE_PASSWORD_HANDLER, result);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
@@ -225,7 +251,7 @@ public class UserApp implements APIMCLIServiceProvider {
 	}
 
 	public static void main(String args[]) { 
-		int rc = export(args);
+		int rc = changePassword(args);
 		System.exit(rc);
 	}
 

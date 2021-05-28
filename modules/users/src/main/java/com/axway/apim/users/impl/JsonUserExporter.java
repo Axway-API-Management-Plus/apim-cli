@@ -16,7 +16,7 @@ import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.users.lib.ExportUser;
-import com.axway.apim.users.lib.UserExportParams;
+import com.axway.apim.users.lib.params.UserExportParams;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

@@ -8,7 +8,7 @@ import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.users.lib.UserExportParams;
+import com.axway.apim.users.lib.params.UserExportParams;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;

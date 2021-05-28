@@ -167,13 +167,15 @@ public class APIManagerUserAdapter {
 	
 	public User updateUser(User desiredUser, User actualUser) throws AppException {
 		User updatedUser = createOrUpdateUser(desiredUser, actualUser);
-		changepassword(desiredUser, updatedUser);
+		if(desiredUser.getPassword()!=null) {
+			LOG.info("Password of existing user: " + actualUser.getLoginName() + "("+actualUser.getId()+") will not be updated.");
+		}
 		return updatedUser;
 	}
 	
 	public User createUser(User desiredUser) throws AppException {
 		User createdUser = createOrUpdateUser(desiredUser, null);
-		changepassword(desiredUser, createdUser);
+		changepassword(desiredUser.getPassword(), createdUser);
 		return createdUser;
 	}
 	
@@ -230,14 +232,14 @@ public class APIManagerUserAdapter {
 		}
 	}
 	
-	public void changepassword(User desiredUser, User actualUser) throws AppException {
-		if(desiredUser.getPassword()==null) return;
+	public void changepassword(String newPassword, User actualUser) throws AppException {
+		if(newPassword==null) return;
 		HttpResponse httpResponse = null;
 		URI uri;
 		try {
 			RestAPICall request;
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/users/"+actualUser.getId()+"/changepassword").build();
-			HttpEntity entity = new StringEntity("newPassword="+desiredUser.getPassword(), ContentType.APPLICATION_FORM_URLENCODED);
+			HttpEntity entity = new StringEntity("newPassword="+newPassword, ContentType.APPLICATION_FORM_URLENCODED);
 			if ( "oadmin".equals(actualUser.getRole()) ) { // An orgadmin cannot change the password of another orgadmin, even he has created that orgadmin
 				request = new POSTRequest(entity, uri, true);
 			} else {
