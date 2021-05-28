@@ -12,6 +12,7 @@ import com.axway.apim.users.lib.UserImportParams;
 import com.axway.apim.users.lib.cli.UserChangePasswordCLIOptions;
 import com.axway.apim.users.lib.cli.UserExportCLIOptions;
 import com.axway.apim.users.lib.cli.UserImportCLIOptions;
+import com.axway.apim.users.lib.params.UserChangePasswordParams;
 import com.axway.apim.users.lib.params.UserExportParams;
 
 public class UserCLIOptionsTest {
@@ -57,9 +58,9 @@ public class UserCLIOptionsTest {
 	
 	@Test
 	public void testUserChangePasswordParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-id", "UUID-ID-OF-THE-USER", "-loginName", "*mark24*", "-n", "*Mark*", "-email", "*@axway.com*", "-type", "external", "-org", "*Partner*", "-role", "oadmin", "-state", "pending", "-enabled", "true", "-o", "json"};
+		String[] args = {"-s", "prod", "-id", "UUID-ID-OF-THE-USER", "-loginName", "*mark24*", "-n", "*Mark*", "-email", "*@axway.com*", "-type", "external", "-org", "*Partner*", "-role", "oadmin", "-state", "pending", "-enabled", "true", "-o", "json", "-newpassword", "123456"};
 		CLIOptions options = UserChangePasswordCLIOptions.create(args);
-		UserExportParams params = (UserExportParams) options.getParams();
+		UserChangePasswordParams params = (UserChangePasswordParams) options.getParams();
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
@@ -75,6 +76,8 @@ public class UserCLIOptionsTest {
 		Assert.assertEquals(params.getRole(), "oadmin");
 		Assert.assertEquals(params.getState(), "pending");
 		Assert.assertTrue(params.isEnabled());
+		
+		Assert.assertEquals(params.getNewPassword(), "123456");
 	}
 	
 	
