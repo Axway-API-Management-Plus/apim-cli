@@ -168,7 +168,7 @@ public class APIManagerUserAdapter {
 	public User updateUser(User desiredUser, User actualUser) throws AppException {
 		User updatedUser = createOrUpdateUser(desiredUser, actualUser);
 		if(desiredUser.getPassword()!=null) {
-			LOG.info("Password of existing user: " + actualUser.getLoginName() + "("+actualUser.getId()+") will not be updated.");
+			LOG.info("Password of existing user: '" + actualUser.getLoginName() + "' ("+actualUser.getId()+") will not be updated.");
 		}
 		return updatedUser;
 	}
