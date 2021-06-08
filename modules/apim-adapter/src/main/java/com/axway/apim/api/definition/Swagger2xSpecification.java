@@ -1,5 +1,6 @@
 package com.axway.apim.api.definition;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.axway.apim.lib.CoreParameters;
@@ -91,6 +92,8 @@ public class Swagger2xSpecification extends APISpecification {
 				}
 				this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
 			}
+		} catch (MalformedURLException e) {
+			throw new AppException("The backendBasepath: '"+backendBasepath+"' is invalid.", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		} catch (Exception e) {
 			LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
 		}
