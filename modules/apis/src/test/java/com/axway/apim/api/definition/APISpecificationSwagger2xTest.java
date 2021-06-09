@@ -125,7 +125,7 @@ public class APISpecificationSwagger2xTest {
 		Assert.assertEquals(swagger.get("schemes").size(), 2);
 	}
 	
-	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The backendBasepath: 'An-Invalid-URL' is invalid.")
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasepath: 'An-Invalid-URL' is invalid.")
 	public void testInvalidBackendBasepath() throws AppException, IOException {
 
 		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");

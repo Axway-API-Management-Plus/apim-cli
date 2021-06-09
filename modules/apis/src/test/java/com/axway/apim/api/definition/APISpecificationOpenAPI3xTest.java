@@ -57,7 +57,7 @@ public class APISpecificationOpenAPI3xTest {
 		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).get(0).get("url").asText(), "https://myhost.customer.com:8767/api/v1/myAPI");
 	}
 	
-	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The backendBasepath: 'An-Invalid-URL' is invalid.")
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasepath: 'An-Invalid-URL' is invalid.")
 	public void testInvalidBackendBasepath() throws AppException, IOException {
 
 		byte[] content = getSwaggerContent(testPackage + "/openapi30.json");
