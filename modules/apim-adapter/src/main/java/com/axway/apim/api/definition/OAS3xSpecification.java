@@ -58,6 +58,11 @@ public class OAS3xSpecification extends APISpecification {
 				return false;
 			}
 			return true;
+		} catch (AppException e) {
+			if(e.getError()==ErrorCode.UNSUPPORTED_FEATURE) {
+				throw e;
+			}
+			return false;
 		} catch (Exception e) {
 			LOG.trace("No OpenAPI 3.0 specification.", e);
 			return false;

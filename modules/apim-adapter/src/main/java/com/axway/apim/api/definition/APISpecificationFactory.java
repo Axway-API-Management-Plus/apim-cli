@@ -41,15 +41,17 @@ public class APISpecificationFactory {
 				APISpecification spec = (APISpecification) constructor.newInstance(arguments);
 				spec.setApiSpecificationFile(apiDefinitionFile);
 				if(!spec.configure()) {
-					LOG.error("Can't handle API specification with class: " + clazz.getName());
+					LOG.debug("Can't handle API specification with class: " + clazz.getName());
 					continue;
 				} else {
 					return spec;
 				}
+			} catch (AppException e) {
+				throw e;
 			} catch (Exception e) {
-				//if(LOG.isDebugEnabled()) {
+				if(LOG.isDebugEnabled()) {
 					LOG.error("Can't handle API specification with class: " + clazz.getName(), e);
-				//}
+				}
 			}
 		}
 		if(!failOnError) {

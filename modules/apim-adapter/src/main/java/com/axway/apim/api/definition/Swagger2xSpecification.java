@@ -107,6 +107,11 @@ public class Swagger2xSpecification extends APISpecification {
 				return false;
 			}
 			return true;
+		} catch (AppException e) {
+			if(e.getError()==ErrorCode.UNSUPPORTED_FEATURE) {
+				throw e;
+			}
+			return false;
 		} catch (Exception e) {
 			LOG.trace("Could load specification as Swagger 2.0", e);
 			return false;

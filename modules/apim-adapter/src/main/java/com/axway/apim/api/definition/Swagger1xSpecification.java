@@ -63,6 +63,11 @@ public class Swagger1xSpecification extends APISpecification {
 				return false;
 			}
 			return true;
+		} catch (AppException e) {
+			if(e.getError()==ErrorCode.UNSUPPORTED_FEATURE) {
+				throw e;
+			}
+			return false;
 		} catch (Exception e) {
 			LOG.trace("No Swager 1.x specification.", e);
 			return false;
