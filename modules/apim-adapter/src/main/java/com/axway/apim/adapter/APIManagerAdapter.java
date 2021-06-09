@@ -53,7 +53,6 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.DoNothingCacheManager;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.TestIndicator;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import com.axway.apim.lib.utils.rest.DELRequest;
@@ -85,8 +84,6 @@ public class APIManagerAdapter {
 	
 	private boolean usingOrgAdmin = false;
 	private boolean hasAdminAccount = false;
-	
-	private ErrorState error = ErrorState.getInstance();
 	
 	public static String CREDENTIAL_TYPE_API_KEY 		= "apikeys";
 	public static String CREDENTIAL_TYPE_EXT_CLIENTID	= "extclients";
@@ -224,8 +221,8 @@ public class APIManagerAdapter {
 				httpResponse = loginRequest.execute();
 				statusCode = httpResponse.getStatusLine().getStatusCode();
 				if(statusCode != 303){
-					LOG.error("Login finally failed with statusCode: " +statusCode+ ". Got response: '"+response+"'");
-					throw new AppException("Login finally failed with statusCode: " +statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+					//LOG.error("Login finally failed with statusCode: " +statusCode+ ". Got response: '"+response+"'");
+					throw new AppException("Login finally failed with statusCode: " +statusCode, ErrorCode.API_MANAGER_LOGIN_FAILED);
 				} else {
 					LOG.info("Successfully logged in on retry. Received Status-Code: " +statusCode );
 				}
@@ -239,7 +236,6 @@ public class APIManagerAdapter {
 			} else if (user.getRole().equals("oadmin")) {
 				this.usingOrgAdmin = true;
 			} else {
-				error.setError("Not supported user-role: '"+user.getRole()+"'", ErrorCode.API_MANAGER_COMMUNICATION, false);
 				throw new AppException("Not supported user-role: "+user.getRole()+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 		} catch (Exception e) {

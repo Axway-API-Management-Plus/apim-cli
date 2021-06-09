@@ -42,7 +42,7 @@ public class OAS3xSpecification extends APISpecification {
 				this.apiSpecificationContent = this.mapper.writeValueAsBytes(openAPI);
 			}
 		} catch (MalformedURLException e) {
-			throw new AppException("The backendBasepath: '"+backendBasepath+"' is invalid.", ErrorCode.CANT_READ_CONFIG_FILE, e);
+			throw new AppException("The configured backendBasepath: '"+backendBasepath+"' is invalid.", ErrorCode.BACKEND_BASEPATH_IS_INVALID, e);
 		} catch (Exception e) {
 			LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
 		}

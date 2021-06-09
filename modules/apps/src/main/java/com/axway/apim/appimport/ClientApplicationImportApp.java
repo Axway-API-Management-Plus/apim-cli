@@ -1,7 +1,6 @@
 package com.axway.apim.appimport;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +15,10 @@ import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ImportResult;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 
 public class ClientApplicationImportApp implements APIMCLIServiceProvider {
@@ -55,7 +54,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			params = (AppImportParams) AppImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		}
 		ClientApplicationImportApp app = new ClientApplicationImportApp();
 		return app.importApp(params).getRc();
@@ -67,7 +66,6 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			params.validateRequiredParameters();
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			
 			APIManagerAdapter.getInstance();
@@ -75,6 +73,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			ClientAppAdapter desiredAppsAdapter = new JSONConfigClientAppAdapter(params);
 			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
 			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter);
+			ActionResult actionResult = new ActionResult();
 			for(ClientApplication desiredApp : desiredApps) {
 				//I'm reading customProps from desiredApp, what if the desiredApp has no customProps and actualApp has many?
 				ClientApplication actualApp = APIManagerAdapter.getInstance().appAdapter.getApplication(new ClientAppFilter.Builder()
@@ -87,21 +86,14 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 						.build());
 				importManager.setDesiredApp(desiredApp);
 				importManager.setActualApp(actualApp);
-				importManager.replicate();
+				actionResult = importManager.replicate();
 			}
 			LOG.info("Successfully replicated application into API-Manager");
-			result.setRc(errorCodeMapper.getMapedErrorCode(ErrorState.getInstance().getErrorCode()).getCode());
+			result.setRc(errorCodeMapper.getMapedErrorCode(actionResult.getErrorCode()).getCode());
 			return result;
-		} catch (AppException ap) { 
-			ErrorState errorState = ErrorState.getInstance();
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				result.setRc(errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode());
-			} else {
-				LOG.error(ap.getMessage(), ap);
-				result.setRc(errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode());
-			}
+		} catch (AppException ap) {
+			ap.logException(LOG);
+			result.setRc(errorCodeMapper.getMapedErrorCode(ap.getError()).getCode());
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);

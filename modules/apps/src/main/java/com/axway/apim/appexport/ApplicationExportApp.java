@@ -15,10 +15,10 @@ import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 
 public class ApplicationExportApp implements APIMCLIServiceProvider {
@@ -26,7 +26,6 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	private static Logger LOG = LoggerFactory.getLogger(ApplicationExportApp.class);
 
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
-	static ErrorState errorState = ErrorState.getInstance();
 
 	@Override
 	public String getName() {
@@ -55,7 +54,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		}
 		ApplicationExportApp app = new ApplicationExportApp();
 		return app.export(params).getRc();
@@ -76,14 +75,8 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 				return runExport(params, ExportImpl.CONSOLE_EXPORTER, result);
 			}
 		} catch (AppException e) {
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
-				result.setRc(new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode());
-			} else {
-				LOG.error(e.getMessage(), e);
-				result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode());
-			}
+			e.logException(LOG);
+			result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getError()).getCode());
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -95,7 +88,6 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 	private ExportResult runExport(AppExportParams params, ExportImpl exportImpl, ExportResult result) throws AppException {
 		// We need to clean some Singleton-Instances, as tests are running in the same JVM
 		APIManagerAdapter.deleteInstance();
-		ErrorState.deleteInstance();
 		APIMHttpClient.deleteInstances();
 
 		APIMgrAppsAdapter appAdapter = new APIMgrAppsAdapter();
@@ -110,17 +102,17 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		} else {
 			LOG.info("Found " + apps.size() + " application(s).");
 			
-			exporter.export(apps);
+			ActionResult actionResult = exporter.export(apps);
 			if(exporter.hasError()) {
 				LOG.info("");
 				LOG.error("Please check the log. At least one error was recorded.");
 			} else {
 				LOG.debug("Successfully exported " + apps.size() + " application(s).");
 			}
+			APIManagerAdapter.deleteInstance();
+			result.setRc(actionResult.getErrorCode().getCode());
 		}
-		APIManagerAdapter.deleteInstance();
 
-		result.setRc(ErrorState.getInstance().getErrorCode().getCode());
 		return result;
 	}
 

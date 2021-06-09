@@ -28,6 +28,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -79,7 +80,7 @@ public abstract class APIResultHandler {
 		}
 	}
 	
-	public abstract void execute(List<API> apis) throws AppException;
+	public abstract ActionResult execute(List<API> apis) throws AppException;
 	
 	public boolean hasError() {
 		return this.hasError;

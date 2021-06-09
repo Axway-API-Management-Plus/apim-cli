@@ -11,7 +11,6 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.user.it.ExportUserTestAction;
 import com.axway.apim.user.it.ImportUserTestAction;
 import com.axway.lib.testActions.TestParams;
@@ -85,7 +84,6 @@ public class ImportExportUserTestIT extends TestNGCitrusTestRunner implements Te
 		importApp.doExecute(context);
 		
 		echo("####### Export the user #######");
-		ErrorState.deleteInstance();
 		variable("targetFolder", "citrus:systemProperty('java.io.tmpdir')");
 		createVariable(PARAM_TARGET, exportApp.getTestDirectory().getPath());
 		createVariable(PARAM_LOGINNAME, "${loginName}");

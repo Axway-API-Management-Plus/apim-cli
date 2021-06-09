@@ -18,7 +18,6 @@ import com.axway.apim.api.model.Alerts;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
@@ -85,7 +84,6 @@ public class APIManagerAlertsAdapter {
 		Alerts updatedAlerts;
 		try {
 			if(!APIManagerAdapter.hasAdminAccount()) {
-				ErrorState.getInstance().setError("An Admin Account is required to update the API-Manager alerts configuration.", ErrorCode.NO_ADMIN_ROLE_USER, false);
 				throw new AppException("An Admin Account is required to update the API-Manager alerts configuration.", ErrorCode.NO_ADMIN_ROLE_USER);
 			}
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/alerts").build();

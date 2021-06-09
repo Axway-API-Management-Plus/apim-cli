@@ -8,6 +8,7 @@ import com.axway.apim.adapter.clientApps.ClientAppFilter.Builder;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.lib.ExportResult;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
@@ -22,7 +23,8 @@ public class ConsoleAppExporter extends ApplicationExporter {
 	}
 
 	@Override
-	public void export(List<ClientApplication> apps) throws AppException {
+	public ActionResult export(List<ClientApplication> apps) throws AppException {
+		ActionResult result = new ActionResult();
 		switch(params.getWide()) {
 		case standard:
 			printStandard(apps);
@@ -31,6 +33,7 @@ public class ConsoleAppExporter extends ApplicationExporter {
 		case ultra:
 			printWide(apps);
 		}
+		return result;
 	}
 	
 	private void printStandard(List<ClientApplication> apps) {

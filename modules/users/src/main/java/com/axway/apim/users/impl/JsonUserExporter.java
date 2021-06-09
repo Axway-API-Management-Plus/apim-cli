@@ -13,6 +13,7 @@ import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.ExportResult;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.users.lib.ExportUser;
@@ -32,10 +33,12 @@ public class JsonUserExporter extends UserResultHandler {
 	}
 
 	@Override
-	public void export(List<User> users) throws AppException {
+	public ActionResult export(List<User> users) throws AppException {
+		ActionResult result = new ActionResult();
 		for(User user : users) {
 			saveUserLocally(new ExportUser(user));
 		}
+		return result;
 	}
 	
 	private void saveUserLocally(ExportUser user) throws AppException {

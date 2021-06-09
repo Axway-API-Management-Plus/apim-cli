@@ -9,7 +9,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -55,7 +54,6 @@ public class RemotehostDeserializer extends StdDeserializer<RemoteHost> {
 			RemoteHost remoteHost = APIManagerAdapter.getInstance().remoteHostsAdapter.getRemoteHost(remoteHostName, remoteHostPort);
 			if(remoteHost==null) {
 				if(validateRemoteHost(ctxt)) {
-					ErrorState.getInstance().setError("The given remote host: '"+remoteHostName+":"+remoteHostPort+"' is unknown.", ErrorCode.UNKNOWN_REMOTE_HOST, false);
 					throw new AppException("The given remote host: '"+remoteHostName+":"+remoteHostPort+"' is unknown.", ErrorCode.UNKNOWN_REMOTE_HOST);
 				} else {
 					LOG.warn("The given remote host: '"+remoteHostName+":"+remoteHostPort+"' is unknown.");

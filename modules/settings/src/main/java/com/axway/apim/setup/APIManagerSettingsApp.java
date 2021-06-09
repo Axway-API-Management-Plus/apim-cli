@@ -16,7 +16,6 @@ import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import com.axway.apim.setup.adapter.JSONAPIManagerConfigAdapter;
 import com.axway.apim.setup.impl.APIManagerSetupResultHandler;
@@ -30,7 +29,6 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerSettingsApp.class);
 
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
-	static ErrorState errorState = ErrorState.getInstance();
 
 	@Override
 	public String getName() {
@@ -59,7 +57,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 			params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		}
 		APIManagerSettingsApp app = new APIManagerSettingsApp();
 		return app.runExport(params).getRc();
@@ -72,7 +70,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 			params = (StandardImportParams) APIManagerSetupImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		}
 		APIManagerSettingsApp managerConfigApp = new APIManagerSettingsApp();
 		return managerConfigApp.importConfig(params).getRc();
@@ -91,16 +89,9 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 				return exportAPIManagerSetup(params, ResultHandler.CONSOLE_EXPORTER, result);
 			}
 		} catch (AppException e) {
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
-				result.setRc(new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode());
-				return result;
-			} else {
-				LOG.error(e.getMessage(), e);
-				result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode());
-				return result;
-			}
+			e.logException(LOG);
+			result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getError()).getCode());
+			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
@@ -111,7 +102,6 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 	private ExportResult exportAPIManagerSetup(APIManagerSetupExportParams params, ResultHandler exportImpl, ExportResult result) throws AppException {
 		// We need to clean some Singleton-Instances, as tests are running in the same JVM
 		APIManagerAdapter.deleteInstance();
-		ErrorState.deleteInstance();
 		APIMHttpClient.deleteInstances();
 		
 		APIManagerAdapter adapter = APIManagerAdapter.getInstance();
@@ -137,7 +127,6 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 			LOG.info("API-Manager configuration successfully exported.");
 		}
 		APIManagerAdapter.deleteInstance();
-		result.setRc(ErrorState.getInstance().getErrorCode().getCode());
 		return result;
 	}
 	
@@ -149,7 +138,6 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 			params.validateRequiredParameters();
 			// Clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 
 			errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
@@ -181,17 +169,9 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 			LOG.info("API-Manager configuration ("+updatedAssets+") successfully updated.");
 			return result;
 		} catch (AppException ap) { 
-			ErrorState errorState = ErrorState.getInstance();
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				result.setRc(errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode());
-				return result;
-			} else {
-				LOG.error(ap.getMessage(), ap);
-				result.setRc(errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode());
-				return result;
-			}
+			ap.logException(LOG);
+			result.setRc(errorCodeMapper.getMapedErrorCode(ap.getError()).getCode());
+			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());

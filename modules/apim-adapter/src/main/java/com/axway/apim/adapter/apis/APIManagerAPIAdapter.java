@@ -28,7 +28,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -61,7 +60,6 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
@@ -168,7 +166,7 @@ public class APIManagerAPIAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode < 200 || statusCode > 299){
 				if(statusCode == 403 && filter.getId()!=null) {
-					ErrorState.getInstance().setError("Unable to find API with ID: "+filter.getId()+". Please have in mind during API-Update the ID is re-created!", ErrorCode.UNKNOWN_API, false);
+					LOG.error("Unable to find API with ID: "+filter.getId()+". Please have in mind during API-Update the ID is re-created!");
 					apiManagerResponse.put(filter, "[]");
 					return;
 				}
@@ -226,8 +224,7 @@ public class APIManagerAPIAdapter {
 			if(apisPerKey.get(filterKey)!=null && apisPerKey.get(filterKey).size() ==1) {
 				return apisPerKey.get(filterKey).get(0);
 			}
-			ErrorState.getInstance().setError("No unique API found. Found " + foundAPIs.size() + " APIs based on filter: " + filter, ErrorCode.UNKNOWN_API, false);
-			throw new AppException("No unique API found. ", ErrorCode.UNKNOWN_API);
+			throw new AppException("No unique API found. Found " + foundAPIs.size() + " APIs based on filter: " + filter, ErrorCode.UNKNOWN_API);
 		}
 		return foundAPIs.get(0);
 	}
@@ -767,8 +764,7 @@ public class APIManagerAPIAdapter {
 				throw new AppException("Error updating retirement data of API.", ErrorCode.CANT_CREATE_BE_API);
 			}
 		} catch (Exception e) {
-			ErrorState.getInstance().setError("Error while updating the retirementDate.", ErrorCode.CANT_UPDATE_API_PROXY);
-			throw new AppException("Error while updating the retirementDate", ErrorCode.CANT_UPDATE_API_PROXY);
+			throw new AppException("Error while updating the retirementDate", ErrorCode.CANT_UPDATE_API_PROXY, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 
@@ -937,8 +933,7 @@ public class APIManagerAPIAdapter {
 							}
 						}
 					} catch (Exception e) {
-						ErrorState.getInstance().setError("Can't update application quota. Error message: " + e.getMessage(), ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
-						throw new AppException("Can't update application quota.", ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
+						throw new AppException("Can't update application quota. Error message: " + e.getMessage(), ErrorCode.CANT_UPDATE_QUOTA_CONFIG, e);
 					} finally {
 						try {
 							if(httpResponse!=null) 

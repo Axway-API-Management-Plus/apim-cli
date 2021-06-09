@@ -13,6 +13,7 @@ import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.lib.ExportResult;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 
@@ -59,7 +60,7 @@ public abstract class ApplicationExporter {
 		this.result = result;
 	}
 	
-	public abstract void export(List<ClientApplication> apps) throws AppException;
+	public abstract ActionResult export(List<ClientApplication> apps) throws AppException;
 	
 	public boolean hasError() {
 		return this.hasError;

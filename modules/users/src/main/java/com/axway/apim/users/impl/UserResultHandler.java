@@ -12,6 +12,7 @@ import com.axway.apim.adapter.user.UserFilter.Builder;
 import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.lib.ExportResult;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.users.lib.params.UserExportParams;
@@ -60,7 +61,7 @@ public abstract class UserResultHandler {
 		this.result = result;
 	}
 	
-	public abstract void export(List<User> users) throws AppException;
+	public abstract ActionResult export(List<User> users) throws AppException;
 	
 	public boolean hasError() {
 		return this.hasError;

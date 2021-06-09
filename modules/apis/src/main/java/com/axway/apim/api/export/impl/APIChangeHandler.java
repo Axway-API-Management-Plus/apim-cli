@@ -14,9 +14,9 @@ import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.Utils;
 
 public class APIChangeHandler extends APIResultHandler {
@@ -29,7 +29,8 @@ public class APIChangeHandler extends APIResultHandler {
 	}
 
 	@Override
-	public void execute(List<API> apis) throws AppException {
+	public ActionResult execute(List<API> apis) throws AppException {
+		ActionResult result = new ActionResult();
 		APIManagerAdapter adapter = APIManagerAdapter.getInstance();
 		List<APIChangeState> apisToChange = new ArrayList<APIChangeState>();
 		LOG.info(apis.size() + " selected to change.");
@@ -46,8 +47,8 @@ public class APIChangeHandler extends APIResultHandler {
 					continue;
 				}
 				if(changeState.isBreaking() && !params.isForce()) {
+					result.setError("Changing API: '"+api.getName()+"' is a potentially breaking change which can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
 					LOG.error("Changing API: '"+api.getName()+"' is a potentially breaking change which can't be applied without enforcing it! Try option: -force");
-					ErrorState.getInstance().setError("Changing API: '"+api.getName()+"' is a potentially breaking change which can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED, false);
 					continue;
 				}
 				LOG.info("Planned changes for API: '" + api.getName() + "': " + changeState.getAllChanges());
@@ -58,7 +59,7 @@ public class APIChangeHandler extends APIResultHandler {
 		}
 		if(apisToChange.size()==0) {
 			System.out.println("No changes required for the selected APIs.");
-			return;
+			return result;
 		}
 		if(CoreParameters.getInstance().isForce()) {
 			System.out.println("Force flag given to change: "+apis.size()+" API(s)");
@@ -67,7 +68,7 @@ public class APIChangeHandler extends APIResultHandler {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
 			} else {
 				System.out.println("Canceled.");
-				return;
+				return result;
 			}
 		}
 		APIImportManager importManager = new APIImportManager();
@@ -80,6 +81,7 @@ public class APIChangeHandler extends APIResultHandler {
 			}
 		}
 		System.out.println("Done!");
+		return result;
 	}
 
 	@Override

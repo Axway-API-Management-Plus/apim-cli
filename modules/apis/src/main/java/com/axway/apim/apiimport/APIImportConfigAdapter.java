@@ -77,7 +77,6 @@ import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.URLParser;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -110,8 +109,6 @@ public class APIImportConfigAdapter {
 	
 	/** If true, an OrgAdminUser is used to start the tool */
 	private boolean usingOrgAdmin;
-	
-	private ErrorState error = ErrorState.getInstance();
 	
 
 	/**
@@ -163,7 +160,6 @@ public class APIImportConfigAdapter {
 				apiConfig = baseConfig;
 			}
 		} catch (Exception e) {
-			error.setError("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE);
 			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
 	}
@@ -219,19 +215,16 @@ public class APIImportConfigAdapter {
 	
 	private void validateExposurePath(API apiConfig) throws AppException {
 		if(apiConfig.getPath()==null) {
-			ErrorState.getInstance().setError("Config-Parameter: 'path' is not given", ErrorCode.CANT_READ_CONFIG_FILE, false);
-			throw new AppException("Path is invalid.", ErrorCode.CANT_READ_CONFIG_FILE);
+			throw new AppException("Config-Parameter: 'path' is not given", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 		if(!apiConfig.getPath().startsWith("/")) {
-			ErrorState.getInstance().setError("Config-Parameter: 'path' must start with a \"/\" following by a valid API-Path (e.g. /api/v1/customer).", ErrorCode.CANT_READ_CONFIG_FILE, false);
-			throw new AppException("Path is invalid.", ErrorCode.CANT_READ_CONFIG_FILE);
+			throw new AppException("Config-Parameter: 'path' must start with a \"/\" following by a valid API-Path (e.g. /api/v1/customer).", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 	}
 	
 	private void validateOrganization(API apiConfig) throws AppException {
 		if(apiConfig instanceof DesiredTestOnlyAPI) return;
 		if(apiConfig.getOrganization()==null || !apiConfig.getOrganization().isDevelopment()) {
-			error.setError("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION, false);
 			throw new AppException("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
 		}
 		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
@@ -247,7 +240,6 @@ public class APIImportConfigAdapter {
 				this.pathToAPIDefinition=apiConfig.getApiDefinitionImport();
 				LOG.debug("Reading API Definition from configuration file");
 			} else {
-				ErrorState.getInstance().setError("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED, false);
 				throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
 			}
 		}
@@ -490,7 +482,6 @@ public class APIImportConfigAdapter {
 		try {
 			baseDir = this.apiConfigFile.getCanonicalFile().getParent();
 		} catch (IOException e1) {
-			error.setError("Can't read certificate file.", ErrorCode.CANT_READ_CONFIG_FILE);
 			throw new AppException("Can't read certificate file.", ErrorCode.CANT_READ_CONFIG_FILE, e1);
 		}
 		file = new File(baseDir + File.separator + cert.getCertFile());
@@ -667,11 +658,9 @@ public class APIImportConfigAdapter {
 			// Check the referenced profiles are valid
 			InboundProfile profile = importApi.getInboundProfiles().get(profileName);
 			if(profile.getCorsProfile()!=null && getCorsProfile(importApi, profile.getCorsProfile())==null) {
-				ErrorState.getInstance().setError("InboundProfile is referencing a unknown CorsProfile: '"+profile.getCorsProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID, false);
 				throw new AppException("Inbound profile is referencing a unknown CorsProfile: '"+profile.getCorsProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
 			}
 			if(profile.getSecurityProfile()!=null && getSecurityProfile(importApi, profile.getSecurityProfile())==null) {
-				ErrorState.getInstance().setError("InboundProfile is referencing a unknown SecurityProfile: '"+profile.getSecurityProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID, false);
 				throw new AppException("Inbound profile is referencing a unknown SecurityProfile: '"+profile.getSecurityProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
 			}
 		}
@@ -694,7 +683,6 @@ public class APIImportConfigAdapter {
 		for(SecurityProfile profile : importApi.getSecurityProfiles()) {
 			if(profile.getIsDefault() || profile.getName().equals("_default")) {
 				if(hasDefaultProfile) {
-					ErrorState.getInstance().setError("You can have only one _default SecurityProfile.", ErrorCode.CANT_READ_CONFIG_FILE, false);
 					throw new AppException("You can have only one _default SecurityProfile.", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
 				hasDefaultProfile=true;
@@ -727,7 +715,6 @@ public class APIImportConfigAdapter {
 		for(AuthenticationProfile profile : profiles) {
 			if(profile.getIsDefault() || profile.getName().equals("_default")) {
 				if(hasDefaultProfile) {
-					ErrorState.getInstance().setError("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE, false);
 					throw new AppException("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
 				hasDefaultProfile=true;
@@ -766,7 +753,6 @@ public class APIImportConfigAdapter {
 			}
 			// Check the referenced profiles are valid
 			if(profile.getAuthenticationProfile()!=null && getAuthNProfile(importApi, profile.getAuthenticationProfile())==null) {
-				ErrorState.getInstance().setError("OutboundProfile is referencing a unknown AuthenticationProfile: '"+profile.getAuthenticationProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID, false);
 				throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '"+profile.getAuthenticationProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
 			}
 		}
@@ -797,7 +783,6 @@ public class APIImportConfigAdapter {
 		if(providerProfile!=null && providerProfile.startsWith("<key")) return;
 		OAuthClientProfile clientProfile = APIManagerAdapter.getInstance().oauthClientAdapter.getOAuthClientProfile(providerProfile);
 		if(clientProfile==null) {
-			ErrorState.getInstance().setError("The OAuth provider profile is unkown: '"+providerProfile+"'", ErrorCode.REFERENCED_PROFILE_INVALID, false);
 			throw new AppException("The OAuth provider profile is unkown: '"+providerProfile+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
 		}
 		authnProfile.getParameters().put("providerProfile", clientProfile.getId());
@@ -829,9 +814,8 @@ public class APIImportConfigAdapter {
 			KeyStore store = null;
 			store = loadKeystore(clientCertFile, clientCertClasspath, storeType, password);
 			if(store==null) {
-				ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config. Can't load keystore: '"+clientCertFile+"' for any reason. "
-						+ "Turn on debug to see log messages.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
-				throw new AppException("Unable to configure Outbound SSL-Config. Can't load keystore: '"+clientCertFile+"' for any reason.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
+				throw new AppException("Unable to configure Outbound SSL-Config. Can't load keystore: '"+clientCertFile+"' for any reason. "
+						+ "Turn on debug to see log messages.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
 			}
 			X509Certificate certificate = null;
 			Enumeration<String> e = store.aliases();
@@ -850,7 +834,7 @@ public class APIImportConfigAdapter {
 		} 
 	}
 	
-	private KeyStore loadKeystore(File clientCertFile, String clientCertClasspath, String keystoreType, String password) throws IOException {
+	private KeyStore loadKeystore(File clientCertFile, String clientCertClasspath, String keystoreType, String password) throws AppException {
 		InputStream is = null;
 		KeyStore store = null;
 
@@ -868,16 +852,18 @@ public class APIImportConfigAdapter {
 				return store;
 			} catch (IOException e) {
 				if(e.getMessage()!=null && e.getMessage().toLowerCase().contains("keystore password was incorrect")) {
-					ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
-					throw e;
+					throw new AppException("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, e);
 				}
 				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
-				throw e;
+				throw new AppException("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, e);
 			} catch (Exception e) {
 				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
 				return null;
 			} finally {
-				if(is!=null) is.close();
+				if(is!=null)
+					try {
+						is.close();
+					} catch (IOException e) { }
 			}
 		}
 		// Otherwise we try every known type		
@@ -899,14 +885,16 @@ public class APIImportConfigAdapter {
 				}
 			} catch (IOException e) {
 				if(e.getMessage()!=null && e.getMessage().toLowerCase().contains("keystore password was incorrect")) {
-					ErrorState.getInstance().setError("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, false);
-					throw e;
+					throw new AppException("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, e);
 				}
 				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage(), e);
 			} catch (Exception e) {
 				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage(), e);
 			} finally {
-				if(is!=null) is.close();
+				if(is!=null)
+					try {
+						is.close();
+					} catch (IOException e) { }
 			}
 		}
 		return null;
@@ -918,7 +906,6 @@ public class APIImportConfigAdapter {
 		if(pos<3) return new String[]{certFileName, null}; // This occurs for the following format: c:/path/to/my/store
 		String type = certFileName.substring(pos+1);
 		if(!Security.getAlgorithms("KeyStore").contains(type)) {
-			ErrorState.getInstance().setError("Unknown keystore type: '"+type+"'. Supported: " + Security.getAlgorithms("KeyStore"), ErrorCode.WRONG_KEYSTORE_PASSWORD);
 			throw new AppException("Unknown keystore type: '"+type+"'. Supported: " + Security.getAlgorithms("KeyStore"), ErrorCode.WRONG_KEYSTORE_PASSWORD);
 		}
 		certFileName = certFileName.substring(0, pos);
@@ -931,7 +918,6 @@ public class APIImportConfigAdapter {
 		if(APIManagerAdapter.hasAdminAccount()) {
 			Boolean apiRoutingKeyEnabled = APIManagerAdapter.getInstance().configAdapter.getConfig(true).getApiRoutingKeyEnabled();
 			if(!apiRoutingKeyEnabled) {
-				ErrorState.getInstance().setError("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED, false);
 				throw new AppException("API-Manager Query-String Routing option is disabled. Please turn it on to use apiRoutingKey.", ErrorCode.QUERY_STRING_ROUTING_DISABLED);
 			}
 		} else {

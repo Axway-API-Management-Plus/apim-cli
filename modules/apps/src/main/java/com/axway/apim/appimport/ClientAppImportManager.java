@@ -7,9 +7,9 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 
 public class ClientAppImportManager {
 	
@@ -30,17 +30,18 @@ public class ClientAppImportManager {
 		this.apiMgrAppAdapter = APIManagerAdapter.getInstance().appAdapter;
 	}
 
-	public void replicate() throws AppException {
+	public ActionResult replicate() throws AppException {
+		ActionResult result = new ActionResult();
 		if(actualApp==null) {
 			apiMgrAppAdapter.createApplication(desiredApp);
 		} else if(appsAreEqual(desiredApp, actualApp)) {
 			LOG.debug("No changes detected between Desired- and Actual-App. Exiting now...");
-			ErrorState.getInstance().setWarning("No changes detected between Desired- and Actual-App.", ErrorCode.NO_CHANGE, false);
 			throw new AppException("No changes detected between Desired- and Actual-App.", ErrorCode.NO_CHANGE);			
 		} else {
 			LOG.debug("Update existing application");
 			apiMgrAppAdapter.updateApplication(desiredApp, actualApp);
 		}
+		return result;
 	}
 
 	public ClientApplication getDesiredApp() {

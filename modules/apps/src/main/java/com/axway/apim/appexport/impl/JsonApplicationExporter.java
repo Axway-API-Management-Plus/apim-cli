@@ -16,6 +16,7 @@ import com.axway.apim.appexport.impl.jackson.AppExportSerializerModifier;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.appexport.model.ExportApplication;
 import com.axway.apim.lib.ExportResult;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -33,10 +34,12 @@ public class JsonApplicationExporter extends ApplicationExporter {
 	}
 
 	@Override
-	public void export(List<ClientApplication> apps) throws AppException {
+	public ActionResult export(List<ClientApplication> apps) throws AppException {
+		ActionResult result = new ActionResult();
 		for(ClientApplication app : apps) {
 			saveApplicationLocally(new ExportApplication(app));
 		}
+		return result;
 	}
 	
 	private void saveApplicationLocally(ExportApplication app) throws AppException {

@@ -15,7 +15,6 @@ import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertyAnnotation;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 
 /**
  * This class is key, as the desired and actual API comes together.
@@ -81,7 +80,6 @@ public class APIChangeState {
 		}
 		if(!desiredAPI.getOrganization().equals(actualAPI.getOrganization()) && !APIImportParams.getInstance().isChangeOrganization()) {
 			LOG.debug("You may set the toggle: changeOrganization=true to allow to changing the organization of an existing API.");
-			ErrorState.getInstance().setError("The API you would like to register already exists for another organization.", ErrorCode.API_ALREADY_EXISTS, false);
 			throw new AppException("The API you would like to register already exists for another organization.", ErrorCode.API_ALREADY_EXISTS);
 		}
 		Field[] fields = (desiredAPI.getClass().equals(API.class)) ? desiredAPI.getClass().getDeclaredFields() :  desiredAPI.getClass().getSuperclass().getDeclaredFields();

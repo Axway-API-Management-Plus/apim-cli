@@ -13,6 +13,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.ExportResult;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.organization.lib.OrgExportParams;
 import com.github.freva.asciitable.AsciiTable;
@@ -39,7 +40,8 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 	}
 
 	@Override
-	public void export(List<Organization> orgs) throws AppException {
+	public ActionResult export(List<Organization> orgs) throws AppException {
+		ActionResult result = new ActionResult();
 		switch(params.getWide()) {
 		case standard:
 			printStandard(orgs);
@@ -50,6 +52,7 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 		case ultra:
 			printUltra(orgs);
 		}
+		return result;
 	}
 	
 	private void printStandard(List<Organization> orgs) {

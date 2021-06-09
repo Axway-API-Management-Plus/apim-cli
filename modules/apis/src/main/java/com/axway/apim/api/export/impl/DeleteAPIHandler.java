@@ -8,7 +8,9 @@ import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 
 public class DeleteAPIHandler extends APIResultHandler {
@@ -18,7 +20,8 @@ public class DeleteAPIHandler extends APIResultHandler {
 	}
 
 	@Override
-	public void execute(List<API> apis) throws AppException {
+	public ActionResult execute(List<API> apis) throws AppException {
+		ActionResult result = new ActionResult();
 		APIStatusManager statusManager = new APIStatusManager();
 		System.out.println(apis.size() + " selected for deletion.");
 		if(CoreParameters.getInstance().isForce()) {
@@ -27,7 +30,7 @@ public class DeleteAPIHandler extends APIResultHandler {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
 			} else {
 				System.out.println("Canceled.");
-				return;
+				return result;
 			}
 		}
 		System.out.println("Okay, going to delete: " + apis.size() + " API(s)");
@@ -35,10 +38,12 @@ public class DeleteAPIHandler extends APIResultHandler {
 			try {
 				statusManager.update(api, API.STATE_DELETED, true);
 			} catch(Exception e) {
+				result.setError("Error deleting API: " + api.getName(), ErrorCode.ERR_DELETING_API);
 				LOG.error("Error deleting API: " + api.getName());
 			}
 		}
 		System.out.println("Done!");
+		return result;
 
 	}
 

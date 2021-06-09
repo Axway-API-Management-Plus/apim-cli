@@ -6,6 +6,7 @@ import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 
@@ -16,7 +17,8 @@ public class UnpublishAPIHandler extends APIResultHandler {
 	}
 
 	@Override
-	public void execute(List<API> apis) throws AppException {
+	public ActionResult execute(List<API> apis) throws AppException {
+		ActionResult result = new ActionResult();
 		APIStatusManager statusManager = new APIStatusManager();
 		System.out.println(apis.size() + " selected to unpublish.");
 		if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
@@ -30,6 +32,7 @@ public class UnpublishAPIHandler extends APIResultHandler {
 			}
 			System.out.println("Done!");
 		}
+		return result;
 	}
 
 	@Override

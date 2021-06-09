@@ -13,10 +13,10 @@ import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.ImportResult;
+import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import com.axway.apim.users.adapter.JSONUserAdapter;
 import com.axway.apim.users.adapter.UserAdapter;
@@ -35,7 +35,6 @@ public class UserApp implements APIMCLIServiceProvider {
 	private static Logger LOG = LoggerFactory.getLogger(UserApp.class);
 
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
-	static ErrorState errorState = ErrorState.getInstance();
 
 	@Override
 	public String getName() {
@@ -64,7 +63,7 @@ public class UserApp implements APIMCLIServiceProvider {
 			params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		}
 		UserApp app = new UserApp();
 		return app.export(params).getRc();
@@ -83,15 +82,8 @@ public class UserApp implements APIMCLIServiceProvider {
 				return runExport(params, ResultHandler.CONSOLE_EXPORTER, result);
 			}
 		} catch (AppException e) {
-			
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
-				result.setRc(new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode());
-			} else {
-				LOG.error(e.getMessage(), e);
-				result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode());
-			}
+			e.logException(LOG);
+			result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getError()).getCode());
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -103,7 +95,6 @@ public class UserApp implements APIMCLIServiceProvider {
 	private ExportResult runExport(UserExportParams params, ResultHandler exportImpl, ExportResult result) throws AppException {
 		// We need to clean some Singleton-Instances, as tests are running in the same JVM
 		APIManagerAdapter.deleteInstance();
-		ErrorState.deleteInstance();
 		APIMHttpClient.deleteInstances();
 		
 		APIManagerAdapter adapter = APIManagerAdapter.getInstance();
@@ -119,16 +110,16 @@ public class UserApp implements APIMCLIServiceProvider {
 		} else {
 			LOG.info("Found " + users.size() + " user(s).");
 			
-			exporter.export(users);
+			ActionResult actionResult = exporter.export(users);
 			if(exporter.hasError()) {
 				LOG.info("");
 				LOG.error("Please check the log. At least one error was recorded.");
 			} else {
 				LOG.debug("Successfully exported " + users.size() + " organization(s).");
 			}
+			APIManagerAdapter.deleteInstance();
+			result.setRc(actionResult.getErrorCode().getCode());
 		}
-		APIManagerAdapter.deleteInstance();
-		result.setRc(ErrorState.getInstance().getErrorCode().getCode());
 		return result;
 	}
 	
@@ -139,7 +130,7 @@ public class UserApp implements APIMCLIServiceProvider {
 			params = (UserImportParams) UserImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
 			return ErrorCode.MISSING_PARAMETER.getCode();*/
@@ -154,7 +145,6 @@ public class UserApp implements APIMCLIServiceProvider {
 			params.validateRequiredParameters();
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			
 			APIManagerAdapter.getInstance();
@@ -176,21 +166,14 @@ public class UserApp implements APIMCLIServiceProvider {
 					LOG.error("A different user: '"+actualUserWithEmail.getLoginName()+"' with the supplied email address: '"+desiredUser.getEmail()+"' already exists. ");
 					continue;
 				}
-				importManager.replicate(desiredUser, actualUser);
+				ActionResult actionResult = importManager.replicate(desiredUser, actualUser);
+				result.setRc(errorCodeMapper.getMapedErrorCode(actionResult.getErrorCode()).getCode());
 			}
 			LOG.info("Successfully replicated user(s) into API-Manager");
-			result.setRc(errorCodeMapper.getMapedErrorCode(ErrorState.getInstance().getErrorCode()).getCode());
 			return result;
 		} catch (AppException ap) { 
-			ErrorState errorState = ErrorState.getInstance();
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				result.setRc(errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode());
-			} else {
-				LOG.error(ap.getMessage(), ap);
-				result.setRc(errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode());
-			}
+			ap.logException(LOG);
+			result.setRc(errorCodeMapper.getMapedErrorCode(ap.getError()).getCode());
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -206,7 +189,7 @@ public class UserApp implements APIMCLIServiceProvider {
 			params = (UserExportParams) UserDeleteCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
 			return ErrorCode.MISSING_PARAMETER.getCode();*/
@@ -233,7 +216,7 @@ public class UserApp implements APIMCLIServiceProvider {
 			params = (UserChangePasswordParams) UserChangePasswordCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		}
 		UserApp app = new UserApp();
 		return app.changePassword(params).getRc();
