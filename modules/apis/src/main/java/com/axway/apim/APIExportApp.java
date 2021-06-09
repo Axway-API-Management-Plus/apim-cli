@@ -26,7 +26,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.ActionResult;
+import com.axway.apim.lib.Result;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
@@ -180,11 +180,11 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	
 	private static int execute(APIExportParams params, APIListImpl resultHandlerImpl) {
 		try {
-			ActionResult result;
 			APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
 			
 			APIResultHandler resultHandler = APIResultHandler.create(resultHandlerImpl, params);
 			APIFilter filter = resultHandler.getFilter();
+			Result result = resultHandler.getResult();
 
 			List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(filter, true);
 			
@@ -196,7 +196,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				}
 			} else {
 				LOG.info(apis.size() + " API(s) selected.");
-				result = resultHandler.execute(apis);
+				resultHandler.execute(apis);
 				if(resultHandler.hasError()) {
 					LOG.info("");
 					LOG.error("Please check the log. At least one error was recorded.");
@@ -206,7 +206,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				APIManagerAdapter.deleteInstance();
 				
 				if(result.hasError()) {
-					result.logErrorMessages(LOG);
+					LOG.error("An error happened during export. Please check the log");
 				}
 				return result.getErrorCode().getCode();
 			}
@@ -231,7 +231,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
 			if(!APIManagerAdapter.hasAdminAccount()) {
 				LOG.error("Upgrading API-Access needs admin access.");
-				result.setRc(ErrorCode.NO_ADMIN_ROLE_USER.getCode());
+				result.setError(ErrorCode.NO_ADMIN_ROLE_USER);
 				return result;
 			}
 			// Get the reference API from API-Manager
@@ -261,11 +261,11 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			return result;
 		} catch (AppException ap) { 
 			ap.logException(LOG);
-			result.setRc(errorCodeMapper.getMapedErrorCode(ap.getError()).getCode());
+			result.setError(errorCodeMapper.getMapedErrorCode(ap.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}
@@ -281,7 +281,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
 			if(!APIManagerAdapter.hasAdminAccount()) {
 				LOG.error("Upgrading API-Access needs admin access.");
-				result.setRc(ErrorCode.NO_ADMIN_ROLE_USER.getCode());
+				result.setError(ErrorCode.NO_ADMIN_ROLE_USER);
 				return result;
 			}
 			// Get all organizations that should be granted
@@ -310,11 +310,11 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			return result;
 		} catch (AppException ap) { 
 			ap.logException(LOG);
-			result.setRc(errorCodeMapper.getMapedErrorCode(ap.getError()).getCode());
+			result.setError(errorCodeMapper.getMapedErrorCode(ap.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}

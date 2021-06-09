@@ -7,7 +7,6 @@ import java.util.List;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.users.lib.params.UserExportParams;
 import com.github.freva.asciitable.AsciiTable;
@@ -23,8 +22,7 @@ public class ConsoleUserExporter extends UserResultHandler {
 	}
 
 	@Override
-	public ActionResult export(List<User> users) throws AppException {
-		ActionResult result = new ActionResult();
+	public void export(List<User> users) throws AppException {
 		switch(params.getWide()) {
 		case standard:
 			printStandard(users);
@@ -36,7 +34,7 @@ public class ConsoleUserExporter extends UserResultHandler {
 			printUltra(users);
 			break;
 		}
-		return result;
+		return;
 	}
 	
 	private void printStandard(List<User> users) {

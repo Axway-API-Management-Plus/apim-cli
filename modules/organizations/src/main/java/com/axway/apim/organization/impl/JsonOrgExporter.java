@@ -13,7 +13,6 @@ import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.organization.lib.ExportOrganization;
@@ -33,15 +32,14 @@ public class JsonOrgExporter extends OrgResultHandler {
 	}
 
 	@Override
-	public ActionResult export(List<Organization> orgs) throws AppException {
-		ActionResult result = new ActionResult();
+	public void export(List<Organization> orgs) throws AppException {
 		for(Organization org : orgs) {
-			saveOrganizationLocally(new ExportOrganization(org), result);
+			saveOrganizationLocally(new ExportOrganization(org));
 		}
-		return result;
+		return;
 	}
 	
-	private void saveOrganizationLocally(ExportOrganization org, ActionResult result) throws AppException {
+	private void saveOrganizationLocally(ExportOrganization org) throws AppException {
 		String folderName = getExportFolder(org);
 		String targetFolder = params.getTarget();
 		File localFolder = new File(targetFolder +File.separator+ folderName);

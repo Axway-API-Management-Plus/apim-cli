@@ -21,7 +21,6 @@ import com.axway.apim.api.export.jackson.serializer.APIExportSerializerModifier;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -46,8 +45,7 @@ public class JsonAPIExporter extends APIResultHandler {
 	}
 	
 	@Override
-	public ActionResult execute(List<API> apis) throws AppException {
-		ActionResult result = new ActionResult();
+	public void execute(List<API> apis) throws AppException {
 		for (API api : apis) {
 			ExportAPI exportAPI = new ExportAPI(api);
 			try {
@@ -56,7 +54,7 @@ public class JsonAPIExporter extends APIResultHandler {
 				LOG.error("Can't export API: " + e.getMessage() + " Please check in API-Manager UI the API is valid.", e);
 			}
 		}
-		return result;
+		return;
 	}
 	
 	@Override

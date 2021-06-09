@@ -14,7 +14,6 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.StandardExportParams.Wide;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
@@ -29,8 +28,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	}
 
 	@Override
-	public ActionResult execute(List<API> apis) throws AppException {
-		ActionResult result = new ActionResult();
+	public void execute(List<API> apis) throws AppException {
 		switch(params.getWide()) {
 		case standard:
 			printStandard(apis);
@@ -42,7 +40,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 			printUltra(apis);
 			break;
 		}
-		return result;
+		return;
 	}
 	
 	private void printStandard(List<API> apis) {

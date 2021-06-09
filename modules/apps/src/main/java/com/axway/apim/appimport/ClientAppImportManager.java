@@ -7,7 +7,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 
@@ -30,8 +29,7 @@ public class ClientAppImportManager {
 		this.apiMgrAppAdapter = APIManagerAdapter.getInstance().appAdapter;
 	}
 
-	public ActionResult replicate() throws AppException {
-		ActionResult result = new ActionResult();
+	public void replicate() throws AppException {
 		if(actualApp==null) {
 			apiMgrAppAdapter.createApplication(desiredApp);
 		} else if(appsAreEqual(desiredApp, actualApp)) {
@@ -41,7 +39,7 @@ public class ClientAppImportManager {
 			LOG.debug("Update existing application");
 			apiMgrAppAdapter.updateApplication(desiredApp, actualApp);
 		}
-		return result;
+		return;
 	}
 
 	public ClientApplication getDesiredApp() {

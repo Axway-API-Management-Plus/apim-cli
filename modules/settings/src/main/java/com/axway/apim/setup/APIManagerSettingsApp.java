@@ -90,11 +90,11 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 			}
 		} catch (AppException e) {
 			e.logException(LOG);
-			result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getError()).getCode());
+			result.setError(new ErrorCodeMapper().getMapedErrorCode(e.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}
@@ -170,11 +170,11 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 			return result;
 		} catch (AppException ap) { 
 			ap.logException(LOG);
-			result.setRc(errorCodeMapper.getMapedErrorCode(ap.getError()).getCode());
+			result.setError(errorCodeMapper.getMapedErrorCode(ap.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}

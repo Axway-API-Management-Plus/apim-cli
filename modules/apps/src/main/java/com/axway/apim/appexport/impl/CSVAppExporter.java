@@ -25,7 +25,6 @@ import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.appexport.lib.ApplicationComparator;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.StandardExportParams.Wide;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 
@@ -83,8 +82,7 @@ public class CSVAppExporter extends ApplicationExporter {
 	}
 	
 	@Override
-	public ActionResult export(List<ClientApplication> apps) throws AppException {
-		ActionResult result = new ActionResult();
+	public void export(List<ClientApplication> apps) throws AppException {
 		CSVPrinter csvPrinter = null;
 		Wide wide = params.getWide();
 		String givenTarget = params.getTarget();
@@ -111,7 +109,7 @@ public class CSVAppExporter extends ApplicationExporter {
 					throw new AppException("Unable to close CSVWriter", ErrorCode.UNXPECTED_ERROR, ignore);
 				}
 		}
-		return result;
+		return;
 	}
 	
 	private String createFileName() throws AppException {

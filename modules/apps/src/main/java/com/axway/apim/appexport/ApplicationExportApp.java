@@ -15,7 +15,6 @@ import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
@@ -76,11 +75,10 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			}
 		} catch (AppException e) {
 			e.logException(LOG);
-			result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getError()).getCode());
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}
@@ -102,7 +100,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		} else {
 			LOG.info("Found " + apps.size() + " application(s).");
 			
-			ActionResult actionResult = exporter.export(apps);
+			exporter.export(apps);
 			if(exporter.hasError()) {
 				LOG.info("");
 				LOG.error("Please check the log. At least one error was recorded.");
@@ -110,7 +108,6 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 				LOG.debug("Successfully exported " + apps.size() + " application(s).");
 			}
 			APIManagerAdapter.deleteInstance();
-			result.setRc(actionResult.getErrorCode().getCode());
 		}
 
 		return result;

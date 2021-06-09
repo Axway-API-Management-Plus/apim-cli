@@ -14,7 +14,6 @@ import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -29,8 +28,7 @@ public class APIChangeHandler extends APIResultHandler {
 	}
 
 	@Override
-	public ActionResult execute(List<API> apis) throws AppException {
-		ActionResult result = new ActionResult();
+	public void execute(List<API> apis) throws AppException {
 		APIManagerAdapter adapter = APIManagerAdapter.getInstance();
 		List<APIChangeState> apisToChange = new ArrayList<APIChangeState>();
 		LOG.info(apis.size() + " selected to change.");
@@ -47,7 +45,7 @@ public class APIChangeHandler extends APIResultHandler {
 					continue;
 				}
 				if(changeState.isBreaking() && !params.isForce()) {
-					result.setError("Changing API: '"+api.getName()+"' is a potentially breaking change which can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
+					result.setError(ErrorCode.BREAKING_CHANGE_DETECTED);
 					LOG.error("Changing API: '"+api.getName()+"' is a potentially breaking change which can't be applied without enforcing it! Try option: -force");
 					continue;
 				}
@@ -59,7 +57,7 @@ public class APIChangeHandler extends APIResultHandler {
 		}
 		if(apisToChange.size()==0) {
 			System.out.println("No changes required for the selected APIs.");
-			return result;
+			return;
 		}
 		if(CoreParameters.getInstance().isForce()) {
 			System.out.println("Force flag given to change: "+apis.size()+" API(s)");
@@ -68,7 +66,7 @@ public class APIChangeHandler extends APIResultHandler {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
 			} else {
 				System.out.println("Canceled.");
-				return result;
+				return;
 			}
 		}
 		APIImportManager importManager = new APIImportManager();
@@ -81,7 +79,7 @@ public class APIChangeHandler extends APIResultHandler {
 			}
 		}
 		System.out.println("Done!");
-		return result;
+		return;
 	}
 
 	@Override

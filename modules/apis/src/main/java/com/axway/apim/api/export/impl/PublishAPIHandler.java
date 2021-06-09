@@ -6,7 +6,6 @@ import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class PublishAPIHandler extends APIResultHandler {
@@ -16,8 +15,7 @@ public class PublishAPIHandler extends APIResultHandler {
 	}
 
 	@Override
-	public ActionResult execute(List<API> apis) throws AppException {
-		ActionResult result = new ActionResult();
+	public void execute(List<API> apis) throws AppException {
 		APIStatusManager statusManager = new APIStatusManager();
 		System.out.println("Going to publish: " + apis.size() + " API(s)");
 		for(API api : apis) {
@@ -28,7 +26,7 @@ public class PublishAPIHandler extends APIResultHandler {
 			}
 		}
 		System.out.println("Done!");
-		return result;
+		return;
 	}
 
 	@Override

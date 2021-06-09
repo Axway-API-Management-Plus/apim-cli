@@ -8,7 +8,6 @@ import com.axway.apim.adapter.apis.OrgFilter.Builder;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -21,8 +20,7 @@ public class DeleteOrgHandler extends OrgResultHandler {
 	}
 
 	@Override
-	public ActionResult export(List<Organization> orgs) throws AppException {
-		ActionResult result = new ActionResult();
+	public void export(List<Organization> orgs) throws AppException {
 		System.out.println(orgs.size() + " selected for deletion.");
 		if(CoreParameters.getInstance().isForce()) {
 			System.out.println("Force flag given to delete: "+orgs.size()+" Organization(s)");
@@ -30,7 +28,7 @@ public class DeleteOrgHandler extends OrgResultHandler {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
 			} else {
 				System.out.println("Canceled.");
-				return result;
+				return;
 			}
 		}
 		System.out.println("Okay, going to delete: " + orgs.size() + " Organization(s)");
@@ -38,12 +36,12 @@ public class DeleteOrgHandler extends OrgResultHandler {
 			try {
 				APIManagerAdapter.getInstance().orgAdapter.deleteOrganization(org);
 			} catch(Exception e) {
-				result.setError("Error deleting Organization: " + org.getName(), ErrorCode.ERR_DELETING_ORG);
+				result.setError(ErrorCode.ERR_DELETING_ORG);
 				LOG.error("Error deleting Organization: " + org.getName());
 			}
 		}
 		System.out.println("Done!");
-		return result;
+		return;
 	}
 
 	@Override

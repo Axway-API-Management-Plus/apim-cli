@@ -13,7 +13,6 @@ import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.ImportResult;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
@@ -83,11 +82,11 @@ public class UserApp implements APIMCLIServiceProvider {
 			}
 		} catch (AppException e) {
 			e.logException(LOG);
-			result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getError()).getCode());
+			result.setError(new ErrorCodeMapper().getMapedErrorCode(e.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}
@@ -110,7 +109,7 @@ public class UserApp implements APIMCLIServiceProvider {
 		} else {
 			LOG.info("Found " + users.size() + " user(s).");
 			
-			ActionResult actionResult = exporter.export(users);
+			exporter.export(users);
 			if(exporter.hasError()) {
 				LOG.info("");
 				LOG.error("Please check the log. At least one error was recorded.");
@@ -118,7 +117,6 @@ public class UserApp implements APIMCLIServiceProvider {
 				LOG.debug("Successfully exported " + users.size() + " organization(s).");
 			}
 			APIManagerAdapter.deleteInstance();
-			result.setRc(actionResult.getErrorCode().getCode());
 		}
 		return result;
 	}
@@ -166,18 +164,17 @@ public class UserApp implements APIMCLIServiceProvider {
 					LOG.error("A different user: '"+actualUserWithEmail.getLoginName()+"' with the supplied email address: '"+desiredUser.getEmail()+"' already exists. ");
 					continue;
 				}
-				ActionResult actionResult = importManager.replicate(desiredUser, actualUser);
-				result.setRc(errorCodeMapper.getMapedErrorCode(actionResult.getErrorCode()).getCode());
+				importManager.replicate(desiredUser, actualUser);
 			}
 			LOG.info("Successfully replicated user(s) into API-Manager");
 			return result;
 		} catch (AppException ap) { 
 			ap.logException(LOG);
-			result.setRc(errorCodeMapper.getMapedErrorCode(ap.getError()).getCode());
+			result.setError(errorCodeMapper.getMapedErrorCode(ap.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}
@@ -204,7 +201,7 @@ public class UserApp implements APIMCLIServiceProvider {
 			return runExport(params, ResultHandler.USER_DELETE_HANDLER, result);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}
@@ -228,7 +225,7 @@ public class UserApp implements APIMCLIServiceProvider {
 			return runExport(params, ResultHandler.USER_CHANGE_PASSWORD_HANDLER, result);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}

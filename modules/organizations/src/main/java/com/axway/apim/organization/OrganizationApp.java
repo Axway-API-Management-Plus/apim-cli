@@ -11,7 +11,6 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
@@ -79,11 +78,11 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			}
 		} catch (AppException e) {
 			e.logException(LOG);
-			result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getError()).getCode());
+			result.setError(new ErrorCodeMapper().getMapedErrorCode(e.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}
@@ -106,7 +105,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		} else {
 			LOG.info("Found " + orgs.size() + " organization(s).");
 			
-			ActionResult actionResult = exporter.export(orgs);
+			exporter.export(orgs);
 			if(exporter.hasError()) {
 				LOG.info("");
 				LOG.error("Please check the log. At least one error was recorded.");
@@ -114,7 +113,6 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 				LOG.debug("Successfully exported " + orgs.size() + " organization(s).");
 			}
 			APIManagerAdapter.deleteInstance();
-			result.setRc(actionResult.getErrorCode().getCode());
 		}
 		return result;
 	}
@@ -185,11 +183,11 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			return exportOrgs(params, ResultHandler.ORG_DELETE_HANDLER, result);
 		} catch (AppException e) {
 			e.logException(LOG);
-			result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getError()).getCode());
+			result.setError(new ErrorCodeMapper().getMapedErrorCode(e.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}

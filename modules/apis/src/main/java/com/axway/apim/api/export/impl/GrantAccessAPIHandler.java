@@ -10,7 +10,6 @@ import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.export.lib.params.APIGrantAccessParams;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -28,8 +27,7 @@ public class GrantAccessAPIHandler extends APIResultHandler {
 	}
 
 	@Override
-	public ActionResult execute(List<API> apis) throws AppException {
-		ActionResult result = new ActionResult();
+	public void execute(List<API> apis) throws AppException {
 		if(apis == null || apis.size() == 0) {
 			throw new AppException("List of APIs to grant access to is missing.", ErrorCode.UNKNOWN_API);
 		}
@@ -47,7 +45,7 @@ public class GrantAccessAPIHandler extends APIResultHandler {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
 			} else {
 				System.out.println("Canceled.");
-				return result;
+				return;
 			}
 		}
 		System.out.println("Okay, going to grant access to: " + apis.size() + " API(s) for "+orgs.size()+" organizations.");
@@ -56,12 +54,12 @@ public class GrantAccessAPIHandler extends APIResultHandler {
 				APIManagerAdapter.getInstance().apiAdapter.grantClientOrganization(orgs, api, hasError);
 				LOG.info("API: "+api.toStringHuman()+" granted access to orgs: " + orgs.toString());
 			} catch(Exception e) {
-				result.setError("Error granting access to API: " + api.toStringHuman() + " for organizations: "+orgs+" Error message: " + e.getMessage(), ErrorCode.ERR_GRANTING_ACCESS_TO_API);
+				result.setError(ErrorCode.ERR_GRANTING_ACCESS_TO_API);
 				LOG.error("Error granting access to API: " + api.toStringHuman() + " for organizations: "+orgs+" Error message: " + e.getMessage());
 			}
 		}
 		System.out.println("Done!");
-		return result;
+		return;
 	}
 
 	@Override

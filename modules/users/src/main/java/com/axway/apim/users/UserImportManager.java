@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.user.APIManagerUserAdapter;
 import com.axway.apim.api.model.User;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 
@@ -21,8 +20,7 @@ public class UserImportManager {
 		this.userAdapter = APIManagerAdapter.getInstance().userAdapter;
 	}
 
-	public ActionResult replicate(User desiredUser, User actualUser) throws AppException {
-		ActionResult result = new ActionResult();
+	public void replicate(User desiredUser, User actualUser) throws AppException {
 		if(actualUser==null) {
 			userAdapter.createUser(desiredUser);
 		} else if(usersAreEqual(desiredUser, actualUser)) {
@@ -32,7 +30,7 @@ public class UserImportManager {
 			LOG.debug("Update existing application");
 			userAdapter.updateUser(desiredUser, actualUser);
 		}
-		return result;
+		return;
 	}
 	
 	private static boolean usersAreEqual(User desiredUser, User actualUser) {

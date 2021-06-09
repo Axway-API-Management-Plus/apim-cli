@@ -9,7 +9,6 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIApproveParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -21,8 +20,7 @@ public class ApproveAPIHandler extends APIResultHandler {
 	}
 
 	@Override
-	public ActionResult execute(List<API> apis) throws AppException {
-		ActionResult result = new ActionResult();
+	public void execute(List<API> apis) throws AppException {
 		String vhostToUse = ( ((APIApproveParams) params).getPublishVhost()==null) ? "Default" : ((APIApproveParams)params).getPublishVhost();
 		System.out.println(apis.size() + " API(s) selected for approval/publish on V-Host: "+vhostToUse+".");
 		if(CoreParameters.getInstance().isForce()) {
@@ -31,7 +29,7 @@ public class ApproveAPIHandler extends APIResultHandler {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
 			} else {
 				System.out.println("Canceled.");
-				return result;
+				return;
 			}
 		}
 		System.out.println("Okay, going to approve: " + apis.size() + " API(s) on V-Host: " + vhostToUse);
@@ -41,11 +39,11 @@ public class ApproveAPIHandler extends APIResultHandler {
 				LOG.info("API: "+api.getName()+" "+api.getVersion()+" ("+api.getId()+") successfully approved/published.");
 			} catch(Exception e) {
 				LOG.error("Error approving API: " + api.getName()+" "+api.getVersion()+" ("+api.getId()+")");
-				result.setError("Error approving API: " + api.getName()+" "+api.getVersion()+" ("+api.getId()+")", ErrorCode.ERR_APPROVING_API);
+				result.setError(ErrorCode.ERR_APPROVING_API);
 			}
 		}
 		System.out.println("Done!");
-		return result;
+		return;
 	}
 
 	@Override

@@ -15,7 +15,6 @@ import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ImportResult;
-import com.axway.apim.lib.errorHandling.ActionResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
@@ -70,10 +69,9 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the application
-			ClientAppAdapter desiredAppsAdapter = new JSONConfigClientAppAdapter(params);
+			ClientAppAdapter desiredAppsAdapter = new JSONConfigClientAppAdapter(params, result);
 			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
 			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter);
-			ActionResult actionResult = new ActionResult();
 			for(ClientApplication desiredApp : desiredApps) {
 				//I'm reading customProps from desiredApp, what if the desiredApp has no customProps and actualApp has many?
 				ClientApplication actualApp = APIManagerAdapter.getInstance().appAdapter.getApplication(new ClientAppFilter.Builder()
@@ -86,18 +84,16 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 						.build());
 				importManager.setDesiredApp(desiredApp);
 				importManager.setActualApp(actualApp);
-				actionResult = importManager.replicate();
+				importManager.replicate();
 			}
 			LOG.info("Successfully replicated application into API-Manager");
-			result.setRc(errorCodeMapper.getMapedErrorCode(actionResult.getErrorCode()).getCode());
 			return result;
 		} catch (AppException ap) {
 			ap.logException(LOG);
-			result.setRc(errorCodeMapper.getMapedErrorCode(ap.getError()).getCode());
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}

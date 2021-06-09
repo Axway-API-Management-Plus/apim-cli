@@ -24,6 +24,7 @@ import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.OAuth;
 import com.axway.apim.appimport.lib.AppImportParams;
+import com.axway.apim.lib.Result;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -43,10 +44,17 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 
 	public JSONConfigClientAppAdapter(AppImportParams params) {
 		this.importParams = params;
+		this.result = new Result();
+	}
+	
+	public JSONConfigClientAppAdapter(AppImportParams params, Result result) {
+		this.importParams = params;
+		this.result = result;
 	}
 	
 	@Override
 	protected void readConfig() throws AppException {
+		
 		String config = importParams.getConfig();
 		String stage = importParams.getStage();
 
@@ -85,7 +93,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		}
 		addImage(apps, configFile.getParentFile());
 		addOAuthCertificate(apps, configFile.getParentFile());
-		addAPIAccess(apps);
+		addAPIAccess(apps, result);
 		validateCustomProperties(apps);
 		return;
 	}
@@ -129,7 +137,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		}
 	}
 	
-	private void addAPIAccess(List<ClientApplication> apps) throws AppException {
+	private void addAPIAccess(List<ClientApplication> apps, Result result) throws AppException {
 		APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
 		for(ClientApplication app : apps) {
 			if(app.getApiAccess()==null) continue;
@@ -141,12 +149,14 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 						.build()
 				, false);
 				if(apis==null || apis.size()==0) {
-					LOG.error("API with name: " + apiAccess.getApiName() + " not found. Ignoring this APIs.");
+					LOG.error("API with name: '" + apiAccess.getApiName() + "' not found. Ignoring this APIs.");
+					result.setError(ErrorCode.UNKNOWN_API);
 					it.remove();
 					continue;
 				}
 				if(apis.size()>1 && apiAccess.getApiVersion()==null) {
 					LOG.error("Found: "+apis.size()+" APIs with name: " + apiAccess.getApiName() + " not providing a version. Ignoring this APIs.");
+					result.setError(ErrorCode.UNKNOWN_API);
 					it.remove();
 					continue;
 				}
