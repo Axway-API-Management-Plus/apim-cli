@@ -79,6 +79,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.URLParser;
 import com.axway.apim.lib.utils.Utils;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -132,6 +133,8 @@ public class APIImportConfigAdapter {
 		super();
 		SimpleModule module = new SimpleModule();
 		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer());
+		// We would like to get back the original AppExcepption instead of a JsonMappingException
+		mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
 		mapper.registerModule(module);
 		
 		API baseConfig;
@@ -344,7 +347,7 @@ public class APIImportConfigAdapter {
 				String markdownDescription = new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8);
 				apiConfig.setDescriptionManual(markdownDescription);
 				apiConfig.setDescriptionType("manual");
-			} catch (AppException | IOException e) {
+			} catch (IOException e) {
 				throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE, e);
 			}
 		} else if(descriptionType.equals("original")) {

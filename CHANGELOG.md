@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `apim api publish` resets API VHost to configured Default virtual host (See issue [#170](https://github.com/Axway-API-Management-Plus/apim-cli/issues/170))
 - MalformedURLException for Backend-URL not causing the CLI to fail (See issue [#175](https://github.com/Axway-API-Management-Plus/apim-cli/issues/175))
 
+### Changed
+- Updated Jackson Library from 2.11.3 to 2.12.3
+
 ## [1.3.7] 2021-04-19
 ### Fixed
 - apim.sh fails if CWD has a space (See issue [#160](https://github.com/Axway-API-Management-Plus/apim-cli/issues/160))
