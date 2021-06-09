@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.axway.apim.api.API;
+import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
@@ -67,7 +69,8 @@ public class PrivateKeystoreLoadTest {
 		try {
 			importConfig.getDesiredAPI();
 		} catch(AppException e) {
-			Assert.assertTrue(e.getCause().getCause().getMessage().contains("keystore password was incorrect"), 
+			e.logException(LoggerFactory.getLogger(APISpecification.class));
+			Assert.assertTrue(e.getCause().getMessage().contains("keystore password was incorrect"), 
 					"Expected: 'keystore password was incorrect' vs. Actual: '" + e.getCause().getCause().getMessage()+"'");
 		}
 	}

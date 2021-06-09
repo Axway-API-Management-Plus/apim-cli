@@ -34,7 +34,6 @@ public class AppException extends Exception {
 		if(error.getPrintStackTrace()) {
 			cause = this;
 		}
-		getAllMessages();
 		switch (error.getLogLevel()) {
 		case INFO: 
 			LOG.info(getAllMessages(), cause);
