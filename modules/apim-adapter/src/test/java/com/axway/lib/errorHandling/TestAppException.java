@@ -2,7 +2,7 @@ package com.axway.lib.errorHandling;
 
 import java.io.IOException;
 
-import org.junit.Assert;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.errorHandling.AppException;
