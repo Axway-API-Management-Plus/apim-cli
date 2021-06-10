@@ -34,7 +34,7 @@ public class APISpecificationSwagger2xTest {
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com:8767");
-		Assert.assertEquals(swagger.get("basePath").asText(), "/api/v1/myAPI");
+		Assert.assertEquals(swagger.get("basePath").asText(), "/api/v1/myAPI/");
 		Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
 		Assert.assertEquals(swagger.get("schemes").size(), 1);
 	}
@@ -50,7 +50,7 @@ public class APISpecificationSwagger2xTest {
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com:8767");
-		Assert.assertEquals(swagger.get("basePath").asText(), "/api/v1/myAPI");
+		Assert.assertEquals(swagger.get("basePath").asText(), "/api/v1/myAPI/"); 
 		Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
 		Assert.assertEquals(swagger.get("schemes").size(), 1);
 	}

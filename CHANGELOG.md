@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Malformed URL for Backend-URL no longer causing the CLI to fail (See issue [#175](https://github.com/Axway-API-Management-Plus/apim-cli/issues/175))
 - Application import with no changes no longer logs an exception (See issue [#176](https://github.com/Axway-API-Management-Plus/apim-cli/issues/176))
 
+### Added
+- Trailing slash added to given backendBasepath (See issue [#178](https://github.com/Axway-API-Management-Plus/apim-cli/issues/178))
+
 ## [1.3.7] 2021-04-19
 ### Fixed
 - apim.sh fails if CWD has a space (See issue [#160](https://github.com/Axway-API-Management-Plus/apim-cli/issues/160))

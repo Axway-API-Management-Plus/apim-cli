@@ -39,7 +39,7 @@ public class Swagger2xSpecification extends APISpecification {
 			throw new AppException("The API specification doesn't contain a host and no backend basepath is given.", ErrorCode.CANT_READ_API_DEFINITION_FILE);
 		}
 		try {
-			if(backendBasepath!=null) {
+			if(backendBasepath!=null) { 
 				boolean backendBasepathAdjusted = false;
 				URL url = new URL(backendBasepath);
 				String port = url.getPort()==-1 ? ":"+String.valueOf(url.getDefaultPort()) : ":"+String.valueOf(url.getPort());
@@ -60,16 +60,17 @@ public class Swagger2xSpecification extends APISpecification {
 					}
 				}
 				if(url.getPath()!=null && !url.getPath().equals("")) {
-					if(swagger.get("basePath")!=null && swagger.get("basePath").asText().equals(url.getPath())) {
-						LOG.debug("Swagger basePath: '"+swagger.get("basePath").asText()+"' already matches backendBasepath: '"+url.getPath()+"'. Nothing to do.");
+					String basePath = url.getPath().endsWith("/") ? url.getPath() : url.getPath() + "/";
+					if(swagger.get("basePath")!=null && swagger.get("basePath").asText().equals(basePath)) {
+						LOG.debug("Swagger basePath: '"+swagger.get("basePath").asText()+"' already matches backendBasepath: '"+basePath+"'. Nothing to do.");
 					} else {
 						if(swagger.get("basePath")!=null) {
-							LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.getPath()+"' based on configured backendBasepath: '"+backendBasepath+"'");
+							LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+basePath+"' based on configured backendBasepath: '"+backendBasepath+"'");
 						} else {
-							LOG.debug("Setup basePath in Swagger-File to '"+url.getPath()+"' based on backendBasepath: '"+backendBasepath+"'");
+							LOG.debug("Setup basePath in Swagger-File to '"+basePath+"' based on backendBasepath: '"+backendBasepath+"'");
 						}
 						backendBasepathAdjusted = true;
-						((ObjectNode)swagger).put("basePath", url.getPath());
+						((ObjectNode)swagger).put("basePath", basePath);
 					}
 				}
 				 ArrayNode newSchemes = this.mapper.createArrayNode();

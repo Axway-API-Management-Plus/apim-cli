@@ -32,7 +32,10 @@ public class OAS3xSpecification extends APISpecification {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		try {
 			if(backendBasepath!=null) {
-				new URL(backendBasepath); // Parse it to make sure it is valid
+				URL url = new URL(backendBasepath); // Parse it to make sure it is valid
+				if(url.getPath()!=null && !url.getPath().equals("") && !backendBasepath.endsWith("/")) { // See issue #178
+					backendBasepath += "/";
+				}
 				ObjectNode newServer = this.mapper.createObjectNode();
 				newServer.put("url", backendBasepath);
 				if(openAPI.has("servers")) {

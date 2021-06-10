@@ -33,7 +33,10 @@ public class Swagger1xSpecification extends APISpecification {
 			if(backendBasepath!=null) {
 				boolean backendBasepathAdjusted = false;
 				URL url = new URL(backendBasepath);
-				
+				if(url.getPath()!=null && !url.getPath().equals("") && !backendBasepath.endsWith("/")) { // See issue #178
+					backendBasepath += "/";
+					url = new URL(backendBasepath);
+				}
 				if(swagger.get("basePath").asText().equals(url.toString())) {
 					LOG.debug("Swagger resourcePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasepath: '"+url.getPath()+"'. Nothing to do.");
 				} else {
