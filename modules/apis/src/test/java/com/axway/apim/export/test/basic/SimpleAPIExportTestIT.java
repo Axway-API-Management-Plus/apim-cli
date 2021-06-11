@@ -91,7 +91,7 @@ public class SimpleAPIExportTestIT extends TestNGCitrusTestRunner {
 		assertEquals(exportedAPIConfig.get("state").asText(), 				"unpublished");
 		assertEquals(exportedAPIConfig.get("path").asText(), 				context.getVariable("apiPath"));
 		assertEquals(exportedAPIConfig.get("name").asText(), 				context.getVariable("apiName"));
-		assertEquals(exportedAPIConfig.get("backendBasepath").asText(), 	"https://yet.another.petstore/another/path/v2/");
+		assertEquals(exportedAPIConfig.get("backendBasepath").asText(), 	"https://yet.another.petstore/another/path/v2");
 		assertEquals(exportedAPIConfig.get("caCerts").size(), 				4);
 		
 		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("certFile").asText(), 				"swagger.io.crt");
@@ -109,7 +109,7 @@ public class SimpleAPIExportTestIT extends TestNGCitrusTestRunner {
 		// Read the export Swagger-File
 		JsonNode exportedAPISpec = mapper.readTree(new FileInputStream(exportedAPISpecFile));
 		// Check the original basePath is set (See issue https://github.com/Axway-API-Management-Plus/apim-cli/issues/158)
-		assertEquals(exportedAPISpec.get("basePath").asText(), 			"/v2");
+		assertEquals(exportedAPISpec.get("basePath").asText(), 			"/v2/");
 		assertEquals(exportedAPISpec.get("host").asText(), 				"petstore.swagger.io");
 		assertEquals(exportedAPISpec.get("schemes").get(0).asText(), 	"https");
 		
