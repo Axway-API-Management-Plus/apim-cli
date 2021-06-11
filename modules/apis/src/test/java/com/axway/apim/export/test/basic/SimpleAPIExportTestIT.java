@@ -64,7 +64,7 @@ public class SimpleAPIExportTestIT extends TestNGCitrusTestRunner {
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
-		echo("####### Manually configure the backend to https://yet.another.petstore/another/path --> https://yet.another.petstore/another/path/v2 #######");
+		echo("####### Manually configure the backend to https://yet.another.petstore/another/path --> https://yet.another.petstore/another/path/v2 ######");
 		// Get the API-Proxy object
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON).extractFromPayload("$", "apiProxy"));
