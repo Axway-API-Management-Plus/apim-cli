@@ -31,6 +31,7 @@ public class ImportTestAction extends AbstractTestAction {
 	
 	public static String API_DEFINITION = "apiDefinition";
 	public static String API_CONFIG = "apiConfig";
+	public static String STATE = "state";
 	
 	private static Logger LOG = LoggerFactory.getLogger(ImportTestAction.class);
 	

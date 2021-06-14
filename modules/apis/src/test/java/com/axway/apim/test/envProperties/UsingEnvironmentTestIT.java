@@ -24,9 +24,8 @@ public class UsingEnvironmentTestIT extends TestNGCitrusTestDesigner {
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition",  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable("state", "unpublished");
 		createVariable("stage", "localhost");
 		createVariable("useEnvironmentOnly", "true");
@@ -34,9 +33,8 @@ public class UsingEnvironmentTestIT extends TestNGCitrusTestDesigner {
 		action(swaggerImport);
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition",  "/com/axway/apim/test/files/basic/petstore2.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
 		createVariable("state", "unpublished");
 		createVariable("stage", "localhost");
 		createVariable("expectedReturnCode", "0");
