@@ -11,6 +11,7 @@ env:
     - CASSANDRA_DOCKER_IMAGE=cassandra:2.2.12
     - CACHE_FILE_APIM=$CACHE_DIR/api-manager_7.7-20200930-1.cache.tar.gz
     - CACHE_FILE_CASSANDRA=$CACHE_DIR/cassandra_2_2_12.cache.tar.gz
+    - CACHE_FILE_WAIT_FOR_DEPENDENCIES=$CACHE_DIR/wait-for-dependencies.cache.tar.gz
     - counter=0
 
 cache:
@@ -39,6 +40,10 @@ before_install:
   - travis_wait build/pull_cassandra_docker_image.sh
   # Safe Cassandra image inc cache file
   - if [ ! -f $CACHE_FILE_CASSANDRA ]; then docker save $CASSANDRA_DOCKER_IMAGE | gzip > $CACHE_FILE_CASSANDRA; fi
+  # Pull wait-for-dependencies or use the cache
+  - travis_wait build/pull_wait_for_dependencies.sh
+  # Wait dadarek/wait-for-dependencies to avoid docker pull limit
+  - if [ ! -f $CACHE_FILE_WAIT_FOR_DEPENDENCIES ]; then docker save dadarek/wait-for-dependencies | gzip > $CACHE_FILE_WAIT_FOR_DEPENDENCIES; fi
 
 install:
   # Start Cassandra and wait that port 9042 is reachable

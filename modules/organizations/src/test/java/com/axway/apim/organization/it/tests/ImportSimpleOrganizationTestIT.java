@@ -9,7 +9,6 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.organization.it.ExportOrganizationTestAction;
 import com.axway.apim.organization.it.ImportOrganizationTestAction;
 import com.axway.lib.testActions.TestParams;
@@ -58,7 +57,6 @@ public class ImportSimpleOrganizationTestIT extends TestNGCitrusTestRunner imple
 		importApp.doExecute(context);
 		
 		echo("####### Export the organization #######");
-		ErrorState.deleteInstance();
 		createVariable(PARAM_TARGET, exportApp.getTestDirectory().getPath());
 		createVariable(PARAM_EXPECTED_RC, "0");
 		createVariable(PARAM_OUTPUT_FORMAT, "json");

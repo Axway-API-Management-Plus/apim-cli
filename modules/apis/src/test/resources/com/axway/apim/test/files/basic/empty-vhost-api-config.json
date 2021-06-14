@@ -1,0 +1,8 @@
+{
+	"name": "Sample Minimal API",
+	"path": "/sample/minimal/api/v1",
+	"state": "unpublished",
+	"version": "1.0.0",
+	"organization": "API Development",
+	"vhost" : ""
+}

@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 
 public class APISpecificationFactory {
 	
@@ -29,7 +28,6 @@ public class APISpecificationFactory {
 	}
 	
 	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName, boolean failOnError) throws AppException {
-		ErrorState.deleteInstance(); // TODO: Needs to be reworked
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("Handle API-Specification: '" + getContentStart(apiSpecificationContent) + "...', apiDefinitionFile: '"+apiDefinitionFile+"'");	
 		}
@@ -43,11 +41,13 @@ public class APISpecificationFactory {
 				APISpecification spec = (APISpecification) constructor.newInstance(arguments);
 				spec.setApiSpecificationFile(apiDefinitionFile);
 				if(!spec.configure()) {
-					if(ErrorState.getInstance().hasError()) break; // TODO: Needs to be reworked - Using another object to be returned for error handling
-					continue;			
+					LOG.debug("Can't handle API specification with class: " + clazz.getName());
+					continue;
 				} else {
 					return spec;
 				}
+			} catch (AppException e) {
+				throw e;
 			} catch (Exception e) {
 				if(LOG.isDebugEnabled()) {
 					LOG.error("Can't handle API specification with class: " + clazz.getName(), e);
@@ -56,7 +56,6 @@ public class APISpecificationFactory {
 		}
 		if(!failOnError) {
 			LOG.error("API: '"+apiName+"' has a unkown/invalid API-Specification: '" + getContentStart(apiSpecificationContent) + "'");
-			ErrorState.getInstance().setError("API: '"+apiName+"' has a unkown/invalid API-Specification. Please check the log.", ErrorCode.CANT_READ_API_DEFINITION_FILE, false);
 			return new UnknownAPISpecification(apiSpecificationContent, apiName);
 		}
 		LOG.error("API: '"+apiName+"' has a unkown/invalid API-Specification: '" + getContentStart(apiSpecificationContent) + "'");

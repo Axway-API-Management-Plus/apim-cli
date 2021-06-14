@@ -40,6 +40,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 			printUltra(apis);
 			break;
 		}
+		return;
 	}
 	
 	private void printStandard(List<API> apis) {

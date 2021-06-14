@@ -34,7 +34,7 @@ public class APISpecificationSwagger2xTest {
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com:8767");
-		Assert.assertEquals(swagger.get("basePath").asText(), "/api/v1/myAPI");
+		Assert.assertEquals(swagger.get("basePath").asText(), "/api/v1/myAPI/");
 		Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
 		Assert.assertEquals(swagger.get("schemes").size(), 1);
 	}
@@ -50,7 +50,7 @@ public class APISpecificationSwagger2xTest {
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com:8767");
-		Assert.assertEquals(swagger.get("basePath").asText(), "/api/v1/myAPI");
+		Assert.assertEquals(swagger.get("basePath").asText(), "/api/v1/myAPI/"); 
 		Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
 		Assert.assertEquals(swagger.get("schemes").size(), 1);
 	}
@@ -123,6 +123,14 @@ public class APISpecificationSwagger2xTest {
 		Assert.assertEquals(swagger.get("host").asText(), "petstore.swagger.io");
 		Assert.assertEquals(swagger.get("basePath").asText(), "/v2");
 		Assert.assertEquals(swagger.get("schemes").size(), 2);
+	}
+	
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasepath: 'An-Invalid-URL' is invalid.")
+	public void testInvalidBackendBasepath() throws AppException, IOException {
+
+		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
+		apiDefinition.configureBasepath("An-Invalid-URL");
 	}
 	
 	

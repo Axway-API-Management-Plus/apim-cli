@@ -5,7 +5,6 @@ import com.axway.apim.api.API;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.Utils;
 
 public class APIUpgradeAccessParams extends APIExportParams implements Parameters, APIFilterParams {
@@ -85,7 +84,6 @@ public class APIUpgradeAccessParams extends APIExportParams implements Parameter
 	public void validateRequiredParameters() throws AppException {
 		super.validateRequiredParameters();
 		if(getReferenceAPIRetire()!=null && getReferenceAPIRetirementDate()==null) {
-			ErrorState.getInstance().setError("If API should be retired, a retirement date is required.", ErrorCode.MISSING_PARAMETER, false);
 			throw new AppException("If API should be retired, a retirement date is required.", ErrorCode.MISSING_PARAMETER);
 		}
 	}

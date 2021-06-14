@@ -11,7 +11,6 @@ import com.axway.apim.api.API;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 
 public class APIStatusManager {
 	
@@ -85,8 +84,6 @@ public class APIStatusManager {
 		if(!enforceBreakingChange) { 
 			if(StatusChangeRequiresEnforce.getEnum(apiToUpdate.getState())!=null && 
 					StatusChangeRequiresEnforce.valueOf(apiToUpdate.getState()).enforceRequired.contains(desiredState)) {
-				ErrorState.getInstance().setError("Status change from actual status: '"+apiToUpdate.getState()+"' to desired status: '"+desiredState+"' "
-						+ "is breaking. Enforce change with option: -force", ErrorCode.BREAKING_CHANGE_DETECTED, false);
 				throw new AppException("Status change from actual status: '"+apiToUpdate.getState()+"' to desired status: '"+desiredState+"' "
 						+ "is breaking. Enforce change with option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
 			}

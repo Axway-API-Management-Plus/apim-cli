@@ -9,6 +9,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.organization.lib.OrgExportParams;
 
@@ -35,11 +36,12 @@ public class DeleteOrgHandler extends OrgResultHandler {
 			try {
 				APIManagerAdapter.getInstance().orgAdapter.deleteOrganization(org);
 			} catch(Exception e) {
+				result.setError(ErrorCode.ERR_DELETING_ORG);
 				LOG.error("Error deleting Organization: " + org.getName());
 			}
 		}
 		System.out.println("Done!");
-
+		return;
 	}
 
 	@Override

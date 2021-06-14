@@ -1,21 +1,21 @@
 {
-  "loginName" : "${loginName}",
-  "name" : "User Chris",
+  "loginName": "${loginName}",
+  "password": "${password}",
+  "name": "User Chris",
   "organization": "API Development ${orgNumber}",
-  "description" : "An API-Management user",
-  "email" : "${loginName}@company.com",
-  "phone" : "+006856778789",
-  "mobile" : "+007867678891",
-  "role": "oadmin",
+  "description": "An API-Management user",
+  "email": "${loginName}@company.com",
+  "phone": "${phone}",
+  "mobile": "${mobile}",
+  "role": "user",
   "image": "user-image.png",
   "state": "approved",
-  "type": "external",
-  "enabled" : true,
+  "enabled": true,
   "createdOn" : 1593700799104, 
   "lastSeen": 1593700799104, 
   "customProperties": {
-  	"userCustomProperty1": "User custom value 1",
-  	"userCustomProperty2": "2",
-  	"userCustomProperty3": "true"  
+  	"userCustomProperty1": "${userCustomProperty1}",
+  	"userCustomProperty2": "${userCustomProperty2}",
+  	"userCustomProperty3": "${userCustomProperty3}"  
   }
 }

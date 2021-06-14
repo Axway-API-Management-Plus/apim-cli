@@ -22,7 +22,6 @@ import com.axway.apim.api.model.apps.OAuth;
 import com.axway.apim.lib.CustomPropertiesFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 
 public class ClientAppFilter implements CustomPropertiesFilter {
 	
@@ -382,7 +381,6 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 			if(organizationName==null) return this;
 			Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(organizationName);
 			if(org==null) {
-				ErrorState.getInstance().setError("The organization with name: '"+organizationName+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION, false);
 				throw new AppException("The organization with name: '"+organizationName+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
 			}
 			return hasOrganization(org);
