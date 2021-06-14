@@ -224,9 +224,9 @@ public class ImportTestAction extends AbstractTestAction {
 			File tempFile = File.createTempFile(prefix, suffix, testDir);
 			tempFile.deleteOnExit();
 			return tempFile.getAbsolutePath();
-		} catch (IOException e) {
-			LOG.error("Cant create temp file", e);
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			LOG.warn("-----> Cannot create temp file. Using unchanged filename!");
+			return origFilename;
 		}
 	}
 	

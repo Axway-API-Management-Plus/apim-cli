@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
+- CLI does not realize changed policy when updating an API (See issue [#179](https://github.com/Axway-API-Management-Plus/apim-cli/issues/179))
 - API-ManagerApps Adpater now handles 404 if searching for an Application based on the ID that does not exists (See issue [#168](https://github.com/Axway-API-Management-Plus/apim-cli/issues/168))
 - vhost="" no longer creates a new API each time (See issue [#169](https://github.com/Axway-API-Management-Plus/apim-cli/issues/169))
 - `apim api publish` resets API VHost to configured Default virtual host (See issue [#170](https://github.com/Axway-API-Management-Plus/apim-cli/issues/170))
