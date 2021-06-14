@@ -1,14 +1,34 @@
 package com.axway.apim.lib;
 
-public class Result {
-	private int rc = 0;
+import java.util.ArrayList;
+import java.util.List;
 
-	public int getRc() {
-		return rc;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+
+public class Result {
+	
+	private boolean hasError = false;
+	
+	private List<ErrorCode> errorCodes = new ArrayList<ErrorCode>();
+	
+	public ErrorCode getErrorCode() {
+		if(errorCodes.size()>0) {
+			return errorCodes.get(0);
+		} else {
+			return ErrorCode.SUCCESS;
+		}
+	}
+	
+	public void setError(ErrorCode errorCode) {
+		this.errorCodes.add(errorCode);
+		this.hasError = true;
 	}
 
-	public Result setRc(int rc) {
-		this.rc = rc;
-		return this;
+	public int getRc() {
+		return getErrorCode().getCode();
+	}
+	
+	public boolean hasError() {
+		return hasError;
 	}
 }

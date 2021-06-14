@@ -1,9 +1,9 @@
-package com.axway.apim.users.lib;
+package com.axway.apim.users.lib.params;
 
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.StandardExportParams;
 
-public class UserExportParams extends StandardExportParams {
+public class UserExportParams extends StandardExportParams implements UserFilterParams {
 	
 	private String loginName;
 	private String name;

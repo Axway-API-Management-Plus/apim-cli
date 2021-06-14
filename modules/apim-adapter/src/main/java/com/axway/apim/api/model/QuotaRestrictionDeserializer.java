@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;
@@ -27,28 +27,23 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		JsonNode node = oc.readTree(jp);
 		String type = node.get("type").asText();
 		JsonNode quotaConfig = node.get("config");
-		ErrorState errorState = ErrorState.getInstance();
 		if(type.equals("throttlemb")) {
 			if(!quotaConfig.has("period") || !quotaConfig.has("per") || !quotaConfig.has("mb")) {
-				errorState.setError("Invalid quota type: '"+type+"'. For type 'throttlemb' the following configs are required: period, per, mb", ErrorCode.INVALID_QUOTA_CONFIG, false);
-				throw new JsonProcessingException("Invalid quota config. For type 'throttlemb' the following configs are required: period, per, mb"){};
+				throw new AppException("Invalid quota config. For type 'throttlemb' the following configs are required: period, per, mb", ErrorCode.INVALID_QUOTA_CONFIG);
 			}
 		} else if(type.equals("throttle")) {
 			if(!quotaConfig.has("period") || !quotaConfig.has("per") || !quotaConfig.has("messages")) {
-				errorState.setError("Invalid quota type: '"+type+"'. For type 'throttle' the following configs are required: period, per, messages", ErrorCode.INVALID_QUOTA_CONFIG, false);
-				throw new JsonProcessingException("Invalid quota config. For type 'throttle' the following configs are required: period, per, messages"){};
+				throw new AppException("Invalid quota config. For type 'throttle' the following configs are required: period, per, messages", ErrorCode.INVALID_QUOTA_CONFIG);
 			}
 		} else {
-			errorState.setError("Unsupported Quota-Type: '" + type + "'. Must be either: throttle or throttlemb", ErrorCode.INVALID_QUOTA_CONFIG, false);
-			throw new JsonProcessingException("Unsupported Quota-Type: '" + type + "'"){};
+			throw new AppException("Unsupported Quota-Type: '" + type + "'. Must be either: throttle or throttlemb", ErrorCode.INVALID_QUOTA_CONFIG);
 		}
 		String period = quotaConfig.get("period").asText();
 		String per = quotaConfig.get("per").asText();
 		Pattern pattern = Pattern.compile("^("+validPeriods+")$");
 		Matcher matcher = pattern.matcher(period);
 		if(!matcher.matches()) {
-			errorState.setError("Invalid quota period: '"+period+"'. Must be one of the following: "+validPeriods, ErrorCode.INVALID_QUOTA_CONFIG, false);
-			throw new JsonProcessingException("Quota period must be one of the following: "+validPeriods){};
+			throw new AppException("Invalid quota period: '"+period+"'. Must be one of the following: "+validPeriods, ErrorCode.INVALID_QUOTA_CONFIG);
 		}
 		QuotaRestriction restriction = new QuotaRestriction();
 		restriction.setType(QuotaRestrictiontype.valueOf(type));

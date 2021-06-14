@@ -36,6 +36,7 @@ public class JsonOrgExporter extends OrgResultHandler {
 		for(Organization org : orgs) {
 			saveOrganizationLocally(new ExportOrganization(org));
 		}
+		return;
 	}
 	
 	private void saveOrganizationLocally(ExportOrganization org) throws AppException {

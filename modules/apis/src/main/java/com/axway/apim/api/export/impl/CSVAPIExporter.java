@@ -27,7 +27,6 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 
 public class CSVAPIExporter extends APIResultHandler {
 	private static Logger LOG = LoggerFactory.getLogger(CSVAPIExporter.class);
@@ -98,8 +97,7 @@ public class CSVAPIExporter extends APIResultHandler {
 				target = new File(givenTarget + File.separator + createFileName());
 			}
 			if(target.exists() && !params.isDeleteTarget()) {
-				ErrorState.getInstance().setError("Targetfile: " + target.getCanonicalPath() + " already exists. You may set the flag -deleteTarget if you wish to overwrite it.", ErrorCode.EXPORT_FOLDER_EXISTS, false);
-				throw new AppException("Targetfile: " + target.getCanonicalPath() + " already exists.", ErrorCode.EXPORT_FOLDER_EXISTS);
+				throw new AppException("Targetfile: " + target.getCanonicalPath() + " already exists. You may set the flag -deleteTarget if you wish to overwrite it.", ErrorCode.EXPORT_FOLDER_EXISTS);
 			}
 			Appendable appendable = new FileWriter(target);
 			appendable.append("sep=,\n"); // Helps Excel to detect columns
@@ -116,6 +114,7 @@ public class CSVAPIExporter extends APIResultHandler {
 					throw new AppException("Unable to close CSVWriter", ErrorCode.UNXPECTED_ERROR, ignore);
 				}
 		}
+		return;
 	}
 	
 	private String createFileName() throws AppException {

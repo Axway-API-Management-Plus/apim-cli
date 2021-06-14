@@ -66,21 +66,27 @@ public class APISpecificationSwagger1xTest {
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger1xSpecification, "Specification must be an Swagger12Specification");
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
-		Assert.assertEquals(swagger.get("basePath").asText(), "https://petstore.swagger.io:443/myapi");
+		Assert.assertEquals(swagger.get("basePath").asText(), "https://petstore.swagger.io:443/myapi/");
 	}
 	
 	@Test
 	public void testSwagger11Specification() throws AppException, IOException {
 		byte[] content = getSwaggerContent(testPackage + "/swagger11.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath("https://petstore.swagger.io:443/myapi");
+		apiDefinition.configureBasepath("https://petstore.swagger.io:443/myapi/");
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger1xSpecification, "Specification must be an Swagger12Specification");
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
-		Assert.assertEquals(swagger.get("basePath").asText(), "https://petstore.swagger.io:443/myapi");
+		Assert.assertEquals(swagger.get("basePath").asText(), "https://petstore.swagger.io:443/myapi/");
 	}
 	
-	
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasepath: 'An-Invalid-URL' is invalid.")
+	public void testInvalidBackendBasepath() throws AppException, IOException {
+
+		byte[] content = getSwaggerContent(testPackage + "/swagger11.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
+		apiDefinition.configureBasepath("An-Invalid-URL");
+	}
 	
 	
 	private byte[] getSwaggerContent(String swaggerFile) throws AppException {

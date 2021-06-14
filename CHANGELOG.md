@@ -4,7 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## [Unreleased]
+### Fixed
+- CLI does not realize changed policy when updating an API (See issue [#179](https://github.com/Axway-API-Management-Plus/apim-cli/issues/179))
+- API-ManagerApps Adpater now handles 404 if searching for an Application based on the ID that does not exists (See issue [#168](https://github.com/Axway-API-Management-Plus/apim-cli/issues/168))
+- vhost="" no longer creates a new API each time (See issue [#169](https://github.com/Axway-API-Management-Plus/apim-cli/issues/169))
+- `apim api publish` resets API VHost to configured Default virtual host (See issue [#170](https://github.com/Axway-API-Management-Plus/apim-cli/issues/170))
+- Malformed URL for Backend-URL no longer causing the CLI to fail (See issue [#175](https://github.com/Axway-API-Management-Plus/apim-cli/issues/175))
+- Application import with no changes no longer logs an exception (See issue [#176](https://github.com/Axway-API-Management-Plus/apim-cli/issues/176))
+
+### Added
+- Trailing slash added to given backendBasepath (See issue [#178](https://github.com/Axway-API-Management-Plus/apim-cli/issues/178))
+
+## [1.3.7] 2021-04-19
 ### Fixed
 - apim.sh fails if CWD has a space (See issue [#160](https://github.com/Axway-API-Management-Plus/apim-cli/issues/160))
 - Streams not closed bring to a FileSystemException (See issue [#161](https://github.com/Axway-API-Management-Plus/apim-cli/issues/161))
@@ -13,10 +25,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Export-Error when using a Custom-Properties-Model for APIs/Apps/Orgs (See issue [#163](https://github.com/Axway-API-Management-Plus/apim-cli/issues/163))
 
 ### Added
-- Resolve system environment variables in property files (See issue [#166](https://github.com/Axway-API-Management-Plus/apim-cli/issues/166))
+- Resolve system environment variables in environment property files (See issue [#166](https://github.com/Axway-API-Management-Plus/apim-cli/issues/166))
 - Support for API-Management 7.7-2021-March release (See issue [#167](https://github.com/Axway-API-Management-Plus/apim-cli/issues/167))
 
-## [1.3.6] 2020-03-16
+## [1.3.6] 2021-03-16
 ### Fixed
 - Avoid NPE if given OAuth-Provider Profile is invalid (See issue [#143](https://github.com/Axway-API-Management-Plus/apim-cli/issues/143))
 - Actual API-Lookup when using additional criteria V-Host and QueryRoutingVersion (See issue [#151](https://github.com/Axway-API-Management-Plus/apim-cli/issues/151))

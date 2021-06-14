@@ -24,7 +24,6 @@ import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 
 /**
@@ -52,8 +51,8 @@ public class APIImportApp implements APIMCLIServiceProvider {
 		try {
 			params = (APIImportParams)CLIAPIImportOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			e.logException(LOG);
+			return e.getError().getCode();
 		}
 		APIImportApp apiImportApp = new APIImportApp();
 		return apiImportApp.importAPI(params);
@@ -65,7 +64,6 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			params.validateRequiredParameters();
 			// Clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			RollbackHandler.deleteInstance();
 
@@ -105,19 +103,13 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			return 0;
 		} catch (AppException ap) {
 			APIPropertiesExport.getInstance().store(); // Try to create it, even 
-			ErrorState errorState = ErrorState.getInstance();
-			if(!ap.getErrorCode().equals(ErrorCode.NO_CHANGE)) {
+			
+			if(!ap.getError().equals(ErrorCode.NO_CHANGE)) {
 				RollbackHandler rollback = RollbackHandler.getInstance();
 				rollback.executeRollback();
 			}
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
-			} else {
-				LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode();
-			}
+			ap.logException(LOG);
+			return errorCodeMapper.getMapedErrorCode(ap.getError()).getCode();
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();

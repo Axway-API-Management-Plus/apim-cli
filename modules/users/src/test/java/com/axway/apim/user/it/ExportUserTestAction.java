@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.users.UserApp;
-import com.axway.apim.users.lib.UserExportParams;
+import com.axway.apim.users.lib.params.UserExportParams;
 import com.axway.lib.testActions.CLIAbstractExportTestAction;
 import com.axway.lib.testActions.TestParams;
 import com.consol.citrus.context.TestContext;

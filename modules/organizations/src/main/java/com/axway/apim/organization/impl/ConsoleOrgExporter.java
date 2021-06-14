@@ -50,6 +50,7 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 		case ultra:
 			printUltra(orgs);
 		}
+		return;
 	}
 	
 	private void printStandard(List<Organization> orgs) {

@@ -18,7 +18,6 @@ import com.axway.apim.api.model.Policy;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -129,7 +128,6 @@ public class APIManagerPoliciesAdapter {
 			}
 		}
 		LOG.error("Available "+type+" policies: " + policies);
-		ErrorState.getInstance().setError("The policy: '" + name + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
 		throw new AppException("The policy: '" + name + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
 	}
 	
@@ -143,7 +141,6 @@ public class APIManagerPoliciesAdapter {
 			}
 		}
 		LOG.error("Available "+type+" policies: " + policies);
-		ErrorState.getInstance().setError("The policy: '" + key + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY, false);
 		throw new AppException("The policy: '" + key + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
 	}
 	

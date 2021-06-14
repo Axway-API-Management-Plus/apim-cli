@@ -34,9 +34,8 @@ public class WSDLFromURLRefFileInConfigurationTestIT extends TestNGCitrusTestRun
 
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
-		createVariable(ImportTestAction.API_DEFINITION, "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/wsdl/wsdl-file-with-username.url");
+		createVariable(ImportTestAction.API_DEFINITION,"./src/test/resources/com/axway/apim/test/files/wsdl/wsdl-file-with-username.url");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
@@ -50,9 +49,8 @@ public class WSDLFromURLRefFileInConfigurationTestIT extends TestNGCitrusTestRun
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		echo("####### Re-Import API from URL without a change #######");
-		createVariable(ImportTestAction.API_DEFINITION, "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition","./src/test/resources/com/axway/apim/test/files/wsdl/wsdl-file-with-username.url");
+		createVariable(ImportTestAction.API_DEFINITION,"./src/test/resources/com/axway/apim/test/files/wsdl/wsdl-file-with-username.url");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		swaggerImport.doExecute(context);

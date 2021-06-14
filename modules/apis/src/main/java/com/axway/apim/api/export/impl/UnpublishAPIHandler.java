@@ -30,6 +30,7 @@ public class UnpublishAPIHandler extends APIResultHandler {
 			}
 			System.out.println("Done!");
 		}
+		return;
 	}
 
 	@Override

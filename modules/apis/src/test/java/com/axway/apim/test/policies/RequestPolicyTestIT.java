@@ -25,8 +25,21 @@ public class RequestPolicyTestIT extends TestNGCitrusTestDesigner {
 		variable("apiName", "Request Policy Test ${apiNumber}");
 		variable("status", "unpublished");
 		
+		echo("####### Initially add API: '${apiName}' on path: '${apiPath}' without any custom policy #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+		createVariable(ImportTestAction.STATE,  "unpublished");
+		action(swaggerImport);
+		
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has imported with correct settings #######");
+		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
 
-		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+
+		echo("####### Re-Importing API: '${apiName}' on path: '${apiPath}' including a Request-Policy #######");
 		createVariable("requestPolicy", "Request policy 1");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/policies/1_request-policy.json");
@@ -34,19 +47,11 @@ public class RequestPolicyTestIT extends TestNGCitrusTestDesigner {
 		action(swaggerImport);
 		
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has correct settings #######");
-		http().client("apiManager")
-			.send()
-			.get("/proxies")
-			.name("api")
-			.header("Content-Type", "application/json");
+		http().client("apiManager").send().get("/proxies/${apiId}").name("api").header("Content-Type", "application/json");
 
-		http().client("apiManager")
-			.receive()
-			.response(HttpStatus.OK)
-			.messageType(MessageType.JSON)
+		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.requestPolicy", "@assertThat(containsString(Request policy 1))@")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+			.validate("$.[?(@.path=='${apiPath}')].outboundProfiles._default.requestPolicy", "@assertThat(containsString(Request policy 1))@");
 	}
 }
