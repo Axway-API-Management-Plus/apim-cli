@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.model.Policy;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -38,11 +37,7 @@ public class PolicyDeserializer extends StdDeserializer<Policy> {
 			createdColicy.setId(policy);
 			return createdColicy;
 		} else {
-			try {
-				return APIManagerAdapter.getInstance().policiesAdapter.getPolicyForName(PolicyType.getTypeForJsonKey(jp.currentName()), policy);
-			} catch (AppException e) {
-				throw new IOException(e);
-			}
+			return APIManagerAdapter.getInstance().policiesAdapter.getPolicyForName(PolicyType.getTypeForJsonKey(jp.currentName()), policy);
 		}
 	}
 	

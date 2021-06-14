@@ -11,7 +11,6 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.organization.it.ExportOrganizationTestAction;
 import com.axway.apim.organization.it.ImportOrganizationTestAction;
 import com.axway.lib.testActions.TestParams;
@@ -59,7 +58,6 @@ public class ImportExportOrgWithCustomPropsTestIT extends TestNGCitrusTestRunner
 		importApp.doExecute(context);
 		
 		echo("####### Export the organization: '${orgName}' - To validate custom properties are exported #######");
-		ErrorState.deleteInstance();
 		createVariable(PARAM_TARGET, exportApp.getTestDirectory().getPath());
 		createVariable(PARAM_EXPECTED_RC, "0");
 		createVariable(PARAM_OUTPUT_FORMAT, "json");

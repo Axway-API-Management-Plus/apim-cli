@@ -1,4 +1,4 @@
-package com.axway.apim.users.lib;
+package com.axway.apim.users.lib.cli;
 
 import org.apache.commons.cli.Option;
 
@@ -6,6 +6,7 @@ import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.users.lib.UserImportParams;
 
 public class UserImportCLIOptions extends CLIOptions {
 

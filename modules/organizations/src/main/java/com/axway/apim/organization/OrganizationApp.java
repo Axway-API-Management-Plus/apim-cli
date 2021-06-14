@@ -14,7 +14,6 @@ import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import com.axway.apim.organization.adapter.JSONOrgAdapter;
 import com.axway.apim.organization.adapter.OrgAdapter;
@@ -31,7 +30,6 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	private static Logger LOG = LoggerFactory.getLogger(OrganizationApp.class);
 
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
-	static ErrorState errorState = ErrorState.getInstance();
 
 	@Override
 	public String getName() {
@@ -60,7 +58,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		}
 		OrganizationApp app = new OrganizationApp();
 		return app.exportOrgs(params).getRc();
@@ -79,19 +77,12 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 				return exportOrgs(params, ResultHandler.CONSOLE_EXPORTER, result);
 			}
 		} catch (AppException e) {
-			
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
-				result.setRc(new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode());
-			} else {
-				LOG.error(e.getMessage(), e);
-				result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode());
-			}
+			e.logException(LOG);
+			result.setError(new ErrorCodeMapper().getMapedErrorCode(e.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}
@@ -99,7 +90,6 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	private ExportResult exportOrgs(OrgExportParams params, ResultHandler exportImpl, ExportResult result) throws AppException {
 		// We need to clean some Singleton-Instances, as tests are running in the same JVM
 		APIManagerAdapter.deleteInstance();
-		ErrorState.deleteInstance();
 		APIMHttpClient.deleteInstances();
 		
 		APIManagerAdapter adapter = APIManagerAdapter.getInstance();
@@ -122,9 +112,8 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			} else {
 				LOG.debug("Successfully exported " + orgs.size() + " organization(s).");
 			}
+			APIManagerAdapter.deleteInstance();
 		}
-		APIManagerAdapter.deleteInstance();
-		result.setRc(ErrorState.getInstance().getErrorCode().getCode());
 		return result;
 	}
 	
@@ -135,7 +124,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			params = (OrgImportParams) OrgImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
 			return ErrorCode.MISSING_PARAMETER.getCode();*/
@@ -148,7 +137,6 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		try {
 			params.validateRequiredParameters();
 			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			
 			APIManagerAdapter.getInstance();
@@ -163,17 +151,10 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 				importManager.replicate(desiredOrg, actualOrg);
 			}
 			LOG.info("Successfully replicated organization(s) into API-Manager");
-			return errorCodeMapper.getMapedErrorCode(ErrorState.getInstance().getErrorCode()).getCode();
+			return ErrorCode.SUCCESS.getCode();
 		} catch (AppException ap) { 
-			ErrorState errorState = ErrorState.getInstance();
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
-			} else {
-				LOG.error(ap.getMessage(), ap);
-				return errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode();
-			}
+			ap.logException(LOG);
+			return errorCodeMapper.getMapedErrorCode(ap.getError()).getCode();
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
@@ -189,7 +170,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			return orgApp.delete(params).getRc();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		/*} catch (ParseException e) {
 			LOG.error("Error " + e.getMessage());
 			return ErrorCode.MISSING_PARAMETER.getCode();*/
@@ -201,18 +182,12 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		try {
 			return exportOrgs(params, ResultHandler.ORG_DELETE_HANDLER, result);
 		} catch (AppException e) {
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
-				result.setRc(new ErrorCodeMapper().getMapedErrorCode(errorState.getErrorCode()).getCode());
-			} else {
-				LOG.error(e.getMessage(), e);
-				result.setRc(new ErrorCodeMapper().getMapedErrorCode(e.getErrorCode()).getCode());
-			}
+			e.logException(LOG);
+			result.setError(new ErrorCodeMapper().getMapedErrorCode(e.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}

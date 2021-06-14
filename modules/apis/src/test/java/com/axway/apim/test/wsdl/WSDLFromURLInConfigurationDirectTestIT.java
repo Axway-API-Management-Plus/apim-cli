@@ -32,9 +32,8 @@ public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestRunn
 		variable("apiName", "Direct-URL-WSDL in configuration from URL-${apiNumber}");
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
-		createVariable(ImportTestAction.API_DEFINITION, "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition","http://www.mnb.hu/arfolyamok.asmx?WSDL");
+		createVariable(ImportTestAction.API_DEFINITION,"http://www.mnb.hu/arfolyamok.asmx?WSDL");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
@@ -49,17 +48,15 @@ public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestRunn
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		echo("####### Re-Import API from URL without a change #######");
-		createVariable(ImportTestAction.API_DEFINITION, "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition","http://www.mnb.hu/arfolyamok.asmx?WSDL");
+		createVariable(ImportTestAction.API_DEFINITION,"http://www.mnb.hu/arfolyamok.asmx?WSDL");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "10");
 		swaggerImport.doExecute(context);
 		
 		echo("####### Setting the status to Published #######");
-		createVariable(ImportTestAction.API_DEFINITION, "");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
-		createVariable("testAPIDefinition","http://www.mnb.hu/arfolyamok.asmx?WSDL");
+		createVariable(ImportTestAction.API_DEFINITION,"http://www.mnb.hu/arfolyamok.asmx?WSDL");
 		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);

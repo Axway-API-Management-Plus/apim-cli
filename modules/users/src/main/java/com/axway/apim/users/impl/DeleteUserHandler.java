@@ -10,7 +10,7 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
-import com.axway.apim.users.lib.UserExportParams;
+import com.axway.apim.users.lib.params.UserExportParams;
 
 public class DeleteUserHandler extends UserResultHandler {
 
@@ -39,7 +39,7 @@ public class DeleteUserHandler extends UserResultHandler {
 			}
 		}
 		System.out.println("Done!");
-
+		return;
 	}
 
 	@Override
