@@ -21,7 +21,6 @@ import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
@@ -96,8 +95,7 @@ public class APIManagerRemoteHostsAdapter {
 	
 	private RemoteHost uniqueRemoteHost(Map<String, RemoteHost> remoteHosts, RemoteHostFilter filter) throws AppException {
 		if(remoteHosts.size()>1) {
-			ErrorState.getInstance().setError("No unique Remote host found. Found " + remoteHosts.size() + " remote hosts based on filter: " + filter, ErrorCode.UNXPECTED_ERROR, false);
-			throw new AppException("No unique Remote-Hosts found. ", ErrorCode.UNKNOWN_API);
+			throw new AppException("No unique Remote host found. Found " + remoteHosts.size() + " remote hosts based on filter: " + filter, ErrorCode.NO_UNIQUE_REMOTE_HOST);
 		}
 		if(remoteHosts.size()==0) return null;
 		return remoteHosts.values().iterator().next();
@@ -129,7 +127,6 @@ public class APIManagerRemoteHostsAdapter {
 					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new PUTRequest(entity, uri, true);
 				}
-				request.setContentType("application/json");
 				httpResponse = request.execute();
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
 				if(statusCode < 200 || statusCode > 299){

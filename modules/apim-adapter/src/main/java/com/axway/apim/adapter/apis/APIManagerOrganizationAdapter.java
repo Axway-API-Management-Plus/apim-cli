@@ -148,7 +148,6 @@ public class APIManagerOrganizationAdapter {
 					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new PUTRequest(entity, uri, true);
 				}
-				request.setContentType("application/json");
 				httpResponse = request.execute();
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
 				if(statusCode < 200 || statusCode > 299){
@@ -204,7 +203,6 @@ public class APIManagerOrganizationAdapter {
 			.build();
 		try {
 			RestAPICall apiCall = new POSTRequest(entity, uri);
-			apiCall.setContentType(null);
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode < 200 || statusCode > 299){

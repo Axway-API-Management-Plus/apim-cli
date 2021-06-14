@@ -37,10 +37,11 @@ public class ImportExportWithCustomPropsTestIT extends TestNGCitrusTestRunner im
 		ExportAppTestAction exportApp = new ExportAppTestAction(context);
 		
 		variable("appName", "My-Custom-Prop-App-"+importApp.getRandomNum());
-
+		variable("customProp2", "2");
 		echo("####### Import application: '${appName}' #######");		
 		createVariable(PARAM_CONFIGFILE,  PACKAGE + "AppWithCustomProperties.json");
 		createVariable(PARAM_EXPECTED_RC, "0");
+
 		importApp.doExecute(context);
 		
 		echo("####### Validate application: '${appName}' has been imported with Custom-Properties #######");
@@ -49,7 +50,7 @@ public class ImportExportWithCustomPropsTestIT extends TestNGCitrusTestRunner im
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
 			.validate("$.[?(@.name=='${appName}')].appCustomProperty1", "Custom value 1")
-			.validate("$.[?(@.name=='${appName}')].appCustomProperty2", "2")
+			.validate("$.[?(@.name=='${appName}')].appCustomProperty2", "${customProp2}")
 			.validate("$.[?(@.name=='${appName}')].appCustomProperty3", "true")
 			.extractFromPayload("$.[?(@.id=='${appName}')].id", "appId"));
 		
@@ -79,5 +80,20 @@ public class ImportExportWithCustomPropsTestIT extends TestNGCitrusTestRunner im
 		createVariable(PARAM_CONFIGFILE,  exportedConfig);
 		createVariable("expectedReturnCode", "10");
 		importApp.doExecute(context);
+
+		echo("####### Re-Import the exported application with changed custom prop #######");
+		createVariable(PARAM_CONFIGFILE,  PACKAGE + "AppWithCustomProperties.json");
+		createVariable(PARAM_EXPECTED_RC, "0");
+		variable("customProp2", "3");
+		importApp.doExecute(context);
+		echo("####### Validate application: '${appName}' - custom property has been changed #######");
+		http(builder -> builder.client("apiManager").send().get("/applications?field=name&op=eq&value=${appName}").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+		  .validate("$.[?(@.name=='${appName}')].name", "@assertThat(hasSize(1))@")
+		  .validate("$.[?(@.name=='${appName}')].appCustomProperty1", "Custom value 1")
+		  .validate("$.[?(@.name=='${appName}')].appCustomProperty2", "${customProp2}")
+		  .validate("$.[?(@.name=='${appName}')].appCustomProperty3", "true")
+		  .extractFromPayload("$.[?(@.id=='${appName}')].id", "appId"));
+
 	}
 }

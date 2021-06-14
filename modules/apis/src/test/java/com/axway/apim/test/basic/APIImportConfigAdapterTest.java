@@ -16,7 +16,6 @@ import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorState;
 
 public class APIImportConfigAdapterTest extends APIManagerMockBase {
 
@@ -29,7 +28,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 	
 	@BeforeMethod
 	public void cleanSingletons() {
-		ErrorState.deleteInstance();
+		//ErrorState.deleteInstance();
 	}
 	
 	@Test
@@ -171,6 +170,20 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertEquals(apiConfig.getVersion(), "kk1");
 			Assert.assertEquals(apiConfig.getName(), "My OAuth API");
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	@Test
+	public void emptyVHostTest() throws AppException, ParseException {
+		try {
+			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/empty-vhost-api-config.json").getFile();
+			
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false);
+			adapter.getDesiredAPI();
+			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+			Assert.assertNull(apiConfig.getVhost(), "Empty VHost should be considered as not set (null), as an empty VHost is logically not possible to have.");
 		} catch (Exception e) {
 			throw e;
 		}

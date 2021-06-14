@@ -16,7 +16,6 @@ import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.Utils;
 
 public class APIChangeHandler extends APIResultHandler {
@@ -46,8 +45,8 @@ public class APIChangeHandler extends APIResultHandler {
 					continue;
 				}
 				if(changeState.isBreaking() && !params.isForce()) {
+					result.setError(ErrorCode.BREAKING_CHANGE_DETECTED);
 					LOG.error("Changing API: '"+api.getName()+"' is a potentially breaking change which can't be applied without enforcing it! Try option: -force");
-					ErrorState.getInstance().setError("Changing API: '"+api.getName()+"' is a potentially breaking change which can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED, false);
 					continue;
 				}
 				LOG.info("Planned changes for API: '" + api.getName() + "': " + changeState.getAllChanges());
@@ -80,6 +79,7 @@ public class APIChangeHandler extends APIResultHandler {
 			}
 		}
 		System.out.println("Done!");
+		return;
 	}
 
 	@Override

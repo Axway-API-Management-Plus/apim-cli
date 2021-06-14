@@ -9,7 +9,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -38,33 +37,28 @@ public class RemotehostDeserializer extends StdDeserializer<RemoteHost> {
 	public RemoteHost deserialize(JsonParser jp, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
 		JsonNode node = jp.getCodec().readTree(jp);
-		try {
-			String remoteHostName;
-			Integer remoteHostPort;
-			// This must have the format my.host.com:7889
-			String givenRemoteHost = node.asText();
-			// 
-			if(givenRemoteHost.indexOf(":")==-1) {
-				remoteHostName = givenRemoteHost;
-				remoteHostPort = 443;
-			} else {
-				String[] given = givenRemoteHost.split(":");
-				remoteHostName = given[0];
-				remoteHostPort = Integer.parseInt(given[1]);
-			}
-			RemoteHost remoteHost = APIManagerAdapter.getInstance().remoteHostsAdapter.getRemoteHost(remoteHostName, remoteHostPort);
-			if(remoteHost==null) {
-				if(validateRemoteHost(ctxt)) {
-					ErrorState.getInstance().setError("The given remote host: '"+remoteHostName+":"+remoteHostPort+"' is unknown.", ErrorCode.UNKNOWN_REMOTE_HOST, false);
-					throw new AppException("The given remote host: '"+remoteHostName+":"+remoteHostPort+"' is unknown.", ErrorCode.UNKNOWN_REMOTE_HOST);
-				} else {
-					LOG.warn("The given remote host: '"+remoteHostName+":"+remoteHostPort+"' is unknown.");
-				}
-			}
-			return remoteHost;
-		} catch (AppException e) {
-			throw new IOException("Error reading remote hosts from API-Manager", e);
+		String remoteHostName;
+		Integer remoteHostPort;
+		// This must have the format my.host.com:7889
+		String givenRemoteHost = node.asText();
+		// 
+		if(givenRemoteHost.indexOf(":")==-1) {
+			remoteHostName = givenRemoteHost;
+			remoteHostPort = 443;
+		} else {
+			String[] given = givenRemoteHost.split(":");
+			remoteHostName = given[0];
+			remoteHostPort = Integer.parseInt(given[1]);
 		}
+		RemoteHost remoteHost = APIManagerAdapter.getInstance().remoteHostsAdapter.getRemoteHost(remoteHostName, remoteHostPort);
+		if(remoteHost==null) {
+			if(validateRemoteHost(ctxt)) {
+				throw new AppException("The given remote host: '"+remoteHostName+":"+remoteHostPort+"' is unknown.", ErrorCode.UNKNOWN_REMOTE_HOST);
+			} else {
+				LOG.warn("The given remote host: '"+remoteHostName+":"+remoteHostPort+"' is unknown.");
+			}
+		}
+		return remoteHost;
 	}
 	
 	private Boolean validateRemoteHost(DeserializationContext ctxt) {

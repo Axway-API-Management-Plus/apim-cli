@@ -26,8 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.CustomPropertiesEntity;
 import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.CustomProperty.Option;
@@ -35,7 +35,6 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.CustomPropertiesFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -193,7 +192,6 @@ public class Utils {
 			String desiredCustomPropertyValue = customProperties.get(desiredCustomProperty);
 			CustomProperty configuredCustomProperty = APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperty(type, desiredCustomProperty);
 			if(configuredCustomProperty==null) {
-				ErrorState.getInstance().setError("The custom-property: '" + desiredCustomProperty + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE, false);
 				throw new AppException("The custom-property: '" + desiredCustomProperty + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
 			if(configuredCustomProperty.getType()!=null && ( configuredCustomProperty.getType().equals("select") || configuredCustomProperty.getType().equals("switch") )) {
@@ -210,7 +208,6 @@ public class Utils {
 					}
 				}
 				if(!valueFound) {
-					ErrorState.getInstance().setError("The value: '" + desiredCustomPropertyValue + "' is not a valid option for custom property: '" + desiredCustomProperty + "'", ErrorCode.CANT_READ_CONFIG_FILE, false);
 					throw new AppException("The value: '" + desiredCustomPropertyValue + "' is not a valid option for custom property: '" + desiredCustomProperty + "'", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
 			}
@@ -220,7 +217,7 @@ public class Utils {
 	public static void addCustomPropertiesForEntity(List<? extends CustomPropertiesEntity> entities, String json, CustomPropertiesFilter filter) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		// Custom-Properties will be added depending on the given Properties in the filter
-		if(filter.getCustomProperties() == null) {
+		if(filter.getCustomProperties() == null || entities.size() == 0) {
 			return;
 		}
 		Map<String, JsonNode> enitityAsJsonMappedWithId = new HashMap<String, JsonNode>();
@@ -264,8 +261,7 @@ public class Utils {
 			}
 		}
 		if(retDate==null || retDate.before(new Date())) {
-			ErrorState.getInstance().setError("Unable to parse the given retirementDate using the following formats: " + dateFormats, ErrorCode.CANT_READ_CONFIG_FILE, false);
-			throw new AppException("Cannnot parse given retirementDate", ErrorCode.CANT_READ_CONFIG_FILE);
+			throw new AppException("Unable to parse the given retirementDate using the following formats: " + dateFormats, ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 		return retDate.getTime();
 	}

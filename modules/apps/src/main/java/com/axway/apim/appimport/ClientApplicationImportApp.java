@@ -18,7 +18,6 @@ import com.axway.apim.lib.ImportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 
 public class ClientApplicationImportApp implements APIMCLIServiceProvider {
@@ -54,7 +53,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			params = (AppImportParams) AppImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		}
 		ClientApplicationImportApp app = new ClientApplicationImportApp();
 		return app.importApp(params).getRc();
@@ -66,20 +65,21 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			params.validateRequiredParameters();
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the application
-			ClientAppAdapter desiredAppsAdapter = new JSONConfigClientAppAdapter(params);
+			ClientAppAdapter desiredAppsAdapter = new JSONConfigClientAppAdapter(params, result);
 			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
 			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter);
 			for(ClientApplication desiredApp : desiredApps) {
+				//I'm reading customProps from desiredApp, what if the desiredApp has no customProps and actualApp has many?
 				ClientApplication actualApp = APIManagerAdapter.getInstance().appAdapter.getApplication(new ClientAppFilter.Builder()
 						.includeCredentials(true)
 						.includeImage(true)
 						.includeQuotas(true)
 						.includeOauthResources(true)
+						.includeCustomProperties(desiredApp.getCustomPropertiesKeys())
 						.hasName(desiredApp.getName())
 						.build());
 				importManager.setDesiredApp(desiredApp);
@@ -87,22 +87,14 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 				importManager.replicate();
 			}
 			LOG.info("Successfully replicated application into API-Manager");
-			result.setRc(errorCodeMapper.getMapedErrorCode(ErrorState.getInstance().getErrorCode()).getCode());
 			return result;
-		} catch (AppException ap) { 
-			ErrorState errorState = ErrorState.getInstance();
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				result.setRc(errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode());
-			} else {
-				LOG.error(ap.getMessage(), ap);
-				result.setRc(errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode());
-			}
+		} catch (AppException ap) {
+			ap.logException(LOG);
+			result.setError(ap.getError());
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}
@@ -111,5 +103,6 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 		int rc = importApp(args);
 		System.exit(rc);
 	}
+
 
 }

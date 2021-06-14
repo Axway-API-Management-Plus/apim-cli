@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.TestIndicator;
 
 public class CoreParameters implements Parameters {
@@ -470,7 +469,6 @@ public class CoreParameters implements Parameters {
 			LOG.error("Missing required parameters. Use either Command-Line-Options or Environment.Properties to provided required parameters.");
 			LOG.error("Get help with option -help");
 			LOG.error("");
-			ErrorState.getInstance().setError("Missing required parameters.", ErrorCode.MISSING_PARAMETER, false);
 			throw new AppException("Missing required parameters.", ErrorCode.MISSING_PARAMETER);
 		}
 	}

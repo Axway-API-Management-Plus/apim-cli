@@ -20,7 +20,7 @@ public class GETRequest extends RestAPICall {
 	@Override
 	public HttpResponse execute() throws AppException {
 		HttpGet httpGet = new HttpGet(uri);
-		httpGet.setHeader("Content-type", this.contentType);
+		//httpGet.setHeader("Content-type", this.contentType);
 		HttpResponse response = sendRequest(httpGet);
 		return response;
 	}
