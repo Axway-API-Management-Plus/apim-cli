@@ -22,7 +22,7 @@ public class PUTRequest extends RestAPICall {
 	public HttpResponse execute() throws AppException {
 		HttpPut httpPut = new HttpPut(uri);
 		httpPut.setEntity(entity);
-		httpPut.setHeader("Content-type", this.contentType);
+		//httpPut.setHeader("Content-type", this.contentType);
 		HttpResponse response = sendRequest(httpPut);
 		return response;
 	}

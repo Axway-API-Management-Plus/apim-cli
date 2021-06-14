@@ -3,6 +3,6 @@
 	"path": "${apiPath}",
 	"state": "${state}",
 	"version": "2.0.0",
-	"apiDefinition":"${testAPIDefinition}",
+	"apiDefinition":"${apiDefinition}",
 	"organization": "API Development ${orgNumber}"
 }

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 
 /**
  * This class implements a pluggable CLI interface that allows to dynamically add new 
@@ -142,13 +141,9 @@ public class APIManagerCLI {
 				rc = (int)this.selectedMethod.invoke (this.selectedService, (Object)args);
 				return rc;
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				if(!ErrorState.getInstance().isLogStackTrace()) {
-					e.printStackTrace();
-					return ErrorCode.UNXPECTED_ERROR.getCode();
-				}
+				return ErrorCode.UNXPECTED_ERROR.getCode();
 			}
 		}
-		return rc;
 	}
 	
 	private String getMethodName(Method m) {

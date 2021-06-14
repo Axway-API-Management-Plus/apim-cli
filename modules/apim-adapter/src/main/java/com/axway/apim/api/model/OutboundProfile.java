@@ -135,15 +135,20 @@ public class OutboundProfile extends Profile {
 				if(thisParameters!=null) thisParameters.remove("password");
 			}
 			boolean rc = 
-				(this.getFaultHandlerPolicy()==null || this.getFaultHandlerPolicy().equals(otherOutboundProfile.getFaultHandlerPolicy())) &&
-				(this.getRequestPolicy()==null || this.getRequestPolicy().equals(otherOutboundProfile.getRequestPolicy())) &&
-				(this.getRequestPolicy()==null || this.getResponsePolicy().equals(otherOutboundProfile.getResponsePolicy())) &&
-				(this.getRoutePolicy()==null || this.getRoutePolicy().equals(otherOutboundProfile.getRoutePolicy())) &&
+				policiesAreEqual(this.getFaultHandlerPolicy(), otherOutboundProfile.getFaultHandlerPolicy()) &&
+				policiesAreEqual(this.getRequestPolicy(), otherOutboundProfile.getRequestPolicy()) &&
+				policiesAreEqual(this.getResponsePolicy(), otherOutboundProfile.getResponsePolicy()) &&
+				policiesAreEqual(this.getRoutePolicy(), otherOutboundProfile.getRoutePolicy()) &&
 				StringUtils.equals(otherOutboundProfile.getRouteType(), this.getRouteType()) &&
 				(thisParameters==null || thisParameters.equals(otherParameters));
 			return rc;
 		} else {
 			return false;
 		}
+	}
+	
+	private boolean policiesAreEqual(Policy policyA, Policy policyB) {
+		if(policyA==null && policyB == null) return true;
+		return (policyA!=null && policyA.equals(policyB));
 	}
 }

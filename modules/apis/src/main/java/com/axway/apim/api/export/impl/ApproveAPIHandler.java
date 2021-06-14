@@ -10,6 +10,7 @@ import com.axway.apim.api.export.lib.params.APIApproveParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 
 public class ApproveAPIHandler extends APIResultHandler {
@@ -38,10 +39,11 @@ public class ApproveAPIHandler extends APIResultHandler {
 				LOG.info("API: "+api.getName()+" "+api.getVersion()+" ("+api.getId()+") successfully approved/published.");
 			} catch(Exception e) {
 				LOG.error("Error approving API: " + api.getName()+" "+api.getVersion()+" ("+api.getId()+")");
+				result.setError(ErrorCode.ERR_APPROVING_API);
 			}
 		}
 		System.out.println("Done!");
-
+		return;
 	}
 
 	@Override

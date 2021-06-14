@@ -32,6 +32,7 @@ public class JSONUserAdapter extends UserAdapter {
 		} catch (MismatchedInputException me) {
 			try {
 				User user = mapper.readValue(configFile, User.class);
+				user.setType("internal"); // Default to internal, as external makes no sense using the CLI
 				this.users = new ArrayList<User>();
 				this.users.add(user);
 			} catch (Exception pe) {

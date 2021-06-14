@@ -66,6 +66,8 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 	private Organization organization;
 	
 	private Map<String, String> customProperties = null;
+	@JsonIgnore
+	private List<String> customPropertiesKeys = null;
 	
 	public String getOrganizationId() {
 		if(this.organization == null) return null;
@@ -178,6 +180,13 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 	@JsonAnySetter
 	public void setCustomProperties(Map<String, String> customProperties) {
 		this.customProperties = customProperties;
+		if (this.customProperties!=null){
+			this.customPropertiesKeys=customProperties.keySet().stream().collect(Collectors.toList());
+		}
+	}
+
+	public List<String> getCustomPropertiesKeys() {
+		return customPropertiesKeys;
 	}
 
 	@Override

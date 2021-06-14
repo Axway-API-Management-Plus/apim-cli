@@ -28,6 +28,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
+import com.axway.apim.lib.Result;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -37,6 +38,8 @@ public abstract class APIResultHandler {
 	protected static Logger LOG = LoggerFactory.getLogger(APIResultHandler.class);
 	
 	APIExportParams params;
+	
+	protected Result result;
 	
 	boolean hasError = false;
 	
@@ -66,6 +69,12 @@ public abstract class APIResultHandler {
 
 	public APIResultHandler(APIExportParams params) {
 		this.params = params;
+		this.result = new Result();
+	}
+	
+	public APIResultHandler(APIExportParams params, Result result) {
+		this.params = params;
+		this.result = result;
 	}
 	
 	public static APIResultHandler create(APIListImpl exportImpl, APIExportParams params) throws AppException {
@@ -85,6 +94,14 @@ public abstract class APIResultHandler {
 		return this.hasError;
 	}
 	
+	public Result getResult() {
+		return result;
+	}
+
+	public void setResult(Result result) {
+		this.result = result;
+	}
+
 	public abstract APIFilter getFilter();
 	
 	protected Builder getBaseAPIFilterBuilder() {

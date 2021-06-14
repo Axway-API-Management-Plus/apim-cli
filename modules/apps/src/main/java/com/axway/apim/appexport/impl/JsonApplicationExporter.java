@@ -37,6 +37,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		for(ClientApplication app : apps) {
 			saveApplicationLocally(new ExportApplication(app));
 		}
+		return;
 	}
 	
 	private void saveApplicationLocally(ExportApplication app) throws AppException {

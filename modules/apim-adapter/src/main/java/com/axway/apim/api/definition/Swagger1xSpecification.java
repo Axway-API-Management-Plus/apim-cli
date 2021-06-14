@@ -1,9 +1,11 @@
 package com.axway.apim.api.definition;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -31,7 +33,10 @@ public class Swagger1xSpecification extends APISpecification {
 			if(backendBasepath!=null) {
 				boolean backendBasepathAdjusted = false;
 				URL url = new URL(backendBasepath);
-				
+				if(url.getPath()!=null && !url.getPath().equals("") && !backendBasepath.endsWith("/")) { // See issue #178
+					backendBasepath += "/";
+					url = new URL(backendBasepath);
+				}
 				if(swagger.get("basePath").asText().equals(url.toString())) {
 					LOG.debug("Swagger resourcePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasepath: '"+url.getPath()+"'. Nothing to do.");
 				} else {
@@ -44,6 +49,8 @@ public class Swagger1xSpecification extends APISpecification {
 				}
 				this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
 			}
+		} catch (MalformedURLException e) {
+			throw new AppException("The configured backendBasepath: '"+backendBasepath+"' is invalid.", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		} catch (Exception e) {
 			LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
 		}
@@ -59,6 +66,11 @@ public class Swagger1xSpecification extends APISpecification {
 				return false;
 			}
 			return true;
+		} catch (AppException e) {
+			if(e.getError()==ErrorCode.UNSUPPORTED_FEATURE) {
+				throw e;
+			}
+			return false;
 		} catch (Exception e) {
 			LOG.trace("No Swager 1.x specification.", e);
 			return false;

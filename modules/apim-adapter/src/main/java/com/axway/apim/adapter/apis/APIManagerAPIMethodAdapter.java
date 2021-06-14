@@ -19,7 +19,6 @@ import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -81,7 +80,6 @@ public class APIManagerAPIMethodAdapter {
 				return method;
 			}
 		}
-		ErrorState.getInstance().setError("No operation found with name: '"+methodName+"'", ErrorCode.API_OPERATION_NOT_FOUND, false);
 		throw new AppException("No operation found with operationId: '"+methodName+"'", ErrorCode.API_OPERATION_NOT_FOUND);
 	}
 	

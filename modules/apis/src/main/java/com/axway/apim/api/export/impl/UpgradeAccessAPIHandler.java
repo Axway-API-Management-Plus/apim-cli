@@ -51,7 +51,7 @@ public class UpgradeAccessAPIHandler extends APIResultHandler {
 			}
 		}
 		System.out.println("Done!");
-
+		return;
 	}
 
 	@Override

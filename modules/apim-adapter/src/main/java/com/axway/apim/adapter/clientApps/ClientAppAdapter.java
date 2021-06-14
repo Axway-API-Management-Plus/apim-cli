@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.lib.Result;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public abstract class ClientAppAdapter {
@@ -13,6 +14,8 @@ public abstract class ClientAppAdapter {
 	protected static Logger LOG = LoggerFactory.getLogger(ClientAppAdapter.class);
 	
 	protected List<ClientApplication> apps;
+	
+	protected Result result;
 
 	protected ClientAppAdapter() {
 
@@ -29,4 +32,12 @@ public abstract class ClientAppAdapter {
 	}
 	
 	protected abstract void readConfig() throws AppException;
+
+	public Result getResult() {
+		return result;
+	}
+
+	public void setResult(Result result) {
+		this.result = result;
+	}
 }
