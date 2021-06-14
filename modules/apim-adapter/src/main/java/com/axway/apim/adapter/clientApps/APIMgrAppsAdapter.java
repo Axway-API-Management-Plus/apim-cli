@@ -37,7 +37,6 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.CustomPropertiesFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
@@ -95,6 +94,12 @@ public class APIMgrAppsAdapter {
 			LOG.debug("Sending request to find existing applications: " + uri);
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode == 404) {
+				// Nothing found - Simulate a empty response
+				this.apiManagerResponse.put(filter,"[]");
+				return;
+			}
 			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
 			if(response.startsWith("{")) { // Got a single response!
 				response = "["+response+"]";
@@ -129,6 +134,7 @@ public class APIMgrAppsAdapter {
 		readApplicationsFromAPIManager(filter);
 		List<ClientApplication> apps = null;
 		try {
+			if(this.apiManagerResponse.get(filter) == null) return apps;
 			apps = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<ClientApplication>>(){});
 			LOG.debug("Found: "+apps.size() + " applications");
 			for(int i=0; i<apps.size();i++) {
@@ -207,7 +213,6 @@ public class APIMgrAppsAdapter {
 	
 	private ClientApplication uniqueApplication(List<ClientApplication> apps) throws AppException {
 		if(apps.size()>1) {
-			ErrorState.getInstance().setError("No unique application found", ErrorCode.APP_NAME_IS_NOT_UNIQUE, false);
 			throw new AppException("No unique application found", ErrorCode.APP_NAME_IS_NOT_UNIQUE);
 		}
 		if(apps.size()==0) return null;
@@ -348,7 +353,6 @@ public class APIMgrAppsAdapter {
 					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new PUTRequest(entity, uri);
 				}
-				request.setContentType("application/json");
 				httpResponse = request.execute();
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
 				if(statusCode < 200 || statusCode > 299){
@@ -391,7 +395,6 @@ public class APIMgrAppsAdapter {
 			.build();
 		try {
 			RestAPICall apiCall = new POSTRequest(entity, uri);
-			apiCall.setContentType(null);
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode < 200 || statusCode > 299){
@@ -478,7 +481,6 @@ public class APIMgrAppsAdapter {
 				HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 				
 				RestAPICall request = (update ? new PUTRequest(entity,uri) : new POSTRequest(entity, uri));
-				request.setContentType("application/json");
 				httpResponse = request.execute();
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
 				if(statusCode < 200 || statusCode > 299){
@@ -534,7 +536,6 @@ public class APIMgrAppsAdapter {
 			} else {
 				request = new PUTRequest(entity, uri, true);
 			}
-			request.setContentType("application/json");
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode < 200 || statusCode > 299){
@@ -597,7 +598,6 @@ public class APIMgrAppsAdapter {
 				HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+desiredApp.getId()+"/"+endpoint).build();
 				RestAPICall request = (update ? new PUTRequest(entity,uri) : new POSTRequest(entity, uri));
-				request.setContentType("application/json");
 				httpResponse = request.execute();
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
 				if(statusCode < 200 || statusCode > 299){

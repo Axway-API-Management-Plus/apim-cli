@@ -21,7 +21,7 @@ public class DELRequest extends RestAPICall {
 	@Override
 	public HttpResponse execute() throws AppException {
 		HttpUriRequest httpDel = new HttpDelete(uri);
-		httpDel.setHeader("Content-type", this.contentType);
+		//httpDel.setHeader("Content-type", this.contentType);
 		HttpResponse response = sendRequest(httpDel);
 		return response;
 	}

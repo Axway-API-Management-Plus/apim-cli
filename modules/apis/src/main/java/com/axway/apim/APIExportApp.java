@@ -26,10 +26,10 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
+import com.axway.apim.lib.Result;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 
 /**
@@ -41,8 +41,6 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	private static Logger LOG = LoggerFactory.getLogger(APIExportApp.class);
 	
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
-	
-	private static ErrorState errorState = ErrorState.getInstance();
 
 	public static void main(String args[]) { 
 		int rc = grantAccess(args);
@@ -56,7 +54,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			params = (APIExportParams) CLIAPIExportOptions.create(args).getParams();
 		} catch (AppException e) {
 			LOG.error("Error " + e.getMessage());
-			return e.getErrorCode().getCode();
+			return e.getError().getCode();
 		}
 		APIExportApp apiExportApp = new APIExportApp();
 		return apiExportApp.exportAPI(params);
@@ -78,15 +76,8 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				return execute(params, APIListImpl.CONSOLE_EXPORTER);
 			}
 		} catch (AppException e) {
-			
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(e.getMessage(), e);
-				return errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode();
-			} else {
-				LOG.error(e.getMessage(), e);
-				return errorCodeMapper.getMapedErrorCode(e.getErrorCode()).getCode();
-			}
+			e.logException(LOG);
+			return errorCodeMapper.getMapedErrorCode(e.getError()).getCode();
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
@@ -189,13 +180,14 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	
 	private static int execute(APIExportParams params, APIListImpl resultHandlerImpl) {
 		try {
-
 			APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
 			
 			APIResultHandler resultHandler = APIResultHandler.create(resultHandlerImpl, params);
 			APIFilter filter = resultHandler.getFilter();
+			Result result = resultHandler.getResult();
 
 			List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(filter, true);
+			
 			if(apis.size()==0) {
 				if(LOG.isDebugEnabled()) {
 					LOG.info("No APIs found using filter: " + filter);
@@ -211,24 +203,18 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				} else {
 					LOG.debug("Successfully selected " + apis.size() + " API(s).");
 				}
+				APIManagerAdapter.deleteInstance();
+				
+				if(result.hasError()) {
+					LOG.error("An error happened during export. Please check the log");
+				}
+				return result.getErrorCode().getCode();
 			}
-			APIManagerAdapter.deleteInstance();
-			if(ErrorState.getInstance().hasError()) {
-				ErrorState.getInstance().logErrorMessages(LOG);
-			}
-			return ErrorState.getInstance().getErrorCode().getCode();
+			return 0;
 		} catch (AppException ap) {
-			ErrorState errorState = ErrorState.getInstance();
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				return errorState.getErrorCode().getCode();
-			} else {
-				LOG.error(ap.getMessage(), ap);
-				return ap.getErrorCode().getCode();
-			}
+			ap.logException(LOG);
+			return ap.getError().getCode();
 		} catch (Exception e) {
-
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
 		}
@@ -240,13 +226,12 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			params.validateRequiredParameters();
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			
 			APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
 			if(!APIManagerAdapter.hasAdminAccount()) {
 				LOG.error("Upgrading API-Access needs admin access.");
-				result.setRc(ErrorCode.NO_ADMIN_ROLE_USER.getCode());
+				result.setError(ErrorCode.NO_ADMIN_ROLE_USER);
 				return result;
 			}
 			// Get the reference API from API-Manager
@@ -275,19 +260,12 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			}
 			return result;
 		} catch (AppException ap) { 
-			ErrorState errorState = ErrorState.getInstance();
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				result.setRc(errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode());
-			} else {
-				LOG.error(ap.getMessage(), ap);
-				result.setRc(errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode());
-			}
+			ap.logException(LOG);
+			result.setError(errorCodeMapper.getMapedErrorCode(ap.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}
@@ -298,13 +276,12 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			params.validateRequiredParameters();
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
-			ErrorState.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			
 			APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
 			if(!APIManagerAdapter.hasAdminAccount()) {
 				LOG.error("Upgrading API-Access needs admin access.");
-				result.setRc(ErrorCode.NO_ADMIN_ROLE_USER.getCode());
+				result.setError(ErrorCode.NO_ADMIN_ROLE_USER);
 				return result;
 			}
 			// Get all organizations that should be granted
@@ -332,19 +309,12 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			}
 			return result;
 		} catch (AppException ap) { 
-			ErrorState errorState = ErrorState.getInstance();
-			if(errorState.hasError()) {
-				errorState.logErrorMessages(LOG);
-				if(errorState.isLogStackTrace()) LOG.error(ap.getMessage(), ap);
-				result.setRc(errorCodeMapper.getMapedErrorCode(errorState.getErrorCode()).getCode());
-			} else {
-				LOG.error(ap.getMessage(), ap);
-				result.setRc(errorCodeMapper.getMapedErrorCode(ap.getErrorCode()).getCode());
-			}
+			ap.logException(LOG);
+			result.setError(errorCodeMapper.getMapedErrorCode(ap.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
-			result.setRc(ErrorCode.UNXPECTED_ERROR.getCode());
+			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
 		}
 	}
@@ -352,7 +322,6 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	private static void deleteInstances() throws AppException {
 		// We need to clean some Singleton-Instances, as tests are running in the same JVM
 		APIManagerAdapter.deleteInstance();
-		ErrorState.deleteInstance();
 		APIMHttpClient.deleteInstances();
 	}
 	

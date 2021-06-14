@@ -12,13 +12,10 @@ import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 
 public class APIImportManager {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIImportManager.class);
-	
-	private ErrorState error = ErrorState.getInstance();
 	
 	private boolean enforceBreakingChange = CoreParameters.getInstance().isForce();
 	
@@ -36,9 +33,8 @@ public class APIImportManager {
 				LOG.debug("Desired API-State set to published using OrgAdmin account only. Going to create a publish request. "
 						+ "Set allowOrgAdminsToPublish to false to prevent orgAdmins from creating a publishing request.");
 			} else {
-				error.setError("OrgAdmin user only allowed to change/register unpublished APIs. "
-						+ "Set allowOrgAdminsToPublish to true (default) to allow orgAdmins to create a publishing request.", ErrorCode.NO_ADMIN_ROLE_USER, false);
-				throw new AppException("OrgAdmin user only allowed to change/register unpublished APIs.", ErrorCode.NO_ADMIN_ROLE_USER);
+				throw new AppException("OrgAdmin user only allowed to change/register unpublished APIs. "
+						+ "Set allowOrgAdminsToPublish to true (default) to allow orgAdmins to create a publishing request.", ErrorCode.NO_ADMIN_ROLE_USER);
 			}
 		}
 		// No existing API found (means: No match for APIPath/V-Host & Query-Version), creating a complete new
@@ -56,14 +52,12 @@ public class APIImportManager {
 			if(!changeState.hasAnyChanges()) {
 				APIPropertiesExport.getInstance().setProperty("feApiId", changeState.getActualAPI().getId());
 				LOG.debug("BUT, no changes detected between Import- and API-Manager-API. Exiting now...");
-				error.setWarning("No changes detected between Import- and API-Manager-API: '" + changeState.getActualAPI().getName() + "' ("+changeState.getActualAPI().getId()+")", ErrorCode.NO_CHANGE, false);
-				throw new AppException("No changes detected between Import- and API-Manager-API", ErrorCode.NO_CHANGE);
+				throw new AppException("No changes detected between Import- and API-Manager-API: '" + changeState.getActualAPI().getName() + "' ("+changeState.getActualAPI().getId()+")", ErrorCode.NO_CHANGE);
 			}
 			LOG.info("Recognized the following changes. Potentially Breaking: " + changeState.getBreakingChanges() + 
 					" plus Non-Breaking: " + changeState.getNonBreakingChanges());
 			if (changeState.isBreaking()) { // Make sure, breaking changes aren't applied without enforcing it.
 				if(!enforceBreakingChange) {
-					error.setError("A potentially breaking change can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED, false);
 					throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);
 				}
 			}

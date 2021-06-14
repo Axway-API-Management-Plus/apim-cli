@@ -166,11 +166,17 @@ public class APIManagerUserAdapter {
 	}
 	
 	public User updateUser(User desiredUser, User actualUser) throws AppException {
-		return createOrUpdateUser(desiredUser, actualUser);
+		User updatedUser = createOrUpdateUser(desiredUser, actualUser);
+		if(desiredUser.getPassword()!=null) {
+			LOG.info("Password of existing user: '" + actualUser.getLoginName() + "' ("+actualUser.getId()+") will not be updated.");
+		}
+		return updatedUser;
 	}
 	
 	public User createUser(User desiredUser) throws AppException {
-		return createOrUpdateUser(desiredUser, null);
+		User createdUser = createOrUpdateUser(desiredUser, null);
+		changepassword(desiredUser.getPassword(), createdUser);
+		return createdUser;
 	}
 	
 	public User createOrUpdateUser(User desiredUser, User actualUser) throws AppException {
@@ -181,12 +187,13 @@ public class APIManagerUserAdapter {
 			URI uri;
 			if(actualUser==null) {
 				filter = new SimpleFilterProvider().setDefaultFilter(
-						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image", "organization"}));
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"password", "image", "organization", "createdOn"}));
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/users").build();
 			} else {
 				desiredUser.setId(actualUser.getId());
+				desiredUser.setType(actualUser.getType());
 				filter = new SimpleFilterProvider().setDefaultFilter(
-						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image", "organization", "createdOn"}));
+						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"password", "image", "organization"}));
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/users/"+actualUser.getId()).build();
 			}
 			mapper.setFilterProvider(filter);
@@ -196,13 +203,12 @@ public class APIManagerUserAdapter {
 				if(actualUser==null) {
 					String json = mapper.writeValueAsString(desiredUser);
 					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-					request = new POSTRequest(entity, uri, true);
+					request = new POSTRequest(entity, uri, false);
 				} else {
 					String json = mapper.writeValueAsString(desiredUser);
 					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-					request = new PUTRequest(entity, uri, true);
+					request = new PUTRequest(entity, uri, false);
 				}
-				request.setContentType("application/json");
 				httpResponse = request.execute();
 				int statusCode = httpResponse.getStatusLine().getStatusCode();
 				if(statusCode < 200 || statusCode > 299){
@@ -223,6 +229,34 @@ public class APIManagerUserAdapter {
 
 		} catch (Exception e) {
 			throw new AppException("Error creating/updating user", ErrorCode.UNXPECTED_ERROR, e);
+		}
+	}
+	
+	public void changepassword(String newPassword, User actualUser) throws AppException {
+		if(newPassword==null) return;
+		HttpResponse httpResponse = null;
+		URI uri;
+		try {
+			RestAPICall request;
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/users/"+actualUser.getId()+"/changepassword").build();
+			HttpEntity entity = new StringEntity("newPassword="+newPassword, ContentType.APPLICATION_FORM_URLENCODED);
+			if ( "oadmin".equals(actualUser.getRole()) ) { // An orgadmin cannot change the password of another orgadmin, even he has created that orgadmin
+				request = new POSTRequest(entity, uri, true);
+			} else {
+				request = new POSTRequest(entity, uri, false);
+			}
+			httpResponse = request.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode != 204){
+				LOG.error("Error changing password of user. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+				throw new AppException("Error changing password of user. Response-Code: "+statusCode+"", ErrorCode.ERROR_CHANGEPASSWORD);
+			}
+		} catch (Exception e) {
+			throw new AppException("Error changing password of user.", ErrorCode.ERROR_CHANGEPASSWORD, e);
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
 		}
 	}
 	
@@ -256,8 +290,7 @@ public class APIManagerUserAdapter {
 			.addBinaryBody("file", user.getImage().getInputStream(), ContentType.create("image/jpeg"), user.getImage().getBaseFilename())
 			.build();
 		try {
-			RestAPICall apiCall = new POSTRequest(entity, uri, true);
-			apiCall.setContentType(null);
+			RestAPICall apiCall = new POSTRequest(entity, uri, false);
 			httpResponse = apiCall.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode < 200 || statusCode > 299){

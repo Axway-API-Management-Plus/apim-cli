@@ -40,7 +40,7 @@ public class APISpecificationOpenAPI3xTest {
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).size(), 1, "Expected to get only one server url");
-		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).get(0).get("url").asText(), "https://myhost.customer.com:8767/api/v1/myAPI");
+		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).get(0).get("url").asText(), "https://myhost.customer.com:8767/api/v1/myAPI/");
 	}
 	
 	@Test
@@ -54,7 +54,15 @@ public class APISpecificationOpenAPI3xTest {
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
 		JsonNode swagger = ymlMapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).size(), 1, "Expected to get only one server url");
-		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).get(0).get("url").asText(), "https://myhost.customer.com:8767/api/v1/myAPI");
+		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).get(0).get("url").asText(), "https://myhost.customer.com:8767/api/v1/myAPI/");
+	}
+	
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasepath: 'An-Invalid-URL' is invalid.")
+	public void testInvalidBackendBasepath() throws AppException, IOException {
+
+		byte[] content = getSwaggerContent(testPackage + "/openapi30.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
+		apiDefinition.configureBasepath("An-Invalid-URL");
 	}
 	
 	

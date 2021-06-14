@@ -9,6 +9,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 
 public class DeleteAPIHandler extends APIResultHandler {
@@ -35,10 +36,12 @@ public class DeleteAPIHandler extends APIResultHandler {
 			try {
 				statusManager.update(api, API.STATE_DELETED, true);
 			} catch(Exception e) {
+				result.setError(ErrorCode.ERR_DELETING_API);
 				LOG.error("Error deleting API: " + api.getName());
 			}
 		}
 		System.out.println("Done!");
+		return;
 
 	}
 

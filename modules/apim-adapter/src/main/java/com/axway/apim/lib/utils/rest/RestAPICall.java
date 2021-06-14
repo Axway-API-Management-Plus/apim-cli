@@ -33,8 +33,6 @@ public abstract class RestAPICall {
 	
 	protected boolean logHTTPClientInfo = false;
 	
-	protected String contentType = "application/json";
-	
 	protected boolean useAdmin = false;
 	
 	public RestAPICall(HttpEntity entity, URI uri, boolean useAdmin) {
@@ -67,10 +65,6 @@ public abstract class RestAPICall {
 		} catch (IOException e) {
 			throw new AppException("Unable to send HTTP-Request.", ErrorCode.CANT_SEND_HTTP_REQUEST, e);
 		}
-	}
-	
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
 	}
 
 	public boolean isLogHTTPClientInfo() {

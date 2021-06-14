@@ -31,6 +31,7 @@ public class ConsoleAppExporter extends ApplicationExporter {
 		case ultra:
 			printWide(apps);
 		}
+		return;
 	}
 	
 	private void printStandard(List<ClientApplication> apps) {

@@ -5,13 +5,11 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.CustomProperties.Type;
-import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorState;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.organization.lib.OrgImportParams;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -41,7 +39,6 @@ public class JSONOrgAdapter extends OrgAdapter {
 		try {
 			baseOrgs = mapper.readValue(Utils.substitueVariables(configFile), new TypeReference<List<Organization>>(){});
 			if(stageConfig!=null) {
-				ErrorState.getInstance().setError("Stage overrides are not supported for organization lists.", ErrorCode.CANT_READ_CONFIG_FILE, false);
 				throw new AppException("Stage overrides are not supported for organization lists.", ErrorCode.CANT_READ_CONFIG_FILE);
 			} else {
 				this.orgs = baseOrgs;
