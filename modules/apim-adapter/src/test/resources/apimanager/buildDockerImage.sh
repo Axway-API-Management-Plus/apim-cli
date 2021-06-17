@@ -14,6 +14,7 @@ function exitScript() {
 		echo "`basename $0` 7.7-20200930"
 		echo "`basename $0` 7.7-20200730"
 		echo "`basename $0` 7.7-20200530"
+		echo "`basename $0` 7.7-20200331"
 		echo "`basename $0` 7.7-20200130"
 		echo "`basename $0` 7.7-SP2"
 		echo "`basename $0` 7.6.2-SP5"
@@ -40,7 +41,7 @@ case "$version" in
 		installer="APIGateway_7.7.20210530_Install_linux-x86-64_BN02.run";;
 	7.7-20210330)
 		fedFile="swagger-promote-7.7-20210330.fed"
-		installer="APIGateway_7.7.20210330_Install_linux-x86-64_BN06.run";;
+		installer="APIGateway_7.7.20210330_Install_linux-x86-64_BN06.run";;	
 	7.7-20200930)
 		fedFile="swagger-promote-7.7-20200930.fed"
 		installer="APIGateway_7.7.20200930_Install_linux-x86-64_BN03.run"
