@@ -14,6 +14,7 @@ function exitScript() {
 		echo "`basename $0` 7.7-20200930"
 		echo "`basename $0` 7.7-20200730"
 		echo "`basename $0` 7.7-20200530"
+		echo "`basename $0` 7.7-20200331"
 		echo "`basename $0` 7.7-20200130"
 		echo "`basename $0` 7.7-SP2"
 		echo "`basename $0` 7.6.2-SP5"
@@ -40,25 +41,31 @@ case "$version" in
 		installer="APIGateway_7.7.20210530_Install_linux-x86-64_BN02.run";;
 	7.7-20210330)
 		fedFile="swagger-promote-7.7-20210330.fed"
-		installer="APIGateway_7.7.20210330_Install_linux-x86-64_BN06.run";;
+		installer="APIGateway_7.7.20210330_Install_linux-x86-64_BN06.run";;	
 	7.7-20200930)
 		fedFile="swagger-promote-7.7-20200930.fed"
-		installer="APIGateway_7.7.20200930_Install_linux-x86-64_BN03.run";;
+		installer="APIGateway_7.7.20200930_Install_linux-x86-64_BN03.run"
+		dockerScripts="APIGateway_7.7.20200130-1_DockerScripts.tar.gz";;
 	7.7-20200730)
 		fedFile="swagger-promote-7.7-20200130.fed"
-		installer="APIGateway_7.7.20200730_Install_linux-x86-64_BN02.run";;
+		installer="APIGateway_7.7.20200730_Install_linux-x86-64_BN02.run"
+		dockerScripts="APIGateway_7.7.20200130-1_DockerScripts.tar.gz";;
 	7.7-20200530)
 		fedFile="swagger-promote-7.7-20200130.fed"
-		installer="APIGateway_7.7.20200530_Install_linux-x86-64_BN02.run";;
+		installer="APIGateway_7.7.20200530_Install_linux-x86-64_BN02.run"
+		dockerScripts="APIGateway_7.7.20200130-1_DockerScripts.tar.gz";;
 	7.7-20200331)
 		fedFile="swagger-promote-7.7-20200130.fed"
-		installer="APIGateway_7.7_Install_linux-x86-64_BN3.run";;
+		installer="APIGateway_7.7_Install_linux-x86-64_BN3.run"
+		dockerScripts="APIGateway_7.7.20200130-1_DockerScripts.tar.gz";;
 	7.7-20200130)
 		fedFile="swagger-promote-7.7-20200130.fed"
-		installer="APIGateway_7.7.20200130_Install_linux-x86-64_BN02.run";;
+		installer="APIGateway_7.7.20200130_Install_linux-x86-64_BN02.run"
+		dockerScripts="APIGateway_7.7.20200130-1_DockerScripts.tar.gz";;
 	7.7-SP2)
 		fedFile="swagger-promote-7.7.fed"
-		installer="APIGateway_7.7_SP2_linux-x86-64_BN201912201.run";;
+		installer="APIGateway_7.7_SP2_linux-x86-64_BN201912201.run"
+		dockerScripts="APIGateway_7.7.20200130-1_DockerScripts.tar.gz";;
 	7.6.2-SP5)
 		fedFile="swagger-promote-7.6.2.fed"
 		installer="APIGateway_7.6.2_SP5_Install_linux-x86-64_BN20200717.run"
@@ -90,7 +97,13 @@ echo "Installer and FED-File found ..."
 echo "Trying to login into Docker-Registry"
 docker login docker-registry.demo.axway.com
 
-tar xfz $dockerScripts
+if tar xfz $dockerScripts; then
+	echo "Docker scripts extracted"
+else
+	echo "Error extracting Docker-Scripts: $dockerScripts"
+	exit 99
+fi
+
 
 cd *emt*
 
