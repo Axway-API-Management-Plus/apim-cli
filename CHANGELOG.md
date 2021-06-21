@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.3.7] 2021-06-17
+## [1.3.8] 2021-06-17
 ### Fixed
 - CLI does not realize changed policy when updating an API (See issue [#179](https://github.com/Axway-API-Management-Plus/apim-cli/issues/179))
 - API-ManagerApps Adpater now handles 404 if searching for an Application based on the ID that does not exists (See issue [#168](https://github.com/Axway-API-Management-Plus/apim-cli/issues/168))
