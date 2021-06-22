@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased] 
+### Fixed
+- Update RemoteHost lost CreatedBy & CreatedOn (See issue [#180](https://github.com/Axway-API-Management-Plus/apim-cli/issues/180))
+
 ## [1.3.8] 2021-06-17
 ### Fixed
 - CLI does not realize changed policy when updating an API (See issue [#179](https://github.com/Axway-API-Management-Plus/apim-cli/issues/179))
