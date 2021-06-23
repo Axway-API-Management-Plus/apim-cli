@@ -140,6 +140,7 @@ public class OutboundProfile extends Profile {
 				policiesAreEqual(this.getResponsePolicy(), otherOutboundProfile.getResponsePolicy()) &&
 				policiesAreEqual(this.getRoutePolicy(), otherOutboundProfile.getRoutePolicy()) &&
 				StringUtils.equals(otherOutboundProfile.getRouteType(), this.getRouteType()) &&
+				StringUtils.equals(otherOutboundProfile.getAuthenticationProfile(), this.getAuthenticationProfile()) &&
 				(thisParameters==null || thisParameters.equals(otherParameters));
 			return rc;
 		} else {
