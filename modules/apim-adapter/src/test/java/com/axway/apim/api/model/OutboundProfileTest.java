@@ -82,4 +82,15 @@ public class OutboundProfileTest {
 		
 		Assert.assertTrue(actualProfile.equals(desiredProfile), "Outbound profiles must be equal");
 	}
+	
+	@Test
+	public void testWithDifferentAuthNProfile() throws AppException {
+		OutboundProfile actualProfile = new OutboundProfile();
+		OutboundProfile desiredProfile = new OutboundProfile();
+		
+		actualProfile.setAuthenticationProfile("Passthrough");
+		desiredProfile.setAuthenticationProfile("Another profile");
+		
+		Assert.assertFalse(actualProfile.equals(desiredProfile), "The AuthN-Profile of the outbound profiles are different.");
+	}
 }

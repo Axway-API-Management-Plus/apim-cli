@@ -74,6 +74,9 @@ public class ExportAPI {
 		while(it.hasNext()) {
 			OutboundProfile profile = it.next();
 			profile.setApiId(null);
+			if("_default".equals(profile.getAuthenticationProfile())) {
+				profile.setAuthenticationProfile(null);
+			}
 		}
 		return this.actualAPIProxy.getOutboundProfiles();
 	}

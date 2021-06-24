@@ -107,7 +107,7 @@ public class OutboundProfile extends Profile {
 		return usedPolicies;
 	}
 
-	@SuppressWarnings("unchecked")
+
 	public void setParameters(List<Object> parameters) {
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
 			// We need to inject the format as default
