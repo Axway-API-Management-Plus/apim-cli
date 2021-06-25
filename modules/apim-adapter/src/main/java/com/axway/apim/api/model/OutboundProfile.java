@@ -147,6 +147,11 @@ public class OutboundProfile extends Profile {
 			return false;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "OutboundProfile [routeType="+routeType+", requestPolicy=" + requestPolicy + ", responsePolicy=" + responsePolicy+ ", routePolicy=" + routePolicy+ ", faultHandlerPolicy="+ faultHandlerPolicy +", authenticationProfile="+authenticationProfile+"]";
+	}
 	
 	private boolean policiesAreEqual(Policy policyA, Policy policyB) {
 		if(policyA==null && policyB == null) return true;
