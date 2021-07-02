@@ -69,12 +69,14 @@ public class APIQuotaManager {
 			}
 			// Load the entire current default quota
 			APIQuota currentDefaultQuota = APIManagerAdapter.getInstance().quotaAdapter.getDefaultQuota(type);
-			// Remote the restrictions for the actual API
-			Iterator<QuotaRestriction> it = currentDefaultQuota.getRestrictions().iterator();
-			while(it.hasNext()) {
-				QuotaRestriction restriction = it.next();
-				if(restriction.getApi().equals(actualState.getId())) {
-					it.remove();
+			// If there is an actual API, remove the restrictions for the current restrictions for actual API
+			if(actualState!=null) {
+				Iterator<QuotaRestriction> it = currentDefaultQuota.getRestrictions().iterator();
+				while(it.hasNext()) {
+					QuotaRestriction restriction = it.next();
+					if(restriction.getApi().equals(actualState.getId())) {
+						it.remove();
+					}
 				}
 			}
 			// Add all new desired restrictions to the Default-Quota
