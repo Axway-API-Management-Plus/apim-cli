@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased] 
 ### Fixed
 - Update RemoteHost lost CreatedBy & CreatedOn (See issue [#180](https://github.com/Axway-API-Management-Plus/apim-cli/issues/180))
+- Manually configured API-Quotas get lost, when API is re-created (See issue [#187](https://github.com/Axway-API-Management-Plus/apim-cli/issues/187))
 
 ## [1.3.8] 2021-06-17
 ### Fixed
