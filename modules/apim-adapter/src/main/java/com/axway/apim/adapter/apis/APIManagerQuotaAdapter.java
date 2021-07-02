@@ -132,7 +132,7 @@ public class APIManagerQuotaAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
 			if(statusCode < 200 || statusCode > 299){
-				throw new AppException("Can't update API-Manager Quota-Configuration.", ErrorCode.API_MANAGER_COMMUNICATION);
+				throw new AppException("Can't update API-Manager Quota-Configuration. Response: '"+response+"'", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			return mapper.readValue(response, APIQuota.class);
 		} catch (URISyntaxException | UnsupportedOperationException | IOException e) {
