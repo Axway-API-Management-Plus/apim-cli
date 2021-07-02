@@ -183,6 +183,7 @@ public class APIManagerOrganizationAdapter {
 				LOG.error("Error deleting organization. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 				throw new AppException("Error deleting organization. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
+			LOG.info("Organization: "+org.getName()+" ("+org.getId()+")" + " successfully deleted");
 		} catch (Exception e) {
 			throw new AppException("Error deleting organization", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		} finally {
