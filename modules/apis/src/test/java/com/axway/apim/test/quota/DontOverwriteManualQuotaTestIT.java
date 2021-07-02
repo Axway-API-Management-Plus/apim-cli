@@ -67,7 +67,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 				.extractFromPayload("$.[?(@.name=='getPetById')].id", "testMethodId3")
 				.extractFromPayload("$.[?(@.name=='updateUser')].id", "testMethodId4"));
 		
-		echo("####### Define a manual application- and system-quota for the API: ${apiId} #######"); 
+		echo("####### Define a manual application- and system-quotas for the API: ${apiId} on specific methods #######"); 
 		http(builder -> builder.client("apiManager").send().put("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json")
 		.payload("{\"id\":\""+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA+"\", \"type\":\"APPLICATION\",\"name\":\"Application Default\","
 				+ "\"description\":\"Maximum message rates per application. Applied to each application unless an Application-Specific quota is configured\","
@@ -86,8 +86,57 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 				+ "],"
 				+ "\"system\":true}"));
 		
+		echo("####### RECREATE the same API without any configured quotas #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/4_flexible-status-config.json");
+		createVariable("state", "unpublished");
+		createVariable("expectedReturnCode", "0");
+		swaggerImport.doExecute(context);
+		
+		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+			.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
+		echo("####### API: '${apiName}' on path: '${apiPath}' with ID: '${apiId}' imported (RECREATED) #######");
+		
+		echo("####### Get the operations/methods for the RE-CREATED API #######");
+		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}/operations").header("Content-Type", "application/json"));
+		
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.extractFromPayload("$.[?(@.name=='updatePetWithForm')].id", "testMethodId1")
+				.extractFromPayload("$.[?(@.name=='findPetsByStatus')].id", "testMethodId2")
+				.extractFromPayload("$.[?(@.name=='getPetById')].id", "testMethodId3")
+				.extractFromPayload("$.[?(@.name=='updateUser')].id", "testMethodId4"));
+		
+		echo("####### Validate all previously configured APPLICATION quotas (manually configured) do exists #######");
+		echo("####### ############ Sleep 5 seconds ##################### #######");
+		Thread.sleep(5000);
+		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
+		Thread.sleep(5000);
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].type", "throttlemb")
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].config.per", "1")
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].config.mb", "700")
+			
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId2}')].type", "throttle")
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId2}')].config.per", "2")
+			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId2}')].config.messages", "100000"));
+		
+		echo("####### Validate all previously configured SYSTEM quotas (manually configured) do exists #######");
+		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
+		Thread.sleep(5000);
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].type", "throttle")
+				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].config.per", "3")
+				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].config.messages", "1003")
+				
+				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId4}')].type", "throttlemb")
+				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId4}')].config.per", "4")
+				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId4}')].config.mb", "500"));
+		
 		echo("####### Replicate the same API with some Quotas configured, which are different to the one manually defined before #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/quota/1_api-with-quota.json");
 		createVariable("state", "unpublished");
 		createVariable("applicationPeriod", "day");

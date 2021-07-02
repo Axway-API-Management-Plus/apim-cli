@@ -91,7 +91,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 					.includeCustomProperties(desiredAPI.getCustomProperties())
 					.hasQueryStringVersion(desiredAPI.getApiRoutingKey())
 					.includeClientOrganizations(true) // We have to load clientOrganization, in case they have to be taken over
-					.includeQuotas(desiredAPI.getApplicationQuota()!=null) // and Quotas if not given in the Desired-API
+					.includeQuotas(true) // Quotas must be loaded even if not given, as they have been configured manually
 					.includeClientApplications(true) // Client-Apps must be loaded in all cases
 					.useFilter(filters)
 					.useFEAPIDefinition(params.isUseFEAPIDefinition()) // Should API-Definition load from the FE-API?

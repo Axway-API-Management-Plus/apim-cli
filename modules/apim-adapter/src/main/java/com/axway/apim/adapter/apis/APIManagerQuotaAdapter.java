@@ -3,7 +3,6 @@ package com.axway.apim.adapter.apis;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,17 +36,22 @@ public class APIManagerQuotaAdapter {
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerQuotaAdapter.class);
 	
 	public static enum Quota {
-		SYSTEM_DEFAULT ("00000000-0000-0000-0000-000000000000"), 
-		APPLICATION_DEFAULT ("00000000-0000-0000-0000-000000000001");
+		SYSTEM_DEFAULT ("00000000-0000-0000-0000-000000000000", "System default"), 
+		APPLICATION_DEFAULT ("00000000-0000-0000-0000-000000000001", "Application default");
 		
 		private final String quotaId;
+		private final String fiendlyName;
 		
-		private Quota(String quotaId) {
+		private Quota(String quotaId, String fiendlyName) {
 			this.quotaId = quotaId;
+			this.fiendlyName = fiendlyName;
 		}
 
 		public String getQuotaId() {
 			return quotaId;
+		}
+		public String getFiendlyName() {
+			return fiendlyName;
 		}
 	}
 	
