@@ -335,9 +335,6 @@
 								<goals>
 									<goal>sign</goal>
 								</goals>
-								<configuration>
-									<homedir>C:/Users/cwiechmann/AppData/Roaming/gnupg/</homedir>
-								</configuration>
 							</execution>
 						</executions>
 					</plugin>
