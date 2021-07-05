@@ -59,7 +59,7 @@ public class ImportAndExportRemoteHostsTestIT extends TestNGCitrusTestRunner imp
 		echo("####### Update remote host 2 #######");
 		createVariable(PARAM_CONFIGFILE,  PACKAGE + "remote-host-1.json");
 		createVariable(PARAM_EXPECTED_RC, "0");
-		createVariable("${remoteHostPort}", "5555");
+		createVariable("${remoteHostPort}", "9999");
 		importApp.doExecute(context);
 		
 		echo("####### Validate a new Remote-Host has been updated #######");
@@ -67,8 +67,8 @@ public class ImportAndExportRemoteHostsTestIT extends TestNGCitrusTestRunner imp
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].name", "${remoteHostName}")
 				.validate("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].port", "${remoteHostPort}")
-				.validate("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].createdOn", "${remoteHostCreatedOn}") // createdOn should not be changed/updated
 				.validate("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].createdBy", "${remoteHostCreatedBy}") // createdBy should not be changed/updated
+				.validate("$.[?(@.name=='${remoteHostName}' && @.port==${remoteHostPort})].createdOn", "${remoteHostCreatedOn}") // createdOn should not be changed/updated
 				);
 		
 		echo("####### Export remote host 2 #######");

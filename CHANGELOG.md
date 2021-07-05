@@ -4,9 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] 
+## [1.3.9] 2021-07-02
 ### Fixed
 - Update RemoteHost lost CreatedBy & CreatedOn (See issue [#180](https://github.com/Axway-API-Management-Plus/apim-cli/issues/180))
+- Manually configured API-Quotas get lost, when API is re-created (See issue [#187](https://github.com/Axway-API-Management-Plus/apim-cli/issues/187))
+- Cannot delete API with an image, when the image is changed during deletion (See issue [#188](https://github.com/Axway-API-Management-Plus/apim-cli/issues/188))
 
 ## [1.3.8] 2021-06-17
 ### Fixed
