@@ -170,6 +170,16 @@ public class OutboundProfileTest {
         desiredProfile.setRouteType("proxy");
 
         Assert.assertFalse(actualProfile.equals(desiredProfile), "The route type of the outbound profiles are equals.");
+        
+        actualProfile.setRoutePolicy(new Policy("My custom routing policy"));
+         
+        Assert.assertEquals(actualProfile.getRouteType(), "policy","The route type is policy");
+        
+        actualProfile.setRouteType(null);
+        actualProfile.setRoutePolicy(null);
+         
+        Assert.assertEquals(actualProfile.getRouteType(), "proxy","The route type is proxy");
+        
     }
 
 }

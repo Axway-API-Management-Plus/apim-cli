@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.lang.model.util.ElementScanner6;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,13 +43,10 @@ public class OutboundProfile extends Profile {
     }
 
     public String getAuthenticationProfile() {
-        if(this.authenticationProfile==null){
+        if(StringUtils.isBlank(authenticationProfile))
             return "_default"; 
-        }
-        if(this.authenticationProfile!=null && this.authenticationProfile.equals("")) {
-            return "_default";
-        }
-        return this.authenticationProfile;
+        else
+            return this.authenticationProfile;
     }
 
     public void setAuthenticationProfile(String authenticationProfile) {
@@ -55,7 +54,8 @@ public class OutboundProfile extends Profile {
     }
 
     public String getRouteType() {
-        if(this.routeType!=null && !this.routeType.equals("") && !this.routeType.equals("proxy") ) {
+        if ((StringUtils.isNotBlank(routeType) && !StringUtils.equals("proxy", routeType))
+            ||(routePolicy!=null)){
             return "policy";
         } else {
             return "proxy";
