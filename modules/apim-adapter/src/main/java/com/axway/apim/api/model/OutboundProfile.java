@@ -41,6 +41,8 @@ public class OutboundProfile extends Profile {
 	}
 
 	public String getAuthenticationProfile() {
+        // give a default value in case of blanck value
+        // useful in equals methods null = "" = _default 
 		if (StringUtils.isBlank(authenticationProfile))
 			return "_default";
 		else
@@ -52,6 +54,7 @@ public class OutboundProfile extends Profile {
 	}
 
 	public String getRouteType() {
+        // default value policy is set in case of an existing value (different of "proxy" ) or in case of existing routePoulicy 
 		if ((StringUtils.isNotBlank(routeType) && !StringUtils.equals("proxy", routeType)) || (routePolicy != null)) {
 			return "policy";
 		} else {
