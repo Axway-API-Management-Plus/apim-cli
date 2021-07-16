@@ -56,6 +56,7 @@ public enum ErrorCode {
 	ERR_DELETING_API					(91, "API could not be deleted.", false),
 	ERR_DELETING_ORG					(92, "Organization could not be deleted.", false),
 	ERR_GRANTING_ACCESS_TO_API			(93, "Error granting access to an API.", false),
+	ERR_EXPORTING_API_DAT_FILE			(94, "Error exporting API-Date file.", false),
 	UNXPECTED_ERROR						(99, "An unexpected error occured.");
 
 	private final int code;

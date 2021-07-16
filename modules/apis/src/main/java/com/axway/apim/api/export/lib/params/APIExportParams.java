@@ -30,6 +30,8 @@ public class APIExportParams extends StandardExportParams implements APIFilterPa
 	
 	private String tag;
 	
+	private String datPassword;
+	
 	public static synchronized APIExportParams getInstance() {
 		return (APIExportParams)CoreParameters.getInstance();
 	}
@@ -120,6 +122,14 @@ public class APIExportParams extends StandardExportParams implements APIFilterPa
 
 	public void setTag(String tag) {
 		this.tag = tag;
+	}
+
+	public String getDatPassword() {
+		return datPassword;
+	}
+
+	public void setDatPassword(String datPassword) {
+		this.datPassword = datPassword;
 	}
 
 	public boolean isUseFEAPIDefinition() {

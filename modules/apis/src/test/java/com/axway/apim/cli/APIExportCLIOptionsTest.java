@@ -23,7 +23,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 public class APIExportCLIOptionsTest {
 	@Test
 	public void testAPIExportParams() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-n", "*MyAPIName*", "-id", "412378923", "-policy", "*PolicyName*", "-vhost", "custom.host.com", "-state", "approved", "-backend", "backend.customer.com", "-tag", "*myTag*", "-t", "myTarget", "-o", "csv", "-useFEAPIDefinition", "-wide", "-deleteTarget"};
+		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-n", "*MyAPIName*", "-id", "412378923", "-policy", "*PolicyName*", "-vhost", "custom.host.com", "-state", "approved", "-backend", "backend.customer.com", "-tag", "*myTag*", "-t", "myTarget", "-o", "csv", "-useFEAPIDefinition", "-wide", "-deleteTarget", "-datPassword", "123456Axway"};
 		CLIOptions options = CLIAPIExportOptions.create(args);
 		APIExportParams params = (APIExportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
@@ -44,6 +44,7 @@ public class APIExportCLIOptionsTest {
 		Assert.assertEquals(params.getVhost(), "custom.host.com");
 		Assert.assertEquals(params.getState(), "approved");
 		Assert.assertEquals(params.getBackend(), "backend.customer.com");
+		Assert.assertEquals(params.getDatPassword(), "123456Axway");
 	}
 	
 	@Test

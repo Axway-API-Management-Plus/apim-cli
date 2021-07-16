@@ -47,6 +47,7 @@ public abstract class APIResultHandler {
 		JSON_EXPORTER(JsonAPIExporter.class),
 		CONSOLE_EXPORTER(ConsoleAPIExporter.class),
 		CSV_EXPORTER(CSVAPIExporter.class),
+		DAT_EXPORTER(DATAPIExporter.class),
 		API_DELETE_HANDLER(DeleteAPIHandler.class),
 		API_PUBLISH_HANDLER(PublishAPIHandler.class),
 		API_UNPUBLISH_HANDLER(UnpublishAPIHandler.class), 

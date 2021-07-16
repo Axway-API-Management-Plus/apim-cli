@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
 - No change detected when changing authenticationProfile in outboundProfiles (See issue [#184](https://github.com/Axway-API-Management-Plus/apim-cli/issues/184)) by @ftriolet
-- A WSDL file with a long comment at the beginning is not recognized as a WSDL specification. (See issue [#190https://github.com/Axway-API-Management-Plus/apim-cli/issues/190))
+- A WSDL file with a long comment at the beginning is not recognized as a WSDL specification. (See issue [#190](https://github.com/Axway-API-Management-Plus/apim-cli/issues/190))
+
+### Added
+- Added feature to export APIs as DAT-Files (See issue [#191](https://github.com/Axway-API-Management-Plus/apim-cli/issues/191))
 
 ## [1.3.9] 2021-07-02
 ### Fixed

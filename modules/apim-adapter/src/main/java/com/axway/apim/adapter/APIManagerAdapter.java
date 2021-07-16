@@ -216,7 +216,7 @@ public class APIManagerAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 303 && (statusCode < 200 || statusCode > 299)) {
 				String response = EntityUtils.toString(httpResponse.getEntity());
-				LOG.warn("Login failed with statusCode: " +statusCode+ ". Got response: '"+response+"' ... Try again in 1 second.");
+				LOG.warn("Login failed with statusCode: " +statusCode+ " ... Try again in 1 second.");
 				Thread.sleep(1000);
 				httpResponse = loginRequest.execute();
 				statusCode = httpResponse.getStatusLine().getStatusCode();
