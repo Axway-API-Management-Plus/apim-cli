@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+- Changed the Log-Threshold to DEBUG for Console-Logger to make debugging working according to the documentation
+
 ## [1.3.10] 2021-07-16
 ### Fixed
 - No change detected when changing authenticationProfile in outboundProfiles (See issue [#184](https://github.com/Axway-API-Management-Plus/apim-cli/issues/184)) by @ftriolet
