@@ -18,6 +18,8 @@ import com.axway.apim.lib.utils.TestIndicator;
 
 public class SubstituteVariablesTest extends APIManagerMockBase {
 	
+	private static String OS = null;
+
 	@BeforeClass
 	private void initCommandParameters() throws AppException, IOException {
 		setupMockData();
@@ -43,7 +45,11 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 			Assert.assertNotEquals(testAPI.getVhost(), "${GITHUB_ACTION}");
 		} else {
 			// On Windows use USERNAME in the version
-			Assert.assertNotEquals(testAPI.getVersion(), "${USERNAME}");
+			if(isWindows()){
+				Assert.assertNotEquals(testAPI.getVersion(), "${USERNAME}");
+			} else { // MacOS X and Linux use USER in the name
+				Assert.assertNotEquals(testAPI.getName(), "${USER}");
+			}
 		}
 	}
 	
@@ -85,4 +91,12 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 		Assert.assertEquals(testAPI.getDescriptionManual(), "valueFromAnyOtherStageEnv");
 	}
 
+	private static String getOsName(){
+      if(OS == null) { OS = System.getProperty("os.name"); }
+      return OS;
+	}
+
+	public static boolean isWindows(){
+      return getOsName().startsWith("Windows");
+    }
 }
