@@ -63,7 +63,11 @@ public class JSONOrgAdapter extends OrgAdapter {
 		} catch (Exception e) {
 			throw new AppException("Cannot read organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		}
-		addImage(orgs, configFile.getParentFile());
+		try{
+			addImage(orgs, configFile.getCanonicalFile().getParentFile());
+		}catch (Exception e){
+			throw new AppException("Cannot read image for organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+		}
 		validateCustomProperties(orgs);
 		return;
 	}

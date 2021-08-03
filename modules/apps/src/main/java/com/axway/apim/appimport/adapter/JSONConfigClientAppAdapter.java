@@ -91,8 +91,12 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		} catch (Exception e) {
 			throw new AppException("Cannot read organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		}
-		addImage(apps, configFile.getParentFile());
-		addOAuthCertificate(apps, configFile.getParentFile());
+		try{
+			addImage(apps, configFile.getCanonicalFile().getParentFile());
+			addOAuthCertificate(apps, configFile.getCanonicalFile().getParentFile());
+		}catch (Exception e){
+			throw new AppException("Cannot read image/certificate for organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+		}		
 		addAPIAccess(apps, result);
 		validateCustomProperties(apps);
 		return;

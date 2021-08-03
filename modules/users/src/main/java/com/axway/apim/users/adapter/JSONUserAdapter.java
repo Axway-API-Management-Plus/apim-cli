@@ -41,7 +41,11 @@ public class JSONUserAdapter extends UserAdapter {
 		} catch (Exception e) {
 			throw new AppException("Cannot read user(s) from config file: " + config, ErrorCode.UNKNOWN_USER, e);
 		}
-		addImage(users, configFile.getParentFile());
+		try{
+			addImage(users, configFile.getCanonicalFile().getParentFile());
+		}catch (Exception e){
+			throw new AppException("Cannot read image for user(s) from config file: " + config, ErrorCode.UNKNOWN_USER, e);
+		}
 		validateCustomProperties(users);
 		return true;
 	}
