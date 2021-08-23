@@ -32,11 +32,7 @@ public class JSONOrgAdapter extends OrgAdapter {
 
 	public JSONOrgAdapter(OrgImportParams params) {
 		this.importParams = params;
-	}
-	
-	public JSONOrgAdapter(OrgImportParams params, Result result) {
-		this.importParams = params;
-		this.result = result;
+		this.result = new Result(); // Not used, to be refactored
 	}
 
 	public void readConfig() throws AppException {
