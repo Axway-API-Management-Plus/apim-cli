@@ -32,7 +32,7 @@ public class APIImportCLIOptionsTest {
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "api-env");
+		Assert.assertEquals(params.getHostname(), "localhost");
 	}
 	
 	@Test
@@ -42,7 +42,7 @@ public class APIImportCLIOptionsTest {
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "api-env");
+		Assert.assertEquals(params.getHostname(), "localhost");
 		Assert.assertEquals(params.getClientOrgsMode(), Mode.replace);
 		Assert.assertEquals(params.getClientAppsMode(), Mode.replace);
 		Assert.assertEquals(params.getQuotaMode(), Mode.replace);
