@@ -64,9 +64,9 @@ public class JsonOrgExporter extends OrgResultHandler {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
 		FilterProvider filters = new SimpleFilterProvider()
-				.addFilter("OrganizationFilter",
-						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "dn" }))
-				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {}));
+				.addFilter("OrganizationFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "dn" }))
+				.addFilter("APIAccessFilter", SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"apiName", "apiVersion"}))
+				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"createdOn"}));
 		mapper.setFilterProvider(filters);
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
@@ -93,7 +93,10 @@ public class JsonOrgExporter extends OrgResultHandler {
 
 	@Override
 	public OrgFilter getFilter() throws AppException {
-		return getBaseOrgFilterBuilder().includeImage(true).build();
+		return getBaseOrgFilterBuilder()
+				.includeImage(true)
+				.includeAPIAccess(true)
+				.build();
 	}
 	
 	public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
