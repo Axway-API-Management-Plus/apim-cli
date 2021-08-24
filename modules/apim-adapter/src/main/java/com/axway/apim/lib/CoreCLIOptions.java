@@ -60,7 +60,7 @@ public class CoreCLIOptions extends CLIOptions {
 		option.setRequired(false);
 		cliOptions.addOption(option);
 		
-		option = new  Option("rc", "returncodes", false, "Print the possible return codes and description.");
+		option = new  Option("returncodes", false, "Print the possible return codes and description.");
 		option.setRequired(false);
 		cliOptions.addOption(option);
 		
