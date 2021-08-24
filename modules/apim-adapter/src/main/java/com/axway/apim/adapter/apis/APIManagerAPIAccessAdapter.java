@@ -184,7 +184,7 @@ public class APIManagerAPIAccessAdapter {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/"+type+"/"+parentEntity.getId()+"/apis").build();
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiName"}));
+					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiName", "apiVersion"}));
 			mapper.setFilterProvider(filter);
 			String json = mapper.writeValueAsString(apiAccess);
 			HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);

@@ -27,9 +27,6 @@
   <!-- ================ -->
 
   <!-- Our own classes-->
-  <logger name="com.consol.citrus">
-    <level value="INFO"/>
-  </logger>
 
   <logger name="org.springframework">
     <level value="INFO"/>
@@ -48,10 +45,6 @@
 	<level value="WARN"/>
   </logger>  -->
   
-  <logger name="com.consol.citrus">
-	<level value="INFO"/>
-  </logger>
-  
   <logger name="com.axway.apim">
 	<level value="INFO"/>
   </logger>
@@ -59,12 +52,17 @@
   <logger name="org.ehcache">
 	<level value="ERROR"/>
   </logger>
+  
+  <logger name="com.consol.citrus">
+    <level value="INFO"/>
+  </logger>
 
   <!-- ======================= -->
   <!-- Setup the Root logger -->
   <!-- ======================= -->
 
   <root>
+  	<level value="INFO" />
     <appender-ref ref="CONSOLE"/>
   </root>
 

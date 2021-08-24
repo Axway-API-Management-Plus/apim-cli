@@ -7,8 +7,6 @@ import org.testng.annotations.Test;
 import com.axway.apim.apiimport.lib.cli.CLIAPIImportOptions;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CLIOptions;
-import com.axway.apim.lib.CoreCLIOptions;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.lib.errorHandling.AppException;
 
@@ -32,7 +30,7 @@ public class APIImportCLIOptionsTest {
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "api-env");
+		Assert.assertEquals(params.getHostname(), "localhost");
 	}
 	
 	@Test
@@ -42,7 +40,7 @@ public class APIImportCLIOptionsTest {
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "api-env");
+		Assert.assertEquals(params.getHostname(), "localhost");
 		Assert.assertEquals(params.getClientOrgsMode(), Mode.replace);
 		Assert.assertEquals(params.getClientAppsMode(), Mode.replace);
 		Assert.assertEquals(params.getQuotaMode(), Mode.replace);

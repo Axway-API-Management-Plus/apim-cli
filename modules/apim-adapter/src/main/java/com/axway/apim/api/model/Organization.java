@@ -1,15 +1,19 @@
 package com.axway.apim.api.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.axway.apim.adapter.jackson.APIAccessSerializer;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("OrganizationFilter")
@@ -46,6 +50,10 @@ public class Organization extends AbstractEntity implements CustomPropertiesEnti
 	private String isTrial;
 
 	private Map<String, String> customProperties = null;
+	
+	@JsonSerialize (using = APIAccessSerializer.class)
+	@JsonProperty("apis")
+	private List<APIAccess> apiAccess = new ArrayList<APIAccess>();
 	
 	public Organization() {
 		super();
@@ -166,6 +174,13 @@ public class Organization extends AbstractEntity implements CustomPropertiesEnti
 
 	public void setIsTrial(String isTrial) {
 		this.isTrial = isTrial;
+	}
+	
+	public List<APIAccess> getApiAccess() {
+		return apiAccess;
+	}
+	public void setApiAccess(List<APIAccess> apiAccess) {
+		this.apiAccess = apiAccess;
 	}
 	
 	// This avoids, that custom properties are wrapped within customProperties { ... }

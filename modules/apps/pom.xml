@@ -19,7 +19,6 @@
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
 			<artifactId>apimcli-tool</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
 			<artifactId>apimcli-apim-adapter</artifactId>

@@ -22,7 +22,7 @@ public class AppCLIOptionsTest {
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "api-env");
+		Assert.assertEquals(params.getHostname(), "localhost");
 		
 		// Validate App-Import parameters
 		Assert.assertEquals(params.getConfig(), "myAppConfig.json");
@@ -36,7 +36,7 @@ public class AppCLIOptionsTest {
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "api-env");
+		Assert.assertEquals(params.getHostname(), "localhost");
 		
 		// Validate standard export parameters are included
 		Assert.assertEquals(params.getWide(), Wide.wide);
