@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Changed the Log-Threshold to DEBUG for Console-Logger to make debugging working according to the documentation
+- Application-JSON-Export - Credentials should not contain ApplicationID (See issue [#146](https://github.com/Axway-API-Management-Plus/apim-cli/issues/146))
 
 ## [1.3.10] 2021-07-16
 ### Fixed
