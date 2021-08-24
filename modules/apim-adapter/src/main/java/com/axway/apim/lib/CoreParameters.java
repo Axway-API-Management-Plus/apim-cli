@@ -51,6 +51,8 @@ public class CoreParameters implements Parameters {
 	
 	private String stage;
 	
+	private String stageConfig;
+	
 	private String returnCodeMapping;
 	
 	private String clearCache;
@@ -123,6 +125,14 @@ public class CoreParameters implements Parameters {
 
 	public void setStage(String stage) {
 		this.stage = stage;
+	}
+
+	public String getStageConfig() {
+		return stageConfig;
+	}
+
+	public void setStageConfig(String stageConfig) {
+		this.stageConfig = stageConfig;
 	}
 
 	public String getReturnCodeMapping() {

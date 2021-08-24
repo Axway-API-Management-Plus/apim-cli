@@ -20,6 +20,7 @@ public class CoreCLIOptions extends CLIOptions {
 		
 		params.setApimCLIHome(getValue("apimCLIHome"));
 		params.setStage(getValue("stage"));
+		params.setStageConfig(getValue("stageConfig"));
 		params.setHostname(getValue("host"));
 		params.setApiBasepath(getValue("apiBasepath"));
 		params.setPort((getValue("port")!=null) ? Integer.parseInt(getValue("port")) : -1);
@@ -53,6 +54,10 @@ public class CoreCLIOptions extends CLIOptions {
 		Option option = new Option("s", "stage", true, "The API-Management stage (prod, preprod, qa, etc.)\n"
 				+ "Is used to lookup the stage configuration file.");
 		option.setArgName("preprod");
+		cliOptions.addOption(option);
+		
+		option = new Option("stageConfig", true, "Manually provide the name of the stage configuration file to use instead of derived from the given stage.");
+		option.setArgName("apis.stageA.json");
 		cliOptions.addOption(option);
 		
 		// Define core command line parameters!

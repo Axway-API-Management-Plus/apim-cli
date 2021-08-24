@@ -128,8 +128,9 @@ public class Utils {
 	}
 	
 	/**
-	 * This method is replacing variables such as ${TokenEndpoint} with declared variables coming from either 
-	 * the Environment-Variables or from system-properties.
+	 * This method is replacing variables such as ${TokenEndpoint} in the given file 
+	 * with declared variables coming from either the Environment-Variables or 
+	 * from system-properties.
 	 * @param inputFile The API-Config file to be replaced and returned as String
 	 * @return a String representation of the API-Config-File
 	 * @throws IOException if the file can't be found
@@ -141,17 +142,34 @@ public class Utils {
 		return substitutor.replace(givenConfig);
 	}
 	
-	public static File getStageConfig(String stage, File baseConfigFile) {
-		if(stage == null) return null;
-		File stageFile = new File(stage);
-		if(stageFile.exists()) { // This is to support testing with dynamically created files!
-			return stageFile;
+	/**
+	 * @param stage defines a stage which identifies a prod or qa environment.
+	 * @param stageConfig can be given to define the stage config file to be used
+	 * @param baseConfigFile the base configuration
+	 * @return
+	 */
+	public static File getStageConfig(String stage, String stageConfig, File baseConfigFile) {
+		if(stage == null && stageConfig == null) return null;
+		if(stage!=null && new File(stage).exists()) { // This is to support testing with dynamically created files!
+			return new File(stage);
 		}
-		if(!stage.equals("NOT_SET")) {
-			String baseConfig;
-			try {
-				baseConfig = baseConfigFile.getCanonicalPath();
-				stageFile = new File(baseConfig.substring(0, baseConfig.lastIndexOf(".")+1) + stage + baseConfig.substring(baseConfig.lastIndexOf(".")));
+		String baseConfig;
+		try {
+			baseConfig = baseConfigFile.getCanonicalPath();
+		} catch (IOException e) {
+			LOG.error("Error reading stage config file based on the config file.", e);
+			return null;
+		}
+		// If a stageConfig is given it used with preference over the stage
+		if(stageConfig!=null) {
+			// Supporting a StageConfigFile with an absolute path
+			if(new File(stageConfig).exists()) return new File(stageConfig);
+			// Perhaps the stageConfigFile is relative to the main base config
+			File stageFile = new File(baseConfigFile.getParent() + File.separator + stageConfig);
+			if(stageFile.exists()) return stageFile;
+		} else {
+			if(!stage.equals("NOT_SET")) {
+				File stageFile = new File(baseConfig.substring(0, baseConfig.lastIndexOf(".")+1) + stage + baseConfig.substring(baseConfig.lastIndexOf(".")));
 				File subDirStageFile = new File(stageFile.getParentFile()+"/"+stage+"/"+stageFile.getName());
 				if(stageFile.exists()) {
 					return stageFile;
@@ -160,9 +178,7 @@ public class Utils {
 				} else {
 					return null;
 				}
-			} catch (IOException e) {
-				LOG.error("Error reading stage config file", e);
-				return null;
+
 			}
 		}
 		LOG.debug("No stage provided");

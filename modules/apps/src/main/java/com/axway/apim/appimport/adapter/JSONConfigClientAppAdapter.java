@@ -60,7 +60,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 
 		File configFile = Utils.locateConfigFile(config);
 		if(!configFile.exists()) return;
-		File stageConfig = Utils.getStageConfig(stage, configFile);
+		File stageConfig = Utils.getStageConfig(stage, importParams.getStageConfig(), configFile);
 		List<ClientApplication> baseApps;
 		// Try to read a list of applications
 		try {
