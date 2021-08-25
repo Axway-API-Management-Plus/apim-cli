@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - Added feature to grant API access for organization during import (See issue [#196](https://github.com/Axway-API-Management-Plus/apim-cli/issues/196))
+- Added feature to manually define the stage configuration file (See issue [#195](https://github.com/Axway-API-Management-Plus/apim-cli/issues/195))
+- User-Import now supports staging and variables as the other entity types
 
 ### Fixed
 - Changed the Log-Threshold to DEBUG for Console-Logger to make debugging working according to the documentation
