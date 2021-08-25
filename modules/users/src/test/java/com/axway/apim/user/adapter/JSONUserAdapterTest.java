@@ -59,7 +59,7 @@ public class JSONUserAdapterTest extends APIManagerMockBase {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		UserImportParams params = new UserImportParams();
 		params.setConfig(testFile);
-		params.setStageConfig("stagedSingleUser.json");
+		params.setStageConfig("StagedSingleUser.json");
 		JSONUserAdapter adapter = new JSONUserAdapter(params);
 		List<User> users = adapter.getUsers();
 		assertEquals(users.size(), 1, "Expected 1 user returned from the Adapter");
