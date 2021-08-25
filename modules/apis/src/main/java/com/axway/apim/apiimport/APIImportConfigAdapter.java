@@ -73,6 +73,7 @@ import com.axway.apim.api.model.QuotaRestrictionDeserializer;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -121,6 +122,11 @@ public class APIImportConfigAdapter {
 		this.apiConfig = apiConfig;
 		this.apiConfigFile = apiConfigFile;
 	}
+	
+	public APIImportConfigAdapter(APIImportParams params) throws AppException {
+		this(params.getConfig(), params.getStage(), params.getApiDefintion(), APIManagerAdapter.hasOrgAdmin(), params.getStageConfig());
+	}
+	
 	/**
 	 * Constructs the APIImportConfig 
 	 * @param apiConfigFileName the API-Config given by the user
@@ -129,7 +135,7 @@ public class APIImportConfigAdapter {
 	 * @param usingOrgAdmin access to API-Manager should be limited to the Org-Admin account
 	 * @throws AppException if the config-file can't be parsed for some reason
 	 */
-	public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, boolean usingOrgAdmin) throws AppException {
+	public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, boolean usingOrgAdmin, String stageConfig) throws AppException {
 		super();
 		SimpleModule module = new SimpleModule();
 		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer());
@@ -142,19 +148,19 @@ public class APIImportConfigAdapter {
 			this.pathToAPIDefinition = pathToAPIDefinition;
 			this.usingOrgAdmin = usingOrgAdmin;
 			this.apiConfigFile = Utils.locateConfigFile(apiConfigFileName);
-			File stageConfig = Utils.getStageConfig(stage, this.apiConfigFile);
+			File stageConfigFile = Utils.getStageConfig(stage, stageConfig, this.apiConfigFile);
 			// Validate organization for the base config, if no staged-config is given
-			boolean validateOrganization = (stageConfig==null) ? true : false;
+			boolean validateOrganization = (stageConfigFile==null) ? true : false;
 			ObjectReader reader = mapper.reader();
 			baseConfig = reader.withAttribute("validateOrganization", validateOrganization).forType(DesiredAPI.class).readValue(Utils.substitueVariables(this.apiConfigFile));
-			if(stageConfig!=null) {
+			if(stageConfigFile!=null) {
 				try {
 					// If the baseConfig doesn't have a valid organization, the stage config must
 					validateOrganization = (baseConfig.getOrganization()==null) ? true : false;
 					ObjectReader updater = mapper.readerForUpdating(baseConfig).withAttribute("validateOrganization", validateOrganization);
 					// Organization must be valid in staged configuration
-					apiConfig = updater.withAttribute("validateOrganization", true).readValue(Utils.substitueVariables(Utils.getStageConfig(stage, this.apiConfigFile)));
-					LOG.info("Loaded stage API-Config from file: " + Utils.getStageConfig(stage, this.apiConfigFile));
+					apiConfig = updater.withAttribute("validateOrganization", true).readValue(Utils.substitueVariables(stageConfigFile));
+					LOG.info("Loaded stage API-Config from file: " + stageConfigFile);
 				} catch (FileNotFoundException e) {
 					LOG.warn("No config file found for stage: '"+stage+"'");
 					apiConfig = baseConfig;

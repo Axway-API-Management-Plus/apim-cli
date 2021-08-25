@@ -35,7 +35,7 @@ public class APIImportCLIOptionsTest {
 	
 	@Test
 	public void testAPIImportParameter() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-c", "myConfig.json", "-clientOrgsMode", "replace", "-clientAppsMode", "replace", "-quotaMode", "replace", "-detailsExportFile", "myExportFile.txt"};
+		String[] args = {"-s", "prod", "-c", "myConfig.json", "-clientOrgsMode", "replace", "-clientAppsMode", "replace", "-quotaMode", "replace", "-detailsExportFile", "myExportFile.txt", "-stageConfig", "myStageConfigFile.json"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
@@ -45,6 +45,7 @@ public class APIImportCLIOptionsTest {
 		Assert.assertEquals(params.getClientAppsMode(), Mode.replace);
 		Assert.assertEquals(params.getQuotaMode(), Mode.replace);
 		Assert.assertEquals(params.getDetailsExportFile(), "myExportFile.txt");
+		Assert.assertEquals(params.getStageConfig(), "myStageConfigFile.json");
 	}
 	
 	@Test

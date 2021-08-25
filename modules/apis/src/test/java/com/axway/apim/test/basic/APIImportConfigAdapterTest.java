@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.apis.APIManagerMockBase;
@@ -26,11 +25,6 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		setupMockData();
 	}
 	
-	@BeforeMethod
-	public void cleanSingletons() {
-		//ErrorState.deleteInstance();
-	}
-	
 	@Test
 	public void withoutStage() throws AppException, ParseException {
 		try {
@@ -40,7 +34,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 			
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertEquals(apiConfig.getBackendBasepath(), "resolvedToSomething");
 		} catch (Exception e) {
@@ -57,13 +51,25 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 			
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertEquals(apiConfig.getBackendBasepath(), "resolvedToSomethingElse");
 		} catch (Exception e) {
 			LOG.error("Error running test: withStage", e);
 			throw e;
 		}
+	}
+	
+	@Test
+	public void withManualStageConfig() throws AppException, ParseException {
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
+		APIImportParams params = new APIImportParams();
+		params.setConfig(testConfig);
+		params.setStageConfig("staged-minimal-config.json");
+		
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(params);
+		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+		Assert.assertEquals(apiConfig.getName(), "API-Name is different for this stage");
 	}
 	
 	@Test
@@ -74,7 +80,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 			
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			String osArch = System.getProperty("os.arch");
 			Assert.assertEquals(apiConfig.getState(), "notUsed "+osArch);
@@ -92,7 +98,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 			
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
 		} catch (Exception e) {
@@ -109,7 +115,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api config with spaces.json").getFile();
 			
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false);
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
 		} catch (Exception e) {
@@ -126,7 +132,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 			
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "notRelavantForThis Test", false);
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertEquals(apiConfig.getVersion(), "9.0.0");
 			Assert.assertEquals(apiConfig.getName(), "API Config from testStageProd sub folder");
@@ -145,7 +151,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound-oauth-config.json").getFile();
 			
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "petstore.json", false);
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "petstore.json", false, null);
 			adapter.getDesiredAPI();
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertEquals(apiConfig.getVersion(), "kk1");
@@ -165,7 +171,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound-oauth-config.json").getFile();
 			
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false);
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false, null);
 			adapter.getDesiredAPI();
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertEquals(apiConfig.getVersion(), "kk1");
@@ -180,7 +186,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		try {
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/empty-vhost-api-config.json").getFile();
 			
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false);
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false, null);
 			adapter.getDesiredAPI();
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertNull(apiConfig.getVhost(), "Empty VHost should be considered as not set (null), as an empty VHost is logically not possible to have.");

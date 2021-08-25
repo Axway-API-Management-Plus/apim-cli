@@ -71,8 +71,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
 			
-			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params.getConfig(), 
-					params.getStage(), params.getApiDefintion(), APIManagerAdapter.hasOrgAdmin());
+			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params);
 			// Creates an API-Representation of the desired API
 			API desiredAPI = configAdapter.getDesiredAPI();
 			// 

@@ -1,0 +1,6 @@
+{
+  "config": {
+    "portalName": "${portalName}",
+    "portalHostname": "staged-portal-hostname"
+  }
+}

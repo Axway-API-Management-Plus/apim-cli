@@ -80,4 +80,20 @@ public class JSONOrganizationAdapterTest extends APIManagerMockBase {
 		Organization org = orgs.get(0);
 		assertNotNull(org.getName(), "API Development TEST-Stage");		
 	}
+	
+	@Test
+	public void readSingleOrgTestWithStagedConfig() throws AppException {
+		String testFile = JSONOrganizationAdapterTest.class.getResource(testPackage + "/SingleOrganization.json").getPath();
+		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
+		OrgImportParams importParams = new OrgImportParams();
+		importParams.setConfig(testFile);
+		importParams.setStageConfig("StagedSingleOrganization.json");
+		
+		JSONOrgAdapter adapter = new JSONOrgAdapter(importParams);
+		List<Organization> orgs = adapter.getOrganizations();
+		assertEquals(orgs.size(), 1, "Expected 1 org returned from the Adapter");
+		Organization org = orgs.get(0);
+		assertNotNull(org.getImage(), "Organization should have an image attached");
+		assertEquals(org.getDescription(), "Staged description for this organization");
+	}
 }

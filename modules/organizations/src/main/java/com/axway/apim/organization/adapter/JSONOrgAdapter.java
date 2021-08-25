@@ -41,7 +41,7 @@ public class JSONOrgAdapter extends OrgAdapter {
 
 		File configFile = Utils.locateConfigFile(config);
 		if(!configFile.exists()) return;
-		File stageConfig = Utils.getStageConfig(stage, configFile);
+		File stageConfig = Utils.getStageConfig(stage, importParams.getStageConfig(), configFile);
 		List<Organization> baseOrgs;
 		// Try to read a list of organizations
 		try {
