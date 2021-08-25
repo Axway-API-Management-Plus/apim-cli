@@ -167,6 +167,7 @@ public class Utils {
 			// Perhaps the stageConfigFile is relative to the main base config
 			File stageFile = new File(baseConfigFile.getParent() + File.separator + stageConfig);
 			if(stageFile.exists()) return stageFile;
+			LOG.warn("No stage configuration file found with name: '"+stageConfig+"'. It must be either absolute or relative to the main config file.");
 		} else {
 			if(!stage.equals("NOT_SET")) {
 				File stageFile = new File(baseConfig.substring(0, baseConfig.lastIndexOf(".")+1) + stage + baseConfig.substring(baseConfig.lastIndexOf(".")));
