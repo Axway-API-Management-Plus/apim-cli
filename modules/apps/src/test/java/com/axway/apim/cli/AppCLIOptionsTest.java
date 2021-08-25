@@ -16,7 +16,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 public class AppCLIOptionsTest {
 	@Test
 	public void testAppImportParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-c", "myAppConfig.json"};
+		String[] args = {"-s", "prod", "-c", "myAppConfig.json", "-stageConfig", "myStageConfig.json"};
 		CLIOptions options = AppImportCLIOptions.create(args);
 		AppImportParams params = (AppImportParams) options.getParams();
 		// Validate core parameters are included
@@ -26,6 +26,7 @@ public class AppCLIOptionsTest {
 		
 		// Validate App-Import parameters
 		Assert.assertEquals(params.getConfig(), "myAppConfig.json");
+		Assert.assertEquals(params.getStageConfig(), "myStageConfig.json");
 	}
 	
 	@Test

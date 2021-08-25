@@ -17,7 +17,7 @@ import com.axway.apim.organization.lib.OrgImportParams;
 public class OrgCLIOptionsTest {
 	@Test
 	public void testAppImportParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-c", "myOrgConfig.json"};
+		String[] args = {"-s", "prod", "-c", "myOrgConfig.json", "-stageConfig", "myStageConfig.json"};
 		CLIOptions options = OrgImportCLIOptions.create(args);
 		OrgImportParams params = (OrgImportParams) options.getParams();
 		// Validate core parameters are included
@@ -27,6 +27,7 @@ public class OrgCLIOptionsTest {
 		
 		// Validate App-Import parameters
 		Assert.assertEquals(params.getConfig(), "myOrgConfig.json");
+		Assert.assertEquals(params.getStageConfig(), "myStageConfig.json");
 	}
 	
 	@Test

@@ -106,13 +106,4 @@ public class CoreCLIOptionsTest {
 		
 		Assert.assertEquals(params.getApiBasepath(), "/fr/apim/v13/portal");
 	}
-	
-	@Test
-	public void testStageConfig() throws ParseException, AppException {
-		String[] args = {"-stageConfig", "config.stageA.json"};
-		CLIOptions options = SampleCLIOptions.create(args);
-		CoreParameters params = (CoreParameters) options.getParams();
-		
-		Assert.assertEquals(params.getStageConfig(), "config.stageA.json");
-	}
 }
