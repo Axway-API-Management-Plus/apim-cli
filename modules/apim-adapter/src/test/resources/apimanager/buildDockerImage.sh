@@ -38,7 +38,7 @@ echo "Creating docker image for version $version"
 
 case "$version" in
 	7.7-20210830)
-		fedFile="swagger-promote-7.7-20210530.fed"
+		fedFile="swagger-promote-7.7-20210830.fed"
 		installer="apigw-installer-7.7.0.20210830-1-linux64.run";;
 	7.7-20210530)
 		fedFile="swagger-promote-7.7-20210530.fed"
