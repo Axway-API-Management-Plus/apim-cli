@@ -77,6 +77,7 @@ public class CLIAPIFilterOptions extends CLIOptions {
 			}
 			if(startDate.getTime()>endDate.getTime()) {
 				SimpleDateFormat df = new SimpleDateFormat("dd/MMM/yyyy HH:mm:ss", Locale.ENGLISH);
+				df.setTimeZone(TimeZone.getTimeZone("GMT"));
 				throw new AppException("The start-date: "+df.format(startDate)+" GMT cannot be bigger than the end date: "+df.format(endDate)+" GMT.", ErrorCode.INVALID_PARAMETER);
 			}
 			params.setCreatedOnAfter(""+startDate.getTime());
@@ -92,6 +93,7 @@ public class CLIAPIFilterOptions extends CLIOptions {
 	private static Date parseDate(String inputDate, String pattern, int endOrStart) {
 		if(inputDate.equals("now")) return new Date();
 		Calendar cal = GregorianCalendar.getInstance(Locale.ENGLISH);
+		cal.setTimeZone(TimeZone.getTimeZone("GMT"));
 		SimpleDateFormat df = new SimpleDateFormat(pattern, Locale.ENGLISH);
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));
 		try {

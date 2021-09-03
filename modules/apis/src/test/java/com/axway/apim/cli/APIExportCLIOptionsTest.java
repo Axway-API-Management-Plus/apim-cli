@@ -174,7 +174,7 @@ public class APIExportCLIOptionsTest {
 		CLIOptions options = CLIAPIExportOptions.create(args);
 		APIExportParams params = (APIExportParams) options.getParams();
 		Assert.assertEquals(params.getCreatedOnAfter().toString(), "1577836800000");
-		Assert.assertEquals(params.getCreatedOnBefore().toString(), "1609455599000");
+		Assert.assertEquals(params.getCreatedOnBefore().toString(), "1609459199000");
 		
 		// This means:
 		// 2020 as the start	- It should be the same as 2020-01-01
@@ -183,7 +183,7 @@ public class APIExportCLIOptionsTest {
 		options = CLIAPIExportOptions.create(args2);
 		params = (APIExportParams) options.getParams();
 		Assert.assertEquals(params.getCreatedOnAfter().toString(), "1577836800000");
-		Assert.assertEquals(params.getCreatedOnBefore().toString(), "1640991599000");
+		Assert.assertEquals(params.getCreatedOnBefore().toString(), "1640995199000");
 		
 		// This means:
 		// 2020-06 as the start	- It should be the same as 2020-06-01
@@ -209,7 +209,7 @@ public class APIExportCLIOptionsTest {
 		options.getParams();
 	}
 	
-	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The start-date: 01/Jan/2021 01:00:00 GMT cannot be bigger than the end date: 31/Dec/2020 23:59:59 GMT.")
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The start-date: 01/Jan/2021 00:00:00 GMT cannot be bigger than the end date: 31/Dec/2020 23:59:59 GMT.")
 	public void testCreatedOnWithBiggerStartDate() throws ParseException, AppException {
 		String[] args = {"-s", "prod", "-createdOn", "2021-01-01:2020-12-31"};
 		CLIOptions options = CLIAPIExportOptions.create(args);
