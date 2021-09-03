@@ -30,6 +30,10 @@ public class APIExportParams extends StandardExportParams implements APIFilterPa
 	
 	private String tag;
 	
+	private String createdOnAfter;
+	
+	private String createdOnBefore;
+	
 	private String datPassword;
 	
 	public static synchronized APIExportParams getInstance() {
@@ -122,6 +126,22 @@ public class APIExportParams extends StandardExportParams implements APIFilterPa
 
 	public void setTag(String tag) {
 		this.tag = tag;
+	}
+
+	public String getCreatedOnAfter() {
+		return createdOnAfter;
+	}
+
+	public void setCreatedOnAfter(String createdOnAfter) {
+		this.createdOnAfter = createdOnAfter;
+	}
+
+	public String getCreatedOnBefore() {
+		return createdOnBefore;
+	}
+
+	public void setCreatedOnBefore(String createdOnBefore) {
+		this.createdOnBefore = createdOnBefore;
 	}
 
 	public String getDatPassword() {

@@ -397,13 +397,13 @@ public class APIFilter implements CustomPropertiesFilter {
 		filters.add(new BasicNameValuePair("value", state));
 	}
 	
-	public void setCreatedOn(String createdOn, FILTER_OP op) {
+	public void setCreatedOn(List<String[]> createdOn) {
 		if(createdOn==null) return;
-		this.createdOn = createdOn;
-		this.createdOnOp = op;
-		filters.add(new BasicNameValuePair("field", "createdOn"));
-		filters.add(new BasicNameValuePair("op", op.name()));
-		filters.add(new BasicNameValuePair("value", createdOn));
+		for(String[] createdOnFilter : createdOn) {
+			filters.add(new BasicNameValuePair("field", "createdOn"));
+			filters.add(new BasicNameValuePair("op", createdOnFilter[1]));
+			filters.add(new BasicNameValuePair("value", createdOnFilter[0]));
+		}
 	}
 	
 	public String getCreatedOn() {
@@ -645,8 +645,7 @@ public class APIFilter implements CustomPropertiesFilter {
 		String outboundAuthentication;
 		String organization;
 		
-		String createdOn;
-		FILTER_OP createdOnOp;
+		List<String[]> createdOn;
 		
 		APIType apiType;
 		
@@ -727,7 +726,7 @@ public class APIFilter implements CustomPropertiesFilter {
 			apiFilter.setRetired(this.retired);
 			apiFilter.setDeprecated(this.deprecated);
 			apiFilter.setCustomProperties(this.customProperties);
-			apiFilter.setCreatedOn(this.createdOn, this.createdOnOp);
+			apiFilter.setCreatedOn(this.createdOn);
 			apiFilter.setBackendBasepath(this.backendBasepath);
 			apiFilter.setInboundSecurity(this.inboundSecurity);
 			apiFilter.setOutboundAuthentication(this.outboundAuthentication);
@@ -807,14 +806,16 @@ public class APIFilter implements CustomPropertiesFilter {
 		}
 		
 		public Builder isCreatedOnBefore(String createdOn) {
-			this.createdOn = createdOn;
-			this.createdOnOp = FILTER_OP.lt;
+			if(createdOn==null) return this;
+			if(this.createdOn==null) this.createdOn = new ArrayList<String[]>();
+			this.createdOn.add(new String[] {createdOn, FILTER_OP.lt.name()});
 			return this;
 		}
 		
 		public Builder isCreatedOnAfter(String createdOn) {
-			this.createdOn = createdOn;
-			this.createdOnOp = FILTER_OP.gt;
+			if(createdOn==null) return this;
+			if(this.createdOn==null) this.createdOn = new ArrayList<String[]>();
+			this.createdOn.add(new String[] {createdOn, FILTER_OP.gt.name()});
 			return this;
 		}
 		
