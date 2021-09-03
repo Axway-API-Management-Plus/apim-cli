@@ -1,22 +1,23 @@
 {
-  "name": "Complete application",
-  "description": "Sample Client Application, registered for use in the Client Demo",
-  "state": "approved",
-  "image": "app-image.jpg",
+  "name": "${appName}",
+  "organization": "${orgName}",
+  "description": "${description}",
+  "state": "${state}",
+  "image": "${appImage}",
   "enabled": true,
-  "email": "sample@sampleapp.com",
-  "phone": "012345678",
+  "email": "${email}",
+  "phone": "${phone}",
   "credentials": [
     {
       "credentialType": "oauth",
       "enabled": true,
       "secret": "9cb76d80-1bc2-48d3-8d31-edeec0fddf6c",
       "corsOrigins": [
-        
+        "${oauthCorsOrigins}"
       ],
       "cert": "app-oauth-cert.crt",
       "type": "confidential",
-      "clientId": "ClientConfidentialApp",
+      "clientId": "ClientConfidentialApp-${appNumber}",
       "redirectUrls": [
         "https://localhost:8088/client/apigateway/callback",
         "https://oauthclient:8088/client/apigateway/callback"
@@ -27,9 +28,17 @@
       "enabled": true,
       "secret": "34f2b2d6-0334-4dcc-8442-e0e7009b8950",
       "corsOrigins": [
-        "*"
+        "${oauthCorsOrigins}"
       ],
-      "apiKey": "6cd55c27-675a-444a-9bc7-ae9a7869184d"
+      "apiKey": "6cd55c27-675a-444a-9bc7-ae9a7869184d-${appNumber}"
+    },
+    {
+      "credentialType": "extclients",
+      "enabled": true,
+      "clientId": "ClientConfidentialClientID-${appNumber}",
+      "corsOrigins": [
+        "${oauthCorsOrigins}"
+      ]
     }
   ],
   "appQuota": {
@@ -39,8 +48,8 @@
         "method": "*",
         "type": "throttle",
         "config": {
-          "messages": "9999",
-          "period": "week",
+          "messages": "${quotaMessages}",
+          "period": "${quotaPeriod}",
           "per": "1"
         }
       }
@@ -48,22 +57,8 @@
   },
   "appScopes": [
     {
-      "uriprefix": "resource.READ",
-      "scopes": [
-        "resource.READ"
-      ],
-      "scope": "resource.READ",
-      "enabled": true,
-      "isDefault": true
-    },
-    {
-      "uriprefix": "resource.WRITE",
-      "scopes": [
-        "resource.WRITE"
-      ],
-      "scope": "resource.WRITE",
-      "enabled": true,
-      "isDefault": true
+      "scope": "${scopeName2}",
+      "isDefault": ${scopeIsDefault2}
     }
   ]
 }

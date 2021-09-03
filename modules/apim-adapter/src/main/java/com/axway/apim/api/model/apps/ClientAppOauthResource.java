@@ -95,5 +95,11 @@ public class ClientAppOauthResource {
 					otherAppCredential.isDefaultScope()==this.isDefaultScope() );
 		}
 		return false;
-	}	
+	}
+
+	@Override
+	public String toString() {
+		return "ClientAppOauthResource [scope=" + scope + ", enabled=" + enabled + ", defaultScope=" + defaultScope
+				+ "]";
+	}
 }
