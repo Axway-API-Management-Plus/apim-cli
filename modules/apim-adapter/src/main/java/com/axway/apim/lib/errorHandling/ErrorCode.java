@@ -40,6 +40,7 @@ public enum ErrorCode {
 	CANT_READ_WSDL_FILE					(66, "Can't read the given WSDL-File."),
 	API_MANAGER_LOGIN_FAILED			(67, "Login to API-Manager failed."),
 	NO_UNIQUE_REMOTE_HOST				(68, "A unique remote host based on the given filter could not be found.", false),
+	API_MANAGER_COMMUNICATION_ERR		(69, "Unexpected API-Manager communication error.", true),
 	CANT_READ_CONFIG_FILE				(70, "Can't read the API Config-File.", false),
 	INVALID_QUOTA_CONFIG				(71, "The given Quota-Configuration is invalid.", false),
 	API_OPERATION_NOT_FOUND				(72, "The given operationId cannot be found.", false),
