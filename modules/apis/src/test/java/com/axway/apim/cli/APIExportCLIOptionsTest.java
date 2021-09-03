@@ -167,4 +167,52 @@ public class APIExportCLIOptionsTest {
 		Assert.assertEquals(apiFilter.getInboundSecurity(), "api-key");
 		Assert.assertEquals(apiFilter.getTag(), "tagGroup=*myTagValue*");
 	}
+	
+	@Test
+	public void testCreatedOnAPIFilterParameters() throws ParseException, AppException {
+		String[] args = {"-s", "prod", "-createdOn", "2020-01-01:2020-12-31"};
+		CLIOptions options = CLIAPIExportOptions.create(args);
+		APIExportParams params = (APIExportParams) options.getParams();
+		Assert.assertEquals(params.getCreatedOnAfter().toString(), "1577836800000");
+		Assert.assertEquals(params.getCreatedOnBefore().toString(), "1609455599000");
+		
+		// This means:
+		// 2020 as the start	- It should be the same as 2020-01-01
+		// 2021 as the end		- It should be the same as 2021-12-31 23:59:59
+		String[] args2 = {"-s", "prod", "-createdOn", "2020:2021"};
+		options = CLIAPIExportOptions.create(args2);
+		params = (APIExportParams) options.getParams();
+		Assert.assertEquals(params.getCreatedOnAfter().toString(), "1577836800000");
+		Assert.assertEquals(params.getCreatedOnBefore().toString(), "1640991599000");
+		
+		// This means:
+		// 2020-06 as the start	- It should be the same as 2020-06-01
+		// now as the end		- The current date
+		String[] args3 = {"-s", "prod", "-createdOn", "2020-06:now"};
+		options = CLIAPIExportOptions.create(args3);
+		params = (APIExportParams) options.getParams();
+		Assert.assertEquals(params.getCreatedOnAfter().toString(), "1590969600000");
+		Assert.assertTrue(Long.parseLong(params.getCreatedOnBefore())>Long.parseLong("1630665581555"), "Now should be always in the future.");
+	}
+	
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "You cannot use 'now' as the start date.")
+	public void testCreatedOnWithStartNow() throws ParseException, AppException {
+		String[] args = {"-s", "prod", "-createdOn", "now:2020-12-31"};
+		CLIOptions options = CLIAPIExportOptions.create(args);
+		options.getParams();
+	}
+	
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "You must separate the start- and end-date with a ':'.")
+	public void testCreatedWithoutColon() throws ParseException, AppException {
+		String[] args = {"-s", "prod", "-createdOn", "2020-01-01-2020-12-31"};
+		CLIOptions options = CLIAPIExportOptions.create(args);
+		options.getParams();
+	}
+	
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The start-date: 01/Jan/2021 01:00:00 GMT cannot be bigger than the end date: 31/Dec/2020 23:59:59 GMT.")
+	public void testCreatedOnWithBiggerStartDate() throws ParseException, AppException {
+		String[] args = {"-s", "prod", "-createdOn", "2021-01-01:2020-12-31"};
+		CLIOptions options = CLIAPIExportOptions.create(args);
+		options.getParams();
+	}
 }

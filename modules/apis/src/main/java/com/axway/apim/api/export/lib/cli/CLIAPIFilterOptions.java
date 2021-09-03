@@ -1,13 +1,27 @@
 package com.axway.apim.api.export.lib.cli;
 
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import org.apache.commons.cli.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.export.lib.params.APIFilterParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class CLIAPIFilterOptions extends CLIOptions {
+	
+	private static Logger LOG = LoggerFactory.getLogger(CLIAPIFilterOptions.class);
 	
 	private CLIOptions cliOptions;
 
@@ -30,8 +44,76 @@ public class CLIAPIFilterOptions extends CLIOptions {
 		params.setTag(getValue("tag"));
 		params.setInboundSecurity(getValue("inboundsecurity"));
 		params.setOutboundAuthentication(getValue("outboundauthn"));
-		
+		parseCreatedOnFilter(params);
 		return (Parameters) params;
+	}
+	
+	private void parseCreatedOnFilter(APIFilterParams params) throws AppException {
+		try {
+			List<String> dateFormats = Arrays.asList("yyyy-MM-dd", "yyyy-MM", "yyyy"); // "dd.MM.yyyy", "dd/MM/yyyy", "yyyy-MM-dd", "dd-MM-yyyy"
+			String createdOn = getValue("createdOn");
+			if(createdOn==null) return;
+			String[] createdOns = createdOn.trim().toLowerCase().split(":");
+			if(createdOns.length!=2) {
+				throw new AppException("You must separate the start- and end-date with a ':'.", ErrorCode.INVALID_PARAMETER);
+			}
+			String start = createdOns[0];
+			String end = createdOns[1];
+			if(start.equals("now")) {
+				throw new AppException("You cannot use 'now' as the start date.", ErrorCode.INVALID_PARAMETER);
+			}
+			Date startDate = null;
+			Date endDate = null;
+			for(String pattern : dateFormats) {
+				startDate = parseDate(start, pattern, 1);
+				if(startDate!=null) break;
+			}
+			for(String pattern : dateFormats) {
+				endDate = parseDate(end, pattern, 2);
+				if(endDate!=null) break;
+			}
+			if(startDate==null || endDate==null) {
+				throw new AppException("Unable to parse given createdOn filter: '"+createdOn+"'", ErrorCode.INVALID_PARAMETER);
+			}
+			if(startDate.getTime()>endDate.getTime()) {
+				SimpleDateFormat df = new SimpleDateFormat("dd/MMM/yyyy HH:mm:ss", Locale.ENGLISH);
+				throw new AppException("The start-date: "+df.format(startDate)+" GMT cannot be bigger than the end date: "+df.format(endDate)+" GMT.", ErrorCode.INVALID_PARAMETER);
+			}
+			params.setCreatedOnAfter(""+startDate.getTime());
+			params.setCreatedOnBefore(""+endDate.getTime());
+		} catch (Exception e) {
+			LOG.error(e.getMessage());
+			LOG.info("");
+			LOG.info("Valid createdOn filter examples: 2020-01-01:2020-12-31   2020:2021   2020-06:now");
+			throw e;
+		}
+	}
+	
+	private static Date parseDate(String inputDate, String pattern, int endOrStart) {
+		if(inputDate.equals("now")) return new Date();
+		Calendar cal = GregorianCalendar.getInstance(Locale.ENGLISH);
+		SimpleDateFormat df = new SimpleDateFormat(pattern, Locale.ENGLISH);
+		df.setTimeZone(TimeZone.getTimeZone("GMT"));
+		try {
+			Date date = df.parse(inputDate);
+			if(date==null) return null;
+			cal.setTime(date);
+			if(endOrStart==2) { // 1 = End Date - Set some defaults
+				if(inputDate.length()==4) { // yyyy - Missing day and month
+					cal.set(Calendar.DAY_OF_MONTH, 31);
+					cal.set(Calendar.MONTH, 11);
+				} else if(inputDate.length()==7 || inputDate.length()==6) { // No day given (yyyy-MM or yyyy-M)
+					cal.set(Calendar.DAY_OF_MONTH, 31);
+				}
+				// For the endDate we always have to shift the time to the end of the day
+				cal.set(Calendar.HOUR_OF_DAY, 23);
+				cal.set(Calendar.MINUTE, 59);
+				cal.set(Calendar.SECOND, 59);
+			}
+			return cal.getTime();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	@Override
@@ -115,6 +197,11 @@ public class CLIAPIFilterOptions extends CLIOptions {
 		option = new  Option("backend", true, "Filter APIs with specific backendBasepath. Wildcards are supported.");
 		option.setRequired(false);
 		option.setArgName("*mybackhost.com*");
+		cliOptions.addOption(option);
+		
+		option = new  Option("createdOn", true, "Filter APIs based on their creation date. It's a range start:end. You see more examples when you provide an invalid range");
+		option.setRequired(false);
+		option.setArgName("2020-08:now");
 		cliOptions.addOption(option);
 		
 		option = new  Option("inboundsecurity", true, "Filter APIs with specific Inbound-Security. Wildcards are supported when filtering for APIs using a custom security policy.");

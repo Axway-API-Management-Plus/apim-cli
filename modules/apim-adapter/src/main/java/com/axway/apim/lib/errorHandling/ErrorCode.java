@@ -9,6 +9,7 @@ public enum ErrorCode {
 	
 	SUCCESS								(0,  "Replication of the API was successful.", false, LogLevel.INFO),
 	MISSING_PARAMETER					(5,  "There is a missing parameter.", false),
+	INVALID_PARAMETER					(6,  "There is an invalid parameter.", false),
 	API_ALREADY_EXISTS					(7,  "The API already exists for another organization.", false),
 	NO_CHANGE							(10, "No change between desired and actual API has been detected.", false, LogLevel.WARN),
 	EXPORT_FOLDER_EXISTS				(12, "Export failed Export-Folder already exists.", false),

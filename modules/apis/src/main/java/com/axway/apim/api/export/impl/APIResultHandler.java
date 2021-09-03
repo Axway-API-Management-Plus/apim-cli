@@ -122,6 +122,8 @@ public abstract class APIResultHandler {
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.translatePolicies(POLICY_TRANSLATION.TO_NAME)
 				.useFEAPIDefinition(params.isUseFEAPIDefinition())
+				.isCreatedOnAfter(params.getCreatedOnAfter())
+				.isCreatedOnBefore(params.getCreatedOnBefore())
 				.failOnError(false);
 		return builder;
 	}
