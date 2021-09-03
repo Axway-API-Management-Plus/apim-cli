@@ -806,12 +806,14 @@ public class APIFilter implements CustomPropertiesFilter {
 		}
 		
 		public Builder isCreatedOnBefore(String createdOn) {
+			if(createdOn==null) return this;
 			if(this.createdOn==null) this.createdOn = new ArrayList<String[]>();
 			this.createdOn.add(new String[] {createdOn, FILTER_OP.lt.name()});
 			return this;
 		}
 		
 		public Builder isCreatedOnAfter(String createdOn) {
+			if(createdOn==null) return this;
 			if(this.createdOn==null) this.createdOn = new ArrayList<String[]>();
 			this.createdOn.add(new String[] {createdOn, FILTER_OP.gt.name()});
 			return this;

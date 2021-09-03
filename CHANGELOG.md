@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Feature to manually define the stage configuration file (See issue [#195](https://github.com/Axway-API-Management-Plus/apim-cli/issues/195))
 - User-Import now supports staging and variables as the other entity types
 - Feature to filter APIs with `-createdOn` based on their creation date. (See issue [#209](https://github.com/Axway-API-Management-Plus/apim-cli/issues/209))
-- The API-Creation date is now exported into the CSV-Format (See issue [#208](https://github.com/Axway-API-Management-Plus/apim-cli/issues/208))
+- The API-Creation date is now exported into the CSV- and Console-Format (See issue [#208](https://github.com/Axway-API-Management-Plus/apim-cli/issues/208))
 
 ### Fixed
 - Changed the Log-Threshold to DEBUG for Console-Logger to make debugging working according to the documentation

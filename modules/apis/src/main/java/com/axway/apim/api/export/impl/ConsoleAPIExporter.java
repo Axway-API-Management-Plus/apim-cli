@@ -1,5 +1,7 @@
 package com.axway.apim.api.export.impl;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -22,6 +24,8 @@ import com.github.freva.asciitable.HorizontalAlign;
 public class ConsoleAPIExporter extends APIResultHandler {
 	
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
+	
+	DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
 	public ConsoleAPIExporter(APIExportParams params) {
 		super(params);
@@ -48,8 +52,9 @@ public class ConsoleAPIExporter extends APIResultHandler {
 				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getId()),
 				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getPath(api)),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getName()),
-				new Column().header("Version").with(api -> api.getVersion()
-				))));
+				new Column().header("Version").with(api -> api.getVersion()),
+				new Column().header("Created-On").with(api -> getFormattedDate(api))
+				)));
 		printDetails(apis);
 	}
 	
@@ -64,8 +69,9 @@ public class ConsoleAPIExporter extends APIResultHandler {
 				new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getBackendPath(api)),
 				new Column().header("Security").with(api -> getUsedSecurity(api)),
 				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getUsedPoliciesForConsole(api).toString()),
-				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()
-				))));
+				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
+				new Column().header("Created-On").with(api -> getFormattedDate(api))
+				)));
 		printDetails(apis);
 	}
 	
@@ -84,9 +90,15 @@ public class ConsoleAPIExporter extends APIResultHandler {
 				new Column().header("Orgs").with(api -> getOrgCount(api)),
 				new Column().header("Apps").with(api -> getAppCount(api)),
 				new Column().header("Quotas").with(api -> Boolean.toString(hasQuota(api))),
-				new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> Boolean.toString(hasTags(api)))
+				new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> Boolean.toString(hasTags(api))),
+				new Column().header("Created-On").with(api -> getFormattedDate(api))
 				)));
 		printDetails(apis);
+	}
+	
+	private String getFormattedDate(API api) {
+		if(api.getCreatedOn()==null) return "N/A";
+		return dateFormatter.format(api.getCreatedOn());
 	}
 	
 	private String getUsedPoliciesForConsole(API api) {
