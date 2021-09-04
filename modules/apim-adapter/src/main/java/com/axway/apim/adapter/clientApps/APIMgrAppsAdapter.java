@@ -643,11 +643,11 @@ public class APIMgrAppsAdapter {
 			existingScopes = actualApp.getOauthResources();
 		}
 		if(existingScopes==null) existingScopes = new ArrayList<ClientAppOauthResource>();
-		boolean existingScopeFound = false;
 		if(desiredScopes!=null) {
 			// Iterate over the given desired scopes
 			Iterator<ClientAppOauthResource> it = desiredScopes.iterator();
 			while(it.hasNext()) {
+				boolean existingScopeFound = false;
 				ClientAppOauthResource desiredScope = it.next();
 				// Compare each desired scope, if it is already included in the existing scopes
 				for(ClientAppOauthResource existingScope : existingScopes) {
