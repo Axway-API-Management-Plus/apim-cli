@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.3.11] 2021-09-06
 ### Added
 - Feature to grant API access for organization during import (See issue [#196](https://github.com/Axway-API-Management-Plus/apim-cli/issues/196))
 - Feature to manually define the stage configuration file (See issue [#195](https://github.com/Axway-API-Management-Plus/apim-cli/issues/195))
