@@ -527,8 +527,8 @@ public class APIManagerAPIAdapter {
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			if(statusCode != 200){
 				if((statusCode >= 400 && statusCode<=499) && response.contains("Unknown API")) {
-					LOG.warn("Got unexpected error: 'Unknown API' while trying to read Backend-API ... Try again in 1 second.");
-					Thread.sleep(1000);
+					LOG.warn("Got unexpected error: 'Unknown API' while trying to read Backend-API ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
+					Thread.sleep(cmd.getRetryDelay());
 					httpResponse = request.execute();
 					statusCode = httpResponse.getStatusLine().getStatusCode();
 					if(statusCode != 200) {
@@ -962,8 +962,8 @@ public class APIManagerAPIAdapter {
 						if(statusCode < 200 || statusCode > 299){
 							String response = EntityUtils.toString(httpResponse.getEntity());
 							if((statusCode==404 || statusCode==400)) { // Status-Code 400 is returned by 7.7-20200331 ?!
-								LOG.warn("Got unexpected error '" + response + " ("+statusCode+")' while taking over application quota to newer API ... Try again in 1 second.");
-								Thread.sleep(1000);
+								LOG.warn("Got unexpected error '" + response + " ("+statusCode+")' while taking over application quota to newer API ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
+								Thread.sleep(cmd.getRetryDelay());
 								httpResponse = request.execute();
 								statusCode = httpResponse.getStatusLine().getStatusCode();
 								if(statusCode < 200 || statusCode > 299){
@@ -1024,8 +1024,8 @@ public class APIManagerAPIAdapter {
 			if(statusCode != 204){
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				if((statusCode==403 || statusCode==404) && response.contains("Unknown API")) {
-					LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in 1 second.");
-					Thread.sleep(1000);
+					LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
+					Thread.sleep(cmd.getRetryDelay());
 					httpResponse = request.execute();
 					statusCode = httpResponse.getStatusLine().getStatusCode();
 					if(statusCode != 204) {
@@ -1073,8 +1073,8 @@ public class APIManagerAPIAdapter {
 			if(statusCode != 204){
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				if((statusCode==403 || statusCode==404) && response.contains("Unknown API")) {
-					LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in 1 second.");
-					Thread.sleep(1000);
+					LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
+					Thread.sleep(cmd.getRetryDelay());
 					httpResponse = apiCall.execute();
 					statusCode = httpResponse.getStatusLine().getStatusCode();
 					if(statusCode != 204) {

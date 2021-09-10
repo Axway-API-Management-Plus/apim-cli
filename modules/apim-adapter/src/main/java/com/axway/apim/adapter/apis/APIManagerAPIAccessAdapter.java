@@ -194,8 +194,8 @@ public class APIManagerAPIAccessAdapter {
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			if(statusCode < 200 || statusCode > 299){
 				if((statusCode==403 || statusCode==404) && response.contains("Unknown API")) {
-					LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in 1 second.");
-					Thread.sleep(1000);
+					LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
+					Thread.sleep(cmd.getRetryDelay());
 					httpResponse = request.execute();
 					response = EntityUtils.toString(httpResponse.getEntity());
 					statusCode = httpResponse.getStatusLine().getStatusCode();
