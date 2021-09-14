@@ -1102,10 +1102,13 @@ public class APIManagerAPIAdapter {
 	
 	private String getFilterFields(APIFilter filter) {
 		String filterFields = "[";
-		if(filter.getApiPath()!=null) filterFields += "apiPath=" + filter.getApiPath();
-		if(filter.getVhost()!=null) filterFields += " vHost=" + filter.getVhost();
-		if(filter.getQueryStringVersion()!=null) filterFields += " queryString=" + filter.getQueryStringVersion();
-		if(filter!=null) filterFields += " filter=" + filter;
+		if(LOG.isDebugEnabled()) {
+			if(filter.getApiPath()!=null) filterFields += "apiPath=" + filter.getApiPath();
+			if(filter.getVhost()!=null) filterFields += " vHost=" + filter.getVhost();
+			if(filter.getQueryStringVersion()!=null) filterFields += " queryString=" + filter.getQueryStringVersion();
+		} else if (LOG.isTraceEnabled()) {
+			filterFields += " filter=" + filter;
+		}
 		filterFields += "]";
 		return filterFields;
 	}
