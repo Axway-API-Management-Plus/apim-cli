@@ -593,7 +593,7 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public API updateAPIProxy(API api) throws AppException {
-		LOG.debug("Updating API-Proxy");
+		LOG.debug("Updating API-Proxy: '"+api.getName()+" "+api.getVersion()+" ("+api.getId()+")'" );
 		URI uri;
 		HttpEntity entity;
 		mapper.setSerializationInclusion(Include.NON_NULL);
@@ -1000,7 +1000,7 @@ public class APIManagerAPIAdapter {
 					+ "reference/old API: "+Utils.getAPILogString(referenceAPI)+" are the same. Skip upgrade access to newer API.");
 			return false;
 		}
-		LOG.debug("Upgrade access & subscriptions to API: " + apiToUpgradeAccess.getName() + " " + apiToUpgradeAccess.getVersion() + "("+apiToUpgradeAccess.getId()+")");
+		LOG.debug("Upgrade access & subscriptions to API: " + apiToUpgradeAccess.getName() + " " + apiToUpgradeAccess.getVersion() + " ("+apiToUpgradeAccess.getId()+")");
 		
 		URI uri;
 		HttpEntity entity;
@@ -1023,7 +1023,7 @@ public class APIManagerAPIAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
 				String response = EntityUtils.toString(httpResponse.getEntity());
-				if((statusCode==403 || statusCode==404) && response.contains("Unknown API")) {
+				if((statusCode==403 || statusCode==404) && (response.contains("Unknown API") || response.contains("The entity could not be found")) ) {
 					LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
 					Thread.sleep(cmd.getRetryDelay());
 					httpResponse = request.execute();
