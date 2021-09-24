@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+- No change detected when updating the role of a user (See issue [#219](https://github.com/Axway-API-Management-Plus/apim-cli/issues/219))
+
 ## [1.3.12] 2021-09-10
 ### Added
 - Provide option to configure the Retry-Delay for some of the API-Manager REST-API calls (See issue [#213](https://github.com/Axway-API-Management-Plus/apim-cli/issues/213))
