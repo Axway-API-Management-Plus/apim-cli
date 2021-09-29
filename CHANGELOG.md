@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - No change detected when updating the role of a user (See issue [#219](https://github.com/Axway-API-Management-Plus/apim-cli/issues/219))
 
+## [1.3.13] 2021-09-21
+### Fixed
+- Error upgrading access to newer API - The entity could not be found. (See issue [#218](https://github.com/Axway-API-Management-Plus/apim-cli/issues/218))
+
 ## [1.3.12] 2021-09-10
 ### Added
 - Provide option to configure the Retry-Delay for some of the API-Manager REST-API calls (See issue [#213](https://github.com/Axway-API-Management-Plus/apim-cli/issues/213))
