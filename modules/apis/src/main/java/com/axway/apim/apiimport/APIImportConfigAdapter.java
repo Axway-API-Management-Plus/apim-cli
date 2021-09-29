@@ -752,7 +752,7 @@ public class APIImportConfigAdapter {
 			OutboundProfile profile = importApi.getOutboundProfiles().get(profileName);
 			if(profileName.equals("_default")) {
 				defaultProfileFound = true;
-				// Validate the _default Outbound-Profile has an AuthN-Profile, otherwise we must add (See isseu #133)
+				// Validate the _default Outbound-Profile has an AuthN-Profile, otherwise we must add (See issue #133)
 				
 				if(profile.getAuthenticationProfile()==null) {
 					LOG.warn("Provided default outboundProfile doesn't contain AuthN-Profile - Setting it to default");
@@ -760,9 +760,11 @@ public class APIImportConfigAdapter {
 				}
 				continue;
 			}
-			// Check the referenced profiles are valid
-			if(profile.getAuthenticationProfile()!=null && getAuthNProfile(importApi, profile.getAuthenticationProfile())==null) {
-				throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '"+profile.getAuthenticationProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
+			// Check the referenced authentication profile is valid
+			if(!profile.getAuthenticationProfile().equals("_default")) {
+				if(profile.getAuthenticationProfile()!=null && getAuthNProfile(importApi, profile.getAuthenticationProfile())==null) {
+					throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '"+profile.getAuthenticationProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
+				}
 			}
 		}
 		if(!defaultProfileFound) {
