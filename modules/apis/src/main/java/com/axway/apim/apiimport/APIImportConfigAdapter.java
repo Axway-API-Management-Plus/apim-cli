@@ -1,6 +1,5 @@
 package com.axway.apim.apiimport;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,12 +16,9 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +39,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -461,7 +458,7 @@ public class APIImportConfigAdapter {
 			for(CaCert cert :apiConfig.getCaCerts()) {
 				if(cert.getCertBlob()==null) {
 					try(InputStream is = getInputStreamForCertFile(cert)) {
-						JsonNode certInfo = APIManagerAdapter.getCertInfo(is, cert);
+						JsonNode certInfo = APIManagerAdapter.getCertInfoFromFile(is, cert);
 						CaCert completedCert = mapper.readValue(certInfo.get(0).toString(), CaCert.class);
 						completedCaCerts.add(completedCert);
 					} catch (Exception e) {
@@ -801,126 +798,43 @@ public class APIImportConfigAdapter {
 	
 	private void handleOutboundSSLAuthN(AuthenticationProfile authnProfile) throws AppException {
 		if(!authnProfile.getType().equals(AuthType.ssl)) return;
-		String clientCert = (String)authnProfile.getParameters().get("certFile");
+		String keystore = (String)authnProfile.getParameters().get("certFile");
 		String password = (String)authnProfile.getParameters().get("password");
-		String[] result = extractKeystoreTypeFromCertFile(clientCert);
-		clientCert 			= result[0];
-		String storeType 	= result[1];
-		File clientCertFile = new File(clientCert);
-		String clientCertClasspath = null;
+		File clientCertFile = new File(keystore);
 		try {
 			if(!clientCertFile.exists()) {
 				// Try to find file using a relative path to the config file
 				String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
-				clientCertFile = new File(baseDir + "/" + clientCert);
+				clientCertFile = new File(baseDir + "/" + keystore);
 			}
 			if(!clientCertFile.exists()) {
 				// If not found absolute & relative - Try to load it from ClassPath
 				LOG.debug("Trying to load Client-Certificate from classpath");
-				if(this.getClass().getResource(clientCert)==null) {
-					throw new AppException("Can't read Client-Certificate-Keystore: "+clientCert+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR);
+				if(this.getClass().getResource(keystore)==null) {
+					throw new AppException("Can't read Client-Certificate-Keystore: "+keystore+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR);
 				}
-				clientCertClasspath = clientCert;
-			}
-			KeyStore store = null;
-			store = loadKeystore(clientCertFile, clientCertClasspath, storeType, password);
-			if(store==null) {
-				throw new AppException("Unable to configure Outbound SSL-Config. Can't load keystore: '"+clientCertFile+"' for any reason. "
-						+ "Turn on debug to see log messages.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
-			}
-			X509Certificate certificate = null;
-			Enumeration<String> e = store.aliases();
-			while (e.hasMoreElements()) {
-				String alias = e.nextElement();
-				certificate = (X509Certificate) store.getCertificate(alias);
-				certificate.getEncoded();
+				clientCertFile = new File(this.getClass().getResource(keystore).getFile());
 			}
 			if(this.apiConfig instanceof DesiredTestOnlyAPI) return; // Skip here when testing
-			JsonNode node = APIManagerAdapter.getFileData(certificate.getEncoded(), clientCert);
-			String data = node.get("data").asText();
-			authnProfile.getParameters().put("pfx", data);
+			JsonNode fileData = null;
+			try(InputStream is = new FileInputStream(clientCertFile)) {
+				fileData = APIManagerAdapter.getFileData(IOUtils.toByteArray(new FileInputStream(clientCertFile)), keystore, ContentType.create("application/x-pkcs12"));
+			} catch (Exception e) {
+				
+			}
+			CaCert cert = new CaCert();
+			cert.setCertFile(clientCertFile.getName());
+			cert.setInbound("false");
+			cert.setOutbound("true");
+			// This call is to validate the given password, keystore is valid
+
+			APIManagerAdapter.getCertInfo(fileData.get("data").asText(), password, cert);
+			//String data = node.get("data").asText();
+			authnProfile.getParameters().put("pfx", fileData.get("data").asText());
 			authnProfile.getParameters().remove("certFile");
 		} catch (Exception e) {
-			throw new AppException("Can't read Client-Cert-File: "+clientCert+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
+			throw new AppException("Can't read Client-Cert-File: "+keystore+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
 		} 
-	}
-	
-	private KeyStore loadKeystore(File clientCertFile, String clientCertClasspath, String keystoreType, String password) throws AppException {
-		InputStream is = null;
-		KeyStore store = null;
-
-		if(keystoreType!=null) {
-			try {
-				// Get the Inputstream and load the keystore with the given Keystore-Type
-				if(clientCertClasspath==null) {
-					is = new BufferedInputStream(new FileInputStream(clientCertFile));
-				} else {
-					is = this.getClass().getResourceAsStream(clientCertClasspath);
-				}
-				LOG.debug("Loading keystore: '"+clientCertFile+"' using keystore type: '"+keystoreType+"'");
-				store = KeyStore.getInstance(keystoreType);
-				store.load(is, password.toCharArray());
-				return store;
-			} catch (IOException e) {
-				if(e.getMessage()!=null && e.getMessage().toLowerCase().contains("keystore password was incorrect")) {
-					throw new AppException("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, e);
-				}
-				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
-				throw new AppException("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, e);
-			} catch (Exception e) {
-				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
-				return null;
-			} finally {
-				if(is!=null)
-					try {
-						is.close();
-					} catch (IOException e) { }
-			}
-		}
-		// Otherwise we try every known type		
-		LOG.debug("Loading keystore: '"+clientCertFile+"' trying the following types: " + Security.getAlgorithms("KeyStore"));
-		for(String type : Security.getAlgorithms("KeyStore")) {
-			try {
-				LOG.debug("Trying to load keystore: '"+clientCertFile+"' using type: '"+type+"'");
-				// Get the Inputstream and load the keystore with the given Keystore-Type
-				if(clientCertClasspath==null) {
-					is = new BufferedInputStream(new FileInputStream(clientCertFile));
-				} else {
-					is = this.getClass().getResourceAsStream(clientCertClasspath);
-				}
-				store = KeyStore.getInstance(type);
-				store.load(is, password.toCharArray());
-				if(store!=null) {
-					LOG.debug("Successfully loaded keystore: '"+clientCertFile+"' with type: " + type);
-					return store;
-				}
-			} catch (IOException e) {
-				if(e.getMessage()!=null && e.getMessage().toLowerCase().contains("keystore password was incorrect")) {
-					throw new AppException("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, e);
-				}
-				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage(), e);
-			} catch (Exception e) {
-				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage(), e);
-			} finally {
-				if(is!=null)
-					try {
-						is.close();
-					} catch (IOException e) { }
-			}
-		}
-		return null;
-	}
-	
-	private String[] extractKeystoreTypeFromCertFile(String certFileName) throws AppException {
-		if(!certFileName.contains(":")) return new String[]{certFileName, null};
-		int pos = certFileName.lastIndexOf(":");
-		if(pos<3) return new String[]{certFileName, null}; // This occurs for the following format: c:/path/to/my/store
-		String type = certFileName.substring(pos+1);
-		if(!Security.getAlgorithms("KeyStore").contains(type)) {
-			throw new AppException("Unknown keystore type: '"+type+"'. Supported: " + Security.getAlgorithms("KeyStore"), ErrorCode.WRONG_KEYSTORE_PASSWORD);
-		}
-		certFileName = certFileName.substring(0, pos);
-		return new String[]{certFileName, type};
 	}
 	
 	private void validateHasQueryStringKey(API importApi) throws AppException {
