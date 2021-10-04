@@ -184,31 +184,6 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void outboundSSLValidConfig() throws AppException, ParseException {
-		try {
-			EnvironmentProperties props = new EnvironmentProperties(null);  
-			props.put("apiName", "Outbound SSL API");
-			props.put("apiPath", "/api/ssl/outbound");
-			props.put("orgNumber", "");
-			props.put("certFile", "../certificates/clientcert.pfx");
-			props.put("password", "axway");
-			
-			APIImportParams params = new APIImportParams();
-			params.setProperties(props);
-			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/security/api_outbound-ssl.json").getFile();
-			
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "../basic/petstore.json", false, null);
-			adapter.getDesiredAPI();
-			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
-			Assert.assertEquals(apiConfig.getVersion(), "kk1");
-			Assert.assertEquals(apiConfig.getName(), "My OAuth API");
-		} catch (Exception e) {
-			LOG.error("Error running test: notDeclaredVariable", e);
-			throw e;
-		}
-	}
-	
-	@Test
 	public void emptyVHostTest() throws AppException, ParseException {
 		try {
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/empty-vhost-api-config.json").getFile();

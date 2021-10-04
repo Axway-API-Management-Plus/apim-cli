@@ -823,18 +823,15 @@ public class APIImportConfigAdapter {
 			JsonNode fileData = null;
 			try(InputStream is = new FileInputStream(clientCertFile)) {
 				fileData = APIManagerAdapter.getFileData(IOUtils.toByteArray(new FileInputStream(clientCertFile)), keystore, ContentType.create("application/x-pkcs12"));
-			} catch (Exception e) {
-				
 			}
 			CaCert cert = new CaCert();
 			cert.setCertFile(clientCertFile.getName());
 			cert.setInbound("false");
 			cert.setOutbound("true");
 			// This call is to validate the given password, keystore is valid
-
 			APIManagerAdapter.getCertInfo(fileData.get("data").asText(), password, cert);
-			//String data = node.get("data").asText();
-			authnProfile.getParameters().put("pfx", fileData.get("data").asText());
+			String data = fileData.get("data").asText();
+			authnProfile.getParameters().put("pfx", data);
 			authnProfile.getParameters().remove("certFile");
 		} catch (Exception e) {
 			throw new AppException("Can't read Client-Cert-File: "+keystore+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
