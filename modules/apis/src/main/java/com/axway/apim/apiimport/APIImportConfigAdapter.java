@@ -800,6 +800,10 @@ public class APIImportConfigAdapter {
 		if(!authnProfile.getType().equals(AuthType.ssl)) return;
 		String keystore = (String)authnProfile.getParameters().get("certFile");
 		String password = (String)authnProfile.getParameters().get("password");
+		if(keystore.contains(":")) {
+			LOG.warn("Keystore format: <keystorename>:<type> is deprecated. Please remove the keystore type.");
+			keystore = keystore.split(":")[0];
+		}
 		File clientCertFile = new File(keystore);
 		try {
 			if(!clientCertFile.exists()) {
