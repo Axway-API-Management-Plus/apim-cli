@@ -574,11 +574,11 @@ public class APIManagerAdapter {
 	 * @return JsonNode as it's required by the API-Manager.
 	 * @throws AppException if JSON-Node-Config can't be created
 	 */
-	public static JsonNode getCertInfo(String certFile, String password, CaCert cert) throws AppException {
+	public static JsonNode getCertInfoFromUrl(String certFile, String password, CaCert cert) throws AppException {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfo").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfoFromUrl").build();
 			
 			List <NameValuePair> parameters = new ArrayList <NameValuePair>();
 			parameters.add(new BasicNameValuePair("url", certFile));

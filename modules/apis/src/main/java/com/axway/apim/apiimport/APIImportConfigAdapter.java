@@ -829,7 +829,7 @@ public class APIImportConfigAdapter {
 			cert.setInbound("false");
 			cert.setOutbound("true");
 			// This call is to validate the given password, keystore is valid
-			APIManagerAdapter.getCertInfo(fileData.get("data").asText(), password, cert);
+			APIManagerAdapter.getCertInfoFromUrl(fileData.get("data").asText(), password, cert);
 			String data = fileData.get("data").asText();
 			authnProfile.getParameters().put("pfx", data);
 			authnProfile.getParameters().remove("certFile");
