@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - API-Import with Method-Level Outbound-Profiles failes if no custom Outbound-Authentication is given (See issue [#220](https://github.com/Axway-API-Management-Plus/apim-cli/issues/220))
 - Outbound SSL-Authentication is not working (See issue [#221](https://github.com/Axway-API-Management-Plus/apim-cli/issues/221))
 
+### Changed
+- Drop support for API-Manager version 7.6.2
+
 ## [1.3.13] 2021-09-21
 ### Fixed
 - Error upgrading access to newer API - The entity could not be found. (See issue [#218](https://github.com/Axway-API-Management-Plus/apim-cli/issues/218))
