@@ -20,7 +20,7 @@ cache:
     - '$HOME/.m2/repository'
 
 before_install:
-  # Avoid installation if unit-tests fail anyway   
+  # Avoid installation if unit-tests fail anyway
   - mvn clean test
 
   - if [ ! -f /etc/docker/daemon.json ]; then sudo cp -v .github/daemon-default.json /etc/docker/daemon.json; fi
