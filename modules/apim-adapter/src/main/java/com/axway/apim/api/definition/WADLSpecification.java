@@ -10,7 +10,7 @@ import com.axway.apim.lib.utils.Utils;
 
 public class WADLSpecification extends APISpecification {
 	
-	String wadl = null;
+	String wadl = null; 
 	
 	public WADLSpecification(byte[] apiSpecificationContent) throws AppException {
 		super(apiSpecificationContent);
