@@ -1,5 +1,6 @@
 package com.axway.apim.adapter;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -542,21 +543,26 @@ public class APIManagerAdapter {
 		return APIManagerAdapter.apiManagerName;
 	}
 	
-	public static JsonNode getCertInfoFromFile(InputStream certFile, CaCert cert) throws AppException {
+	public static JsonNode getCertInfo(InputStream certificate, String password, CaCert cert) throws AppException {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfo").build();
 			HttpEntity entity = MultipartEntityBuilder.create()
-					.addBinaryBody("file", IOUtils.toByteArray(certFile), ContentType.create("application/x-x509-ca-cert"), cert.getCertFile())
+					.addBinaryBody("file", certificate, ContentType.create("application/x-x509-ca-cert"), cert.getCertFile())
 					.addTextBody("inbound", cert.getInbound())
 					.addTextBody("outbound", cert.getOutbound())
+					.addTextBody("passphrase", password)
 					.build();
 			POSTRequest postRequest = new POSTRequest(entity, uri);
 			httpResponse = postRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			if( statusCode != 200){
+				if(response!=null && response.contains("Bad password")) {
+					LOG.debug("API-Manager failed to read certificate information: " + cert.getCertFile() + ". Got response: '"+response+"'.");
+					throw new AppException("Password for keystore: '" + cert.getCertFile() + "' is wrong.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
+				}
 				throw new AppException("API-Manager failed to read certificate information from file. Got response: '"+response+"'", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			JsonNode jsonResponse = mapper.readTree(response);

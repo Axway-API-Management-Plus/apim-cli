@@ -59,6 +59,11 @@
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.consol.citrus</groupId>
 			<artifactId>citrus-core</artifactId>
 		</dependency>
