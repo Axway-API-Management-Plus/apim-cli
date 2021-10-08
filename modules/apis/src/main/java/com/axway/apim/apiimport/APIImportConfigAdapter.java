@@ -458,7 +458,7 @@ public class APIImportConfigAdapter {
 			for(CaCert cert :apiConfig.getCaCerts()) {
 				if(cert.getCertBlob()==null) {
 					try(InputStream is = getInputStreamForCertFile(cert)) {
-						JsonNode certInfo = APIManagerAdapter.getCertInfo(is, null, cert);
+						JsonNode certInfo = APIManagerAdapter.getCertInfo(is, "", cert);
 						CaCert completedCert = mapper.readValue(certInfo.get(0).toString(), CaCert.class);
 						completedCaCerts.add(completedCert);
 					} catch (Exception e) {
