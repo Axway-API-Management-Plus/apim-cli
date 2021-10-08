@@ -9,6 +9,7 @@ public enum ErrorCode {
 	
 	SUCCESS								(0,  "Replication of the API was successful.", false, LogLevel.INFO),
 	MISSING_PARAMETER					(5,  "There is a missing parameter.", false),
+	INVALID_PARAMETER					(6,  "There is an invalid parameter.", false),
 	API_ALREADY_EXISTS					(7,  "The API already exists for another organization.", false),
 	NO_CHANGE							(10, "No change between desired and actual API has been detected.", false, LogLevel.WARN),
 	EXPORT_FOLDER_EXISTS				(12, "Export failed Export-Folder already exists.", false),
@@ -40,6 +41,7 @@ public enum ErrorCode {
 	CANT_READ_WSDL_FILE					(66, "Can't read the given WSDL-File."),
 	API_MANAGER_LOGIN_FAILED			(67, "Login to API-Manager failed."),
 	NO_UNIQUE_REMOTE_HOST				(68, "A unique remote host based on the given filter could not be found.", false),
+	API_MANAGER_COMMUNICATION_ERR		(69, "Unexpected API-Manager communication error.", true),
 	CANT_READ_CONFIG_FILE				(70, "Can't read the API Config-File.", false),
 	INVALID_QUOTA_CONFIG				(71, "The given Quota-Configuration is invalid.", false),
 	API_OPERATION_NOT_FOUND				(72, "The given operationId cannot be found.", false),
@@ -56,6 +58,8 @@ public enum ErrorCode {
 	ERR_DELETING_API					(91, "API could not be deleted.", false),
 	ERR_DELETING_ORG					(92, "Organization could not be deleted.", false),
 	ERR_GRANTING_ACCESS_TO_API			(93, "Error granting access to an API.", false),
+	ERR_EXPORTING_API_DAT_FILE			(94, "Error exporting API-Date file.", false),
+	ERR_CREATING_APPLICATION			(95, "Error creating/updating an application.", true),
 	UNXPECTED_ERROR						(99, "An unexpected error occured.");
 
 	private final int code;

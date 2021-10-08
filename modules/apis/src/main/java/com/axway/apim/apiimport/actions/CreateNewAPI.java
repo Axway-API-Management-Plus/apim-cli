@@ -71,7 +71,7 @@ public class CreateNewAPI {
 			}
 
 			// Is a Quota is defined we must manage it
-			new APIQuotaManager(desiredAPI, createdAPI).execute();
+			new APIQuotaManager(desiredAPI, actualAPI).execute(createdAPI);
 
 			// Grant access to the API
 			new ManageClientOrgs(desiredAPI, createdAPI).execute(reCreation);

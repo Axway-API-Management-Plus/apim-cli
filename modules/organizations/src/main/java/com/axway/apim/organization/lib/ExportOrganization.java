@@ -1,9 +1,12 @@
 package com.axway.apim.organization.lib;
 
+import java.util.List;
 import java.util.Map;
 
+import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ExportOrganization {
 	
@@ -33,10 +36,6 @@ public class ExportOrganization {
 		return this.org.isDevelopment();
 	}
 	
-	public Long getCreatedOn() {
-		return this.org.getCreatedOn();
-	}	
-	
 	public String getEmail() {
 		return this.org.getEmail();
 	}
@@ -47,5 +46,11 @@ public class ExportOrganization {
 	
 	public Map<String, String> getCustomProperties() {
 		return this.org.getCustomProperties();
+	}
+	
+	@JsonProperty("apis")
+	public List<APIAccess> getAPIAccess() {
+		if(org.getApiAccess()==null || org.getApiAccess().size()==0) return null;
+		return org.getApiAccess();
 	}
 }

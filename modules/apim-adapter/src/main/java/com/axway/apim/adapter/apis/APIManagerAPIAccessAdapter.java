@@ -184,7 +184,7 @@ public class APIManagerAPIAccessAdapter {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/"+type+"/"+parentEntity.getId()+"/apis").build();
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiName"}));
+					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiName", "apiVersion"}));
 			mapper.setFilterProvider(filter);
 			String json = mapper.writeValueAsString(apiAccess);
 			HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
@@ -193,9 +193,9 @@ public class APIManagerAPIAccessAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			if(statusCode < 200 || statusCode > 299){
-				if((statusCode==403 || statusCode==404) && response.contains("Unknown API")) {
-					LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in 1 second.");
-					Thread.sleep(1000);
+				if((statusCode==403 || statusCode==404) && (response.contains("Unknown API") || response.contains("The entity could not be found")) ) {
+					LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
+					Thread.sleep(cmd.getRetryDelay());
 					httpResponse = request.execute();
 					response = EntityUtils.toString(httpResponse.getEntity());
 					statusCode = httpResponse.getStatusLine().getStatusCode();

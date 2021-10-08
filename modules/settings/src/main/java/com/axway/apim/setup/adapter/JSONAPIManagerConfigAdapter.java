@@ -36,7 +36,7 @@ public class JSONAPIManagerConfigAdapter {
 		String stage = importParams.getStage();
 		File configFile = Utils.locateConfigFile(config);
 		if(!configFile.exists()) return;
-		File stageConfig = Utils.getStageConfig(stage, configFile);
+		File stageConfig = Utils.getStageConfig(stage, importParams.getStageConfig(), configFile);
 		APIManagerConfig baseConfig;
 		try {
 			mapper.configOverride(Map.class).setMergeable(true);

@@ -44,6 +44,10 @@ public class CLIAPIImportOptions extends CLIOptions {
 		option.setArgName("api_config.json");
 		addOption(option);
 		
+		option = new Option("stageConfig", true, "Manually provide the name of the stage configuration file to use instead of derived from the given stage.");
+		option.setArgName("my-staged-api-config.json");
+		addOption(option);
+		
 		option = new Option("ignoreQuotas", "Use this flag to ignore configured API quotas.");
 		option.setRequired(false);
 		addOption(option);
@@ -124,6 +128,7 @@ public class CLIAPIImportOptions extends CLIOptions {
 	public Parameters getParams() {
 		APIImportParams params = new APIImportParams();
 		params.setConfig(getValue("config"));
+		params.setStageConfig(getValue("stagedConfig"));
 		params.setApiDefintion(getValue("apidefinition"));
 		params.setForceUpdate(hasOption("forceUpdate"));
 		params.setChangeOrganization(hasOption("changeOrganization"));
@@ -137,6 +142,7 @@ public class CLIAPIImportOptions extends CLIOptions {
 		params.setValidateRemoteHost(Boolean.parseBoolean(getValue("validateRemoteHost")));
 		params.setZeroDowntimeUpdate(Boolean.parseBoolean(getValue("zeroDowntimeUpdate")));
 		if(getValue("allowOrgAdminsToPublish")!=null) params.setAllowOrgAdminsToPublish(Boolean.parseBoolean(getValue("allowOrgAdminsToPublish")));
+		params.setStageConfig(getValue("stageConfig"));
 		return params;
 	}
 }
