@@ -27,6 +27,10 @@ public class APIManagerSetupImportCLIOptions extends CLIOptions {
 		option.setRequired(true);
 		option.setArgName("api-manager.json");
 		addOption(option);
+		
+		option = new Option("stageConfig", true, "Manually provide the name of the stage configuration file to use instead of derived from the given stage.");
+		option.setArgName("my-staged-setting.json");
+		addOption(option);
 	}
 
 	@Override
@@ -51,6 +55,7 @@ public class APIManagerSetupImportCLIOptions extends CLIOptions {
 	public StandardImportParams getParams() throws AppException {
 		StandardImportParams params = new StandardImportParams();
 		params.setConfig(getValue("config"));
+		params.setStageConfig(getValue("stageConfig"));
 		return params;
 	}
 

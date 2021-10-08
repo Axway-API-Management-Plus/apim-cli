@@ -1,6 +1,5 @@
 package com.axway.apim.apiimport;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,12 +16,9 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +39,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -73,6 +70,7 @@ import com.axway.apim.api.model.QuotaRestrictionDeserializer;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -121,6 +119,11 @@ public class APIImportConfigAdapter {
 		this.apiConfig = apiConfig;
 		this.apiConfigFile = apiConfigFile;
 	}
+	
+	public APIImportConfigAdapter(APIImportParams params) throws AppException {
+		this(params.getConfig(), params.getStage(), params.getApiDefintion(), APIManagerAdapter.hasOrgAdmin(), params.getStageConfig());
+	}
+	
 	/**
 	 * Constructs the APIImportConfig 
 	 * @param apiConfigFileName the API-Config given by the user
@@ -129,7 +132,7 @@ public class APIImportConfigAdapter {
 	 * @param usingOrgAdmin access to API-Manager should be limited to the Org-Admin account
 	 * @throws AppException if the config-file can't be parsed for some reason
 	 */
-	public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, boolean usingOrgAdmin) throws AppException {
+	public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, boolean usingOrgAdmin, String stageConfig) throws AppException {
 		super();
 		SimpleModule module = new SimpleModule();
 		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer());
@@ -142,19 +145,19 @@ public class APIImportConfigAdapter {
 			this.pathToAPIDefinition = pathToAPIDefinition;
 			this.usingOrgAdmin = usingOrgAdmin;
 			this.apiConfigFile = Utils.locateConfigFile(apiConfigFileName);
-			File stageConfig = Utils.getStageConfig(stage, this.apiConfigFile);
+			File stageConfigFile = Utils.getStageConfig(stage, stageConfig, this.apiConfigFile);
 			// Validate organization for the base config, if no staged-config is given
-			boolean validateOrganization = (stageConfig==null) ? true : false;
+			boolean validateOrganization = (stageConfigFile==null) ? true : false;
 			ObjectReader reader = mapper.reader();
 			baseConfig = reader.withAttribute("validateOrganization", validateOrganization).forType(DesiredAPI.class).readValue(Utils.substitueVariables(this.apiConfigFile));
-			if(stageConfig!=null) {
+			if(stageConfigFile!=null) {
 				try {
 					// If the baseConfig doesn't have a valid organization, the stage config must
 					validateOrganization = (baseConfig.getOrganization()==null) ? true : false;
 					ObjectReader updater = mapper.readerForUpdating(baseConfig).withAttribute("validateOrganization", validateOrganization);
 					// Organization must be valid in staged configuration
-					apiConfig = updater.withAttribute("validateOrganization", true).readValue(Utils.substitueVariables(Utils.getStageConfig(stage, this.apiConfigFile)));
-					LOG.info("Loaded stage API-Config from file: " + Utils.getStageConfig(stage, this.apiConfigFile));
+					apiConfig = updater.withAttribute("validateOrganization", true).readValue(Utils.substitueVariables(stageConfigFile));
+					LOG.info("Loaded stage API-Config from file: " + stageConfigFile);
 				} catch (FileNotFoundException e) {
 					LOG.warn("No config file found for stage: '"+stage+"'");
 					apiConfig = baseConfig;
@@ -455,7 +458,7 @@ public class APIImportConfigAdapter {
 			for(CaCert cert :apiConfig.getCaCerts()) {
 				if(cert.getCertBlob()==null) {
 					try(InputStream is = getInputStreamForCertFile(cert)) {
-						JsonNode certInfo = APIManagerAdapter.getCertInfo(is, cert);
+						JsonNode certInfo = APIManagerAdapter.getCertInfo(is, "", cert);
 						CaCert completedCert = mapper.readValue(certInfo.get(0).toString(), CaCert.class);
 						completedCaCerts.add(completedCert);
 					} catch (Exception e) {
@@ -746,7 +749,7 @@ public class APIImportConfigAdapter {
 			OutboundProfile profile = importApi.getOutboundProfiles().get(profileName);
 			if(profileName.equals("_default")) {
 				defaultProfileFound = true;
-				// Validate the _default Outbound-Profile has an AuthN-Profile, otherwise we must add (See isseu #133)
+				// Validate the _default Outbound-Profile has an AuthN-Profile, otherwise we must add (See issue #133)
 				
 				if(profile.getAuthenticationProfile()==null) {
 					LOG.warn("Provided default outboundProfile doesn't contain AuthN-Profile - Setting it to default");
@@ -754,9 +757,11 @@ public class APIImportConfigAdapter {
 				}
 				continue;
 			}
-			// Check the referenced profiles are valid
-			if(profile.getAuthenticationProfile()!=null && getAuthNProfile(importApi, profile.getAuthenticationProfile())==null) {
-				throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '"+profile.getAuthenticationProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
+			// Check the referenced authentication profile is valid
+			if(!profile.getAuthenticationProfile().equals("_default")) {
+				if(profile.getAuthenticationProfile()!=null && getAuthNProfile(importApi, profile.getAuthenticationProfile())==null) {
+					throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '"+profile.getAuthenticationProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
+				}
 			}
 		}
 		if(!defaultProfileFound) {
@@ -793,126 +798,44 @@ public class APIImportConfigAdapter {
 	
 	private void handleOutboundSSLAuthN(AuthenticationProfile authnProfile) throws AppException {
 		if(!authnProfile.getType().equals(AuthType.ssl)) return;
-		String clientCert = (String)authnProfile.getParameters().get("certFile");
+		String keystore = (String)authnProfile.getParameters().get("certFile");
 		String password = (String)authnProfile.getParameters().get("password");
-		String[] result = extractKeystoreTypeFromCertFile(clientCert);
-		clientCert 			= result[0];
-		String storeType 	= result[1];
-		File clientCertFile = new File(clientCert);
-		String clientCertClasspath = null;
+		if(keystore.contains(":")) {
+			LOG.warn("Keystore format: <keystorename>:<type> is deprecated. Please remove the keystore type.");
+			keystore = keystore.split(":")[0];
+		}
+		File clientCertFile = new File(keystore);
 		try {
 			if(!clientCertFile.exists()) {
 				// Try to find file using a relative path to the config file
 				String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
-				clientCertFile = new File(baseDir + "/" + clientCert);
+				clientCertFile = new File(baseDir + "/" + keystore);
 			}
 			if(!clientCertFile.exists()) {
 				// If not found absolute & relative - Try to load it from ClassPath
 				LOG.debug("Trying to load Client-Certificate from classpath");
-				if(this.getClass().getResource(clientCert)==null) {
-					throw new AppException("Can't read Client-Certificate-Keystore: "+clientCert+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR);
+				if(this.getClass().getResource(keystore)==null) {
+					throw new AppException("Can't read Client-Certificate-Keystore: "+keystore+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR);
 				}
-				clientCertClasspath = clientCert;
-			}
-			KeyStore store = null;
-			store = loadKeystore(clientCertFile, clientCertClasspath, storeType, password);
-			if(store==null) {
-				throw new AppException("Unable to configure Outbound SSL-Config. Can't load keystore: '"+clientCertFile+"' for any reason. "
-						+ "Turn on debug to see log messages.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
-			}
-			X509Certificate certificate = null;
-			Enumeration<String> e = store.aliases();
-			while (e.hasMoreElements()) {
-				String alias = e.nextElement();
-				certificate = (X509Certificate) store.getCertificate(alias);
-				certificate.getEncoded();
+				clientCertFile = new File(this.getClass().getResource(keystore).getFile());
 			}
 			if(this.apiConfig instanceof DesiredTestOnlyAPI) return; // Skip here when testing
-			JsonNode node = APIManagerAdapter.getFileData(certificate.getEncoded(), clientCert);
-			String data = node.get("data").asText();
+			JsonNode fileData = null;
+			try(InputStream is = new FileInputStream(clientCertFile)) {
+				fileData = APIManagerAdapter.getFileData(IOUtils.toByteArray(new FileInputStream(clientCertFile)), keystore, ContentType.create("application/x-pkcs12"));
+			}
+			CaCert cert = new CaCert();
+			cert.setCertFile(clientCertFile.getName());
+			cert.setInbound("false");
+			cert.setOutbound("true");
+			// This call is to validate the given password, keystore is valid
+			APIManagerAdapter.getCertInfo(new FileInputStream(clientCertFile), password, cert);
+			String data = fileData.get("data").asText();
 			authnProfile.getParameters().put("pfx", data);
 			authnProfile.getParameters().remove("certFile");
 		} catch (Exception e) {
-			throw new AppException("Can't read Client-Cert-File: "+clientCert+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
+			throw new AppException("Can't read Client-Cert-File: "+keystore+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
 		} 
-	}
-	
-	private KeyStore loadKeystore(File clientCertFile, String clientCertClasspath, String keystoreType, String password) throws AppException {
-		InputStream is = null;
-		KeyStore store = null;
-
-		if(keystoreType!=null) {
-			try {
-				// Get the Inputstream and load the keystore with the given Keystore-Type
-				if(clientCertClasspath==null) {
-					is = new BufferedInputStream(new FileInputStream(clientCertFile));
-				} else {
-					is = this.getClass().getResourceAsStream(clientCertClasspath);
-				}
-				LOG.debug("Loading keystore: '"+clientCertFile+"' using keystore type: '"+keystoreType+"'");
-				store = KeyStore.getInstance(keystoreType);
-				store.load(is, password.toCharArray());
-				return store;
-			} catch (IOException e) {
-				if(e.getMessage()!=null && e.getMessage().toLowerCase().contains("keystore password was incorrect")) {
-					throw new AppException("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, e);
-				}
-				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
-				throw new AppException("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, e);
-			} catch (Exception e) {
-				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage());
-				return null;
-			} finally {
-				if(is!=null)
-					try {
-						is.close();
-					} catch (IOException e) { }
-			}
-		}
-		// Otherwise we try every known type		
-		LOG.debug("Loading keystore: '"+clientCertFile+"' trying the following types: " + Security.getAlgorithms("KeyStore"));
-		for(String type : Security.getAlgorithms("KeyStore")) {
-			try {
-				LOG.debug("Trying to load keystore: '"+clientCertFile+"' using type: '"+type+"'");
-				// Get the Inputstream and load the keystore with the given Keystore-Type
-				if(clientCertClasspath==null) {
-					is = new BufferedInputStream(new FileInputStream(clientCertFile));
-				} else {
-					is = this.getClass().getResourceAsStream(clientCertClasspath);
-				}
-				store = KeyStore.getInstance(type);
-				store.load(is, password.toCharArray());
-				if(store!=null) {
-					LOG.debug("Successfully loaded keystore: '"+clientCertFile+"' with type: " + type);
-					return store;
-				}
-			} catch (IOException e) {
-				if(e.getMessage()!=null && e.getMessage().toLowerCase().contains("keystore password was incorrect")) {
-					throw new AppException("Unable to configure Outbound SSL-Config as password for keystore: is incorrect.", ErrorCode.WRONG_KEYSTORE_PASSWORD, e);
-				}
-				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage(), e);
-			} catch (Exception e) {
-				LOG.debug("Error message using type: " + keystoreType + " Error-Message: " + e.getMessage(), e);
-			} finally {
-				if(is!=null)
-					try {
-						is.close();
-					} catch (IOException e) { }
-			}
-		}
-		return null;
-	}
-	
-	private String[] extractKeystoreTypeFromCertFile(String certFileName) throws AppException {
-		if(!certFileName.contains(":")) return new String[]{certFileName, null};
-		int pos = certFileName.lastIndexOf(":");
-		if(pos<3) return new String[]{certFileName, null}; // This occurs for the following format: c:/path/to/my/store
-		String type = certFileName.substring(pos+1);
-		if(!Security.getAlgorithms("KeyStore").contains(type)) {
-			throw new AppException("Unknown keystore type: '"+type+"'. Supported: " + Security.getAlgorithms("KeyStore"), ErrorCode.WRONG_KEYSTORE_PASSWORD);
-		}
-		certFileName = certFileName.substring(0, pos);
-		return new String[]{certFileName, type};
 	}
 	
 	private void validateHasQueryStringKey(API importApi) throws AppException {

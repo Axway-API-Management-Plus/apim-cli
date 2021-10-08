@@ -41,7 +41,7 @@ public class AppException extends JsonProcessingException {
 	
 	public void logException(Logger LOG) {
 		Throwable cause = null;
-		if(error.getPrintStackTrace()) {
+		if(error.getPrintStackTrace() || LOG.isDebugEnabled()) {
 			cause = this;
 		}
 		switch (error.getLogLevel()) {

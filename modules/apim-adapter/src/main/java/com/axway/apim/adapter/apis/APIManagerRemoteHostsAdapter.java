@@ -15,8 +15,8 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.jackson.OrganizationSerializerModifier;
+import com.axway.apim.adapter.jackson.UserSerializerModifier;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -38,7 +38,7 @@ public class APIManagerRemoteHostsAdapter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerRemoteHostsAdapter.class);
 	
-	ObjectMapper mapper = APIManagerAdapter.mapper;
+	ObjectMapper mapper = new ObjectMapper();
 	
 	CoreParameters cmd = CoreParameters.getInstance();
 
@@ -76,7 +76,7 @@ public class APIManagerRemoteHostsAdapter {
 		readRemotehostsFromAPIManager(filter);
 		try {
 			List<RemoteHost> remoteHostsList = mapper.readValue(apiManagerResponse.get(filter), new TypeReference<List<RemoteHost>>(){});
-			remoteHostsList.removeIf(remoteHost -> filter.filter(remoteHost));
+			remoteHostsList.removeIf(remoteHost -> !filter.filter(remoteHost));
 			Map<String, RemoteHost> remoteHosts = new HashMap<String, RemoteHost>();
 			for(RemoteHost remoteHost : remoteHostsList) {
 				remoteHosts.put(remoteHost.getName(), remoteHost);
@@ -106,14 +106,17 @@ public class APIManagerRemoteHostsAdapter {
 		RemoteHost createdRemoteHost;
 		try {
 			URI uri;
+			FilterProvider filter;
 			if(actualRemoteHost==null) {
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/remotehosts").build();
+				filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"createdBy", "organization"}));
 			} else {
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/remotehosts/"+actualRemoteHost.getId()).build();
+				filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"organization"}));
 			}
-			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"createdBy", "organization"}));
 			mapper.setFilterProvider(filter);
 			mapper.registerModule(new SimpleModule().setSerializerModifier(new OrganizationSerializerModifier(false)));
+			mapper.registerModule(new SimpleModule().setSerializerModifier(new UserSerializerModifier(false)));
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			try {
 				RestAPICall request;
@@ -123,6 +126,8 @@ public class APIManagerRemoteHostsAdapter {
 					request = new POSTRequest(entity, uri, true);
 				} else {
 					desiredRemoteHost.setId(actualRemoteHost.getId());
+					desiredRemoteHost.setCreatedOn(actualRemoteHost.getCreatedOn());
+					desiredRemoteHost.setCreatedBy(actualRemoteHost.getCreatedBy());
 					String json = mapper.writeValueAsString(desiredRemoteHost);
 					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new PUTRequest(entity, uri, true);

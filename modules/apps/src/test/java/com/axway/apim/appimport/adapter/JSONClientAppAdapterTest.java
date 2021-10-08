@@ -19,6 +19,7 @@ import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.QuotaRestrictiontype;
 import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
+import com.axway.apim.api.model.apps.ClientAppOauthResource;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.OAuth;
 import com.axway.apim.appimport.lib.AppImportParams;
@@ -140,5 +141,12 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertEquals(restr.getConfig().get("messages"), "9999");
 		assertEquals(restr.getConfig().get("period"), "week");
 		assertEquals(restr.getConfig().get("per"), "1");
+		
+		List<ClientAppOauthResource> oauthResources = app.getOauthResources();
+		assertNotNull(oauthResources, "oauthResources is null");
+		assertEquals(oauthResources.size(), 2, "Expected two OAuth resources");
+		ClientAppOauthResource oauthRes = oauthResources.get(0);
+		assertEquals(oauthRes.getScope(), "resource.READ");
+		assertEquals(oauthRes.isEnabled(), true);
 	}
 }

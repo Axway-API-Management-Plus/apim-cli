@@ -7,11 +7,13 @@ import org.testng.annotations.Test;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
+import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.setup.lib.APIManagerSetupImportCLIOptions;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportCLIOptions;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportParams;
 
-public class RemoteHostExportCLIOptionsTest {
+public class RemoteHostCLIOptionsTest {
 	@Test
 	public void testRemoteHostExportParams() throws ParseException, AppException {
 		String[] args = {"-s", "mytest", "-n", "*MyHost*", "-id", "MyRemoteHostID", "-t", "myTarget", "-o", "json", "-wide", "-deleteTarget"};
@@ -40,5 +42,15 @@ public class RemoteHostExportCLIOptionsTest {
 		Assert.assertEquals(params.getWide(), Wide.ultra);
 		// Validate target is current directory if not given
 		Assert.assertEquals(params.getTarget(), ".");
+	}
+	
+	@Test
+	public void testSettingsImportParams() throws ParseException, AppException {
+		String[] args = {"-c", "mySettings.json", "-stageConfig", "myStagedSettings.json"};
+		CLIOptions options = APIManagerSetupImportCLIOptions.create(args);
+		StandardImportParams params = (StandardImportParams) options.getParams();
+		
+		Assert.assertEquals(params.getConfig(), "mySettings.json");
+		Assert.assertEquals(params.getStageConfig(), "myStagedSettings.json");
 	}
 }

@@ -6,6 +6,50 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
+- No change detected when updating the role of a user (See issue [#219](https://github.com/Axway-API-Management-Plus/apim-cli/issues/219))
+- API-Import with Method-Level Outbound-Profiles failes if no custom Outbound-Authentication is given (See issue [#220](https://github.com/Axway-API-Management-Plus/apim-cli/issues/220))
+- Outbound SSL-Authentication is not working (See issue [#221](https://github.com/Axway-API-Management-Plus/apim-cli/issues/221))
+
+### Changed
+- Drop support for API-Manager version 7.6.2
+
+## [1.3.13] 2021-09-21
+### Fixed
+- Error upgrading access to newer API - The entity could not be found. (See issue [#218](https://github.com/Axway-API-Management-Plus/apim-cli/issues/218))
+
+## [1.3.12] 2021-09-10
+### Added
+- Provide option to configure the Retry-Delay for some of the API-Manager REST-API calls (See issue [#213](https://github.com/Axway-API-Management-Plus/apim-cli/issues/213))
+
+## [1.3.11] 2021-09-06
+### Added
+- Feature to grant API access for organization during import (See issue [#196](https://github.com/Axway-API-Management-Plus/apim-cli/issues/196))
+- Feature to manually define the stage configuration file (See issue [#195](https://github.com/Axway-API-Management-Plus/apim-cli/issues/195))
+- User-Import now supports staging and variables as the other entity types
+- Feature to filter APIs with `-createdOn` based on their creation date. (See issue [#209](https://github.com/Axway-API-Management-Plus/apim-cli/issues/209))
+- The API-Creation date is now exported into the CSV- and Console-Format (See issue [#208](https://github.com/Axway-API-Management-Plus/apim-cli/issues/208))
+
+### Fixed
+- Changed the Log-Threshold to DEBUG for Console-Logger to make debugging working according to the documentation
+- Application-JSON-Export - Credentials should not contain ApplicationID (See issue [#146](https://github.com/Axway-API-Management-Plus/apim-cli/issues/146))
+- Import Application scopes doesn't work (See issue [#206](https://github.com/Axway-API-Management-Plus/apim-cli/issues/206))
+
+## [1.3.10] 2021-07-16
+### Fixed
+- No change detected when changing authenticationProfile in outboundProfiles (See issue [#184](https://github.com/Axway-API-Management-Plus/apim-cli/issues/184)) by @ftriolet
+- A WSDL file with a long comment at the beginning is not recognized as a WSDL specification. (See issue [#190](https://github.com/Axway-API-Management-Plus/apim-cli/issues/190))
+
+### Added
+- Added feature to export APIs as DAT-Files (See issue [#191](https://github.com/Axway-API-Management-Plus/apim-cli/issues/191))
+
+## [1.3.9] 2021-07-02
+### Fixed
+- Update RemoteHost lost CreatedBy & CreatedOn (See issue [#180](https://github.com/Axway-API-Management-Plus/apim-cli/issues/180))
+- Manually configured API-Quotas get lost, when API is re-created (See issue [#187](https://github.com/Axway-API-Management-Plus/apim-cli/issues/187))
+- Cannot delete API with an image, when the image is changed during deletion (See issue [#188](https://github.com/Axway-API-Management-Plus/apim-cli/issues/188))
+
+## [1.3.8] 2021-06-17
+### Fixed
 - CLI does not realize changed policy when updating an API (See issue [#179](https://github.com/Axway-API-Management-Plus/apim-cli/issues/179))
 - API-ManagerApps Adpater now handles 404 if searching for an Application based on the ID that does not exists (See issue [#168](https://github.com/Axway-API-Management-Plus/apim-cli/issues/168))
 - vhost="" no longer creates a new API each time (See issue [#169](https://github.com/Axway-API-Management-Plus/apim-cli/issues/169))

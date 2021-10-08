@@ -27,7 +27,11 @@ public class UserImportCLIOptions extends CLIOptions {
 		// Define command line options required for Application export
 		Option option = new Option("c", "config", true, "This is the JSON-Formatted Organization-Config file containing the organization. You may get that config file using apim org get with output set to JSON.");
 		option.setRequired(true);
-		option.setArgName("org_config.json");
+		option.setArgName("user_config.json");
+		addOption(option);
+		
+		option = new Option("stageConfig", true, "Manually provide the name of the stage configuration file to use instead of derived from the given stage.");
+		option.setArgName("my-staged-user.json");
 		addOption(option);
 	}
 
@@ -55,6 +59,7 @@ public class UserImportCLIOptions extends CLIOptions {
 		UserImportParams params = new UserImportParams();
 
 		params.setConfig(getValue("config"));
+		params.setStageConfig(getValue("stagedConfig"));
 		return params;
 	}
 }

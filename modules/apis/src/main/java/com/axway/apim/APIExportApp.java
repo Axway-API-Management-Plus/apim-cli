@@ -43,7 +43,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 
 	public static void main(String args[]) { 
-		int rc = grantAccess(args);
+		int rc = exportAPI(args);
 		System.exit(rc);
 	}
 	
@@ -72,6 +72,8 @@ public class APIExportApp implements APIMCLIServiceProvider {
 				return execute(params, APIListImpl.JSON_EXPORTER);
 			case csv:
 				return execute(params, APIListImpl.CSV_EXPORTER);
+			case dat:
+				return execute(params, APIListImpl.DAT_EXPORTER);
 			default:
 				return execute(params, APIListImpl.CONSOLE_EXPORTER);
 			}

@@ -103,6 +103,8 @@ public class CoreParameters implements Parameters {
 	
 	private String proxyPassword;
 	
+	private int retryDelay;
+	
 	public CoreParameters() {
 		super();
 		CoreParameters.instance = this;
@@ -413,6 +415,28 @@ public class CoreParameters implements Parameters {
 		this.proxyPassword = proxyPassword;
 	}
 	
+	public int getRetryDelay() {
+		if(retryDelay==0) return 1000;
+		return retryDelay;
+	}
+	
+	public void setRetryDelay(String retryDelay) {
+		this.retryDelay = 1000;
+		if(retryDelay==null || retryDelay.equals("null")) {
+			return;
+		}
+		try {
+			this.retryDelay = Integer.parseInt(retryDelay);
+			LOG.info("Retrying unexpected API-Manager REST-API responses with a delay of " + this.retryDelay + " milliseconds.");
+		} catch(Exception e) {
+			LOG.error("Error while parsing given retryDelay: '"+retryDelay+"' as a milliseconds. Using default of 1000 milliseconds.");
+		}
+	}
+
+	public void setRetryDelay(int retryDelay) {
+		this.retryDelay = retryDelay;
+	}
+
 	public Boolean isZeroDowntimeUpdate() {
 		if(zeroDowntimeUpdate==null) return false;
 		return zeroDowntimeUpdate;
