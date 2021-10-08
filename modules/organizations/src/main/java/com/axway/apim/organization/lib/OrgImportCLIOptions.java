@@ -28,6 +28,10 @@ public class OrgImportCLIOptions extends CLIOptions {
 		option.setRequired(true);
 		option.setArgName("org_config.json");
 		addOption(option);
+		
+		option = new Option("stageConfig", true, "Manually provide the name of the stage configuration file to use instead of derived from the given stage.");
+		option.setArgName("my-staged-org-config.json");
+		addOption(option);
 	}
 
 	@Override
@@ -53,6 +57,7 @@ public class OrgImportCLIOptions extends CLIOptions {
 	public Parameters getParams() throws AppException {
 		OrgImportParams params = new OrgImportParams();
 		params.setConfig(getValue("config"));
+		params.setStageConfig(getValue("stageConfig"));
 		return params;
 	}
 }

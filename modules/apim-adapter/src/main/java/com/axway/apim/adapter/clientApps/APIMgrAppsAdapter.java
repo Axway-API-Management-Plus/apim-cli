@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,6 +40,7 @@ import com.axway.apim.lib.CustomPropertiesFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.PUTRequest;
@@ -340,14 +343,14 @@ public class APIMgrAppsAdapter {
 				RestAPICall request;
 				if(actualApp==null) {
 					FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-							SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentials", "appQuota", "organization", "image","oauthResources"}));
+							SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentials", "appQuota", "organization", "image","appScopes"}));
 					mapper.setFilterProvider(filter);
 					String json = mapper.writeValueAsString(desiredApp);
 					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 					request = new POSTRequest(entity, uri);
 				} else {
 					FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-							SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentials", "appQuota", "organization", "image", "apis","oauthResources"}));
+							SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"credentials", "appQuota", "organization", "image", "apis","appScopes"}));
 					mapper.setFilterProvider(filter);
 					String json = mapper.writeValueAsString(desiredApp);
 					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
@@ -376,12 +379,12 @@ public class APIMgrAppsAdapter {
 			saveImage(desiredApp, actualApp);
 			saveAPIAccess(desiredApp, actualApp);
 			saveCredentials(desiredApp, actualApp);
-			saveOauthResources(desiredApp, actualApp);
+			manageOAuthResources(desiredApp, actualApp);
 			saveQuota(desiredApp, actualApp);
 			return createdApp;
 
 		} catch (Exception e) {
-			throw new AppException("Error creating/updating application", ErrorCode.CANT_CREATE_API_PROXY, e);
+			throw new AppException("Error creating/updating application", ErrorCode.ERR_CREATING_APPLICATION, e);
 		}
 	}
 	
@@ -562,31 +565,25 @@ public class APIMgrAppsAdapter {
 		accessAdapter.saveAPIAccess(app.getApiAccess(), app, Type.applications);
 	}
 	
-	private void saveOauthResources(ClientApplication desiredApp, ClientApplication actualApp) throws AppException {
-		if(desiredApp.getOauthResources()==null || desiredApp.getOauthResources().size()==0) return;
-
+	private void manageOAuthResources(ClientApplication desiredApp, ClientApplication actualApp) throws AppException {
+		List<ClientAppOauthResource> scopes2Update = new ArrayList<ClientAppOauthResource>();
+		List<ClientAppOauthResource> scopes2Create = new ArrayList<ClientAppOauthResource>();
+		List<ClientAppOauthResource> scopes2Delete = new ArrayList<ClientAppOauthResource>();
+		getScopes2AddOrUpdate(actualApp, desiredApp, scopes2Update, scopes2Create, scopes2Delete);
+		saveOrUpdateOAuthResources(desiredApp, scopes2Create, false);
+		saveOrUpdateOAuthResources(desiredApp, scopes2Update, true);
+		deleteOAuthResources(desiredApp, scopes2Delete);
+	}
+	
+	private void saveOrUpdateOAuthResources(ClientApplication desiredApp, List<ClientAppOauthResource> scopes2Create, boolean update) throws AppException {
+		if(scopes2Create==null || scopes2Create.size()==0) return;
 		HttpResponse httpResponse = null;
-		for(ClientAppOauthResource res : desiredApp.getOauthResources()) {
+		for(ClientAppOauthResource res : scopes2Create) {
 			String endpoint = "oauthresource";
-			if(actualApp!=null && actualApp.getOauthResources().contains(res)) //nothing to do
-				continue;
-			
 			try {
-				boolean update = false;
-				if (actualApp!=null && actualApp.getOauthResources()!=null) {
-					Optional<ClientAppOauthResource> opt = actualApp.getOauthResources().stream().filter(o -> o.getScope().equals(res.getScope())).findFirst();
-					if (opt.isPresent()) {
-					//I found an oauth resource with same scope name but different in some properties, I have to update it		
-						String oauthResourceId = opt.get().getId();
-						endpoint += "/"+oauthResourceId;
-						res.setId(oauthResourceId);
-						res.setApplicationId(opt.get().getApplicationId());
-						res.setUriprefix(opt.get().getUriprefix());
-						update = true;
-						LOG.debug("Oauth resource already exists, updating");
-					} else {
-						LOG.debug("Oauth resource not found, creating");
-					}
+				if(update) {
+					endpoint += "/"+res.getId();
+					LOG.debug("Oauth resource already exists, updating");
 				} else {
 					LOG.debug("Oauth resource not found, creating");
 				}
@@ -612,7 +609,78 @@ public class APIMgrAppsAdapter {
 				} catch (Exception ignore) { }
 			}
 		}
-	}	
+	}
+	
+	private void deleteOAuthResources(ClientApplication desiredApp, List<ClientAppOauthResource> scopes2Delete) throws AppException {
+		if(scopes2Delete==null || scopes2Delete.size()==0) return;
+		HttpResponse httpResponse = null;
+		for(ClientAppOauthResource res : scopes2Delete) {
+			try {
+				URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+desiredApp.getId()+"/oauthresource/"+res.getId()).build();
+				RestAPICall request = new DELRequest(uri, true);
+				httpResponse = request.execute();
+				int statusCode = httpResponse.getStatusLine().getStatusCode();
+				if(statusCode != 204){
+					LOG.error("Error deleting application scope. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+					throw new AppException("Error deleting application scope. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+				}
+				LOG.info("Application scope: "+res.getScope()+" for application: "+desiredApp.getName()+" successfully deleted");
+			} catch (Exception e) {
+				throw new AppException("Error deleting application scope", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			} finally {
+				try {
+					((CloseableHttpResponse)httpResponse).close();
+				} catch (Exception ignore) { }
+			}
+		}
+	}
+	
+	private void getScopes2AddOrUpdate(ClientApplication actualApp, ClientApplication desiredApp, 
+			List<ClientAppOauthResource> scopes2Update, List<ClientAppOauthResource> scopes2Create, List<ClientAppOauthResource> scopes2Delete) throws AppException {
+		List<ClientAppOauthResource> existingScopes = null;
+		List<ClientAppOauthResource> desiredScopes = desiredApp.getOauthResources();
+		if(actualApp!=null) {
+			existingScopes = actualApp.getOauthResources();
+		}
+		if(existingScopes==null) existingScopes = new ArrayList<ClientAppOauthResource>();
+		if(desiredScopes!=null) {
+			// Iterate over the given desired scopes
+			Iterator<ClientAppOauthResource> it = desiredScopes.iterator();
+			while(it.hasNext()) {
+				boolean existingScopeFound = false;
+				ClientAppOauthResource desiredScope = it.next();
+				// Compare each desired scope, if it is already included in the existing scopes
+				for(ClientAppOauthResource existingScope : existingScopes) {
+					// If it is the same scope (based on the name) ...
+					if(desiredScope.getScope().equals(existingScope.getScope())) {
+						// Check, if the scopes are not equal and if so take over the configuration and put it to the list of scopes to update
+						if(!desiredScope.equals(existingScope)) {
+							existingScope.setDefaultScope(desiredScope.isDefaultScope());
+							existingScope.setEnabled(desiredScope.isEnabled());
+							scopes2Update.add(existingScope);
+						}
+						existingScopeFound = true;
+						break;
+					}
+				}
+				if(!existingScopeFound) scopes2Create.add(desiredScope);
+			}
+		}
+		// finally iterate over all existing scopes and check if they are still desired
+		if(existingScopes!=null) {
+			for(ClientAppOauthResource existingScope : existingScopes) {
+				boolean actualScopeFound = false;
+				for(ClientAppOauthResource desiredScope : desiredScopes) {
+					if(existingScope.getScope().equals(desiredScope.getScope())) {
+						actualScopeFound = true;
+						break; // As the actual scope is still desired
+					}
+				}
+				if(!actualScopeFound) scopes2Delete.add(existingScope);
+			}
+		}
+		return;
+	}
 	
 	
 	public void setTestApiManagerResponse(ClientAppFilter filter, String apiManagerResponse) {

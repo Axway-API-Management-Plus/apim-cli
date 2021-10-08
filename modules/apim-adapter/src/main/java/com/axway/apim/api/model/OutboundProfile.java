@@ -15,25 +15,25 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 public class OutboundProfile extends Profile {
-	
+
 	protected static Logger LOG = LoggerFactory.getLogger(OutboundProfile.class);
-	
+
 	String routeType;
-	
-	@JsonDeserialize( using = PolicyDeserializer.class)
+
+	@JsonDeserialize(using = PolicyDeserializer.class)
 	Policy requestPolicy;
-	
-	@JsonDeserialize( using = PolicyDeserializer.class)
+
+	@JsonDeserialize(using = PolicyDeserializer.class)
 	Policy responsePolicy;
-	
-	@JsonDeserialize( using = PolicyDeserializer.class)
+
+	@JsonDeserialize(using = PolicyDeserializer.class)
 	Policy routePolicy;
-	
-	@JsonDeserialize( using = PolicyDeserializer.class)
+
+	@JsonDeserialize(using = PolicyDeserializer.class)
 	Policy faultHandlerPolicy;
-	
+
 	String authenticationProfile;
-	
+
 	List<Object> parameters = new ArrayList<Object>();
 
 	public OutboundProfile() throws AppException {
@@ -41,7 +41,12 @@ public class OutboundProfile extends Profile {
 	}
 
 	public String getAuthenticationProfile() {
-		return this.authenticationProfile;
+        // give a default value in case of blanck value
+        // useful in equals methods null = "" = _default 
+		if (StringUtils.isBlank(authenticationProfile))
+			return "_default";
+		else
+			return this.authenticationProfile;
 	}
 
 	public void setAuthenticationProfile(String authenticationProfile) {
@@ -49,7 +54,8 @@ public class OutboundProfile extends Profile {
 	}
 
 	public String getRouteType() {
-		if(this.routePolicy!=null && !this.routePolicy.equals("")) {
+        // default value policy is set in case of an existing value (different of "proxy" ) or in case of existing routePoulicy 
+		if ((StringUtils.isNotBlank(routeType) && !StringUtils.equals("proxy", routeType)) || (routePolicy != null)) {
 			return "policy";
 		} else {
 			return "proxy";
@@ -63,7 +69,7 @@ public class OutboundProfile extends Profile {
 	public Policy getRequestPolicy() {
 		return requestPolicy;
 	}
-	
+
 	public void setRequestPolicy(Policy requestPolicy) throws AppException {
 		this.requestPolicy = requestPolicy;
 	}
@@ -93,27 +99,31 @@ public class OutboundProfile extends Profile {
 	}
 
 	public List<Object> getParameters() {
-		if(parameters==null || parameters.size()==0) return null;
+		if (parameters == null || parameters.size() == 0)
+			return null;
 		return parameters;
 	}
-	
+
 	@JsonIgnore
 	public List<Policy> getAllPolices() {
 		List<Policy> usedPolicies = new ArrayList<Policy>();
-		if(this.requestPolicy!=null) usedPolicies.add(this.requestPolicy);
-		if(this.routePolicy!=null) usedPolicies.add(this.routePolicy);
-		if(this.responsePolicy!=null) usedPolicies.add(this.responsePolicy);
-		if(this.faultHandlerPolicy!=null) usedPolicies.add(this.faultHandlerPolicy);
+		if (this.requestPolicy != null)
+			usedPolicies.add(this.requestPolicy);
+		if (this.routePolicy != null)
+			usedPolicies.add(this.routePolicy);
+		if (this.responsePolicy != null)
+			usedPolicies.add(this.responsePolicy);
+		if (this.faultHandlerPolicy != null)
+			usedPolicies.add(this.faultHandlerPolicy);
 		return usedPolicies;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void setParameters(List<Object> parameters) {
-		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
+		if (APIManagerAdapter.hasAPIManagerVersion("7.7.20200130")) {
 			// We need to inject the format as default
-			for(Object params : parameters) {
-				if(params instanceof Map<?, ?>) {
-					if(!((Map<?, ?>)params).containsKey("format")) {
+			for (Object params : parameters) {
+				if (params instanceof Map<?, ?>) {
+					if (!((Map<?, ?>) params).containsKey("format")) {
 						((Map<String, ?>) params).put("format", null);
 					}
 				}
@@ -124,31 +134,45 @@ public class OutboundProfile extends Profile {
 
 	@Override
 	public boolean equals(Object other) {
-		if(other == null) return false;
-		if(other instanceof OutboundProfile) {
-			OutboundProfile otherOutboundProfile = (OutboundProfile)other;
+		if (other == null)
+			return false;
+		if (other instanceof OutboundProfile) {
+			OutboundProfile otherOutboundProfile = (OutboundProfile) other;
 			List<Object> otherParameters = otherOutboundProfile.getParameters();
 			List<Object> thisParameters = this.getParameters();
-			if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
-				// Passwords no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
-				if(otherParameters!=null) otherParameters.remove("password");
-				if(thisParameters!=null) thisParameters.remove("password");
+			if (APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")
+					|| APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
+				// Passwords no longer exposed by API-Manager REST-API - Can't use it anymore to
+				// compare the state
+				if (otherParameters != null)
+					otherParameters.remove("password");
+				if (thisParameters != null)
+					thisParameters.remove("password");
 			}
-			boolean rc = 
-				policiesAreEqual(this.getFaultHandlerPolicy(), otherOutboundProfile.getFaultHandlerPolicy()) &&
-				policiesAreEqual(this.getRequestPolicy(), otherOutboundProfile.getRequestPolicy()) &&
-				policiesAreEqual(this.getResponsePolicy(), otherOutboundProfile.getResponsePolicy()) &&
-				policiesAreEqual(this.getRoutePolicy(), otherOutboundProfile.getRoutePolicy()) &&
-				StringUtils.equals(otherOutboundProfile.getRouteType(), this.getRouteType()) &&
-				(thisParameters==null || thisParameters.equals(otherParameters));
+			boolean rc = policiesAreEqual(this.getFaultHandlerPolicy(), otherOutboundProfile.getFaultHandlerPolicy())
+					&& policiesAreEqual(this.getRequestPolicy(), otherOutboundProfile.getRequestPolicy())
+					&& policiesAreEqual(this.getResponsePolicy(), otherOutboundProfile.getResponsePolicy())
+					&& policiesAreEqual(this.getRoutePolicy(), otherOutboundProfile.getRoutePolicy())
+					&& StringUtils.equalsIgnoreCase(this.getRouteType(), otherOutboundProfile.getRouteType())
+					&& StringUtils.equalsIgnoreCase(this.getAuthenticationProfile(),
+							otherOutboundProfile.getAuthenticationProfile())
+					&& (thisParameters == null || thisParameters.equals(otherParameters));
 			return rc;
 		} else {
 			return false;
 		}
 	}
-	
+
+	@Override
+	public String toString() {
+		return "OutboundProfile [routeType=" + routeType + ", requestPolicy=" + requestPolicy + ", responsePolicy="
+				+ responsePolicy + ", routePolicy=" + routePolicy + ", faultHandlerPolicy=" + faultHandlerPolicy
+				+ ", authenticationProfile=" + authenticationProfile + "]";
+	}
+
 	private boolean policiesAreEqual(Policy policyA, Policy policyB) {
-		if(policyA==null && policyB == null) return true;
-		return (policyA!=null && policyA.equals(policyB));
+		if (policyA == null && policyB == null)
+			return true;
+		return (policyA != null && policyA.equals(policyB));
 	}
 }

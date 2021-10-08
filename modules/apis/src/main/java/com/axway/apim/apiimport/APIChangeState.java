@@ -82,6 +82,10 @@ public class APIChangeState {
 			LOG.debug("You may set the toggle: changeOrganization=true to allow to changing the organization of an existing API.");
 			throw new AppException("The API you would like to register already exists for another organization.", ErrorCode.API_ALREADY_EXISTS);
 		}
+		if(API.STATE_DELETED.equals(desiredAPI.getState())) {
+			nonBreakingChanges.add("state");
+			return;
+		}
 		Field[] fields = (desiredAPI.getClass().equals(API.class)) ? desiredAPI.getClass().getDeclaredFields() :  desiredAPI.getClass().getSuperclass().getDeclaredFields();
 		for (Field field : fields) {
 			try {
@@ -146,6 +150,7 @@ public class APIChangeState {
 		Field field = null;
 		
 		Class clazz = (sourceAPI.getClass().equals(API.class)) ? sourceAPI.getClass() :  sourceAPI.getClass().getSuperclass();
+		boolean hasProperyCopied = false;
 		if(propsToCopy.size()!=0) {
 			String message = "Updating Frontend-API (Proxy) for the following properties: ";
 			for(String fieldName : propsToCopy) {
@@ -164,14 +169,19 @@ public class APIChangeState {
 						
 						setMethod.invoke(targetAPI, desiredObject);
 						message = message + fieldName + " ";
+						hasProperyCopied = true;
 					}
 				} catch (Exception e) {
 					throw new AppException("Can't handle property: "+fieldName+" to update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
 				}
 			}
 			if(logMessage) {
-				LOG.info(message);
-			}	
+				if(hasProperyCopied) {
+					LOG.info(message);
+				} else {
+					LOG.debug("API-Proxy requires no updates");
+				}
+			}
 		} else {
 			LOG.debug("API-Proxy requires no updates");
 		}

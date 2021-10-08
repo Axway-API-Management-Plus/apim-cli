@@ -1,37 +1,69 @@
 {
-  "name" : "Complete application",
-  "description" : "Sample Client Application, registered for use in the Client Demo",
-  "state" : "approved",
-  "image" : "app-image.jpg",
-  "enabled" : true,
-  "email" : "sample@sampleapp.com",
-  "phone" : "012345678",
-  "credentials" : [ {
-    "credentialType" : "oauth",
-    "enabled" : true,
-    "secret" : "9cb76d80-1bc2-48d3-8d31-edeec0fddf6c",
-    "corsOrigins" : [ ],
-    "cert" : "app-oauth-cert.crt",
-    "type" : "confidential",
-    "clientId" : "ClientConfidentialApp",
-    "redirectUrls" : [ "https://localhost:8088/client/apigateway/callback", "https://oauthclient:8088/client/apigateway/callback" ]
-  }, {
-    "credentialType" : "apikeys",
-    "enabled" : true,
-    "secret" : "34f2b2d6-0334-4dcc-8442-e0e7009b8950",
-    "corsOrigins" : [ "*" ],
-    "apiKey" : "6cd55c27-675a-444a-9bc7-ae9a7869184d"
-  } ],
-  "appQuota" : {
-    "restrictions" : [{
-      "api" : "*",
-      "method" : "*",
-      "type" : "throttle",
-      "config" : {
-        "messages" : "9999",
-        "period" : "week",
-        "per" : "1"
+  "name": "Complete application",
+  "description": "Sample Client Application, registered for use in the Client Demo",
+  "state": "approved",
+  "image": "app-image.jpg",
+  "enabled": true,
+  "email": "sample@sampleapp.com",
+  "phone": "012345678",
+  "credentials": [
+    {
+      "credentialType": "oauth",
+      "enabled": true,
+      "secret": "9cb76d80-1bc2-48d3-8d31-edeec0fddf6c",
+      "corsOrigins": [
+        
+      ],
+      "cert": "app-oauth-cert.crt",
+      "type": "confidential",
+      "clientId": "ClientConfidentialApp",
+      "redirectUrls": [
+        "https://localhost:8088/client/apigateway/callback",
+        "https://oauthclient:8088/client/apigateway/callback"
+      ]
+    },
+    {
+      "credentialType": "apikeys",
+      "enabled": true,
+      "secret": "34f2b2d6-0334-4dcc-8442-e0e7009b8950",
+      "corsOrigins": [
+        "*"
+      ],
+      "apiKey": "6cd55c27-675a-444a-9bc7-ae9a7869184d"
+    }
+  ],
+  "appQuota": {
+    "restrictions": [
+      {
+        "api": "*",
+        "method": "*",
+        "type": "throttle",
+        "config": {
+          "messages": "9999",
+          "period": "week",
+          "per": "1"
+        }
       }
-    } ]
-  }
+    ]
+  },
+  "appScopes": [
+    {
+      "uriprefix": "resource.READ",
+      "scopes": [
+        "resource.READ"
+      ],
+      "scope": "resource.READ",
+      "enabled": true,
+      "isDefault": true
+    },
+    {
+      "uriprefix": "resource.WRITE",
+      "scopes": [
+        "resource.WRITE"
+      ],
+      "scope": "resource.WRITE",
+      "enabled": true,
+      "isDefault": true
+    }
+  ]
 }

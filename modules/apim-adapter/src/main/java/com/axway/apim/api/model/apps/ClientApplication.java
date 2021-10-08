@@ -59,6 +59,7 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 	
 	private APIQuota appQuota;
 	
+	@JsonProperty("appScopes")
 	private List<ClientAppOauthResource> oauthResources = new ArrayList<ClientAppOauthResource>();
 	
 	@JsonDeserialize( using = OrganizationDeserializer.class)

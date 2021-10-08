@@ -43,6 +43,8 @@ public class CoreCLIOptions extends CLIOptions {
 		params.setProxyPort((getValue("httpProxyPort")!=null) ? Integer.valueOf(getValue("httpProxyPort")) : null);
 		params.setProxyUsername(getValue("httpProxyUsername"));
 		params.setProxyPassword(getValue("httpProxyPassword"));
+		params.setRetryDelay(getValue("retryDelay"));
+		
 		
 		return (Parameters) params;
 	}
@@ -60,7 +62,7 @@ public class CoreCLIOptions extends CLIOptions {
 		option.setRequired(false);
 		cliOptions.addOption(option);
 		
-		option = new  Option("rc", "returncodes", false, "Print the possible return codes and description.");
+		option = new  Option("returncodes", false, "Print the possible return codes and description.");
 		option.setRequired(false);
 		cliOptions.addOption(option);
 		
@@ -144,6 +146,11 @@ public class CoreCLIOptions extends CLIOptions {
 		cliOptions.addInternalOption(option);
 		
 		option = new Option("apiBasepath", true, "The API-Manager REST-API base path. Defaults to: " + CoreParameters.DEFAULT_API_BASEPATH);
+		option.setRequired(false);
+		option.setArgName("true");
+		cliOptions.addInternalOption(option);
+		
+		option = new Option("retryDelay", true, "Retry delay in milliseconds for the some of the flaky REST-API-Manager API-Calls. See issue #213");
 		option.setRequired(false);
 		option.setArgName("true");
 		cliOptions.addInternalOption(option);

@@ -12,6 +12,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 
 public class RemoteHostFilter {
 
+	private String alias;
 	private String id;
 	private String name;
 	private Integer port;
@@ -19,6 +20,14 @@ public class RemoteHostFilter {
 
 	private RemoteHostFilter() { }
 	
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+
 	public void setId(String id) {
 		if(id==null) return;
 		this.id = id;
@@ -80,30 +89,36 @@ public class RemoteHostFilter {
 	}
 	
 	public boolean filter(RemoteHost remoteHost) {
-		if(this.getName()==null && this.getPort()==null && this.getOrganization()==null && this.getId()==null) { // Nothing given to filter out.
+		if(this.getName()==null && this.getPort()==null && this.getOrganization()==null && this.getId()==null && this.getAlias()==null) { // Nothing given to filter out.
 			return false;
 		}
 		if(this.getName()!=null) {
 			Pattern pattern = Pattern.compile(this.getName().replace("*", ".*"));
 			Matcher matcher = pattern.matcher(remoteHost.getName());
-			if(!matcher.matches()) return true;
+			if(!matcher.matches()) return false;
 		}
 		if(this.getPort()!=null) {
-			if(!this.getPort().equals(remoteHost.getPort())) return true;
+			if(!this.getPort().equals(remoteHost.getPort())) return false;
 		}
 		if(this.getId()!=null) {
-			if(!this.getId().equals(remoteHost.getId())) return true;
+			if(!this.getId().equals(remoteHost.getId())) return false;
 		}
 		if(this.getOrganization()!=null) {
 			Pattern pattern = Pattern.compile(this.getOrganization().getName().replace("*", ".*"));
 			Matcher matcher = pattern.matcher(remoteHost.getOrganization().getName());
-			if(!matcher.matches()) return true;
+			if(!matcher.matches()) return false;
 		}
-		return false;
+		if(this.getAlias()!=null) {
+			Pattern pattern = Pattern.compile(this.getAlias().replace("*", ".*"));
+			Matcher matcher = pattern.matcher(remoteHost.getAlias());
+			if(!matcher.matches()) return false;
+		}
+		return true;
 	}
 
 	public static class Builder {
 
+		String alias;
 		String id;
 		String name;
 		Integer port;
@@ -115,11 +130,17 @@ public class RemoteHostFilter {
 
 		public RemoteHostFilter build() {
 			RemoteHostFilter filter = new RemoteHostFilter();
+			filter.setAlias(this.alias);
 			filter.setId(this.id);
 			filter.setName(this.name);
 			filter.setPort(this.port);
 			filter.setOrganization(this.organization);
 			return filter;
+		}
+		
+		public Builder hasAlias(String alias) {
+			this.alias = alias;
+			return this;
 		}
 
 		public Builder hasId(String id) {

@@ -28,6 +28,7 @@ public class CLIAPIExportOptions extends CLIOptions {
 	public Parameters getParams() {
 		APIExportParams params = new APIExportParams();
 		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
+		params.setDatPassword(getValue("datPassword"));
 		return params;
 	}
 
@@ -36,6 +37,11 @@ public class CLIAPIExportOptions extends CLIOptions {
 		Option option = new Option("useFEAPIDefinition", "If this flag is set, the exported API contains the API-Specification (e.g. Swagger-File) "
 				+ "from the FE-API instead of the original imported API. But the specification contains the host, basePath and scheme from the backend.");
 		option.setRequired(false);
+		addOption(option);
+		
+		option = new Option("datPassword", true, "Password used when exporting APIs in a DAT-Format.");
+		option.setRequired(false);
+		option.setArgName("myExportPassword");
 		addOption(option);
 	}
 	

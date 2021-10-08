@@ -11,6 +11,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.ActualAPI;
@@ -67,6 +68,24 @@ public class ChangeStateTest {
 
 		APIChangeState changeState = new APIChangeState(managerAPI, importAPI);
 		Assert.assertEquals(changeState.isBreaking(), true);
+	}
+	
+	@Test
+	public void isDesiredStateDeleted() throws Exception {
+		API importAPI = getTestAPI();
+		API managerAPI = getTestAPI();
+
+		((ActualAPI)importAPI).setState(API.STATE_DELETED);
+		((ActualAPI)importAPI).setDescriptionType("ANY-TYPE");
+		
+		
+		((ActualAPI)managerAPI).setState(API.STATE_PUBLISHED);
+		((ActualAPI)importAPI).setDescriptionType("ANY-OTHER-TYPE");
+
+		APIChangeState changeState = new APIChangeState(managerAPI, importAPI);
+		// As the API should be deleted anyway, desiredChanges should be ignored - The API should just be deleted
+		Assert.assertEquals(changeState.getAllChanges().size(), 1, "The state should be included");
+		Assert.assertEquals(changeState.getAllChanges().get(0), "state", "The state should be included");
 	}
 
 	private static API getTestAPI() throws AppException {

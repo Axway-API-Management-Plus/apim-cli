@@ -31,12 +31,15 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 public class CSVAPIExporter extends APIResultHandler {
 	private static Logger LOG = LoggerFactory.getLogger(CSVAPIExporter.class);
 	
+	DateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
 	private static enum HeaderFields {
 		standard(new String[] {
 				"API ID", 
 				"API Name", 
 				"API Path", 
-				"API Version"
+				"API Version",
+				"Created on"
 				}),
 		wide(new String[] {
 				"API ID", 
@@ -50,7 +53,8 @@ public class CSVAPIExporter extends APIResultHandler {
 				"Request Policy", 
 				"Routing Policy", 
 				"Response Policy", 
-				"Fault-Handler Policy"
+				"Fault-Handler Policy",
+				"Created on"
 				}),
 		ultra(new String[] {
 				"API ID",
@@ -70,7 +74,8 @@ public class CSVAPIExporter extends APIResultHandler {
 				"Tags",
 				"Granted Organization",
 				"Application Name",
-				"Application Organization"
+				"Application Organization",
+				"Created on"
 				});
 		
 		String[] headerFields;
@@ -203,7 +208,8 @@ public class CSVAPIExporter extends APIResultHandler {
 				api.getId(), 
 				api.getName(), 
 				api.getPath(), 
-				api.getVersion()
+				api.getVersion(),
+				getFormattedDate(api)
 		);
 	}
 	
@@ -220,7 +226,8 @@ public class CSVAPIExporter extends APIResultHandler {
 				getUsedPolicies(api, PolicyType.REQUEST).toString().replace("[", "").replace("]", ""),
 				getUsedPolicies(api, PolicyType.ROUTING).toString().replace("[", "").replace("]", ""),
 				getUsedPolicies(api, PolicyType.RESPONSE).toString().replace("[", "").replace("]", ""),
-				getUsedPolicies(api, PolicyType.FAULT_HANDLER).toString().replace("[", "").replace("]", "")
+				getUsedPolicies(api, PolicyType.FAULT_HANDLER).toString().replace("[", "").replace("]", ""),
+				getFormattedDate(api)
 		);
 	}
 	
@@ -243,8 +250,14 @@ public class CSVAPIExporter extends APIResultHandler {
 				getTags(api) , 
 				org.getName(), 
 				app.getName(), 
-				app.getOrganization().getName()
+				app.getOrganization().getName(),
+				getFormattedDate(api)
 		);
+	}
+	
+	private String getFormattedDate(API api) {
+		if(api.getCreatedOn()==null) return "N/A";
+		return isoDateFormatter.format(api.getCreatedOn());
 	}
 	
 	@Override
