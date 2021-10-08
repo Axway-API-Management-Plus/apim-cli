@@ -21,6 +21,7 @@ public class APISpecificationFactory {
 	    add(Swagger1xSpecification.class);
 	    add(OAS3xSpecification.class);
 	    add(WSDLSpecification.class);
+	    add(WADLSpecification.class);
 	}};
 	
 	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName) throws AppException {

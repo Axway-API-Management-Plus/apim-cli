@@ -22,8 +22,11 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
+import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
+import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -132,7 +135,7 @@ public class APIManagerOrganizationAdapter {
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/organizations/"+actualOrg.getId()).build();
 			}
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image", "createdOn"}));
+					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image", "createdOn", "apis"}));
 			mapper.setFilterProvider(filter);
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			try {
@@ -164,6 +167,7 @@ public class APIManagerOrganizationAdapter {
 			}
 			desiredOrg.setId(createdOrg.getId());
 			saveImage(desiredOrg, actualOrg);
+			saveAPIAccess(desiredOrg, actualOrg);
 			return createdOrg;
 
 		} catch (Exception e) {
@@ -183,6 +187,7 @@ public class APIManagerOrganizationAdapter {
 				LOG.error("Error deleting organization. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 				throw new AppException("Error deleting organization. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
+			LOG.info("Organization: "+org.getName()+" ("+org.getId()+")" + " successfully deleted");
 		} catch (Exception e) {
 			throw new AppException("Error deleting organization", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		} finally {
@@ -228,6 +233,7 @@ public class APIManagerOrganizationAdapter {
 			for(int i=0; i<allOrgs.size();i++) {
 				Organization org = allOrgs.get(i);
 				addImage(org, filter.isIncludeImage());
+				addAPIAccess(org, filter.isIncludeAPIAccess());
 			}
 			Utils.addCustomPropertiesForEntity(allOrgs, this.apiManagerResponse.get(filter), filter);
 			return allOrgs;
@@ -261,6 +267,27 @@ public class APIManagerOrganizationAdapter {
 			return null;
 		}
 		return orgs.get(0);
+	}
+	
+	void addAPIAccess(Organization org, boolean addAPIAccess) throws Exception {
+		if(!addAPIAccess) return;
+		try {
+			List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(org, Type.organizations, true);
+			org.getApiAccess().addAll(apiAccess);
+		} catch (Exception e) {
+			throw new AppException("Error reading organizations API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
+		}
+	}
+	
+	private void saveAPIAccess(Organization org, Organization actualOrg) throws AppException {
+		if(org.getApiAccess()==null || org.getApiAccess().size()==0) return;
+		if(actualOrg!=null && actualOrg.getApiAccess().equals(actualOrg.getApiAccess())) return;
+		if(!APIManagerAdapter.hasAdminAccount()) {
+			LOG.warn("Ignoring API-Access, as no admin account is given");
+			return;
+		}
+		APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
+		accessAdapter.saveAPIAccess(org.getApiAccess(), org, Type.organizations);
 	}
 	
 	void addImage(Organization org, boolean addImage) throws Exception {

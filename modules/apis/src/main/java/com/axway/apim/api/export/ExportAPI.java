@@ -74,6 +74,10 @@ public class ExportAPI {
 		while(it.hasNext()) {
 			OutboundProfile profile = it.next();
 			profile.setApiId(null);
+			// If the AuthenticationProfile is _default there is no need to export it, hence null is returned
+			if("_default".equals(profile.getAuthenticationProfile())) {
+				profile.setAuthenticationProfile(null);
+			}
 		}
 		return this.actualAPIProxy.getOutboundProfiles();
 	}

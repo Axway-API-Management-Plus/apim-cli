@@ -1,6 +1,5 @@
 package com.axway.apim.api.model.apps;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -96,5 +95,11 @@ public class ClientAppOauthResource {
 					otherAppCredential.isDefaultScope()==this.isDefaultScope() );
 		}
 		return false;
-	}	
+	}
+
+	@Override
+	public String toString() {
+		return "ClientAppOauthResource [scope=" + scope + ", enabled=" + enabled + ", defaultScope=" + defaultScope
+				+ "]";
+	}
 }

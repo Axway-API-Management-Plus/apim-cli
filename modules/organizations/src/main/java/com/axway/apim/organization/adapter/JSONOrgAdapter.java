@@ -3,11 +3,18 @@ package com.axway.apim.organization.adapter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIFilter;
+import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
+import com.axway.apim.api.API;
+import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.lib.Result;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -25,6 +32,7 @@ public class JSONOrgAdapter extends OrgAdapter {
 
 	public JSONOrgAdapter(OrgImportParams params) {
 		this.importParams = params;
+		this.result = new Result(); // Not used, to be refactored
 	}
 
 	public void readConfig() throws AppException {
@@ -33,7 +41,7 @@ public class JSONOrgAdapter extends OrgAdapter {
 
 		File configFile = Utils.locateConfigFile(config);
 		if(!configFile.exists()) return;
-		File stageConfig = Utils.getStageConfig(stage, configFile);
+		File stageConfig = Utils.getStageConfig(stage, importParams.getStageConfig(), configFile);
 		List<Organization> baseOrgs;
 		// Try to read a list of organizations
 		try {
@@ -63,7 +71,12 @@ public class JSONOrgAdapter extends OrgAdapter {
 		} catch (Exception e) {
 			throw new AppException("Cannot read organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		}
-		addImage(orgs, configFile.getParentFile());
+		try{
+			addImage(orgs, configFile.getCanonicalFile().getParentFile());
+		}catch (Exception e){
+			throw new AppException("Cannot read image for organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+		}
+		addAPIAccess(orgs, result);
 		validateCustomProperties(orgs);
 		return;
 	}
@@ -72,6 +85,35 @@ public class JSONOrgAdapter extends OrgAdapter {
 		for(Organization org : orgs) {
 			if(org.getImageUrl()==null || org.getImageUrl().equals("")) continue;
 			org.setImage(Image.createImageFromFile(new File(parentFolder + File.separator + org.getImageUrl())));
+		}
+	}
+	
+	private void addAPIAccess(List<Organization> orgs, Result result) throws AppException {
+		APIManagerAPIAdapter apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
+		for(Organization org : orgs) {
+			if(org.getApiAccess()==null) continue;
+			Iterator<APIAccess> it = org.getApiAccess().iterator();
+			while(it.hasNext()) {
+				APIAccess apiAccess = it.next();
+				List<API> apis = apiAdapter.getAPIs(new APIFilter.Builder()
+						.hasName(apiAccess.getApiName())
+						.build()
+				, false);
+				if(apis==null || apis.size()==0) {
+					LOG.error("API with name: '" + apiAccess.getApiName() + "' not found. Ignoring this APIs.");
+					result.setError(ErrorCode.UNKNOWN_API);
+					it.remove();
+					continue;
+				}
+				if(apis.size()>1 && apiAccess.getApiVersion()==null) {
+					LOG.error("Found: "+apis.size()+" APIs with name: " + apiAccess.getApiName() + " not providing a version. Ignoring this APIs.");
+					result.setError(ErrorCode.UNKNOWN_API);
+					it.remove();
+					continue;
+				}
+				API api = apis.get(0);
+				apiAccess.setApiId(api.getId());
+			}
 		}
 	}
 	
