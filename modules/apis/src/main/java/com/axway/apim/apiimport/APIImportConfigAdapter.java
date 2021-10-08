@@ -458,7 +458,7 @@ public class APIImportConfigAdapter {
 			for(CaCert cert :apiConfig.getCaCerts()) {
 				if(cert.getCertBlob()==null) {
 					try(InputStream is = getInputStreamForCertFile(cert)) {
-						JsonNode certInfo = APIManagerAdapter.getCertInfoFromFile(is, cert);
+						JsonNode certInfo = APIManagerAdapter.getCertInfo(is, null, cert);
 						CaCert completedCert = mapper.readValue(certInfo.get(0).toString(), CaCert.class);
 						completedCaCerts.add(completedCert);
 					} catch (Exception e) {
@@ -829,7 +829,7 @@ public class APIImportConfigAdapter {
 			cert.setInbound("false");
 			cert.setOutbound("true");
 			// This call is to validate the given password, keystore is valid
-			APIManagerAdapter.getCertInfoFromUrl(fileData.get("data").asText(), password, cert);
+			APIManagerAdapter.getCertInfo(new FileInputStream(clientCertFile), password, cert);
 			String data = fileData.get("data").asText();
 			authnProfile.getParameters().put("pfx", data);
 			authnProfile.getParameters().remove("certFile");
