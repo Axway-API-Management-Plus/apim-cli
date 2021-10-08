@@ -4,14 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.4.0] 2021-10-08
 ### Fixed
 - No change detected when updating the role of a user (See issue [#219](https://github.com/Axway-API-Management-Plus/apim-cli/issues/219))
 - API-Import with Method-Level Outbound-Profiles failes if no custom Outbound-Authentication is given (See issue [#220](https://github.com/Axway-API-Management-Plus/apim-cli/issues/220))
 - Outbound SSL-Authentication is not working (See issue [#221](https://github.com/Axway-API-Management-Plus/apim-cli/issues/221))
 
+### Added
+- WADL support (See issue [#222](https://github.com/Axway-API-Management-Plus/apim-cli/issues/222))
+
 ### Changed
-- Drop support for API-Manager version 7.6.2
+- Dropped support for API-Manager version 7.6.2
 
 ## [1.3.13] 2021-09-21
 ### Fixed
