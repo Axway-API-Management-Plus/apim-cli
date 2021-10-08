@@ -275,6 +275,13 @@ public class Config {
 			description = "Specifies whether or not to lock a user account when invalid login attempts are encountered; settings include, how many times authentication can be attempted, and what happens after this limit is crossed.")
 	private LockUserAccount lockUserAccount;
 	
+	@APIManagerConfigAnnotation(
+			configType = ConfigType.Session,
+			name = "Login response time (ms)",
+			description = "Login response time in milliseconds to mitigate user accounts enumeration.")
+	private Integer loginResponseTime;
+	
+	
 	private Boolean baseOAuth;
 	
 	private Boolean oadminSelfServiceEnabled;
@@ -717,6 +724,14 @@ public class Config {
 
 	public void setLockUserAccount(LockUserAccount lockUserAccount) {
 		this.lockUserAccount = lockUserAccount;
+	}
+
+	public Integer getLoginResponseTime() {
+		return loginResponseTime;
+	}
+
+	public void setLoginResponseTime(Integer loginResponseTime) {
+		this.loginResponseTime = loginResponseTime;
 	}
 
 	public Boolean getRegTokenEmailEnabled() {

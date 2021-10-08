@@ -70,6 +70,7 @@ public class APIImageTestIT extends TestNGCitrusTestRunner {
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/image/2_image_included_flex_state.json");
 		createVariable("image", "/com/axway/apim/test/files/basic/LargeImage.jpg");
+		createVariable("state", "published");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 		
@@ -80,6 +81,13 @@ public class APIImageTestIT extends TestNGCitrusTestRunner {
 		createVariable("expectedReturnCode", "10");
 		swaggerImport.doExecute(context);
 		
-		
+		echo("####### Finally try to delete this API (See issue: #188) #######");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/image/2_image_included_flex_state.json");
+		createVariable("image", "/com/axway/apim/test/files/basic/otherAPIImage.jpg");
+		createVariable("state", "deleted");
+		createVariable("enforce", "true");
+		createVariable("expectedReturnCode", "0");
+		swaggerImport.doExecute(context);
 	}
 }

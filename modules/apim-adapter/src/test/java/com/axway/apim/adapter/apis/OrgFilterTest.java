@@ -155,6 +155,14 @@ public class OrgFilterTest {
 	}
 	
 	@Test
+	public void filterIncludeAPIAccess() {
+		OrgFilter filter = new OrgFilter.Builder()
+				.includeAPIAccess(true)
+				.build();
+		Assert.assertTrue(filter.includeAPIAccess);
+	}
+	
+	@Test
 	public void filterOrgWithDescription() {
 		OrgFilter filter = new OrgFilter.Builder()
 				.hasDescription("my description I want")

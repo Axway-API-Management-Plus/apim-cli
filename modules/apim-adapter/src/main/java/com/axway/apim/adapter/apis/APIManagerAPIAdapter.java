@@ -527,8 +527,8 @@ public class APIManagerAPIAdapter {
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			if(statusCode != 200){
 				if((statusCode >= 400 && statusCode<=499) && response.contains("Unknown API")) {
-					LOG.warn("Got unexpected error: 'Unknown API' while trying to read Backend-API ... Try again in 1 second.");
-					Thread.sleep(1000);
+					LOG.warn("Got unexpected error: 'Unknown API' while trying to read Backend-API ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
+					Thread.sleep(cmd.getRetryDelay());
 					httpResponse = request.execute();
 					statusCode = httpResponse.getStatusLine().getStatusCode();
 					if(statusCode != 200) {
@@ -593,7 +593,7 @@ public class APIManagerAPIAdapter {
 	}
 	
 	public API updateAPIProxy(API api) throws AppException {
-		LOG.debug("Updating API-Proxy");
+		LOG.debug("Updating API-Proxy: '"+api.getName()+" "+api.getVersion()+" ("+api.getId()+")'" );
 		URI uri;
 		HttpEntity entity;
 		mapper.setSerializationInclusion(Include.NON_NULL);
@@ -691,13 +691,58 @@ public class APIManagerAPIAdapter {
 		updateAPIStatus(api, API.STATE_PUBLISHED, vhost);
 	}
 	
+	public byte[] getAPIDatFile(API api, String password) throws AppException {
+		URI uri;
+		HttpResponse httpResponse = null;
+		RestAPICall request;
+		try {
+			List <NameValuePair> parameters = new ArrayList <NameValuePair>();
+			parameters.add(new BasicNameValuePair("filename", "api-export.dat"));
+			parameters.add(new BasicNameValuePair("password", password));
+			parameters.add(new BasicNameValuePair("id", api.getId()));
+			HttpEntity entity = new UrlEncodedFormEntity(parameters);
+			
+			uri = new URIBuilder(cmd.getAPIManagerURL())
+						.setPath(cmd.getApiBasepath()+"/proxies/export")
+						.build();
+			request = new POSTRequest(entity, uri);
+			httpResponse = request.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode != 201){
+				String response = EntityUtils.toString(httpResponse.getEntity());
+				LOG.error("Error exporting DAT-File representation of API: "+api.getName()+" ("+api.getId()+"). Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
+				throw new AppException("Error exporting DAT-File representation of API: "+api.getName()+" ("+api.getId()+"). Received Status-Code: " +statusCode, ErrorCode.ERR_EXPORTING_API_DAT_FILE);
+			} else {
+				// The file can now be loaded from the returned Location header
+				String locationHeader = httpResponse.getHeaders("Location")[0].getValue();
+				uri = new URI(cmd.getAPIManagerURL() + locationHeader);
+				request = new GETRequest(uri);
+				httpResponse = request.execute();
+				statusCode = httpResponse.getStatusLine().getStatusCode();
+				if(statusCode != 200){
+					String response = EntityUtils.toString(httpResponse.getEntity());
+					LOG.error("Error getting DAT-File representation of API: "+api.getName()+" ("+api.getId()+"). Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
+					throw new AppException("Error getting DAT-File representation of API: "+api.getName()+" ("+api.getId()+"). Received Status-Code: " +statusCode, ErrorCode.ERR_EXPORTING_API_DAT_FILE);
+				}
+				return EntityUtils.toByteArray(httpResponse.getEntity());
+			}
+		} catch (Exception e) {
+			throw new AppException("Cannot export API-DAT file.", ErrorCode.ERR_EXPORTING_API_DAT_FILE, e);
+		} finally {
+			try {
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) {}
+		}
+	}
+	
 	public void updateAPIStatus(API api, String desiredState, String vhost) throws AppException {
 		LOG.debug("Update API-Proxy status to: " + api.getState());
 		URI uri;
 		HttpResponse httpResponse = null;
 		RestAPICall request;
 		try {
-		uri = new URIBuilder(cmd.getAPIManagerURL())
+			uri = new URIBuilder(cmd.getAPIManagerURL())
 				.setPath(cmd.getApiBasepath()+"/proxies/"+api.getId()+"/"+StatusEndpoint.valueOf(desiredState).endpoint)
 				.build();
 			if(vhost!=null && desiredState.equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
@@ -917,8 +962,8 @@ public class APIManagerAPIAdapter {
 						if(statusCode < 200 || statusCode > 299){
 							String response = EntityUtils.toString(httpResponse.getEntity());
 							if((statusCode==404 || statusCode==400)) { // Status-Code 400 is returned by 7.7-20200331 ?!
-								LOG.warn("Got unexpected error '" + response + " ("+statusCode+")' while taking over application quota to newer API ... Try again in 1 second.");
-								Thread.sleep(1000);
+								LOG.warn("Got unexpected error '" + response + " ("+statusCode+")' while taking over application quota to newer API ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
+								Thread.sleep(cmd.getRetryDelay());
 								httpResponse = request.execute();
 								statusCode = httpResponse.getStatusLine().getStatusCode();
 								if(statusCode < 200 || statusCode > 299){
@@ -955,7 +1000,7 @@ public class APIManagerAPIAdapter {
 					+ "reference/old API: "+Utils.getAPILogString(referenceAPI)+" are the same. Skip upgrade access to newer API.");
 			return false;
 		}
-		LOG.debug("Upgrade access & subscriptions to API: " + apiToUpgradeAccess.getName() + " " + apiToUpgradeAccess.getVersion() + "("+apiToUpgradeAccess.getId()+")");
+		LOG.debug("Upgrade access & subscriptions to API: " + apiToUpgradeAccess.getName() + " " + apiToUpgradeAccess.getVersion() + " ("+apiToUpgradeAccess.getId()+")");
 		
 		URI uri;
 		HttpEntity entity;
@@ -978,9 +1023,9 @@ public class APIManagerAPIAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
 				String response = EntityUtils.toString(httpResponse.getEntity());
-				if((statusCode==403 || statusCode==404) && response.contains("Unknown API")) {
-					LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in 1 second.");
-					Thread.sleep(1000);
+				if((statusCode==403 || statusCode==404) && (response.contains("Unknown API") || response.contains("The entity could not be found")) ) {
+					LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
+					Thread.sleep(cmd.getRetryDelay());
 					httpResponse = request.execute();
 					statusCode = httpResponse.getStatusLine().getStatusCode();
 					if(statusCode != 204) {
@@ -1028,8 +1073,8 @@ public class APIManagerAPIAdapter {
 			if(statusCode != 204){
 				String response = EntityUtils.toString(httpResponse.getEntity());
 				if((statusCode==403 || statusCode==404) && response.contains("Unknown API")) {
-					LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in 1 second.");
-					Thread.sleep(1000);
+					LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
+					Thread.sleep(cmd.getRetryDelay());
 					httpResponse = apiCall.execute();
 					statusCode = httpResponse.getStatusLine().getStatusCode();
 					if(statusCode != 204) {
@@ -1057,10 +1102,13 @@ public class APIManagerAPIAdapter {
 	
 	private String getFilterFields(APIFilter filter) {
 		String filterFields = "[";
-		if(filter.getApiPath()!=null) filterFields += "apiPath=" + filter.getApiPath();
-		if(filter.getVhost()!=null) filterFields += " vHost=" + filter.getVhost();
-		if(filter.getQueryStringVersion()!=null) filterFields += " queryString=" + filter.getQueryStringVersion();
-		if(filter!=null) filterFields += " filter=" + filter;
+		if(LOG.isDebugEnabled()) {
+			if(filter.getApiPath()!=null) filterFields += "apiPath=" + filter.getApiPath();
+			if(filter.getVhost()!=null) filterFields += " vHost=" + filter.getVhost();
+			if(filter.getQueryStringVersion()!=null) filterFields += " queryString=" + filter.getQueryStringVersion();
+		} else if (LOG.isTraceEnabled()) {
+			filterFields += " filter=" + filter;
+		}
 		filterFields += "]";
 		return filterFields;
 	}

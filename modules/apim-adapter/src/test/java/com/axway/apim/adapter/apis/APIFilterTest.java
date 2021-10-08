@@ -167,6 +167,21 @@ public class APIFilterTest {
 	}
 	
 	@Test
+	public void filterWithCreatedOn() {
+		APIFilter filter = new APIFilter.Builder()
+				.isCreatedOnAfter("1623915264000")	// 17.06.2021
+				.isCreatedOnBefore("1624865664000") // 28.06.2021
+				.build();
+		Assert.assertEquals(filter.getFilters().size(), 6);
+		Assert.assertEquals(filter.getFilters().get(0).getValue(), "createdOn");
+		Assert.assertEquals(filter.getFilters().get(1).getValue(), "gt");
+		Assert.assertEquals(filter.getFilters().get(2).getValue(), "1623915264000");
+		Assert.assertEquals(filter.getFilters().get(3).getValue(), "createdOn");
+		Assert.assertEquals(filter.getFilters().get(4).getValue(), "lt");
+		Assert.assertEquals(filter.getFilters().get(5).getValue(), "1624865664000");
+	}
+	
+	@Test
 	public void apiFilterEqualTest() {
 		APIFilter filter1 = new APIFilter.Builder()
 				.hasId("12345")

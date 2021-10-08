@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonFilter("ClientAppCredentialFilter")
 public abstract class ClientAppCredential {

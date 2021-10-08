@@ -28,6 +28,7 @@ public abstract class APISpecification {
 		OPEN_API_30("Open API 3.0", ".json"),
 		OPEN_API_30_YAML("Open API 3.0 (YAML)", ".yaml"),
 		WSDL_API ("WSDL", ".xml"),
+		WADL_API ("Web Application Description Language (WADL)", ".wadl"),
 		UNKNOWN ("Unknown", ".txt");
 		
 		String niceName;

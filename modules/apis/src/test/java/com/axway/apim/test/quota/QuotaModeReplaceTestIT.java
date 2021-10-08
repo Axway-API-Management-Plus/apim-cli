@@ -91,10 +91,9 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 		swaggerImport.doExecute(context);
 		
 		echo("####### Check Application-Quotas have been setup as configured #######");
-		echo("####### ############ Sleep 5 seconds ##################### #######");
-		Thread.sleep(5000);
+		echo("####### ############ Sleep 2 seconds ##################### #######");
+		Thread.sleep(2000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
-		Thread.sleep(5000);
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			// The method specific quotas must be have been removed
@@ -107,10 +106,9 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='*'&& @.type=='throttlemb')].config.per", "1"));
 		
 		echo("####### Check that only the configured quota remains and previouls configured are removed #######");
-		echo("####### ############ Sleep 5 seconds ##################### #######");
-		Thread.sleep(5000);
+		echo("####### ############ Sleep 2 seconds ##################### #######");
+		Thread.sleep(2000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
-		Thread.sleep(5000);
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			// The method specific quotas must be have been removed
@@ -141,10 +139,9 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 		swaggerImport.doExecute(context);
 		
 		echo("####### Check System-Quotas have been updated #######");
-		echo("####### ############ Sleep 5 seconds ##################### #######");
-		Thread.sleep(5000);
+		echo("####### ############ Sleep 2 seconds ##################### #######");
+		Thread.sleep(2000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/00000000-0000-0000-0000-000000000000").header("Content-Type", "application/json"));
-		Thread.sleep(5000);
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${apiId}')].type", "throttle")
@@ -201,10 +198,9 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "newApiId"));
 		
 		echo("####### Check System-Quotas have been setup as configured for the new API #######");
-		echo("####### ############ Sleep 5 seconds ##################### #######");
-		Thread.sleep(5000);
+		echo("####### ############ Sleep 2 seconds ##################### #######");
+		Thread.sleep(2000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
-		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttle")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")
@@ -214,10 +210,9 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].config.per", "2"));
 		
 		echo("####### Check Application-Quotas have been setup as configured for the new API  #######");
-		echo("####### ############ Sleep 5 seconds ##################### #######");
-		Thread.sleep(5000);
+		echo("####### ############ Sleep 2 seconds ##################### #######");
+		Thread.sleep(2000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
-		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].type", "throttlemb")
 			.validate("$.restrictions.[?(@.api=='${newApiId}')].method", "*")

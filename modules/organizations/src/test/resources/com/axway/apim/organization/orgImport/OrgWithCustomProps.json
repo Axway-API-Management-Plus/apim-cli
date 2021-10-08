@@ -4,7 +4,6 @@
   "restricted" : false,
   "enabled" : true,
   "development" : true,
-  "createdOn" : 1593700799104, 
   "customProperties": {
   	"orgCustomProperty1": "Org custom value 1",
   	"orgCustomProperty2": "2",

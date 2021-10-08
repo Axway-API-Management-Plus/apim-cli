@@ -118,7 +118,7 @@ public class APIManagerConfigAdapter {
 			managerConfig.put(useAdmin, config);
 			return config;
 		} catch (IOException e) {
-			throw new AppException("Error parsing API-Manager configuration", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Error parsing API-Manager configuration", ErrorCode.API_MANAGER_COMMUNICATION_ERR, e);
 		}
 	}
 	

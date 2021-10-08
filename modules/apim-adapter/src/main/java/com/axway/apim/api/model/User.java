@@ -183,6 +183,7 @@ public class User implements CustomPropertiesEntity {
 			User otherUser = (User)other;
 			return 
 					StringUtils.equals(otherUser.getName(), this.getName()) &&
+					StringUtils.equals(otherUser.getRole(), this.getRole()) &&
 					StringUtils.equals(otherUser.getLoginName(), this.getLoginName()) &&
 					StringUtils.equals(otherUser.getMobile(), this.getMobile()) &&
 					otherUser.getOrganization().equals(this.getOrganization()) &&
