@@ -69,7 +69,7 @@ case "$version" in
 	7.7-SP2)
 		fedFile="swagger-promote-7.7.fed"
 		installer="APIGateway_7.7_SP2_linux-x86-64_BN201912201.run"
-		dockerScripts="APIGateway_7.7.20200130-1_DockerScripts.tar.gz";;
+		dockerScripts="APIGateway_7.7-1_DockerScripts.tar.gz";;
 	7.6.2-SP5)
 		fedFile="swagger-promote-7.6.2.fed"
 		installer="APIGateway_7.6.2_SP5_Install_linux-x86-64_BN20200717.run"

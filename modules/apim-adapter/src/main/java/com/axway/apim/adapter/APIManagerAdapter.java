@@ -1,5 +1,6 @@
 package com.axway.apim.adapter;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -216,8 +217,8 @@ public class APIManagerAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 303 && (statusCode < 200 || statusCode > 299)) {
 				String response = EntityUtils.toString(httpResponse.getEntity());
-				LOG.warn("Login failed with statusCode: " +statusCode+ " ... Try again in 1 second.");
-				Thread.sleep(1000);
+				LOG.warn("Login failed with statusCode: " +statusCode+ " ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
+				Thread.sleep(cmd.getRetryDelay());
 				httpResponse = loginRequest.execute();
 				statusCode = httpResponse.getStatusLine().getStatusCode();
 				if(statusCode != 303){
@@ -542,6 +543,35 @@ public class APIManagerAdapter {
 		return APIManagerAdapter.apiManagerName;
 	}
 	
+	public static JsonNode getCertInfo(InputStream certificate, String password, CaCert cert) throws AppException {
+		URI uri;
+		HttpResponse httpResponse = null;
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfo").build();
+			HttpEntity entity = MultipartEntityBuilder.create()
+					.addBinaryBody("file", certificate, ContentType.create("application/x-x509-ca-cert"), cert.getCertFile())
+					.addTextBody("inbound", cert.getInbound())
+					.addTextBody("outbound", cert.getOutbound())
+					.addTextBody("passphrase", password)
+					.build();
+			POSTRequest postRequest = new POSTRequest(entity, uri);
+			httpResponse = postRequest.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			String response = EntityUtils.toString(httpResponse.getEntity());
+			if( statusCode != 200){
+				if(response!=null && response.contains("Bad password")) {
+					LOG.debug("API-Manager failed to read certificate information: " + cert.getCertFile() + ". Got response: '"+response+"'.");
+					throw new AppException("Password for keystore: '" + cert.getCertFile() + "' is wrong.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
+				}
+				throw new AppException("API-Manager failed to read certificate information from file. Got response: '"+response+"'", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
+			JsonNode jsonResponse = mapper.readTree(response);
+			return jsonResponse;
+		} catch (Exception e) {
+			throw new AppException("API-Manager failed to read certificate information from file.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+		}
+	}
+	
 	/**
 	 * Helper method to fulfill the given certificates by the API-Developer into the required 
 	 * format as it's needed by the API-Manager. 
@@ -550,28 +580,34 @@ public class APIManagerAdapter {
 	 * @return JsonNode as it's required by the API-Manager.
 	 * @throws AppException if JSON-Node-Config can't be created
 	 */
-	public static JsonNode getCertInfo(InputStream certFile, CaCert cert) throws AppException {
+	public static JsonNode getCertInfoFromUrl(String certFile, String password, CaCert cert) throws AppException {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfo/").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfoFromUrl").build();
 			
-			HttpEntity entity = MultipartEntityBuilder.create()
-					.addBinaryBody("file", IOUtils.toByteArray(certFile), ContentType.create("application/x-x509-ca-cert"), cert.getCertFile())
-					.addTextBody("inbound", cert.getInbound())
-					.addTextBody("outbound", cert.getOutbound())
-					.build();
+			List <NameValuePair> parameters = new ArrayList <NameValuePair>();
+			parameters.add(new BasicNameValuePair("url", certFile));
+			parameters.add(new BasicNameValuePair("inbound", cert.getInbound()));
+			parameters.add(new BasicNameValuePair("outbound", cert.getOutbound()));
+			parameters.add(new BasicNameValuePair("password", password));
+			HttpEntity entity = new UrlEncodedFormEntity(parameters);
+
 			POSTRequest postRequest = new POSTRequest(entity, uri);
 			httpResponse = postRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if( statusCode != 200){
-				LOG.error("Can't decode provided certificate. Message: '"+EntityUtils.toString(httpResponse.getEntity())+"' Response-Code: "+statusCode+"");
-				throw new AppException("Can't decode provided certificate: " + cert.getCertFile(), ErrorCode.API_MANAGER_COMMUNICATION);
+				String response = EntityUtils.toString(httpResponse.getEntity());
+				if(response!=null && response.contains("Bad password")) {
+					LOG.debug("API-Manager failed to read certificate information: " + cert.getCertFile() + ". Got response: '"+response+"'.");
+					throw new AppException("Password for keystore: '" + cert.getCertFile() + "' is wrong.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
+				}
+				throw new AppException("API-Manager failed to read certificate information: " + cert.getCertFile() + ". Got response: '"+response+"'.", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			JsonNode jsonResponse = mapper.readTree(httpResponse.getEntity().getContent());
 			return jsonResponse;
 		} catch (Exception e) {
-			throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("API-Manager failed to read certificate information.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 
@@ -583,19 +619,19 @@ public class APIManagerAdapter {
 	/**
 	 * Helper method to translate a Base64 encoded format 
 	 * as it's needed by the API-Manager.
-	 * @param certificate the certificate content
+	 * @param fileFontent the certificate content
 	 * @param filename the name of the certificate file used as a reference in the generated Json object
 	 * @throws AppException when the certificate information can't be created
 	 * @return a Json-Object structure as needed by the API-Manager
 	 */
-	public static JsonNode getFileData(byte[] certificate, String filename) throws AppException {
+	public static JsonNode getFileData(byte[] fileFontent, String filename, ContentType contentType) throws AppException {
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/filedata/").build();
 			
 			HttpEntity entity = MultipartEntityBuilder.create()
-					.addBinaryBody("file", certificate, ContentType.create("application/x-pkcs12"), filename)
+					.addBinaryBody("file", fileFontent, contentType, filename)
 					.build();
 			POSTRequest postRequest = new POSTRequest(entity, uri);
 			httpResponse = postRequest.execute();

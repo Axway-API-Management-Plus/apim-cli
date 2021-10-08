@@ -50,7 +50,7 @@ public class OutboundSSLTestIT extends TestNGCitrusTestRunner {
 				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
 				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "ssl")
 				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.trustAll", true)
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.pfx", "@assertThat(startsWith(data:application/x-pkcs12;base64,MIIJ0QIBAzCCCZcGCSqGSIb3DQEHAaCCCYgEggmEMIIJg))@")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.pfx", "@assertThat(startsWith(data:application/x-pkcs12;base64,MIIJ0QIBAzCCCZcGCSqGSIb3DQEHAaCCCYgEggmEMIIJgDCCBDcGCSqGSIb3DQEHBqCCBCgwggQk))@")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.trustAll", "trustAll")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		} else {
@@ -61,7 +61,7 @@ public class OutboundSSLTestIT extends TestNGCitrusTestRunner {
 				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "ssl")
 				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.password", "${password}")
 				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.trustAll", true)
-				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.pfx", "@assertThat(startsWith(data:application/x-pkcs12;base64,MIIJ0QIBAzCCCZcGCSqGSIb3DQEHAaCCCYgEggmEMIIJg))@")
+				.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.pfx", "@assertThat(startsWith(data:application/x-pkcs12;base64,MIIJ0QIBAzCCCZcGCSqGSIb3DQEHAaCCCYgEggmEMIIJgDCCBDcGCSqGSIb3DQEHBqCCBCgwggQk))@")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.trustAll", "trustAll")
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		}

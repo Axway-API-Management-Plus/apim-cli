@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- No change detected when updating the role of a user (See issue [#219](https://github.com/Axway-API-Management-Plus/apim-cli/issues/219))
+- API-Import with Method-Level Outbound-Profiles failes if no custom Outbound-Authentication is given (See issue [#220](https://github.com/Axway-API-Management-Plus/apim-cli/issues/220))
+- Outbound SSL-Authentication is not working (See issue [#221](https://github.com/Axway-API-Management-Plus/apim-cli/issues/221))
+
+### Changed
+- Drop support for API-Manager version 7.6.2
+
+## [1.3.13] 2021-09-21
+### Fixed
+- Error upgrading access to newer API - The entity could not be found. (See issue [#218](https://github.com/Axway-API-Management-Plus/apim-cli/issues/218))
+
+## [1.3.12] 2021-09-10
+### Added
+- Provide option to configure the Retry-Delay for some of the API-Manager REST-API calls (See issue [#213](https://github.com/Axway-API-Management-Plus/apim-cli/issues/213))
+
+## [1.3.11] 2021-09-06
 ### Added
 - Feature to grant API access for organization during import (See issue [#196](https://github.com/Axway-API-Management-Plus/apim-cli/issues/196))
 - Feature to manually define the stage configuration file (See issue [#195](https://github.com/Axway-API-Management-Plus/apim-cli/issues/195))
@@ -15,6 +32,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Changed the Log-Threshold to DEBUG for Console-Logger to make debugging working according to the documentation
 - Application-JSON-Export - Credentials should not contain ApplicationID (See issue [#146](https://github.com/Axway-API-Management-Plus/apim-cli/issues/146))
+- Import Application scopes doesn't work (See issue [#206](https://github.com/Axway-API-Management-Plus/apim-cli/issues/206))
 
 ## [1.3.10] 2021-07-16
 ### Fixed

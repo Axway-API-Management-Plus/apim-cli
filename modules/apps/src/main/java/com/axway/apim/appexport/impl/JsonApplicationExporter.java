@@ -69,7 +69,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "apiId", "createdBy", "createdOn", "enabled"}))
 				.addFilter("APIAccessFilter", SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"apiName", "apiVersion"}))
 				.addFilter("ClientAppCredentialFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"applicationId", "id", "createdOn", "createdBy"}))
-				.addFilter("ClientAppOauthResourceFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"applicationId", "id"}));
+				.addFilter("ClientAppOauthResourceFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"applicationId", "id", "uriprefix", "scopes", "enabled"}));
 		mapper.setFilterProvider(filter);
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {

@@ -1,6 +1,7 @@
 package com.axway.apim.test.basic;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.apis.APIManagerMockBase;
+import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
@@ -190,6 +192,25 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			adapter.getDesiredAPI();
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertNull(apiConfig.getVhost(), "Empty VHost should be considered as not set (null), as an empty VHost is logically not possible to have.");
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	@Test
+	public void outboundProfileWithDefaultAuthOnlyTest() throws AppException, ParseException {
+		try {
+			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/methodLevel/method-level-outboundprofile-default-authn-only.json").getFile();
+			
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+			adapter.getDesiredAPI();
+			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+			Map<String, OutboundProfile> outboundProfiles = apiConfig.getOutboundProfiles();
+			Assert.assertEquals(outboundProfiles.size(), 2, "Two outbound profiles are expected.");
+			OutboundProfile defaultProfile = outboundProfiles.get("_default");
+			OutboundProfile getOrderByIdProfile = outboundProfiles.get("getOrderById");
+			Assert.assertEquals(defaultProfile.getAuthenticationProfile(), "_default", "Authentication profile should be the default.");
+			Assert.assertEquals(getOrderByIdProfile.getAuthenticationProfile(), "_default", "Authentication profile should be the default.");
 		} catch (Exception e) {
 			throw e;
 		}
