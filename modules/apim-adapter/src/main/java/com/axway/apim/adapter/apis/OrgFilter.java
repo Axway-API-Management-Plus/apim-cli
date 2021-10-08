@@ -21,6 +21,7 @@ public class OrgFilter implements CustomPropertiesFilter {
 	String phone;
 	String development;
 	boolean includeImage;
+	boolean includeAPIAccess;
 	
 	private List<String> customProperties;
 
@@ -117,6 +118,14 @@ public class OrgFilter implements CustomPropertiesFilter {
 	public boolean isIncludeImage() {
 		return includeImage;
 	}
+	
+	public boolean isIncludeAPIAccess() {
+		return includeAPIAccess;
+	}
+	
+	public void setIncludeAPIAccess(boolean includeAPIAccess) {
+		this.includeAPIAccess = includeAPIAccess;
+	}
 
 	public List<String> getCustomProperties() {
 		return customProperties;
@@ -176,6 +185,7 @@ public class OrgFilter implements CustomPropertiesFilter {
 		String development;
 		
 		boolean includeImage;
+		boolean includeAPIAccess;
 		
 		private List<String> customProperties;
 
@@ -195,6 +205,7 @@ public class OrgFilter implements CustomPropertiesFilter {
 			filter.setName(this.name);
 			filter.setPhone(this.phone);
 			filter.includeImage = this.includeImage;
+			filter.includeAPIAccess = this.includeAPIAccess;
 			filter.setDevelopment(this.development);
 			filter.setCustomProperties(this.customProperties);
 			return filter;
@@ -242,6 +253,11 @@ public class OrgFilter implements CustomPropertiesFilter {
 		
 		public Builder includeImage(boolean includeImage) {
 			this.includeImage = includeImage;
+			return this;
+		}
+		
+		public Builder includeAPIAccess(boolean includeAPIAccess) {
+			this.includeAPIAccess = includeAPIAccess;
 			return this;
 		}
 		

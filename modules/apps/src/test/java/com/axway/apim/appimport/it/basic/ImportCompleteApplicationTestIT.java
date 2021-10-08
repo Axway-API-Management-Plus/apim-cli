@@ -24,7 +24,7 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void importApplicationBasicTest(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+	public void importApplicationBasicTest(@Optional @CitrusResource TestContext context) throws IOException, AppException, InterruptedException {
 		description("Import application into API-Manager");
 		
 		ImportAppTestAction importApp = new ImportAppTestAction(context);
@@ -39,6 +39,14 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 		variable("state", "approved");
 		variable("appImage", "app-image.jpg");
 		variable("oauthCorsOrigins","");
+		
+		variable("scopeName1","scope.READ");
+		variable("scopeEnabled1",true);
+		variable("scopeIsDefault1",false);
+		
+		variable("scopeName2","scope.WRITE");
+		variable("scopeEnabled2",false);
+		variable("scopeIsDefault2",false);
 
 		echo("####### Import application: '${appName}' #######");		
 		createVariable(PARAM_CONFIGFILE,  PACKAGE + "CompleteApplication.json");
@@ -70,7 +78,7 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 				.validate("$.restrictions[0].config.period", "${quotaPeriod}")
 				.validate("$.restrictions[0].config.per", "1"));
 		
-		echo("####### Validate application: '${appName}' with id: ${appId} OAuth has been imported #######");
+		echo("####### Validate application: '${appName}' with id: ${appId} OAuth-Credentials have been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/oauth").header("Content-Type", "application/json"));
 		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
@@ -94,6 +102,12 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 				.validate("$.[?(@.clientId=='ClientConfidentialClientID-${appNumber}')].enabled", "true")
 				.validate("$[0].corsOrigins[0]", ""));
 		
+		echo("####### Validate application: '${appName}' with id: ${appId} Application-Scopes have been imported #######");
+		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/oauthresource").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.scope=='${scopeName1}')].isDefault", "${scopeIsDefault1}")
+				.validate("$.[?(@.scope=='${scopeName2}')].isDefault", "${scopeIsDefault2}"));
+		
 		echo("####### Re-Import same application - Should be a No-Change #######");
 		createVariable(PARAM_EXPECTED_RC, "10");
 		importApp.doExecute(context);
@@ -103,7 +117,14 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 		variable("quotaMessages", "1111");
 		variable("quotaPeriod", "day");
 		
+		variable("scopeName2","scope.WRITE");
+		variable("scopeEnabled2",true);
+		variable("scopeIsDefault2",true);
+		
+		// First scope is removed - Second scope becomes the first (See the config file: CompleteApplicationOnlyOneScope.json)
+		
 		createVariable(PARAM_EXPECTED_RC, "0");
+		createVariable(PARAM_CONFIGFILE,  PACKAGE + "CompleteApplicationOnlyOneScope.json");
 		importApp.doExecute(context);
 		
 		echo("####### Validate application: '${appName}' (${appId}) has been updated #######");
@@ -131,13 +152,18 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 				.validate("$.restrictions[0].config.period", "${quotaPeriod}")
 				.validate("$.restrictions[0].config.per", "1"));
 		
+		echo("####### Validate modified scopes for application: '${appName}' with id: ${appId} #######");
+		Thread.sleep(1000);
+		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/oauthresource").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+				.validate("$.[?(@.scope=='${scopeName2}')].enabled", "${scopeEnabled2}")
+				.validate("$.[?(@.scope=='${scopeName2}')].isDefault", "${scopeIsDefault2}"));
+		
 		echo("####### Update the application image only #######");
 		variable("appImage", "other-app-image.jpg");
 		
 		createVariable(PARAM_EXPECTED_RC, "0");
 		importApp.doExecute(context);
-		
-		
 		
 		echo("####### Re-Import change corsorigins (oauth) - Existing App should be updated #######");
 		variable("oauthCorsOrigins","*");

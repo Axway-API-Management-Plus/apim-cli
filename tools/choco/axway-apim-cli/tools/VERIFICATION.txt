@@ -3,4 +3,4 @@ Verification is intended to assist the Chocolatey moderators and community
 in verifying that this package's contents are trustworthy.
 
 Original package can be found here:
-https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote/releases
+https://github.com/Axway-API-Management-Plus/apim-cli/releases

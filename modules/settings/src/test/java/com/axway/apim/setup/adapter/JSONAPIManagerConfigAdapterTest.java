@@ -56,4 +56,16 @@ public class JSONAPIManagerConfigAdapterTest extends APIManagerMockBase {
 		
 		Assert.assertEquals(managerConfig.getConfig().getPortalName(), "My API Manager");
 	}
+	
+	@Test
+	public void testManualStageConfig() throws AppException {
+		StandardImportParams importParams = new StandardImportParams();
+		String configFileName = this.getClass().getClassLoader().getResource(PACKAGE + "apimanager-config.json").getFile();
+		importParams.setConfig(configFileName);
+		importParams.setStageConfig("staged-apimanager-config.json");
+		JSONAPIManagerConfigAdapter adapter = new JSONAPIManagerConfigAdapter(importParams);
+		APIManagerConfig managerConfig = adapter.getManagerConfig();
+		
+		Assert.assertEquals(managerConfig.getConfig().getPortalHostname(), "staged-portal-hostname");
+	}
 }

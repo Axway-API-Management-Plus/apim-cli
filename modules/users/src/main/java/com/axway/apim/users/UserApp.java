@@ -147,8 +147,7 @@ public class UserApp implements APIMCLIServiceProvider {
 			
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the organization
-			UserAdapter userAdapter = new JSONUserAdapter();
-			userAdapter.readConfig(params.getConfig());
+			UserAdapter userAdapter = new JSONUserAdapter(params);
 			List<User> desiredUsers = userAdapter.getUsers();
 			UserImportManager importManager = new UserImportManager();
 			

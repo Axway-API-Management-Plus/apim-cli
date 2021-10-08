@@ -25,18 +25,27 @@ public class APISpecificationWSDLTest {
 	}
 	
 	@Test
-	public void isWSDLSpecification() throws AppException, IOException {
+	public void isWSDLSpecificationBasedOnTheURL() throws AppException, IOException {
 
-		byte[] content = getSwaggerContent(testPackage + "/sample-wsdl.xml");
+		byte[] content = getWSDLContent(testPackage + "/sample-wsdl.xml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "http://www.mnb.hu/arfolyamok.asmx?WSDL", "Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
 		
-		// Check if the Swagger-File has been changed
+		// Check, if the specification has been identified as a WSDL
+		Assert.assertTrue(apiDefinition instanceof WSDLSpecification);
+	}
+	
+	@Test
+	public void isWSDLSpecificationBasedOnWSDLString() throws AppException, IOException {
+
+		byte[] content = getWSDLContent(testPackage + "/sample-wsdl.xml");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "http://wsdl.from.a.resource", "Test-API");
+		
+		// Check, if the specification has been identified as a WSDL
 		Assert.assertTrue(apiDefinition instanceof WSDLSpecification);
 	}
 	
 	
-	private byte[] getSwaggerContent(String swaggerFile) throws AppException {
+	private byte[] getWSDLContent(String swaggerFile) throws AppException {
 		try {
 			return IOUtils.toByteArray(this.getClass().getResourceAsStream(swaggerFile));
 		} catch (IOException e) {
