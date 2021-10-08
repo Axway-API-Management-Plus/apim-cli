@@ -18,4 +18,6 @@ public interface APIFilterParams {
 	void setTag(String tag);
 	void setInboundSecurity(String inboundsecurity);
 	void setOutboundAuthentication(String outboundauthn);
+	void setCreatedOnAfter(String createdOnAfter);
+	void setCreatedOnBefore(String createdOnBefore);
 }

@@ -11,7 +11,8 @@ public class StandardExportParams extends CoreParameters {
 	public static enum OutputFormat {
 		console, 
 		json, 
-		csv;
+		csv,
+		dat;
 		
 		public static OutputFormat getFormat(String name) {
 			if(name==null || valueOf(name)==null) return console;

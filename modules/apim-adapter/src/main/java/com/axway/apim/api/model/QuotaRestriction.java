@@ -43,11 +43,11 @@ public class QuotaRestriction {
 		this.config = config;
 	}
 	
-	public boolean isSameRestriction(QuotaRestriction otherRestriction) {
+	public boolean isSameRestriction(QuotaRestriction otherRestriction, boolean ignoreAPI) {
 		if(otherRestriction == null) return false;
 		return 
 				StringUtils.equals(otherRestriction.getMethod(), this.getMethod()) &&
-				StringUtils.equals(otherRestriction.getApi(), this.getApi()) &&
+				(ignoreAPI || StringUtils.equals(otherRestriction.getApi(), this.getApi() )) &&
 				otherRestriction.getType()==this.getType() &&
 				StringUtils.equals(otherRestriction.getConfig().get("period"), this.getConfig().get("period")) &&
 				StringUtils.equals(otherRestriction.getConfig().get("per"), this.getConfig().get("per"));

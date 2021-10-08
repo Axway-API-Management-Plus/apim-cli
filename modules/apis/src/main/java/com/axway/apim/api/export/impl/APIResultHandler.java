@@ -47,6 +47,7 @@ public abstract class APIResultHandler {
 		JSON_EXPORTER(JsonAPIExporter.class),
 		CONSOLE_EXPORTER(ConsoleAPIExporter.class),
 		CSV_EXPORTER(CSVAPIExporter.class),
+		DAT_EXPORTER(DATAPIExporter.class),
 		API_DELETE_HANDLER(DeleteAPIHandler.class),
 		API_PUBLISH_HANDLER(PublishAPIHandler.class),
 		API_UNPUBLISH_HANDLER(UnpublishAPIHandler.class), 
@@ -121,6 +122,8 @@ public abstract class APIResultHandler {
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.translatePolicies(POLICY_TRANSLATION.TO_NAME)
 				.useFEAPIDefinition(params.isUseFEAPIDefinition())
+				.isCreatedOnAfter(params.getCreatedOnAfter())
+				.isCreatedOnBefore(params.getCreatedOnBefore())
 				.failOnError(false);
 		return builder;
 	}

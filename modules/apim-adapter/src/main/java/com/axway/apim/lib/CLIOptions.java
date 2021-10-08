@@ -140,10 +140,8 @@ public abstract class CLIOptions {
 	 * This is called automatically by the constructor to see the list of return-Codes.
 	 */
 	public void showReturnCodes() {
-		try {
-			cmd = parser.parse(options, args);
-
-			if(cmd.hasOption("returncodes")) {
+		for(String arg : args) {
+			if("-returncodes".equals(arg)) {
 				String spaces = "                                   ";
 				System.out.println("Possible error codes and their meaning:\n");
 				for(ErrorCode code : ErrorCode.values()) {
@@ -151,8 +149,6 @@ public abstract class CLIOptions {
 				}
 				System.exit(0);
 			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
 		}
 	}
 

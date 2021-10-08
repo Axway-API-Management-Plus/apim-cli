@@ -28,6 +28,10 @@ public class AppImportCLIOptions extends CLIOptions {
 		option.setRequired(true);
 		option.setArgName("app_config.json");
 		addOption(option);
+		
+		option = new Option("stageConfig", true, "Manually provide the name of the stage configuration file to use instead of derived from the given stage.");
+		option.setArgName("my-staged-app-config.json");
+		addOption(option);
 	}
 
 	@Override
@@ -55,6 +59,7 @@ public class AppImportCLIOptions extends CLIOptions {
 		AppImportParams params = new AppImportParams();
 		
 		params.setConfig(getValue("c"));
+		params.setStageConfig(getValue("stageConfig"));
 		return params;
 	}
 }

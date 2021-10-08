@@ -33,10 +33,10 @@ public class WSDLSpecification extends APISpecification {
 				apiSpecificationFile.toLowerCase().endsWith("?singlewsdl")) {
 			return true;
 		}
-		if(new String(this.apiSpecificationContent, 0, 100).contains("wsdl")) {
+		if(new String(this.apiSpecificationContent, 0, 500).contains("wsdl")) {
 			return true;
 		}
-		LOG.debug("No WSDL specification. Specification doesn't contain wsdl in the first 100 characters.");
+		LOG.debug("No WSDL specification. Specification doesn't contain wsdl in the first 500 characters.");
 		return false;
 	}
 }

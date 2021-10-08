@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.lib.Result;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public abstract class OrgAdapter {
@@ -13,6 +14,8 @@ public abstract class OrgAdapter {
 	static Logger LOG = LoggerFactory.getLogger(JSONOrgAdapter.class);
 	
 	List<Organization> orgs;
+	
+	protected Result result;
 
 	public OrgAdapter() {
 		// TODO Auto-generated constructor stub
