@@ -18,8 +18,8 @@ public class RemoteHostFilterTest {
 		RemoteHost remoteHost1 = new RemoteHost();
 		remoteHost1.setName("ABC");
 
-		Assert.assertFalse(filter1.filter(remoteHost1), "Remote should not be filtered, as the name is different.");
-		Assert.assertTrue(filter2.filter(remoteHost1), "Remote should be filtered, as the name is the same.");
+		Assert.assertTrue(filter1.filter(remoteHost1), "Remote should be filtered, as the name is different.");
+		Assert.assertFalse(filter2.filter(remoteHost1), "Remote should NOT be filtered, as the name is the same.");
 	}
 	
 	@Test
@@ -35,11 +35,10 @@ public class RemoteHostFilterTest {
 		remoteHost1.setPort(7878);
 		remoteHost1.setAlias("SomeAlias");
 
-		Assert.assertFalse(filter1.filter(remoteHost1), "Remote host should not be filtered, as the name is different.");
-		Assert.assertFalse(filter2.filter(remoteHost1), "Remote host should not be filtered, as the port is different.");
-		Assert.assertTrue(filter3.filter(remoteHost1), "Remote host should be filtered, as name and port are equal.");
-		Assert.assertFalse(filter4.filter(remoteHost1), "Remote host should not be filtered, as the alias is different.");
-		Assert.assertTrue(filter5.filter(remoteHost1), "Remote host should be filtered, as everything equals.");
+		Assert.assertTrue(filter1.filter(remoteHost1), "Remote host should be filtered, as the name is different.");
+		Assert.assertTrue(filter2.filter(remoteHost1), "Remote host should be filtered, as the port is different.");
+		Assert.assertFalse(filter3.filter(remoteHost1), "Remote host should NOT be filtered, as name and port are equal.");
+		Assert.assertTrue(filter4.filter(remoteHost1), "Remote host should be filtered, as the alias is different.");
+		Assert.assertFalse(filter5.filter(remoteHost1), "Remote host should NOT be filtered, as everything equals.");
 	}
 }
-
