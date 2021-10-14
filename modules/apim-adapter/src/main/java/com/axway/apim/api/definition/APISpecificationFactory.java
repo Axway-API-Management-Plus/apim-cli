@@ -22,6 +22,8 @@ public class APISpecificationFactory {
 	    add(OAS3xSpecification.class);
 	    add(WSDLSpecification.class);
 	    add(WADLSpecification.class);
+	    add(ODataV2Specification.class);
+	    add(ODataV4Specification.class);
 	}};
 	
 	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName) throws AppException {
@@ -45,6 +47,7 @@ public class APISpecificationFactory {
 					LOG.debug("Can't handle API specification with class: " + clazz.getName());
 					continue;
 				} else {
+					LOG.info("Detected: " + spec.getAPIDefinitionType().niceName + " specification.");
 					return spec;
 				}
 			} catch (AppException e) {

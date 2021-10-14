@@ -29,6 +29,8 @@ public abstract class APISpecification {
 		OPEN_API_30_YAML("Open API 3.0 (YAML)", ".yaml"),
 		WSDL_API ("WSDL", ".xml"),
 		WADL_API ("Web Application Description Language (WADL)", ".wadl"),
+		ODATA_V2 ("OData V2", "$metadata"),
+		ODATA_V4 ("OData V4", "$metadata"),
 		UNKNOWN ("Unknown", ".txt");
 		
 		String niceName;
