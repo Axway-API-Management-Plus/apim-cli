@@ -55,7 +55,7 @@ public abstract class APIManagerMockBase {
 		String userApiAdmin = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(				testPackage + "users/user-apiadmin.json"));
 		String userFred = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(					testPackage + "users/user-fred.json"));
 		String oauthClientProfile = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(		testPackage + "clientProfiles/OAuthClientProfile.json"));
-		String customPropertiesConfig = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(	testPackage + "customProperties/customPropertiesConfig.json"));
+		String noCustomPropertiesConfig = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(	testPackage + "customProperties/noCustomPropertiesConfig.json"));
 		
 		
 
@@ -93,7 +93,7 @@ public abstract class APIManagerMockBase {
 		// OAuth Client Profile: Sample OAuth Client Profile
 		apim.oauthClientAdapter.setAPIManagerTestResponse(oauthClientProfile);
 		
-		apim.customPropertiesAdapter.setAPIManagerTestResponse(customPropertiesConfig);
+		apim.customPropertiesAdapter.setAPIManagerTestResponse(noCustomPropertiesConfig);
 	}
 
 }

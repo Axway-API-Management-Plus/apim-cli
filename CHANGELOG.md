@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - API-Manager Remote-Hosts export not working - Filtered incorrectly (See issue [#225](https://github.com/Axway-API-Management-Plus/apim-cli/issues/225))
 
+### Added
+- Entity import should fail if a required custom property is missing (See issue [#229](https://github.com/Axway-API-Management-Plus/apim-cli/issues/229))
+
 ## [1.4.0] 2021-10-08
 ### Fixed
 - No change detected when updating the role of a user (See issue [#219](https://github.com/Axway-API-Management-Plus/apim-cli/issues/219))
