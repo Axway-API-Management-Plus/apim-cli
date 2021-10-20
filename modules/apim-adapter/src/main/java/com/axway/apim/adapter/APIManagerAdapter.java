@@ -1,6 +1,5 @@
 package com.axway.apim.adapter;
 
-import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;

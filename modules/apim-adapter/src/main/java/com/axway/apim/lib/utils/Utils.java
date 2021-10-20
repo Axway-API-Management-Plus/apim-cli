@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.commons.text.StringSubstitutor;
@@ -202,12 +203,15 @@ public class Utils {
 	}
 	
 	public static void validateCustomProperties(Map<String, String> customProperties, Type type) throws AppException {
-		if(customProperties==null) return; // Nothing to validate	
+		Map<String, CustomProperty> configuredCustomProperties = APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperties(type);
+		Map<String, CustomProperty> requiredConfiguredCustomProperties = APIManagerAdapter.getInstance().customPropertiesAdapter.getRequiredCustomProperties(type);
+		if(customProperties==null && requiredConfiguredCustomProperties==null || requiredConfiguredCustomProperties.size()==0) return; // Nothing to validate
+
 		Iterator<String> desiredCustomProps = customProperties.keySet().iterator();
 		while(desiredCustomProps.hasNext()) {
 			String desiredCustomProperty = desiredCustomProps.next();
 			String desiredCustomPropertyValue = customProperties.get(desiredCustomProperty);
-			CustomProperty configuredCustomProperty = APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperty(type, desiredCustomProperty);
+			CustomProperty configuredCustomProperty = configuredCustomProperties.get(desiredCustomProperty);
 			if(configuredCustomProperty==null) {
 				throw new AppException("The custom-property: '" + desiredCustomProperty + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
@@ -228,6 +232,13 @@ public class Utils {
 					throw new AppException("The value: '" + desiredCustomPropertyValue + "' is not a valid option for custom property: '" + desiredCustomProperty + "'", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
 			}
+			// Remove 
+			requiredConfiguredCustomProperties.remove(desiredCustomProperty);
+		}
+		// Finally check, if missing custom properties are left
+		if(requiredConfiguredCustomProperties.size()==0) return;
+		for(String propName : requiredConfiguredCustomProperties.keySet()) {
+			throw new AppException("Missing required custom property: '"+propName+"'", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 	}
 	

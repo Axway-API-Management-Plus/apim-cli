@@ -10,6 +10,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
@@ -214,5 +215,24 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		} catch (Exception e) {
 			throw e;
 		}
+	}
+	
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required custom property: 'customProperty4'")
+	public void testMissingMandatoryCustomProperty() throws AppException, ParseException {
+			EnvironmentProperties props = new EnvironmentProperties(null);
+			props.put("orgNumber", "1");
+			props.put("apiPath", "/api/with/custom/props");
+			props.put("status", "unpublished");
+			props.put("customProperty1", "public");
+			props.put("customProperty3", "true");
+			
+			
+			APIImportParams params = new APIImportParams();
+			params.setProperties(props);
+			
+			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/customProperties/1_custom-properties-config.json").getFile();
+			
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+			adapter.getDesiredAPI(); // Should fail, as a mandatory customProperty is missing
 	}
 }

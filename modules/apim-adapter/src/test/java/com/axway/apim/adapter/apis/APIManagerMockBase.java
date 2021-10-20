@@ -55,6 +55,8 @@ public abstract class APIManagerMockBase {
 		String userApiAdmin = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(				testPackage + "users/user-apiadmin.json"));
 		String userFred = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(					testPackage + "users/user-fred.json"));
 		String oauthClientProfile = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(		testPackage + "clientProfiles/OAuthClientProfile.json"));
+		String customPropertiesConfig = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(	testPackage + "customProperties/customPropertiesConfig.json"));
+		
 		
 
 		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().hasId("72745ed9-f75b-428c-959c-b483eea497a1").build(), testAPI1);
@@ -78,7 +80,7 @@ public abstract class APIManagerMockBase {
 		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasName("API Development").build(), testOrganizations);
 		// Org: Singe Result org
 		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().build(), testOrganizations); // Used for all orgs query
-		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasName("Single Result Org").build(), "["+singleOrganization +"]");
+		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasName("API Development 1").build(), "["+singleOrganization +"]");
 		// Org: FHIR
 		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasId("2efca39a-2572-4b62-8d0f-53241d93d362").build(), fhirOrganization);
 		apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasName("FHIR").build(), fhirOrganization);		
@@ -90,6 +92,8 @@ public abstract class APIManagerMockBase {
 		apim.userAdapter.setAPIManagerTestResponse(new UserFilter.Builder().hasLoginName("fred").build(), userFred);
 		// OAuth Client Profile: Sample OAuth Client Profile
 		apim.oauthClientAdapter.setAPIManagerTestResponse(oauthClientProfile);
+		
+		apim.customPropertiesAdapter.setAPIManagerTestResponse(customPropertiesConfig);
 	}
 
 }

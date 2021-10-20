@@ -211,6 +211,8 @@ public class APIImportConfigAdapter {
 			completeClientApplications(apiConfig);
 			handleVhost(apiConfig);
 			return apiConfig;
+		} catch (AppException e) {
+			throw e;
 		} catch (Exception e) {
 			if(e.getCause() instanceof AppException) {
 				throw (AppException)e.getCause();

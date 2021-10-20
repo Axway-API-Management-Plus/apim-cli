@@ -3,6 +3,8 @@ package com.axway.apim.adapter.customProperties;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +78,21 @@ public class APIManagerCustomPropertiesAdapter {
 		}
 	}
 	
+	public Map<String, CustomProperty> getRequiredCustomProperties(Type type) throws AppException {
+		 Map<String, CustomProperty> allCustomProps = getCustomProperties(type);
+		 if(allCustomProps==null) return null;
+		 Map<String, CustomProperty> requiredCustomProps = new HashMap<String, CustomProperty>();
+		 Iterator<String> it = allCustomProps.keySet().iterator();
+		 while(it.hasNext()) {
+			 String propName = it.next();
+			 CustomProperty prop = allCustomProps.get(propName);
+			 if(prop.getRequired()) {
+				 requiredCustomProps.put(propName, prop);
+			 }
+		 }
+		 return requiredCustomProps;
+	}
+	
 	public Map<String, CustomProperty> getCustomProperties(Type type) throws AppException {
 		CustomProperties customProperties = getCustomProperties();
 		if(customProperties == null) return null;
@@ -105,7 +122,7 @@ public class APIManagerCustomPropertiesAdapter {
 		return new ArrayList<>(customProperties.keySet());
 	}
 	
-	void setAPIManagerTestResponse(String jsonResponse) {
+	public void setAPIManagerTestResponse(String jsonResponse) {
 		if(jsonResponse==null) {
 			LOG.error("Test-Response is empty. Ignoring!");
 			return;
