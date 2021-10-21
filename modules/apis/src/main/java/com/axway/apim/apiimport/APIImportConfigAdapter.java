@@ -757,13 +757,16 @@ public class APIImportConfigAdapter {
 					LOG.warn("Provided default outboundProfile doesn't contain AuthN-Profile - Setting it to default");
 					profile.setAuthenticationProfile("_default");
 				}
-				continue;
 			}
 			// Check the referenced authentication profile is valid
 			if(!profile.getAuthenticationProfile().equals("_default")) {
 				if(profile.getAuthenticationProfile()!=null && getAuthNProfile(importApi, profile.getAuthenticationProfile())==null) {
 					throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '"+profile.getAuthenticationProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
 				}
+			}
+			// Check a routingPolicy is given, if routeType is policy
+			if("policy".equals(profile.getRouteType()) && profile.getRoutePolicy()==null) {
+				throw new AppException("Missing routingPolicy when routeType is set to policy", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
 		}
 		if(!defaultProfileFound) {

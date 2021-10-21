@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Entity import should fail if a required custom property is missing (See issue [#229](https://github.com/Axway-API-Management-Plus/apim-cli/issues/229))
+- APIM-CLI should check & fail, when RouteType is Policy without providing a RoutingPolicy (See issue [#227](https://github.com/Axway-API-Management-Plus/apim-cli/issues/227))
 
 ## [1.4.0] 2021-10-08
 ### Fixed

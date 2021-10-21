@@ -90,74 +90,54 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 
 	@Test
 	public void notDeclaredVariable() throws AppException, ParseException {
-		try {
-			EnvironmentProperties props = new EnvironmentProperties(null);
-			APIImportParams params = new APIImportParams();
-			params.setProperties(props);
-			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
+		EnvironmentProperties props = new EnvironmentProperties(null);
+		APIImportParams params = new APIImportParams();
+		params.setProperties(props);
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
-			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
-			Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
-		} catch (Exception e) {
-			LOG.error("Error running test: notDeclaredVariable", e);
-			throw e;
-		}
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
+		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+		Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
 	}
 
 	@Test
 	public void configFileWithSpaces() throws AppException, ParseException {
-		try {
-			EnvironmentProperties props = new EnvironmentProperties(null);
-			APIImportParams params = new APIImportParams();
-			params.setProperties(props);
-			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api config with spaces.json").getFile();
+		EnvironmentProperties props = new EnvironmentProperties(null);
+		APIImportParams params = new APIImportParams();
+		params.setProperties(props);
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api config with spaces.json").getFile();
 
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
-			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
-			Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
-		} catch (Exception e) {
-			LOG.error("Error running test: notDeclaredVariable", e);
-			throw e;
-		}
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
+		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+		Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
 	}
 
 	@Test
 	public void stageConfigInSubDirectory() throws AppException, ParseException {
-		try {
-			EnvironmentProperties props = new EnvironmentProperties(null);
-			APIImportParams params = new APIImportParams();
-			params.setProperties(props);
-			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
+		EnvironmentProperties props = new EnvironmentProperties(null);
+		APIImportParams params = new APIImportParams();
+		params.setProperties(props);
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "notRelavantForThis Test", false, null);
-			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
-			Assert.assertEquals(apiConfig.getVersion(), "9.0.0");
-			Assert.assertEquals(apiConfig.getName(), "API Config from testStageProd sub folder");
-		} catch (Exception e) {
-			LOG.error("Error running test: notDeclaredVariable", e);
-			throw e;
-		}
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "notRelavantForThis Test", false, null);
+		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+		Assert.assertEquals(apiConfig.getVersion(), "9.0.0");
+		Assert.assertEquals(apiConfig.getName(), "API Config from testStageProd sub folder");
 	}
 
 	@Test
 	public void outboundOAuthValidConfig() throws AppException, ParseException {
-		try {
-			EnvironmentProperties props = new EnvironmentProperties(null);  
-			props.put("myOAuthProfileName", "Sample OAuth Client Profile");
-			APIImportParams params = new APIImportParams();
-			params.setProperties(props);
-			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound-oauth-config.json").getFile();
+		EnvironmentProperties props = new EnvironmentProperties(null);  
+		props.put("myOAuthProfileName", "Sample OAuth Client Profile");
+		APIImportParams params = new APIImportParams();
+		params.setProperties(props);
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound-oauth-config.json").getFile();
 
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "petstore.json", false, null);
-			adapter.getDesiredAPI();
-			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
-			Assert.assertEquals(apiConfig.getVersion(), "kk1");
-			Assert.assertEquals(apiConfig.getName(), "My OAuth API");
-		} catch (Exception e) {
-			LOG.error("Error running test: notDeclaredVariable", e);
-			throw e;
-		}
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "petstore.json", false, null);
+		adapter.getDesiredAPI();
+		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+		Assert.assertEquals(apiConfig.getVersion(), "kk1");
+		Assert.assertEquals(apiConfig.getName(), "My OAuth API");
 	}
 
 	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The OAuth provider profile is unkown: 'Invalid profile name'")
@@ -176,36 +156,36 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 	}
 
 	@Test
-	public void emptyVHostTest() throws AppException, ParseException {
-		try {
-			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/empty-vhost-api-config.json").getFile();
+	public void emptyVHostTest() throws AppException, ParseException {		
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/empty-vhost-api-config.json").getFile();
 
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false, null);
-			adapter.getDesiredAPI();
-			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
-			Assert.assertNull(apiConfig.getVhost(), "Empty VHost should be considered as not set (null), as an empty VHost is logically not possible to have.");
-		} catch (Exception e) {
-			throw e;
-		}
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false, null);
+		adapter.getDesiredAPI();
+		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+		Assert.assertNull(apiConfig.getVhost(), "Empty VHost should be considered as not set (null), as an empty VHost is logically not possible to have.");
 	}
 
 	@Test
 	public void outboundProfileWithDefaultAuthOnlyTest() throws AppException, ParseException {
-		try {
-			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/methodLevel/method-level-outboundprofile-default-authn-only.json").getFile();
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/methodLevel/method-level-outboundprofile-default-authn-only.json").getFile();
 
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
-			adapter.getDesiredAPI();
-			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
-			Map<String, OutboundProfile> outboundProfiles = apiConfig.getOutboundProfiles();
-			Assert.assertEquals(outboundProfiles.size(), 2, "Two outbound profiles are expected.");
-			OutboundProfile defaultProfile = outboundProfiles.get("_default");
-			OutboundProfile getOrderByIdProfile = outboundProfiles.get("getOrderById");
-			Assert.assertEquals(defaultProfile.getAuthenticationProfile(), "_default", "Authentication profile should be the default.");
-			Assert.assertEquals(getOrderByIdProfile.getAuthenticationProfile(), "_default", "Authentication profile should be the default.");
-		} catch (Exception e) {
-			throw e;
-		}
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+		adapter.getDesiredAPI();
+		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+		Map<String, OutboundProfile> outboundProfiles = apiConfig.getOutboundProfiles();
+		Assert.assertEquals(outboundProfiles.size(), 2, "Two outbound profiles are expected.");
+		OutboundProfile defaultProfile = outboundProfiles.get("_default");
+		OutboundProfile getOrderByIdProfile = outboundProfiles.get("getOrderById");
+		Assert.assertEquals(defaultProfile.getAuthenticationProfile(), "_default", "Authentication profile should be the default.");
+		Assert.assertEquals(getOrderByIdProfile.getAuthenticationProfile(), "_default", "Authentication profile should be the default.");
+	}
+	
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing routingPolicy when routeType is set to policy")
+	public void outboundProfileTypePolicyWithoutRoutingPolicy() throws AppException, ParseException {	
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/policies/invalid-RouteType-Policy-NoRoutingPolicy.json").getFile();
+
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+		adapter.getDesiredAPI();
 	}
 
 	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required custom property: 'customProperty4'")
