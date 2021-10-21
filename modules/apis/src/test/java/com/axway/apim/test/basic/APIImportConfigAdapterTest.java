@@ -210,8 +210,10 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 
 	@Test(priority = 100, expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required custom property: 'customProperty4'")
 	public void testMissingMandatoryCustomProperty() throws ParseException, IOException, InterruptedException {
+		System.out.println("Run test testMissingMandatoryCustomProperty");
 		String customPropertiesConfig = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "customProperties/customPropertiesConfig.json"));
 		APIManagerAdapter.getInstance().customPropertiesAdapter.setAPIManagerTestResponse(customPropertiesConfig);
+		System.out.println("Manager prepared");
 
 		EnvironmentProperties props = new EnvironmentProperties(null);
 		props.put("orgNumber", "1");
