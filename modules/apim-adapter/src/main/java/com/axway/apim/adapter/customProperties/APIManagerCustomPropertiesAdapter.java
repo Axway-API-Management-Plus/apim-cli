@@ -27,22 +27,23 @@ import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class APIManagerCustomPropertiesAdapter {
-	
+
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerCustomPropertiesAdapter.class);
-	
+
 	ObjectMapper mapper = APIManagerAdapter.mapper;
-	
+
 	CoreParameters cmd = CoreParameters.getInstance();
 
 	public APIManagerCustomPropertiesAdapter() {}
-	
+
 	String apiManagerResponse;
-	
+
 	CustomProperties customProperties;
-	
+
 	private void readCustomPropertiesFromAPIManager() throws AppException {
-		LOG.info("YYYYYYYYYYYY: Reading custom props");
+		LOG.info("YYYYYYYYYYYY: Read custom props from API-Manager");
 		if(apiManagerResponse != null) return;
+		LOG.info("AAAAAAAAAAAA: Really reading custom props from API-Manager");
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {			
@@ -66,9 +67,11 @@ public class APIManagerCustomPropertiesAdapter {
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	public CustomProperties getCustomProperties() throws AppException {
+		LOG.info("BBBBBBBBBBB: Get custom props");
 		if(customProperties!=null) return customProperties;
+		LOG.info("DDDDDDDDDDD: Get custom props from API-Manager");
 		readCustomPropertiesFromAPIManager();
 		try {
 			CustomProperties props = mapper.readValue(apiManagerResponse, CustomProperties.class);
@@ -78,22 +81,23 @@ public class APIManagerCustomPropertiesAdapter {
 			throw new AppException("Error parsing API-Manager custom properties", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
-	
+
 	public Map<String, CustomProperty> getRequiredCustomProperties(Type type) throws AppException {
-		 Map<String, CustomProperty> allCustomProps = getCustomProperties(type);
-		 if(allCustomProps==null) return null;
-		 Map<String, CustomProperty> requiredCustomProps = new HashMap<String, CustomProperty>();
-		 Iterator<String> it = allCustomProps.keySet().iterator();
-		 while(it.hasNext()) {
-			 String propName = it.next();
-			 CustomProperty prop = allCustomProps.get(propName);
-			 if(prop.getRequired()) {
-				 requiredCustomProps.put(propName, prop);
-			 }
-		 }
-		 return requiredCustomProps;
+		LOG.info("CCCCCCCCCCC: Get required custom props");
+		Map<String, CustomProperty> allCustomProps = getCustomProperties(type);
+		if(allCustomProps==null) return null;
+		Map<String, CustomProperty> requiredCustomProps = new HashMap<String, CustomProperty>();
+		Iterator<String> it = allCustomProps.keySet().iterator();
+		while(it.hasNext()) {
+			String propName = it.next();
+			CustomProperty prop = allCustomProps.get(propName);
+			if(prop.getRequired()) {
+				requiredCustomProps.put(propName, prop);
+			}
+		}
+		return requiredCustomProps;
 	}
-	
+
 	public Map<String, CustomProperty> getCustomProperties(Type type) throws AppException {
 		CustomProperties customProperties = getCustomProperties();
 		if(customProperties == null) return null;
@@ -108,21 +112,21 @@ public class APIManagerCustomPropertiesAdapter {
 			return customProperties.getOrganization();
 		default:
 			throw new AppException("Unknown custom properties type: " + type, ErrorCode.UNXPECTED_ERROR);
+		}
 	}
-	}
-	
+
 	public CustomProperty getCustomProperty(Type type, String customPropertyName) throws AppException {
 		Map<String, CustomProperty> customProperties = getCustomProperties(type);
 		if(customProperties == null) return null;
 		return customProperties.get(customPropertyName);
 	}
-	
+
 	public List<String> getCustomPropertyNames(Type type) throws AppException {
 		Map<String, CustomProperty> customProperties = getCustomProperties(type);
 		if(customProperties == null) return new ArrayList<String>();
 		return new ArrayList<>(customProperties.keySet());
 	}
-	
+
 	public void setAPIManagerTestResponse(String jsonResponse) {
 		if(jsonResponse==null) {
 			LOG.error("Test-Response is empty. Ignoring!");
