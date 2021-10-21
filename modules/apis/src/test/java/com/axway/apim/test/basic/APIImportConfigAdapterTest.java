@@ -208,13 +208,10 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		}
 	}
 
-	//@Test(priority = 100, expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required custom property: 'customProperty4'")
-	@Test(priority = 100)
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required custom property: 'customProperty4'")
 	public void testMissingMandatoryCustomProperty() throws ParseException, IOException, InterruptedException {
-		System.out.println("Run test testMissingMandatoryCustomProperty");
 		String customPropertiesConfig = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "customProperties/customPropertiesConfig.json"));
 		APIManagerAdapter.getInstance().customPropertiesAdapter.setAPIManagerTestResponse(customPropertiesConfig);
-		System.out.println("Manager prepared");
 
 		EnvironmentProperties props = new EnvironmentProperties(null);
 		props.put("orgNumber", "1");
@@ -223,20 +220,11 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		props.put("customProperty1", "public");
 		props.put("customProperty3", "true");
 
-		Thread.sleep(2000);
 		APIImportParams params = new APIImportParams();
 		params.setProperties(props);
-
-		try {
-			System.out.println("Test-Config loaded");
 			
-			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/customProperties/1_custom-properties-config.json").getFile();
-			LOG.info("Get Config Adapter");
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
-			LOG.info("Get desired API");
-			//adapter.getDesiredAPI(); // Should fail, as a mandatory customProperty is missing
-		} catch (Exception e) {
-			LOG.error("ERROR running test", e);
-		}
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/customproperties/1_custom-properties-config.json").getFile();
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+		adapter.getDesiredAPI(); // Should fail, as a mandatory customProperty is missing
 	}
 }

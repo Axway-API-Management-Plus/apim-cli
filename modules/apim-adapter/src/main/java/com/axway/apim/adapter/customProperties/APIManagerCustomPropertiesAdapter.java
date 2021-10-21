@@ -41,9 +41,7 @@ public class APIManagerCustomPropertiesAdapter {
 	CustomProperties customProperties;
 
 	private void readCustomPropertiesFromAPIManager() throws AppException {
-		LOG.info("YYYYYYYYYYYY: Read custom props from API-Manager");
 		if(apiManagerResponse != null) return;
-		LOG.info("AAAAAAAAAAAA: Really reading custom props from API-Manager");
 		URI uri;
 		HttpResponse httpResponse = null;
 		try {			
@@ -69,9 +67,7 @@ public class APIManagerCustomPropertiesAdapter {
 	}
 
 	public CustomProperties getCustomProperties() throws AppException {
-		LOG.info("BBBBBBBBBBB: Get custom props");
 		if(customProperties!=null) return customProperties;
-		LOG.info("DDDDDDDDDDD: Get custom props from API-Manager");
 		readCustomPropertiesFromAPIManager();
 		try {
 			CustomProperties props = mapper.readValue(apiManagerResponse, CustomProperties.class);
@@ -83,7 +79,6 @@ public class APIManagerCustomPropertiesAdapter {
 	}
 
 	public Map<String, CustomProperty> getRequiredCustomProperties(Type type) throws AppException {
-		LOG.info("CCCCCCCCCCC: Get required custom props");
 		Map<String, CustomProperty> allCustomProps = getCustomProperties(type);
 		if(allCustomProps==null) return null;
 		Map<String, CustomProperty> requiredCustomProps = new HashMap<String, CustomProperty>();
@@ -132,7 +127,6 @@ public class APIManagerCustomPropertiesAdapter {
 			LOG.error("Test-Response is empty. Ignoring!");
 			return;
 		}
-		LOG.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX: " + jsonResponse);
 		this.customProperties = null; // Reset it, if new test data is provided
 		this.apiManagerResponse = jsonResponse;
 	}
