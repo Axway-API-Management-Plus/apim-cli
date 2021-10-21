@@ -1,0 +1,16 @@
+[
+	{
+		"name": "${appName}", 
+		"organization": "${orgName}",
+		"permissions": [ 
+		{
+			"user":"${username2}",
+			"permission":"view" 
+		}, 
+		{
+			"user":"InvalidUserName",
+			"permission":"view" 
+		}	
+		 ]  
+	}
+]
