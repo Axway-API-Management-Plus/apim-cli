@@ -23,12 +23,12 @@ import com.axway.apim.lib.errorHandling.AppException;
 public class APIImportConfigAdapterTest extends APIManagerMockBase {
 
 	private static Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapterTest.class);
-	
+
 	@BeforeClass
 	private void initCommandParameters() throws AppException, IOException {
 		setupMockData();
 	}
-	
+
 	// Make sure, you don't have configured APIM_CLI_HOME when running this test
 	@Test
 	public void withoutStage() throws AppException, ParseException {
@@ -37,12 +37,12 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		APIImportParams params = new APIImportParams();
 		params.setProperties(props);
 		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
-		
+
 		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 		Assert.assertEquals(apiConfig.getBackendBasepath(), "resolvedToSomething");
 	}
-	
+
 	// Make sure, you don't have configured APIM_CLI_HOME when running this test 
 	@Test
 	public void withStage() throws AppException, ParseException {
@@ -51,12 +51,12 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		APIImportParams params = new APIImportParams();
 		params.setProperties(props);
 		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
-		
+
 		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 		Assert.assertEquals(apiConfig.getBackendBasepath(), "resolvedToSomethingElse");
 	}
-	
+
 	// Make sure, you don't have configured APIM_CLI_HOME when running this test
 	@Test
 	public void withManualStageConfig() throws AppException, ParseException {
@@ -64,12 +64,12 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		APIImportParams params = new APIImportParams();
 		params.setConfig(testConfig);
 		params.setStageConfig("staged-minimal-config.json");
-		
+
 		APIImportConfigAdapter adapter = new APIImportConfigAdapter(params);
 		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 		Assert.assertEquals(apiConfig.getName(), "API-Name is different for this stage");
 	}
-	
+
 	@Test
 	public void usingOSEnvVariable() throws AppException, ParseException {
 		try {
@@ -77,7 +77,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			APIImportParams params = new APIImportParams();
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
-			
+
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			String osArch = System.getProperty("os.arch");
@@ -87,7 +87,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			throw e;
 		}
 	}
-	
+
 	@Test
 	public void notDeclaredVariable() throws AppException, ParseException {
 		try {
@@ -95,7 +95,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			APIImportParams params = new APIImportParams();
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
-			
+
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
@@ -104,7 +104,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			throw e;
 		}
 	}
-	
+
 	@Test
 	public void configFileWithSpaces() throws AppException, ParseException {
 		try {
@@ -112,7 +112,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			APIImportParams params = new APIImportParams();
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api config with spaces.json").getFile();
-			
+
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
@@ -121,7 +121,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			throw e;
 		}
 	}
-	
+
 	@Test
 	public void stageConfigInSubDirectory() throws AppException, ParseException {
 		try {
@@ -129,7 +129,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			APIImportParams params = new APIImportParams();
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
-			
+
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 			Assert.assertEquals(apiConfig.getVersion(), "9.0.0");
@@ -139,7 +139,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			throw e;
 		}
 	}
-	
+
 	@Test
 	public void outboundOAuthValidConfig() throws AppException, ParseException {
 		try {
@@ -148,7 +148,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			APIImportParams params = new APIImportParams();
 			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound-oauth-config.json").getFile();
-			
+
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "petstore.json", false, null);
 			adapter.getDesiredAPI();
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
@@ -159,7 +159,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			throw e;
 		}
 	}
-	
+
 	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The OAuth provider profile is unkown: 'Invalid profile name'")
 	public void outboundOAuthInValidConfig() throws AppException, ParseException {
 		EnvironmentProperties props = new EnvironmentProperties(null);
@@ -167,19 +167,19 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		APIImportParams params = new APIImportParams();
 		params.setProperties(props);
 		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound-oauth-config.json").getFile();
-		
+
 		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false, null);
 		adapter.getDesiredAPI();
 		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 		Assert.assertEquals(apiConfig.getVersion(), "kk1");
 		Assert.assertEquals(apiConfig.getName(), "My OAuth API");
 	}
-	
+
 	@Test
 	public void emptyVHostTest() throws AppException, ParseException {
 		try {
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/empty-vhost-api-config.json").getFile();
-			
+
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false, null);
 			adapter.getDesiredAPI();
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
@@ -188,12 +188,12 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			throw e;
 		}
 	}
-	
+
 	@Test
 	public void outboundProfileWithDefaultAuthOnlyTest() throws AppException, ParseException {
 		try {
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/methodLevel/method-level-outboundprofile-default-authn-only.json").getFile();
-			
+
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
 			adapter.getDesiredAPI();
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
@@ -207,26 +207,26 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 			throw e;
 		}
 	}
-	
+
 	@Test(priority = 100, expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required custom property: 'customProperty4'")
 	public void testMissingMandatoryCustomProperty() throws ParseException, IOException, InterruptedException {
-			EnvironmentProperties props = new EnvironmentProperties(null);
-			props.put("orgNumber", "1");
-			props.put("apiPath", "/api/with/custom/props");
-			props.put("status", "unpublished");
-			props.put("customProperty1", "public");
-			props.put("customProperty3", "true");
-			
-			String customPropertiesConfig = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "customProperties/customPropertiesConfig.json"));
-			APIManagerAdapter.getInstance().customPropertiesAdapter.setAPIManagerTestResponse(customPropertiesConfig);
-			
-			Thread.sleep(2000);
-			APIImportParams params = new APIImportParams();
-			params.setProperties(props);
-			
-			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/customProperties/1_custom-properties-config.json").getFile();
-			
-			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
-			adapter.getDesiredAPI(); // Should fail, as a mandatory customProperty is missing
+		String customPropertiesConfig = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "customProperties/customPropertiesConfig.json"));
+		APIManagerAdapter.getInstance().customPropertiesAdapter.setAPIManagerTestResponse(customPropertiesConfig);
+
+		EnvironmentProperties props = new EnvironmentProperties(null);
+		props.put("orgNumber", "1");
+		props.put("apiPath", "/api/with/custom/props");
+		props.put("status", "unpublished");
+		props.put("customProperty1", "public");
+		props.put("customProperty3", "true");
+
+		Thread.sleep(2000);
+		APIImportParams params = new APIImportParams();
+		params.setProperties(props);
+
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/customProperties/1_custom-properties-config.json").getFile();
+
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+		adapter.getDesiredAPI(); // Should fail, as a mandatory customProperty is missing
 	}
 }
