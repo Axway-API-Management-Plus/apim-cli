@@ -233,11 +233,11 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		System.out.println("Get Config Adapter");
 		try {
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+			System.out.println("Get desired API");
+			adapter.getDesiredAPI(); // Should fail, as a mandatory customProperty is missing
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
 		}
-		System.out.println("Get desired API");
-		adapter.getDesiredAPI(); // Should fail, as a mandatory customProperty is missing
 	}
 }
