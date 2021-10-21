@@ -127,6 +127,7 @@ public class APIManagerCustomPropertiesAdapter {
 			LOG.error("Test-Response is empty. Ignoring!");
 			return;
 		}
+		LOG.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX: " + jsonResponse);
 		this.customProperties = null; // Reset it, if new test data is provided
 		this.apiManagerResponse = jsonResponse;
 	}
