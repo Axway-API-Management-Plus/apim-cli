@@ -41,6 +41,7 @@ public class APIManagerCustomPropertiesAdapter {
 	CustomProperties customProperties;
 	
 	private void readCustomPropertiesFromAPIManager() throws AppException {
+		LOG.info("YYYYYYYYYYYY: Reading custom props");
 		if(apiManagerResponse != null) return;
 		URI uri;
 		HttpResponse httpResponse = null;
