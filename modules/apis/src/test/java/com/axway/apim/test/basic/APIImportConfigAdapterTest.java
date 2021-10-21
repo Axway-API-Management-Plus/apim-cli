@@ -231,7 +231,12 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/customProperties/1_custom-properties-config.json").getFile();
 
 		System.out.println("Get Config Adapter");
-		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+		try {
+			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
 		System.out.println("Get desired API");
 		adapter.getDesiredAPI(); // Should fail, as a mandatory customProperty is missing
 	}
