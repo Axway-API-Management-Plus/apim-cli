@@ -208,7 +208,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		}
 	}
 	
-	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required custom property: 'customProperty4'")
+	@Test(priority = 100, expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required custom property: 'customProperty4'")
 	public void testMissingMandatoryCustomProperty() throws ParseException, IOException {
 			EnvironmentProperties props = new EnvironmentProperties(null);
 			props.put("orgNumber", "1");
