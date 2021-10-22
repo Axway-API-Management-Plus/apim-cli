@@ -44,6 +44,8 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 	@JsonProperty("image")
 	private String imageUrl;
 	
+	private String createdBy;
+	
 	@JsonIgnore
 	private Image image;
 	
@@ -54,6 +56,9 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 	@JsonSerialize (using = APIAccessSerializer.class)
 	@JsonProperty("apis")
 	private List<APIAccess> apiAccess = new ArrayList<APIAccess>();
+
+	@JsonProperty("permissions")
+	private List<ApplicationPermission> permissions = new ArrayList<ApplicationPermission>();	
 	
 	private List<ClientAppCredential> credentials = new ArrayList<ClientAppCredential>(); 
 	
@@ -169,6 +174,22 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 
 	public void setOauthResources(List<ClientAppOauthResource> oauthResources) {
 		this.oauthResources = oauthResources;
+	}
+
+	public List<ApplicationPermission> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(List<ApplicationPermission> permissions) {
+		this.permissions = permissions;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
 	}
 
 	// This avoids, that custom properties are wrapped within customProperties { ... }

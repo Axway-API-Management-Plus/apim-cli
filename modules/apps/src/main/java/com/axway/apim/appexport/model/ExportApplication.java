@@ -6,6 +6,7 @@ import java.util.Map;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.apps.ApplicationPermission;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientAppOauthResource;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -57,6 +58,10 @@ public class ExportApplication {
 
 	public Image getImage() {
 		return clientApp.getImage();
+	}
+	
+	public List<ApplicationPermission> getPermissions() {
+		return clientApp.getPermissions();
 	}
 
 	public APIQuota getAppQuota() {
