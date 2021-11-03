@@ -72,7 +72,6 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			ClientAppAdapter desiredAppsAdapter = new JSONConfigClientAppAdapter(params, result);
 			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
 			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter);
-			LOG.info("1");
 			for(ClientApplication desiredApp : desiredApps) {
 				//I'm reading customProps from desiredApp, what if the desiredApp has no customProps and actualApp has many?
 				ClientApplication actualApp = APIManagerAdapter.getInstance().appAdapter.getApplication(new ClientAppFilter.Builder()

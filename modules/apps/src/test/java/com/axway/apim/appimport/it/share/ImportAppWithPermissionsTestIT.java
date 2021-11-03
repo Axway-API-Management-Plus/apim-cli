@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Test
 public class ImportAppWithPermissionsTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
-	private static String PACKAGE = "/com/axway/apim/appimport/apps/share/";
+	private static String PACKAGE = "/com/axway/apim/appimport/apps/appPermissions/";
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
