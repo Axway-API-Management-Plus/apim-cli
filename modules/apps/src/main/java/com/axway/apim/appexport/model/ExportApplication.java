@@ -10,6 +10,7 @@ import com.axway.apim.api.model.apps.ApplicationPermission;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientAppOauthResource;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.api.model.apps.ClientApplication.ApplicationState;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -52,7 +53,7 @@ public class ExportApplication {
 		return clientApp.isEnabled();
 	}
 
-	public String getState() {
+	public ApplicationState getState() {
 		return clientApp.getState();
 	}
 
