@@ -28,7 +28,7 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner implements
 	private static String PACKAGE = "/com/axway/apim/appimport/apps/appQuotas/";
 	
 	@CitrusTest
-	@Test @Parameters("context")
+	@Test(enabled = false) @Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		description("Import application into API-Manager");
 		
