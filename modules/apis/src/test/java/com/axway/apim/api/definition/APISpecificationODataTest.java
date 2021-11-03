@@ -73,38 +73,11 @@ public class APISpecificationODataTest {
 		Assert.assertEquals(openAPI.getServers().get(0).getUrl(), "https://services.odata.org/V2/Northwind/Northwind.svc"); // Has our configured base path
 	}
 	
-	@Test
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Detected OData V4 specification, which is not yet supported by the APIM-CLI..*")
 	public void testODataV4API() throws AppException, IOException {
 		
 		byte[] content = getAPISpecificationContent("/api_definition_1/ODataV4TrippinServiceMetadata.xml");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "https://services.odata.org/TripPinRESTierService/(S(5kkh4dfw32ks0ph51razkxao))/$metadata", "OData-V4-Test-API");
-		apiDefinition.configureBasepath(null);
-		
-		Assert.assertTrue(apiDefinition instanceof ODataV4Specification);
-		OpenAPI openAPI = mapper.readValue(apiDefinition.getApiSpecificationContent(), OpenAPI.class);
-		
-		// OpenAPI has been created - Perform some assertions
-		Assert.assertNotNull(openAPI.getServers(), "Expected OpenAPI servers set based on given MetaData URL");
-		Assert.assertEquals(openAPI.getServers().size(), 1); // One Server is expected
-		Assert.assertEquals(openAPI.getServers().get(0).getUrl(), "https://services.odata.org/TripPinRESTierService/(S(5kkh4dfw32ks0ph51razkxao))"); // Has our configured base path
-		
-		PathItem peoplePaths = openAPI.getPaths().get("/People({UserName})*");
-		Assert.assertNotNull(peoplePaths, "Expected a path for /People({UserName})*");
-		
-		// Check the GET Operation for this entity 
-		Operation peopleGet = peoplePaths.getGet();
-		Assert.assertNotNull(peopleGet, "Expected a GET operation for /People({UserName})*");
-		Assert.assertNull(peopleGet.getRequestBody()); // No body is expected for a GET Method
-		Assert.assertEquals(peopleGet.getParameters().size(), 8); // For each entity a path should have being created
-		
-		// Check the POST Operation for this entity
-		Operation peoplePost = peoplePaths.getPost();
-		Assert.assertNotNull(peoplePost.getRequestBody(), "Body for a POST method is expected"); // A body is expected for a POST Method
-		Assert.assertNotNull(peoplePost.getRequestBody().getContent(), "Body content for a POST method is expected"); // A body content is expected for a POST Method
-		Assert.assertNotNull(peoplePost.getRequestBody().getContent().get("application/json"), "Expected content type should be JSON");
-		
-		// Make sure, Unbound Actions/Functions are generated
-		
+		APISpecificationFactory.getAPISpecification(content, "https://services.odata.org/TripPinRESTierService/(S(5kkh4dfw32ks0ph51razkxao))/$metadata", "OData-V4-Test-API");
 	}
 	
 	

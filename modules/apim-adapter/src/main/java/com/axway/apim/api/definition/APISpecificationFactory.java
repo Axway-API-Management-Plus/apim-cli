@@ -63,7 +63,7 @@ public class APISpecificationFactory {
 			return new UnknownAPISpecification(apiSpecificationContent, apiName);
 		}
 		LOG.error("API: '"+apiName+"' has a unkown/invalid API-Specification: '" + getContentStart(apiSpecificationContent) + "'");
-		throw new AppException("Can't handle API specification. No suiteable API-Specification implementation available.", ErrorCode.CANT_READ_API_DEFINITION_FILE);
+		throw new AppException("Can't handle API specification. No suiteable API-Specification implementation available.", ErrorCode.UNSUPPORTED_API_SPECIFICATION);
 	}
 	
 	static String getContentStart(byte[] apiSpecificationContent) {
