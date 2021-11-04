@@ -48,7 +48,8 @@ public class APISpecificationODataTest {
 		Operation categoryGet = categoryPaths.getGet();
 		Assert.assertNotNull(categoryGet, "Expected a GET operation for /Categories({CategoryID})*");
 		Assert.assertNull(categoryGet.getRequestBody()); // No body is expected for a GET Method
-		Assert.assertEquals(categoryGet.getParameters().size(), 8); // For each entity a path should have being created
+		//Assert.assertEquals(categoryGet.getOperationId(), "GET Categories");
+		Assert.assertEquals(categoryGet.getParameters().size(), 9); // For each entity a path should have being created
 		
 		// Check the POST Operation for this entity
 		Operation categoryPost = categoryPaths.getPost();

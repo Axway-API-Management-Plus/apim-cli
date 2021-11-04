@@ -86,8 +86,10 @@ public class ODataV2Specification extends ODataSpecification {
 		// GET Method
 		operation = new Operation();
 		operation.setSummary("Get EntitySet " + entityName);
+		//operation.setOperationId("GET " + entityName);
 		operation.setDescription("Returns the EntitySet " + entityName);
 		operation.addParametersItem(createParameter("$expand", "Expand navigation property"));
+		operation.addParametersItem(createParameter("$filter", "Filter your query"));
 		operation.addParametersItem(createParameter("$select", "Select structural property"));
 		operation.addParametersItem(createParameter("$orderby", "Order by some property"));
 		operation.addParametersItem(createParameter("$top", "Top elements"));

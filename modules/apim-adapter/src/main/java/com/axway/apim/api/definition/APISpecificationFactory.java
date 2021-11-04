@@ -47,7 +47,10 @@ public class APISpecificationFactory {
 					LOG.debug("Can't handle API specification with class: " + clazz.getName());
 					continue;
 				} else {
-					LOG.info("Detected: " + spec.getAPIDefinitionType().niceName + " specification.");
+					LOG.info("Detected: " + spec.getAPIDefinitionType().niceName + " specification. " + spec.getAPIDefinitionType().getNote());
+					if(spec.getAPIDefinitionType().getAdditionalNote()!=null) {
+						LOG.info(spec.getAPIDefinitionType().getAdditionalNote());
+					}
 					return spec;
 				}
 			} catch (AppException e) {
