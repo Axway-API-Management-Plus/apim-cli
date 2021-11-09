@@ -1,7 +1,10 @@
 package com.axway.apim.api.definition;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -10,15 +13,14 @@ import org.testng.annotations.Test;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.PathItem;
 
 public class APISpecificationODataTest {
 	
 	ObjectMapper mapper = new ObjectMapper();
+	
+	private static String TEST_PACKAGE = "/com/axway/apim/api/definition/odata";
 	
 	@BeforeClass
 	private void initTestIndicator() {
@@ -29,56 +31,164 @@ public class APISpecificationODataTest {
 	@Test
 	public void testODataV2API() throws AppException, IOException {
 		
-		byte[] content = getAPISpecificationContent("/api_definition_1/ODataV2NorthWindMetadata.xml");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "northwind-odata-v2.xml$metadata", "OData-V2-Test-API");
+		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
+		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2NorthWindOpenAPI3.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "northwind-odata-v2.xml$metadata", "OData-V2-Test-API");
 		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
-		OpenAPI openAPI = mapper.readValue(apiDefinition.getApiSpecificationContent(), OpenAPI.class);
+		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
+			System.out.print(new String(apiDefinition.getApiSpecificationContent(), StandardCharsets.UTF_8));
+		}
+		Assert.assertEquals(apiDefinition.getApiSpecificationContent(), odataOpenAPI3);
+	}
+	
+	@Test
+	public void testODataV2APIWithFunctions() throws AppException, IOException {
 		
-		// OpenAPI has been created - Perform some assertions
-		Assert.assertEquals(openAPI.getServers().size(), 1); // One Server is expected
-		Assert.assertEquals(openAPI.getServers().get(0).getUrl(), "https://myhost.customer.com:8767/api/v1/myAPI/"); // Has our configured base path
-		Assert.assertEquals(openAPI.getPaths().size(), 26); // For each entity a path should have being created
+		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2ODataDemoMetadata.xml");
+		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2ODataDemoOpenAPI.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
+		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
 		
-		PathItem categoryPaths = openAPI.getPaths().get("/Categories({CategoryID})*");
-		Assert.assertNotNull(categoryPaths, "Expected a path for /Categories({CategoryID})*");
-		
-		// Check the GET Operation for this entity 
-		Operation categoryGet = categoryPaths.getGet();
-		Assert.assertNotNull(categoryGet, "Expected a GET operation for /Categories({CategoryID})*");
-		Assert.assertNull(categoryGet.getRequestBody()); // No body is expected for a GET Method
-		//Assert.assertEquals(categoryGet.getOperationId(), "GET Categories");
-		Assert.assertEquals(categoryGet.getParameters().size(), 9); // For each entity a path should have being created
-		
-		// Check the POST Operation for this entity
-		Operation categoryPost = categoryPaths.getPost();
-		Assert.assertNotNull(categoryPost.getRequestBody(), "Body for a POST method is expected"); // A body is expected for a POST Method
-		Assert.assertNotNull(categoryPost.getRequestBody().getContent(), "Body content for a POST method is expected"); // A body content is expected for a POST Method
-		Assert.assertNotNull(categoryPost.getRequestBody().getContent().get("application/json"), "Expected content type should be JSON");
+		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
+			System.out.print(new String(apiDefinition.getApiSpecificationContent(), StandardCharsets.UTF_8));
+		}
+		Assert.assertEquals(apiDefinition.getApiSpecificationContent(), odataOpenAPI3);
 	}
 	
 	@Test
 	public void testODataV2APIBackendFromMetadata() throws AppException, IOException {
 		
-		byte[] content = getAPISpecificationContent("/api_definition_1/ODataV2NorthWindMetadata.xml");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "https://services.odata.org/V2/Northwind/Northwind.svc/$metadata", "OData-V2-Test-API");
+		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/Northwind/Northwind.svc/$metadata", "OData-V2-Test-API");
 		apiDefinition.configureBasepath(null);
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
-		OpenAPI openAPI = mapper.readValue(apiDefinition.getApiSpecificationContent(), OpenAPI.class);
+		JsonNode openAPI = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		
-		// OpenAPI has been created - Perform some assertions
-		Assert.assertNotNull(openAPI.getServers(), "Expected OpenAPI servers set based on given MetaData URL");
-		Assert.assertEquals(openAPI.getServers().size(), 1); // One Server is expected
-		Assert.assertEquals(openAPI.getServers().get(0).getUrl(), "https://services.odata.org/V2/Northwind/Northwind.svc"); // Has our configured base path
+		Assert.assertEquals(openAPI.get("servers").get(0).get("url").asText(), "https://services.odata.org/V2/Northwind/Northwind.svc"); // Has our configured base path
+	}
+	
+	@Test
+	public void testSAPODataV2AccountDuplicateCheck() throws AppException, IOException {
+		
+		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-AccountDuplicateCheckMetadata.xml");
+		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-AccountDuplicateCheckOpenAPI.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
+		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
+		
+		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
+			System.out.print(new String(apiDefinition.getApiSpecificationContent(), StandardCharsets.UTF_8));
+		}
+		Assert.assertEquals(apiDefinition.getApiSpecificationContent(), odataOpenAPI3);
+	}
+	
+	@Test
+	public void testSAPODataV2360ReviewsManagement() throws AppException, IOException {
+		
+		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-PMGMMultiraterMetadata.xml");
+		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-PMGMMultiraterOpenAPI.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
+		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
+		
+		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
+			System.out.print(new String(apiDefinition.getApiSpecificationContent(), StandardCharsets.UTF_8));
+		}
+		Assert.assertEquals(apiDefinition.getApiSpecificationContent(), odataOpenAPI3);
+	}
+	
+	@Test
+	public void testSAPODataAccountsAndTransactionsAPI() throws AppException, IOException {
+		
+		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-AccountsAndTransactionsMetadata.xml");
+		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-AccountsAndTransactionsOpenAPI.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
+		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
+		
+		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
+			System.out.print(new String(apiDefinition.getApiSpecificationContent(), StandardCharsets.UTF_8));
+		}
+		Assert.assertEquals(apiDefinition.getApiSpecificationContent(), odataOpenAPI3);
+	}
+	
+	@Test
+	public void testSAPODataBusinessPartnerA2XAPI() throws AppException, IOException {
+		
+		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-BusinessPartnerA2XMetadata.xml");
+		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-BusinessPartnerA2XOpenAPI.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
+		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
+		
+		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
+			System.out.print(new String(apiDefinition.getApiSpecificationContent(), StandardCharsets.UTF_8));
+		}
+		Assert.assertEquals(apiDefinition.getApiSpecificationContent(), odataOpenAPI3);
+	}
+	
+	@Test
+	public void testSAPODataBasicProductAvailabilityInfoAPI() throws AppException, IOException {
+		
+		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-BasicProductAvailabilityInfoMetadata.xml");
+		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-BasicProductAvailabilityInfoOpenAPI.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
+		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
+		
+		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
+			System.out.print(new String(apiDefinition.getApiSpecificationContent(), StandardCharsets.UTF_8));
+		}
+		Assert.assertEquals(apiDefinition.getApiSpecificationContent(), odataOpenAPI3);
+	}
+	
+	@Test
+	public void testSAPODataMasterDataForBusinessPartnerAPI() throws AppException, IOException {
+		
+		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-MasterDataForBusinessPartnerMetadata.xml");
+		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-MasterDataForBusinessPartnerOpenAPI.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
+		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
+		
+		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
+			System.out.print(new String(apiDefinition.getApiSpecificationContent(), StandardCharsets.UTF_8));
+		}
+		Assert.assertEquals(apiDefinition.getApiSpecificationContent(), odataOpenAPI3);
+	}
+	
+	@Test
+	public void testSAPODataCustomerMaterialA2XAPI() throws AppException, IOException {
+		
+		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-CustomerMaterialA2XMetadata.xml");
+		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-CustomerMaterialA2XOpenAPI.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
+		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI");
+		
+		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
+			System.out.print(new String(apiDefinition.getApiSpecificationContent(), StandardCharsets.UTF_8));
+		}
+		Assert.assertEquals(apiDefinition.getApiSpecificationContent(), odataOpenAPI3);
+	}
+	
+	
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Detected OData V3 specification, which is not yet supported by the APIM-CLI..*")
+	public void testODataV3API() throws AppException, IOException {
+		
+		byte[] content = getAPISpecificationContent(TEST_PACKAGE+"/ODataV3ODataDemoMetadata.xml");
+		APISpecificationFactory.getAPISpecification(content, "https://any.odata.service", "OData-V3-Test-API");
 	}
 	
 	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Detected OData V4 specification, which is not yet supported by the APIM-CLI..*")
 	public void testODataV4API() throws AppException, IOException {
 		
-		byte[] content = getAPISpecificationContent("/api_definition_1/ODataV4TrippinServiceMetadata.xml");
-		APISpecificationFactory.getAPISpecification(content, "https://services.odata.org/TripPinRESTierService/(S(5kkh4dfw32ks0ph51razkxao))/$metadata", "OData-V4-Test-API");
+		byte[] content = getAPISpecificationContent(TEST_PACKAGE+"/ODataV4TrippinServiceMetadata.xml");
+		APISpecificationFactory.getAPISpecification(content, "https://any.odata.service", "OData-V4-Test-API");
 	}
 	
 	

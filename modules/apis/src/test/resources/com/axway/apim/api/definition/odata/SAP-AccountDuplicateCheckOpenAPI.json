@@ -1,0 +1,807 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "OData Service",
+    "description" : "The OData Service from https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata",
+    "version" : "1.0"
+  },
+  "servers" : [ {
+    "url" : "https://myhost.customer.com:8767/api/v1/myAPI/"
+  } ],
+  "paths" : {
+    "/CheckForDuplicateAccounts" : {
+      "get" : {
+        "tags" : [ "AccountDuplicateCheckResultCollection" ],
+        "parameters" : [ {
+          "name" : "Name",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Country",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "State",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "City",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "PostalCode",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Street",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "HouseNumber",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "POBoxPostalCode",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "POBox",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "CompanyPostalCode",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Phone",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Mobile",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Fax",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Email",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "IDTypeCode",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "IDNumber",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "AccountDuplicateCheckResult",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/AccountDuplicateCheckResult"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/AccountDuplicateCheckResultCollection*" : {
+      "get" : {
+        "tags" : [ "AccountDuplicateCheckResultCollection" ],
+        "summary" : "Get AccountDuplicateCheckResultCollection",
+        "description" : "Returns the EntitySet: AccountDuplicateCheckResultCollection<br />The entity: AccountDuplicateCheckResultCollection supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet AccountDuplicateCheckResultCollection",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/AccountDuplicateCheckResult"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/AccountDuplicateCheckResultCollection({Id})*" : {
+      "get" : {
+        "tags" : [ "AccountDuplicateCheckResultCollection" ],
+        "summary" : "Get AccountDuplicateCheckResultCollection on Id",
+        "description" : "Returns the EntitySet: AccountDuplicateCheckResultCollection<br />The entity: AccountDuplicateCheckResultCollection supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet AccountDuplicateCheckResultCollection",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AccountDuplicateCheckResult"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "AccountDuplicateCheckResultCollection" ],
+        "summary" : "Create a new entity AccountDuplicateCheckResultCollection",
+        "description" : "Create a new entity in EntitySet: AccountDuplicateCheckResultCollection",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AccountDuplicateCheckResult"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet AccountDuplicateCheckResultCollection",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "AccountDuplicateCheckResultCollection" ],
+        "summary" : "Delete AccountDuplicateCheckResultCollection",
+        "description" : "Delete entity in EntitySet AccountDuplicateCheckResultCollection",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet AccountDuplicateCheckResultCollection successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "AccountDuplicateCheckResultCollection" ],
+        "summary" : "Update entity AccountDuplicateCheckResultCollection",
+        "description" : "Update an existing entity in EntitySet: AccountDuplicateCheckResultCollection",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AccountDuplicateCheckResult"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet AccountDuplicateCheckResultCollection",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: ObjectID",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    },
+    "/AccountDuplicateCheckResultStatusCodeCollection*" : {
+      "get" : {
+        "tags" : [ "AccountDuplicateCheckResultStatusCodeCollection" ],
+        "summary" : "Get AccountDuplicateCheckResultStatusCodeCollection",
+        "description" : "Returns the EntitySet: AccountDuplicateCheckResultStatusCodeCollection<br />The entity: AccountDuplicateCheckResultStatusCodeCollection supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet AccountDuplicateCheckResultStatusCodeCollection",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CodeList"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/AccountDuplicateCheckResultStatusCodeCollection({Id})*" : {
+      "get" : {
+        "tags" : [ "AccountDuplicateCheckResultStatusCodeCollection" ],
+        "summary" : "Get AccountDuplicateCheckResultStatusCodeCollection on Id",
+        "description" : "Returns the EntitySet: AccountDuplicateCheckResultStatusCodeCollection<br />The entity: AccountDuplicateCheckResultStatusCodeCollection supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet AccountDuplicateCheckResultStatusCodeCollection",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CodeList"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "AccountDuplicateCheckResultStatusCodeCollection" ],
+        "summary" : "Create a new entity AccountDuplicateCheckResultStatusCodeCollection",
+        "description" : "Create a new entity in EntitySet: AccountDuplicateCheckResultStatusCodeCollection",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CodeList"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet AccountDuplicateCheckResultStatusCodeCollection",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "AccountDuplicateCheckResultStatusCodeCollection" ],
+        "summary" : "Delete AccountDuplicateCheckResultStatusCodeCollection",
+        "description" : "Delete entity in EntitySet AccountDuplicateCheckResultStatusCodeCollection",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet AccountDuplicateCheckResultStatusCodeCollection successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "AccountDuplicateCheckResultStatusCodeCollection" ],
+        "summary" : "Update entity AccountDuplicateCheckResultStatusCodeCollection",
+        "description" : "Update an existing entity in EntitySet: AccountDuplicateCheckResultStatusCodeCollection",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CodeList"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet AccountDuplicateCheckResultStatusCodeCollection",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: Code",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "CodeList" : {
+        "type" : "object",
+        "properties" : {
+          "Code" : {
+            "title" : "Code",
+            "type" : "string",
+            "nullable" : false
+          },
+          "Description" : {
+            "title" : "Description",
+            "type" : "string",
+            "nullable" : false
+          }
+        }
+      },
+      "AccountDuplicateCheckResult" : {
+        "type" : "object",
+        "properties" : {
+          "ObjectID" : {
+            "title" : "Object ID",
+            "maxLength" : 70,
+            "type" : "string",
+            "nullable" : false
+          },
+          "ETag" : {
+            "title" : "Entity Tag",
+            "type" : "string",
+            "nullable" : true
+          },
+          "AccountID" : {
+            "title" : "Account ID",
+            "maxLength" : 10,
+            "type" : "string",
+            "nullable" : true
+          },
+          "AccountUUID" : {
+            "title" : "Account UUID",
+            "type" : "string",
+            "format" : "uuid",
+            "nullable" : true
+          },
+          "StatusCode" : {
+            "title" : "Status",
+            "maxLength" : 2,
+            "type" : "string",
+            "nullable" : true
+          },
+          "StatusCodeText" : {
+            "title" : "Status Text",
+            "type" : "string",
+            "nullable" : true
+          },
+          "Name" : {
+            "title" : "Name",
+            "maxLength" : 480,
+            "type" : "string",
+            "nullable" : true
+          },
+          "Address" : {
+            "title" : "Address",
+            "maxLength" : 480,
+            "type" : "string",
+            "nullable" : true
+          },
+          "Phone" : {
+            "title" : "Phone",
+            "maxLength" : 40,
+            "type" : "string",
+            "nullable" : true
+          },
+          "Mobile" : {
+            "title" : "Mobile",
+            "maxLength" : 40,
+            "type" : "string",
+            "nullable" : true
+          },
+          "Fax" : {
+            "title" : "Fax",
+            "maxLength" : 40,
+            "type" : "string",
+            "nullable" : true
+          },
+          "Email" : {
+            "title" : "E-Mail",
+            "maxLength" : 255,
+            "type" : "string",
+            "nullable" : true
+          },
+          "CreatedOn" : {
+            "title" : "Created On",
+            "type" : "string",
+            "nullable" : true
+          },
+          "CreatedBy" : {
+            "title" : "Created By",
+            "maxLength" : 480,
+            "type" : "string",
+            "nullable" : true
+          },
+          "EntityLastChangedOn" : {
+            "title" : "Entity Last Changed On",
+            "type" : "string",
+            "nullable" : true
+          },
+          "EntityLastChangedBy" : {
+            "title" : "Entity Last Changed By",
+            "maxLength" : 480,
+            "type" : "string",
+            "nullable" : true
+          },
+          "SimilarityPercent" : {
+            "title" : "Similarity Percent",
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,401 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "OData Service",
+    "description" : "The OData Service from https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata",
+    "version" : "1.0"
+  },
+  "servers" : [ {
+    "url" : "https://myhost.customer.com:8767/api/v1/myAPI/"
+  } ],
+  "paths" : {
+    "/A_CustomerMaterial*" : {
+      "get" : {
+        "tags" : [ "Customer Materials" ],
+        "summary" : "Get A_CustomerMaterial",
+        "description" : "Returns the EntitySet: A_CustomerMaterial<br />The entity: A_CustomerMaterial supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet A_CustomerMaterial",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/A_CustomerMaterialType"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/A_CustomerMaterial({Id})*" : {
+      "get" : {
+        "tags" : [ "Customer Materials" ],
+        "summary" : "Get A_CustomerMaterial on Id",
+        "description" : "Returns the EntitySet: A_CustomerMaterial<br />The entity: A_CustomerMaterial supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet A_CustomerMaterial",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/A_CustomerMaterialType"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Customer Materials" ],
+        "summary" : "Create a new entity A_CustomerMaterial",
+        "description" : "Create a new entity in EntitySet: A_CustomerMaterial",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/A_CustomerMaterialType"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet A_CustomerMaterial",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Customer Materials" ],
+        "summary" : "Delete A_CustomerMaterial",
+        "description" : "Delete entity in EntitySet A_CustomerMaterial",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet A_CustomerMaterial successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "Customer Materials" ],
+        "summary" : "Update entity A_CustomerMaterial",
+        "description" : "Update an existing entity in EntitySet: A_CustomerMaterial",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/A_CustomerMaterialType"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet A_CustomerMaterial",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: SalesOrganization, DistributionChannel, Customer, Material",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "A_CustomerMaterialType" : {
+        "title" : "Customer Materials",
+        "type" : "object",
+        "properties" : {
+          "SalesOrganization" : {
+            "title" : "Sales Organization",
+            "maxLength" : 4,
+            "type" : "string",
+            "nullable" : false
+          },
+          "DistributionChannel" : {
+            "title" : "Distribution Channel",
+            "maxLength" : 2,
+            "type" : "string",
+            "nullable" : false
+          },
+          "Customer" : {
+            "title" : "Customer",
+            "maxLength" : 10,
+            "type" : "string",
+            "nullable" : false
+          },
+          "Material" : {
+            "title" : "Material",
+            "maxLength" : 40,
+            "type" : "string",
+            "nullable" : false
+          },
+          "MaterialByCustomer" : {
+            "title" : "Customer Material",
+            "maxLength" : 35,
+            "type" : "string"
+          },
+          "MaterialDescriptionByCustomer" : {
+            "title" : "Customer Description",
+            "maxLength" : 40,
+            "type" : "string"
+          },
+          "Plant" : {
+            "title" : "Plant",
+            "maxLength" : 4,
+            "type" : "string"
+          },
+          "DeliveryPriority" : {
+            "title" : "Delivery Priority",
+            "maxLength" : 2,
+            "type" : "string"
+          },
+          "MinDeliveryQtyInBaseUnit" : {
+            "title" : "Minimum Delivery Qty",
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "BaseUnit" : {
+            "title" : "Base Unit of Measure",
+            "maxLength" : 3,
+            "type" : "string"
+          },
+          "PartialDeliveryIsAllowed" : {
+            "title" : "Part.dlv./item",
+            "maxLength" : 1,
+            "type" : "string"
+          },
+          "MaxNmbrOfPartialDelivery" : {
+            "title" : "Max.Part.Deliveries",
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "UnderdelivTolrtdLmtRatioInPct" : {
+            "title" : "Underdel. Tolerance",
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "OverdelivTolrtdLmtRatioInPct" : {
+            "title" : "Overdeliv. Tolerance",
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "UnlimitedOverdeliveryIsAllowed" : {
+            "title" : "Unlimited Tolerance",
+            "type" : "boolean"
+          },
+          "CustomerMaterialItemUsage" : {
+            "title" : "Item Usage",
+            "maxLength" : 4,
+            "type" : "string"
+          },
+          "SalesUnit" : {
+            "title" : "Sales Unit",
+            "maxLength" : 3,
+            "type" : "string"
+          },
+          "SalesQtyToBaseQtyDnmntr" : {
+            "title" : "Denominator",
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "SalesQtyToBaseQtyNmrtr" : {
+            "title" : "Numerator",
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "ETag" : {
+            "title" : "ETag",
+            "maxLength" : 10,
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+}

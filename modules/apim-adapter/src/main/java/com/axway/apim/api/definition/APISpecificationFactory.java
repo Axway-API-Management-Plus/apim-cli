@@ -23,6 +23,7 @@ public class APISpecificationFactory {
 	    add(WSDLSpecification.class);
 	    add(WADLSpecification.class);
 	    add(ODataV2Specification.class);
+	    add(ODataV3Specification.class);
 	    add(ODataV4Specification.class);
 	}};
 	
@@ -47,10 +48,11 @@ public class APISpecificationFactory {
 					LOG.debug("Can't handle API specification with class: " + clazz.getName());
 					continue;
 				} else {
-					LOG.info("Detected: " + spec.getAPIDefinitionType().niceName + " specification. " + spec.getAPIDefinitionType().getNote());
+					String addNote = "";
 					if(spec.getAPIDefinitionType().getAdditionalNote()!=null) {
-						LOG.info(spec.getAPIDefinitionType().getAdditionalNote());
+						addNote = "\n                                 | " + spec.getAPIDefinitionType().getAdditionalNote();
 					}
+					LOG.info("Detected: " + spec.getAPIDefinitionType().niceName + " specification. " + spec.getAPIDefinitionType().getNote()+addNote);
 					return spec;
 				}
 			} catch (AppException e) {

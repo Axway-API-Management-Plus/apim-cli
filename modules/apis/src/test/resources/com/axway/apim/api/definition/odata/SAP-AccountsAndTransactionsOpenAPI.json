@@ -1,0 +1,2416 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "OData Service",
+    "description" : "The OData Service from https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata",
+    "version" : "1.0"
+  },
+  "servers" : [ {
+    "url" : "https://myhost.customer.com:8767/api/v1/myAPI/"
+  } ],
+  "paths" : {
+    "/AccountSet*" : {
+      "get" : {
+        "tags" : [ "Bank Account" ],
+        "summary" : "Get AccountSet",
+        "description" : "Returns the EntitySet: AccountSet<br /><br />The entity: AccountSet supports the following navigational properties: <br />Transactions, Conditions<br />For example: .../AccountSet(1)/Conditions/.....",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet AccountSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Account"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/AccountSet({Id})*" : {
+      "get" : {
+        "tags" : [ "Bank Account" ],
+        "summary" : "Get AccountSet on Id",
+        "description" : "Returns the EntitySet: AccountSet<br /><br />The entity: AccountSet supports the following navigational properties: <br />Transactions, Conditions<br />For example: .../AccountSet(1)/Conditions/.....",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet AccountSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Bank Account" ],
+        "summary" : "Create a new entity AccountSet",
+        "description" : "Create a new entity in EntitySet: AccountSet",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Account"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet AccountSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Bank Account" ],
+        "summary" : "Delete AccountSet",
+        "description" : "Delete entity in EntitySet AccountSet",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet AccountSet successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "Bank Account" ],
+        "summary" : "Update entity AccountSet",
+        "description" : "Update an existing entity in EntitySet: AccountSet",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Account"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet AccountSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: ID",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    },
+    "/TransactionSet*" : {
+      "get" : {
+        "tags" : [ "Transaction Item" ],
+        "summary" : "Get TransactionSet",
+        "description" : "Returns the EntitySet: TransactionSet<br />The entity: TransactionSet supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet TransactionSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Transaction"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/TransactionSet({Id})*" : {
+      "get" : {
+        "tags" : [ "Transaction Item" ],
+        "summary" : "Get TransactionSet on Id",
+        "description" : "Returns the EntitySet: TransactionSet<br />The entity: TransactionSet supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet TransactionSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Transaction"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Transaction Item" ],
+        "summary" : "Create a new entity TransactionSet",
+        "description" : "Create a new entity in EntitySet: TransactionSet",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Transaction"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet TransactionSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Transaction Item" ],
+        "summary" : "Delete TransactionSet",
+        "description" : "Delete entity in EntitySet TransactionSet",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet TransactionSet successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "Transaction Item" ],
+        "summary" : "Update entity TransactionSet",
+        "description" : "Update an existing entity in EntitySet: TransactionSet",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Transaction"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet TransactionSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: AccountID, TransactionID",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    },
+    "/StatusSet*" : {
+      "get" : {
+        "tags" : [ "Customer Status" ],
+        "summary" : "Get StatusSet",
+        "description" : "Returns the EntitySet: StatusSet<br /><br />The entity: StatusSet supports the following navigational properties: <br />Accounts, Recipients, TransactionClasses<br />For example: .../StatusSet(1)/TransactionClasses/.....",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet StatusSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Status"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/StatusSet({Id})*" : {
+      "get" : {
+        "tags" : [ "Customer Status" ],
+        "summary" : "Get StatusSet on Id",
+        "description" : "Returns the EntitySet: StatusSet<br /><br />The entity: StatusSet supports the following navigational properties: <br />Accounts, Recipients, TransactionClasses<br />For example: .../StatusSet(1)/TransactionClasses/.....",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet StatusSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Status"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Customer Status" ],
+        "summary" : "Create a new entity StatusSet",
+        "description" : "Create a new entity in EntitySet: StatusSet",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Status"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet StatusSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Customer Status" ],
+        "summary" : "Delete StatusSet",
+        "description" : "Delete entity in EntitySet StatusSet",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet StatusSet successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "Customer Status" ],
+        "summary" : "Update entity StatusSet",
+        "description" : "Update an existing entity in EntitySet: StatusSet",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Status"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet StatusSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: CustomerExternalID",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    },
+    "/TransferSet*" : {
+      "get" : {
+        "tags" : [ "Bank Transfer" ],
+        "summary" : "Get TransferSet",
+        "description" : "Returns the EntitySet: TransferSet<br />The entity: TransferSet supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet TransferSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Transfer"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/TransferSet({Id})*" : {
+      "get" : {
+        "tags" : [ "Bank Transfer" ],
+        "summary" : "Get TransferSet on Id",
+        "description" : "Returns the EntitySet: TransferSet<br />The entity: TransferSet supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet TransferSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Transfer"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Bank Transfer" ],
+        "summary" : "Create a new entity TransferSet",
+        "description" : "Create a new entity in EntitySet: TransferSet",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Transfer"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet TransferSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Bank Transfer" ],
+        "summary" : "Delete TransferSet",
+        "description" : "Delete entity in EntitySet TransferSet",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet TransferSet successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "Bank Transfer" ],
+        "summary" : "Update entity TransferSet",
+        "description" : "Update an existing entity in EntitySet: TransferSet",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Transfer"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet TransferSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: ID",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    },
+    "/ConditionSet*" : {
+      "get" : {
+        "tags" : [ "ConditionSet" ],
+        "summary" : "Get ConditionSet",
+        "description" : "Returns the EntitySet: ConditionSet<br />The entity: ConditionSet supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet ConditionSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Condition"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/ConditionSet({Id})*" : {
+      "get" : {
+        "tags" : [ "ConditionSet" ],
+        "summary" : "Get ConditionSet on Id",
+        "description" : "Returns the EntitySet: ConditionSet<br />The entity: ConditionSet supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet ConditionSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Condition"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "ConditionSet" ],
+        "summary" : "Create a new entity ConditionSet",
+        "description" : "Create a new entity in EntitySet: ConditionSet",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Condition"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet ConditionSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "ConditionSet" ],
+        "summary" : "Delete ConditionSet",
+        "description" : "Delete entity in EntitySet ConditionSet",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet ConditionSet successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "ConditionSet" ],
+        "summary" : "Update entity ConditionSet",
+        "description" : "Update an existing entity in EntitySet: ConditionSet",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Condition"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet ConditionSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: AccountID, Group, Type, Index",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    },
+    "/RecipientSet*" : {
+      "get" : {
+        "tags" : [ "Bank Transfer Recipient" ],
+        "summary" : "Get RecipientSet",
+        "description" : "Returns the EntitySet: RecipientSet<br />The entity: RecipientSet supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet RecipientSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Recipient"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/RecipientSet({Id})*" : {
+      "get" : {
+        "tags" : [ "Bank Transfer Recipient" ],
+        "summary" : "Get RecipientSet on Id",
+        "description" : "Returns the EntitySet: RecipientSet<br />The entity: RecipientSet supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet RecipientSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Recipient"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Bank Transfer Recipient" ],
+        "summary" : "Create a new entity RecipientSet",
+        "description" : "Create a new entity in EntitySet: RecipientSet",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Recipient"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet RecipientSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Bank Transfer Recipient" ],
+        "summary" : "Delete RecipientSet",
+        "description" : "Delete entity in EntitySet RecipientSet",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet RecipientSet successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "Bank Transfer Recipient" ],
+        "summary" : "Update entity RecipientSet",
+        "description" : "Update an existing entity in EntitySet: RecipientSet",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Recipient"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet RecipientSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: AccountID",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    },
+    "/TransactionClassSet*" : {
+      "get" : {
+        "tags" : [ "Transaction Classification" ],
+        "summary" : "Get TransactionClassSet",
+        "description" : "Returns the EntitySet: TransactionClassSet<br />The entity: TransactionClassSet supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet TransactionClassSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/TransactionClass"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/TransactionClassSet({Id})*" : {
+      "get" : {
+        "tags" : [ "Transaction Classification" ],
+        "summary" : "Get TransactionClassSet on Id",
+        "description" : "Returns the EntitySet: TransactionClassSet<br />The entity: TransactionClassSet supports <b>no</b> navigational properties.",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "Expand a navigation property",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "Select structural property",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values",
+          "schema" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet TransactionClassSet",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TransactionClass"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Transaction Classification" ],
+        "summary" : "Create a new entity TransactionClassSet",
+        "description" : "Create a new entity in EntitySet: TransactionClassSet",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TransactionClass"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet TransactionClassSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Transaction Classification" ],
+        "summary" : "Delete TransactionClassSet",
+        "description" : "Delete entity in EntitySet TransactionClassSet",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet TransactionClassSet successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "Transaction Classification" ],
+        "summary" : "Update entity TransactionClassSet",
+        "description" : "Update an existing entity in EntitySet: TransactionClassSet",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TransactionClass"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet TransactionClassSet",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: ID",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Status" : {
+        "title" : "Customer Status",
+        "type" : "object",
+        "properties" : {
+          "CustomerExternalID" : {
+            "title" : "Customer ID (external ID such as User ID, Passport etc.)",
+            "maxLength" : 20,
+            "type" : "string",
+            "nullable" : false
+          },
+          "CurrentBalanceTotal" : {
+            "title" : "Current Balance (Total, across all bank accounts)",
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "AvailableAmountTotal" : {
+            "title" : "Available Amount (Total, across all bank accounts)",
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "CurrencyCode" : {
+            "title" : "Currency",
+            "maxLength" : 5,
+            "type" : "string"
+          },
+          "AvailableDescription" : {
+            "title" : "Additional Description & Information for Available Amount",
+            "maxLength" : 80,
+            "type" : "string"
+          },
+          "LastTransactionDate" : {
+            "title" : "Last Transactioin (Date)",
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "LastTransactionDescription" : {
+            "title" : "Last Transactioin (Description)",
+            "maxLength" : 140,
+            "type" : "string"
+          },
+          "StatusDescription" : {
+            "title" : "Status Description",
+            "maxLength" : 20,
+            "type" : "string"
+          },
+          "TitleHeader" : {
+            "title" : "Overall Description",
+            "maxLength" : 30,
+            "type" : "string"
+          },
+          "TitleSubheader" : {
+            "title" : "Overall Subdescription",
+            "maxLength" : 30,
+            "type" : "string"
+          }
+        }
+      },
+      "Condition" : {
+        "type" : "object",
+        "properties" : {
+          "AccountID" : {
+            "title" : "Bank Account ID (IBAN)",
+            "maxLength" : 35,
+            "type" : "string",
+            "nullable" : false
+          },
+          "Group" : {
+            "title" : "Condition Group",
+            "maxLength" : 1,
+            "type" : "string",
+            "nullable" : false
+          },
+          "Type" : {
+            "title" : "Condition Type",
+            "maxLength" : 6,
+            "type" : "string",
+            "nullable" : false
+          },
+          "Index" : {
+            "title" : "Condition Index",
+            "type" : "string",
+            "nullable" : false
+          },
+          "ValidFrom" : {
+            "title" : "Valid From Date/Time",
+            "type" : "string",
+            "format" : "date-time",
+            "nullable" : false
+          },
+          "ValidTo" : {
+            "title" : "Valid To Date/Time",
+            "type" : "string",
+            "format" : "date-time",
+            "nullable" : false
+          },
+          "CurrentlyValid" : {
+            "title" : "Indicator that Condition is currently valid",
+            "type" : "boolean",
+            "nullable" : false
+          },
+          "GroupTxt" : {
+            "title" : "Condition Group Description",
+            "maxLength" : 40,
+            "type" : "string",
+            "nullable" : false
+          },
+          "TypeTxt" : {
+            "title" : "Condition Type Description",
+            "maxLength" : 40,
+            "type" : "string",
+            "nullable" : false
+          },
+          "Determination" : {
+            "title" : "Determination: Interval/Scaled/Simple",
+            "maxLength" : 20,
+            "type" : "string",
+            "nullable" : false
+          },
+          "MergedInterestRate" : {
+            "title" : "Merged Interest Rate",
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          },
+          "AmountLowerLimit" : {
+            "title" : "Interval/Scaled: AmountLowerLimit",
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          },
+          "AmountUpperLimit" : {
+            "title" : "Interval/Scaled: AmountUpperLimit",
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          },
+          "AmountCurrency" : {
+            "title" : "Interval/Scaled: AmountCurrency",
+            "maxLength" : 5,
+            "type" : "string",
+            "nullable" : false
+          }
+        }
+      },
+      "Account" : {
+        "title" : "Bank Account",
+        "type" : "object",
+        "properties" : {
+          "ID" : {
+            "title" : "Bank Account ID (IBAN)",
+            "maxLength" : 35,
+            "type" : "string",
+            "nullable" : false
+          },
+          "CustomerExternalID" : {
+            "title" : "Customer ID (external ID such as User ID, Passport etc.)",
+            "maxLength" : 20,
+            "type" : "string",
+            "nullable" : false
+          },
+          "AccountHolderID" : {
+            "title" : "Customer ID (internal ID) which is the Account Holder",
+            "maxLength" : 10,
+            "type" : "string",
+            "nullable" : false
+          },
+          "BankAccountID" : {
+            "title" : "Bank Account Number",
+            "maxLength" : 35,
+            "type" : "string",
+            "nullable" : false
+          },
+          "BankRoutingID" : {
+            "title" : "Bank Key",
+            "maxLength" : 35,
+            "type" : "string",
+            "nullable" : false
+          },
+          "BankCountryCode" : {
+            "title" : "Bank Country",
+            "maxLength" : 3,
+            "type" : "string",
+            "nullable" : false
+          },
+          "ProductID" : {
+            "title" : "Product ID",
+            "maxLength" : 32,
+            "type" : "string",
+            "nullable" : false
+          },
+          "ProductDescription" : {
+            "title" : "Product Description",
+            "maxLength" : 80,
+            "type" : "string",
+            "nullable" : false
+          },
+          "UsageNote" : {
+            "title" : "Usage Note",
+            "maxLength" : 80,
+            "type" : "string",
+            "nullable" : false
+          },
+          "CurrencyCode" : {
+            "title" : "Currency",
+            "maxLength" : 5,
+            "type" : "string",
+            "nullable" : false
+          },
+          "CurrentBalance" : {
+            "title" : "Current Balance",
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          },
+          "AvailableAmount" : {
+            "title" : "Available Amount",
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          },
+          "CurrentPostingDate" : {
+            "title" : "Current Posting Date of the Bank",
+            "type" : "string",
+            "format" : "date-time",
+            "nullable" : false
+          },
+          "CurrentTotalDebitInterestRate" : {
+            "title" : "Current Total Debit Interest Rate",
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          },
+          "CurrentTotalCreditInterestRate" : {
+            "title" : "Current Total Credit Interest Rate",
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          },
+          "DefaultMinPostingDate" : {
+            "title" : "Default Minimum Posting Date (Transaction Item retrieval)",
+            "type" : "string",
+            "format" : "date-time",
+            "nullable" : false
+          },
+          "DefaultMaxPostingDate" : {
+            "title" : "Default Maximum Posting Date (Transaction Item retrieval)",
+            "type" : "string",
+            "format" : "date-time",
+            "nullable" : false
+          }
+        }
+      },
+      "Transaction" : {
+        "title" : "Transaction Item",
+        "type" : "object",
+        "properties" : {
+          "AccountID" : {
+            "title" : "Bank Account ID (IBAN)",
+            "maxLength" : 34,
+            "type" : "string",
+            "nullable" : false
+          },
+          "TransactionID" : {
+            "title" : "Transaction ID",
+            "maxLength" : 35,
+            "type" : "string",
+            "nullable" : false
+          },
+          "TypeCode" : {
+            "title" : "Transaction Type Code",
+            "maxLength" : 6,
+            "type" : "string"
+          },
+          "TypeName" : {
+            "title" : "Transaction Type Description",
+            "maxLength" : 40,
+            "type" : "string"
+          },
+          "PostingDate" : {
+            "title" : "Posting Date",
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "ValueDate" : {
+            "title" : "Value Date",
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "DebitIndicator" : {
+            "title" : "Debit Indicator",
+            "type" : "boolean",
+            "nullable" : false
+          },
+          "Amount" : {
+            "title" : "Amount",
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "Currency" : {
+            "title" : "Currency",
+            "maxLength" : 5,
+            "type" : "string"
+          },
+          "ReturnAllowedIndicator" : {
+            "title" : "Return Allowed Indicator",
+            "type" : "boolean"
+          },
+          "PaymentNote" : {
+            "title" : "Payment Note",
+            "maxLength" : 80,
+            "type" : "string"
+          },
+          "CounterpartyAccountID" : {
+            "title" : "Counterparty Bank Account ID (IBAN)",
+            "maxLength" : 34,
+            "type" : "string"
+          },
+          "CounterpartyHolderName" : {
+            "title" : "Counterparty Account Holder Name",
+            "maxLength" : 60,
+            "type" : "string"
+          },
+          "TransactionClassID" : {
+            "title" : "My Transaction Class ID",
+            "maxLength" : 40,
+            "type" : "string"
+          },
+          "TransactionClassName" : {
+            "title" : "My Transaction Class Name",
+            "maxLength" : 80,
+            "type" : "string"
+          }
+        }
+      },
+      "TransactionClass" : {
+        "title" : "Transaction Classification",
+        "type" : "object",
+        "properties" : {
+          "ID" : {
+            "title" : "My Transaction Class ID",
+            "maxLength" : 40,
+            "type" : "string",
+            "nullable" : false
+          },
+          "CustomerExternalID" : {
+            "title" : "Customer ID (external ID such as User ID, Passport etc.)",
+            "maxLength" : 20,
+            "type" : "string",
+            "nullable" : false
+          },
+          "Description" : {
+            "title" : "My Transaction Class Name",
+            "maxLength" : 80,
+            "type" : "string",
+            "nullable" : false
+          }
+        }
+      },
+      "Transfer" : {
+        "title" : "Bank Transfer",
+        "type" : "object",
+        "properties" : {
+          "ID" : {
+            "title" : "Bank Transfer ID",
+            "maxLength" : 36,
+            "type" : "string",
+            "nullable" : false
+          },
+          "CustomerExternalID" : {
+            "title" : "Customer ID (external ID such as User ID, Passport etc.)",
+            "maxLength" : 20,
+            "type" : "string",
+            "nullable" : false
+          },
+          "AccountID" : {
+            "title" : "Sender - Bank Account ID (IBAN)",
+            "maxLength" : 34,
+            "type" : "string"
+          },
+          "TypeCode" : {
+            "title" : "Bank Transfer Type Code",
+            "maxLength" : 6,
+            "type" : "string"
+          },
+          "PostingDate" : {
+            "title" : "Posting Date (requested execution date)",
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "Amount" : {
+            "title" : "Amount",
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "Currency" : {
+            "title" : "Currency",
+            "maxLength" : 5,
+            "type" : "string"
+          },
+          "PaymentNote" : {
+            "title" : "Payment Note",
+            "maxLength" : 80,
+            "type" : "string"
+          },
+          "RecipientID" : {
+            "title" : "Recipient ID",
+            "maxLength" : 40,
+            "type" : "string"
+          },
+          "RecipientAccountID" : {
+            "title" : "Recipient - Bank Account ID (IBAN)",
+            "maxLength" : 34,
+            "type" : "string"
+          },
+          "RecipientHolderName" : {
+            "title" : "Recipient - Account Holder Name",
+            "maxLength" : 80,
+            "type" : "string"
+          },
+          "TPH" : {
+            "title" : "TPH",
+            "maxLength" : 6,
+            "type" : "string",
+            "nullable" : false
+          }
+        }
+      },
+      "Recipient" : {
+        "title" : "Bank Transfer Recipient",
+        "type" : "object",
+        "properties" : {
+          "AccountID" : {
+            "title" : "Recipient  Bank Account ID (IBAN)",
+            "maxLength" : 34,
+            "type" : "string",
+            "nullable" : false
+          },
+          "CustomerExternalID" : {
+            "title" : "Customer ID (external ID such as User ID, Passport etc.)",
+            "maxLength" : 20,
+            "type" : "string"
+          },
+          "Description" : {
+            "title" : "Recipient Party Description",
+            "maxLength" : 100,
+            "type" : "string"
+          },
+          "Currency" : {
+            "title" : "Currency",
+            "maxLength" : 5,
+            "type" : "string"
+          },
+          "AccountHolderName" : {
+            "title" : "Recipient Account Holder Name",
+            "maxLength" : 40,
+            "type" : "string"
+          },
+          "AccountNo" : {
+            "title" : "Recipient Account Holder Number",
+            "maxLength" : 35,
+            "type" : "string"
+          },
+          "BankNo" : {
+            "title" : "Recipient Bank ID",
+            "maxLength" : 35,
+            "type" : "string"
+          },
+          "RecipientID" : {
+            "title" : "Recipient  ID",
+            "maxLength" : 60,
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+}

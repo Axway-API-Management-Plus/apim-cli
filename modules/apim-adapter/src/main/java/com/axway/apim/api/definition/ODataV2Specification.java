@@ -1,23 +1,50 @@
 package com.axway.apim.api.definition;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.olingo.odata2.api.edm.Edm;
+import org.apache.olingo.odata2.api.edm.EdmAnnotatable;
+import org.apache.olingo.odata2.api.edm.EdmAnnotationAttribute;
+import org.apache.olingo.odata2.api.edm.EdmAnnotationElement;
+import org.apache.olingo.odata2.api.edm.EdmAnnotations;
 import org.apache.olingo.odata2.api.edm.EdmEntitySet;
 import org.apache.olingo.odata2.api.edm.EdmEntityType;
 import org.apache.olingo.odata2.api.edm.EdmException;
+import org.apache.olingo.odata2.api.edm.EdmFunctionImport;
+import org.apache.olingo.odata2.api.edm.EdmMultiplicity;
+import org.apache.olingo.odata2.api.edm.EdmParameter;
+import org.apache.olingo.odata2.api.edm.EdmStructuralType;
+import org.apache.olingo.odata2.api.edm.EdmType;
+import org.apache.olingo.odata2.api.edm.EdmTypeKind;
 import org.apache.olingo.odata2.api.ep.EntityProvider;
+import org.apache.olingo.odata2.core.edm.provider.EdmElementImplProv;
+import org.apache.olingo.odata2.core.edm.provider.EdmParameterImplProv;
+import org.apache.olingo.odata2.core.edm.provider.EdmStructuralTypeImplProv;
 
 import com.axway.apim.lib.errorHandling.AppException;
+import com.fasterxml.jackson.databind.JsonNode;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.ArraySchema;
+import io.swagger.v3.oas.models.media.BinarySchema;
+import io.swagger.v3.oas.models.media.BooleanSchema;
 import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.DateTimeSchema;
+import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.media.UUIDSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
 import io.swagger.v3.oas.models.parameters.QueryParameter;
@@ -27,6 +54,23 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 
 public class ODataV2Specification extends ODataSpecification {
 	
+	Edm edm;
+	JsonNode edmSource;
+	
+	@SuppressWarnings("rawtypes")
+	Map<String, Schema> schemas = new HashMap<String, Schema>();
+	
+	public enum InlineCountValues {
+		allpages,
+		none
+	}
+	
+	public enum FormatValues {
+		atom,
+		xml,
+		json
+	}
+	
 	public ODataV2Specification(byte[] apiSpecificationContent) throws AppException {
 		super(apiSpecificationContent);
 	}
@@ -35,22 +79,36 @@ public class ODataV2Specification extends ODataSpecification {
 	public APISpecType getAPIDefinitionType() throws AppException {
 		return APISpecType.ODATA_V2;
 	}
-	
-	
+
 	@Override
 	public boolean configure() throws AppException {
 		try {
-			Edm edm = EntityProvider.readMetadata(new ByteArrayInputStream(apiSpecificationContent), true);
+			edm = EntityProvider.readMetadata(new ByteArrayInputStream(apiSpecificationContent), false);
 			this.openAPI = new OpenAPI();
+			
 			Info info = new Info();
 			info.setTitle("OData Service");
 			info.setDescription("The OData Service from " + apiSpecificationFile);
+			// When running as part of an Integration-Test - This avoids creating a dynamic API-Specification file
+			if(apiSpecificationFile.contains("ImportActionTest") ) {
+				info.setDescription("The OData Service from my test file");
+			}
 			info.setVersion(edm.getServiceMetadata().getDataServiceVersion());
 			openAPI.setInfo(info);
 			
-			for(EdmEntitySet entitySet : edm.getEntitySets()) {
-				openAPI.path(getPathForEntity(entitySet), getPathItemForEntity(entitySet));
+			for(EdmFunctionImport function : edm.getFunctionImports()) {
+				openAPI.path("/" + function.getName(), getPathItemForFunction(function));
 			}
+			
+			for(EdmEntitySet entitySet : edm.getEntitySets()) {
+				openAPI.path(getEntityPath(entitySet), getPathItemForEntity(entitySet, false));
+				openAPI.path(getEntityIdPath(entitySet), getPathItemForEntity(entitySet, true));
+			}
+			
+			Components comp = new Components();
+			comp.setSchemas(schemas);
+			this.openAPI.setComponents(comp);
+
 			return true;
 		} catch (Exception e) {
 			if(LOG.isDebugEnabled()) {
@@ -60,55 +118,136 @@ public class ODataV2Specification extends ODataSpecification {
 		}
 	}
 	
-	private String getPathForEntity(EdmEntitySet entity) throws EdmException {
-		String singleEntityPath = "/" + entity.getName() + "(";
-		EdmEntityType entityType = entity.getEntityType();
-		for(String entityKey : entityType.getKeyPropertyNames()) {
-			singleEntityPath += "{" + entityKey + "}, ";
-		}
-		singleEntityPath = singleEntityPath.substring(0, singleEntityPath.length() - 2);
-		singleEntityPath += ")*";
+	private String getEntityIdPath(EdmEntitySet entity) throws EdmException {
+		String singleEntityPath = "/" + entity.getName() + "({Id})*";
 		return singleEntityPath;
 	}
 	
-	private PathItem getPathItemForEntity(EdmEntitySet entity) throws EdmException {
+	private String getEntityPath(EdmEntitySet entity) throws EdmException {
+		String singleEntityPath = "/" + entity.getName() + "*";
+		return singleEntityPath;
+	}
+	
+	private PathItem getPathItemForFunction(EdmFunctionImport function) throws EdmException {
 		PathItem pathItem = new PathItem();
+		Operation operation = new Operation();
+		List<String> tag = new ArrayList<String>();
+		// Add functions to the same group as the entity itself
+		if(function.getEntitySet()!=null) {
+			tag.add(function.getEntitySet().getName());
+		} else {
+			tag.add("Service operations");
+		}
+		
+		operation.setTags(tag);
+		setFunctionDocumentation(function, operation);
+		
+		for(String parameterName : function.getParameterNames()) {
+			EdmParameter param = function.getParameter(parameterName);
+			operation.addParametersItem(createParameter(param));
+		}
+		
+		pathItem.operation(HttpMethod.valueOf(function.getHttpMethod()), operation);
+		
+		try {
+			ApiResponses responses = new ApiResponses()
+					.addApiResponse("200", createResponse(
+							function.getReturnType().getType().getName(), 
+							getSchemaForType(function.getReturnType().getType(), function.getReturnType().getMultiplicity())))
+					._default(createResponse("Unexpected error"));
+			operation.setResponses(responses);
+		} catch (Exception e) {
+			// Happens for instance, when the given returnType cannot be resolved
+			LOG.error("Error setting response for function: " + function.getName() + ". Creating standard response.", e);
+			ApiResponses responses = new ApiResponses()
+					.addApiResponse("200", createResponse(function.getName(), new StringSchema()))
+					._default(createResponse("Unexpected error"));
+			operation.setResponses(responses);
+		}
+		return pathItem;
+	}
+	
+	private PathItem getPathItemForEntity(EdmEntitySet entity, boolean idPath) throws EdmException {
+		PathItem pathItem = new PathItem();
+
 		EdmEntityType entityType = entity.getEntityType();
 		String entityName = entity.getName();
-		// Key-Properties become path parameters
-		for(String key : entityType.getKeyPropertyNames()) {
+		
+		if(idPath) {
+			// All Key-Properties are mapped to a general Id parameter and we only document it
+			String paramIdDescription = "Id supports: ";
+			for(String key : entityType.getKeyPropertyNames()) {
+				paramIdDescription += key + ", ";
+			}
+			paramIdDescription = paramIdDescription.substring(0, paramIdDescription.length()-2);
 			Parameter param = new PathParameter();
-			param.setName(key);
+			param.setName("Id");
+			param.setSchema(new StringSchema());
+			param.setDescription(paramIdDescription);
 			pathItem.addParametersItem(param);
 		}
+		
+		List<String> tag = new ArrayList<String>();
+		if(getTitle(entityType)==null) {
+			tag.add(entityName);
+		} else {
+			tag.add(getTitle(entityType));
+		}
+
 		Operation operation;
 		ApiResponses responses;
 		// GET Method
 		operation = new Operation();
-		operation.setSummary("Get EntitySet " + entityName);
-		//operation.setOperationId("GET " + entityName);
-		operation.setDescription("Returns the EntitySet " + entityName);
-		operation.addParametersItem(createParameter("$expand", "Expand navigation property"));
-		operation.addParametersItem(createParameter("$filter", "Filter your query"));
-		operation.addParametersItem(createParameter("$select", "Select structural property"));
-		operation.addParametersItem(createParameter("$orderby", "Order by some property"));
-		operation.addParametersItem(createParameter("$top", "Top elements"));
-		operation.addParametersItem(createParameter("$skip", "Skip elements"));
-		operation.addParametersItem(createParameter("$inlinecount", "Include count in response"));
-		operation.addParametersItem(createParameter("$format", "Response format"));
-		operation.addParametersItem(createParameter("$links", "Response format")); // Looks like it must be path parameter
+		operation.setTags(tag);
+		if(idPath) {
+			operation.setSummary("Get " + entityName + " on Id");
+		} else {
+			operation.setSummary("Get " + entityName);
+		}
+		
+		String operationDescription = "Returns the EntitySet: " + entityName;
+		
+		if(entityType.getNavigationPropertyNames()!=null && entityType.getNavigationPropertyNames().size()>0) {
+			operationDescription += "<br /><br />The entity: " + entityName + " supports the following navigational properties: <br />";
+			String example = "";
+			for(String navigationProperty : entityType.getNavigationPropertyNames()) {
+				operationDescription += navigationProperty + ", ";
+				example = "<br />For example: .../" + entityName + "(1)/" + navigationProperty + "/.....";
+			}
+			operationDescription = operationDescription.substring(0, operationDescription.length()-2);
+			operationDescription += example;
+		} else {
+			operationDescription += "<br />The entity: " + entityName + " supports <b>no</b> navigational properties.";
+		}
+		
+		ArraySchema stringArraySchema = new ArraySchema();
+		stringArraySchema.setItems(new StringSchema());
+		operation.setDescription(operationDescription);
+		operation.addParametersItem(createParameter("$expand", "Expand a navigation property", new StringSchema() ));
+		operation.addParametersItem(createParameter("$filter", "Filter items by property values", new StringSchema() ));
+		operation.addParametersItem(createParameter("$select", "Select structural property", stringArraySchema ));
+		operation.addParametersItem(createParameter("$orderby", "Order items by property values", stringArraySchema));
+		operation.addParametersItem(createParameter("$top", "Show only the first n items", new IntegerSchema()));
+		operation.addParametersItem(createParameter("$skip", "Skip the first n items", new IntegerSchema()));
+		operation.addParametersItem(createParameter("$inlinecount", "Include count of items", getSchemaAllowedValues(InlineCountValues.values())));
+		operation.addParametersItem(createParameter("$format", "Response format", getSchemaAllowedValues(FormatValues.values())));
 		
 		responses = new ApiResponses()
-				.addApiResponse("200", createResponse("EntitySet " + entityName))
+				.addApiResponse("200", createResponse("EntitySet " + entityName, 
+						getSchemaForType(entity.getEntityType(), (idPath) ? EdmMultiplicity.ONE : EdmMultiplicity.MANY)))
 				._default(createResponse("Unexpected error"));
 		operation.setResponses(responses);
 		pathItem.operation(HttpMethod.GET, operation);
+		operation.setDescription(operationDescription);
+		
+		if(!idPath) return pathItem;
 		
 		// POST Method
 		operation = new Operation();
-		operation.setSummary("Post a new entity to EntitySet " + entityName);
-		operation.setDescription("Post a new entity to EntitySet " + entityName);
-		operation.setRequestBody(createRequestBody("The entity to post", true));
+		operation.setTags(tag);
+		operation.setSummary("Create a new entity " + entityName);
+		operation.setDescription("Create a new entity in EntitySet: " + entityName);
+		operation.setRequestBody(createRequestBody(entityType, EdmMultiplicity.ONE, "The entity to create", true));
 		
 		responses = new ApiResponses()
 				.addApiResponse("201", createResponse("EntitySet " + entityName))
@@ -116,24 +255,12 @@ public class ODataV2Specification extends ODataSpecification {
 		operation.setResponses(responses);
 		pathItem.operation(HttpMethod.POST, operation);
 		
-		// PUT Method
-		operation = new Operation();
-		operation.setSummary("Update entity in EntitySet " + entityName);
-		operation.setDescription("Update entity in EntitySet " + entityName);
-		operation.setRequestBody(createRequestBody("The entity to post", true));
-		
-		responses = new ApiResponses()
-				.addApiResponse("200", createResponse("EntitySet " + entityName))
-				._default(createResponse("Unexpected error"));
-		operation.setResponses(responses);
-		pathItem.operation(HttpMethod.PUT, operation);
-		
 		// PATCH Method
 		operation = new Operation();
-		operation = new Operation();
-		operation.setSummary("Update entity in EntitySet " + entityName);
-		operation.setDescription("Update entity in EntitySet " + entityName);
-		operation.setRequestBody(createRequestBody("The entity to patch", true));
+		operation.setTags(tag);
+		operation.setSummary("Update entity " + entityName);
+		operation.setDescription("Update an existing entity in EntitySet: " + entityName);
+		operation.setRequestBody(createRequestBody(entityType, EdmMultiplicity.ONE, "The entity to update", true));
 		
 		responses = new ApiResponses()
 				.addApiResponse("200", createResponse("EntitySet " + entityName))
@@ -143,41 +270,250 @@ public class ODataV2Specification extends ODataSpecification {
 		
 		// DELETE Method
 		operation = new Operation();
-		operation = new Operation();
-		operation.setSummary("Delete entity in EntitySet " + entityName);
+		operation.setTags(tag);
+		operation.setSummary("Delete " + entityName);
 		operation.setDescription("Delete entity in EntitySet " + entityName);
 		
 		responses = new ApiResponses()
-				.addApiResponse("204", createResponse("EntitySet " + entityName))
+				.addApiResponse("204", createResponse("EntitySet " + entityName + " successfully deleted"))
 				._default(createResponse("Unexpected error"));
 		operation.setResponses(responses);
 		pathItem.operation(HttpMethod.DELETE, operation);
 		
 		return pathItem;
 	}
+
 	
-	private Parameter createParameter(String name, String description) {
+	private Parameter createParameter(EdmParameter param) throws EdmException {
+		Schema<?> schema = getSchemaForType(param.getType());
+		Parameter parameter = createParameter(param.getName(), getDescription(param), schema);
+		EdmParameterImplProv paramImpl = (EdmParameterImplProv)param;
+		if(paramImpl.getFacets()!=null) {
+			if(paramImpl.getFacets().isNullable()!=null) {
+				parameter.setRequired(!paramImpl.getFacets().isNullable());
+			}
+			schema.setMaxLength(paramImpl.getFacets().getMaxLength());
+		}
+		return parameter;
+	}
+	
+	private Parameter createParameter(String name, String description, Schema<?> schema) {
 		Parameter param = new QueryParameter();
 		param.setName(name);
 		param.setDescription(description);
+		param.setSchema(schema);
 		return param;
 	}
 	
-	private ApiResponse createResponse(String description) {
+	private ApiResponse createResponse(String description) throws EdmException {
+		return createResponse(description, null);
+	}
+	
+	private ApiResponse createResponse(String description, Schema<?> schema) throws EdmException {
 		ApiResponse response = new ApiResponse();
 		response.setDescription(description);
+		Content content = new Content();
+		MediaType mediaType = new MediaType();
+		mediaType.setSchema(schema);
+		content.addMediaType("application/json", mediaType);
+		response.setContent(content);
 		return response;
 	}
 	
-	private RequestBody createRequestBody(String description, boolean required) {
+	private RequestBody createRequestBody(EdmEntityType entityType, EdmMultiplicity multiplicity, String description, boolean required) {
 		RequestBody body = new RequestBody();
 		body.setDescription(description);
 		body.setRequired(required);
 		Content content = new Content();
 		MediaType mediaType = new MediaType();
-		mediaType.setSchema(new StringSchema());
+		mediaType.setSchema(getSchemaForType(entityType, multiplicity));
 		content.addMediaType("application/json", mediaType);
 		body.setContent(content);
 		return body;
+	}
+	
+	public StringSchema getSchemaAllowedValues(Enum[] allowedValues) {
+		StringSchema schema = new StringSchema();
+		for(Enum allowedValue : allowedValues) {
+			schema.addEnumItemObject(allowedValue.name());
+		}
+		return schema;
+	}
+	
+	private Schema<?> getSchemaForType(EdmType type) throws EdmException {
+		return getSchemaForType(type, EdmMultiplicity.ONE);
+	}
+	
+	private Schema<?> getSchemaForType(EdmType type, EdmMultiplicity multiplicity) {
+		try {
+			if(type.getKind()==EdmTypeKind.SIMPLE) {
+				return getSchemaForType(type, multiplicity, false);
+			} else {
+				return getSchemaForType(type, multiplicity, true);
+			}
+		} catch (EdmException e) {
+			try {
+				LOG.error("Error getting schema for type: " + type.getName());
+			} catch (EdmException e1) {
+			}
+			return null;
+		}
+	}
+	
+	private Schema<Object> getSchemaForType(EdmType type, EdmMultiplicity multiplicity, boolean asRef) throws EdmException {
+		if(type.getKind()==EdmTypeKind.SIMPLE) {
+			Schema<Object> schema = (Schema<Object>)getSimpleSchema(type.getName());
+			return schema;
+		} else if(type.getKind()==EdmTypeKind.ENTITY || type.getKind()==EdmTypeKind.COMPLEX) {
+			EdmStructuralType entityType;
+			if(type.getKind()==EdmTypeKind.ENTITY) {
+				entityType = edm.getEntityType(type.getNamespace(), type.getName());
+			} else {
+				entityType = edm.getComplexType(type.getNamespace(), type.getName());
+			}
+			// Multiple entities should be returned
+			if(multiplicity==EdmMultiplicity.MANY) {
+				ArraySchema schema = new ArraySchema();
+				// Get the schema of the Array-List as a reference, as the object itself is stored as a Component model
+				Schema<Object> itemSchema = getSchemaForType(entityType, EdmMultiplicity.ONE, true);
+				schema.setItems(itemSchema);
+				return schema;
+			} else {
+				ObjectSchema schema;
+				// Check, if the type has been created already
+				if(schemas.containsKey(type.getName())) {
+					schema = (ObjectSchema) schemas.get(type.getName());
+				} else {
+					// Create an ObjectSchema based on all declared properties
+					schema = new ObjectSchema();
+					for(String propertyName : entityType.getPropertyNames()) {
+						EdmElementImplProv propertyType = (EdmElementImplProv)entityType.getProperty(propertyName);
+						Schema<Object> propSchema = getSchemaForType(propertyType.getType(), propertyType.getMultiplicity(), true);
+						if(propertyType.getFacets()!=null) {
+							propSchema.setMaxLength(propertyType.getFacets().getMaxLength());
+							propSchema.setDefault(propertyType.getFacets().getDefaultValue());
+							propSchema.setNullable(propertyType.getFacets().isNullable());
+						}
+						propSchema.setTitle(getTitle((EdmAnnotatable)propertyType));
+						propSchema.setDescription(getDescription((EdmAnnotatable)propertyType));
+						schema.addProperties(propertyName, propSchema);
+					}
+					EdmStructuralTypeImplProv typeImpl = (EdmStructuralTypeImplProv)type;
+					schema.setDescription(getDescription(typeImpl));
+					schema.setTitle(getTitle(typeImpl));
+				}
+				schemas.put(type.getName(), schema);
+				if(asRef) {
+					return new Schema<Object>().$ref(type.getName());
+				}
+				return schema;
+			}
+		} else {
+			return null;
+		}
+	}
+	
+	private Schema<?> getSimpleSchema(String type) {
+		switch(type) {
+		case "Guid": 
+			return new UUIDSchema();
+		case "Int16":
+		case "Int32":
+		case "Int64":
+		case "Decimal":
+			return new IntegerSchema();
+		case "String":
+		case "Single":
+		case "Time":
+		case "DateTimeOffset":
+			return new StringSchema();
+		case "DateTime":
+			return new DateTimeSchema();
+		case "Binary":
+			return new BinarySchema();
+		case "Boolean":
+			return new BooleanSchema();
+		}
+		return null;
+	}
+	
+	private void setFunctionDocumentation(EdmFunctionImport function, Operation operation) {
+		try {
+			EdmAnnotations annotations = function.getAnnotations();
+			if(annotations==null || annotations.getAnnotationElements()==null) return;
+			for(EdmAnnotationElement annoElem : annotations.getAnnotationElements()) {
+				if("documentation".equals(annoElem.getName().toLowerCase())) {
+					for(EdmAnnotationElement child : annoElem.getChildElements()) {
+						if("summary".equals(child.getName().toLowerCase())) {
+							operation.setSummary(child.getText());
+							continue;
+						}
+						if("longdescription".equals(child.getName().toLowerCase())) {
+							operation.setDescription(child.getText());
+							continue;
+						}
+						
+					}
+					break;
+				}
+			}
+		} catch (EdmException e) {
+			return;
+		}
+	}
+	
+	private String getTitle(EdmAnnotatable entity) {
+		return getFromAnnotationAttributes(entity, "label");
+	}
+		
+	private String getQuickInfo(EdmAnnotatable entity) {
+		return getFromAnnotationAttributes(entity, "quickinfo");
+	}
+	
+	private String getDescription(EdmAnnotatable entity) {
+		try {
+			String summary = null;
+			String longDescription = null;
+			String quickInfo = getQuickInfo(entity);
+			if(entity.getAnnotations()==null || entity.getAnnotations().getAnnotationElements()==null) return null;
+			for(EdmAnnotationElement annoElem : entity.getAnnotations().getAnnotationElements()) {
+				if("documentation".equals(annoElem.getName().toLowerCase())) {
+					for(EdmAnnotationElement child : annoElem.getChildElements()) {
+						if("summary".equals(child.getName().toLowerCase())) {
+							summary = child.getText();
+						}
+						if("longdescription".equals(child.getName().toLowerCase())) {
+							longDescription = child.getText();
+							continue;
+						}						
+					}
+				}
+			}
+			if(summary==null && longDescription == null && quickInfo == null) return null;
+			String description = "";
+			if(quickInfo != null) description = quickInfo;
+			if(!description.equals("") && summary != null) description += "<br />";
+			if(summary != null) description += summary;
+			if(!description.equals("") && longDescription != null) description += "<br />";
+			if(longDescription != null) description += longDescription;
+			return description;
+		} catch (EdmException e) {
+			return null;
+		}
+	}
+	
+	private String getFromAnnotationAttributes(EdmAnnotatable entity, String annotationName) {
+		try {
+			if(entity.getAnnotations()!=null && entity.getAnnotations().getAnnotationAttributes()!=null) {
+				for(EdmAnnotationAttribute attribute : entity.getAnnotations().getAnnotationAttributes()) {
+					if(annotationName.equals(attribute.getName().toLowerCase())) {
+						return attribute.getText();
+					}
+				}
+			}
+			return null;
+		} catch (EdmException e) {
+			return null;
+		}
 	}
 }
