@@ -909,7 +909,9 @@ public class APIManagerAPIAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			if(statusCode != 201){
-				LOG.error("Error importing API-Specification. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
+				LOG.error("Error importing API-Specification to create Backend-API. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
+				LOG.error("ContentType length: " + api.getApiDefinition().getApiSpecificationContent().length);
+				LOG.error("Content start: " + new String(api.getApiDefinition().getApiSpecificationContent(), 0, 300, StandardCharsets.UTF_8));
 				throw new AppException("Can't import API-Specification to create Backend-API.", ErrorCode.CANT_CREATE_BE_API);
 			}
 			JsonNode jsonNode = mapper.readTree(response);
