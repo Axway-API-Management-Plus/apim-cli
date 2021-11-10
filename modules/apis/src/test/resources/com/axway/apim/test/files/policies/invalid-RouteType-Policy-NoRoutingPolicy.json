@@ -1,0 +1,14 @@
+{
+	"name": "API without routing Policy",
+	"path": "/api/no/routing/policy",
+	"description": "Must fail, as the routing policy for routeType policy is missing",
+	"state": "unpublished",
+	"version": "1.0.0",
+	"organization": "API Development",
+	"outboundProfiles": {
+		"_default": {
+			"routeType":"policy",
+			"requestPolicy": "Amazon V2 - DescribeInstances"
+		}
+	}
+}

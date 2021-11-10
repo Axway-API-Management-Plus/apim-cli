@@ -95,25 +95,25 @@ public class RemoteHostFilter {
 		if(this.getName()!=null) {
 			Pattern pattern = Pattern.compile(this.getName().replace("*", ".*"));
 			Matcher matcher = pattern.matcher(remoteHost.getName());
-			if(!matcher.matches()) return false;
+			if(!matcher.matches()) return true;
 		}
 		if(this.getPort()!=null) {
-			if(!this.getPort().equals(remoteHost.getPort())) return false;
+			if(!this.getPort().equals(remoteHost.getPort())) return true;
 		}
 		if(this.getId()!=null) {
-			if(!this.getId().equals(remoteHost.getId())) return false;
+			if(!this.getId().equals(remoteHost.getId())) return true;
 		}
 		if(this.getOrganization()!=null) {
 			Pattern pattern = Pattern.compile(this.getOrganization().getName().replace("*", ".*"));
 			Matcher matcher = pattern.matcher(remoteHost.getOrganization().getName());
-			if(!matcher.matches()) return false;
+			if(!matcher.matches()) return true;
 		}
 		if(this.getAlias()!=null) {
 			Pattern pattern = Pattern.compile(this.getAlias().replace("*", ".*"));
 			Matcher matcher = pattern.matcher(remoteHost.getAlias());
-			if(!matcher.matches()) return false;
+			if(!matcher.matches()) return true;
 		}
-		return true;
+		return false;
 	}
 
 	public static class Builder {
