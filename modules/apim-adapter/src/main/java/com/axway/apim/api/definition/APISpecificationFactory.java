@@ -22,6 +22,9 @@ public class APISpecificationFactory {
 	    add(OAS3xSpecification.class);
 	    add(WSDLSpecification.class);
 	    add(WADLSpecification.class);
+	    add(ODataV2Specification.class);
+	    add(ODataV3Specification.class);
+	    add(ODataV4Specification.class);
 	}};
 	
 	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName) throws AppException {
@@ -45,6 +48,11 @@ public class APISpecificationFactory {
 					LOG.debug("Can't handle API specification with class: " + clazz.getName());
 					continue;
 				} else {
+					String addNote = "";
+					if(spec.getAPIDefinitionType().getAdditionalNote()!=null) {
+						addNote = "\n                                 | " + spec.getAPIDefinitionType().getAdditionalNote();
+					}
+					LOG.info("Detected: " + spec.getAPIDefinitionType().niceName + " specification. " + spec.getAPIDefinitionType().getNote()+addNote);
 					return spec;
 				}
 			} catch (AppException e) {
@@ -60,7 +68,7 @@ public class APISpecificationFactory {
 			return new UnknownAPISpecification(apiSpecificationContent, apiName);
 		}
 		LOG.error("API: '"+apiName+"' has a unkown/invalid API-Specification: '" + getContentStart(apiSpecificationContent) + "'");
-		throw new AppException("Can't handle API specification. No suiteable API-Specification implementation available.", ErrorCode.CANT_READ_API_DEFINITION_FILE);
+		throw new AppException("Can't handle API specification. No suiteable API-Specification implementation available.", ErrorCode.UNSUPPORTED_API_SPECIFICATION);
 	}
 	
 	static String getContentStart(byte[] apiSpecificationContent) {

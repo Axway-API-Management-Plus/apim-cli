@@ -47,4 +47,10 @@ public class UtilsTest {
 		File stageConfigFile = Utils.getStageConfig(null, "my-stage-test-api-config.json", new File(testConfig));
 		Assert.assertEquals(stageConfigFile.getName(), "my-stage-test-api-config.json");
 	}
+	
+	@Test
+	public void testMissingMandatoryCustomProperty() {
+		File stageConfigFile = Utils.getStageConfig(null, "my-stage-test-api-config.json", new File(testConfig));
+		Assert.assertEquals(stageConfigFile.getName(), "my-stage-test-api-config.json");
+	}
 }
