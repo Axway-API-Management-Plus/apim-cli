@@ -3,6 +3,8 @@ package com.axway.apim.adapter.customProperties;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -25,19 +27,19 @@ import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class APIManagerCustomPropertiesAdapter {
-	
+
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerCustomPropertiesAdapter.class);
-	
+
 	ObjectMapper mapper = APIManagerAdapter.mapper;
-	
+
 	CoreParameters cmd = CoreParameters.getInstance();
 
 	public APIManagerCustomPropertiesAdapter() {}
-	
+
 	String apiManagerResponse;
-	
+
 	CustomProperties customProperties;
-	
+
 	private void readCustomPropertiesFromAPIManager() throws AppException {
 		if(apiManagerResponse != null) return;
 		URI uri;
@@ -63,7 +65,7 @@ public class APIManagerCustomPropertiesAdapter {
 			} catch (Exception ignore) {}
 		}
 	}
-	
+
 	public CustomProperties getCustomProperties() throws AppException {
 		if(customProperties!=null) return customProperties;
 		readCustomPropertiesFromAPIManager();
@@ -75,7 +77,22 @@ public class APIManagerCustomPropertiesAdapter {
 			throw new AppException("Error parsing API-Manager custom properties", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
-	
+
+	public Map<String, CustomProperty> getRequiredCustomProperties(Type type) throws AppException {
+		Map<String, CustomProperty> allCustomProps = getCustomProperties(type);
+		if(allCustomProps==null) return null;
+		Map<String, CustomProperty> requiredCustomProps = new HashMap<String, CustomProperty>();
+		Iterator<String> it = allCustomProps.keySet().iterator();
+		while(it.hasNext()) {
+			String propName = it.next();
+			CustomProperty prop = allCustomProps.get(propName);
+			if(prop.getRequired()) {
+				requiredCustomProps.put(propName, prop);
+			}
+		}
+		return requiredCustomProps;
+	}
+
 	public Map<String, CustomProperty> getCustomProperties(Type type) throws AppException {
 		CustomProperties customProperties = getCustomProperties();
 		if(customProperties == null) return null;
@@ -90,26 +107,27 @@ public class APIManagerCustomPropertiesAdapter {
 			return customProperties.getOrganization();
 		default:
 			throw new AppException("Unknown custom properties type: " + type, ErrorCode.UNXPECTED_ERROR);
+		}
 	}
-	}
-	
+
 	public CustomProperty getCustomProperty(Type type, String customPropertyName) throws AppException {
 		Map<String, CustomProperty> customProperties = getCustomProperties(type);
 		if(customProperties == null) return null;
 		return customProperties.get(customPropertyName);
 	}
-	
+
 	public List<String> getCustomPropertyNames(Type type) throws AppException {
 		Map<String, CustomProperty> customProperties = getCustomProperties(type);
 		if(customProperties == null) return new ArrayList<String>();
 		return new ArrayList<>(customProperties.keySet());
 	}
-	
-	void setAPIManagerTestResponse(String jsonResponse) {
+
+	public void setAPIManagerTestResponse(String jsonResponse) {
 		if(jsonResponse==null) {
 			LOG.error("Test-Response is empty. Ignoring!");
 			return;
 		}
+		this.customProperties = null; // Reset it, if new test data is provided
 		this.apiManagerResponse = jsonResponse;
 	}
 }

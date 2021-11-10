@@ -29,6 +29,8 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 	
 	boolean includeQuota;
 	
+	boolean includeAppPermissions;
+	
 	boolean includeCredentials;
 	
 	boolean includeAPIAccess;
@@ -61,6 +63,14 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 		return includeQuota;
 	}
 	
+	public boolean isIncludeAppPermissions() {
+		return includeAppPermissions;
+	}
+
+	public void setIncludeAppPermissions(boolean includeAppPermissions) {
+		this.includeAppPermissions = includeAppPermissions;
+	}
+
 	public boolean isIncludeCredentials() {
 		return includeCredentials;
 	}
@@ -302,6 +312,8 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 		
 		private boolean includeQuota;
 		
+		private boolean includeAppPermissions;
+		
 		private boolean includeCredentials;
 		
 		private boolean includeImage;
@@ -342,6 +354,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 			filter.setOrganization(this.organization);
 			filter.setState(this.state);
 			filter.setIncludeQuota(this.includeQuota);
+			filter.setIncludeAppPermissions(this.includeAppPermissions);
 			filter.setIncludeCredentials(this.includeCredentials);
 			filter.setIncludeImage(this.includeImage);
 			filter.setIncludeAPIAccess(this.includeAPIAccess);
@@ -408,6 +421,11 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 		
 		public Builder includeQuotas(boolean includeQuota) {
 			this.includeQuota = includeQuota;
+			return this;
+		}
+		
+		public Builder includeAppPermissions(boolean includeAppPermissions) {
+			this.includeAppPermissions = includeAppPermissions;
 			return this;
 		}
 		
