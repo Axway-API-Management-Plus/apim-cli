@@ -1,0 +1,32 @@
+{
+  "name": "${appName}",
+  "organization": "${orgName}",
+  "state": "approved",
+  "enabled": true,
+  "email": "user@domain.com",
+  "phone": "654654646234",
+  "appQuota": {
+    "restrictions": [
+      {
+        "api": "*",
+        "method": "*",
+        "type": "throttle",
+        "config": {
+          "messages": "${quotaMessages}",
+          "period": "${quotaPeriod}",
+          "per": "1"
+        }
+      }, 
+      {
+        "api": "*",
+        "method": "*",
+        "type": "throttle",
+        "config": {
+          "messages": "${quotaMessages}",
+          "period": "${quotaPeriod}",
+          "per": "1"
+        }
+      }, 
+    ]
+  }
+}

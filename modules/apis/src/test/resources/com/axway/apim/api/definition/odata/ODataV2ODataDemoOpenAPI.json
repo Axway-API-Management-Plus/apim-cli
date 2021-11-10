@@ -1,0 +1,844 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "OData Service",
+    "description" : "The OData Service from https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata",
+    "version" : "2.0"
+  },
+  "servers" : [ {
+    "url" : "https://myhost.customer.com:8767/api/v1/myAPI/"
+  } ],
+  "paths" : {
+    "/GetProductsByRating" : {
+      "get" : {
+        "tags" : [ "Products" ],
+        "parameters" : [ {
+          "name" : "rating",
+          "in" : "query",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Product",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/Products*" : {
+      "get" : {
+        "tags" : [ "Products" ],
+        "summary" : "Get Products",
+        "description" : "Returns the entity: Products. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Products supports the following navigational properties: [Category, Supplier]<br />For example: .../Products(Entity-Id)/<b>Category</b>/.....",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Category"
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Name"
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.5. Filter System Query Option ($filter)</a> for more information.",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.2. Orderby System Query Option ($orderby)</a> for more information.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Name"
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 10
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format if supported by the backend service.",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet Products",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/Products({Id})*" : {
+      "get" : {
+        "tags" : [ "Products" ],
+        "summary" : "Get Products on Id",
+        "description" : "Returns the entity: Products. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Products supports the following navigational properties: [Category, Supplier]<br />For example: .../Products(Entity-Id)/<b>Category</b>/.....",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Category"
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Name"
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format if supported by the backend service.",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet Products",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Products" ],
+        "summary" : "Create a new entity Products",
+        "description" : "Create a new entity in EntitySet: Products",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Product"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet Products",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Products" ],
+        "summary" : "Delete Products",
+        "description" : "Delete entity in EntitySet Products",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet Products successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "Products" ],
+        "summary" : "Update entity Products",
+        "description" : "Update an existing entity in EntitySet: Products",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Product"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet Products",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: ID",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    },
+    "/Categories*" : {
+      "get" : {
+        "tags" : [ "Categories" ],
+        "summary" : "Get Categories",
+        "description" : "Returns the entity: Categories. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Categories supports the following navigational properties: [Products]<br />For example: .../Categories(Entity-Id)/<b>Products</b>/.....",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Products"
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Name"
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.5. Filter System Query Option ($filter)</a> for more information.",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.2. Orderby System Query Option ($orderby)</a> for more information.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Name"
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 10
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format if supported by the backend service.",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet Categories",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Category"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/Categories({Id})*" : {
+      "get" : {
+        "tags" : [ "Categories" ],
+        "summary" : "Get Categories on Id",
+        "description" : "Returns the entity: Categories. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Categories supports the following navigational properties: [Products]<br />For example: .../Categories(Entity-Id)/<b>Products</b>/.....",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Products"
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Name"
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format if supported by the backend service.",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet Categories",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Categories" ],
+        "summary" : "Create a new entity Categories",
+        "description" : "Create a new entity in EntitySet: Categories",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Category"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet Categories",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Categories" ],
+        "summary" : "Delete Categories",
+        "description" : "Delete entity in EntitySet Categories",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet Categories successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "Categories" ],
+        "summary" : "Update entity Categories",
+        "description" : "Update an existing entity in EntitySet: Categories",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Category"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet Categories",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: ID",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    },
+    "/Suppliers*" : {
+      "get" : {
+        "tags" : [ "Suppliers" ],
+        "summary" : "Get Suppliers",
+        "description" : "Returns the entity: Suppliers. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Suppliers supports the following navigational properties: [Products]<br />For example: .../Suppliers(Entity-Id)/<b>Products</b>/.....",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Products"
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Name"
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.5. Filter System Query Option ($filter)</a> for more information.",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "$orderby",
+          "in" : "query",
+          "description" : "Order items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.2. Orderby System Query Option ($orderby)</a> for more information.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Name"
+        }, {
+          "name" : "$top",
+          "in" : "query",
+          "description" : "Show only the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 10
+          }
+        }, {
+          "name" : "$skip",
+          "in" : "query",
+          "description" : "Skip the first n items",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "$inlinecount",
+          "in" : "query",
+          "description" : "Include count of items",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "allpages", "none" ]
+          }
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format if supported by the backend service.",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet Suppliers",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Supplier"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/Suppliers({Id})*" : {
+      "get" : {
+        "tags" : [ "Suppliers" ],
+        "summary" : "Get Suppliers on Id",
+        "description" : "Returns the entity: Suppliers. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Suppliers supports the following navigational properties: [Products]<br />For example: .../Suppliers(Entity-Id)/<b>Products</b>/.....",
+        "parameters" : [ {
+          "name" : "$expand",
+          "in" : "query",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Products"
+        }, {
+          "name" : "$select",
+          "in" : "query",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Name"
+        }, {
+          "name" : "$format",
+          "in" : "query",
+          "description" : "Response format if supported by the backend service.",
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "atom", "xml", "json" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet Suppliers",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Supplier"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Suppliers" ],
+        "summary" : "Create a new entity Suppliers",
+        "description" : "Create a new entity in EntitySet: Suppliers",
+        "requestBody" : {
+          "description" : "The entity to create",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Supplier"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "EntitySet Suppliers",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Suppliers" ],
+        "summary" : "Delete Suppliers",
+        "description" : "Delete entity in EntitySet Suppliers",
+        "responses" : {
+          "204" : {
+            "description" : "EntitySet Suppliers successfully deleted",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "patch" : {
+        "tags" : [ "Suppliers" ],
+        "summary" : "Update entity Suppliers",
+        "description" : "Update an existing entity in EntitySet: Suppliers",
+        "requestBody" : {
+          "description" : "The entity to update",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Supplier"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "EntitySet Suppliers",
+            "content" : {
+              "application/json" : { }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "Id",
+        "in" : "path",
+        "description" : "Id supports: ID",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Category" : {
+        "type" : "object",
+        "properties" : {
+          "ID" : {
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          },
+          "Name" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "Address" : {
+        "type" : "object",
+        "properties" : {
+          "Street" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "City" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "State" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "ZipCode" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "Country" : {
+            "type" : "string",
+            "nullable" : true
+          }
+        }
+      },
+      "Product" : {
+        "type" : "object",
+        "properties" : {
+          "ID" : {
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          },
+          "Name" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "Description" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "ReleaseDate" : {
+            "type" : "string",
+            "format" : "date-time",
+            "nullable" : false
+          },
+          "DiscontinuedDate" : {
+            "type" : "string",
+            "format" : "date-time",
+            "nullable" : true
+          },
+          "Rating" : {
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          },
+          "Price" : {
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          }
+        }
+      },
+      "Supplier" : {
+        "type" : "object",
+        "properties" : {
+          "ID" : {
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          },
+          "Name" : {
+            "type" : "string",
+            "nullable" : true
+          },
+          "Address" : {
+            "$ref" : "#/components/schemas/Address",
+            "nullable" : false
+          },
+          "Concurrency" : {
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          }
+        }
+      }
+    }
+  }
+}

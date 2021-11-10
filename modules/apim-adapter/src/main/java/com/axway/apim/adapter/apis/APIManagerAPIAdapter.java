@@ -140,7 +140,7 @@ public class APIManagerAPIAdapter {
 	public API getAPI(APIFilter filter, boolean logMessage) throws AppException {
 		List<API> foundAPIs = getAPIs(filter, false);
 		API api = getUniqueAPI(foundAPIs, filter);
-		if(logMessage && api!=null) LOG.info("Found existing API on path: '"+api.getPath()+"' ("+api.getState()+") (ID: '"+api.getId()+"'");
+		if(logMessage && api!=null) LOG.info("Found existing API on path: '"+api.getPath()+"' ("+api.getState()+") (ID: '"+api.getId()+"')");
 		return api;
 	}
 
@@ -874,8 +874,10 @@ public class APIManagerAPIAdapter {
 				throw new AppException("Can't import WSDL from URL / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
 			}
 			return mapper.readTree(response);
+		} catch (AppException e) {
+			throw e;
 		} catch (Exception e) {
-			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
+			throw new AppException("Unexpected error creating Backend-API based on WSDL. Error message: " + e.getMessage(), ErrorCode.CANT_CREATE_BE_API, e);
 		} finally {
 			try {
 				if(httpResponse!=null)
@@ -907,13 +909,15 @@ public class APIManagerAPIAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			if(statusCode != 201){
-				LOG.error("Error importing Swagger-Definition. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
-				throw new AppException("Can't import Swagger-definition / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
+				LOG.error("Error importing API-Specification ("+api.getApiDefinition().getAPIDefinitionType().getNiceName()+") to create Backend-API. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
+				throw new AppException("Can't import API-Specification to create Backend-API.", ErrorCode.CANT_CREATE_BE_API);
 			}
 			JsonNode jsonNode = mapper.readTree(response);
 			return jsonNode;
+		} catch (AppException e) {
+			throw e;
 		} catch (Exception e) {
-			throw new AppException("Can't read Swagger-File.", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
+			throw new AppException("Unexpected error creating Backend-API based on API-Specification. Error message: " + e.getMessage(), ErrorCode.CANT_CREATE_BE_API, e);
 		} finally {
 			try {
 				if(httpResponse!=null)
