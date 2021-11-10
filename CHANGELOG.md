@@ -9,10 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - API-Manager Remote-Hosts export not working - Filtered incorrectly (See issue [#225](https://github.com/Axway-API-Management-Plus/apim-cli/issues/225))
 
 ### Added
+- Added support for OData V2 EDMX specifications (See issue [#228](https://github.com/Axway-API-Management-Plus/apim-cli/issues/228))
 - Control application user permissions (See issue [#186](https://github.com/Axway-API-Management-Plus/apim-cli/issues/186))
 - Entity import should fail if a required custom property is missing (See issue [#229](https://github.com/Axway-API-Management-Plus/apim-cli/issues/229))
 - APIM-CLI should check & fail, when RouteType is Policy without providing a RoutingPolicy (See issue [#227](https://github.com/Axway-API-Management-Plus/apim-cli/issues/227))
-- Improved logging for missing policies. Now the type of missing policy is logged.
+- Improved logging for missing policies. Now the type of the missing policy is logged.
 
 ## [1.4.0] 2021-10-08
 ### Fixed
