@@ -1,0 +1,256 @@
+{
+    "user": {
+        "notify": {
+            "label": "Notification",
+            "type": "switch",
+            "disabled": false,
+            "required": false,
+            "help": "If true, user will get notifications from the platform.",
+            "permissions": {
+                "user": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "oadmin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "admin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                }
+            },
+            "options": [
+                {
+                    "value": true,
+                    "label": "True"
+                },
+                {
+                    "value": false,
+                    "label": "False"
+                }
+            ]
+        },
+        "sampleUserCustomProp": {
+            "label": "Sample custom property",
+            "type": "custom",
+            "disabled": false,
+            "required": false,
+            "help": "A sample custom property for a user entity.",
+            "permissions": {
+                "user": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "oadmin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "admin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                }
+            }
+        }
+    },
+    "organization": {
+        "sampleOrgCustomProp": {
+            "label": "Sample custom property",
+            "type": "custom",
+            "disabled": false,
+            "required": false,
+            "help": "A sample custom property for an organization entity.",
+            "permissions": {
+                "user": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "oadmin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "admin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                }
+            }
+        }
+    },
+    "application": {
+        "publicApp": {
+            "label": "Public Application",
+            "type": "switch",
+            "disabled": false,
+            "required": true,
+            "help": "Controls if the Application is pulic. Public application cannot access private APIs.",
+            "permissions": {
+                "user": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "oadmin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "admin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                }
+            },
+            "options": [
+                {
+                    "value": true,
+                    "label": "True"
+                },
+                {
+                    "value": false,
+                    "label": "False"
+                }
+            ]
+        }
+    },
+    "api": {
+        "customProperty1": {
+            "label": "Security level",
+            "type": "select",
+            "disabled": false,
+            "required": true,
+            "help": "Is required for each API to set the appropriate level.",
+            "permissions": {
+                "user": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "oadmin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "admin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                }
+            },
+            "options": [
+                {
+                    "value": "public",
+                    "label": "Public"
+                },
+                {
+                    "value": "private",
+                    "label": "Private"
+                },
+                {
+                    "value": "confidential",
+                    "label": "Confidential"
+                }
+            ]
+        },
+        "customProperty2": {
+            "label": "Project",
+            "type": "custom",
+            "disabled": false,
+            "required": false,
+            "help": "Stores the internal project ID.",
+            "permissions": {
+                "user": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "oadmin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "admin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                }
+            }
+        },
+        "customProperty3": {
+            "label": "Validate request",
+            "type": "switch",
+            "disabled": false,
+            "required": false,
+            "help": "If true, the request will be checked against OpenAPI Schema definition.",
+            "permissions": {
+                "user": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "oadmin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "admin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                }
+            },
+            "options": [
+                {
+                    "value": true,
+                    "label": "True"
+                },
+                {
+                    "value": false,
+                    "label": "False"
+                }
+            ]
+        },
+        "customProperty4": {
+            "label": "Public API",
+            "type": "switch",
+            "disabled": false,
+            "required": true,
+            "help": "Controls if the API is externally available",
+            "permissions": {
+                "user": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "oadmin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                },
+                "admin": {
+                    "read": true,
+                    "write": true,
+                    "visible": true
+                }
+            },
+            "options": [
+                {
+                    "value": true,
+                    "label": "True"
+                },
+                {
+                    "value": false,
+                    "label": "False"
+                }
+            ]
+        }
+    }
+}

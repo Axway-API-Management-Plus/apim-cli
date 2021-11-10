@@ -29,10 +29,16 @@ public abstract class APISpecification {
 		OPEN_API_30_YAML("Open API 3.0 (YAML)", ".yaml"),
 		WSDL_API ("WSDL", ".xml"),
 		WADL_API ("Web Application Description Language (WADL)", ".wadl"),
+		ODATA_V2 ("OData V2 (converted to OpenAPI 3.0.1)", "$metadata", "Given OData specification is converted into an OpenAPI 3 specification.", 
+				"Please note: You need to use the OData-Routing policy for this API. See: https://github.com/Axway-API-Management-Plus/odata-routing-policy"),
+		ODATA_V3 ("OData V4", "$metadata"),
+		ODATA_V4 ("OData V4", "$metadata"),
 		UNKNOWN ("Unknown", ".txt");
 		
 		String niceName;
 		String fileExtension;
+		String note;
+		String additionalNote;
 		
 		public String getNiceName() {
 			return niceName;
@@ -41,10 +47,25 @@ public abstract class APISpecification {
 		public String getFileExtension() {
 			return fileExtension;
 		}
+		
+		public String getNote() {
+			if(note==null) return "";
+			return note;
+		}
+		
+		public String getAdditionalNote() {
+			return additionalNote;
+		}
 
 		APISpecType(String niceName, String fileExtension) {
+			this(niceName, fileExtension, null, null);
+		}
+
+		APISpecType(String niceName, String fileExtension, String note, String additionalNote) {
 			this.niceName = niceName;
 			this.fileExtension = fileExtension;
+			this.note = note;
+			this.additionalNote = additionalNote;
 		}
 	}
 	

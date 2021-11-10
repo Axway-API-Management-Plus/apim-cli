@@ -8,6 +8,7 @@ import com.axway.apim.lib.errorHandling.AppException.LogLevel;
 public enum ErrorCode {
 	
 	SUCCESS								(0,  "Replication of the API was successful.", false, LogLevel.INFO),
+	UNSUPPORTED_API_SPECIFICATION		(1,  "The API-Specification is not supported by the APIM-CLI.", false),
 	MISSING_PARAMETER					(5,  "There is a missing parameter.", false),
 	INVALID_PARAMETER					(6,  "There is an invalid parameter.", false),
 	API_ALREADY_EXISTS					(7,  "The API already exists for another organization.", false),
