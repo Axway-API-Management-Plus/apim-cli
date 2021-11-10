@@ -38,7 +38,7 @@ public class ConsoleAppExporter extends ApplicationExporter {
 		System.out.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
 				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getId()),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getName()),
-				new Column().header("State").with(app -> app.getState()),
+				new Column().header("State").with(app -> app.getState().name()),
 				new Column().header("Email").with(app -> app.getEmail()),
 				new Column().header("Enabled").with(app -> Boolean.toString(app.isEnabled())
 				))));
@@ -48,7 +48,7 @@ public class ConsoleAppExporter extends ApplicationExporter {
 		System.out.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
 				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getId()),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getName()),
-				new Column().header("State").with(app -> app.getState()),
+				new Column().header("State").with(app -> app.getState().name()),
 				new Column().header("Email").with(app -> app.getEmail()),
 				new Column().header("Enabled").with(app -> Boolean.toString(app.isEnabled())),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(app -> app.getOrganization().getName()),

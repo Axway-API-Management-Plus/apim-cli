@@ -127,8 +127,8 @@ public class APIManagerPoliciesAdapter {
 				return policy;
 			}
 		}
-		LOG.error("Available "+type+" policies: " + policies);
-		throw new AppException("The policy: '" + name + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
+		LOG.error("Available "+type.getRestAPIKey()+" policies: " + policies);
+		throw new AppException("The "+type.getRestAPIKey()+" policy: '" + name + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
 	}
 	
 	public Policy getPolicyForKey(PolicyType type, String key) throws AppException {
@@ -140,8 +140,8 @@ public class APIManagerPoliciesAdapter {
 				return policy;
 			}
 		}
-		LOG.error("Available "+type+" policies: " + policies);
-		throw new AppException("The policy: '" + key + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
+		LOG.error("Available "+type.getRestAPIKey()+" policies: " + policies);
+		throw new AppException("The "+type.getRestAPIKey()+" policy: '" + key + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
 	}
 	
 	public List<Policy> getAllPolicies() throws AppException {

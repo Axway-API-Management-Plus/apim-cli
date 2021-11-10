@@ -1,0 +1,12 @@
+[
+	{
+		"name": "${appName}", 
+		"organization": "${orgName}",
+		"permissions": [ 
+		{
+			"user":"ALL",
+			"permission":"view" 
+		}
+		 ]  
+	}
+]
