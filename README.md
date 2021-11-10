@@ -61,7 +61,7 @@ The automated End-2-End test suite contains of __116__ different scenarios, whic
 | 7.7-20200530    | test-with-7.7-20200530  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200530)](https://app.travis-ci.com/github/Axway-API-Management-Plus/apim-cli/branches)||
 | 7.7-20200331    | test-with-7.7-20200331  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200331)](https://app.travis-ci.com/github/Axway-API-Management-Plus/apim-cli/branches)||
 | 7.7-20200130    | test-with-7.7-20200130  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20200130)](https://app.travis-ci.com/github/Axway-API-Management-Plus/apim-cli/branches)||
-| 7.7.0 SP2       | test-with-7.7-SP2       | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/develop)](https://app.travis-ci.com/github/Axway-API-Management-Plus/apim-cli/branches)||
+| 7.7.0 SP2       | develop                 | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/develop)](https://app.travis-ci.com/github/Axway-API-Management-Plus/apim-cli/branches)||
 
 Version 7.6.2 and below is NOT supported. At least version 7.7 SP2 is required.  
 
