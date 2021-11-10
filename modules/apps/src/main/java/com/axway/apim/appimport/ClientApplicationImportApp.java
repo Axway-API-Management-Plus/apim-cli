@@ -78,6 +78,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 						.includeCredentials(true)
 						.includeImage(true)
 						.includeQuotas(true)
+						.includeAppPermissions(true)
 						.includeOauthResources(true)
 						.includeCustomProperties(desiredApp.getCustomPropertiesKeys())
 						.hasName(desiredApp.getName())

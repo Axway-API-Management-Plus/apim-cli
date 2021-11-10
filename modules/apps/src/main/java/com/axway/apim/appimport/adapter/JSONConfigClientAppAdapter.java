@@ -6,6 +6,9 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +19,14 @@ import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.AppCredentialsDeserializer;
+import com.axway.apim.adapter.user.APIManagerUserAdapter;
+import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.User;
+import com.axway.apim.api.model.apps.ApplicationPermission;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.model.apps.OAuth;
@@ -54,7 +61,6 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	
 	@Override
 	protected void readConfig() throws AppException {
-		
 		String config = importParams.getConfig();
 		String stage = importParams.getStage();
 
@@ -74,6 +80,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		// Try to read single application
 		} catch (MismatchedInputException me) {
 			try {
+				LOG.debug("Error reading single application: " + me.getMessage() + ". Trying to read single application now.");
 				ClientApplication app = mapper.readValue(Utils.substitueVariables(configFile), ClientApplication.class);
 				if(stageConfig!=null) {
 					try {
@@ -83,22 +90,24 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 						LOG.warn("No config file found for stage: '"+stage+"'");
 					}
 				}
+				
 				this.apps = new ArrayList<ClientApplication>();
 				this.apps.add(app);
 			} catch (Exception pe) {
-				throw new AppException("Cannot read organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, pe);
+				throw new AppException("Cannot read application(s) from config file: " + config, ErrorCode.ERR_CREATING_APPLICATION, pe);
 			}
 		} catch (Exception e) {
-			throw new AppException("Cannot read organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+			throw new AppException("Cannot read application(s) from config file: " + config, ErrorCode.ERR_CREATING_APPLICATION, e);
 		}
 		try{
 			addImage(apps, configFile.getCanonicalFile().getParentFile());
 			addOAuthCertificate(apps, configFile.getCanonicalFile().getParentFile());
 		}catch (Exception e){
-			throw new AppException("Cannot read image/certificate for organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+			throw new AppException("Cannot read image/certificate for application(s) from config file: " + config, ErrorCode.ERR_CREATING_APPLICATION, e);
 		}		
 		addAPIAccess(apps, result);
 		validateCustomProperties(apps);
+		validateAppPermissions(apps);
 		return;
 	}
 	
@@ -174,5 +183,46 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		for(ClientApplication app : apps) {
 			Utils.validateCustomProperties(app.getCustomProperties(), Type.application);
 		}
+	}
+	
+	private void validateAppPermissions(List<ClientApplication> apps) throws AppException {
+		APIManagerUserAdapter userAdapter = APIManagerAdapter.getInstance().userAdapter;		
+		for(ClientApplication app: apps) {
+			if(app.getPermissions()==null || app.getPermissions().size()==0) continue;
+			// First check, if there is an ALL User
+			for(ApplicationPermission permission : app.getPermissions()) {
+				if("ALL".equals(permission.getUsername())) { 
+					// Create a map of all usernames 
+					Map<String, ApplicationPermission> usernames = app.getPermissions().stream().collect(
+							Collectors.toMap(ApplicationPermission::getUsername, Function.identity()));
+					// Get all users for the app organization
+					List<User> allOrgUsers = userAdapter.getUsers(new UserFilter.Builder().hasOrganization(app.getOrganization().getName()).build());
+					for(User user: allOrgUsers) {
+						// Only add permission based on ALL if not manually configured
+						if(!usernames.containsKey(user.getLoginName())) {
+							ApplicationPermission appPerm = new ApplicationPermission();
+							appPerm.setUser(user);
+							appPerm.setPermission(permission.getPermission());
+							app.getPermissions().add(appPerm);
+						}
+					}
+					break;
+				}
+			}
+			app.getPermissions().removeIf(e -> e.getUsername().equals("ALL"));
+			// Check individual permissions (e.g. single usernames)
+			for(int i=0; i < app.getPermissions().size(); i++) {
+				ApplicationPermission permission = app.getPermissions().get(i);
+				if(permission.getUser()!=null) continue;
+				User user = userAdapter.getUserForLoginName(permission.getUsername());
+				if(user==null) {
+					LOG.warn("Cannot share application with user: '"+permission.getUsername()+"', as user does not exists.");
+					app.getPermissions().remove(i);
+					continue;
+				}
+				permission.setUser(user);
+			}
+		}
+		
 	}
 }

@@ -33,16 +33,23 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("ApplicationFilter")
 public class ClientApplication extends AbstractEntity implements CustomPropertiesEntity {
+	
+	public enum ApplicationState {
+		approved,
+		pending
+	}
 
 	
 	private String email;
 	private String phone;
 	private boolean enabled;
 
-	private String state;
+	private ApplicationState state;
 
 	@JsonProperty("image")
 	private String imageUrl;
+	
+	private String createdBy;
 	
 	@JsonIgnore
 	private Image image;
@@ -54,6 +61,9 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 	@JsonSerialize (using = APIAccessSerializer.class)
 	@JsonProperty("apis")
 	private List<APIAccess> apiAccess = new ArrayList<APIAccess>();
+
+	@JsonProperty("permissions")
+	private List<ApplicationPermission> permissions = new ArrayList<ApplicationPermission>();	
 	
 	private List<ClientAppCredential> credentials = new ArrayList<ClientAppCredential>(); 
 	
@@ -95,11 +105,11 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-	public String getState() {
-		if(this.state==null) return "approved";
+	public ApplicationState getState() {
+		if(this.state==null) return ApplicationState.approved;
 		return state;
 	}
-	public void setState(String state) {
+	public void setState(ApplicationState state) {
 		this.state = state;
 	}
 	
@@ -171,6 +181,22 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 		this.oauthResources = oauthResources;
 	}
 
+	public List<ApplicationPermission> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(List<ApplicationPermission> permissions) {
+		this.permissions = permissions;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
 	// This avoids, that custom properties are wrapped within customProperties { ... }
 	// See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
 	@JsonAnyGetter
@@ -201,7 +227,7 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 					StringUtils.equals(otherApp.getEmail(), this.getEmail()) && 
 					StringUtils.equals(otherApp.getDescription(), this.getDescription()) &&
 					StringUtils.equals(otherApp.getPhone(), this.getPhone()) &&
-					StringUtils.equals(otherApp.getState(), this.getState()) &&
+					otherApp.getState().equals(this.getState()) &&
 					(otherApp.getCredentials()==null || otherApp.getCredentials().stream().sorted(c).collect(Collectors.toList()).equals(this.getCredentials().stream().sorted(c).collect(Collectors.toList()))) &&
 					(otherApp.getOauthResources()==null || otherApp.getOauthResources().stream().sorted(Comparator.comparing(ClientAppOauthResource::getScope)).collect(Collectors.toList()).equals(this.getOauthResources().stream().sorted(Comparator.comparing(ClientAppOauthResource::getScope)).collect(Collectors.toList()))) &&
 					(otherApp.getImage()==null || otherApp.getImage().equals(this.getImage())) &&

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edmx:Edmx xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" Version="1.0">
+   <edmx:DataServices xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" m:DataServiceVersion="1.0">
+      <Schema xmlns="http://schemas.microsoft.com/ado/2008/09/edm" xmlns:c4c="http://www.sap.com/Protocols/C4CData" xmlns:sap="http://www.sap.com/Protocols/SAPData" Namespace="c4codata">
+         <EntityType Name="AccountDuplicateCheckResult">
+            <Key>
+               <PropertyRef Name="ObjectID" />
+            </Key>
+            <Property Name="ObjectID" Type="Edm.String" Nullable="false" MaxLength="70" FixedLength="true" sap:creatable="false" sap:updatable="false" sap:filterable="true" sap:label="Object ID" />
+            <Property Name="ETag" Type="Edm.DateTimeOffset" Nullable="true" Precision="7" ConcurrencyMode="Fixed" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="Entity Tag" />
+            <Property Name="AccountID" Type="Edm.String" Nullable="true" MaxLength="10" FixedLength="true" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="Account ID" />
+            <Property Name="AccountUUID" Type="Edm.Guid" Nullable="true" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="Account UUID" />
+            <Property Name="StatusCode" Type="Edm.String" Nullable="true" MaxLength="2" FixedLength="true" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:text="StatusCodeText" c4c:value-help="AccountDuplicateCheckResultStatusCodeCollection" sap:label="Status" />
+            <Property Name="StatusCodeText" Type="Edm.String" Nullable="true" sap:label="Status Text" sap:creatable="false" sap:updatable="false" sap:filterable="false" />
+            <Property Name="Name" Type="Edm.String" Nullable="true" MaxLength="480" FixedLength="true" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="Name" />
+            <Property Name="Address" Type="Edm.String" Nullable="true" MaxLength="480" FixedLength="true" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="Address" />
+            <Property Name="Phone" Type="Edm.String" Nullable="true" MaxLength="40" FixedLength="true" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="Phone" />
+            <Property Name="Mobile" Type="Edm.String" Nullable="true" MaxLength="40" FixedLength="true" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="Mobile" />
+            <Property Name="Fax" Type="Edm.String" Nullable="true" MaxLength="40" FixedLength="true" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="Fax" />
+            <Property Name="Email" Type="Edm.String" Nullable="true" MaxLength="255" FixedLength="true" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="E-Mail" />
+            <Property Name="CreatedOn" Type="Edm.DateTimeOffset" Nullable="true" Precision="7" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="Created On" />
+            <Property Name="CreatedBy" Type="Edm.String" Nullable="true" MaxLength="480" FixedLength="true" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="Created By" />
+            <Property Name="EntityLastChangedOn" Type="Edm.DateTimeOffset" Nullable="true" Precision="7" sap:creatable="false" sap:updatable="false" sap:filterable="true" sap:label="Entity Last Changed On" />
+            <Property Name="EntityLastChangedBy" Type="Edm.String" Nullable="true" MaxLength="480" FixedLength="true" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="Entity Last Changed By" />
+            <Property Name="SimilarityPercent" Type="Edm.String" Nullable="true" FixedLength="true" sap:creatable="false" sap:updatable="false" sap:filterable="false" sap:label="Similarity Percent" />
+         </EntityType>
+         <EntityType Name="CodeList">
+            <Key>
+               <PropertyRef Name="Code" />
+            </Key>
+            <Property Name="Code" Type="Edm.String" Nullable="false" FixedLength="false" sap:creatable="false" sap:updatable="false" sap:filterable="true" sap:label="Code" />
+            <Property Name="Description" Type="Edm.String" Nullable="false" FixedLength="false" sap:creatable="false" sap:updatable="false" sap:filterable="true" sap:label="Description" />
+         </EntityType>
+         <EntityContainer Name="c4codata" m:IsDefaultEntityContainer="true">
+            <EntitySet Name="AccountDuplicateCheckResultCollection" EntityType="c4codata.AccountDuplicateCheckResult" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:label="Account Duplicate Check Result" />
+            <EntitySet Name="AccountDuplicateCheckResultStatusCodeCollection" EntityType="c4codata.CodeList" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:semantics="fixed-values" />
+            <FunctionImport Name="CheckForDuplicateAccounts" ReturnType="Collection(c4codata.AccountDuplicateCheckResult)" EntitySet="AccountDuplicateCheckResultCollection" m:HttpMethod="GET">
+               <Parameter Name="Name" Type="Edm.String" />
+               <Parameter Name="Country" Type="Edm.String" />
+               <Parameter Name="State" Type="Edm.String" />
+               <Parameter Name="City" Type="Edm.String" />
+               <Parameter Name="PostalCode" Type="Edm.String" />
+               <Parameter Name="Street" Type="Edm.String" />
+               <Parameter Name="HouseNumber" Type="Edm.String" />
+               <Parameter Name="POBoxPostalCode" Type="Edm.String" />
+               <Parameter Name="POBox" Type="Edm.String" />
+               <Parameter Name="CompanyPostalCode" Type="Edm.String" />
+               <Parameter Name="Phone" Type="Edm.String" />
+               <Parameter Name="Mobile" Type="Edm.String" />
+               <Parameter Name="Fax" Type="Edm.String" />
+               <Parameter Name="Email" Type="Edm.String" />
+               <Parameter Name="IDTypeCode" Type="Edm.String" />
+               <Parameter Name="IDNumber" Type="Edm.String" />
+            </FunctionImport>
+         </EntityContainer>
+      </Schema>
+   </edmx:DataServices>
+</edmx:Edmx>
+
