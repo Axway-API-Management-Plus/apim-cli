@@ -13,48 +13,46 @@
       "get" : {
         "tags" : [ "Bank Account" ],
         "summary" : "Get AccountSet",
-        "description" : "Returns the EntitySet: AccountSet<br /><br />The entity: AccountSet supports the following navigational properties: <br />Transactions, Conditions<br />For example: .../AccountSet(1)/Conditions/.....",
+        "description" : "Returns the entity: AccountSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AccountSet supports the following navigational properties: [Transactions, Conditions]<br />For example: .../AccountSet(Entity-Id)/<b>Transactions</b>/.....",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
-          "schema" : {
-            "type" : "string"
-          }
+          },
+          "example" : "Transactions"
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
+          },
+          "example" : "CustomerExternalID"
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.5. Filter System Query Option ($filter)</a> for more information.",
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "$orderby",
           "in" : "query",
-          "description" : "Order items by property values",
+          "description" : "Order items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.2. Orderby System Query Option ($orderby)</a> for more information.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
+            "type" : "string"
+          },
+          "example" : "CustomerExternalID"
         }, {
           "name" : "$top",
           "in" : "query",
           "description" : "Show only the first n items",
           "schema" : {
             "type" : "integer",
-            "format" : "int32"
+            "format" : "int32",
+            "default" : 10
           }
         }, {
           "name" : "$skip",
@@ -75,7 +73,7 @@
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -108,69 +106,27 @@
       "get" : {
         "tags" : [ "Bank Account" ],
         "summary" : "Get AccountSet on Id",
-        "description" : "Returns the EntitySet: AccountSet<br /><br />The entity: AccountSet supports the following navigational properties: <br />Transactions, Conditions<br />For example: .../AccountSet(1)/Conditions/.....",
+        "description" : "Returns the entity: AccountSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AccountSet supports the following navigational properties: [Transactions, Conditions]<br />For example: .../AccountSet(Entity-Id)/<b>Transactions</b>/.....",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
-          "schema" : {
-            "type" : "string"
-          }
+          },
+          "example" : "Transactions"
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$orderby",
-          "in" : "query",
-          "description" : "Order items by property values",
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$top",
-          "in" : "query",
-          "description" : "Show only the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$skip",
-          "in" : "query",
-          "description" : "Skip the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$inlinecount",
-          "in" : "query",
-          "description" : "Include count of items",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "allpages", "none" ]
-          }
+            "type" : "string"
+          },
+          "example" : "CustomerExternalID"
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -288,48 +244,45 @@
       "get" : {
         "tags" : [ "Transaction Item" ],
         "summary" : "Get TransactionSet",
-        "description" : "Returns the EntitySet: TransactionSet<br />The entity: TransactionSet supports <b>no</b> navigational properties.",
+        "description" : "Returns the entity: TransactionSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: TransactionSet supports <b>no</b> navigational properties.",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
           }
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
+          },
+          "example" : "AccountID"
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.5. Filter System Query Option ($filter)</a> for more information.",
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "$orderby",
           "in" : "query",
-          "description" : "Order items by property values",
+          "description" : "Order items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.2. Orderby System Query Option ($orderby)</a> for more information.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
+            "type" : "string"
+          },
+          "example" : "AccountID"
         }, {
           "name" : "$top",
           "in" : "query",
           "description" : "Show only the first n items",
           "schema" : {
             "type" : "integer",
-            "format" : "int32"
+            "format" : "int32",
+            "default" : 10
           }
         }, {
           "name" : "$skip",
@@ -350,7 +303,7 @@
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -383,69 +336,26 @@
       "get" : {
         "tags" : [ "Transaction Item" ],
         "summary" : "Get TransactionSet on Id",
-        "description" : "Returns the EntitySet: TransactionSet<br />The entity: TransactionSet supports <b>no</b> navigational properties.",
+        "description" : "Returns the entity: TransactionSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: TransactionSet supports <b>no</b> navigational properties.",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
           }
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$orderby",
-          "in" : "query",
-          "description" : "Order items by property values",
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$top",
-          "in" : "query",
-          "description" : "Show only the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$skip",
-          "in" : "query",
-          "description" : "Skip the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$inlinecount",
-          "in" : "query",
-          "description" : "Include count of items",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "allpages", "none" ]
-          }
+            "type" : "string"
+          },
+          "example" : "AccountID"
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -563,48 +473,46 @@
       "get" : {
         "tags" : [ "Customer Status" ],
         "summary" : "Get StatusSet",
-        "description" : "Returns the EntitySet: StatusSet<br /><br />The entity: StatusSet supports the following navigational properties: <br />Accounts, Recipients, TransactionClasses<br />For example: .../StatusSet(1)/TransactionClasses/.....",
+        "description" : "Returns the entity: StatusSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: StatusSet supports the following navigational properties: [Accounts, Recipients, TransactionClasses]<br />For example: .../StatusSet(Entity-Id)/<b>Accounts</b>/.....",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
-          "schema" : {
-            "type" : "string"
-          }
+          },
+          "example" : "Accounts"
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
+          },
+          "example" : "CustomerExternalID"
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.5. Filter System Query Option ($filter)</a> for more information.",
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "$orderby",
           "in" : "query",
-          "description" : "Order items by property values",
+          "description" : "Order items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.2. Orderby System Query Option ($orderby)</a> for more information.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
+            "type" : "string"
+          },
+          "example" : "CustomerExternalID"
         }, {
           "name" : "$top",
           "in" : "query",
           "description" : "Show only the first n items",
           "schema" : {
             "type" : "integer",
-            "format" : "int32"
+            "format" : "int32",
+            "default" : 10
           }
         }, {
           "name" : "$skip",
@@ -625,7 +533,7 @@
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -658,69 +566,27 @@
       "get" : {
         "tags" : [ "Customer Status" ],
         "summary" : "Get StatusSet on Id",
-        "description" : "Returns the EntitySet: StatusSet<br /><br />The entity: StatusSet supports the following navigational properties: <br />Accounts, Recipients, TransactionClasses<br />For example: .../StatusSet(1)/TransactionClasses/.....",
+        "description" : "Returns the entity: StatusSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: StatusSet supports the following navigational properties: [Accounts, Recipients, TransactionClasses]<br />For example: .../StatusSet(Entity-Id)/<b>Accounts</b>/.....",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
-          "schema" : {
-            "type" : "string"
-          }
+          },
+          "example" : "Accounts"
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$orderby",
-          "in" : "query",
-          "description" : "Order items by property values",
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$top",
-          "in" : "query",
-          "description" : "Show only the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$skip",
-          "in" : "query",
-          "description" : "Skip the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$inlinecount",
-          "in" : "query",
-          "description" : "Include count of items",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "allpages", "none" ]
-          }
+            "type" : "string"
+          },
+          "example" : "CustomerExternalID"
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -838,48 +704,45 @@
       "get" : {
         "tags" : [ "Bank Transfer" ],
         "summary" : "Get TransferSet",
-        "description" : "Returns the EntitySet: TransferSet<br />The entity: TransferSet supports <b>no</b> navigational properties.",
+        "description" : "Returns the entity: TransferSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: TransferSet supports <b>no</b> navigational properties.",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
           }
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
+          },
+          "example" : "CustomerExternalID"
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.5. Filter System Query Option ($filter)</a> for more information.",
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "$orderby",
           "in" : "query",
-          "description" : "Order items by property values",
+          "description" : "Order items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.2. Orderby System Query Option ($orderby)</a> for more information.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
+            "type" : "string"
+          },
+          "example" : "CustomerExternalID"
         }, {
           "name" : "$top",
           "in" : "query",
           "description" : "Show only the first n items",
           "schema" : {
             "type" : "integer",
-            "format" : "int32"
+            "format" : "int32",
+            "default" : 10
           }
         }, {
           "name" : "$skip",
@@ -900,7 +763,7 @@
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -933,69 +796,26 @@
       "get" : {
         "tags" : [ "Bank Transfer" ],
         "summary" : "Get TransferSet on Id",
-        "description" : "Returns the EntitySet: TransferSet<br />The entity: TransferSet supports <b>no</b> navigational properties.",
+        "description" : "Returns the entity: TransferSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: TransferSet supports <b>no</b> navigational properties.",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
           }
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$orderby",
-          "in" : "query",
-          "description" : "Order items by property values",
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$top",
-          "in" : "query",
-          "description" : "Show only the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$skip",
-          "in" : "query",
-          "description" : "Skip the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$inlinecount",
-          "in" : "query",
-          "description" : "Include count of items",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "allpages", "none" ]
-          }
+            "type" : "string"
+          },
+          "example" : "CustomerExternalID"
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -1113,48 +933,45 @@
       "get" : {
         "tags" : [ "ConditionSet" ],
         "summary" : "Get ConditionSet",
-        "description" : "Returns the EntitySet: ConditionSet<br />The entity: ConditionSet supports <b>no</b> navigational properties.",
+        "description" : "Returns the entity: ConditionSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: ConditionSet supports <b>no</b> navigational properties.",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
           }
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
+          },
+          "example" : "AccountID"
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.5. Filter System Query Option ($filter)</a> for more information.",
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "$orderby",
           "in" : "query",
-          "description" : "Order items by property values",
+          "description" : "Order items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.2. Orderby System Query Option ($orderby)</a> for more information.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
+            "type" : "string"
+          },
+          "example" : "AccountID"
         }, {
           "name" : "$top",
           "in" : "query",
           "description" : "Show only the first n items",
           "schema" : {
             "type" : "integer",
-            "format" : "int32"
+            "format" : "int32",
+            "default" : 10
           }
         }, {
           "name" : "$skip",
@@ -1175,7 +992,7 @@
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -1208,69 +1025,26 @@
       "get" : {
         "tags" : [ "ConditionSet" ],
         "summary" : "Get ConditionSet on Id",
-        "description" : "Returns the EntitySet: ConditionSet<br />The entity: ConditionSet supports <b>no</b> navigational properties.",
+        "description" : "Returns the entity: ConditionSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: ConditionSet supports <b>no</b> navigational properties.",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
           }
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$orderby",
-          "in" : "query",
-          "description" : "Order items by property values",
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$top",
-          "in" : "query",
-          "description" : "Show only the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$skip",
-          "in" : "query",
-          "description" : "Skip the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$inlinecount",
-          "in" : "query",
-          "description" : "Include count of items",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "allpages", "none" ]
-          }
+            "type" : "string"
+          },
+          "example" : "AccountID"
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -1388,48 +1162,45 @@
       "get" : {
         "tags" : [ "Bank Transfer Recipient" ],
         "summary" : "Get RecipientSet",
-        "description" : "Returns the EntitySet: RecipientSet<br />The entity: RecipientSet supports <b>no</b> navigational properties.",
+        "description" : "Returns the entity: RecipientSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: RecipientSet supports <b>no</b> navigational properties.",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
           }
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
+          },
+          "example" : "AccountID"
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.5. Filter System Query Option ($filter)</a> for more information.",
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "$orderby",
           "in" : "query",
-          "description" : "Order items by property values",
+          "description" : "Order items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.2. Orderby System Query Option ($orderby)</a> for more information.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
+            "type" : "string"
+          },
+          "example" : "AccountID"
         }, {
           "name" : "$top",
           "in" : "query",
           "description" : "Show only the first n items",
           "schema" : {
             "type" : "integer",
-            "format" : "int32"
+            "format" : "int32",
+            "default" : 10
           }
         }, {
           "name" : "$skip",
@@ -1450,7 +1221,7 @@
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -1483,69 +1254,26 @@
       "get" : {
         "tags" : [ "Bank Transfer Recipient" ],
         "summary" : "Get RecipientSet on Id",
-        "description" : "Returns the EntitySet: RecipientSet<br />The entity: RecipientSet supports <b>no</b> navigational properties.",
+        "description" : "Returns the entity: RecipientSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: RecipientSet supports <b>no</b> navigational properties.",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
           }
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$orderby",
-          "in" : "query",
-          "description" : "Order items by property values",
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$top",
-          "in" : "query",
-          "description" : "Show only the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$skip",
-          "in" : "query",
-          "description" : "Skip the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$inlinecount",
-          "in" : "query",
-          "description" : "Include count of items",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "allpages", "none" ]
-          }
+            "type" : "string"
+          },
+          "example" : "AccountID"
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -1663,48 +1391,45 @@
       "get" : {
         "tags" : [ "Transaction Classification" ],
         "summary" : "Get TransactionClassSet",
-        "description" : "Returns the EntitySet: TransactionClassSet<br />The entity: TransactionClassSet supports <b>no</b> navigational properties.",
+        "description" : "Returns the entity: TransactionClassSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: TransactionClassSet supports <b>no</b> navigational properties.",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
           }
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
+            "type" : "string"
+          },
+          "example" : "CustomerExternalID"
+        }, {
+          "name" : "$filter",
+          "in" : "query",
+          "description" : "Filter items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.5. Filter System Query Option ($filter)</a> for more information.",
+          "schema" : {
+            "type" : "string"
           }
         }, {
           "name" : "$orderby",
           "in" : "query",
-          "description" : "Order items by property values",
+          "description" : "Order items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.2. Orderby System Query Option ($orderby)</a> for more information.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
+            "type" : "string"
+          },
+          "example" : "CustomerExternalID"
         }, {
           "name" : "$top",
           "in" : "query",
           "description" : "Show only the first n items",
           "schema" : {
             "type" : "integer",
-            "format" : "int32"
+            "format" : "int32",
+            "default" : 10
           }
         }, {
           "name" : "$skip",
@@ -1725,7 +1450,7 @@
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]
@@ -1758,69 +1483,26 @@
       "get" : {
         "tags" : [ "Transaction Classification" ],
         "summary" : "Get TransactionClassSet on Id",
-        "description" : "Returns the EntitySet: TransactionClassSet<br />The entity: TransactionClassSet supports <b>no</b> navigational properties.",
+        "description" : "Returns the entity: TransactionClassSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: TransactionClassSet supports <b>no</b> navigational properties.",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
-          "description" : "Expand a navigation property",
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "$filter",
-          "in" : "query",
-          "description" : "Filter items by property values",
+          "description" : "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.",
           "schema" : {
             "type" : "string"
           }
         }, {
           "name" : "$select",
           "in" : "query",
-          "description" : "Select structural property",
+          "description" : "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.",
           "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$orderby",
-          "in" : "query",
-          "description" : "Order items by property values",
-          "schema" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        }, {
-          "name" : "$top",
-          "in" : "query",
-          "description" : "Show only the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$skip",
-          "in" : "query",
-          "description" : "Skip the first n items",
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32"
-          }
-        }, {
-          "name" : "$inlinecount",
-          "in" : "query",
-          "description" : "Include count of items",
-          "schema" : {
-            "type" : "string",
-            "enum" : [ "allpages", "none" ]
-          }
+            "type" : "string"
+          },
+          "example" : "CustomerExternalID"
         }, {
           "name" : "$format",
           "in" : "query",
-          "description" : "Response format",
+          "description" : "Response format if supported by the backend service.",
           "schema" : {
             "type" : "string",
             "enum" : [ "atom", "xml", "json" ]

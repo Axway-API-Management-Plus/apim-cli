@@ -205,32 +205,38 @@ public class ODataV2Specification extends ODataSpecification {
 			operation.setSummary("Get " + entityName);
 		}
 		
-		String operationDescription = "Returns the EntitySet: " + entityName;
+		String operationDescription = "Returns the entity: " + entityName + ". "
+				+ "For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a>";
+		List<String> navProperties = new ArrayList<String>();
+		List<String> structProperties = entityType.getPropertyNames();
 		
 		if(entityType.getNavigationPropertyNames()!=null && entityType.getNavigationPropertyNames().size()>0) {
-			operationDescription += "<br /><br />The entity: " + entityName + " supports the following navigational properties: <br />";
-			String example = "";
 			for(String navigationProperty : entityType.getNavigationPropertyNames()) {
-				operationDescription += navigationProperty + ", ";
-				example = "<br />For example: .../" + entityName + "(1)/" + navigationProperty + "/.....";
+				navProperties.add(navigationProperty);
 			}
-			operationDescription = operationDescription.substring(0, operationDescription.length()-2);
-			operationDescription += example;
+			operationDescription += "<br /><br />The entity: " + entityName + " supports the following navigational properties: "+navProperties;
+			operationDescription += "<br />For example: .../" + entityName + "(Entity-Id)/<b>" + navProperties.get(0) + "</b>/.....";
 		} else {
 			operationDescription += "<br />The entity: " + entityName + " supports <b>no</b> navigational properties.";
 		}
 		
 		ArraySchema stringArraySchema = new ArraySchema();
 		stringArraySchema.setItems(new StringSchema());
+		
 		operation.setDescription(operationDescription);
-		operation.addParametersItem(createParameter("$expand", "Expand a navigation property", new StringSchema() ));
-		operation.addParametersItem(createParameter("$filter", "Filter items by property values", new StringSchema() ));
-		operation.addParametersItem(createParameter("$select", "Select structural property", stringArraySchema ));
-		operation.addParametersItem(createParameter("$orderby", "Order items by property values", stringArraySchema));
-		operation.addParametersItem(createParameter("$top", "Show only the first n items", new IntegerSchema()));
-		operation.addParametersItem(createParameter("$skip", "Skip the first n items", new IntegerSchema()));
-		operation.addParametersItem(createParameter("$inlinecount", "Include count of items", getSchemaAllowedValues(InlineCountValues.values())));
-		operation.addParametersItem(createParameter("$format", "Response format", getSchemaAllowedValues(FormatValues.values())));
+		operation.addParametersItem(createParameter("$expand", "The syntax of a $expand query option is a comma-separated list of Navigation Properties. Additionally each Navigation Property can be followed by a forward slash and another Navigation Property to enable identifying a multi-level relationship.", new StringSchema(), getExample(navProperties) ));
+		operation.addParametersItem(createParameter("$select", "The value of a $select System Query Option is a comma-separated list of selection clauses. Each selection clause may be a Property name, Navigation Property name, or the \"*\" character.", new StringSchema(), getExample(structProperties) ));
+		if(!idPath) { // When requesting with specific ID the following parameters are not required/meaningful
+			operation.addParametersItem(createParameter("$filter", "Filter items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.5. Filter System Query Option ($filter)</a> for more information.", new StringSchema()));
+			operation.addParametersItem(createParameter("$orderby", "Order items by property values. See <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">4.2. Orderby System Query Option ($orderby)</a> for more information.", new StringSchema(), getExample(structProperties)));
+			IntegerSchema topSchema = new IntegerSchema();
+			topSchema.setDefault(10);
+			operation.addParametersItem(createParameter("$top", "Show only the first n items", topSchema));
+			operation.addParametersItem(createParameter("$skip", "Skip the first n items", new IntegerSchema()));
+			operation.addParametersItem(createParameter("$inlinecount", "Include count of items", getSchemaAllowedValues(InlineCountValues.values())));
+			
+		}
+		operation.addParametersItem(createParameter("$format", "Response format if supported by the backend service.", getSchemaAllowedValues(FormatValues.values())));
 		
 		responses = new ApiResponses()
 				.addApiResponse("200", createResponse("EntitySet " + entityName, 
@@ -298,10 +304,15 @@ public class ODataV2Specification extends ODataSpecification {
 	}
 	
 	private Parameter createParameter(String name, String description, Schema<?> schema) {
+		return createParameter(name, description, schema, null);
+	}
+	
+	private Parameter createParameter(String name, String description, Schema<?> schema, String example) {
 		Parameter param = new QueryParameter();
 		param.setName(name);
 		param.setDescription(description);
 		param.setSchema(schema);
+		if(example!=null) param.setExample(example);
 		return param;
 	}
 	
@@ -515,5 +526,13 @@ public class ODataV2Specification extends ODataSpecification {
 		} catch (EdmException e) {
 			return null;
 		}
+	}
+	
+	private String getExample(List<String> possibleExamples) {
+		// Avoid providing a example such ID, id as it is in most cases not the best option for an example
+		for(String example : possibleExamples) {
+			if(!example.toLowerCase().equals("id")) return example;
+		}
+		return null;
 	}
 }
