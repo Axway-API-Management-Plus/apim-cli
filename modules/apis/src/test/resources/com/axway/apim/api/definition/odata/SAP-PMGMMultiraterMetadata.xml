@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edmx:Edmx xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:atom="http://www.w3.org/2005/Atom" Version="1.0">
+   <edmx:DataServices xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" m:DataServiceVersion="2.0">
+      <Schema xmlns="http://schemas.microsoft.com/ado/2008/09/edm" xmlns:sap="http://www.sap.com/Protocols/SAPData" xmlns:sf="http://www.successfactors.com/edm/sf" Namespace="SFODataSet">
+         <EntityContainer Name="EntityContainer" m:IsDefaultEntityContainer="true">
+            <FunctionImport Name="complete360" ReturnType="SFOData.CORouteFormStatusBean" m:HttpMethod="GET" sap:support-payload="false">
+               <Documentation>
+                  <Summary>Complete 360 evaluation form</Summary>
+                  <LongDescription>Function import API to complete 360 evaluation form.</LongDescription>
+                  <sap:tagcollection>
+                     <sap:tag>Performance and Goals (PM/GM)</sap:tag>
+                     <sap:tag>PM/GM - MultiRater</sap:tag>
+                  </sap:tagcollection>
+               </Documentation>
+               <Parameter Name="formDataId" Type="Edm.Int64" />
+               <Parameter Name="comment" Type="Edm.String" />
+            </FunctionImport>
+         </EntityContainer>
+      </Schema>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2008/09/edm" xmlns:sap="http://www.successfactors.com/edm/sap" xmlns:sf="http://www.successfactors.com/edm/sf" Namespace="SFOData">
+         <ComplexType Name="CORouteFormStatusBean">
+            <Documentation>
+               <Summary>CORouteFormStatusBean</Summary>
+               <LongDescription>identify if form is successfully signed/rejected/sent to next step</LongDescription>
+               <sap:tagcollection>
+                  <sap:tag>Performance and Goals (PM/GM)</sap:tag>
+                  <sap:tag>PM/GM - MultiRater</sap:tag>
+                  <sap:tag>PM/GM - Continuous Performance Management</sap:tag>
+                  <sap:tag>PM - Forms Management</sap:tag>
+                  <sap:tag>EC - Workflow</sap:tag>
+               </sap:tagcollection>
+            </Documentation>
+            <Property Name="redirectUrl" Type="Edm.String" Nullable="true" sap:required="false" sap:creatable="true" sap:updatable="true" sap:upsertable="true" sap:visible="true" sap:sortable="false" sap:filterable="false" sap:label="redirectUrl" />
+            <Property Name="status" Type="Edm.String" Nullable="true" sap:required="false" sap:creatable="true" sap:updatable="true" sap:upsertable="true" sap:visible="true" sap:sortable="false" sap:filterable="false" sap:label="status" />
+         </ComplexType>
+      </Schema>
+   </edmx:DataServices>
+</edmx:Edmx>

@@ -1,0 +1,224 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "OData Service",
+    "description" : "The OData Service from https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata",
+    "version" : "1.0"
+  },
+  "servers" : [ {
+    "url" : "https://myhost.customer.com:8767/api/v1/myAPI/"
+  } ],
+  "paths" : {
+    "/DetermineAvailabilityAt" : {
+      "get" : {
+        "tags" : [ "Service operations" ],
+        "parameters" : [ {
+          "name" : "SupplyingPlant",
+          "in" : "query",
+          "description" : "Plant",
+          "schema" : {
+            "maxLength" : 4,
+            "type" : "string"
+          }
+        }, {
+          "name" : "Material",
+          "in" : "query",
+          "description" : "Material",
+          "schema" : {
+            "maxLength" : 40,
+            "type" : "string"
+          }
+        }, {
+          "name" : "ATPCheckingRule",
+          "in" : "query",
+          "description" : "Checking rule",
+          "schema" : {
+            "maxLength" : 2,
+            "type" : "string"
+          }
+        }, {
+          "name" : "RequestedUTCDateTime",
+          "in" : "query",
+          "description" : "Date",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "AvailabilityRecord",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AvailabilityRecord"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/DetermineAvailabilityOf" : {
+      "get" : {
+        "tags" : [ "Service operations" ],
+        "parameters" : [ {
+          "name" : "RequestedQuantityInBaseUnit",
+          "in" : "query",
+          "description" : "Requested Qty",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "Material",
+          "in" : "query",
+          "description" : "Material",
+          "schema" : {
+            "maxLength" : 40,
+            "type" : "string"
+          }
+        }, {
+          "name" : "SupplyingPlant",
+          "in" : "query",
+          "description" : "Plant",
+          "schema" : {
+            "maxLength" : 4,
+            "type" : "string"
+          }
+        }, {
+          "name" : "ATPCheckingRule",
+          "in" : "query",
+          "description" : "Checking rule",
+          "schema" : {
+            "maxLength" : 2,
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "AvailabilityRecord",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AvailabilityRecord"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    },
+    "/CalculateAvailabilityTimeseries" : {
+      "get" : {
+        "tags" : [ "Service operations" ],
+        "parameters" : [ {
+          "name" : "ATPCheckingRule",
+          "in" : "query",
+          "description" : "Checking rule",
+          "schema" : {
+            "maxLength" : 2,
+            "type" : "string"
+          }
+        }, {
+          "name" : "Material",
+          "in" : "query",
+          "description" : "Material",
+          "schema" : {
+            "maxLength" : 40,
+            "type" : "string"
+          }
+        }, {
+          "name" : "SupplyingPlant",
+          "in" : "query",
+          "description" : "Plant",
+          "schema" : {
+            "maxLength" : 4,
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "AvailabilityRecord",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/AvailabilityRecord"
+                  }
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "AvailabilityRecord" : {
+        "type" : "object",
+        "properties" : {
+          "PeriodStartUTCDateTime" : {
+            "title" : "Perd Start Date Time",
+            "type" : "string",
+            "description" : "UTC Time Stamp in Short Form (YYYYMMDDhhmmss)<br />The UTC timestamp is the date and time relative to the UTC (Universal coordinated time).<br />To normalize local times in a UTC time stamp and make them comparable, they must be converted using their time zone and the ABAP command convert.Although the time zone for the conversion can be fetched from customizing or master data, you should save it redundantly.The internal structure of the UTC time stamp is logically divided into a date and time part in packed number format <YYYYMMDDhhmmss>. There is also a high resolution UTC time stamp (10^-7 seconds).",
+            "format" : "date-time",
+            "nullable" : false
+          },
+          "PeriodStartTimeZone" : {
+            "title" : "Perd Start Time Zone",
+            "maxLength" : 6,
+            "type" : "string",
+            "description" : "Time Zone<br />The time zone describes the location of an object in relation to its local time.<br />The basic field assignments describeThe time difference of the time zone in hours/minutes relative to the UTCThe beginning and end of summer timeOn the basis of these field assignments, you do not need to use different time zones for summer and winder time, nor are these appropriate.It is possible to convert local times between the local time and a UTC time stamp using the ABAP command convert. The parameters are always the local time (date and time), the time zone, and the UTC time stamp.",
+            "nullable" : false
+          },
+          "PeriodEndUTCDateTime" : {
+            "title" : "Perd End Date Time",
+            "type" : "string",
+            "description" : "UTC Time Stamp in Short Form (YYYYMMDDhhmmss)<br />The UTC timestamp is the date and time relative to the UTC (Universal coordinated time).<br />To normalize local times in a UTC time stamp and make them comparable, they must be converted using their time zone and the ABAP command convert.Although the time zone for the conversion can be fetched from customizing or master data, you should save it redundantly.The internal structure of the UTC time stamp is logically divided into a date and time part in packed number format <YYYYMMDDhhmmss>. There is also a high resolution UTC time stamp (10^-7 seconds).",
+            "format" : "date-time",
+            "nullable" : false
+          },
+          "PeriodEndTimeZone" : {
+            "title" : "Perd End Time Zone",
+            "maxLength" : 6,
+            "type" : "string",
+            "description" : "Time Zone<br />The time zone describes the location of an object in relation to its local time.<br />The basic field assignments describeThe time difference of the time zone in hours/minutes relative to the UTCThe beginning and end of summer timeOn the basis of these field assignments, you do not need to use different time zones for summer and winder time, nor are these appropriate.It is possible to convert local times between the local time and a UTC time stamp using the ABAP command convert. The parameters are always the local time (date and time), the time zone, and the UTC time stamp.",
+            "nullable" : false
+          },
+          "AvailableQuantityInBaseUnit" : {
+            "title" : "Available Quantity",
+            "type" : "integer",
+            "format" : "int32",
+            "nullable" : false
+          },
+          "BaseUnit" : {
+            "title" : "Unit",
+            "maxLength" : 3,
+            "type" : "string",
+            "nullable" : false
+          }
+        }
+      }
+    }
+  }
+}
