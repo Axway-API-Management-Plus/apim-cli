@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edmx:Edmx xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData" Version="1.0">
+   <edmx:DataServices m:DataServiceVersion="2.0">
+      <Schema xmlns="http://schemas.microsoft.com/ado/2008/09/edm" Namespace="/BAO/XC_ACCOVR_SRV" xml:lang="en" sap:schema-version="1">
+         <EntityType Name="Account" sap:label="Bank Account" sap:content-version="1">
+            <Key>
+               <PropertyRef Name="ID" />
+            </Key>
+            <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="35" sap:label="Bank Account ID (IBAN)" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="CustomerExternalID" Type="Edm.String" Nullable="false" MaxLength="20" sap:label="Customer ID (external ID such as User ID, Passport etc.)" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="AccountHolderID" Type="Edm.String" Nullable="false" MaxLength="10" sap:label="Customer ID (internal ID) which is the Account Holder" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="BankAccountID" Type="Edm.String" Nullable="false" MaxLength="35" sap:label="Bank Account Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="BankRoutingID" Type="Edm.String" Nullable="false" MaxLength="35" sap:label="Bank Key" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="BankCountryCode" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="Bank Country" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="ProductID" Type="Edm.String" Nullable="false" MaxLength="32" sap:label="Product ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="ProductDescription" Type="Edm.String" Nullable="false" MaxLength="80" sap:label="Product Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="UsageNote" Type="Edm.String" Nullable="false" MaxLength="80" sap:label="Usage Note" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="CurrencyCode" Type="Edm.String" Nullable="false" MaxLength="5" sap:label="Currency" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="CurrentBalance" Type="Edm.Decimal" Nullable="false" Precision="17" Scale="2" sap:label="Current Balance" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="AvailableAmount" Type="Edm.Decimal" Nullable="false" Precision="17" Scale="2" sap:label="Available Amount" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="CurrentPostingDate" Type="Edm.DateTime" Nullable="false" Precision="0" sap:label="Current Posting Date of the Bank" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="CurrentTotalDebitInterestRate" Type="Edm.Decimal" Nullable="false" Precision="15" Scale="10" sap:label="Current Total Debit Interest Rate" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="CurrentTotalCreditInterestRate" Type="Edm.Decimal" Nullable="false" Precision="15" Scale="10" sap:label="Current Total Credit Interest Rate" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="DefaultMinPostingDate" Type="Edm.DateTime" Nullable="false" Precision="0" sap:label="Default Minimum Posting Date (Transaction Item retrieval)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="DefaultMaxPostingDate" Type="Edm.DateTime" Nullable="false" Precision="0" sap:label="Default Maximum Posting Date (Transaction Item retrieval)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <NavigationProperty Name="Transactions" Relationship="/BAO/XC_ACCOVR_SRV.Transactions" FromRole="FromRole_Transactions" ToRole="ToRole_Transactions" />
+            <NavigationProperty Name="Conditions" Relationship="/BAO/XC_ACCOVR_SRV.Conditions" FromRole="FromRole_Conditions" ToRole="ToRole_Conditions" />
+         </EntityType>
+         <EntityType Name="Transaction" sap:label="Transaction Item" sap:content-version="1">
+            <Key>
+               <PropertyRef Name="AccountID" />
+               <PropertyRef Name="TransactionID" />
+            </Key>
+            <Property Name="AccountID" Type="Edm.String" Nullable="false" MaxLength="34" sap:label="Bank Account ID (IBAN)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="TransactionID" Type="Edm.String" Nullable="false" MaxLength="35" sap:label="Transaction ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="TypeCode" Type="Edm.String" MaxLength="6" sap:label="Transaction Type Code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="TypeName" Type="Edm.String" MaxLength="40" sap:label="Transaction Type Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="PostingDate" Type="Edm.DateTime" Precision="0" sap:label="Posting Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="ValueDate" Type="Edm.DateTime" Precision="0" sap:label="Value Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="DebitIndicator" Type="Edm.Boolean" Nullable="false" sap:label="Debit Indicator" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="Amount" Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Amount" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="Currency" Type="Edm.String" MaxLength="5" sap:label="Currency" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="ReturnAllowedIndicator" Type="Edm.Boolean" sap:label="Return Allowed Indicator" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="PaymentNote" Type="Edm.String" MaxLength="80" sap:label="Payment Note" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="CounterpartyAccountID" Type="Edm.String" MaxLength="34" sap:label="Counterparty Bank Account ID (IBAN)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="CounterpartyHolderName" Type="Edm.String" MaxLength="60" sap:label="Counterparty Account Holder Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="TransactionClassID" Type="Edm.String" MaxLength="40" sap:label="My Transaction Class ID" sap:creatable="false" sap:sortable="false" />
+            <Property Name="TransactionClassName" Type="Edm.String" MaxLength="80" sap:label="My Transaction Class Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+         </EntityType>
+         <EntityType Name="Status" sap:label="Customer Status" sap:content-version="1">
+            <Key>
+               <PropertyRef Name="CustomerExternalID" />
+            </Key>
+            <Property Name="CustomerExternalID" Type="Edm.String" Nullable="false" MaxLength="20" sap:label="Customer ID (external ID such as User ID, Passport etc.)" />
+            <Property Name="CurrentBalanceTotal" Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Current Balance (Total, across all bank accounts)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="AvailableAmountTotal" Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Available Amount (Total, across all bank accounts)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="CurrencyCode" Type="Edm.String" MaxLength="5" sap:label="Currency" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="AvailableDescription" Type="Edm.String" MaxLength="80" sap:label="Additional Description &amp; Information for Available Amount" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="LastTransactionDate" Type="Edm.DateTime" Precision="0" sap:label="Last Transactioin (Date)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="LastTransactionDescription" Type="Edm.String" MaxLength="140" sap:label="Last Transactioin (Description)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="StatusDescription" Type="Edm.String" MaxLength="20" sap:label="Status Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="TitleHeader" Type="Edm.String" MaxLength="30" sap:label="Overall Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="TitleSubheader" Type="Edm.String" MaxLength="30" sap:label="Overall Subdescription" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <NavigationProperty Name="Accounts" Relationship="/BAO/XC_ACCOVR_SRV.Accounts" FromRole="FromRole_Accounts" ToRole="ToRole_Accounts" />
+            <NavigationProperty Name="Recipients" Relationship="/BAO/XC_ACCOVR_SRV.Recipients" FromRole="FromRole_Recipients" ToRole="ToRole_Recipients" />
+            <NavigationProperty Name="TransactionClasses" Relationship="/BAO/XC_ACCOVR_SRV.TransactionClasses" FromRole="FromRole_TransactionClasses" ToRole="ToRole_TransactionClasses" />
+         </EntityType>
+         <EntityType Name="Transfer" sap:label="Bank Transfer" sap:content-version="1">
+            <Key>
+               <PropertyRef Name="ID" />
+            </Key>
+            <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="36" sap:label="Bank Transfer ID" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="CustomerExternalID" Type="Edm.String" Nullable="false" MaxLength="20" sap:label="Customer ID (external ID such as User ID, Passport etc.)" sap:updatable="false" sap:sortable="false" />
+            <Property Name="AccountID" Type="Edm.String" MaxLength="34" sap:label="Sender - Bank Account ID (IBAN)" sap:updatable="false" sap:sortable="false" />
+            <Property Name="TypeCode" Type="Edm.String" MaxLength="6" sap:label="Bank Transfer Type Code" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="PostingDate" Type="Edm.DateTime" Precision="0" sap:label="Posting Date (requested execution date)" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="Amount" Type="Edm.Decimal" Precision="17" Scale="2" sap:label="Amount" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="Currency" Type="Edm.String" MaxLength="5" sap:label="Currency" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="PaymentNote" Type="Edm.String" MaxLength="80" sap:label="Payment Note" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="RecipientID" Type="Edm.String" MaxLength="40" sap:label="Recipient ID" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="RecipientAccountID" Type="Edm.String" MaxLength="34" sap:label="Recipient - Bank Account ID (IBAN)" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="RecipientHolderName" Type="Edm.String" MaxLength="80" sap:label="Recipient - Account Holder Name" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="TPH" Type="Edm.String" Nullable="false" MaxLength="6" sap:label="TPH" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+         </EntityType>
+         <EntityType Name="Condition" sap:content-version="1">
+            <Key>
+               <PropertyRef Name="AccountID" />
+               <PropertyRef Name="Group" />
+               <PropertyRef Name="Type" />
+               <PropertyRef Name="Index" />
+            </Key>
+            <Property Name="AccountID" Type="Edm.String" Nullable="false" MaxLength="35" sap:label="Bank Account ID (IBAN)" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="Group" Type="Edm.String" Nullable="false" MaxLength="1" sap:label="Condition Group" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="Type" Type="Edm.String" Nullable="false" MaxLength="6" sap:label="Condition Type" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="Index" Type="Edm.String" Nullable="false" sap:label="Condition Index" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="ValidFrom" Type="Edm.DateTime" Nullable="false" Precision="0" sap:label="Valid From Date/Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="ValidTo" Type="Edm.DateTime" Nullable="false" Precision="0" sap:label="Valid To Date/Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="CurrentlyValid" Type="Edm.Boolean" Nullable="false" sap:label="Indicator that Condition is currently valid" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="GroupTxt" Type="Edm.String" Nullable="false" MaxLength="40" sap:label="Condition Group Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="TypeTxt" Type="Edm.String" Nullable="false" MaxLength="40" sap:label="Condition Type Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="Determination" Type="Edm.String" Nullable="false" MaxLength="20" sap:label="Determination: Interval/Scaled/Simple" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="MergedInterestRate" Type="Edm.Decimal" Nullable="false" Precision="15" Scale="10" sap:label="Merged Interest Rate" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="AmountLowerLimit" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="2" sap:label="Interval/Scaled: AmountLowerLimit" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="AmountUpperLimit" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="2" sap:label="Interval/Scaled: AmountUpperLimit" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="AmountCurrency" Type="Edm.String" Nullable="false" MaxLength="5" sap:label="Interval/Scaled: AmountCurrency" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+         </EntityType>
+         <EntityType Name="Recipient" sap:label="Bank Transfer Recipient" sap:content-version="1">
+            <Key>
+               <PropertyRef Name="AccountID" />
+            </Key>
+            <Property Name="AccountID" Type="Edm.String" Nullable="false" MaxLength="34" sap:label="Recipient  Bank Account ID (IBAN)" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="CustomerExternalID" Type="Edm.String" MaxLength="20" sap:label="Customer ID (external ID such as User ID, Passport etc.)" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+            <Property Name="Description" Type="Edm.String" MaxLength="100" sap:label="Recipient Party Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="Currency" Type="Edm.String" MaxLength="5" sap:label="Currency" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="AccountHolderName" Type="Edm.String" MaxLength="40" sap:label="Recipient Account Holder Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="AccountNo" Type="Edm.String" MaxLength="35" sap:label="Recipient Account Holder Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="BankNo" Type="Edm.String" MaxLength="35" sap:label="Recipient Bank ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+            <Property Name="RecipientID" Type="Edm.String" MaxLength="60" sap:label="Recipient  ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" />
+         </EntityType>
+         <EntityType Name="TransactionClass" sap:label="Transaction Classification" sap:content-version="1">
+            <Key>
+               <PropertyRef Name="ID" />
+            </Key>
+            <Property Name="ID" Type="Edm.String" Nullable="false" MaxLength="40" sap:label="My Transaction Class ID" />
+            <Property Name="CustomerExternalID" Type="Edm.String" Nullable="false" MaxLength="20" sap:label="Customer ID (external ID such as User ID, Passport etc.)" sap:sortable="false" />
+            <Property Name="Description" Type="Edm.String" Nullable="false" MaxLength="80" sap:label="My Transaction Class Name" sap:sortable="false" sap:filterable="false" />
+         </EntityType>
+         <Association Name="Accounts" sap:content-version="1" sap:label="Customer's Bank Accounts">
+            <End Type="/BAO/XC_ACCOVR_SRV.Status" Multiplicity="1" Role="FromRole_Accounts" />
+            <End Type="/BAO/XC_ACCOVR_SRV.Account" Multiplicity="*" Role="ToRole_Accounts" />
+            <ReferentialConstraint>
+               <Principal Role="FromRole_Accounts">
+                  <PropertyRef Name="CustomerExternalID" />
+               </Principal>
+               <Dependent Role="ToRole_Accounts">
+                  <PropertyRef Name="CustomerExternalID" />
+               </Dependent>
+            </ReferentialConstraint>
+         </Association>
+         <Association Name="Recipients" sap:content-version="1" sap:label="Customer's template/default Recipients">
+            <End Type="/BAO/XC_ACCOVR_SRV.Status" Multiplicity="1" Role="FromRole_Recipients" />
+            <End Type="/BAO/XC_ACCOVR_SRV.Recipient" Multiplicity="*" Role="ToRole_Recipients" />
+            <ReferentialConstraint>
+               <Principal Role="FromRole_Recipients">
+                  <PropertyRef Name="CustomerExternalID" />
+               </Principal>
+               <Dependent Role="ToRole_Recipients">
+                  <PropertyRef Name="CustomerExternalID" />
+               </Dependent>
+            </ReferentialConstraint>
+         </Association>
+         <Association Name="TransactionClasses" sap:content-version="1" sap:label="Customer's configured Transaction Classes">
+            <End Type="/BAO/XC_ACCOVR_SRV.Status" Multiplicity="1" Role="FromRole_TransactionClasses" />
+            <End Type="/BAO/XC_ACCOVR_SRV.TransactionClass" Multiplicity="*" Role="ToRole_TransactionClasses" />
+            <ReferentialConstraint>
+               <Principal Role="FromRole_TransactionClasses">
+                  <PropertyRef Name="CustomerExternalID" />
+               </Principal>
+               <Dependent Role="ToRole_TransactionClasses">
+                  <PropertyRef Name="CustomerExternalID" />
+               </Dependent>
+            </ReferentialConstraint>
+         </Association>
+         <Association Name="Conditions" sap:content-version="1" sap:label="Bank Accounts Conditions (Interest Rates)">
+            <End Type="/BAO/XC_ACCOVR_SRV.Account" Multiplicity="1" Role="FromRole_Conditions" />
+            <End Type="/BAO/XC_ACCOVR_SRV.Condition" Multiplicity="*" Role="ToRole_Conditions" />
+            <ReferentialConstraint>
+               <Principal Role="FromRole_Conditions">
+                  <PropertyRef Name="ID" />
+               </Principal>
+               <Dependent Role="ToRole_Conditions">
+                  <PropertyRef Name="AccountID" />
+               </Dependent>
+            </ReferentialConstraint>
+         </Association>
+         <Association Name="Transactions" sap:content-version="1" sap:label="Bank Accounts Transactions">
+            <End Type="/BAO/XC_ACCOVR_SRV.Account" Multiplicity="1" Role="FromRole_Transactions" />
+            <End Type="/BAO/XC_ACCOVR_SRV.Transaction" Multiplicity="*" Role="ToRole_Transactions" />
+            <ReferentialConstraint>
+               <Principal Role="FromRole_Transactions">
+                  <PropertyRef Name="ID" />
+               </Principal>
+               <Dependent Role="ToRole_Transactions">
+                  <PropertyRef Name="AccountID" />
+               </Dependent>
+            </ReferentialConstraint>
+         </Association>
+         <EntityContainer Name="/BAO/XC_ACCOVR_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
+            <EntitySet Name="AccountSet" EntityType="/BAO/XC_ACCOVR_SRV.Account" sap:label="Bank Account" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:requires-filter="true" sap:content-version="1" />
+            <EntitySet Name="TransactionSet" EntityType="/BAO/XC_ACCOVR_SRV.Transaction" sap:label="Transaction Classification" sap:creatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1" />
+            <EntitySet Name="StatusSet" EntityType="/BAO/XC_ACCOVR_SRV.Status" sap:label="Customer Status" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:requires-filter="true" sap:content-version="1" />
+            <EntitySet Name="TransferSet" EntityType="/BAO/XC_ACCOVR_SRV.Transfer" sap:label="Bank Transfer" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" />
+            <EntitySet Name="ConditionSet" EntityType="/BAO/XC_ACCOVR_SRV.Condition" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:requires-filter="true" sap:content-version="1" />
+            <EntitySet Name="RecipientSet" EntityType="/BAO/XC_ACCOVR_SRV.Recipient" sap:label="Bank Transfer Recipient" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:requires-filter="true" sap:content-version="1" />
+            <EntitySet Name="TransactionClassSet" EntityType="/BAO/XC_ACCOVR_SRV.TransactionClass" sap:label="Transaction Item" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:requires-filter="true" sap:content-version="1" />
+            <AssociationSet Name="TransactionsSet" Association="/BAO/XC_ACCOVR_SRV.Transactions" sap:label="Bank Accounts Transactions" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+               <End EntitySet="AccountSet" Role="FromRole_Transactions" />
+               <End EntitySet="TransactionSet" Role="ToRole_Transactions" />
+            </AssociationSet>
+            <AssociationSet Name="RecipientsSet" Association="/BAO/XC_ACCOVR_SRV.Recipients" sap:label="Customer's template/default Recipients" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+               <End EntitySet="StatusSet" Role="FromRole_Recipients" />
+               <End EntitySet="RecipientSet" Role="ToRole_Recipients" />
+            </AssociationSet>
+            <AssociationSet Name="ConditionsSet" Association="/BAO/XC_ACCOVR_SRV.Conditions" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+               <End EntitySet="AccountSet" Role="FromRole_Conditions" />
+               <End EntitySet="ConditionSet" Role="ToRole_Conditions" />
+            </AssociationSet>
+            <AssociationSet Name="TransactionClassesSet" Association="/BAO/XC_ACCOVR_SRV.TransactionClasses" sap:label="Customer's configured Transaction Classes" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+               <End EntitySet="StatusSet" Role="FromRole_TransactionClasses" />
+               <End EntitySet="TransactionClassSet" Role="ToRole_TransactionClasses" />
+            </AssociationSet>
+            <AssociationSet Name="AccountsSet" Association="/BAO/XC_ACCOVR_SRV.Accounts" sap:label="Customer's Bank Accounts" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+               <End EntitySet="StatusSet" Role="FromRole_Accounts" />
+               <End EntitySet="AccountSet" Role="ToRole_Accounts" />
+            </AssociationSet>
+         </EntityContainer>
+         <atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="self" href="http://mo-f05fb2674.mo.sap.corp:8001/sap/opu/odata/BAO/XC_ACCOVR_SRV/$metadata" />
+         <atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="latest-version" href="http://mo-f05fb2674.mo.sap.corp:8001/sap/opu/odata/BAO/XC_ACCOVR_SRV/$metadata" />
+      </Schema>
+   </edmx:DataServices>
+</edmx:Edmx>
+

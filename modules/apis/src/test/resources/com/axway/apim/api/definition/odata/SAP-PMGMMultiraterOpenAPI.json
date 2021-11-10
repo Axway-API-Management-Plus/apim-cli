@@ -1,0 +1,72 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "OData Service",
+    "description" : "The OData Service from https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata",
+    "version" : "1.0"
+  },
+  "servers" : [ {
+    "url" : "https://myhost.customer.com:8767/api/v1/myAPI/"
+  } ],
+  "paths" : {
+    "/complete360" : {
+      "get" : {
+        "tags" : [ "Service operations" ],
+        "summary" : "Complete 360 evaluation form",
+        "description" : "Function import API to complete 360 evaluation form.",
+        "parameters" : [ {
+          "name" : "formDataId",
+          "in" : "query",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "comment",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "CORouteFormStatusBean",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CORouteFormStatusBean"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : { }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "CORouteFormStatusBean" : {
+        "type" : "object",
+        "properties" : {
+          "redirectUrl" : {
+            "title" : "redirectUrl",
+            "type" : "string",
+            "nullable" : true
+          },
+          "status" : {
+            "title" : "status",
+            "type" : "string",
+            "nullable" : true
+          }
+        },
+        "description" : "CORouteFormStatusBean<br />identify if form is successfully signed/rejected/sent to next step"
+      }
+    }
+  }
+}
