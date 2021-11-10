@@ -47,10 +47,13 @@ public class AppException extends JsonProcessingException {
 		switch (error.getLogLevel()) {
 		case INFO: 
 			LOG.info(getAllMessages(), cause);
+			break;
 		case WARN: 
 			LOG.warn(getAllMessages(), cause);
+			break;
 		case DEBUG: 
 			LOG.debug(getAllMessages(), cause);
+			break;
 		default:
 			LOG.error(getAllMessages(), cause);
 		}

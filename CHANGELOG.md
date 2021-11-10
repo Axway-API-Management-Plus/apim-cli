@@ -6,12 +6,26 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
+- API-Manager Remote-Hosts export not working - Filtered incorrectly (See issue [#225](https://github.com/Axway-API-Management-Plus/apim-cli/issues/225))
+
+### Added
+- Added support for OData V2 EDMX specifications (See issue [#228](https://github.com/Axway-API-Management-Plus/apim-cli/issues/228))
+- Control application user permissions (See issue [#186](https://github.com/Axway-API-Management-Plus/apim-cli/issues/186))
+- Entity import should fail if a required custom property is missing (See issue [#229](https://github.com/Axway-API-Management-Plus/apim-cli/issues/229))
+- APIM-CLI should check & fail, when RouteType is Policy without providing a RoutingPolicy (See issue [#227](https://github.com/Axway-API-Management-Plus/apim-cli/issues/227))
+- Improved logging for missing policies. Now the type of the missing policy is logged.
+
+## [1.4.0] 2021-10-08
+### Fixed
 - No change detected when updating the role of a user (See issue [#219](https://github.com/Axway-API-Management-Plus/apim-cli/issues/219))
 - API-Import with Method-Level Outbound-Profiles failes if no custom Outbound-Authentication is given (See issue [#220](https://github.com/Axway-API-Management-Plus/apim-cli/issues/220))
 - Outbound SSL-Authentication is not working (See issue [#221](https://github.com/Axway-API-Management-Plus/apim-cli/issues/221))
 
+### Added
+- WADL support (See issue [#222](https://github.com/Axway-API-Management-Plus/apim-cli/issues/222))
+
 ### Changed
-- Drop support for API-Manager version 7.6.2
+- Dropped support for API-Manager version 7.6.2
 
 ## [1.3.13] 2021-09-21
 ### Fixed
