@@ -34,7 +34,7 @@ echo ""
 
 cd "$currentDir"
 
-"$_java" -Xms64m -Xmx256m -Dlog4j.configuration=../lib/log4j.xml -classpath "$CP" com.axway.apim.cli.APIManagerCLI "${@}"
+"$_java" -Xms64m -Xmx256m -Dlog4j.configurationFile=../lib/log4j.xml -classpath "$CP" com.axway.apim.cli.APIManagerCLI "${@}"
 rc=$?
 if [ $rc -eq 10 ];then
         echo "No changes detected. Existing with RC: 0"
