@@ -43,7 +43,7 @@ apim api get -s prod -wide
 
 To get a list of commands for each group call for instance `apim app`
 
-The CLI is flexible and more commands will be added. For an up-to-date list of the supported groups and commands, see the [documentation](https://github.com/Axway-API-Management-Plus/apim-cli/wiki#supported-commands).
+The CLI is flexible and already provides a lot of commands & utility functions. For an up-to-date list of the supported groups and commands, see the [documentation](https://github.com/Axway-API-Management-Plus/apim-cli/wiki#supported-commands).
 
 ## Quality assurance process
 By using this CLI to control your Axway API management infrastructure it becomes a key component of your CI/CD process. Product quality is therefore very important so that you can be confident this CLI is doing what it's supposed to do.  
