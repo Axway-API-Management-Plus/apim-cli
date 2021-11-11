@@ -26,9 +26,9 @@ public class CaCert {
 	
 	String version;
 	
-	String notValidBefore;
+	Long notValidBefore;
 	
-	String notValidAfter;
+	Long notValidAfter;
 	
 	String signatureAlgorithm;
 	
@@ -92,19 +92,19 @@ public class CaCert {
 		this.version = version;
 	}
 
-	public String getNotValidBefore() {
+	public Long getNotValidBefore() {
 		return notValidBefore;
 	}
 
-	public void setNotValidBefore(String notValidBefore) {
+	public void setNotValidBefore(Long notValidBefore) {
 		this.notValidBefore = notValidBefore;
 	}
 
-	public String getNotValidAfter() {
+	public Long getNotValidAfter() {
 		return notValidAfter;
 	}
 
-	public void setNotValidAfter(String notValidAfter) {
+	public void setNotValidAfter(Long notValidAfter) {
 		this.notValidAfter = notValidAfter;
 	}
 

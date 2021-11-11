@@ -79,7 +79,7 @@ public class CLIAPIUpgradeAccessOptions extends CLIOptions {
 
 	@Override
 	protected String getAppName() {
-		return getBinaryName()+" api approve";
+		return "Upgrade access";
 	}
 
 	@Override

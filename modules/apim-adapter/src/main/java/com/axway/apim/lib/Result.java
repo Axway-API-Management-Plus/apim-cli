@@ -9,6 +9,8 @@ public class Result {
 	
 	private boolean hasError = false;
 	
+	private Object resultDetails;
+	
 	private List<ErrorCode> errorCodes = new ArrayList<ErrorCode>();
 	
 	public ErrorCode getErrorCode() {
@@ -30,5 +32,13 @@ public class Result {
 	
 	public boolean hasError() {
 		return hasError;
+	}
+
+	public Object getResultDetails() {
+		return resultDetails;
+	}
+
+	public void setResultDetails(Object resultDetails) {
+		this.resultDetails = resultDetails;
 	}
 }

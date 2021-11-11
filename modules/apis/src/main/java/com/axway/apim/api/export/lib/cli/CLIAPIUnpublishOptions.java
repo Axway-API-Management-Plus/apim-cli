@@ -39,7 +39,7 @@ public class CLIAPIUnpublishOptions extends CLIOptions {
 
 	@Override
 	protected String getAppName() {
-		return "API-Export";
+		return "Unpublish APIs";
 	}
 
 	@Override
