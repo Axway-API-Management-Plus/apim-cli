@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.5.0] 2021-11-11
 ### Fixed
 - API-Manager Remote-Hosts export not working - Filtered incorrectly (See issue [#225](https://github.com/Axway-API-Management-Plus/apim-cli/issues/225))
 
