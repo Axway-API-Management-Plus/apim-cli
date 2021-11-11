@@ -47,7 +47,7 @@ GOTO :END
 
 CD /D "%currentDir%"
 
-%_java% -Xms64m -Xmx256m -Dlog4j.configuration=../lib/log4j.xml -classpath %CLASSPATH% com.axway.apim.cli.APIManagerCLI %*
+%_java% -Xms64m -Xmx256m -Dlog4j.configurationFile=../lib/log4j.xml -classpath %CLASSPATH% com.axway.apim.cli.APIManagerCLI %*
 SET ERRNO=%ERRORLEVEL%
 IF %ERRNO% EQU 10 (
   ECHO "No changes detected. Existing with RC: 0"
