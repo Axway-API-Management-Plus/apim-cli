@@ -2,19 +2,19 @@ package com.axway.apim.api.export.lib.cli;
 
 import org.apache.commons.cli.Option;
 
-import com.axway.apim.api.export.lib.params.APIChangeParams;
+import com.axway.apim.api.export.lib.params.APICheckCertificatesParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 
-public class CLIChangeAPIOptions extends CLIOptions {
+public class CLICheckCertificatesOptions extends CLIOptions {
 
-	private CLIChangeAPIOptions(String[] args) {
+	private CLICheckCertificatesOptions(String[] args) {
 		super(args);
 	}
 	
 	public static CLIOptions create(String[] args) {
-		CLIOptions cliOptions = new CLIChangeAPIOptions(args);
+		CLIOptions cliOptions = new CLICheckCertificatesOptions(args);
 		cliOptions = new CLIAPIFilterOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);
 		cliOptions.addOptions();
@@ -24,14 +24,9 @@ public class CLIChangeAPIOptions extends CLIOptions {
 
 	@Override
 	public void addOptions() {
-		Option option = new Option("newBackend", true, "The new backend you would like to change to.");
-		option.setRequired(false);
-		option.setArgName("https://new.server.com:8080/api");
-		addOption(option);
-		
-		option = new Option("oldBackend", true, "If given, only APIs matching to this backend will be changed");
-		option.setRequired(false);
-		option.setArgName("https://old.server.com:8080/api");
+		Option option = new Option("days", true, "The number of days for which you want to check if certificates expire.");
+		option.setRequired(true);
+		option.setArgName("30");
 		addOption(option);
 	}
 
@@ -53,14 +48,13 @@ public class CLIChangeAPIOptions extends CLIOptions {
 
 	@Override
 	protected String getAppName() {
-		return "Change API";
+		return "API Check certificates";
 	}
 	
 	@Override
 	public Parameters getParams() {
-		APIChangeParams params = new APIChangeParams();
-		params.setNewBackend(getValue("newBackend"));
-		params.setOldBackend(getValue("oldBackend"));
+		APICheckCertificatesParams params = new APICheckCertificatesParams();
+		params.setNumberOfDays(Integer.parseInt(getValue("days")));
 		return params;
 	}
 }

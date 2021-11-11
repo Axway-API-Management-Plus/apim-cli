@@ -53,7 +53,7 @@ public class CLIAPIGrantAccessOptions extends CLIOptions {
 
 	@Override
 	protected String getAppName() {
-		return getBinaryName()+" api approve";
+		return "Grant access";
 	}
 
 	@Override

@@ -17,8 +17,10 @@ import com.axway.apim.api.export.lib.cli.CLIAPIGrantAccessOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIUnpublishOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIUpgradeAccessOptions;
 import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
+import com.axway.apim.api.export.lib.cli.CLICheckCertificatesOptions;
 import com.axway.apim.api.export.lib.params.APIApproveParams;
 import com.axway.apim.api.export.lib.params.APIChangeParams;
+import com.axway.apim.api.export.lib.params.APICheckCertificatesParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.export.lib.params.APIGrantAccessParams;
 import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
@@ -43,7 +45,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 
 	public static void main(String args[]) { 
-		int rc = exportAPI(args);
+		int rc = checkCertificates(args);
 		System.exit(rc);
 	}
 	
@@ -174,6 +176,20 @@ public class APIExportApp implements APIMCLIServiceProvider {
 			APIExportApp app = new APIExportApp();
 			ExportResult result = app.grantAccessToAPI(params, APIListImpl.API_GRANT_ACCESS_HANDLER);
 			return result.getRc();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return ErrorCode.UNXPECTED_ERROR.getCode();
+		}
+	}
+	
+	@CLIServiceMethod(name = "check-certs", description = "Checks if certificates from selected APIs expire within the specified number of days")
+	public static int checkCertificates(String args[]) {
+		try {
+			deleteInstances();
+			
+			APICheckCertificatesParams params = (APICheckCertificatesParams) CLICheckCertificatesOptions.create(args).getParams();
+			
+			return execute(params, APIListImpl.API_CHECK_CERTS_HANDLER);
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();

@@ -38,7 +38,7 @@ public class CLIAPIDeleteOptions extends CLIOptions {
 
 	@Override
 	protected String getAppName() {
-		return "Application-Export";
+		return "Delete APIs";
 	}
 
 	@Override

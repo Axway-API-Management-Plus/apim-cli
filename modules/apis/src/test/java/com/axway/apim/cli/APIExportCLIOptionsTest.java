@@ -10,8 +10,10 @@ import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIGrantAccessOptions;
 import com.axway.apim.api.export.lib.cli.CLIAPIUpgradeAccessOptions;
 import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
+import com.axway.apim.api.export.lib.cli.CLICheckCertificatesOptions;
 import com.axway.apim.api.export.lib.params.APIApproveParams;
 import com.axway.apim.api.export.lib.params.APIChangeParams;
+import com.axway.apim.api.export.lib.params.APICheckCertificatesParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.export.lib.params.APIGrantAccessParams;
 import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
@@ -214,5 +216,17 @@ public class APIExportCLIOptionsTest {
 		String[] args = {"-s", "prod", "-createdOn", "2021-01-01:2020-12-31"};
 		CLIOptions options = CLIAPIExportOptions.create(args);
 		options.getParams();
+	}
+	
+	@Test
+	public void testCertificateCheckParams() throws ParseException, AppException {
+		String[] args = {"-s", "prod", "-days", "999"};
+		CLIOptions options = CLICheckCertificatesOptions.create(args);
+		APICheckCertificatesParams params = (APICheckCertificatesParams)options.getParams();
+		Assert.assertEquals(params.getNumberOfDays(), 999);
+		// Check base parameters to make sure, all parameters up to the root are parsed
+		Assert.assertEquals(params.getUsername(), "apiadmin");
+		Assert.assertEquals(params.getPassword(), "changeme");
+		Assert.assertEquals(params.getHostname(), "localhost");
 	}
 }
