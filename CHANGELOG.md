@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Added support for OData V2 EDMX specifications (See issue [#228](https://github.com/Axway-API-Management-Plus/apim-cli/issues/228))
+- Add check expired certificates command (See issue [#233](https://github.com/Axway-API-Management-Plus/apim-cli/issues/233))
 - Control application user permissions (See issue [#186](https://github.com/Axway-API-Management-Plus/apim-cli/issues/186))
 - Entity import should fail if a required custom property is missing (See issue [#229](https://github.com/Axway-API-Management-Plus/apim-cli/issues/229))
 - APIM-CLI should check & fail, when RouteType is Policy without providing a RoutingPolicy (See issue [#227](https://github.com/Axway-API-Management-Plus/apim-cli/issues/227))
