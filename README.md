@@ -21,6 +21,7 @@ To get an overview about the groups just call `apim`:
 ```
 Available commands and options:
 apim app             Manage your applications 
+apim settings        Manage your API-Manager Config/Remote-Hosts & Alerts
 apim org             Manage your organizations
 apim api             Manage your APIs 
 apim user            Manage your users 
