@@ -12,6 +12,7 @@
     "/CreateBusinessPartnerWithConsent" : {
       "post" : {
         "tags" : [ "Service operations" ],
+        "operationId" : "CreateBusinessPartnerWithConsent",
         "parameters" : [ {
           "name" : "DataSubjectId",
           "in" : "query",
@@ -151,6 +152,7 @@
         "tags" : [ "Address" ],
         "summary" : "Get Address",
         "description" : "Returns the entity: Address. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Address supports the following navigational properties: [to_WorkplaceAddress, to_Email, to_MobilePhone, to_LandlinePhone, to_Fax, to_Web, to_PostalAddress, to_Person, to_Organization, to_DefaultPostalAddress, to_DefaultEmail, to_DefaultMobilePhone, to_DefaultLandlinePhone, to_DefaultFax, to_DefaultWeb, to_DefaultPerson, to_DefaultOrganization, to_DefaultWorkplaceAddress, to_Parent]<br />For example: .../Address(Entity-Id)/<b>to_WorkplaceAddress</b>/.....",
+        "operationId" : "getAddress",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -244,6 +246,7 @@
         "tags" : [ "Address" ],
         "summary" : "Get Address on Id",
         "description" : "Returns the entity: Address. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Address supports the following navigational properties: [to_WorkplaceAddress, to_Email, to_MobilePhone, to_LandlinePhone, to_Fax, to_Web, to_PostalAddress, to_Person, to_Organization, to_DefaultPostalAddress, to_DefaultEmail, to_DefaultMobilePhone, to_DefaultLandlinePhone, to_DefaultFax, to_DefaultWeb, to_DefaultPerson, to_DefaultOrganization, to_DefaultWorkplaceAddress, to_Parent]<br />For example: .../Address(Entity-Id)/<b>to_WorkplaceAddress</b>/.....",
+        "operationId" : "getAddressId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -292,6 +295,7 @@
         "tags" : [ "Address" ],
         "summary" : "Create a new entity Address",
         "description" : "Create a new entity in EntitySet: Address",
+        "operationId" : "createAddress",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -322,6 +326,7 @@
         "tags" : [ "Address" ],
         "summary" : "Delete Address",
         "description" : "Delete entity in EntitySet Address",
+        "operationId" : "deleteAddress",
         "responses" : {
           "204" : {
             "description" : "EntitySet Address successfully deleted",
@@ -341,6 +346,7 @@
         "tags" : [ "Address" ],
         "summary" : "Update entity Address",
         "description" : "Update an existing entity in EntitySet: Address",
+        "operationId" : "updateAddress",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -382,6 +388,7 @@
         "tags" : [ "AddressIndependentCommunication" ],
         "summary" : "Get AddressIndependentCommunication",
         "description" : "Returns the entity: AddressIndependentCommunication. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentCommunication supports the following navigational properties: [to_AddressIndependentLandlinePhone, to_AddressIndependentMobilePhone, to_AddressIndependentFax, to_AddressIndependentEmail, to_AddressIndependentWeb]<br />For example: .../AddressIndependentCommunication(Entity-Id)/<b>to_AddressIndependentLandlinePhone</b>/.....",
+        "operationId" : "getAddressIndependentCommunication",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -475,6 +482,7 @@
         "tags" : [ "AddressIndependentCommunication" ],
         "summary" : "Get AddressIndependentCommunication on Id",
         "description" : "Returns the entity: AddressIndependentCommunication. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentCommunication supports the following navigational properties: [to_AddressIndependentLandlinePhone, to_AddressIndependentMobilePhone, to_AddressIndependentFax, to_AddressIndependentEmail, to_AddressIndependentWeb]<br />For example: .../AddressIndependentCommunication(Entity-Id)/<b>to_AddressIndependentLandlinePhone</b>/.....",
+        "operationId" : "getAddressIndependentCommunicationId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -523,6 +531,7 @@
         "tags" : [ "AddressIndependentCommunication" ],
         "summary" : "Create a new entity AddressIndependentCommunication",
         "description" : "Create a new entity in EntitySet: AddressIndependentCommunication",
+        "operationId" : "createAddressIndependentCommunication",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -553,6 +562,7 @@
         "tags" : [ "AddressIndependentCommunication" ],
         "summary" : "Delete AddressIndependentCommunication",
         "description" : "Delete entity in EntitySet AddressIndependentCommunication",
+        "operationId" : "deleteAddressIndependentCommunication",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressIndependentCommunication successfully deleted",
@@ -572,6 +582,7 @@
         "tags" : [ "AddressIndependentCommunication" ],
         "summary" : "Update entity AddressIndependentCommunication",
         "description" : "Update an existing entity in EntitySet: AddressIndependentCommunication",
+        "operationId" : "updateAddressIndependentCommunication",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -613,6 +624,7 @@
         "tags" : [ "AddressIndependentEmail" ],
         "summary" : "Get AddressIndependentEmail",
         "description" : "Returns the entity: AddressIndependentEmail. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentEmail supports the following navigational properties: [to_EmailNote, to_Parent]<br />For example: .../AddressIndependentEmail(Entity-Id)/<b>to_EmailNote</b>/.....",
+        "operationId" : "getAddressIndependentEmail",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -706,6 +718,7 @@
         "tags" : [ "AddressIndependentEmail" ],
         "summary" : "Get AddressIndependentEmail on Id",
         "description" : "Returns the entity: AddressIndependentEmail. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentEmail supports the following navigational properties: [to_EmailNote, to_Parent]<br />For example: .../AddressIndependentEmail(Entity-Id)/<b>to_EmailNote</b>/.....",
+        "operationId" : "getAddressIndependentEmailId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -754,6 +767,7 @@
         "tags" : [ "AddressIndependentEmail" ],
         "summary" : "Create a new entity AddressIndependentEmail",
         "description" : "Create a new entity in EntitySet: AddressIndependentEmail",
+        "operationId" : "createAddressIndependentEmail",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -784,6 +798,7 @@
         "tags" : [ "AddressIndependentEmail" ],
         "summary" : "Delete AddressIndependentEmail",
         "description" : "Delete entity in EntitySet AddressIndependentEmail",
+        "operationId" : "deleteAddressIndependentEmail",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressIndependentEmail successfully deleted",
@@ -803,6 +818,7 @@
         "tags" : [ "AddressIndependentEmail" ],
         "summary" : "Update entity AddressIndependentEmail",
         "description" : "Update an existing entity in EntitySet: AddressIndependentEmail",
+        "operationId" : "updateAddressIndependentEmail",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -844,6 +860,7 @@
         "tags" : [ "AddressIndependentEmailAddressDummy" ],
         "summary" : "Get AddressIndependentEmailAddressDummy",
         "description" : "Returns the entity: AddressIndependentEmailAddressDummy. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentEmailAddressDummy supports the following navigational properties: [to_EmailNote, to_Parent]<br />For example: .../AddressIndependentEmailAddressDummy(Entity-Id)/<b>to_EmailNote</b>/.....",
+        "operationId" : "getAddressIndependentEmailAddressDummy",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -937,6 +954,7 @@
         "tags" : [ "AddressIndependentEmailAddressDummy" ],
         "summary" : "Get AddressIndependentEmailAddressDummy on Id",
         "description" : "Returns the entity: AddressIndependentEmailAddressDummy. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentEmailAddressDummy supports the following navigational properties: [to_EmailNote, to_Parent]<br />For example: .../AddressIndependentEmailAddressDummy(Entity-Id)/<b>to_EmailNote</b>/.....",
+        "operationId" : "getAddressIndependentEmailAddressDummyId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -985,6 +1003,7 @@
         "tags" : [ "AddressIndependentEmailAddressDummy" ],
         "summary" : "Create a new entity AddressIndependentEmailAddressDummy",
         "description" : "Create a new entity in EntitySet: AddressIndependentEmailAddressDummy",
+        "operationId" : "createAddressIndependentEmailAddressDummy",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -1015,6 +1034,7 @@
         "tags" : [ "AddressIndependentEmailAddressDummy" ],
         "summary" : "Delete AddressIndependentEmailAddressDummy",
         "description" : "Delete entity in EntitySet AddressIndependentEmailAddressDummy",
+        "operationId" : "deleteAddressIndependentEmailAddressDummy",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressIndependentEmailAddressDummy successfully deleted",
@@ -1034,6 +1054,7 @@
         "tags" : [ "AddressIndependentEmailAddressDummy" ],
         "summary" : "Update entity AddressIndependentEmailAddressDummy",
         "description" : "Update an existing entity in EntitySet: AddressIndependentEmailAddressDummy",
+        "operationId" : "updateAddressIndependentEmailAddressDummy",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -1075,6 +1096,7 @@
         "tags" : [ "AddressIndependentFaxNumber" ],
         "summary" : "Get AddressIndependentFaxNumber",
         "description" : "Returns the entity: AddressIndependentFaxNumber. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentFaxNumber supports the following navigational properties: [to_FaxNote, to_Parent]<br />For example: .../AddressIndependentFaxNumber(Entity-Id)/<b>to_FaxNote</b>/.....",
+        "operationId" : "getAddressIndependentFaxNumber",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1168,6 +1190,7 @@
         "tags" : [ "AddressIndependentFaxNumber" ],
         "summary" : "Get AddressIndependentFaxNumber on Id",
         "description" : "Returns the entity: AddressIndependentFaxNumber. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentFaxNumber supports the following navigational properties: [to_FaxNote, to_Parent]<br />For example: .../AddressIndependentFaxNumber(Entity-Id)/<b>to_FaxNote</b>/.....",
+        "operationId" : "getAddressIndependentFaxNumberId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1216,6 +1239,7 @@
         "tags" : [ "AddressIndependentFaxNumber" ],
         "summary" : "Create a new entity AddressIndependentFaxNumber",
         "description" : "Create a new entity in EntitySet: AddressIndependentFaxNumber",
+        "operationId" : "createAddressIndependentFaxNumber",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -1246,6 +1270,7 @@
         "tags" : [ "AddressIndependentFaxNumber" ],
         "summary" : "Delete AddressIndependentFaxNumber",
         "description" : "Delete entity in EntitySet AddressIndependentFaxNumber",
+        "operationId" : "deleteAddressIndependentFaxNumber",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressIndependentFaxNumber successfully deleted",
@@ -1265,6 +1290,7 @@
         "tags" : [ "AddressIndependentFaxNumber" ],
         "summary" : "Update entity AddressIndependentFaxNumber",
         "description" : "Update an existing entity in EntitySet: AddressIndependentFaxNumber",
+        "operationId" : "updateAddressIndependentFaxNumber",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -1306,6 +1332,7 @@
         "tags" : [ "AddressIndependentFaxNumberDummy" ],
         "summary" : "Get AddressIndependentFaxNumberDummy",
         "description" : "Returns the entity: AddressIndependentFaxNumberDummy. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentFaxNumberDummy supports the following navigational properties: [to_FaxNote, to_Parent]<br />For example: .../AddressIndependentFaxNumberDummy(Entity-Id)/<b>to_FaxNote</b>/.....",
+        "operationId" : "getAddressIndependentFaxNumberDummy",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1399,6 +1426,7 @@
         "tags" : [ "AddressIndependentFaxNumberDummy" ],
         "summary" : "Get AddressIndependentFaxNumberDummy on Id",
         "description" : "Returns the entity: AddressIndependentFaxNumberDummy. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentFaxNumberDummy supports the following navigational properties: [to_FaxNote, to_Parent]<br />For example: .../AddressIndependentFaxNumberDummy(Entity-Id)/<b>to_FaxNote</b>/.....",
+        "operationId" : "getAddressIndependentFaxNumberDummyId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1447,6 +1475,7 @@
         "tags" : [ "AddressIndependentFaxNumberDummy" ],
         "summary" : "Create a new entity AddressIndependentFaxNumberDummy",
         "description" : "Create a new entity in EntitySet: AddressIndependentFaxNumberDummy",
+        "operationId" : "createAddressIndependentFaxNumberDummy",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -1477,6 +1506,7 @@
         "tags" : [ "AddressIndependentFaxNumberDummy" ],
         "summary" : "Delete AddressIndependentFaxNumberDummy",
         "description" : "Delete entity in EntitySet AddressIndependentFaxNumberDummy",
+        "operationId" : "deleteAddressIndependentFaxNumberDummy",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressIndependentFaxNumberDummy successfully deleted",
@@ -1496,6 +1526,7 @@
         "tags" : [ "AddressIndependentFaxNumberDummy" ],
         "summary" : "Update entity AddressIndependentFaxNumberDummy",
         "description" : "Update an existing entity in EntitySet: AddressIndependentFaxNumberDummy",
+        "operationId" : "updateAddressIndependentFaxNumberDummy",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -1537,6 +1568,7 @@
         "tags" : [ "AddressIndependentPhoneNumber" ],
         "summary" : "Get AddressIndependentPhoneNumber",
         "description" : "Returns the entity: AddressIndependentPhoneNumber. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentPhoneNumber supports the following navigational properties: [to_PhoneNote, to_Parent]<br />For example: .../AddressIndependentPhoneNumber(Entity-Id)/<b>to_PhoneNote</b>/.....",
+        "operationId" : "getAddressIndependentPhoneNumber",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1630,6 +1662,7 @@
         "tags" : [ "AddressIndependentPhoneNumber" ],
         "summary" : "Get AddressIndependentPhoneNumber on Id",
         "description" : "Returns the entity: AddressIndependentPhoneNumber. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentPhoneNumber supports the following navigational properties: [to_PhoneNote, to_Parent]<br />For example: .../AddressIndependentPhoneNumber(Entity-Id)/<b>to_PhoneNote</b>/.....",
+        "operationId" : "getAddressIndependentPhoneNumberId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1678,6 +1711,7 @@
         "tags" : [ "AddressIndependentPhoneNumber" ],
         "summary" : "Create a new entity AddressIndependentPhoneNumber",
         "description" : "Create a new entity in EntitySet: AddressIndependentPhoneNumber",
+        "operationId" : "createAddressIndependentPhoneNumber",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -1708,6 +1742,7 @@
         "tags" : [ "AddressIndependentPhoneNumber" ],
         "summary" : "Delete AddressIndependentPhoneNumber",
         "description" : "Delete entity in EntitySet AddressIndependentPhoneNumber",
+        "operationId" : "deleteAddressIndependentPhoneNumber",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressIndependentPhoneNumber successfully deleted",
@@ -1727,6 +1762,7 @@
         "tags" : [ "AddressIndependentPhoneNumber" ],
         "summary" : "Update entity AddressIndependentPhoneNumber",
         "description" : "Update an existing entity in EntitySet: AddressIndependentPhoneNumber",
+        "operationId" : "updateAddressIndependentPhoneNumber",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -1768,6 +1804,7 @@
         "tags" : [ "AddressIndependentPhoneNumberDummy" ],
         "summary" : "Get AddressIndependentPhoneNumberDummy",
         "description" : "Returns the entity: AddressIndependentPhoneNumberDummy. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentPhoneNumberDummy supports the following navigational properties: [to_PhoneNote, to_Parent]<br />For example: .../AddressIndependentPhoneNumberDummy(Entity-Id)/<b>to_PhoneNote</b>/.....",
+        "operationId" : "getAddressIndependentPhoneNumberDummy",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1861,6 +1898,7 @@
         "tags" : [ "AddressIndependentPhoneNumberDummy" ],
         "summary" : "Get AddressIndependentPhoneNumberDummy on Id",
         "description" : "Returns the entity: AddressIndependentPhoneNumberDummy. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentPhoneNumberDummy supports the following navigational properties: [to_PhoneNote, to_Parent]<br />For example: .../AddressIndependentPhoneNumberDummy(Entity-Id)/<b>to_PhoneNote</b>/.....",
+        "operationId" : "getAddressIndependentPhoneNumberDummyId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1909,6 +1947,7 @@
         "tags" : [ "AddressIndependentPhoneNumberDummy" ],
         "summary" : "Create a new entity AddressIndependentPhoneNumberDummy",
         "description" : "Create a new entity in EntitySet: AddressIndependentPhoneNumberDummy",
+        "operationId" : "createAddressIndependentPhoneNumberDummy",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -1939,6 +1978,7 @@
         "tags" : [ "AddressIndependentPhoneNumberDummy" ],
         "summary" : "Delete AddressIndependentPhoneNumberDummy",
         "description" : "Delete entity in EntitySet AddressIndependentPhoneNumberDummy",
+        "operationId" : "deleteAddressIndependentPhoneNumberDummy",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressIndependentPhoneNumberDummy successfully deleted",
@@ -1958,6 +1998,7 @@
         "tags" : [ "AddressIndependentPhoneNumberDummy" ],
         "summary" : "Update entity AddressIndependentPhoneNumberDummy",
         "description" : "Update an existing entity in EntitySet: AddressIndependentPhoneNumberDummy",
+        "operationId" : "updateAddressIndependentPhoneNumberDummy",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -1999,6 +2040,7 @@
         "tags" : [ "AddressIndependentWeb" ],
         "summary" : "Get AddressIndependentWeb",
         "description" : "Returns the entity: AddressIndependentWeb. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentWeb supports the following navigational properties: [to_WebNote, to_Parent]<br />For example: .../AddressIndependentWeb(Entity-Id)/<b>to_WebNote</b>/.....",
+        "operationId" : "getAddressIndependentWeb",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -2092,6 +2134,7 @@
         "tags" : [ "AddressIndependentWeb" ],
         "summary" : "Get AddressIndependentWeb on Id",
         "description" : "Returns the entity: AddressIndependentWeb. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentWeb supports the following navigational properties: [to_WebNote, to_Parent]<br />For example: .../AddressIndependentWeb(Entity-Id)/<b>to_WebNote</b>/.....",
+        "operationId" : "getAddressIndependentWebId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -2140,6 +2183,7 @@
         "tags" : [ "AddressIndependentWeb" ],
         "summary" : "Create a new entity AddressIndependentWeb",
         "description" : "Create a new entity in EntitySet: AddressIndependentWeb",
+        "operationId" : "createAddressIndependentWeb",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -2170,6 +2214,7 @@
         "tags" : [ "AddressIndependentWeb" ],
         "summary" : "Delete AddressIndependentWeb",
         "description" : "Delete entity in EntitySet AddressIndependentWeb",
+        "operationId" : "deleteAddressIndependentWeb",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressIndependentWeb successfully deleted",
@@ -2189,6 +2234,7 @@
         "tags" : [ "AddressIndependentWeb" ],
         "summary" : "Update entity AddressIndependentWeb",
         "description" : "Update an existing entity in EntitySet: AddressIndependentWeb",
+        "operationId" : "updateAddressIndependentWeb",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -2230,6 +2276,7 @@
         "tags" : [ "AddressIndependentWebDummy" ],
         "summary" : "Get AddressIndependentWebDummy",
         "description" : "Returns the entity: AddressIndependentWebDummy. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentWebDummy supports the following navigational properties: [to_WebNote, to_Parent]<br />For example: .../AddressIndependentWebDummy(Entity-Id)/<b>to_WebNote</b>/.....",
+        "operationId" : "getAddressIndependentWebDummy",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -2323,6 +2370,7 @@
         "tags" : [ "AddressIndependentWebDummy" ],
         "summary" : "Get AddressIndependentWebDummy on Id",
         "description" : "Returns the entity: AddressIndependentWebDummy. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressIndependentWebDummy supports the following navigational properties: [to_WebNote, to_Parent]<br />For example: .../AddressIndependentWebDummy(Entity-Id)/<b>to_WebNote</b>/.....",
+        "operationId" : "getAddressIndependentWebDummyId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -2371,6 +2419,7 @@
         "tags" : [ "AddressIndependentWebDummy" ],
         "summary" : "Create a new entity AddressIndependentWebDummy",
         "description" : "Create a new entity in EntitySet: AddressIndependentWebDummy",
+        "operationId" : "createAddressIndependentWebDummy",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -2401,6 +2450,7 @@
         "tags" : [ "AddressIndependentWebDummy" ],
         "summary" : "Delete AddressIndependentWebDummy",
         "description" : "Delete entity in EntitySet AddressIndependentWebDummy",
+        "operationId" : "deleteAddressIndependentWebDummy",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressIndependentWebDummy successfully deleted",
@@ -2420,6 +2470,7 @@
         "tags" : [ "AddressIndependentWebDummy" ],
         "summary" : "Update entity AddressIndependentWebDummy",
         "description" : "Update an existing entity in EntitySet: AddressIndependentWebDummy",
+        "operationId" : "updateAddressIndependentWebDummy",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -2461,6 +2512,7 @@
         "tags" : [ "AddressInformation" ],
         "summary" : "Get AddressInformation",
         "description" : "Returns the entity: AddressInformation. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressInformation supports the following navigational properties: [to_AddressUsage, to_Address, to_Parent]<br />For example: .../AddressInformation(Entity-Id)/<b>to_AddressUsage</b>/.....",
+        "operationId" : "getAddressInformation",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -2554,6 +2606,7 @@
         "tags" : [ "AddressInformation" ],
         "summary" : "Get AddressInformation on Id",
         "description" : "Returns the entity: AddressInformation. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressInformation supports the following navigational properties: [to_AddressUsage, to_Address, to_Parent]<br />For example: .../AddressInformation(Entity-Id)/<b>to_AddressUsage</b>/.....",
+        "operationId" : "getAddressInformationId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -2602,6 +2655,7 @@
         "tags" : [ "AddressInformation" ],
         "summary" : "Create a new entity AddressInformation",
         "description" : "Create a new entity in EntitySet: AddressInformation",
+        "operationId" : "createAddressInformation",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -2632,6 +2686,7 @@
         "tags" : [ "AddressInformation" ],
         "summary" : "Delete AddressInformation",
         "description" : "Delete entity in EntitySet AddressInformation",
+        "operationId" : "deleteAddressInformation",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressInformation successfully deleted",
@@ -2651,6 +2706,7 @@
         "tags" : [ "AddressInformation" ],
         "summary" : "Update entity AddressInformation",
         "description" : "Update an existing entity in EntitySet: AddressInformation",
+        "operationId" : "updateAddressInformation",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -2692,6 +2748,7 @@
         "tags" : [ "AddressOrganizationName" ],
         "summary" : "Get AddressOrganizationName",
         "description" : "Returns the entity: AddressOrganizationName. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressOrganizationName supports the following navigational properties: [to_Parent]<br />For example: .../AddressOrganizationName(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getAddressOrganizationName",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -2785,6 +2842,7 @@
         "tags" : [ "AddressOrganizationName" ],
         "summary" : "Get AddressOrganizationName on Id",
         "description" : "Returns the entity: AddressOrganizationName. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressOrganizationName supports the following navigational properties: [to_Parent]<br />For example: .../AddressOrganizationName(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getAddressOrganizationNameId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -2833,6 +2891,7 @@
         "tags" : [ "AddressOrganizationName" ],
         "summary" : "Create a new entity AddressOrganizationName",
         "description" : "Create a new entity in EntitySet: AddressOrganizationName",
+        "operationId" : "createAddressOrganizationName",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -2863,6 +2922,7 @@
         "tags" : [ "AddressOrganizationName" ],
         "summary" : "Delete AddressOrganizationName",
         "description" : "Delete entity in EntitySet AddressOrganizationName",
+        "operationId" : "deleteAddressOrganizationName",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressOrganizationName successfully deleted",
@@ -2882,6 +2942,7 @@
         "tags" : [ "AddressOrganizationName" ],
         "summary" : "Update entity AddressOrganizationName",
         "description" : "Update an existing entity in EntitySet: AddressOrganizationName",
+        "operationId" : "updateAddressOrganizationName",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -2923,6 +2984,7 @@
         "tags" : [ "AddressPersonName" ],
         "summary" : "Get AddressPersonName",
         "description" : "Returns the entity: AddressPersonName. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressPersonName supports the following navigational properties: [to_Parent]<br />For example: .../AddressPersonName(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getAddressPersonName",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -3016,6 +3078,7 @@
         "tags" : [ "AddressPersonName" ],
         "summary" : "Get AddressPersonName on Id",
         "description" : "Returns the entity: AddressPersonName. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressPersonName supports the following navigational properties: [to_Parent]<br />For example: .../AddressPersonName(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getAddressPersonNameId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -3064,6 +3127,7 @@
         "tags" : [ "AddressPersonName" ],
         "summary" : "Create a new entity AddressPersonName",
         "description" : "Create a new entity in EntitySet: AddressPersonName",
+        "operationId" : "createAddressPersonName",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -3094,6 +3158,7 @@
         "tags" : [ "AddressPersonName" ],
         "summary" : "Delete AddressPersonName",
         "description" : "Delete entity in EntitySet AddressPersonName",
+        "operationId" : "deleteAddressPersonName",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressPersonName successfully deleted",
@@ -3113,6 +3178,7 @@
         "tags" : [ "AddressPersonName" ],
         "summary" : "Update entity AddressPersonName",
         "description" : "Update an existing entity in EntitySet: AddressPersonName",
+        "operationId" : "updateAddressPersonName",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -3154,6 +3220,7 @@
         "tags" : [ "AddressUsage" ],
         "summary" : "Get AddressUsage",
         "description" : "Returns the entity: AddressUsage. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressUsage supports the following navigational properties: [to_Address, to_Parent, to_Root]<br />For example: .../AddressUsage(Entity-Id)/<b>to_Address</b>/.....",
+        "operationId" : "getAddressUsage",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -3247,6 +3314,7 @@
         "tags" : [ "AddressUsage" ],
         "summary" : "Get AddressUsage on Id",
         "description" : "Returns the entity: AddressUsage. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AddressUsage supports the following navigational properties: [to_Address, to_Parent, to_Root]<br />For example: .../AddressUsage(Entity-Id)/<b>to_Address</b>/.....",
+        "operationId" : "getAddressUsageId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -3295,6 +3363,7 @@
         "tags" : [ "AddressUsage" ],
         "summary" : "Create a new entity AddressUsage",
         "description" : "Create a new entity in EntitySet: AddressUsage",
+        "operationId" : "createAddressUsage",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -3325,6 +3394,7 @@
         "tags" : [ "AddressUsage" ],
         "summary" : "Delete AddressUsage",
         "description" : "Delete entity in EntitySet AddressUsage",
+        "operationId" : "deleteAddressUsage",
         "responses" : {
           "204" : {
             "description" : "EntitySet AddressUsage successfully deleted",
@@ -3344,6 +3414,7 @@
         "tags" : [ "AddressUsage" ],
         "summary" : "Update entity AddressUsage",
         "description" : "Update an existing entity in EntitySet: AddressUsage",
+        "operationId" : "updateAddressUsage",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -3385,6 +3456,7 @@
         "tags" : [ "BusinessPartner" ],
         "summary" : "Get BusinessPartner",
         "description" : "Returns the entity: BusinessPartner. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: BusinessPartner supports the following navigational properties: [to_Customer, to_AddressInformation, to_Person, to_Organization, to_Group, to_Identification, to_IndustrySector, to_Role, to_AddressUsage, to_TaxNumber, to_DefaultIndustrySector, to_DefaultPerson, to_DefaultOrganization, to_DefaultGroup, to_CurrentAddressInformation, to_CurrentDefaultAddressUsageCode, to_CurrentDefaultAddressUsage, to_BusinessPartnerRelationship, to_HasContactPerson, to_CurrentHasContactPerson, to_CurrentDefaultHasContactPerson, to_Supplier, to_Bank, to_PaymentCard, to_AddressIndependentCommunication]<br />For example: .../BusinessPartner(Entity-Id)/<b>to_Customer</b>/.....",
+        "operationId" : "getBusinessPartner",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -3478,6 +3550,7 @@
         "tags" : [ "BusinessPartner" ],
         "summary" : "Get BusinessPartner on Id",
         "description" : "Returns the entity: BusinessPartner. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: BusinessPartner supports the following navigational properties: [to_Customer, to_AddressInformation, to_Person, to_Organization, to_Group, to_Identification, to_IndustrySector, to_Role, to_AddressUsage, to_TaxNumber, to_DefaultIndustrySector, to_DefaultPerson, to_DefaultOrganization, to_DefaultGroup, to_CurrentAddressInformation, to_CurrentDefaultAddressUsageCode, to_CurrentDefaultAddressUsage, to_BusinessPartnerRelationship, to_HasContactPerson, to_CurrentHasContactPerson, to_CurrentDefaultHasContactPerson, to_Supplier, to_Bank, to_PaymentCard, to_AddressIndependentCommunication]<br />For example: .../BusinessPartner(Entity-Id)/<b>to_Customer</b>/.....",
+        "operationId" : "getBusinessPartnerId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -3526,6 +3599,7 @@
         "tags" : [ "BusinessPartner" ],
         "summary" : "Create a new entity BusinessPartner",
         "description" : "Create a new entity in EntitySet: BusinessPartner",
+        "operationId" : "createBusinessPartner",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -3556,6 +3630,7 @@
         "tags" : [ "BusinessPartner" ],
         "summary" : "Delete BusinessPartner",
         "description" : "Delete entity in EntitySet BusinessPartner",
+        "operationId" : "deleteBusinessPartner",
         "responses" : {
           "204" : {
             "description" : "EntitySet BusinessPartner successfully deleted",
@@ -3575,6 +3650,7 @@
         "tags" : [ "BusinessPartner" ],
         "summary" : "Update entity BusinessPartner",
         "description" : "Update an existing entity in EntitySet: BusinessPartner",
+        "operationId" : "updateBusinessPartner",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -3616,6 +3692,7 @@
         "tags" : [ "BusinessPartnerBank" ],
         "summary" : "Get BusinessPartnerBank",
         "description" : "Returns the entity: BusinessPartnerBank. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: BusinessPartnerBank supports the following navigational properties: [to_CountryCode, to_Parent]<br />For example: .../BusinessPartnerBank(Entity-Id)/<b>to_CountryCode</b>/.....",
+        "operationId" : "getBusinessPartnerBank",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -3709,6 +3786,7 @@
         "tags" : [ "BusinessPartnerBank" ],
         "summary" : "Get BusinessPartnerBank on Id",
         "description" : "Returns the entity: BusinessPartnerBank. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: BusinessPartnerBank supports the following navigational properties: [to_CountryCode, to_Parent]<br />For example: .../BusinessPartnerBank(Entity-Id)/<b>to_CountryCode</b>/.....",
+        "operationId" : "getBusinessPartnerBankId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -3757,6 +3835,7 @@
         "tags" : [ "BusinessPartnerBank" ],
         "summary" : "Create a new entity BusinessPartnerBank",
         "description" : "Create a new entity in EntitySet: BusinessPartnerBank",
+        "operationId" : "createBusinessPartnerBank",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -3787,6 +3866,7 @@
         "tags" : [ "BusinessPartnerBank" ],
         "summary" : "Delete BusinessPartnerBank",
         "description" : "Delete entity in EntitySet BusinessPartnerBank",
+        "operationId" : "deleteBusinessPartnerBank",
         "responses" : {
           "204" : {
             "description" : "EntitySet BusinessPartnerBank successfully deleted",
@@ -3806,6 +3886,7 @@
         "tags" : [ "BusinessPartnerBank" ],
         "summary" : "Update entity BusinessPartnerBank",
         "description" : "Update an existing entity in EntitySet: BusinessPartnerBank",
+        "operationId" : "updateBusinessPartnerBank",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -3847,6 +3928,7 @@
         "tags" : [ "BusinessPartnerRelationship" ],
         "summary" : "Get BusinessPartnerRelationship",
         "description" : "Returns the entity: BusinessPartnerRelationship. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: BusinessPartnerRelationship supports the following navigational properties: [to_ContactPerson, to_FirstBusinessPartner, to_SecondBusinessPartner]<br />For example: .../BusinessPartnerRelationship(Entity-Id)/<b>to_ContactPerson</b>/.....",
+        "operationId" : "getBusinessPartnerRelationship",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -3940,6 +4022,7 @@
         "tags" : [ "BusinessPartnerRelationship" ],
         "summary" : "Get BusinessPartnerRelationship on Id",
         "description" : "Returns the entity: BusinessPartnerRelationship. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: BusinessPartnerRelationship supports the following navigational properties: [to_ContactPerson, to_FirstBusinessPartner, to_SecondBusinessPartner]<br />For example: .../BusinessPartnerRelationship(Entity-Id)/<b>to_ContactPerson</b>/.....",
+        "operationId" : "getBusinessPartnerRelationshipId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -3988,6 +4071,7 @@
         "tags" : [ "BusinessPartnerRelationship" ],
         "summary" : "Create a new entity BusinessPartnerRelationship",
         "description" : "Create a new entity in EntitySet: BusinessPartnerRelationship",
+        "operationId" : "createBusinessPartnerRelationship",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -4018,6 +4102,7 @@
         "tags" : [ "BusinessPartnerRelationship" ],
         "summary" : "Delete BusinessPartnerRelationship",
         "description" : "Delete entity in EntitySet BusinessPartnerRelationship",
+        "operationId" : "deleteBusinessPartnerRelationship",
         "responses" : {
           "204" : {
             "description" : "EntitySet BusinessPartnerRelationship successfully deleted",
@@ -4037,6 +4122,7 @@
         "tags" : [ "BusinessPartnerRelationship" ],
         "summary" : "Update entity BusinessPartnerRelationship",
         "description" : "Update an existing entity in EntitySet: BusinessPartnerRelationship",
+        "operationId" : "updateBusinessPartnerRelationship",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -4078,6 +4164,7 @@
         "tags" : [ "BusinessPartnerWhldgTax" ],
         "summary" : "Get BusinessPartnerWhldgTax",
         "description" : "Returns the entity: BusinessPartnerWhldgTax. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: BusinessPartnerWhldgTax supports the following navigational properties: [to_Parent]<br />For example: .../BusinessPartnerWhldgTax(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getBusinessPartnerWhldgTax",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -4171,6 +4258,7 @@
         "tags" : [ "BusinessPartnerWhldgTax" ],
         "summary" : "Get BusinessPartnerWhldgTax on Id",
         "description" : "Returns the entity: BusinessPartnerWhldgTax. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: BusinessPartnerWhldgTax supports the following navigational properties: [to_Parent]<br />For example: .../BusinessPartnerWhldgTax(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getBusinessPartnerWhldgTaxId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -4219,6 +4307,7 @@
         "tags" : [ "BusinessPartnerWhldgTax" ],
         "summary" : "Create a new entity BusinessPartnerWhldgTax",
         "description" : "Create a new entity in EntitySet: BusinessPartnerWhldgTax",
+        "operationId" : "createBusinessPartnerWhldgTax",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -4249,6 +4338,7 @@
         "tags" : [ "BusinessPartnerWhldgTax" ],
         "summary" : "Delete BusinessPartnerWhldgTax",
         "description" : "Delete entity in EntitySet BusinessPartnerWhldgTax",
+        "operationId" : "deleteBusinessPartnerWhldgTax",
         "responses" : {
           "204" : {
             "description" : "EntitySet BusinessPartnerWhldgTax successfully deleted",
@@ -4268,6 +4358,7 @@
         "tags" : [ "BusinessPartnerWhldgTax" ],
         "summary" : "Update entity BusinessPartnerWhldgTax",
         "description" : "Update an existing entity in EntitySet: BusinessPartnerWhldgTax",
+        "operationId" : "updateBusinessPartnerWhldgTax",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -4309,6 +4400,7 @@
         "tags" : [ "C_Countries" ],
         "summary" : "Get C_Countries",
         "description" : "Returns the entity: C_Countries. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: C_Countries supports the following navigational properties: [text, subdivision, localised]<br />For example: .../C_Countries(Entity-Id)/<b>text</b>/.....",
+        "operationId" : "getC_Countries",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -4402,6 +4494,7 @@
         "tags" : [ "C_Countries" ],
         "summary" : "Get C_Countries on Id",
         "description" : "Returns the entity: C_Countries. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: C_Countries supports the following navigational properties: [text, subdivision, localised]<br />For example: .../C_Countries(Entity-Id)/<b>text</b>/.....",
+        "operationId" : "getC_CountriesId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -4450,6 +4543,7 @@
         "tags" : [ "C_Countries" ],
         "summary" : "Create a new entity C_Countries",
         "description" : "Create a new entity in EntitySet: C_Countries",
+        "operationId" : "createC_Countries",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -4480,6 +4574,7 @@
         "tags" : [ "C_Countries" ],
         "summary" : "Delete C_Countries",
         "description" : "Delete entity in EntitySet C_Countries",
+        "operationId" : "deleteC_Countries",
         "responses" : {
           "204" : {
             "description" : "EntitySet C_Countries successfully deleted",
@@ -4499,6 +4594,7 @@
         "tags" : [ "C_Countries" ],
         "summary" : "Update entity C_Countries",
         "description" : "Update an existing entity in EntitySet: C_Countries",
+        "operationId" : "updateC_Countries",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -4540,6 +4636,7 @@
         "tags" : [ "CommunicationDataText" ],
         "summary" : "Get CommunicationDataText",
         "description" : "Returns the entity: CommunicationDataText. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: CommunicationDataText supports <b>no</b> navigational properties.",
+        "operationId" : "getCommunicationDataText",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -4632,6 +4729,7 @@
         "tags" : [ "CommunicationDataText" ],
         "summary" : "Get CommunicationDataText on Id",
         "description" : "Returns the entity: CommunicationDataText. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: CommunicationDataText supports <b>no</b> navigational properties.",
+        "operationId" : "getCommunicationDataTextId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -4679,6 +4777,7 @@
         "tags" : [ "CommunicationDataText" ],
         "summary" : "Create a new entity CommunicationDataText",
         "description" : "Create a new entity in EntitySet: CommunicationDataText",
+        "operationId" : "createCommunicationDataText",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -4709,6 +4808,7 @@
         "tags" : [ "CommunicationDataText" ],
         "summary" : "Delete CommunicationDataText",
         "description" : "Delete entity in EntitySet CommunicationDataText",
+        "operationId" : "deleteCommunicationDataText",
         "responses" : {
           "204" : {
             "description" : "EntitySet CommunicationDataText successfully deleted",
@@ -4728,6 +4828,7 @@
         "tags" : [ "CommunicationDataText" ],
         "summary" : "Update entity CommunicationDataText",
         "description" : "Update an existing entity in EntitySet: CommunicationDataText",
+        "operationId" : "updateCommunicationDataText",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -4769,6 +4870,7 @@
         "tags" : [ "ContactPerson" ],
         "summary" : "Get ContactPerson",
         "description" : "Returns the entity: ContactPerson. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: ContactPerson supports the following navigational properties: [to_Parent, to_WorkPlaceAddressInformation, to_CurrentDefaultWorkPlaceAddressInformation, to_Cwai]<br />For example: .../ContactPerson(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getContactPerson",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -4862,6 +4964,7 @@
         "tags" : [ "ContactPerson" ],
         "summary" : "Get ContactPerson on Id",
         "description" : "Returns the entity: ContactPerson. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: ContactPerson supports the following navigational properties: [to_Parent, to_WorkPlaceAddressInformation, to_CurrentDefaultWorkPlaceAddressInformation, to_Cwai]<br />For example: .../ContactPerson(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getContactPersonId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -4910,6 +5013,7 @@
         "tags" : [ "ContactPerson" ],
         "summary" : "Create a new entity ContactPerson",
         "description" : "Create a new entity in EntitySet: ContactPerson",
+        "operationId" : "createContactPerson",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -4940,6 +5044,7 @@
         "tags" : [ "ContactPerson" ],
         "summary" : "Delete ContactPerson",
         "description" : "Delete entity in EntitySet ContactPerson",
+        "operationId" : "deleteContactPerson",
         "responses" : {
           "204" : {
             "description" : "EntitySet ContactPerson successfully deleted",
@@ -4959,6 +5064,7 @@
         "tags" : [ "ContactPerson" ],
         "summary" : "Update entity ContactPerson",
         "description" : "Update an existing entity in EntitySet: ContactPerson",
+        "operationId" : "updateContactPerson",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -5000,6 +5106,7 @@
         "tags" : [ "CountryTexts" ],
         "summary" : "Get CountryTexts",
         "description" : "Returns the entity: CountryTexts. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: CountryTexts supports <b>no</b> navigational properties.",
+        "operationId" : "getCountryTexts",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -5092,6 +5199,7 @@
         "tags" : [ "CountryTexts" ],
         "summary" : "Get CountryTexts on Id",
         "description" : "Returns the entity: CountryTexts. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: CountryTexts supports <b>no</b> navigational properties.",
+        "operationId" : "getCountryTextsId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -5139,6 +5247,7 @@
         "tags" : [ "CountryTexts" ],
         "summary" : "Create a new entity CountryTexts",
         "description" : "Create a new entity in EntitySet: CountryTexts",
+        "operationId" : "createCountryTexts",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -5169,6 +5278,7 @@
         "tags" : [ "CountryTexts" ],
         "summary" : "Delete CountryTexts",
         "description" : "Delete entity in EntitySet CountryTexts",
+        "operationId" : "deleteCountryTexts",
         "responses" : {
           "204" : {
             "description" : "EntitySet CountryTexts successfully deleted",
@@ -5188,6 +5298,7 @@
         "tags" : [ "CountryTexts" ],
         "summary" : "Update entity CountryTexts",
         "description" : "Update an existing entity in EntitySet: CountryTexts",
+        "operationId" : "updateCountryTexts",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -5229,6 +5340,7 @@
         "tags" : [ "Customer" ],
         "summary" : "Get Customer",
         "description" : "Returns the entity: Customer. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Customer supports the following navigational properties: [to_AddressInformation, to_SalesArea, to_SalesTax, to_Parent]<br />For example: .../Customer(Entity-Id)/<b>to_AddressInformation</b>/.....",
+        "operationId" : "getCustomer",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -5322,6 +5434,7 @@
         "tags" : [ "Customer" ],
         "summary" : "Get Customer on Id",
         "description" : "Returns the entity: Customer. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Customer supports the following navigational properties: [to_AddressInformation, to_SalesArea, to_SalesTax, to_Parent]<br />For example: .../Customer(Entity-Id)/<b>to_AddressInformation</b>/.....",
+        "operationId" : "getCustomerId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -5370,6 +5483,7 @@
         "tags" : [ "Customer" ],
         "summary" : "Create a new entity Customer",
         "description" : "Create a new entity in EntitySet: Customer",
+        "operationId" : "createCustomer",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -5400,6 +5514,7 @@
         "tags" : [ "Customer" ],
         "summary" : "Delete Customer",
         "description" : "Delete entity in EntitySet Customer",
+        "operationId" : "deleteCustomer",
         "responses" : {
           "204" : {
             "description" : "EntitySet Customer successfully deleted",
@@ -5419,6 +5534,7 @@
         "tags" : [ "Customer" ],
         "summary" : "Update entity Customer",
         "description" : "Update an existing entity in EntitySet: Customer",
+        "operationId" : "updateCustomer",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -5460,6 +5576,7 @@
         "tags" : [ "CustomerPartnerFunction" ],
         "summary" : "Get CustomerPartnerFunction",
         "description" : "Returns the entity: CustomerPartnerFunction. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: CustomerPartnerFunction supports the following navigational properties: [to_Parent]<br />For example: .../CustomerPartnerFunction(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getCustomerPartnerFunction",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -5553,6 +5670,7 @@
         "tags" : [ "CustomerPartnerFunction" ],
         "summary" : "Get CustomerPartnerFunction on Id",
         "description" : "Returns the entity: CustomerPartnerFunction. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: CustomerPartnerFunction supports the following navigational properties: [to_Parent]<br />For example: .../CustomerPartnerFunction(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getCustomerPartnerFunctionId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -5601,6 +5719,7 @@
         "tags" : [ "CustomerPartnerFunction" ],
         "summary" : "Create a new entity CustomerPartnerFunction",
         "description" : "Create a new entity in EntitySet: CustomerPartnerFunction",
+        "operationId" : "createCustomerPartnerFunction",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -5631,6 +5750,7 @@
         "tags" : [ "CustomerPartnerFunction" ],
         "summary" : "Delete CustomerPartnerFunction",
         "description" : "Delete entity in EntitySet CustomerPartnerFunction",
+        "operationId" : "deleteCustomerPartnerFunction",
         "responses" : {
           "204" : {
             "description" : "EntitySet CustomerPartnerFunction successfully deleted",
@@ -5650,6 +5770,7 @@
         "tags" : [ "CustomerPartnerFunction" ],
         "summary" : "Update entity CustomerPartnerFunction",
         "description" : "Update an existing entity in EntitySet: CustomerPartnerFunction",
+        "operationId" : "updateCustomerPartnerFunction",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -5691,6 +5812,7 @@
         "tags" : [ "EmailAddress" ],
         "summary" : "Get EmailAddress",
         "description" : "Returns the entity: EmailAddress. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: EmailAddress supports the following navigational properties: [to_Parent, to_EmailNote]<br />For example: .../EmailAddress(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getEmailAddress",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -5784,6 +5906,7 @@
         "tags" : [ "EmailAddress" ],
         "summary" : "Get EmailAddress on Id",
         "description" : "Returns the entity: EmailAddress. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: EmailAddress supports the following navigational properties: [to_Parent, to_EmailNote]<br />For example: .../EmailAddress(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getEmailAddressId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -5832,6 +5955,7 @@
         "tags" : [ "EmailAddress" ],
         "summary" : "Create a new entity EmailAddress",
         "description" : "Create a new entity in EntitySet: EmailAddress",
+        "operationId" : "createEmailAddress",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -5862,6 +5986,7 @@
         "tags" : [ "EmailAddress" ],
         "summary" : "Delete EmailAddress",
         "description" : "Delete entity in EntitySet EmailAddress",
+        "operationId" : "deleteEmailAddress",
         "responses" : {
           "204" : {
             "description" : "EntitySet EmailAddress successfully deleted",
@@ -5881,6 +6006,7 @@
         "tags" : [ "EmailAddress" ],
         "summary" : "Update entity EmailAddress",
         "description" : "Update an existing entity in EntitySet: EmailAddress",
+        "operationId" : "updateEmailAddress",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -5922,6 +6048,7 @@
         "tags" : [ "FaxNumber" ],
         "summary" : "Get FaxNumber",
         "description" : "Returns the entity: FaxNumber. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: FaxNumber supports the following navigational properties: [to_Parent, to_FaxNote]<br />For example: .../FaxNumber(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getFaxNumber",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -6015,6 +6142,7 @@
         "tags" : [ "FaxNumber" ],
         "summary" : "Get FaxNumber on Id",
         "description" : "Returns the entity: FaxNumber. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: FaxNumber supports the following navigational properties: [to_Parent, to_FaxNote]<br />For example: .../FaxNumber(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getFaxNumberId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -6063,6 +6191,7 @@
         "tags" : [ "FaxNumber" ],
         "summary" : "Create a new entity FaxNumber",
         "description" : "Create a new entity in EntitySet: FaxNumber",
+        "operationId" : "createFaxNumber",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -6093,6 +6222,7 @@
         "tags" : [ "FaxNumber" ],
         "summary" : "Delete FaxNumber",
         "description" : "Delete entity in EntitySet FaxNumber",
+        "operationId" : "deleteFaxNumber",
         "responses" : {
           "204" : {
             "description" : "EntitySet FaxNumber successfully deleted",
@@ -6112,6 +6242,7 @@
         "tags" : [ "FaxNumber" ],
         "summary" : "Update entity FaxNumber",
         "description" : "Update an existing entity in EntitySet: FaxNumber",
+        "operationId" : "updateFaxNumber",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -6153,6 +6284,7 @@
         "tags" : [ "GroupName" ],
         "summary" : "Get GroupName",
         "description" : "Returns the entity: GroupName. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: GroupName supports the following navigational properties: [to_Parent]<br />For example: .../GroupName(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getGroupName",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -6246,6 +6378,7 @@
         "tags" : [ "GroupName" ],
         "summary" : "Get GroupName on Id",
         "description" : "Returns the entity: GroupName. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: GroupName supports the following navigational properties: [to_Parent]<br />For example: .../GroupName(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getGroupNameId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -6294,6 +6427,7 @@
         "tags" : [ "GroupName" ],
         "summary" : "Create a new entity GroupName",
         "description" : "Create a new entity in EntitySet: GroupName",
+        "operationId" : "createGroupName",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -6324,6 +6458,7 @@
         "tags" : [ "GroupName" ],
         "summary" : "Delete GroupName",
         "description" : "Delete entity in EntitySet GroupName",
+        "operationId" : "deleteGroupName",
         "responses" : {
           "204" : {
             "description" : "EntitySet GroupName successfully deleted",
@@ -6343,6 +6478,7 @@
         "tags" : [ "GroupName" ],
         "summary" : "Update entity GroupName",
         "description" : "Update an existing entity in EntitySet: GroupName",
+        "operationId" : "updateGroupName",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -6384,6 +6520,7 @@
         "tags" : [ "Identification" ],
         "summary" : "Get Identification",
         "description" : "Returns the entity: Identification. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Identification supports the following navigational properties: [to_Parent]<br />For example: .../Identification(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getIdentification",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -6477,6 +6614,7 @@
         "tags" : [ "Identification" ],
         "summary" : "Get Identification on Id",
         "description" : "Returns the entity: Identification. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Identification supports the following navigational properties: [to_Parent]<br />For example: .../Identification(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getIdentificationId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -6525,6 +6663,7 @@
         "tags" : [ "Identification" ],
         "summary" : "Create a new entity Identification",
         "description" : "Create a new entity in EntitySet: Identification",
+        "operationId" : "createIdentification",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -6555,6 +6694,7 @@
         "tags" : [ "Identification" ],
         "summary" : "Delete Identification",
         "description" : "Delete entity in EntitySet Identification",
+        "operationId" : "deleteIdentification",
         "responses" : {
           "204" : {
             "description" : "EntitySet Identification successfully deleted",
@@ -6574,6 +6714,7 @@
         "tags" : [ "Identification" ],
         "summary" : "Update entity Identification",
         "description" : "Update an existing entity in EntitySet: Identification",
+        "operationId" : "updateIdentification",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -6615,6 +6756,7 @@
         "tags" : [ "IndustrySector" ],
         "summary" : "Get IndustrySector",
         "description" : "Returns the entity: IndustrySector. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: IndustrySector supports the following navigational properties: [to_Parent]<br />For example: .../IndustrySector(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getIndustrySector",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -6708,6 +6850,7 @@
         "tags" : [ "IndustrySector" ],
         "summary" : "Get IndustrySector on Id",
         "description" : "Returns the entity: IndustrySector. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: IndustrySector supports the following navigational properties: [to_Parent]<br />For example: .../IndustrySector(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getIndustrySectorId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -6756,6 +6899,7 @@
         "tags" : [ "IndustrySector" ],
         "summary" : "Create a new entity IndustrySector",
         "description" : "Create a new entity in EntitySet: IndustrySector",
+        "operationId" : "createIndustrySector",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -6786,6 +6930,7 @@
         "tags" : [ "IndustrySector" ],
         "summary" : "Delete IndustrySector",
         "description" : "Delete entity in EntitySet IndustrySector",
+        "operationId" : "deleteIndustrySector",
         "responses" : {
           "204" : {
             "description" : "EntitySet IndustrySector successfully deleted",
@@ -6805,6 +6950,7 @@
         "tags" : [ "IndustrySector" ],
         "summary" : "Update entity IndustrySector",
         "description" : "Update an existing entity in EntitySet: IndustrySector",
+        "operationId" : "updateIndustrySector",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -6846,6 +6992,7 @@
         "tags" : [ "OrganizationName" ],
         "summary" : "Get OrganizationName",
         "description" : "Returns the entity: OrganizationName. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: OrganizationName supports the following navigational properties: [to_Parent]<br />For example: .../OrganizationName(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getOrganizationName",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -6939,6 +7086,7 @@
         "tags" : [ "OrganizationName" ],
         "summary" : "Get OrganizationName on Id",
         "description" : "Returns the entity: OrganizationName. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: OrganizationName supports the following navigational properties: [to_Parent]<br />For example: .../OrganizationName(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getOrganizationNameId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -6987,6 +7135,7 @@
         "tags" : [ "OrganizationName" ],
         "summary" : "Create a new entity OrganizationName",
         "description" : "Create a new entity in EntitySet: OrganizationName",
+        "operationId" : "createOrganizationName",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -7017,6 +7166,7 @@
         "tags" : [ "OrganizationName" ],
         "summary" : "Delete OrganizationName",
         "description" : "Delete entity in EntitySet OrganizationName",
+        "operationId" : "deleteOrganizationName",
         "responses" : {
           "204" : {
             "description" : "EntitySet OrganizationName successfully deleted",
@@ -7036,6 +7186,7 @@
         "tags" : [ "OrganizationName" ],
         "summary" : "Update entity OrganizationName",
         "description" : "Update an existing entity in EntitySet: OrganizationName",
+        "operationId" : "updateOrganizationName",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -7077,6 +7228,7 @@
         "tags" : [ "PaymentCard" ],
         "summary" : "Get PaymentCard",
         "description" : "Returns the entity: PaymentCard. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: PaymentCard supports the following navigational properties: [to_Parent]<br />For example: .../PaymentCard(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getPaymentCard",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -7170,6 +7322,7 @@
         "tags" : [ "PaymentCard" ],
         "summary" : "Get PaymentCard on Id",
         "description" : "Returns the entity: PaymentCard. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: PaymentCard supports the following navigational properties: [to_Parent]<br />For example: .../PaymentCard(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getPaymentCardId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -7218,6 +7371,7 @@
         "tags" : [ "PaymentCard" ],
         "summary" : "Create a new entity PaymentCard",
         "description" : "Create a new entity in EntitySet: PaymentCard",
+        "operationId" : "createPaymentCard",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -7248,6 +7402,7 @@
         "tags" : [ "PaymentCard" ],
         "summary" : "Delete PaymentCard",
         "description" : "Delete entity in EntitySet PaymentCard",
+        "operationId" : "deletePaymentCard",
         "responses" : {
           "204" : {
             "description" : "EntitySet PaymentCard successfully deleted",
@@ -7267,6 +7422,7 @@
         "tags" : [ "PaymentCard" ],
         "summary" : "Update entity PaymentCard",
         "description" : "Update an existing entity in EntitySet: PaymentCard",
+        "operationId" : "updatePaymentCard",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -7308,6 +7464,7 @@
         "tags" : [ "PersonName" ],
         "summary" : "Get PersonName",
         "description" : "Returns the entity: PersonName. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: PersonName supports the following navigational properties: [to_Parent]<br />For example: .../PersonName(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getPersonName",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -7401,6 +7558,7 @@
         "tags" : [ "PersonName" ],
         "summary" : "Get PersonName on Id",
         "description" : "Returns the entity: PersonName. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: PersonName supports the following navigational properties: [to_Parent]<br />For example: .../PersonName(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getPersonNameId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -7449,6 +7607,7 @@
         "tags" : [ "PersonName" ],
         "summary" : "Create a new entity PersonName",
         "description" : "Create a new entity in EntitySet: PersonName",
+        "operationId" : "createPersonName",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -7479,6 +7638,7 @@
         "tags" : [ "PersonName" ],
         "summary" : "Delete PersonName",
         "description" : "Delete entity in EntitySet PersonName",
+        "operationId" : "deletePersonName",
         "responses" : {
           "204" : {
             "description" : "EntitySet PersonName successfully deleted",
@@ -7498,6 +7658,7 @@
         "tags" : [ "PersonName" ],
         "summary" : "Update entity PersonName",
         "description" : "Update an existing entity in EntitySet: PersonName",
+        "operationId" : "updatePersonName",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -7539,6 +7700,7 @@
         "tags" : [ "PhoneNumber" ],
         "summary" : "Get PhoneNumber",
         "description" : "Returns the entity: PhoneNumber. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: PhoneNumber supports the following navigational properties: [to_Parent, to_PhoneNote]<br />For example: .../PhoneNumber(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getPhoneNumber",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -7632,6 +7794,7 @@
         "tags" : [ "PhoneNumber" ],
         "summary" : "Get PhoneNumber on Id",
         "description" : "Returns the entity: PhoneNumber. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: PhoneNumber supports the following navigational properties: [to_Parent, to_PhoneNote]<br />For example: .../PhoneNumber(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getPhoneNumberId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -7680,6 +7843,7 @@
         "tags" : [ "PhoneNumber" ],
         "summary" : "Create a new entity PhoneNumber",
         "description" : "Create a new entity in EntitySet: PhoneNumber",
+        "operationId" : "createPhoneNumber",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -7710,6 +7874,7 @@
         "tags" : [ "PhoneNumber" ],
         "summary" : "Delete PhoneNumber",
         "description" : "Delete entity in EntitySet PhoneNumber",
+        "operationId" : "deletePhoneNumber",
         "responses" : {
           "204" : {
             "description" : "EntitySet PhoneNumber successfully deleted",
@@ -7729,6 +7894,7 @@
         "tags" : [ "PhoneNumber" ],
         "summary" : "Update entity PhoneNumber",
         "description" : "Update an existing entity in EntitySet: PhoneNumber",
+        "operationId" : "updatePhoneNumber",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -7770,6 +7936,7 @@
         "tags" : [ "PostalAddress" ],
         "summary" : "Get PostalAddress",
         "description" : "Returns the entity: PostalAddress. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: PostalAddress supports the following navigational properties: [to_Parent]<br />For example: .../PostalAddress(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getPostalAddress",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -7863,6 +8030,7 @@
         "tags" : [ "PostalAddress" ],
         "summary" : "Get PostalAddress on Id",
         "description" : "Returns the entity: PostalAddress. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: PostalAddress supports the following navigational properties: [to_Parent]<br />For example: .../PostalAddress(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getPostalAddressId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -7911,6 +8079,7 @@
         "tags" : [ "PostalAddress" ],
         "summary" : "Create a new entity PostalAddress",
         "description" : "Create a new entity in EntitySet: PostalAddress",
+        "operationId" : "createPostalAddress",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -7941,6 +8110,7 @@
         "tags" : [ "PostalAddress" ],
         "summary" : "Delete PostalAddress",
         "description" : "Delete entity in EntitySet PostalAddress",
+        "operationId" : "deletePostalAddress",
         "responses" : {
           "204" : {
             "description" : "EntitySet PostalAddress successfully deleted",
@@ -7960,6 +8130,7 @@
         "tags" : [ "PostalAddress" ],
         "summary" : "Update entity PostalAddress",
         "description" : "Update an existing entity in EntitySet: PostalAddress",
+        "operationId" : "updatePostalAddress",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -8001,6 +8172,7 @@
         "tags" : [ "Role" ],
         "summary" : "Get Role",
         "description" : "Returns the entity: Role. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Role supports the following navigational properties: [to_Parent]<br />For example: .../Role(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getRole",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -8094,6 +8266,7 @@
         "tags" : [ "Role" ],
         "summary" : "Get Role on Id",
         "description" : "Returns the entity: Role. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Role supports the following navigational properties: [to_Parent]<br />For example: .../Role(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getRoleId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -8142,6 +8315,7 @@
         "tags" : [ "Role" ],
         "summary" : "Create a new entity Role",
         "description" : "Create a new entity in EntitySet: Role",
+        "operationId" : "createRole",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -8172,6 +8346,7 @@
         "tags" : [ "Role" ],
         "summary" : "Delete Role",
         "description" : "Delete entity in EntitySet Role",
+        "operationId" : "deleteRole",
         "responses" : {
           "204" : {
             "description" : "EntitySet Role successfully deleted",
@@ -8191,6 +8366,7 @@
         "tags" : [ "Role" ],
         "summary" : "Update entity Role",
         "description" : "Update an existing entity in EntitySet: Role",
+        "operationId" : "updateRole",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -8232,6 +8408,7 @@
         "tags" : [ "SalesArea" ],
         "summary" : "Get SalesArea",
         "description" : "Returns the entity: SalesArea. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: SalesArea supports the following navigational properties: [to_CustomerPartnerFunction, to_Parent]<br />For example: .../SalesArea(Entity-Id)/<b>to_CustomerPartnerFunction</b>/.....",
+        "operationId" : "getSalesArea",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -8325,6 +8502,7 @@
         "tags" : [ "SalesArea" ],
         "summary" : "Get SalesArea on Id",
         "description" : "Returns the entity: SalesArea. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: SalesArea supports the following navigational properties: [to_CustomerPartnerFunction, to_Parent]<br />For example: .../SalesArea(Entity-Id)/<b>to_CustomerPartnerFunction</b>/.....",
+        "operationId" : "getSalesAreaId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -8373,6 +8551,7 @@
         "tags" : [ "SalesArea" ],
         "summary" : "Create a new entity SalesArea",
         "description" : "Create a new entity in EntitySet: SalesArea",
+        "operationId" : "createSalesArea",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -8403,6 +8582,7 @@
         "tags" : [ "SalesArea" ],
         "summary" : "Delete SalesArea",
         "description" : "Delete entity in EntitySet SalesArea",
+        "operationId" : "deleteSalesArea",
         "responses" : {
           "204" : {
             "description" : "EntitySet SalesArea successfully deleted",
@@ -8422,6 +8602,7 @@
         "tags" : [ "SalesArea" ],
         "summary" : "Update entity SalesArea",
         "description" : "Update an existing entity in EntitySet: SalesArea",
+        "operationId" : "updateSalesArea",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -8463,6 +8644,7 @@
         "tags" : [ "SalesTax" ],
         "summary" : "Get SalesTax",
         "description" : "Returns the entity: SalesTax. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: SalesTax supports the following navigational properties: [to_Customer]<br />For example: .../SalesTax(Entity-Id)/<b>to_Customer</b>/.....",
+        "operationId" : "getSalesTax",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -8556,6 +8738,7 @@
         "tags" : [ "SalesTax" ],
         "summary" : "Get SalesTax on Id",
         "description" : "Returns the entity: SalesTax. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: SalesTax supports the following navigational properties: [to_Customer]<br />For example: .../SalesTax(Entity-Id)/<b>to_Customer</b>/.....",
+        "operationId" : "getSalesTaxId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -8604,6 +8787,7 @@
         "tags" : [ "SalesTax" ],
         "summary" : "Create a new entity SalesTax",
         "description" : "Create a new entity in EntitySet: SalesTax",
+        "operationId" : "createSalesTax",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -8634,6 +8818,7 @@
         "tags" : [ "SalesTax" ],
         "summary" : "Delete SalesTax",
         "description" : "Delete entity in EntitySet SalesTax",
+        "operationId" : "deleteSalesTax",
         "responses" : {
           "204" : {
             "description" : "EntitySet SalesTax successfully deleted",
@@ -8653,6 +8838,7 @@
         "tags" : [ "SalesTax" ],
         "summary" : "Update entity SalesTax",
         "description" : "Update an existing entity in EntitySet: SalesTax",
+        "operationId" : "updateSalesTax",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -8694,6 +8880,7 @@
         "tags" : [ "SubdivisionTexts" ],
         "summary" : "Get SubdivisionTexts",
         "description" : "Returns the entity: SubdivisionTexts. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: SubdivisionTexts supports <b>no</b> navigational properties.",
+        "operationId" : "getSubdivisionTexts",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -8786,6 +8973,7 @@
         "tags" : [ "SubdivisionTexts" ],
         "summary" : "Get SubdivisionTexts on Id",
         "description" : "Returns the entity: SubdivisionTexts. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: SubdivisionTexts supports <b>no</b> navigational properties.",
+        "operationId" : "getSubdivisionTextsId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -8833,6 +9021,7 @@
         "tags" : [ "SubdivisionTexts" ],
         "summary" : "Create a new entity SubdivisionTexts",
         "description" : "Create a new entity in EntitySet: SubdivisionTexts",
+        "operationId" : "createSubdivisionTexts",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -8863,6 +9052,7 @@
         "tags" : [ "SubdivisionTexts" ],
         "summary" : "Delete SubdivisionTexts",
         "description" : "Delete entity in EntitySet SubdivisionTexts",
+        "operationId" : "deleteSubdivisionTexts",
         "responses" : {
           "204" : {
             "description" : "EntitySet SubdivisionTexts successfully deleted",
@@ -8882,6 +9072,7 @@
         "tags" : [ "SubdivisionTexts" ],
         "summary" : "Update entity SubdivisionTexts",
         "description" : "Update an existing entity in EntitySet: SubdivisionTexts",
+        "operationId" : "updateSubdivisionTexts",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -8923,6 +9114,7 @@
         "tags" : [ "Subdivisions" ],
         "summary" : "Get Subdivisions",
         "description" : "Returns the entity: Subdivisions. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Subdivisions supports the following navigational properties: [subdivisionText, localisedSubdivision]<br />For example: .../Subdivisions(Entity-Id)/<b>subdivisionText</b>/.....",
+        "operationId" : "getSubdivisions",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -9016,6 +9208,7 @@
         "tags" : [ "Subdivisions" ],
         "summary" : "Get Subdivisions on Id",
         "description" : "Returns the entity: Subdivisions. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Subdivisions supports the following navigational properties: [subdivisionText, localisedSubdivision]<br />For example: .../Subdivisions(Entity-Id)/<b>subdivisionText</b>/.....",
+        "operationId" : "getSubdivisionsId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -9064,6 +9257,7 @@
         "tags" : [ "Subdivisions" ],
         "summary" : "Create a new entity Subdivisions",
         "description" : "Create a new entity in EntitySet: Subdivisions",
+        "operationId" : "createSubdivisions",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -9094,6 +9288,7 @@
         "tags" : [ "Subdivisions" ],
         "summary" : "Delete Subdivisions",
         "description" : "Delete entity in EntitySet Subdivisions",
+        "operationId" : "deleteSubdivisions",
         "responses" : {
           "204" : {
             "description" : "EntitySet Subdivisions successfully deleted",
@@ -9113,6 +9308,7 @@
         "tags" : [ "Subdivisions" ],
         "summary" : "Update entity Subdivisions",
         "description" : "Update an existing entity in EntitySet: Subdivisions",
+        "operationId" : "updateSubdivisions",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -9154,6 +9350,7 @@
         "tags" : [ "Supplier" ],
         "summary" : "Get Supplier",
         "description" : "Returns the entity: Supplier. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Supplier supports the following navigational properties: [to_Parent, to_AddressInformation, to_CompanyCode, to_SupplierPurchasing]<br />For example: .../Supplier(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getSupplier",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -9247,6 +9444,7 @@
         "tags" : [ "Supplier" ],
         "summary" : "Get Supplier on Id",
         "description" : "Returns the entity: Supplier. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Supplier supports the following navigational properties: [to_Parent, to_AddressInformation, to_CompanyCode, to_SupplierPurchasing]<br />For example: .../Supplier(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getSupplierId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -9295,6 +9493,7 @@
         "tags" : [ "Supplier" ],
         "summary" : "Create a new entity Supplier",
         "description" : "Create a new entity in EntitySet: Supplier",
+        "operationId" : "createSupplier",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -9325,6 +9524,7 @@
         "tags" : [ "Supplier" ],
         "summary" : "Delete Supplier",
         "description" : "Delete entity in EntitySet Supplier",
+        "operationId" : "deleteSupplier",
         "responses" : {
           "204" : {
             "description" : "EntitySet Supplier successfully deleted",
@@ -9344,6 +9544,7 @@
         "tags" : [ "Supplier" ],
         "summary" : "Update entity Supplier",
         "description" : "Update an existing entity in EntitySet: Supplier",
+        "operationId" : "updateSupplier",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -9385,6 +9586,7 @@
         "tags" : [ "SupplierCompany" ],
         "summary" : "Get SupplierCompany",
         "description" : "Returns the entity: SupplierCompany. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: SupplierCompany supports the following navigational properties: [to_WithholdingTax, to_Parent]<br />For example: .../SupplierCompany(Entity-Id)/<b>to_WithholdingTax</b>/.....",
+        "operationId" : "getSupplierCompany",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -9478,6 +9680,7 @@
         "tags" : [ "SupplierCompany" ],
         "summary" : "Get SupplierCompany on Id",
         "description" : "Returns the entity: SupplierCompany. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: SupplierCompany supports the following navigational properties: [to_WithholdingTax, to_Parent]<br />For example: .../SupplierCompany(Entity-Id)/<b>to_WithholdingTax</b>/.....",
+        "operationId" : "getSupplierCompanyId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -9526,6 +9729,7 @@
         "tags" : [ "SupplierCompany" ],
         "summary" : "Create a new entity SupplierCompany",
         "description" : "Create a new entity in EntitySet: SupplierCompany",
+        "operationId" : "createSupplierCompany",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -9556,6 +9760,7 @@
         "tags" : [ "SupplierCompany" ],
         "summary" : "Delete SupplierCompany",
         "description" : "Delete entity in EntitySet SupplierCompany",
+        "operationId" : "deleteSupplierCompany",
         "responses" : {
           "204" : {
             "description" : "EntitySet SupplierCompany successfully deleted",
@@ -9575,6 +9780,7 @@
         "tags" : [ "SupplierCompany" ],
         "summary" : "Update entity SupplierCompany",
         "description" : "Update an existing entity in EntitySet: SupplierCompany",
+        "operationId" : "updateSupplierCompany",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -9616,6 +9822,7 @@
         "tags" : [ "SupplierPartnerFunction" ],
         "summary" : "Get SupplierPartnerFunction",
         "description" : "Returns the entity: SupplierPartnerFunction. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: SupplierPartnerFunction supports the following navigational properties: [to_Parent]<br />For example: .../SupplierPartnerFunction(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getSupplierPartnerFunction",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -9709,6 +9916,7 @@
         "tags" : [ "SupplierPartnerFunction" ],
         "summary" : "Get SupplierPartnerFunction on Id",
         "description" : "Returns the entity: SupplierPartnerFunction. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: SupplierPartnerFunction supports the following navigational properties: [to_Parent]<br />For example: .../SupplierPartnerFunction(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getSupplierPartnerFunctionId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -9757,6 +9965,7 @@
         "tags" : [ "SupplierPartnerFunction" ],
         "summary" : "Create a new entity SupplierPartnerFunction",
         "description" : "Create a new entity in EntitySet: SupplierPartnerFunction",
+        "operationId" : "createSupplierPartnerFunction",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -9787,6 +9996,7 @@
         "tags" : [ "SupplierPartnerFunction" ],
         "summary" : "Delete SupplierPartnerFunction",
         "description" : "Delete entity in EntitySet SupplierPartnerFunction",
+        "operationId" : "deleteSupplierPartnerFunction",
         "responses" : {
           "204" : {
             "description" : "EntitySet SupplierPartnerFunction successfully deleted",
@@ -9806,6 +10016,7 @@
         "tags" : [ "SupplierPartnerFunction" ],
         "summary" : "Update entity SupplierPartnerFunction",
         "description" : "Update an existing entity in EntitySet: SupplierPartnerFunction",
+        "operationId" : "updateSupplierPartnerFunction",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -9847,6 +10058,7 @@
         "tags" : [ "SupplierPurchasingOrg" ],
         "summary" : "Get SupplierPurchasingOrg",
         "description" : "Returns the entity: SupplierPurchasingOrg. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: SupplierPurchasingOrg supports the following navigational properties: [to_SupplierPartnerFunction, to_Parent]<br />For example: .../SupplierPurchasingOrg(Entity-Id)/<b>to_SupplierPartnerFunction</b>/.....",
+        "operationId" : "getSupplierPurchasingOrg",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -9940,6 +10152,7 @@
         "tags" : [ "SupplierPurchasingOrg" ],
         "summary" : "Get SupplierPurchasingOrg on Id",
         "description" : "Returns the entity: SupplierPurchasingOrg. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: SupplierPurchasingOrg supports the following navigational properties: [to_SupplierPartnerFunction, to_Parent]<br />For example: .../SupplierPurchasingOrg(Entity-Id)/<b>to_SupplierPartnerFunction</b>/.....",
+        "operationId" : "getSupplierPurchasingOrgId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -9988,6 +10201,7 @@
         "tags" : [ "SupplierPurchasingOrg" ],
         "summary" : "Create a new entity SupplierPurchasingOrg",
         "description" : "Create a new entity in EntitySet: SupplierPurchasingOrg",
+        "operationId" : "createSupplierPurchasingOrg",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -10018,6 +10232,7 @@
         "tags" : [ "SupplierPurchasingOrg" ],
         "summary" : "Delete SupplierPurchasingOrg",
         "description" : "Delete entity in EntitySet SupplierPurchasingOrg",
+        "operationId" : "deleteSupplierPurchasingOrg",
         "responses" : {
           "204" : {
             "description" : "EntitySet SupplierPurchasingOrg successfully deleted",
@@ -10037,6 +10252,7 @@
         "tags" : [ "SupplierPurchasingOrg" ],
         "summary" : "Update entity SupplierPurchasingOrg",
         "description" : "Update an existing entity in EntitySet: SupplierPurchasingOrg",
+        "operationId" : "updateSupplierPurchasingOrg",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -10078,6 +10294,7 @@
         "tags" : [ "TaxNumber" ],
         "summary" : "Get TaxNumber",
         "description" : "Returns the entity: TaxNumber. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: TaxNumber supports the following navigational properties: [to_Parent]<br />For example: .../TaxNumber(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getTaxNumber",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -10171,6 +10388,7 @@
         "tags" : [ "TaxNumber" ],
         "summary" : "Get TaxNumber on Id",
         "description" : "Returns the entity: TaxNumber. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: TaxNumber supports the following navigational properties: [to_Parent]<br />For example: .../TaxNumber(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getTaxNumberId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -10219,6 +10437,7 @@
         "tags" : [ "TaxNumber" ],
         "summary" : "Create a new entity TaxNumber",
         "description" : "Create a new entity in EntitySet: TaxNumber",
+        "operationId" : "createTaxNumber",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -10249,6 +10468,7 @@
         "tags" : [ "TaxNumber" ],
         "summary" : "Delete TaxNumber",
         "description" : "Delete entity in EntitySet TaxNumber",
+        "operationId" : "deleteTaxNumber",
         "responses" : {
           "204" : {
             "description" : "EntitySet TaxNumber successfully deleted",
@@ -10268,6 +10488,7 @@
         "tags" : [ "TaxNumber" ],
         "summary" : "Update entity TaxNumber",
         "description" : "Update an existing entity in EntitySet: TaxNumber",
+        "operationId" : "updateTaxNumber",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -10309,6 +10530,7 @@
         "tags" : [ "Web" ],
         "summary" : "Get Web",
         "description" : "Returns the entity: Web. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Web supports the following navigational properties: [to_Parent, to_WebNote]<br />For example: .../Web(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getWeb",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -10402,6 +10624,7 @@
         "tags" : [ "Web" ],
         "summary" : "Get Web on Id",
         "description" : "Returns the entity: Web. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Web supports the following navigational properties: [to_Parent, to_WebNote]<br />For example: .../Web(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getWebId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -10450,6 +10673,7 @@
         "tags" : [ "Web" ],
         "summary" : "Create a new entity Web",
         "description" : "Create a new entity in EntitySet: Web",
+        "operationId" : "createWeb",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -10480,6 +10704,7 @@
         "tags" : [ "Web" ],
         "summary" : "Delete Web",
         "description" : "Delete entity in EntitySet Web",
+        "operationId" : "deleteWeb",
         "responses" : {
           "204" : {
             "description" : "EntitySet Web successfully deleted",
@@ -10499,6 +10724,7 @@
         "tags" : [ "Web" ],
         "summary" : "Update entity Web",
         "description" : "Update an existing entity in EntitySet: Web",
+        "operationId" : "updateWeb",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -10540,6 +10766,7 @@
         "tags" : [ "WorkPlaceAddressInformation" ],
         "summary" : "Get WorkPlaceAddressInformation",
         "description" : "Returns the entity: WorkPlaceAddressInformation. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: WorkPlaceAddressInformation supports the following navigational properties: [to_Parent, to_WorkplaceAddress, to_OrganizationAddress]<br />For example: .../WorkPlaceAddressInformation(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getWorkPlaceAddressInformation",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -10633,6 +10860,7 @@
         "tags" : [ "WorkPlaceAddressInformation" ],
         "summary" : "Get WorkPlaceAddressInformation on Id",
         "description" : "Returns the entity: WorkPlaceAddressInformation. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: WorkPlaceAddressInformation supports the following navigational properties: [to_Parent, to_WorkplaceAddress, to_OrganizationAddress]<br />For example: .../WorkPlaceAddressInformation(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getWorkPlaceAddressInformationId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -10681,6 +10909,7 @@
         "tags" : [ "WorkPlaceAddressInformation" ],
         "summary" : "Create a new entity WorkPlaceAddressInformation",
         "description" : "Create a new entity in EntitySet: WorkPlaceAddressInformation",
+        "operationId" : "createWorkPlaceAddressInformation",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -10711,6 +10940,7 @@
         "tags" : [ "WorkPlaceAddressInformation" ],
         "summary" : "Delete WorkPlaceAddressInformation",
         "description" : "Delete entity in EntitySet WorkPlaceAddressInformation",
+        "operationId" : "deleteWorkPlaceAddressInformation",
         "responses" : {
           "204" : {
             "description" : "EntitySet WorkPlaceAddressInformation successfully deleted",
@@ -10730,6 +10960,7 @@
         "tags" : [ "WorkPlaceAddressInformation" ],
         "summary" : "Update entity WorkPlaceAddressInformation",
         "description" : "Update an existing entity in EntitySet: WorkPlaceAddressInformation",
+        "operationId" : "updateWorkPlaceAddressInformation",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -10771,6 +11002,7 @@
         "tags" : [ "Workplace" ],
         "summary" : "Get Workplace",
         "description" : "Returns the entity: Workplace. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Workplace supports the following navigational properties: [to_Parent]<br />For example: .../Workplace(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getWorkplace",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -10864,6 +11096,7 @@
         "tags" : [ "Workplace" ],
         "summary" : "Get Workplace on Id",
         "description" : "Returns the entity: Workplace. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Workplace supports the following navigational properties: [to_Parent]<br />For example: .../Workplace(Entity-Id)/<b>to_Parent</b>/.....",
+        "operationId" : "getWorkplaceId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -10912,6 +11145,7 @@
         "tags" : [ "Workplace" ],
         "summary" : "Create a new entity Workplace",
         "description" : "Create a new entity in EntitySet: Workplace",
+        "operationId" : "createWorkplace",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -10942,6 +11176,7 @@
         "tags" : [ "Workplace" ],
         "summary" : "Delete Workplace",
         "description" : "Delete entity in EntitySet Workplace",
+        "operationId" : "deleteWorkplace",
         "responses" : {
           "204" : {
             "description" : "EntitySet Workplace successfully deleted",
@@ -10961,6 +11196,7 @@
         "tags" : [ "Workplace" ],
         "summary" : "Update entity Workplace",
         "description" : "Update an existing entity in EntitySet: Workplace",
+        "operationId" : "updateWorkplace",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {

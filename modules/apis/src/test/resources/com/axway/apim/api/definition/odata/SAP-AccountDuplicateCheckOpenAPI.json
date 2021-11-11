@@ -12,6 +12,7 @@
     "/CheckForDuplicateAccounts" : {
       "get" : {
         "tags" : [ "AccountDuplicateCheckResultCollection" ],
+        "operationId" : "CheckForDuplicateAccounts",
         "parameters" : [ {
           "name" : "Name",
           "in" : "query",
@@ -137,6 +138,7 @@
         "tags" : [ "AccountDuplicateCheckResultCollection" ],
         "summary" : "Get AccountDuplicateCheckResultCollection",
         "description" : "Returns the entity: AccountDuplicateCheckResultCollection. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: AccountDuplicateCheckResultCollection supports <b>no</b> navigational properties.",
+        "operationId" : "getAccountDuplicateCheckResultCollection",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -229,6 +231,7 @@
         "tags" : [ "AccountDuplicateCheckResultCollection" ],
         "summary" : "Get AccountDuplicateCheckResultCollection on Id",
         "description" : "Returns the entity: AccountDuplicateCheckResultCollection. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: AccountDuplicateCheckResultCollection supports <b>no</b> navigational properties.",
+        "operationId" : "getAccountDuplicateCheckResultCollectionId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -276,6 +279,7 @@
         "tags" : [ "AccountDuplicateCheckResultCollection" ],
         "summary" : "Create a new entity AccountDuplicateCheckResultCollection",
         "description" : "Create a new entity in EntitySet: AccountDuplicateCheckResultCollection",
+        "operationId" : "createAccountDuplicateCheckResultCollection",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -306,6 +310,7 @@
         "tags" : [ "AccountDuplicateCheckResultCollection" ],
         "summary" : "Delete AccountDuplicateCheckResultCollection",
         "description" : "Delete entity in EntitySet AccountDuplicateCheckResultCollection",
+        "operationId" : "deleteAccountDuplicateCheckResultCollection",
         "responses" : {
           "204" : {
             "description" : "EntitySet AccountDuplicateCheckResultCollection successfully deleted",
@@ -325,6 +330,7 @@
         "tags" : [ "AccountDuplicateCheckResultCollection" ],
         "summary" : "Update entity AccountDuplicateCheckResultCollection",
         "description" : "Update an existing entity in EntitySet: AccountDuplicateCheckResultCollection",
+        "operationId" : "updateAccountDuplicateCheckResultCollection",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -366,6 +372,7 @@
         "tags" : [ "AccountDuplicateCheckResultStatusCodeCollection" ],
         "summary" : "Get AccountDuplicateCheckResultStatusCodeCollection",
         "description" : "Returns the entity: AccountDuplicateCheckResultStatusCodeCollection. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: AccountDuplicateCheckResultStatusCodeCollection supports <b>no</b> navigational properties.",
+        "operationId" : "getAccountDuplicateCheckResultStatusCodeCollection",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -458,6 +465,7 @@
         "tags" : [ "AccountDuplicateCheckResultStatusCodeCollection" ],
         "summary" : "Get AccountDuplicateCheckResultStatusCodeCollection on Id",
         "description" : "Returns the entity: AccountDuplicateCheckResultStatusCodeCollection. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: AccountDuplicateCheckResultStatusCodeCollection supports <b>no</b> navigational properties.",
+        "operationId" : "getAccountDuplicateCheckResultStatusCodeCollectionId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -505,6 +513,7 @@
         "tags" : [ "AccountDuplicateCheckResultStatusCodeCollection" ],
         "summary" : "Create a new entity AccountDuplicateCheckResultStatusCodeCollection",
         "description" : "Create a new entity in EntitySet: AccountDuplicateCheckResultStatusCodeCollection",
+        "operationId" : "createAccountDuplicateCheckResultStatusCodeCollection",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -535,6 +544,7 @@
         "tags" : [ "AccountDuplicateCheckResultStatusCodeCollection" ],
         "summary" : "Delete AccountDuplicateCheckResultStatusCodeCollection",
         "description" : "Delete entity in EntitySet AccountDuplicateCheckResultStatusCodeCollection",
+        "operationId" : "deleteAccountDuplicateCheckResultStatusCodeCollection",
         "responses" : {
           "204" : {
             "description" : "EntitySet AccountDuplicateCheckResultStatusCodeCollection successfully deleted",
@@ -554,6 +564,7 @@
         "tags" : [ "AccountDuplicateCheckResultStatusCodeCollection" ],
         "summary" : "Update entity AccountDuplicateCheckResultStatusCodeCollection",
         "description" : "Update an existing entity in EntitySet: AccountDuplicateCheckResultStatusCodeCollection",
+        "operationId" : "updateAccountDuplicateCheckResultStatusCodeCollection",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {

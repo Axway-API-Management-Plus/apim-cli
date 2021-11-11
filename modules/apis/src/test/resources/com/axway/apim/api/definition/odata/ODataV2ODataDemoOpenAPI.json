@@ -12,6 +12,7 @@
     "/GetProductsByRating" : {
       "get" : {
         "tags" : [ "Products" ],
+        "operationId" : "GetProductsByRating",
         "parameters" : [ {
           "name" : "rating",
           "in" : "query",
@@ -48,6 +49,7 @@
         "tags" : [ "Products" ],
         "summary" : "Get Products",
         "description" : "Returns the entity: Products. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Products supports the following navigational properties: [Category, Supplier]<br />For example: .../Products(Entity-Id)/<b>Category</b>/.....",
+        "operationId" : "getProducts",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -141,6 +143,7 @@
         "tags" : [ "Products" ],
         "summary" : "Get Products on Id",
         "description" : "Returns the entity: Products. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Products supports the following navigational properties: [Category, Supplier]<br />For example: .../Products(Entity-Id)/<b>Category</b>/.....",
+        "operationId" : "getProductsId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -189,6 +192,7 @@
         "tags" : [ "Products" ],
         "summary" : "Create a new entity Products",
         "description" : "Create a new entity in EntitySet: Products",
+        "operationId" : "createProducts",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -219,6 +223,7 @@
         "tags" : [ "Products" ],
         "summary" : "Delete Products",
         "description" : "Delete entity in EntitySet Products",
+        "operationId" : "deleteProducts",
         "responses" : {
           "204" : {
             "description" : "EntitySet Products successfully deleted",
@@ -238,6 +243,7 @@
         "tags" : [ "Products" ],
         "summary" : "Update entity Products",
         "description" : "Update an existing entity in EntitySet: Products",
+        "operationId" : "updateProducts",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -279,6 +285,7 @@
         "tags" : [ "Categories" ],
         "summary" : "Get Categories",
         "description" : "Returns the entity: Categories. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Categories supports the following navigational properties: [Products]<br />For example: .../Categories(Entity-Id)/<b>Products</b>/.....",
+        "operationId" : "getCategories",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -372,6 +379,7 @@
         "tags" : [ "Categories" ],
         "summary" : "Get Categories on Id",
         "description" : "Returns the entity: Categories. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Categories supports the following navigational properties: [Products]<br />For example: .../Categories(Entity-Id)/<b>Products</b>/.....",
+        "operationId" : "getCategoriesId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -420,6 +428,7 @@
         "tags" : [ "Categories" ],
         "summary" : "Create a new entity Categories",
         "description" : "Create a new entity in EntitySet: Categories",
+        "operationId" : "createCategories",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -450,6 +459,7 @@
         "tags" : [ "Categories" ],
         "summary" : "Delete Categories",
         "description" : "Delete entity in EntitySet Categories",
+        "operationId" : "deleteCategories",
         "responses" : {
           "204" : {
             "description" : "EntitySet Categories successfully deleted",
@@ -469,6 +479,7 @@
         "tags" : [ "Categories" ],
         "summary" : "Update entity Categories",
         "description" : "Update an existing entity in EntitySet: Categories",
+        "operationId" : "updateCategories",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -510,6 +521,7 @@
         "tags" : [ "Suppliers" ],
         "summary" : "Get Suppliers",
         "description" : "Returns the entity: Suppliers. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Suppliers supports the following navigational properties: [Products]<br />For example: .../Suppliers(Entity-Id)/<b>Products</b>/.....",
+        "operationId" : "getSuppliers",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -603,6 +615,7 @@
         "tags" : [ "Suppliers" ],
         "summary" : "Get Suppliers on Id",
         "description" : "Returns the entity: Suppliers. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: Suppliers supports the following navigational properties: [Products]<br />For example: .../Suppliers(Entity-Id)/<b>Products</b>/.....",
+        "operationId" : "getSuppliersId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -651,6 +664,7 @@
         "tags" : [ "Suppliers" ],
         "summary" : "Create a new entity Suppliers",
         "description" : "Create a new entity in EntitySet: Suppliers",
+        "operationId" : "createSuppliers",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -681,6 +695,7 @@
         "tags" : [ "Suppliers" ],
         "summary" : "Delete Suppliers",
         "description" : "Delete entity in EntitySet Suppliers",
+        "operationId" : "deleteSuppliers",
         "responses" : {
           "204" : {
             "description" : "EntitySet Suppliers successfully deleted",
@@ -700,6 +715,7 @@
         "tags" : [ "Suppliers" ],
         "summary" : "Update entity Suppliers",
         "description" : "Update an existing entity in EntitySet: Suppliers",
+        "operationId" : "updateSuppliers",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {

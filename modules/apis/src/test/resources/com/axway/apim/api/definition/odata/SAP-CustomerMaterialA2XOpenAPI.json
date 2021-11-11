@@ -14,6 +14,7 @@
         "tags" : [ "Customer Materials" ],
         "summary" : "Get A_CustomerMaterial",
         "description" : "Returns the entity: A_CustomerMaterial. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: A_CustomerMaterial supports <b>no</b> navigational properties.",
+        "operationId" : "getA_CustomerMaterial",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -106,6 +107,7 @@
         "tags" : [ "Customer Materials" ],
         "summary" : "Get A_CustomerMaterial on Id",
         "description" : "Returns the entity: A_CustomerMaterial. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: A_CustomerMaterial supports <b>no</b> navigational properties.",
+        "operationId" : "getA_CustomerMaterialId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -153,6 +155,7 @@
         "tags" : [ "Customer Materials" ],
         "summary" : "Create a new entity A_CustomerMaterial",
         "description" : "Create a new entity in EntitySet: A_CustomerMaterial",
+        "operationId" : "createA_CustomerMaterial",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -183,6 +186,7 @@
         "tags" : [ "Customer Materials" ],
         "summary" : "Delete A_CustomerMaterial",
         "description" : "Delete entity in EntitySet A_CustomerMaterial",
+        "operationId" : "deleteA_CustomerMaterial",
         "responses" : {
           "204" : {
             "description" : "EntitySet A_CustomerMaterial successfully deleted",
@@ -202,6 +206,7 @@
         "tags" : [ "Customer Materials" ],
         "summary" : "Update entity A_CustomerMaterial",
         "description" : "Update an existing entity in EntitySet: A_CustomerMaterial",
+        "operationId" : "updateA_CustomerMaterial",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {

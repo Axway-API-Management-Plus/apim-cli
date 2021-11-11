@@ -140,6 +140,7 @@ public class ODataV2Specification extends ODataSpecification {
 		}
 		
 		operation.setTags(tag);
+		operation.setOperationId(function.getName());
 		setFunctionDocumentation(function, operation);
 		
 		for(String parameterName : function.getParameterNames()) {
@@ -201,8 +202,10 @@ public class ODataV2Specification extends ODataSpecification {
 		operation.setTags(tag);
 		if(idPath) {
 			operation.setSummary("Get " + entityName + " on Id");
+			operation.setOperationId("get"+entityName+"Id");
 		} else {
 			operation.setSummary("Get " + entityName);
+			operation.setOperationId("get"+entityName);
 		}
 		
 		String operationDescription = "Returns the entity: " + entityName + ". "
@@ -252,6 +255,7 @@ public class ODataV2Specification extends ODataSpecification {
 		operation = new Operation();
 		operation.setTags(tag);
 		operation.setSummary("Create a new entity " + entityName);
+		operation.setOperationId("create"+entityName);
 		operation.setDescription("Create a new entity in EntitySet: " + entityName);
 		operation.setRequestBody(createRequestBody(entityType, EdmMultiplicity.ONE, "The entity to create", true));
 		
@@ -265,6 +269,7 @@ public class ODataV2Specification extends ODataSpecification {
 		operation = new Operation();
 		operation.setTags(tag);
 		operation.setSummary("Update entity " + entityName);
+		operation.setOperationId("update"+entityName);
 		operation.setDescription("Update an existing entity in EntitySet: " + entityName);
 		operation.setRequestBody(createRequestBody(entityType, EdmMultiplicity.ONE, "The entity to update", true));
 		
@@ -278,6 +283,7 @@ public class ODataV2Specification extends ODataSpecification {
 		operation = new Operation();
 		operation.setTags(tag);
 		operation.setSummary("Delete " + entityName);
+		operation.setOperationId("delete"+entityName);
 		operation.setDescription("Delete entity in EntitySet " + entityName);
 		
 		responses = new ApiResponses()

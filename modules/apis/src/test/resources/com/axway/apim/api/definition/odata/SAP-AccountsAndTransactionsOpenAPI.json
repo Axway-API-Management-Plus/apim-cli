@@ -14,6 +14,7 @@
         "tags" : [ "Bank Account" ],
         "summary" : "Get AccountSet",
         "description" : "Returns the entity: AccountSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AccountSet supports the following navigational properties: [Transactions, Conditions]<br />For example: .../AccountSet(Entity-Id)/<b>Transactions</b>/.....",
+        "operationId" : "getAccountSet",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -107,6 +108,7 @@
         "tags" : [ "Bank Account" ],
         "summary" : "Get AccountSet on Id",
         "description" : "Returns the entity: AccountSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: AccountSet supports the following navigational properties: [Transactions, Conditions]<br />For example: .../AccountSet(Entity-Id)/<b>Transactions</b>/.....",
+        "operationId" : "getAccountSetId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -155,6 +157,7 @@
         "tags" : [ "Bank Account" ],
         "summary" : "Create a new entity AccountSet",
         "description" : "Create a new entity in EntitySet: AccountSet",
+        "operationId" : "createAccountSet",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -185,6 +188,7 @@
         "tags" : [ "Bank Account" ],
         "summary" : "Delete AccountSet",
         "description" : "Delete entity in EntitySet AccountSet",
+        "operationId" : "deleteAccountSet",
         "responses" : {
           "204" : {
             "description" : "EntitySet AccountSet successfully deleted",
@@ -204,6 +208,7 @@
         "tags" : [ "Bank Account" ],
         "summary" : "Update entity AccountSet",
         "description" : "Update an existing entity in EntitySet: AccountSet",
+        "operationId" : "updateAccountSet",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -245,6 +250,7 @@
         "tags" : [ "Transaction Item" ],
         "summary" : "Get TransactionSet",
         "description" : "Returns the entity: TransactionSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: TransactionSet supports <b>no</b> navigational properties.",
+        "operationId" : "getTransactionSet",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -337,6 +343,7 @@
         "tags" : [ "Transaction Item" ],
         "summary" : "Get TransactionSet on Id",
         "description" : "Returns the entity: TransactionSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: TransactionSet supports <b>no</b> navigational properties.",
+        "operationId" : "getTransactionSetId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -384,6 +391,7 @@
         "tags" : [ "Transaction Item" ],
         "summary" : "Create a new entity TransactionSet",
         "description" : "Create a new entity in EntitySet: TransactionSet",
+        "operationId" : "createTransactionSet",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -414,6 +422,7 @@
         "tags" : [ "Transaction Item" ],
         "summary" : "Delete TransactionSet",
         "description" : "Delete entity in EntitySet TransactionSet",
+        "operationId" : "deleteTransactionSet",
         "responses" : {
           "204" : {
             "description" : "EntitySet TransactionSet successfully deleted",
@@ -433,6 +442,7 @@
         "tags" : [ "Transaction Item" ],
         "summary" : "Update entity TransactionSet",
         "description" : "Update an existing entity in EntitySet: TransactionSet",
+        "operationId" : "updateTransactionSet",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -474,6 +484,7 @@
         "tags" : [ "Customer Status" ],
         "summary" : "Get StatusSet",
         "description" : "Returns the entity: StatusSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: StatusSet supports the following navigational properties: [Accounts, Recipients, TransactionClasses]<br />For example: .../StatusSet(Entity-Id)/<b>Accounts</b>/.....",
+        "operationId" : "getStatusSet",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -567,6 +578,7 @@
         "tags" : [ "Customer Status" ],
         "summary" : "Get StatusSet on Id",
         "description" : "Returns the entity: StatusSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br /><br />The entity: StatusSet supports the following navigational properties: [Accounts, Recipients, TransactionClasses]<br />For example: .../StatusSet(Entity-Id)/<b>Accounts</b>/.....",
+        "operationId" : "getStatusSetId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -615,6 +627,7 @@
         "tags" : [ "Customer Status" ],
         "summary" : "Create a new entity StatusSet",
         "description" : "Create a new entity in EntitySet: StatusSet",
+        "operationId" : "createStatusSet",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -645,6 +658,7 @@
         "tags" : [ "Customer Status" ],
         "summary" : "Delete StatusSet",
         "description" : "Delete entity in EntitySet StatusSet",
+        "operationId" : "deleteStatusSet",
         "responses" : {
           "204" : {
             "description" : "EntitySet StatusSet successfully deleted",
@@ -664,6 +678,7 @@
         "tags" : [ "Customer Status" ],
         "summary" : "Update entity StatusSet",
         "description" : "Update an existing entity in EntitySet: StatusSet",
+        "operationId" : "updateStatusSet",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -705,6 +720,7 @@
         "tags" : [ "Bank Transfer" ],
         "summary" : "Get TransferSet",
         "description" : "Returns the entity: TransferSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: TransferSet supports <b>no</b> navigational properties.",
+        "operationId" : "getTransferSet",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -797,6 +813,7 @@
         "tags" : [ "Bank Transfer" ],
         "summary" : "Get TransferSet on Id",
         "description" : "Returns the entity: TransferSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: TransferSet supports <b>no</b> navigational properties.",
+        "operationId" : "getTransferSetId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -844,6 +861,7 @@
         "tags" : [ "Bank Transfer" ],
         "summary" : "Create a new entity TransferSet",
         "description" : "Create a new entity in EntitySet: TransferSet",
+        "operationId" : "createTransferSet",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -874,6 +892,7 @@
         "tags" : [ "Bank Transfer" ],
         "summary" : "Delete TransferSet",
         "description" : "Delete entity in EntitySet TransferSet",
+        "operationId" : "deleteTransferSet",
         "responses" : {
           "204" : {
             "description" : "EntitySet TransferSet successfully deleted",
@@ -893,6 +912,7 @@
         "tags" : [ "Bank Transfer" ],
         "summary" : "Update entity TransferSet",
         "description" : "Update an existing entity in EntitySet: TransferSet",
+        "operationId" : "updateTransferSet",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -934,6 +954,7 @@
         "tags" : [ "ConditionSet" ],
         "summary" : "Get ConditionSet",
         "description" : "Returns the entity: ConditionSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: ConditionSet supports <b>no</b> navigational properties.",
+        "operationId" : "getConditionSet",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1026,6 +1047,7 @@
         "tags" : [ "ConditionSet" ],
         "summary" : "Get ConditionSet on Id",
         "description" : "Returns the entity: ConditionSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: ConditionSet supports <b>no</b> navigational properties.",
+        "operationId" : "getConditionSetId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1073,6 +1095,7 @@
         "tags" : [ "ConditionSet" ],
         "summary" : "Create a new entity ConditionSet",
         "description" : "Create a new entity in EntitySet: ConditionSet",
+        "operationId" : "createConditionSet",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -1103,6 +1126,7 @@
         "tags" : [ "ConditionSet" ],
         "summary" : "Delete ConditionSet",
         "description" : "Delete entity in EntitySet ConditionSet",
+        "operationId" : "deleteConditionSet",
         "responses" : {
           "204" : {
             "description" : "EntitySet ConditionSet successfully deleted",
@@ -1122,6 +1146,7 @@
         "tags" : [ "ConditionSet" ],
         "summary" : "Update entity ConditionSet",
         "description" : "Update an existing entity in EntitySet: ConditionSet",
+        "operationId" : "updateConditionSet",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -1163,6 +1188,7 @@
         "tags" : [ "Bank Transfer Recipient" ],
         "summary" : "Get RecipientSet",
         "description" : "Returns the entity: RecipientSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: RecipientSet supports <b>no</b> navigational properties.",
+        "operationId" : "getRecipientSet",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1255,6 +1281,7 @@
         "tags" : [ "Bank Transfer Recipient" ],
         "summary" : "Get RecipientSet on Id",
         "description" : "Returns the entity: RecipientSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: RecipientSet supports <b>no</b> navigational properties.",
+        "operationId" : "getRecipientSetId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1302,6 +1329,7 @@
         "tags" : [ "Bank Transfer Recipient" ],
         "summary" : "Create a new entity RecipientSet",
         "description" : "Create a new entity in EntitySet: RecipientSet",
+        "operationId" : "createRecipientSet",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -1332,6 +1360,7 @@
         "tags" : [ "Bank Transfer Recipient" ],
         "summary" : "Delete RecipientSet",
         "description" : "Delete entity in EntitySet RecipientSet",
+        "operationId" : "deleteRecipientSet",
         "responses" : {
           "204" : {
             "description" : "EntitySet RecipientSet successfully deleted",
@@ -1351,6 +1380,7 @@
         "tags" : [ "Bank Transfer Recipient" ],
         "summary" : "Update entity RecipientSet",
         "description" : "Update an existing entity in EntitySet: RecipientSet",
+        "operationId" : "updateRecipientSet",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
@@ -1392,6 +1422,7 @@
         "tags" : [ "Transaction Classification" ],
         "summary" : "Get TransactionClassSet",
         "description" : "Returns the entity: TransactionClassSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: TransactionClassSet supports <b>no</b> navigational properties.",
+        "operationId" : "getTransactionClassSet",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1484,6 +1515,7 @@
         "tags" : [ "Transaction Classification" ],
         "summary" : "Get TransactionClassSet on Id",
         "description" : "Returns the entity: TransactionClassSet. For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a><br />The entity: TransactionClassSet supports <b>no</b> navigational properties.",
+        "operationId" : "getTransactionClassSetId",
         "parameters" : [ {
           "name" : "$expand",
           "in" : "query",
@@ -1531,6 +1563,7 @@
         "tags" : [ "Transaction Classification" ],
         "summary" : "Create a new entity TransactionClassSet",
         "description" : "Create a new entity in EntitySet: TransactionClassSet",
+        "operationId" : "createTransactionClassSet",
         "requestBody" : {
           "description" : "The entity to create",
           "content" : {
@@ -1561,6 +1594,7 @@
         "tags" : [ "Transaction Classification" ],
         "summary" : "Delete TransactionClassSet",
         "description" : "Delete entity in EntitySet TransactionClassSet",
+        "operationId" : "deleteTransactionClassSet",
         "responses" : {
           "204" : {
             "description" : "EntitySet TransactionClassSet successfully deleted",
@@ -1580,6 +1614,7 @@
         "tags" : [ "Transaction Classification" ],
         "summary" : "Update entity TransactionClassSet",
         "description" : "Update an existing entity in EntitySet: TransactionClassSet",
+        "operationId" : "updateTransactionClassSet",
         "requestBody" : {
           "description" : "The entity to update",
           "content" : {
