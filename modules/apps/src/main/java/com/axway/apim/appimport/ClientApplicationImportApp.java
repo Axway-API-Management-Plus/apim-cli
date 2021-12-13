@@ -86,8 +86,8 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 				importManager.setDesiredApp(desiredApp);
 				importManager.setActualApp(actualApp);
 				importManager.replicate();
+				LOG.info("Successfully replicated application: "+desiredApp.getName()+" into API-Manager");
 			}
-			LOG.info("Successfully replicated application into API-Manager");
 			return result;
 		} catch (AppException ap) {
 			ap.logException(LOG);

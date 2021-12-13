@@ -24,11 +24,12 @@ public class OrganizationImportManager {
 		if(actualOrg==null) {
 			orgAdapter.createOrganization(desiredOrg);
 		} else if(orgsAreEqual(desiredOrg, actualOrg)) {
-			LOG.debug("No changes detected between Desired- and Actual-Organization. Exiting now...");
-			throw new AppException("No changes detected between Desired- and Actual-Og.", ErrorCode.NO_CHANGE);			
+			LOG.debug("No changes detected between Desired- and Actual-Organization: " + desiredOrg.getName());
+			throw new AppException("No changes detected between Desired- and Actual-Org: "+desiredOrg.getName()+".", ErrorCode.NO_CHANGE);			
 		} else {
-			LOG.debug("Update existing application");
+			LOG.debug("Update existing organization: " + desiredOrg.getName());
 			orgAdapter.updateOrganization(desiredOrg, actualOrg);
+			LOG.info("Successfully replicated organization: "+desiredOrg.getName()+" into API-Manager");
 		}
 	}
 	

@@ -24,11 +24,12 @@ public class UserImportManager {
 		if(actualUser==null) {
 			userAdapter.createUser(desiredUser);
 		} else if(usersAreEqual(desiredUser, actualUser)) {
-			LOG.debug("No changes detected between Desired- and Actual-User. Exiting now...");
+			LOG.debug("No changes detected between Desired- and Actual-User: " + desiredUser.getName());
 			throw new AppException("No changes detected between Desired- and Actual-User.", ErrorCode.NO_CHANGE);			
 		} else {
-			LOG.debug("Update existing application");
+			LOG.debug("Update existing user: " + desiredUser.getName());
 			userAdapter.updateUser(desiredUser, actualUser);
+			LOG.info("Successfully replicated user: "+desiredUser.getName()+" into API-Manager");
 		}
 		return;
 	}
