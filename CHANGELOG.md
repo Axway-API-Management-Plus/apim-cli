@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Security
-- Updated Apache Log4J from version 1.2.17 to 2.14.1
+- Updated Apache Log4J from version 1.2.17 to 2.15.0
 
 ## [1.5.0] 2021-11-11
 ### Fixed
