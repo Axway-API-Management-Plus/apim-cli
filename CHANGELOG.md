@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.5.1] 2021-12-13
 ### Security
 - Updated Apache Log4J from version 1.2.17 to 2.15.0
 
