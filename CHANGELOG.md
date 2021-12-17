@@ -8,8 +8,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Logging improved if APIM-CLI is running in batch mode
 
+### Security
+- Updated Apache Log4J from version 1.15.0 to 2.16.0
+
 ### Changed
-- Updated all libraries to latest available version
+- Updated commons-cli from 1.4 to 1.5.0
+- Updated commons-io from 2.8.0 to 2.11.0
+- Updated commons-lang3 from 3.11 to 3.12.0
+- Updated commons-text from 1.8 to 1.9
+- Updated jackson-* from 2.11.3 to 2.13.0
+- Updated ehcache from 3.8.1 to 3.9.7 (requires to add dependency: org.glassfish.jaxb:jaxb-runtime:2.3.5)
 
 ## [1.5.1] 2021-12-13
 ### Security
