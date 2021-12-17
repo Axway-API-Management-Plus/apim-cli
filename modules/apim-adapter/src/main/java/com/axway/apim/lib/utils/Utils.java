@@ -137,8 +137,9 @@ public class Utils {
 	 * @throws IOException if the file can't be found
 	 */
 	public static String substitueVariables(File inputFile) throws IOException {
-		StringSubstitutor substitutor = new StringSubstitutor(CoreParameters.getInstance().getProperties());
 		String givenConfig = new String(Files.readAllBytes(inputFile.toPath()), StandardCharsets.UTF_8);
+		if(CoreParameters.getInstance().getProperties()==null) return givenConfig;
+		StringSubstitutor substitutor = new StringSubstitutor(CoreParameters.getInstance().getProperties());
 		givenConfig = StringSubstitutor.replace(givenConfig, System.getenv());
 		return substitutor.replace(givenConfig);
 	}
