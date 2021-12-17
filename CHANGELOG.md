@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Logging improved if APIM-CLI is running in batch mode
 
 ### Security
-- Updated Apache Log4J from version 1.15.0 to 2.16.0 (See issue [#225](https://github.com/Axway-API-Management-Plus/apim-cli/issues/225))
+- Updated Apache Log4J from version 2.15.0 to 2.16.0 (See issue [#225](https://github.com/Axway-API-Management-Plus/apim-cli/issues/225))
 
 ### Changed
 - Updated commons-cli from 1.4 to 1.5.0
