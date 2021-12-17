@@ -1,3 +1,10 @@
+# putting in defaults for test - TCI Support
+# ------------------------------------------
+os: linux
+dist: xenial
+arch: amd64
+# ------------------------------------------
+
 language: java
 script: "mvn clean verify"
 
@@ -13,7 +20,6 @@ env:
     - CACHE_FILE_CASSANDRA=$CACHE_DIR/cassandra_2_2_12.cache.tar.gz
     - CACHE_FILE_WAIT_FOR_DEPENDENCIES=$CACHE_DIR/wait-for-dependencies.cache.tar.gz
     - counter=0
-
 cache:
   directories:
     - $CACHE_DIR
