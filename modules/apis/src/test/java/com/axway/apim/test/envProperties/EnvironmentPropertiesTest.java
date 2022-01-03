@@ -34,7 +34,7 @@ public class EnvironmentPropertiesTest {
 	
 	@Test
 	public void testNoStageFromConfDir() throws AppException, IOException, URISyntaxException {
-		// A given path should be used to load the Environent-Config file from
+		// A given path should be used to load the Environment-Config file from
 		String path = EnvironmentPropertiesTest.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 		path += "envPropertiesTest/swaggerPromoteHome";
 
@@ -45,7 +45,7 @@ public class EnvironmentPropertiesTest {
 		
 		
 		Assert.assertEquals(properties.get("admin_username"), "userFromSwaggerPromoteHome");
-		Assert.assertEquals(properties.get("admin_password"), "passwordFromSwaggerPromoteHome");
+		Assert.assertEquals(properties.get("admin_password"), "\\passwordFromSwagger\\PromoteHome");
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public class EnvironmentPropertiesTest {
 		
 		
 		Assert.assertEquals(properties.get("admin_username"), "stageUserFromSwaggerPromoteHome");
-		Assert.assertEquals(properties.get("admin_password"), "stageUasswordFromSwaggerPromoteHome");
+		Assert.assertEquals(properties.get("admin_password"), "\\stagePasswordFrom\\SwaggerPromoteHome");
 	}
 	
 	@Test

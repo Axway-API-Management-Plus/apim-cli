@@ -2,6 +2,7 @@ package com.axway.apim.lib;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
@@ -9,6 +10,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +70,7 @@ public class EnvironmentProperties implements Map<String, String> {
 				pathToUse = (stage==null) ? "env.properties" : "env."+stage+".properties";
 				is = APIMHttpClient.class.getClassLoader().getResourceAsStream(pathToUse);
 			}
-			props.load(is);
+			props.load(new StringReader(IOUtils.toString(is, "UTF-8").replace("\\", "\\\\")));
 			LOG.debug("Loaded environment properties from file: " + pathToUse);
 		} catch (Exception e) {
 			LOG.debug("Trying to load environment properties from file: "+pathToUse+" ... not found.");
