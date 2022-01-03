@@ -4,12 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.6.1]
+## [Unreleased]
+### Changed
+- Renamed log4j.xml into log4j2.xml
 
+## [1.6.1] 2021-12-20
 ### Security
 - Updated Apache Log4J from version 2.16.0 to 2.17.0 
 
-## [1.6.0]
+## [1.6.0] 2021-12-17
 ### Added
 - Logging improved if APIM-CLI is running in batch mode
 
