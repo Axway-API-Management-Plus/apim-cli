@@ -147,7 +147,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		Assert.assertTrue(translatedProfile2.startsWith("<key type='AuthProfilesGroup'><id field='name' value='Auth Profil"), "OAuth provider profile 2 is not translated.");
 	}
 
-	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The OAuth provider profile is unkown: 'Invalid profile name'")
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The OAuth provider profile is unkown: 'Invalid profile name'. Known profiles:.*")
 	public void outboundOAuthInValidConfig() throws AppException, ParseException {
 		EnvironmentProperties props = new EnvironmentProperties(null);
 		props.put("myOAuthProfileName", "Invalid profile name");
