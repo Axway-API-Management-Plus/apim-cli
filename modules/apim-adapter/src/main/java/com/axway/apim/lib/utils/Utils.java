@@ -290,7 +290,7 @@ public class Utils {
 			}
 		}
 		if(retDate==null || retDate.before(new Date())) {
-			throw new AppException("Unable to parse the given retirementDate using the following formats: " + dateFormats, ErrorCode.CANT_READ_CONFIG_FILE);
+			throw new AppException("Unable to parse the given retirementDate using the following formats: " + dateFormats + ". Please note the retirementDate must be in the future.", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 		return retDate.getTime();
 	}

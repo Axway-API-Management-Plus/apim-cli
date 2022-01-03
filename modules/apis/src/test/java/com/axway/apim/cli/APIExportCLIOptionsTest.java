@@ -105,7 +105,7 @@ public class APIExportCLIOptionsTest {
 	
 	@Test
 	public void testUpgradeAccessAPIParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-a", "/api/v1/to/be/upgraded", "-refAPIId", "123456", "-refAPIName", "myRefOldAPI", "-refAPIVersion", "1.2.3", "-refAPIOrg", "RefOrg", "-refAPIDeprecate", "true", "-refAPIRetire", "true", "-refAPIRetireDate", "31.12.2021"};
+		String[] args = {"-s", "prod", "-a", "/api/v1/to/be/upgraded", "-refAPIId", "123456", "-refAPIName", "myRefOldAPI", "-refAPIVersion", "1.2.3", "-refAPIOrg", "RefOrg", "-refAPIDeprecate", "true", "-refAPIRetire", "true", "-refAPIRetireDate", "31.12.2023"};
 		CLIOptions cliOptions = CLIAPIUpgradeAccessOptions.create(args);
 		APIUpgradeAccessParams params = (APIUpgradeAccessParams)cliOptions.getParams();
 		
