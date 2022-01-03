@@ -123,7 +123,7 @@ public class APIExportCLIOptionsTest {
 		Assert.assertEquals(params.getReferenceAPIOrganization(), "RefOrg");
 		Assert.assertTrue(params.getReferenceAPIRetire());
 		Assert.assertTrue(params.getReferenceAPIDeprecate());
-		Assert.assertTrue(params.getReferenceAPIRetirementDate() == Long.parseLong("1640908800000"));
+		Assert.assertTrue(params.getReferenceAPIRetirementDate() == Long.parseLong("1703980800000"));
 		
 		// Make sure, the default handling works for deprecate / and retire
 		String[] args2 = {"-s", "prod", "-a", "/api/v1/to/be/upgraded"};
