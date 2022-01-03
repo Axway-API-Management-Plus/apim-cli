@@ -138,6 +138,13 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 		Assert.assertEquals(apiConfig.getVersion(), "kk1");
 		Assert.assertEquals(apiConfig.getName(), "My OAuth API");
+		// Make sure, the OAuth-Provider profiles are translated
+		Assert.assertTrue(apiConfig.getAuthenticationProfiles().get(0).getIsDefault(), "First OAuth profile is configured as default");
+		Assert.assertFalse(apiConfig.getAuthenticationProfiles().get(1).getIsDefault(), "Second OAuth profile is not default");
+		String translatedProfile1 = (String)apiConfig.getAuthenticationProfiles().get(0).getParameters().get("providerProfile");
+		String translatedProfile2 = (String)apiConfig.getAuthenticationProfiles().get(1).getParameters().get("providerProfile");
+		Assert.assertTrue(translatedProfile1.startsWith("<key type='AuthProfilesGroup'><id field='name' value='Auth Profil"), "OAuth provider profile 1 is not translated.");
+		Assert.assertTrue(translatedProfile2.startsWith("<key type='AuthProfilesGroup'><id field='name' value='Auth Profil"), "OAuth provider profile 2 is not translated.");
 	}
 
 	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The OAuth provider profile is unkown: 'Invalid profile name'")

@@ -77,6 +77,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.URLParser;
 import com.axway.apim.lib.utils.Utils;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -165,8 +166,10 @@ public class APIImportConfigAdapter {
 			} else {
 				apiConfig = baseConfig;
 			}
+		} catch (JsonParseException e) {
+			throw new AppException("Cannot parse API-Config file(s)", ErrorCode.CANT_READ_JSON_PAYLOAD, e);
 		} catch (Exception e) {
-			throw new AppException("Cant parse JSON-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
+			throw new AppException("Error reading API-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
 	}
 
@@ -758,7 +761,7 @@ public class APIImportConfigAdapter {
 					profile.setAuthenticationProfile("_default");
 				}
 			}
-			// Check the referenced authentication profile is valid
+			// Check the referenced authentication profile exists
 			if(!profile.getAuthenticationProfile().equals("_default")) {
 				if(profile.getAuthenticationProfile()!=null && getAuthNProfile(importApi, profile.getAuthenticationProfile())==null) {
 					throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '"+profile.getAuthenticationProfile()+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
@@ -780,11 +783,13 @@ public class APIImportConfigAdapter {
 	
 	private void validateOutboundAuthN(API importApi) throws AppException {
 		// Request to use some specific Outbound-AuthN for this API
-		if(importApi.getAuthenticationProfiles()!=null && importApi.getAuthenticationProfiles().size()!=0) {
-			if(importApi.getAuthenticationProfiles().get(0).getType().equals(AuthType.ssl)) { 
-				handleOutboundSSLAuthN(importApi.getAuthenticationProfiles().get(0));
-			} else if(importApi.getAuthenticationProfiles().get(0).getType().equals(AuthType.oauth)) {
-				handleOutboundOAuthAuthN(importApi.getAuthenticationProfiles().get(0));
+		if(importApi.getAuthenticationProfiles()==null || importApi.getAuthenticationProfiles().size()==0) return;
+			
+		for(AuthenticationProfile authProfile : importApi.getAuthenticationProfiles()) {
+			if(authProfile.getType().equals(AuthType.ssl)) { 
+				handleOutboundSSLAuthN(authProfile);
+			} else if(authProfile.getType().equals(AuthType.oauth)) {
+				handleOutboundOAuthAuthN(authProfile);
 			}
 		}
 		
@@ -796,7 +801,11 @@ public class APIImportConfigAdapter {
 		if(providerProfile!=null && providerProfile.startsWith("<key")) return;
 		OAuthClientProfile clientProfile = APIManagerAdapter.getInstance().oauthClientAdapter.getOAuthClientProfile(providerProfile);
 		if(clientProfile==null) {
-			throw new AppException("The OAuth provider profile is unkown: '"+providerProfile+"'", ErrorCode.REFERENCED_PROFILE_INVALID);
+			List<String> knownProfiles = new ArrayList<String>();
+			for(OAuthClientProfile profile : APIManagerAdapter.getInstance().oauthClientAdapter.getOAuthClientProfiles()) {
+				knownProfiles.add(profile.getName());
+			}
+			throw new AppException("The OAuth provider profile is unkown: '"+providerProfile+"'. Known profiles: " + knownProfiles, ErrorCode.REFERENCED_PROFILE_INVALID);
 		}
 		authnProfile.getParameters().put("providerProfile", clientProfile.getId());
 	}

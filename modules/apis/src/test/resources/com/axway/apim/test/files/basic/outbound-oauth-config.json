@@ -1,21 +1,30 @@
 {
-    "name": "My OAuth API",
-    "path": "/api/v1/Some.Services/XmlApi",
-    "state": "published",
-    "version": "kk1",
-    "organization": "API Development",
-    "apiDefinition": "the-api-definition.json",
-    "backendBasepath": "https://the.backend.of.the.service/Some.Services/XmlApi",
-    "replaceHostInSwagger": false,
-    "authenticationProfiles":[
-      {
-         "name":"_default",
-         "isDefault":"true",
-         "parameters":{
-            "providerProfile":"${myOAuthProfileName}",
-            "ownerId":"${authentication.subject.id}"
-         },
-         "type":"oauth"
-      }
-   ]
+  "name": "My OAuth API",
+  "path": "/api/v1/Some.Services/XmlApi",
+  "state": "published",
+  "version": "kk1",
+  "organization": "API Development",
+  "apiDefinition": "the-api-definition.json",
+  "backendBasepath": "https://the.backend.of.the.service/Some.Services/XmlApi",
+  "replaceHostInSwagger": false,
+  "authenticationProfiles": [
+    {
+      "name": "_default",
+      "isDefault": "true",
+      "parameters": {
+        "providerProfile": "${myOAuthProfileName}",
+        "ownerId": "${authentication.subject.id}"
+      },
+      "type": "oauth"
+    },
+    {
+      "name": "OAuth",
+      "isDefault": false,
+      "parameters": {
+        "providerProfile": "Another sample OAuth Client Profile",
+        "ownerId": "${authentication.subject.id}"
+      },
+      "type": "oauth"
+    }
+  ]
 }
