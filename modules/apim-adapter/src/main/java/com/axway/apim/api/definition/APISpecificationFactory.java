@@ -28,10 +28,10 @@ public class APISpecificationFactory {
 	}};
 	
 	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName) throws AppException {
-		return getAPISpecification(apiSpecificationContent, apiDefinitionFile, apiName, true);
+		return getAPISpecification(apiSpecificationContent, apiDefinitionFile, apiName, true, true);
 	}
 	
-	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName, boolean failOnError) throws AppException {
+	public static APISpecification getAPISpecification(byte[] apiSpecificationContent, String apiDefinitionFile, String apiName, boolean failOnError, boolean logDetectedVersion) throws AppException {
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("Handle API-Specification: '" + getContentStart(apiSpecificationContent) + "...', apiDefinitionFile: '"+apiDefinitionFile+"'");	
 		}
@@ -52,7 +52,9 @@ public class APISpecificationFactory {
 					if(spec.getAPIDefinitionType().getAdditionalNote()!=null) {
 						addNote = "\n                                 | " + spec.getAPIDefinitionType().getAdditionalNote();
 					}
-					LOG.info("Detected: " + spec.getAPIDefinitionType().niceName + " specification. " + spec.getAPIDefinitionType().getNote()+addNote);
+					if(logDetectedVersion) {
+						LOG.info("Detected: " + spec.getAPIDefinitionType().niceName + " specification. " + spec.getAPIDefinitionType().getNote()+addNote);
+					}
 					return spec;
 				}
 			} catch (AppException e) {

@@ -140,7 +140,7 @@ public class APIManagerAPIAdapter {
 	public API getAPI(APIFilter filter, boolean logMessage) throws AppException {
 		List<API> foundAPIs = getAPIs(filter, false);
 		API api = getUniqueAPI(foundAPIs, filter);
-		if(logMessage && api!=null) LOG.info("Found existing API on path: '"+api.getPath()+"' ("+api.getState()+") (ID: '"+api.getId()+"')");
+		if(logMessage && api!=null) LOG.info("Found existing API: '"+api.getName()+"' ("+api.getState()+") on path: '"+api.getPath()+"' (ID: '"+api.getId()+"')");
 		return api;
 	}
 	
@@ -503,7 +503,7 @@ public class APIManagerAPIAdapter {
 			if(httpResponse.containsHeader("Content-Disposition")) {
 				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
 			}
-			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), api.getName(), filter.isFailOnError());
+			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), api.getName(), filter.isFailOnError(), false);
 			addBackendResourcePath(api, apiDefinition, filter.isUseFEAPIDefinition());
 			api.setApiDefinition(apiDefinition);
 		} catch (Exception e) {

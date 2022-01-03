@@ -18,7 +18,7 @@ public enum ErrorCode {
 	NO_ADMIN_ROLE_USER					(17, "An action failed due to a missing Admin-Account.", false),
 	CANT_PARSE_HTTP_RESPONSE			(20, "Cannot parse a HTTP-Response for REST-API-Call"),
 	CANT_SEND_HTTP_REQUEST				(25, "Cannot send a HTTP-Request."),
-	CANT_READ_JSON_PAYLOAD				(30, "Cannot read or parse JSON-Payload."),
+	CANT_READ_JSON_PAYLOAD				(30, "Cannot read or parse JSON-Payload.", true),
 	CANT_CREATE_API_PROXY				(35, "Cannot create API-Proxy (FE-API)"),
 	CANT_CREATE_BE_API					(40, "Cannot import Swagger-Definition -> Can't create BE-API."),
 	CANT_UPDATE_API_PROXY				(45, "Can't update API-Proxy (FE-API)."),
