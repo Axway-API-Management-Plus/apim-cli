@@ -60,6 +60,7 @@ public abstract class APIManagerMockBase {
 		
 
 		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().hasId("72745ed9-f75b-428c-959c-b483eea497a1").build(), testAPI1);
+		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().hasName("apiName-routeKeyD").build(), testAPI1); // Register the name API also based on the API-Name
 		apiAdapter.setAPIManagerResponse(new APIFilter.Builder().hasId("72745ed9-f75b-428c-959c-99999999").build(), testAPI2);
 		apiAdapter.setAPIManagerResponse("72745ed9-f75b-428c-959c-b483eea497a1", new Image());
 		apiAdapter.setAPIManagerResponse("72745ed9-f75b-428c-959c-99999999", new Image());

@@ -25,6 +25,9 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.QuotaRestriction;
+import com.axway.apim.api.model.QuotaRestrictionDeserializer;
+import com.axway.apim.api.model.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ApplicationPermission;
 import com.axway.apim.api.model.apps.ClientAppCredential;
@@ -71,6 +74,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		// Try to read a list of applications
 		try {
 			mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
+			mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile)));
 			baseApps = mapper.readValue(Utils.substitueVariables(configFile), new TypeReference<List<ClientApplication>>(){});
 			if(stageConfig!=null) {
 				throw new AppException("Stage overrides are not supported for application lists.", ErrorCode.CANT_READ_CONFIG_FILE);

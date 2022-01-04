@@ -1,0 +1,29 @@
+{
+  "name": "Application with quota",
+  "description": "Application that configured quota per API-Name",
+  "state": "approved",
+  "appQuota": {
+    "restrictions": [
+      {
+        "api": "*",
+        "method": "*",
+        "type": "throttle",
+        "config": {
+          "messages": "9999",
+          "period": "week",
+          "per": "1"
+        }
+      },
+      {
+        "api": "apiName-routeKeyD",
+        "method": "*",
+        "type": "throttle",
+        "config": {
+          "messages": "9999",
+          "period": "week",
+          "per": "1"
+        }
+      }
+    ]
+  }
+}

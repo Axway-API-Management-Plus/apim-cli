@@ -67,6 +67,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.QuotaRestrictionDeserializer;
+import com.axway.apim.api.model.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -136,7 +137,7 @@ public class APIImportConfigAdapter {
 	public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, boolean usingOrgAdmin, String stageConfig) throws AppException {
 		super();
 		SimpleModule module = new SimpleModule();
-		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer());
+		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile));
 		// We would like to get back the original AppExcepption instead of a JsonMappingException
 		mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
 		mapper.registerModule(module);
