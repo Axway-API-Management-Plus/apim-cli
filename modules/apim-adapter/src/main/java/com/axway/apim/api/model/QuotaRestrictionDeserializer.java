@@ -52,7 +52,11 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		String per = quotaConfig.get("per").asText();
 
 		QuotaRestriction restriction = new QuotaRestriction();
-		restriction.setType(QuotaRestrictiontype.valueOf(type));
+		try {
+			restriction.setType(QuotaRestrictiontype.valueOf(type));
+		} catch (IllegalArgumentException e) {
+			throw new AppException("Invalid quota config. The restriction type: " + type + " is invalid.", ErrorCode.INVALID_QUOTA_CONFIG);
+		}
 		restriction.setMethod(node.get("method").asText());
 		Map<String, String> configMap = new LinkedHashMap<String, String>();
 		configMap.put("period", period);

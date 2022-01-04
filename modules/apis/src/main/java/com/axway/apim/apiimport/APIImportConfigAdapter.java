@@ -168,9 +168,9 @@ public class APIImportConfigAdapter {
 				apiConfig = baseConfig;
 			}
 		} catch (JsonParseException e) {
-			throw new AppException("Cannot parse API-Config file(s)", ErrorCode.CANT_READ_JSON_PAYLOAD, e);
+			throw new AppException("Cannot parse API-Config file(s). Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_JSON_PAYLOAD, e);
 		} catch (Exception e) {
-			throw new AppException("Error reading API-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
+			throw new AppException("Error reading API-Config file(s). Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
 	}
 
