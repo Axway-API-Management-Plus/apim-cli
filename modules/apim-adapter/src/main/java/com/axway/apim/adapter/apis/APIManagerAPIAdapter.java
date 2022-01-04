@@ -110,6 +110,8 @@ public class APIManagerAPIAdapter {
 	};
 
 	public APIManagerAPIAdapter() throws AppException {
+		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiId"}));
+		mapper.setFilterProvider(filter);
 	}
 
 	public List<API> getAPIs(APIFilter filter, boolean logProgress) throws AppException {
