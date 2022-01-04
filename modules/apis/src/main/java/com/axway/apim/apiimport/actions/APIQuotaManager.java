@@ -65,7 +65,7 @@ public class APIQuotaManager {
 			List<QuotaRestriction> mergedRestrictions = addOrMergeRestriction(actualRestrictions, desiredRestrictions);
 			// Update the API-ID for the API-Restrictions as the API might be re-created.
 			for(QuotaRestriction restriction : mergedRestrictions) {
-				restriction.setApi(createdAPI.getId());
+				restriction.setApiId(createdAPI.getId());
 				if(restriction.getMethod().equals("*")) continue;
 				// Additionally, we have to change the methodId
 				// Load the method for actualAPI to get the name of the method to which the existing quota is applied to
@@ -80,7 +80,7 @@ public class APIQuotaManager {
 				Iterator<QuotaRestriction> it = currentDefaultQuota.getRestrictions().iterator();
 				while(it.hasNext()) {
 					QuotaRestriction restriction = it.next();
-					if(restriction.getApi().equals(actualState.getId())) {
+					if(restriction.getApiId().equals(actualState.getId())) {
 						it.remove();
 					}
 				}
@@ -106,7 +106,7 @@ public class APIQuotaManager {
 			Iterator<QuotaRestriction> it = desiredRestrictions.iterator();
 			while(it.hasNext()) {
 				QuotaRestriction desiredRestriction = it.next();
-				desiredRestriction.setApi(null);
+				desiredRestriction.setApiId(null);
 				// And compare each desired restriction, if it is already included in the existing restrictions
 				for(QuotaRestriction existingRestriction : mergedRestrictions) {
 					if(desiredRestriction.isSameRestriction(existingRestriction, true)) {

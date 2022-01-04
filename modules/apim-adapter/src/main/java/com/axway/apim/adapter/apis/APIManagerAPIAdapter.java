@@ -943,9 +943,9 @@ public class APIManagerAPIAdapter {
 				// REST-API for App-Quota is also returning Default-Quotas, but we have to ignore them here!
 				if(app.getAppQuota().getId().equals(APIManagerAdapter.APPLICATION_DEFAULT_QUOTA) || app.getAppQuota().getId().equals(APIManagerAdapter.SYSTEM_API_QUOTA)) continue;
 				for(QuotaRestriction restriction : app.getAppQuota().getRestrictions()) {
-					if(restriction.getApi().equals(referenceAPI.getId())) { // This application has a restriction for this specific API
+					if(restriction.getApiId().equals(referenceAPI.getId())) { // This application has a restriction for this specific API
 						updateAppQuota = true;
-						restriction.setApi(apiToUpgradeAccess.getId()); // Take over the quota config to new API
+						restriction.setApiId(apiToUpgradeAccess.getId()); // Take over the quota config to new API
 						if(!restriction.getMethod().equals("*")) { // The restriction is for a specific method
 							String originalMethodName = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(referenceAPI.getId(), restriction.getMethod()).getName();
 							// Try to find the same operation for the newly created API based on the name

@@ -161,7 +161,7 @@ public class APIManagerQuotaAdapter {
 		List<QuotaRestriction> apiRestrictions = new ArrayList<QuotaRestriction>();
 		try {
 			for(QuotaRestriction restriction : quotaConfig.getRestrictions()) {
-				if(restriction.getApi().equals(apiId)) {
+				if(restriction.getApiId().equals(apiId)) {
 					apiRestrictions.add(restriction);
 				}
 			}

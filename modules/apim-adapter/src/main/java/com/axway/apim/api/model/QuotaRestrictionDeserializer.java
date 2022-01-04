@@ -52,7 +52,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		configMap.put("period", period);
 		configMap.put("per", per);
 		if(node.has("api")) {
-			restriction.setApi(node.get("api").asText());
+			restriction.setApiId(node.get("api").asText());
 		}
 		if(type.equals("throttle")) {
 			configMap.put("messages", quotaConfig.get("messages").asText());

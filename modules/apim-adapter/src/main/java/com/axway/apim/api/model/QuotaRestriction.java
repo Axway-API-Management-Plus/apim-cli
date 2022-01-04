@@ -4,19 +4,22 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 public class QuotaRestriction {
-	String api;
+	@JsonAlias({"api"})
+	String apiId;
 	String method;
 	QuotaRestrictiontype type;
 	
 	Map<String, String> config;
 
-	public String getApi() {
-		return api;
+	public String getApiId() {
+		return apiId;
 	}
 
-	public void setApi(String api) {
-		this.api = api;
+	public void setApiId(String apiId) {
+		this.apiId = apiId;
 	}
 
 	public String getMethod() {
@@ -47,7 +50,7 @@ public class QuotaRestriction {
 		if(otherRestriction == null) return false;
 		return 
 				StringUtils.equals(otherRestriction.getMethod(), this.getMethod()) &&
-				(ignoreAPI || StringUtils.equals(otherRestriction.getApi(), this.getApi() )) &&
+				(ignoreAPI || StringUtils.equals(otherRestriction.getApiId(), this.getApiId() )) &&
 				otherRestriction.getType()==this.getType() &&
 				StringUtils.equals(otherRestriction.getConfig().get("period"), this.getConfig().get("period")) &&
 				StringUtils.equals(otherRestriction.getConfig().get("per"), this.getConfig().get("per"));
@@ -69,6 +72,6 @@ public class QuotaRestriction {
 
 	@Override
 	public String toString() {
-		return "QuotaRestriction [api=" + api + ", method=" + method + ", type=" + type + ", config=" + config + "]";
+		return "QuotaRestriction [api=" + apiId + ", method=" + method + ", type=" + type + ", config=" + config + "]";
 	}
 }

@@ -135,7 +135,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertNotNull(appQuota.getRestrictions(), "appQuota restrictions are null");
 		assertEquals(appQuota.getRestrictions().size(), 1, "Expected one restriction");
 		QuotaRestriction restr = appQuota.getRestrictions().get(0);
-		assertEquals(restr.getApi(), "*");
+		assertEquals(restr.getApiId(), "*");
 		assertEquals(restr.getMethod(), "*");
 		assertEquals(restr.getType(), QuotaRestrictiontype.throttle);
 		assertEquals(restr.getConfig().get("messages"), "9999");
