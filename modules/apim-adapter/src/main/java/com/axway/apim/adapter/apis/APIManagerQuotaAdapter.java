@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
+import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
+import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.lib.CoreParameters;
@@ -30,6 +32,7 @@ import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
@@ -60,7 +63,7 @@ public class APIManagerQuotaAdapter {
 	
 	Cache<String, String> applicationsQuotaCache;
 	
-	ObjectMapper mapper = APIManagerAdapter.mapper;
+	ObjectMapper mapper = new ObjectMapper();
 	
 	CoreParameters cmd = CoreParameters.getInstance();
 
@@ -111,6 +114,7 @@ public class APIManagerQuotaAdapter {
 		readQuotaFromAPIManager(quotaId);
 		APIQuota quotaConfig;
 		try {
+			mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.apiManagerData)));
 			quotaConfig = mapper.readValue(apiManagerResponse.get(quotaId), APIQuota.class);
 			if(apiId!=null)
 				quotaConfig = filterQuotaForAPI(quotaConfig, apiId);

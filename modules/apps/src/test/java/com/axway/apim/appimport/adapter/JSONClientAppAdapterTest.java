@@ -181,4 +181,33 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertEquals(restr2.getRestrictedAPI().getName(), "apiName-routeKeyD");
 		assertEquals(restr2.getMethod(), "*");
 	}
+	
+	@Test
+	public void testAppWithQuotaBasedOnAPIPath() throws AppException {
+		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/AppWithQuotaPerAPIPath.json").getPath();
+		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
+		AppImportParams importParams = new AppImportParams();
+		importParams.setConfig(testFile);
+		ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+
+		List<ClientApplication> apps = adapter.getApplications();
+		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
+		ClientApplication app = apps.get(0);
+		assertEquals(app.getName(), "Application with quota");
+		assertEquals(app.getDescription(), "Application that configured quota per API-Path");
+		
+		APIQuota appQuota = app.getAppQuota();
+		assertNotNull(appQuota, "appQuota is null");
+		assertNotNull(appQuota.getRestrictions(), "appQuota restrictions are null");
+		assertEquals(appQuota.getRestrictions().size(), 1, "Expected one restriction");
+		QuotaRestriction restr1 = appQuota.getRestrictions().get(0);
+		assertEquals(restr1.getApiId(), "72745ed9-f75b-428c-959c-b483eea497a1");
+		assertEquals(restr1.getRestrictedAPI().getName(), "apiName-routeKeyD");
+		assertEquals(restr1.getRestrictedAPI().getPath(), "/query-string-api-oadmin-839");
+		assertEquals(restr1.getMethod(), "*");
+		assertEquals(restr1.getType(), QuotaRestrictiontype.throttle);
+		assertEquals(restr1.getConfig().get("messages"), "9999");
+		assertEquals(restr1.getConfig().get("period"), "week");
+		assertEquals(restr1.getConfig().get("per"), "1");
+	}
 }

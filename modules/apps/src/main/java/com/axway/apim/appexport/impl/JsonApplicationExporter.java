@@ -10,7 +10,9 @@ import org.apache.commons.io.FileUtils;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.ImageSerializer;
+import com.axway.apim.adapter.jackson.QuotaRestrictionSerializer;
 import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.jackson.AppExportSerializerModifier;
 import com.axway.apim.appexport.lib.AppExportParams;
@@ -65,8 +67,11 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new AppExportSerializerModifier(localFolder)));
 		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
+		mapper.registerModule(new SimpleModule().addSerializer(QuotaRestriction.class, new QuotaRestrictionSerializer(null)));
+		
 		FilterProvider filter = new SimpleFilterProvider()
 				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "apiId", "createdBy", "createdOn", "enabled"}))
+				.addFilter("QuotaRestrictionFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"api", "apiId"})) // Is handled in ExportApplication
 				.addFilter("APIAccessFilter", SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"apiName", "apiVersion"}))
 				.addFilter("ApplicationPermissionFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"userId", "createdBy", "id" }))
 				.addFilter("ClientAppCredentialFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"applicationId", "id", "createdOn", "createdBy"}))

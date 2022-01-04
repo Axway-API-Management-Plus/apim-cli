@@ -1,4 +1,4 @@
-package com.axway.apim.api.model;
+package com.axway.apim.adapter.jackson;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -10,6 +10,8 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.QuotaRestriction;
+import com.axway.apim.api.model.QuotaRestrictiontype;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.core.JsonParser;
@@ -76,8 +78,8 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		if(node.has("apiPath")) { // Which might be given in the API-Config file
 			APIFilter apiFilter = new APIFilter.Builder().
 					hasApiPath(node.get("apiPath").asText()).
-					hasVHost(node.get("vhost").asText()).
-					hasQueryStringVersion(node.get("apiRoutingKey").asText()).
+					hasVHost(node.get("vhost")!=null ? node.get("vhost").asText() : null).
+					hasQueryStringVersion(node.get("apiRoutingKey")!=null ? node.get("apiRoutingKey").asText() : null).
 					build();
 			api = apiAdapter.getAPI(apiFilter, false);
 			if(api == null) {

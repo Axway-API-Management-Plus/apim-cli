@@ -1,7 +1,5 @@
 package com.axway.apim.adapter.jackson;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.axway.apim.api.API;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

@@ -12,21 +12,21 @@
         "method": "*",
         "type": "throttle",
         "config": {
-          "messages": "${quotaMessages}",
-          "period": "${quotaPeriod}",
+          "messages": "1000",
+          "period": "day",
           "per": "1"
         }
       }, 
       {
-        "api": "*",
+        "api": "${apiName}",
         "method": "*",
         "type": "throttle",
         "config": {
-          "messages": "${quotaMessages}",
-          "period": "${quotaPeriod}",
+          "messages": "2000",
+          "period": "month",
           "per": "1"
         }
-      }, 
+      }
     ]
   }
 }
