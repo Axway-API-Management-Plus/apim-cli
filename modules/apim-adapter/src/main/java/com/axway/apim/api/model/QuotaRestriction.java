@@ -4,14 +4,31 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.axway.apim.api.API;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @JsonFilter("QuotaRestrictionFilter")
 public class QuotaRestriction {
+	/**
+	 * Contains the ID of the API this restriction is applied to or a "*" if applied to all APIs. 
+	 * The JsonAlias is required for Deserialization as the API-Manager returns the information in field api
+	 */
 	@JsonAlias({"api"})
 	String apiId;
+	
+	/**
+	 * The API-Method either is the API-Method-ID or a "*" if applied to all API-Methods.
+	 */
 	String method;
+	
+	/**
+	 * The underlying API, if any, this restriction is applied too
+	 */
+	@JsonIgnore
+	API restrictedAPI;
+	
 	QuotaRestrictiontype type;
 	
 	Map<String, String> config;
@@ -24,8 +41,20 @@ public class QuotaRestriction {
 		this.apiId = apiId;
 	}
 	
+	/**
+	 * This getter is used when the Quota-Restriction is send to the API-Manager REST-API, which expects a field api
+	 * @return the ID of the API or a "*" if applied for all APIs.
+	 */
 	public String getApi() {
 		return apiId;
+	}
+
+	public API getRestrictedAPI() {
+		return restrictedAPI;
+	}
+
+	public void setRestrictedAPI(API restrictedAPI) {
+		this.restrictedAPI = restrictedAPI;
 	}
 
 	public String getMethod() {
