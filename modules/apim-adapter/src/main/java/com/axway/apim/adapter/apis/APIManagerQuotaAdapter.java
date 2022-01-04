@@ -110,12 +110,12 @@ public class APIManagerQuotaAdapter {
 		}
 	}
 	
-	public APIQuota getQuotaForAPI(String quotaId, API api) throws AppException {
+	public APIQuota getQuotaForAPI(String quotaId, API api, boolean addRestrictedAPI) throws AppException {
 		if(!APIManagerAdapter.hasAdminAccount()) return null;
 		readQuotaFromAPIManager(quotaId); // Quota-ID might be the System- or Application-Default Quota
 		APIQuota quotaConfig;
 		try {
-			mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.apiManagerData, false)));
+			mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.apiManagerData, addRestrictedAPI)));
 			quotaConfig = mapper.readValue(apiManagerResponse.get(quotaId), APIQuota.class);
 			if(api!=null) {
 				quotaConfig = filterQuotaForAPI(quotaConfig, api);
