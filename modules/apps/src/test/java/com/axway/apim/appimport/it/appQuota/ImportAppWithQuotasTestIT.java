@@ -9,6 +9,8 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
+import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -23,6 +25,7 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.message.MessageType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 @Test
 public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner implements TestParams {
@@ -78,6 +81,7 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner implements
 		Assert.assertEquals(exportApp.getLastResult().getExportedFiles().size(), 1, "Expected to have one application exported");
 		String exportedConfig = exportApp.getLastResult().getExportedFiles().get(0);
 		
+		mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile, true)));
 		ClientApplication exportedApp = mapper.readValue(new File(exportedConfig), ClientApplication.class);
 		
 		Assert.assertNotNull(exportedApp.getAppQuota(), "Exported client application must have application quota");
@@ -102,7 +106,7 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner implements
 		Assert.assertEquals(allAPIsRestri.getApiId(), "*");
 		Assert.assertEquals(allAPIsRestri.getMethod(), "*");
 		
-		Assert.assertEquals(APIRestri.getApiId(), context.getVariable("apiName"));
+		Assert.assertEquals(APIRestri.getRestrictedAPI().getName(), context.getVariable("apiName"));
 		Assert.assertEquals(APIRestri.getRestrictedAPI().getPath(), context.getVariable("apiPath"));
 		Assert.assertEquals(APIRestri.getMethod(), "*");
 	}

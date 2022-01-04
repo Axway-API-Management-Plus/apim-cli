@@ -36,6 +36,7 @@ public class QuotaRestrictionSerializer extends StdSerializer<QuotaRestriction> 
 				jgen.writeObjectField("apiRoutingKey", quotaRestriction.getRestrictedAPI().getApiRoutingKey());
 			}
 		}
+		jgen.writePOJOField("type",quotaRestriction.getType());
 		jgen.writePOJOField("config",quotaRestriction.getConfig());
 		jgen.writeEndObject();
 	}
