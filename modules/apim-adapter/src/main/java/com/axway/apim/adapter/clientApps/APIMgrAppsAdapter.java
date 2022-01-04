@@ -573,6 +573,8 @@ public class APIMgrAppsAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+app.getId()+"/quota").build();
+			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiId"}));
+			mapper.setFilterProvider(filter);
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			String json = mapper.writeValueAsString(app.getAppQuota());
 			HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
