@@ -5,7 +5,9 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFilter;
 
+@JsonFilter("QuotaRestrictionFilter")
 public class QuotaRestriction {
 	@JsonAlias({"api"})
 	String apiId;
@@ -20,6 +22,10 @@ public class QuotaRestriction {
 
 	public void setApiId(String apiId) {
 		this.apiId = apiId;
+	}
+	
+	public String getApi() {
+		return apiId;
 	}
 
 	public String getMethod() {

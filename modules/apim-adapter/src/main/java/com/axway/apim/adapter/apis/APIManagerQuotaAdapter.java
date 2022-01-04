@@ -30,6 +30,9 @@ import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class APIManagerQuotaAdapter {
 	
@@ -87,14 +90,14 @@ public class APIManagerQuotaAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
 			if( statusCode != 200){
-				throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.API_MANAGER_COMMUNICATION);
+				throw new AppException("Can't get API-Manager Quota-Configuration. Got status code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			this.apiManagerResponse.put(quotaId,response);
 			if(!Quota.APPLICATION_DEFAULT.getQuotaId().equals(quotaId) && !Quota.SYSTEM_DEFAULT.getQuotaId().equals(quotaId)) {
 				applicationsQuotaCache.put(quotaId, response);
 			}
 		} catch (URISyntaxException | UnsupportedOperationException | IOException e) {
-			throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.UNXPECTED_ERROR, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 
@@ -124,7 +127,8 @@ public class APIManagerQuotaAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/quotas/"+quotaId).build();
-			
+			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiId"}));
+			mapper.setFilterProvider(filter);
 			entity = new StringEntity(mapper.writeValueAsString(quotaConfig), ContentType.APPLICATION_JSON);
 			
 			RestAPICall request = new PUTRequest(entity, uri, true);
@@ -136,7 +140,7 @@ public class APIManagerQuotaAdapter {
 			}
 			return mapper.readValue(response, APIQuota.class);
 		} catch (URISyntaxException | UnsupportedOperationException | IOException e) {
-			throw new AppException("Can't update Quota-Configuration in API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Can't update Quota-Configuration in API-Manager.", ErrorCode.UNXPECTED_ERROR, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 
@@ -152,7 +156,7 @@ public class APIManagerQuotaAdapter {
 		try {
 			quotaConfig = mapper.readValue(apiManagerResponse.get(quotaType.getQuotaId()), APIQuota.class);
 		} catch (IOException e) {
-			throw new AppException("Error cant load default quotas from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Error cant load default quotas from API-Manager.", ErrorCode.UNXPECTED_ERROR, e);
 		}
 		return quotaConfig;
 	}	
@@ -172,7 +176,7 @@ public class APIManagerQuotaAdapter {
 			apiQuota.setRestrictions(apiRestrictions);
 			return apiQuota;
 		} catch (Exception e) {
-			throw new AppException("Can't parse quota from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Can't parse quota from API-Manager", ErrorCode.UNXPECTED_ERROR, e);
 		}
 	}
 	
