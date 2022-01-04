@@ -29,11 +29,18 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 	
 	private DeserializeMode desiralizeMode;
 	
+	private boolean addRestrictedAPI = true;
+	
 	APIManagerAPIAdapter apiAdapter;
+	
+	public QuotaRestrictionDeserializer(DeserializeMode deserializeMode) {
+		this(deserializeMode, true);
+	}
 
-	public QuotaRestrictionDeserializer(DeserializeMode desirializeMode) {
+	public QuotaRestrictionDeserializer(DeserializeMode deserializeMode, boolean addRestrictedAPI) {
 		super();
-		this.desiralizeMode = desirializeMode;
+		this.desiralizeMode = deserializeMode;
+		this.addRestrictedAPI = addRestrictedAPI;
 		try {
 			this.apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
 		} catch (AppException e) {
@@ -76,40 +83,51 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		// If an API-Path is given, it takes precedence and the API-Name and API-Version is completely ignored
 		API api = null;
 		if(node.has("apiPath")) { // Which might be given in the API-Config file
-			APIFilter apiFilter = new APIFilter.Builder().
-					hasApiPath(node.get("apiPath").asText()).
-					hasVHost(node.get("vhost")!=null ? node.get("vhost").asText() : null).
-					hasQueryStringVersion(node.get("apiRoutingKey")!=null ? node.get("apiRoutingKey").asText() : null).
-					build();
-			api = apiAdapter.getAPI(apiFilter, false);
-			if(api == null) {
-				throw new AppException("Invalid quota configuration. No API found using filter: '" + apiFilter + " (primary key: apiPath).", ErrorCode.INVALID_QUOTA_CONFIG);
+			if(addRestrictedAPI) {
+				APIFilter apiFilter = new APIFilter.Builder().
+						hasApiPath(node.get("apiPath").asText()).
+						hasVHost(node.get("vhost")!=null ? node.get("vhost").asText() : null).
+						hasQueryStringVersion(node.get("apiRoutingKey")!=null ? node.get("apiRoutingKey").asText() : null).
+						build();
+				api = apiAdapter.getAPI(apiFilter, false);
+				if(api == null) {
+					throw new AppException("Invalid quota configuration. No API found using filter: '" + apiFilter + " (primary key: apiPath).", ErrorCode.INVALID_QUOTA_CONFIG);
+				}
+				restriction.setRestrictedAPI(api);
 			}
-			restriction.setRestrictedAPI(api);
 			restriction.setApiId(api.getId());
 		// If no API-Path is given,
 		} else if(node.has("api")) { // Field api might contain the API-ID (From API-Manager), the API-Name or a Star if restriction should be applied to all APIs.
 			if("*".equals(node.get("api").asText())) {
 				restriction.setApiId("*");
 			} else {
-				// If data comes from API-Manager api contains the API-ID
-				if(desiralizeMode == DeserializeMode.apiManagerData) {
-					// api contains the ID of the API
-					api = APIManagerAdapter.getInstance().apiAdapter.getAPIWithId(node.get("api").asText());
-				// In the API-Config file the api contains the apiName
-				} else if (desiralizeMode == DeserializeMode.configFile) {
-					// If the apiPath is given, it takes precedence and the API-Name and API-Version is completely ignored
-					APIFilter apiFilter = new APIFilter.Builder().
-							hasName(node.get("api").asText()).
-							build();
-					api = apiAdapter.getAPI(apiFilter, false);
-					if(api == null) {
-						throw new AppException("Invalid quota configuration. No API found using API-Name: '" + node.get("api").asText() + " (Version: "+node.get("apiVersion").asText()+").", ErrorCode.INVALID_QUOTA_CONFIG);
+				/*
+				 * Sometime it is better not to attach the underlying API for performance reasons. For instance System- and Application-Quotas
+				 * contain all APIs, but quite often only the specific API-Quota is required. Therefore the underlying API is added at a later point
+				 */
+				if(addRestrictedAPI) {
+					// If data comes from API-Manager api contains the API-ID
+					if(desiralizeMode == DeserializeMode.apiManagerData) {
+						// api contains the ID of the API
+						api = APIManagerAdapter.getInstance().apiAdapter.getAPIWithId(node.get("api").asText());
+					// In the API-Config file the api contains the apiName
+					} else if (desiralizeMode == DeserializeMode.configFile) {
+						// If the apiPath is given, it takes precedence and the API-Name and API-Version is completely ignored
+						APIFilter apiFilter = new APIFilter.Builder().
+								hasName(node.get("api").asText()).
+								build();
+						api = apiAdapter.getAPI(apiFilter, false);
+						if(api == null) {
+							throw new AppException("Invalid quota configuration. No API found using API-Name: '" + node.get("api").asText() + " (Version: "+node.get("apiVersion").asText()+").", ErrorCode.INVALID_QUOTA_CONFIG);
+						}
+						
 					}
-					
+					restriction.setRestrictedAPI(api);
+					restriction.setApiId(api.getId());
+				} else {
+					// As a fall back we take over the ID we got and add it to the restriction
+					restriction.setApiId(node.get("api").asText());
 				}
-				restriction.setRestrictedAPI(api);
-				restriction.setApiId(api.getId());
 			}
 		// No API given, which means apply the Quota to all APIs
 		} else {

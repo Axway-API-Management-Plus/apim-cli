@@ -23,6 +23,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
+import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.lib.CoreParameters;
@@ -109,17 +110,18 @@ public class APIManagerQuotaAdapter {
 		}
 	}
 	
-	public APIQuota getQuotaForAPI(String quotaId, String apiId) throws AppException {
+	public APIQuota getQuotaForAPI(String quotaId, API api) throws AppException {
 		if(!APIManagerAdapter.hasAdminAccount()) return null;
-		readQuotaFromAPIManager(quotaId);
+		readQuotaFromAPIManager(quotaId); // Quota-ID might be the System- or Application-Default Quota
 		APIQuota quotaConfig;
 		try {
-			mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.apiManagerData)));
+			mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.apiManagerData, false)));
 			quotaConfig = mapper.readValue(apiManagerResponse.get(quotaId), APIQuota.class);
-			if(apiId!=null)
-				quotaConfig = filterQuotaForAPI(quotaConfig, apiId);
+			if(api!=null) {
+				quotaConfig = filterQuotaForAPI(quotaConfig, api);
+			}
 		} catch (IOException e) {
-			throw new AppException("Error cant load API-Methods for API: '"+apiId+"' from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Error cant load API-Methods for API: '"+api.getId()+"' from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 		return quotaConfig;
 	}
@@ -165,11 +167,13 @@ public class APIManagerQuotaAdapter {
 		return quotaConfig;
 	}	
 	
-	private static APIQuota filterQuotaForAPI(APIQuota quotaConfig, String apiId) throws AppException {
+	private static APIQuota filterQuotaForAPI(APIQuota quotaConfig, API api) throws AppException {
 		List<QuotaRestriction> apiRestrictions = new ArrayList<QuotaRestriction>();
 		try {
 			for(QuotaRestriction restriction : quotaConfig.getRestrictions()) {
-				if(restriction.getApiId().equals(apiId)) {
+				if(restriction.getApiId().equals(api.getId())) {
+					restriction.setRestrictedAPI(api);
+					restriction.setApiId(api.getId());
 					apiRestrictions.add(restriction);
 				}
 			}

@@ -413,8 +413,8 @@ public class APIManagerAPIAdapter {
 		APIQuota applicationQuota = null;
 		APIQuota sytemQuota = null;
 		try {
-			applicationQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), api.getId()); // Get the Application-Default-Quota
-			sytemQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), api.getId()); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
+			applicationQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), api); // Get the Application-Default-Quota
+			sytemQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), api); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
 			api.setApplicationQuota(applicationQuota);
 			api.setSystemQuota(sytemQuota);
 		} catch (AppException e) {
