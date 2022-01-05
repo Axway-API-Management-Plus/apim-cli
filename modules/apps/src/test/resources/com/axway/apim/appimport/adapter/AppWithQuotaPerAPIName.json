@@ -23,6 +23,16 @@
           "period": "week",
           "per": "1"
         }
+      },
+      {
+        "api": "apiName-routeKeyD",
+        "method": "addPet",
+        "type": "throttle",
+        "config": {
+          "messages": "9999",
+          "period": "week",
+          "per": "1"
+        }
       }
     ]
   }

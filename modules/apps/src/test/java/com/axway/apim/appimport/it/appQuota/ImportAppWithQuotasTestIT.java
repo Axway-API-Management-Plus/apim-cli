@@ -87,7 +87,7 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner implements
 		Assert.assertNotNull(exportedApp.getAppQuota(), "Exported client application must have application quota");
 		
 		APIQuota appQuota = exportedApp.getAppQuota();
-		Assert.assertEquals(appQuota.getRestrictions().size(), 2, "Two restrictions are expected.");
+		Assert.assertEquals(appQuota.getRestrictions().size(), 3, "Two restrictions are expected.");
 		QuotaRestriction allAPIsRestri = null;
 		QuotaRestriction APIRestri = null;
 		QuotaRestriction APIMethodRestri = null;
@@ -109,5 +109,7 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner implements
 		Assert.assertEquals(APIRestri.getRestrictedAPI().getName(), context.getVariable("apiName"));
 		Assert.assertEquals(APIRestri.getRestrictedAPI().getPath(), context.getVariable("apiPath"));
 		Assert.assertEquals(APIRestri.getMethod(), "*");
+		
+		Assert.assertNotEquals(APIMethodRestri.getMethod(), "*");
 	}
 }

@@ -26,6 +26,16 @@
           "period": "month",
           "per": "1"
         }
+      },
+      {
+        "api": "${apiName}",
+        "method": "addPet",
+        "type": "throttle",
+        "config": {
+          "messages": "3000",
+          "period": "hour",
+          "per": "1"
+        }
       }
     ]
   }

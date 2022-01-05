@@ -116,7 +116,7 @@ public class APIManagerQuotaAdapter {
 	 * @param quotaId is either system or application default or a concrete quota ID
 	 * @param api is the quote for an API, then it can be passed here directly. This is then bound to the quote as restrictedAPI
 	 * @param addRestrictedAPI If false, then no effort is made to load the restricted api and bind it to the quote during deserialization. In this case the api should be passed. Defaults to true
-	 * @param ignoreSystemQuotas If true, then no quotas are returned with the flag: system: true
+	 * @param ignoreSystemQuotas If true, then no quotas are returned with the switch: system: true. This is useful if quotas for applications are requested and they should not contain application default quotas.
 	 * @return the configured quotas
 	 * @throws AppException is something goes wrong.
 	 */

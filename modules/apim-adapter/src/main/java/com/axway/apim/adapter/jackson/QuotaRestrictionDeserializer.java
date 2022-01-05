@@ -9,7 +9,9 @@ import java.util.regex.Pattern;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.QuotaRestrictiontype;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -32,6 +34,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 	private boolean addRestrictedAPI = true;
 	
 	APIManagerAPIAdapter apiAdapter;
+	APIManagerAPIMethodAdapter apiMethodAdapter;
 	
 	public QuotaRestrictionDeserializer(DeserializeMode deserializeMode) {
 		this(deserializeMode, true);
@@ -43,6 +46,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		this.addRestrictedAPI = addRestrictedAPI;
 		try {
 			this.apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
+			this.apiMethodAdapter = APIManagerAdapter.getInstance().methodAdapter;
 		} catch (AppException e) {
 			throw new RuntimeException(e);
 		}
@@ -66,7 +70,6 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		} catch (IllegalArgumentException e) {
 			throw new AppException("Invalid quota config. The restriction type: " + type + " is invalid.", ErrorCode.INVALID_QUOTA_CONFIG);
 		}
-		restriction.setMethod(node.get("method").asText());
 		Map<String, String> configMap = new LinkedHashMap<String, String>();
 		configMap.put("period", period);
 		configMap.put("per", per);
@@ -133,6 +136,23 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		} else {
 			restriction.setApiId("*");
 		}
+		
+		if(!node.has("method") || "*".equals(node.get("method").asText())) {
+			restriction.setMethod("*");
+		} else {
+			// Specific method defined. Translate it into the methodId
+			if(desiralizeMode == DeserializeMode.configFile) {
+				APIMethod method = apiMethodAdapter.getMethodForName(restriction.getApiId(), node.get("method").asText());
+				if(method == null) {
+					throw new AppException("Invalid quota configuration. Method: "+node.get("method").asText()+" not found for API with ID: " +restriction.getApiId(), ErrorCode.INVALID_QUOTA_CONFIG);
+				}
+				restriction.setMethod(method.getId());
+			} else if (desiralizeMode == DeserializeMode.apiManagerData) {
+				// Take over the ID given by API-Manager is translated into method name in QuotaRestrictionSerializer
+				restriction.setMethod(node.get("method").asText());
+			}
+		}
+		
 		validateRestriction(restriction);
 		return restriction;
 	}

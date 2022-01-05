@@ -167,8 +167,11 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		APIQuota appQuota = app.getAppQuota();
 		assertNotNull(appQuota, "appQuota is null");
 		assertNotNull(appQuota.getRestrictions(), "appQuota restrictions are null");
-		assertEquals(appQuota.getRestrictions().size(), 2, "Expected two restrictions");
+		assertEquals(appQuota.getRestrictions().size(), 3, "Expected two restrictions");
 		QuotaRestriction restr1 = appQuota.getRestrictions().get(0);
+		QuotaRestriction restr2 = appQuota.getRestrictions().get(1);
+		QuotaRestriction restr3 = appQuota.getRestrictions().get(2);
+		
 		assertEquals(restr1.getApiId(), "*");
 		assertEquals(restr1.getMethod(), "*");
 		assertEquals(restr1.getType(), QuotaRestrictiontype.throttle);
@@ -176,10 +179,13 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertEquals(restr1.getConfig().get("period"), "week");
 		assertEquals(restr1.getConfig().get("per"), "1");
 		
-		QuotaRestriction restr2 = appQuota.getRestrictions().get(1);
+		
 		assertEquals(restr2.getApiId(), "72745ed9-f75b-428c-959c-b483eea497a1");
 		assertEquals(restr2.getRestrictedAPI().getName(), "apiName-routeKeyD");
 		assertEquals(restr2.getMethod(), "*");
+		
+		assertEquals(restr3.getMethod(), "3b5ebd1c-afdd-4120-bb07-6d74389a4da7");
+		
 	}
 	
 	@Test

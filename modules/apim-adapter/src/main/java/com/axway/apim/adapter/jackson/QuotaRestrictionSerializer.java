@@ -2,6 +2,8 @@ package com.axway.apim.adapter.jackson;
 
 import java.io.IOException;
 
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -25,15 +27,20 @@ public class QuotaRestrictionSerializer extends StdSerializer<QuotaRestriction> 
 		if(quotaRestriction.getRestrictedAPI()==null) {
 			jgen.writeObjectField("api", "*");
 			jgen.writeObjectField("method", "*");
-		} else {
+		} else { // API-Specific quota
 			jgen.writeObjectField("api", quotaRestriction.getRestrictedAPI().getName());
 			jgen.writeObjectField("apiPath", quotaRestriction.getRestrictedAPI().getPath());
-			jgen.writeObjectField("method", "*");
 			if(quotaRestriction.getRestrictedAPI().getVhost()!=null) {
 				jgen.writeObjectField("vhost", quotaRestriction.getRestrictedAPI().getVhost());
 			}
 			if(quotaRestriction.getRestrictedAPI().getApiRoutingKey()!=null) {
 				jgen.writeObjectField("apiRoutingKey", quotaRestriction.getRestrictedAPI().getApiRoutingKey());
+			}
+			if(quotaRestriction.getMethod()==null || "*".equals(quotaRestriction.getMethod())) {
+				jgen.writeObjectField("method", "*");
+			} else {
+				APIMethod method = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(quotaRestriction.getApiId(), quotaRestriction.getMethod());
+				jgen.writeObjectField("method", method.getName());
 			}
 		}
 		jgen.writePOJOField("type",quotaRestriction.getType());
