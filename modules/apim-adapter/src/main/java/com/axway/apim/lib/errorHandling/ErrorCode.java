@@ -60,7 +60,7 @@ public enum ErrorCode {
 	ERR_DELETING_ORG					(92, "Organization could not be deleted.", false),
 	ERR_GRANTING_ACCESS_TO_API			(93, "Error granting access to an API.", false),
 	ERR_EXPORTING_API_DAT_FILE			(94, "Error exporting API-Date file.", false),
-	ERR_CREATING_APPLICATION			(95, "Error creating/updating an application.", true),
+	ERR_CREATING_APPLICATION			(95, "Error creating/updating an application.", false),
 	UNXPECTED_ERROR						(99, "An unexpected error occured.", true),
 	CHECK_CERTS_UNXPECTED_ERROR			(100, "There was an unexpected error checking the expiration date of certificates.", false),
 	CHECK_CERTS_FOUND_CERTS				(101, "Certificates found that will expire within the given number of days.", false);

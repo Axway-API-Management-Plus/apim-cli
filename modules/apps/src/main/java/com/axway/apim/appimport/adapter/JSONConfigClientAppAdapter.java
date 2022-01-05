@@ -98,10 +98,10 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 				this.apps = new ArrayList<ClientApplication>();
 				this.apps.add(app);
 			} catch (Exception pe) {
-				throw new AppException("Cannot read application(s) from config file: " + config + ". Exception: " + pe.getClass().getName() + ": " + pe.getMessage(), ErrorCode.ERR_CREATING_APPLICATION, pe);
+				throw new AppException("Cannot read application(s) from config file: " + config, "Exception: " + pe.getClass().getName() + ": " + pe.getMessage(), ErrorCode.ERR_CREATING_APPLICATION, pe);
 			}
 		} catch (Exception e) {
-			throw new AppException("Cannot read application(s) from config file: " + config + ". Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.ERR_CREATING_APPLICATION, e);
+			throw new AppException("Cannot read application(s) from config file: " + config, "Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.ERR_CREATING_APPLICATION, e);
 		}
 		try{
 			addImage(apps, configFile.getCanonicalFile().getParentFile());
