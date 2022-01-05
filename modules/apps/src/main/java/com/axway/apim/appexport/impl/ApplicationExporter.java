@@ -20,15 +20,16 @@ public abstract class ApplicationExporter {
 	
 	protected static Logger LOG = LoggerFactory.getLogger(ApplicationExporter.class);
 	
-	public enum ExportImpl {
+	public enum ResultHandler {
 		JSON_EXPORTER(JsonApplicationExporter.class),
 		CONSOLE_EXPORTER(ConsoleAppExporter.class),
-		CSV_EXPORTER(CSVAppExporter.class);
+		CSV_EXPORTER(CSVAppExporter.class),
+		DELETE_APP_HANDLER(DeleteAppHandler.class);
 		
 		private final Class<ApplicationExporter> implClass;
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		private ExportImpl(Class clazz) {
+		private ResultHandler(Class clazz) {
 			this.implClass = clazz;
 		}
 
@@ -42,7 +43,7 @@ public abstract class ApplicationExporter {
 	
 	boolean hasError = false;
 	
-	public static ApplicationExporter create(ExportImpl exportImpl, AppExportParams params, ExportResult result) throws AppException {
+	public static ApplicationExporter create(ResultHandler exportImpl, AppExportParams params, ExportResult result) throws AppException {
 		try {
 			Object[] intArgs = new Object[] { params, result };
 			Constructor<ApplicationExporter> constructor =
@@ -76,8 +77,8 @@ public abstract class ApplicationExporter {
 				.hasRedirectUrl(params.getRedirectUrl())
 				.hasOrganizationName(params.getOrgName())
 				.includeCustomProperties(getCustomProperties())
-				.includeAppPermissions(true)
-				.includeOauthResources(true)
+				.includeAppPermissions(false)
+				.includeOauthResources(false)
 				.hasApiName(params.getApiName())
 				.includeImage(false);
 		if(params.getCredential()!=null || params.getRedirectUrl()!=null) builder.includeCredentials(true);

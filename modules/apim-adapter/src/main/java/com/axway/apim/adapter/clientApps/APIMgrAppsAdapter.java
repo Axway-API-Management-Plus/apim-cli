@@ -29,7 +29,6 @@ import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ApplicationPermission;
@@ -147,7 +146,7 @@ public class APIMgrAppsAdapter {
 				ClientApplication app = apps.get(i);
 				addImage(app, filter.isIncludeImage());
 				if(filter.isIncludeQuota()) {
-					app.setAppQuota(APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(app.getId(), null, true));
+					app.setAppQuota(APIManagerAdapter.getInstance().quotaAdapter.getQuota(app.getId(), null, true, true));
 				}
 				addApplicationCredentials(app, filter.isIncludeCredentials());
 				addOauthResources(app,filter.isIncludeOauthResources());

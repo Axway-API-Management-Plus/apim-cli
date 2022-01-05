@@ -9,7 +9,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
-import com.axway.apim.appexport.impl.ApplicationExporter.ExportImpl;
+import com.axway.apim.appexport.impl.ApplicationExporter.ResultHandler;
 import com.axway.apim.appexport.lib.AppExportCLIOptions;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
@@ -59,19 +59,47 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		return app.export(params).getRc();
 	}
 	
+	@CLIServiceMethod(name = "delete", description = "Delete selected application(s) from the API-Manager")
+	public static int delete(String args[]) {
+		AppExportParams params;
+		try {
+			params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
+		} catch (AppException e) {
+			LOG.error("Error " + e.getMessage());
+			return e.getError().getCode();
+		}
+		ApplicationExportApp app = new ApplicationExportApp();
+		return app.delete(params).getRc();
+	}
+	
+	public ExportResult delete(AppExportParams params) {
+		ExportResult result = new ExportResult();
+		try {
+			return runExport(params, ResultHandler.DELETE_APP_HANDLER, result);
+		} catch (AppException e) {
+			e.logException(LOG);
+			result.setError(new ErrorCodeMapper().getMapedErrorCode(e.getError()));
+			return result;
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			result.setError(ErrorCode.UNXPECTED_ERROR);
+			return result;
+		}
+	}
+	
 	public ExportResult export(AppExportParams params) {
 		ExportResult result = new ExportResult();
 		try {
 			params.validateRequiredParameters();
 			switch(params.getOutputFormat()) {
 			case console:
-				return runExport(params, ExportImpl.CONSOLE_EXPORTER, result);
+				return runExport(params, ResultHandler.CONSOLE_EXPORTER, result);
 			case json:
-				return runExport(params, ExportImpl.JSON_EXPORTER, result);
+				return runExport(params, ResultHandler.JSON_EXPORTER, result);
 			case csv:
-				return runExport(params, ExportImpl.CSV_EXPORTER, result);
+				return runExport(params, ResultHandler.CSV_EXPORTER, result);
 			default:
-				return runExport(params, ExportImpl.CONSOLE_EXPORTER, result);
+				return runExport(params, ResultHandler.CONSOLE_EXPORTER, result);
 			}
 		} catch (AppException e) {
 			e.logException(LOG);
@@ -83,7 +111,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		}
 	}
 
-	private ExportResult runExport(AppExportParams params, ExportImpl exportImpl, ExportResult result) throws AppException {
+	private ExportResult runExport(AppExportParams params, ResultHandler exportImpl, ExportResult result) throws AppException {
 		// We need to clean some Singleton-Instances, as tests are running in the same JVM
 		APIManagerAdapter.deleteInstance();
 		APIMHttpClient.deleteInstances();

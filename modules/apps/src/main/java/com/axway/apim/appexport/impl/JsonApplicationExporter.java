@@ -136,6 +136,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 				.includeAPIAccess(true)
 				.includeImage(true)
 				.includeOauthResources(true)
+				.includeAppPermissions(true)
 				.build();
 	}
 }

@@ -15,7 +15,7 @@ public class APIQuota {
 	
 	String description;
 	
-	String system;
+	Boolean system;
 	
 	List<QuotaRestriction> restrictions;
 
@@ -59,11 +59,11 @@ public class APIQuota {
 		this.id = id;
 	}
 
-	public String getSystem() {
+	public Boolean getSystem() {
 		return system;
 	}
 
-	public void setSystem(String system) {
+	public void setSystem(Boolean system) {
 		this.system = system;
 	}
 	

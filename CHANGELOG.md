@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Outbound-AuthN OAuth-Provider-Profile only translated into FED-Name for _default profile (See issue [#246](https://github.com/Axway-API-Management-Plus/apim-cli/issues/246))
 - Backslashes in user passwords are ignored (See issue [#244](https://github.com/Axway-API-Management-Plus/apim-cli/issues/244))
 
+### Added
+- Added support to delete applications from API-Manager
+
 ## [1.6.1] 2021-12-20
 ### Security
 - Updated Apache Log4J from version 2.16.0 to 2.17.0 

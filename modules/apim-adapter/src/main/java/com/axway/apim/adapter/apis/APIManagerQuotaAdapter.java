@@ -110,13 +110,24 @@ public class APIManagerQuotaAdapter {
 		}
 	}
 	
-	public APIQuota getQuotaForAPI(String quotaId, API api, boolean addRestrictedAPI) throws AppException {
+	/**
+	 * Returns the configured quotas for the quota ID from the API manager.
+	 * 
+	 * @param quotaId is either system or application default or a concrete quota ID
+	 * @param api is the quote for an API, then it can be passed here directly. This is then bound to the quote as restrictedAPI
+	 * @param addRestrictedAPI If false, then no effort is made to load the restricted api and bind it to the quote during deserialization. In this case the api should be passed. Defaults to true
+	 * @param ignoreSystemQuotas If true, then no quotas are returned with the flag: system: true
+	 * @return the configured quotas
+	 * @throws AppException is something goes wrong.
+	 */
+	public APIQuota getQuota(String quotaId, API api, boolean addRestrictedAPI, boolean ignoreSystemQuotas) throws AppException {
 		if(!APIManagerAdapter.hasAdminAccount()) return null;
 		readQuotaFromAPIManager(quotaId); // Quota-ID might be the System- or Application-Default Quota
 		APIQuota quotaConfig;
 		try {
 			mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.apiManagerData, addRestrictedAPI)));
 			quotaConfig = mapper.readValue(apiManagerResponse.get(quotaId), APIQuota.class);
+			if(ignoreSystemQuotas && quotaConfig.getSystem()) return null;
 			if(api!=null) {
 				quotaConfig = filterQuotaForAPI(quotaConfig, api);
 			}
