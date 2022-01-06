@@ -9,11 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Renamed log4j.xml into log4j2.xml
 
 ### Fixed
+- App-Export - AppQuota contains API-ID instead of API-Name (See issue [#145](https://github.com/Axway-API-Management-Plus/apim-cli/issues/145))
 - Outbound-AuthN OAuth-Provider-Profile only translated into FED-Name for _default profile (See issue [#246](https://github.com/Axway-API-Management-Plus/apim-cli/issues/246))
 - Backslashes in user passwords are ignored (See issue [#244](https://github.com/Axway-API-Management-Plus/apim-cli/issues/244))
 
 ### Added
 - Added support to delete applications from API-Manager
+- Added support for API-Method level quotas
 
 ## [1.6.1] 2021-12-20
 ### Security
