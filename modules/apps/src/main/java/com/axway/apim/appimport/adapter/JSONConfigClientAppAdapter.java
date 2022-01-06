@@ -19,12 +19,15 @@ import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.AppCredentialsDeserializer;
+import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
+import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.adapter.user.APIManagerUserAdapter;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ApplicationPermission;
 import com.axway.apim.api.model.apps.ClientAppCredential;
@@ -71,6 +74,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		// Try to read a list of applications
 		try {
 			mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
+			mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile)));
 			baseApps = mapper.readValue(Utils.substitueVariables(configFile), new TypeReference<List<ClientApplication>>(){});
 			if(stageConfig!=null) {
 				throw new AppException("Stage overrides are not supported for application lists.", ErrorCode.CANT_READ_CONFIG_FILE);
@@ -94,10 +98,10 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 				this.apps = new ArrayList<ClientApplication>();
 				this.apps.add(app);
 			} catch (Exception pe) {
-				throw new AppException("Cannot read application(s) from config file: " + config, ErrorCode.ERR_CREATING_APPLICATION, pe);
+				throw new AppException("Cannot read application(s) from config file: " + config, "Exception: " + pe.getClass().getName() + ": " + pe.getMessage(), ErrorCode.ERR_CREATING_APPLICATION, pe);
 			}
 		} catch (Exception e) {
-			throw new AppException("Cannot read application(s) from config file: " + config, ErrorCode.ERR_CREATING_APPLICATION, e);
+			throw new AppException("Cannot read application(s) from config file: " + config, "Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.ERR_CREATING_APPLICATION, e);
 		}
 		try{
 			addImage(apps, configFile.getCanonicalFile().getParentFile());

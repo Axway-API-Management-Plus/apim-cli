@@ -146,7 +146,7 @@ public class APIMgrAppsAdapter {
 				ClientApplication app = apps.get(i);
 				addImage(app, filter.isIncludeImage());
 				if(filter.isIncludeQuota()) {
-					app.setAppQuota(APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(app.getId(), null));
+					app.setAppQuota(APIManagerAdapter.getInstance().quotaAdapter.getQuota(app.getId(), null, true, true));
 				}
 				addApplicationCredentials(app, filter.isIncludeCredentials());
 				addOauthResources(app,filter.isIncludeOauthResources());
@@ -573,6 +573,8 @@ public class APIMgrAppsAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+app.getId()+"/quota").build();
+			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"}));
+			mapper.setFilterProvider(filter);
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			String json = mapper.writeValueAsString(app.getAppQuota());
 			HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
@@ -841,6 +843,28 @@ public class APIMgrAppsAdapter {
 					((CloseableHttpResponse)httpResponse).close();
 				} catch (Exception ignore) { }
 			}
+		}
+	}
+	
+	public void deleteApplication(ClientApplication app) throws AppException {
+		HttpResponse httpResponse = null;
+		URI uri;
+		try {
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+app.getId()).build();
+			RestAPICall request = new DELRequest(uri, true);
+			httpResponse = request.execute();
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
+			if(statusCode != 204){
+				LOG.error("Error deleting application. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+				throw new AppException("Error deleting application. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+			}
+			LOG.info("Application: "+app.getName()+" ("+app.getId()+")" + " successfully deleted");
+		} catch (Exception e) {
+			throw new AppException("Error deleting application", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+		} finally {
+			try {
+				((CloseableHttpResponse)httpResponse).close();
+			} catch (Exception ignore) { }
 		}
 	}
 	

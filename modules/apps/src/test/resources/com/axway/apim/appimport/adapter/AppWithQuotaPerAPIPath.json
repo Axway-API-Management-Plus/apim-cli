@@ -1,0 +1,20 @@
+{
+  "name": "Application with quota",
+  "description": "Application that configured quota per API-Path",
+  "state": "approved",
+  "appQuota": {
+    "restrictions": [
+      {
+        "api": "Not used",
+        "apiPath": "/query-string-api-oadmin-839",
+        "method": "*",
+        "type": "throttle",
+        "config": {
+          "messages": "9999",
+          "period": "week",
+          "per": "1"
+        }
+      }
+    ]
+  }
+}

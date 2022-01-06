@@ -1,10 +1,7 @@
 {
-  "name": "${appName}",
-  "organization": "${orgName}",
+  "name": "Application with quota",
+  "description": "Application that configured quota per API-Name",
   "state": "approved",
-  "enabled": true,
-  "email": "user@domain.com",
-  "phone": "654654646234",
   "appQuota": {
     "restrictions": [
       {
@@ -12,28 +9,28 @@
         "method": "*",
         "type": "throttle",
         "config": {
-          "messages": "1000",
-          "period": "day",
-          "per": "1"
-        }
-      }, 
-      {
-        "api": "${apiName}",
-        "method": "*",
-        "type": "throttle",
-        "config": {
-          "messages": "2000",
-          "period": "month",
+          "messages": "9999",
+          "period": "week",
           "per": "1"
         }
       },
       {
-        "api": "${apiName}",
+        "api": "apiName-routeKeyD",
+        "method": "*",
+        "type": "throttle",
+        "config": {
+          "messages": "9999",
+          "period": "week",
+          "per": "1"
+        }
+      },
+      {
+        "api": "apiName-routeKeyD",
         "method": "addPet",
         "type": "throttle",
         "config": {
-          "messages": "3000",
-          "period": "hour",
+          "messages": "9999",
+          "period": "week",
           "per": "1"
         }
       }

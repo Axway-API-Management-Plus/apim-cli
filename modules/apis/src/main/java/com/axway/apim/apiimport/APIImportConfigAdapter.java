@@ -51,6 +51,8 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
+import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.api.API;
 import com.axway.apim.api.definition.APISpecification;
 import com.axway.apim.api.definition.APISpecificationFactory;
@@ -66,7 +68,6 @@ import com.axway.apim.api.model.OAuthClientProfile;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.QuotaRestriction;
-import com.axway.apim.api.model.QuotaRestrictionDeserializer;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -136,7 +137,7 @@ public class APIImportConfigAdapter {
 	public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, boolean usingOrgAdmin, String stageConfig) throws AppException {
 		super();
 		SimpleModule module = new SimpleModule();
-		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer());
+		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile));
 		// We would like to get back the original AppExcepption instead of a JsonMappingException
 		mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
 		mapper.registerModule(module);
@@ -167,9 +168,9 @@ public class APIImportConfigAdapter {
 				apiConfig = baseConfig;
 			}
 		} catch (JsonParseException e) {
-			throw new AppException("Cannot parse API-Config file(s)", ErrorCode.CANT_READ_JSON_PAYLOAD, e);
+			throw new AppException("Cannot parse API-Config file(s).", "Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_JSON_PAYLOAD, e);
 		} catch (Exception e) {
-			throw new AppException("Error reading API-Config file(s)", ErrorCode.CANT_READ_CONFIG_FILE, e);
+			throw new AppException("Error reading API-Config file(s)", "Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
 	}
 

@@ -135,7 +135,7 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		assertNotNull(appQuota.getRestrictions(), "appQuota restrictions are null");
 		assertEquals(appQuota.getRestrictions().size(), 1, "Expected one restriction");
 		QuotaRestriction restr = appQuota.getRestrictions().get(0);
-		assertEquals(restr.getApi(), "*");
+		assertEquals(restr.getApiId(), "*");
 		assertEquals(restr.getMethod(), "*");
 		assertEquals(restr.getType(), QuotaRestrictiontype.throttle);
 		assertEquals(restr.getConfig().get("messages"), "9999");
@@ -148,5 +148,72 @@ public class JSONClientAppAdapterTest extends APIManagerMockBase {
 		ClientAppOauthResource oauthRes = oauthResources.get(0);
 		assertEquals(oauthRes.getScope(), "resource.READ");
 		assertEquals(oauthRes.isEnabled(), true);
+	}
+	
+	@Test
+	public void testAppWithQuotaBasedOnAPIName() throws AppException {
+		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/AppWithQuotaPerAPIName.json").getPath();
+		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
+		AppImportParams importParams = new AppImportParams();
+		importParams.setConfig(testFile);
+		ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+
+		List<ClientApplication> apps = adapter.getApplications();
+		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
+		ClientApplication app = apps.get(0);
+		assertEquals(app.getName(), "Application with quota");
+		assertEquals(app.getDescription(), "Application that configured quota per API-Name");
+		
+		APIQuota appQuota = app.getAppQuota();
+		assertNotNull(appQuota, "appQuota is null");
+		assertNotNull(appQuota.getRestrictions(), "appQuota restrictions are null");
+		assertEquals(appQuota.getRestrictions().size(), 3, "Expected two restrictions");
+		QuotaRestriction restr1 = appQuota.getRestrictions().get(0);
+		QuotaRestriction restr2 = appQuota.getRestrictions().get(1);
+		QuotaRestriction restr3 = appQuota.getRestrictions().get(2);
+		
+		assertEquals(restr1.getApiId(), "*");
+		assertEquals(restr1.getMethod(), "*");
+		assertEquals(restr1.getType(), QuotaRestrictiontype.throttle);
+		assertEquals(restr1.getConfig().get("messages"), "9999");
+		assertEquals(restr1.getConfig().get("period"), "week");
+		assertEquals(restr1.getConfig().get("per"), "1");
+		
+		
+		assertEquals(restr2.getApiId(), "72745ed9-f75b-428c-959c-b483eea497a1");
+		assertEquals(restr2.getRestrictedAPI().getName(), "apiName-routeKeyD");
+		assertEquals(restr2.getMethod(), "*");
+		
+		assertEquals(restr3.getMethod(), "3b5ebd1c-afdd-4120-bb07-6d74389a4da7");
+		
+	}
+	
+	@Test
+	public void testAppWithQuotaBasedOnAPIPath() throws AppException {
+		String testFile = JSONClientAppAdapterTest.class.getResource(testPackage + "/AppWithQuotaPerAPIPath.json").getPath();
+		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
+		AppImportParams importParams = new AppImportParams();
+		importParams.setConfig(testFile);
+		ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+
+		List<ClientApplication> apps = adapter.getApplications();
+		assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
+		ClientApplication app = apps.get(0);
+		assertEquals(app.getName(), "Application with quota");
+		assertEquals(app.getDescription(), "Application that configured quota per API-Path");
+		
+		APIQuota appQuota = app.getAppQuota();
+		assertNotNull(appQuota, "appQuota is null");
+		assertNotNull(appQuota.getRestrictions(), "appQuota restrictions are null");
+		assertEquals(appQuota.getRestrictions().size(), 1, "Expected one restriction");
+		QuotaRestriction restr1 = appQuota.getRestrictions().get(0);
+		assertEquals(restr1.getApiId(), "72745ed9-f75b-428c-959c-b483eea497a1");
+		assertEquals(restr1.getRestrictedAPI().getName(), "apiName-routeKeyD");
+		assertEquals(restr1.getRestrictedAPI().getPath(), "/query-string-api-oadmin-839");
+		assertEquals(restr1.getMethod(), "*");
+		assertEquals(restr1.getType(), QuotaRestrictiontype.throttle);
+		assertEquals(restr1.getConfig().get("messages"), "9999");
+		assertEquals(restr1.getConfig().get("period"), "week");
+		assertEquals(restr1.getConfig().get("per"), "1");
 	}
 }

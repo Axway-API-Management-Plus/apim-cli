@@ -9,6 +9,10 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
+import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
+import com.axway.apim.api.model.APIQuota;
+import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appimport.it.ExportAppTestAction;
 import com.axway.apim.appimport.it.ImportAppTestAction;
@@ -21,14 +25,16 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.message.MessageType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 @Test
 public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
-	private static String PACKAGE = "/com/axway/apim/appimport/apps/appQuotas/";
+	private static String PACKAGE = "/com/axway/apim/appimport/apps/appQuota/";
 	
 	@CitrusTest
-	@Test(enabled = false) @Parameters("context")
+	@Test
+	@Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		description("Import application into API-Manager");
 		
@@ -37,11 +43,15 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner implements
 		ImportTestAction apiImport = new ImportTestAction();
 		ObjectMapper mapper = new ObjectMapper();
 		
-		variable("appName", "My-App-"+importApp.getRandomNum());
+		int randomId = importApp.getRandomNum();
+		
+		variable("appName", "My-App-"+randomId);
+		variable("apiName", "Test-API-"+randomId);
+		variable("apiPath", "/test/api/"+randomId);
 		
 		echo("####### Importing Test API 1 : '${apiName}' on path: '${apiPath}' #######");
-		createVariable(ImportTestAction.API_DEFINITION,  PACKAGE + "petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  PACKAGE + "../basic/test-api-config.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/appimport/apps/basic/petstore.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/appimport/apps/basic/test-api-config.json");
 		createVariable("expectedReturnCode", "0");
 		apiImport.doExecute(context);
 
@@ -71,9 +81,35 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner implements
 		Assert.assertEquals(exportApp.getLastResult().getExportedFiles().size(), 1, "Expected to have one application exported");
 		String exportedConfig = exportApp.getLastResult().getExportedFiles().get(0);
 		
+		mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile, true)));
 		ClientApplication exportedApp = mapper.readValue(new File(exportedConfig), ClientApplication.class);
 		
-		Assert.assertNotNull(exportedApp.getPermissions(), "Exported client application must have permissions");
-		Assert.assertEquals(exportedApp.getPermissions().size(), 4, "Exported client application must have 4 permissions");
+		Assert.assertNotNull(exportedApp.getAppQuota(), "Exported client application must have application quota");
+		
+		APIQuota appQuota = exportedApp.getAppQuota();
+		Assert.assertEquals(appQuota.getRestrictions().size(), 3, "Two restrictions are expected.");
+		QuotaRestriction allAPIsRestri = null;
+		QuotaRestriction APIRestri = null;
+		QuotaRestriction APIMethodRestri = null;
+		for(QuotaRestriction restr: appQuota.getRestrictions()) {
+			if(restr.getConfig().get("messages").equals("1000")) { 
+				allAPIsRestri = restr;
+			} else if(restr.getConfig().get("messages").equals("2000")) {
+				APIRestri = restr;
+			} else if(restr.getConfig().get("messages").equals("3000")) {
+				APIMethodRestri = restr;
+			}
+		}
+		Assert.assertNotNull(allAPIsRestri, "Expected a restriction for all APIs.");
+		Assert.assertNotNull(APIRestri, "Expected a restriction for a specific APIs");
+		
+		Assert.assertEquals(allAPIsRestri.getApiId(), "*");
+		Assert.assertEquals(allAPIsRestri.getMethod(), "*");
+		
+		Assert.assertEquals(APIRestri.getRestrictedAPI().getName(), context.getVariable("apiName"));
+		Assert.assertEquals(APIRestri.getRestrictedAPI().getPath(), context.getVariable("apiPath"));
+		Assert.assertEquals(APIRestri.getMethod(), "*");
+		
+		Assert.assertNotEquals(APIMethodRestri.getMethod(), "*");
 	}
 }

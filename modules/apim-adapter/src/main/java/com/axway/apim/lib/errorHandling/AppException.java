@@ -11,11 +11,19 @@ public class AppException extends JsonProcessingException {
 	
 	private final ErrorCode error;
 	
+	private String secondMessage;
+	
 	public enum LogLevel {
 		INFO,
 		WARN, 
 		ERROR, 
 		DEBUG
+	}
+	
+	public AppException(String message, String secondMessage, ErrorCode errorCode, Throwable throwable) {
+		super(message, throwable);
+		this.error = errorCode;
+		this.secondMessage = secondMessage;
 	}
 
 	public AppException(String message, ErrorCode errorCode, Throwable throwable) {
@@ -43,6 +51,8 @@ public class AppException extends JsonProcessingException {
 		Throwable cause = null;
 		if(error.getPrintStackTrace() || LOG.isDebugEnabled()) {
 			cause = this;
+		} else {
+			LOG.info("You may enable debug to get more details. See: https://github.com/Axway-API-Management-Plus/apim-cli/wiki/9.1.-Enable-Debug");
 		}
 		switch (error.getLogLevel()) {
 		case INFO: 
@@ -59,10 +69,23 @@ public class AppException extends JsonProcessingException {
 		}
 	}
 
+	public String getSecondMessage() {
+		return secondMessage;
+	}
+
+	public void setSecondMessage(String secondMessage) {
+		this.secondMessage = secondMessage;
+	}
+
 	public String getAllMessages() {
 		String message = getMessage();
+		String secondMessage = getSecondMessage();
+		
 		if(this.getCause()!=null && this.getCause() instanceof AppException) {
 			message += "\n                                 | " + ((AppException)this.getCause()).getAllMessages();
+		}
+		if(secondMessage!=null) {
+			message += "\n                                 | " + secondMessage;
 		}
 		return message;
 	}

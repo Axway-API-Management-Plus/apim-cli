@@ -413,8 +413,8 @@ public class APIManagerAPIAdapter {
 		APIQuota applicationQuota = null;
 		APIQuota sytemQuota = null;
 		try {
-			applicationQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), api.getId()); // Get the Application-Default-Quota
-			sytemQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), api.getId()); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
+			applicationQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), api, false, false); // Get the Application-Default-Quota
+			sytemQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), api, false, false); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
 			api.setApplicationQuota(applicationQuota);
 			api.setSystemQuota(sytemQuota);
 		} catch (AppException e) {
@@ -428,7 +428,7 @@ public class APIManagerAPIAdapter {
 		if(!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
 		if(api.getApplications()==null || api.getApplications().size()==0) return;
 		for(ClientApplication app : api.getApplications()) {
-			APIQuota appQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuotaForAPI(app.getId(), null);
+			APIQuota appQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuota(app.getId(), null, true, true);
 			app.setAppQuota(appQuota);
 		}
 	}
@@ -943,9 +943,9 @@ public class APIManagerAPIAdapter {
 				// REST-API for App-Quota is also returning Default-Quotas, but we have to ignore them here!
 				if(app.getAppQuota().getId().equals(APIManagerAdapter.APPLICATION_DEFAULT_QUOTA) || app.getAppQuota().getId().equals(APIManagerAdapter.SYSTEM_API_QUOTA)) continue;
 				for(QuotaRestriction restriction : app.getAppQuota().getRestrictions()) {
-					if(restriction.getApi().equals(referenceAPI.getId())) { // This application has a restriction for this specific API
+					if(restriction.getApiId().equals(referenceAPI.getId())) { // This application has a restriction for this specific API
 						updateAppQuota = true;
-						restriction.setApi(apiToUpgradeAccess.getId()); // Take over the quota config to new API
+						restriction.setApiId(apiToUpgradeAccess.getId()); // Take over the quota config to new API
 						if(!restriction.getMethod().equals("*")) { // The restriction is for a specific method
 							String originalMethodName = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(referenceAPI.getId(), restriction.getMethod()).getName();
 							// Try to find the same operation for the newly created API based on the name
@@ -957,6 +957,8 @@ public class APIManagerAPIAdapter {
 				if(updateAppQuota) {
 					LOG.info("Taking over existing quota config for application: '"+app.getName()+"' to newly created API.");
 					try {
+						FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"}));
+						mapper.setFilterProvider(filter);
 						uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/applications/"+app.getId()+"/quota").build();
 						entity = new StringEntity(mapper.writeValueAsString(app.getAppQuota()), ContentType.APPLICATION_JSON);
 						
