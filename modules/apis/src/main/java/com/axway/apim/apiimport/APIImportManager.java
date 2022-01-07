@@ -26,7 +26,7 @@ public class APIImportManager {
 	 * @param forceUpdate controls if the API should be re-created or not no matter if required
 	 * @throws AppException is the desired state can't be replicated into the API-Manager.
 	 */
-	public void applyChanges(APIChangeState changeState, boolean forceUpdate) throws AppException {
+	public void applyChanges(APIChangeState changeState, boolean forceUpdate, boolean updateOnly) throws AppException {
 		CoreParameters commands = CoreParameters.getInstance();
 		if(!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded() ) {
 			if(commands.isAllowOrgAdminsToPublish()) {
@@ -40,6 +40,9 @@ public class APIImportManager {
 		// No existing API found (means: No match for APIPath/V-Host & Query-Version), creating a complete new
 		if(changeState.getActualAPI()==null) {
 			// --> CreateNewAPI
+			if(updateOnly) {
+				throw new AppException("No existing API but, cannot create new API as flag updateOnly is set.", ErrorCode.UPDATE_ONLY_IS_SET);
+			}
 			LOG.info("No existing API found, creating new!");
 			CreateNewAPI createAPI = new CreateNewAPI();
 			createAPI.execute(changeState, false);

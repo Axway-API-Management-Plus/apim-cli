@@ -9,6 +9,7 @@ public class APIImportParams extends StandardImportParams implements Parameters 
 	private Boolean forceUpdate;
 	private Boolean useFEAPIDefinition;
 	private Boolean validateRemoteHost;
+	private Boolean updateOnly;
 	
 	private Boolean changeOrganization = false; 
 	
@@ -58,6 +59,14 @@ public class APIImportParams extends StandardImportParams implements Parameters 
 
 	public void setApiDefintion(String apiDefintion) {
 		this.apiDefintion = apiDefintion;
+	}
+
+	public Boolean isUpdateOnly() {
+		return updateOnly;
+	}
+
+	public void setUpdateOnly(Boolean updateOnly) {
+		this.updateOnly = updateOnly;
 	}
 
 	public Boolean isChangeOrganization() {

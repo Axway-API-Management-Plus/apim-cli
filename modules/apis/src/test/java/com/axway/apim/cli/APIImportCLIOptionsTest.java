@@ -50,12 +50,13 @@ public class APIImportCLIOptionsTest {
 	
 	@Test
 	public void testToggles() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-allowOrgAdminsToPublish", "false", "-replaceHostInSwagger", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreAdminAccount", "-ignoreQuotas"};
+		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-allowOrgAdminsToPublish", "false", "-replaceHostInSwagger", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreAdminAccount", "-ignoreQuotas", "-updateOnly"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertTrue(params.isForce());
 		Assert.assertTrue(params.isForceUpdate());
 		Assert.assertTrue(params.isIgnoreCache());
+		Assert.assertTrue(params.isUpdateOnly());
 		Assert.assertFalse(params.isAllowOrgAdminsToPublish());
 		Assert.assertTrue(params.isChangeOrganization());
 		Assert.assertTrue(params.isReplaceHostInSwagger());
@@ -72,6 +73,7 @@ public class APIImportCLIOptionsTest {
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertFalse(params.isIgnoreClientApps(), "Should be false, as the default is add");
 		Assert.assertFalse(params.isIgnoreClientOrgs(), "Should be false, as the default is add");
+		Assert.assertFalse(params.isUpdateOnly());
 	}
 	
 	@Test

@@ -52,6 +52,10 @@ public class CLIAPIImportOptions extends CLIOptions {
 		option.setRequired(false);
 		addOption(option);
 		
+		option = new Option("updateOnly", "If set, an existing actual API will be updated. If no actual API is found, the CLI stops.");
+		option.setRequired(false);
+		addOption(option);
+		
 		option = new Option("useFEAPIDefinition", "If this flag is set, the Actual-API contains the API-Definition (e.g. Swagger) from the FE-API instead of the original imported API.");
 		option.setRequired(false);
 		addOption(option);
@@ -136,6 +140,7 @@ public class CLIAPIImportOptions extends CLIOptions {
 		if(getValue("replaceHostInSwagger")!=null) params.setReplaceHostInSwagger(Boolean.parseBoolean(getValue("replaceHostInSwagger")));
 		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
 		params.setIgnoreQuotas(hasOption("ignoreQuotas"));
+		params.setUpdateOnly(hasOption("updateOnly"));
 		params.setClientOrgsMode(Mode.valueOfDefault(getValue("clientOrgsMode")));
 		params.setClientAppsMode(Mode.valueOfDefault(getValue("clientAppsMode")));
 		params.setQuotaMode(Mode.valueOfDefault(getValue("quotaMode")));

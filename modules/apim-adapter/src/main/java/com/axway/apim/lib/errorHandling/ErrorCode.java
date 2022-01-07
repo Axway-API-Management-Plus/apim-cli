@@ -14,6 +14,7 @@ public enum ErrorCode {
 	API_ALREADY_EXISTS					(7,  "The API already exists for another organization.", false),
 	NO_CHANGE							(10, "No change between desired and actual API has been detected.", false, LogLevel.WARN),
 	EXPORT_FOLDER_EXISTS				(12, "Export failed Export-Folder already exists.", false),
+	UPDATE_ONLY_IS_SET					(13, "Creating of a new API fails, when flag updateOnly is set.", false),
 	BREAKING_CHANGE_DETECTED			(15, "A breaking change detected, but no force flag was given.", false),
 	NO_ADMIN_ROLE_USER					(17, "An action failed due to a missing Admin-Account.", false),
 	CANT_PARSE_HTTP_RESPONSE			(20, "Cannot parse a HTTP-Response for REST-API-Call"),
