@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Backslashes in user passwords are ignored (See issue [#244](https://github.com/Axway-API-Management-Plus/apim-cli/issues/244))
 
 ### Added
+- Added updateOnly toggle (See issue [#251](https://github.com/Axway-API-Management-Plus/apim-cli/issues/251))
 - Added support to delete applications from API-Manager
 - Added support for API-Method level quotas
 
