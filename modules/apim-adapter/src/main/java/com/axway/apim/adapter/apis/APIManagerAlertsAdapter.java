@@ -48,6 +48,7 @@ public class APIManagerAlertsAdapter {
 		try {			
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/alerts").build();
 			RestAPICall getRequest = new GETRequest(uri, true);
+			LOG.debug("Load configured alerts from API-Manager using filter");
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			int statusCode = httpResponse.getStatusLine().getStatusCode();

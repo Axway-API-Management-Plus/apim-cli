@@ -47,6 +47,7 @@ public class APIManagerCustomPropertiesAdapter {
 		try {			
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/config/customproperties").build();
 			RestAPICall getRequest = new GETRequest(uri);
+			LOG.debug("Read configured custom properties from API-Manager");
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			int statusCode = httpResponse.getStatusLine().getStatusCode();

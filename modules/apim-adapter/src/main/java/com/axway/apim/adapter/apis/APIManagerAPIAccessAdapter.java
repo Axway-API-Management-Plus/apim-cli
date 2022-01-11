@@ -81,6 +81,7 @@ public class APIManagerAPIAccessAdapter {
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/"+type+"/"+id+"/apis").build();
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+			LOG.debug("Load API-Access with type: "+type+" from API-Manager with ID: " + id);
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			int statusCode = httpResponse.getStatusLine().getStatusCode();

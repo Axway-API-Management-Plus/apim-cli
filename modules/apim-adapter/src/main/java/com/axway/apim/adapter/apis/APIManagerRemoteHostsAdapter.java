@@ -53,6 +53,7 @@ public class APIManagerRemoteHostsAdapter {
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/remotehosts").build();
 			RestAPICall getRequest = new GETRequest(uri);
+			LOG.debug("Load remote hosts from API-Manager using filter: " + filter);
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			int statusCode = httpResponse.getStatusLine().getStatusCode();

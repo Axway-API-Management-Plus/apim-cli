@@ -48,6 +48,7 @@ public class APIManagerOAuthClientProfilesAdapter {
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/oauthclientprofiles").build();
 			RestAPICall getRequest = new GETRequest(uri);
+			LOG.debug("Load OAuth-Profiles from API-Manager.");
 			httpResponse = getRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if( statusCode != 200){

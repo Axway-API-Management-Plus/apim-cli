@@ -195,6 +195,7 @@ public class APIMgrAppsAdapter {
 		try {
 			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/"+apiId+"/applications").build();
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+			LOG.debug("Load subscribed applications for API-ID: "+apiId+" from API-Manager");
 			httpResponse = getRequest.execute();
 			response = EntityUtils.toString(httpResponse.getEntity());
 			subscribedAppAPIManagerResponse.put(apiId, response);

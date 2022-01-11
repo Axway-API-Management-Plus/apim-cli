@@ -43,6 +43,7 @@ public class APIManagerAPIMethodAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/"+apiId+"/operations").build();
+			LOG.debug("Load API-Methods for API: "+apiId+" from API-Manager.");
 			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
 			httpResponse = getRequest.execute();
 			this.apiManagerResponse.put(apiId,EntityUtils.toString(httpResponse.getEntity()));
