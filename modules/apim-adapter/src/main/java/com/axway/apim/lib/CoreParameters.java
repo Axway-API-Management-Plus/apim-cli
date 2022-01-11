@@ -38,6 +38,8 @@ public class CoreParameters implements Parameters {
 	
 	public static String DEFAULT_API_BASEPATH = "/api/portal/v1.3";
 	
+	private String apiManagerUrl = null;
+	
 	private static CoreParameters instance;
 	
 	private List<CacheType> cachesToClear = null;
@@ -310,7 +312,10 @@ public class CoreParameters implements Parameters {
 	}
 
 	public String getAPIManagerURL() {
-		return "https://"+this.getHostname()+":"+this.getPort();
+		if(apiManagerUrl==null) {
+			apiManagerUrl = "https://"+this.getHostname()+":"+this.getPort();
+		}
+		return apiManagerUrl;
 	}
 	
 	public Boolean isIgnoreAdminAccount() {
