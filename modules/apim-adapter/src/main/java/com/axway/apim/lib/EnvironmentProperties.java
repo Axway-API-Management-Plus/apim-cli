@@ -87,7 +87,6 @@ public class EnvironmentProperties implements Map<String, String> {
 		} else if(this.systemProperties!=null && systemProperties.containsKey(key)) {
 			return resolveValueWithEnvVars(systemProperties.getProperty((String)key));
 		} else {
-			LOG.debug("Property: '" + key + "' not found.");
 			return null;
 		}
 	}
