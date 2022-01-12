@@ -19,11 +19,11 @@ public class APIImportParams extends StandardImportParams implements Parameters 
 		return (APIImportParams)CoreParameters.getInstance();
 	}
 	
-	/*@Override
+	@Override
 	public boolean isIgnoreCache() {
 		// For import action we ignore the cache in all cases!
 		return true;
-	}*/
+	}
 
 	public Boolean isUseFEAPIDefinition() {
 		if(useFEAPIDefinition==null) return false;
