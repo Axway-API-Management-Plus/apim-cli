@@ -454,8 +454,13 @@ public class CoreParameters implements Parameters {
 	public List<CacheType> clearCaches() {
 		if(getClearCache()==null) return null;
 		if(cachesToClear!=null) return cachesToClear;
-		cachesToClear = new ArrayList<CacheType>();
-		for(String cacheName : getClearCache().split(",")) {
+		cachesToClear = createCacheList(getClearCache());
+		return cachesToClear;
+	}
+	
+	protected List<CacheType> createCacheList(String configString) {
+		List<CacheType> cachesList = new ArrayList<CacheType>();
+		for(String cacheName : configString.split(",")) {
 			if(cacheName.equals("ALL")) cacheName = "*";
 			cacheName = cacheName.trim();
 			if(cacheName.contains("*")) {
@@ -463,19 +468,20 @@ public class CoreParameters implements Parameters {
 				for(CacheType cacheType : CacheType.values()) {
 					Matcher matcher = pattern.matcher(cacheType.name().toLowerCase());
 					if(matcher.matches()) {
-						cachesToClear.add(cacheType);
+						cachesList.add(cacheType);
+						continue;
 					}
 				}
 			} else {
 				try {
-					cachesToClear.add(CacheType.valueOf(cacheName));
+					cachesList.add(CacheType.valueOf(cacheName));
 				} catch (IllegalArgumentException e) {
-					LOG.error("Unable to clear cache: " +cacheName + " as the cache is unknown.");
+					LOG.error("Unknown cache: " +cacheName + " configured.");
 					LOG.error("Available caches: " + Arrays.asList(CacheType.values()));
 				}
 			}
 		}
-		return cachesToClear;
+		return cachesList;
 	}
 	
 	
@@ -513,6 +519,10 @@ public class CoreParameters implements Parameters {
 	private String getFromProperties(String key) {
 		if(this.properties==null) return null;
 		return this.properties.get(key);
+	}
+	
+	public List<CacheType> getEnabledCacheTypes() {
+		return null;
 	}
 
 	@Override

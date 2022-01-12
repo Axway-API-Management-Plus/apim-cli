@@ -19,7 +19,7 @@ import org.ehcache.spi.loaderwriter.CacheWritingException;
 
 public class DoNothingCacheManager implements CacheManager {
 	
-	public class DoNothingCache<K, V> implements Cache<K, V> {
+	public static class DoNothingCache<K, V> implements Cache<K, V> {
 
 		@Override
 		public void clear() {

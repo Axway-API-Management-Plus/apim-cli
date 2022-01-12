@@ -51,9 +51,12 @@ import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.DoNothingCacheManager;
+import com.axway.apim.lib.FilteredCacheManager;
+import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.TestIndicator;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
@@ -97,7 +100,7 @@ public class APIManagerAdapter {
 	
 	private static CoreParameters cmd;
 	
-	private static CacheManager cacheManager;
+	private static FilteredCacheManager cacheManager;
 	
 	public APIManagerConfigAdapter configAdapter;
 	public APIManagerCustomPropertiesAdapter customPropertiesAdapter;
@@ -325,11 +328,12 @@ public class APIManagerAdapter {
 			return APIManagerAdapter.cacheManager;
 		}
 		if(CoreParameters.getInstance().isIgnoreCache()) {
-			APIManagerAdapter.cacheManager = new DoNothingCacheManager();
+			APIManagerAdapter.cacheManager = new FilteredCacheManager(new DoNothingCacheManager());
 		} else {
 			URL myUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
 			XmlConfiguration xmlConfig = new XmlConfiguration(myUrl);
-			APIManagerAdapter.cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
+			CacheManager ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
+			APIManagerAdapter.cacheManager = new FilteredCacheManager(ehcacheManager);
 			APIManagerAdapter.cacheManager.init();
 		}
 		return cacheManager;
@@ -337,6 +341,10 @@ public class APIManagerAdapter {
 	
 	public static <K, V> Cache<K, V> getCache(CacheType cacheType, Class<K> key, Class<V> value) {
 		getCacheManager();
+		if(CoreParameters.getInstance() instanceof StandardImportParams) {
+			List<CacheType> enabledCaches = StandardImportParams.getInstance().getEnabledCacheTypes();
+			APIManagerAdapter.cacheManager.setEnabledCaches(enabledCaches);
+		}
 		Cache<K, V> cache = APIManagerAdapter.cacheManager.getCache(cacheType.name(), key, value);
 		if(CoreParameters.getInstance().clearCaches()!=null && CoreParameters.getInstance().clearCaches().contains(cacheType)) {
 			cache.clear();
@@ -344,8 +352,6 @@ public class APIManagerAdapter {
 		}
 		return cache;
 	}
-	
-	
 	
 	public static void clearCache(String cacheName) {
 		if(APIManagerAdapter.cacheManager==null || APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) return;

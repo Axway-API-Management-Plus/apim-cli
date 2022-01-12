@@ -11,7 +11,7 @@
 			<ehcache:ttl unit="minutes">60</ehcache:ttl>
 		</ehcache:expiry>
 		<ehcache:resources>
-			<ehcache:heap unit="MB">10</ehcache:heap>
+			<ehcache:heap unit="entries">100</ehcache:heap>
 			<ehcache:disk unit="MB" persistent="true">20</ehcache:disk>
 		</ehcache:resources>
 	</ehcache:cache>
@@ -24,7 +24,7 @@
 			<ehcache:ttl unit="minutes">60</ehcache:ttl>
 		</ehcache:expiry>
 		<ehcache:resources>
-			<ehcache:heap unit="MB">10</ehcache:heap>
+			<ehcache:heap unit="entries">50</ehcache:heap>
 			<ehcache:disk unit="MB" persistent="true">20</ehcache:disk>
 		</ehcache:resources>
 	</ehcache:cache>
@@ -37,7 +37,7 @@
 			<ehcache:ttl unit="days">14</ehcache:ttl>
 		</ehcache:expiry>
 		<ehcache:resources>
-			<ehcache:heap unit="MB">1</ehcache:heap>
+			<ehcache:heap unit="entries">1</ehcache:heap>
 			<ehcache:disk unit="MB" persistent="true">2</ehcache:disk>
 		</ehcache:resources>
 	</ehcache:cache>
@@ -50,7 +50,7 @@
 			<ehcache:ttl unit="minutes">180</ehcache:ttl>
 		</ehcache:expiry>
 		<ehcache:resources>
-			<ehcache:heap unit="MB">10</ehcache:heap>
+			<ehcache:heap unit="entries">500</ehcache:heap>
 			<ehcache:disk unit="MB" persistent="true">20</ehcache:disk>
 		</ehcache:resources>
 	</ehcache:cache>
@@ -63,7 +63,7 @@
 			<ehcache:ttl unit="minutes">180</ehcache:ttl>
 		</ehcache:expiry>
 		<ehcache:resources>
-			<ehcache:heap unit="MB">10</ehcache:heap>
+			<ehcache:heap unit="entries">500</ehcache:heap>
 			<ehcache:disk unit="MB" persistent="true">20</ehcache:disk>
 		</ehcache:resources>
 	</ehcache:cache>
@@ -76,7 +76,7 @@
 			<ehcache:ttl unit="minutes">180</ehcache:ttl>
 		</ehcache:expiry>
 		<ehcache:resources>
-			<ehcache:heap unit="MB">10</ehcache:heap>
+			<ehcache:heap unit="entries">500</ehcache:heap>
 			<ehcache:disk unit="MB" persistent="true">20</ehcache:disk>
 		</ehcache:resources>
 	</ehcache:cache>
@@ -89,7 +89,7 @@
 			<ehcache:ttl unit="minutes">60</ehcache:ttl>
 		</ehcache:expiry>
 		<ehcache:resources>
-			<ehcache:heap unit="MB">10</ehcache:heap>
+			<ehcache:heap unit="entries">500</ehcache:heap>
 			<ehcache:disk unit="MB" persistent="true">20</ehcache:disk>
 		</ehcache:resources>
 	</ehcache:cache>
@@ -102,7 +102,7 @@
 			<ehcache:ttl unit="days">7</ehcache:ttl>
 		</ehcache:expiry>
 		<ehcache:resources>
-			<ehcache:heap unit="MB">10</ehcache:heap>
+			<ehcache:heap unit="entries">50</ehcache:heap>
 			<ehcache:disk unit="MB" persistent="true">20</ehcache:disk>
 		</ehcache:resources>
 	</ehcache:cache>
@@ -115,7 +115,7 @@
 			<ehcache:ttl unit="days">7</ehcache:ttl>
 		</ehcache:expiry>
 		<ehcache:resources>
-			<ehcache:heap unit="MB">10</ehcache:heap>
+			<ehcache:heap unit="entries">500</ehcache:heap>
 			<ehcache:disk unit="MB" persistent="true">20</ehcache:disk>
 		</ehcache:resources>
 	</ehcache:cache>

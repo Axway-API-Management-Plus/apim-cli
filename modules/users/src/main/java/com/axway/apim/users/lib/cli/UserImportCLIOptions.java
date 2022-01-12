@@ -5,6 +5,7 @@ import org.apache.commons.cli.Option;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
+import com.axway.apim.lib.StandardImportCLIOptions;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.users.lib.UserImportParams;
 
@@ -16,6 +17,7 @@ public class UserImportCLIOptions extends CLIOptions {
 	
 	public static CLIOptions create(String[] args) {
 		CLIOptions cliOptions = new UserImportCLIOptions(args);
+		cliOptions = new StandardImportCLIOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);
 		cliOptions.addOptions();
 		cliOptions.parse();
@@ -28,10 +30,6 @@ public class UserImportCLIOptions extends CLIOptions {
 		Option option = new Option("c", "config", true, "This is the JSON-Formatted Organization-Config file containing the organization. You may get that config file using apim org get with output set to JSON.");
 		option.setRequired(true);
 		option.setArgName("user_config.json");
-		addOption(option);
-		
-		option = new Option("stageConfig", true, "Manually provide the name of the stage configuration file to use instead of derived from the given stage.");
-		option.setArgName("my-staged-user.json");
 		addOption(option);
 	}
 
@@ -59,7 +57,6 @@ public class UserImportCLIOptions extends CLIOptions {
 		UserImportParams params = new UserImportParams();
 
 		params.setConfig(getValue("config"));
-		params.setStageConfig(getValue("stagedConfig"));
 		return params;
 	}
 }

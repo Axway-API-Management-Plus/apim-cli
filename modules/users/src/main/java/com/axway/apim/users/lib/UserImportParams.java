@@ -8,10 +8,4 @@ public class UserImportParams extends StandardImportParams {
 	public static synchronized UserImportParams getInstance() {
 		return (UserImportParams)CoreParameters.getInstance();
 	}
-	
-	@Override
-	public boolean isIgnoreCache() {
-		// For import action we ignore the cache in all cases!
-		return true;
-	}
 }

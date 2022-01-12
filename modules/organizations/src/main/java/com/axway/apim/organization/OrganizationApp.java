@@ -158,6 +158,10 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
+		} finally {
+			try {
+				APIManagerAdapter.deleteInstance();
+			} catch (AppException ignore) { }
 		}
 	}
 	

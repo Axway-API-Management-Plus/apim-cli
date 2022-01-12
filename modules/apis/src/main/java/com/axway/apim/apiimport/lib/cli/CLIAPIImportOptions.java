@@ -7,6 +7,7 @@ import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.lib.Parameters;
+import com.axway.apim.lib.StandardImportCLIOptions;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class CLIAPIImportOptions extends CLIOptions {
@@ -17,6 +18,7 @@ public class CLIAPIImportOptions extends CLIOptions {
 	
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new CLIAPIImportOptions(args);
+		cliOptions = new StandardImportCLIOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);
 		cliOptions.addOptions();
 		cliOptions.parse();
@@ -42,10 +44,6 @@ public class CLIAPIImportOptions extends CLIOptions {
 		option = new Option("c", "config", true, "This is the JSON-Formatted API-Config containing information how to expose the API. You may get that config file using apim api get with output set to JSON.");
 		option.setRequired(true);
 		option.setArgName("api_config.json");
-		addOption(option);
-		
-		option = new Option("stageConfig", true, "Manually provide the name of the stage configuration file to use instead of derived from the given stage.");
-		option.setArgName("my-staged-api-config.json");
 		addOption(option);
 		
 		option = new Option("ignoreQuotas", "Use this flag to ignore configured API quotas.");
@@ -148,7 +146,6 @@ public class CLIAPIImportOptions extends CLIOptions {
 		params.setValidateRemoteHost(Boolean.parseBoolean(getValue("validateRemoteHost")));
 		params.setZeroDowntimeUpdate(Boolean.parseBoolean(getValue("zeroDowntimeUpdate")));
 		if(getValue("allowOrgAdminsToPublish")!=null) params.setAllowOrgAdminsToPublish(Boolean.parseBoolean(getValue("allowOrgAdminsToPublish")));
-		params.setStageConfig(getValue("stageConfig"));
 		return params;
 	}
 }
