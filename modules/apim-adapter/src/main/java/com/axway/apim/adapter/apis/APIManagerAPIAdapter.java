@@ -427,6 +427,7 @@ public class APIManagerAPIAdapter {
 	private void addExistingClientAppQuotas(API api, boolean addQuota) throws AppException {
 		if(!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
 		if(api.getApplications()==null || api.getApplications().size()==0) return;
+		LOG.debug("Loading application quota for " + api.getApplications() + " subscribed applications.");
 		for(ClientApplication app : api.getApplications()) {
 			APIQuota appQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuota(app.getId(), null, true, true);
 			app.setAppQuota(appQuota);
