@@ -25,6 +25,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
+import org.ehcache.StateTransitionException;
 import org.ehcache.Status;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.xml.XmlConfiguration;
@@ -56,7 +57,6 @@ import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.TestIndicator;
-import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
@@ -332,9 +332,23 @@ public class APIManagerAdapter {
 		} else {
 			URL myUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
 			XmlConfiguration xmlConfig = new XmlConfiguration(myUrl);
-			CacheManager ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
-			APIManagerAdapter.cacheManager = new FilteredCacheManager(ehcacheManager);
-			APIManagerAdapter.cacheManager.init();
+			// The Cache-Manager creates an exclusive lock on the Cache-Directory, which means only on APIM-CLI can initialize it at a time
+			// When running in a CI/CD pipeline, multiple CPIM-CLIs might be executed
+			int initAttempts = 1;
+			int maxAttempts = 100;
+			do {
+				try {
+					CacheManager ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
+					APIManagerAdapter.cacheManager = new FilteredCacheManager(ehcacheManager);
+					APIManagerAdapter.cacheManager.init();
+				} catch (StateTransitionException e) {
+					LOG.warn("Error initiliazing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 2 seconds. Attempts: "+initAttempts+"/"+maxAttempts);
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException ignore) { }
+				}
+				initAttempts++;
+			} while (APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED && initAttempts <= maxAttempts);
 		}
 		return cacheManager;
 	}
