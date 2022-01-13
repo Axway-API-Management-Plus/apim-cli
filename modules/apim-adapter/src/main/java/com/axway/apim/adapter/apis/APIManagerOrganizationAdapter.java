@@ -26,7 +26,6 @@ import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -168,6 +167,8 @@ public class APIManagerOrganizationAdapter {
 			desiredOrg.setId(createdOrg.getId());
 			saveImage(desiredOrg, actualOrg);
 			saveAPIAccess(desiredOrg, actualOrg);
+			// Force reload of this organization next time
+			organizationCache.remove(createdOrg.getId());
 			return createdOrg;
 
 		} catch (Exception e) {
@@ -187,6 +188,8 @@ public class APIManagerOrganizationAdapter {
 				LOG.error("Error deleting organization. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 				throw new AppException("Error deleting organization. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
+			// Deleted org should also be deleted from the cache
+			organizationCache.remove(org.getId());
 			LOG.info("Organization: "+org.getName()+" ("+org.getId()+")" + " successfully deleted");
 		} catch (Exception e) {
 			throw new AppException("Error deleting organization", ErrorCode.ACCESS_ORGANIZATION_ERR, e);

@@ -417,6 +417,8 @@ public class APIMgrAppsAdapter {
 					((CloseableHttpResponse)httpResponse).close();
 				} catch (Exception ignore) { }
 			}
+			// Remove application from cache to force reload next time
+			applicationsCache.remove(createdApp.getId());
 			if(baseAppOnly) return createdApp;
 			
 			desiredApp.setId(createdApp.getId());

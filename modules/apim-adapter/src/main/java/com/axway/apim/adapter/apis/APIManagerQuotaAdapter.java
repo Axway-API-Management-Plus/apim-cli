@@ -156,6 +156,8 @@ public class APIManagerQuotaAdapter {
 			if(statusCode < 200 || statusCode > 299){
 				throw new AppException("Can't update API-Manager Quota-Configuration. Response: '"+response+"'", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
+			// Force reload of this quota next time
+			applicationsQuotaCache.remove(quotaId);
 			return mapper.readValue(response, APIQuota.class);
 		} catch (URISyntaxException | UnsupportedOperationException | IOException e) {
 			throw new AppException("Can't update Quota-Configuration in API-Manager.", ErrorCode.UNXPECTED_ERROR, e);

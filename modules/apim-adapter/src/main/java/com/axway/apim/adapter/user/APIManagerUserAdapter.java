@@ -225,6 +225,8 @@ public class APIManagerUserAdapter {
 					((CloseableHttpResponse)httpResponse).close();
 				} catch (Exception ignore) { }
 			}
+			// Force reload of updated user next time
+			userCache.remove(createdUser.getId());
 			return createdUser;
 
 		} catch (Exception e) {
@@ -272,6 +274,9 @@ public class APIManagerUserAdapter {
 				LOG.error("Error deleting user. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 				throw new AppException("Error deleting user. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
+			// Also remove this user from cache
+			userCache.remove(user.getId());
+			LOG.info("User: "+user.getName()+" ("+user.getId()+")" + " successfully deleted");
 		} catch (Exception e) {
 			throw new AppException("Error deleting user", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 		} finally {
