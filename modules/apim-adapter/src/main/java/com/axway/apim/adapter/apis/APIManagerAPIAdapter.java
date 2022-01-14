@@ -166,7 +166,7 @@ public class APIManagerAPIAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode < 200 || statusCode > 299){
 				if(statusCode == 403 && filter.getId()!=null) {
-					LOG.error("Unable to find API with ID: "+filter.getId()+". Please have in mind during API-Update the ID is re-created!");
+					LOG.error("Unable to find API with ID: "+filter.getId()+". Please have in mind during API-Update the ID is re-created or add -ignoreCache !");
 					apiManagerResponse.put(filter, "[]");
 					return;
 				}
