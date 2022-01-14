@@ -3,7 +3,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>axway-apim-cli</id>
-    <version>1.6.1</version>
+    <version>1.7.0</version>
     <packageSourceUrl>https://github.com/Axway-API-Management-Plus/apim-cli/tree/develop/tools/choco/axway-apim-cli</packageSourceUrl>
     <owners>Christoph Wiechmann</owners>
     <title>Axway API-Management CLI (Install)</title>
