@@ -90,7 +90,7 @@ public class APIManagerConfigAdapter {
 		HttpResponse httpResponse = null;
 		try {			
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/config").build();
-			LOG.debug("Load configuration API-Manager.");
+			LOG.debug("Load API-Manager configuration.");
 			RestAPICall getRequest = new GETRequest(uri, useAdmin);
 			httpResponse = getRequest.execute();
 			String response = EntityUtils.toString(httpResponse.getEntity());

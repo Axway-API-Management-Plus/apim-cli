@@ -104,7 +104,7 @@ public class APIManagerAdapter {
 	
 	private static CoreParameters cmd;
 	
-	private static FilteredCacheManager cacheManager;
+	public static FilteredCacheManager cacheManager;
 	
 	public APIManagerConfigAdapter configAdapter;
 	public APIManagerCustomPropertiesAdapter customPropertiesAdapter;
@@ -126,10 +126,20 @@ public class APIManagerAdapter {
 		oauthClientProviderCache, 
 		applicationsCache, 
 		applicationsSubscriptionCache, 
-		applicationsQuotaCache,
+		applicationsQuotaCache(true),
 		applicationsCredentialCache,
 		organizationCache,
 		userCache;
+		
+		public boolean supportsImportActions = false;
+		
+		private CacheType() {
+			this.supportsImportActions = false;
+		}
+
+		private CacheType(boolean supportsImportActions) {
+			this.supportsImportActions = supportsImportActions;
+		}
 	}
 	
 	public static synchronized APIManagerAdapter getInstance() throws AppException {
@@ -149,9 +159,9 @@ public class APIManagerAdapter {
 	
 	public static synchronized void deleteInstance() throws AppException {
 		if(APIManagerAdapter.cacheManager!=null && APIManagerAdapter.cacheManager.getStatus()==Status.AVAILABLE) {
-			LOG.debug("Closing cache begin");
+			LOG.debug("Closing cache ...");
 			APIManagerAdapter.cacheManager.close();
-			LOG.debug("Closing cache end");
+			LOG.trace("Cache Closed.");
 		}
 		if(APIManagerAdapter.instance!=null) {
 			if(hasOrgAdmin()) APIManagerAdapter.instance.logoutFromAPIManager(false); // Logout potentially logged in OrgAdmin

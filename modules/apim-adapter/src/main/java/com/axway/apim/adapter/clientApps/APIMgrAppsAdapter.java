@@ -70,11 +70,14 @@ public class APIMgrAppsAdapter {
 	Cache<String, String> applicationsCache;
 	Cache<String, String> applicationsSubscriptionCache;
 	Cache<String, String> applicationsCredentialCache;
+	Cache<String, String> applicationsQuotaCache;
 
 	public APIMgrAppsAdapter() throws AppException {
 		applicationsCache = APIManagerAdapter.getCache(CacheType.applicationsCache, String.class, String.class);
 		applicationsSubscriptionCache = APIManagerAdapter.getCache(CacheType.applicationsSubscriptionCache, String.class, String.class);
 		applicationsCredentialCache = APIManagerAdapter.getCache(CacheType.applicationsCredentialCache, String.class, String.class);
+		// Must be refactored to use Quota-Adapter instead of doing this in 
+		applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
 	}
 
 	/**
@@ -352,10 +355,6 @@ public class APIMgrAppsAdapter {
 		app.setImage(image);
 	}
 	
-	void addQuota(ClientApplication app, boolean addQuota) {
-		
-	}
-	
 	public ClientApplication updateApplication(ClientApplication desiredApp, ClientApplication actualApp) throws AppException {
 		return createOrUpdateApplication(desiredApp, actualApp);
 	}
@@ -594,6 +593,8 @@ public class APIMgrAppsAdapter {
 				LOG.error("Error creating/updating application quota. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 				throw new AppException("Error creating application' Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
+			// Force reload of this quota next time
+			applicationsQuotaCache.remove(app.getId());
 		} catch (Exception e) {
 			throw new AppException("Error creating application quota. Error: " + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
 		} finally {

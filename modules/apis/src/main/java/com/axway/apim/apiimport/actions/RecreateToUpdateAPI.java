@@ -3,6 +3,7 @@ package com.axway.apim.apiimport.actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIChangeState;
@@ -37,6 +38,10 @@ public class RecreateToUpdateAPI {
 		LOG.info("New API successfuly created. Going to delete old API: '"+actualAPI.getName()+"' "+actualAPI.getVersion()+" (ID: "+actualAPI.getId()+")");
 		// Delete the existing old API!
 		new APIStatusManager().update(actualAPI, API.STATE_DELETED, true);
+		
+		// Maintain the Ehcache 
+		// All cached entities referencing this API must be updated with the correct API-ID
+		APIManagerAdapter.cacheManager.flipApiId(changes.getActualAPI().getId(), createNewAPI.getCreatedAPI().getId());
 	}
 
 }

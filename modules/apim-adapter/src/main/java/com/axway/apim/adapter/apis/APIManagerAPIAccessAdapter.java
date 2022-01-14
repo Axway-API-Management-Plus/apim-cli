@@ -120,7 +120,7 @@ public class APIManagerAPIAccessAdapter {
 				for(APIAccess apiAccess : allApiAccess) {
 					API api = APIManagerAdapter.getInstance().apiAdapter.getAPI(new APIFilter.Builder().hasId(apiAccess.getApiId()).build(), false);
 					if(api==null) {
-						throw new AppException("Unable to find API with ID: " + apiAccess.getApiId() + " referenced by "+type.niceName+": " + entity.getName(), ErrorCode.UNKNOWN_API);
+						throw new AppException("Unable to find API with ID: " + apiAccess.getApiId() + " referenced by "+type.niceName+": " + entity.getName() + ". You may try again with -clearCache", ErrorCode.UNKNOWN_API);
 					}
 					apiAccess.setApiName(api.getName());
 					apiAccess.setApiVersion(api.getVersion());

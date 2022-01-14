@@ -23,10 +23,11 @@ import com.axway.apim.lib.errorHandling.AppException;
 public class CreateNewAPI {
 
 	static Logger LOG = LoggerFactory.getLogger(CreateNewAPI.class);
+	
+	private API createdAPI = null;
 
 	public void execute(APIChangeState changes, boolean reCreation) throws AppException {
 
-		API createdAPI = null;
 		API desiredAPI = changes.getDesiredAPI();
 		API actualAPI  = changes.getActualAPI();
 		
@@ -90,5 +91,9 @@ public class CreateNewAPI {
 				APIPropertiesExport.getInstance().setProperty("feApiId", createdAPI.getId());
 			}
 		}
+	}
+
+	public API getCreatedAPI() {
+		return createdAPI;
 	}
 }

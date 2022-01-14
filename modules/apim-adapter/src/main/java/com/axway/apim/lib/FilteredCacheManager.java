@@ -13,7 +13,16 @@ import org.ehcache.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIManagerAdapter.CacheType;
+import com.axway.apim.lib.DoNothingCacheManager.DoNothingCache;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 public class FilteredCacheManager implements CacheManager {
 	
@@ -37,7 +46,11 @@ public class FilteredCacheManager implements CacheManager {
 		if(enabledCaches==null || cacheManager instanceof DoNothingCacheManager) return;
 		this.enabledCaches = new ArrayList<String>();
 		for(CacheType cacheType : enabledCaches) {
-			this.enabledCaches.add(cacheType.name());
+			if(cacheType.supportsImportActions) {
+				this.enabledCaches.add(cacheType.name());
+			} else {
+				LOG.error("The cache: " + cacheType.name() + " is currently not supported for import actions.");
+			}
 		}
 		LOG.info("Enabled caches: " + this.enabledCaches);
 	}
@@ -95,5 +108,46 @@ public class FilteredCacheManager implements CacheManager {
 		cacheManager.removeCache(arg0);
 	}
 	
-	
+	/**
+	 * There are a number of entities which have references to an API (e.g. QuotaRestrictions). 
+	 * These are stored/maintained with their own ID (quotaId) and cached in Ehcache. 
+	 * But, if the API-ID changes, the cached reference points to an API that no longer exists. 
+	 * This method is used to update all entities in the cache when the API ID of an API 
+	 * changes (e.g. with a Replace Action).
+	 * @param oldApiId the ID currently used by the cached entities
+	 * @param newApiId the new ID that must be replaced
+	 * @throws AppException when the cache cannot be updated.
+	 */
+	public void flipApiId(String oldApiId, String newApiId) throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		Cache<String, String> appQuotaCached = getCache(CacheType.applicationsQuotaCache.name(), String.class, String.class);
+		if(appQuotaCached instanceof DoNothingCache) return;
+		LOG.debug("Updating ApplicationQuotaCache: Flip API-ID: " + oldApiId + " --> " + newApiId);
+		try {
+			appQuotaCached.forEach(entry -> {
+				try {
+					String cachedValueString = entry.getValue();
+					JsonNode cachedValue = mapper.readTree(cachedValueString);
+					// As System- and App-Default-Quotas are not cached, they can be ignored
+					if(APIManagerAdapter.APPLICATION_DEFAULT_QUOTA.equals(cachedValue.get("id").asText()) ||
+							APIManagerAdapter.SYSTEM_API_QUOTA.equals(cachedValue.get("id").asText())) {
+						// Do nothing
+					} else {
+						ArrayNode restrictions = cachedValue.withArray("restrictions");
+						for(JsonNode restriction : restrictions) {
+							if(oldApiId.equals(restriction.get("api").asText())) {
+								((ObjectNode)restriction).replace("api", new TextNode(newApiId));
+								appQuotaCached.replace(entry.getKey(), cachedValue.toString());
+							}
+						}
+					}
+				} catch (Exception e) {
+					throw new RuntimeException("There was an error updating the cache.", e);
+				}
+			});
+		} catch (Exception e) {
+			appQuotaCached.clear();
+			throw new AppException("Error updating the cache. Cache has been cleared.", ErrorCode.UNXPECTED_ERROR, e);
+		}
+	}
 }
