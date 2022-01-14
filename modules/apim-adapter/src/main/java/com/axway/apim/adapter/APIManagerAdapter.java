@@ -342,9 +342,9 @@ public class APIManagerAdapter {
 					APIManagerAdapter.cacheManager = new FilteredCacheManager(ehcacheManager);
 					APIManagerAdapter.cacheManager.init();
 				} catch (StateTransitionException e) {
-					LOG.warn("Error initiliazing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 2 seconds. Attempts: "+initAttempts+"/"+maxAttempts);
+					LOG.warn("Error initiliazing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 3 seconds. Attempts: "+initAttempts+"/"+maxAttempts);
 					try {
-						Thread.sleep(2000);
+						Thread.sleep(3000);
 					} catch (InterruptedException ignore) { }
 				}
 				initAttempts++;
