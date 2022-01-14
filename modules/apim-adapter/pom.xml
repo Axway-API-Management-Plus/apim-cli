@@ -120,10 +120,6 @@
 					</execution>
 				</executions>
 				<configuration>
-					<excludes>
-						<exclude>cacheConfig.xml</exclude>
-						<exclude>log4j2.xml</exclude>
-					</excludes>
 					<archive>
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
