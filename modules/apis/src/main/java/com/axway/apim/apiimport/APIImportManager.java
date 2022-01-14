@@ -24,6 +24,7 @@ public class APIImportManager {
 	 * synchronize the desired API-State into the API-Manager.
 	 * @param changeState containing the desired and actual API
 	 * @param forceUpdate controls if the API should be re-created or not no matter if required
+	 * @param updateOnly if true, no new API is created
 	 * @throws AppException is the desired state can't be replicated into the API-Manager.
 	 */
 	public void applyChanges(APIChangeState changeState, boolean forceUpdate, boolean updateOnly) throws AppException {

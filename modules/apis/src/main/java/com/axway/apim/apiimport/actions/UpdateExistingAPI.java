@@ -7,12 +7,11 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIChangeState;
-import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.errorHandling.AppException;
 
 /**
- * This class is used by the {@link APIImportManager#applyChanges(APIChangeState, boolean)} to update an existing API. 
+ * This class is used by the APIImportManager#applyChanges(APIChangeState, boolean) to update an existing API. 
  * This happens, when all changes can be applied to the existing API which is quite of the case for an "Unpublished" API.
  * 
  * @author cwiechmann@axway.com

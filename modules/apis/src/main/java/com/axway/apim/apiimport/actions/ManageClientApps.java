@@ -34,8 +34,8 @@ public class ManageClientApps {
 	 * @param desiredState the desired state of the API
 	 * @param actualState the actual state of the API incl. intermediate changes already performed so far
 	 * @param oldAPI the actual state of the API how it was loaded initially
+	 * @throws AppException when an error occurs
 	 */
-	
 	public ManageClientApps(API desiredState, API actualState, API oldAPI) throws AppException {
 		this.desiredState = desiredState;
 		this.actualState = actualState;

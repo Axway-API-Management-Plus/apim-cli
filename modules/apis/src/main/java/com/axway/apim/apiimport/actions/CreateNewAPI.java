@@ -8,7 +8,6 @@ import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIChangeState;
-import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.apiimport.rollback.RollbackAPIProxy;
 import com.axway.apim.apiimport.rollback.RollbackBackendAPI;
 import com.axway.apim.apiimport.rollback.RollbackHandler;
@@ -16,7 +15,7 @@ import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.errorHandling.AppException;
 
 /**
- * This class is used by the {@link APIImportManager#applyChanges(APIChangeState, boolean)} to create a new API.
+ * This class is used by the APIImportManager#applyChanges(APIChangeState, boolean) to create a new API.
  * It's called, when an existing API can't be found.
  *
  * @author cwiechmann@axway.com

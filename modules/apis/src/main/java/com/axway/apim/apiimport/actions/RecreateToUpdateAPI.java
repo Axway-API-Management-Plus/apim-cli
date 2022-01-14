@@ -6,11 +6,10 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIChangeState;
-import com.axway.apim.apiimport.APIImportManager;
 import com.axway.apim.lib.errorHandling.AppException;
 
 /**
- * This class is used by the {@link APIImportManager#applyChanges(APIChangeState, boolean)} to re-create an API. 
+ * This class is used by the APIImportManager#applyChanges(APIChangeState, boolean) to re-create an API. 
  * It's called, when an existing API is found, by at least one changed property can't be applied to the existing 
  * API.  
  * In that case, the desired API must be re-imported, completely updated (proxy, image, Quota, etc.), 

@@ -115,6 +115,7 @@ public class APIImportConfigAdapter {
 	/**
 	 * Constructor just for testing. Don't use it!
 	 * @param apiConfig the desired API to test with
+	 * @param apiConfigFile the API configuration file
 	 * @throws AppException if the API import configuration cannot be loaded/initialized
 	 */
 	public APIImportConfigAdapter(API apiConfig, File apiConfigFile) throws AppException {
@@ -132,6 +133,7 @@ public class APIImportConfigAdapter {
 	 * @param stage an optional stage used to load overrides and stage specific environment properties
 	 * @param pathToAPIDefinition an optional path to the API-Definition (Swagger / WSDL), can be in the config-file as well.
 	 * @param usingOrgAdmin access to API-Manager should be limited to the Org-Admin account
+	 * @param stageConfig a stage config string
 	 * @throws AppException if the config-file can't be parsed for some reason
 	 */
 	public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, boolean usingOrgAdmin, String stageConfig) throws AppException {
