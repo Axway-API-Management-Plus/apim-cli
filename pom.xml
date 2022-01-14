@@ -393,6 +393,13 @@
 			</build>
 		</profile>
 		<profile>
+			<id>no-tests</id>
+			<properties>
+				<skip.integration.tests>true</skip.integration.tests>
+				<skip.unit.tests>true</skip.unit.tests>
+			</properties>
+		</profile>
+		<profile>
 			<id>integration-tests</id>
 			<properties>
 				<skip.integration.tests>false</skip.integration.tests>

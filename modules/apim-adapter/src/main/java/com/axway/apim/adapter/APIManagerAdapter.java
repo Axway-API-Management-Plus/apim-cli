@@ -1,7 +1,10 @@
 package com.axway.apim.adapter;
 
+import java.io.File;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,6 +60,7 @@ import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.TestIndicator;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
@@ -330,8 +334,21 @@ public class APIManagerAdapter {
 		if(CoreParameters.getInstance().isIgnoreCache()) {
 			APIManagerAdapter.cacheManager = new FilteredCacheManager(new DoNothingCacheManager());
 		} else {
-			URL myUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
-			XmlConfiguration xmlConfig = new XmlConfiguration(myUrl);
+			URL cacheConfigUrl;
+			File cacheConfigFile = null;
+			try {
+				cacheConfigFile = new File(Utils.getInstallFolder()+"/conf/cacheConfig.xml");
+				if(cacheConfigFile.exists()) {
+					LOG.debug("Using custom cache configuration file: " + cacheConfigFile);
+					cacheConfigUrl = cacheConfigFile.toURI().toURL();
+				} else {
+					cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
+				}
+			} catch (MalformedURLException | URISyntaxException e1) {
+				LOG.trace("Error customer cache config file: " + cacheConfigFile + ". Using default configuration.");
+				cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
+			}
+			XmlConfiguration xmlConfig = new XmlConfiguration(cacheConfigUrl);
 			// The Cache-Manager creates an exclusive lock on the Cache-Directory, which means only on APIM-CLI can initialize it at a time
 			// When running in a CI/CD pipeline, multiple CPIM-CLIs might be executed
 			int initAttempts = 1;

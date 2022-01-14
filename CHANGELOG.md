@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Changed
 - Renamed log4j.xml into log4j2.xml
+- Customer specific Cache-Configuration now read from conf/cacheConfig.xml
+
 ### Security
 - Updated Apache Log4J from version 2.17.0 to 2.17.1
 

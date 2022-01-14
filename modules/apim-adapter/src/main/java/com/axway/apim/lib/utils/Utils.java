@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -193,13 +194,17 @@ public class Utils {
 			File configFile = new File(configFileName);
 			if(configFile.exists()) return configFile;
 			// This is mainly to load the samples sitting inside the package!
-			String installFolder = new File(Utils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getParent();
+			String installFolder = getInstallFolder();
 			configFile = new File(installFolder + File.separator + configFileName);
 			if(configFile.exists()) return configFile;
 			throw new AppException("Unable to find given Config-File: '"+configFileName+"'", ErrorCode.CANT_READ_CONFIG_FILE);
 		} catch (Exception e) {
 			throw new AppException("Unable to find given Config-File: '"+configFileName+"'", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
+	}
+	
+	public static String getInstallFolder() throws URISyntaxException {
+		return new File(Utils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getParent();
 	}
 	
 	public static void validateCustomProperties(Map<String, String> customProperties, Type type) throws AppException {
