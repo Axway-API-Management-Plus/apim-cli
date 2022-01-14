@@ -1,5 +1,6 @@
 language: java
-script: "mvn clean verify"
+# Run integration tests only, as Unit-Tests ran before installation of the API-Manager test instance
+script: "mvn verify -P integration-tests"
 
 services:
   - docker

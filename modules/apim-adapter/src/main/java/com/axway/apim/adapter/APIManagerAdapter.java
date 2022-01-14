@@ -1,7 +1,10 @@
 package com.axway.apim.adapter;
 
+import java.io.File;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
+import org.ehcache.StateTransitionException;
 import org.ehcache.Status;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.xml.XmlConfiguration;
@@ -51,9 +55,12 @@ import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.DoNothingCacheManager;
+import com.axway.apim.lib.FilteredCacheManager;
+import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.TestIndicator;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
@@ -97,7 +104,7 @@ public class APIManagerAdapter {
 	
 	private static CoreParameters cmd;
 	
-	private static CacheManager cacheManager;
+	private static FilteredCacheManager cacheManager;
 	
 	public APIManagerConfigAdapter configAdapter;
 	public APIManagerCustomPropertiesAdapter customPropertiesAdapter;
@@ -325,18 +332,50 @@ public class APIManagerAdapter {
 			return APIManagerAdapter.cacheManager;
 		}
 		if(CoreParameters.getInstance().isIgnoreCache()) {
-			APIManagerAdapter.cacheManager = new DoNothingCacheManager();
+			APIManagerAdapter.cacheManager = new FilteredCacheManager(new DoNothingCacheManager());
 		} else {
-			URL myUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
-			XmlConfiguration xmlConfig = new XmlConfiguration(myUrl);
-			APIManagerAdapter.cacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
-			APIManagerAdapter.cacheManager.init();
+			URL cacheConfigUrl;
+			File cacheConfigFile = null;
+			try {
+				cacheConfigFile = new File(Utils.getInstallFolder()+"/conf/cacheConfig.xml");
+				if(cacheConfigFile.exists()) {
+					LOG.debug("Using customer cache configuration file: " + cacheConfigFile);
+					cacheConfigUrl = cacheConfigFile.toURI().toURL();
+				} else {
+					cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
+				}
+			} catch (MalformedURLException | URISyntaxException e1) {
+				LOG.trace("Error reading customer cache config file: " + cacheConfigFile + ". Using default configuration.");
+				cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
+			}
+			XmlConfiguration xmlConfig = new XmlConfiguration(cacheConfigUrl);
+			// The Cache-Manager creates an exclusive lock on the Cache-Directory, which means only on APIM-CLI can initialize it at a time
+			// When running in a CI/CD pipeline, multiple CPIM-CLIs might be executed
+			int initAttempts = 1;
+			int maxAttempts = 100;
+			do {
+				try {
+					CacheManager ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
+					APIManagerAdapter.cacheManager = new FilteredCacheManager(ehcacheManager);
+					APIManagerAdapter.cacheManager.init();
+				} catch (StateTransitionException e) {
+					LOG.warn("Error initiliazing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 3 seconds. Attempts: "+initAttempts+"/"+maxAttempts);
+					try {
+						Thread.sleep(3000);
+					} catch (InterruptedException ignore) { }
+				}
+				initAttempts++;
+			} while (APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED && initAttempts <= maxAttempts);
 		}
 		return cacheManager;
 	}
 	
 	public static <K, V> Cache<K, V> getCache(CacheType cacheType, Class<K> key, Class<V> value) {
 		getCacheManager();
+		if(CoreParameters.getInstance() instanceof StandardImportParams) {
+			List<CacheType> enabledCaches = StandardImportParams.getInstance().getEnabledCacheTypes();
+			APIManagerAdapter.cacheManager.setEnabledCaches(enabledCaches);
+		}
 		Cache<K, V> cache = APIManagerAdapter.cacheManager.getCache(cacheType.name(), key, value);
 		if(CoreParameters.getInstance().clearCaches()!=null && CoreParameters.getInstance().clearCaches().contains(cacheType)) {
 			cache.clear();
@@ -344,8 +383,6 @@ public class APIManagerAdapter {
 		}
 		return cache;
 	}
-	
-	
 	
 	public static void clearCache(String cacheName) {
 		if(APIManagerAdapter.cacheManager==null || APIManagerAdapter.cacheManager.getStatus()==Status.UNINITIALIZED) return;

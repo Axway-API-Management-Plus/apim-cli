@@ -8,10 +8,4 @@ public class AppImportParams extends StandardImportParams {
 	public static synchronized AppImportParams getInstance() {
 		return (AppImportParams)CoreParameters.getInstance();
 	}
-	
-	@Override
-	public boolean isIgnoreCache() {
-		// For import action we ignore the cache in all cases!
-		return true;
-	}
 }

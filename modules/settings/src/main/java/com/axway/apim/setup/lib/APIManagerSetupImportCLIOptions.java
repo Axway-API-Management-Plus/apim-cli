@@ -4,6 +4,7 @@ import org.apache.commons.cli.Option;
 
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
+import com.axway.apim.lib.StandardImportCLIOptions;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 
@@ -15,6 +16,7 @@ public class APIManagerSetupImportCLIOptions extends CLIOptions {
 	
 	public static CLIOptions create(String[] args) {
 		CLIOptions cliOptions = new APIManagerSetupImportCLIOptions(args);
+		cliOptions = new StandardImportCLIOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);
 		cliOptions.addOptions();
 		cliOptions.parse();
@@ -26,10 +28,6 @@ public class APIManagerSetupImportCLIOptions extends CLIOptions {
 		Option option = new Option("c", "config", true, "This is the JSON-Formatted API-Manager configuration. You may get that config file using apim config get with output set to JSON.");
 		option.setRequired(true);
 		option.setArgName("api-manager.json");
-		addOption(option);
-		
-		option = new Option("stageConfig", true, "Manually provide the name of the stage configuration file to use instead of derived from the given stage.");
-		option.setArgName("my-staged-setting.json");
 		addOption(option);
 	}
 
@@ -55,7 +53,6 @@ public class APIManagerSetupImportCLIOptions extends CLIOptions {
 	public StandardImportParams getParams() throws AppException {
 		StandardImportParams params = new StandardImportParams();
 		params.setConfig(getValue("config"));
-		params.setStageConfig(getValue("stageConfig"));
 		return params;
 	}
 

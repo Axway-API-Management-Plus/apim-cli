@@ -97,6 +97,10 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			LOG.error(e.getMessage(), e);
 			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
+		} finally {
+			try {
+				APIManagerAdapter.deleteInstance();
+			} catch (AppException ignore) { }
 		}
 	}
 	
