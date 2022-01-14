@@ -427,7 +427,11 @@ public class APIManagerAPIAdapter {
 	private void addExistingClientAppQuotas(API api, boolean addQuota) throws AppException {
 		if(!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
 		if(api.getApplications()==null || api.getApplications().size()==0) return;
-		LOG.debug("Loading application quota for " + api.getApplications().size()+ " subscribed applications.");
+		if(api.getApplications().size()>1000) {
+			LOG.info("Loading application quotas for " + api.getApplications().size()+ " subscribed applications. This might take a few minutes ...");
+		} else {
+			LOG.info("Loading application quotas for " + api.getApplications().size()+ " subscribed applications.");
+		}
 		for(ClientApplication app : api.getApplications()) {
 			APIQuota appQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuota(app.getId(), null, true, true);
 			app.setAppQuota(appQuota);
