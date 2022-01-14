@@ -6,6 +6,7 @@ import java.net.URI;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.slf4j.Logger;
@@ -60,6 +61,9 @@ public abstract class RestAPICall {
 			if(apimClient.getCsrfToken()!=null) request.addHeader("CSRF-Token", apimClient.getCsrfToken());
 			HttpResponse response = apimClient.getHttpClient().execute(request, apimClient.getClientContext());
 			return response;
+		} catch (NoHttpResponseException e) {
+			throw new AppException("No response received for request: "+request.toString()+" from API-Manager within time limit. "
+					+ "Perhaps the API-Manager is overloaded or contains too many entities to process the request.", ErrorCode.UNXPECTED_ERROR, e);
 		} catch (ClientProtocolException e) {
 			throw new AppException("Unable to send HTTP-Request.", ErrorCode.CANT_SEND_HTTP_REQUEST, e);
 		} catch (IOException e) {

@@ -339,13 +339,13 @@ public class APIManagerAdapter {
 			try {
 				cacheConfigFile = new File(Utils.getInstallFolder()+"/conf/cacheConfig.xml");
 				if(cacheConfigFile.exists()) {
-					LOG.debug("Using custom cache configuration file: " + cacheConfigFile);
+					LOG.debug("Using customer cache configuration file: " + cacheConfigFile);
 					cacheConfigUrl = cacheConfigFile.toURI().toURL();
 				} else {
 					cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
 				}
 			} catch (MalformedURLException | URISyntaxException e1) {
-				LOG.trace("Error customer cache config file: " + cacheConfigFile + ". Using default configuration.");
+				LOG.trace("Error reading customer cache config file: " + cacheConfigFile + ". Using default configuration.");
 				cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
 			}
 			XmlConfiguration xmlConfig = new XmlConfiguration(cacheConfigUrl);
