@@ -4,7 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.7.0] 2022-01-14
+
 ### Changed
 - Renamed log4j.xml into log4j2.xml
 - Customer specific Cache-Configuration now read from conf/cacheConfig.xml
@@ -23,10 +24,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added support for API-Method level quotas
 
 ## [1.6.1] 2021-12-20
+
 ### Security
 - Updated Apache Log4J from version 2.16.0 to 2.17.0 
 
 ## [1.6.0] 2021-12-17
+
 ### Added
 - Logging improved if APIM-CLI is running in batch mode
 
