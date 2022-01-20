@@ -32,8 +32,9 @@ public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestRunn
 		variable("apiName", "Direct-URL-WSDL in configuration from URL-${apiNumber}");
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time from URL #######");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-backendBasepath-and-apidefinition.json");
 		createVariable(ImportTestAction.API_DEFINITION,"http://www.mnb.hu/arfolyamok.asmx?WSDL");
+		createVariable("backendBasepath", "https://any.server.com:7676");
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
