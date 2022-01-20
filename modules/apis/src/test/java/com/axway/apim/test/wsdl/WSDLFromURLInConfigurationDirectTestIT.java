@@ -39,15 +39,16 @@ public class WSDLFromURLInConfigurationDirectTestIT extends TestNGCitrusTestRunn
 		swaggerImport.doExecute(context);
 		
 
-		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported #######");
+		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported with correct backend base path #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
 
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+			.validate("$.[?(@.path=='${apiPath}')].serviceProfiles._default.basePath", "https://any.server.com:7676") // Make sure the backend base path is configured for SOAP-Services as well
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
-		echo("####### Re-Import API from URL without a change #######");
+		echo("####### Re-Import API with ID: '${apiId}' from URL without a change #######");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-api-definition.json");
 		createVariable(ImportTestAction.API_DEFINITION,"http://www.mnb.hu/arfolyamok.asmx?WSDL");
 		createVariable("state", "unpublished");

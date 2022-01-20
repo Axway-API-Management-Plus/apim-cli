@@ -4,5 +4,6 @@
 	"state": "${state}",
 	"version": "2.0.0",
 	"apiDefinition":"${apiDefinition}",
-	"organization": "API Development ${orgNumber}"
+	"organization": "API Development ${orgNumber}",
+	"backendBasepath":"https://any.server.com:7676"
 }

@@ -203,7 +203,7 @@ public class APIImportConfigAdapter {
 			validateOutboundProfile(apiConfig);
 			validateInboundProfile(apiConfig);
 			APISpecification apiSpecification = APISpecificationFactory.getAPISpecification(getAPIDefinitionContent(), this.pathToAPIDefinition, apiConfig.getName());
-			apiSpecification.configureBasepath(((DesiredAPI)apiConfig).getBackendBasepath());
+			apiSpecification.configureBasepath(((DesiredAPI)apiConfig).getBackendBasepath(), apiConfig);
 			apiConfig.setApiDefinition(apiSpecification);
 			addImageContent(apiConfig);
 			Utils.validateCustomProperties(apiConfig.getCustomProperties(), Type.api);

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.jackson.YAMLFactoryExt;
+import com.axway.apim.api.API;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -115,6 +116,10 @@ public abstract class APISpecification {
 		} else {
 			return false;
 		}
+	}
+	
+	public void configureBasepath(String backendBasepath, API api) throws AppException {
+		return;
 	}
 	
 	public abstract void configureBasepath(String backendBasepath) throws AppException;

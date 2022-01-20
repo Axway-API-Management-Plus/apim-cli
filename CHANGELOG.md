@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.7.1] 2022-01-20
+
+### Fixed
+- Backend service URL not configured for SOAP-Services (See issue [#255](https://github.com/Axway-API-Management-Plus/apim-cli/issues/255))
+
 ## [1.7.0] 2022-01-14
 
 ### Changed
