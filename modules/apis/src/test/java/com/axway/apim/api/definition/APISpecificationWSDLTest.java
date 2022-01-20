@@ -7,6 +7,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.axway.apim.api.API;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -32,6 +33,12 @@ public class APISpecificationWSDLTest {
 		
 		// Check, if the specification has been identified as a WSDL
 		Assert.assertTrue(apiDefinition instanceof WSDLSpecification);
+		
+		API testAPI = new API();
+		
+		apiDefinition.configureBasepath("https://some-url-com", testAPI);
+		
+		Assert.assertEquals(testAPI.getServiceProfiles().get("_default").getBasePath(), "https://some-url-com");
 	}
 	
 	@Test

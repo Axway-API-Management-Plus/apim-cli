@@ -3,6 +3,7 @@ package com.axway.apim.api.definition;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.axway.apim.api.API;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -33,7 +34,7 @@ public class Swagger2xSpecification extends APISpecification {
 	}
 
 	@Override
-	public void configureBasepath(String backendBasepath) throws AppException {
+	public void configureBasepath(String backendBasepath, API api) throws AppException {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		if(backendBasepath==null && swagger.get("host")==null) {
 			throw new AppException("The API specification doesn't contain a host and no backend basepath is given.", ErrorCode.CANT_READ_API_DEFINITION_FILE);

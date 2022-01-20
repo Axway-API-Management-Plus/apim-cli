@@ -20,11 +20,6 @@ public class WSDLSpecification extends APISpecification {
 	public APISpecType getAPIDefinitionType() throws AppException {
 		return APISpecType.WSDL_API;
 	}
-	
-	@Override
-	public void configureBasepath(String backendBasepath) throws AppException {
-		return;
-	}
 
 	@Override
 	public void configureBasepath(String backendBasepath, API api) throws AppException {

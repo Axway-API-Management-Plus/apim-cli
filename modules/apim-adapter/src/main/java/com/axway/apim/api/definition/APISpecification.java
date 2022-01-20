@@ -118,11 +118,7 @@ public abstract class APISpecification {
 		}
 	}
 	
-	public void configureBasepath(String backendBasepath, API api) throws AppException {
-		return;
-	}
-	
-	public abstract void configureBasepath(String backendBasepath) throws AppException;
+	public abstract void configureBasepath(String backendBasepath, API api) throws AppException;
 	
 	public abstract APISpecType getAPIDefinitionType() throws AppException;
 	

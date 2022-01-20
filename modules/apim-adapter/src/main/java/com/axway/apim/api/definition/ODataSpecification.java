@@ -3,6 +3,7 @@ package com.axway.apim.api.definition;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.axway.apim.api.API;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -26,7 +27,7 @@ public abstract class ODataSpecification extends APISpecification {
 	protected OpenAPI openAPI;
 	
 	@Override
-	public void configureBasepath(String backendBasepath) throws AppException {
+	public void configureBasepath(String backendBasepath, API api) throws AppException {
 		if(backendBasepath==null || !CoreParameters.getInstance().isReplaceHostInSwagger()) {
 			// Try to setup the Backend-Host + Basepath based on the given Metadata URL
 			try {

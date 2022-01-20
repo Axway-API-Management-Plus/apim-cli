@@ -3,6 +3,7 @@ package com.axway.apim.api.definition;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.axway.apim.api.API;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -22,7 +23,7 @@ public class WADLSpecification extends APISpecification {
 	}
 
 	@Override
-	public void configureBasepath(String backendBasepath) throws AppException {
+	public void configureBasepath(String backendBasepath, API api) throws AppException {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		try {
 			if(backendBasepath!=null) {
