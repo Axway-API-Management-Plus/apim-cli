@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -46,6 +47,8 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 	private String state;
 	
 	private Organization organization;
+	
+	private User createdBy;
 	
 	private String applicationId;
 	
@@ -134,6 +137,18 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 
 	public Organization getOrganization() {
 		return organization;
+	}
+	
+	public void setCreatedBy(User createdBy) {
+		if(createdBy==null) return;
+		this.createdBy = createdBy;
+		filters.add(new BasicNameValuePair("field", "userid"));
+		filters.add(new BasicNameValuePair("op", "eq"));
+		filters.add(new BasicNameValuePair("value", createdBy.getId()));
+	}
+
+	public User getCreatedBy() {
+		return createdBy;
 	}
 
 	public List<String> getCustomProperties() {
@@ -322,6 +337,8 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 		
 		private Organization organization;
 		
+		private User createdBy;
+		
 		/** The name of the application */
 		private String applicationName;
 		
@@ -352,6 +369,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 			filter.setApplicationId(this.applicationId);
 			filter.setApplicationName(this.applicationName);
 			filter.setOrganization(this.organization);
+			filter.setCreatedBy(this.createdBy);
 			filter.setState(this.state);
 			filter.setIncludeQuota(this.includeQuota);
 			filter.setIncludeAppPermissions(this.includeAppPermissions);
@@ -401,6 +419,27 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 		
 		public Builder hasOrganization(Organization organization) throws AppException {
 			this.organization = organization;
+			return this;
+		}
+		
+		public Builder hasCreatedByUserId(String userId) throws AppException {
+			if(userId==null) return this;
+			User user = new User();
+			user.setId(userId);
+			return hasCreatedBy(user);
+		}
+		
+		public Builder hasCreatedByLoginName(String loginName) throws AppException {
+			if(loginName==null) return this;
+			User user = APIManagerAdapter.getInstance().userAdapter.getUserForLoginName(loginName);
+			if(user==null) {
+				throw new AppException("The user with login name: '"+loginName+"' is unknown.", ErrorCode.UNKNOWN_USER);
+			}
+			return hasCreatedBy(user);
+		}
+		
+		public Builder hasCreatedBy(User user) throws AppException {
+			this.createdBy = user;
 			return this;
 		}
 		

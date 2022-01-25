@@ -41,9 +41,14 @@ public class AppExportCLIOptions extends CLIOptions {
 		option.setArgName("pending");
 		addOption(option);
 
-		option = new  Option("orgName", true, "Filter applications to this organization");
+		option = new  Option("orgName", true, "Filter for applications to this organization");
 		option.setRequired(false);
 		option.setArgName("*Partners*");
+		addOption(option);
+		
+		option = new  Option("createdBy", true, "Filter for applications created by this user based on the login-name");
+		option.setRequired(false);
+		option.setArgName("tom");
 		addOption(option);
 		
 		option = new  Option("api", true, "Filter applications having access to this API. You may use wildcards at the end or beginning.");
@@ -97,6 +102,7 @@ public class AppExportCLIOptions extends CLIOptions {
 		params.setId(getValue("id"));
 		params.setState(getValue("state"));
 		params.setOrgName(getValue("orgName"));
+		params.setCreatedBy(getValue("createdBy"));
 		params.setCredential(getValue("credential"));
 		params.setRedirectUrl(getValue("redirectUrl"));
 		params.setApiName(getValue("api"));
