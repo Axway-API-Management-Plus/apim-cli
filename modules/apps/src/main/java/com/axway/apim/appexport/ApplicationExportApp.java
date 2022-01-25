@@ -108,6 +108,11 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			LOG.error(e.getMessage(), e);
 			result.setError(ErrorCode.UNXPECTED_ERROR);
 			return result;
+		} finally {
+			try {
+				// make sure the cache is updated, even an exception is thrown
+				APIManagerAdapter.deleteInstance();
+			} catch (Exception ignore) { }
 		}
 	}
 

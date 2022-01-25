@@ -133,6 +133,22 @@ public class ClientAppFilterTest extends APIManagerMockBase {
 		assertFalse(filter.filter(testApp), "App SHOULD match as the given API exists.");
 	}
 	
+	@Test
+	public void testFilterAppCreatedByAndOrganization() throws AppException, JsonParseException, JsonMappingException, IOException {
+		
+		ClientAppFilter filter = new ClientAppFilter.Builder()
+				.hasCreatedByLoginName("fred")
+				.hasOrganizationName("FHIR")
+				.build();
+		Assert.assertEquals(filter.getFilters().size(), 6);
+		Assert.assertEquals(filter.getFilters().get(0).getValue(), "orgid");
+		Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
+		Assert.assertEquals(filter.getFilters().get(2).getValue(), "2efca39a-2572-4b62-8d0f-53241d93d362");
+		Assert.assertEquals(filter.getFilters().get(3).getValue(), "userid");
+		Assert.assertEquals(filter.getFilters().get(4).getValue(), "eq");
+		Assert.assertEquals(filter.getFilters().get(5).getValue(), "c888af4e-0728-4e82-880c-7cf490138220");
+	}
+	
 	private ClientApplication getTestApp(String appConfig) throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));

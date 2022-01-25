@@ -39,7 +39,8 @@ public class CSVAppExporter extends ApplicationExporter {
 				"Email", 
 				"Phone", 
 				"State", 
-				"Enabled"
+				"Enabled",
+				"Created by"
 				}),
 		wide(new String[] {
 				"ID", 
@@ -49,6 +50,7 @@ public class CSVAppExporter extends ApplicationExporter {
 				"Phone", 
 				"State", 
 				"Enabled",
+				"Created by",
 				"API Quota",
 				"API-Method",
 				"Quota Config"
@@ -61,6 +63,7 @@ public class CSVAppExporter extends ApplicationExporter {
 				"Phone", 
 				"State", 
 				"Enabled",
+				"Created by",
 				"API-Name", 
 				"API-Version", 
 				"Access created by", 
@@ -178,7 +181,8 @@ public class CSVAppExporter extends ApplicationExporter {
 				app.getEmail(),
 				app.getPhone(),
 				app.getState(),
-				app.isEnabled()
+				app.isEnabled(),
+				getCreatedBy(app.getCreatedBy(), app)
 		);
 	}
 	
@@ -191,6 +195,7 @@ public class CSVAppExporter extends ApplicationExporter {
 				app.getPhone(),
 				app.getState(),
 				app.isEnabled(),
+				getCreatedBy(app.getCreatedBy(), app),
 				getRestrictedAPI(quotaRestriction),
 				getRestrictedMethod(quotaRestriction),
 				getQuotaConfig(quotaRestriction)
@@ -206,9 +211,10 @@ public class CSVAppExporter extends ApplicationExporter {
 				app.getPhone(),
 				app.getState(),
 				app.isEnabled(),
+				getCreatedBy(app.getCreatedBy(), app),
 				apiAccess.getApiName(),
 				apiAccess.getApiVersion(), 
-				getCreatedBy(apiAccess.getCreatedBy()),
+				getCreatedBy(apiAccess.getCreatedBy(), app),
 				getCreatedOn(apiAccess.getCreatedOn())
 		);
 	}
@@ -232,25 +238,13 @@ public class CSVAppExporter extends ApplicationExporter {
 		return ""+quotaRestriction.getConfig();
 	}
 	
-	private String getCreatedBy(String userId) {
-		try {
-			return apiManager.userAdapter.getUserForId(userId).getLoginName();
-		} catch (AppException e) {
-			LOG.error("Error getting createdBy user with Id: " + userId,e);
-			return "Err";
-		}
-	}
-	
-	private Date getCreatedOn(Long createdOn) {
-		return new Date(createdOn);
-	}
-	
 	@Override
 	public ClientAppFilter getFilter() throws AppException {
 		Builder builder = getBaseFilterBuilder();
 
 		switch(params.getWide()) {
 		case standard:
+			break;
 		case wide:
 			builder.includeQuotas(true);
 			break;

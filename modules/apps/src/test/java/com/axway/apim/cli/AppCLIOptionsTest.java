@@ -31,7 +31,7 @@ public class AppCLIOptionsTest {
 	
 	@Test
 	public void testExportApplicationParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-n", "*My Great App*", "-id", "UUID-ID-OF-THE-APP", "-state", "pending", "-orgName", "*Partners*", "-credential", "*9877979779*", "-redirectUrl", "*localhost*", "-o", "json", "-wide"};
+		String[] args = {"-s", "prod", "-n", "*My Great App*", "-id", "UUID-ID-OF-THE-APP", "-state", "pending", "-orgName", "*Partners*", "-createdBy", "Tom", "-credential", "*9877979779*", "-redirectUrl", "*localhost*", "-o", "json", "-wide"};
 		CLIOptions options = AppExportCLIOptions.create(args);
 		AppExportParams params = (AppExportParams) options.getParams();
 		// Validate core parameters are included
@@ -48,6 +48,7 @@ public class AppCLIOptionsTest {
 		Assert.assertEquals(params.getId(), "UUID-ID-OF-THE-APP");
 		Assert.assertEquals(params.getState(), "pending");
 		Assert.assertEquals(params.getOrgName(), "*Partners*");
+		Assert.assertEquals(params.getCreatedBy(), "Tom");
 		Assert.assertEquals(params.getCredential(), "*9877979779*");
 		Assert.assertEquals(params.getRedirectUrl(), "*localhost*");
 	}

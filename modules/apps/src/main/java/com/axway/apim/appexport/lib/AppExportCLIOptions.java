@@ -46,6 +46,11 @@ public class AppExportCLIOptions extends CLIOptions {
 		option.setArgName("*Partners*");
 		addOption(option);
 		
+		option = new  Option("createdBy", true, "Filter applications created by this user");
+		option.setRequired(false);
+		option.setArgName("Tom");
+		addOption(option);
+		
 		option = new  Option("api", true, "Filter applications having access to this API. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*MyAPI*");
@@ -97,6 +102,7 @@ public class AppExportCLIOptions extends CLIOptions {
 		params.setId(getValue("id"));
 		params.setState(getValue("state"));
 		params.setOrgName(getValue("orgName"));
+		params.setCreatedBy(getValue("createdBy"));
 		params.setCredential(getValue("credential"));
 		params.setRedirectUrl(getValue("redirectUrl"));
 		params.setApiName(getValue("api"));

@@ -51,6 +51,8 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 	
 	private String createdBy;
 	
+	private Long createdOn;
+	
 	@JsonIgnore
 	private Image image;
 	
@@ -196,6 +198,14 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
+	
+	public Long getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(Long createdOn) {
+		this.createdOn = createdOn;
+	}
 
 	// This avoids, that custom properties are wrapped within customProperties { ... }
 	// See http://www.cowtowncoder.com/blog/archives/2011/07/entry_458.html
@@ -238,7 +248,6 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 	}
 	@Override
 	public String toString() {
-		return "[" + getName() + "]";
+		return "[" + getName() + " ("+getId()+")]";
 	}
-
 }

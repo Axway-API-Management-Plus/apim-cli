@@ -81,7 +81,9 @@ public class APIManagerUserAdapter {
 			LOG.debug("Load users from API-Manager using filter: " + filter);
 			LOG.trace("Load users with URI: " + uri);
 			httpResponse = getRequest.execute();
-			if(httpResponse.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
+			if(httpResponse.getStatusLine().getStatusCode()==HttpStatus.SC_NOT_FOUND) {
+				throw new AppException("No user found for user id: " + userId, ErrorCode.UNKNOWN_USER);
+			} else if(httpResponse.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
 				LOG.error("Sent request: " + uri);
 				LOG.error("Received Status-Code: " +httpResponse.getStatusLine().getStatusCode()+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
 				throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
@@ -97,7 +99,6 @@ public class APIManagerUserAdapter {
 				apiManagerResponse.put(filter, response);
 			}
 		} catch (Exception e) {
-			LOG.error("Error cant read users from API-Manager with filter: "+filter+". Can't parse response: " + httpResponse, e);
 			throw new AppException("Error cant read users from API-Manager with filter: "+filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
