@@ -246,18 +246,14 @@ public class APIImportConfigAdapter {
 		if(((DesiredAPI)apiConfig).getDesiredAPISpecification()!=null) {
 			// API-Specification object that might contain filters, the type of an API, etc.
 			apiSpecification = APISpecificationFactory.getAPISpecification(((DesiredAPI)apiConfig).getDesiredAPISpecification(), this.apiConfigFile.getCanonicalFile().getParent(), apiConfig.getName());
+		} else if (StringUtils.isNotEmpty(this.pathToAPIDefinition)) {
+			apiSpecification = APISpecificationFactory.getAPISpecification(this.pathToAPIDefinition, this.apiConfigFile.getCanonicalFile().getParent(), apiConfig.getName());
+		} else if (StringUtils.isNotEmpty(apiConfig.getApiDefinitionImport()))  {
+			apiSpecification = APISpecificationFactory.getAPISpecification(apiConfig.getApiDefinitionImport(), this.apiConfigFile.getCanonicalFile().getParent(), apiConfig.getName());
+			this.pathToAPIDefinition=apiConfig.getApiDefinitionImport();
+			LOG.debug("Reading API Definition from configuration file");
 		} else {
-			// Or only the path to the apiDefinition is given either in the config file or using -a parameter
-			if (StringUtils.isEmpty(this.pathToAPIDefinition)) {
-				// Otherwise the API-Specification must be part of the config file 
-				if (StringUtils.isNotEmpty(apiConfig.getApiDefinitionImport())) {
-					this.pathToAPIDefinition=apiConfig.getApiDefinitionImport();
-					apiSpecification = APISpecificationFactory.getAPISpecification(this.pathToAPIDefinition, this.apiConfigFile.getCanonicalFile().getParent(), apiConfig.getName());
-					LOG.debug("Reading API Definition from configuration file");
-				} else {
-					throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
-				}
-			}
+			throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
 		}
 		apiSpecification.configureBasepath(((DesiredAPI)apiConfig).getBackendBasepath(), apiConfig);
 		apiConfig.setApiDefinition(apiSpecification);
