@@ -2,14 +2,13 @@ package com.axway.apim.apiimport;
 
 import java.util.LinkedHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.ServiceProfile;
+import com.axway.apim.api.specification.DesiredAPISpecification;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -23,9 +22,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class DesiredAPI extends API {
 	
-	private static Logger LOG = LoggerFactory.getLogger(DesiredAPI.class);
-	
 	private String backendBasepath = null;
+	
+	@JsonAlias("apiSpecification")
+	private DesiredAPISpecification desiredAPISpecification = null;
 	
 	@JsonProperty("apiDefinition")
 	public String apiDefinitionImport = null;
@@ -73,5 +73,13 @@ public class DesiredAPI extends API {
 	
 	public void setRetirementDate(String retirementDate) throws AppException {
 		this.retirementDate = Utils.getParsedDate(retirementDate);
+	}
+
+	public DesiredAPISpecification getDesiredAPISpecification() {
+		return desiredAPISpecification;
+	}
+
+	public void setDesiredAPISpecification(DesiredAPISpecification desiredAPISpecification) {
+		this.desiredAPISpecification = desiredAPISpecification;
 	}
 }

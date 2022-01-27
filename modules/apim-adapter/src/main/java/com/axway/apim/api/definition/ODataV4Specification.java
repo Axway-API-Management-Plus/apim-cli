@@ -4,10 +4,6 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class ODataV4Specification extends ODataSpecification {
-	
-	public ODataV4Specification(byte[] apiSpecificationContent) throws AppException {
-		super(apiSpecificationContent);
-	}
 
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
@@ -15,8 +11,8 @@ public class ODataV4Specification extends ODataSpecification {
 	}
 	
 	@Override
-	public boolean configure() throws AppException {
-		String specStart = new String(this.apiSpecificationContent, 0, 500).toLowerCase();
+	public boolean parse(byte[] apiSpecificationContent) throws AppException {
+		String specStart = new String(apiSpecificationContent, 0, 500).toLowerCase();
 		if(specStart.contains("edmx") && specStart.contains("4.0")) {
 			throw new AppException("Detected OData V4 specification, which is not yet supported by the APIM-CLI.\n"
 					+ "                                 | If you have a need for OData V4 support please upvote the following issue:\n"

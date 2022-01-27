@@ -71,18 +71,15 @@ public class ODataV2Specification extends ODataSpecification {
 		json
 	}
 	
-	public ODataV2Specification(byte[] apiSpecificationContent) throws AppException {
-		super(apiSpecificationContent);
-	}
-
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
 		return APISpecType.ODATA_V2;
 	}
 
 	@Override
-	public boolean configure() throws AppException {
+	public boolean parse(byte[] apiSpecificationContent) throws AppException {
 		try {
+			super.parse(apiSpecificationContent);
 			edm = EntityProvider.readMetadata(new ByteArrayInputStream(apiSpecificationContent), false);
 			this.openAPI = new OpenAPI();
 			

@@ -78,15 +78,6 @@ public abstract class APISpecification {
 	
 	protected byte[] apiSpecificationContent = null;
 
-	public APISpecification(byte[] apiSpecificationContent) throws AppException {
-		super();
-		this.apiSpecificationContent = apiSpecificationContent;
-	}
-	
-	public APISpecification() {
-		super();
-	}
-
 	public String getApiSpecificationFile() {
 		return apiSpecificationFile;
 	}
@@ -97,10 +88,6 @@ public abstract class APISpecification {
 
 	public byte[] getApiSpecificationContent() {
 		return apiSpecificationContent;
-	}
-
-	public void setApiSpecificationContent(byte[] apiSpecificationContent) {
-		this.apiSpecificationContent = apiSpecificationContent;
 	}
 	
 	@Override
@@ -122,7 +109,10 @@ public abstract class APISpecification {
 	
 	public abstract APISpecType getAPIDefinitionType() throws AppException;
 	
-	public abstract boolean configure() throws AppException;
+	public boolean parse(byte[] apiSpecificationContent) throws AppException {
+		this.apiSpecificationContent = apiSpecificationContent;
+		return true;
+	}
 	
 	protected void setMapperForDataFormat() throws AppException {
 		YAMLFactory yamlFactory = new YAMLFactoryExt().disable(Feature.WRITE_DOC_START_MARKER);
@@ -130,7 +120,7 @@ public abstract class APISpecification {
 		DataFormatDetector detector = new DataFormatDetector(yamlFactory, jsonFactory);
 		DataFormatMatcher formatMatcher;
 		try {
-			formatMatcher = detector.findFormat(apiSpecificationContent);
+			formatMatcher = detector.findFormat(this.apiSpecificationContent);
 		} catch (IOException e) {
 			LOG.error("Error detecting dataformat", e);
 			return;

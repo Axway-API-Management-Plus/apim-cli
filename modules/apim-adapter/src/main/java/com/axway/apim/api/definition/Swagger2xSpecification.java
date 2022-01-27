@@ -21,10 +21,6 @@ public class Swagger2xSpecification extends APISpecification {
 		super();
 	}
 
-	public Swagger2xSpecification(byte[] apiSpecificationContent) throws AppException {
-		super(apiSpecificationContent);
-	}
-
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
 		if(this.mapper.getFactory() instanceof YAMLFactory) {
@@ -100,8 +96,9 @@ public class Swagger2xSpecification extends APISpecification {
 	}
 
 	@Override
-	public boolean configure() throws AppException {
+	public boolean parse(byte[] apiSpecificationContent) throws AppException {
 		try {
+			super.parse(apiSpecificationContent);
 			setMapperForDataFormat();
 			if(this.mapper==null) return false;
 			swagger = this.mapper.readTree(apiSpecificationContent);

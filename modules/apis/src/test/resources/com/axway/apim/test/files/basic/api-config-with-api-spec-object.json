@@ -1,0 +1,19 @@
+{
+  "name": "API with API-Specification object",
+  "path": "/api/v1/Some.Services/XmlApi",
+  "state": "published",
+  "version": "1.0.0",
+  "organization": "API Development",
+  "apiSpecification": {
+  	"resource": "petstore.json",
+  	"filter": {
+  		"include": {
+  			"GET": "*",
+  			"PUT": "test" 
+  		},
+  		"exclude": {
+  			"DELETE": "*" 
+  		}
+  	} 
+  }
+}

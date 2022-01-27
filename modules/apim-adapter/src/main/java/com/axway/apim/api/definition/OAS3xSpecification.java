@@ -15,10 +15,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 public class OAS3xSpecification extends APISpecification {
 	
 	JsonNode openAPI = null;
-	
-	public OAS3xSpecification(byte[] apiSpecificationContent) throws AppException {
-		super(apiSpecificationContent);
-	}
 
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
@@ -53,8 +49,9 @@ public class OAS3xSpecification extends APISpecification {
 	}
 	
 	@Override
-	public boolean configure() throws AppException {
+	public boolean parse(byte[] apiSpecificationContent) throws AppException {
 		try {
+			super.parse(apiSpecificationContent); 
 			setMapperForDataFormat();
 			if(this.mapper==null) return false;
 			openAPI = this.mapper.readTree(apiSpecificationContent);
