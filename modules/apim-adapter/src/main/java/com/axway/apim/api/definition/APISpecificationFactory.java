@@ -149,7 +149,8 @@ public class APISpecificationFactory {
 					if(inputFile.exists()) { 
 						is = new FileInputStream(inputFile);
 					} else {
-						is = APISpecificationFactory.class.getClass().getResourceAsStream(apiDefinitionFile);
+						// Have to remove leading slash (Read more: https://stackoverflow.com/questions/16570523/getresourceasstream-returns-null
+						is = APISpecificationFactory.class.getClassLoader().getResourceAsStream(apiDefinitionFile.replaceFirst("/", ""));
 					}
 				}
 				if(is == null) {
