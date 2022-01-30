@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.axway.apim.api.apiSpecification.filter.BaseAPISpecificationFIlter.FilterConfig;
 import com.axway.apim.api.model.APISpecificationFilter;
 
@@ -13,6 +16,8 @@ import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.models.Paths;
 
 public class OpenAPI3SpecificationFilter {
+	
+	static Logger LOG = LoggerFactory.getLogger(OpenAPI3SpecificationFilter.class);
 	
 	public static void filter(OpenAPI openAPI, APISpecificationFilter filterConfig) {
 		Paths paths = openAPI.getPaths();
@@ -71,5 +76,6 @@ public class OpenAPI3SpecificationFilter {
 				break;
 			}
 		}
+		LOG.info("API-Specification successfully filtered.");
 	}
 }

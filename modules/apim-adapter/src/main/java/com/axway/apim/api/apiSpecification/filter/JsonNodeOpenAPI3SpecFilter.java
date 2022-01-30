@@ -1,10 +1,11 @@
 package com.axway.apim.api.apiSpecification.filter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.apiSpecification.filter.BaseAPISpecificationFIlter.FilterConfig;
 import com.axway.apim.api.model.APISpecificationFilter;
@@ -12,6 +13,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonNodeOpenAPI3SpecFilter  {
+	
+	static Logger LOG = LoggerFactory.getLogger(JsonNodeOpenAPI3SpecFilter.class);
 
 	public static void filter(JsonNode openAPISpec, APISpecificationFilter filterConfig) {
 		JsonNode paths = openAPISpec.get("paths");
@@ -43,5 +46,6 @@ public class JsonNodeOpenAPI3SpecFilter  {
 				((ObjectNode)paths).remove(excludePath);
 			}
 		}
+		LOG.info("API-Specification successfully filtered.");
 	}
 }
