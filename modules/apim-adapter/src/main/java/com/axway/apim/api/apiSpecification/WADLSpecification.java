@@ -1,4 +1,4 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,6 +16,11 @@ public class WADLSpecification extends APISpecification {
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
 		return APISpecType.WADL_API;
+	}
+	
+	@Override
+	public byte[] getApiSpecificationContent() {
+		return this.apiSpecificationContent;
 	}
 
 	@Override

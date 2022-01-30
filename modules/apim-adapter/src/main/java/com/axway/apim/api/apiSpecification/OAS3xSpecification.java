@@ -1,12 +1,15 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.axway.apim.api.API;
+import com.axway.apim.api.apiSpecification.filter.JsonNodeOpenAPI3SpecFilter;
+import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -16,12 +19,33 @@ public class OAS3xSpecification extends APISpecification {
 	
 	JsonNode openAPI = null;
 
+	public OAS3xSpecification() {
+		super();
+	}
+
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
 		if(this.mapper.getFactory() instanceof YAMLFactory) {
 			return APISpecType.OPEN_API_30_YAML;
 		}
 		return APISpecType.OPEN_API_30;
+	}
+
+	@Override
+	public void filterAPISpecification() {
+		if(filterConfig == null) return;
+		JsonNodeOpenAPI3SpecFilter.filter(openAPI, filterConfig);
+	}
+
+	@Override
+	public byte[] getApiSpecificationContent() {
+		// Return the original given API-Spec if no filters are applied
+		if(this.filterConfig == null) return this.apiSpecificationContent;
+		try {
+			return mapper.writeValueAsBytes(openAPI);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Error parsing API-Specification", e);
+		}
 	}
 
 	@Override
@@ -51,7 +75,7 @@ public class OAS3xSpecification extends APISpecification {
 	@Override
 	public boolean parse(byte[] apiSpecificationContent) throws AppException {
 		try {
-			super.parse(apiSpecificationContent); 
+			super.parse(apiSpecificationContent);
 			setMapperForDataFormat();
 			if(this.mapper==null) return false;
 			openAPI = this.mapper.readTree(apiSpecificationContent);

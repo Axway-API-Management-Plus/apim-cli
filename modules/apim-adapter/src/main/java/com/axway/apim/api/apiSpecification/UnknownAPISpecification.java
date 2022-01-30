@@ -1,4 +1,4 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import com.axway.apim.api.API;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -31,8 +31,6 @@ public class UnknownAPISpecification extends APISpecification {
 	@Override
 	public byte[] getApiSpecificationContent() {
 		LOG.error("API: '" + this.apiName + "' has a unkown/invalid API-Specification: " + APISpecificationFactory.getContentStart(this.apiSpecificationContent) );
-		return super.getApiSpecificationContent();
-	}
-	
-	
+		return this.apiSpecificationContent;
+	}	
 }

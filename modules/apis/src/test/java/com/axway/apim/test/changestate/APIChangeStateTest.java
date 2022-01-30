@@ -12,9 +12,9 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.api.API;
-import com.axway.apim.api.definition.APISpecification;
-import com.axway.apim.api.definition.APISpecificationFactory;
-import com.axway.apim.api.definition.Swagger2xSpecification;
+import com.axway.apim.api.apiSpecification.APISpecification;
+import com.axway.apim.api.apiSpecification.APISpecificationFactory;
+import com.axway.apim.api.apiSpecification.Swagger2xSpecification;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.TagMap;

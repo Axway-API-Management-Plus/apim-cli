@@ -1,4 +1,4 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -25,6 +25,8 @@ import org.apache.olingo.odata2.core.edm.provider.EdmElementImplProv;
 import org.apache.olingo.odata2.core.edm.provider.EdmParameterImplProv;
 import org.apache.olingo.odata2.core.edm.provider.EdmStructuralTypeImplProv;
 
+import com.axway.apim.api.apiSpecification.filter.OpenAPI3SpecificationFilter;
+import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -74,6 +76,12 @@ public class ODataV2Specification extends ODataSpecification {
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
 		return APISpecType.ODATA_V2;
+	}
+
+	@Override
+	public void filterAPISpecification() {
+		if(filterConfig == null) return;
+		OpenAPI3SpecificationFilter.filter(openAPI, filterConfig);
 	}
 
 	@Override

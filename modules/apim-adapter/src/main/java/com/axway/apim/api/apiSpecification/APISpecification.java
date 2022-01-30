@@ -1,4 +1,4 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.jackson.YAMLFactoryExt;
 import com.axway.apim.api.API;
+import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -77,6 +78,8 @@ public abstract class APISpecification {
 	protected String apiSpecificationFile = null;
 	
 	protected byte[] apiSpecificationContent = null;
+	
+	protected APISpecificationFilter filterConfig = null;
 
 	public String getApiSpecificationFile() {
 		return apiSpecificationFile;
@@ -86,9 +89,7 @@ public abstract class APISpecification {
 		this.apiSpecificationFile = apiSpecificationFile;
 	}
 
-	public byte[] getApiSpecificationContent() {
-		return apiSpecificationContent;
-	}
+	public abstract byte[] getApiSpecificationContent();
 	
 	@Override
 	public boolean equals(Object other) {
@@ -144,5 +145,14 @@ public abstract class APISpecification {
 		default:
 			break;
 		}
+	}
+	
+	public void filterAPISpecification() {
+		return;
+	}
+
+	public APISpecification setFilterConfig(APISpecificationFilter filterConfig) {
+		this.filterConfig = filterConfig;
+		return this;
 	}
 }

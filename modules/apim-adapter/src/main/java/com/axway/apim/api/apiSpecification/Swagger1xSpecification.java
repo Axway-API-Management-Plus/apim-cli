@@ -1,4 +1,4 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,6 +21,11 @@ public class Swagger1xSpecification extends APISpecification {
 			return APISpecType.SWAGGGER_API_1x_YAML;
 		}
 		return APISpecType.SWAGGGER_API_1x;
+	}
+
+	@Override
+	public byte[] getApiSpecificationContent() {
+		return this.apiSpecificationContent;
 	}
 
 	@Override

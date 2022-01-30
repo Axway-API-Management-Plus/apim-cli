@@ -1,4 +1,4 @@
-package com.axway.apim.api.specification;
+package com.axway.apim.api.model;
 
 public class DesiredAPISpecification {
 	

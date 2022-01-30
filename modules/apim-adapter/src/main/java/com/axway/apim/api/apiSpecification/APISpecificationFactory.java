@@ -1,4 +1,4 @@
-package com.axway.apim.api.definition; 
+package com.axway.apim.api.apiSpecification; 
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -23,7 +23,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.api.specification.DesiredAPISpecification;
+import com.axway.apim.api.model.DesiredAPISpecification;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.URLParser;
@@ -48,7 +48,9 @@ public class APISpecificationFactory {
 	}};
 	
 	public static APISpecification getAPISpecification(DesiredAPISpecification desiredAPISpec, String configBaseDir, String apiName) throws AppException {
-		return getAPISpecification(getAPIDefinitionContent(desiredAPISpec.getResource(), configBaseDir), desiredAPISpec.getResource(), apiName, true, true);
+		APISpecification spec = getAPISpecification(getAPIDefinitionContent(desiredAPISpec.getResource(), configBaseDir), desiredAPISpec.getResource(), apiName, true, true);
+		spec.setFilterConfig(desiredAPISpec.getFilter()).filterAPISpecification();
+		return spec;
 	}
 	
 	/**

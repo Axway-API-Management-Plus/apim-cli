@@ -1,12 +1,15 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.axway.apim.api.API;
+import com.axway.apim.api.apiSpecification.filter.JsonNodeOpenAPI3SpecFilter;
+import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,6 +30,23 @@ public class Swagger2xSpecification extends APISpecification {
 			return APISpecType.SWAGGGER_API_20_YAML;
 		}
 		return APISpecType.SWAGGGER_API_20;
+	}
+	
+	@Override
+	public byte[] getApiSpecificationContent() {
+		// Return the original given API-Spec if no filters are applied
+		if(this.filterConfig == null) return this.apiSpecificationContent;
+		try {
+			return mapper.writeValueAsBytes(swagger);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException("Error parsing API-Specification", e);
+		}
+	}
+	
+	@Override
+	public void filterAPISpecification() {
+		if(this.filterConfig == null) return;
+		JsonNodeOpenAPI3SpecFilter.filter(swagger, filterConfig);
 	}
 
 	@Override

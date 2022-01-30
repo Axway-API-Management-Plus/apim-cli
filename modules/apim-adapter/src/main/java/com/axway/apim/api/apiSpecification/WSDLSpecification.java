@@ -1,4 +1,4 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import java.util.LinkedHashMap;
 
@@ -15,6 +15,11 @@ public class WSDLSpecification extends APISpecification {
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
 		return APISpecType.WSDL_API;
+	}
+	
+	@Override
+	public byte[] getApiSpecificationContent() {
+		return this.apiSpecificationContent;
 	}
 
 	@Override
