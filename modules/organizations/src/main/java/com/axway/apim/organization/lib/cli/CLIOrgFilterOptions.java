@@ -3,6 +3,7 @@ package com.axway.apim.organization.lib.cli;
 import org.apache.commons.cli.Option;
 
 import com.axway.apim.lib.CLIOptions;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.organization.lib.OrgFilterParams;
@@ -78,5 +79,10 @@ public class CLIOrgFilterOptions extends CLIOptions {
 		option.setRequired(false);
 		option.setArgName("true|false");
 		cliOptions.addOption(option);
+	}
+
+	@Override
+	public EnvironmentProperties getEnvProperties() {
+		return this.cliOptions.getEnvProperties();
 	}
 }

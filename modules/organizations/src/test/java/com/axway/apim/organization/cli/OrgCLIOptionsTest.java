@@ -28,6 +28,7 @@ public class OrgCLIOptionsTest {
 		// Validate App-Import parameters
 		Assert.assertEquals(params.getConfig(), "myOrgConfig.json");
 		Assert.assertEquals(params.getStageConfig(), "myStageConfig.json");
+		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
 	}
 	
 	@Test
@@ -48,6 +49,7 @@ public class OrgCLIOptionsTest {
 		Assert.assertEquals(params.getName(), "*My organization*");
 		Assert.assertEquals(params.getId(), "UUID-ID-OF-THE-ORG");
 		Assert.assertEquals(params.getDev(), "true");
+		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
 	}
 	
 	@Test
@@ -64,6 +66,7 @@ public class OrgCLIOptionsTest {
 		Assert.assertEquals(params.getName(), "*My organization*");
 		Assert.assertEquals(params.getId(), "UUID-ID-OF-THE-ORG");
 		Assert.assertEquals(params.getDev(), "true");
+		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
 	}
 
 }

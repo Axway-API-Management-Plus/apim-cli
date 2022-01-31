@@ -47,6 +47,7 @@ public class APIExportCLIOptionsTest {
 		Assert.assertEquals(params.getState(), "approved");
 		Assert.assertEquals(params.getBackend(), "backend.customer.com");
 		Assert.assertEquals(params.getDatPassword(), "123456Axway");
+		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
 	}
 	
 	@Test

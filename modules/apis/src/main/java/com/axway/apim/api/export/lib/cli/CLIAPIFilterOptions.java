@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.export.lib.params.APIFilterParams;
 import com.axway.apim.lib.CLIOptions;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -220,5 +221,10 @@ public class CLIAPIFilterOptions extends CLIOptions {
 		option.setRequired(false);
 		option.setArgName("tagGroup=*myTagValue*");
 		cliOptions.addOption(option);
+	}
+	
+	@Override
+	public EnvironmentProperties getEnvProperties() {
+		return cliOptions.getEnvProperties();
 	}
 }

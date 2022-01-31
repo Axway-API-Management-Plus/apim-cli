@@ -3,6 +3,7 @@ package com.axway.apim.users.lib.cli;
 import org.apache.commons.cli.Option;
 
 import com.axway.apim.lib.CLIOptions;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.users.lib.params.UserFilterParams;
@@ -117,5 +118,10 @@ public class CLIUserFilterOptions extends CLIOptions {
 		addOption(option);
 		
 		cliOptions.addOptions();
+	}
+
+	@Override
+	public EnvironmentProperties getEnvProperties() {
+		return this.cliOptions.getEnvProperties();
 	}
 }
