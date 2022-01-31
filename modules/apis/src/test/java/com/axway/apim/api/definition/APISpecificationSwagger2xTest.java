@@ -135,9 +135,9 @@ public class APISpecificationSwagger2xTest {
 	public void testPetstoreFiltered() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getPaths().addInclude("/pet/findByStatus:GET");
-		filterConfig.getPaths().addInclude("*:DELETE");
-		filterConfig.getPaths().addExclude("/user/{username}:DELETE");
+		filterConfig.getInclude().addPath("/pet/findByStatus:GET");
+		filterConfig.getInclude().addPath("*:DELETE");
+		filterConfig.getExclude().addPath("/user/{username}:DELETE");
 		
 		desiredAPISpec.setResource("/api_definition_1/petstore.json");
 		desiredAPISpec.setFilter(filterConfig);

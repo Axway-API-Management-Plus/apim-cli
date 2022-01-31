@@ -23,10 +23,10 @@ public class BaseAPISpecificationFIlter {
 		
 		public FilterConfig(APISpecificationFilter filterConfig) {
 			super();
-			for(String pathAndVerb : filterConfig.getPaths().getInclude()) {
+			for(String pathAndVerb : filterConfig.getInclude().getPaths()) {
 				add(pathAndVerb, includedPaths);
 			}
-			for(String pathAndVerb : filterConfig.getPaths().getExclude()) {
+			for(String pathAndVerb : filterConfig.getExclude().getPaths()) {
 				add(pathAndVerb, excludedPaths);
 			}
 		}

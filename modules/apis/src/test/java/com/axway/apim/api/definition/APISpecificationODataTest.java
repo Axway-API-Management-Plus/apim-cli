@@ -51,9 +51,9 @@ public class APISpecificationODataTest {
 	public void testODataV2APIFilteredSomeExludes() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getPaths().addExclude("*:DELETE"); // Exclude all DELETE-Methods
-		filterConfig.getPaths().addExclude("*:POST"); // Exclude all POST-Methods
-		filterConfig.getPaths().addExclude("/Suppliers*:*"); // Exclude all HTTP-Verbs for /Suppliers*
+		filterConfig.getExclude().addPath("*:DELETE"); // Exclude all DELETE-Methods
+		filterConfig.getExclude().addPath("*:POST"); // Exclude all POST-Methods
+		filterConfig.getExclude().addPath("/Suppliers*:*"); // Exclude all HTTP-Verbs for /Suppliers*
 		desiredAPISpec.setResource(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
 		desiredAPISpec.setFilter(filterConfig);
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "northwind-odata-v2.xml$metadata", "OData-V2-Test-API");
@@ -72,8 +72,8 @@ public class APISpecificationODataTest {
 	public void testODataV2APIFilteredSomeIncludes() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getPaths().addInclude("*:GET"); // Include all GET-Methods
-		filterConfig.getPaths().addInclude("*:PATCH"); // Include all PUT-Methods
+		filterConfig.getInclude().addPath("*:GET"); // Include all GET-Methods
+		filterConfig.getInclude().addPath("*:PATCH"); // Include all PUT-Methods
 		desiredAPISpec.setResource(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
 		desiredAPISpec.setFilter(filterConfig);
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "northwind-odata-v2.xml$metadata", "OData-V2-Test-API");

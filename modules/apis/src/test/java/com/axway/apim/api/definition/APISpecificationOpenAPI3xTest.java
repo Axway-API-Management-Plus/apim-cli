@@ -75,7 +75,7 @@ public class APISpecificationOpenAPI3xTest {
 	public void testPetstoreSomeIncluded() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getPaths().addInclude("/pet/{petId}:GET"); // Only this single method should be included
+		filterConfig.getInclude().addPath("/pet/{petId}:GET"); // Only this single method should be included
 		
 		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
 		desiredAPISpec.setFilter(filterConfig);
@@ -93,7 +93,7 @@ public class APISpecificationOpenAPI3xTest {
 	public void testPetstoreAllGetsIncluded() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getPaths().addInclude("*:GET");
+		filterConfig.getInclude().addPath("*:GET");
 		
 		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
 		desiredAPISpec.setFilter(filterConfig);
@@ -111,9 +111,9 @@ public class APISpecificationOpenAPI3xTest {
 	public void testPetstoreSomeExcluded() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getPaths().addExclude("/pet/{petId}:DELETE"); // No DELETE-Method anymore for this path
-		filterConfig.getPaths().addExclude("/pet/{petId}/uploadImage:POST"); // Last operation - Path should have been removed
-		filterConfig.getPaths().addExclude("/store/order/{orderId}:*"); // Remove all operations for this path
+		filterConfig.getExclude().addPath("/pet/{petId}:DELETE"); // No DELETE-Method anymore for this path
+		filterConfig.getExclude().addPath("/pet/{petId}/uploadImage:POST"); // Last operation - Path should have been removed
+		filterConfig.getExclude().addPath("/store/order/{orderId}:*"); // Remove all operations for this path
 		
 		
 		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
@@ -135,7 +135,7 @@ public class APISpecificationOpenAPI3xTest {
 	public void testPetstoreAllDeletesExcluded() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getPaths().addExclude("*:DELETE");
+		filterConfig.getExclude().addPath("*:DELETE");
 		
 		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
 		desiredAPISpec.setFilter(filterConfig);

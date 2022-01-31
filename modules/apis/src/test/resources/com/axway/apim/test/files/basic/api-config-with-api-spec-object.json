@@ -7,13 +7,15 @@
   "apiSpecification": {
   	"resource": "petstore.json",
   	"filter": {
-  		"paths": { 
-	  		"include": [ 
+  		"include": { 
+	  		"paths": [ 
 	  			"/test2:GET",
 	  			"test3:GET",
 	  			"test:PUT" 
-	  		],
-	  		"exclude": [ 
+	  		]
+	  	},
+	  	"exclude": { 
+	  		"paths": [ 
 	  			"abc:DELETE",
 	  			"xyz:DELETE"
 	  		]

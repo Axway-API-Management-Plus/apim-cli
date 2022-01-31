@@ -5,38 +5,20 @@ import java.util.List;
 
 public class APISpecIncludeExcludeFilter {
 	
-	private List<String> include = new ArrayList<String>();
+	private List<String> paths = new ArrayList<String>();
 	
-	private List<String> exclude = new ArrayList<String>();
-
-	public List<String> getInclude() {
-		return include;
+	public List<String> getPaths() {
+		return paths;
 	}
 
-	public void setInclude(List<String> include) {
-		this.include = include;
+	public void setPaths(List<String> paths) {
+		this.paths = paths;
 	}
 
-	public List<String> getExclude() {
-		return exclude;
-	}
-
-	public void setExclude(List<String> exclude) {
-		this.exclude = exclude;
-	}
-	
-	
-	public void addExclude(String pathAndVerb) {
-		if(this.exclude==null) {
-			this.exclude = new ArrayList<String>();
+	public void addPath(String pathAndVerb) {
+		if(this.paths==null) {
+			this.paths = new ArrayList<String>();
 		}
-		this.exclude.add(pathAndVerb);
-	}
-	
-	public void addInclude(String pathAndVerb) {
-		if(this.include==null) {
-			this.include = new ArrayList<String>();
-		}
-		this.include.add(pathAndVerb);
+		this.paths.add(pathAndVerb);
 	}
 }
