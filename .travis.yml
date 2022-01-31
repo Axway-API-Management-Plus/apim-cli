@@ -14,6 +14,8 @@ env:
     - CACHE_FILE_CASSANDRA=$CACHE_DIR/cassandra_2_2_12.cache.tar.gz
     - CACHE_FILE_WAIT_FOR_DEPENDENCIES=$CACHE_DIR/wait-for-dependencies.cache.tar.gz
     - counter=0
+    # Variable to test the OS-Environment variable replace
+    - OS=TravisCI
 
 cache:
   directories:
