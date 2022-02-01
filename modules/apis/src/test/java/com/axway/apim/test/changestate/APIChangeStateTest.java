@@ -12,9 +12,9 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.api.API;
-import com.axway.apim.api.definition.APISpecification;
-import com.axway.apim.api.definition.APISpecificationFactory;
-import com.axway.apim.api.definition.Swagger2xSpecification;
+import com.axway.apim.api.apiSpecification.APISpecification;
+import com.axway.apim.api.apiSpecification.APISpecificationFactory;
+import com.axway.apim.api.apiSpecification.Swagger2xSpecification;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.TagMap;
@@ -125,9 +125,11 @@ public class APIChangeStateTest extends APIManagerMockBase {
 	
 	@Test
 	public void testChangedAPIDefinition() throws JsonParseException, JsonMappingException, IOException, AppException {
-		APISpecification spec1 = new Swagger2xSpecification(new String("TEST API 1111111").getBytes());
+		APISpecification spec1 = new Swagger2xSpecification();
+		spec1.parse(new String("TEST API 1111111").getBytes());
 		testAPI1.setApiDefinition(spec1);
-		APISpecification spec2 = new Swagger2xSpecification(new String("TEST API 2222222").getBytes());
+		APISpecification spec2 = new Swagger2xSpecification();
+		spec2.parse(new String("TEST API 2222222").getBytes());
 		testAPI2.setApiDefinition(spec2);
 		APIChangeState changeState = new APIChangeState(testAPI1, testAPI2);
 		Assert.assertTrue(changeState.isRecreateAPI(), "API needs to be recreated");
@@ -135,9 +137,11 @@ public class APIChangeStateTest extends APIManagerMockBase {
 	
 	@Test
 	public void testUnchangedAPIDefinition() throws JsonParseException, JsonMappingException, IOException, AppException {
-		APISpecification spec1 = new Swagger2xSpecification(new String("TEST API 3333333").getBytes());
+		APISpecification spec1 = new Swagger2xSpecification();
+		spec1.parse(new String("TEST API 3333333").getBytes());
 		testAPI1.setApiDefinition(spec1);
-		APISpecification spec2 = new Swagger2xSpecification(new String("TEST API 3333333").getBytes());
+		APISpecification spec2 = new Swagger2xSpecification();
+		spec2.parse(new String("TEST API 3333333").getBytes());
 		testAPI2.setApiDefinition(spec2);
 		APIChangeState changeState = new APIChangeState(testAPI1, testAPI2);
 		Assert.assertFalse(changeState.isRecreateAPI(), "API-Definition is unchanged.");
