@@ -157,9 +157,9 @@ public class Utils {
 	 */
 	public static String substitueVariables(File inputFile) throws IOException {
 		String givenConfig = new String(Files.readAllBytes(inputFile.toPath()), StandardCharsets.UTF_8);
+		givenConfig = StringSubstitutor.replace(givenConfig, System.getenv());
 		if(CoreParameters.getInstance().getProperties()==null) return givenConfig;
 		StringSubstitutor substitutor = new StringSubstitutor(CoreParameters.getInstance().getProperties());
-		givenConfig = StringSubstitutor.replace(givenConfig, System.getenv());
 		return substitutor.replace(givenConfig);
 	}
 	

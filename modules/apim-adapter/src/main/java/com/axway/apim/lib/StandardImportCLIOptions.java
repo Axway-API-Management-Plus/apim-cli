@@ -68,4 +68,9 @@ public class StandardImportCLIOptions extends CLIOptions {
 	public boolean hasOption(String key) {
 		return cliOptions.hasOption(key);
 	}
+
+	@Override
+	public EnvironmentProperties getEnvProperties() {
+		return cliOptions.getEnvProperties();
+	}
 }

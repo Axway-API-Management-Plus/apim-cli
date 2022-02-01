@@ -29,6 +29,7 @@ public class RemoteHostCLIOptionsTest {
 		Assert.assertEquals(params.getName(), "*MyHost*");
 		Assert.assertEquals(params.getId(), "MyRemoteHostID");
 		Assert.assertEquals(params.getOutputFormat(), OutputFormat.json);
+		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
 	}
 	
 	@Test
@@ -52,5 +53,6 @@ public class RemoteHostCLIOptionsTest {
 		
 		Assert.assertEquals(params.getConfig(), "mySettings.json");
 		Assert.assertEquals(params.getStageConfig(), "myStagedSettings.json");
+		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
 	}
 }
