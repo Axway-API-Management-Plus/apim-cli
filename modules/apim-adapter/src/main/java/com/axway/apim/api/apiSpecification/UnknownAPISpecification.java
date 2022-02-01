@@ -1,4 +1,4 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import com.axway.apim.api.API;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -7,8 +7,7 @@ public class UnknownAPISpecification extends APISpecification {
 	
 	String apiName;
 
-	public UnknownAPISpecification(byte[] apiSpecificationContent, String apiName) throws AppException {
-		super(apiSpecificationContent);
+	public UnknownAPISpecification(String apiName) throws AppException {
 		this.apiName = apiName;
 	}
 
@@ -25,15 +24,13 @@ public class UnknownAPISpecification extends APISpecification {
 	}
 
 	@Override
-	public boolean configure() throws AppException {
+	public boolean parse(byte[] apiSpecificationContent) throws AppException {
 		return false;
 	}
 
 	@Override
 	public byte[] getApiSpecificationContent() {
 		LOG.error("API: '" + this.apiName + "' has a unkown/invalid API-Specification: " + APISpecificationFactory.getContentStart(this.apiSpecificationContent) );
-		return super.getApiSpecificationContent();
-	}
-	
-	
+		return this.apiSpecificationContent;
+	}	
 }

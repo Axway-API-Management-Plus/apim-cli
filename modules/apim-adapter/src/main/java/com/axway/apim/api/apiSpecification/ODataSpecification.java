@@ -1,4 +1,4 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,10 +19,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.servers.Server;
 
 public abstract class ODataSpecification extends APISpecification {
-	
-	public ODataSpecification(byte[] apiSpecificationContent) throws AppException {
-		super(apiSpecificationContent);
-	}
 
 	protected OpenAPI openAPI;
 	

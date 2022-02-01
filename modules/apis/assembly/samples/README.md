@@ -13,7 +13,7 @@ scripts\apim.bat api import -a ../petstore.json -c samples/basic/minimal-config.
 
 Instead of providing the API externally, it's referenced as part of the API-Config:  
 ```
-scripts\apim.bat api import -c samples/basic/minimal-config-api-definition.json -s api-env
+scripts\apim.bat api import -c samples/basic/minimal-config-api-specification.json -s api-env
 ```
 
 Creates a SOAP-Service API:    
@@ -23,7 +23,7 @@ scripts\apim.bat api import -a "http://www.dneonline.com/calculator.asmx?wsdl" -
 
 Creates a SOAP-Service API having the API-Definition internally:  
 ```
-scripts\apim.bat api import -c samples/basic/minimal-config-wsdl-api-definition.json -s api-env
+scripts\apim.bat api import -c samples/basic/minimal-config-wsdl-api-specification.json -s api-env
 ```
 
 ### Inbound Security
@@ -180,12 +180,12 @@ scripts\apim.bat api import -a ../petstore.json -c samples/methodLevel/outboundb
 ```  
 
 ### Staging examples
-Is loading a Environment-Properties: env.api-env.properties and overrides API-Config with minimal-config-api-definition.api-env.json:
+Is loading a Environment-Properties: env.api-env.properties and overrides API-Config with minimal-config-api-specification.api-env.json:
 ```
-scripts\apim.bat api import -c samples/staging/minimal-config-api-definition.json -s api-env
+scripts\apim.bat api import -c samples/staging/minimal-config-api-specification.json -s api-env
 ```
 
-Is overriding the default API-Config: minimal-config-api-definition.json with minimal-config-api-definition.prod.json (No prod specific Env-File is used):
+Is overriding the default API-Config: minimal-config-api-specification.json with minimal-config-api-specification.prod.json (No prod specific Env-File is used):
 ```
-scripts\apim.bat api import -c samples/staging/minimal-config-api-definition.json -s prod -s api-env
+scripts\apim.bat api import -c samples/staging/minimal-config-api-specification.json -s prod -s api-env
 ```

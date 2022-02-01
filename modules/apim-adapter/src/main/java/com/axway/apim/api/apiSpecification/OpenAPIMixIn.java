@@ -1,4 +1,4 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 

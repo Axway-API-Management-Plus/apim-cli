@@ -14,6 +14,7 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
 public class ConsoleAppExporter extends ApplicationExporter {
+
 	
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 
@@ -28,8 +29,11 @@ public class ConsoleAppExporter extends ApplicationExporter {
 			printStandard(apps);
 			break;
 		case wide:
-		case ultra:
 			printWide(apps);
+			break;
+		case ultra:
+			printUltra(apps);
+			break;
 		}
 		return;
 	}
@@ -40,7 +44,8 @@ public class ConsoleAppExporter extends ApplicationExporter {
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getName()),
 				new Column().header("State").with(app -> app.getState().name()),
 				new Column().header("Email").with(app -> app.getEmail()),
-				new Column().header("Enabled").with(app -> Boolean.toString(app.isEnabled())
+				new Column().header("Enabled").with(app -> Boolean.toString(app.isEnabled())),
+				new Column().header("Created by").with(app -> getCreatedBy(app.getCreatedBy(), app)
 				))));
 	}
 	
@@ -51,6 +56,21 @@ public class ConsoleAppExporter extends ApplicationExporter {
 				new Column().header("State").with(app -> app.getState().name()),
 				new Column().header("Email").with(app -> app.getEmail()),
 				new Column().header("Enabled").with(app -> Boolean.toString(app.isEnabled())),
+				new Column().header("Created by").with(app -> getCreatedBy(app.getCreatedBy(), app)),
+				new Column().header("Created on").with(app -> getCreatedOn(app.getCreatedOn()).toString()),
+				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(app -> app.getOrganization().getName())
+				)));
+	}
+	
+	private void printUltra(List<ClientApplication> apps) {
+		System.out.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
+				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getId()),
+				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getName()),
+				new Column().header("State").with(app -> app.getState().name()),
+				new Column().header("Email").with(app -> app.getEmail()),
+				new Column().header("Enabled").with(app -> Boolean.toString(app.isEnabled())),
+				new Column().header("Created by").with(app -> getCreatedBy(app.getCreatedBy(), app)),
+				new Column().header("Created on").with(app -> getCreatedOn(app.getCreatedOn()).toString()),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(app -> app.getOrganization().getName()),
 				new Column().header("APIs").with(app -> Integer.toString(app.getApiAccess().size())),
 				new Column().header("Quotas").with(app -> Boolean.toString(hasAppQuota(app))
@@ -74,6 +94,10 @@ public class ConsoleAppExporter extends ApplicationExporter {
 			if(params.getApiName()==null) builder.includeAPIAccess(false);
 			break;
 		case wide:
+			if(params.getCredential()==null && params.getRedirectUrl()==null) builder.includeCredentials(false);
+			builder.includeQuotas(false);
+			builder.includeAPIAccess(false);
+			break;
 		case ultra:
 			builder.includeQuotas(true);
 			if(params.getCredential()==null && params.getRedirectUrl()==null) builder.includeCredentials(true);

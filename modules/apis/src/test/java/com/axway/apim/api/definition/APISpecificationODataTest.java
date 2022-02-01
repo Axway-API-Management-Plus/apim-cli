@@ -2,12 +2,18 @@ package com.axway.apim.api.definition;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.axway.apim.api.apiSpecification.APISpecification;
+import com.axway.apim.api.apiSpecification.APISpecificationFactory;
+import com.axway.apim.api.apiSpecification.ODataV2Specification;
+import com.axway.apim.api.model.APISpecificationFilter;
+import com.axway.apim.api.model.DesiredAPISpecification;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -39,6 +45,75 @@ public class APISpecificationODataTest {
 			System.out.print(new String(apiDefinition.getApiSpecificationContent(), StandardCharsets.UTF_8));
 		}
 		Assert.assertEquals(apiDefinition.getApiSpecificationContent(), odataOpenAPI3);
+	}
+	
+	@Test
+	public void testODataV2APIFilteredSomeExludes() throws AppException, IOException {
+		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
+		APISpecificationFilter filterConfig = new APISpecificationFilter();
+		filterConfig.getExclude().addPath("*:DELETE"); // Exclude all DELETE-Methods
+		filterConfig.getExclude().addPath("*:POST"); // Exclude all POST-Methods
+		filterConfig.getExclude().addPath("/Suppliers*:*"); // Exclude all HTTP-Verbs for /Suppliers*
+		desiredAPISpec.setResource(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
+		desiredAPISpec.setFilter(filterConfig);
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "northwind-odata-v2.xml$metadata", "OData-V2-Test-API");
+		
+		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
+		
+		for(JsonNode path : filteredSpec.get("paths")) {
+			Assert.assertNull(path.get("delete"), "No delete method expected for path: " + path.get("delete"));
+			Assert.assertNull(path.get("post"), "No post method expected for path: " + path.get("post"));
+		}
+		Assert.assertNull(filteredSpec.get("paths").get("/Suppliers*"), "/Suppliers* should have been removed");
+	}
+	
+	@Test
+	public void testODataV2APIFilteredSomeIncludes() throws AppException, IOException {
+		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
+		APISpecificationFilter filterConfig = new APISpecificationFilter();
+		filterConfig.getInclude().addPath("*:GET"); // Include all GET-Methods
+		filterConfig.getInclude().addPath("*:PATCH"); // Include all PUT-Methods
+		desiredAPISpec.setResource(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
+		desiredAPISpec.setFilter(filterConfig);
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "northwind-odata-v2.xml$metadata", "OData-V2-Test-API");
+		
+		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
+		
+		Assert.assertNotNull(filteredSpec.get("paths").get("/Categories*").get("get"), "Get method expected for path: /Categories*");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/Products*").get("get"), "Get method expected for path: /Products*");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/Products({Id})*").get("get"), "Get method expected for path: /Products({Id})*");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/Products({Id})*").get("patch"), "Patch method expected for path: /Products({Id})*");
+		
+		Assert.assertNull(filteredSpec.get("paths").get("/Products({Id})*").get("delete"), "Delete method NOT expected for path: /Products({Id})*");
+		Assert.assertNull(filteredSpec.get("paths").get("/Products({Id})*").get("post"), "Post method NOT expected for path: /Products({Id})*");
+	}
+	
+	@Test
+	public void testODataV2APIFilteredWithTags() throws AppException, IOException {
+		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
+		APISpecificationFilter filterConfig = new APISpecificationFilter();
+		desiredAPISpec.setResource(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
+		filterConfig.getInclude().addTag("Regions");
+		filterConfig.getExclude().addPath("/Regions({Id})*:DELETE"); // Should be excluded, even the tag is included
+		filterConfig.getInclude().addTag("Order_Details");
+		filterConfig.getInclude().addTag("Products");
+		filterConfig.getExclude().addTag("Products"); // Must override the products tag
+		desiredAPISpec.setFilter(filterConfig);
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "northwind-odata-v2.xml$metadata", "OData-V2-Test-API");
+		
+		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
+		
+		Assert.assertNotNull(filteredSpec.get("paths").get("/Order_Details*").get("get"), "/Order_Details*:GET is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/Order_Details({Id})*").get("get"), "/Order_Details({Id})*:GET is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/Regions*").get("get"), "/Regions*:GET is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/Regions({Id})*").get("patch"), "/Regions({Id})*:PATCH is expected");
+		Assert.assertNull(filteredSpec.get("paths").get("/Regions({Id})*").get("delete"), "/Regions({Id})*:DELETE should be filtered");
+		Assert.assertNull(filteredSpec.get("paths").get("/Categories*"), "/Categories* should be filtered");
+		Assert.assertNull(filteredSpec.get("paths").get("/Products*"), "/Regions({Id}) should be filtered");
+		Assert.assertNull(filteredSpec.get("paths").get("/Employees({Id})*"), "/Employees({Id}) should be filtered");
 	}
 	
 	@Test
@@ -173,7 +248,6 @@ public class APISpecificationODataTest {
 		}
 		Assert.assertEquals(apiDefinition.getApiSpecificationContent(), odataOpenAPI3);
 	}
-	
 	
 	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Detected OData V3 specification, which is not yet supported by the APIM-CLI..*")
 	public void testODataV3API() throws AppException, IOException {

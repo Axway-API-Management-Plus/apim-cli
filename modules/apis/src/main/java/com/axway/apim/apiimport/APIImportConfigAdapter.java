@@ -1,23 +1,12 @@
 package com.axway.apim.apiimport;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,25 +16,7 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +25,8 @@ import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.api.API;
-import com.axway.apim.api.definition.APISpecification;
-import com.axway.apim.api.definition.APISpecificationFactory;
+import com.axway.apim.api.apiSpecification.APISpecification;
+import com.axway.apim.api.apiSpecification.APISpecificationFactory;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
@@ -76,7 +47,6 @@ import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.URLParser;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -99,7 +69,7 @@ public class APIImportConfigAdapter {
 	private ObjectMapper mapper = new ObjectMapper();
 	
 
-	/** This is the given path to WSDL or Swagger using -a parameter */
+	/** This is the given path to WSDL or Swagger. It is either set using -a parameter or as part of the config file */
 	private String pathToAPIDefinition;
 	
 	/** The API-Config-File given by the user with -c parameter */
@@ -197,14 +167,11 @@ public class APIImportConfigAdapter {
 		try {
 			validateExposurePath(apiConfig);
 			validateOrganization(apiConfig);
-			checkForAPIDefinitionInConfiguration(apiConfig);
+			addAPISpecification(apiConfig);
 			addDefaultPassthroughSecurityProfile(apiConfig);
 			addDefaultAuthenticationProfile(apiConfig);
 			validateOutboundProfile(apiConfig);
 			validateInboundProfile(apiConfig);
-			APISpecification apiSpecification = APISpecificationFactory.getAPISpecification(getAPIDefinitionContent(), this.pathToAPIDefinition, apiConfig.getName());
-			apiSpecification.configureBasepath(((DesiredAPI)apiConfig).getBackendBasepath(), apiConfig);
-			apiConfig.setApiDefinition(apiSpecification);
 			addImageContent(apiConfig);
 			Utils.validateCustomProperties(apiConfig.getCustomProperties(), Type.api);
 			validateDescription(apiConfig);
@@ -246,23 +213,22 @@ public class APIImportConfigAdapter {
 		}
 	}
 
-	private void checkForAPIDefinitionInConfiguration(API apiConfig) throws AppException {
-		String path = getCurrentPath();
-		LOG.debug("Current path={}",path);
-		if (StringUtils.isEmpty(this.pathToAPIDefinition)) {
-			if (StringUtils.isNotEmpty(apiConfig.getApiDefinitionImport())) {
-				this.pathToAPIDefinition=apiConfig.getApiDefinitionImport();
-				LOG.debug("Reading API Definition from configuration file");
-			} else {
-				throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
-			}
+	private void addAPISpecification(API apiConfig) throws IOException {
+		APISpecification apiSpecification = null;
+		if(((DesiredAPI)apiConfig).getDesiredAPISpecification()!=null) {
+			// API-Specification object that might contain filters, the type of an API, etc.
+			apiSpecification = APISpecificationFactory.getAPISpecification(((DesiredAPI)apiConfig).getDesiredAPISpecification(), this.apiConfigFile.getCanonicalFile().getParent(), apiConfig.getName());
+		} else if (StringUtils.isNotEmpty(this.pathToAPIDefinition)) {
+			apiSpecification = APISpecificationFactory.getAPISpecification(this.pathToAPIDefinition, this.apiConfigFile.getCanonicalFile().getParent(), apiConfig.getName());
+		} else if (StringUtils.isNotEmpty(apiConfig.getApiDefinitionImport()))  {
+			apiSpecification = APISpecificationFactory.getAPISpecification(apiConfig.getApiDefinitionImport(), this.apiConfigFile.getCanonicalFile().getParent(), apiConfig.getName());
+			this.pathToAPIDefinition=apiConfig.getApiDefinitionImport();
+			LOG.debug("Reading API Definition from configuration file");
+		} else {
+			throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
 		}
-	}
-
-	private String getCurrentPath() {
-		Path currentRelativePath = Paths.get("");
-		String s = currentRelativePath.toAbsolutePath().toString();
-		return s;
+		apiSpecification.configureBasepath(((DesiredAPI)apiConfig).getBackendBasepath(), apiConfig);
+		apiConfig.setApiDefinition(apiSpecification);
 	}
 	
 	private void handleAllOrganizations(API apiConfig) throws AppException {
@@ -521,138 +487,6 @@ public class APIImportConfigAdapter {
 		return is;
 	}
 	
-	private byte[] getAPIDefinitionContent() throws AppException {
-		try(InputStream stream = getAPIDefinitionAsStream()) {
-			Reader reader = new InputStreamReader(stream,StandardCharsets.UTF_8);
-			return IOUtils.toByteArray(reader,StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			throw new AppException("Can't read API-Definition from file", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
-		}
-	}
-	
-	/**
-	 * To make testing easier we allow reading test-files from classpath as well
-	 * @throws AppException when the import Swagger-File can't be read.
-	 * @return The import Swagger-File as an InputStream
-	 */
-	public InputStream getAPIDefinitionAsStream() throws AppException {
-		InputStream is = null;
-		if(pathToAPIDefinition.endsWith(".url")) {
-			return getAPIDefinitionFromURL(Utils.getAPIDefinitionUriFromFile(pathToAPIDefinition));
-		} else if(isHttpUri(pathToAPIDefinition)) {
-			return getAPIDefinitionFromURL(pathToAPIDefinition);
-		} else {
-			try {
-				File inputFile = new File(pathToAPIDefinition);
-				if(inputFile.exists()) { 
-					LOG.info("Reading API-Definition (Swagger/WSDL) from file: '" + pathToAPIDefinition + "' (relative path)");
-					is = new FileInputStream(pathToAPIDefinition);
-				} else {
-					String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
-					inputFile= new File(baseDir + File.separator + this.pathToAPIDefinition);
-					LOG.info("Reading API-Definition (Swagger/WSDL) from file: '" + inputFile.getCanonicalFile() + "' (absolute path)"); 
-					if(inputFile.exists()) { 
-						is = new FileInputStream(inputFile);
-					} else {
-						is = this.getClass().getResourceAsStream(pathToAPIDefinition);
-					}
-				}
-				if(is == null) {
-					throw new AppException("Unable to read Swagger/WSDL file from: " + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE);
-				}
-			} catch (Exception e) {
-				throw new AppException("Unable to read Swagger/WSDL file from: " + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
-			}
-			
-		}
-		return is;
-	}
-	
-	private InputStream getAPIDefinitionFromURL(String urlToAPIDefinition) throws AppException {
-		URLParser url = new URLParser(urlToAPIDefinition);
-		String uri = url.getUri();
-		String username = url.getUsername();
-		String password = url.getPassword();
-		CloseableHttpClient httpclient = createHttpClient(uri, username, password);
-		try {
-			RequestConfig config = RequestConfig.custom()
-					.setRelativeRedirectsAllowed(true)
-					.setCircularRedirectsAllowed(true)
-					.build();
-			HttpGet httpGet = new HttpGet(uri);
-			httpGet.setConfig(config);
-			
-            ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
-
-                @Override
-                public String handleResponse(
-                        final HttpResponse response) throws ClientProtocolException, IOException {
-                    int status = response.getStatusLine().getStatusCode();
-                    if (status >= 200 && status < 300) {
-                        HttpEntity entity = response.getEntity();
-                        return entity != null ? EntityUtils.toString(entity,StandardCharsets.UTF_8) : null;
-                    } else {
-                        throw new ClientProtocolException("Unexpected response status: " + status);
-                    }
-                }
-
-            };
-            String responseBody = httpclient.execute(httpGet, responseHandler);
-            return new ByteArrayInputStream(responseBody.getBytes(StandardCharsets.UTF_8));
-		} catch (Exception e) {
-			throw new AppException("Cannot load API-Definition from URI: "+uri, ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
-		} finally {
-			try {
-				httpclient.close();
-			} catch (Exception ignore) {}
-		}
-	}
-
-	private CloseableHttpClient createHttpClient(String uri, String username, String password) throws AppException {
-		HttpClientBuilder httpClientBuilder = HttpClients.custom();
-		try {
-			addBasicAuthCredential(uri, username, password, httpClientBuilder);
-			addSSLContext(uri, httpClientBuilder);
-			return httpClientBuilder.build();
-		} catch (Exception e) {
-			throw new AppException("Error during create http client for retrieving ...", ErrorCode.CANT_CREATE_HTTP_CLIENT);
-		}
-	}
-
-	private void addSSLContext(String uri, HttpClientBuilder httpClientBuilder) throws KeyManagementException,
-			NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException {
-		if (isHttpsUri(uri)) {
-			SSLConnectionSocketFactory sslCtx = createSSLContext();
-			if (sslCtx!=null) {
-				httpClientBuilder.setSSLSocketFactory(sslCtx);
-			}
-		}
-	}
-
-	private void addBasicAuthCredential(String uri, String username, String password,
-			HttpClientBuilder httpClientBuilder) {
-		if(this.apiConfig instanceof DesiredTestOnlyAPI) return; // Don't do that when unit-testing
-		if(username!=null) {
-			LOG.info("Loading API-Definition from: " + uri + " ("+username+")");
-			CredentialsProvider credsProvider = new BasicCredentialsProvider();
-			credsProvider.setCredentials(
-		            new AuthScope(AuthScope.ANY),
-		            new UsernamePasswordCredentials(username, password));
-			httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
-		} else {
-			LOG.info("Loading API-Definition from: " + uri);
-		}
-	}
-	
-	public static boolean isHttpUri(String pathToAPIDefinition) {
-		String httpUri = pathToAPIDefinition.substring(pathToAPIDefinition.indexOf("@")+1);
-		return( httpUri.startsWith("http://") || httpUri.startsWith("https://"));
-	}
-	
-	public static boolean isHttpsUri(String uri) {
-		return( uri.startsWith("https://") );
-	}
-	
 	private API validateInboundProfile(API importApi) throws AppException {
 		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) {
 			Map<String, InboundProfile> def = new HashMap<String, InboundProfile>();
@@ -907,38 +741,6 @@ public class APIImportConfigAdapter {
 
 	public void setPathToAPIDefinition(String pathToAPIDefinition) {
 		this.pathToAPIDefinition = pathToAPIDefinition;
-	}
-	
-	private SSLConnectionSocketFactory createSSLContext() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException {
-		SSLContextBuilder builder = new SSLContextBuilder();
-		builder.loadTrustMaterial(null, new TrustAllStrategy());
-		
-		String keyStorePath=System.getProperty("javax.net.ssl.keyStore","");
-		if (StringUtils.isNotEmpty(keyStorePath)) {
-			String keyStorePassword=System.getProperty("javax.net.ssl.keyStorePassword","");
-			if (StringUtils.isNotEmpty(keyStorePassword)) {
-				String keystoreType=System.getProperty("javax.net.ssl.keyStoreType",KeyStore.getDefaultType());
-				LOG.debug("Reading keystore from {}",keyStorePath);
-				KeyStore ks = KeyStore.getInstance(keystoreType);
-				ks.load(new FileInputStream(new File(keyStorePath)), keyStorePassword.toCharArray());				
-				builder.loadKeyMaterial(ks,keyStorePassword.toCharArray());
-			}
-		} else {
-			LOG.debug("NO javax.net.ssl.keyStore property.");
-		}
-		String [] tlsProts = getAcceptedTLSProtocols();
-		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-				builder.build(),
-                tlsProts,
-                null,
-                new NoopHostnameVerifier());
-		return sslsf;
-	}
-
-	private String[] getAcceptedTLSProtocols() {
-		String protocols = System.getProperty("https.protocols","TLSv1.2"); //default TLSv1.2
-		LOG.debug("https protocols: {}",protocols);
-		return protocols.split(",");
 	}
 	
 	/*

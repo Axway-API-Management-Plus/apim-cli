@@ -1,4 +1,4 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,10 +14,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 public class Swagger1xSpecification extends APISpecification {
 	
 	JsonNode swagger = null;
-	
-	public Swagger1xSpecification(byte[] apiSpecificationContent) throws AppException {
-		super(apiSpecificationContent);
-	}
 
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
@@ -25,6 +21,11 @@ public class Swagger1xSpecification extends APISpecification {
 			return APISpecType.SWAGGGER_API_1x_YAML;
 		}
 		return APISpecType.SWAGGGER_API_1x;
+	}
+
+	@Override
+	public byte[] getApiSpecificationContent() {
+		return this.apiSpecificationContent;
 	}
 
 	@Override
@@ -58,8 +59,9 @@ public class Swagger1xSpecification extends APISpecification {
 	}
 	
 	@Override
-	public boolean configure() throws AppException {
+	public boolean parse(byte[] apiSpecificationContent) throws AppException {
 		try {
+			super.parse(apiSpecificationContent);
 			setMapperForDataFormat();
 			if(this.mapper==null) return false;
 			swagger = this.mapper.readTree(apiSpecificationContent);

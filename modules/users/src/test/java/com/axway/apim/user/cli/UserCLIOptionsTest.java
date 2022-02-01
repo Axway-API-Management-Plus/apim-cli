@@ -28,6 +28,7 @@ public class UserCLIOptionsTest {
 		
 		// Validate App-Import parameters
 		Assert.assertEquals(params.getConfig(), "myUserConfig.json");
+		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
 	}
 	
 	@Test
@@ -54,6 +55,7 @@ public class UserCLIOptionsTest {
 		Assert.assertEquals(params.getRole(), "oadmin");
 		Assert.assertEquals(params.getState(), "pending");
 		Assert.assertFalse(params.isEnabled());
+		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
 	}
 	
 	@Test
@@ -78,6 +80,7 @@ public class UserCLIOptionsTest {
 		Assert.assertTrue(params.isEnabled());
 		
 		Assert.assertEquals(params.getNewPassword(), "123456");
+		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
 	}
 	
 	

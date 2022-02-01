@@ -73,15 +73,12 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 	@Test
 	public void usingOSEnvVariable() throws AppException, ParseException {
 		try {
-			EnvironmentProperties props = new EnvironmentProperties(null);
-			APIImportParams params = new APIImportParams();
-			params.setProperties(props);
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
-			String osArch = System.getProperty("os.arch");
-			Assert.assertEquals(apiConfig.getState(), "notUsed "+osArch);
+			String os = System.getenv().get("OS");
+			Assert.assertEquals(apiConfig.getSummary(), "Operating system: "+os);
 		} catch (Exception e) {
 			LOG.error("Error running test: usingOSEnvVariable", e);
 			throw e;
@@ -213,5 +210,19 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/customproperties/1_custom-properties-config.json").getFile();
 		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
 		adapter.getDesiredAPI(); // Should fail, as a mandatory customProperty is missing
+	}
+	
+	@Test
+	public void apiSpecificationObject() throws AppException, ParseException {
+		EnvironmentProperties props = new EnvironmentProperties(null);
+		APIImportParams params = new APIImportParams();
+		params.setProperties(props);
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-api-spec-object.json").getFile();
+
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, false, null);
+		adapter.getDesiredAPI();
+		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+		Assert.assertEquals(apiConfig.getName(), "API with API-Specification object");
+		Assert.assertEquals(apiConfig.getVersion(), "1.0.0");
 	}
 }

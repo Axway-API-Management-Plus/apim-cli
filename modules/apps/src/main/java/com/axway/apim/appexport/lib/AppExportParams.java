@@ -10,6 +10,7 @@ public class AppExportParams extends StandardExportParams implements Parameters 
 	private String name;
 	private String id;
 	private String orgName;
+	private String createdBy;
 	private String credential;
 	private String redirectUrl;
 	private String apiName;
@@ -48,6 +49,14 @@ public class AppExportParams extends StandardExportParams implements Parameters 
 
 	public void setOrgName(String orgName) {
 		this.orgName = orgName;
+	}
+	
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
 	}
 
 	public String getCredential() {

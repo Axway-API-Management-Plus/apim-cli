@@ -1,0 +1,10 @@
+{
+	"name": "Sample Minimal WSDL API",
+	"path": "/sample/minimal/wsdl/apispecification/api/v1",
+	"state": "unpublished",
+	"version": "1.0.0",
+    "apiSpecification": {
+        "resource": "http://www.dneonline.com/calculator.asmx?wsdl"
+    },
+	"organization": "API Development" 
+}

@@ -2,12 +2,19 @@ package com.axway.apim.lib.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
@@ -22,7 +29,19 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.TimeZone;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,9 +157,9 @@ public class Utils {
 	 */
 	public static String substitueVariables(File inputFile) throws IOException {
 		String givenConfig = new String(Files.readAllBytes(inputFile.toPath()), StandardCharsets.UTF_8);
+		givenConfig = StringSubstitutor.replace(givenConfig, System.getenv());
 		if(CoreParameters.getInstance().getProperties()==null) return givenConfig;
 		StringSubstitutor substitutor = new StringSubstitutor(CoreParameters.getInstance().getProperties());
-		givenConfig = StringSubstitutor.replace(givenConfig, System.getenv());
 		return substitutor.replace(givenConfig);
 	}
 	
@@ -302,5 +321,82 @@ public class Utils {
 	public static String getAPILogString(API api) {
 		if(api==null) return "N/A";
 		return api.getName() + " " + api.getVersion() + " ("+api.getVersion()+")";
+	}
+	
+	public static CloseableHttpClient createHttpClient(String uri, String username, String password) throws AppException {
+		HttpClientBuilder httpClientBuilder = HttpClients.custom();
+		try {
+			addBasicAuthCredential(uri, username, password, httpClientBuilder);
+			addSSLContext(uri, httpClientBuilder);
+			return httpClientBuilder.build();
+		} catch (Exception e) {
+			throw new AppException("Error during create http client for retrieving ...", ErrorCode.CANT_CREATE_HTTP_CLIENT);
+		}
+	}
+
+	private static void addSSLContext(String uri, HttpClientBuilder httpClientBuilder) throws KeyManagementException,
+			NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException {
+		if (isHttpsUri(uri)) {
+			SSLConnectionSocketFactory sslCtx = createSSLContext();
+			if (sslCtx!=null) {
+				httpClientBuilder.setSSLSocketFactory(sslCtx);
+			}
+		}
+	}
+
+	private static void addBasicAuthCredential(String uri, String username, String password,
+			HttpClientBuilder httpClientBuilder) {
+		//if(this.apiConfig instanceof DesiredTestOnlyAPI) return; // Don't do that when unit-testing
+		if(username!=null) {
+			LOG.info("Loading API-Definition from: " + uri + " ("+username+")");
+			CredentialsProvider credsProvider = new BasicCredentialsProvider();
+			credsProvider.setCredentials(
+		            new AuthScope(AuthScope.ANY),
+		            new UsernamePasswordCredentials(username, password));
+			httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
+		} else {
+			LOG.info("Loading API-Definition from: " + uri);
+		}
+	}
+	
+	public static boolean isHttpUri(String pathToAPIDefinition) {
+		String httpUri = pathToAPIDefinition.substring(pathToAPIDefinition.indexOf("@")+1);
+		return( httpUri.startsWith("http://") || httpUri.startsWith("https://"));
+	}
+	
+	public static boolean isHttpsUri(String uri) {
+		return( uri.startsWith("https://") );
+	}
+	
+	private static SSLConnectionSocketFactory createSSLContext() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException {
+		SSLContextBuilder builder = new SSLContextBuilder();
+		builder.loadTrustMaterial(null, new TrustAllStrategy());
+		
+		String keyStorePath=System.getProperty("javax.net.ssl.keyStore","");
+		if (StringUtils.isNotEmpty(keyStorePath)) {
+			String keyStorePassword=System.getProperty("javax.net.ssl.keyStorePassword","");
+			if (StringUtils.isNotEmpty(keyStorePassword)) {
+				String keystoreType=System.getProperty("javax.net.ssl.keyStoreType",KeyStore.getDefaultType());
+				LOG.debug("Reading keystore from {}",keyStorePath);
+				KeyStore ks = KeyStore.getInstance(keystoreType);
+				ks.load(new FileInputStream(new File(keyStorePath)), keyStorePassword.toCharArray());				
+				builder.loadKeyMaterial(ks,keyStorePassword.toCharArray());
+			}
+		} else {
+			LOG.debug("NO javax.net.ssl.keyStore property.");
+		}
+		String [] tlsProts = getAcceptedTLSProtocols();
+		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+				builder.build(),
+                tlsProts,
+                null,
+                new NoopHostnameVerifier());
+		return sslsf;
+	}
+
+	private static String[] getAcceptedTLSProtocols() {
+		String protocols = System.getProperty("https.protocols","TLSv1.2"); //default TLSv1.2
+		LOG.debug("https protocols: {}",protocols);
+		return protocols.split(",");
 	}
 }

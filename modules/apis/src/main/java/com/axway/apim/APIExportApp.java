@@ -235,6 +235,11 @@ public class APIExportApp implements APIMCLIServiceProvider {
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
 			return ErrorCode.UNXPECTED_ERROR.getCode();
+		} finally {
+			try {
+				// make sure the cache is updated, even an exception is thrown
+				APIManagerAdapter.deleteInstance();
+			} catch (Exception ignore) { }
 		}
 	}
 	

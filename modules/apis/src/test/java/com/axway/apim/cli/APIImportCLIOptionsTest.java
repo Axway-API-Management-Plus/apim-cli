@@ -28,6 +28,7 @@ public class APIImportCLIOptionsTest {
 		String[] args = {"-s", "prod", "-c", "myConfig.json"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
+		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
 		Assert.assertEquals(params.getHostname(), "localhost");

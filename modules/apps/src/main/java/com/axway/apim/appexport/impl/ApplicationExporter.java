@@ -1,6 +1,8 @@
 package com.axway.apim.appexport.impl;
 
 import java.lang.reflect.Constructor;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -19,6 +21,8 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 public abstract class ApplicationExporter {
 	
 	protected static Logger LOG = LoggerFactory.getLogger(ApplicationExporter.class);
+	
+	private HashMap<String, String> userIdToLogin = new HashMap<String, String>();
 	
 	public enum ResultHandler {
 		JSON_EXPORTER(JsonApplicationExporter.class),
@@ -76,6 +80,7 @@ public abstract class ApplicationExporter {
 				.hasCredential(params.getCredential())
 				.hasRedirectUrl(params.getRedirectUrl())
 				.hasOrganizationName(params.getOrgName())
+				.hasCreatedByLoginName(params.getCreatedBy())
 				.includeCustomProperties(getCustomProperties())
 				.includeAppPermissions(false)
 				.includeOauthResources(false)
@@ -93,5 +98,26 @@ public abstract class ApplicationExporter {
 			LOG.error("Error reading custom properties configuration for applications from API-Manager");
 			return null;
 		}
+	}
+	
+	protected String getCreatedBy(String userId, ClientApplication app) {
+		if(this.userIdToLogin.containsKey(userId)) return this.userIdToLogin.get(userId);
+		String loginName;
+		if(userId == null) {
+			LOG.error("Application: " + app.toString() + " has no createdBy information.");
+			loginName = "N/A";
+		}
+		try {
+			loginName = APIManagerAdapter.getInstance().userAdapter.getUserForId(app.getCreatedBy()).getLoginName();
+		} catch (AppException e) {
+			LOG.error("Error getting createdBy user with Id: " + app.getCreatedBy() + " for application: " + app.toString());
+			loginName = app.getCreatedBy();
+		}
+		this.userIdToLogin.put(userId, loginName);
+		return loginName;
+	}
+	
+	protected Date getCreatedOn(Long createdOn) {
+		return new Date(createdOn);
 	}
 }

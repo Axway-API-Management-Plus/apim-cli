@@ -28,15 +28,15 @@ public class CLIAPIImportOptions extends CLIOptions {
 	@Override
 	public void addOptions() {
 		// Define command line options required for Application export
-		Option option = new Option("a", "apidefinition", true, "(Optional) The API Definition either as Swagger (JSON/YAML) or a WSDL for SOAP-Services:\n"
+		Option option = new Option("a", "apidefinition", true, "(Optional) The API Specification either as OpenAPI (JSON/YAML) or a WSDL for SOAP-Services:\n"
 				+ "- in local filesystem using a relative or absolute path. Example: swagger_file.json\n"
 				+ "  Please note: Local filesystem is not supported for WSDLs. Please use direct URL or a URL-Reference-File.\n"
 				+ "- a URL providing the Swagger-File or WSDL-File. Examples:\n"
 				+ "  [username/password@]https://any.host.com/my/path/to/swagger.json\n"
 				+ "  [username/password@]http://www.dneonline.com/calculator.asmx?wsdl\n"
 				+ "- a reference file called anyname-i-want.url which contains a line with the URL\n"
-				+ "  (same format as above for Swagger or WSDL)."
-				+ "  If not specified, the API Definition configuration is read directly from the API-Config file.");
+				+ "  (same format as above for OpenAPI or WSDL)."
+				+ "  If not specified, the API Specification configuration is read directly from the API-Config file.");
 		option.setRequired(false);
 		option.setArgName("swagger_file.json");
 		addOption(option);
@@ -108,13 +108,12 @@ public class CLIAPIImportOptions extends CLIOptions {
 		super.printUsage(message, args);		
 		System.out.println("----------------------------------------------------------------------------------------");
 		System.out.println("How to import APIs");
-		System.out.println("Import an API including the API-Definition using environment properties file: env.api-env.properties:");
-		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config-api-definition.json -s api-env");
+		System.out.println("Import an API including the API-Specification using environment properties file: env.api-env.properties:");
+		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config-api-specification.json -s api-env");
+		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config-api-specification-filtered.json -s api-env");
 		System.out.println(getBinaryName()+" api import -c samples/basic/odata-v2-northwind-api.json -s api-env");
 		System.out.println();
 		System.out.println();
-		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme");
-		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme -s prod");
 		System.out.println(getBinaryName()+" api import -c samples/complex/complete-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme");
 		System.out.println();
 		System.out.println("For more information and advanced examples please visit:");

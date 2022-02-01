@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.axway.apim.adapter.jackson.RemotehostDeserializer;
-import com.axway.apim.api.definition.APISpecification;
+import com.axway.apim.api.apiSpecification.APISpecification;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthenticationProfile;
