@@ -7,8 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Support to filter API-Specifications based on the Paths or Tags (See issue [#238](https://github.com/Axway-API-Management-Plus/apim-cli/issues/238))
 - Support to filter for the creator of an application (See issue [#252](https://github.com/Axway-API-Management-Plus/apim-cli/issues/252))
-- CSV- and Application-Console export now contains the creator of an application (See issue [#252](https://github.com/Axway-API-Management-Plus/apim-cli/issues/252))
+- CSV- and Application-Console export now contains the creator of an application (See issue [#252](https://github.com/Axway-API-Management-Plus/apim-cli/issues/252)) 
 
 ### Fixed
 - Environment-Variables in API-config file gets not substituted anymore (See issue [#257](https://github.com/Axway-API-Management-Plus/apim-cli/issues/257))
