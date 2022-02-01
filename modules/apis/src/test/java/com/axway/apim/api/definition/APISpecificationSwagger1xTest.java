@@ -7,6 +7,12 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.axway.apim.api.apiSpecification.APISpecification;
+import com.axway.apim.api.apiSpecification.APISpecificationFactory;
+import com.axway.apim.api.apiSpecification.Swagger1xSpecification;
+import com.axway.apim.api.apiSpecification.APISpecification.APISpecType;
+import com.axway.apim.api.model.APISpecificationFilter;
+import com.axway.apim.api.model.DesiredAPISpecification;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -87,7 +93,6 @@ public class APISpecificationSwagger1xTest {
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
 		apiDefinition.configureBasepath("An-Invalid-URL", null);
 	}
-	
 	
 	private byte[] getSwaggerContent(String swaggerFile) throws AppException {
 		try {

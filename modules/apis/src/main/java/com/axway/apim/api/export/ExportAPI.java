@@ -8,12 +8,13 @@ import java.util.Map;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.definition.APISpecification;
+import com.axway.apim.api.apiSpecification.APISpecification;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.CorsProfile;
+import com.axway.apim.api.model.DesiredAPISpecification;
 import com.axway.apim.api.model.DeviceType;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.InboundProfile;
@@ -32,7 +33,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@JsonPropertyOrder({ "name", "path", "state", "version", "organization", "apiDefinition", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost", 
+@JsonPropertyOrder({ "name", "path", "state", "version", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost", 
 	"backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties", 
 	"corsProfiles", "caCerts", "applicationQuota", "systemQuota" })
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
@@ -306,11 +307,11 @@ public class ExportAPI {
 		return exportApps;
 	}
 
-	
-
-	@JsonProperty("apiDefinition")
-	public String getApiDefinitionImport() {
-		return this.getAPIDefinition().getApiSpecificationFile();
+	@JsonProperty("apiSpecification")
+	public DesiredAPISpecification getApiDefinitionImport() {
+		DesiredAPISpecification spec = new DesiredAPISpecification();
+		spec.setResource(this.getAPIDefinition().getApiSpecificationFile());
+		return spec;
 	}
 	
 

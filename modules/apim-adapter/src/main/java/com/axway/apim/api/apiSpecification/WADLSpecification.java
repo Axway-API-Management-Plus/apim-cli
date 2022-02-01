@@ -1,4 +1,4 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,14 +12,15 @@ import com.axway.apim.lib.utils.Utils;
 public class WADLSpecification extends APISpecification {
 	
 	String wadl = null; 
-	
-	public WADLSpecification(byte[] apiSpecificationContent) throws AppException {
-		super(apiSpecificationContent);
-	}
 
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
 		return APISpecType.WADL_API;
+	}
+	
+	@Override
+	public byte[] getApiSpecificationContent() {
+		return this.apiSpecificationContent;
 	}
 
 	@Override
@@ -45,7 +46,8 @@ public class WADLSpecification extends APISpecification {
 	
 	
 	@Override
-	public boolean configure() throws AppException {
+	public boolean parse(byte[] apiSpecificationContent) throws AppException {
+		super.parse(apiSpecificationContent);
 		if(apiSpecificationFile.toLowerCase().endsWith(".url")) {
 			apiSpecificationFile = Utils.getAPIDefinitionUriFromFile(apiSpecificationFile);
 		}
@@ -54,7 +56,7 @@ public class WADLSpecification extends APISpecification {
 			return false;
 		}
 			// We going to use a cheap way - Avoid parsing & writing back the WADL-File.
-		this.wadl = new String(this.apiSpecificationContent);
+		this.wadl = new String(apiSpecificationContent);
 		return true;
 	}
 }
