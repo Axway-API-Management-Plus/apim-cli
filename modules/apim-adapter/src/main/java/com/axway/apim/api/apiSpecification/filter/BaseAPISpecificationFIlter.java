@@ -48,18 +48,19 @@ public class BaseAPISpecificationFIlter {
 			pathsAndVerb.put(path, verbs);
 		}
 		
+		boolean isPathOrTagIncluded(String path, String verb, List<String> tags) {
+			// If nothing is configured, it should be included by default
+			if(includedPaths.isEmpty() && includedTags.isEmpty()) return true;
+			// Check if the path or the tag is included
+			return (isIncludedExcluded(path, verb, includedPaths) ||  isTagsIncluded(tags)) ;
+		}
+		
 		boolean isExcluded(String path, String verb) {
 			if(excludedPaths.isEmpty()) return false;
 			return isIncludedExcluded(path, verb, excludedPaths);
 		}
 		
-		boolean isIncluded(String path, String verb) {
-			if(includedPaths.isEmpty()) return true;
-			return isIncludedExcluded(path, verb, includedPaths);
-		}
-		
-		boolean isTagsIncluded(List<String> tags) {
-			if(includedTags.isEmpty()) return true;
+		private boolean isTagsIncluded(List<String> tags) {
 			for(String tag : tags) {
 				if(includedTags.contains(tag)) return true;
 			}
@@ -75,15 +76,16 @@ public class BaseAPISpecificationFIlter {
 		}
 
 		private boolean isIncludedExcluded(String path, String verb, Map<String, List<String>> paths) {
-			// Check if the path is directly configured
-			List<String> operations = paths.get(path);
-			if(operations == null) {
-				// If not, check for a wildcard
-				if(paths.containsKey("*")) {
-					operations = paths.get("*");
-				} else {
-					return false;
-				}
+			List<String> operations = null;
+			// Check if the path is configured directly and if the requested verb is configured
+			if(paths.containsKey(path) && (paths.get(path).contains(verb) || paths.get(path).contains("*"))) {
+				operations = paths.get(path);
+			// If not, check there is a wildcard configured
+			} else if(paths.containsKey("*")) {
+				operations = paths.get("*");
+			} else {
+			// Otherwise no rule is declared
+				return false;
 			}
 			if(operations.contains(verb.toLowerCase()) || operations.contains("*")) return true;
 			return false;

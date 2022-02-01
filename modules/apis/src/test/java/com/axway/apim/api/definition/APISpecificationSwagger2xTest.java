@@ -155,10 +155,17 @@ public class APISpecificationSwagger2xTest {
 	}
 	
 	@Test
-	public void testPetstoreFilteredWithTags() throws AppException, IOException {
+	public void testPetstoreFilteredWithTagsAndPaths() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getInclude().addTag("user");
+		filterConfig.getInclude().addTag("pet");
+		filterConfig.getInclude().addTag("store");
+		filterConfig.getInclude().addPath("/user/{username}:*");
+		filterConfig.getInclude().addPath("/user/login:GET");
+		filterConfig.getInclude().addPath("/user/logout:GET");
+		
+		filterConfig.getExclude().addPath("*:DELETE");
+		filterConfig.getExclude().addPath("/pet/{petId}:POST");
 		
 		desiredAPISpec.setResource("/api_definition_1/petstore.json");
 		desiredAPISpec.setFilter(filterConfig);
@@ -168,11 +175,26 @@ public class APISpecificationSwagger2xTest {
 		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.SWAGGGER_API_20);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		
-		Assert.assertEquals(filteredSpec.get("paths").size(), 6, "6 Methods expected");
-		Assert.assertNotNull(filteredSpec.get("paths").get("/user").get("post"), "/user:POST expected");
-		Assert.assertNotNull(filteredSpec.get("paths").get("/user/createWithArray").get("post"), "/user/createWithArray:POST expected");
-		Assert.assertNotNull(filteredSpec.get("paths").get("/user/createWithList").get("post"), "/user/createWithList:POST expected");
-		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}"), "/pet/{petId}:GET NOT expected");
+		// Assert.assertEquals(filteredSpec.get("paths").size(), 6, "6 Methods expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet").get("post"), "/pet:POST is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet").get("put"), "/pet:PUT is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/findByStatus").get("get"), "/pet/findByStatus:GET is expected");
+		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}").get("post"), "/pet/{petId}:POST is NOT expected");
+		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}").get("delete"), "/pet/{petId}:DELETE is NOT expected");
+		
+		Assert.assertNotNull(filteredSpec.get("paths").get("/store/inventory").get("get"), "/store/inventory:GET is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/store/order").get("post"), "/store/order:POST is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/store/order/{orderId}").get("get"), "/store/order:GET is expected");
+		Assert.assertNull(filteredSpec.get("paths").get("/store/order/{orderId}").get("delete"), "/store/order:DELETE is NOT expected");
+		
+		Assert.assertNull(filteredSpec.get("paths").get("/user"), "/user is NOT expected");
+		Assert.assertNull(filteredSpec.get("paths").get("/user/createWithArray"), "/user/createWithArray is NOT expected");
+		Assert.assertNull(filteredSpec.get("paths").get("/user/createWithList"), "/user/createWithList is NOT expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/user/login").get("get"), "/user/login:GET is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/user/logout").get("get"), "/user/logout:GET is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/user/{username}").get("get"), "/user/{username}:GET is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/user/{username}").get("put"), "/user/{username}:PUT is expected");
+		Assert.assertNull(filteredSpec.get("paths").get("/user/{username}").get("delete"), "/user/{username}:DELETE is NOT expected");
 	}
 	
 	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasepath: 'An-Invalid-URL' is invalid.")

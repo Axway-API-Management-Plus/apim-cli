@@ -39,10 +39,14 @@ public class OpenAPI3SpecificationFilter {
 				String httpMethod = next.toString().toLowerCase();
 				Operation operation = getOperation4HttpMethod(operations, httpMethod);
 				List<String> tags = operation.getTags();
-				if(filter.isExcluded(specPath, httpMethod) || !filter.isIncluded(specPath, httpMethod)) {
+				// If path OR tag is excluded, if must be removed no matter if configured as included
+				if(filter.isExcluded(specPath, httpMethod) || filter.isTagsExcluded(tags)) {
 					toBeRemoved.add(specPath+":"+httpMethod);
-				} else if(filter.isTagsExcluded(tags) || !filter.isTagsIncluded(tags)) {
+					LOG.debug("Removed excluded: " + specPath + ":"+httpMethod + " and tags: " + tags);
+				// If path AND tag are not included it must be removed
+				} else if(!filter.isPathOrTagIncluded(specPath, httpMethod, tags)) {
 					toBeRemoved.add(specPath+":"+httpMethod);
+					LOG.debug("Removed not included: " + specPath + ":"+httpMethod + " and tags: " + tags);
 				} else {
 					removePath = false;
 				}
