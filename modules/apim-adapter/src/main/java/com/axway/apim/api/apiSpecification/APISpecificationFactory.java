@@ -3,7 +3,6 @@ package com.axway.apim.api.apiSpecification;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -53,14 +52,7 @@ public class APISpecificationFactory {
 		spec.setFilterConfig(desiredAPISpec.getFilter()).filterAPISpecification();
 		return spec;
 	}
-	
-	/**
-	 * @param parsedAPISpecificationContent the content API-Specification itself
-	 * @param apiDefinitionFile the path to the file that contains the spec. It is also used to determine the specification type
-	 * @param apiName name of the API. Used for error reporting only
-	 * @return the detected concrete API-Specification
-	 * @throws AppException if the API-Specification cannot be detected or loaded
-	 */
+
 	public static APISpecification getAPISpecification(String apiDefinitionFile, String configBaseDir, String apiName) throws AppException {
 		return getAPISpecification(getAPIDefinitionContent(apiDefinitionFile, configBaseDir), apiDefinitionFile, apiName, true, true);
 	}
@@ -129,11 +121,6 @@ public class APISpecificationFactory {
 		}
 	}
 	
-	/**
-	 * To make testing easier we allow reading test-files from classpath as well
-	 * @throws AppException when the import Swagger-File can't be read.
-	 * @return The import Swagger-File as an InputStream
-	 */
 	private static InputStream getAPIDefinitionAsStream(String apiDefinitionFile, String configBaseDir) throws AppException {
 		InputStream is = null;
 		if(apiDefinitionFile.endsWith(".url")) {

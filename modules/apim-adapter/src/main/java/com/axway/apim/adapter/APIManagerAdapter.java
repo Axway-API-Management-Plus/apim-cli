@@ -1,4 +1,4 @@
-package com.axway.apim.adapter;
+	package com.axway.apim.adapter;
 
 import java.io.File;
 import java.io.InputStream;
@@ -623,6 +623,7 @@ public class APIManagerAdapter {
 	 * format as it's needed by the API-Manager. 
 	 * @param certFile InputStream to the Certificate
 	 * @param cert the certificate itself
+	 * @param password the password 
 	 * @return JsonNode as it's required by the API-Manager.
 	 * @throws AppException if JSON-Node-Config can't be created
 	 */
@@ -667,6 +668,7 @@ public class APIManagerAdapter {
 	 * as it's needed by the API-Manager.
 	 * @param fileFontent the certificate content
 	 * @param filename the name of the certificate file used as a reference in the generated Json object
+	 * @param contentType the content type
 	 * @throws AppException when the certificate information can't be created
 	 * @return a Json-Object structure as needed by the API-Manager
 	 */

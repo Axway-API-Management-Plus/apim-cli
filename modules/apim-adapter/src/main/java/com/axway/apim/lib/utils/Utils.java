@@ -167,7 +167,7 @@ public class Utils {
 	 * @param stage defines a stage which identifies a prod or qa environment.
 	 * @param stageConfig can be given to define the stage config file to be used
 	 * @param baseConfigFile the base configuration
-	 * @return
+	 * @return the staged config file
 	 */
 	public static File getStageConfig(String stage, String stageConfig, File baseConfigFile) {
 		if(stage == null && stageConfig == null) return null;
