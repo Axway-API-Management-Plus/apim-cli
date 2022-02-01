@@ -91,6 +91,32 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
+	public void testODataV2APIFilteredWithTags() throws AppException, IOException {
+		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
+		APISpecificationFilter filterConfig = new APISpecificationFilter();
+		desiredAPISpec.setResource(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
+		filterConfig.getInclude().addTag("Regions");
+		filterConfig.getExclude().addPath("/Regions({Id})*:DELETE"); // Should be excluded, even the tag is included
+		filterConfig.getInclude().addTag("Order_Details");
+		filterConfig.getInclude().addTag("Products");
+		filterConfig.getExclude().addTag("Products"); // Must override the products tag
+		desiredAPISpec.setFilter(filterConfig);
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "northwind-odata-v2.xml$metadata", "OData-V2-Test-API");
+		
+		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
+		
+		Assert.assertNotNull(filteredSpec.get("paths").get("/Order_Details*").get("get"), "/Order_Details*:GET is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/Order_Details({Id})*").get("get"), "/Order_Details({Id})*:GET is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/Regions*").get("get"), "/Regions*:GET is expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/Regions({Id})*").get("patch"), "/Regions({Id})*:PATCH is expected");
+		Assert.assertNull(filteredSpec.get("paths").get("/Regions({Id})*").get("delete"), "/Regions({Id})*:DELETE should be filtered");
+		Assert.assertNull(filteredSpec.get("paths").get("/Categories*"), "/Categories* should be filtered");
+		Assert.assertNull(filteredSpec.get("paths").get("/Products*"), "/Regions({Id}) should be filtered");
+		Assert.assertNull(filteredSpec.get("paths").get("/Employees({Id})*"), "/Employees({Id}) should be filtered");
+	}
+	
+	@Test
 	public void testODataV2APIWithFunctions() throws AppException, IOException {
 		
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2ODataDemoMetadata.xml");

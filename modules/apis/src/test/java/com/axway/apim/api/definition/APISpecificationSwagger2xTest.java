@@ -154,6 +154,27 @@ public class APISpecificationSwagger2xTest {
 		Assert.assertNull(filteredSpec.get("paths").get("/user/{username}"), "/user/{username}:DELETE NOT expected");
 	}
 	
+	@Test
+	public void testPetstoreFilteredWithTags() throws AppException, IOException {
+		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
+		APISpecificationFilter filterConfig = new APISpecificationFilter();
+		filterConfig.getInclude().addTag("user");
+		
+		desiredAPISpec.setResource("/api_definition_1/petstore.json");
+		desiredAPISpec.setFilter(filterConfig);
+		
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
+		
+		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.SWAGGGER_API_20);
+		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
+		
+		Assert.assertEquals(filteredSpec.get("paths").size(), 6, "6 Methods expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/user").get("post"), "/user:POST expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/user/createWithArray").get("post"), "/user/createWithArray:POST expected");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/user/createWithList").get("post"), "/user/createWithList:POST expected");
+		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}"), "/pet/{petId}:GET NOT expected");
+	}
+	
 	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasepath: 'An-Invalid-URL' is invalid.")
 	public void testInvalidBackendBasepath() throws AppException, IOException {
 

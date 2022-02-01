@@ -151,6 +151,26 @@ public class APISpecificationOpenAPI3xTest {
 		Assert.assertNull(filteredSpec.get("paths").get("/store/order/{orderId}").get("delete"), "Delete operation for /store/order/{orderId} should have been removed.");
 	}
 	
+	@Test
+	public void testTagPetIncludedOnly() throws AppException, IOException {
+		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
+		APISpecificationFilter filterConfig = new APISpecificationFilter();
+		filterConfig.getInclude().addTag("pet");
+		filterConfig.getInclude().addTag("store"); // Must be ignored, as it is also excluded
+		filterConfig.getExclude().addTag("store");
+		filterConfig.getExclude().addPath("/pet/{petId}/uploadImage:POST");
+		
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setFilter(filterConfig);
+		
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
+		
+		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.OPEN_API_30);
+		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
+		
+		Assert.assertEquals(filteredSpec.get("paths").size(), 4, "All paths tagged with pet and store must be included");
+	}
+	
 	
 	private byte[] getSwaggerContent(String swaggerFile) throws AppException {
 		try {

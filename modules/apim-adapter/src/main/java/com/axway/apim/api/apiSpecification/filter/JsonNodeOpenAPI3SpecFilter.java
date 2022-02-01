@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.api.apiSpecification.filter.BaseAPISpecificationFIlter.FilterConfig;
 import com.axway.apim.api.model.APISpecificationFilter;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonNodeOpenAPI3SpecFilter  {
@@ -30,7 +31,14 @@ public class JsonNodeOpenAPI3SpecFilter  {
 			Iterator<String> it2 = operations.fieldNames();
 			while(it2.hasNext()) {
 				String specVerb = it2.next();
+				JsonNode operation = operations.get(specVerb);
+				ArrayNode tags = (ArrayNode)operation.get("tags");
+				// Is the path is excluded or not included
 				if(filter.isExcluded(specPath, specVerb) || !filter.isIncluded(specPath, specVerb)) {
+					toBeRemoved.add(specPath+":"+specVerb);
+				// If one of the tags is excluded remove the operation 
+				// or if included exists, but tag is not included remove it 
+				} else if(filter.isTagsExcluded(toList(tags)) || !filter.isTagsIncluded(toList(tags))) {
 					toBeRemoved.add(specPath+":"+specVerb);
 				}
 			}
@@ -47,5 +55,13 @@ public class JsonNodeOpenAPI3SpecFilter  {
 			}
 		}
 		LOG.info("API-Specification successfully filtered.");
+	}
+	
+	private static List<String> toList(ArrayNode arrayNode) {
+		List<String> list = new ArrayList<String>();
+		for(JsonNode node : arrayNode) {
+			list.add(node.asText());
+		}
+		return list;
 	}
 }

@@ -11,6 +11,7 @@ import com.axway.apim.api.apiSpecification.filter.BaseAPISpecificationFIlter.Fil
 import com.axway.apim.api.model.APISpecificationFilter;
 
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.models.Paths;
@@ -36,7 +37,11 @@ public class OpenAPI3SpecificationFilter {
 			while(it2.hasNext()) {
 				HttpMethod next = it2.next();
 				String httpMethod = next.toString().toLowerCase();
+				Operation operation = getOperation4HttpMethod(operations, httpMethod);
+				List<String> tags = operation.getTags();
 				if(filter.isExcluded(specPath, httpMethod) || !filter.isIncluded(specPath, httpMethod)) {
+					toBeRemoved.add(specPath+":"+httpMethod);
+				} else if(filter.isTagsExcluded(tags) || !filter.isTagsIncluded(tags)) {
 					toBeRemoved.add(specPath+":"+httpMethod);
 				} else {
 					removePath = false;
@@ -77,5 +82,23 @@ public class OpenAPI3SpecificationFilter {
 			}
 		}
 		LOG.info("API-Specification successfully filtered.");
+	}
+	
+	private static Operation getOperation4HttpMethod(PathItem operations, String httpMethod) {
+		switch(httpMethod){
+		case "get":
+			return operations.getGet();
+		case "put":
+			return operations.getPut();
+		case "post":
+			return operations.getPost();
+		case "delete":
+			return operations.getDelete();
+		case "patch":
+			return operations.getPatch();
+		case "head":
+			return operations.getHead();
+		}
+		return null;
 	}
 }

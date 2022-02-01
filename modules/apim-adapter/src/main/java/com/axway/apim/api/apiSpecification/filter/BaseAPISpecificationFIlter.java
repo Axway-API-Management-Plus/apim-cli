@@ -21,6 +21,10 @@ public class BaseAPISpecificationFIlter {
 		 */
 		private Map<String, List<String>> excludedPaths = new HashMap<String, List<String>>();
 		
+		private List<String> includedTags = new ArrayList<String>();
+		
+		private List<String> excludedTags = new ArrayList<String>();
+		
 		public FilterConfig(APISpecificationFilter filterConfig) {
 			super();
 			for(String pathAndVerb : filterConfig.getInclude().getPaths()) {
@@ -29,6 +33,8 @@ public class BaseAPISpecificationFIlter {
 			for(String pathAndVerb : filterConfig.getExclude().getPaths()) {
 				add(pathAndVerb, excludedPaths);
 			}
+			excludedTags = filterConfig.getExclude().getTags();
+			includedTags = filterConfig.getInclude().getTags();
 		}
 		
 		void add(String pathAndVerb, Map<String, List<String>> pathsAndVerb) {
@@ -52,6 +58,22 @@ public class BaseAPISpecificationFIlter {
 			return isIncludedExcluded(path, verb, includedPaths);
 		}
 		
+		boolean isTagsIncluded(List<String> tags) {
+			if(includedTags.isEmpty()) return true;
+			for(String tag : tags) {
+				if(includedTags.contains(tag)) return true;
+			}
+			return false;
+		}
+		
+		boolean isTagsExcluded(List<String> tags) {
+			if(excludedTags.isEmpty()) return false;
+			for(String tag : tags) {
+				if(excludedTags.contains(tag)) return true;
+			}
+			return false;
+		}
+
 		private boolean isIncludedExcluded(String path, String verb, Map<String, List<String>> paths) {
 			// Check if the path is directly configured
 			List<String> operations = paths.get(path);
