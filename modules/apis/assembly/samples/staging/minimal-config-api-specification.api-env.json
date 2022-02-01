@@ -1,0 +1,7 @@
+{
+	"name": "Samples Staging API-ENV override",  
+    "apiSpecification": {
+        "resource": "../petstore.json"
+    },
+	"organization": "API Development" 
+}

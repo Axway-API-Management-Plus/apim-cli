@@ -3,6 +3,8 @@
 	"path": "/samples/staging/minimal/api/v1",
 	"state": "unpublished",
 	"version": "1.0.0",
-	"apiDefinition":"../petstore.json",
+    "apiSpecification": {
+        "resource": "../petstore.json"
+    },
 	"organization": "API Development" 
 }

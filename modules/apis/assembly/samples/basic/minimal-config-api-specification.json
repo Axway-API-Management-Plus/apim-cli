@@ -1,0 +1,10 @@
+{
+	"name": "Sample Minimal API",
+	"path": "/sample/minimal/apispecification/api/v1",
+	"state": "unpublished",
+	"version": "1.0.0",
+    "apiSpecification": {
+        "resource": "../petstore.json"
+    },
+	"organization": "API Development" 
+}
