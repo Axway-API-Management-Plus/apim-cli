@@ -33,15 +33,21 @@ public class JsonNodeOpenAPI3SpecFilter  {
 				String httpMethod = it2.next();
 				JsonNode operation = operations.get(httpMethod);
 				ArrayNode tags = (ArrayNode)operation.get("tags");
-				// If path OR tag is excluded, if must be removed no matter if configured as included
-				if(filter.isExcluded(specPath, httpMethod) || filter.isTagsExcluded(toList(tags))) {
+				if(filter.filter(specPath, httpMethod, toList(tags))) {
 					toBeRemoved.add(specPath+":"+httpMethod);
-					LOG.debug("Removed excluded: " + specPath + ":"+httpMethod + " and tags: " + tags);
+					LOG.info("Removed excluded: " + specPath + ":"+httpMethod + " and tags: " + tags);
+				}
+				
+				
+				// If path OR tag is excluded, if must be removed no matter if configured as included
+				/*if(filter.isExcluded(specPath, httpMethod) || filter.isTagsExcluded(toList(tags))) {
+					toBeRemoved.add(specPath+":"+httpMethod);
+					LOG.info("Removed excluded: " + specPath + ":"+httpMethod + " and tags: " + tags);
 				// If the path AND tags are not included in either path- or tag-config it must be removed
 				} else if(!filter.isPathOrTagIncluded(specPath, httpMethod, toList(tags))) {
 					toBeRemoved.add(specPath+":"+httpMethod);
-					LOG.debug("Removed not included: " + specPath + ":"+httpMethod + " and tags: " + tags);
-				}
+					LOG.info("Removed not included: " + specPath + ":"+httpMethod + " and tags: " + tags);
+				}*/
 			}
 		}
 		for(String pathAndVerb : toBeRemoved) {

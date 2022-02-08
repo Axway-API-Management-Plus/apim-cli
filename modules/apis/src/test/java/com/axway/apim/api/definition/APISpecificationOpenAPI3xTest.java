@@ -75,7 +75,7 @@ public class APISpecificationOpenAPI3xTest {
 	public void testPetstoreSomeIncluded() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getInclude().addPath("/pet/{petId}:GET"); // Only this single method should be included
+		filterConfig.addInclude(new String[] {"/pet/{petId}:GET"}, null); // Only this single method should be included
 		
 		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
 		desiredAPISpec.setFilter(filterConfig);
@@ -93,7 +93,7 @@ public class APISpecificationOpenAPI3xTest {
 	public void testPetstoreAllGetsIncluded() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getInclude().addPath("*:GET");
+		filterConfig.addInclude(new String[] {"*:GET"}, null);
 		
 		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
 		desiredAPISpec.setFilter(filterConfig);
@@ -111,9 +111,9 @@ public class APISpecificationOpenAPI3xTest {
 	public void testPetstoreSomeExcluded() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getExclude().addPath("/pet/{petId}:DELETE"); // No DELETE-Method anymore for this path
-		filterConfig.getExclude().addPath("/pet/{petId}/uploadImage:POST"); // Last operation - Path should have been removed
-		filterConfig.getExclude().addPath("/store/order/{orderId}:*"); // Remove all operations for this path
+		filterConfig.addExclude(new String[] {"/pet/{petId}:DELETE"}, null); // No DELETE-Method anymore for this path
+		filterConfig.addExclude(new String[] {"/pet/{petId}/uploadImage:POST"}, null); // Last operation - Path should have been removed
+		filterConfig.addExclude(new String[] {"/store/order/{orderId}:*"}, null); // Remove all operations for this path
 		
 		
 		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
@@ -135,7 +135,7 @@ public class APISpecificationOpenAPI3xTest {
 	public void testPetstoreAllDeletesExcluded() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getExclude().addPath("*:DELETE");
+		filterConfig.addExclude(new String[] {"*:DELETE"}, null);
 		
 		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
 		desiredAPISpec.setFilter(filterConfig);
@@ -155,10 +155,10 @@ public class APISpecificationOpenAPI3xTest {
 	public void testTagPetIncludedOnly() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getInclude().addTag("pet");
-		filterConfig.getInclude().addTag("store"); // Must be ignored, as it is also excluded
-		filterConfig.getExclude().addTag("store");
-		filterConfig.getExclude().addPath("/pet/{petId}/uploadImage:POST");
+		filterConfig.addInclude(null, new String[] {"pet"});
+		filterConfig.addInclude(null, new String[] {"store"}); // Must be removed, as it is also excluded, which overrules the include
+		filterConfig.addExclude(null, new String[] {"store"});
+		filterConfig.addExclude(new String[] { "/pet/{petId}/uploadImage:POST" }, null);
 		
 		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
 		desiredAPISpec.setFilter(filterConfig);
@@ -168,7 +168,63 @@ public class APISpecificationOpenAPI3xTest {
 		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.OPEN_API_30);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		
-		Assert.assertEquals(filteredSpec.get("paths").size(), 4, "All paths tagged with pet and store must be included");
+		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}/uploadImage"));
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet").get("post"));
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet").get("put"));
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/findByStatus").get("get"));
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/findByTags").get("get"));
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/{petId}").get("get"));
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/{petId}").get("post"));
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/{petId}").get("delete"));
+		
+		Assert.assertNull(filteredSpec.get("paths").get("/store/order"));
+		Assert.assertNull(filteredSpec.get("paths").get("/store/order/{orderId}"));
+		Assert.assertNull(filteredSpec.get("paths").get("/store/inventory"));
+		
+		Assert.assertNull(filteredSpec.get("paths").get("/user/createWithArray"));
+		Assert.assertNull(filteredSpec.get("paths").get("/user/createWithList"));
+		Assert.assertNull(filteredSpec.get("paths").get("/user/{username}"));
+		Assert.assertNull(filteredSpec.get("paths").get("/user/login"));
+		Assert.assertNull(filteredSpec.get("paths").get("/user/logout"));
+		Assert.assertNull(filteredSpec.get("paths").get("/user"));
+	}
+	
+	@Test
+	public void testCombinedFilter() throws AppException, IOException {
+		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
+		APISpecificationFilter filterConfig = new APISpecificationFilter();
+		// Include all GET-Methods from tags pet and store
+		filterConfig.addInclude(new String[] {"*:GET", "/pet/{petId}/uploadImage:POST"}, new String[] {"pet"});
+		filterConfig.addInclude(new String[] {"*:DELETE", "*:PUT", "/store/order:POST"}, new String[] {"store"});
+		// But in general POST methods should be removed
+		filterConfig.addExclude(new String[] {"*:POST"}, null);
+		
+		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
+		desiredAPISpec.setFilter(filterConfig);
+		
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
+		
+		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.OPEN_API_30);
+		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
+		
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/{petId}/uploadImage"));
+		Assert.assertNull(filteredSpec.get("paths").get("/pet"), "Entire path /get must be removed, as it contains no GET method and POST and PUT should only be included for store");
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/findByStatus").get("get"));
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/findByTags").get("get"));
+		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/{petId}").get("get"));
+		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}").get("post"));
+		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}").get("delete"));
+		
+		Assert.assertNotNull(filteredSpec.get("paths").get("/store/order").get("post"));
+		Assert.assertNotNull(filteredSpec.get("paths").get("/store/order/{orderId}").get("delete"));
+		Assert.assertNull(filteredSpec.get("paths").get("/store/inventory"));
+		
+		Assert.assertNull(filteredSpec.get("paths").get("/user/createWithArray"));
+		Assert.assertNull(filteredSpec.get("paths").get("/user/createWithList"));
+		Assert.assertNull(filteredSpec.get("paths").get("/user/{username}"));
+		Assert.assertNull(filteredSpec.get("paths").get("/user/login"));
+		Assert.assertNull(filteredSpec.get("paths").get("/user/logout"));
+		Assert.assertNull(filteredSpec.get("paths").get("/user"));
 	}
 	
 	

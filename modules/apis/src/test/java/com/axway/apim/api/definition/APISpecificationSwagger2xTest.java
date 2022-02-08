@@ -135,9 +135,9 @@ public class APISpecificationSwagger2xTest {
 	public void testPetstoreFiltered() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getInclude().addPath("/pet/findByStatus:GET");
-		filterConfig.getInclude().addPath("*:DELETE");
-		filterConfig.getExclude().addPath("/user/{username}:DELETE");
+		filterConfig.addInclude(new String[] {"/pet/findByStatus:GET"}, null);
+		filterConfig.addInclude(new String[] {"*:DELETE"}, null);
+		filterConfig.addExclude(new String[] {"/user/{username}:DELETE"}, null);
 		
 		desiredAPISpec.setResource("/api_definition_1/petstore.json");
 		desiredAPISpec.setFilter(filterConfig);
@@ -158,14 +158,14 @@ public class APISpecificationSwagger2xTest {
 	public void testPetstoreFilteredWithTagsAndPaths() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
-		filterConfig.getInclude().addTag("pet");
-		filterConfig.getInclude().addTag("store");
-		filterConfig.getInclude().addPath("/user/{username}:*");
-		filterConfig.getInclude().addPath("/user/login:GET");
-		filterConfig.getInclude().addPath("/user/logout:GET");
+		filterConfig.addInclude(new String[] {"/user/{username}:*"}, null);
+		filterConfig.addInclude(new String[] {"/user/login:GET"}, null);
+		filterConfig.addInclude(new String[] {"/user/logout:GET"}, null);
+		filterConfig.addInclude(null, new String[] {"pet"});
+		filterConfig.addInclude(null, new String[] {"store"});
 		
-		filterConfig.getExclude().addPath("*:DELETE");
-		filterConfig.getExclude().addPath("/pet/{petId}:POST");
+		filterConfig.addExclude(new String[] {"*:DELETE"}, null);
+		filterConfig.addExclude(new String[] {"/pet/{petId}:POST"}, null);
 		
 		desiredAPISpec.setResource("/api_definition_1/petstore.json");
 		desiredAPISpec.setFilter(filterConfig);
