@@ -53,6 +53,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
@@ -138,6 +139,12 @@ public class APIImportConfigAdapter {
 				}
 			} else {
 				apiConfig = baseConfig;
+			}
+		} catch (MismatchedInputException e) {
+			if(e.getMessage().contains("APISpecIncludeExcludeFilter>` from Object value (token `JsonToken.START_OBJECT`)")) {
+				throw new AppException("An error occurred while reading the API specification filters. Please note that the filter structure has changed "
+						+ "between version 1.8.0 and 1.9.0. You can find more information here: "
+						+ "https://github.com/Axway-API-Management-Plus/apim-cli/wiki/2.1.10-API-Specification#filter-api-specifications", ErrorCode.CANT_READ_CONFIG_FILE, e);
 			}
 		} catch (JsonParseException e) {
 			throw new AppException("Cannot parse API-Config file(s).", "Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_JSON_PAYLOAD, e);
