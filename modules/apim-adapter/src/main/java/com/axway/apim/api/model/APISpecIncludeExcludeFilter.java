@@ -68,7 +68,7 @@ public class APISpecIncludeExcludeFilter {
 		// If filter has both configured check them in combination
 		if(pathMap!=null && !pathMap.isEmpty() && this.tags!=null && !this.tags.isEmpty()) {
 			if(httpMethods4Path==null) return false;
-			if(httpMethods4Path.contains(httpMethod.toLowerCase()) && containsTags(tags)) {
+			if((httpMethods4Path.contains(httpMethod.toLowerCase()) || httpMethods4Path.contains("*")) && containsTags(tags)) {
 				return true;
 			} else {
 				return false;
@@ -97,7 +97,7 @@ public class APISpecIncludeExcludeFilter {
 
 	/**
 	 * This method is used for tests only
-	 * @param pathAndVerb the path and verb
+	 * @param pathAndVerbs an array of path and verbs to include or exclude
 	 */
 	public void addPath(String[] pathAndVerbs) {
 		this.paths.addAll(Arrays.asList(pathAndVerbs));
@@ -109,6 +109,14 @@ public class APISpecIncludeExcludeFilter {
 	 */
 	public void addTag(String[] tags) {
 		this.tags.addAll(Arrays.asList(tags));
+	}
+	
+	/**
+	 * This method is used for tests only
+	 * @param models a list of models to include or exclude
+	 */
+	public void addModel(String[] models) {
+		this.models.addAll(Arrays.asList(models));
 	}
 	
 	private boolean containsTags(List<String> tags) {

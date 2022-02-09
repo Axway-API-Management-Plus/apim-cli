@@ -22,6 +22,7 @@ public class JsonNodeOpenAPI3SpecFilter  {
 		FilterConfig filter = new FilterConfig(filterConfig);
 		// If includes are given - Remove all others not defined as included
 		List<String> toBeRemoved = new ArrayList<String>();
+		List<String> toBeRemovedModels = new ArrayList<String>();
 		// Iterate over the API specification and create a list of all paths 
 		// that must to be removed because they were not configured as included
 		Iterator<String> it = paths.fieldNames();
@@ -33,21 +34,10 @@ public class JsonNodeOpenAPI3SpecFilter  {
 				String httpMethod = it2.next();
 				JsonNode operation = operations.get(httpMethod);
 				ArrayNode tags = (ArrayNode)operation.get("tags");
-				if(filter.filter(specPath, httpMethod, toList(tags))) {
+				if(filter.filterOperations(specPath, httpMethod, toList(tags))) {
 					toBeRemoved.add(specPath+":"+httpMethod);
-					LOG.info("Removed excluded: " + specPath + ":"+httpMethod + " and tags: " + tags);
+					LOG.debug("Removed patH/operation: " + specPath + ":"+httpMethod + " and tags: " + tags);
 				}
-				
-				
-				// If path OR tag is excluded, if must be removed no matter if configured as included
-				/*if(filter.isExcluded(specPath, httpMethod) || filter.isTagsExcluded(toList(tags))) {
-					toBeRemoved.add(specPath+":"+httpMethod);
-					LOG.info("Removed excluded: " + specPath + ":"+httpMethod + " and tags: " + tags);
-				// If the path AND tags are not included in either path- or tag-config it must be removed
-				} else if(!filter.isPathOrTagIncluded(specPath, httpMethod, toList(tags))) {
-					toBeRemoved.add(specPath+":"+httpMethod);
-					LOG.info("Removed not included: " + specPath + ":"+httpMethod + " and tags: " + tags);
-				}*/
 			}
 		}
 		for(String pathAndVerb : toBeRemoved) {
@@ -59,6 +49,27 @@ public class JsonNodeOpenAPI3SpecFilter  {
 			// Remove the entire path, if no more remaining operations
 			if(path.size()==0) {
 				((ObjectNode)paths).remove(excludePath);
+			}
+		}
+		JsonNode schemas = null;
+		if(openAPISpec.get("components")!=null && openAPISpec.get("components").get("schemas")!=null) {
+			// OpenAPI 3.x.x
+			schemas = openAPISpec.get("components").get("schemas");
+		} else if (openAPISpec.get("definitions")!=null) {
+			// Swagger 2.x
+			schemas = openAPISpec.get("definitions");
+		}
+		if(schemas!=null) {
+			Iterator<String> modelNamesIt = schemas.fieldNames();
+			while(modelNamesIt.hasNext()) {
+				String modelName = modelNamesIt.next();
+				if(filter.filterModel(modelName)) {
+					toBeRemovedModels.add(modelName);
+					LOG.debug("Removed model: " + modelName + " from API-Specification.");
+				}
+			}
+			for(String modelName : toBeRemovedModels) {
+				((ObjectNode)schemas).remove(modelName);
 			}
 		}
 		LOG.info("API-Specification successfully filtered.");

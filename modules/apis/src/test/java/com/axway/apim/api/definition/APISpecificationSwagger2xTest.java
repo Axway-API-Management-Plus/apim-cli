@@ -138,6 +138,7 @@ public class APISpecificationSwagger2xTest {
 		filterConfig.addInclude(new String[] {"/pet/findByStatus:GET"}, null);
 		filterConfig.addInclude(new String[] {"*:DELETE"}, null);
 		filterConfig.addExclude(new String[] {"/user/{username}:DELETE"}, null);
+		filterConfig.addExclude(null, null, new String[] {"Tag"});
 		
 		desiredAPISpec.setResource("/api_definition_1/petstore.json");
 		desiredAPISpec.setFilter(filterConfig);
@@ -152,6 +153,11 @@ public class APISpecificationSwagger2xTest {
 		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/{petId}").get("delete"), "/pet/{petId}:DELETE expected");
 		Assert.assertNotNull(filteredSpec.get("paths").get("/store/order/{orderId}").get("delete"), "/store/order/{orderId}:DELETE expected");
 		Assert.assertNull(filteredSpec.get("paths").get("/user/{username}"), "/user/{username}:DELETE NOT expected");
+		
+		Assert.assertNull(filteredSpec.get("definitions").get("Tag"));
+		Assert.assertNotNull(filteredSpec.get("definitions").get("Order"));
+		Assert.assertNotNull(filteredSpec.get("definitions").get("User"));
+		
 	}
 	
 	@Test

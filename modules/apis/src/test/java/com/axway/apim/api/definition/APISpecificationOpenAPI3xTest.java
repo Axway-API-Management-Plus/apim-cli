@@ -194,10 +194,10 @@ public class APISpecificationOpenAPI3xTest {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		// Include all GET-Methods from tags pet and store
-		filterConfig.addInclude(new String[] {"*:GET", "/pet/{petId}/uploadImage:POST"}, new String[] {"pet"});
-		filterConfig.addInclude(new String[] {"*:DELETE", "*:PUT", "/store/order:POST"}, new String[] {"store"});
+		filterConfig.addInclude(new String[] {"*:GET", "/pet/{petId}/uploadImage:POST"}, new String[] {"pet"}, new String[] {"Category"});
+		filterConfig.addInclude(new String[] {"*:DELETE", "*:PUT", "/store/order:POST"}, new String[] {"store"}, new String[] {"Pet", "Order"});
 		// But in general POST methods should be removed
-		filterConfig.addExclude(new String[] {"*:POST"}, null);
+		filterConfig.addExclude(new String[] {"*:POST"}, null, new String[] {"Order"});
 		
 		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
 		desiredAPISpec.setFilter(filterConfig);
@@ -225,6 +225,12 @@ public class APISpecificationOpenAPI3xTest {
 		Assert.assertNull(filteredSpec.get("paths").get("/user/login"));
 		Assert.assertNull(filteredSpec.get("paths").get("/user/logout"));
 		Assert.assertNull(filteredSpec.get("paths").get("/user"));
+		
+		Assert.assertNotNull(filteredSpec.get("components").get("schemas").get("Category"));
+		Assert.assertNotNull(filteredSpec.get("components").get("schemas").get("Pet"));
+		Assert.assertNull(filteredSpec.get("components").get("schemas").get("Order"));
+		Assert.assertNull(filteredSpec.get("components").get("schemas").get("User"));
+		Assert.assertNull(filteredSpec.get("components").get("schemas").get("ApiResponse"));
 	}
 	
 	

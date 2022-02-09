@@ -43,24 +43,49 @@ public class APISpecificationFilter {
 	}
 	
 	/**
-	 * This method is used for tests only
-	 * @param pathAndVerb the path and verb
+	 * This method is for tests only
+	 * @param pathAndVerbs an array of paths and verbs to include
+	 * @param tags an array of tags to include
 	 */
 	public void addInclude(String[] pathAndVerbs, String[] tags) {
+		addInclude(pathAndVerbs, tags, null);
+	}
+	
+	/**
+	 * This method is for tests only
+	 * @param pathAndVerbs an array of paths and verbs to exclude
+	 * @param tags an array of tags to exclude
+	 */
+	public void addExclude(String[] pathAndVerbs, String[] tags) {
+		addExclude(pathAndVerbs, tags, null);
+	}
+	
+	
+	/**
+	 * This method is for tests only
+	 * @param pathAndVerbs an array of paths and verbs to include
+	 * @param tags an array of tags to include
+	 * @param models an array of models to include
+	 */
+	public void addInclude(String[] pathAndVerbs, String[] tags, String[] models) {
 		APISpecIncludeExcludeFilter filter = new APISpecIncludeExcludeFilter();
 		if(pathAndVerbs!=null) filter.addPath(pathAndVerbs);
 		if(tags!=null) filter.addTag(tags);
+		if(models!=null) filter.addModel(models);
 		this.include.add(filter);
 	}
 	
 	/**
-	 * This method is used for tests only
-	 * @param tag the tag to include or exclude
+	 * This method is for tests only
+	 * @param pathAndVerbs an array of paths and verbs to exclude
+	 * @param tags an array of tags to exclude
+	 * @param models an array of models to exclude
 	 */
-	public void addExclude(String[] pathAndVerbs, String[] tags) {
+	public void addExclude(String[] pathAndVerbs, String[] tags, String[] models) {
 		APISpecIncludeExcludeFilter filter = new APISpecIncludeExcludeFilter();
 		if(pathAndVerbs!=null) filter.addPath(pathAndVerbs);
 		if(tags!=null) filter.addTag(tags);
+		if(models!=null) filter.addModel(models);
 		this.exclude.add(filter);
 	}
 	

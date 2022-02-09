@@ -26,6 +26,7 @@ public class OpenAPI3SpecificationFilter {
 		// If includes are given - Remove all others not defined as included
 		List<String> toBeRemoved = new ArrayList<String>();
 		List<String> pathsToBeRemoved = new ArrayList<String>();
+		List<String> modelsToBeRemoved = new ArrayList<String>();
 		// Iterate over the API specification and create a list of all paths 
 		// that must to be removed because they were not configured as included
 		Iterator<String> it = paths.keySet().iterator();
@@ -40,9 +41,9 @@ public class OpenAPI3SpecificationFilter {
 				Operation operation = getOperation4HttpMethod(operations, httpMethod);
 				List<String> tags = operation.getTags();
 				// If path OR tag is excluded, if must be removed no matter if configured as included
-				if(filter.filter(specPath, httpMethod, tags)) {
+				if(filter.filterOperations(specPath, httpMethod, tags)) {
 					toBeRemoved.add(specPath+":"+httpMethod);
-					LOG.debug("Removed excluded: " + specPath + ":"+httpMethod + " and tags: " + tags);
+					LOG.debug("Removed: " + specPath + ":"+httpMethod + " and tags: " + tags);
 				} else {
 					removePath = false;
 				}
@@ -79,6 +80,19 @@ public class OpenAPI3SpecificationFilter {
 			case "head":
 				pathItem.setHead(null);
 				break;
+			}
+		}
+		if(openAPI.getComponents()!=null && openAPI.getComponents().getSchemas()!=null) {
+			Iterator<String> schemaNamesIt = openAPI.getComponents().getSchemas().keySet().iterator();
+			while(schemaNamesIt.hasNext()) {
+				String modelName = schemaNamesIt.next();
+				if(filter.filterModel(modelName)) {
+					modelsToBeRemoved.add(modelName);
+					LOG.debug("Removed: " + modelName + " from API-Specification.");
+				}
+			}
+			for(String modelName : modelsToBeRemoved) {
+				openAPI.getComponents().getSchemas().remove(modelName);
 			}
 		}
 		LOG.info("API-Specification successfully filtered.");

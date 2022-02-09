@@ -91,7 +91,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testODataV2APIFilteredWithTags() throws AppException, IOException {
+	public void testODataV2APIFilteredWithTagsAndModels() throws AppException, IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		desiredAPISpec.setResource(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
@@ -99,7 +99,8 @@ public class APISpecificationODataTest {
 		filterConfig.addExclude(new String[] {"/Regions({Id})*:DELETE"}, null); // Should be excluded, even the tag is included
 		filterConfig.addInclude(null, new String[] {"Order_Details"});
 		filterConfig.addInclude(null, new String[] {"Products"});
-		filterConfig.addExclude(null, new String[] {"Products"}); // Must override the products tag
+		filterConfig.addExclude(null, new String[] {"Products"}, new String[] {"Summary_of_Sales_by_Quarter"}); // Must override the products tag
+		filterConfig.addInclude(null, null, new String[] {"Invoice", "Customer", "Summary_of_Sales_by_Quarter"});
 		desiredAPISpec.setFilter(filterConfig);
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "northwind-odata-v2.xml$metadata", "OData-V2-Test-API");
 		
@@ -114,6 +115,12 @@ public class APISpecificationODataTest {
 		Assert.assertNull(filteredSpec.get("paths").get("/Categories*"), "/Categories* should be filtered");
 		Assert.assertNull(filteredSpec.get("paths").get("/Products*"), "/Regions({Id}) should be filtered");
 		Assert.assertNull(filteredSpec.get("paths").get("/Employees({Id})*"), "/Employees({Id}) should be filtered");
+		
+		Assert.assertNotNull(filteredSpec.get("components").get("schemas").get("Invoice"));
+		Assert.assertNotNull(filteredSpec.get("components").get("schemas").get("Customer"));
+		Assert.assertNull(filteredSpec.get("components").get("schemas").get("Category"));
+		Assert.assertNull(filteredSpec.get("components").get("schemas").get("Sales_by_Category"));
+		Assert.assertNull(filteredSpec.get("components").get("schemas").get("Summary_of_Sales_by_Quarter"), "Must be excluded even if part of the includes");
 	}
 	
 	@Test
