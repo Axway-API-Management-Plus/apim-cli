@@ -17,10 +17,15 @@
          ],
          "exclude":[ 
          	{
-               "paths":[ "*:DELETE", "/pet/{petId}:POST" ]
-            }
+               "paths":[ "*:DELETE" ]
+            },
+			{
+				"models": [ "ApiResponse" ]
+			}
          ]
       }
    },
-   "organization":"API Development"
+   "organization":"API Development",
+   "customProperties":{
+   }
 }

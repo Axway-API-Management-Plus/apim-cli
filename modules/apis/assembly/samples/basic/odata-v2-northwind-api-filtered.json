@@ -34,8 +34,6 @@
    "descriptionManual":"This is the OData V2 [Northwind API](https://www.odata.org/odata-services). The metadata description (EDMX) has been converted by the APIM CLI to an OpenAPI 3.0.1 specification and imported as any other API into the API-Manager.  Please make sure you have configured the [OData Routing Policy](https://github.com/Axway-API-Management-Plus/odata-routing-policy). You may use an API-Custom-Property as in this API to control the OData Routing-Policy.",
    "organization":"API Development",
    "customProperties":{
-      "ODataApi":"true",
-	  "securityLevel": "public",
-	  "publicAPI": "true"
+      "ODataApi":"true"
    }
 }
