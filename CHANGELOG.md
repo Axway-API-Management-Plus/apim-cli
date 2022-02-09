@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+- Support to filter API-Specifications Models/Schemas
+
+### Changed
+- Include/Exclude filter structure changed from object to an array.
+
 ## [1.8.0] 2022-02-01
 
 ### Added
