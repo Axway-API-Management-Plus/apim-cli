@@ -141,7 +141,7 @@ public class APIImportConfigAdapter {
 				apiConfig = baseConfig;
 			}
 		} catch (MismatchedInputException e) {
-			if(e.getMessage().contains("APISpecIncludeExcludeFilter>` from Object value (token `JsonToken.START_OBJECT`)")) {
+			if(e.getMessage().contains("com.axway.apim.api.model.APISpecIncludeExcludeFilter")) {
 				throw new AppException("An error occurred while reading the API specification filters. Please note that the filter structure has changed "
 						+ "between version 1.8.0 and 1.9.0. You can find more information here: "
 						+ "https://github.com/Axway-API-Management-Plus/apim-cli/wiki/2.1.10-API-Specification#filter-api-specifications", ErrorCode.CANT_READ_CONFIG_FILE, e);
