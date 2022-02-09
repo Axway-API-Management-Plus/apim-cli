@@ -105,7 +105,7 @@ public class APISpecIncludeExcludeFilter {
 	
 	/**
 	 * This method is used for tests only
-	 * @param tag the tag to include or exclude
+	 * @param tags a list of tags to include or exclude
 	 */
 	public void addTag(String[] tags) {
 		this.tags.addAll(Arrays.asList(tags));
