@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'; # stop on all errors
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$fileLocation = Join-Path $toolsDir 'axway-apimcli-1.8.0.zip'
+$fileLocation = Join-Path $toolsDir 'axway-apimcli-1.9.0.zip'
 
 Get-ChocolateyUnzip "$fileLocation" $toolsDir
 Install-BinFile -Name "apim" -Path "$toolsDir\apim-cli-$env:chocolateyPackageVersion\scripts\apim.bat" -Command "choco"
