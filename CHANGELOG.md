@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Support to provide a list of local markdown description files that can be combined with the original description
+
 ### Fixed
 - Now the given parameter -port is trimmed to avoid a number format exception
 

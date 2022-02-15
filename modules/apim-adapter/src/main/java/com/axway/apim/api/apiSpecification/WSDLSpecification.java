@@ -54,4 +54,9 @@ public class WSDLSpecification extends APISpecification {
 		LOG.debug("No WSDL specification. Specification doesn't contain wsdl in the first 500 characters.");
 		return false;
 	}
+	
+	@Override
+	public String getDescription() {
+		return "";
+	}
 }

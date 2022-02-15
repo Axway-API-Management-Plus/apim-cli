@@ -108,6 +108,8 @@ public abstract class APISpecification {
 	
 	public abstract void configureBasepath(String backendBasepath, API api) throws AppException;
 	
+	public abstract String getDescription();
+	
 	public abstract APISpecType getAPIDefinitionType() throws AppException;
 	
 	public boolean parse(byte[] apiSpecificationContent) throws AppException {

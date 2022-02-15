@@ -38,6 +38,15 @@ public class OAS3xSpecification extends APISpecification {
 	}
 
 	@Override
+	public String getDescription() {
+		if(this.openAPI.get("info")!=null && this.openAPI.get("info").get("description")!=null) {
+			return this.openAPI.get("info").get("description").asText();
+		} else {
+			return "";
+		}
+	}
+
+	@Override
 	public byte[] getApiSpecificationContent() {
 		// Return the original given API-Spec if no filters are applied
 		if(this.filterConfig == null) return this.apiSpecificationContent;

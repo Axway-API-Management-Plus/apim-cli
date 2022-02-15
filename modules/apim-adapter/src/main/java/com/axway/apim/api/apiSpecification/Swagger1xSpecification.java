@@ -29,6 +29,15 @@ public class Swagger1xSpecification extends APISpecification {
 	}
 
 	@Override
+	public String getDescription() {
+		if(this.swagger.get("info")!=null && this.swagger.get("info").get("description")!=null) {
+			return this.swagger.get("info").get("description").asText();
+		} else {
+			return "";	
+		}
+	}
+
+	@Override
 	public void configureBasepath(String backendBasepath, API api) throws AppException {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		try {
