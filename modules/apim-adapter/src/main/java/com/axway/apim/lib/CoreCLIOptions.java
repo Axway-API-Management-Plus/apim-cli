@@ -22,7 +22,7 @@ public class CoreCLIOptions extends CLIOptions {
 		params.setStage(getValue("stage"));
 		params.setHostname(getValue("host"));
 		params.setApiBasepath(getValue("apiBasepath"));
-		params.setPort((getValue("port")!=null) ? Integer.parseInt(getValue("port")) : -1);
+		params.setPort((getValue("port")!=null) ? Integer.parseInt(getValue("port").trim()) : -1);
 		params.setUsername(getValue("username"));
 		params.setPassword(getValue("password"));
 		params.setAdminUsername(getValue("admin_username"));
