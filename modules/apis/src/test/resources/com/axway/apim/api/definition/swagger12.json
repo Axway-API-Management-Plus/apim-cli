@@ -3,6 +3,9 @@
   "swaggerVersion": "1.2",
   "basePath": "https://example.com:8443/test-api",
   "resourcePath": "/blob",
+  "info": {
+  	"description": "Swagger 1.2 Description"
+  },
   "apis": [
     {
       "path": "/blob",

@@ -3,6 +3,7 @@ package com.axway.apim.api;
 import java.util.List;
 import java.util.Map;
 
+import com.axway.apim.adapter.jackson.MarkdownLocalDeserializer;
 import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.axway.apim.adapter.jackson.RemotehostDeserializer;
 import com.axway.apim.api.apiSpecification.APISpecification;
@@ -82,7 +83,8 @@ public class API implements CustomPropertiesEntity {
 	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_PUBLISHED, API.STATE_DEPRECATED})
 	protected String descriptionUrl = null;
 	
-	protected String markdownLocal = null;
+	@JsonDeserialize( using = MarkdownLocalDeserializer.class)
+	protected List<String> markdownLocal = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
 	@JsonSetter(nulls=Nulls.SKIP)
@@ -383,11 +385,11 @@ public class API implements CustomPropertiesEntity {
 		this.descriptionUrl = descriptionUrl;
 	}
 
-	public String getMarkdownLocal() {
+	public List<String> getMarkdownLocal() {
 		return markdownLocal;
 	}
 
-	public void setMarkdownLocal(String markdownLocal) {
+	public void setMarkdownLocal(List<String> markdownLocal) {
 		this.markdownLocal = markdownLocal;
 	}
 

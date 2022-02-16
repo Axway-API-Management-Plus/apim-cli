@@ -85,4 +85,8 @@ public abstract class ODataSpecification extends APISpecification {
 		return pathToMetaData;
 	}
 
+	@Override
+	public String getDescription() {
+		return openAPI.getInfo().getDescription();
+	}
 }

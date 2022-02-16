@@ -59,4 +59,9 @@ public class WADLSpecification extends APISpecification {
 		this.wadl = new String(apiSpecificationContent);
 		return true;
 	}
+	
+	@Override
+	public String getDescription() {
+		return "";
+	}
 }

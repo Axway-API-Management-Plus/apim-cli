@@ -1,0 +1,13 @@
+	
+{
+	"name": "API with classic markdown local",
+	"path": "/api/path",
+	"state": "${state}",
+	"version": "1.0.0",
+	"organization": "API Development",
+	"descriptionType": "markdownLocal", 
+	"markdownLocal": "MyLocalMarkdown.md", 
+	"apiSpecification": {
+		"resource": "../basic/petstore.json" 
+	}
+}

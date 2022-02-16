@@ -145,6 +145,8 @@ public class APIImportConfigAdapter {
 				throw new AppException("An error occurred while reading the API specification filters. Please note that the filter structure has changed "
 						+ "between version 1.8.0 and 1.9.0. You can find more information here: "
 						+ "https://github.com/Axway-API-Management-Plus/apim-cli/wiki/2.1.10-API-Specification#filter-api-specifications", ErrorCode.CANT_READ_CONFIG_FILE, e);
+			} else {
+				throw new AppException("Error reading API-Config file(s)", "Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_CONFIG_FILE, e);
 			}
 		} catch (JsonParseException e) {
 			throw new AppException("Cannot parse API-Config file(s).", "Exception: " + e.getClass().getName() + ": " + e.getMessage(), ErrorCode.CANT_READ_JSON_PAYLOAD, e);
@@ -317,18 +319,27 @@ public class APIImportConfigAdapter {
 				throw new AppException("markdownLocal can't be null with descriptionType set to 'markdownLocal'", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
 			try {
-				File markdownFile = new File(apiConfig.getMarkdownLocal());
-				if(!markdownFile.exists()) { // The image isn't provided with an absolute path, try to read it relative to the config file
-					LOG.trace("Error reading markdown description file (absolute): '" + markdownFile.getCanonicalPath() + "'");
-					String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
-					markdownFile = new File(baseDir + "/" + apiConfig.getMarkdownLocal());
+				String markdownDescription = "";
+				String newLine = "";
+				for(String markdownFilename : apiConfig.getMarkdownLocal()) {
+					if("ORIGINAL".equals(markdownFilename)) {
+						markdownDescription += newLine + apiConfig.getApiDefinition().getDescription();
+					} else {
+						File markdownFile = new File(markdownFilename);
+						if(!markdownFile.exists()) { // The file isn't provided with an absolute path, try to read it relative to the config file
+							LOG.trace("Error reading markdown description file (absolute): '" + markdownFile.getCanonicalPath() + "'");
+							String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
+							markdownFile = new File(baseDir + "/" + markdownFilename);
+						}
+						if(!markdownFile.exists()) {
+							LOG.trace("Error reading markdown description file (relative): '" + markdownFile.getCanonicalPath() + "'");
+							throw new AppException("Error reading markdown description file: " + markdownFilename, ErrorCode.CANT_READ_CONFIG_FILE);
+						}
+						LOG.debug("Reading local markdown description file: " + markdownFile.getPath());
+						markdownDescription += newLine + new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8);
+					}
+					newLine = "\n";
 				}
-				if(!markdownFile.exists()) {
-					LOG.trace("Error reading markdown description file (relative): '" + markdownFile.getCanonicalPath() + "'");
-					throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE);
-				}
-				LOG.debug("Reading local markdown description file: " + markdownFile.getPath());
-				String markdownDescription = new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8);
 				apiConfig.setDescriptionManual(markdownDescription);
 				apiConfig.setDescriptionType("manual");
 			} catch (IOException e) {

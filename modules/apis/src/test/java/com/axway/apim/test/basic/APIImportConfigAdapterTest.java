@@ -225,4 +225,34 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		Assert.assertEquals(apiConfig.getName(), "API with API-Specification object");
 		Assert.assertEquals(apiConfig.getVersion(), "1.0.0");
 	}
+	
+	@Test
+	public void testMarkdownLocalClassic() throws AppException, ParseException {
+		EnvironmentProperties props = new EnvironmentProperties(null);
+		APIImportParams params = new APIImportParams();
+		params.setProperties(props);
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/description/1_api_with_local_mark_down_classic.json").getFile();
+
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, false, null);
+		adapter.getDesiredAPI();
+		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+		Assert.assertEquals(apiConfig.getName(), "API with classic markdown local");
+		Assert.assertEquals(apiConfig.getDescriptionManual(), "THIS IS THE API-DESCRIPTION FROM A LOCAL MARKDOWN!");
+	}
+	
+	@Test
+	public void testMarkdownLocalList() throws AppException, ParseException {
+		EnvironmentProperties props = new EnvironmentProperties(null);
+		APIImportParams params = new APIImportParams();
+		params.setProperties(props);
+		String testConfig = this.getClass().getResource("/com/axway/apim/test/files/description/1_api_with_local_mark_down_list.json").getFile();
+
+		APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, false, null);
+		adapter.getDesiredAPI();
+		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
+		Assert.assertEquals(apiConfig.getName(), "API with classic markdown local list");
+		Assert.assertEquals(apiConfig.getDescriptionManual(), "THIS IS THE API-DESCRIPTION FROM A LOCAL MARKDOWN!\n"
+				+ "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.\n"
+				+ "THIS IS THE SECOND API-DESCRIPTION FROM A LOCAL MARKDOWN!");
+	}
 }

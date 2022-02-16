@@ -41,6 +41,7 @@ public class APISpecificationODataTest {
 		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
+		Assert.assertEquals(apiDefinition.getDescription(), "The OData Service from northwind-odata-v2.xml$metadata");
 		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
 			System.out.print(new String(apiDefinition.getApiSpecificationContent(), StandardCharsets.UTF_8));
 		}

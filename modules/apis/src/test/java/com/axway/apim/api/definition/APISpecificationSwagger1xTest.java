@@ -10,9 +10,6 @@ import org.testng.annotations.Test;
 import com.axway.apim.api.apiSpecification.APISpecification;
 import com.axway.apim.api.apiSpecification.APISpecificationFactory;
 import com.axway.apim.api.apiSpecification.Swagger1xSpecification;
-import com.axway.apim.api.apiSpecification.APISpecification.APISpecType;
-import com.axway.apim.api.model.APISpecificationFilter;
-import com.axway.apim.api.model.DesiredAPISpecification;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -38,6 +35,7 @@ public class APISpecificationSwagger1xTest {
 		apiDefinition.configureBasepath("https://petstore.swagger.io", null);
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger1xSpecification, "Specification must be an Swagger12Specification");
+		Assert.assertEquals(apiDefinition.getDescription(), "Swagger 1.2 Description");
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("basePath").asText(), "https://petstore.swagger.io");
 	}

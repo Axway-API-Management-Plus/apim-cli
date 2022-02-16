@@ -5,7 +5,6 @@ import java.net.URL;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.filter.JsonNodeOpenAPI3SpecFilter;
-import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -47,6 +46,15 @@ public class Swagger2xSpecification extends APISpecification {
 	public void filterAPISpecification() {
 		if(this.filterConfig == null) return;
 		JsonNodeOpenAPI3SpecFilter.filter(swagger, filterConfig);
+	}
+
+	@Override
+	public String getDescription() {
+		if(this.swagger.get("info")!=null && this.swagger.get("info").get("description")!=null) {
+			return this.swagger.get("info").get("description").asText();
+		} else {
+			return "";
+		}
 	}
 
 	@Override
