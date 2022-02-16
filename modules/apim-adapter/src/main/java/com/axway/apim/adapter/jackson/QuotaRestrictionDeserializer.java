@@ -136,20 +136,22 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		} else {
 			restriction.setApiId("*");
 		}
-		
-		if(!node.has("method") || "*".equals(node.get("method").asText())) {
-			restriction.setMethod("*");
-		} else {
-			// Specific method defined. Translate it into the methodId
-			if(desiralizeMode == DeserializeMode.configFile) {
-				APIMethod method = apiMethodAdapter.getMethodForName(restriction.getApiId(), node.get("method").asText());
-				if(method == null) {
-					throw new AppException("Invalid quota configuration. Method: "+node.get("method").asText()+" not found for API with ID: " +restriction.getApiId(), ErrorCode.INVALID_QUOTA_CONFIG);
+		// Only required, when Quota-Restriction belongs to an application
+		if(addRestrictedAPI) {
+			if(!node.has("method") || "*".equals(node.get("method").asText())) {
+				restriction.setMethod("*");
+			} else {
+				// Specific method defined. Translate it into the methodId
+				if(desiralizeMode == DeserializeMode.configFile) {
+					APIMethod method = apiMethodAdapter.getMethodForName(restriction.getApiId(), node.get("method").asText());
+					if(method == null) {
+						throw new AppException("Invalid quota configuration. Method: "+node.get("method").asText()+" not found for API with ID: " +restriction.getApiId(), ErrorCode.INVALID_QUOTA_CONFIG);
+					}
+					restriction.setMethod(method.getId());
+				} else if (desiralizeMode == DeserializeMode.apiManagerData) {
+					// Take over the ID given by API-Manager is translated into method name in QuotaRestrictionSerializer
+					restriction.setMethod(node.get("method").asText());
 				}
-				restriction.setMethod(method.getId());
-			} else if (desiralizeMode == DeserializeMode.apiManagerData) {
-				// Take over the ID given by API-Manager is translated into method name in QuotaRestrictionSerializer
-				restriction.setMethod(node.get("method").asText());
 			}
 		}
 		
