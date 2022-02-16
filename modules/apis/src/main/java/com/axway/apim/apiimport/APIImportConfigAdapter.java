@@ -205,10 +205,10 @@ public class APIImportConfigAdapter {
 	
 	private void validateExposurePath(API apiConfig) throws AppException {
 		if(apiConfig.getPath()==null) {
-			throw new AppException("Config-Parameter: 'path' is not given", ErrorCode.CANT_READ_CONFIG_FILE);
+			throw new AppException("API-Config parameter: 'path' is missing. Please check your API-Config file.", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 		if(!apiConfig.getPath().startsWith("/")) {
-			throw new AppException("Config-Parameter: 'path' must start with a \"/\" following by a valid API-Path (e.g. /api/v1/customer).", ErrorCode.CANT_READ_CONFIG_FILE);
+			throw new AppException("API-Config parameter: 'path' must start with a \"/\" following by a valid API-Path (e.g. /api/v1/customer).", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 	}
 	
