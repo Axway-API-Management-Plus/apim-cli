@@ -251,8 +251,8 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 		adapter.getDesiredAPI();
 		DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
 		Assert.assertEquals(apiConfig.getName(), "API with classic markdown local list");
-		Assert.assertEquals(apiConfig.getDescriptionManual(), "THIS IS THE API-DESCRIPTION FROM A LOCAL MARKDOWN!\n\n"
-				+ "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.\n\n"
+		Assert.assertEquals(apiConfig.getDescriptionManual(), "THIS IS THE API-DESCRIPTION FROM A LOCAL MARKDOWN!\n"
+				+ "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.\n"
 				+ "THIS IS THE SECOND API-DESCRIPTION FROM A LOCAL MARKDOWN!");
 	}
 }

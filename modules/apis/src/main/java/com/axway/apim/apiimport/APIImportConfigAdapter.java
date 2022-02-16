@@ -320,10 +320,10 @@ public class APIImportConfigAdapter {
 			}
 			try {
 				String markdownDescription = "";
-				String newLines = "";
+				String newLine = "";
 				for(String markdownFilename : apiConfig.getMarkdownLocal()) {
 					if("ORIGINAL".equals(markdownFilename)) {
-						markdownDescription += newLines + apiConfig.getApiDefinition().getDescription();
+						markdownDescription += newLine + apiConfig.getApiDefinition().getDescription();
 					} else {
 						File markdownFile = new File(markdownFilename);
 						if(!markdownFile.exists()) { // The file isn't provided with an absolute path, try to read it relative to the config file
@@ -336,9 +336,9 @@ public class APIImportConfigAdapter {
 							throw new AppException("Error reading markdown description file: " + markdownFilename, ErrorCode.CANT_READ_CONFIG_FILE);
 						}
 						LOG.debug("Reading local markdown description file: " + markdownFile.getPath());
-						markdownDescription += newLines + new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8);
+						markdownDescription += newLine + new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8);
 					}
-					newLines = "\n\n";
+					newLine = "\n";
 				}
 				apiConfig.setDescriptionManual(markdownDescription);
 				apiConfig.setDescriptionType("manual");
