@@ -136,12 +136,11 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		} else {
 			restriction.setApiId("*");
 		}
-		// Only required, when Quota-Restriction belongs to an application
-		if(addRestrictedAPI) {
-			if(!node.has("method") || "*".equals(node.get("method").asText())) {
-				restriction.setMethod("*");
-			} else {
-				// Specific method defined. Translate it into the methodId
+		if(!node.has("method") || "*".equals(node.get("method").asText())) {
+			restriction.setMethod("*");
+		} else {
+			if(addRestrictedAPI) {
+				// Specific method defined. Translate it into the methodId, but only for applications as otherwise it is related to the API anyway
 				if(desiralizeMode == DeserializeMode.configFile) {
 					APIMethod method = apiMethodAdapter.getMethodForName(restriction.getApiId(), node.get("method").asText());
 					if(method == null) {
@@ -152,6 +151,9 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 					// Take over the ID given by API-Manager is translated into method name in QuotaRestrictionSerializer
 					restriction.setMethod(node.get("method").asText());
 				}
+			} else {
+				// Take over the given method name
+				restriction.setMethod(node.get("method").asText());
 			}
 		}
 		
