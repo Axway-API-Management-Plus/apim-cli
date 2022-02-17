@@ -132,7 +132,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 					restriction.setApiId(node.get("api").asText());
 				}
 			}
-		// No API given, which means apply the Quota to all APIs
+		// No API given, which means apply the Quota to all APIs, which only makes sense for application quotas
 		} else {
 			restriction.setApiId("*");
 		}

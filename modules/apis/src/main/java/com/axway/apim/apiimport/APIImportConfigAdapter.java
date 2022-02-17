@@ -110,7 +110,7 @@ public class APIImportConfigAdapter {
 	public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, boolean usingOrgAdmin, String stageConfig) throws AppException {
 		super();
 		SimpleModule module = new SimpleModule();
-		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile));
+		module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile, false));
 		// We would like to get back the original AppExcepption instead of a JsonMappingException
 		mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
 		mapper.registerModule(module);
