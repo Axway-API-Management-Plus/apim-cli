@@ -61,9 +61,11 @@ public class APIQuotaManager {
 			LOG.info("Updating "+type.getFiendlyName()+" quota for API: " + createdAPI.getName());
 			LOG.debug(type.getFiendlyName()+"-Restrictions: Desired: '" + desiredRestrictions+"', Actual: '" + actualRestrictions+"'");
 			// In order to compare/merge the restrictions, we must translate the desired API-Method-Names, if not a "*", into the methodId of the createdAPI
-			for(QuotaRestriction desiredRestriction : desiredRestrictions) {
-				if("*".equals(desiredRestriction.getMethod())) continue;
-				desiredRestriction.setMethod(APIManagerAdapter.getInstance().methodAdapter.getMethodForName(createdAPI.getId(), desiredRestriction.getMethod()).getId());
+			if(desiredRestrictions!=null) {
+				for(QuotaRestriction desiredRestriction : desiredRestrictions) {
+					if("*".equals(desiredRestriction.getMethod())) continue;
+					desiredRestriction.setMethod(APIManagerAdapter.getInstance().methodAdapter.getMethodForName(createdAPI.getId(), desiredRestriction.getMethod()).getId());
+				}
 			}
 			// Load the entire current default quota
 			APIQuota currentDefaultQuota = APIManagerAdapter.getInstance().quotaAdapter.getDefaultQuota(type);
