@@ -156,6 +156,8 @@ public class APIManagerQuotaAdapter {
 			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
 			
 			if(statusCode < 200 || statusCode > 299){
+				LOG.error("XXXXXXXXXXXXXXXX");
+				LOG.error("statusCode: " + statusCode + ", response: " + response + ", contains: " + response.contains("API not found"));
 				if((statusCode==102) && (response.contains("API not found")) ) {
 					LOG.warn("Got unexpected error: 'API not found' while saving quota configuration ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
 					Thread.sleep(cmd.getRetryDelay());
@@ -170,11 +172,6 @@ public class APIManagerQuotaAdapter {
 				} else {
 					throw new AppException("Can't update API-Manager Quota-Configuration. Response: '"+response+"'", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
-			}
-			
-			
-			if(statusCode < 200 || statusCode > 299){
-				throw new AppException("Can't update API-Manager Quota-Configuration. Response: '"+response+"'", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			// Force reload of this quota next time
 			applicationsQuotaCache.remove(quotaId);
