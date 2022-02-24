@@ -234,7 +234,7 @@ public class APIImportConfigAdapter {
 			this.pathToAPIDefinition=apiConfig.getApiDefinitionImport();
 			LOG.debug("Reading API Definition from configuration file");
 		} else {
-			throw new AppException("No API Definition configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
+			throw new AppException("No API Specification configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
 		}
 		apiSpecification.configureBasepath(((DesiredAPI)apiConfig).getBackendBasepath(), apiConfig);
 		apiConfig.setApiDefinition(apiSpecification);

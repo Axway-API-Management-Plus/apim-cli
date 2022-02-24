@@ -38,7 +38,7 @@ public enum ErrorCode {
 	INVALID_CLIENT_ORGANIZATIONS		(61, "At least one configured organization is invalid. Check the log file for more information."),
 	INVALID_CLIENT_APPLICATIONS			(62, "At least one configured application is invalid. Check the log file for more information."),
 	UNKNOWN_REMOTE_HOST					(63, "Unknown remote host given.", false),
-	NO_API_DEFINITION_CONFIGURED		(64, "No API Definition configured.", false),
+	NO_API_DEFINITION_CONFIGURED		(64, "No API Specification configured.", false),
 	CANT_READ_API_DEFINITION_FILE		(65, "Can't read the given API-Definition", false),
 	CANT_READ_WSDL_FILE					(66, "Can't read the given WSDL-File."),
 	API_MANAGER_LOGIN_FAILED			(67, "Login to API-Manager failed."),

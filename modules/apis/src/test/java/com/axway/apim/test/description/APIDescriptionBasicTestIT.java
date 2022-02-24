@@ -61,7 +61,7 @@ public class APIDescriptionBasicTestIT extends TestNGCitrusTestRunner {
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/description/1_api_with_manual_description.json");
 		createVariable("state", "published");
 		createVariable("descriptionType", "manual");
-		createVariable("descriptionManual", "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
+		createVariable("descriptionManual", "This is my markdown description test slightly updated!");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
 		
