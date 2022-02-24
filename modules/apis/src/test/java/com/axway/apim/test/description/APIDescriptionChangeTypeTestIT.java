@@ -2,22 +2,27 @@ package com.axway.apim.test.description;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.axway.apim.test.ImportTestAction;
+import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
+import com.consol.citrus.context.TestContext;
+import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
 @Test(testName="APIDescriptionChangeTypeTest")
-public class APIDescriptionChangeTypeTestIT extends TestNGCitrusTestDesigner {
+public class APIDescriptionChangeTypeTestIT extends TestNGCitrusTestRunner {
 	
 	@Autowired
 	private ImportTestAction swaggerImport;
 	
 	@CitrusTest(name = "APIDescriptionChangeTypeTest")
-	public void run() {
+	@Test @Parameters("context")
+	public void run(@Optional @CitrusResource TestContext context) {
 		description("Tests, that the description type can be changed");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -33,16 +38,16 @@ public class APIDescriptionChangeTypeTestIT extends TestNGCitrusTestDesigner {
 		createVariable("descriptionType", "manual");
 		createVariable("descriptionManual", "This is my manual markdown description!");
 		createVariable("expectedReturnCode", "0");
-		action(swaggerImport);
+		swaggerImport.doExecute(context);
 		
 		echo("####### Validate API: '${apiName}' has a manual description configured #######");
-		http().client("apiManager")
+		http(builder -> builder.client("apiManager")
 			.send()
 			.get("/proxies")
 			.name("api")
-			.header("Content-Type", "application/json");
+			.header("Content-Type", "application/json"));
 
-		http().client("apiManager")
+		http(builder -> builder.client("apiManager")
 			.receive()
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
@@ -50,7 +55,7 @@ public class APIDescriptionChangeTypeTestIT extends TestNGCitrusTestDesigner {
 			.validate("$.[?(@.path=='${apiPath}')].state", "published")
 			.validate("$.[?(@.path=='${apiPath}')].descriptionType", "manual")
 			.validate("$.[?(@.path=='${apiPath}')].descriptionManual", "This is my manual markdown description!")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/description/1_api_with_url_description.json");
@@ -58,23 +63,23 @@ public class APIDescriptionChangeTypeTestIT extends TestNGCitrusTestDesigner {
 		createVariable("descriptionType", "url");
 		createVariable("descriptionUrl", "https://any.url.com/serves/my/docu.md");
 		createVariable("expectedReturnCode", "0");
-		action(swaggerImport);
+		swaggerImport.doExecute(context);
 		
 		echo("####### Validate API: '${apiName}' has a manual description configured - Same API-ID #######");
-		http().client("apiManager")
+		http(builder -> builder.client("apiManager")
 			.send()
 			.get("/proxies")
 			.name("api")
-			.header("Content-Type", "application/json");
+			.header("Content-Type", "application/json"));
 
-		http().client("apiManager")
+		http(builder -> builder.client("apiManager")
 			.receive()
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
 			.validate("$.[?(@.id=='${apiId}')].state", "published")
 			.validate("$.[?(@.id=='${apiId}')].descriptionType", "url")
-			.validate("$.[?(@.id=='${apiId}')].descriptionUrl", "https://any.url.com/serves/my/docu.md");
+			.validate("$.[?(@.id=='${apiId}')].descriptionUrl", "https://any.url.com/serves/my/docu.md"));
 		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/description/1_api_with_markdown_description.json");
@@ -82,23 +87,23 @@ public class APIDescriptionChangeTypeTestIT extends TestNGCitrusTestDesigner {
 		createVariable("descriptionType", "markdown");
 		createVariable("descriptionMarkdown", "${//env.DOCUMENTS//}/api/docu.md");
 		createVariable("expectedReturnCode", "0");
-		action(swaggerImport);
+		swaggerImport.doExecute(context);
 		
 		echo("####### Validate description is now set to markdown - Same API-ID #######");
-		http().client("apiManager")
+		http(builder -> builder.client("apiManager")
 			.send()
 			.get("/proxies")
 			.name("api")
-			.header("Content-Type", "application/json");
+			.header("Content-Type", "application/json"));
 
-		http().client("apiManager")
+		http(builder -> builder.client("apiManager")
 			.receive()
 			.response(HttpStatus.OK)
 			.messageType(MessageType.JSON)
 			.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
 			.validate("$.[?(@.id=='${apiId}')].state", "published")
 			.validate("$.[?(@.id=='${apiId}')].descriptionType", "markdown") 
-			.validate("$.[?(@.id=='${apiId}')].descriptionMarkdown", "${//env.DOCUMENTS//}/api/docu.md");
+			.validate("$.[?(@.id=='${apiId}')].descriptionMarkdown", "${//env.DOCUMENTS//}/api/docu.md"));
 	}
 
 }
