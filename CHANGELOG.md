@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased] 
+
+### Fixed
+- Import of an API fails when using Method-Level quotas (See issue [#261](https://github.com/Axway-API-Management-Plus/apim-cli/issues/261))
+- Export API to JSON fails if V-Host of API contains a port (See issue [#262](https://github.com/Axway-API-Management-Plus/apim-cli/issues/262))
+- Exported quota methods now contain the method-name (operationId) instead of the internal ID
+
 ## [1.10.0] 2022-02-17
 
 ### Added

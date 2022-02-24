@@ -133,9 +133,9 @@ public class JsonAPIExporter extends APIResultHandler {
 	}
 	
 	private String getVHost(ExportAPI exportAPI) throws AppException {
-		if(exportAPI.getVhost()!=null) return exportAPI.getVhost() + File.separator;
+		if(exportAPI.getVhost()!=null) return exportAPI.getVhost().replace(":", "_") + File.separator;
 		String orgVHost = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(exportAPI.getOrganizationId()).build()).getVirtualHost();
-		if(orgVHost!=null) return orgVHost+File.separator;
+		if(orgVHost!=null) return orgVHost.replace(":", "_")+File.separator;
 		return "";
 	}
 	

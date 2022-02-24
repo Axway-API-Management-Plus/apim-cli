@@ -20,6 +20,7 @@ import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.OutboundProfile;
+import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
@@ -265,13 +266,22 @@ public class ExportAPI {
 	}
 
 
-	public APIQuota getApplicationQuota() {
-		return this.actualAPIProxy.getApplicationQuota();
+	public APIQuota getApplicationQuota() throws AppException {
+		return translateMethodIds(this.actualAPIProxy.getApplicationQuota());
 	}
 
 
-	public APIQuota getSystemQuota() {
-		return this.actualAPIProxy.getSystemQuota();
+	public APIQuota getSystemQuota() throws AppException {
+		return translateMethodIds(this.actualAPIProxy.getSystemQuota());
+	}
+	
+	private APIQuota translateMethodIds(APIQuota apiQuota) throws AppException {
+		if(apiQuota==null || apiQuota.getRestrictions()==null) return apiQuota;
+		for(QuotaRestriction restriction : apiQuota.getRestrictions()) {
+			if("*".equals(restriction.getMethod())) continue;
+			restriction.setMethod(APIManagerAdapter.getInstance().methodAdapter.getMethodForId(this.actualAPIProxy.getId(), restriction.getMethod()).getName());
+		}
+		return apiQuota;
 	}
 
 	@JsonIgnore
@@ -283,7 +293,7 @@ public class ExportAPI {
 		if(!APIManagerAdapter.hasAdminAccount()) return null; 
 		if(this.actualAPIProxy.getClientOrganizations().size()==0) return null;
 		if(this.actualAPIProxy.getClientOrganizations().size()==1 && 
-				this.actualAPIProxy.getClientOrganizations().get(0).equals(getOrganization())) 
+				this.actualAPIProxy.getClientOrganizations().get(0).getName().equals(getOrganization())) 
 			return null;
 		List<String> orgs = new ArrayList<String>();
 		for(Organization org : this.actualAPIProxy.getClientOrganizations()) {

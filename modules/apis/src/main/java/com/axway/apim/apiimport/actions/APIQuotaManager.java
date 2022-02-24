@@ -60,11 +60,16 @@ public class APIQuotaManager {
 		} else {
 			LOG.info("Updating "+type.getFiendlyName()+" quota for API: " + createdAPI.getName());
 			LOG.debug(type.getFiendlyName()+"-Restrictions: Desired: '" + desiredRestrictions+"', Actual: '" + actualRestrictions+"'");
+			// In order to compare/merge the restrictions, we must translate the desired API-Method-Names, if not a "*", into the methodId of the createdAPI
+			for(QuotaRestriction desiredRestriction : desiredRestrictions) {
+				if("*".equals(desiredRestriction.getMethod())) continue;
+				desiredRestriction.setMethod(APIManagerAdapter.getInstance().methodAdapter.getMethodForName(createdAPI.getId(), desiredRestriction.getMethod()).getId());
+			}
 			// Load the entire current default quota
 			APIQuota currentDefaultQuota = APIManagerAdapter.getInstance().quotaAdapter.getDefaultQuota(type);
 			List<QuotaRestriction> mergedRestrictions = addOrMergeRestriction(actualRestrictions, desiredRestrictions);
-			// Update the API-ID for the API-Restrictions as the API might be re-created.
 			for(QuotaRestriction restriction : mergedRestrictions) {
+				// Update the API-ID for the API-Restrictions as the API might be re-created.
 				restriction.setApiId(createdAPI.getId());
 				if(restriction.getMethod().equals("*")) continue;
 				// Additionally, we have to change the methodId
@@ -109,8 +114,9 @@ public class APIQuotaManager {
 				desiredRestriction.setApiId(null);
 				// And compare each desired restriction, if it is already included in the existing restrictions
 				for(QuotaRestriction existingRestriction : mergedRestrictions) {
+					// It's considered as the same restriction when type, method, period & per are equal
 					if(desiredRestriction.isSameRestriction(existingRestriction, true)) {
-						// If it the same restriction, we need to update the restriction configuration
+						// If it is the same restriction, we need to update the restriction configuration
 						if(existingRestriction.getType()==QuotaRestrictiontype.throttle) {
 							existingRestriction.getConfig().put("messages", desiredRestriction.getConfig().get("messages"));
 						} else {
