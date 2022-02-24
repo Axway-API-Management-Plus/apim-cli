@@ -154,13 +154,32 @@ public class APIManagerQuotaAdapter {
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
+			
+			if(statusCode < 200 || statusCode > 299){
+				if((statusCode==102) && (response.contains("API not found")) ) {
+					LOG.warn("Got unexpected error: 'API not found' while saving quota configuration ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
+					Thread.sleep(cmd.getRetryDelay());
+					httpResponse = request.execute();
+					response = EntityUtils.toString(httpResponse.getEntity());
+					statusCode = httpResponse.getStatusLine().getStatusCode();
+					if(statusCode < 200 || statusCode > 299){
+						throw new AppException("Can't update API-Manager Quota-Configuration. Response: '"+response+"'", ErrorCode.API_MANAGER_COMMUNICATION);
+					} else {
+						LOG.info("Successfully created API-Access on retry. Received Status-Code: " +statusCode );
+					}
+				} else {
+					throw new AppException("Can't update API-Manager Quota-Configuration. Response: '"+response+"'", ErrorCode.API_MANAGER_COMMUNICATION);
+				}
+			}
+			
+			
 			if(statusCode < 200 || statusCode > 299){
 				throw new AppException("Can't update API-Manager Quota-Configuration. Response: '"+response+"'", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			// Force reload of this quota next time
 			applicationsQuotaCache.remove(quotaId);
 			return mapper.readValue(response, APIQuota.class);
-		} catch (URISyntaxException | UnsupportedOperationException | IOException e) {
+		} catch (Exception e) {
 			throw new AppException("Can't update Quota-Configuration in API-Manager.", ErrorCode.UNXPECTED_ERROR, e);
 		} finally {
 			try {
