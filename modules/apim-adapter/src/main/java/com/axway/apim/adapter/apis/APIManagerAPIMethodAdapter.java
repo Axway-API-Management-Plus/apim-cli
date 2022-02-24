@@ -81,7 +81,7 @@ public class APIManagerAPIMethodAdapter {
 				return method;
 			}
 		}
-		throw new AppException("No operation found with operationId: '"+methodName+"'", ErrorCode.API_OPERATION_NOT_FOUND);
+		throw new AppException("No operation found with name: '"+methodName+"'", ErrorCode.API_OPERATION_NOT_FOUND);
 	}
 	
 	public APIMethod getMethodForId(String apiId, String methodId) throws AppException {
