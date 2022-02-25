@@ -23,7 +23,7 @@
         "type": "throttle",
         "config": {
           "messages": "2000",
-          "period": "month",
+          "period": "minute",
           "per": "1"
         }
       },

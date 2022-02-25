@@ -27,7 +27,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 	
 	public enum DeserializeMode {apiManagerData, configFile};
 	
-	private final static String validPeriods = "month|week|day|hour|minute|second";
+	private final static String validPeriods = "week|day|hour|minute|second";
 	
 	private DeserializeMode desiralizeMode;
 	
