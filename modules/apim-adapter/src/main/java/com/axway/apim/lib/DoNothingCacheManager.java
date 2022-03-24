@@ -1,5 +1,6 @@
 package com.axway.apim.lib;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +43,7 @@ public class DoNothingCacheManager implements CacheManager {
 		}
 		@Override
 		public Iterator iterator() {
-			return null;
+			return Collections.emptyIterator();
 		}
 		@Override
 		public void put(Object arg0, Object arg1) throws CacheWritingException {
