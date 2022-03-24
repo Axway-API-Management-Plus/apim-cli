@@ -55,7 +55,7 @@ import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.DoNothingCacheManager;
-import com.axway.apim.lib.FilteredCacheManager;
+import com.axway.apim.lib.APIMCLICacheManager;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -104,7 +104,7 @@ public class APIManagerAdapter {
 	
 	private static CoreParameters cmd;
 	
-	public static FilteredCacheManager cacheManager;
+	public static APIMCLICacheManager cacheManager;
 	
 	public APIManagerConfigAdapter configAdapter;
 	public APIManagerCustomPropertiesAdapter customPropertiesAdapter;
@@ -342,7 +342,7 @@ public class APIManagerAdapter {
 			return APIManagerAdapter.cacheManager;
 		}
 		if(CoreParameters.getInstance().isIgnoreCache()) {
-			APIManagerAdapter.cacheManager = new FilteredCacheManager(new DoNothingCacheManager());
+			APIManagerAdapter.cacheManager = new APIMCLICacheManager(new DoNothingCacheManager());
 		} else {
 			URL cacheConfigUrl;
 			File cacheConfigFile = null;
@@ -366,7 +366,7 @@ public class APIManagerAdapter {
 			do {
 				try {
 					CacheManager ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
-					APIManagerAdapter.cacheManager = new FilteredCacheManager(ehcacheManager);
+					APIManagerAdapter.cacheManager = new APIMCLICacheManager(ehcacheManager);
 					APIManagerAdapter.cacheManager.init();
 				} catch (StateTransitionException e) {
 					LOG.warn("Error initiliazing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 3 seconds. Attempts: "+initAttempts+"/"+maxAttempts);

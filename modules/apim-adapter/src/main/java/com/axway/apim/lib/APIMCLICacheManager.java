@@ -24,15 +24,15 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-public class FilteredCacheManager implements CacheManager {
+public class APIMCLICacheManager implements CacheManager {
 	
-	private static Logger LOG = LoggerFactory.getLogger(FilteredCacheManager.class);
+	private static Logger LOG = LoggerFactory.getLogger(APIMCLICacheManager.class);
 	
 	private CacheManager cacheManager;
 	
 	private List<String> enabledCaches;
 
-	public FilteredCacheManager(CacheManager cacheManager) {
+	public APIMCLICacheManager(CacheManager cacheManager) {
 		super();
 		this.cacheManager = cacheManager;
 	}
@@ -73,14 +73,17 @@ public class FilteredCacheManager implements CacheManager {
 
 	@Override
 	public <K, V> Cache<K, V> getCache(String alias, Class<K> keyType, Class<V> valueType) {
+		String cachePrefix = CoreParameters.getInstance().getHostname() + CoreParameters.getInstance().getPort(); 
 		if(this.enabledCaches==null) {
 			// Caches not specified, return requested cache 
 			// however, cacheManager might be a DoNothingCacheManager if ignoreCache is set
-			return cacheManager.getCache(alias, keyType, valueType);
+			Cache<K, V> plainCache = cacheManager.getCache(alias, keyType, valueType);
+			return new APIMCLICache<K, V>(plainCache, cachePrefix);
 		} else {
 			if(this.enabledCaches.contains(alias)) {
 				LOG.debug("Using cache: " + alias + " as it is enabled.");
-				return cacheManager.getCache(alias, keyType, valueType);
+				Cache<K, V> plainCache = cacheManager.getCache(alias, keyType, valueType);
+				return new APIMCLICache<K, V>(plainCache, cachePrefix);
 			} else {
 				Cache<K, V> doNothingCache = new DoNothingCacheManager.DoNothingCache<K, V>();
 				return doNothingCache;
