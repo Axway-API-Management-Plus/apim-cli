@@ -279,6 +279,30 @@ public class APIFilterTest {
 		addPolicy(testAPI, "Response Policy 1", PolicyType.RESPONSE);
 		assertTrue(filter.filter(testAPI), "API must NOT match to pattern 'Not used policy' as it is using 'Response Policy 1'");
 	}
+
+	@Test
+	public void testPolicyFilterWithSpecialCaracter() throws AppException {
+		APIFilter filter = new APIFilter.Builder()
+			.hasPolicyName("*(Policy)*")
+			.build();
+		API testAPI = new API();
+		addPolicy(testAPI, "Request (Policy) 1", PolicyType.REQUEST);
+		assertFalse(filter.filter(testAPI), "API must match to pattern '*(Policy)*'");
+
+		filter = new APIFilter.Builder(){}
+			.hasPolicyName("()*{}()[].+?^$|")
+			.build();
+		testAPI = new API();
+		addPolicy(testAPI, "(){}()[].+?^$|", PolicyType.REQUEST);
+		assertFalse(filter.filter(testAPI), "API must match to pattern '*(Policy)*'");
+
+		filter = new APIFilter.Builder(){}
+			.hasPolicyName("*(policy)*")
+			.build();
+		testAPI = new API();
+		addPolicy(testAPI, "Request policy", PolicyType.REQUEST);
+		assertTrue(filter.filter(testAPI), "API must not match to pattern '*(Policy)*'");
+	}
 	
 	@Test
 	public void testTagFilter() throws AppException {
