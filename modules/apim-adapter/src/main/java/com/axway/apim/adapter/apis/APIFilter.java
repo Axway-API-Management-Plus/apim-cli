@@ -923,7 +923,10 @@ public class APIFilter implements CustomPropertiesFilter {
 	}
 	
 	private static boolean isPolicyUsed(API api, String policyName) throws AppException {
-		Pattern pattern = Pattern.compile(policyName.toLowerCase().replace("*", ".*"));
+		// pattern for escaping special regex characters (except *)
+		Pattern SPECIAL_REGEX_CHARS = Pattern.compile("[{}()\\[\\].+?^$\\\\|]");
+		String escaped = SPECIAL_REGEX_CHARS.matcher(policyName).replaceAll("\\\\$0");
+		Pattern pattern = Pattern.compile(escaped.toLowerCase().replace("*", ".*"));
 		if(api.getOutboundProfiles()!=null) {
 			Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
 			while(it.hasNext()) {
@@ -950,7 +953,7 @@ public class APIFilter implements CustomPropertiesFilter {
 							for(SecurityDevice device : securityProfile.getDevices()) {
 								if(device.getType()==DeviceType.authPolicy) {
 									String securityPolicy = device.getProperties().get("authenticationPolicy");
-									if(securityPolicy==null) return false;
+									if(securityPolicy==null) return false;					
 									Matcher matcher = pattern.matcher(Utils.getExternalPolicyName(securityPolicy).toLowerCase());
 									if(matcher.matches()) {
 										return true;

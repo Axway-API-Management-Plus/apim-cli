@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Now underlying cache is based on API-Manager Hostname and Port (See issue [#265](https://github.com/Axway-API-Management-Plus/apim-cli/issues/265))
+- Problem on filtering API with policy name (See issue [#268](https://github.com/Axway-API-Management-Plus/apim-cli/issues/268))
 
 ## [1.10.1] 2022-02-25
 
