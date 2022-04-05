@@ -7,8 +7,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        :raised_hand: 
-        The handling procedure for issues has changed. If you need immediate support, please open an Axway support case instead. 
+        :raised_hand: The handling procedure for issues has changed. If you need immediate support, please open an Axway support case instead. 
+        
         ---
         
         Before opening a bug report, please search for the behaviour in the existing issues. 
