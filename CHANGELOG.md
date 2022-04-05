@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Now underlying cache is based on API-Manager Hostname and Port (See issue [#265](https://github.com/Axway-API-Management-Plus/apim-cli/issues/265))
 - Problem on filtering API with policy name (See issue [#268](https://github.com/Axway-API-Management-Plus/apim-cli/issues/268))
 
+### Security
+- Updated Jackson Databind from version 2.13.0 to 2.13.2.1 to fix CWE-787
+
 ## [1.10.1] 2022-02-25
 
 ### Fixed
