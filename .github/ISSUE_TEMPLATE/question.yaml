@@ -2,7 +2,7 @@ name: Question
 description: Ask a question concerning the APIM-CLI
 labels: [question]
 assignees:
-  - @apim-cli-support
+  - apim-cli-support
 body:
   - type: markdown
     attributes:
