@@ -1,8 +1,6 @@
 name: Question
 description: Ask a question concerning the APIM-CLI
 labels: [question]
-assignees:
-  - @Axway-API-Management-Plus/apim-cli-support
 body:
   - type: markdown
     attributes:
