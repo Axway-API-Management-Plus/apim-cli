@@ -1,0 +1,25 @@
+name: Question
+description: Ask a question concerning the APIM-CLI
+labels: [question]
+assignees:
+  - cwiechmann
+body:
+  - type: input
+    id: apimcliVersion
+    attributes:
+      label: APIM-CLI version
+      description: "The APIM-CLI version you are using"
+      placeholder: "1.10.1"
+  - type: input
+    id: apimanagementVersion
+    attributes:
+      label: API-Management version
+      description: "If relevant to the question, the API-Management version you are using"
+      placeholder: "7.7.0.20220228"
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: Your question about the solution or a specific problem
+    validations:
+      required: true

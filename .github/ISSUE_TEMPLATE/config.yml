@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Axway Support
+    url: https://support.axway.com
+    about: If you are using an Axway officially supported version you may also create an Axway support case.
