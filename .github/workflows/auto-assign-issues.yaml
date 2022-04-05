@@ -3,6 +3,7 @@ name: Issue assignment
 on:
     issues:
         types: [opened]
+    workflow_dispatch:
 
 jobs:
     auto-assign:
@@ -12,5 +13,5 @@ jobs:
               uses: pozil/auto-assign-issue@v1.4.0
               with:
                 repo-token: ${{ secrets.AUTO_ASSIGN_ISSUES_PAT }}
-                teams: @Axway-API-Management-Plus/apim-cli-support
+                teams: "@apim-cli-support"
                 numOfAssignee: 2
