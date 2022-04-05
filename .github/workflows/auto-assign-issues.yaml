@@ -1,0 +1,16 @@
+name: Issue assignment
+
+on:
+    issues:
+        types: [opened]
+
+jobs:
+    auto-assign:
+        runs-on: ubuntu-latest
+        steps:
+            - name: 'Auto-assign issue'
+              uses: pozil/auto-assign-issue@v1.4.0
+              with:
+                repo-token: ${{ secrets.AUTO_ASSIGN_ISSUES_PAT }}
+                teams: @Axway-API-Management-Plus/apim-cli-support
+                numOfAssignee: 2
