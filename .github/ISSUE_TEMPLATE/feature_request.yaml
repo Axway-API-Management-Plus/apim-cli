@@ -2,7 +2,7 @@ name: Feature request
 description: Tell us what you need and why in the API-Mgr. CLI
 labels: [enhancement]
 assignees:
-  - cwiechmann
+  - apim-cli-support
 body:
   - type: markdown
     attributes:
