@@ -12,5 +12,5 @@ jobs:
               uses: pozil/auto-assign-issue@v1.4.0
               with:
                 repo-token: ${{ secrets.AUTO_ASSIGN_ISSUES_PAT }}
-                teams: @Axway-API-Management-Plus/apim-cli-support
+                teams: "@Axway-API-Management-Plus/apim-cli-support"
                 numOfAssignee: 2
