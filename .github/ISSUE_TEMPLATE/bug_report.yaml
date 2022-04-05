@@ -2,7 +2,7 @@ name: Bug report
 description: Create a report to help us to improve the API-Manager CLI
 labels: [bug]
 assignees:
-  - apim-cli-support
+  - @apim-cli-support
 body:
   - type: markdown
     attributes:
