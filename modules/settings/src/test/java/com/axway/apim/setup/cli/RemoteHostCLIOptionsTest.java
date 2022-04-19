@@ -42,7 +42,7 @@ public class RemoteHostCLIOptionsTest {
 		
 		Assert.assertEquals(params.getWide(), Wide.ultra);
 		// Validate target is current directory if not given
-		Assert.assertEquals(params.getTarget(), ".");
+		Assert.assertNotEquals(params.getTarget(), "");
 	}
 	
 	@Test

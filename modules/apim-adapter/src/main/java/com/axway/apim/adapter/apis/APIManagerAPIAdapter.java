@@ -489,28 +489,46 @@ public class APIManagerAPIAdapter {
 	
 	private void addOriginalAPIDefinitionFromAPIM(API api, APIFilter filter) throws AppException {
 		if(!filter.isIncludeOriginalAPIDefinition()) return;
+		String[] feAPISpecVersions = {"3.0", "2.0", "1.1"};
 		URI uri;
 		APISpecification apiDefinition;
 		HttpResponse httpResponse = null;
 		try {
-			if(filter.isUseFEAPIDefinition()) {
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/discovery/swagger/api/id/"+api.getId())
-						.setParameter("swaggerVersion", "2.0").build();
-				LOG.debug("Loading API-Definition from FE-API: ");
-			} else {
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/"+api.getApiId()+"/download")
-						.setParameter("original", "true").build();
+			for(String specVersion : feAPISpecVersions) {
+				if(filter.isUseFEAPIDefinition()) {
+					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/discovery/swagger/api/id/"+api.getId())
+							.setParameter("swaggerVersion", specVersion).build();
+					LOG.debug("Get API-Specification with version "+specVersion+" from Frontend-API.");
+				} else {
+					uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/"+api.getApiId()+"/download")
+							.setParameter("original", "true").build();
+				}
+				RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+				httpResponse=getRequest.execute();
+				int statusCode = httpResponse.getStatusLine().getStatusCode();
+				if(statusCode != 200){
+					if(filter.isUseFEAPIDefinition()) {
+						LOG.debug("Failed to download API-Specification with version "+specVersion+" from Frontend-API. Received Status-Code: " +statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
+						continue;
+					} else {
+						LOG.error("Failed to download original API-Specification. You may use the toggle -useFEAPIDefinition to download the Frontend-API specification instead.");
+						// No need to continue when trying to download the original API-Specification
+						break;
+					}
+				}
+				if(filter.isUseFEAPIDefinition()) {
+					LOG.info("Successfully downloaded API-Specification with version "+specVersion+" from Frontend-API.");
+				}
+				String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
+				String origFilename = "Unkown filename";
+				if(httpResponse.containsHeader("Content-Disposition")) {
+					origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
+				}
+				apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), api.getName(), filter.isFailOnError(), false);
+				addBackendResourcePath(api, apiDefinition, filter.isUseFEAPIDefinition());
+				api.setApiDefinition(apiDefinition);
+				break;
 			}
-			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
-			httpResponse=getRequest.execute();
-			String res = EntityUtils.toString(httpResponse.getEntity(),StandardCharsets.UTF_8);
-			String origFilename = "Unkown filename";
-			if(httpResponse.containsHeader("Content-Disposition")) {
-				origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
-			}
-			apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=")+9), api.getName(), filter.isFailOnError(), false);
-			addBackendResourcePath(api, apiDefinition, filter.isUseFEAPIDefinition());
-			api.setApiDefinition(apiDefinition);
 		} catch (Exception e) {
 			throw new AppException("Cannot parse API-Definition for API: '" + api.getName() + "' ("+api.getVersion()+") on path: '"+api.getPath()+"'", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {

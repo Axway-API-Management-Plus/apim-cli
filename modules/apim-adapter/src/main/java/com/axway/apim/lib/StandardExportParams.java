@@ -1,5 +1,7 @@
 package com.axway.apim.lib;
 
+import java.nio.file.Paths;
+
 public class StandardExportParams extends CoreParameters {
 	
 	public static enum Wide {
@@ -61,7 +63,7 @@ public class StandardExportParams extends CoreParameters {
 	}
 
 	public String getTarget() {
-		if(this.target==null) return ".";
+		if(this.target==null) return Paths.get("").toAbsolutePath().toString();
 		return target;
 	}
 

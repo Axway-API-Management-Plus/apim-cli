@@ -55,7 +55,7 @@ public class DATAPIExporter extends APIResultHandler {
 	private void saveAPILocally(API api) throws AppException {
 		String apiPath = getAPIExportFolder(api.getPath());
 		File localFolder = new File(this.givenExportFolder +File.separator+ getVHost(api) + apiPath);
-		LOG.info("Going to export API into folder: " + localFolder);
+		LOG.debug("Going to export API: '"+api.toStringShort()+"' into folder: " + localFolder);
 		if(localFolder.exists()) {
 			if(params.isDeleteTarget()) {
 				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
@@ -82,7 +82,7 @@ public class DATAPIExporter extends APIResultHandler {
 			throw new AppException("Can't save API-DAT file locally: " + targetFile,
 					ErrorCode.UNXPECTED_ERROR, e);
 		}
-		LOG.info("Successfully exported API as DAT-File into folder: " + localFolder.getAbsolutePath());
+		LOG.info("Successfully exported API: "+api.toStringShort()+" as DAT-File into folder: " + localFolder.getAbsolutePath());
 	}
 	
 	private String getVHost(API api) throws AppException {

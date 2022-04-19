@@ -471,6 +471,10 @@ public class API implements CustomPropertiesEntity {
 	public String toStringHuman() {
 		return getName() + " ("+getVersion()+") exposed on path: " + getPath();
 	}
+	
+	public String toStringShort() {
+		return getName() + " ("+getVersion()+")";
+	}
 
 	public String getApiDefinitionImport() {
 		return null;
