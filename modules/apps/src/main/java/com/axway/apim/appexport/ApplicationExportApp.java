@@ -103,6 +103,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			}
 		} catch (AppException e) {
 			e.logException(LOG);
+			result.setError(new ErrorCodeMapper().getMapedErrorCode(e.getError()));
 			return result;
 		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
@@ -120,10 +121,11 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		// We need to clean some Singleton-Instances, as tests are running in the same JVM
 		APIManagerAdapter.deleteInstance();
 		APIMHttpClient.deleteInstances();
+		
+		APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
 
-		APIMgrAppsAdapter appAdapter = new APIMgrAppsAdapter();
 		ApplicationExporter exporter = ApplicationExporter.create(exportImpl, params, result);
-		List<ClientApplication> apps = appAdapter.getApplications(exporter.getFilter(), true);
+		List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
 		if(apps.size()==0) {
 			if(LOG.isDebugEnabled()) {
 				LOG.info("No applications found using filter: " + exporter.getFilter());
