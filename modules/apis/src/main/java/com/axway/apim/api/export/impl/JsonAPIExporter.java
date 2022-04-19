@@ -72,7 +72,7 @@ public class JsonAPIExporter extends APIResultHandler {
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {
 		String apiPath = getAPIExportFolder(exportAPI.getPath());
 		File localFolder = new File(this.givenExportFolder +File.separator+ getVHost(exportAPI) + apiPath);
-		LOG.info("Going to export API into folder: " + localFolder);
+		LOG.debug("Going to export API: '"+exportAPI.toStringShort()+"' into folder: " + localFolder);
 		if(localFolder.exists()) {
 			if(params.isDeleteTarget()) {
 				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
@@ -123,7 +123,7 @@ public class JsonAPIExporter extends APIResultHandler {
 		if(exportAPI.getCaCerts()!=null && !exportAPI.getCaCerts().isEmpty()) {
 			storeCaCerts(localFolder, exportAPI.getCaCerts());
 		}
-		LOG.info("Successfully exported API into folder: " + localFolder.getAbsolutePath());
+		LOG.info("Successfully exported API: '"+exportAPI.toStringShort()+"' into folder: " + localFolder.getAbsolutePath());
 		if(!APIManagerAdapter.hasAdminAccount()) {
 			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
 			LOG.warn("- No Quotas has been exported for the API");

@@ -340,4 +340,8 @@ public class ExportAPI {
 			return this.getServiceProfiles().get("_default").getBasePath();	
 		}
 	}
+	
+	public String toStringShort() {
+		return this.actualAPIProxy.toStringShort();
+	}
 }
