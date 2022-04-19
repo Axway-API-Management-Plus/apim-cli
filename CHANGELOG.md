@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Now underlying cache is based on API-Manager Hostname and Port (See issue [#265](https://github.com/Axway-API-Management-Plus/apim-cli/issues/265))
 - Problem on filtering API with policy name (See issue [#268](https://github.com/Axway-API-Management-Plus/apim-cli/issues/268))
+- Application export always returned error code 0 (See issue [#278](https://github.com/Axway-API-Management-Plus/apim-cli/issues/278))
 
 ### Changed
 - Now, when using toggle: -useFEAPIDefinition it is no longer using swaggerVersion 2.0 by default, instead it tries to download the spec using version 3.0, 2.0 and 1.1
