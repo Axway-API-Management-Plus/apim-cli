@@ -117,7 +117,7 @@ public class APIMgrAppsAdapter {
 				applicationsCache.put(filter.getApplicationId(), response);
 			}
 		} catch (Exception e) {
-			throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+			throw new AppException("Can't initialize API-Manager App-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
 				if(httpResponse!=null) 
