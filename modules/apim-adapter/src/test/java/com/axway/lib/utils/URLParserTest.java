@@ -44,4 +44,12 @@ public class URLParserTest {
 		String urlToAPIDefinition = "dadasdsa@https://petstore.swagger.io/v2/swagger.json";
 		assertThrows(AppException.class, () -> {new URLParser(urlToAPIDefinition);});
 	}
+	
+	@Test
+	public void testPasswordWithAt() throws AppException {
+		String urlToAPIDefinition = "user@axway.com/abc@12345@https://petstore.swagger.io/v2/swagger.json";
+		URLParser parser = new URLParser(urlToAPIDefinition);
+		Assert.assertEquals(parser.getUsername(), "user@axway.com");
+		Assert.assertEquals(parser.getPassword(), "abc@12345");
+	}
 }

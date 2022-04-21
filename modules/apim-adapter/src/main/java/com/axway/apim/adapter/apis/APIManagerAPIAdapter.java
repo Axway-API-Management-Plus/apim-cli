@@ -60,6 +60,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.URLParser;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
@@ -873,9 +874,10 @@ public class APIManagerAPIAdapter {
 		} else {
 			completeWsdlUrl = api.getApiDefinition().getApiSpecificationFile();
 		}
-		wsdlUrl = extractURI(completeWsdlUrl);
-		username=extractUsername(completeWsdlUrl);
-		pass=extractPassword(completeWsdlUrl);
+		URLParser parser = new URLParser(completeWsdlUrl);
+		wsdlUrl = parser.getUri();
+		username = parser.getUsername();
+		pass = parser.getPassword();
 
 		try {
 			URIBuilder uriBuilder = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/apirepo/importFromUrl/")
@@ -1140,34 +1142,6 @@ public class APIManagerAPIAdapter {
 		}
 		filterFields += "]";
 		return filterFields;
-	}
-	
-	private String extractUsername(String url) {
-		String[] temp = url.split("@");
-		if(temp.length==2) {
-			return temp[0].substring(0, temp[0].indexOf("/"));
-		}
-		return null;
-	}
-	
-	private String extractPassword(String url) {
-		String[] temp = url.split("@");
-		if(temp.length==2) {
-			return temp[0].substring(temp[0].indexOf("/")+1);
-		}
-		return null;
-	}
-	
-	private String extractURI(String url) throws AppException
-	{
-		String[] temp = url.split("@");
-		if(temp.length==1) {
-			return temp[0];
-		} else if(temp.length==2) {
-			return temp[1];
-		} else {
-			throw new AppException("WSDL-URL has an invalid format. ", ErrorCode.CANT_READ_WSDL_FILE);
-		}
 	}
 	
 	public APIManagerAPIAdapter setAPIManagerResponse(APIFilter filter, String apiManagerResponse) {
