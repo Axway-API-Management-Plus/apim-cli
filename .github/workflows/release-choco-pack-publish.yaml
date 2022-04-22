@@ -7,9 +7,6 @@ on:
 jobs:
   publish-choco-package:
     name: Publish Choco package
-    defaults:
-      run:
-        working-directory: 'tools/choco/axway-apim-cli'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -25,14 +22,15 @@ jobs:
     - name: Move releas to tools
       run: |
         ls -l
-        mv axway-apimcli-${{ github.event.release.tag_name }}.zip tools
+        ls -l tools/choco/axway-apim-cli
+        mv tools/choco/axway-apim-cli/axway-apimcli-${{ github.event.release.tag_name }}.zip tools/choco/axway-apim-cli/tools
         ls -l tools
     - name: Adjust Nuspec version
       run: |
-        sed -i 's|<version>.*</version>|<version>${{ github.event.release.tag_name }}</version>|g' axway-apim-cli.nuspec
-        cat axway-apim-cli.nuspec
-        sed -i "s/\$fileLocation = Join-Path \$toolsDir 'axway-apimcli-.*.zip'/\$fileLocation = Join-Path \$toolsDir 'axway-apimcli-${{ github.event.release.tag_name }}.zip'"/g tools/chocolateyinstall.ps1
-        cat tools/chocolateyinstall.ps1
+        sed -i 's|<version>.*</version>|<version>${{ github.event.release.tag_name }}</version>|g' tools/choco/axway-apim-cli/axway-apim-cli.nuspec
+        cat tools/choco/axway-apim-cli/axway-apim-cli.nuspec
+        sed -i "s/\$fileLocation = Join-Path \$toolsDir 'axway-apimcli-.*.zip'/\$fileLocation = Join-Path \$toolsDir 'axway-apimcli-${{ github.event.release.tag_name }}.zip'"/g tools/choco/axway-apim-cli/tools/chocolateyinstall.ps1
+        cat tools/choco/axway-apim-cli/tools/chocolateyinstall.ps1
     - uses: crazy-max/ghaction-chocolatey@v1
       name: Choco pack
       with:
@@ -40,4 +38,4 @@ jobs:
     - uses: crazy-max/ghaction-chocolatey@v1
       name: Choco push
       with:
-        args: push --api-key ${{ secrets.CHOCO_API_KEY }} axway-apim-cli.${{ github.event.release.tag_name }}.nupkg
+        args: push --api-key ${{ secrets.CHOCO_API_KEY }} tools/choco/axway-apim-cli/axway-apim-cli.${{ github.event.release.tag_name }}.nupkg
