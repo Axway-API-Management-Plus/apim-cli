@@ -14,6 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       name: Check-Out
+    - name: Debug
+      uses: hmarr/debug-action@v1.0.0
     - name: Fetch release package
       uses: wyozi/download-gh-release-asset@master
       with:
