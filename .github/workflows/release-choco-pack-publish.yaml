@@ -1,0 +1,41 @@
+name: Publish Choco package
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish-choco-package:
+    name: Publish Choco package
+    defaults:
+      run:
+        working-directory: 'tools/choco/axway-apim-cli'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      name: Check-Out
+    - name: Fetch release package
+      uses: wyozi/download-gh-release-asset@master
+      with:
+        args: axway-apimcli-${{ github.event.release.tag_name }}.zip 
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+    - name: Move releas to tools
+      run: |
+        ls -l
+        mv axway-apimcli-${{ github.event.release.tag_name }}.zip tools
+        ls -l tools
+    - name: Adjust Nuspec version
+      run: |
+        sed "/<version>.*</version>/ s/<version>${{ github.event.release.tag_name }}</version>/g;" axway-apim-cli.nuspec
+        cat axway-apim-cli.nuspec
+        sed "/$fileLocation = Join-Path $toolsDir 'axway-apimcli-1.10.0.zip'/ s/$fileLocation = Join-Path $toolsDir 'axway-apimcli-1.10.0.zip'/g;" tools/chocolateyinstall.ps1
+        cat tools/chocolateyinstall.ps1
+    - uses: crazy-max/ghaction-chocolatey@v1
+      name: Choco pack
+      with:
+        args: pack
+    - uses: crazy-max/ghaction-chocolatey@v1
+      name: Choco push
+      with:
+        args: push --api-key ${{ secrets.CHOCO_API_KEY }} axway-apim-cli.${{ github.event.release.tag_name }}.nupkg
