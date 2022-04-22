@@ -35,7 +35,11 @@ jobs:
       name: Choco pack 
       with:
         args: pack tools/choco/axway-apim-cli/axway-apim-cli.nuspec
+    - name: Push changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: 'Choco version updated'
     - uses: crazy-max/ghaction-chocolatey@v1
       name: Choco push
       with:
-        args: push --api-key ${{ secrets.CHOCO_API_KEY }} tools/choco/axway-apim-cli/axway-apim-cli.${{ github.event.release.tag_name }}.nupkg
+        args: push --api-key ${{ secrets.CHOCO_API_KEY }} axway-apim-cli.${{ github.event.release.tag_name }}.nupkg
