@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Now, when using toggle: -useFEAPIDefinition it is no longer using swaggerVersion 2.0 by default, instead it tries to download the spec using version 3.0, 2.0 and 1.1
+### Changed
+- Updated jackson-* from 2.13.0 to 2.13.2
+- Updated commons-csv from 1.8 to 1.9.0
+- Updated swagger-models from 2.1.11 to 2.2.0
 
 ### Security
 - Updated Jackson Databind from version 2.13.0 to 2.13.2.1 to fix CWE-787
