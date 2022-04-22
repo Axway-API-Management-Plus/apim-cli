@@ -13,7 +13,9 @@ are ready for the next version. This means that the develop branch is actually s
 
 - A Windows, Linux or Mac workstation with Git installed.  
 - Write access on master and develop on https://github.com/Axway-API-Management-Plus/apim-cli
-- A Sonatype user with access to the repository (https://central.sonatype.org/publish/publish-guide)
+- A Sonatype user with access to https://s01.oss.sonatype.org
+  - And access to project: `com.github.axway-api-management-plus`
+  - Create a JIRA-Ticket to get access (https://central.sonatype.org/publish/publish-guide)
 - GnuPG for Code-Signing (e.g. https://gnupg.org/)
 - Apache Maven 3.6.3 or higher
 
