@@ -2,7 +2,7 @@ name: Publish Choco package
 
 on:
   release:
-    types: [published, prereleased, edited]
+    types: [published, prereleased, edited, unpublished]
 
 jobs:
   publish-choco-package:
