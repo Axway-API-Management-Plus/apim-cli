@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.11.0] 2022-04-22
 
 ### Fixed
 - Now underlying cache is based on API-Manager Hostname and Port (See issue [#265](https://github.com/Axway-API-Management-Plus/apim-cli/issues/265))
