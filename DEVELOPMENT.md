@@ -50,24 +50,14 @@ __5. Create the release__
   ```
   
 __6. Create a release on GitHub__  
-  - based on the create tag
-  - use the description from the previous release and modify it
+  - Select the tag created by Maven
+  - Use the description from the previous release and modify it
+  - It also pushes the Chocolately package
   - upload the created release files to GitHub: 
     ```
     target/checkout/modules/distribution/target/axway-apimcli-1.11.0.zip
     target/checkout/modules/distribution/target/axway-apimcli-1.11.0.tar.gz
     ```
-    
-__7. Create the Chocolatey package__  
-  ```sh
-  cp target/checkout/modules/distribution/target/axway-apimcli-1.11.0.zip tools/choco/axway-apim-cli/tools
-  # Adjust the version number in: 
-  tools/choco/axway-apim-cli/axway-apim-cli.nuspec
-  # Create the chocolately package
-  choco pack
-  # Push the package
-  choco push --api-key <api-key-goes-here> axway-apim-cli.1.11.0.nupkg
-  ```
   
 __8. Commit all changes and merge master into develop__
   ```
