@@ -12,13 +12,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.api.model.DesiredAPISpecification;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.HTTPClient;
 import com.axway.apim.lib.utils.URLParser;
 import com.axway.apim.lib.utils.Utils;
 
@@ -159,7 +156,10 @@ public class APISpecificationFactory {
 		String uri = url.getUri();
 		String username = url.getUsername();
 		String password = url.getPassword();
-		CloseableHttpClient httpclient = Utils.createHttpClient(uri, username, password);
+		CloseableHttpResponse httpResponse = null;
+		
+		HTTPClient httpClient = new HTTPClient(uri, username, password);
+
 		try {
 			RequestConfig config = RequestConfig.custom()
 					.setRelativeRedirectsAllowed(true)
@@ -167,29 +167,22 @@ public class APISpecificationFactory {
 					.build();
 			HttpGet httpGet = new HttpGet(uri);
 			httpGet.setConfig(config);
-			
-            ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
 
-                @Override
-                public String handleResponse(
-                        final HttpResponse response) throws ClientProtocolException, IOException {
-                    int status = response.getStatusLine().getStatusCode();
-                    if (status >= 200 && status < 300) {
-                        HttpEntity entity = response.getEntity();
-                        return entity != null ? EntityUtils.toString(entity,StandardCharsets.UTF_8) : null;
-                    } else {
-                        throw new ClientProtocolException("Unexpected response status: " + status);
-                    }
-                }
-
-            };
-            String responseBody = httpclient.execute(httpGet, responseHandler);
-            return new ByteArrayInputStream(responseBody.getBytes(StandardCharsets.UTF_8));
+            httpResponse = httpClient.execute(httpGet);
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            String response = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+            if (statusCode >= 200 && statusCode < 300) {
+            	return new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8));
+            } else {
+            	throw new AppException("Cannot load API-Specification from URI. Received Status-Code: " + statusCode + ", Response: '" + response + "'", 
+            			ErrorCode.CANT_READ_API_DEFINITION_FILE);
+            }
 		} catch (Exception e) {
-			throw new AppException("Cannot load API-Definition from URI: "+uri, ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
+			throw new AppException("Cannot load API-Specification from URI: "+uri, ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
 		} finally {
 			try {
-				httpclient.close();
+				httpClient.close();
+				httpResponse.close();
 			} catch (Exception ignore) {}
 		}
 	}

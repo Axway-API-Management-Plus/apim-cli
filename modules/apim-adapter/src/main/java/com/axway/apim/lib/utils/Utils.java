@@ -323,42 +323,6 @@ public class Utils {
 		return api.getName() + " " + api.getVersion() + " ("+api.getVersion()+")";
 	}
 	
-	public static CloseableHttpClient createHttpClient(String uri, String username, String password) throws AppException {
-		HttpClientBuilder httpClientBuilder = HttpClients.custom();
-		try {
-			addBasicAuthCredential(uri, username, password, httpClientBuilder);
-			addSSLContext(uri, httpClientBuilder);
-			return httpClientBuilder.build();
-		} catch (Exception e) {
-			throw new AppException("Error during create http client for retrieving ...", ErrorCode.CANT_CREATE_HTTP_CLIENT);
-		}
-	}
-
-	private static void addSSLContext(String uri, HttpClientBuilder httpClientBuilder) throws KeyManagementException,
-			NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException {
-		if (isHttpsUri(uri)) {
-			SSLConnectionSocketFactory sslCtx = createSSLContext();
-			if (sslCtx!=null) {
-				httpClientBuilder.setSSLSocketFactory(sslCtx);
-			}
-		}
-	}
-
-	private static void addBasicAuthCredential(String uri, String username, String password,
-			HttpClientBuilder httpClientBuilder) {
-		//if(this.apiConfig instanceof DesiredTestOnlyAPI) return; // Don't do that when unit-testing
-		if(username!=null) {
-			LOG.info("Loading API-Definition from: " + uri + " ("+username+")");
-			CredentialsProvider credsProvider = new BasicCredentialsProvider();
-			credsProvider.setCredentials(
-		            new AuthScope(AuthScope.ANY),
-		            new UsernamePasswordCredentials(username, password));
-			httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
-		} else {
-			LOG.info("Loading API-Definition from: " + uri);
-		}
-	}
-	
 	public static boolean isHttpUri(String pathToAPIDefinition) {
 		String httpUri = pathToAPIDefinition.substring(pathToAPIDefinition.indexOf("@")+1);
 		return( httpUri.startsWith("http://") || httpUri.startsWith("https://"));
@@ -366,37 +330,5 @@ public class Utils {
 	
 	public static boolean isHttpsUri(String uri) {
 		return( uri.startsWith("https://") );
-	}
-	
-	private static SSLConnectionSocketFactory createSSLContext() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException {
-		SSLContextBuilder builder = new SSLContextBuilder();
-		builder.loadTrustMaterial(null, new TrustAllStrategy());
-		
-		String keyStorePath=System.getProperty("javax.net.ssl.keyStore","");
-		if (StringUtils.isNotEmpty(keyStorePath)) {
-			String keyStorePassword=System.getProperty("javax.net.ssl.keyStorePassword","");
-			if (StringUtils.isNotEmpty(keyStorePassword)) {
-				String keystoreType=System.getProperty("javax.net.ssl.keyStoreType",KeyStore.getDefaultType());
-				LOG.debug("Reading keystore from {}",keyStorePath);
-				KeyStore ks = KeyStore.getInstance(keystoreType);
-				ks.load(new FileInputStream(new File(keyStorePath)), keyStorePassword.toCharArray());				
-				builder.loadKeyMaterial(ks,keyStorePassword.toCharArray());
-			}
-		} else {
-			LOG.debug("NO javax.net.ssl.keyStore property.");
-		}
-		String [] tlsProts = getAcceptedTLSProtocols();
-		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-				builder.build(),
-                tlsProts,
-                null,
-                new NoopHostnameVerifier());
-		return sslsf;
-	}
-
-	private static String[] getAcceptedTLSProtocols() {
-		String protocols = System.getProperty("https.protocols","TLSv1.2"); //default TLSv1.2
-		LOG.debug("https protocols: {}",protocols);
-		return protocols.split(",");
 	}
 }
