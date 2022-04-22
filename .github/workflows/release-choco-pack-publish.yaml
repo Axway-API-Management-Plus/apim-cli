@@ -23,7 +23,7 @@ jobs:
       run: |
         ls -l
         ls -l tools/choco/axway-apim-cli
-        mv tools/choco/axway-apim-cli/axway-apimcli-${{ github.event.release.tag_name }}.zip tools/choco/axway-apim-cli/tools
+        mv axway-apimcli-${{ github.event.release.tag_name }}.zip tools/choco/axway-apim-cli/tools
         ls -l tools
     - name: Adjust Nuspec version
       run: |
