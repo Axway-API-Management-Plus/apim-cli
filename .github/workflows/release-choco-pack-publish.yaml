@@ -11,20 +11,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       name: Check-Out
-    - name: Debug
-      uses: hmarr/debug-action@v1.0.0
     - name: Fetch release package
       uses: wyozi/download-gh-release-asset@master
       with:
         args: axway-apimcli-${{ github.event.release.tag_name }}.zip 
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-    - name: Move releas to tools
+    - name: Move release to tools
       run: |
-        ls -l
-        ls -l tools/choco/axway-apim-cli
         mv axway-apimcli-${{ github.event.release.tag_name }}.zip tools/choco/axway-apim-cli/tools
-        ls -l tools
+        ls -l tools/choco/axway-apim-cli/tools
     - name: Adjust Nuspec version
       run: |
         sed -i 's|<version>.*</version>|<version>${{ github.event.release.tag_name }}</version>|g' tools/choco/axway-apim-cli/axway-apim-cli.nuspec
@@ -35,10 +31,6 @@ jobs:
       name: Choco pack 
       with:
         args: pack tools/choco/axway-apim-cli/axway-apim-cli.nuspec
-    - name: Push changes
-      uses: EndBug/add-and-commit@v9
-      with:
-        message: 'Choco version updated'
     - uses: crazy-max/ghaction-chocolatey@v1
       name: Choco push
       with:
