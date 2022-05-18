@@ -125,7 +125,7 @@ public class CSVAPIExporter extends APIResultHandler {
 	private String createFileName() throws AppException {
 		DateFormat df = new SimpleDateFormat("ddMMyyyy-HHmm");
 		String dateTime = df.format(new Date());
-		String host = params.getHostname();
+		String host = params.getAPIManagerURL().getHost();
 		if(params.getStage()!=null) {
 			host = params.getStage();
 		}

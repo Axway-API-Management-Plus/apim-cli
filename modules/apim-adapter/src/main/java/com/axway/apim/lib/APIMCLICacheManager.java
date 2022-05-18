@@ -73,7 +73,12 @@ public class APIMCLICacheManager implements CacheManager {
 
 	@Override
 	public <K, V> Cache<K, V> getCache(String alias, Class<K> keyType, Class<V> valueType) {
-		String cachePrefix = CoreParameters.getInstance().getHostname() + CoreParameters.getInstance().getPort(); 
+		String cachePrefix;
+		try {
+			cachePrefix = CoreParameters.getInstance().getAPIManagerURL().toString();
+		} catch (AppException e) {
+			throw new RuntimeException(e);
+		} 
 		if(this.enabledCaches==null) {
 			// Caches not specified, return requested cache 
 			// however, cacheManager might be a DoNothingCacheManager if ignoreCache is set

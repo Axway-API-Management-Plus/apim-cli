@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TagMap<K, V> extends LinkedHashMap<String, String[]> {
 
-	protected ObjectMapper objectMapper = new ObjectMapper();
 	/**
 	 * 
 	 */

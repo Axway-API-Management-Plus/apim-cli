@@ -263,7 +263,7 @@ public class APIManagerOrganizationAdapter {
 	public Organization getOrg(OrgFilter filter) throws AppException {
 		List<Organization> orgs = getOrgs(filter);
 		if(orgs.size()>1) {
-			throw new AppException("No unique Organization found", ErrorCode.UNKNOWN_API);
+			throw new AppException("No unique Organization found for filter: " + filter, ErrorCode.UNKNOWN_API);
 		}
 		if(orgs.size()==0) {
 			LOG.info("No organization found using filter: " + filter);

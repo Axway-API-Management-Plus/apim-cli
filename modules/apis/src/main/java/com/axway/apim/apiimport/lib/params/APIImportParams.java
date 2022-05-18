@@ -9,7 +9,7 @@ public class APIImportParams extends StandardImportParams implements Parameters 
 	private Boolean forceUpdate;
 	private Boolean useFEAPIDefinition;
 	private Boolean validateRemoteHost;
-	private Boolean updateOnly;
+	private Boolean updateOnly = false;
 	
 	private Boolean changeOrganization = false; 
 	

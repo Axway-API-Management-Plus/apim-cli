@@ -72,19 +72,14 @@ public class APIMHttpClient {
 	
 	private APIMHttpClient(boolean adminInstance) throws AppException {
 		CoreParameters params = CoreParameters.getInstance();
-		if(adminInstance) {
-			
-			createConnection("https://"+params.getHostname()+":"+params.getPort());
-		} else {
-			createConnection("https://"+params.getHostname()+":"+params.getPort());
-		}
+		createConnection(params.getAPIManagerURL());
 	}
 
-	private void createConnection(String apiManagerURL) throws AppException {
+	private void createConnection(URI uri) throws AppException {
 		PoolingHttpClientConnectionManager cm;
 		HttpHost targetHost;
 		
-		URI uri = URI.create(apiManagerURL);
+		
 		SSLContextBuilder builder = new SSLContextBuilder();
 		try {
 			builder.loadTrustMaterial(null, new TrustAllStrategy());
@@ -125,7 +120,7 @@ public class APIMHttpClient {
 				clientBuilder.setRoutePlanner(routePlanner);
 				if(params.getProxyUsername()!=null) {
 					CredentialsProvider credentialsPovider = new BasicCredentialsProvider();
-					credentialsPovider.setCredentials(new AuthScope(params.getProxyHost(), params.getPort()), new UsernamePasswordCredentials(params.getProxyUsername(), params.getProxyPassword()));
+					credentialsPovider.setCredentials(new AuthScope(params.getProxyHost(), uri.getPort()), new UsernamePasswordCredentials(params.getProxyUsername(), params.getProxyPassword()));
 					clientBuilder.setDefaultCredentialsProvider(credentialsPovider);
 				}
 			}

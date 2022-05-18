@@ -23,7 +23,7 @@ public class OrgCLIOptionsTest {
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		
 		// Validate App-Import parameters
 		Assert.assertEquals(params.getConfig(), "myOrgConfig.json");
@@ -39,7 +39,7 @@ public class OrgCLIOptionsTest {
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		
 		// Validate standard export parameters are included
 		Assert.assertEquals(params.getWide(), Wide.ultra);
@@ -60,7 +60,7 @@ public class OrgCLIOptionsTest {
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		
 		// Validate Org-Import parameters
 		Assert.assertEquals(params.getName(), "*My organization*");

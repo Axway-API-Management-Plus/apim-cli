@@ -16,10 +16,9 @@ public class CoreCLIOptionsTest {
 		CLIOptions options = SampleCLIOptions.create(args);
 		CoreParameters params = (CoreParameters) options.getParams();
 		
-		Assert.assertEquals(params.getHostname(), "api-env");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://api-env:8888");
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getPort(), 8888);
 		Assert.assertEquals(params.getApimCLIHome(), "My-home-is-my-castle");
 		Assert.assertEquals(params.getClearCache(), "ALL");
 		Assert.assertEquals(params.getReturnCodeMapping(), "10:0");
@@ -28,6 +27,14 @@ public class CoreCLIOptionsTest {
 		Assert.assertTrue(params.isIgnoreCache());
 		Assert.assertTrue(params.isIgnoreAdminAccount());
 		Assert.assertEquals(params.getRetryDelay(), 10000);
+	}
+	
+	@Test
+	public void testManagerURLParameter() throws AppException {
+		String[] args = {"-apimanagerUrl", "https://manager.k8s.com/some/path", "-u", "apiadmin", "-p", "changeme"};
+		CLIOptions options = SampleCLIOptions.create(args);
+		CoreParameters params = (CoreParameters) options.getParams();
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://manager.k8s.com/some/path");
 	}
 	
 	@Test
@@ -57,7 +64,7 @@ public class CoreCLIOptionsTest {
 		CLIOptions options = SampleCLIOptions.create(args);
 		CoreParameters params = (CoreParameters) options.getParams();
 		
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		Assert.assertEquals(params.getProperties().get("myTestVariable"), "resolvedToSomething"); // from env.properties
 	}
 	

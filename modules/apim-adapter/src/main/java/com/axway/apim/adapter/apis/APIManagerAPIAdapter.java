@@ -188,7 +188,7 @@ public class APIManagerAPIAdapter {
 		}
 	}
 	
-	URI getAPIRequestUri(APIFilter filter) throws URISyntaxException {		
+	URI getAPIRequestUri(APIFilter filter) throws URISyntaxException, AppException {		
 		String requestedId = "";
 		if(filter==null) filter = new APIFilter.Builder().build();
 		if(filter.getId()!=null) {
@@ -593,7 +593,7 @@ public class APIManagerAPIAdapter {
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
 		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies/").build();
+			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/proxies").build();
 			entity = new StringEntity("{\"apiId\":\"" + api.getApiId() + "\",\"organizationId\":\"" + api.getOrganization().getId() + "\"}", ContentType.APPLICATION_JSON);
 			
 			RestAPICall request = new POSTRequest(entity, uri);
@@ -601,7 +601,7 @@ public class APIManagerAPIAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			if(statusCode != 201){
-				LOG.error("Error creating API-Proxy (FE-API). Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
+				LOG.error("Error creating API-Proxy (FE-API) using URI: "+uri+". Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
 				throw new AppException("Error creating API-Proxy (FE-API). Received Status-Code: " +statusCode, ErrorCode.CANT_CREATE_API_PROXY);
 			}
 			API apiProxy =  mapper.readValue(response, API.class);
@@ -934,7 +934,7 @@ public class APIManagerAPIAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity());
 			if(statusCode != 201){
-				LOG.error("Error importing API-Specification ("+api.getApiDefinition().getAPIDefinitionType().getNiceName()+") to create Backend-API. Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
+				LOG.error("Error importing API-Specification ("+api.getApiDefinition().getAPIDefinitionType().getNiceName()+") to create Backend-API using URI: "+uri+". Received Status-Code: " +statusCode+ ", Response: '" + response + "'");
 				throw new AppException("Can't import API-Specification to create Backend-API.", ErrorCode.CANT_CREATE_BE_API);
 			}
 			JsonNode jsonNode = mapper.readTree(response);

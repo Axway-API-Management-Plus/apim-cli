@@ -96,7 +96,7 @@ public class APIManagerQuotaAdapter {
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
 			if( statusCode != 200){
-				throw new AppException("Can't get API-Manager Quota-Configuration. Got status code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+				throw new AppException("Can't read API-Manager Quota-Configuration. Got status code: " + statusCode + " for request: " + uri, ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			this.apiManagerResponse.put(quotaId,response);
 			if(!Quota.APPLICATION_DEFAULT.getQuotaId().equals(quotaId) && !Quota.SYSTEM_DEFAULT.getQuotaId().equals(quotaId)) {

@@ -1,5 +1,7 @@
 package com.axway.apim.lib;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +40,7 @@ public class CoreParameters implements Parameters {
 	
 	public static String DEFAULT_API_BASEPATH = "/api/portal/v1.3";
 	
-	private String apiManagerUrl = null;
+	private URI apiManagerUrl = null;
 	
 	private static CoreParameters instance;
 	
@@ -151,16 +153,20 @@ public class CoreParameters implements Parameters {
 		this.hostname = hostname;
 	}
 
-	public String getHostname() {
-		if(hostname!=null) return hostname;
-		return getFromProperties("host");
+	public String getHostname2() throws URISyntaxException {
+		if(this.apiManagerUrl != null) {
+			return this.apiManagerUrl.getHost();
+		} else {
+			if(hostname!=null) return hostname;
+			return getFromProperties("host");
+		}
 	}
 
 	public void setPort(int port) {
 		this.port = port;
 	}
 	
-	public int getPort() {
+	public int getPort2() {
 		if(port==-1) {
 			if(getFromProperties("port")!=null) {
 				return Integer.parseInt(getFromProperties("port"));
@@ -310,12 +316,25 @@ public class CoreParameters implements Parameters {
 		if(clientOrgsMode==null) return; // Stick with the default
 		this.clientOrgsMode = clientOrgsMode;
 	}
-
-	public String getAPIManagerURL() {
-		if(apiManagerUrl==null) {
-			apiManagerUrl = "https://"+this.getHostname()+":"+this.getPort();
+	
+	public void setAPIManagerURL(String apiManagerUrl) throws AppException  {
+		if(apiManagerUrl == null) return;
+		try {
+			this.apiManagerUrl = new URI(apiManagerUrl);
+		} catch (URISyntaxException e) {
+			throw new AppException("Error parsing up API-Manager URL: " + apiManagerUrl, ErrorCode.INVALID_PARAMETER, e);
 		}
-		return apiManagerUrl;
+	}
+
+	public URI getAPIManagerURL() throws AppException  {
+		try {
+			if(apiManagerUrl==null) {
+					apiManagerUrl = new URI("https://"+this.getHostname2()+":"+this.getPort2());
+			}
+			return apiManagerUrl;
+		} catch (URISyntaxException e) {
+			throw new AppException("Error setting up API-Manager URL", ErrorCode.INVALID_PARAMETER, e);
+		}
 	}
 	
 	public Boolean isIgnoreAdminAccount() {
@@ -496,9 +515,9 @@ public class CoreParameters implements Parameters {
 			parameterMissing = true;
 			LOG.error("Required parameter: 'password' or 'admin_password' is missing.");
 		}
-		if(getHostname()==null) {
+		if(getAPIManagerURL()==null) {
 			parameterMissing = true;
-			LOG.error("Required parameter: 'host' is missing.");
+			LOG.error("Required parameter: apimanagerUrl is missing.");
 		}
 		if(parameterMissing) {
 			LOG.error("Missing required parameters. Use either Command-Line-Options or Environment.Properties to provided required parameters.");

@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+- New parameter apimanagerUrl added, which can be used instead of host and port. 
+
+### Fixed
+- APIM-CLI was not able to connect to API-Manager running on GKE using ingress class: gce-internal due to the port 443 part of the host header
+- Logging improved for failed REST-API requests
+
 ## [1.11.0] 2022-04-22
 
 ### Fixed

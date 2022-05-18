@@ -31,7 +31,7 @@ public class APIImportCLIOptionsTest {
 		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 	}
 	
 	@Test
@@ -41,7 +41,7 @@ public class APIImportCLIOptionsTest {
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		Assert.assertEquals(params.getClientOrgsMode(), Mode.replace);
 		Assert.assertEquals(params.getClientAppsMode(), Mode.replace);
 		Assert.assertEquals(params.getQuotaMode(), Mode.replace);

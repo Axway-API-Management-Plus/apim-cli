@@ -24,7 +24,7 @@ public class UserCLIOptionsTest {
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		
 		// Validate App-Import parameters
 		Assert.assertEquals(params.getConfig(), "myUserConfig.json");
@@ -39,7 +39,7 @@ public class UserCLIOptionsTest {
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		
 		// Validate standard export parameters are included
 		Assert.assertEquals(params.getWide(), Wide.standard);
@@ -66,7 +66,7 @@ public class UserCLIOptionsTest {
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		
 		// Validate user filter parameters
 		Assert.assertEquals(params.getId(), "UUID-ID-OF-THE-USER");

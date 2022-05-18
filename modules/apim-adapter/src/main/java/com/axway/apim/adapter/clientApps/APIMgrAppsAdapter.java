@@ -126,7 +126,7 @@ public class APIMgrAppsAdapter {
 		}
 	}
 	
-	URI getApplicationsUri(ClientAppFilter filter) throws URISyntaxException {		
+	URI getApplicationsUri(ClientAppFilter filter) throws URISyntaxException, AppException {		
 		String requestedId = "";
 		if(filter==null) filter = new ClientAppFilter.Builder().build();
 		if(filter.getApplicationId()!=null) {

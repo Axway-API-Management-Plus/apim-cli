@@ -30,7 +30,7 @@ public class APIExportCLIOptionsTest {
 		APIExportParams params = (APIExportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		
 		Assert.assertEquals(params.getWide(), Wide.wide);
 		Assert.assertTrue(params.isDeleteTarget());
@@ -57,7 +57,7 @@ public class APIExportCLIOptionsTest {
 		APIExportParams params = (APIExportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		
 		Assert.assertEquals(params.getWide(), Wide.ultra);
 		// Validate target is current directory if not given
@@ -72,7 +72,7 @@ public class APIExportCLIOptionsTest {
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		
 		// Validate wide is is using standard as default
 		Assert.assertEquals(params.getWide(), Wide.standard);
@@ -96,7 +96,7 @@ public class APIExportCLIOptionsTest {
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		
 		// Validate an API-Filter parameters are included
 		Assert.assertEquals(params.getApiPath(), "/api/v1/greet");
@@ -113,7 +113,7 @@ public class APIExportCLIOptionsTest {
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		
 		// Validate an API-Filter parameters are included
 		Assert.assertEquals(params.getApiPath(), "/api/v1/to/be/upgraded");
@@ -144,7 +144,7 @@ public class APIExportCLIOptionsTest {
 		// Validate core parameters are included
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 		
 		// Validate an API-Filter parameters are included
 		Assert.assertEquals(params.getApiPath(), "/api/v1/some");
@@ -228,6 +228,6 @@ public class APIExportCLIOptionsTest {
 		// Check base parameters to make sure, all parameters up to the root are parsed
 		Assert.assertEquals(params.getUsername(), "apiadmin");
 		Assert.assertEquals(params.getPassword(), "changeme");
-		Assert.assertEquals(params.getHostname(), "localhost");
+		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 	}
 }

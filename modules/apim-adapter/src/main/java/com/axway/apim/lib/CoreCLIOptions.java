@@ -21,6 +21,7 @@ public class CoreCLIOptions extends CLIOptions {
 		params.setApimCLIHome(getValue("apimCLIHome"));
 		params.setStage(getValue("stage"));
 		params.setHostname(getValue("host"));
+		params.setAPIManagerURL(getValue("apimanagerUrl"));
 		params.setApiBasepath(getValue("apiBasepath"));
 		params.setPort((getValue("port")!=null) ? Integer.parseInt(getValue("port").trim()) : -1);
 		params.setUsername(getValue("username"));
@@ -72,6 +73,10 @@ public class CoreCLIOptions extends CLIOptions {
 		option = new Option("h", "host", true, "The API-Manager hostname the API should be imported");
 		option.setRequired(false);
 		option.setArgName("api-host");
+		cliOptions.addOption(option);
+		
+		option = new Option("apimanagerUrl", true, "Instead of using host and port, you can set the entire API-Manager URL. Host and Port will be ignored if set.");
+		option.setArgName("https://manager.domain.com");
 		cliOptions.addOption(option);
 
 		option = new Option("port", true, "Optional parameter to declare the API-Manager port. Defaults to 8075.");
