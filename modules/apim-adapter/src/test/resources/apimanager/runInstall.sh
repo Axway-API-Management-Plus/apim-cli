@@ -16,7 +16,7 @@ installerVersion=$(( $(echo "$installerInfo" | cut -c 19-23 | tr -d .) ))
 #Strip out year ie 2020-01-30 = 2020
 installerDate=$(( $(echo "$installerInfo" | cut -c 37-41) ))
 
-disabled_components="analytics,policystudio,configurationstudio,qstart,cassandra"
+disabled_components="analytics,policystudio,configurationstudio,qstart,cassandra,agentsConfiguration"
 #Only add apitester to components in versions earlier than 7.7.2020
 if [ $installerVersion -lt 770 ] || [ $installerDate -lt 2020 ]
 then
@@ -26,6 +26,7 @@ fi
 echo 'Performing install steps...'
 cd /opt && \
     ./APIGateway_Install.run \
+    	--acceptGeneralConditions yes \
         --mode unattended \
         --unattendedmodeui none \
         --setup_type complete \
