@@ -51,5 +51,4 @@ cd /opt && \
         /opt/Axway/apigateway/system/conf/threat-protection/SpiderLabs-owasp-modsecurity-crs-2.2.9-7-g3e6782b.zip \
         /opt/Axway/apigateway/system/conf/oracle-em \
         /opt/Axway/apigateway/system/conf/migrate \
-        /opt/Axway/apigateway/samples \
         /opt/Axway/apigateway/tools/sdk-generator
