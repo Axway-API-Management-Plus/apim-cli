@@ -43,11 +43,13 @@ case "$version" in
 	7.7-20220530)
 		fedFile="swagger-promote-7.7-20220530.fed"
 		installer="APIGateway_7.7.20220530_Install_linux-x86-64_BN02.run"
-		dockerScripts="apigw-emt-scripts-2.4.0-20220222.150412-10.tar.gz";;
+		dockerScripts="apigw-emt-scripts-2.5.0.tar.gz"
+		dockerScriptsDir="apigw-emt-scripts-2.5.0";;
 	7.7-20220228)
 		fedFile="swagger-promote-7.7-20220228.fed"
 		installer="apigw-installer-7.7.0.20220228-1-linux64.run"
-		dockerScripts="apigw-emt-scripts-2.4.0-20220222.150412-10.tar.gz";;
+		dockerScripts="apigw-emt-scripts-2.4.0-20220222.150412-10.tar.gz"
+		dockerScriptsDir="apigw-emt-scripts-2.4.0-SNAPSHOT";;
 	7.7-20211130)
 		fedFile="swagger-promote-7.7-20211130.fed"
 		installer="apigw-installer-7.7.0.20211130-1-linux64.run";;
@@ -122,18 +124,20 @@ else
 	exit 99
 fi
 
-
-cd *emt*
+if [[ ! -z "$dockerScriptsDir" ]]; then
+	cd "$dockerScriptsDir"
+else 
+	cd *emt*
+fi
 
 echo "Using reduced runInstall.sh"
 cp -v $testSources/runInstall.sh Dockerfiles/gateway-base/scripts/runInstall.sh
 
 ./gen_domain_cert.py --default-cert --force
 echo "########### Create Base-Image        ###################"
-./build_base_image.py --installer=../$installer --os=centos7
+./build_base_image.py --installer=../$installer --os=centos7 --out-image apigw-base:$version
 echo "########### Create API-Gateway-Image ###################"
-./build_gw_image.py --license=../multiple.lic --default-cert --fed=$testSources/$fedFile --merge-dir $testSources/merge-dir/apigateway --out-image=api-gw-mgr:$version
+./build_gw_image.py --license=../multiple.lic --default-cert --fed=$testSources/$fedFile --merge-dir $testSources/merge-dir/apigateway --parent-image apigw-base:$version --out-image=docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:$version
 
-docker tag api-gw-mgr:$version docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:$version
 echo "########### Push Image               ###################"
 docker push docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:$version
