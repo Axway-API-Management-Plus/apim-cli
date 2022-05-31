@@ -669,7 +669,7 @@ public class APIManagerAPIAdapter {
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
-				LOG.error("Error deleting API-Proxy. Response-Code: "+statusCode + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+				LOG.error("Error deleting API-Proxy using URI: "+uri+". Response-Code: "+statusCode + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
 				throw new AppException("Error deleting API-Proxy. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			LOG.info("API: "+api.getName()+" "+api.getVersion()+" ("+api.getId()+")" + " successfully deleted");
@@ -694,7 +694,7 @@ public class APIManagerAPIAdapter {
 			httpResponse = request.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 204){
-				LOG.error("Error deleting Backend-API. Response-Code: "+statusCode + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+				LOG.error("Error deleting Backend-API using URI: "+uri+". Response-Code: "+statusCode + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
 				throw new AppException("Error deleting Backend-API. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 		} catch (Exception e) {

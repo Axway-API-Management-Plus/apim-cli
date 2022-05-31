@@ -39,8 +39,6 @@ import com.axway.apim.lib.utils.rest.APIMHttpClient;
 public class APIImportApp implements APIMCLIServiceProvider {
 
 	private static Logger LOG = LoggerFactory.getLogger(APIImportApp.class);
-	
-	ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 
 	public static void main(String args[]) { 
 		int rc = importAPI(args);
@@ -59,34 +57,10 @@ public class APIImportApp implements APIMCLIServiceProvider {
 		APIImportApp apiImportApp = new APIImportApp();
 		return apiImportApp.importAPI(params);
 	}
-	
-	public int importAPI(APIImportParams params) {
-		// Creates an API-Representation of the desired API
-		try {
-			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params);
-			API desiredAPI = configAdapter.getDesiredAPI();
-			return importAPI(desiredAPI,  params);
-		} catch (AppException ap) {
-			APIPropertiesExport.getInstance().store(); // Try to create it, even 
-			
-			if(!ap.getError().equals(ErrorCode.NO_CHANGE)) {
-				RollbackHandler rollback = RollbackHandler.getInstance();
-				rollback.executeRollback();
-			}
-			ap.logException(LOG);
-			return errorCodeMapper.getMapedErrorCode(ap.getError()).getCode();
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			return ErrorCode.UNXPECTED_ERROR.getCode();
-		} finally {
-			try {
-				APIManagerAdapter.deleteInstance();
-			} catch (AppException ignore) { }
-		}
-	}
 
-	public int importAPI(API desiredAPI, APIImportParams  params) {
-		try {
+	public int importAPI(APIImportParams params) {
+		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+		try {		
 			params.validateRequiredParameters();
 			// Clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
@@ -96,7 +70,11 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
 			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
- 
+			
+			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params);
+			// Creates an API-Representation of the desired API
+			API desiredAPI = configAdapter.getDesiredAPI();
+			// 
 			List<NameValuePair> filters = new ArrayList<NameValuePair>();
 			// If we don't have an AdminAccount available, we ignore published APIs - For OrgAdmins 
 			// the unpublished or pending APIs become the actual API
