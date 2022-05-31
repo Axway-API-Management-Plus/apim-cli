@@ -323,7 +323,7 @@ public class APIChangeState {
 		if(this.isAdminAccountNeeded!=null) return Boolean.parseBoolean(this.isAdminAccountNeeded);
 		// Perhaps the API-Manager is configured with OAdmin-Self-Service support enabled (See <VMArg name="-Dapi.manager.orgadmin.selfservice.enabled=true"/>)
 		Boolean oadminSelfServiceEnabled = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getOadminSelfServiceEnabled();
-		if(oadminSelfServiceEnabled) return false;
+		if(oadminSelfServiceEnabled!=null && oadminSelfServiceEnabled) return false;
 		// If the desired & actual API is state Unpublished - No Admin-Account is needed
 		if((getDesiredAPI().getState().equals(API.STATE_UNPUBLISHED) || getDesiredAPI().getState().equals(API.STATE_DELETED)) && 
 				(getActualAPI()==null || getActualAPI().getState().equals(API.STATE_UNPUBLISHED))) {
