@@ -13,7 +13,7 @@ public class AuthenticationProfile {
 
 	private boolean isDefault;
 
-	private Map<String, String> parameters;
+	private Map<String, Object> parameters;
 	
 	private AuthType type;
 
@@ -37,12 +37,12 @@ public class AuthenticationProfile {
 		this.isDefault = isDefault;
 	}
 	
-	public Map<String, String> getParameters() {
-		if(parameters==null) return new HashMap<String, String>();
+	public Map<String, Object> getParameters() {
+		if(parameters==null) return new HashMap<String, Object>();
 		return parameters;
 	}
 
-	public void setParameters(Map<String, String> parameters) {
+	public void setParameters(Map<String, Object> parameters) {
 		this.parameters = parameters;
 	}
 
@@ -60,13 +60,13 @@ public class AuthenticationProfile {
 			return false;
 		if (other instanceof AuthenticationProfile) {
 			AuthenticationProfile authenticationProfile = (AuthenticationProfile) other;
-			Map<String, String> otherParameters = authenticationProfile.getParameters();
-			Map<String, String> thisParameters = this.getParameters();
+			Map<String, Object> otherParameters = authenticationProfile.getParameters();
+			Map<String, Object> thisParameters = this.getParameters();
 			otherParameters.remove("_id_");
 			thisParameters.remove("_id_");
 			// Passwords are no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
-			String otherPassword = null;
-			String thisPassword = null;
+			Object otherPassword = null;
+			Object thisPassword = null;
 			if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
 				// Empty password handling - Make sure, there is a password set
 				if(!thisParameters.containsKey("password") || thisParameters.get("password")==null) thisParameters.put("password", "");
