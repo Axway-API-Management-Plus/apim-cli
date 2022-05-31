@@ -620,9 +620,16 @@ public class APIManagerAPIAdapter {
 		LOG.debug("Updating API-Proxy: '"+api.getName()+" "+api.getVersion()+" ("+api.getId()+")'" );
 		URI uri;
 		HttpEntity entity;
+		String[] serializeAllExcept;
+		// queryStringPassThrough
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20220530")) {
+			serializeAllExcept = new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
+		} else {
+			serializeAllExcept = new String[] {"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
+		}
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-				SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"}));
+				SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new APIImportSerializerModifier(false)));
 		mapper.setFilterProvider(filter);
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(false)));
