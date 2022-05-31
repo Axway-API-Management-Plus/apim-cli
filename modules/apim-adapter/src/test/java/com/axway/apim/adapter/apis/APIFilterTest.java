@@ -391,7 +391,7 @@ public class APIFilterTest {
 		testAPI = new API();
 		addOutboundSecurityToAPI(testAPI, AuthType.oauth);
 		
-		Map<String, String> parameters = new HashMap<String, String>();
+		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("providerProfile", "<key type='AuthProfilesGroup'><id field='name' value='Auth Profiles'/><key type='OAuthGroup'><id field='name' value='OAuth2'/><key type='OAuthProviderProfile'><id field='name' value='API Gateway'/><key type='OAuthAppProfile'><id field='name' value='Sample Client Authzcode App'/></key></key></key></key>");
 		testAPI.getAuthenticationProfiles().get(0).setParameters(parameters);
 		filter = new APIFilter.Builder().hasOutboundAuthentication("oauth").build();
