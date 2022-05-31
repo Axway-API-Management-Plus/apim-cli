@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - APIM-CLI was not able to connect to API-Manager running on GKE using ingress class: gce-internal due to the port 443 part of the host header
 - Logging improved for failed REST-API requests
+- Changing the application organization was not recognized as a change (See issue [#284](https://github.com/Axway-API-Management-Plus/apim-cli/issues/284))
 
 ## [1.11.0] 2022-04-22
 

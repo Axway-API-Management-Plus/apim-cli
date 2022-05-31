@@ -238,6 +238,7 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 					StringUtils.equals(otherApp.getDescription(), this.getDescription()) &&
 					StringUtils.equals(otherApp.getPhone(), this.getPhone()) &&
 					otherApp.getState().equals(this.getState()) &&
+					otherApp.getOrganization().equals(this.getOrganization()) &&
 					(otherApp.getCredentials()==null || otherApp.getCredentials().stream().sorted(c).collect(Collectors.toList()).equals(this.getCredentials().stream().sorted(c).collect(Collectors.toList()))) &&
 					(otherApp.getOauthResources()==null || otherApp.getOauthResources().stream().sorted(Comparator.comparing(ClientAppOauthResource::getScope)).collect(Collectors.toList()).equals(this.getOauthResources().stream().sorted(Comparator.comparing(ClientAppOauthResource::getScope)).collect(Collectors.toList()))) &&
 					(otherApp.getImage()==null || otherApp.getImage().equals(this.getImage())) &&
