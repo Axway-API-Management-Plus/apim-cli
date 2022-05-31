@@ -9,6 +9,8 @@ public class InboundProfile extends Profile {
 	
 	boolean monitorAPI = true;
 	
+	boolean queryStringPassThrough = false;
+	
 	String monitorSubject = "authentication.subject.id";
 	
 	String securityProfile;
@@ -47,6 +49,14 @@ public class InboundProfile extends Profile {
 		this.corsProfile = corsProfile;
 	}
 
+	public boolean isQueryStringPassThrough() {
+		return queryStringPassThrough;
+	}
+
+	public void setQueryStringPassThrough(boolean queryStringPassThrough) {
+		this.queryStringPassThrough = queryStringPassThrough;
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if(other == null) return false;
@@ -54,6 +64,7 @@ public class InboundProfile extends Profile {
 			InboundProfile otherInboundProfile = (InboundProfile)other;
 			return
 					otherInboundProfile.getMonitorAPI()==this.getMonitorAPI() &&
+					otherInboundProfile.isQueryStringPassThrough()==this.isQueryStringPassThrough() &&
 					StringUtils.equals(otherInboundProfile.getMonitorSubject(), this.getMonitorSubject()) &&
 					StringUtils.equals(otherInboundProfile.getSecurityProfile(), this.getSecurityProfile()) &&
 					StringUtils.equals(otherInboundProfile.getCorsProfile(), this.getCorsProfile());
