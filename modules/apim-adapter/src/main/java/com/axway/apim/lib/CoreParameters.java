@@ -38,7 +38,7 @@ public class CoreParameters implements Parameters {
 	
 	public static String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
 	
-	public static String DEFAULT_API_BASEPATH = "/api/portal/v1.3";
+	public static String DEFAULT_API_BASEPATH = "/api/portal/v1.4";
 	
 	private URI apiManagerUrl = null;
 	
