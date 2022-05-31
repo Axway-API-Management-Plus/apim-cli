@@ -10,18 +10,19 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.api.API;
-import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 
-public class ChangeStateTest {
+public class ChangeStateTest extends APIManagerMockBase {
 	
 	@BeforeClass
-	public void prepareTest() {
+	public void prepareTest() throws AppException, IOException {
+		setupMockData();
 		TestIndicator.getInstance().setTestRunning(true);
 	}
 	
