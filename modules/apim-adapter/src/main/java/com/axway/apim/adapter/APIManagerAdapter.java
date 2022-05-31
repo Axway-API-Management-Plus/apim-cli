@@ -295,15 +295,15 @@ public class APIManagerAdapter {
 	
 	public static User getCurrentUser(boolean useAdminClient) throws AppException {
 		URI uri;
-		HttpResponse response = null;
-		JsonNode jsonResponse = null;
+		HttpResponse httpResponse = null;
+		String currentUser = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/currentuser").build();
 		    GETRequest currentUserRequest = new GETRequest(uri, useAdminClient);
-		    response = currentUserRequest.execute();
-		    getCsrfToken(response, useAdminClient); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
-			String currentUser = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
-			int statusCode = response.getStatusLine().getStatusCode();
+		    httpResponse = currentUserRequest.execute();
+		    getCsrfToken(httpResponse, useAdminClient); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
+			currentUser = EntityUtils.toString(httpResponse.getEntity());
+			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if( statusCode != 200) {
 				throw new AppException("Status-Code: "+statusCode+", Can't get current-user (For admin: "+useAdminClient+") information on response: '" + currentUser + "'", 
 						ErrorCode.API_MANAGER_COMMUNICATION);				
@@ -316,12 +316,12 @@ public class APIManagerAdapter {
 			return user;
 		    
 		} catch (Exception e) {
-			throw new AppException("Can't get current-user information on response: '" + jsonResponse + "'", 
+			throw new AppException("Error: '"+e.getMessage()+"' while parsing current-user information on response: '" + currentUser + "'", 
 					ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
-				if(response!=null) 
-					((CloseableHttpResponse)response).close();
+				if(httpResponse!=null) 
+					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
 	}
