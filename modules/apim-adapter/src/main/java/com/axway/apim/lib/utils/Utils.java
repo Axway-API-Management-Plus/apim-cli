@@ -210,9 +210,11 @@ public class Utils {
 		File installFolder = null;
 		while(permissions.hasMoreElements()) {
 			Permission permission = permissions.asIterator().next();
+			LOG.info("Permission class: " + permission.getClass());
 			if(permission.getClass() == FilePermission.class) {
 				String permName = permission.getName();
-				// APIM-CLI runs compiles e.g. C:\Axway\Tools\apim-cli-1.12.0-SNAPSHOT\lib\apimcli-apim-adapter-1.12.0-SNAPSHOT.jar
+				LOG.info("Permission name: " + permName);
+				// APIM-CLI runs compiled e.g. C:\Axway\Tools\apim-cli-1.12.0-SNAPSHOT\lib\apimcli-apim-adapter-1.12.0-SNAPSHOT.jar
 				if(permName.endsWith(".jar")) {
 					installFolder = new File(permName).getParentFile().getParentFile();
 					break;
@@ -224,7 +226,7 @@ public class Utils {
 			}
 		}
 		if(installFolder == null) {
-			LOG.error("Cloud not determine install folder.");
+			LOG.error("Could not determine install folder.");
 		}
 		if(!installFolder.isDirectory()) {
 			LOG.error("Determined install folder: "+installFolder+" is not a directory.");
