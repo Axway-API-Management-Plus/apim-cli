@@ -210,16 +210,14 @@ public class Utils {
 		File installFolder = null;
 		while(permissions.hasMoreElements()) {
 			Permission permission = permissions.asIterator().next();
-			LOG.info("Permission class: " + permission.getClass());
 			if(permission.getClass() == FilePermission.class) {
 				String permName = permission.getName();
-				LOG.info("Permission name: " + permName);
 				// APIM-CLI runs compiled e.g. C:\Axway\Tools\apim-cli-1.12.0-SNAPSHOT\lib\apimcli-apim-adapter-1.12.0-SNAPSHOT.jar
 				if(permName.endsWith(".jar")) {
 					installFolder = new File(permName).getParentFile().getParentFile();
 					break;
 				// APIM-CLI runs out of the classes folder
-				} else if(permission.getName().endsWith("classes\\-")) {
+				} else if(permission.getName().endsWith("classes\\-") || permission.getName().endsWith("classes/-")) {
 					installFolder = new File(permName.substring(0, permName.length()-2));
 					break;
 				}
