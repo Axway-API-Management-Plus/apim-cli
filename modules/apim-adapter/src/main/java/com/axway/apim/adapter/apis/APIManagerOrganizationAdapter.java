@@ -67,13 +67,7 @@ public class APIManagerOrganizationAdapter {
 			LOG.warn("Using OrgAdmin only to load all organizations.");
 		}
 		String orgId = "";
-		// In some versions (e.g. 7.6.2 - 7.6.2 SP4 confirmed) an Org-Admin can't provide it's own Org-Id to load it's own org
-		// Therefore we need to skip that here
-		if(filter.getId()!=null && APIManagerAdapter.hasAdminAccount()) {
-			if(organizationCache.containsKey(filter.getId())) {
-				apiManagerResponse.put(filter, organizationCache.get(filter.getId()));
-				return;
-			}
+		if(filter.getId()!=null) {
 			orgId = "/"+filter.getId();
 		}
 		URI uri;
