@@ -195,31 +195,31 @@
 		<dependency>
 			<groupId>com.consol.citrus</groupId>
 			<artifactId>citrus-core</artifactId>
-			<version>2.7.9</version>
+			<version>2.7.7</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.consol.citrus</groupId>
 			<artifactId>citrus-jms</artifactId>
-			<version>2.7.9</version>
+			<version>2.7.7</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.consol.citrus</groupId>
 			<artifactId>citrus-ws</artifactId>
-			<version>2.7.9</version>
+			<version>2.7.7</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.consol.citrus</groupId>
 			<artifactId>citrus-http</artifactId>
-			<version>2.7.9</version>
+			<version>2.7.7</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.consol.citrus</groupId>
 			<artifactId>citrus-java-dsl</artifactId>
-			<version>2.7.9</version>
+			<version>2.7.7</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
