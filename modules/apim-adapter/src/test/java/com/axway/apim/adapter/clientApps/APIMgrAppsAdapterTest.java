@@ -35,7 +35,7 @@ public class APIMgrAppsAdapterTest {
 		ClientAppFilter filter = new ClientAppFilter.Builder().hasName("Application 123").build();
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 		Assert.assertNotNull(requestUri, "RequestUri is null");
-		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=name&op=eq&value=Application+123");
+		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.4/applications?field=name&op=eq&value=Application+123");
 	}
 	
 	@Test
@@ -43,7 +43,7 @@ public class APIMgrAppsAdapterTest {
 		APIMgrAppsAdapter clientAppAdapter = new APIMgrAppsAdapter();
 		URI requestUri = clientAppAdapter.getApplicationsUri(null);
 		Assert.assertNotNull(requestUri, "RequestUri is null");
-		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications");
+		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.4/applications");
 	}
 	
 	@Test
@@ -53,7 +53,7 @@ public class APIMgrAppsAdapterTest {
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 		
 		Assert.assertNotNull(requestUri, "RequestUri is null");
-		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications/5893475934875934");
+		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.4/applications/5893475934875934");
 	}
 	
 	@Test
@@ -63,7 +63,7 @@ public class APIMgrAppsAdapterTest {
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 		
 		Assert.assertNotNull(requestUri, "RequestUri is null");
-		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=name&op=eq&value=MyTestApp");
+		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.4/applications?field=name&op=eq&value=MyTestApp");
 	}
 	
 	@Test
@@ -73,7 +73,7 @@ public class APIMgrAppsAdapterTest {
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 		
 		Assert.assertNotNull(requestUri, "RequestUri is null");
-		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=orgid&op=eq&value=42342342342343223");
+		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.4/applications?field=orgid&op=eq&value=42342342342343223");
 	}
 	
 	@Test
@@ -83,7 +83,7 @@ public class APIMgrAppsAdapterTest {
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 		
 		Assert.assertNotNull(requestUri, "RequestUri is null");
-		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=state&op=eq&value=pending");
+		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.4/applications?field=state&op=eq&value=pending");
 	}
 	
 	@Test
@@ -94,7 +94,7 @@ public class APIMgrAppsAdapterTest {
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 
 		Assert.assertNotNull(requestUri, "RequestUri is null");
-		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=name&op=eq&value=AnotherPendingApp&field=state&op=eq&value=pending");
+		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.4/applications?field=name&op=eq&value=AnotherPendingApp&field=state&op=eq&value=pending");
 	}
 	
 	@Test
@@ -113,7 +113,7 @@ public class APIMgrAppsAdapterTest {
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 		
 		Assert.assertNotNull(requestUri, "RequestUri is null");
-		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications?field=name&op=eq&value=AnotherPendingApp&field=email&op=eq&value=this%40there.com");
+		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.4/applications?field=name&op=eq&value=AnotherPendingApp&field=email&op=eq&value=this%40there.com");
 	}
 	
 	@Test
@@ -124,7 +124,7 @@ public class APIMgrAppsAdapterTest {
 		URI requestUri = clientAppAdapter.getApplicationsUri(filter);
 
 		Assert.assertNotNull(requestUri, "RequestUri is null");
-		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.3/applications");
+		Assert.assertEquals(requestUri.toString(), "https://"+testHostname+":"+testPort+"/api/portal/v1.4/applications");
 	}
 	
 }
