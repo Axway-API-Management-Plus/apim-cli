@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Dropped support for release 7.7-20200130
 - Now using API-Manager REST-API version /api/portal/v1.4
+- Updated libs
+	- jackson-* from 2.13.2 to 2.13.3
+	- olingo-odata2-api from 2.0.11 to 2.0.12
+	- log4j-slf4j-impl from 2.17.1 to 2.17.2
+	- ascii-table from 1.1.0 to 1.2.0
 
 ## [1.11.0] 2022-04-22
 
