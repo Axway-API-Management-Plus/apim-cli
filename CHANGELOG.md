@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 	- olingo-odata2-api from 2.0.11 to 2.0.12
 	- log4j-slf4j-impl from 2.17.1 to 2.17.2
 	- ascii-table from 1.1.0 to 1.2.0
+- Changed the way the APIM-CLI install folder is located (See issue [#276](https://github.com/Axway-API-Management-Plus/apim-cli/issues/276))
 
 ## [1.11.0] 2022-04-22
 
