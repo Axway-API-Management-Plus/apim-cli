@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - New parameter apimanagerUrl added, which can be used instead of host and port. 
 - Support for release 7.7-20220530
+- Support for API-Manager feature flag api.manager.orgadmin.selfservice.enabled (See issue [#217](https://github.com/Axway-API-Management-Plus/apim-cli/issues/217))
 
 ### Fixed
 - APIM-CLI was not able to connect to API-Manager running on GKE using ingress class: gce-internal due to the port 443 part of the host header
@@ -17,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Dropped support for release 7.7-20200130
+- Now using API-Manager REST-API version /api/portal/v1.4
 
 ## [1.11.0] 2022-04-22
 
