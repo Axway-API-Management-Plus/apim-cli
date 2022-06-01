@@ -2,12 +2,16 @@ package com.axway.lib.utils;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.utils.Utils;
 
 public class UtilsTest {
+	
+	private static Logger LOG = LoggerFactory.getLogger(UtilsTest.class);
 	
 	String testConfig = this.getClass().getResource("/stageConfigTest/test-api-config.json").getFile();
 	String stageConfig = this.getClass().getResource("/stageConfigTest/my-stage-test-api-config.json").getFile();
@@ -52,5 +56,13 @@ public class UtilsTest {
 	public void testMissingMandatoryCustomProperty() {
 		File stageConfigFile = Utils.getStageConfig(null, "my-stage-test-api-config.json", new File(testConfig));
 		Assert.assertEquals(stageConfigFile.getName(), "my-stage-test-api-config.json");
+	}
+	
+	@Test
+	public void testLocateInstallFolder() {
+		File installFolder = Utils.getInstallFolder();
+		LOG.info("Validate install folder: "+installFolder+" exists");
+		Assert.assertNotNull(installFolder);
+		Assert.assertTrue(installFolder.exists());
 	}
 }

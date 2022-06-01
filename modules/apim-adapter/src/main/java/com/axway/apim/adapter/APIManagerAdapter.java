@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,9 +52,9 @@ import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.lib.APIMCLICacheManager;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.DoNothingCacheManager;
-import com.axway.apim.lib.APIMCLICacheManager;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -354,7 +353,7 @@ public class APIManagerAdapter {
 				} else {
 					cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
 				}
-			} catch (MalformedURLException | URISyntaxException e1) {
+			} catch (MalformedURLException e1) {
 				LOG.trace("Error reading customer cache config file: " + cacheConfigFile + ". Using default configuration.");
 				cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
 			}

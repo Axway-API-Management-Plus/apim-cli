@@ -2,24 +2,19 @@ package com.axway.apim.lib.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FilePermission;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
+import java.security.Permission;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -29,19 +24,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.TimeZone;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustAllStrategy;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -213,7 +196,7 @@ public class Utils {
 			File configFile = new File(configFileName);
 			if(configFile.exists()) return configFile;
 			// This is mainly to load the samples sitting inside the package!
-			String installFolder = getInstallFolder();
+			File installFolder = getInstallFolder();
 			configFile = new File(installFolder + File.separator + configFileName);
 			if(configFile.exists()) return configFile;
 			throw new AppException("Unable to find given Config-File: '"+configFileName+"'", ErrorCode.CANT_READ_CONFIG_FILE);
@@ -222,8 +205,31 @@ public class Utils {
 		}
 	}
 	
-	public static String getInstallFolder() throws URISyntaxException {
-		return new File(Utils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getParent();
+	public static File getInstallFolder() {
+		Enumeration<Permission> permissions = Utils.class.getProtectionDomain().getPermissions().elements();
+		File installFolder = null;
+		while(permissions.hasMoreElements()) {
+			Permission permission = permissions.asIterator().next();
+			if(permission.getClass() == FilePermission.class) {
+				String permName = permission.getName();
+				// APIM-CLI runs compiles e.g. C:\Axway\Tools\apim-cli-1.12.0-SNAPSHOT\lib\apimcli-apim-adapter-1.12.0-SNAPSHOT.jar
+				if(permName.endsWith(".jar")) {
+					installFolder = new File(permName).getParentFile().getParentFile();
+					break;
+				// APIM-CLI runs out of the classes folder
+				} else if(permission.getName().endsWith("classes\\-")) {
+					installFolder = new File(permName.substring(0, permName.length()-2));
+					break;
+				}
+			}
+		}
+		if(installFolder == null) {
+			LOG.error("Cloud not determine install folder.");
+		}
+		if(!installFolder.isDirectory()) {
+			LOG.error("Determined install folder: "+installFolder+" is not a directory.");
+		}
+		return installFolder;
 	}
 	
 	public static void validateCustomProperties(Map<String, String> customProperties, Type type) throws AppException {
