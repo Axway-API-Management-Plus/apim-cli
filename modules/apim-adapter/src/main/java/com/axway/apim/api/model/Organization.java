@@ -213,6 +213,7 @@ public class Organization extends AbstractEntity implements CustomPropertiesEnti
 					StringUtils.equals(otherOrg.getEmail(), this.getEmail()) && 
 					StringUtils.equals(otherOrg.getDescription(), this.getDescription()) &&
 					StringUtils.equals(otherOrg.getPhone(), this.getPhone()) &&
+					(otherOrg.getApiAccess().size() == this.getApiAccess().size() && otherOrg.getApiAccess().containsAll(this.getApiAccess())) &&
 					(otherOrg.getImage()==null || otherOrg.getImage().equals(this.getImage())) &&
 					(otherOrg.getCustomProperties()==null || otherOrg.getCustomProperties().equals(this.getCustomProperties()))
 					;
