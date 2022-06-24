@@ -147,6 +147,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			for(Organization desiredOrg : desiredOrgs) {
 				Organization actualOrg = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder()
 						.hasName(desiredOrg.getName())
+						.includeAPIAccess(true)
 						.build());
 				importManager.replicate(desiredOrg, actualOrg);
 			}

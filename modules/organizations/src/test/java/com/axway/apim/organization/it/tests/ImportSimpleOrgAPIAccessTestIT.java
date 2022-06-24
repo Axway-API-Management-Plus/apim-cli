@@ -72,7 +72,7 @@ public class ImportSimpleOrgAPIAccessTestIT extends TestNGCitrusTestRunner imple
 				.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId2"));
 
 		echo("####### Import organization to test: '${orgName}' #######");		
-		createVariable(PARAM_CONFIGFILE,  PACKAGE + "SingleOrgGrantAPIAccess.json");
+		createVariable(PARAM_CONFIGFILE,  PACKAGE + "SingleOrgGrantAPIAccessTwoAPIs.json");
 		createVariable(PARAM_EXPECTED_RC, "0");
 		importApp.doExecute(context);
 		
@@ -82,7 +82,7 @@ public class ImportSimpleOrgAPIAccessTestIT extends TestNGCitrusTestRunner imple
 			.validate("$.[?(@.name=='${orgName}')].name", "@assertThat(hasSize(1))@")
 			.extractFromPayload("$.[?(@.name=='${orgName}')].id", "orgId"));
 		
-		echo("####### Validate organization: '${orgName}' (${orgId}) has access to the imported API 1 #######");
+		echo("####### Validate organization: '${orgName}' (${orgId}) has access to the imported API 1 and 2 #######");
 		http(builder -> builder.client("apiManager").send().get("/organizations/${orgId}/apis").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.[?(@.apiId=='${apiId1}')].enabled", "true")
@@ -91,6 +91,17 @@ public class ImportSimpleOrgAPIAccessTestIT extends TestNGCitrusTestRunner imple
 		echo("####### Re-Import same organization - Should be a No-Change #######");
 		createVariable(PARAM_EXPECTED_RC, "10");
 		importApp.doExecute(context);
+		
+		echo("####### Re-Import same organization - But reduced API-Access to API 1 #######");		
+		createVariable(PARAM_CONFIGFILE,  PACKAGE + "SingleOrgGrantAPIAccessOneAPI.json");
+		createVariable(PARAM_EXPECTED_RC, "0");
+		importApp.doExecute(context);
+		
+		echo("####### Validate organization: '${orgName}' (${orgId}) has access to the imported API 1 only #######");
+		http(builder -> builder.client("apiManager").send().get("/organizations/${orgId}/apis").header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+			.validate("$.[?(@.apiId=='${apiId1}')].enabled", "true")
+			.validate("$.*.apiId", "@assertThat(not(containsString(${apiId2})))@"));
 		
 		echo("####### Export the organization #######");
 		createVariable(PARAM_TARGET, exportApp.getTestDirectory().getPath());

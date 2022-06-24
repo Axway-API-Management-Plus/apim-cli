@@ -1,0 +1,12 @@
+{
+  "name" : "${orgName}",
+  "description" : "${orgDescription}",
+  "restricted" : false,
+  "enabled" : true,
+  "development" : true,
+  "apis" : [ {
+  		 "apiName": "${apiName1}",
+  		 "apiVersion" : "1.0"
+  	}
+  ]
+}
