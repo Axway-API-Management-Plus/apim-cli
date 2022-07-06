@@ -57,11 +57,11 @@
 						<configuration>
 							<finalName>axway-apimcli-${project.version}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
+							<tarLongFileMode>posix</tarLongFileMode>
 							<descriptors>
 								<descriptor>assembly/dist-release.xml</descriptor>
 							</descriptors>
 							<attach>false</attach>
-							<appendAssemblyId>false</appendAssemblyId>
 						</configuration>
 					</execution>
 				</executions>
