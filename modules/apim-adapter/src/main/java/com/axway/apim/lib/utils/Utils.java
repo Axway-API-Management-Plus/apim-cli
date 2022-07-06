@@ -209,7 +209,7 @@ public class Utils {
 		Enumeration<Permission> permissions = Utils.class.getProtectionDomain().getPermissions().elements();
 		File installFolder = null;
 		while(permissions.hasMoreElements()) {
-			Permission permission = permissions.asIterator().next();
+			Permission permission = permissions.nextElement();
 			if(permission.getClass() == FilePermission.class) {
 				String permName = permission.getName();
 				// APIM-CLI runs compiled e.g. C:\Axway\Tools\apim-cli-1.12.0-SNAPSHOT\lib\apimcli-apim-adapter-1.12.0-SNAPSHOT.jar

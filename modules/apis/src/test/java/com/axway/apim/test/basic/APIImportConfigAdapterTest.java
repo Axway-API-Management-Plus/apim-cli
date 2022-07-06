@@ -77,8 +77,12 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
-			String os = System.getenv().get("OS");
-			Assert.assertEquals(apiConfig.getSummary(), "Operating system: "+os);
+			String osName = System.getProperty("os.name");
+			// To ignore the check on MAC OS as MAC does not have environment variable 'OS'
+			if(osName.startsWith("Mac"))
+				return;
+			String osEnv = System.getenv().get("OS");
+			Assert.assertEquals(apiConfig.getSummary(), "Operating system: "+osEnv);
 		} catch (Exception e) {
 			LOG.error("Error running test: usingOSEnvVariable", e);
 			throw e;

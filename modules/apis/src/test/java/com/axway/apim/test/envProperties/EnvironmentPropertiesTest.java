@@ -3,6 +3,8 @@ package com.axway.apim.test.envProperties;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -10,6 +12,9 @@ import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class EnvironmentPropertiesTest {
+
+	private static Logger LOG = LoggerFactory.getLogger(EnvironmentPropertiesTest.class);
+
 
 	@Test
 	public void testNoStage() throws AppException, IOException {
@@ -70,6 +75,11 @@ public class EnvironmentPropertiesTest {
 		EnvironmentProperties properties = new EnvironmentProperties("NOT_SET");
 		
 		Assert.assertNotEquals(properties.get("variableFromOSEnvironmentVariable"), "${JAVA_HOME}");
+		String javaHome = System.getenv("JAVA_HOME");
+		if(javaHome == null){
+			LOG.warn("JAVA_HOME is not set and test is 'testEnvironementWithOSEnvVariables' is ignored");
+			return;
+		}
 		Assert.assertEquals(properties.get("variablePartiallyFromOSEnvironmentVariable"), "Fixed value and true some dynamic parts");		
 	}
 }

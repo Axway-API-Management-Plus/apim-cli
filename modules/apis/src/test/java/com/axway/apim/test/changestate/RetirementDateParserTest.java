@@ -1,7 +1,9 @@
 package com.axway.apim.test.changestate;
 
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -12,11 +14,16 @@ import com.axway.apim.lib.errorHandling.AppException;
 public class RetirementDateParserTest {
 	
 	// Test the supported formats: "dd.MM.yyyy", "dd/MM/yyyy", "yyyy-MM-dd", "dd-MM-yyyy"
-	
 	SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-	
+
+	public RetirementDateParserTest(){
+		df.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Z")));
+	}
+
 	@Test
 	public void testValidRetirementDates() throws AppException {
+		
+
 		DesiredAPI testAPI = new DesiredAPI();
 		testAPI.setRetirementDate("2050-12-31");
 		Date retirementDate = new Date(testAPI.getRetirementDate());
