@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- Configured API access of an organization not updated (See issue [#290](https://github.com/Axway-API-Management-Plus/apim-cli/issues/290))
+
 ## [1.12.0] 2022-06-09
 
 ### Added
