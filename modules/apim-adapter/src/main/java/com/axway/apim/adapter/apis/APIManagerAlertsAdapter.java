@@ -33,9 +33,11 @@ public class APIManagerAlertsAdapter {
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
-	CoreParameters cmd = CoreParameters.getInstance();
+	private CoreParameters cmd;
 
-	public APIManagerAlertsAdapter() {}
+	public APIManagerAlertsAdapter() {
+		cmd = CoreParameters.getInstance();
+	}
 	
 	String apiManagerResponse = null;
 	
@@ -108,7 +110,8 @@ public class APIManagerAlertsAdapter {
 				throw new AppException("Error updating API-Manager alert configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			} finally {
 				try {
-					((CloseableHttpResponse)httpResponse).close();
+					if( httpResponse != null)
+						((CloseableHttpResponse)httpResponse).close();
 				} catch (Exception ignore) { }
 			}
 			return updatedAlerts;
@@ -117,12 +120,5 @@ public class APIManagerAlertsAdapter {
 			throw new AppException("Error updating API-Manager alert configuration.", ErrorCode.CANT_CREATE_API_PROXY, e);
 		}
 	}
-	
-	void setAPIManagerTestResponse(String jsonResponse) {
-		if(jsonResponse==null) {
-			LOG.error("Test-Response is empty. Ignoring!");
-			return;
-		}
-		this.apiManagerResponse = jsonResponse;
-	}
+
 }

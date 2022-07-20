@@ -39,13 +39,13 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class APIManagerAPIAccessAdapter {
 	
-	public static enum Type {
+	public enum Type {
 		organizations("Organization"), 
 		applications("Application");
 		
 		String niceName;
 
-		private Type(String niceName) {
+		Type(String niceName) {
 			this.niceName = niceName;
 		}
 	}
@@ -54,25 +54,26 @@ public class APIManagerAPIAccessAdapter {
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
-	CoreParameters cmd = CoreParameters.getInstance();
+	private CoreParameters cmd;
 	
-	private Map<Type, Cache<String, String>> caches = new HashMap<Type, Cache<String, String>>();
+	private Map<Type, Cache<String, String>> caches = new HashMap<>();
 
 	public APIManagerAPIAccessAdapter() {
+		cmd = CoreParameters.getInstance();
 		caches.put(Type.applications, APIManagerAdapter.getCache(CacheType.applicationAPIAccessCache, String.class, String.class));
 		caches.put(Type.organizations, APIManagerAdapter.getCache(CacheType.organizationAPIAccessCache, String.class, String.class));
 	}
 	
-	Map<Type, Map<String, String>> apiManagerResponse = new HashMap<Type, Map<String,String>>();
+	Map<Type, Map<String, String>> apiManagerResponse = new HashMap<>();
 	
 	private void readAPIAccessFromAPIManager(Type type, String id) throws AppException {
 		if(apiManagerResponse.get(type)!=null && apiManagerResponse.get(type).get(id)!=null) return;
-		Map<String, String> mappedResponse = new HashMap<String, String>();
+		Map<String, String> mappedResponse = new HashMap<>();
 		
 		String cachedResponse = getFromCache(id, type);
 		if(cachedResponse!=null) {
 			mappedResponse.put(id, cachedResponse);
-			if(cachedResponse!=null) apiManagerResponse.put(type, mappedResponse);
+			apiManagerResponse.put(type, mappedResponse);
 			return;
 		}
 		String response = null;
@@ -162,12 +163,12 @@ public class APIManagerAPIAccessAdapter {
 		List<APIAccess> existingAPIAccess = getAPIAccess(entity, type);
 		
 		List<APIAccess> toBeRemovedAccesses = getMissingAPIAccesses(existingAPIAccess, apiAccess);
-		List<APIAccess> toBeAddeddAccesses = getMissingAPIAccesses(apiAccess, existingAPIAccess);
+		List<APIAccess> toBeAddedAccesses = getMissingAPIAccesses(apiAccess, existingAPIAccess);
 
 		for(APIAccess access : toBeRemovedAccesses) {
 			deleteAPIAccess(access, entity, type);
 		}
-		for(APIAccess access : toBeAddeddAccesses) {
+		for(APIAccess access : toBeAddedAccesses) {
 			createAPIAccess(access, entity, type);
 		}
 		return apiAccess;
@@ -246,12 +247,12 @@ public class APIManagerAPIAccessAdapter {
 				throw new AppException("Can't delete API access requests for application. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
 			removeFromCache(parentEntity.getId(), type);
-			return;
 		} catch (Exception e) {
 			throw new AppException("Can't delete API access requests for application.", ErrorCode.CANT_CREATE_API_PROXY, e);
 		} finally {
 			try {
-				((CloseableHttpResponse)httpResponse).close();
+				if(httpResponse != null)
+					((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) { }
 		}
 	}
@@ -272,10 +273,10 @@ public class APIManagerAPIAccessAdapter {
 		}
 	}
 	
-	private List<APIAccess> getMissingAPIAccesses(List<APIAccess> apiAccess, List<APIAccess> otherApiAccess) throws AppException {
-		List<APIAccess> missingAccess = new ArrayList<APIAccess>();
-		if(otherApiAccess == null) otherApiAccess = new ArrayList<APIAccess>();
-		if(apiAccess == null) apiAccess = new ArrayList<APIAccess>();
+	private List<APIAccess> getMissingAPIAccesses(List<APIAccess> apiAccess, List<APIAccess> otherApiAccess) {
+		List<APIAccess> missingAccess = new ArrayList<>();
+		if(otherApiAccess == null) otherApiAccess = new ArrayList<>();
+		if(apiAccess == null) apiAccess = new ArrayList<>();
 		for(APIAccess access : apiAccess) {
 			if(otherApiAccess.contains(access)) {
 				continue;
@@ -286,7 +287,7 @@ public class APIManagerAPIAccessAdapter {
 	}
 	
 	void setAPIManagerTestResponse(Type type, String id, String response) {
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 		map.put(id, response);
 		this.apiManagerResponse.put(type, map);
 	}

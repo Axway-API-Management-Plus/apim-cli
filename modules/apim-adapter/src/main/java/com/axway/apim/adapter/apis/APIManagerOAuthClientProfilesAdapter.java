@@ -32,11 +32,13 @@ public class APIManagerOAuthClientProfilesAdapter {
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
-	CoreParameters cmd = CoreParameters.getInstance();
+	private CoreParameters cmd;
 	
 	Cache<String, String> oauthClientCache = APIManagerAdapter.getCache(CacheType.oauthClientProviderCache, String.class, String.class);
 
-	public APIManagerOAuthClientProfilesAdapter() {}
+	public APIManagerOAuthClientProfilesAdapter() {
+		cmd = CoreParameters.getInstance();
+	}
 	
 	String apiManagerResponse = null;
 	

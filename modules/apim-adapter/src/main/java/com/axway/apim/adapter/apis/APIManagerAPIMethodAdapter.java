@@ -30,11 +30,13 @@ public class APIManagerAPIMethodAdapter {
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
-	CoreParameters cmd = CoreParameters.getInstance();
+	private CoreParameters cmd;
 
-	public APIManagerAPIMethodAdapter() {}
+	public APIManagerAPIMethodAdapter() {
+		cmd = CoreParameters.getInstance();
+	}
 	
-	Map<String, String> apiManagerResponse = new HashMap<String, String>();
+	Map<String, String> apiManagerResponse = new HashMap<>();
 	
 	private void readMethodsFromAPIManager(String apiId) throws AppException {
 		if(this.apiManagerResponse.get(apiId)!=null) return;
@@ -60,7 +62,7 @@ public class APIManagerAPIMethodAdapter {
 	
 	public List<APIMethod> getAllMethodsForAPI(String apiId) throws AppException {
 		readMethodsFromAPIManager(apiId);
-		List<APIMethod> apiMethods = new ArrayList<APIMethod>();
+		List<APIMethod> apiMethods;
 		try {
 			apiMethods = mapper.readValue(this.apiManagerResponse.get(apiId), new TypeReference<List<APIMethod>>(){});
 		} catch (IOException e) {

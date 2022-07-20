@@ -42,7 +42,7 @@ public class APIManagerQuotaAdapter {
 	
 	private static Logger LOG = LoggerFactory.getLogger(APIManagerQuotaAdapter.class);
 	
-	public static enum Quota {
+	public enum Quota {
 		SYSTEM_DEFAULT ("00000000-0000-0000-0000-000000000000", "System default"), 
 		APPLICATION_DEFAULT ("00000000-0000-0000-0000-000000000001", "Application default");
 		
@@ -66,13 +66,14 @@ public class APIManagerQuotaAdapter {
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
-	CoreParameters cmd = CoreParameters.getInstance();
+	private CoreParameters cmd;
 
 	public APIManagerQuotaAdapter() {
+		cmd = CoreParameters.getInstance();
 		applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
 	}
 	
-	Map<String, String> apiManagerResponse = new HashMap<String, String>();
+	Map<String, String> apiManagerResponse = new HashMap<>();
 	
 	private void readQuotaFromAPIManager(String quotaId) throws AppException {
 		if(!APIManagerAdapter.hasAdminAccount()) return;
@@ -197,7 +198,7 @@ public class APIManagerQuotaAdapter {
 	}	
 	
 	private static APIQuota filterQuotaForAPI(APIQuota quotaConfig, API api) throws AppException {
-		List<QuotaRestriction> apiRestrictions = new ArrayList<QuotaRestriction>();
+		List<QuotaRestriction> apiRestrictions = new ArrayList<>();
 		try {
 			for(QuotaRestriction restriction : quotaConfig.getRestrictions()) {
 				if(restriction.getApiId().equals(api.getId())) {
@@ -217,7 +218,5 @@ public class APIManagerQuotaAdapter {
 		}
 	}
 	
-	void setAPIManagerTestResponse(String apiId, String response) {
-		this.apiManagerResponse.put(apiId, response);
-	}
+
 }

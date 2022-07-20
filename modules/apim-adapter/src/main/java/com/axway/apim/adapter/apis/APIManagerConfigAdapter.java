@@ -38,20 +38,22 @@ public class APIManagerConfigAdapter {
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
-	CoreParameters cmd = CoreParameters.getInstance();
+	private CoreParameters cmd;
 
-	public APIManagerConfigAdapter() {}
+	public APIManagerConfigAdapter() {
+		cmd = CoreParameters.getInstance();
+	}
 	
-	Map<Boolean, String> apiManagerResponse = new HashMap<Boolean, String>();
+	Map<Boolean, String> apiManagerResponse = new HashMap<>();
 	
-	Map<Boolean, Config> managerConfig = new HashMap<Boolean, Config>();
+	Map<Boolean, Config> managerConfig = new HashMap<>();
 	
 	
 	/**
 	 * Config fields that were introduced with a certain API-Manager version. 
 	 * This list is mainly used to filter out fields, when using an older API-Manager version.
 	 */
-	protected static enum ConfigFields {
+	protected enum ConfigFields {
 		version7720200130 ("7.7.20200530", new String[] {"apiImportTimeout", "apiImportMimeValidation", "apiImportEditable", "lockUserAccount" }),
 		version77 ("7.7.0", new String[] {
 				"userNameRegex", "changePasswordOnFirstLogin", "passwordExpiryEnabled", "passwordLifetimeDays",  
@@ -152,7 +154,8 @@ public class APIManagerConfigAdapter {
 				throw new AppException("Error updating API-Manager configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			} finally {
 				try {
-					((CloseableHttpResponse)httpResponse).close();
+					if( httpResponse != null)
+						((CloseableHttpResponse)httpResponse).close();
 				} catch (Exception ignore) { }
 			}
 			return updatedConfig;

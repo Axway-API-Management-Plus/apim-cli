@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- APIManagerAPIAdapter keeps old parameters (See issue [#293](https://github.com/Axway-API-Management-Plus/apim-cli/issues/293))
+
 ## [1.12.1] 2022-07-06
 
 ### Fixed

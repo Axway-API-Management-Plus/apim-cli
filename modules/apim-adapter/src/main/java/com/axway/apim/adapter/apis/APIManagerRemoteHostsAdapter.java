@@ -40,11 +40,13 @@ public class APIManagerRemoteHostsAdapter {
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
-	CoreParameters cmd = CoreParameters.getInstance();
+	private CoreParameters cmd;
 
-	public APIManagerRemoteHostsAdapter() {}
+	public APIManagerRemoteHostsAdapter() {
+		cmd = CoreParameters.getInstance();
+	}
 	
-	Map<RemoteHostFilter, String> apiManagerResponse = new HashMap<RemoteHostFilter, String>();
+	Map<RemoteHostFilter, String> apiManagerResponse = new HashMap<>();
 	
 	private void readRemotehostsFromAPIManager(RemoteHostFilter filter) throws AppException {
 		if(apiManagerResponse.get(filter) != null) return;
@@ -78,7 +80,7 @@ public class APIManagerRemoteHostsAdapter {
 		try {
 			List<RemoteHost> remoteHostsList = mapper.readValue(apiManagerResponse.get(filter), new TypeReference<List<RemoteHost>>(){});
 			remoteHostsList.removeIf(remoteHost -> filter.filter(remoteHost));
-			Map<String, RemoteHost> remoteHosts = new HashMap<String, RemoteHost>();
+			Map<String, RemoteHost> remoteHosts = new HashMap<>();
 			for(RemoteHost remoteHost : remoteHostsList) {
 				remoteHosts.put(remoteHost.getName(), remoteHost);
 			}
@@ -144,7 +146,8 @@ public class APIManagerRemoteHostsAdapter {
 				throw new AppException("Error creating/updating remote host.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
 			} finally {
 				try {
-					((CloseableHttpResponse)httpResponse).close();
+					if( httpResponse != null)
+						((CloseableHttpResponse)httpResponse).close();
 				} catch (Exception ignore) { }
 			}
 			desiredRemoteHost.setId(createdRemoteHost.getId());
@@ -155,32 +158,26 @@ public class APIManagerRemoteHostsAdapter {
 		}
 	}
 	
-	public void deleteRemoteHost(RemoteHost remoteHost) throws AppException {
-		HttpResponse httpResponse = null;
-		URI uri;
-		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/remotehosts/"+remoteHost.getId()).build();
-			RestAPICall request = new DELRequest(uri, true);
-			httpResponse = request.execute();
-			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if(statusCode != 204){
-				LOG.error("Error deleting remote host. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
-				throw new AppException("Error deleting remote host. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
-			}
-		} catch (Exception e) {
-			throw new AppException("Error deleting remote host.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
-		} finally {
-			try {
-				((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) { }
-		}
-	}
+//	public void deleteRemoteHost(RemoteHost remoteHost) throws AppException {
+//		HttpResponse httpResponse = null;
+//		URI uri;
+//		try {
+//			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/remotehosts/"+remoteHost.getId()).build();
+//			RestAPICall request = new DELRequest(uri, true);
+//			httpResponse = request.execute();
+//			int statusCode = httpResponse.getStatusLine().getStatusCode();
+//			if(statusCode != 204){
+//				LOG.error("Error deleting remote host. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
+//				throw new AppException("Error deleting remote host. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+//			}
+//		} catch (Exception e) {
+//			throw new AppException("Error deleting remote host.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+//		} finally {
+//			try {
+//				((CloseableHttpResponse)httpResponse).close();
+//			} catch (Exception ignore) { }
+//		}
+//	}
 	
-	void setAPIManagerTestResponse(String jsonResponse, RemoteHostFilter filter) {
-		if(jsonResponse==null) {
-			LOG.error("Test-Response is empty. Ignoring!");
-			return;
-		}
-		this.apiManagerResponse.put(filter, jsonResponse);
-	}
+
 }

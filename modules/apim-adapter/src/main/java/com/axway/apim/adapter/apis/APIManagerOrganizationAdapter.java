@@ -43,261 +43,267 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class APIManagerOrganizationAdapter {
-	
-	private static Logger LOG = LoggerFactory.getLogger(APIManagerOrganizationAdapter.class);
-	
-	CoreParameters cmd = CoreParameters.getInstance();
-	
-	public final static String SYSTEM_API_QUOTA 				= "00000000-0000-0000-0000-000000000000";
-	public final static String APPLICATION_DEFAULT_QUOTA 		= "00000000-0000-0000-0000-000000000001";
-		
-	ObjectMapper mapper = APIManagerAdapter.mapper;
-	
-	Map<OrgFilter, String> apiManagerResponse = new HashMap<OrgFilter, String>();
-	
-	Cache<String, String> organizationCache;
-	
-	public APIManagerOrganizationAdapter() {
-		organizationCache = APIManagerAdapter.getCache(CacheType.organizationCache, String.class, String.class);
-	}
-	
-	private void readOrgsFromAPIManager(OrgFilter filter) throws AppException {
-		if(apiManagerResponse.get(filter) != null) return;
-		if(!APIManagerAdapter.hasAdminAccount()) {
-			LOG.warn("Using OrgAdmin only to load all organizations.");
-		}
-		String orgId = "";
-		if(filter.getId()!=null) {
-			orgId = "/"+filter.getId();
-		}
-		URI uri;
-		HttpResponse httpResponse = null;
-		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations"+orgId)
-					.addParameters(filter.getFilters())
-					.build();
-			RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
-			LOG.debug("Load organizations from API-Manager using filter: " + filter);
-			LOG.trace("Load organization with URI: " + uri);
-			httpResponse = getRequest.execute();
-			if(httpResponse.getStatusLine().getStatusCode()!=HttpStatus.SC_OK) {
-				LOG.error("Sent request: " + uri);
-				LOG.error("Received Status-Code: " +httpResponse.getStatusLine().getStatusCode()+ ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
-				throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
-			}
-			String response = EntityUtils.toString(httpResponse.getEntity());
-			if(!orgId.equals("")) {
-				// Store it as an Array
-				response = "[" + response+ "]";
-				apiManagerResponse.put(filter, response);
-				organizationCache.put(orgId, response);
-			} else {
-				// We got an Array from API-Manager
-				apiManagerResponse.put(filter, response);
-			}
-		} catch (Exception e) {
-			LOG.error("Error cant read orgs from API-Manager with filter: "+filter+". Can't parse response: " + httpResponse, e);
-			throw new AppException("Error cant read orgs from API-Manager with filter: "+filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
-	public Organization updateOrganization(Organization desiredOrg, Organization actualOrg) throws AppException {
-		return createOrUpdateOrganization(desiredOrg, actualOrg);
-	}
-	
-	public Organization createOrganization(Organization desiredOrg) throws AppException {
-		return createOrUpdateOrganization(desiredOrg, null);
-	}
-	
-	public Organization createOrUpdateOrganization(Organization desiredOrg, Organization actualOrg) throws AppException {
-		HttpResponse httpResponse = null;
-		Organization createdOrg;
-		try {
-			URI uri;
-			if(actualOrg==null) {
-				if(!APIManagerAdapter.hasAdminAccount()) {
-					throw new AppException("Admin account is required to create a new organization", ErrorCode.NO_ADMIN_ROLE_USER);
-				}
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/organizations").build();
-			} else {
-				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/organizations/"+actualOrg.getId()).build();
-			}
-			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"image", "createdOn", "apis"}));
-			mapper.setFilterProvider(filter);
-			mapper.setSerializationInclusion(Include.NON_NULL);
-			try {
-				RestAPICall request;
-				if(actualOrg==null) {
-					String json = mapper.writeValueAsString(desiredOrg);
-					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-					request = new POSTRequest(entity, uri, true);
-				} else {
-					desiredOrg.setId(actualOrg.getId());
-					if (desiredOrg.getDn()==null) desiredOrg.setDn(actualOrg.getDn());
-					String json = mapper.writeValueAsString(desiredOrg);
-					HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-					request = new PUTRequest(entity, uri, true);
-				}
-				httpResponse = request.execute();
-				int statusCode = httpResponse.getStatusLine().getStatusCode();
-				if(statusCode < 200 || statusCode > 299){
-					LOG.error("Error creating/updating organization. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
-					throw new AppException("Error creating/updating organization. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
-				}
-				createdOrg = mapper.readValue(httpResponse.getEntity().getContent(), Organization.class);
-			} catch (Exception e) {
-				throw new AppException("Error creating/updating organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
-			} finally {
-				try {
-					((CloseableHttpResponse)httpResponse).close();
-				} catch (Exception ignore) { }
-			}
-			desiredOrg.setId(createdOrg.getId());
-			saveImage(desiredOrg, actualOrg);
-			saveAPIAccess(desiredOrg, actualOrg);
-			// Force reload of this organization next time
-			organizationCache.remove(createdOrg.getId());
-			return createdOrg;
 
-		} catch (Exception e) {
-			throw new AppException("Error creating/updating organization", ErrorCode.CANT_CREATE_API_PROXY, e);
-		}
-	}
-	
-	public void deleteOrganization(Organization org) throws AppException {
-		HttpResponse httpResponse = null;
-		URI uri;
-		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/organizations/"+org.getId()).build();
-			RestAPICall request = new DELRequest(uri, true);
-			httpResponse = request.execute();
-			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if(statusCode != 204){
-				LOG.error("Error deleting organization. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
-				throw new AppException("Error deleting organization. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
-			}
-			// Deleted org should also be deleted from the cache
-			organizationCache.remove(org.getId());
-			LOG.info("Organization: "+org.getName()+" ("+org.getId()+")" + " successfully deleted");
-		} catch (Exception e) {
-			throw new AppException("Error deleting organization", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
-		} finally {
-			try {
-				((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) { }
-		}
-	}
-	
-	private void saveImage(Organization org, Organization actualOrg) throws URISyntaxException, AppException {
-		if(org.getImage()==null) return;
-		if(actualOrg!=null && org.getImage().equals(actualOrg.getImage())) return;
-		HttpResponse httpResponse = null;
-		URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/organizations/"+org.getId()+"/image").build();
-		InputStream is = org.getImage().getInputStream();
-		HttpEntity entity = MultipartEntityBuilder.create()
-			.addBinaryBody("file", is, ContentType.create("image/jpeg"), org.getImage().getBaseFilename())
-			.build();
-		try {
-			RestAPICall apiCall = new POSTRequest(entity, uri);
-			httpResponse = apiCall.execute();
-			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if(statusCode < 200 || statusCode > 299){
-				LOG.error("Error saving/updating organization image. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
-			}
-		} catch (Exception e) {
-			throw new AppException("Error uploading organization image", ErrorCode.CANT_CREATE_API_PROXY, e);
-		} finally {
-			try {
-				((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) { }
-			try {
-				is.close();
-			} catch (Exception ignore) { } 
-		}
-	}
-	
-	public List<Organization> getOrgs(OrgFilter filter) throws AppException {
-		readOrgsFromAPIManager(filter);
-		try {
-			List<Organization> allOrgs = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<Organization>>(){});
-			allOrgs.removeIf(org -> filter.filter(org));
-			for(int i=0; i<allOrgs.size();i++) {
-				Organization org = allOrgs.get(i);
-				addImage(org, filter.isIncludeImage());
-				addAPIAccess(org, filter.isIncludeAPIAccess());
-			}
-			Utils.addCustomPropertiesForEntity(allOrgs, this.apiManagerResponse.get(filter), filter);
-			return allOrgs;
-		} catch (Exception e) {
-			LOG.error("Error cant read orgs from API-Manager with filter: "+filter+". Returned response: " + apiManagerResponse);
-			throw new AppException("Error cant read orgs from API-Manager with filter: "+filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
-		}
-	}
-	
-	public List<Organization> getAllOrgs() throws AppException {
-		return getOrgs(new OrgFilter.Builder().build());
-	}
-	
-	public Organization getOrgForName(String orgName) throws AppException {
-		Organization org = getOrg(new OrgFilter.Builder().hasName(orgName).build());
-		return org;
-	}
-	
-	public Organization getOrgForId(String orgId) throws AppException {
-		Organization org = getOrg(new OrgFilter.Builder().hasId(orgId).build());
-		return org;
-	}
-	
-	public Organization getOrg(OrgFilter filter) throws AppException {
-		List<Organization> orgs = getOrgs(filter);
-		if(orgs.size()>1) {
-			throw new AppException("No unique Organization found for filter: " + filter, ErrorCode.UNKNOWN_API);
-		}
-		if(orgs.size()==0) {
-			LOG.info("No organization found using filter: " + filter);
-			return null;
-		}
-		return orgs.get(0);
-	}
-	
-	void addAPIAccess(Organization org, boolean addAPIAccess) throws Exception {
-		if(!addAPIAccess) return;
-		try {
-			List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(org, Type.organizations, true);
-			org.getApiAccess().addAll(apiAccess);
-		} catch (Exception e) {
-			throw new AppException("Error reading organizations API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
-		}
-	}
-	
-	private void saveAPIAccess(Organization org, Organization actualOrg) throws AppException {
-		if(org.getApiAccess()==null || org.getApiAccess().size()==0) return;
-		if(actualOrg!=null && actualOrg.getApiAccess().size() == org.getApiAccess().size() && actualOrg.getApiAccess().containsAll(org.getApiAccess())) return;
-		if(!APIManagerAdapter.hasAdminAccount()) {
-			LOG.warn("Ignoring API-Access, as no admin account is given");
-			return;
-		}
-		APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
-		accessAdapter.saveAPIAccess(org.getApiAccess(), org, Type.organizations);
-	}
-	
-	void addImage(Organization org, boolean addImage) throws Exception {
-		if(!addImage) return;
-		URI uri;
-		if(org.getImageUrl()==null) return;
-		uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations/"+org.getId()+"/image")
-				.build();
-		Image image = APIManagerAdapter.getImageFromAPIM(uri, "org-image");
-		org.setImage(image);
-	}
-	
-	public void setAPIManagerTestResponse(OrgFilter key, String response) {
-		this.apiManagerResponse.put(key, response);
-	}
+    private static Logger LOG = LoggerFactory.getLogger(APIManagerOrganizationAdapter.class);
+
+    private CoreParameters cmd;
+
+    ObjectMapper mapper = APIManagerAdapter.mapper;
+
+    Map<OrgFilter, String> apiManagerResponse = new HashMap<>();
+
+    Cache<String, String> organizationCache;
+
+    public APIManagerOrganizationAdapter() {
+        cmd = CoreParameters.getInstance();
+        organizationCache = APIManagerAdapter.getCache(CacheType.organizationCache, String.class, String.class);
+    }
+
+    private void readOrgsFromAPIManager(OrgFilter filter) throws AppException {
+        if (apiManagerResponse.get(filter) != null) return;
+        if (!APIManagerAdapter.hasAdminAccount()) {
+            LOG.warn("Using OrgAdmin only to load all organizations.");
+        }
+        String orgId = "";
+        if (filter.getId() != null) {
+            orgId = "/" + filter.getId();
+        }
+        URI uri;
+        HttpResponse httpResponse = null;
+        try {
+            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations" + orgId)
+                    .addParameters(filter.getFilters())
+                    .build();
+            RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+            LOG.debug("Load organizations from API-Manager using filter: " + filter);
+            LOG.trace("Load organization with URI: " + uri);
+            httpResponse = getRequest.execute();
+            if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                LOG.error("Sent request: " + uri);
+                LOG.error("Received Status-Code: " + httpResponse.getStatusLine().getStatusCode() + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
+            }
+            String response = EntityUtils.toString(httpResponse.getEntity());
+            if (!orgId.equals("")) {
+                // Store it as an Array
+                response = "[" + response + "]";
+                apiManagerResponse.put(filter, response);
+                organizationCache.put(orgId, response);
+            } else {
+                // We got an Array from API-Manager
+                apiManagerResponse.put(filter, response);
+            }
+        } catch (Exception e) {
+            LOG.error("Error cant read orgs from API-Manager with filter: " + filter + ". Can't parse response: " + httpResponse, e);
+            throw new AppException("Error cant read orgs from API-Manager with filter: " + filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
+        } finally {
+            try {
+                if (httpResponse != null)
+                    ((CloseableHttpResponse) httpResponse).close();
+            } catch (Exception ignore) {
+            }
+        }
+    }
+
+    public Organization updateOrganization(Organization desiredOrg, Organization actualOrg) throws AppException {
+        return createOrUpdateOrganization(desiredOrg, actualOrg);
+    }
+
+    public Organization createOrganization(Organization desiredOrg) throws AppException {
+        return createOrUpdateOrganization(desiredOrg, null);
+    }
+
+    public Organization createOrUpdateOrganization(Organization desiredOrg, Organization actualOrg) throws AppException {
+        HttpResponse httpResponse = null;
+        Organization createdOrg;
+        try {
+            URI uri;
+            if (actualOrg == null) {
+                if (!APIManagerAdapter.hasAdminAccount()) {
+                    throw new AppException("Admin account is required to create a new organization", ErrorCode.NO_ADMIN_ROLE_USER);
+                }
+                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations").build();
+            } else {
+                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations/" + actualOrg.getId()).build();
+            }
+            FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+                    SimpleBeanPropertyFilter.serializeAllExcept(new String[]{"image", "createdOn", "apis"}));
+            mapper.setFilterProvider(filter);
+            mapper.setSerializationInclusion(Include.NON_NULL);
+            try {
+                RestAPICall request;
+                if (actualOrg == null) {
+                    String json = mapper.writeValueAsString(desiredOrg);
+                    HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+                    request = new POSTRequest(entity, uri, true);
+                } else {
+                    desiredOrg.setId(actualOrg.getId());
+                    if (desiredOrg.getDn() == null) desiredOrg.setDn(actualOrg.getDn());
+                    String json = mapper.writeValueAsString(desiredOrg);
+                    HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+                    request = new PUTRequest(entity, uri, true);
+                }
+                httpResponse = request.execute();
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode < 200 || statusCode > 299) {
+                    LOG.error("Error creating/updating organization. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                    throw new AppException("Error creating/updating organization. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+                createdOrg = mapper.readValue(httpResponse.getEntity().getContent(), Organization.class);
+            } catch (Exception e) {
+                throw new AppException("Error creating/updating organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+            } finally {
+                try {
+                    if (httpResponse != null)
+                        ((CloseableHttpResponse) httpResponse).close();
+                } catch (Exception ignore) {
+                }
+            }
+            desiredOrg.setId(createdOrg.getId());
+            saveImage(desiredOrg, actualOrg);
+            saveAPIAccess(desiredOrg, actualOrg);
+            // Force reload of this organization next time
+            organizationCache.remove(createdOrg.getId());
+            return createdOrg;
+
+        } catch (Exception e) {
+            throw new AppException("Error creating/updating organization", ErrorCode.CANT_CREATE_API_PROXY, e);
+        }
+    }
+
+    public void deleteOrganization(Organization org) throws AppException {
+        HttpResponse httpResponse = null;
+        URI uri;
+        try {
+            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations/" + org.getId()).build();
+            RestAPICall request = new DELRequest(uri, true);
+            httpResponse = request.execute();
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            if (statusCode != 204) {
+                LOG.error("Error deleting organization. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                throw new AppException("Error deleting organization. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+            }
+            // Deleted org should also be deleted from the cache
+            organizationCache.remove(org.getId());
+            LOG.info("Organization: " + org.getName() + " (" + org.getId() + ")" + " successfully deleted");
+        } catch (Exception e) {
+            throw new AppException("Error deleting organization", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+        } finally {
+            try {
+                if (httpResponse != null)
+                    ((CloseableHttpResponse) httpResponse).close();
+            } catch (Exception ignore) {
+            }
+        }
+    }
+
+    private void saveImage(Organization org, Organization actualOrg) throws URISyntaxException, AppException {
+        if (org.getImage() == null) return;
+        if (actualOrg != null && org.getImage().equals(actualOrg.getImage())) return;
+        HttpResponse httpResponse = null;
+        URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations/" + org.getId() + "/image").build();
+        InputStream is = org.getImage().getInputStream();
+        HttpEntity entity = MultipartEntityBuilder.create()
+                .addBinaryBody("file", is, ContentType.create("image/jpeg"), org.getImage().getBaseFilename())
+                .build();
+        try {
+            RestAPICall apiCall = new POSTRequest(entity, uri);
+            httpResponse = apiCall.execute();
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            if (statusCode < 200 || statusCode > 299) {
+                LOG.error("Error saving/updating organization image. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+            }
+        } catch (Exception e) {
+            throw new AppException("Error uploading organization image", ErrorCode.CANT_CREATE_API_PROXY, e);
+        } finally {
+            try {
+                if (httpResponse != null)
+                    ((CloseableHttpResponse) httpResponse).close();
+            } catch (Exception ignore) {
+            }
+            try {
+                is.close();
+            } catch (Exception ignore) {
+            }
+        }
+    }
+
+    public List<Organization> getOrgs(OrgFilter filter) throws AppException {
+        readOrgsFromAPIManager(filter);
+        try {
+            List<Organization> allOrgs = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<Organization>>() {
+            });
+            allOrgs.removeIf(org -> filter.filter(org));
+            for (int i = 0; i < allOrgs.size(); i++) {
+                Organization org = allOrgs.get(i);
+                addImage(org, filter.isIncludeImage());
+                addAPIAccess(org, filter.isIncludeAPIAccess());
+            }
+            Utils.addCustomPropertiesForEntity(allOrgs, this.apiManagerResponse.get(filter), filter);
+            return allOrgs;
+        } catch (Exception e) {
+            LOG.error("Error cant read orgs from API-Manager with filter: " + filter + ". Returned response: " + apiManagerResponse);
+            throw new AppException("Error cant read orgs from API-Manager with filter: " + filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
+        }
+    }
+
+    public List<Organization> getAllOrgs() throws AppException {
+        return getOrgs(new OrgFilter.Builder().build());
+    }
+
+    public Organization getOrgForName(String orgName) throws AppException {
+        return getOrg(new OrgFilter.Builder().hasName(orgName).build());
+    }
+
+    public Organization getOrgForId(String orgId) throws AppException {
+        return getOrg(new OrgFilter.Builder().hasId(orgId).build());
+    }
+
+    public Organization getOrg(OrgFilter filter) throws AppException {
+        List<Organization> orgs = getOrgs(filter);
+        if (orgs.size() > 1) {
+            throw new AppException("No unique Organization found for filter: " + filter, ErrorCode.UNKNOWN_API);
+        }
+        if (orgs.size() == 0) {
+            LOG.info("No organization found using filter: " + filter);
+            return null;
+        }
+        return orgs.get(0);
+    }
+
+    void addAPIAccess(Organization org, boolean addAPIAccess) throws Exception {
+        if (!addAPIAccess) return;
+        try {
+            List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(org, Type.organizations, true);
+            org.getApiAccess().addAll(apiAccess);
+        } catch (Exception e) {
+            throw new AppException("Error reading organizations API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
+        }
+    }
+
+    private void saveAPIAccess(Organization org, Organization actualOrg) throws AppException {
+        if (org.getApiAccess() == null || org.getApiAccess().size() == 0) return;
+        if (actualOrg != null && actualOrg.getApiAccess().size() == org.getApiAccess().size() && actualOrg.getApiAccess().containsAll(org.getApiAccess()))
+            return;
+        if (!APIManagerAdapter.hasAdminAccount()) {
+            LOG.warn("Ignoring API-Access, as no admin account is given");
+            return;
+        }
+        APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
+        accessAdapter.saveAPIAccess(org.getApiAccess(), org, Type.organizations);
+    }
+
+    void addImage(Organization org, boolean addImage) throws Exception {
+        if (!addImage) return;
+        URI uri;
+        if (org.getImageUrl() == null) return;
+        uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations/" + org.getId() + "/image")
+                .build();
+        Image image = APIManagerAdapter.getImageFromAPIM(uri, "org-image");
+        org.setImage(image);
+    }
+
+    public void setAPIManagerTestResponse(OrgFilter key, String response) {
+        this.apiManagerResponse.put(key, response);
+    }
 }
