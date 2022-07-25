@@ -8,7 +8,7 @@
 		</Console>
 	</Appenders>
 	<Loggers>
-		<Logger name="com.axway.apim" level="info" />
+		<Logger name="com.axway.apim" level="${env:LOG_LEVEL:-info}" />
 		
 		<Logger name="com.consol.citrus" level="info" />
 		<Logger name="org.apache" level="info" />
