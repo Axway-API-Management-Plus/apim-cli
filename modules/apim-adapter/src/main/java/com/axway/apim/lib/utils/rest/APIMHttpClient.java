@@ -1,9 +1,8 @@
 package com.axway.apim.lib.utils.rest;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -28,12 +27,12 @@ import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 
-import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * The interface to the API-Manager itself responsible to setup the underlying HTTPS-Communication. 
+ * The interface to the API-Manager itself responsible to set up the underlying HTTPS-Communication.
  * It's used by the RESTAPICall.  
  * Implemented as a Singleton, which holds the actual connection to the API-Manager.
  * @author cwiechmann@axway.com
@@ -41,17 +40,16 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
  */
 public class APIMHttpClient {
 	
-	private static Map<Boolean, APIMHttpClient> instances = new HashMap<Boolean, APIMHttpClient>();
+	private static Map<Boolean, APIMHttpClient> instances = new HashMap<>();
 	
 	private HttpClient httpClient;
 	private HttpClientContext clientContext;
-	
 	private BasicCookieStore cookieStore = new BasicCookieStore();
 	
 	private String csrfToken;
 	
 	public static void deleteInstances() {
-		instances = new HashMap<Boolean, APIMHttpClient>();
+		instances = new HashMap<>();
 	}
 	
 	public static void addInstance(boolean adminInstance, APIMHttpClient client) {
@@ -63,11 +61,11 @@ public class APIMHttpClient {
 	}
 	
 	public static APIMHttpClient getInstance(boolean adminInstance) throws AppException {
-		if(!APIMHttpClient.instances.containsKey(new Boolean(adminInstance))) {
+		if(!APIMHttpClient.instances.containsKey(adminInstance)) {
 			APIMHttpClient client = new APIMHttpClient(adminInstance);
-			instances.put(new Boolean(adminInstance), client);
+			instances.put(adminInstance, client);
 		}
-		return APIMHttpClient.instances.get(new Boolean(adminInstance));
+		return APIMHttpClient.instances.get(adminInstance);
 	}
 	
 	private APIMHttpClient(boolean adminInstance) throws AppException {
@@ -76,24 +74,22 @@ public class APIMHttpClient {
 	}
 
 	private void createConnection(URI uri) throws AppException {
-		PoolingHttpClientConnectionManager cm;
+		PoolingHttpClientConnectionManager httpClientConnectionManager;
 		HttpHost targetHost;
-		
-		
 		SSLContextBuilder builder = new SSLContextBuilder();
 		try {
 			builder.loadTrustMaterial(null, new TrustAllStrategy());
 
-			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), new NoopHostnameVerifier());
+			SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(builder.build(), new NoopHostnameVerifier());
 	
 			Registry<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory>create()
-					.register(uri.getScheme(), sslsf)
+					.register(uri.getScheme(), sslConnectionSocketFactory)
 					.register("http", PlainConnectionSocketFactory.INSTANCE)
 					.build();
-	
-			cm = new PoolingHttpClientConnectionManager(r);
-			cm.setMaxTotal(5);
-			cm.setDefaultMaxPerRoute(2);
+
+			httpClientConnectionManager = new PoolingHttpClientConnectionManager(r);
+			httpClientConnectionManager.setMaxTotal(5);
+			httpClientConnectionManager.setDefaultMaxPerRoute(2);
 			targetHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
 	
 			// Add AuthCache to the execution context
@@ -101,41 +97,40 @@ public class APIMHttpClient {
 			//clientContext.setAuthCache(authCache);
 			clientContext.setCookieStore(cookieStore);
 	
-			cm.setMaxPerRoute(new HttpRoute(targetHost), 2);
+			httpClientConnectionManager.setMaxPerRoute(new HttpRoute(targetHost), 2);
 			// We have make sure, that cookies are correclty parsed!
-			RequestConfig defaultRequestConfig = RequestConfig.custom()
-			        .setCookieSpec(CookieSpecs.STANDARD).build();
+			RequestConfig.Builder defaultRequestConfig = RequestConfig.custom()
+			        .setCookieSpec(CookieSpecs.STANDARD);
 			CoreParameters params = CoreParameters.getInstance();
 
 			HttpClientBuilder clientBuilder = HttpClientBuilder.create()
 					.disableRedirectHandling()
-					.setConnectionManager(cm)
-					.useSystemProperties()
-					.setDefaultRequestConfig(defaultRequestConfig);
-			
+					.setConnectionManager(httpClientConnectionManager)
+					.useSystemProperties();
+
 			// Check if a proxy is configured
 			if(params.getProxyHost()!=null) {
 				HttpHost proxyHost = new HttpHost(params.getProxyHost(), params.getProxyPort());
 				HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
 				clientBuilder.setRoutePlanner(routePlanner);
 				if(params.getProxyUsername()!=null) {
-					CredentialsProvider credentialsPovider = new BasicCredentialsProvider();
-					credentialsPovider.setCredentials(new AuthScope(params.getProxyHost(), uri.getPort()), new UsernamePasswordCredentials(params.getProxyUsername(), params.getProxyPassword()));
-					clientBuilder.setDefaultCredentialsProvider(credentialsPovider);
+					CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+					credentialsProvider.setCredentials(new AuthScope(params.getProxyHost(), params.getProxyPort()), new UsernamePasswordCredentials(params.getProxyUsername(), params.getProxyPassword()));
+					clientBuilder.setDefaultCredentialsProvider(credentialsProvider);
 				}
+				defaultRequestConfig.setProxy(proxyHost);
 			}
-			
+			clientBuilder.setDefaultRequestConfig(defaultRequestConfig.build());
 			this.httpClient = clientBuilder.build();
 		} catch (Exception e) {
 			throw new AppException("Can't create connection to API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
 		}
-
 	}
 
 	public HttpClient getHttpClient() {
 		return httpClient;
 	}
-	
+
 	public HttpClientContext getClientContext() {
 		return clientContext;
 	}

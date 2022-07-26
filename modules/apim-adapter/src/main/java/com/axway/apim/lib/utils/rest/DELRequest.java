@@ -1,12 +1,10 @@
 package com.axway.apim.lib.utils.rest;
 
-import java.net.URI;
-
+import com.axway.apim.lib.errorHandling.AppException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpUriRequest;
 
-import com.axway.apim.lib.errorHandling.AppException;
+import java.net.URI;
 
 public class DELRequest extends RestAPICall {
 
@@ -20,9 +18,7 @@ public class DELRequest extends RestAPICall {
 
 	@Override
 	public HttpResponse execute() throws AppException {
-		HttpUriRequest httpDel = new HttpDelete(uri);
-		//httpDel.setHeader("Content-type", this.contentType);
-		HttpResponse response = sendRequest(httpDel);
-		return response;
+		HttpDelete httpDel = new HttpDelete(uri);
+		return sendRequest(httpDel);
 	}
 }
