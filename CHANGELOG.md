@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - APIManagerAPIAdapter keeps old parameters (See issue [#293](https://github.com/Axway-API-Management-Plus/apim-cli/issues/293))
-- Sample Dockerfile for apimcli
-- Environmentalize log level with environment variable LOG_LEVEL. Default LOG_LEVEL is info
 - Proxy Authentication is not working (See issue [#295](https://github.com/Axway-API-Management-Plus/apim-cli/issues/295))
+- JsonAPIExporter.saveAPILocally logs Exception, but APIExportApp.exportAPI returns 0 (See issue [#298](https://github.com/Axway-API-Management-Plus/apim-cli/issues/298))
+
+### Changed
+- Sample Dockerfile for apimcli
+- Environmentalize log level in log42.xml with environment variable LOG_LEVEL. Default LOG_LEVEL is info
 
 ## [1.12.1] 2022-07-06
 

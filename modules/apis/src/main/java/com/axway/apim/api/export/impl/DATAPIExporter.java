@@ -1,14 +1,5 @@
 package com.axway.apim.api.export.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
@@ -17,14 +8,21 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 public class DATAPIExporter extends APIResultHandler {
 	private static Logger LOG = LoggerFactory.getLogger(DATAPIExporter.class);
 
 	/** Where to store the exported API-Definition */
-	private String givenExportFolder = null;
+	private String givenExportFolder;
 	
-	private String datPassword = null;
+	private String datPassword;
 
 	APIManagerAdapter apiManager = APIManagerAdapter.getInstance();
 	
@@ -41,9 +39,9 @@ public class DATAPIExporter extends APIResultHandler {
 				saveAPILocally(api);
 			} catch (AppException e) {
 				LOG.error("Can't export API: " + e.getMessage() + " as DAT-File. Please check in API-Manager UI the API is valid.", e);
+				throw e;
 			}
 		}
-		return;
 	}
 	
 	@Override
@@ -56,24 +54,8 @@ public class DATAPIExporter extends APIResultHandler {
 		String apiPath = getAPIExportFolder(api.getPath());
 		File localFolder = new File(this.givenExportFolder +File.separator+ getVHost(api) + apiPath);
 		LOG.debug("Going to export API: '"+api.toStringShort()+"' into folder: " + localFolder);
-		if(localFolder.exists()) {
-			if(params.isDeleteTarget()) {
-				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
-				try {
-					FileUtils.deleteDirectory(localFolder);
-				} catch (IOException e) {
-					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
-				}				
-			} else {
-				LOG.warn("Local export folder: " + localFolder + " already exists. API will not be exported. (You may set -deleteTarget)");
-				return;
-			}
-		}
-		if (!localFolder.mkdirs()) {
-			throw new AppException("Cant create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
-		}
+		validateFolder(localFolder);
 		byte[] datFileContent = apiManager.apiAdapter.getAPIDatFile(api, datPassword);
-
 		String targetFile = null;
 		try {
 			targetFile = localFolder.getCanonicalPath() + "/" + api.getName() + ".dat";

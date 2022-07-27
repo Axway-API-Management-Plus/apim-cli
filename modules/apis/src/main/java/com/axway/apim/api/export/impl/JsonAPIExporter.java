@@ -1,15 +1,5 @@
 package com.axway.apim.api.export.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Base64;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
@@ -30,14 +20,21 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class JsonAPIExporter extends APIResultHandler {
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Base64;
+import java.util.List;
+
+public class
+JsonAPIExporter extends APIResultHandler {
 	private static Logger LOG = LoggerFactory.getLogger(JsonAPIExporter.class);
 
 	/** Where to store the exported API-Definition */
-	private String givenExportFolder = null;
-
-	APIManagerAdapter apiManager;
+	private String givenExportFolder;
 	
 	public JsonAPIExporter(APIExportParams params) throws AppException {
 		super(params);
@@ -52,9 +49,9 @@ public class JsonAPIExporter extends APIResultHandler {
 				saveAPILocally(exportAPI);
 			} catch (AppException e) {
 				LOG.error("Can't export API: " + e.getMessage() + " Please check in API-Manager UI the API is valid.", e);
+				throw e;
 			}
 		}
-		return;
 	}
 	
 	@Override
@@ -73,22 +70,7 @@ public class JsonAPIExporter extends APIResultHandler {
 		String apiPath = getAPIExportFolder(exportAPI.getPath());
 		File localFolder = new File(this.givenExportFolder +File.separator+ getVHost(exportAPI) + apiPath);
 		LOG.debug("Going to export API: '"+exportAPI.toStringShort()+"' into folder: " + localFolder);
-		if(localFolder.exists()) {
-			if(params.isDeleteTarget()) {
-				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
-				try {
-					FileUtils.deleteDirectory(localFolder);
-				} catch (IOException e) {
-					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
-				}				
-			} else {
-				LOG.warn("Local export folder: " + localFolder + " already exists. API will not be exported. (You may set -deleteTarget)");
-				return;
-			}
-		}
-		if (!localFolder.mkdirs()) {
-			throw new AppException("Cant create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
-		}
+		validateFolder(localFolder);
 		APISpecification apiDef = exportAPI.getAPIDefinition();
 		String targetFile = null;
 		try {

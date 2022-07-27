@@ -1,5 +1,7 @@
 package com.axway.apim.api.export.impl;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,8 +86,7 @@ public abstract class APIResultHandler {
 		try {
 			Object[] intArgs = new Object[] { params };
 			Constructor<APIResultHandler> constructor = exportImpl.getClazz().getConstructor(new Class[]{APIExportParams.class});
-			APIResultHandler exporter = constructor.newInstance(intArgs);
-			return exporter;
+			return constructor.newInstance(intArgs);
 		} catch (Exception e) {
 			throw new AppException("Error initializing API export handler", ErrorCode.UNXPECTED_ERROR, e);
 		}
@@ -107,7 +109,7 @@ public abstract class APIResultHandler {
 	public abstract APIFilter getFilter();
 	
 	protected Builder getBaseAPIFilterBuilder() {
-		Builder builder = new APIFilter.Builder(APIType.CUSTOM)
+		return new Builder(APIType.CUSTOM)
 				.hasVHost(params.getVhost())
 				.hasApiPath(params.getApiPath())
 				.hasPolicyName(params.getPolicy())
@@ -126,7 +128,6 @@ public abstract class APIResultHandler {
 				.isCreatedOnAfter(params.getCreatedOnAfter())
 				.isCreatedOnBefore(params.getCreatedOnBefore())
 				.failOnError(false);
-		return builder;
 	}
 	
 	protected List<String> getAPICustomProperties() {
@@ -144,8 +145,8 @@ public abstract class APIResultHandler {
 	}
     
     protected static String getUsedSecurity(API api) {
-		List<String> usedSecurity = new ArrayList<String>();
-		Map<String, SecurityProfile> secProfilesMappedByName = new HashMap<String, SecurityProfile>();
+		List<String> usedSecurity = new ArrayList<>();
+		Map<String, SecurityProfile> secProfilesMappedByName = new HashMap<>();
 		try {
 			for(SecurityProfile secProfile : api.getSecurityProfiles()) {
 				secProfilesMappedByName.put(secProfile.getName(), secProfile);
@@ -168,8 +169,7 @@ public abstract class APIResultHandler {
 				}
 			}
 		}
-		String result = usedSecurity.toString().replace("[", "").replace("]", "");
-		return result;
+			return usedSecurity.toString().replace("[", "").replace("]", "");
 		} catch (AppException e) {
 			LOG.error("Error getting security information for API", e);
 			return "Err";
@@ -182,11 +182,11 @@ public abstract class APIResultHandler {
 	
 	protected static Map<PolicyType, List<String>> getUsedPolicies(API api) {
 		Iterator<OutboundProfile> it;
-		Map<PolicyType, List<String>> result = new HashMap<PolicyType, List<String>>();
-		List<String> requestPolicies = new ArrayList<String>();
-		List<String> routingPolicies = new ArrayList<String>();
-		List<String> responsePolicies = new ArrayList<String>();
-		List<String> faultHandlerPolicies = new ArrayList<String>();
+		Map<PolicyType, List<String>> result = new HashMap<>();
+		List<String> requestPolicies = new ArrayList<>();
+		List<String> routingPolicies = new ArrayList<>();
+		List<String> responsePolicies = new ArrayList<>();
+		List<String> faultHandlerPolicies = new ArrayList<>();
 		it = api.getOutboundProfiles().values().iterator();
 		
 		while(it.hasNext()) {
@@ -214,7 +214,7 @@ public abstract class APIResultHandler {
 	protected static String getCustomProps(API api) {
 		if(api.getCustomProperties()==null) return "N/A";
 		Iterator<String> it = api.getCustomProperties().keySet().iterator();
-		List<String> props = new ArrayList<String>();
+		List<String> props = new ArrayList<>();
 		while(it.hasNext()) {
 			String property = it.next();
 			String value = api.getCustomProperties().get(property);
@@ -226,7 +226,7 @@ public abstract class APIResultHandler {
 	protected static String getTags(API api) {
 		if(api.getTags()==null) return "None";
 		Iterator<String> it = api.getTags().keySet().iterator();
-		List<String> tags = new ArrayList<String>();
+		List<String> tags = new ArrayList<>();
 		while(it.hasNext()) {
 			String tagGroup = it.next();
 			String[] tagValues = api.getTags().get(tagGroup);
@@ -236,7 +236,7 @@ public abstract class APIResultHandler {
 	}
 	
 	protected static List<String> getGrantedOrganizations(API api) {
-		List<String> grantedOrgs = new ArrayList<String>();
+		List<String> grantedOrgs = new ArrayList<>();
 		try {
 			if(api.getClientOrganizations()==null) return grantedOrgs;
 			for(Organization org : api.getClientOrganizations()) {
@@ -246,6 +246,25 @@ public abstract class APIResultHandler {
 		} catch (Exception e) {
 			LOG.error("Error getting API client organization");
 			return grantedOrgs;
+		}
+	}
+
+	protected void validateFolder(File localFolder) throws AppException{
+		if(localFolder.exists()) {
+			if(params.isDeleteTarget()) {
+				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
+				try {
+					FileUtils.deleteDirectory(localFolder);
+				} catch (IOException e) {
+					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
+				}
+			} else {
+				LOG.warn("Local export folder: " + localFolder + " already exists. API will not be exported. (You may set -deleteTarget)");
+				return;
+			}
+		}
+		if (!localFolder.mkdirs()) {
+			throw new AppException("Cant create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
 	}
 }
