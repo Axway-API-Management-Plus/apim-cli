@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FilePermission;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -46,7 +48,7 @@ public class Utils {
 
 	private static Logger LOG = LoggerFactory.getLogger(Utils.class);
 
-	public static enum FedKeyType {
+	public enum FedKeyType {
 		FilterCircuit("<key type='FilterCircuit'>"), 
 		OAuthAppProfile("<key type='OAuthAppProfile'>");
 		
@@ -62,18 +64,12 @@ public class Utils {
 	}
 	
 	public static String getAPIDefinitionUriFromFile(String pathToAPIDefinition) throws AppException {
-		String uriToAPIDefinition = null;
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(pathToAPIDefinition));
+		String uriToAPIDefinition;
+		try (BufferedReader br = new BufferedReader(new FileReader(pathToAPIDefinition))) {
 			uriToAPIDefinition = br.readLine();
 			return uriToAPIDefinition;
 		} catch (Exception e) {
 			throw new AppException("Can't load file:" + pathToAPIDefinition, ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
-		} finally {
-			try {
-				br.close();
-			} catch (Exception ignore) {}
 		}
 	}
 	
@@ -82,17 +78,17 @@ public class Utils {
 	        throw new IllegalArgumentException();
 	    }
 	    int maxBareSize = 10; // 10unit for 100%
-	    int remainProcent = ((100 * remain) / total) / maxBareSize;
+	    int remainPercent = ((100 * remain) / total) / maxBareSize;
 	    char defaultChar = '-';
 	    String icon = "*";
 	    String bare = new String(new char[maxBareSize]).replace('\0', defaultChar) + "]";
 	    StringBuilder bareDone = new StringBuilder();
-	    bareDone.append(prefix + " [");
-	    for (int i = 0; i < remainProcent; i++) {
+	    bareDone.append(prefix).append(" [");
+	    for (int i = 0; i < remainPercent; i++) {
 	        bareDone.append(icon);
 	    }
-	    String bareRemain = bare.substring(remainProcent, bare.length());
-	    System.out.print("\r" + bareDone + bareRemain + " " + remainProcent * 10 + "%");
+	    String bareRemain = bare.substring(remainPercent);
+	    System.out.print("\r" + bareDone + bareRemain + " " + remainPercent * 10 + "%");
 	    if (remain == total) {
 	        System.out.print("\n");
 	    }
@@ -138,7 +134,7 @@ public class Utils {
 	 * @return a String representation of the API-Config-File
 	 * @throws IOException if the file can't be found
 	 */
-	public static String substitueVariables(File inputFile) throws IOException {
+	public static String substituteVariables(File inputFile) throws IOException {
 		String givenConfig = new String(Files.readAllBytes(inputFile.toPath()), StandardCharsets.UTF_8);
 		givenConfig = StringSubstitutor.replace(givenConfig, System.getenv());
 		if(CoreParameters.getInstance().getProperties()==null) return givenConfig;
@@ -278,7 +274,7 @@ public class Utils {
 		if(filter.getCustomProperties() == null || entities.size() == 0) {
 			return;
 		}
-		Map<String, JsonNode> enitityAsJsonMappedWithId = new HashMap<String, JsonNode>();
+		Map<String, JsonNode> enitityAsJsonMappedWithId = new HashMap<>();
 		JsonNode jsonPayload = mapper.readTree(json);
 		// Create a map based on the API-ID containing the original JSON-Payload received from API-Manager
 		for(JsonNode node : jsonPayload) {
@@ -333,8 +329,23 @@ public class Utils {
 		String httpUri = pathToAPIDefinition.substring(pathToAPIDefinition.indexOf("@")+1);
 		return( httpUri.startsWith("http://") || httpUri.startsWith("https://"));
 	}
-	
-	public static boolean isHttpsUri(String uri) {
-		return( uri.startsWith("https://") );
+
+	public static String handleOpenAPIServerUrl(String serverUrl, String backendBasePath) throws MalformedURLException {
+		String newBackendBasePath;
+		if(isHttpUri(serverUrl)){
+			URL openApiUrl = new URL(serverUrl);
+			String path = openApiUrl.getPath();
+			if(backendBasePath.endsWith("/")){
+				newBackendBasePath = backendBasePath.substring(0, backendBasePath.length()-1) + path;
+			}else
+				newBackendBasePath = backendBasePath + path;
+		}else {
+			if(serverUrl.startsWith("/") && !backendBasePath.endsWith("/"))
+				newBackendBasePath = backendBasePath + serverUrl;
+			else if(backendBasePath.endsWith("/"))
+				newBackendBasePath = backendBasePath.substring(0, backendBasePath.length()-1) + serverUrl;
+			else newBackendBasePath = backendBasePath + "/" + serverUrl;
+		}
+		return newBackendBasePath;
 	}
 }

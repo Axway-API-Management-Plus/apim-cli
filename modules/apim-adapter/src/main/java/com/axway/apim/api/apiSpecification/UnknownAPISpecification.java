@@ -15,7 +15,7 @@ public class UnknownAPISpecification extends APISpecification {
 	}
 
 	@Override
-	public void configureBasepath(String backendBasepath, API api) throws AppException {
+	public void configureBasePath(String backendBasePath, API api) throws AppException {
 	}
 
 	@Override

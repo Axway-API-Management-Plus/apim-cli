@@ -124,14 +124,14 @@ public class APIImportConfigAdapter {
 			// Validate organization for the base config, if no staged-config is given
 			boolean validateOrganization = (stageConfigFile==null) ? true : false;
 			ObjectReader reader = mapper.reader();
-			baseConfig = reader.withAttribute("validateOrganization", validateOrganization).forType(DesiredAPI.class).readValue(Utils.substitueVariables(this.apiConfigFile));
+			baseConfig = reader.withAttribute("validateOrganization", validateOrganization).forType(DesiredAPI.class).readValue(Utils.substituteVariables(this.apiConfigFile));
 			if(stageConfigFile!=null) {
 				try {
 					// If the baseConfig doesn't have a valid organization, the stage config must
 					validateOrganization = (baseConfig.getOrganization()==null) ? true : false;
 					ObjectReader updater = mapper.readerForUpdating(baseConfig).withAttribute("validateOrganization", validateOrganization);
 					// Organization must be valid in staged configuration
-					apiConfig = updater.withAttribute("validateOrganization", true).readValue(Utils.substitueVariables(stageConfigFile));
+					apiConfig = updater.withAttribute("validateOrganization", true).readValue(Utils.substituteVariables(stageConfigFile));
 					LOG.info("Loaded stage API-Config from file: " + stageConfigFile);
 				} catch (FileNotFoundException e) {
 					LOG.warn("No config file found for stage: '"+stage+"'");
@@ -236,7 +236,7 @@ public class APIImportConfigAdapter {
 		} else {
 			throw new AppException("No API Specification configured", ErrorCode.NO_API_DEFINITION_CONFIGURED);
 		}
-		apiSpecification.configureBasepath(((DesiredAPI)apiConfig).getBackendBasepath(), apiConfig);
+		apiSpecification.configureBasePath(((DesiredAPI)apiConfig).getBackendBasepath(), apiConfig);
 		apiConfig.setApiDefinition(apiSpecification);
 	}
 	

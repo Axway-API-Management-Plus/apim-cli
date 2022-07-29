@@ -1,16 +1,14 @@
 package com.axway.apim.api.apiSpecification;
 
-import java.util.LinkedHashMap;
-
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
-import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.LinkedHashMap;
 
 public class WSDLSpecification extends APISpecification {
-	
-	JsonNode wsdl = null;
+
 
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
@@ -23,14 +21,14 @@ public class WSDLSpecification extends APISpecification {
 	}
 
 	@Override
-	public void configureBasepath(String backendBasepath, API api) throws AppException {
+	public void configureBasePath(String backendBasePath, API api) throws AppException {
 		// For SOAP services, the WSDL has not been adapted in any case, 
 		// so the necessary service profile is to be created here.
-		if(backendBasepath!=null) {
+		if(backendBasePath!=null) {
 			ServiceProfile serviceProfile = new ServiceProfile();
-			serviceProfile.setBasePath(backendBasepath);
+			serviceProfile.setBasePath(backendBasePath);
 			if(api.getServiceProfiles() == null) {
-				api.setServiceProfiles(new LinkedHashMap<String, ServiceProfile>());
+				api.setServiceProfiles(new LinkedHashMap<>());
 			}
 			api.getServiceProfiles().put("_default", serviceProfile);
 		}

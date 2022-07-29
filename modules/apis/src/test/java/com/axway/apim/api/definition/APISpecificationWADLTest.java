@@ -31,7 +31,7 @@ public class APISpecificationWADLTest {
 
 		byte[] content = getAPISpecificationContent("/api_definition_1/sample-payment-api.wadl");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "sample-payment-api.wadl", "Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		Assert.assertTrue(apiDefinition instanceof WADLSpecification);
 		// Check if the WADL-File has been changed based on the configured base path
@@ -46,7 +46,7 @@ public class APISpecificationWADLTest {
 
 		byte[] content = getAPISpecificationContent("/api_definition_1/sample-accounts-api.wadl");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "sample-accounts-api.wadl", "Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		Assert.assertTrue(apiDefinition instanceof WADLSpecification);
 		// Check if the WADL-File has been changed based on the configured base path

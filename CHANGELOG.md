@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- oas 3.0 base path handling (See issue [#297](https://github.com/Axway-API-Management-Plus/apim-cli/issues/297)
+
+### Changed
+- If backendBasepath is present in api-config.json, Openapi (OAS 3) servers.url will be modified based on the values. E.g
+  - If open api servers.url is /api/v3 and backendBasepath is https://backend, the openapi server.url will be replaced with https://backend/api/v3
+  - If open api servers.url is https://petstore.swagger.io/api/v3 and backendBasepath is https://backend, the openapi server.url will be replaced with https://backend/api/v3
+  - If open api servers.url is https://petstore.swagger.io/api/v3 and backendBasepath is https://backend/api, the openapi server.url will be replaced with https://backend/api/api/v3
+
+
 ## [1.12.2] 2022-07-28
 
 ### Fixed

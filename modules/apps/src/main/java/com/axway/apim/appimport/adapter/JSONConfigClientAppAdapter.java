@@ -75,7 +75,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		try {
 			mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
 			mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile)));
-			baseApps = mapper.readValue(Utils.substitueVariables(configFile), new TypeReference<List<ClientApplication>>(){});
+			baseApps = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<List<ClientApplication>>(){});
 			if(stageConfig!=null) {
 				throw new AppException("Stage overrides are not supported for application lists.", ErrorCode.CANT_READ_CONFIG_FILE);
 			} else {
@@ -85,11 +85,11 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		} catch (MismatchedInputException me) {
 			try {
 				LOG.debug("Error reading single application: " + me.getMessage() + ". Trying to read single application now.");
-				ClientApplication app = mapper.readValue(Utils.substitueVariables(configFile), ClientApplication.class);
+				ClientApplication app = mapper.readValue(Utils.substituteVariables(configFile), ClientApplication.class);
 				if(stageConfig!=null) {
 					try {
 						ObjectReader updater = mapper.readerForUpdating(app);
-						app = updater.readValue(Utils.substitueVariables(stageConfig));
+						app = updater.readValue(Utils.substituteVariables(stageConfig));
 					} catch (FileNotFoundException e) {
 						LOG.warn("No config file found for stage: '"+stage+"'");
 					}

@@ -35,7 +35,7 @@ public class JSONUserAdapter extends UserAdapter {
 		List<User> baseUsers;
 		// Try to read a list of users
 		try {
-			baseUsers = mapper.readValue(Utils.substitueVariables(configFile), new TypeReference<List<User>>(){});
+			baseUsers = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<List<User>>(){});
 			if(stageConfig!=null) {
 				throw new AppException("Stage overrides are not supported for users lists.", ErrorCode.CANT_READ_CONFIG_FILE);
 			} else {
@@ -44,11 +44,11 @@ public class JSONUserAdapter extends UserAdapter {
 		// Try to read single user
 		} catch (MismatchedInputException me) {
 			try {
-				User user = mapper.readValue(Utils.substitueVariables(configFile), User.class);
+				User user = mapper.readValue(Utils.substituteVariables(configFile), User.class);
 				if(stageConfig!=null) {
 					try {
 						ObjectReader updater = mapper.readerForUpdating(user);
-						user = updater.readValue(Utils.substitueVariables(stageConfig));
+						user = updater.readValue(Utils.substituteVariables(stageConfig));
 					} catch (FileNotFoundException e) {
 						LOG.warn("No config file found for stage: '"+stage+"'");
 					}

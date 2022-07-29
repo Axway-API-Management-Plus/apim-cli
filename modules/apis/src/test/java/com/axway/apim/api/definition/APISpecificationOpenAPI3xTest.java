@@ -40,14 +40,14 @@ public class APISpecificationOpenAPI3xTest {
 
 		byte[] content = getSwaggerContent(TEST_PACKAGE + "/petstore-openapi30.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
 		Assert.assertEquals(apiDefinition.getDescription(), "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.");
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).size(), 1, "Expected to get only one server url");
-		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).get(0).get("url").asText(), "https://myhost.customer.com:8767/api/v1/myAPI/");
+		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).get(0).get("url").asText(), "https://myhost.customer.com:8767/api/v1/myAPI/v2");
 	}
 	
 	@Test
@@ -55,7 +55,7 @@ public class APISpecificationOpenAPI3xTest {
 		APIManagerAdapter.apiManagerVersion="7.7.0";
 		byte[] content = getSwaggerContent(TEST_PACKAGE + "/psd2-api_1.3.6_errata20200327.yaml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
@@ -64,12 +64,12 @@ public class APISpecificationOpenAPI3xTest {
 		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).get(0).get("url").asText(), "https://myhost.customer.com:8767/api/v1/myAPI/");
 	}
 	
-	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasepath: 'An-Invalid-URL' is invalid.")
-	public void testInvalidBackendBasepath() throws AppException, IOException {
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasePath: 'An-Invalid-URL' is invalid.")
+	public void testInvalidBackendBasePath() throws AppException, IOException {
 
 		byte[] content = getSwaggerContent(TEST_PACKAGE + "/petstore-openapi30.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath("An-Invalid-URL", null);
+		apiDefinition.configureBasePath("An-Invalid-URL", null);
 	}
 	
 	@Test
@@ -121,7 +121,7 @@ public class APISpecificationOpenAPI3xTest {
 		desiredAPISpec.setFilter(filterConfig);
 		
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		
 		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.OPEN_API_30);

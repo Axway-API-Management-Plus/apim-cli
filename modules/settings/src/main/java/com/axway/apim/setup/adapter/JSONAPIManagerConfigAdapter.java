@@ -44,11 +44,11 @@ public class JSONAPIManagerConfigAdapter {
 					.withAttribute(UserDeserializer.Params.useLoginName, true)
 					.withAttribute(RemotehostDeserializer.Params.validateRemoteHost, true)
 					.forType(APIManagerConfig.class)
-					.readValue(Utils.substitueVariables(configFile));
+					.readValue(Utils.substituteVariables(configFile));
 			if(stageConfig!=null) {
 				try {
 					ObjectReader updater = mapper.readerForUpdating(baseConfig);
-					this.managerConfig = updater.readValue(Utils.substitueVariables(stageConfig));
+					this.managerConfig = updater.readValue(Utils.substituteVariables(stageConfig));
 					LOG.info("Successfully read stage configuration file: " + stageConfig);
 				} catch (FileNotFoundException e) {
 					LOG.warn("No config file found for stage: '"+stage+"'");

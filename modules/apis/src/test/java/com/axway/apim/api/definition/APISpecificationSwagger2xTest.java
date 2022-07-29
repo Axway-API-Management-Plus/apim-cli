@@ -34,7 +34,7 @@ public class APISpecificationSwagger2xTest {
 
 		byte[] content = getSwaggerContent("/api_definition_1/airports_swagger_20.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "airports_swagger_20.json", "Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
@@ -50,7 +50,7 @@ public class APISpecificationSwagger2xTest {
 
 		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
@@ -65,7 +65,7 @@ public class APISpecificationSwagger2xTest {
 	public void backendHostOnly() throws AppException, IOException {
 		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath("http://myhost.customer.com:8767", null);
+		apiDefinition.configureBasePath("http://myhost.customer.com:8767", null);
 
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -79,7 +79,7 @@ public class APISpecificationSwagger2xTest {
 	public void backendHostBasisBasePath() throws AppException, IOException {
 		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com/", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com/", null);
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -93,7 +93,7 @@ public class APISpecificationSwagger2xTest {
 	public void swaggerWithoutSchemes() throws AppException, IOException {
 		byte[] content = getSwaggerContent("/api_definition_1/petstore-without-schemes.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com/", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com/", null);
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -107,7 +107,7 @@ public class APISpecificationSwagger2xTest {
 	public void backendBasepathChangesNothing() throws AppException, IOException {
 		byte[] content = getSwaggerContent("/api_definition_1/petstore-only-https-scheme.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath("https://petstore.swagger.io", null);
+		apiDefinition.configureBasePath("https://petstore.swagger.io", null);
 		
 		Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -203,12 +203,12 @@ public class APISpecificationSwagger2xTest {
 		Assert.assertNull(filteredSpec.get("paths").get("/user/{username}").get("delete"), "/user/{username}:DELETE is NOT expected");
 	}
 	
-	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasepath: 'An-Invalid-URL' is invalid.")
+	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasePath: 'An-Invalid-URL' is invalid.")
 	public void testInvalidBackendBasepath() throws AppException, IOException {
 
 		byte[] content = getSwaggerContent("/api_definition_1/petstore.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasepath("An-Invalid-URL", null);
+		apiDefinition.configureBasePath("An-Invalid-URL", null);
 	}
 	
 	

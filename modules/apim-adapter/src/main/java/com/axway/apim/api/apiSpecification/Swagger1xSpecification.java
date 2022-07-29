@@ -38,30 +38,30 @@ public class Swagger1xSpecification extends APISpecification {
 	}
 
 	@Override
-	public void configureBasepath(String backendBasepath, API api) throws AppException {
+	public void configureBasePath(String backendBasePath, API api) throws AppException {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		try {
-			if(backendBasepath!=null) {
-				boolean backendBasepathAdjusted = false;
-				URL url = new URL(backendBasepath);
-				if(url.getPath()!=null && !url.getPath().equals("") && !backendBasepath.endsWith("/")) { // See issue #178
-					backendBasepath += "/";
-					url = new URL(backendBasepath);
+			if(backendBasePath!=null) {
+				boolean backendBasePathAdjusted = false;
+				URL url = new URL(backendBasePath);
+				if(url.getPath()!=null && !url.getPath().equals("") && !backendBasePath.endsWith("/")) { // See issue #178
+					backendBasePath += "/";
+					url = new URL(backendBasePath);
 				}
 				if(swagger.get("basePath").asText().equals(url.toString())) {
-					LOG.debug("Swagger resourcePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasepath: '"+url.getPath()+"'. Nothing to do.");
+					LOG.debug("Swagger resourcePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasePath: '"+url.getPath()+"'. Nothing to do.");
 				} else {
-					LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.toString()+"' based on configured backendBasepath: '"+backendBasepath+"'");
-					backendBasepathAdjusted = true;
+					LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.toString()+"' based on configured backendBasePath: '"+backendBasePath+"'");
+					backendBasePathAdjusted = true;
 					((ObjectNode)swagger).put("basePath", url.toString());
 				}
-				if(backendBasepathAdjusted) {
-					LOG.info("Used the configured backendBasepath: '"+backendBasepath+"' to adjust the Swagger definition.");
+				if(backendBasePathAdjusted) {
+					LOG.info("Used the configured backendBasePath: '"+backendBasePath+"' to adjust the Swagger definition.");
 				}
 				this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
 			}
 		} catch (MalformedURLException e) {
-			throw new AppException("The configured backendBasepath: '"+backendBasepath+"' is invalid.", ErrorCode.CANT_READ_CONFIG_FILE, e);
+			throw new AppException("The configured backendBasePath: '"+backendBasePath+"' is invalid.", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		} catch (Exception e) {
 			LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
 		}
@@ -84,7 +84,7 @@ public class Swagger1xSpecification extends APISpecification {
 			}
 			return false;
 		} catch (Exception e) {
-			LOG.trace("No Swager 1.x specification.", e);
+			LOG.trace("No Swagger 1.x specification.", e);
 			return false;
 		}
 	}

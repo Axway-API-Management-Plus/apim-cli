@@ -39,7 +39,7 @@ public class APISpecificationWSDLTest {
 		
 		API testAPI = new API();
 		
-		apiDefinition.configureBasepath("https://some-url-com", testAPI);
+		apiDefinition.configureBasePath("https://some-url-com", testAPI);
 		
 		Assert.assertEquals(testAPI.getServiceProfiles().get("_default").getBasePath(), "https://some-url-com");
 	}

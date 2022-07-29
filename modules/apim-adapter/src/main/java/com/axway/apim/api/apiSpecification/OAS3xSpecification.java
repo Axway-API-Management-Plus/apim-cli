@@ -1,19 +1,19 @@
 package com.axway.apim.api.apiSpecification;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.filter.JsonNodeOpenAPI3SpecFilter;
-import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class OAS3xSpecification extends APISpecification {
 	
@@ -58,24 +58,31 @@ public class OAS3xSpecification extends APISpecification {
 	}
 
 	@Override
-	public void configureBasepath(String backendBasepath, API api) throws AppException {
+	public void configureBasePath(String backendBasePath, API api) throws AppException {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		try {
-			if(backendBasepath!=null) {
-				URL url = new URL(backendBasepath); // Parse it to make sure it is valid
-				if(url.getPath()!=null && !url.getPath().equals("") && !backendBasepath.endsWith("/")) { // See issue #178
-					backendBasepath += "/";
+			if(backendBasePath!=null) {
+				URL url = new URL(backendBasePath); // Parse it to make sure it is valid
+				if(url.getPath()!=null && !url.getPath().equals("") && !backendBasePath.endsWith("/")) { // See issue #178
+					backendBasePath += "/";
 				}
-				ObjectNode newServer = this.mapper.createObjectNode();
-				newServer.put("url", backendBasepath);
 				if(openAPI.has("servers")) {
+					JsonNode server =  openAPI.get("servers").get(0); // takes the first entity -- currently not handling multiple URLs
+					JsonNode urlJsonNode = server.get("url");
+					if(urlJsonNode != null){
+						String serverUrl = urlJsonNode.asText();
+						backendBasePath = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
+					}
 					((ArrayNode) openAPI.get("servers")).removeAll();
 				}
+				LOG.info("Backend BasePath of API "+backendBasePath);
+				ObjectNode newServer = this.mapper.createObjectNode();
+				newServer.put("url", backendBasePath);
 				((ObjectNode)openAPI).set("servers", mapper.createArrayNode().add(newServer));
 				this.apiSpecificationContent = this.mapper.writeValueAsBytes(openAPI);
 			}
 		} catch (MalformedURLException e) {
-			throw new AppException("The configured backendBasepath: '"+backendBasepath+"' is invalid.", ErrorCode.BACKEND_BASEPATH_IS_INVALID, e);
+			throw new AppException("The configured backendBasePath: '"+backendBasePath+"' is invalid.", ErrorCode.BACKEND_BASEPATH_IS_INVALID, e);
 		} catch (Exception e) {
 			LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
 		}
@@ -88,10 +95,7 @@ public class OAS3xSpecification extends APISpecification {
 			setMapperForDataFormat();
 			if(this.mapper==null) return false;
 			openAPI = this.mapper.readTree(apiSpecificationContent);
-			if(!(openAPI.has("openapi") && openAPI.get("openapi").asText().startsWith("3.0."))) {
-				return false;
-			}
-			return true;
+			return openAPI.has("openapi") && openAPI.get("openapi").asText().startsWith("3.0.");
 		} catch (AppException e) {
 			if(e.getError()==ErrorCode.UNSUPPORTED_FEATURE) {
 				throw e;

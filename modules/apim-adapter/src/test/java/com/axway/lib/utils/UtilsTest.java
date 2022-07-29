@@ -1,6 +1,7 @@
 package com.axway.lib.utils;
 
 import java.io.File;
+import java.net.MalformedURLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,4 +66,60 @@ public class UtilsTest {
 		Assert.assertNotNull(installFolder);
 		Assert.assertTrue(installFolder.exists());
 	}
+
+
+	@Test
+	public void testHandleOpenAPIServerUrlBackendBasePathWithSlash()  throws MalformedURLException{
+		String serverUrl = "https://petstore3.swagger.io/api/v3";
+		String backendBasePath = "http://backend/";
+		String	result = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
+		Assert.assertEquals(result, "http://backend/api/v3");
+	}
+
+	@Test
+	public void testHandleOpenAPIServerUrlBackendBasePathWithoutSlash()  throws MalformedURLException{
+		String serverUrl = "https://petstore3.swagger.io/api/v3";
+		String backendBasePath = "http://backend";
+		String	result = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
+		Assert.assertEquals(result, "http://backend/api/v3");
+	}
+	@Test
+	public void testHandleOpenAPIServerUriBackendBasePathWithSlash()  throws MalformedURLException{
+		String serverUrl = "https://petstore3.swagger.io/api/v3";
+		String backendBasePath = "http://backend/";
+		String	result = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
+		Assert.assertEquals(result, "http://backend/api/v3");
+	}
+	@Test
+	public void testHandleOpenAPIServerUrlBackendBasePathWithPath()  throws MalformedURLException{
+		String serverUrl = "https://petstore3.swagger.io/api/v3";
+		String backendBasePath = "http://backend/api";
+		String	result = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
+		Assert.assertEquals(result, "http://backend/api/api/v3");
+	}
+
+	@Test
+	public void testHandleOpenAPIServerUriBackendBasePathWithoutSlash()  throws MalformedURLException{
+		String serverUrl = "/api/v3";
+		String backendBasePath = "http://backend";
+		String	result = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
+		Assert.assertEquals(result, "http://backend/api/v3");
+	}
+	@Test
+	public void testHandleOpenAPIServerUrlWithoutSlashAndUri()  throws MalformedURLException{
+		String serverUrl = "/api/v3";
+		String backendBasePath = "http://backend";
+		String	result = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
+		Assert.assertEquals(result, "http://backend/api/v3");
+	}
+
+	@Test
+	public void testHandleOpenAPIServerUriBackendBasePathWithPath()  throws MalformedURLException{
+		String serverUrl = "/api/v3";
+		String backendBasePath = "http://backend/api";
+		String	result = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
+		Assert.assertEquals(result, "http://backend/api/api/v3");
+	}
+
+
 }

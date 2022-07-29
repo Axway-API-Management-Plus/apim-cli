@@ -561,7 +561,7 @@ public class APIManagerAPIAdapter {
             String basePath = jsonNode.get("basePath").asText();
             // Only adjust the API-Specification when exporting the FE-API-Spec otherwise we need the originally imported API-Spec
             if (exportFEAPIDefinition) {
-                apiDefinition.configureBasepath(basePath + resourcePath, null);
+                apiDefinition.configureBasePath(basePath + resourcePath, null);
             }
             // In any case, we save the backend resource path, as it is necessary for the full backendBasepath in the exported API config.
             api.setBackendResourcePath(resourcePath);

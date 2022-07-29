@@ -23,9 +23,9 @@ public abstract class ODataSpecification extends APISpecification {
 	protected OpenAPI openAPI;
 	
 	@Override
-	public void configureBasepath(String backendBasepath, API api) throws AppException {
-		if(backendBasepath==null || !CoreParameters.getInstance().isReplaceHostInSwagger()) {
-			// Try to setup the Backend-Host + Basepath based on the given Metadata URL
+	public void configureBasePath(String backendBasePath, API api) throws AppException {
+		if(backendBasePath==null || !CoreParameters.getInstance().isReplaceHostInSwagger()) {
+			// Try to set up the Backend-Host + BasePath based on the given Metadata URL
 			try {
 				String backend = getBasePath(apiSpecificationFile);
 				Server server = new Server();
@@ -39,23 +39,23 @@ public abstract class ODataSpecification extends APISpecification {
 					replaceHostInSwaggerDisabledNote = " with parameter: replaceHostInSwagger set to true";
 				}
 				throw new AppException("Error importing OData API. Unknown backend host. "
-						+ "You either have to provide the MetaData-File using an HTTP-Endpoint or configure a backendBasepath"+replaceHostInSwaggerDisabledNote+".", ErrorCode.CANT_READ_API_DEFINITION_FILE);
+						+ "You either have to provide the MetaData-File using an HTTP-Endpoint or configure a backendBasePath"+replaceHostInSwaggerDisabledNote+".", ErrorCode.CANT_READ_API_DEFINITION_FILE);
 			}
 		}
 		
 		// Otherwise we are using the configured backendBasePath
 		try {
-			if(backendBasepath!=null) {
-				URL url = new URL(backendBasepath); // Parse it to make sure it is valid
-				if(url.getPath()!=null && !url.getPath().equals("") && !backendBasepath.endsWith("/")) { // See issue #178
-					backendBasepath += "/";
+			if(backendBasePath!=null) {
+				URL url = new URL(backendBasePath); // Parse it to make sure it is valid
+				if(url.getPath()!=null && !url.getPath().equals("") && !backendBasePath.endsWith("/")) { // See issue #178
+					backendBasePath += "/";
 				}
 				Server server = new Server();
-				server.setUrl(backendBasepath);
+				server.setUrl(backendBasePath);
 				openAPI.addServersItem(server);
 			}
 		} catch (MalformedURLException e) {
-			throw new AppException("The configured backendBasepath: '"+backendBasepath+"' is invalid.", ErrorCode.BACKEND_BASEPATH_IS_INVALID, e);
+			throw new AppException("The configured backendBasePath: '"+backendBasePath+"' is invalid.", ErrorCode.BACKEND_BASEPATH_IS_INVALID, e);
 		} catch (Exception e) {
 			LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
 		}

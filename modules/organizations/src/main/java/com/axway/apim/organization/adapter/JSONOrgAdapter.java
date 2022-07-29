@@ -45,7 +45,7 @@ public class JSONOrgAdapter extends OrgAdapter {
 		List<Organization> baseOrgs;
 		// Try to read a list of organizations
 		try {
-			baseOrgs = mapper.readValue(Utils.substitueVariables(configFile), new TypeReference<List<Organization>>(){});
+			baseOrgs = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<List<Organization>>(){});
 			if(stageConfig!=null) {
 				throw new AppException("Stage overrides are not supported for organization lists.", ErrorCode.CANT_READ_CONFIG_FILE);
 			} else {
@@ -54,11 +54,11 @@ public class JSONOrgAdapter extends OrgAdapter {
 		// Try to read single organization
 		} catch (MismatchedInputException me) {
 			try {
-				Organization org = mapper.readValue(Utils.substitueVariables(configFile), Organization.class);
+				Organization org = mapper.readValue(Utils.substituteVariables(configFile), Organization.class);
 				if(stageConfig!=null) {
 					try {
 						ObjectReader updater = mapper.readerForUpdating(org);
-						org = updater.readValue(Utils.substitueVariables(stageConfig));
+						org = updater.readValue(Utils.substituteVariables(stageConfig));
 					} catch (FileNotFoundException e) {
 						LOG.warn("No config file found for stage: '"+stage+"'");
 					}

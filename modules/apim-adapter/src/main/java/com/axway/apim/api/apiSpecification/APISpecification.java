@@ -106,7 +106,7 @@ public abstract class APISpecification {
 		}
 	}
 	
-	public abstract void configureBasepath(String backendBasepath, API api) throws AppException;
+	public abstract void configureBasePath(String backendBasePath, API api) throws AppException;
 	
 	public abstract String getDescription();
 	

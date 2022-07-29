@@ -38,7 +38,7 @@ public class APISpecificationODataTest {
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2NorthWindOpenAPI3.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "northwind-odata-v2.xml$metadata", "OData-V2-Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
 		Assert.assertEquals(apiDefinition.getDescription(), "The OData Service from northwind-odata-v2.xml$metadata");
@@ -130,7 +130,7 @@ public class APISpecificationODataTest {
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2ODataDemoMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2ODataDemoOpenAPI.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
 		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
@@ -144,7 +144,7 @@ public class APISpecificationODataTest {
 		
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/Northwind/Northwind.svc/$metadata", "OData-V2-Test-API");
-		apiDefinition.configureBasepath(null, null);
+		apiDefinition.configureBasePath(null, null);
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
 		JsonNode openAPI = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -158,7 +158,7 @@ public class APISpecificationODataTest {
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-AccountDuplicateCheckMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-AccountDuplicateCheckOpenAPI.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
 		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
@@ -173,7 +173,7 @@ public class APISpecificationODataTest {
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-PMGMMultiraterMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-PMGMMultiraterOpenAPI.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
 		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
@@ -188,7 +188,7 @@ public class APISpecificationODataTest {
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-AccountsAndTransactionsMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-AccountsAndTransactionsOpenAPI.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
 		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
@@ -203,7 +203,7 @@ public class APISpecificationODataTest {
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-BusinessPartnerA2XMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-BusinessPartnerA2XOpenAPI.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
 		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
@@ -218,7 +218,7 @@ public class APISpecificationODataTest {
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-BasicProductAvailabilityInfoMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-BasicProductAvailabilityInfoOpenAPI.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
 		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
@@ -233,7 +233,7 @@ public class APISpecificationODataTest {
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-MasterDataForBusinessPartnerMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-MasterDataForBusinessPartnerOpenAPI.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
 		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
@@ -248,7 +248,7 @@ public class APISpecificationODataTest {
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-CustomerMaterialA2XMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-CustomerMaterialA2XOpenAPI.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/(S(owef4vwcosio0xpu1glpf320))/OData/OData.svc/$metadata", "OData-V2-Test-API");
-		apiDefinition.configureBasepath("https://myhost.customer.com:8767/api/v1/myAPI", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
 		
 		Assert.assertTrue(apiDefinition instanceof ODataV2Specification);
 		if(apiDefinition.getApiSpecificationContent().length!=odataOpenAPI3.length) {
