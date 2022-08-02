@@ -29,8 +29,7 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 
-public class
-JsonAPIExporter extends APIResultHandler {
+public class JsonAPIExporter extends APIResultHandler {
 	private static Logger LOG = LoggerFactory.getLogger(JsonAPIExporter.class);
 
 	/** Where to store the exported API-Definition */
@@ -142,8 +141,8 @@ JsonAPIExporter extends APIResultHandler {
 
 	private static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
 
-		try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {
-			fileOuputStream.write(bFile);
+		try (FileOutputStream fileOutputStream = new FileOutputStream(fileDest)) {
+			fileOutputStream.write(bFile);
 		} catch (IOException e) {
 			throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
 		}
