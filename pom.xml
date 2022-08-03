@@ -262,10 +262,6 @@
 				<groupId>com.consol.citrus.mvn</groupId>
 				<artifactId>citrus-maven-plugin</artifactId>
 				<version>2.7.7</version>
-				<configuration>
-					<author>Christoph Wiechmann</author>
-					<targetPackage>com.consol.citrus</targetPackage>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
