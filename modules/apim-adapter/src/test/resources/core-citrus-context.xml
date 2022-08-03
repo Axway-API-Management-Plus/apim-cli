@@ -29,12 +29,12 @@
     	<citrus:variable name="apiManagerHost" value="${apiManagerHost}"/>
     	<citrus:variable name="apiManagerUser" value="${apiManagerUser}"/>
     	<citrus:variable name="apiManagerPass" value="${apiManagerPass}"/>
-    	<citrus:variable name="API_VERSION" value="/api/portal/v1.3"/>
+    	<citrus:variable name="API_VERSION" value="/api/portal/v1.4"/>
 	</citrus:global-variables>
 
 	
 	<citrus-http:client id="apiManager"
-          request-url="https://${apiManagerHost}:8075/api/portal/v1.3"
+          request-url="https://${apiManagerHost}:8075/api/portal/v1.4"
           request-method="GET"
           content-type="application/json"
           charset="UTF-8"

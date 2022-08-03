@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - oas 3.0 base path handling (See issue [#297](https://github.com/Axway-API-Management-Plus/apim-cli/issues/297)
+- BackendBasepath problem exporting SOAP API with apim-cli (See issue [#299](https://github.com/Axway-API-Management-Plus/apim-cli/issues/299)
 
 ### Changed
 - If backendBasepath is present in api-config.json, Openapi (OAS 3) servers.url will be modified based on the values. E.g
