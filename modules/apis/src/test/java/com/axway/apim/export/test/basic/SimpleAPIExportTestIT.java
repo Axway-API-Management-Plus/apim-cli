@@ -91,7 +91,7 @@ public class SimpleAPIExportTestIT extends TestNGCitrusTestRunner {
 		assertEquals(exportedAPIConfig.get("state").asText(), 				"unpublished");
 		assertEquals(exportedAPIConfig.get("path").asText(), 				context.getVariable("apiPath"));
 		assertEquals(exportedAPIConfig.get("name").asText(), 				context.getVariable("apiName"));
-		assertEquals(exportedAPIConfig.get("backendBasepath").asText(), 	"https://yet.another.petstore/another/path/v2");
+		assertEquals(exportedAPIConfig.get("backendBasepath").asText(), 	"https://yet.another.petstore/another/path");
 		assertEquals(exportedAPIConfig.get("caCerts").size(), 				4);
 		
 		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("certFile").asText(), 				"swagger.io.crt");

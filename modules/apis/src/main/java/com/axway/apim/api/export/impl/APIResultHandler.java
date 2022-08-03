@@ -139,7 +139,7 @@ public abstract class APIResultHandler {
 
     protected static String getBackendPath(API api) {
         ExportAPI exportAPI = new ExportAPI(api);
-        return exportAPI.getBackendBasePath();
+        return exportAPI.getBackendBasepath();
     }
 
     protected static String getUsedSecurity(API api) {

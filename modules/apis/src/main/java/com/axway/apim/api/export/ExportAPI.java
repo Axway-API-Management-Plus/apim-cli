@@ -326,7 +326,7 @@ public class ExportAPI {
     }
 
 
-    public String getBackendBasePath() {
+    public String getBackendBasepath() {
         //if(this.actualAPIProxy.getResourcePath()!=null) {
         // The API Manager composes the actual backend path from the host + path and backend resource path
         // specified in the frontend.
