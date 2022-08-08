@@ -84,8 +84,6 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    ;
-
     public APIManagerAPIAdapter() {
         cmd = CoreParameters.getInstance();
     }
@@ -175,10 +173,9 @@ public class APIManagerAPIAdapter {
         if (filter.getId() != null) {
             requestedId = "/" + filter.getId();
         }
-        URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + filter.getApiType() + requestedId)
+        return new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + filter.getApiType() + requestedId)
                 .addParameters(filter.getFilters())
                 .build();
-        return uri;
     }
 
     API getUniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
@@ -454,7 +451,7 @@ public class APIManagerAPIAdapter {
     private void addClientApplications(API api, APIFilter filter) throws AppException {
         if (!filter.isIncludeClientApplications()) return;
         List<ClientApplication> existingClientApps = new ArrayList<>();
-        List<ClientApplication> apps = null;
+        List<ClientApplication> apps;
         // With version >7.7 we can retrieve the subscribed apps directly
         if (APIManagerAdapter.hasAPIManagerVersion("7.7")) {
             apps = APIManagerAdapter.getInstance().appAdapter.getAppsSubscribedWithAPI(api.getId());
@@ -565,7 +562,6 @@ public class APIManagerAPIAdapter {
             }
             // In any case, we save the backend resource path, as it is necessary for the full backendBasepath in the exported API config.
             api.setBackendResourcePath(resourcePath);
-            return;
         } catch (Exception e) {
             throw new AppException("Cannot parse Backend-API for API: '" + api.toStringHuman() + "' in order to change API-Specification", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
         } finally {
@@ -594,8 +590,7 @@ public class APIManagerAPIAdapter {
                 LOG.error("Error creating API-Proxy (FE-API) using URI: " + uri + ". Received Status-Code: " + statusCode + ", Response: '" + response + "'");
                 throw new AppException("Error creating API-Proxy (FE-API). Received Status-Code: " + statusCode, ErrorCode.CANT_CREATE_API_PROXY);
             }
-            API apiProxy = mapper.readValue(response, API.class);
-            return apiProxy;
+            return mapper.readValue(response, API.class);
         } catch (Exception e) {
             throw new AppException("Can't create API-Proxy.", ErrorCode.CANT_CREATE_API_PROXY, e);
         } finally {
@@ -639,8 +634,7 @@ public class APIManagerAPIAdapter {
                 LOG.debug("Request sent:" + EntityUtils.toString(entity));
                 throw new AppException("Error updating API-Proxy. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
             }
-            API apiProxy = mapper.readValue(response, API.class);
-            return apiProxy;
+            return mapper.readValue(response, API.class);
         } catch (Exception e) {
             throw new AppException("Cannot update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
         } finally {
@@ -867,7 +861,6 @@ public class APIManagerAPIAdapter {
 
     private JsonNode importFromWSDL(API api) throws IOException {
         URI uri;
-        HttpEntity entity = new StringEntity("", ContentType.APPLICATION_FORM_URLENCODED);
         String username;
         String pass;
         String wsdlUrl;
@@ -884,16 +877,18 @@ public class APIManagerAPIAdapter {
         pass = parser.getPassword();
 
         try {
-            URIBuilder uriBuilder = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/importFromUrl/")
-                    .setParameter("organizationId", api.getOrganization().getId())
-                    .setParameter("type", "wsdl")
-                    .setParameter("url", wsdlUrl)
-                    .setParameter("name", api.getName());
+            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/importFromUrl/").build();
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+
+            nameValuePairs.add(new BasicNameValuePair("organizationId", api.getOrganization().getId()));
+            nameValuePairs.add(new BasicNameValuePair("type", "wsdl"));
+            nameValuePairs.add(new BasicNameValuePair("url", wsdlUrl));
+            nameValuePairs.add(new BasicNameValuePair("name", api.getName()));
             if (username != null) {
-                uriBuilder.setParameter("username", username);
-                uriBuilder.setParameter("password", pass);
+                nameValuePairs.add(new BasicNameValuePair("username", username));
+                nameValuePairs.add(new BasicNameValuePair("password", pass));
             }
-            uri = uriBuilder.build();
+            HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
             RestAPICall importWSDL = new POSTRequest(entity, uri);
             httpResponse = importWSDL.execute();
             int statusCode = httpResponse.getStatusLine().getStatusCode();
