@@ -10,13 +10,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - oas 3.0 base path handling (See issue [#297](https://github.com/Axway-API-Management-Plus/apim-cli/issues/297)
 - BackendBasepath problem exporting SOAP API with apim-cli (See issue [#299](https://github.com/Axway-API-Management-Plus/apim-cli/issues/299)
+- Importing SOAP API with apim-cli adds "+" instead of spaces for the Backend API name (See issue [#301](https://github.com/Axway-API-Management-Plus/apim-cli/issues/301)
 
 ### Changed
+- Added new parameter disableCompression.  The parameter enables logging API Gateway responses for debugging.
+  - Usage - **api get -u apiadmin -p Space*Salt*25 -h 208.67.129.25 -port 8075 -n "PetStore 3.0" -o json -disableCompression**
+  - Enable http client header and payload logging using jvm -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog -Dorg.apache.commons.logging.simplelog.showdatetime=true -Dorg.apache.commons.logging.simplelog.log.org.apache.http=DEBUG
 - If backendBasepath is present in api-config.json, Openapi (OAS 3) servers.url will be modified based on the values. E.g
   - If open api servers.url is /api/v3 and backendBasepath is https://backend, the openapi server.url will be replaced with https://backend/api/v3
   - If open api servers.url is https://petstore.swagger.io/api/v3 and backendBasepath is https://backend, the openapi server.url will be replaced with https://backend/api/v3
   - If open api servers.url is https://petstore.swagger.io/api/v3 and backendBasepath is https://backend/api, the openapi server.url will be replaced with https://backend/api/api/v3
-
 
 ## [1.12.2] 2022-07-28
 

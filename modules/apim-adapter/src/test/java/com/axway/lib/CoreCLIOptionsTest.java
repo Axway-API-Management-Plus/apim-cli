@@ -115,4 +115,21 @@ public class CoreCLIOptionsTest {
 		
 		Assert.assertEquals(params.getApiBasepath(), "/fr/apim/v13/portal");
 	}
+
+	@Test
+	public void testDisableCompression() throws AppException {
+		String[] args = {"-disableCompression"};
+		CLIOptions options = SampleCLIOptions.create(args);
+		CoreParameters params = (CoreParameters) options.getParams();
+		Assert.assertEquals(params.isDisableCompression(), true);
+
+	}
+	@Test
+	public void testDisableCompressionNegative() throws AppException {
+		String[] args = {""};
+		CLIOptions options = SampleCLIOptions.create(args);
+		CoreParameters params = (CoreParameters) options.getParams();
+		Assert.assertEquals(params.isDisableCompression(), false);
+
+	}
 }

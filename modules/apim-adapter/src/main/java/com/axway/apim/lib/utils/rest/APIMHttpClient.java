@@ -120,6 +120,8 @@ public class APIMHttpClient {
 				}
 				defaultRequestConfig.setProxy(proxyHost);
 			}
+			if(params.isDisableCompression())
+				clientBuilder.disableContentCompression();
 			clientBuilder.setDefaultRequestConfig(defaultRequestConfig.build());
 			this.httpClient = clientBuilder.build();
 		} catch (Exception e) {

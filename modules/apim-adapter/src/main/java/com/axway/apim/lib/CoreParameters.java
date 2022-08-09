@@ -108,6 +108,8 @@ public class CoreParameters implements Parameters {
 	private String proxyPassword;
 	
 	private int retryDelay;
+
+	private boolean disableCompression;
 	
 	public CoreParameters() {
 		super();
@@ -542,6 +544,14 @@ public class CoreParameters implements Parameters {
 	
 	public List<CacheType> getEnabledCacheTypes() {
 		return null;
+	}
+
+	public boolean isDisableCompression() {
+		return disableCompression;
+	}
+
+	public void setDisableCompression(boolean disableCompression) {
+		this.disableCompression = disableCompression;
 	}
 
 	@Override

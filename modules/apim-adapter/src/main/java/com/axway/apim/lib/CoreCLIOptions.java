@@ -45,9 +45,8 @@ public class CoreCLIOptions extends CLIOptions {
 		params.setProxyUsername(getValue("httpProxyUsername"));
 		params.setProxyPassword(getValue("httpProxyPassword"));
 		params.setRetryDelay(getValue("retryDelay"));
-		
-		
-		return (Parameters) params;
+		params.setDisableCompression(hasOption("disableCompression"));
+		return params;
 	}
 
 	@Override
@@ -158,6 +157,10 @@ public class CoreCLIOptions extends CLIOptions {
 		option = new Option("retryDelay", true, "Retry delay in milliseconds for the some of the flaky REST-API-Manager API-Calls. See issue #213");
 		option.setRequired(false);
 		option.setArgName("true");
+		cliOptions.addInternalOption(option);
+
+		option = new Option("disableCompression", false, "Disable Http Client gzip Compression");
+		option.setRequired(false);
 		cliOptions.addInternalOption(option);
 	}
 
