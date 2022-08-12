@@ -74,14 +74,15 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 	public void usingOSEnvVariable() throws AppException, ParseException {
 		try {
 			String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
-
 			APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
 			DesiredAPI apiConfig = (DesiredAPI)adapter.getApiConfig();
-			String osName = System.getProperty("os.name");
-			// To ignore the check on MAC OS as MAC does not have environment variable 'OS'
-			if(osName.startsWith("Mac"))
-				return;
 			String osEnv = System.getenv().get("OS");
+			// To ignore the check on OS as  MAC, Ubuntu does not have environment variable 'OS'
+			if(osEnv == null) {
+				String osName = System.getProperty("os.name");
+				LOG.warn("Ignoring test as OS : "+osName +" does not have environment variable OS");
+				return;
+			}
 			Assert.assertEquals(apiConfig.getSummary(), "Operating system: "+osEnv);
 		} catch (Exception e) {
 			LOG.error("Error running test: usingOSEnvVariable", e);

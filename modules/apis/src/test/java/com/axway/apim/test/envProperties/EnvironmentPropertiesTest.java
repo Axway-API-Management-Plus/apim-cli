@@ -73,11 +73,16 @@ public class EnvironmentPropertiesTest {
 	public void testEnvironementWithOSEnvVariables() throws AppException, IOException {
 		// For this test to run, the system must provide the environment properties CI & JAVA_HOME
 		EnvironmentProperties properties = new EnvironmentProperties("NOT_SET");
-		
+		System.out.println(properties);
 		Assert.assertNotEquals(properties.get("variableFromOSEnvironmentVariable"), "${JAVA_HOME}");
 		String javaHome = System.getenv("JAVA_HOME");
 		if(javaHome == null){
 			LOG.warn("JAVA_HOME is not set and test is 'testEnvironementWithOSEnvVariables' is ignored");
+			return;
+		}
+		String CI = System.getenv("CI");
+		if(CI == null){
+			LOG.warn("CI is not set and test is 'variablePartiallyFromOSEnvironmentVariable' is ignored");
 			return;
 		}
 		Assert.assertEquals(properties.get("variablePartiallyFromOSEnvironmentVariable"), "Fixed value and true some dynamic parts");		
