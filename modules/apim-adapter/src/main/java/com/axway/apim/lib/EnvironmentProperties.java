@@ -91,7 +91,7 @@ public class EnvironmentProperties implements Map<String, String> {
 		}
 	}
 	
-	private static String resolveValueWithEnvVars(String value) {
+	public static String resolveValueWithEnvVars(String value) {
 		if (null == value) {
 			return null;
 		}
