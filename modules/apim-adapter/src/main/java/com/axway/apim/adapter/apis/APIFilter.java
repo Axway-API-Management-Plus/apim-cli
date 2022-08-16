@@ -33,21 +33,21 @@ import com.axway.apim.lib.utils.Utils.FedKeyType;
 
 public class APIFilter implements CustomPropertiesFilter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
 	
-	public static enum METHOD_TRANSLATION {
+	public enum METHOD_TRANSLATION {
 		NONE, 
 		AS_NAME, 
 		AS_ID
 	}
 	
-	public static enum POLICY_TRANSLATION {
+	public enum POLICY_TRANSLATION {
 		NONE, 
 		TO_KEY, 
 		TO_NAME
 	}
 	
-	public static enum FILTER_OP {
+	public enum FILTER_OP {
 		eq, 
 		ne, 
 		gt, 
@@ -55,7 +55,7 @@ public class APIFilter implements CustomPropertiesFilter {
 		ge, 
 		le, 
 		like,
-		gele;
+		gele
 	}
 	
 	private String id;
@@ -69,21 +69,14 @@ public class APIFilter implements CustomPropertiesFilter {
 	private String inboundSecurity;
 	private String outboundAuthentication;
 	private String organization;
-	
 	private String createdOn;
 	private FILTER_OP createdOnOp;
-	
 	private APIType type;
-	
 	private String policyName;
-	
 	private String tag;
-	
 	private List<String> customProperties;
-	
 	private boolean deprecated;
 	private boolean retired;
-	
 	private String apiType;
 	
 	private METHOD_TRANSLATION translateMethodMode = METHOD_TRANSLATION.NONE;
@@ -98,41 +91,27 @@ public class APIFilter implements CustomPropertiesFilter {
 	private boolean includeClientAppQuota = false;
 	private boolean includeImage = false;
 	private boolean includeRemoteHost = false;
-	
 	private boolean includeOriginalAPIDefinition = false;
-	
 	private boolean useFEAPIDefinition = false;
-	
 	private boolean failOnError = true;
-	
+	private boolean includeMethods;
 	POLICY_TRANSLATION translatePolicyMode = POLICY_TRANSLATION.NONE;
-	
-	List<NameValuePair> filters = new ArrayList<NameValuePair>();
-
-	private APIFilter() {
-		this.type = APIType.CUSTOM;
-	}
-	
+	List<NameValuePair> filters = new ArrayList<>();
 	private APIFilter(APIType type) {
 		this.type = type;
 	}
-
 	public List<NameValuePair> getFilters() {
 		return filters;
 	}
-
 	public void setFilters(List<NameValuePair> filters) {
 		this.filters.addAll(filters);
 	}
-
 	public String getId() {
 		return id;
 	}
-
 	public void setId(String id) {
 		this.id = id;
 	}
-
 	public String getApiId() {
 		return apiId;
 	}
@@ -434,7 +413,7 @@ public class APIFilter implements CustomPropertiesFilter {
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (this == obj) return true;
-		if(obj instanceof APIFilter == false) return false;
+		if(!(obj instanceof APIFilter)) return false;
 		APIFilter other = (APIFilter)obj;
 		return (
 				StringUtils.equals(other.getId(), this.getId()) && 
@@ -449,6 +428,14 @@ public class APIFilter implements CustomPropertiesFilter {
 		hashCode += (this.id!=null) ? this.id.hashCode() : 0;
 		hashCode += (this.name!=null) ? this.name.hashCode() : 0;
 		return hashCode;
+	}
+
+	public boolean isIncludeMethods() {
+		return includeMethods;
+	}
+
+	public void setIncludeMethods(boolean includeMethods) {
+		this.includeMethods = includeMethods;
 	}
 
 	@Override
@@ -501,14 +488,12 @@ public class APIFilter implements CustomPropertiesFilter {
 		if(this.getInboundSecurity()!=null) {
 			boolean match = false;
 			if(api.getInboundProfiles()!=null) {
-				Iterator<InboundProfile> it = api.getInboundProfiles().values().iterator();
-				while(it.hasNext()) {
-					InboundProfile profile = it.next();
-					if(profile.getSecurityProfile()!=null) {
-						for(SecurityProfile securityProfile : api.getSecurityProfiles()) {
-							for(SecurityDevice securityDevice : securityProfile.getDevices()) {
+				for (InboundProfile profile : api.getInboundProfiles().values()) {
+					if (profile.getSecurityProfile() != null) {
+						for (SecurityProfile securityProfile : api.getSecurityProfiles()) {
+							for (SecurityDevice securityDevice : securityProfile.getDevices()) {
 								List<String> deviceNames = Arrays.asList(securityDevice.getType().getAlternativeNames());
-								if(deviceNames.contains(this.getInboundSecurity().toLowerCase())) {
+								if (deviceNames.contains(this.getInboundSecurity().toLowerCase())) {
 									match = true;
 									break;
 								}
@@ -575,24 +560,22 @@ public class APIFilter implements CustomPropertiesFilter {
 		if(this.getOutboundAuthentication()!=null) {
 			boolean match = false;
 			if(api.getOutboundProfiles()!=null) {
-				Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
-				while(it.hasNext()) {
-					OutboundProfile profile = it.next();
-					if(profile.getAuthenticationProfile()!=null) {
-						for(AuthenticationProfile authnProfile : api.getAuthenticationProfiles()) {
-							if(authnProfile.getName().equals(profile.getAuthenticationProfile())) {
+				for (OutboundProfile profile : api.getOutboundProfiles().values()) {
+					if (profile.getAuthenticationProfile() != null) {
+						for (AuthenticationProfile authnProfile : api.getAuthenticationProfiles()) {
+							if (authnProfile.getName().equals(profile.getAuthenticationProfile())) {
 								List<String> authnNames = Arrays.asList(authnProfile.getType().getAlternativeNames());
-								if(authnNames.contains(this.getOutboundAuthentication().toLowerCase())) {
-									match=true;
+								if (authnNames.contains(this.getOutboundAuthentication().toLowerCase())) {
+									match = true;
 									break;
 								}
-								if(authnProfile.getType()==AuthType.oauth) {
-									String providerProfile = (String)authnProfile.getParameters().get("providerProfile");
-									providerProfile = Utils.getExternalPolicyName(providerProfile, FedKeyType.OAuthAppProfile); 
+								if (authnProfile.getType() == AuthType.oauth) {
+									String providerProfile = (String) authnProfile.getParameters().get("providerProfile");
+									providerProfile = Utils.getExternalPolicyName(providerProfile, FedKeyType.OAuthAppProfile);
 									Pattern pattern = Pattern.compile(this.getOutboundAuthentication().toLowerCase().replace("*", ".*"));
 									Matcher matcher = pattern.matcher(providerProfile.toLowerCase());
-									if(matcher.matches()) {
-										match=true;
+									if (matcher.matches()) {
+										match = true;
 										break;
 									}
 								}
@@ -606,9 +589,7 @@ public class APIFilter implements CustomPropertiesFilter {
 		if(this.getOrganization()!=null) {
 			Pattern pattern = Pattern.compile(this.getOrganization().toLowerCase().replace("*", ".*"));
 			Matcher matcher = pattern.matcher(api.getOrganization().getName().toLowerCase());
-			if(!matcher.matches()) {
-				return true;
-			}
+			return !matcher.matches();
 		}
 		return false;
 	}
@@ -618,7 +599,7 @@ public class APIFilter implements CustomPropertiesFilter {
 	 */
 	public static class Builder {
 		
-		public static enum APIType {
+		public enum APIType {
 			/**
 			 * APIs are created with: 
 			 * - includingQuotas
@@ -644,20 +625,13 @@ public class APIFilter implements CustomPropertiesFilter {
 		String inboundSecurity;
 		String outboundAuthentication;
 		String organization;
-		
 		List<String[]> createdOn;
-		
 		APIType apiType;
-		
 		List<String> customProperties;
-		
 		boolean deprecated;
 		boolean retired;
-		
 		METHOD_TRANSLATION translateMethodMode = METHOD_TRANSLATION.NONE;
-		
-		boolean loadBackendAPI = false;
-		
+		boolean loadBackendAPI;
 		boolean includeOperations = false;
 		boolean includeQuotas = false;
 		boolean includeClientOrganizations = false;
@@ -665,17 +639,12 @@ public class APIFilter implements CustomPropertiesFilter {
 		boolean includeClientAppQuota = false;
 		boolean includeImage = false;
 		boolean includeRemoteHost = false;
-		
 		boolean includeOriginalAPIDefinition = false;
-		
 		boolean useFEAPIDefinition = false;
-		
 		boolean failOnError = true;
-		
+		boolean includeMethods;
 		POLICY_TRANSLATION translatePolicyMode = POLICY_TRANSLATION.NONE;
-		
-		List<NameValuePair> filters = new ArrayList<NameValuePair>();
-
+		List<NameValuePair> filters = new ArrayList<>();
 		public Builder() {
 			this(APIType.CUSTOM, false);
 		}
@@ -732,6 +701,7 @@ public class APIFilter implements CustomPropertiesFilter {
 			apiFilter.setOutboundAuthentication(this.outboundAuthentication);
 			apiFilter.setFailOnError(this.failOnError);
 			apiFilter.setOrganization(organization);
+			apiFilter.setIncludeMethods(includeMethods);
 			return apiFilter;
 		}
 
@@ -807,14 +777,14 @@ public class APIFilter implements CustomPropertiesFilter {
 		
 		public Builder isCreatedOnBefore(String createdOn) {
 			if(createdOn==null) return this;
-			if(this.createdOn==null) this.createdOn = new ArrayList<String[]>();
+			if(this.createdOn==null) this.createdOn = new ArrayList<>();
 			this.createdOn.add(new String[] {createdOn, FILTER_OP.lt.name()});
 			return this;
 		}
 		
 		public Builder isCreatedOnAfter(String createdOn) {
 			if(createdOn==null) return this;
-			if(this.createdOn==null) this.createdOn = new ArrayList<String[]>();
+			if(this.createdOn==null) this.createdOn = new ArrayList<>();
 			this.createdOn.add(new String[] {createdOn, FILTER_OP.gt.name()});
 			return this;
 		}
@@ -882,7 +852,12 @@ public class APIFilter implements CustomPropertiesFilter {
 		
 		public Builder includeCustomProperties(Map<String, String> customProperties) {
 			if(customProperties==null) return this;
-			this.customProperties = new ArrayList<String>(customProperties.keySet());
+			this.customProperties = new ArrayList<>(customProperties.keySet());
+			return this;
+		}
+
+		public Builder includeMethods(boolean includeMethods) {
+			this.includeMethods = includeMethods;
 			return this;
 		}
 		
@@ -928,41 +903,37 @@ public class APIFilter implements CustomPropertiesFilter {
 		String escaped = SPECIAL_REGEX_CHARS.matcher(policyName).replaceAll("\\\\$0");
 		Pattern pattern = Pattern.compile(escaped.toLowerCase().replace("*", ".*"));
 		if(api.getOutboundProfiles()!=null) {
-			Iterator<OutboundProfile> it = api.getOutboundProfiles().values().iterator();
-			while(it.hasNext()) {
-				OutboundProfile profile = it.next();
-				for(Policy policy : profile.getAllPolices()) {
-					if(policy.getName()==null) {
-						LOG.warn("Cannot check policy: "+policy+" as policy name is empty.");
+			for (OutboundProfile profile : api.getOutboundProfiles().values()) {
+				for (Policy policy : profile.getAllPolices()) {
+					if (policy.getName() == null) {
+						LOG.warn("Cannot check policy: " + policy + " as policy name is empty.");
 						continue;
 					}
 					Matcher matcher = pattern.matcher(policy.getName().toLowerCase());
-					if(matcher.matches()) {
+					if (matcher.matches()) {
 						return true;
 					}
 				}
 			}
 		}
 		if(api.getInboundProfiles()!=null) {
-			Iterator<InboundProfile> it = api.getInboundProfiles().values().iterator();
-			while(it.hasNext()) {
-				InboundProfile profile = it.next();
-				if(profile.getSecurityProfile()!=null) {
-					for(SecurityProfile securityProfile : api.getSecurityProfiles()) {
-						if(securityProfile.getName().equals(profile.getSecurityProfile())) {
-							for(SecurityDevice device : securityProfile.getDevices()) {
-								if(device.getType()==DeviceType.authPolicy) {
+			for (InboundProfile profile : api.getInboundProfiles().values()) {
+				if (profile.getSecurityProfile() != null) {
+					for (SecurityProfile securityProfile : api.getSecurityProfiles()) {
+						if (securityProfile.getName().equals(profile.getSecurityProfile())) {
+							for (SecurityDevice device : securityProfile.getDevices()) {
+								if (device.getType() == DeviceType.authPolicy) {
 									String securityPolicy = device.getProperties().get("authenticationPolicy");
-									if(securityPolicy==null) return false;					
+									if (securityPolicy == null) return false;
 									Matcher matcher = pattern.matcher(Utils.getExternalPolicyName(securityPolicy).toLowerCase());
-									if(matcher.matches()) {
+									if (matcher.matches()) {
 										return true;
 									}
-								} else if(device.getType()==DeviceType.oauthExternal) {
+								} else if (device.getType() == DeviceType.oauthExternal) {
 									String tokenInfoPolicy = device.getProperties().get("tokenStore");
-									if(tokenInfoPolicy!=null) {
+									if (tokenInfoPolicy != null) {
 										Matcher matcher = pattern.matcher(Utils.getExternalPolicyName(tokenInfoPolicy).toLowerCase());
-										if(matcher.matches()) {
+										if (matcher.matches()) {
 											return true;
 										}
 									}

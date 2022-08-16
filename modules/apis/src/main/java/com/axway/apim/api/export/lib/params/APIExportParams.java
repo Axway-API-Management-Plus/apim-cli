@@ -5,160 +5,156 @@ import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportParams;
 
 public class APIExportParams extends StandardExportParams implements APIFilterParams, Parameters {
-	
-	private String name;
-	
-	private String organization;
-	
-	private String id;
-	
-	private Boolean useFEAPIDefinition;
-	
-	private String vhost;
-	
-	private String apiPath;
-	
-	private String policy;
-	
-	private String state;
-	
-	private String backend;
-	
-	private String inboundSecurity;
-	
-	private String outboundAuthentication ;
-	
-	private String tag;
-	
-	private String createdOnAfter;
-	
-	private String createdOnBefore;
-	
-	private String datPassword;
-	
-	public static synchronized APIExportParams getInstance() {
-		return (APIExportParams)CoreParameters.getInstance();
-	}
 
-	public String getName() {
-		return name;
-	}
+    private String name;
+    private String organization;
+    private String id;
+    private Boolean useFEAPIDefinition;
+    private String vhost;
+    private String apiPath;
+    private String policy;
+    private String state;
+    private String backend;
+    private String inboundSecurity;
+    private String outboundAuthentication;
+    private String tag;
+    private String createdOnAfter;
+    private String createdOnBefore;
+    private String datPassword;
+    private boolean exportMethods;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public static synchronized APIExportParams getInstance() {
+        return (APIExportParams) CoreParameters.getInstance();
+    }
 
-	public String getOrganization() {
-		return organization;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setOrganization(String organization) {
-		this.organization = organization;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getOrganization() {
+        return organization;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setOrganization(String organization) {
+        this.organization = organization;
+    }
 
-	public String getVhost() {
-		return vhost;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setVhost(String vhost) {
-		this.vhost = vhost;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public String getApiPath() {
-		return apiPath;
-	}
+    public String getVhost() {
+        return vhost;
+    }
 
-	public void setApiPath(String apiPath) {
-		this.apiPath = apiPath;
-	}
+    public void setVhost(String vhost) {
+        this.vhost = vhost;
+    }
 
-	public String getPolicy() {
-		return policy;
-	}
+    public String getApiPath() {
+        return apiPath;
+    }
 
-	public void setPolicy(String policy) {
-		this.policy = policy;
-	}
+    public void setApiPath(String apiPath) {
+        this.apiPath = apiPath;
+    }
 
-	public String getState() {
-		return state;
-	}
+    public String getPolicy() {
+        return policy;
+    }
 
-	public void setState(String state) {
-		this.state = state;
-	}
+    public void setPolicy(String policy) {
+        this.policy = policy;
+    }
 
-	public String getBackend() {
-		return backend;
-	}
+    public String getState() {
+        return state;
+    }
 
-	public void setBackend(String backend) {
-		this.backend = backend;
-	}
+    public void setState(String state) {
+        this.state = state;
+    }
 
-	public String getInboundSecurity() {
-		return inboundSecurity;
-	}
+    public String getBackend() {
+        return backend;
+    }
 
-	public void setInboundSecurity(String inboundSecurity) {
-		this.inboundSecurity = inboundSecurity;
-	}
+    public void setBackend(String backend) {
+        this.backend = backend;
+    }
 
-	public String getOutboundAuthentication() {
-		return outboundAuthentication;
-	}
+    public String getInboundSecurity() {
+        return inboundSecurity;
+    }
 
-	public void setOutboundAuthentication(String outboundAuthentication) {
-		this.outboundAuthentication = outboundAuthentication;
-	}
+    public void setInboundSecurity(String inboundSecurity) {
+        this.inboundSecurity = inboundSecurity;
+    }
 
-	public String getTag() {
-		return tag;
-	}
+    public String getOutboundAuthentication() {
+        return outboundAuthentication;
+    }
 
-	public void setTag(String tag) {
-		this.tag = tag;
-	}
+    public void setOutboundAuthentication(String outboundAuthentication) {
+        this.outboundAuthentication = outboundAuthentication;
+    }
 
-	public String getCreatedOnAfter() {
-		return createdOnAfter;
-	}
+    public String getTag() {
+        return tag;
+    }
 
-	public void setCreatedOnAfter(String createdOnAfter) {
-		this.createdOnAfter = createdOnAfter;
-	}
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 
-	public String getCreatedOnBefore() {
-		return createdOnBefore;
-	}
+    public String getCreatedOnAfter() {
+        return createdOnAfter;
+    }
 
-	public void setCreatedOnBefore(String createdOnBefore) {
-		this.createdOnBefore = createdOnBefore;
-	}
+    public void setCreatedOnAfter(String createdOnAfter) {
+        this.createdOnAfter = createdOnAfter;
+    }
 
-	public String getDatPassword() {
-		return datPassword;
-	}
+    public String getCreatedOnBefore() {
+        return createdOnBefore;
+    }
 
-	public void setDatPassword(String datPassword) {
-		this.datPassword = datPassword;
-	}
+    public void setCreatedOnBefore(String createdOnBefore) {
+        this.createdOnBefore = createdOnBefore;
+    }
 
-	public boolean isUseFEAPIDefinition() {
-		if(useFEAPIDefinition==null) return false;
-		return useFEAPIDefinition.booleanValue();
-	}
+    public String getDatPassword() {
+        return datPassword;
+    }
 
-	public void setUseFEAPIDefinition(Boolean useFEAPIDefinition) {
-		if(useFEAPIDefinition==null) return;
-		this.useFEAPIDefinition = useFEAPIDefinition;
-	}
+    public void setDatPassword(String datPassword) {
+        this.datPassword = datPassword;
+    }
+
+    public boolean isUseFEAPIDefinition() {
+        if (useFEAPIDefinition == null) return false;
+        return useFEAPIDefinition.booleanValue();
+    }
+
+    public void setUseFEAPIDefinition(Boolean useFEAPIDefinition) {
+        if (useFEAPIDefinition == null) return;
+        this.useFEAPIDefinition = useFEAPIDefinition;
+    }
+
+    public boolean isExportMethods() {
+        return exportMethods;
+    }
+
+    public void setExportMethods(boolean exportMethods) {
+        this.exportMethods = exportMethods;
+    }
 }
+

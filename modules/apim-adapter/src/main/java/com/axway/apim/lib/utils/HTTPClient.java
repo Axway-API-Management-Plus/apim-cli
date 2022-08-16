@@ -40,7 +40,6 @@ public class HTTPClient {
 	private HttpClientContext clientContext;
 	
 	public HTTPClient(String url, String username, String password) throws AppException {
-		super();
 		try {
 			this.url = new URI(url);
 			this.password = password;
@@ -56,7 +55,6 @@ public class HTTPClient {
 			SSLContextBuilder builder = SSLContextBuilder.create();
 			builder.loadTrustMaterial(null, new TrustAllStrategy());
 			SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build(), new NoopHostnameVerifier());
-			
 			HttpClientBuilder httpClientBuilder = HttpClients.custom()
 					.setSSLSocketFactory(sslsf);
 			
@@ -68,10 +66,8 @@ public class HTTPClient {
 				authCache.put( new HttpHost(url.getHost(), url.getPort(), url.getScheme()), basicAuth );
 				clientContext = HttpClientContext.create();
 				clientContext.setAuthCache(authCache);
-	
 				httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
 			}
-		
 			this.httpClient = httpClientBuilder.build();
 		} catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
 			throw new AppException("Error creating HTTP-Client.", ErrorCode.UNXPECTED_ERROR, e);
@@ -79,8 +75,7 @@ public class HTTPClient {
 	}
 	
 	public CloseableHttpResponse execute(HttpUriRequest request) throws Exception {
-		CloseableHttpResponse response = httpClient.execute(request, clientContext);
-		return response;
+		return httpClient.execute(request, clientContext);
 	}
 	
 	public void close() {
@@ -89,5 +84,4 @@ public class HTTPClient {
 		} catch (IOException e) {
 		}
 	}
-
 }

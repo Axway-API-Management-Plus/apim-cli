@@ -54,15 +54,11 @@ import java.util.*;
 
 public class APIManagerAPIAdapter {
 
-    private static Logger LOG = LoggerFactory.getLogger(APIManagerAPIAdapter.class);
-
+    private static final Logger LOG = LoggerFactory.getLogger(APIManagerAPIAdapter.class);
     Map<APIFilter, String> apiManagerResponse = new HashMap<>();
-
     Map<String, Image> imagesResponse = new HashMap<>();
-
     ObjectMapper mapper = new ObjectMapper();
-
-    private CoreParameters cmd;
+    private final CoreParameters cmd;
 
     /**
      * Maps the provided status to the REST-API endpoint to change the status!
@@ -103,6 +99,7 @@ public class APIManagerAPIAdapter {
                 addOriginalAPIDefinitionFromAPIM(api, filter);
                 addImageFromAPIM(api, filter.isIncludeImage());
                 addRemoteHost(api, filter.isIncludeRemoteHost());
+                addMethods(api, filter.isIncludeMethods());
                 if (logProgress && apis.size() > 5)
                     Utils.progressPercentage(i, apis.size(), "Loading details of " + apis.size() + " APIs");
             }
@@ -211,7 +208,7 @@ public class APIManagerAPIAdapter {
     private List<API> filterAPIs(APIFilter filter) throws IOException {
         List<API> apis = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<API>>() {
         });
-        apis.removeIf(api -> filter.filter(api));
+        apis.removeIf(filter::filter);
 
         if (apis.size() != 0) {
             String dbgCrit = "";
@@ -310,6 +307,20 @@ public class APIManagerAPIAdapter {
             if (LOG.isDebugEnabled()) {
                 LOG.error("Error setting remote host for API based on backendBasePath: " + backendBasePath, e);
             }
+        }
+    }
+
+    private void addMethods(API api, boolean includeMethods) throws AppException {
+        if(!includeMethods)
+            return;
+        try {
+            List<APIMethod> apiMethods = APIManagerAdapter.getInstance().methodAdapter.getAllMethodsForAPI(api.getId());
+            api.setApiMethods(apiMethods);
+        } catch (Exception e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.error("Error setting Front end API  methods for API " + api.getName(), e);
+            }
+            throw new AppException("Can't read Frontend API Methods from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
 
@@ -878,7 +889,7 @@ public class APIManagerAPIAdapter {
 
         try {
             uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/importFromUrl/").build();
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            List<NameValuePair> nameValuePairs = new ArrayList<>();
 
             nameValuePairs.add(new BasicNameValuePair("organizationId", api.getOrganization().getId()));
             nameValuePairs.add(new BasicNameValuePair("type", "wsdl"));

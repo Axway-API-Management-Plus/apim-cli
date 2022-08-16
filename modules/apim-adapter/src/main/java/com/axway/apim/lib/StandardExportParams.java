@@ -4,13 +4,13 @@ import java.nio.file.Paths;
 
 public class StandardExportParams extends CoreParameters {
 	
-	public static enum Wide {
+	public enum Wide {
 		standard, 
 		wide, 
 		ultra
 	}
 	
-	public static enum OutputFormat {
+	public enum OutputFormat {
 		console, 
 		json, 
 		csv,
@@ -54,7 +54,7 @@ public class StandardExportParams extends CoreParameters {
 
 	public Boolean isDeleteTarget() {
 		if(deleteTarget==null) return false;
-		return deleteTarget.booleanValue();
+		return deleteTarget;
 	}
 
 	public void setDeleteTarget(Boolean deleteTarget) {

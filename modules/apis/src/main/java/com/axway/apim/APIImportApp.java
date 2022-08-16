@@ -38,15 +38,15 @@ import com.axway.apim.lib.utils.rest.APIMHttpClient;
  */
 public class APIImportApp implements APIMCLIServiceProvider {
 
-	private static Logger LOG = LoggerFactory.getLogger(APIImportApp.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIImportApp.class);
 
-	public static void main(String args[]) { 
+	public static void main(String[] args) {
 		int rc = importAPI(args);
 		System.exit(rc);
 	}
 	
 	@CLIServiceMethod(name = "import", description = "Import APIs into the API-Manager")
-	public static int importAPI(String args[]) {
+	public static int importAPI(String[] args) {
 		APIImportParams params;
 		try {
 			params = (APIImportParams)CLIAPIImportOptions.create(args).getParams();
@@ -66,16 +66,12 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			APIManagerAdapter.deleteInstance();
 			APIMHttpClient.deleteInstances();
 			RollbackHandler.deleteInstance();
-
 			errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
-			
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
-			
 			APIImportConfigAdapter configAdapter = new APIImportConfigAdapter(params);
 			// Creates an API-Representation of the desired API
 			API desiredAPI = configAdapter.getDesiredAPI();
-			// 
-			List<NameValuePair> filters = new ArrayList<NameValuePair>();
+			List<NameValuePair> filters = new ArrayList<>();
 			// If we don't have an AdminAccount available, we ignore published APIs - For OrgAdmins 
 			// the unpublished or pending APIs become the actual API
 			if(!APIManagerAdapter.hasAdminAccount()) {
@@ -95,6 +91,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 					.includeClientOrganizations(true) // We have to load clientOrganization, in case they have to be taken over
 					.includeQuotas(true) // Quotas must be loaded even if not given, as they have been configured manually
 					.includeClientApplications(true) // Client-Apps must be loaded in all cases
+					.includeMethods(true)
 					.useFilter(filters)
 					.useFEAPIDefinition(params.isUseFEAPIDefinition()) // Should API-Definition load from the FE-API?
 					.build();

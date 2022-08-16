@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import com.axway.apim.api.model.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
@@ -27,20 +28,7 @@ import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMo
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.APISpecification;
 import com.axway.apim.api.apiSpecification.APISpecificationFactory;
-import com.axway.apim.api.model.APIQuota;
-import com.axway.apim.api.model.AuthType;
-import com.axway.apim.api.model.AuthenticationProfile;
-import com.axway.apim.api.model.CaCert;
-import com.axway.apim.api.model.CorsProfile;
 import com.axway.apim.api.model.CustomProperties.Type;
-import com.axway.apim.api.model.DeviceType;
-import com.axway.apim.api.model.InboundProfile;
-import com.axway.apim.api.model.OAuthClientProfile;
-import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.OutboundProfile;
-import com.axway.apim.api.model.QuotaRestriction;
-import com.axway.apim.api.model.SecurityDevice;
-import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertiesExport;
@@ -65,7 +53,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
  */
 public class APIImportConfigAdapter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapter.class);
 	
 	private ObjectMapper mapper = new ObjectMapper();
 	
@@ -192,6 +180,7 @@ public class APIImportConfigAdapter {
 			handleAllOrganizations(apiConfig);
 			completeClientApplications(apiConfig);
 			handleVhost(apiConfig);
+			validateMethodDescription(apiConfig.getApiMethods());
 			return apiConfig;
 		} catch (AppException e) {
 			throw e;
@@ -223,7 +212,7 @@ public class APIImportConfigAdapter {
 	}
 
 	private void addAPISpecification(API apiConfig) throws IOException {
-		APISpecification apiSpecification = null;
+		APISpecification apiSpecification;
 		if(((DesiredAPI)apiConfig).getDesiredAPISpecification()!=null) {
 			// API-Specification object that might contain filters, the type of an API, etc.
 			apiSpecification = APISpecificationFactory.getAPISpecification(((DesiredAPI)apiConfig).getDesiredAPISpecification(), this.apiConfigFile.getCanonicalFile().getParent(), apiConfig.getName());
@@ -250,7 +239,7 @@ public class APIImportConfigAdapter {
 			List<Organization> allOrgs =  APIManagerAdapter.getInstance().orgAdapter.getAllOrgs();
 			apiConfig.getClientOrganizations().clear();
 			apiConfig.getClientOrganizations().addAll(allOrgs);
-			((DesiredAPI)apiConfig).setRequestForAllOrgs(true);
+			apiConfig.setRequestForAllOrgs(true);
 		} else {
 			// As the API-Manager internally handles the owning organization in the same way, 
 			// we have to add the Owning-Org as a desired org
@@ -260,7 +249,7 @@ public class APIImportConfigAdapter {
 			// And validate each configured organization really exists in the API-Manager
 			Iterator<Organization> it = apiConfig.getClientOrganizations().iterator();
 			String invalidClientOrgs = null;
-			List<Organization> foundOrgs = new ArrayList<Organization>();
+			List<Organization> foundOrgs = new ArrayList<>();
 			while(it.hasNext()) {
 				Organization desiredOrg = it.next();
 				Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(desiredOrg.getName());
@@ -280,9 +269,8 @@ public class APIImportConfigAdapter {
 	
 	private void addQuotaConfiguration(API apiConfig) throws AppException {
 		if(apiConfig.getState()==API.STATE_UNPUBLISHED) return;
-		API importAPI = apiConfig;
-		initQuota(importAPI.getSystemQuota());
-		initQuota(importAPI.getApplicationQuota());
+		initQuota(apiConfig.getSystemQuota());
+		initQuota(apiConfig.getApplicationQuota());
 	}
 	
 	private void initQuota(APIQuota quotaConfig) {
@@ -351,10 +339,41 @@ public class APIImportConfigAdapter {
 			throw new AppException("Unknown descriptionType: '"+descriptionType+"'", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 	}
+
+	private void validateMethodDescription(List<APIMethod> apiMethods) throws AppException {
+		if(apiMethods == null)
+			return;
+		for (APIMethod apiMethod: apiMethods){
+			String descriptionType = apiMethod.getDescriptionType();
+			if(descriptionType == null ){
+				throw new AppException("apiMethods descriptionType can't be null set default value as 'original'", ErrorCode.CANT_READ_CONFIG_FILE);
+			}
+			if(descriptionType.equals("original"))
+				return;
+			else if(descriptionType.equals("manual")) {
+				if(apiMethod.getDescriptionManual()==null) {
+					throw new AppException("apiMethods descriptionManual can't be null with descriptionType set to 'manual'", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+			} else if(descriptionType.equals("url")) {
+				if(apiMethod.getDescriptionUrl()==null) {
+					throw new AppException("apiMethods descriptionUrl can't be null with descriptionType set to 'url'", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+			} else if(descriptionType.equals("markdown")) {
+				if (apiMethod.getDescriptionMarkdown() == null) {
+					throw new AppException("apiMethods descriptionMarkdown can't be null with descriptionType set to 'markdown'", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+				if (!apiMethod.getDescriptionMarkdown().startsWith("${env.")) {
+					throw new AppException("apiMethods descriptionMarkdown must start with an environment variable", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+			}else {
+				throw new AppException("apiMethods Unknown descriptionType: '"+descriptionType+"'", ErrorCode.CANT_READ_CONFIG_FILE);
+			}
+		}
+	}
 	
 	private void addDefaultCorsProfile(API apiConfig) throws AppException {
 		if(apiConfig.getCorsProfiles()==null) {
-			((API)apiConfig).setCorsProfiles(new ArrayList<CorsProfile>());
+			apiConfig.setCorsProfiles(new ArrayList<>());
 		}
 		// Check if there is a default cors profile declared otherwise create one internally
 		boolean defaultCorsFound = false;
@@ -446,7 +465,7 @@ public class APIImportConfigAdapter {
 	
 	private void completeCaCerts(API apiConfig) throws AppException {
 		if(apiConfig.getCaCerts()!=null) {
-			List<CaCert> completedCaCerts = new ArrayList<CaCert>();
+			List<CaCert> completedCaCerts = new ArrayList<>();
 			for(CaCert cert :apiConfig.getCaCerts()) {
 				if(cert.getCertBlob()==null) {
 					try(InputStream is = getInputStreamForCertFile(cert)) {
@@ -490,7 +509,7 @@ public class APIImportConfigAdapter {
 				throw new AppException("Cant read given certificate file", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
 		} else {
-			LOG.debug("Can't read certifiate from file-location: " + file.toString() + ". Now trying to read it from the classpath.");
+			LOG.debug("Can't read certifiate from file-location: " + file + ". Now trying to read it from the classpath.");
 			// Try to read it from classpath
 			is = APIManagerAdapter.class.getResourceAsStream(cert.getCertFile()); 
 		}
@@ -507,7 +526,7 @@ public class APIImportConfigAdapter {
 	
 	private API validateInboundProfile(API importApi) throws AppException {
 		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) {
-			Map<String, InboundProfile> def = new HashMap<String, InboundProfile>();
+			Map<String, InboundProfile> def = new HashMap<>();
 			def.put("_default", InboundProfile.getDefaultInboundProfile());
 			importApi.setInboundProfiles(def);
 			return importApi;
@@ -544,7 +563,7 @@ public class APIImportConfigAdapter {
 	
 	private API addDefaultPassthroughSecurityProfile(API importApi) throws AppException {
 		boolean hasDefaultProfile = false;
-		if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<SecurityProfile>());
+		if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<>());
 		List<SecurityProfile> profiles = importApi.getSecurityProfiles();
 		for(SecurityProfile profile : importApi.getSecurityProfiles()) {
 			if(profile.getIsDefault() || profile.getName().equals("_default")) {
@@ -656,7 +675,7 @@ public class APIImportConfigAdapter {
 		if(providerProfile!=null && providerProfile.startsWith("<key")) return;
 		OAuthClientProfile clientProfile = APIManagerAdapter.getInstance().oauthClientAdapter.getOAuthClientProfile(providerProfile);
 		if(clientProfile==null) {
-			List<String> knownProfiles = new ArrayList<String>();
+			List<String> knownProfiles = new ArrayList<>();
 			for(OAuthClientProfile profile : APIManagerAdapter.getInstance().oauthClientAdapter.getOAuthClientProfiles()) {
 				knownProfiles.add(profile.getName());
 			}
@@ -689,16 +708,16 @@ public class APIImportConfigAdapter {
 				clientCertFile = new File(this.getClass().getResource(keystore).getFile());
 			}
 			if(this.apiConfig instanceof DesiredTestOnlyAPI) return; // Skip here when testing
-			JsonNode fileData = null;
-			try(InputStream is = new FileInputStream(clientCertFile)) {
-				fileData = APIManagerAdapter.getFileData(IOUtils.toByteArray(new FileInputStream(clientCertFile)), keystore, ContentType.create("application/x-pkcs12"));
+			JsonNode fileData;
+			try(InputStream inputStream = Files.newInputStream(clientCertFile.toPath())) {
+				fileData = APIManagerAdapter.getFileData(IOUtils.toByteArray(inputStream), keystore, ContentType.create("application/x-pkcs12"));
 			}
 			CaCert cert = new CaCert();
 			cert.setCertFile(clientCertFile.getName());
 			cert.setInbound("false");
 			cert.setOutbound("true");
 			// This call is to validate the given password, keystore is valid
-			APIManagerAdapter.getCertInfo(new FileInputStream(clientCertFile), password, cert);
+			APIManagerAdapter.getCertInfo(Files.newInputStream(clientCertFile.toPath()), password, cert);
 			String data = fileData.get("data").asText();
 			authnProfile.getParameters().put("pfx", data);
 			authnProfile.getParameters().remove("certFile");
@@ -723,7 +742,7 @@ public class APIImportConfigAdapter {
 	private API addImageContent(API importApi) throws AppException {
 		// No image declared do nothing
 		if(importApi.getImage()==null) return importApi;
-		File file = null;
+		File file;
 		try {
 			file = new File(importApi.getImage().getFilename());
 			if(!file.exists()) { // The image isn't provided with an absolute path, try to read it relative to the config file
@@ -733,7 +752,7 @@ public class APIImportConfigAdapter {
 			importApi.getImage().setBaseFilename(file.getName());
 			if(file.exists()) {
 				LOG.info("Loading image from: '"+file.getCanonicalFile()+"'");
-				try(InputStream is = new FileInputStream(file)) {
+				try(InputStream is = Files.newInputStream(file.toPath())) {
 					importApi.getImage().setImageContent(IOUtils.toByteArray(is));
 					return importApi;
 				}

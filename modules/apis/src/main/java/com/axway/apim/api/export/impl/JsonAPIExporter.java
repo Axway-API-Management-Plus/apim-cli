@@ -30,14 +30,16 @@ import java.util.Base64;
 import java.util.List;
 
 public class JsonAPIExporter extends APIResultHandler {
-	private static Logger LOG = LoggerFactory.getLogger(JsonAPIExporter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(JsonAPIExporter.class);
 
 	/** Where to store the exported API-Definition */
 	private String givenExportFolder;
+	private boolean exportMethods;
 	
 	public JsonAPIExporter(APIExportParams params) throws AppException {
 		super(params);
 		this.givenExportFolder = params.getTarget();
+		this.exportMethods = params.isExportMethods();
 	}
 	
 	@Override
@@ -62,10 +64,13 @@ public class JsonAPIExporter extends APIResultHandler {
 				.includeClientOrganizations(true)
 				.includeOriginalAPIDefinition(true)
 				.includeRemoteHost(true);
+		if(exportMethods)
+			builder.includeMethods(true);
 		return builder.build();
 	}
 
 	private void saveAPILocally(ExportAPI exportAPI) throws AppException {
+
 		String apiPath = getAPIExportFolder(exportAPI.getPath());
 		File localFolder = new File(this.givenExportFolder +File.separator+ getVHost(exportAPI) + apiPath);
 		LOG.debug("Going to export API: '"+exportAPI.toStringShort()+"' into folder: " + localFolder);

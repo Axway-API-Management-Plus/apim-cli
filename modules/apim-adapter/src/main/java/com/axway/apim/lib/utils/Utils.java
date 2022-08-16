@@ -14,17 +14,7 @@ import java.security.Permission;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
@@ -46,7 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Utils {
 	
 
-	private static Logger LOG = LoggerFactory.getLogger(Utils.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
 	public enum FedKeyType {
 		FilterCircuit("<key type='FilterCircuit'>"), 
@@ -232,28 +222,26 @@ public class Utils {
 		Map<String, CustomProperty> configuredCustomProperties = APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomProperties(type);
 		Map<String, CustomProperty> requiredConfiguredCustomProperties = APIManagerAdapter.getInstance().customPropertiesAdapter.getRequiredCustomProperties(type);
 		if(customProperties!=null) {
-			Iterator<String> desiredCustomProps = customProperties.keySet().iterator();
-			while(desiredCustomProps.hasNext()) {
-				String desiredCustomProperty = desiredCustomProps.next();
+			for (String desiredCustomProperty : customProperties.keySet()) {
 				String desiredCustomPropertyValue = customProperties.get(desiredCustomProperty);
 				CustomProperty configuredCustomProperty = configuredCustomProperties.get(desiredCustomProperty);
-				if(configuredCustomProperty==null) {
+				if (configuredCustomProperty == null) {
 					throw new AppException("The custom-property: '" + desiredCustomProperty + "' is not configured in API-Manager.", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
-				if(configuredCustomProperty.getType()!=null && ( configuredCustomProperty.getType().equals("select") || configuredCustomProperty.getType().equals("switch") )) {
+				if (configuredCustomProperty.getType() != null && (configuredCustomProperty.getType().equals("select") || configuredCustomProperty.getType().equals("switch"))) {
 					boolean valueFound = false;
 					List<Option> knownOptions = configuredCustomProperty.getOptions();
-					if(knownOptions==null) {
+					if (knownOptions == null) {
 						LOG.warn("Skipping custom property validation, as the custom-property: '" + desiredCustomProperty + "' with type: " + configuredCustomProperty.getType() + " has no options configured. Please check your custom properties configuration.");
 						break;
 					}
-					for(Option knownOption : knownOptions) {
-						if(knownOption.getValue().equals(desiredCustomPropertyValue)) {
+					for (Option knownOption : knownOptions) {
+						if (knownOption.getValue().equals(desiredCustomPropertyValue)) {
 							valueFound = true;
 							break;
 						}
 					}
-					if(!valueFound) {
+					if (!valueFound) {
 						throw new AppException("The value: '" + desiredCustomPropertyValue + "' is not a valid option for custom property: '" + desiredCustomProperty + "'", ErrorCode.CANT_READ_CONFIG_FILE);
 					}
 				}
@@ -347,5 +335,33 @@ public class Utils {
 			else newBackendBasePath = backendBasePath + "/" + serverUrl;
 		}
 		return newBackendBasePath;
+	}
+
+//	public static <T> boolean areEqualIgnoringOrder(List<T> list, List<T> listDesired, Comparator<? super T> comparator) {
+//
+//		// if not the same size, lists are not equal
+//		if (list.size() != listDesired.size()) {
+//			return false;
+//		}
+//		list.sort(comparator);
+//		listDesired.sort(comparator);
+//		for (int i = 0; i < list.size(); i++) {
+//			T t1 = list.get(i);
+//			T t2 = listDesired.get(i);
+//			if (!t1.equals(t2)) {
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
+
+	public static boolean compareValues(Object actualValue, Object desiredValue) {
+		if(actualValue instanceof List) {
+			return ((List<?>)actualValue).size() == ((List<?>)desiredValue).size() &&
+					((List<?>)actualValue).containsAll((List<?>)desiredValue) &&
+					((List<?>)desiredValue).containsAll((List<?>)actualValue);
+		} else {
+			return actualValue.equals(desiredValue);
+		}
 	}
 }

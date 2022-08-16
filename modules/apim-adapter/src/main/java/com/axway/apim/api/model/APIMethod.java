@@ -2,33 +2,26 @@ package com.axway.apim.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"original"})
 public class APIMethod {
 	/**
 	 * The ID of the FE-API operation
 	 */
 	private String id;
-	
 	private String virtualizedApiId;
-	
 	private String name;
-	
 	private String apiId;
-	
 	/**
 	 * The ID of the Backend-API method
 	 */
 	private String apiMethodId;
-
 	private String summary;
-
 	private String original;
-	
 	private String descriptionManual;
-	
 	private String descriptionMarkdown;
-	
 	private String descriptionUrl;
+	private String descriptionType;
+	private TagMap<String, String[]> tags = null;
 
 	public String getId() {
 		return id;
@@ -109,6 +102,44 @@ public class APIMethod {
 	public void setDescriptionUrl(String descriptionUrl) {
 		this.descriptionUrl = descriptionUrl;
 	}
-	
-	
+
+	public TagMap<String, String[]> getTags() {
+		return tags;
+	}
+
+	public void setTags(TagMap<String, String[]> tags) {
+		this.tags = tags;
+	}
+	public String getDescriptionType() {
+		return descriptionType;
+	}
+	public void setDescriptionType(String descriptionType) {
+		this.descriptionType = descriptionType;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		APIMethod apiMethod = (APIMethod) o;
+		if (name.equals(apiMethod.name) && summary.equals(apiMethod.summary) && descriptionType.equals(apiMethod.descriptionType)) {
+				boolean flag;
+				if (tags == null && apiMethod.tags == null) {
+					flag = true;
+				}else {
+					flag =  tags.equals(apiMethod.tags);
+				}
+				if (descriptionType.equals("manual") && descriptionManual.equals(apiMethod.descriptionManual)) {
+					flag = true;
+				} else if (descriptionType.equals("url") && descriptionUrl.equals(apiMethod.descriptionUrl)) {
+					flag = true;
+				} else if (descriptionType.equals("markdown") && descriptionMarkdown.equals(apiMethod.descriptionMarkdown)) {
+					flag = true;
+				}
+				return flag;
+		}
+		return false;
+	}
 }
+
+
