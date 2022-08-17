@@ -133,7 +133,7 @@ public class API implements CustomPropertiesEntity {
 	@APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED})
 	protected String name = null;
 	
-	@APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED, API.STATE_DEPRECATED})
+	@APIPropertyAnnotation(isBreaking = false, writableStates = {API.STATE_UNPUBLISHED, API.STATE_DEPRECATED})
 	protected String summary = null;
 	
 	protected Long createdOn = null;

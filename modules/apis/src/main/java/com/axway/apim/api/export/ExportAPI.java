@@ -1,31 +1,9 @@
 package com.axway.apim.api.export;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.APISpecification;
-import com.axway.apim.api.model.APIQuota;
-import com.axway.apim.api.model.AuthType;
-import com.axway.apim.api.model.AuthenticationProfile;
-import com.axway.apim.api.model.CaCert;
-import com.axway.apim.api.model.CorsProfile;
-import com.axway.apim.api.model.DesiredAPISpecification;
-import com.axway.apim.api.model.DeviceType;
-import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.InboundProfile;
-import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.OutboundProfile;
-import com.axway.apim.api.model.QuotaRestriction;
-import com.axway.apim.api.model.RemoteHost;
-import com.axway.apim.api.model.SecurityDevice;
-import com.axway.apim.api.model.SecurityProfile;
-import com.axway.apim.api.model.ServiceProfile;
-import com.axway.apim.api.model.TagMap;
+import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
@@ -34,12 +12,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.util.*;
+
 @JsonPropertyOrder({"name", "path", "state", "version", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost",
         "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties",
-        "corsProfiles", "caCerts", "applicationQuota", "systemQuota"})
+        "corsProfiles", "caCerts", "applicationQuota", "systemQuota", "apiMethods"})
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class ExportAPI {
-
     API actualAPIProxy = null;
 
     public String getPath() throws AppException {
@@ -47,7 +26,6 @@ public class ExportAPI {
     }
 
     public ExportAPI() {
-
     }
 
     public ExportAPI(API actualAPIProxy) {
@@ -72,9 +50,7 @@ public class ExportAPI {
                     && (APIManagerAdapter.hasAPIManagerVersion("7.6.2") && defaultProfile.getFaultHandlerPolicy() == null)
             ) return null;
         }
-        Iterator<OutboundProfile> it = this.actualAPIProxy.getOutboundProfiles().values().iterator();
-        while (it.hasNext()) {
-            OutboundProfile profile = it.next();
+        for (OutboundProfile profile : this.actualAPIProxy.getOutboundProfiles().values()) {
             profile.setApiId(null);
             // If the AuthenticationProfile is _default there is no need to export it, hence null is returned
             if ("_default".equals(profile.getAuthenticationProfile())) {
@@ -90,9 +66,7 @@ public class ExportAPI {
             if (this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().get(0).getType() == DeviceType.passThrough)
                 return null;
         }
-        ListIterator<SecurityProfile> it = this.actualAPIProxy.getSecurityProfiles().listIterator();
-        while (it.hasNext()) {
-            SecurityProfile profile = it.next();
+        for (SecurityProfile profile : this.actualAPIProxy.getSecurityProfiles()) {
             for (SecurityDevice device : profile.getDevices()) {
                 if (device.getType().equals(DeviceType.oauthExternal)) {
                     String tokenStore = device.getProperties().get("tokenStore");
@@ -343,6 +317,31 @@ public class ExportAPI {
         //} else {
         return this.getServiceProfiles().get("_default").getBasePath();
         //}
+    }
+
+    public List<APIMethod> getApiMethods() {
+        List<APIMethod> apiMethods = this.actualAPIProxy.getApiMethods();
+        if (apiMethods == null || apiMethods.size() == 0) return null;
+        List<APIMethod> apiMethodsTransformed = new ArrayList<>();
+        for (APIMethod actualMethod : apiMethods) {
+            APIMethod apiMethod = new APIMethod();
+            apiMethod.setName(actualMethod.getName());
+            apiMethod.setSummary(actualMethod.getSummary());
+            TagMap<String, String[]> tagMap = actualMethod.getTags();
+            if (tagMap != null && tagMap.size() > 0)
+                apiMethod.setTags(actualMethod.getTags());
+            apiMethodsTransformed.add(apiMethod);
+            String descriptionType = actualMethod.getDescriptionType();
+            if (descriptionType.equals("manual")) {
+                apiMethod.setDescriptionManual(actualMethod.getDescriptionManual());
+            } else if (descriptionType.equals("url")) {
+                apiMethod.setDescriptionUrl(actualMethod.getDescriptionUrl());
+            } else if (descriptionType.equals("markdown")) {
+                apiMethod.setDescriptionMarkdown(actualMethod.getDescriptionMarkdown());
+            }
+            apiMethod.setDescriptionType(descriptionType);
+        }
+        return apiMethodsTransformed;
     }
 
     public String toStringShort() {

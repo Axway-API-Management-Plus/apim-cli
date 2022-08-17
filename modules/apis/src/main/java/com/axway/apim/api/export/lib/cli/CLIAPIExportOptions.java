@@ -29,6 +29,7 @@ public class CLIAPIExportOptions extends CLIOptions {
 		APIExportParams params = new APIExportParams();
 		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
 		params.setDatPassword(getValue("datPassword"));
+		params.setExportMethods(hasOption("exportMethods"));
 		return params;
 	}
 
@@ -42,6 +43,10 @@ public class CLIAPIExportOptions extends CLIOptions {
 		option = new Option("datPassword", true, "Password used when exporting APIs in a DAT-Format.");
 		option.setRequired(false);
 		option.setArgName("myExportPassword");
+		addOption(option);
+
+		option = new Option("exportMethods", "If this flag is set, the exported API contains API Methods from frontend API");
+		option.setRequired(false);
 		addOption(option);
 	}
 	

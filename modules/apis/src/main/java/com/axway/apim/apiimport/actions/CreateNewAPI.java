@@ -1,5 +1,6 @@
 package com.axway.apim.apiimport.actions;
 
+import com.axway.apim.api.model.APIMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +14,8 @@ import com.axway.apim.apiimport.rollback.RollbackBackendAPI;
 import com.axway.apim.apiimport.rollback.RollbackHandler;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.errorHandling.AppException;
+
+import java.util.List;
 
 /**
  * This class is used by the APIImportManager#applyChanges(APIChangeState, boolean) to create a new API.
@@ -43,6 +46,10 @@ public class CreateNewAPI {
 		try {
 			desiredAPI.setApiId(createdBEAPI.getApiId());
 			createdAPI = apiAdapter.createAPIProxy(desiredAPI);
+			List<APIMethod> desiredApiMethods = desiredAPI.getApiMethods();
+			List<APIMethod> actualApiMethods = APIManagerAdapter.getInstance().methodAdapter.getAllMethodsForAPI(createdAPI.getId());
+			ManageApiMethods manageApiMethods = new ManageApiMethods();
+			manageApiMethods.updateApiMethods(createdAPI.getId(),actualApiMethods, desiredApiMethods);
 		} catch (Exception e) {
 			// Try to rollback FE-API (Proxy) bases on the created BE-API
 			rollback.addRollbackAction(new RollbackAPIProxy(createdBEAPI));
