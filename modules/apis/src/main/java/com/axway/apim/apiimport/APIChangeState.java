@@ -91,8 +91,8 @@ public class APIChangeState {
                     Object desiredValue = method.invoke(desiredAPI, null);
                     Object actualValue = method2.invoke(actualAPI, null);
                     if (desiredValue == null && actualValue == null) continue;
-                    if (desiredValue == null || desiredValue.equals("")) {
-                        LOG.debug("Ignoring Null-Property / Empty String: " + field.getName() + "[Desired: '" + desiredValue + "' vs Actual: '" + actualValue + "']");
+                    if(desiredValue == null) {
+                        LOG.debug("Ignoring Null-Property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
                         continue; // No change, if nothing is provided!
                     }
                     // desiredValue == null - This can be used to reset/clean a property! (Need to think about this!)
