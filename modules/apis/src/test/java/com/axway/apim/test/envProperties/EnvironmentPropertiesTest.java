@@ -1,24 +1,28 @@
 package com.axway.apim.test.envProperties;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
+import com.axway.apim.lib.EnvironmentProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.lib.errorHandling.AppException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class EnvironmentPropertiesTest {
 
-	private static Logger LOG = LoggerFactory.getLogger(EnvironmentPropertiesTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EnvironmentPropertiesTest.class);
+	private String apimCliHome;
+	@BeforeClass
+	private void initCommandParameters() {
+		apimCliHome = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
+	}
 
 
 	@Test
-	public void testNoStage() throws AppException, IOException {
-		EnvironmentProperties properties = new EnvironmentProperties("NOT_SET");
+	public void testNoStage() {
+		EnvironmentProperties properties = new EnvironmentProperties("NOT_SET", apimCliHome);
 
 		Assert.assertEquals(properties.containsKey("doesnExists"), false);
 		Assert.assertEquals(properties.containsKey("admin_username"), true);
@@ -28,17 +32,15 @@ public class EnvironmentPropertiesTest {
 	}
 
 	@Test
-	public void testStage() throws AppException, IOException {
-		EnvironmentProperties properties = new EnvironmentProperties("anyOtherStage");
-
+	public void testStage() {
+		EnvironmentProperties properties = new EnvironmentProperties("anyOtherStage", apimCliHome);
 		Assert.assertEquals(properties.containsKey("thisKeyExists"), true);
-
 		Assert.assertEquals(properties.get("admin_username"), "anyOtherUser");
 		Assert.assertEquals(properties.get("admin_password"), "anyOtherPassword");
 	}
 	
 	@Test
-	public void testNoStageFromConfDir() throws AppException, IOException, URISyntaxException {
+	public void testNoStageFromConfDir() throws URISyntaxException {
 		// A given path should be used to load the Environment-Config file from
 		String path = EnvironmentPropertiesTest.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 		path += "envPropertiesTest/swaggerPromoteHome";
@@ -54,7 +56,7 @@ public class EnvironmentPropertiesTest {
 	}
 
 	@Test
-	public void testStageFromConfDir() throws AppException, IOException, URISyntaxException {
+	public void testStageFromConfDir() throws URISyntaxException {
 		// A given path should be used to load the Environment-Config file from
 		String path = EnvironmentPropertiesTest.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
 		path += "envPropertiesTest/swaggerPromoteHome";
@@ -70,7 +72,7 @@ public class EnvironmentPropertiesTest {
 	}
 	
 	@Test
-	public void testEnvironementWithOSEnvVariables() throws AppException, IOException {
+	public void testEnvironementWithOSEnvVariables() throws IOException {
 		// For this test to run, the system must provide the environment properties CI & JAVA_HOME
 		EnvironmentProperties properties = new EnvironmentProperties("NOT_SET");
 		System.out.println(properties);

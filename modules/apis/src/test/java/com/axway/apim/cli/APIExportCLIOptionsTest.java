@@ -1,31 +1,25 @@
 package com.axway.apim.cli;
 
-import org.apache.commons.cli.ParseException;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import com.axway.apim.adapter.apis.APIFilter;
-import com.axway.apim.api.export.lib.cli.CLIAPIApproveOptions;
-import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
-import com.axway.apim.api.export.lib.cli.CLIAPIGrantAccessOptions;
-import com.axway.apim.api.export.lib.cli.CLIAPIUpgradeAccessOptions;
-import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
-import com.axway.apim.api.export.lib.cli.CLICheckCertificatesOptions;
-import com.axway.apim.api.export.lib.params.APIApproveParams;
-import com.axway.apim.api.export.lib.params.APIChangeParams;
-import com.axway.apim.api.export.lib.params.APICheckCertificatesParams;
-import com.axway.apim.api.export.lib.params.APIExportParams;
-import com.axway.apim.api.export.lib.params.APIGrantAccessParams;
-import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
+import com.axway.apim.api.export.lib.cli.*;
+import com.axway.apim.api.export.lib.params.*;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class APIExportCLIOptionsTest {
+	private String apimCliHome;
+	@BeforeClass
+	private void initCommandParameters() {
+		apimCliHome = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
+	}
 	@Test
-	public void testAPIExportParams() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-n", "*MyAPIName*", "-id", "412378923", "-policy", "*PolicyName*", "-vhost", "custom.host.com", "-state", "approved", "-backend", "backend.customer.com", "-tag", "*myTag*", "-t", "myTarget", "-o", "csv", "-useFEAPIDefinition", "-wide", "-deleteTarget", "-datPassword", "123456Axway"};
+	public void testAPIExportParams() throws AppException {
+		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-n", "*MyAPIName*", "-id", "412378923", "-policy", "*PolicyName*", "-vhost", "custom.host.com", "-state", "approved", "-backend", "backend.customer.com", "-tag", "*myTag*", "-t", "myTarget", "-o", "csv", "-useFEAPIDefinition", "-wide", "-deleteTarget", "-datPassword", "123456Axway", "-apimCLIHome", apimCliHome};
 		CLIOptions options = CLIAPIExportOptions.create(args);
 		APIExportParams params = (APIExportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
@@ -51,8 +45,8 @@ public class APIExportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testUltra() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-ultra"};
+	public void testUltra() throws AppException {
+		String[] args = {"-s", "prod", "-ultra", "-apimCLIHome", apimCliHome};
 		CLIOptions options = CLIAPIExportOptions.create(args);
 		APIExportParams params = (APIExportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
@@ -65,8 +59,8 @@ public class APIExportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testChangeAPIParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-newBackend", "http://my.new.backend", "-oldBackend", "http://my.old.backend"};
+	public void testChangeAPIParameters() throws AppException {
+		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-newBackend", "http://my.new.backend", "-oldBackend", "http://my.old.backend", "-apimCLIHome", apimCliHome};
 		CLIOptions options = CLIChangeAPIOptions.create(args);
 		APIChangeParams params = (APIChangeParams) options.getParams();
 		// Validate core parameters are included
@@ -88,8 +82,8 @@ public class APIExportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testApproveAPIParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-publishVHost", "my.api-host.com"};
+	public void testApproveAPIParameters() throws AppException {
+		String[] args = {"-s", "prod", "-a", "/api/v1/greet", "-publishVHost", "my.api-host.com", "-apimCLIHome", apimCliHome};
 		CLIOptions cliOptions = CLIAPIApproveOptions.create(args);
 		APIApproveParams params = (APIApproveParams)cliOptions.getParams();
 		
@@ -105,8 +99,8 @@ public class APIExportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testUpgradeAccessAPIParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-a", "/api/v1/to/be/upgraded", "-refAPIId", "123456", "-refAPIName", "myRefOldAPI", "-refAPIVersion", "1.2.3", "-refAPIOrg", "RefOrg", "-refAPIDeprecate", "true", "-refAPIRetire", "true", "-refAPIRetireDate", "31.12.2023"};
+	public void testUpgradeAccessAPIParameters() throws AppException {
+		String[] args = {"-s", "prod", "-a", "/api/v1/to/be/upgraded", "-refAPIId", "123456", "-refAPIName", "myRefOldAPI", "-refAPIVersion", "1.2.3", "-refAPIOrg", "RefOrg", "-refAPIDeprecate", "true", "-refAPIRetire", "true", "-refAPIRetireDate", "31.12.2023", "-apimCLIHome", apimCliHome};
 		CLIOptions cliOptions = CLIAPIUpgradeAccessOptions.create(args);
 		APIUpgradeAccessParams params = (APIUpgradeAccessParams)cliOptions.getParams();
 		
@@ -135,9 +129,9 @@ public class APIExportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testGrantAccessAPIParameters() throws ParseException, AppException {
+	public void testGrantAccessAPIParameters() throws AppException {
 		String[] args = {"-s", "prod", "-a", "/api/v1/some", "-orgName", "OrgName", "-orgId", "OrgId", "-n", "MyAPIName", "-org", "MyAPIOrg", "-id", "MY-API-ID", "-vhost", "api.chost.com", "-backend", "backend.host", 
-				"-policy", "PolicyName", "-inboundsecurity", "api-key", "-tag", "tagGroup=*myTagValue*"};
+				"-policy", "PolicyName", "-inboundsecurity", "api-key", "-tag", "tagGroup=*myTagValue*", "-apimCLIHome", apimCliHome};
 		CLIOptions cliOptions = CLIAPIGrantAccessOptions.create(args);
 		APIGrantAccessParams params = (APIGrantAccessParams)cliOptions.getParams();
 		
@@ -172,12 +166,12 @@ public class APIExportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testCreatedOnAPIFilterParameters() throws ParseException, AppException {
+	public void testCreatedOnAPIFilterParameters() throws AppException {
 		String[] args = {"-s", "prod", "-createdOn", "2020-01-01:2020-12-31"};
 		CLIOptions options = CLIAPIExportOptions.create(args);
 		APIExportParams params = (APIExportParams) options.getParams();
-		Assert.assertEquals(params.getCreatedOnAfter().toString(), "1577836800000");
-		Assert.assertEquals(params.getCreatedOnBefore().toString(), "1609459199000");
+		Assert.assertEquals(params.getCreatedOnAfter(), "1577836800000");
+		Assert.assertEquals(params.getCreatedOnBefore(), "1609459199000");
 		
 		// This means:
 		// 2020 as the start	- It should be the same as 2020-01-01
@@ -185,8 +179,8 @@ public class APIExportCLIOptionsTest {
 		String[] args2 = {"-s", "prod", "-createdOn", "2020:2021"};
 		options = CLIAPIExportOptions.create(args2);
 		params = (APIExportParams) options.getParams();
-		Assert.assertEquals(params.getCreatedOnAfter().toString(), "1577836800000");
-		Assert.assertEquals(params.getCreatedOnBefore().toString(), "1640995199000");
+		Assert.assertEquals(params.getCreatedOnAfter(), "1577836800000");
+		Assert.assertEquals(params.getCreatedOnBefore(), "1640995199000");
 		
 		// This means:
 		// 2020-06 as the start	- It should be the same as 2020-06-01
@@ -194,34 +188,34 @@ public class APIExportCLIOptionsTest {
 		String[] args3 = {"-s", "prod", "-createdOn", "2020-06:now"};
 		options = CLIAPIExportOptions.create(args3);
 		params = (APIExportParams) options.getParams();
-		Assert.assertEquals(params.getCreatedOnAfter().toString(), "1590969600000");
+		Assert.assertEquals(params.getCreatedOnAfter(), "1590969600000");
 		Assert.assertTrue(Long.parseLong(params.getCreatedOnBefore())>Long.parseLong("1630665581555"), "Now should be always in the future.");
 	}
 	
 	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "You cannot use 'now' as the start date.")
-	public void testCreatedOnWithStartNow() throws ParseException, AppException {
+	public void testCreatedOnWithStartNow() throws AppException {
 		String[] args = {"-s", "prod", "-createdOn", "now:2020-12-31"};
 		CLIOptions options = CLIAPIExportOptions.create(args);
 		options.getParams();
 	}
 	
 	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "You must separate the start- and end-date with a ':'.")
-	public void testCreatedWithoutColon() throws ParseException, AppException {
+	public void testCreatedWithoutColon() throws AppException {
 		String[] args = {"-s", "prod", "-createdOn", "2020-01-01-2020-12-31"};
 		CLIOptions options = CLIAPIExportOptions.create(args);
 		options.getParams();
 	}
 	
 	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The start-date: 01/Jan/2021 00:00:00 GMT cannot be bigger than the end date: 31/Dec/2020 23:59:59 GMT.")
-	public void testCreatedOnWithBiggerStartDate() throws ParseException, AppException {
+	public void testCreatedOnWithBiggerStartDate() throws AppException {
 		String[] args = {"-s", "prod", "-createdOn", "2021-01-01:2020-12-31"};
 		CLIOptions options = CLIAPIExportOptions.create(args);
 		options.getParams();
 	}
 	
 	@Test
-	public void testCertificateCheckParams() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-days", "999"};
+	public void testCertificateCheckParams() throws AppException {
+		String[] args = {"-s", "prod", "-days", "999", "-apimCLIHome", apimCliHome};
 		CLIOptions options = CLICheckCertificatesOptions.create(args);
 		APICheckCertificatesParams params = (APICheckCertificatesParams)options.getParams();
 		Assert.assertEquals(params.getNumberOfDays(), 999);

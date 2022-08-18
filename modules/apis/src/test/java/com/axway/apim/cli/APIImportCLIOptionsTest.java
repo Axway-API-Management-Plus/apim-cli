@@ -1,19 +1,23 @@
 package com.axway.apim.cli;
 
-import org.apache.commons.cli.ParseException;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import com.axway.apim.apiimport.lib.cli.CLIAPIImportOptions;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.lib.errorHandling.AppException;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class APIImportCLIOptionsTest {
+	private String apimCliHome;
+	@BeforeClass
+	private void initCommandParameters() {
+		apimCliHome = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
+	}
 	@Test
-	public void testWithoutAdminUser() throws ParseException, AppException {
-		String[] args = {"-u", "myUser", "-p", "myPassword", "-port", "8175", "-c", "myConfig.json"};
+	public void testWithoutAdminUser() throws AppException {
+		String[] args = {"-u", "myUser", "-p", "myPassword", "-port", "8175", "-c", "myConfig.json", "-apimCLIHome", apimCliHome};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "myUser");        // Taken from cmd directly
@@ -24,8 +28,8 @@ public class APIImportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testUserDetailsFromStage() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-c", "myConfig.json"};
+	public void testUserDetailsFromStage() throws AppException {
+		String[] args = {"-s", "prod", "-c", "myConfig.json", "-apimCLIHome", apimCliHome};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
@@ -35,8 +39,8 @@ public class APIImportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testAPIImportParameter() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-c", "myConfig.json", "-clientOrgsMode", "replace", "-clientAppsMode", "replace", "-quotaMode", "replace", "-detailsExportFile", "myExportFile.txt", "-stageConfig", "myStageConfigFile.json", "-enabledCaches", "applicationsQuotaCache,*API*"};
+	public void testAPIImportParameter() throws AppException {
+		String[] args = {"-s", "prod", "-c", "myConfig.json", "-clientOrgsMode", "replace", "-clientAppsMode", "replace", "-quotaMode", "replace", "-detailsExportFile", "myExportFile.txt", "-stageConfig", "myStageConfigFile.json", "-enabledCaches", "applicationsQuotaCache,*API*", "-apimCLIHome", apimCliHome};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
@@ -51,7 +55,7 @@ public class APIImportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testToggles() throws ParseException, AppException {
+	public void testToggles() throws AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-allowOrgAdminsToPublish", "false", "-replaceHostInSwagger", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreAdminAccount", "-ignoreQuotas", "-updateOnly"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
@@ -69,7 +73,7 @@ public class APIImportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testModeParameterDefaults() throws ParseException, AppException {
+	public void testModeParameterDefaults() throws AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
@@ -79,7 +83,7 @@ public class APIImportCLIOptionsTest {
 	}
 	
 	@Test
-	public void testAPIDefinitionAsCLIArg() throws ParseException, AppException {
+	public void testAPIDefinitionAsCLIArg() throws AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json", "-a", "thisIsMyAPIDefinition"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();

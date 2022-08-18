@@ -1,9 +1,5 @@
 package com.axway.apim.user.cli;
 
-import org.apache.commons.cli.ParseException;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
@@ -14,11 +10,34 @@ import com.axway.apim.users.lib.cli.UserExportCLIOptions;
 import com.axway.apim.users.lib.cli.UserImportCLIOptions;
 import com.axway.apim.users.lib.params.UserChangePasswordParams;
 import com.axway.apim.users.lib.params.UserExportParams;
+import org.apache.commons.io.IOUtils;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class UserCLIOptionsTest {
+
+	private String apimCliHome;
+	@BeforeClass
+	private void init() throws IOException {
+		apimCliHome = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
+		String confPath = String.valueOf(Files.createDirectories(Paths.get(apimCliHome + "/conf")).toAbsolutePath());
+		try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("env.properties");
+			 OutputStream outputStream= Files.newOutputStream(new File(confPath, "env.properties").toPath())){
+			IOUtils.copy(inputStream,outputStream );
+		}
+	}
+
 	@Test
-	public void testUserImportParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-c", "myUserConfig.json"};
+	public void testUserImportParameters() throws AppException {
+		String[] args = {"-s", "prod", "-c", "myUserConfig.json", "-apimCLIHome", apimCliHome};
 		CLIOptions options = UserImportCLIOptions.create(args);
 		UserImportParams params = (UserImportParams) options.getParams();
 		// Validate core parameters are included
@@ -32,8 +51,8 @@ public class UserCLIOptionsTest {
 	}
 	
 	@Test
-	public void testExportUserParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-id", "UUID-ID-OF-THE-USER", "-loginName", "*mark24*", "-n", "*Mark*", "-email", "*@axway.com*", "-type", "external", "-org", "*Partner*", "-role", "oadmin", "-state", "pending", "-enabled", "false", "-o", "json"};
+	public void testExportUserParameters() throws AppException {
+		String[] args = {"-s", "prod", "-id", "UUID-ID-OF-THE-USER", "-loginName", "*mark24*", "-n", "*Mark*", "-email", "*@axway.com*", "-type", "external", "-org", "*Partner*", "-role", "oadmin", "-state", "pending", "-enabled", "false", "-o", "json", "-apimCLIHome", apimCliHome};
 		CLIOptions options = UserExportCLIOptions.create(args);
 		UserExportParams params = (UserExportParams) options.getParams();
 		// Validate core parameters are included
@@ -59,8 +78,8 @@ public class UserCLIOptionsTest {
 	}
 	
 	@Test
-	public void testUserChangePasswordParameters() throws ParseException, AppException {
-		String[] args = {"-s", "prod", "-id", "UUID-ID-OF-THE-USER", "-loginName", "*mark24*", "-n", "*Mark*", "-email", "*@axway.com*", "-type", "external", "-org", "*Partner*", "-role", "oadmin", "-state", "pending", "-enabled", "true", "-o", "json", "-newpassword", "123456"};
+	public void testUserChangePasswordParameters() throws AppException {
+		String[] args = {"-s", "prod", "-id", "UUID-ID-OF-THE-USER", "-loginName", "*mark24*", "-n", "*Mark*", "-email", "*@axway.com*", "-type", "external", "-org", "*Partner*", "-role", "oadmin", "-state", "pending", "-enabled", "true", "-o", "json", "-newpassword", "123456", "-apimCLIHome", apimCliHome};
 		CLIOptions options = UserChangePasswordCLIOptions.create(args);
 		UserChangePasswordParams params = (UserChangePasswordParams) options.getParams();
 		// Validate core parameters are included
@@ -85,7 +104,7 @@ public class UserCLIOptionsTest {
 	
 	
 	@Test
-	public void testEnabledToggleDefault() throws ParseException, AppException {
+	public void testEnabledToggleDefault() throws AppException {
 		String[] args = {"-s", "prod"};
 		CLIOptions options = UserExportCLIOptions.create(args);
 		UserExportParams params = (UserExportParams) options.getParams();

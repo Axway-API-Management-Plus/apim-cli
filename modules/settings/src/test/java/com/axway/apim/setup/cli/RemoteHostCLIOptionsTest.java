@@ -1,7 +1,9 @@
 package com.axway.apim.setup.cli;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.axway.apim.lib.CLIOptions;
@@ -13,10 +15,26 @@ import com.axway.apim.setup.lib.APIManagerSetupImportCLIOptions;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportCLIOptions;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportParams;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 public class RemoteHostCLIOptionsTest {
+
+	private String apimCliHome;
+	@BeforeClass
+	private void init() throws IOException {
+		apimCliHome = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
+		String confPath = String.valueOf(Files.createDirectories(Paths.get(apimCliHome + "/conf")).toAbsolutePath());
+		try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("env.properties");
+			 OutputStream outputStream=new FileOutputStream(new File(confPath, "env.properties" ))){
+			IOUtils.copy(inputStream,outputStream );
+		}
+	}
+
 	@Test
 	public void testRemoteHostExportParams() throws ParseException, AppException {
-		String[] args = {"-s", "mytest", "-n", "*MyHost*", "-id", "MyRemoteHostID", "-t", "myTarget", "-o", "json", "-wide", "-deleteTarget"};
+		String[] args = {"-s", "mytest", "-n", "*MyHost*", "-id", "MyRemoteHostID", "-t", "myTarget", "-o", "json", "-wide", "-deleteTarget", "-apimCLIHome", apimCliHome};
 		CLIOptions options = RemoteHostsExportCLIOptions.create(args);
 		RemoteHostsExportParams params = (RemoteHostsExportParams) options.getParams();
 		// This make sure staging is working
@@ -34,7 +52,7 @@ public class RemoteHostCLIOptionsTest {
 	
 	@Test
 	public void testUltra() throws ParseException, AppException {
-		String[] args = {"-s", "mytest", "-ultra"};
+		String[] args = {"-s", "mytest", "-ultra", "-apimCLIHome", apimCliHome};
 		CLIOptions options = RemoteHostsExportCLIOptions.create(args);
 		RemoteHostsExportParams params = (RemoteHostsExportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "apiadmin");
