@@ -1,0 +1,47 @@
+{
+  "name": "${apiName}",
+  "path": "${apiPath}",
+  "state": "${state}",
+  "version": "1.0.7",
+  "organization": "API Development ${orgNumber}",
+  "securityProfiles": [
+    {
+      "name": "${securityProfileName}",
+      "isDefault": false,
+      "devices": [
+        {
+          "name": "API Key",
+          "type": "apiKey",
+          "order": 0,
+          "properties": {
+            "apiKeyFieldName": "KeyId",
+            "takeFrom": "HEADER",
+            "removeCredentialsOnSuccess": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "apiMethods": [
+    {
+      "name": "createUser",
+      "summary": "Create user",
+      "descriptionType": "original",
+      "tags": {
+        "stage": [
+          "dev"
+        ]
+      }
+    },
+    {
+      "name": "logoutUser",
+      "summary": "Logs out current logged in user session",
+      "descriptionType": "original",
+      "tags": {
+        "stage": [
+          "dev"
+        ]
+      }
+    }
+  ]
+}

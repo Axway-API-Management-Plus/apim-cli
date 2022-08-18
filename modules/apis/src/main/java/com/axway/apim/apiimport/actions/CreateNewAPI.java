@@ -48,8 +48,10 @@ public class CreateNewAPI {
 			createdAPI = apiAdapter.createAPIProxy(desiredAPI);
 			List<APIMethod> desiredApiMethods = desiredAPI.getApiMethods();
 			List<APIMethod> actualApiMethods = APIManagerAdapter.getInstance().methodAdapter.getAllMethodsForAPI(createdAPI.getId());
+			LOG.debug("Number of Methods : {}", actualApiMethods.size());
 			ManageApiMethods manageApiMethods = new ManageApiMethods();
 			manageApiMethods.updateApiMethods(createdAPI.getId(),actualApiMethods, desiredApiMethods);
+			desiredAPI.setApiMethods(null);
 		} catch (Exception e) {
 			// Try to rollback FE-API (Proxy) bases on the created BE-API
 			rollback.addRollbackAction(new RollbackAPIProxy(createdBEAPI));
@@ -62,7 +64,6 @@ public class CreateNewAPI {
 			APIChangeState.initCreatedAPI(desiredAPI, createdAPI);
 			// But without updating the Swagger, as we have just imported it!
 			createdAPI = apiAdapter.updateAPIProxy(createdAPI);
-
 			// If an image is included, update it
 			if(desiredAPI.getImage()!=null) {
 				apiAdapter.updateAPIImage(createdAPI, desiredAPI.getImage());
@@ -76,16 +77,12 @@ public class CreateNewAPI {
 				// In case, the existing API is already in use (Published), we have to grant access to our new imported API
 				apiAdapter.upgradeAccessToNewerAPI(createdAPI, actualAPI);
 			}
-
 			// Is a Quota is defined we must manage it
 			new APIQuotaManager(desiredAPI, actualAPI).execute(createdAPI);
-
 			// Grant access to the API
 			new ManageClientOrgs(desiredAPI, createdAPI).execute(reCreation);
-
 			// Handle subscription to applications
 			new ManageClientApps(desiredAPI, createdAPI, actualAPI).execute(reCreation);
-
 			// Provide the ID of the created API to the desired API just for logging purposes
 			changes.getDesiredAPI().setId(createdAPI.getId());
 			LOG.info(changes.waiting4Approval()+"Successfully created "+createdAPI.getState()+" API: '"+createdAPI.getName()+"' "+createdAPI.getVersion()+" (ID: "+createdAPI.getId()+")" );

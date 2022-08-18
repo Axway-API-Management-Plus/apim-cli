@@ -22,7 +22,9 @@ public class ExportTestAction extends AbstractTestAction {
 		boolean useFEAPIDefinition	= false;
 		String stage				= null;
 		String vhostToExport		= null;
-		
+		boolean exportMethods = false;
+
+
 		try {
 			stage 				= context.getVariable("stage");
 		} catch (CitrusRuntimeException ignore) {};
@@ -46,7 +48,12 @@ public class ExportTestAction extends AbstractTestAction {
 		try {
 			vhostToExport = context.getVariable("vhostToExport");
 		} catch (Exception ignore) {};
-		
+
+		try {
+			exportMethods = Boolean.parseBoolean(context.getVariable("exportMethods"));
+		} catch (Exception ignore) {};
+
+
 		if(stage==null) {
 			stage = "NOT_SET";
 		}
@@ -85,6 +92,9 @@ public class ExportTestAction extends AbstractTestAction {
 			}
 			if(useFEAPIDefinition) {
 				args.add("-useFEAPIDefinition");
+			}
+			if(exportMethods){
+				args.add("-exportMethods");
 			}
 		}
 		int rc = APIExportApp.exportAPI(args.toArray(new String[args.size()]));
