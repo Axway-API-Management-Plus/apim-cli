@@ -33,120 +33,111 @@ import java.util.Map;
 
 /**
  * The interface to the API-Manager itself responsible to set up the underlying HTTPS-Communication.
- * It's used by the RESTAPICall.  
+ * It's used by the RESTAPICall.
  * Implemented as a Singleton, which holds the actual connection to the API-Manager.
- * @author cwiechmann@axway.com
  *
+ * @author cwiechmann@axway.com
  */
 public class APIMHttpClient {
-	
-	private static Map<Boolean, APIMHttpClient> instances = new HashMap<>();
-	
-	private HttpClient httpClient;
-	private HttpClientContext clientContext;
-	private BasicCookieStore cookieStore = new BasicCookieStore();
-	
-	private String csrfToken;
-	
-	public static void deleteInstances() {
-		instances = new HashMap<>();
-	}
-	
-	public static void addInstance(boolean adminInstance, APIMHttpClient client) {
-		instances.put(adminInstance, client);
-	}
-	
-	public static APIMHttpClient getInstance() throws AppException {
-		return getInstance(false);
-	}
-	
-	public static APIMHttpClient getInstance(boolean adminInstance) throws AppException {
-		if(!APIMHttpClient.instances.containsKey(adminInstance)) {
-			APIMHttpClient client = new APIMHttpClient(adminInstance);
-			instances.put(adminInstance, client);
-		}
-		return APIMHttpClient.instances.get(adminInstance);
-	}
-	
-	private APIMHttpClient(boolean adminInstance) throws AppException {
-		CoreParameters params = CoreParameters.getInstance();
-		createConnection(params.getAPIManagerURL());
-	}
 
-	private void createConnection(URI uri) throws AppException {
-		PoolingHttpClientConnectionManager httpClientConnectionManager;
-		HttpHost targetHost;
-		SSLContextBuilder builder = new SSLContextBuilder();
-		try {
-			builder.loadTrustMaterial(null, new TrustAllStrategy());
+    private static Map<Boolean, APIMHttpClient> instances = new HashMap<>();
+    private HttpClient httpClient;
+    private HttpClientContext clientContext;
+    private BasicCookieStore cookieStore = new BasicCookieStore();
+    private String csrfToken;
 
-			SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(builder.build(), new NoopHostnameVerifier());
-	
-			Registry<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory>create()
-					.register(uri.getScheme(), sslConnectionSocketFactory)
-					.register("http", PlainConnectionSocketFactory.INSTANCE)
-					.build();
+    public static void deleteInstances() {
+        instances = new HashMap<>();
+    }
 
-			httpClientConnectionManager = new PoolingHttpClientConnectionManager(r);
-			httpClientConnectionManager.setMaxTotal(5);
-			httpClientConnectionManager.setDefaultMaxPerRoute(2);
-			targetHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
-	
-			// Add AuthCache to the execution context
-			clientContext = HttpClientContext.create();
-			//clientContext.setAuthCache(authCache);
-			clientContext.setCookieStore(cookieStore);
-	
-			httpClientConnectionManager.setMaxPerRoute(new HttpRoute(targetHost), 2);
-			// We have make sure, that cookies are correclty parsed!
-			RequestConfig.Builder defaultRequestConfig = RequestConfig.custom()
-			        .setCookieSpec(CookieSpecs.STANDARD);
-			CoreParameters params = CoreParameters.getInstance();
+    public static void addInstance(boolean adminInstance, APIMHttpClient client) {
+        instances.put(adminInstance, client);
+    }
 
-			HttpClientBuilder clientBuilder = HttpClientBuilder.create()
-					.disableRedirectHandling()
-					.setConnectionManager(httpClientConnectionManager)
-					.useSystemProperties();
+    public static APIMHttpClient getInstance() throws AppException {
+        return getInstance(false);
+    }
 
-			// Check if a proxy is configured
-			if(params.getProxyHost()!=null) {
-				HttpHost proxyHost = new HttpHost(params.getProxyHost(), params.getProxyPort());
-				HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
-				clientBuilder.setRoutePlanner(routePlanner);
-				if(params.getProxyUsername()!=null) {
-					CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-					credentialsProvider.setCredentials(new AuthScope(params.getProxyHost(), params.getProxyPort()), new UsernamePasswordCredentials(params.getProxyUsername(), params.getProxyPassword()));
-					clientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-				}
-				defaultRequestConfig.setProxy(proxyHost);
-			}
-			if(params.isDisableCompression())
-				clientBuilder.disableContentCompression();
-			clientBuilder.setDefaultRequestConfig(defaultRequestConfig.build());
-			this.httpClient = clientBuilder.build();
-		} catch (Exception e) {
-			throw new AppException("Can't create connection to API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
-		}
-	}
+    public static APIMHttpClient getInstance(boolean adminInstance) throws AppException {
+        if (!APIMHttpClient.instances.containsKey(adminInstance)) {
+            APIMHttpClient client = new APIMHttpClient(adminInstance);
+            instances.put(adminInstance, client);
+        }
+        return APIMHttpClient.instances.get(adminInstance);
+    }
 
-	public HttpClient getHttpClient() {
-		return httpClient;
-	}
+    private APIMHttpClient(boolean adminInstance) throws AppException {
+        CoreParameters params = CoreParameters.getInstance();
+        createConnection(params.getAPIManagerURL());
+    }
 
-	public HttpClientContext getClientContext() {
-		return clientContext;
-	}
+    private void createConnection(URI uri) throws AppException {
+        PoolingHttpClientConnectionManager httpClientConnectionManager;
+        HttpHost targetHost;
+        SSLContextBuilder builder = new SSLContextBuilder();
+        try {
+            builder.loadTrustMaterial(null, new TrustAllStrategy());
+            SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(builder.build(), new NoopHostnameVerifier());
+            Registry<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory>create()
+                    .register(uri.getScheme(), sslConnectionSocketFactory)
+                    .register("http", PlainConnectionSocketFactory.INSTANCE)
+                    .build();
 
-	public String getCsrfToken() {
-		return csrfToken;
-	}
+            httpClientConnectionManager = new PoolingHttpClientConnectionManager(r);
+            httpClientConnectionManager.setMaxTotal(5);
+            httpClientConnectionManager.setDefaultMaxPerRoute(2);
+            targetHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+            // Add AuthCache to the execution context
+            clientContext = HttpClientContext.create();
+            //clientContext.setAuthCache(authCache);
+            clientContext.setCookieStore(cookieStore);
+            httpClientConnectionManager.setMaxPerRoute(new HttpRoute(targetHost), 2);
+            // We have make sure, that cookies are correclty parsed!
+            RequestConfig.Builder defaultRequestConfig = RequestConfig.custom()
+                    .setCookieSpec(CookieSpecs.STANDARD);
+            CoreParameters params = CoreParameters.getInstance();
+            HttpClientBuilder clientBuilder = HttpClientBuilder.create()
+                    .disableRedirectHandling()
+                    .setConnectionManager(httpClientConnectionManager)
+                    .useSystemProperties();
 
-	public void setCsrfToken(String csrfToken) {
-		this.csrfToken = csrfToken;
-	}
+            // Check if a proxy is configured
+            if (params.getProxyHost() != null) {
+                HttpHost proxyHost = new HttpHost(params.getProxyHost(), params.getProxyPort());
+                HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
+                clientBuilder.setRoutePlanner(routePlanner);
+                if (params.getProxyUsername() != null) {
+                    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                    credentialsProvider.setCredentials(new AuthScope(params.getProxyHost(), params.getProxyPort()), new UsernamePasswordCredentials(params.getProxyUsername(), params.getProxyPassword()));
+                    clientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+                }
+                defaultRequestConfig.setProxy(proxyHost);
+            }
+            if (params.isDisableCompression())
+                clientBuilder.disableContentCompression();
+            clientBuilder.setDefaultRequestConfig(defaultRequestConfig.build());
+           // clientBuilder.addInterceptorLast()
+            this.httpClient = clientBuilder.build();
+        } catch (Exception e) {
+            throw new AppException("Can't create connection to API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
+        }
+    }
 
-	@Override
-	public String toString() {
-		return "APIMHttpClient [cookieStore=" + cookieStore + ", csrfToken=" + csrfToken + "]";
-	}
+    public HttpClient getHttpClient() {
+        return httpClient;
+    }
+    public HttpClientContext getClientContext() {
+        return clientContext;
+    }
+    public String getCsrfToken() {
+        return csrfToken;
+    }
+
+    public void setCsrfToken(String csrfToken) {
+        this.csrfToken = csrfToken;
+    }
+    @Override
+    public String toString() {
+        return "APIMHttpClient [cookieStore=" + cookieStore + ", csrfToken=" + csrfToken + "]";
+    }
 }
