@@ -32,7 +32,7 @@ public class ImportTestAction extends AbstractTestAction {
 	public static String API_CONFIG = "apiConfig";
 	public static String STATE = "state";
 	
-	private static Logger LOG = LoggerFactory.getLogger(ImportTestAction.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ImportTestAction.class);
 	
 	File testDir = null;
 	
@@ -41,12 +41,12 @@ public class ImportTestAction extends AbstractTestAction {
 		String origApiDefinition 			= context.getVariable(API_DEFINITION);
 		String origConfigFile 			= context.getVariable(API_CONFIG);
 		String stage				= null;
-		String apiDefinition			= null;
+		String apiDefinition;
 		boolean useEnvironmentOnly = false;
 		testDir = createTestDirectory(context);
 		try {
 			stage 				= context.getVariable("stage");
-		} catch (CitrusRuntimeException ignore) {};
+		} catch (CitrusRuntimeException ignore) {}
 		if(StringUtils.isNotEmpty(origApiDefinition) && !origApiDefinition.contains("http://") && !origApiDefinition.contains("https://")) {
 			apiDefinition = replaceDynamicContentInFile(origApiDefinition, context, createTempFilename(origApiDefinition));
 		} else {
@@ -59,12 +59,12 @@ public class ImportTestAction extends AbstractTestAction {
 		int expectedReturnCode = 0;
 		try {
 			expectedReturnCode 	= Integer.parseInt(context.getVariable("expectedReturnCode"));
-		} catch (Exception ignore) {};
-		
+		} catch (Exception ignore) {}
+
 		try {
 			useEnvironmentOnly 	= Boolean.parseBoolean(context.getVariable("useEnvironmentOnly"));
-		} catch (Exception ignore) {};
-		
+		} catch (Exception ignore) {}
+
 		boolean enforce = false;
 		boolean ignoreQuotas = false;
 		boolean ignoreAdminAccount = false;
@@ -74,35 +74,40 @@ public class ImportTestAction extends AbstractTestAction {
 		String clientOrgsMode = null;
 		String clientAppsMode = null;
 		String quotaMode = null;
+		boolean exportMethods = false;
 		
 		
 		try {
 			enforce = Boolean.parseBoolean(context.getVariable("enforce"));
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		try {
 			ignoreQuotas = Boolean.parseBoolean(context.getVariable("ignoreQuotas"));
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		try {
 			quotaMode = context.getVariable("quotaMode");
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		try {
 			clientOrgsMode = context.getVariable("clientOrgsMode");
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		try {
 			clientAppsMode = context.getVariable("clientAppsMode");
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		try {
 			ignoreAdminAccount = Boolean.parseBoolean(context.getVariable("ignoreAdminAccount"));
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		try {
 			allowOrgAdminsToPublish = context.getVariable("allowOrgAdminsToPublish");
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		try {
 			changeOrganization = Boolean.parseBoolean(context.getVariable("changeOrganization"));
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		try {
 			ignoreCache = Boolean.parseBoolean(context.getVariable("ignoreCache"));
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
+
+		try {
+			exportMethods = Boolean.parseBoolean(context.getVariable("exportMethods"));
+		} catch (Exception ignore) {}
 		
 		
 		if(stage==null) {
@@ -116,7 +121,7 @@ public class ImportTestAction extends AbstractTestAction {
 		}
 		copyImagesAndCertificates(origConfigFile, context);
 		
-		List<String> args = new ArrayList<String>();
+		List<String> args = new ArrayList<>();
 		if(useEnvironmentOnly) {
 			args.add("-c");
 			args.add(configFile);
@@ -164,6 +169,9 @@ public class ImportTestAction extends AbstractTestAction {
 			if(ignoreAdminAccount) {
 				args.add("-ignoreAdminAccount");
 			}
+			if(exportMethods){
+				args.add("-exportMethods");
+			}
 		}
 		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);
 		int rc = APIImportApp.importAPI(args.toArray(new String[args.size()]));
@@ -178,7 +186,7 @@ public class ImportTestAction extends AbstractTestAction {
 	private String replaceDynamicContentInFile(String pathToFile, TestContext context, String replacedFilename) {
 		
 		File inputFile = new File(pathToFile);
-		InputStream is = null;
+		InputStream is;
 		OutputStream os = null;
 		try {
 			if(inputFile.exists()) { 
@@ -194,7 +202,7 @@ public class ImportTestAction extends AbstractTestAction {
 
 			String jsonReplaced = context.replaceDynamicContentInString(jsonData);
 
-			os = new FileOutputStream(new File(replacedFilename));
+			os = new FileOutputStream(replacedFilename);
 			IOUtils.write(jsonReplaced, os, StandardCharsets.UTF_8);
 			
 			return replacedFilename;
@@ -260,7 +268,7 @@ public class ImportTestAction extends AbstractTestAction {
 			LOG.info("Copy certificates and images from source: "+sourceDir+" into test-dir: '"+testDir+"' (Filter: \"*.crt\", \"*.jpg\", \"*.png\", \"*.pem\", \"*.md\")");
 			FileUtils.copyDirectory(sourceDir, testDir, filter);
 		} catch (IOException e) {
-
+			e.printStackTrace();
 		}
 	}
 }
