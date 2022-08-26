@@ -83,7 +83,8 @@
 		<module>modules/users</module>
 		<module>modules/settings</module>
 		<module>distribution</module>
-	</modules>
+        <module>modules/spectoconfig</module>
+    </modules>
 
 	<dependencyManagement>
 		<dependencies>

@@ -12,7 +12,7 @@ public enum AuthType {
 	private final String name;
 	private final String[] alternativenames;
 	
-	private AuthType(String name, String[] alternativeNames) {
+	AuthType(String name, String[] alternativeNames) {
 		this.name = name;
 		this.alternativenames = alternativeNames;
 	}
