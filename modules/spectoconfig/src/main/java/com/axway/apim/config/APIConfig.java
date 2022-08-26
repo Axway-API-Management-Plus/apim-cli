@@ -1,18 +1,15 @@
 package com.axway.apim.config;
 
 import com.axway.apim.api.API;
-import com.axway.apim.api.apiSpecification.APISpecification;
-import com.axway.apim.api.apiSpecification.OAS3xSpecification;
 import com.axway.apim.api.model.*;
 import com.axway.apim.config.model.APISecurity;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +19,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class APIConfig {
 
-    private API api = null;
+    private API api;
     private String apiDefinition;
     private Map<String, Object> securityProfiles;
 
@@ -54,13 +51,19 @@ public class APIConfig {
     }
 
 
-    public Map<String, Object> getSecurityProfiles() {
+    public List<Map<String, Object>> getSecurityProfiles() {
         if (securityProfiles.size() == 1) {
             List<APISecurity> apiSecurities = (List<APISecurity>) securityProfiles.get("devices");
             if (apiSecurities.get(0).getType().equals(DeviceType.passThrough.getName()))
                 return null;
         }
-        return securityProfiles;
+        List<Map<String, Object>> list = new ArrayList<>();
+        list.add(securityProfiles);
+        return list;
+    }
+
+    public String getPath(){
+        return api.getPath();
     }
 
 
@@ -68,16 +71,6 @@ public class APIConfig {
         if (api.getAuthenticationProfiles().size() == 1) {
             if (api.getAuthenticationProfiles().get(0).getType() == AuthType.none)
                 return null;
-        }
-        for (AuthenticationProfile profile : api.getAuthenticationProfiles()) {
-            if (profile.getType() == AuthType.oauth) {
-                String providerProfile = (String) profile.getParameters().get("providerProfile");
-                if (providerProfile.startsWith("<key")) {
-                    providerProfile = providerProfile.substring(providerProfile.indexOf("<key type='OAuthAppProfile'>"));
-                    providerProfile = providerProfile.substring(providerProfile.indexOf("value='") + 7, providerProfile.lastIndexOf("'/></key>"));
-                }
-                profile.getParameters().put("providerProfile", providerProfile);
-            }
         }
         return api.getAuthenticationProfiles();
     }
@@ -92,7 +85,6 @@ public class APIConfig {
         }
         return api.getInboundProfiles();
     }
-
 
     public List<CorsProfile> getCorsProfiles() {
 
@@ -136,22 +128,6 @@ public class APIConfig {
         return api.getOrganization().getName();
     }
 
-
-    public Map<String, String> getCustomProperties() {
-        if (api.getCustomProperties() == null || api.getCustomProperties().size() == 0)
-            return null;
-        Iterator<String> it = api.getCustomProperties().values().iterator();
-        boolean propertyFound = false;
-        while (it.hasNext()) {
-            String propValue = it.next();
-            if (propValue != null) {
-                propertyFound = true;
-                break;
-            }
-        }
-        if (!propertyFound) return null; // If no property is declared for this API return null
-        return api.getCustomProperties();
-    }
 
     public String getDescriptionType() {
         if (api.getDescriptionType().equals("original")) return null;

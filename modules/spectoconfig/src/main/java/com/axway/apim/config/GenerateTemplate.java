@@ -63,10 +63,6 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         GenerateTemplateParameters params;
         try {
             params = (GenerateTemplateParameters) GenerateTemplateCLIOptions.create(args).getParams();
-         //   params.validateRequiredParameters();
-//            APIManagerAdapter.deleteInstance();
-//            APIMHttpClient.deleteInstances();
-//            APIManagerAdapter.getInstance();
         } catch (AppException e) {
             LOG.error("Error " + e.getMessage());
             return e.getError().getCode();
@@ -80,9 +76,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
             objectMapper.setFilterProvider(filter);
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-//            objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
             JsonNode jsonNode = objectMapper.convertValue(apiConfig, JsonNode.class);
-            //  ((ObjectNode) jsonNode).put("apiDefinition", params.getApiDefinition());
             objectMapper.writeValue(fileWriter, jsonNode);
         } catch (IOException e) {
             LOG.error("Error in processing :", e);
@@ -167,9 +161,10 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         api.setName(info.getTitle());
         api.setVersion(info.getVersion());
         api.setTags(apiManagerTags);
-        api.setDescriptionType("original"); // Use description from openapi
+        api.setDescriptionType("original");
         CorsProfile corsProfile = new CorsProfile();
-        corsProfile.setName("CORS profile");
+        corsProfile.setName("_default");
+        corsProfile.setIsDefault(true);
         corsProfile.setOrigins(new String[]{"*"});
         corsProfile.setAllowedHeaders(new String[]{"Authorization"});
         corsProfile.setExposedHeaders(new String[]{"Via"});
@@ -179,7 +174,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         api.setCorsProfiles(corsProfiles);
         String frontendAuthType = parameters.getFrontendAuthType();
         // If frontendAuthType is null, use authentication from openapi spec. If none found, set it as pass through
-        Map<String, Object> securityProfiles = addInboundSecurityToAPI(api, frontendAuthType);
+        Map<String, Object> securityProfiles = addInboundSecurityToAPI(frontendAuthType);
         String backendAuthType = parameters.getBackendAuthType();
         addOutboundSecurityToAPI(api, backendAuthType);
         APIConfig apiConfig = new APIConfig(api, parameters.getApiDefinition(), securityProfiles);
@@ -221,16 +216,30 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         AuthenticationProfile authNProfile = new AuthenticationProfile();
         authNProfile.setName("_default");
         authNProfile.setType(authType);
+        authNProfile.setIsDefault(true);
+        Map<String, Object> parameters = new LinkedHashMap<>();
+        if (authType.equals(AuthType.apiKey)) {
+            parameters.put("apiKey", "4249823490238490");
+            parameters.put("apiKeyField", "KeyId");
+            parameters.put("httpLocation", "QUERYSTRING_PARAMETER");
+        } else if (authType.equals(AuthType.http_basic) || authType.equals(AuthType.http_digest)) {
+            parameters.put("username", "user1");
+            parameters.put("password", "password1");
+        } else if (authType.equals(AuthType.oauth)) {
+            parameters.put("providerProfile", "<Name-of-configured-OAuth-Profile>");
+            parameters.put("ownerId", "${authentication.subject.id}");
+        } else if (authType.equals(AuthType.ssl)) {
+            parameters.put("source", "file");
+            parameters.put("certFile", "../certificates/clientcert.pfx");
+            parameters.put("password", "myClientCertPW");
+            parameters.put("trustAll", true);
+        }
+        authNProfile.setParameters(parameters);
         authnProfiles.add(authNProfile);
-        Map<String, OutboundProfile> outboundProfiles = new HashMap<>();
-        OutboundProfile outboundProfile = new OutboundProfile();
-        outboundProfile.setAuthenticationProfile("_default");
-        outboundProfiles.put("_default", outboundProfile);
         api.setAuthenticationProfiles(authnProfiles);
-        api.setOutboundProfiles(outboundProfiles);
     }
 
-    private Map<String, Object> addInboundSecurityToAPI(API api, String frontendAuthType) throws AppException {
+    private Map<String, Object> addInboundSecurityToAPI(String frontendAuthType) throws AppException {
         DeviceType deviceType = null;
         try {
             deviceType = DeviceType.valueOf(frontendAuthType);
@@ -263,7 +272,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         if (deviceType.equals(DeviceType.apiKey)) {
             properties.put("apiKeyFieldName", "KeyId");
             properties.put("takeFrom", "HEADER");
-            properties.put("removeCredentialsOnSuccess", true);
+            properties.put("removeCredentialsOnSuccess", "true");
         } else if (deviceType.equals(DeviceType.oauth)) {
             properties.put("tokenStore", "OAuth Access Token Store");
             properties.put("scopes", "resource.WRITE, resource.READ");
