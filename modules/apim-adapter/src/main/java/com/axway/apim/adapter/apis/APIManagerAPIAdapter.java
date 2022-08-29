@@ -615,10 +615,12 @@ public class APIManagerAPIAdapter {
 
     public API updateAPIProxy(API api) throws AppException {
         LOG.debug("Updating API-Proxy: '" + api.getName() + " " + api.getVersion() + " (" + api.getId() + ")'");
+        LOG.debug("**API** : {}", api.getClass().getName());
+
         URI uri;
         HttpEntity entity;
         String[] serializeAllExcept;
-        serializeAllExcept = new String[]{"apiDefinition", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota",  "remoteHost"};
+        serializeAllExcept = new String[]{"caCerts", "apiDefinition", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota",  "remoteHost"};
         mapper.setSerializationInclusion(Include.NON_NULL);
         FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                 SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
