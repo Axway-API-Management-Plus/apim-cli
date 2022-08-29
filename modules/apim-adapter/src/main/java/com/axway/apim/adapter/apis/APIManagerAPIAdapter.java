@@ -618,12 +618,7 @@ public class APIManagerAPIAdapter {
         URI uri;
         HttpEntity entity;
         String[] serializeAllExcept;
-        // queryStringPassThrough
-        if (APIManagerAdapter.hasAPIManagerVersion("7.7.20220530")) {
-            serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
-        } else {
-            serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
-        }
+        serializeAllExcept = new String[]{"apiDefinition", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota",  "remoteHost"};
         mapper.setSerializationInclusion(Include.NON_NULL);
         FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                 SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
@@ -635,7 +630,6 @@ public class APIManagerAPIAdapter {
         try {
             uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + api.getId()).build();
             entity = new StringEntity(mapper.writeValueAsString(api), ContentType.APPLICATION_JSON);
-
             RestAPICall request = new PUTRequest(entity, uri);
             httpResponse = request.execute();
             String response = EntityUtils.toString(httpResponse.getEntity());
