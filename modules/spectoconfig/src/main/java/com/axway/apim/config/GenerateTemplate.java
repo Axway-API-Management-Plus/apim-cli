@@ -163,22 +163,45 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         api.setTags(apiManagerTags);
         api.setDescriptionType("original");
         CorsProfile corsProfile = new CorsProfile();
-        corsProfile.setName("_default");
-        corsProfile.setIsDefault(true);
+        corsProfile.setName("Custom CORS");
+        corsProfile.setIsDefault(false);
+        corsProfile.setSupportCredentials(true);
         corsProfile.setOrigins(new String[]{"*"});
         corsProfile.setAllowedHeaders(new String[]{"Authorization"});
         corsProfile.setExposedHeaders(new String[]{"Via"});
         corsProfile.setMaxAgeSeconds("0");
+
+        CorsProfile corsProfileDefault = new CorsProfile();
+        corsProfileDefault.setName("_default");
+        corsProfileDefault.setIsDefault(true);
+        corsProfileDefault.setOrigins(new String[]{"*"});
+        corsProfileDefault.setAllowedHeaders(new String[]{});
+        corsProfileDefault.setExposedHeaders(new String[]{"X-CorrelationID"});
+        corsProfileDefault.setMaxAgeSeconds("0");
+
         List<CorsProfile> corsProfiles = new ArrayList<>();
+        corsProfiles.add(corsProfileDefault);
         corsProfiles.add(corsProfile);
         api.setCorsProfiles(corsProfiles);
+
+
+        Map<String, InboundProfile> inboundProfiles = new HashMap<>();
+        InboundProfile profile = new InboundProfile();
+        profile.setCorsProfile("Custom CORS");
+        profile.setSecurityProfile("_default");
+        profile.setMonitorAPI(true);
+        profile.setMonitorSubject("authentication.subject.id");
+        profile.setQueryStringPassThrough(false);
+        inboundProfiles.put("_default", profile);
+        api.setInboundProfiles(inboundProfiles);
+
+
         String frontendAuthType = parameters.getFrontendAuthType();
         // If frontendAuthType is null, use authentication from openapi spec. If none found, set it as pass through
         Map<String, Object> securityProfiles = addInboundSecurityToAPI(frontendAuthType);
         String backendAuthType = parameters.getBackendAuthType();
         addOutboundSecurityToAPI(api, backendAuthType);
-        APIConfig apiConfig = new APIConfig(api, parameters.getApiDefinition(), securityProfiles);
-        return apiConfig;
+        return new APIConfig(api, parameters.getApiDefinition(), securityProfiles);
     }
 
 

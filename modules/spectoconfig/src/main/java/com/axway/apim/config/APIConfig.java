@@ -81,7 +81,7 @@ public class APIConfig {
         if (api.getInboundProfiles().size() == 1) {
             InboundProfile defaultProfile = api.getInboundProfiles().get("_default");
             if (defaultProfile.getSecurityProfile().equals("_default")
-                /*&& defaultProfile.getCorsProfile().equals("_default")*/) return null;
+                && defaultProfile.getCorsProfile().equals("_default")) return null;
         }
         return api.getInboundProfiles();
     }
