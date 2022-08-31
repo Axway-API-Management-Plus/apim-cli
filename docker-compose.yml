@@ -16,7 +16,7 @@ services:
       - 8075:8075   # API-Manager UI
       - 8065:8065   # API-Manager Traffic
       - 8080:8080   # Plain socket for smoke tests
-    hostname:   apimgmt
+    hostname: apimgmt
     depends_on:
       - cassandra
   start_cassandra:
