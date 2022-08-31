@@ -52,6 +52,6 @@ install:
   # Start Cassandra and wait that port 9042 is reachable
   - docker-compose run --rm start_cassandra
   # Start the API-Gateway + API-Manager
-  - docker-compose run --rm start_apimgmt
+  - docker-compose run start_apimgmt
   # Give API-Manager a moment to start
   - docker-compose logs --tail 30 apimgmt
