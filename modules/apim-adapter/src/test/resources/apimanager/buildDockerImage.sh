@@ -9,6 +9,7 @@ function exitScript() {
 	cd $currentDir
 	if [[ $rc = 10 ]]; then
 		echo "Supported versions"
+		echo "`basename $0` 7.7-20220830"
 		echo "`basename $0` 7.7-20220530"
 		echo "`basename $0` 7.7-20220228"
 		echo "`basename $0` 7.7-20211130"
@@ -40,6 +41,11 @@ buildDir="$HOME/apim-cli-dockerimage"
 echo "Creating docker image for version $version"
 
 case "$version" in
+	7.7-20220830)
+		fedFile="swagger-promote-7.7-20220830.fed"
+		installer="APIGateway_7.7.20220830_Install_linux-x86-64_BN04.run"
+		dockerScripts="APIGateway_7.7.20220830-DockerScripts-2.6.0-1.tar.gz"
+		dockerScriptsDir="apigw-emt-scripts-2.5.0";;
 	7.7-20220530)
 		fedFile="swagger-promote-7.7-20220530.fed"
 		installer="APIGateway_7.7.20220530_Install_linux-x86-64_BN02.run"

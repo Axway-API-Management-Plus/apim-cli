@@ -620,7 +620,12 @@ public class APIManagerAPIAdapter {
         URI uri;
         HttpEntity entity;
         String[] serializeAllExcept;
-        serializeAllExcept = new String[]{"certFile", "useForInbound", "useForOutbound", "apiDefinition", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota",  "remoteHost"};
+        // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
+        if (APIManagerAdapter.hasAPIManagerVersion("7.7.20220530") || APIManagerAdapter.hasAPIManagerVersion("7.7.20220830")) {
+            serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath","remoteHost"};
+        } else {
+            serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
+        }
         mapper.setSerializationInclusion(Include.NON_NULL);
         FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                 SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
