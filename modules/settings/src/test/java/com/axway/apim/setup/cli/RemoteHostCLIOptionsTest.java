@@ -16,6 +16,8 @@ import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportCLIOptions;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportParams;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -23,8 +25,9 @@ public class RemoteHostCLIOptionsTest {
 
 	private String apimCliHome;
 	@BeforeClass
-	private void init() throws IOException {
-		apimCliHome = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
+	private void init() throws IOException, URISyntaxException {
+		URI uri = this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI();
+		apimCliHome =  Paths.get(uri) + File.separator + "apimcli";
 		String confPath = String.valueOf(Files.createDirectories(Paths.get(apimCliHome + "/conf")).toAbsolutePath());
 		try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("env.properties");
 			 OutputStream outputStream=new FileOutputStream(new File(confPath, "env.properties" ))){
