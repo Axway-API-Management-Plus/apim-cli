@@ -184,4 +184,14 @@ public class GenerateTemplateCLIOptionsTest {
         Assert.assertEquals(true, documentContext.read("$.authenticationProfiles[0].isDefault", Boolean.class).booleanValue());
     }
 
+    @Test
+    public void testGenerateAPIConfigWithHttpsEndpoint() throws FileNotFoundException {
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "https://petstore3.swagger.io/api/v3/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey"};
+        GenerateTemplate.generate(args);
+        DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
+        Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
+        Assert.assertEquals("published", documentContext.read("$.state"));
+        Assert.assertEquals("/api/v3", documentContext.read("$.path"));
+    }
+
 }

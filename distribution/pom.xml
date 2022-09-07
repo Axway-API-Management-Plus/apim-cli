@@ -40,6 +40,10 @@
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
 			<artifactId>apimcli-settings</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-spectoconfig</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

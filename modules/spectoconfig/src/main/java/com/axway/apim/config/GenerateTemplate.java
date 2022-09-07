@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -27,10 +28,17 @@ import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.*;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 public class GenerateTemplate implements APIMCLIServiceProvider {
@@ -60,6 +68,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
 
     @CLIServiceMethod(name = "generate", description = "Generate APIM CLI Config file template from Open API")
     public static int generate(String[] args) {
+        LOG.info("Generating APIM CLI configuration file");
         GenerateTemplateParameters params;
         try {
             params = (GenerateTemplateParameters) GenerateTemplateCLIOptions.create(args).getParams();
@@ -72,13 +81,17 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         try {
             APIConfig apiConfig = app.generateTemplate(params);
             fileWriter = new FileWriter(params.getConfig());
-            FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAll());
+            String[] serializeAllExcept = new String[]{"useForInbound", "useForOutbound"};
+
+            FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
             objectMapper.setFilterProvider(filter);
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
             JsonNode jsonNode = objectMapper.convertValue(apiConfig, JsonNode.class);
             objectMapper.writeValue(fileWriter, jsonNode);
-        } catch (IOException e) {
+            LOG.info("Writing APIM CLI configuration file to : {}", params.getConfig());
+
+        } catch (IOException | CertificateEncodingException | NoSuchAlgorithmException | KeyManagementException e) {
             LOG.error("Error in processing :", e);
             if (e instanceof AppException) {
                 AppException appException = (AppException) e;
@@ -99,7 +112,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
     }
 
 
-    public APIConfig generateTemplate(GenerateTemplateParameters parameters) throws MalformedURLException, AppException {
+    public APIConfig generateTemplate(GenerateTemplateParameters parameters) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, KeyManagementException {
         List<AuthorizationValue> authorizationValues = new ArrayList<>();
         ParseOptions parseOptions = new ParseOptions();
         parseOptions.setResolve(true); // implicit
@@ -167,8 +180,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         corsProfile.setIsDefault(false);
         corsProfile.setSupportCredentials(true);
         corsProfile.setOrigins(new String[]{"*"});
-        corsProfile.setAllowedHeaders(new String[]{"Authorization"});
-        corsProfile.setExposedHeaders(new String[]{"Via"});
+        corsProfile.setAllowedHeaders(new String[]{"Authorization", "x-requested-with", "Bearer"});
+        corsProfile.setExposedHeaders(new String[]{"Via", "X-CorrelationID"});
         corsProfile.setMaxAgeSeconds("0");
 
         CorsProfile corsProfileDefault = new CorsProfile();
@@ -194,13 +207,15 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         profile.setQueryStringPassThrough(false);
         inboundProfiles.put("_default", profile);
         api.setInboundProfiles(inboundProfiles);
-
-
         String frontendAuthType = parameters.getFrontendAuthType();
         // If frontendAuthType is null, use authentication from openapi spec. If none found, set it as pass through
         Map<String, Object> securityProfiles = addInboundSecurityToAPI(frontendAuthType);
         String backendAuthType = parameters.getBackendAuthType();
         addOutboundSecurityToAPI(api, backendAuthType);
+        if (uri.startsWith("https")) {
+            downloadAPISpecification(openAPI, parameters.getConfig());
+            downloadCertificates(api, parameters.getConfig(), uri);
+        }
         return new APIConfig(api, parameters.getApiDefinition(), securityProfiles);
     }
 
@@ -341,5 +356,98 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         properties.put("authCodeGrantTypeTokenEndpointUrl", "https://localhost:8089/api/oauth/token");
         properties.put("authCodeGrantTypeTokenEndpointTokenName", "access_code");
     }
+
+    public void downloadAPISpecification(OpenAPI openAPI, String configPath) throws IOException {
+        File file = new File(configPath);
+        String parent = file.getParent();
+        String filename = "openapi.yaml";
+        if (parent != null) {
+            filename = file.toPath().getParent().toString() + File.separator + filename;
+        }
+        ObjectMapper openAPIMapper = Yaml.mapper();
+        try (FileWriter fileWriter = new FileWriter(filename);) {
+            String value = openAPIMapper.writeValueAsString(openAPI);
+            fileWriter.write(value);
+            fileWriter.flush();
+        }
+    }
+
+
+    public void downloadCertificates(API api, String configPath, String url) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, KeyManagementException {
+        HostnameVerifier hostnameVerifier = (hostname, session) -> true;
+        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }};
+
+        File file = new File(configPath);
+        String parent = file.getParent();
+        Base64.Encoder encoder = Base64.getMimeEncoder(64, System.getProperty("line.separator").getBytes());
+        URL httpURL = new URL(url);
+        SSLContext sc = SSLContext.getInstance("TLS");
+        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        HttpsURLConnection httpsURLConnection = (HttpsURLConnection) httpURL.openConnection();
+        httpsURLConnection.setHostnameVerifier(hostnameVerifier);
+        httpsURLConnection.connect();
+        Certificate[] certificates = httpsURLConnection.getServerCertificates();
+        List<CaCert> caCerts = new ArrayList<>();
+        for (Certificate certificate : certificates) {
+            if (certificate instanceof X509Certificate) {
+                X509Certificate publicCert = (X509Certificate) certificate;
+                int basicConstraints = publicCert.getBasicConstraints();
+                if (basicConstraints == -1) {
+                    continue;
+                }
+                CaCert caCert = new CaCert();
+                String encodedCertText = new String(encoder.encode(publicCert.getEncoded()));
+                byte[] certContent = ("-----BEGIN CERTIFICATE-----\n" + encodedCertText + "\n-----END CERTIFICATE-----").getBytes();
+                String filename = createCertFileName(publicCert);
+                if (parent != null) {
+                    filename = file.toPath().getParent().toString() + File.separator + filename;
+                }
+                try (FileOutputStream fileOutputStream = new FileOutputStream(filename)) {
+                    fileOutputStream.write(certContent);
+                } catch (IOException e) {
+                    throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
+                }
+                caCert.setCertFile(filename);
+                caCert.setInbound("false");
+                caCert.setOutbound("true");
+                caCerts.add(caCert);
+            }
+        }
+        api.setCaCerts(caCerts);
+    }
+
+    public String createCertFileName(X509Certificate certificate) {
+        String filename = null;
+        String certAlias = certificate.getSubjectDN().getName();
+        String[] nameParts = certAlias.split(",");
+        for (String namePart : nameParts) {
+            if (namePart.trim().startsWith("CN=")) {
+                filename = namePart.trim().substring(3);
+                break;
+            }
+        }
+        if (filename == null) {
+            LOG.warn("No CN");
+            filename = "UnknownCertificate_" + UUID.randomUUID();
+            LOG.warn("Created a random filename: " + filename + ".ctr");
+        } else {
+            filename = filename.replace(" ", "");
+            filename = filename.replace("*", "");
+            if (filename.startsWith(".")) filename = filename.replaceFirst(".", "");
+        }
+        return filename + ".crt";
+    }
+
 
 }

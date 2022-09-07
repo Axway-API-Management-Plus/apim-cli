@@ -615,8 +615,6 @@ public class APIManagerAPIAdapter {
 
     public API updateAPIProxy(API api) throws AppException {
         LOG.debug("Updating API-Proxy: '" + api.getName() + " " + api.getVersion() + " (" + api.getId() + ")'");
-        LOG.debug("**API** : {}", api.getClass().getName());
-
         URI uri;
         HttpEntity entity;
         String[] serializeAllExcept;
