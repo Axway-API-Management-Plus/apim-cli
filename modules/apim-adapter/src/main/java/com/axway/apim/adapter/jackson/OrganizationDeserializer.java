@@ -55,7 +55,7 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 			// organization name is given in the config file
 			// If we don't have an Admin-Account don't try to load the organization!
 			// commented out to support org admin self service.
-//			if(!APIManagerAdapter.hasAdminAccount()) {
+
 //				User user = APIManagerAdapter.getCurrentUser(false);
 //				if(!node.asText().equals(user.getOrganization().getName())) {
 //					LOG.warn("The given API-Organization is invalid as OrgAdmin user: '"+user.getName()+"' belongs to organization: '" + user.getOrganization().getName() + "'. API will be registered with OrgAdmin organization.");
@@ -65,8 +65,16 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 
 			// Otherwise make sure the organization exists and try to load it
 			organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(node.asText());
+
 			if(organization==null && validateOrganization(ctxt)) {
 				throw new AppException("The given organization: '"+node.asText()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
+			}
+
+			// Check
+			if(!APIManagerAdapter.hasAdminAccount()){
+				if(!APIManagerAdapter.hasOrgAdmin()){
+					throw new AppException("The given organization: '"+node.asText()+"' does not have appropriate role.", ErrorCode.UNKNOWN_ORGANIZATION);
+				}
 			}
 			return organization;
 		}
