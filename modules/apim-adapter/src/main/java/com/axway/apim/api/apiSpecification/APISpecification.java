@@ -22,11 +22,11 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 
 public abstract class APISpecification {
 	
-	public static enum APISpecType {
-		SWAGGGER_API_1x("Swagger 1.x", ".json"),
-		SWAGGGER_API_1x_YAML("Swagger 1.x (YAML)", ".yaml"),
-		SWAGGGER_API_20("Swagger 2.0", ".json"),
-		SWAGGGER_API_20_YAML("Swagger 2.0 (YAML)", ".yaml"),
+	public enum APISpecType {
+		SWAGGER_API_1x("Swagger 1.x", ".json"),
+		SWAGGER_API_1x_YAML("Swagger 1.x (YAML)", ".yaml"),
+		SWAGGER_API_20("Swagger 2.0", ".json"),
+		SWAGGER_API_20_YAML("Swagger 2.0 (YAML)", ".yaml"),
 		OPEN_API_30("Open API 3.0", ".json"),
 		OPEN_API_30_YAML("Open API 3.0 (YAML)", ".yaml"),
 		WSDL_API ("WSDL", ".xml"),
@@ -150,7 +150,6 @@ public abstract class APISpecification {
 	}
 	
 	public void filterAPISpecification() {
-		return;
 	}
 
 	public APISpecification setFilterConfig(APISpecificationFilter filterConfig) {

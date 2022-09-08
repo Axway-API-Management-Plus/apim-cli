@@ -145,7 +145,7 @@ public class APISpecificationSwagger2xTest {
 		
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 		
-		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.SWAGGGER_API_20);
+		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.SWAGGER_API_20);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		
 		Assert.assertEquals(filteredSpec.get("paths").size(), 3, "3 Methods expected");
@@ -178,7 +178,7 @@ public class APISpecificationSwagger2xTest {
 		
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 		
-		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.SWAGGGER_API_20);
+		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.SWAGGER_API_20);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		
 		// Assert.assertEquals(filteredSpec.get("paths").size(), 6, "6 Methods expected");

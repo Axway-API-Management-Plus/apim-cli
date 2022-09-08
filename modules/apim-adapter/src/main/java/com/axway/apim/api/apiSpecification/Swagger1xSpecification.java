@@ -18,9 +18,9 @@ public class Swagger1xSpecification extends APISpecification {
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
 		if(this.mapper.getFactory() instanceof YAMLFactory) {
-			return APISpecType.SWAGGGER_API_1x_YAML;
+			return APISpecType.SWAGGER_API_1x_YAML;
 		}
-		return APISpecType.SWAGGGER_API_1x;
+		return APISpecType.SWAGGER_API_1x;
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class Swagger1xSpecification extends APISpecification {
 				if(swagger.get("basePath").asText().equals(url.toString())) {
 					LOG.debug("Swagger resourcePath: '"+swagger.get("basePath").asText()+"' already matches configured backendBasePath: '"+url.getPath()+"'. Nothing to do.");
 				} else {
-					LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+url.toString()+"' based on configured backendBasePath: '"+backendBasePath+"'");
+					LOG.debug("Replacing existing basePath: '"+swagger.get("basePath").asText()+"' in Swagger-File to '"+ url +"' based on configured backendBasePath: '"+backendBasePath+"'");
 					backendBasePathAdjusted = true;
 					((ObjectNode)swagger).put("basePath", url.toString());
 				}
