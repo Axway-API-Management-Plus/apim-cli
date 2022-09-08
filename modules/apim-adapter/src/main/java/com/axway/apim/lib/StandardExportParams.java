@@ -14,6 +14,7 @@ public class StandardExportParams extends CoreParameters {
 		console, 
 		json, 
 		csv,
+		yaml,
 		dat;
 		
 		public static OutputFormat getFormat(String name) {

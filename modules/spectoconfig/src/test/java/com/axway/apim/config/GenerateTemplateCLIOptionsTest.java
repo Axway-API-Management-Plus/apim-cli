@@ -5,37 +5,40 @@ import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class GenerateTemplateCLIOptionsTest {
 
     private String apimCliHome;
+    private String openApiLocation;
 
     @BeforeClass
     private void init() throws  URISyntaxException {
         URI uri = this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI();
-        apimCliHome =  Paths.get(uri) + File.separator + "apimcli";
-
+        Path path = Paths.get(uri);
+        openApiLocation = path + File.separator  + "openapi.json";
+        apimCliHome =  path + File.separator + "apimcli";
     }
 
     @Test
     public void testAppImportParameters() throws AppException {
-        String[] args = {"-c", "myOrgConfig.json", "-a", "openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "oauth", "-frontendAuthType", "oauth"};
+        String[] args = {"-c", "myOrgConfig.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "oauth", "-frontendAuthType", "oauth"};
         CLIOptions options = GenerateTemplateCLIOptions.create(args);
         GenerateTemplateParameters params = (GenerateTemplateParameters) options.getParams();
         // Validate core parameters are included
         Assert.assertEquals(params.getConfig(), "myOrgConfig.json");
         // Validate App-Import parameters
-        Assert.assertEquals(params.getApiDefinition(), "openapi.json");
+        Assert.assertEquals(params.getApiDefinition(), openApiLocation);
         Assert.assertEquals(params.getBackendAuthType(), "oauth");
         Assert.assertEquals(params.getFrontendAuthType(), "oauth");
 
@@ -43,7 +46,7 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfig() throws FileNotFoundException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "openapi.json", "-apimCLIHome", apimCliHome};
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome};
         GenerateTemplate.generate(args);
         DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
 
@@ -53,7 +56,7 @@ public class GenerateTemplateCLIOptionsTest {
         Assert.assertEquals("1.0.11", documentContext.read("$.version"));
         Assert.assertEquals("API Development", documentContext.read("$.organization"));
 
-        Assert.assertEquals("openapi.json", documentContext.read("$.apiSpecification.resource"));
+        Assert.assertEquals(openApiLocation, documentContext.read("$.apiSpecification.resource"));
         Assert.assertEquals("https://localhost", documentContext.read("$.backendBasepath"));
 
         Assert.assertEquals("pet", documentContext.read("$.tags.pet[0]"));
@@ -72,7 +75,7 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfigWithFrontendApikey() throws FileNotFoundException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey"};
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey"};
         GenerateTemplate.generate(args);
         DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
 
@@ -87,7 +90,7 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfigWithFrontendOauth() throws FileNotFoundException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "oauth"};
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "oauth"};
         GenerateTemplate.generate(args);
         DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
         Assert.assertEquals("oauth", documentContext.read("$.securityProfiles[0].devices[0].type"));
@@ -115,7 +118,7 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfigWithFrontendExternalOauth() throws FileNotFoundException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "oauth-external"};
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "oauth-external"};
         GenerateTemplate.generate(args);
         DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
         Assert.assertEquals("oauthExternal", documentContext.read("$.securityProfiles[0].devices[0].type"));
@@ -146,7 +149,7 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfigWithBackendApikey() throws FileNotFoundException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey"};
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey"};
         GenerateTemplate.generate(args);
         DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
         Assert.assertEquals("_default", documentContext.read("$.authenticationProfiles[0].name"));
@@ -159,7 +162,7 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfigWithBackendOauth() throws FileNotFoundException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "oauth", "-frontendAuthType", "apikey"};
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "oauth", "-frontendAuthType", "apikey"};
         GenerateTemplate.generate(args);
         DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
         Assert.assertEquals("_default", documentContext.read("$.authenticationProfiles[0].name"));
@@ -171,7 +174,7 @@ public class GenerateTemplateCLIOptionsTest {
 
     @Test
     public void testGenerateAPIConfigWithBackendSSL() throws FileNotFoundException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "ssl", "-frontendAuthType", "apikey"};
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "ssl", "-frontendAuthType", "apikey"};
         GenerateTemplate.generate(args);
         DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
         Assert.assertEquals("_default", documentContext.read("$.authenticationProfiles[0].name"));
@@ -182,15 +185,4 @@ public class GenerateTemplateCLIOptionsTest {
         Assert.assertEquals(true, documentContext.read("$.authenticationProfiles[0].parameters.trustAll", Boolean.class).booleanValue());
         Assert.assertEquals(true, documentContext.read("$.authenticationProfiles[0].isDefault", Boolean.class).booleanValue());
     }
-
-    @Test
-    public void testGenerateAPIConfigWithHttpsEndpoint() throws FileNotFoundException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "https://petstore3.swagger.io/api/v3/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey"};
-        GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
-        Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
-        Assert.assertEquals("published", documentContext.read("$.state"));
-        Assert.assertEquals("/api/v3", documentContext.read("$.path"));
-    }
-
 }

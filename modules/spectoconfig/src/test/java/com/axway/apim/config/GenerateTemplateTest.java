@@ -87,6 +87,7 @@ public class GenerateTemplateTest {
     }
     @Test
     public void testDownloadCertificates() throws IOException, CertificateEncodingException, NoSuchAlgorithmException, KeyManagementException {
+        HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);
         GenerateTemplate generateTemplate = new GenerateTemplate();
         API api = new API();
         generateTemplate.downloadCertificates(api, "config.json", "https://localhost:8443");
@@ -95,8 +96,6 @@ public class GenerateTemplateTest {
 
     @Test
     public void testGenerateAPIConfigWithHttpEndpoint() throws FileNotFoundException {
-        System.setProperty("TRUST_ALL","true");
-        HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);
         String[] args = {"template", "generate", "-c", "api-config.json", "-a", "http://localhost:7070/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey"};
         GenerateTemplate.generate(args);
         DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
@@ -113,5 +112,28 @@ public class GenerateTemplateTest {
         Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
         Assert.assertEquals("published", documentContext.read("$.state"));
         Assert.assertEquals("/api/v3", documentContext.read("$.path"));
+    }
+
+    @Test
+    public void testLocalApiSpecYaml() throws FileNotFoundException {
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "http://localhost:7070/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey", "-o", "yaml"};
+        GenerateTemplate.generate(args);
+        DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
+        Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
+        Assert.assertEquals("published", documentContext.read("$.state"));
+        Assert.assertEquals("/api/v3", documentContext.read("$.path"));
+        Assert.assertEquals(new File("openapi.yaml").exists(), true);
+    }
+
+    @Test
+    public void testLocalApiSpecJsonWithHttps() throws FileNotFoundException {
+
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "https://localhost:8443/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey", "-o", "json"};
+        GenerateTemplate.generate(args);
+        DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
+        Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
+        Assert.assertEquals("published", documentContext.read("$.state"));
+        Assert.assertEquals("/api/v3", documentContext.read("$.path"));
+       // Assert.assertEquals(new File("openapi.json").exists(), true);
     }
 }

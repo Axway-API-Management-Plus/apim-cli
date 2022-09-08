@@ -76,6 +76,11 @@ public class JsonAPIExporter extends APIResultHandler {
 		LOG.debug("Going to export API: '"+exportAPI.toStringShort()+"' into folder: " + localFolder);
 		validateFolder(localFolder);
 		APISpecification apiDef = exportAPI.getAPIDefinition();
+		// Skip processing if API definition is not available due to original API cloned and deleted.
+		if(apiDef == null){
+			LOG.error("Backend API Definition is not available for the API : {}, hence use the option -useFEAPIDefinition to export API", exportAPI.getName());
+			return;
+		}
 		String targetFile = null;
 		try {
 			targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName()+apiDef.getAPIDefinitionType().getFileExtension();

@@ -6,6 +6,7 @@ import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.config.model.APISecurity;
 import com.axway.apim.config.model.GenerateTemplateParameters;
+import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.URLParser;
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -33,6 +35,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -68,6 +71,9 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
 
     @CLIServiceMethod(name = "generate", description = "Generate APIM CLI Config file template from Open API")
     public static int generate(String[] args) {
+        // Trust all certificate and hostname for openapi parser
+        System.setProperty("TRUST_ALL","true");
+        HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);
         LOG.info("Generating APIM CLI configuration file");
         GenerateTemplateParameters params;
         try {
@@ -197,7 +203,6 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         corsProfiles.add(corsProfile);
         api.setCorsProfiles(corsProfiles);
 
-
         Map<String, InboundProfile> inboundProfiles = new HashMap<>();
         InboundProfile profile = new InboundProfile();
         profile.setCorsProfile("Custom CORS");
@@ -212,11 +217,17 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         Map<String, Object> securityProfiles = addInboundSecurityToAPI(frontendAuthType);
         String backendAuthType = parameters.getBackendAuthType();
         addOutboundSecurityToAPI(api, backendAuthType);
+        String apiSpecLocation;
         if (uri.startsWith("https")) {
-            downloadAPISpecification(openAPI, parameters.getConfig());
             downloadCertificates(api, parameters.getConfig(), uri);
         }
-        return new APIConfig(api, parameters.getApiDefinition(), securityProfiles);
+        if(uri.startsWith("http")){
+            apiSpecLocation = downloadAPISpecification(openAPI, parameters.getConfig(), parameters.getOutputFormat());
+        }else{
+            apiSpecLocation = parameters.getApiDefinition();
+        }
+
+        return new APIConfig(api, apiSpecLocation, securityProfiles);
     }
 
 
@@ -357,24 +368,32 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         properties.put("authCodeGrantTypeTokenEndpointTokenName", "access_code");
     }
 
-    public void downloadAPISpecification(OpenAPI openAPI, String configPath) throws IOException {
+    public String downloadAPISpecification(OpenAPI openAPI, String configPath, StandardExportParams.OutputFormat outputFormat) throws IOException {
+
         File file = new File(configPath);
         String parent = file.getParent();
         String filename = "openapi.yaml";
+        ObjectMapper openAPIMapper;
+        if(outputFormat.equals(StandardExportParams.OutputFormat.json)){
+            filename = "openapi.json";
+            openAPIMapper = Json.mapper();
+        }else {
+            openAPIMapper = Yaml.mapper();
+        }
         if (parent != null) {
             filename = file.toPath().getParent().toString() + File.separator + filename;
         }
-        ObjectMapper openAPIMapper = Yaml.mapper();
+        LOG.info("Writing API specification to : {}", filename);
         try (FileWriter fileWriter = new FileWriter(filename);) {
             String value = openAPIMapper.writeValueAsString(openAPI);
             fileWriter.write(value);
             fileWriter.flush();
         }
+        return filename;
     }
 
 
     public void downloadCertificates(API api, String configPath, String url) throws IOException, CertificateEncodingException, NoSuchAlgorithmException, KeyManagementException {
-        HostnameVerifier hostnameVerifier = (hostname, session) -> true;
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                 return null;
@@ -395,7 +414,6 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         sc.init(null, trustAllCerts, new java.security.SecureRandom());
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         HttpsURLConnection httpsURLConnection = (HttpsURLConnection) httpURL.openConnection();
-        httpsURLConnection.setHostnameVerifier(hostnameVerifier);
         httpsURLConnection.connect();
         Certificate[] certificates = httpsURLConnection.getServerCertificates();
         List<CaCert> caCerts = new ArrayList<>();
