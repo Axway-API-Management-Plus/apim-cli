@@ -423,6 +423,11 @@
             </properties>
         </profile>
     </profiles>
-
+    <repositories>
+        <repository>
+            <id>spring-repo</id>
+            <url>https://repository.springsource.com/maven/bundles/external</url>
+        </repository>
+    </repositories>
 
 </project>
