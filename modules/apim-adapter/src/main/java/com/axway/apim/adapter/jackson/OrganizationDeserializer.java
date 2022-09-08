@@ -69,13 +69,6 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 			if(organization==null && validateOrganization(ctxt)) {
 				throw new AppException("The given organization: '"+node.asText()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
 			}
-
-			// Check
-			if(!APIManagerAdapter.hasAdminAccount()){
-				if(!APIManagerAdapter.hasOrgAdmin()){
-					throw new AppException("The given organization: '"+node.asText()+"' does not have appropriate role.", ErrorCode.UNKNOWN_ORGANIZATION);
-				}
-			}
 			return organization;
 		}
 	}
