@@ -4,12 +4,12 @@
 <Configuration>
 	<Appenders>
 		<Console name="STDOUT" target="SYSTEM_OUT">
-			<PatternLayout pattern="%-6r %-5level %20.20C{1}| %m%n"/>
+			<PatternLayout pattern="%highlight{%d [%c{1}] %-5level: %msg%n%throwable}{STYLE=Logback}"/>
 		</Console>
 	</Appenders>
 	<Loggers>
 		<Logger name="com.axway.apim" level="${env:LOG_LEVEL:-info}" />
-		
+
 		<Logger name="com.consol.citrus" level="info" />
 		<Logger name="org.apache" level="info" />
 		<Logger name="org.ehcache" level="error" />
