@@ -404,7 +404,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 X509Certificate publicCert = (X509Certificate) certificate;
                 int basicConstraints = publicCert.getBasicConstraints();
                 if (basicConstraints == -1) {
-                    continue;
+                    if(caCerts.size() > 1) // ignore for self signed certs
+                        continue;
                 }
                 CaCert caCert = new CaCert();
                 String encodedCertText = new String(encoder.encode(publicCert.getEncoded()));
