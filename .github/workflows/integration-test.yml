@@ -1,6 +1,6 @@
 name: APIM CLI Integration test
 
-on: [push]
+on: [push, pull_request]
 
 env:
   CASSANDRA_DOCKER_IMAGE: cassandra:2.2.12
