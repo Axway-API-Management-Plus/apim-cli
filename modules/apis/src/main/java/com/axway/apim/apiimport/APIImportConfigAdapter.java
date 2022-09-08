@@ -69,19 +69,8 @@ public class APIImportConfigAdapter {
 	
 	/** If true, an OrgAdminUser is used to start the tool */
 	private boolean usingOrgAdmin;
-	
 
-	/**
-	 * Constructor just for testing. Don't use it!
-	 * @param apiConfig the desired API to test with
-	 * @param apiConfigFile the API configuration file
-	 * @throws AppException if the API import configuration cannot be loaded/initialized
-	 */
-	public APIImportConfigAdapter(API apiConfig, File apiConfigFile) throws AppException {
-		this.apiConfig = apiConfig;
-		this.apiConfigFile = apiConfigFile;
-	}
-	
+
 	public APIImportConfigAdapter(APIImportParams params) throws AppException {
 		this(params.getConfig(), params.getStage(), params.getApiDefintion(), APIManagerAdapter.hasOrgAdmin(), params.getStageConfig());
 	}
@@ -206,9 +195,10 @@ public class APIImportConfigAdapter {
 		if(apiConfig.getOrganization()==null || !apiConfig.getOrganization().isDevelopment()) {
 			throw new AppException("The given organization: '"+apiConfig.getOrganization()+"' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
 		}
-		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
-			apiConfig.getOrganization().setId(APIManagerAdapter.getCurrentUser(false).getOrganization().getId());
-		}
+//		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
+//			//apiConfig.get
+//			apiConfig.getOrganization().setId(APIManagerAdapter.getCurrentUser(false).getOrganization().getId());
+//		}
 	}
 
 	private void addAPISpecification(API apiConfig) throws IOException {
