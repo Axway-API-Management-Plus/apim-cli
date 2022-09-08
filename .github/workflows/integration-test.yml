@@ -2,6 +2,10 @@ name: APIM CLI Integration test
 
 on: [push]
 
+env:
+  CASSANDRA_DOCKER_IMAGE: cassandra:2.2.12
+  APIM_DOCKER_IMAGE: docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7-20220830
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,8 +29,8 @@ jobs:
           password: ${{ secrets.AXWAY_DOCKER_REG_PASS }}
       - name: Pull and Run docker images
         run: |
-          docker pull docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7-20220830
-          docker pull cassandra:2.2.12
+          docker pull $APIM_DOCKER_IMAGE
+          docker pull $CASSANDRA_DOCKER_IMAGE
           docker-compose run --rm start_cassandra
           docker-compose run --rm start_apimgmt
           docker-compose logs --tail 30 apimgmt
