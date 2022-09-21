@@ -30,12 +30,14 @@ import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.*;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -384,7 +386,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
             filename = file.toPath().getParent().toString() + File.separator + filename;
         }
         LOG.info("Writing API specification to : {}", filename);
-        try (FileWriter fileWriter = new FileWriter(filename);) {
+        try (FileWriter fileWriter = new FileWriter(filename)) {
             String value = openAPIMapper.writeValueAsString(openAPI);
             fileWriter.write(value);
             fileWriter.flush();

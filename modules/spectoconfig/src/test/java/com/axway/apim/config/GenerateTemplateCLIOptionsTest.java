@@ -10,10 +10,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -45,10 +45,10 @@ public class GenerateTemplateCLIOptionsTest {
     }
 
     @Test
-    public void testGenerateAPIConfig() throws FileNotFoundException {
+    public void testGenerateAPIConfig() throws IOException {
         String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
 
         Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
         Assert.assertEquals("published", documentContext.read("$.state"));
@@ -65,19 +65,19 @@ public class GenerateTemplateCLIOptionsTest {
 
         Assert.assertEquals("_default", documentContext.read("$.corsProfiles[0].name"));
         Assert.assertEquals("*", documentContext.read("$.corsProfiles[0].origins[0]"));
-        Assert.assertEquals(true, documentContext.read("$.corsProfiles[0].isDefault", Boolean.class).booleanValue());
+        Assert.assertTrue(documentContext.read("$.corsProfiles[0].isDefault", Boolean.class));
         //Assert.assertEquals("Authorization", documentContext.read("$.corsProfiles[0].allowedHeaders[0]"));
         Assert.assertEquals("X-CorrelationID", documentContext.read("$.corsProfiles[0].exposedHeaders[0]"));
-        Assert.assertEquals(false, documentContext.read("$.corsProfiles[0].supportCredentials", Boolean.class).booleanValue());
+        Assert.assertFalse(documentContext.read("$.corsProfiles[0].supportCredentials", Boolean.class));
         Assert.assertEquals(0, documentContext.read("$.corsProfiles[0].maxAgeSeconds", Integer.class).intValue());
     }
 
 
     @Test
-    public void testGenerateAPIConfigWithFrontendApikey() throws FileNotFoundException {
+    public void testGenerateAPIConfigWithFrontendApikey() throws IOException {
         String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
 
         Assert.assertEquals("apiKey", documentContext.read("$.securityProfiles[0].devices[0].type"));
         Assert.assertEquals("API Key", documentContext.read("$.securityProfiles[0].devices[0].name"));
@@ -89,10 +89,10 @@ public class GenerateTemplateCLIOptionsTest {
     }
 
     @Test
-    public void testGenerateAPIConfigWithFrontendOauth() throws FileNotFoundException {
+    public void testGenerateAPIConfigWithFrontendOauth() throws IOException {
         String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "oauth"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
         Assert.assertEquals("oauth", documentContext.read("$.securityProfiles[0].devices[0].type"));
         Assert.assertEquals("OAuth", documentContext.read("$.securityProfiles[0].devices[0].name"));
         Assert.assertEquals(1, documentContext.read("$.securityProfiles[0].devices[0].order", Integer.class).intValue());
@@ -102,11 +102,11 @@ public class GenerateTemplateCLIOptionsTest {
         //Assert.assertEquals("", documentContext.read("$.securityProfiles.devices[0].properties.accessTokenLocationQueryString"));
         Assert.assertEquals("Any", documentContext.read("$.securityProfiles[0].devices[0].properties.scopesMustMatch"));
         Assert.assertEquals("resource.WRITE, resource.READ", documentContext.read("$.securityProfiles[0].devices[0].properties.scopes"));
-        Assert.assertEquals(true, documentContext.read("$.securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", Boolean.class).booleanValue());
-        Assert.assertEquals(true, documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantEnabled", Boolean.class).booleanValue());
+        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", Boolean.class));
+        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantEnabled", Boolean.class));
         Assert.assertEquals("https://localhost:8089/api/oauth/authorize", documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantLoginEndpointUrl"));
         Assert.assertEquals("access_token", documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantLoginTokenName"));
-        Assert.assertEquals(true, documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeEnabled", Boolean.class).booleanValue());
+        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeEnabled", Boolean.class));
         Assert.assertEquals("https://localhost:8089/api/oauth/authorize", documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeRequestEndpointUrl"));
         Assert.assertEquals("client_id", documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeRequestClientIdName"));
         Assert.assertEquals("client_secret", documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeRequestSecretName"));
@@ -117,10 +117,10 @@ public class GenerateTemplateCLIOptionsTest {
     }
 
     @Test
-    public void testGenerateAPIConfigWithFrontendExternalOauth() throws FileNotFoundException {
+    public void testGenerateAPIConfigWithFrontendExternalOauth() throws IOException {
         String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "oauth-external"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
         Assert.assertEquals("oauthExternal", documentContext.read("$.securityProfiles[0].devices[0].type"));
         Assert.assertEquals("OAuth (External)", documentContext.read("$.securityProfiles[0].devices[0].name"));
         Assert.assertEquals(1, documentContext.read("$.securityProfiles[0].devices[0].order", Integer.class).intValue());
@@ -130,14 +130,14 @@ public class GenerateTemplateCLIOptionsTest {
         //Assert.assertEquals("", documentContext.read("$.securityProfiles.devices[0].properties.accessTokenLocationQueryString"));
         Assert.assertEquals("Any", documentContext.read("$.securityProfiles[0].devices[0].properties.scopesMustMatch"));
         Assert.assertEquals("resource.WRITE, resource.READ", documentContext.read("$.securityProfiles[0].devices[0].properties.scopes"));
-        Assert.assertEquals(true, documentContext.read("$.securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", Boolean.class).booleanValue());
-        Assert.assertEquals(true, documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantEnabled", Boolean.class).booleanValue());
-        Assert.assertEquals(true, documentContext.read("$.securityProfiles[0].devices[0].properties.useClientRegistry", Boolean.class).booleanValue());
+        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", Boolean.class));
+        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantEnabled", Boolean.class));
+        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.useClientRegistry", Boolean.class));
 
         Assert.assertEquals("${oauth.token.client_id}", documentContext.read("$.securityProfiles[0].devices[0].properties.subjectSelector"));
         Assert.assertEquals("https://localhost:8089/api/oauth/authorize", documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantLoginEndpointUrl"));
         Assert.assertEquals("access_token", documentContext.read("$.securityProfiles[0].devices[0].properties.implicitGrantLoginTokenName"));
-        Assert.assertEquals(true, documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeEnabled", Boolean.class).booleanValue());
+        Assert.assertTrue(documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeEnabled", Boolean.class));
 
         Assert.assertEquals("https://localhost:8089/api/oauth/authorize", documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeRequestEndpointUrl"));
         Assert.assertEquals("client_id", documentContext.read("$.securityProfiles[0].devices[0].properties.authCodeGrantTypeRequestClientIdName"));
@@ -148,41 +148,41 @@ public class GenerateTemplateCLIOptionsTest {
     }
 
     @Test
-    public void testGenerateAPIConfigWithBackendApikey() throws FileNotFoundException {
+    public void testGenerateAPIConfigWithBackendApikey() throws IOException {
         String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
         Assert.assertEquals("_default", documentContext.read("$.authenticationProfiles[0].name"));
         Assert.assertEquals("apiKey", documentContext.read("$.authenticationProfiles[0].type"));
         Assert.assertEquals("4249823490238490", documentContext.read("$.authenticationProfiles[0].parameters.apiKey"));
         Assert.assertEquals("KeyId", documentContext.read("$.authenticationProfiles[0].parameters.apiKeyField"));
         Assert.assertEquals("QUERYSTRING_PARAMETER", documentContext.read("$.authenticationProfiles[0].parameters.httpLocation"));
-        Assert.assertEquals(true, documentContext.read("$.authenticationProfiles[0].isDefault", Boolean.class).booleanValue());
+        Assert.assertTrue(documentContext.read("$.authenticationProfiles[0].isDefault", Boolean.class));
     }
 
     @Test
-    public void testGenerateAPIConfigWithBackendOauth() throws FileNotFoundException {
+    public void testGenerateAPIConfigWithBackendOauth() throws IOException {
         String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "oauth", "-frontendAuthType", "apikey"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
         Assert.assertEquals("_default", documentContext.read("$.authenticationProfiles[0].name"));
         Assert.assertEquals("oauth", documentContext.read("$.authenticationProfiles[0].type"));
         Assert.assertEquals("<Name-of-configured-OAuth-Profile>", documentContext.read("$.authenticationProfiles[0].parameters.providerProfile"));
         Assert.assertEquals("${authentication.subject.id}", documentContext.read("$.authenticationProfiles[0].parameters.ownerId"));
-        Assert.assertEquals(true, documentContext.read("$.authenticationProfiles[0].isDefault", Boolean.class).booleanValue());
+        Assert.assertTrue(documentContext.read("$.authenticationProfiles[0].isDefault", Boolean.class));
     }
 
     @Test
-    public void testGenerateAPIConfigWithBackendSSL() throws FileNotFoundException {
+    public void testGenerateAPIConfigWithBackendSSL() throws IOException {
         String[] args = {"template", "generate", "-c", "api-config.json", "-a", openApiLocation, "-apimCLIHome", apimCliHome, "-backendAuthType", "ssl", "-frontendAuthType", "apikey"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(new FileInputStream("api-config.json"));
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
         Assert.assertEquals("_default", documentContext.read("$.authenticationProfiles[0].name"));
         Assert.assertEquals("ssl", documentContext.read("$.authenticationProfiles[0].type"));
         Assert.assertEquals("file", documentContext.read("$.authenticationProfiles[0].parameters.source"));
         Assert.assertEquals("../certificates/clientcert.pfx", documentContext.read("$.authenticationProfiles[0].parameters.certFile"));
         Assert.assertEquals("myClientCertPW", documentContext.read("$.authenticationProfiles[0].parameters.password"));
-        Assert.assertEquals(true, documentContext.read("$.authenticationProfiles[0].parameters.trustAll", Boolean.class).booleanValue());
-        Assert.assertEquals(true, documentContext.read("$.authenticationProfiles[0].isDefault", Boolean.class).booleanValue());
+        Assert.assertTrue(documentContext.read("$.authenticationProfiles[0].parameters.trustAll", Boolean.class));
+        Assert.assertTrue(documentContext.read("$.authenticationProfiles[0].isDefault", Boolean.class));
     }
 }
