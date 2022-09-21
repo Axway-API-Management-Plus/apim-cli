@@ -17,14 +17,16 @@ public class UserOrgName2IdConverter extends StdConverter<User, User> {
 //        if(user.getRole().equals("oadmin")) {
 //            orgName2Id.put(organization.getName(), organization.getId());
 //        }
-        for (Map.Entry<String,String> entry : orgs2Role.entrySet()){
-            String orgId = entry.getKey();
-            String role = entry.getValue();
-            if(role.equals("oadmin") || role.equals("admin")){
-                orgName2Id.put(orgs2Name.get(orgId), orgId);
+        if(orgs2Role != null) {
+            for (Map.Entry<String, String> entry : orgs2Role.entrySet()) {
+                String orgId = entry.getKey();
+                String role = entry.getValue();
+                if (role.equals("oadmin") || role.equals("admin")) {
+                    orgName2Id.put(orgs2Name.get(orgId), orgId);
+                }
             }
+            user.setName2OrgId(orgName2Id);
         }
-        user.setName2OrgId(orgName2Id);
         return user;
     }
 }

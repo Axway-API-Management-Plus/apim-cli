@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("UserFilter")
-//@JsonDeserialize(converter = UserOrgName2IdConverter.class)
+@JsonDeserialize(converter = UserOrgName2IdConverter.class)
 public class User implements CustomPropertiesEntity {
     String id;
     @JsonDeserialize(using = OrganizationDeserializer.class)

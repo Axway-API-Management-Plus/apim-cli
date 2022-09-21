@@ -15,7 +15,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 
 public class UserFilter implements CustomPropertiesFilter {
 	
-	public static enum USER_TYPE {
+	public enum USER_TYPE {
 		internal, 
 		external
 	}
@@ -36,7 +36,7 @@ public class UserFilter implements CustomPropertiesFilter {
 	
 	private List<String> customProperties;
 
-	private List<NameValuePair> filters = new ArrayList<NameValuePair>();
+	private List<NameValuePair> filters = new ArrayList<>();
 
 	private UserFilter() { }
 
@@ -170,7 +170,7 @@ public class UserFilter implements CustomPropertiesFilter {
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (this == obj) return true;
-		if(obj instanceof UserFilter == false) return false;
+		if(!(obj instanceof UserFilter)) return false;
 		UserFilter other = (UserFilter)obj;
 		return (
 				StringUtils.equals(other.getId(), this.getId()) && 
@@ -229,7 +229,6 @@ public class UserFilter implements CustomPropertiesFilter {
 		
 		private List<String> customProperties;
 
-		List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
 		public Builder() {
 			super();
