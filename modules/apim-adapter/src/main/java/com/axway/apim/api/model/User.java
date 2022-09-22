@@ -1,23 +1,14 @@
 package com.axway.apim.api.model;
 
-import java.util.Map;
-
-import com.axway.apim.adapter.jackson.UserOrgName2IdConverter;
+import com.axway.apim.adapter.jackson.OrganizationDeserializer;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.commons.lang3.StringUtils;
 
-import com.axway.apim.adapter.jackson.OrganizationDeserializer;
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonFilter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("UserFilter")
-@JsonDeserialize(converter = UserOrgName2IdConverter.class)
 public class User implements CustomPropertiesEntity {
     String id;
     @JsonDeserialize(using = OrganizationDeserializer.class)
