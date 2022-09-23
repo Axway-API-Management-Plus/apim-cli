@@ -50,7 +50,7 @@ public class StandardExportCLIOptions extends CLIOptions {
 		
 		option = new Option("o", "output", true, "Controls the output format. By default the console is used. CSV and DAT is not supported for all entities.");
 		option.setRequired(false);
-		option.setArgName("console|json|csv|dat");
+		option.setArgName("console|json|csv|dat|yaml");
 		cliOptions.addOption(option);
 	}
 

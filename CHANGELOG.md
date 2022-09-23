@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- Junit fix (See issue [#305](https://github.com/Axway-API-Management-Plus/apim-cli/issues/305)
+- Attempt to import WSDL API definition produces HTTP error code 400 when creating front end API (See issue [#308](https://github.com/Axway-API-Management-Plus/apim-cli/issues/308)
+- AXWAY_APIM_CLI_HOME in the environment may break tests (See issue [#306](https://github.com/Axway-API-Management-Plus/apim-cli/issues/306)
+- Allow override per method for tags (See issue [#162](https://github.com/Axway-API-Management-Plus/apim-cli/issues/162)
+- apim cli always use first org for api deployment if user is assigned to multiple org (See issue [#311](https://github.com/Axway-API-Management-Plus/apim-cli/issues/311)
+
+### Changed
+- Automate APIM CLI config file creation based on openapi specification
+- 
 ## [1.12.3] 2002-08-09
 
 ### Fixed
