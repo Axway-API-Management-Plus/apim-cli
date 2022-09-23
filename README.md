@@ -54,7 +54,8 @@ The automated End-2-End test suite contains of __116__ different scenarios, whic
 
 | Version       | Branch               | Status | Comment | 
 | :---          | :---                 | :---:  | :--- |
-| 7.7-20220530    | develop  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20211130)](https://app.travis-ci.com/github/Axway-API-Management-Plus/apim-cli/branches)|Requires version >=1.12.0, Multi-Org is not yet supported|
+| 7.7-20220830    | develop  | [![Build Status](https://github.com/github/docs/actions/workflows/integration-test.yml/badge.svg?branch=test-with-7.7-20220830)]|Requires version >=1.12.0, Multi-Org is not yet supported|
+| 7.7-20220530    | test-with-7.7-20220530  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20211130)](https://app.travis-ci.com/github/Axway-API-Management-Plus/apim-cli/branches)|Requires version >=1.12.0, Multi-Org is not yet supported|
 | 7.7-20220228    | test-with-7.7-20220228  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20220228)](https://app.travis-ci.com/github/Axway-API-Management-Plus/apim-cli/branches)|Requires version >=1.10.1, Multi-Org is not yet supported|
 | 7.7-20211130    | test-with-7.7-20211130  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20211130)](https://app.travis-ci.com/github/Axway-API-Management-Plus/apim-cli/branches)|Requires version >=1.3.11, Multi-Org is not yet supported|
 | 7.7-20210830    | test-with-7.7-20210830  | [![Build Status](https://img.shields.io/travis/Axway-API-Management-Plus/apim-cli/test-with-7.7-20210830)](https://app.travis-ci.com/github/Axway-API-Management-Plus/apim-cli/branches)|Requires version >=1.3.11, Multi-Org is not yet supported|
