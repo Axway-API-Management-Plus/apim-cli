@@ -13,9 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Allow override per method for tags (See issue [#162](https://github.com/Axway-API-Management-Plus/apim-cli/issues/162)
 - apim cli always use first org for api deployment if user is assigned to multiple org (See issue [#311](https://github.com/Axway-API-Management-Plus/apim-cli/issues/311)
 
-### Changed
+### Added
 - Automate APIM CLI config file creation based on openapi specification
-- 
+- Support for release 7.7-20220830
+
 ## [1.12.3] 2002-08-09
 
 ### Fixed
