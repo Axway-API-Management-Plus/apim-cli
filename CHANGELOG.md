@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.13.0] 2022-09-23
 
 ### Fixed
 - Junit fix (See issue [#305](https://github.com/Axway-API-Management-Plus/apim-cli/issues/305)
@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Automate APIM CLI config file creation based on openapi specification
 - Support for release 7.7-20220830
 
-## [1.12.3] 2002-08-09
+## [1.12.3] 2022-08-09
 
 ### Fixed
 
