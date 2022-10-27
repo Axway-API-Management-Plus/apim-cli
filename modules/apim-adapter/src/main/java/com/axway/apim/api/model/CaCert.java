@@ -182,6 +182,7 @@ public class CaCert {
 			} else {
 				filename = filename.replace(" ", "");
 				filename = filename.replace("*", "");
+				filename = filename.replace("/", "");
 				if(filename.startsWith(".")) filename = filename.replaceFirst(".", "");
 			}
 			certFile = filename+".crt";

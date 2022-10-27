@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.13.1] In progress
+- Get API causes an error when related certificates contains slash character '/' in their CN (See issue [#315](https://github.com/Axway-API-Management-Plus/apim-cli/issues/315)
+
 ## [1.13.0] 2022-09-23
 
 ### Fixed
