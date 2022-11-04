@@ -1,9 +1,5 @@
 package com.axway.apim.api.export.impl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
@@ -17,9 +13,15 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class APIChangeHandler extends APIResultHandler {
-	
+	private static final Logger LOG = LoggerFactory.getLogger(APIChangeHandler.class);
 	APIChangeParams changeParams;
 
 	public APIChangeHandler(APIExportParams params) {
@@ -30,7 +32,7 @@ public class APIChangeHandler extends APIResultHandler {
 	@Override
 	public void execute(List<API> apis) throws AppException {
 		APIManagerAdapter adapter = APIManagerAdapter.getInstance();
-		List<APIChangeState> apisToChange = new ArrayList<APIChangeState>();
+		List<APIChangeState> apisToChange = new ArrayList<>();
 		LOG.info(apis.size() + " selected to change.");
 		for(API api : apis) {
 			try {
@@ -79,7 +81,6 @@ public class APIChangeHandler extends APIResultHandler {
 			}
 		}
 		System.out.println("Done!");
-		return;
 	}
 
 	@Override
@@ -104,9 +105,7 @@ public class APIChangeHandler extends APIResultHandler {
 				return api;
 			}
 		}
-		Iterator<ServiceProfile> it = api.getServiceProfiles().values().iterator();
-		while(it.hasNext()) {
-			ServiceProfile profile = it.next();
+		for (ServiceProfile profile : api.getServiceProfiles().values()) {
 			profile.setBasePath(newBackendBasepath);
 		}
 		return api;

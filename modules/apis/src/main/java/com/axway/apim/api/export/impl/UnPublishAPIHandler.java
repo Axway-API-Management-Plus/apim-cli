@@ -1,17 +1,20 @@
 package com.axway.apim.api.export.impl;
 
-import java.util.List;
-
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class UnpublishAPIHandler extends APIResultHandler {
+import java.util.List;
 
-	public UnpublishAPIHandler(APIExportParams params) {
+public class UnPublishAPIHandler extends APIResultHandler {
+
+	private static final Logger LOG = LoggerFactory.getLogger(UnPublishAPIHandler.class);
+	public UnPublishAPIHandler(APIExportParams params) {
 		super(params);
 	}
 
@@ -30,7 +33,6 @@ public class UnpublishAPIHandler extends APIResultHandler {
 			}
 			System.out.println("Done!");
 		}
-		return;
 	}
 
 	@Override

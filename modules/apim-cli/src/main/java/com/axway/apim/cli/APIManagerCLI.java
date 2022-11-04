@@ -1,14 +1,15 @@
 package com.axway.apim.cli;
 
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
-
-import com.axway.apim.lib.errorHandling.ErrorCode;
 
 /**
  * This class implements a pluggable CLI interface that allows to dynamically add new 
@@ -18,15 +19,15 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
  * With that in place, the module is detected automatically and becomes part of the CLI.
  */
 public class APIManagerCLI {
-	
-	private static String APIM_CLI_CDM = "apim";
+	private static final Logger LOG = LoggerFactory.getLogger(APIManagerCLI.class);
+	private static final String APIM_CLI_CDM = "apim";
 	
 	/**
 	 * A Service-Implementation belongs a certain group (like api or app). This map, groups services against their groups.
 	 */
-	HashMap<String, List<APIMCLIServiceProvider>> servicesMappedByGroup = new HashMap<String, List<APIMCLIServiceProvider>>();
+	HashMap<String, List<APIMCLIServiceProvider>> servicesMappedByGroup = new HashMap<>();
 	
-	HashMap<APIMCLIServiceProvider, List<Method>> methodsMappedByService = new HashMap<APIMCLIServiceProvider, List<Method>>();
+	HashMap<APIMCLIServiceProvider, List<Method>> methodsMappedByService = new HashMap<>();
 	
 	/**
 	 * Is set by parseArguments when the first parameter is set. For instance: apim api - With that the selected service group is api and will 
@@ -48,21 +49,19 @@ public class APIManagerCLI {
 		super();
 		ServiceLoader<APIMCLIServiceProvider> loader = ServiceLoader
 			      .load(APIMCLIServiceProvider.class);
-		Iterator<APIMCLIServiceProvider> it = loader.iterator();
-		while(it.hasNext()) {
-			APIMCLIServiceProvider cliService = it.next();
+		for (APIMCLIServiceProvider cliService : loader) {
 			List<APIMCLIServiceProvider> providerList = servicesMappedByGroup.get(cliService.getGroupId());
-			if(providerList==null) {
-				providerList = new ArrayList<APIMCLIServiceProvider>();
+			if (providerList == null) {
+				providerList = new ArrayList<>();
 				providerList.add(cliService);
 				servicesMappedByGroup.put(cliService.getGroupId(), providerList);
 			} else {
 				providerList.add(cliService);
 			}
-			for(Method method : cliService.getClass().getDeclaredMethods()) {
-				if(method.isAnnotationPresent(CLIServiceMethod.class)) {
+			for (Method method : cliService.getClass().getDeclaredMethods()) {
+				if (method.isAnnotationPresent(CLIServiceMethod.class)) {
 					List<Method> methodList = methodsMappedByService.get(cliService);
-					if(methodList==null) methodList = new ArrayList<Method>();
+					if (methodList == null) methodList = new ArrayList<>();
 					methodList.add(method);
 					methodsMappedByService.put(cliService, methodList);
 				}
@@ -105,12 +104,10 @@ public class APIManagerCLI {
 		if(this.selectedServiceGroup==null) {
 			System.out.println("The Axway API-Management CLI supports the following commands.");
 			System.out.println("To get more information for each group, please run for instance: 'apim api'");
-			System.out.println("");
+			System.out.println();
 			System.out.println("Available command groups: ");
-			Iterator<String> it = servicesMappedByGroup.keySet().iterator();
-			while(it.hasNext()) {
-				String key = it.next();
-				System.out.printf("%-20s %s \n", APIM_CLI_CDM + " "+ key, servicesMappedByGroup.get(key).get(0).getGroupDescription());
+			for (String key : servicesMappedByGroup.keySet()) {
+				System.out.printf("%-20s %s \n", APIM_CLI_CDM + " " + key, servicesMappedByGroup.get(key).get(0).getGroupDescription());
 				// We just take the first registered service for a group to retrieve the group description
 			}
 		} else {
@@ -125,18 +122,12 @@ public class APIManagerCLI {
 	
 	int run(String[] args) {
 		int rc = 0;
-		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("API-Manager CLI: "+APIManagerCLI.class.getPackage().getImplementationVersion());
-		System.out.println("                                                                        ");
-		System.out.println("To report issues or get help, please visit: ");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli");
-		System.out.println("----------------------------------------------------------------------------------------");
+		LOG.info("API-Manager CLI: {}",APIManagerCLI.class.getPackage().getImplementationVersion());
 		if(this.selectedMethod==null) {
 			this.printUsage();
 			return rc;
 		} else {
-			System.out.println("Module: " + this.selectedService.getName() + " ("+this.selectedService.getVersion()+")");
-			System.out.println("----------------------------------------------------------------------------------------");
+			LOG.info("Module: " + this.selectedService.getName() + " ("+this.selectedService.getVersion()+")");
 			try {
 				rc = (int)this.selectedMethod.invoke (this.selectedService, (Object)args);
 				return rc;

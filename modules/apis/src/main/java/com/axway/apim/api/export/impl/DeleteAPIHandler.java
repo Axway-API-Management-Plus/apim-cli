@@ -1,7 +1,5 @@
 package com.axway.apim.api.export.impl;
 
-import java.util.List;
-
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
@@ -11,9 +9,13 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class DeleteAPIHandler extends APIResultHandler {
-
+	private static final Logger LOG = LoggerFactory.getLogger(DeleteAPIHandler.class);
 	public DeleteAPIHandler(APIExportParams params) {
 		super(params);
 	}
@@ -41,7 +43,6 @@ public class DeleteAPIHandler extends APIResultHandler {
 			}
 		}
 		System.out.println("Done!");
-		return;
 
 	}
 

@@ -1,66 +1,37 @@
 package com.axway.apim.api.apiSpecification;
 
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.olingo.odata2.api.edm.Edm;
-import org.apache.olingo.odata2.api.edm.EdmAnnotatable;
-import org.apache.olingo.odata2.api.edm.EdmAnnotationAttribute;
-import org.apache.olingo.odata2.api.edm.EdmAnnotationElement;
-import org.apache.olingo.odata2.api.edm.EdmAnnotations;
-import org.apache.olingo.odata2.api.edm.EdmEntitySet;
-import org.apache.olingo.odata2.api.edm.EdmEntityType;
-import org.apache.olingo.odata2.api.edm.EdmException;
-import org.apache.olingo.odata2.api.edm.EdmFunctionImport;
-import org.apache.olingo.odata2.api.edm.EdmMultiplicity;
-import org.apache.olingo.odata2.api.edm.EdmParameter;
-import org.apache.olingo.odata2.api.edm.EdmStructuralType;
-import org.apache.olingo.odata2.api.edm.EdmType;
-import org.apache.olingo.odata2.api.edm.EdmTypeKind;
-import org.apache.olingo.odata2.api.ep.EntityProvider;
-import org.apache.olingo.odata2.core.edm.provider.EdmElementImplProv;
-import org.apache.olingo.odata2.core.edm.provider.EdmParameterImplProv;
-import org.apache.olingo.odata2.core.edm.provider.EdmStructuralTypeImplProv;
-
 import com.axway.apim.api.apiSpecification.filter.OpenAPI3SpecificationFilter;
-import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.media.ArraySchema;
-import io.swagger.v3.oas.models.media.BinarySchema;
-import io.swagger.v3.oas.models.media.BooleanSchema;
-import io.swagger.v3.oas.models.media.Content;
-import io.swagger.v3.oas.models.media.DateTimeSchema;
-import io.swagger.v3.oas.models.media.IntegerSchema;
-import io.swagger.v3.oas.models.media.MediaType;
-import io.swagger.v3.oas.models.media.ObjectSchema;
-import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.media.StringSchema;
-import io.swagger.v3.oas.models.media.UUIDSchema;
+import io.swagger.v3.oas.models.media.*;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
 import io.swagger.v3.oas.models.parameters.QueryParameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import org.apache.olingo.odata2.api.edm.*;
+import org.apache.olingo.odata2.api.ep.EntityProvider;
+import org.apache.olingo.odata2.core.edm.provider.EdmElementImplProv;
+import org.apache.olingo.odata2.core.edm.provider.EdmParameterImplProv;
+import org.apache.olingo.odata2.core.edm.provider.EdmStructuralTypeImplProv;
+
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ODataV2Specification extends ODataSpecification {
 	
 	Edm edm;
-	JsonNode edmSource;
-	
 	@SuppressWarnings("rawtypes")
-	Map<String, Schema> schemas = new HashMap<String, Schema>();
+	Map<String, Schema> schemas = new HashMap<>();
 	
 	public enum InlineCountValues {
 		allpages,
@@ -90,7 +61,6 @@ public class ODataV2Specification extends ODataSpecification {
 			super.parse(apiSpecificationContent);
 			edm = EntityProvider.readMetadata(new ByteArrayInputStream(apiSpecificationContent), false);
 			this.openAPI = new OpenAPI();
-			
 			Info info = new Info();
 			info.setTitle("OData Service");
 			info.setDescription("The OData Service from " + apiSpecificationFile);
@@ -100,20 +70,16 @@ public class ODataV2Specification extends ODataSpecification {
 			}
 			info.setVersion(edm.getServiceMetadata().getDataServiceVersion());
 			openAPI.setInfo(info);
-			
 			for(EdmFunctionImport function : edm.getFunctionImports()) {
 				openAPI.path("/" + function.getName(), getPathItemForFunction(function));
 			}
-			
 			for(EdmEntitySet entitySet : edm.getEntitySets()) {
 				openAPI.path(getEntityPath(entitySet), getPathItemForEntity(entitySet, false));
 				openAPI.path(getEntityIdPath(entitySet), getPathItemForEntity(entitySet, true));
 			}
-			
 			Components comp = new Components();
 			comp.setSchemas(schemas);
 			this.openAPI.setComponents(comp);
-
 			return true;
 		} catch (Exception e) {
 			if(LOG.isDebugEnabled()) {
@@ -136,7 +102,7 @@ public class ODataV2Specification extends ODataSpecification {
 	private PathItem getPathItemForFunction(EdmFunctionImport function) throws EdmException {
 		PathItem pathItem = new PathItem();
 		Operation operation = new Operation();
-		List<String> tag = new ArrayList<String>();
+		List<String> tag = new ArrayList<>();
 		// Add functions to the same group as the entity itself
 		if(function.getEntitySet()!=null) {
 			tag.add(function.getEntitySet().getName());
@@ -193,7 +159,7 @@ public class ODataV2Specification extends ODataSpecification {
 			pathItem.addParametersItem(param);
 		}
 		
-		List<String> tag = new ArrayList<String>();
+		List<String> tag = new ArrayList<>();
 		if(getTitle(entityType)==null) {
 			tag.add(entityName);
 		} else {
@@ -215,7 +181,7 @@ public class ODataV2Specification extends ODataSpecification {
 		
 		String operationDescription = "Returns the entity: " + entityName + ". "
 				+ "For more information using the query parameters please see: <a target=\"_blank\" href=\"https://www.odata.org/documentation/odata-version-2-0/uri-conventions/\">URI Conventions (OData Version 2.0)</a>";
-		List<String> navProperties = new ArrayList<String>();
+		List<String> navProperties = new ArrayList<>();
 		List<String> structProperties = entityType.getPropertyNames();
 		
 		if(entityType.getNavigationPropertyNames()!=null && entityType.getNavigationPropertyNames().size()>0) {
@@ -331,7 +297,7 @@ public class ODataV2Specification extends ODataSpecification {
 		return createResponse(description, null);
 	}
 	
-	private ApiResponse createResponse(String description, Schema<?> schema) throws EdmException {
+	private ApiResponse createResponse(String description, Schema<?> schema) {
 		ApiResponse response = new ApiResponse();
 		response.setDescription(description);
 		Content content = new Content();
@@ -362,7 +328,7 @@ public class ODataV2Specification extends ODataSpecification {
 		return schema;
 	}
 	
-	private Schema<?> getSchemaForType(EdmType type) throws EdmException {
+	private Schema<?> getSchemaForType(EdmType type) {
 		return getSchemaForType(type, EdmMultiplicity.ONE);
 	}
 	
@@ -426,7 +392,7 @@ public class ODataV2Specification extends ODataSpecification {
 				}
 				schemas.put(type.getName(), schema);
 				if(asRef) {
-					return new Schema<Object>().$ref(type.getName());
+					return new Schema<>().$ref(type.getName());
 				}
 				return schema;
 			}
@@ -464,15 +430,14 @@ public class ODataV2Specification extends ODataSpecification {
 			EdmAnnotations annotations = function.getAnnotations();
 			if(annotations==null || annotations.getAnnotationElements()==null) return;
 			for(EdmAnnotationElement annoElem : annotations.getAnnotationElements()) {
-				if("documentation".equals(annoElem.getName().toLowerCase())) {
+				if("documentation".equalsIgnoreCase(annoElem.getName())) {
 					for(EdmAnnotationElement child : annoElem.getChildElements()) {
-						if("summary".equals(child.getName().toLowerCase())) {
+						if("summary".equalsIgnoreCase(child.getName())) {
 							operation.setSummary(child.getText());
 							continue;
 						}
-						if("longdescription".equals(child.getName().toLowerCase())) {
+						if("longdescription".equalsIgnoreCase(child.getName())) {
 							operation.setDescription(child.getText());
-							continue;
 						}
 						
 					}
@@ -480,7 +445,6 @@ public class ODataV2Specification extends ODataSpecification {
 				}
 			}
 		} catch (EdmException e) {
-			return;
 		}
 	}
 	
@@ -499,15 +463,14 @@ public class ODataV2Specification extends ODataSpecification {
 			String quickInfo = getQuickInfo(entity);
 			if(entity.getAnnotations()==null || entity.getAnnotations().getAnnotationElements()==null) return null;
 			for(EdmAnnotationElement annoElem : entity.getAnnotations().getAnnotationElements()) {
-				if("documentation".equals(annoElem.getName().toLowerCase())) {
+				if("documentation".equalsIgnoreCase(annoElem.getName())) {
 					for(EdmAnnotationElement child : annoElem.getChildElements()) {
-						if("summary".equals(child.getName().toLowerCase())) {
+						if("summary".equalsIgnoreCase(child.getName())) {
 							summary = child.getText();
 						}
-						if("longdescription".equals(child.getName().toLowerCase())) {
+						if("longdescription".equalsIgnoreCase(child.getName())) {
 							longDescription = child.getText();
-							continue;
-						}						
+						}
 					}
 				}
 			}
@@ -542,7 +505,7 @@ public class ODataV2Specification extends ODataSpecification {
 	private String getExample(List<String> possibleExamples) {
 		// Avoid providing a example such ID, id as it is in most cases not the best option for an example
 		for(String example : possibleExamples) {
-			if(!example.toLowerCase().equals("id")) return example;
+			if(!example.equalsIgnoreCase("id")) return example;
 		}
 		return null;
 	}

@@ -7,8 +7,12 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PublishAPIHandler extends APIResultHandler {
+
+	private static final Logger LOG = LoggerFactory.getLogger(PublishAPIHandler.class);
 
 	public PublishAPIHandler(APIExportParams params) {
 		super(params);
@@ -26,7 +30,6 @@ public class PublishAPIHandler extends APIResultHandler {
 			}
 		}
 		System.out.println("Done!");
-		return;
 	}
 
 	@Override

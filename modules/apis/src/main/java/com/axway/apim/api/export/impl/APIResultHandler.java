@@ -38,7 +38,7 @@ import com.axway.apim.lib.utils.Utils;
 
 public abstract class APIResultHandler {
 
-    protected static Logger LOG = LoggerFactory.getLogger(APIResultHandler.class);
+    private static Logger LOG = LoggerFactory.getLogger(APIResultHandler.class);
     APIExportParams params;
 
     protected Result result;
@@ -51,7 +51,7 @@ public abstract class APIResultHandler {
         DAT_EXPORTER(DATAPIExporter.class),
         API_DELETE_HANDLER(DeleteAPIHandler.class),
         API_PUBLISH_HANDLER(PublishAPIHandler.class),
-        API_UNPUBLISH_HANDLER(UnpublishAPIHandler.class),
+        API_UNPUBLISH_HANDLER(UnPublishAPIHandler.class),
         API_CHANGE_HANDLER(APIChangeHandler.class),
         API_APPROVE_HANDLER(ApproveAPIHandler.class),
         API_UPGRADE_ACCESS_HANDLE(UpgradeAccessAPIHandler.class),

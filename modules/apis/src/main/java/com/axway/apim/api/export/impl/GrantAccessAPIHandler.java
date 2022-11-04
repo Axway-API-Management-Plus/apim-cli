@@ -1,7 +1,5 @@
 package com.axway.apim.api.export.impl;
 
-import java.util.List;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
@@ -13,9 +11,14 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class GrantAccessAPIHandler extends APIResultHandler {
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(GrantAccessAPIHandler.class);
 	List<API> apis;
 	List<Organization> orgs;
 
@@ -35,9 +38,9 @@ public class GrantAccessAPIHandler extends APIResultHandler {
 			throw new AppException("List of Orgs to grant access to is missing.", ErrorCode.UNKNOWN_ORGANIZATION);
 		}
 		if(apis.size()==1) {
-			System.out.println("Selected organizations: " + orgs.toString() + " get access to API: "+apis.get(0).toStringHuman());
+			System.out.println("Selected organizations: " + orgs + " get access to API: "+apis.get(0).toStringHuman());
 		} else {
-			System.out.println("Selected organizations: " + orgs.toString() + " get access to "+apis.size()+" selected APIs.");	
+			System.out.println("Selected organizations: " + orgs + " get access to "+apis.size()+" selected APIs.");
 		}
 		if(CoreParameters.getInstance().isForce()) {
 			System.out.println("Force flag given to grant access for selected organizations to: "+apis.size()+" API(s)");
@@ -59,7 +62,6 @@ public class GrantAccessAPIHandler extends APIResultHandler {
 			}
 		}
 		System.out.println("Done!");
-		return;
 	}
 
 	@Override

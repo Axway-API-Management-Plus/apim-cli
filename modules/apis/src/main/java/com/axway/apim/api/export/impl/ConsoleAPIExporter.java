@@ -1,13 +1,5 @@
 package com.axway.apim.api.export.impl;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
@@ -20,9 +12,16 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class ConsoleAPIExporter extends APIResultHandler {
-	
+	private static final Logger LOG = LoggerFactory.getLogger(ConsoleAPIExporter.class);
+
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 	
 	DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -44,54 +43,53 @@ public class ConsoleAPIExporter extends APIResultHandler {
 			printUltra(apis);
 			break;
 		}
-		return;
 	}
 	
 	private void printStandard(List<API> apis) {
 		System.out.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
-				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getId()),
-				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getPath(api)),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getName()),
-				new Column().header("Version").with(api -> api.getVersion()),
-				new Column().header("Created-On").with(api -> getFormattedDate(api))
+				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
+				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
+				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
+				new Column().header("Version").with(API::getVersion),
+				new Column().header("Created-On").with(this::getFormattedDate)
 				)));
 		printDetails(apis);
 	}
 	
 	private void printWide(List<API> apis) {
 		System.out.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
-				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getId()),
-				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getPath(api)),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getName()),
-				new Column().header("Version").with(api -> api.getVersion()),
-				new Column().header("V-Host").with(api -> api.getVhost()),
-				new Column().header("State").with(api -> getState(api)),
-				new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getBackendPath(api)),
-				new Column().header("Security").with(api -> getUsedSecurity(api)),
-				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getUsedPoliciesForConsole(api).toString()),
+				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
+				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
+				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
+				new Column().header("Version").with(API::getVersion),
+				new Column().header("V-Host").with(API::getVhost),
+				new Column().header("State").with(this::getState),
+				new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(APIResultHandler::getBackendPath),
+				new Column().header("Security").with(APIResultHandler::getUsedSecurity),
+				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(this::getUsedPoliciesForConsole),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
-				new Column().header("Created-On").with(api -> getFormattedDate(api))
+				new Column().header("Created-On").with(this::getFormattedDate)
 				)));
 		printDetails(apis);
 	}
 	
 	private void printUltra(List<API> apis) {
 		System.out.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
-				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getId()),
-				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getPath(api)),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> api.getName()),
-				new Column().header("Version").with(api -> api.getVersion()),
-				new Column().header("V-Host").with(api -> api.getVhost()),
-				new Column().header("State").with(api -> getState(api)),
-				new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(api -> getBackendPath(api)),
-				new Column().header("Security").with(api -> getUsedSecurity(api)),
-				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> getUsedPoliciesForConsole(api).toString()),
+				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
+				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
+				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
+				new Column().header("Version").with(API::getVersion),
+				new Column().header("V-Host").with(API::getVhost),
+				new Column().header("State").with(this::getState),
+				new Column().header("Backend").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(APIResultHandler::getBackendPath),
+				new Column().header("Security").with(APIResultHandler::getUsedSecurity),
+				new Column().header("Policies").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(this::getUsedPoliciesForConsole),
 				new Column().header("Organization").dataAlign(HorizontalAlign.LEFT).with(api -> api.getOrganization().getName()),
-				new Column().header("Orgs").with(api -> getOrgCount(api)),
-				new Column().header("Apps").with(api -> getAppCount(api)),
+				new Column().header("Orgs").with(this::getOrgCount),
+				new Column().header("Apps").with(this::getAppCount),
 				new Column().header("Quotas").with(api -> Boolean.toString(hasQuota(api))),
 				new Column().header("Tags").dataAlign(HorizontalAlign.LEFT).maxColumnWidth(30).with(api -> Boolean.toString(hasTags(api))),
-				new Column().header("Created-On").with(api -> getFormattedDate(api))
+				new Column().header("Created-On").with(this::getFormattedDate)
 				)));
 		printDetails(apis);
 	}
@@ -102,7 +100,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	}
 	
 	private String getUsedPoliciesForConsole(API api) {
-		List<String> usedPolicies = new ArrayList<String>();
+		List<String> usedPolicies = new ArrayList<>();
 		Map<PolicyType, List<String>> allPolicies = getUsedPolicies(api);
 		for(List<String> policyNames : allPolicies.values()) {
 			for(String polName : policyNames) {
@@ -161,10 +159,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 		}
 	}
 	
-	private String getPath(API api) {
-		return api.getPath();
-	}
-	
+
 	private boolean hasTags(API api) {
 		return (api.getTags()!=null && api.getTags().size()!=0);
 	}
@@ -181,7 +176,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	
 	private String getSubscribedApplications(API api) {
 		if(api.getApplications()==null) return "N/A";
-		List<String> subscribedApps = new ArrayList<String>();
+		List<String> subscribedApps = new ArrayList<>();
 		for(ClientApplication app : api.getApplications()) {
 			subscribedApps.add(app.getName());
 		}
@@ -191,7 +186,6 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	@Override
 	public APIFilter getFilter() {
 		Builder builder = getBaseAPIFilterBuilder();
-
 		switch(params.getWide()) {
 		case standard:
 		case wide:
@@ -207,8 +201,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 			builder.includeClientApplications(true);
 			builder.includeClientOrganizations(true);
 			break;
-		}		
-		APIFilter filter = builder.build();
-		return filter;
+		}
+		return builder.build();
 	}
 }

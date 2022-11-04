@@ -12,8 +12,12 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ApproveAPIHandler extends APIResultHandler {
+
+	private static final Logger LOG = LoggerFactory.getLogger(ApproveAPIHandler.class);
 
 	public ApproveAPIHandler(APIExportParams params) {
 		super(params);
@@ -43,7 +47,6 @@ public class ApproveAPIHandler extends APIResultHandler {
 			}
 		}
 		System.out.println("Done!");
-		return;
 	}
 
 	@Override

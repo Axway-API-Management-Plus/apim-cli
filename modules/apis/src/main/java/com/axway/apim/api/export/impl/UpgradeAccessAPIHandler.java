@@ -1,9 +1,5 @@
 package com.axway.apim.api.export.impl;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
@@ -14,8 +10,15 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 public class UpgradeAccessAPIHandler extends APIResultHandler {
+	private static final Logger LOG = LoggerFactory.getLogger(UpgradeAccessAPIHandler.class);
 
 	public UpgradeAccessAPIHandler(APIExportParams params) {
 		super(params);
@@ -51,7 +54,6 @@ public class UpgradeAccessAPIHandler extends APIResultHandler {
 			}
 		}
 		System.out.println("Done!");
-		return;
 	}
 
 	@Override
