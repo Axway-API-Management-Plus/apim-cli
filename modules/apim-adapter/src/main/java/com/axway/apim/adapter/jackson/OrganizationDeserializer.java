@@ -1,13 +1,7 @@
 package com.axway.apim.adapter.jackson;
 
-import java.io.IOException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.User;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.core.JsonParser;
@@ -16,12 +10,12 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
+import java.io.IOException;
+
 public class OrganizationDeserializer extends StdDeserializer<Organization> {
 	
-	static Logger LOG = LoggerFactory.getLogger(OrganizationDeserializer.class);
-	
 	private static final long serialVersionUID = 1L;
-	
+
 	public OrganizationDeserializer() {
 		this(null);
 	}
@@ -65,7 +59,6 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 
 			// Otherwise make sure the organization exists and try to load it
 			organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(node.asText());
-
 			if(organization==null && validateOrganization(ctxt)) {
 				throw new AppException("The given organization: '"+node.asText()+"' is unknown.", ErrorCode.UNKNOWN_ORGANIZATION);
 			}
@@ -74,7 +67,7 @@ public class OrganizationDeserializer extends StdDeserializer<Organization> {
 	}
 	
 	private boolean validateOrganization(DeserializationContext ctxt) {
-		// By default the organization should be validated
+		// By default, the organization should be validated
 		if(ctxt.getAttribute("validateOrganization")==null) return true;
 		return (Boolean)ctxt.getAttribute("validateOrganization");
 	}
