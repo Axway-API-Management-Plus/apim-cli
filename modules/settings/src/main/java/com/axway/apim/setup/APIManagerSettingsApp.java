@@ -50,7 +50,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 		try {
 			params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " , e.getMessage());
+			LOG.error("Error " + e.getMessage());
 			return e.getError().getCode();
 		}
 		APIManagerSettingsApp app = new APIManagerSettingsApp();
@@ -63,7 +63,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 		try {
 			params = (StandardImportParams) APIManagerSetupImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " , e.getMessage());
+			LOG.error("Error " + e.getMessage());
 			return e.getError().getCode();
 		}
 		APIManagerSettingsApp managerConfigApp = new APIManagerSettingsApp();
@@ -165,9 +165,14 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 
 	public static void main(String[] args) throws InvocationTargetException, IllegalAccessException {
 
+		if(args.length == 0){
+			System.out.println("Invalid arguments - prefix commandline param with \"settings get\"");
+			return;
+		}
+
 		String serviceName = args[1];
 		if (serviceName == null) {
-			System.out.println("Invalid arguments - prefix commandline param with \"apim export\"");
+			System.out.println("Invalid arguments - prefix commandline param with \"settings get\"");
 			return;
 		}
 		for (final Method method : APIManagerSettingsApp.class.getDeclaredMethods()) {

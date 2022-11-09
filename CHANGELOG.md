@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.13.1] In progress
 - Get API causes an error when related certificates contains slash character '/' in their CN (See issue [#315](https://github.com/Axway-API-Management-Plus/apim-cli/issues/315)
+- globalrequest and response polices are not handled correctly using apim settings import (See issue [#325](https://github.com/Axway-API-Management-Plus/apim-cli/issues/325)
 
 ## [1.13.0] 2022-09-23
 
