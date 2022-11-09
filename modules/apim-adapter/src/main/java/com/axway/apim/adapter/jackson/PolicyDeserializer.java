@@ -33,9 +33,9 @@ public class PolicyDeserializer extends StdDeserializer<Policy> {
 		if(StringUtils.isEmpty(policy)) return null;
 		if(policy.startsWith("<key")) {
 			String policyName = getName(policy);
-			Policy createdColicy = new Policy(policyName);
-			createdColicy.setId(policy);
-			return createdColicy;
+			Policy createdPolicy = new Policy(policyName);
+			createdPolicy.setId(policy);
+			return createdPolicy;
 		} else {
 			return APIManagerAdapter.getInstance().policiesAdapter.getPolicyForName(PolicyType.getTypeForJsonKey(jp.currentName()), policy);
 		}

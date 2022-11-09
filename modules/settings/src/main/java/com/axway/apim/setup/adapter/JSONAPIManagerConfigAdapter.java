@@ -19,9 +19,9 @@ import com.fasterxml.jackson.databind.ObjectReader;
 
 public class JSONAPIManagerConfigAdapter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(JSONAPIManagerConfigAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(JSONAPIManagerConfigAdapter.class);
 	
-	private ObjectMapper mapper = new ObjectMapper();
+	private final ObjectMapper mapper = new ObjectMapper();
 	
 	APIManagerConfig managerConfig;
 	
@@ -59,7 +59,6 @@ public class JSONAPIManagerConfigAdapter {
 		} catch (Exception e) {
 			throw new AppException("Cannot read API-Manager configuration from config file: " + config, ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}		
-		return;
 	}
 	
 	public APIManagerConfig getManagerConfig() throws AppException {

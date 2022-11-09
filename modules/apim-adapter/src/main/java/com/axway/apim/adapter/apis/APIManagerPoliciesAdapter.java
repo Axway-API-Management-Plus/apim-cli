@@ -30,7 +30,9 @@ public class APIManagerPoliciesAdapter {
 		REQUEST ("request", "requestPolicy", "Request policy"),
 		RESPONSE ("response", "responsePolicy", "Response policy"),
 		FAULT_HANDLER ("faulthandler", "faultHandlerPolicy", "Fault-Handler"), 
-		GLOBAL_FAULT_HANDLER("faulthandler", "globalFaultHandlerPolicy", "Global Fault-Handler");
+		GLOBAL_FAULT_HANDLER("faulthandler", "globalFaultHandlerPolicy", "Global Fault-Handler"),
+		GLOBAL_REQUEST_HANDLER("globalrequest", "globalRequestPolicy", "Global Request Policy"),
+		GLOBAL_RESPONSE_HANDLER("globalresponse", "globalResponsePolicy", "Global Response Policy");
 		
 		private final String restAPIKey;
 		private final String jsonKey;
@@ -38,7 +40,7 @@ public class APIManagerPoliciesAdapter {
 		
 		private static Map<String, PolicyType> jsonKeyToTypeMapping = null;
 		
-		private PolicyType(String restAPIKey, String jsonKey, String niceName) {
+		PolicyType(String restAPIKey, String jsonKey, String niceName) {
 			this.restAPIKey = restAPIKey;
 			this.jsonKey = jsonKey;
 			this.niceName = niceName;
@@ -57,7 +59,7 @@ public class APIManagerPoliciesAdapter {
 		}
 		
 		private static void initMapping() {
-			jsonKeyToTypeMapping = new HashMap<String, PolicyType>();
+			jsonKeyToTypeMapping = new HashMap<>();
 			for(PolicyType type : values()) {
 				jsonKeyToTypeMapping.put(type.getJsonKey(), type);
 			}
@@ -70,16 +72,16 @@ public class APIManagerPoliciesAdapter {
 		}
 	}
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIManagerPoliciesAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIManagerPoliciesAdapter.class);
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 
 	public APIManagerPoliciesAdapter() {}
 	
-	Map<PolicyType, String> apiManagerResponse = new HashMap<PolicyType, String>();
+	Map<PolicyType, String> apiManagerResponse = new HashMap<>();
 	
-	Map<PolicyType, List<Policy>> mappedPolicies = new HashMap<PolicyType, List<Policy>>();
-	List<Policy> allPolicies = new ArrayList<Policy>();
+	Map<PolicyType, List<Policy>> mappedPolicies = new HashMap<>();
+	List<Policy> allPolicies = new ArrayList<>();
 	
 	private void readPoliciesFromAPIManager(PolicyType type) throws AppException { 
 		if(apiManagerResponse.get(type)!=null) return;
@@ -88,7 +90,7 @@ public class APIManagerPoliciesAdapter {
 		try {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/policies")
 					.setParameter("type", type.getRestAPIKey()).build();
-			LOG.debug("Load policies with type: "+type+" from API-Manager");
+			LOG.debug("Load policies with type: {} from API-Manager", type);
 			RestAPICall getRequest = new GETRequest(uri);
 			httpResponse = getRequest.execute();
 			apiManagerResponse.put(type, EntityUtils.toString(httpResponse.getEntity()));
@@ -97,6 +99,7 @@ public class APIManagerPoliciesAdapter {
 			throw new AppException("Can't initialize policies for type: " + type, ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {
 			try {
+				assert httpResponse != null;
 				((CloseableHttpResponse)httpResponse).close();
 			} catch (Exception ignore) {}
 		}
@@ -130,19 +133,6 @@ public class APIManagerPoliciesAdapter {
 		}
 		LOG.error("Available "+type.getRestAPIKey()+" policies: " + policies);
 		throw new AppException("The "+type.getRestAPIKey()+" policy: '" + name + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
-	}
-	
-	public Policy getPolicyForKey(PolicyType type, String key) throws AppException {
-		initPoliciesType(type);
-		List<Policy> policies = this.mappedPolicies.get(type);
-		
-		for(Policy policy : policies) {
-			if(policy.getId().equals(key)) {
-				return policy;
-			}
-		}
-		LOG.error("Available "+type.getRestAPIKey()+" policies: " + policies);
-		throw new AppException("The "+type.getRestAPIKey()+" policy: '" + key + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
 	}
 	
 	public List<Policy> getAllPolicies() throws AppException {
