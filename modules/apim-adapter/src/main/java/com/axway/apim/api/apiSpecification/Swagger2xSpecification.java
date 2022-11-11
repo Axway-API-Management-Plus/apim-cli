@@ -13,12 +13,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Swagger2xSpecification extends APISpecification {
-	
-	JsonNode swagger = null;
-	
-
+	private final Logger LOG = LoggerFactory.getLogger(Swagger2xSpecification.class);
+	private JsonNode swagger = null;
 	public Swagger2xSpecification() {
 		super();
 	}

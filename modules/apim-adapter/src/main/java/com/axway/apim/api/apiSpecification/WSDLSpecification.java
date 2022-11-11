@@ -4,11 +4,14 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 
 public class WSDLSpecification extends APISpecification {
 
+	private final Logger LOG = LoggerFactory.getLogger(WSDLSpecification.class);
 
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {

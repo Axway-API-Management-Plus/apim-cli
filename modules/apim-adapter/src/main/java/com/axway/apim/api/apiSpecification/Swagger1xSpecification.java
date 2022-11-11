@@ -10,10 +10,14 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Swagger1xSpecification extends APISpecification {
-	
-	JsonNode swagger = null;
+
+	private final Logger LOG = LoggerFactory.getLogger(Swagger1xSpecification.class);
+
+	private JsonNode swagger = null;
 
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
@@ -74,10 +78,7 @@ public class Swagger1xSpecification extends APISpecification {
 			setMapperForDataFormat();
 			if(this.mapper==null) return false;
 			swagger = this.mapper.readTree(apiSpecificationContent);
-			if(!(swagger.has("swaggerVersion") && swagger.get("swaggerVersion").asText().startsWith("1."))) {
-				return false;
-			}
-			return true;
+			return swagger.has("swaggerVersion") && swagger.get("swaggerVersion").asText().startsWith("1.");
 		} catch (AppException e) {
 			if(e.getError()==ErrorCode.UNSUPPORTED_FEATURE) {
 				throw e;

@@ -25,7 +25,7 @@ public class APISpecificationFactory {
 
     static Logger LOG = LoggerFactory.getLogger(APISpecificationFactory.class);
 
-    private static ArrayList<Class<?>> specificationTypes = new ArrayList<Class<?>>() {
+    private static final ArrayList<Class<?>> specificationTypes = new ArrayList<Class<?>>() {
         private static final long serialVersionUID = 1L;
 
         {

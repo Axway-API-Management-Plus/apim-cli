@@ -20,6 +20,8 @@ import org.apache.olingo.odata2.api.ep.EntityProvider;
 import org.apache.olingo.odata2.core.edm.provider.EdmElementImplProv;
 import org.apache.olingo.odata2.core.edm.provider.EdmParameterImplProv;
 import org.apache.olingo.odata2.core.edm.provider.EdmStructuralTypeImplProv;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -28,7 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ODataV2Specification extends ODataSpecification {
-	
+	private final Logger LOG = LoggerFactory.getLogger(ODataV2Specification.class);
+
 	Edm edm;
 	@SuppressWarnings("rawtypes")
 	Map<String, Schema> schemas = new HashMap<>();
@@ -90,13 +93,11 @@ public class ODataV2Specification extends ODataSpecification {
 	}
 	
 	private String getEntityIdPath(EdmEntitySet entity) throws EdmException {
-		String singleEntityPath = "/" + entity.getName() + "({Id})*";
-		return singleEntityPath;
+		return "/" + entity.getName() + "({Id})*";
 	}
 	
 	private String getEntityPath(EdmEntitySet entity) throws EdmException {
-		String singleEntityPath = "/" + entity.getName() + "*";
-		return singleEntityPath;
+		return "/" + entity.getName() + "*";
 	}
 	
 	private PathItem getPathItemForFunction(EdmFunctionImport function) throws EdmException {
@@ -399,30 +400,6 @@ public class ODataV2Specification extends ODataSpecification {
 		} else {
 			return null;
 		}
-	}
-	
-	private Schema<?> getSimpleSchema(String type) {
-		switch(type) {
-		case "Guid": 
-			return new UUIDSchema();
-		case "Int16":
-		case "Int32":
-		case "Int64":
-		case "Decimal":
-			return new IntegerSchema();
-		case "String":
-		case "Single":
-		case "Time":
-		case "DateTimeOffset":
-			return new StringSchema();
-		case "DateTime":
-			return new DateTimeSchema();
-		case "Binary":
-			return new BinarySchema();
-		case "Boolean":
-			return new BooleanSchema();
-		}
-		return null;
 	}
 	
 	private void setFunctionDocumentation(EdmFunctionImport function, Operation operation) {

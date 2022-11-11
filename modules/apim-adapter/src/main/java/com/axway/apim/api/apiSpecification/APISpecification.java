@@ -21,6 +21,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 
 public abstract class APISpecification {
+	private final Logger LOG = LoggerFactory.getLogger(APISpecification.class);
 	
 	public enum APISpecType {
 		SWAGGER_API_1x("Swagger 1.x", ".json"),
@@ -70,9 +71,6 @@ public abstract class APISpecification {
 			this.additionalNote = additionalNote;
 		}
 	}
-	
-	static Logger LOG = LoggerFactory.getLogger(APISpecification.class);
-	
 	protected ObjectMapper mapper = null;
 	
 	protected String apiSpecificationFile = null;

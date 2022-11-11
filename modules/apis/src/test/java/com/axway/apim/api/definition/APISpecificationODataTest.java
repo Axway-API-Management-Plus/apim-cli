@@ -1,9 +1,12 @@
 package com.axway.apim.api.definition;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
+import com.axway.apim.api.apiSpecification.ODataV4Specification;
+import io.swagger.v3.oas.models.OpenAPI;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -264,11 +267,17 @@ public class APISpecificationODataTest {
 		APISpecificationFactory.getAPISpecification(content, "https://any.odata.service", "OData-V3-Test-API");
 	}
 	
-	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Detected OData V4 specification, which is not yet supported by the APIM-CLI..*")
+	//@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Detected OData V4 specification, which is not yet supported by the APIM-CLI..*")
+	@Test
 	public void testODataV4API() throws AppException, IOException {
 		
 		byte[] content = getAPISpecificationContent(TEST_PACKAGE+"/ODataV4TrippinServiceMetadata.xml");
-		APISpecificationFactory.getAPISpecification(content, "https://any.odata.service", "OData-V4-Test-API");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "https://any.odata.service", "OData-V4-Test-API");
+		System.out.println(apiDefinition);
+		Assert.assertTrue(apiDefinition instanceof ODataV4Specification);
+		ODataV4Specification oDataV4Specification = (ODataV4Specification) apiDefinition;
+		byte[] openAPI = oDataV4Specification.getApiSpecificationContent();
+		System.out.println(new String(openAPI));
 	}
 	
 	

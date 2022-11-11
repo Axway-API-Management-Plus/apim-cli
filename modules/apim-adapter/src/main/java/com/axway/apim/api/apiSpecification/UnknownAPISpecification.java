@@ -2,16 +2,16 @@ package com.axway.apim.api.apiSpecification;
 
 import com.axway.apim.api.API;
 import com.axway.apim.lib.errorHandling.AppException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UnknownAPISpecification extends APISpecification {
-	
+
+	private final Logger LOG = LoggerFactory.getLogger(UnknownAPISpecification.class);
 	String apiName;
 
-	public UnknownAPISpecification(String apiName) throws AppException {
+	public UnknownAPISpecification(String apiName) {
 		this.apiName = apiName;
-	}
-
-	public UnknownAPISpecification() {
 	}
 
 	@Override
