@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 import com.axway.apim.api.apiSpecification.ODataV4Specification;
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
@@ -273,11 +274,13 @@ public class APISpecificationODataTest {
 		
 		byte[] content = getAPISpecificationContent(TEST_PACKAGE+"/ODataV4TrippinServiceMetadata.xml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "https://any.odata.service", "OData-V4-Test-API");
-		System.out.println(apiDefinition);
 		Assert.assertTrue(apiDefinition instanceof ODataV4Specification);
 		ODataV4Specification oDataV4Specification = (ODataV4Specification) apiDefinition;
 		byte[] openAPI = oDataV4Specification.getApiSpecificationContent();
-		System.out.println(new String(openAPI));
+		ObjectMapper objectMapper = new ObjectMapper();
+		TypeReference<OpenAPI> api = new TypeReference<OpenAPI>(){};
+		OpenAPI generatedAPI = objectMapper.readValue(openAPI, api);
+		Assert.assertEquals(generatedAPI.getInfo().getTitle(), "Trippin OData Service");
 	}
 	
 	

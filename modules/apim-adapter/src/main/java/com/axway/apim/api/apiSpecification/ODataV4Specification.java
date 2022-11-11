@@ -25,15 +25,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ODataV4Specification extends ODataSpecification {
 
     private final Logger logger = LoggerFactory.getLogger(ODataV4Specification.class);
-
     private final Map<String, Schema> schemas = new HashMap<>();
     private final Map<String, String> knownEntityTags = new HashMap<>();
     private final Map<String, String> namespaceAliasMap = new HashMap<>();
@@ -64,6 +60,8 @@ public class ODataV4Specification extends ODataSpecification {
             this.openAPI.setComponents(comp);
             addTopSkipSearchAndCount(openAPI);
             addServer(openAPI);
+            addErrorSchema();
+            addErrorResponse(openAPI);
             List<EdmSchema> edmSchemas = edm.getSchemas();
             for (EdmSchema schema : edmSchemas) {
                 info.setTitle(schema.getNamespace() + " OData Service");
@@ -81,7 +79,6 @@ public class ODataV4Specification extends ODataSpecification {
                     openAPI.path(getSingletonPath(edmSingleton), getPathItemForEntity(edm, edmSingleton, false));
                     openAPI.path(getSingletonIdPath(edmSingleton), getPathItemForEntity(edm, edmSingleton, true));
                 }
-
                 for (EdmFunction function : schema.getFunctions()) {
                     openAPI.path("/" + function.getName(), getPathItemForFunction(edm, function));
                 }
@@ -155,6 +152,48 @@ public class ODataV4Specification extends ODataSpecification {
         openAPI.getComponents().setParameters(parameters);
     }
 
+    public void addErrorResponse(OpenAPI openAPI) {
+        ApiResponse errorResponse = new ApiResponse();
+        errorResponse.setDescription("Error");
+
+        Content content = new Content();
+        MediaType mediaType = new MediaType();
+        mediaType.setSchema(new Schema<>().$ref("error"));
+        content.addMediaType("application/json", mediaType);
+        errorResponse.setContent(content);
+        Map<String, ApiResponse> apiResponses = openAPI.getComponents().getResponses();
+        if (apiResponses == null) {
+            apiResponses = new HashMap<>();
+        }
+        //rootParameter("error", errorParameter);
+        apiResponses.put("error", errorResponse);
+        openAPI.getComponents().setResponses(apiResponses);
+    }
+
+    public void addErrorSchema() {
+        ObjectSchema error = new ObjectSchema();
+        error.setRequired(Arrays.asList("error"));
+        ObjectSchema objectSchema = new ObjectSchema();
+        objectSchema.setRequired(Arrays.asList("code", "message"));
+        objectSchema.addProperty("code", new StringSchema());
+        objectSchema.addProperty("message", new StringSchema());
+        objectSchema.addProperty("target", new StringSchema());
+        ArraySchema detailsSchema = new ArraySchema();
+        ObjectSchema detailsObject = new ObjectSchema();
+        detailsObject.setRequired(Arrays.asList("code", "message"));
+        detailsSchema.items(detailsObject);
+        detailsSchema.addProperty("code", new StringSchema());
+        detailsSchema.addProperty("message", new StringSchema());
+        detailsSchema.addProperty("target", new StringSchema());
+        objectSchema.addProperty("details", detailsSchema);
+        ObjectSchema innerError = new ObjectSchema();
+        innerError.setDescription("The structure of this object is service-specific");
+        objectSchema.addProperty("innererror", innerError);
+        error.addProperty("error", objectSchema);
+        schemas.put("error", error);
+    }
+
+
     public void createBatchResource(OpenAPI openAPI) {
 
         PathItem pathItem = new PathItem();
@@ -164,9 +203,7 @@ public class ODataV4Specification extends ODataSpecification {
         batchOperation.setTags(tag);
         batchOperation.setSummary("Send a group of requests");
         batchOperation.setDescription("Group multiple requests into a single request payload, see [Batch Requests](http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_BatchRequests).\n\n*Please note that \"Try it out\" is not supported for this request.*");
-
         pathItem.operation(HttpMethod.valueOf("POST"), batchOperation);
-
         RequestBody requestBody = new RequestBody();
         requestBody.setRequired(true);
         requestBody.setDescription("Batch request");
@@ -178,26 +215,21 @@ public class ODataV4Specification extends ODataSpecification {
         requestContent.addMediaType("multipart/mixed;boundary=request-separator", requestMediaType);
         requestBody.setContent(requestContent);
         batchOperation.setRequestBody(requestBody);
-
         ApiResponses responses = new ApiResponses();
         ApiResponse response200 = new ApiResponse();
-        //  response200.se
         response200.setDescription("Batch request");
         StringSchema responseSchema = new StringSchema();
         MediaType responseMediaType = new MediaType();
-        //  response200.setContent(new Content().addMediaType(MediaType));
-
         responseSchema.setExample("--request-separator\nContent-Type: application/http\nContent-Transfer-Encoding: binary\n\nGET People HTTP/1.1\nAccept: application/json\n\n\n--request-separator--");
         Content responseContent = new Content();
-        responseContent.addMediaType("multipart/mixed", requestMediaType);
+        responseContent.addMediaType("multipart/mixed", responseMediaType);
         response200.setContent(responseContent);
         responses.addApiResponse("200", response200);
-
         ApiResponse response4xx = new ApiResponse();
         response4xx.$ref("error");
         responses.addApiResponse("4XX", response4xx);
         batchOperation.setResponses(responses);
-        openAPI.getPaths().addPathItem("/$batch",pathItem);
+        openAPI.getPaths().addPathItem("/$batch", pathItem);
 
     }
 
@@ -220,11 +252,24 @@ public class ODataV4Specification extends ODataSpecification {
         return updatedProperty;
     }
 
+    public ArraySchema addArraySchema(List<String> properties) {
+        ArraySchema navArraySchema = new ArraySchema();
+        navArraySchema.setUniqueItems(true);
+        StringSchema navStringSchema = new StringSchema();
+        navStringSchema._enum(properties);
+        List<Schema> anyOff = new ArrayList<>();
+        anyOff.add(navStringSchema);
+        StringSchema stringSchema = new StringSchema();
+        anyOff.add(stringSchema);
+        navArraySchema.setItems(new Schema<>().anyOf(anyOff));
+        return navArraySchema;
+    }
+
     private PathItem getPathItemForEntity(Edm edm, EdmBindingTarget entity, boolean idPath) throws EdmException {
         PathItem pathItem = new PathItem();
         String entityName = entity.getName();
         EdmEntityType entityType = entity.getEntityType();
-        logger.info("entityName: {} Container: {}", entityName, entity.getEntityContainer());
+        logger.debug("entityName: {} Container: {}", entityName, entity.getEntityContainer());
         if (idPath) {
             // All Key-Properties are mapped to a general Id parameter and we only document it
             StringBuilder paramIdDescription = new StringBuilder("Id supports: ");
@@ -269,32 +314,19 @@ public class ODataV4Specification extends ODataSpecification {
             navProperties.addAll(entityType.getNavigationPropertyNames());
             operationDescription += "<br /><br />The entity: " + entityName + " supports the following navigational properties: " + navProperties;
             operationDescription += "<br />For example: .../" + entityName + "(Entity-Id)/<b>" + navProperties.get(0) + "</b>/.....";
-            ArraySchema navArraySchema = new ArraySchema();
-            navArraySchema.setUniqueItems(true);
-
-            StringSchema navStringSchema = new StringSchema();
-            navStringSchema._enum(navProperties);
-            navArraySchema.setItems(navStringSchema);
+            ArraySchema navArraySchema = addArraySchema(navProperties);
             operation.addParametersItem(createParameter("$expand", "Expand related entities, see [Expand](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionexpand)", navArraySchema, getExample(navProperties)));
 
         } else {
             operationDescription += "<br />The entity: " + entityName + " supports <b>no</b> navigational properties.";
         }
-        ArraySchema selectArraySchema = new ArraySchema();
-        selectArraySchema.setUniqueItems(true);
-        StringSchema selectStringSchema = new StringSchema();
-        selectStringSchema._enum(structProperties);
-        selectArraySchema.setItems(selectStringSchema);
+        ArraySchema selectArraySchema = addArraySchema(structProperties);
         operation.setDescription(operationDescription);
         operation.addParametersItem(createParameter("$select", "Select properties to be returned, see [Select](http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionselect)", selectArraySchema, getExample(structProperties)));
         if (!idPath) { // When requesting with specific ID the following parameters are not required/meaningful
             operation.addParametersItem(createParameter("$filter", "Filter items by property values, see [Filtering](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionfilter)", new StringSchema()));
-            ArraySchema orderArraySchema = new ArraySchema();
-            orderArraySchema.setUniqueItems(true);
-            List<String> updatedProperties = addDescToProperties(structProperties);
-            StringSchema stringSchema = new StringSchema();
-            stringSchema._enum(updatedProperties);
-            orderArraySchema.setItems(stringSchema);
+            List<String> updatedStructProperties = addDescToProperties(structProperties);
+            ArraySchema orderArraySchema = addArraySchema(updatedStructProperties);
             operation.addParametersItem(createParameter("$orderby", "Order items by property values, see [Sorting](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionorderby)", orderArraySchema, getExample(structProperties)));
             IntegerSchema topSchema = new IntegerSchema();
             topSchema.setDefault(10);
@@ -303,16 +335,17 @@ public class ODataV4Specification extends ODataSpecification {
             operation.addParametersItem(new Parameter().$ref("search"));
             operation.addParametersItem(new Parameter().$ref("count"));
         }
+        ApiResponse response4xx = new ApiResponse();
+        response4xx.$ref("error");
         responses = new ApiResponses()
                 .addApiResponse("200", createResponse("EntitySet " + entityName,
-                        getSchemaForType(edm, entityType, idPath)))
-                ._default(createResponse("Unexpected error"));
+                        getSchemaForType(edm, entityType, idPath))).addApiResponse("4XX", response4xx);
+
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.GET, operation);
         operation.setDescription(operationDescription);
 
         if (!idPath) return pathItem;
-
         // POST Method
         operation = new Operation();
         operation.setTags(tag);
@@ -323,7 +356,7 @@ public class ODataV4Specification extends ODataSpecification {
 
         responses = new ApiResponses()
                 .addApiResponse("201", createResponse("EntitySet " + entityName))
-                ._default(createResponse("Unexpected error"));
+                .addApiResponse("4XX", response4xx);
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.POST, operation);
 
@@ -337,7 +370,7 @@ public class ODataV4Specification extends ODataSpecification {
 
         responses = new ApiResponses()
                 .addApiResponse("200", createResponse("EntitySet " + entityName))
-                ._default(createResponse("Unexpected error"));
+                .addApiResponse("4XX", response4xx);
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.PATCH, operation);
 
@@ -350,7 +383,7 @@ public class ODataV4Specification extends ODataSpecification {
 
         responses = new ApiResponses()
                 .addApiResponse("204", createResponse("Entity " + entityName + " successfully deleted"))
-                ._default(createResponse("Unexpected error"));
+                .addApiResponse("4XX", response4xx);
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.DELETE, operation);
 
@@ -633,5 +666,96 @@ public class ODataV4Specification extends ODataSpecification {
             // Otherwise try to get the annotations
             return this.entityAnnotations.get(null);
         }
+    }
+
+    public static class Error {
+        String code;
+        String message;
+        String target;
+
+        List<Detail> details;
+        InnerError innerError;
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getTarget() {
+            return target;
+        }
+
+        public void setTarget(String target) {
+            this.target = target;
+        }
+
+        public List<Detail> getDetails() {
+            return details;
+        }
+
+        public void setDetails(List<Detail> details) {
+            this.details = details;
+        }
+
+        public InnerError getInnerError() {
+            return innerError;
+        }
+
+        public void setInnerError(InnerError innerError) {
+            this.innerError = innerError;
+        }
+    }
+
+    public static class Detail {
+        String code;
+        String message;
+        String target;
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getTarget() {
+            return target;
+        }
+
+        public void setTarget(String target) {
+            this.target = target;
+        }
+    }
+
+    public static class InnerError {
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        String description = "The structure of this object is service-specific";
     }
 }
