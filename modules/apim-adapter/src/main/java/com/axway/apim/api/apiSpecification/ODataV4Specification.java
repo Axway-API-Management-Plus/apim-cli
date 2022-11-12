@@ -74,7 +74,6 @@ public class ODataV4Specification extends ODataSpecification {
                     openAPI.path(getEntityPath(entityType), getPathItemForEntity(edm, entityType, false));
                     openAPI.path(getEntityIdPath(entityType), getPathItemForEntity(edm, entityType, true));
                 }
-
                 for (EdmSingleton edmSingleton : schema.getEntityContainer().getSingletons()) {
                     openAPI.path(getSingletonPath(edmSingleton), getPathItemForEntity(edm, edmSingleton, false));
                     openAPI.path(getSingletonIdPath(edmSingleton), getPathItemForEntity(edm, edmSingleton, true));
@@ -86,7 +85,6 @@ public class ODataV4Specification extends ODataSpecification {
                     openAPI.path("/" + action.getName(), getPathItemForFunction(edm, action));
                 }
             }
-
             comp.setSchemas(schemas);
             List<Tag> tags = getTags();
             this.openAPI.setTags(tags);
@@ -119,35 +117,32 @@ public class ODataV4Specification extends ODataSpecification {
         integerSchema.setMinimum(BigDecimal.valueOf(0));
         integerSchema.setFormat(null);
         topParameter.setSchema(integerSchema);
-        topParameter.setDescription("Show only the first n items, see [Paging - Top](http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptiontop)");
+        topParameter.setDescription("Show only the first n items, see [Paging - Top](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptiontop)");
         topParameter.setExample(50);
         Map<String, Parameter> parameters = openAPI.getComponents().getParameters();
         if (parameters == null) {
             parameters = new HashMap<>();
         }
         parameters.put("top", topParameter);
-
         Parameter skipParameter = new Parameter();
         skipParameter.setName("$skip");
         skipParameter.setIn("query");
         skipParameter.setSchema(integerSchema);
-        skipParameter.setDescription("Skip the first n items, see [Paging - Skip](http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionskip)");
+        skipParameter.setDescription("Skip the first n items, see [Paging - Skip](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionskip)");
         parameters.put("skip", skipParameter);
-
         Parameter countParameter = new Parameter();
         countParameter.setName("$count");
         countParameter.setIn("query");
         BooleanSchema booleanSchema = new BooleanSchema();
         countParameter.setSchema(booleanSchema);
-        countParameter.setDescription("Include count of items, see [Count](http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptioncount)");
+        countParameter.setDescription("Include count of items, see [Count](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptioncount)");
         parameters.put("count", countParameter);
-
         Parameter searchParameter = new Parameter();
         searchParameter.setName("$search");
         searchParameter.setIn("query");
         StringSchema stringSchema = new StringSchema();
         searchParameter.setSchema(stringSchema);
-        searchParameter.setDescription("Search items by search phrases, see [Searching](http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionsearch)");
+        searchParameter.setDescription("Search items by search phrases, see [Searching](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionsearch)");
         parameters.put("search", searchParameter);
         openAPI.getComponents().setParameters(parameters);
     }
@@ -155,7 +150,6 @@ public class ODataV4Specification extends ODataSpecification {
     public void addErrorResponse(OpenAPI openAPI) {
         ApiResponse errorResponse = new ApiResponse();
         errorResponse.setDescription("Error");
-
         Content content = new Content();
         MediaType mediaType = new MediaType();
         mediaType.setSchema(new Schema<>().$ref("error"));
@@ -165,14 +159,13 @@ public class ODataV4Specification extends ODataSpecification {
         if (apiResponses == null) {
             apiResponses = new HashMap<>();
         }
-        //rootParameter("error", errorParameter);
         apiResponses.put("error", errorResponse);
         openAPI.getComponents().setResponses(apiResponses);
     }
 
     public void addErrorSchema() {
         ObjectSchema error = new ObjectSchema();
-        error.setRequired(Arrays.asList("error"));
+        error.setRequired(Collections.singletonList("error"));
         ObjectSchema objectSchema = new ObjectSchema();
         objectSchema.setRequired(Arrays.asList("code", "message"));
         objectSchema.addProperty("code", new StringSchema());
@@ -195,14 +188,13 @@ public class ODataV4Specification extends ODataSpecification {
 
 
     public void createBatchResource(OpenAPI openAPI) {
-
         PathItem pathItem = new PathItem();
         Operation batchOperation = new Operation();
         List<String> tag = new ArrayList<>();
         tag.add("Batch Requests");
         batchOperation.setTags(tag);
         batchOperation.setSummary("Send a group of requests");
-        batchOperation.setDescription("Group multiple requests into a single request payload, see [Batch Requests](http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_BatchRequests).\n\n*Please note that \"Try it out\" is not supported for this request.*");
+        batchOperation.setDescription("Group multiple requests into a single request payload, see [Batch Requests](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_BatchRequests).\n\n*Please note that \"Try it out\" is not supported for this request.*");
         pathItem.operation(HttpMethod.valueOf("POST"), batchOperation);
         RequestBody requestBody = new RequestBody();
         requestBody.setRequired(true);
@@ -230,7 +222,6 @@ public class ODataV4Specification extends ODataSpecification {
         responses.addApiResponse("4XX", response4xx);
         batchOperation.setResponses(responses);
         openAPI.getPaths().addPathItem("/$batch", pathItem);
-
     }
 
     public List<Tag> getTags() {
@@ -271,7 +262,7 @@ public class ODataV4Specification extends ODataSpecification {
         EdmEntityType entityType = entity.getEntityType();
         logger.debug("entityName: {} Container: {}", entityName, entity.getEntityContainer());
         if (idPath) {
-            // All Key-Properties are mapped to a general Id parameter and we only document it
+            // All Key-Properties are mapped to a general Id parameter, and we only document it
             StringBuilder paramIdDescription = new StringBuilder("Id supports: ");
             for (EdmKeyPropertyRef key : entityType.getKeyPropertyRefs()) {
                 paramIdDescription.append(key.getName()).append(", ");
@@ -284,15 +275,8 @@ public class ODataV4Specification extends ODataSpecification {
             pathItem.addParametersItem(param);
         }
         List<String> tag = new ArrayList<>();
-        if (getTitle(entity) == null) {
-            tag.add(entityName);
-            knownEntityTags.put(entityName, entityName);
-        } else {
-            String title = getTitle(entity);
-            tag.add(title);
-            knownEntityTags.put(title, title);
-        }
-
+        tag.add(entityName);
+        knownEntityTags.put(entityName, entityName);
         Operation operation;
         ApiResponses responses;
         // GET Method
@@ -308,10 +292,9 @@ public class ODataV4Specification extends ODataSpecification {
 
         String operationDescription = "Returns the entity: " + entityName + ". "
                 + "For more information on how to access entities visit: <a target=\"_blank\" href=\"https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#sec_AddressingEntities\">Addressing Entities</a>";
-        List<String> navProperties = new ArrayList<>();
         List<String> structProperties = entityType.getPropertyNames();
         if (entityType.getNavigationPropertyNames() != null && entityType.getNavigationPropertyNames().size() > 0) {
-            navProperties.addAll(entityType.getNavigationPropertyNames());
+            List<String> navProperties = new ArrayList<>(entityType.getNavigationPropertyNames());
             operationDescription += "<br /><br />The entity: " + entityName + " supports the following navigational properties: " + navProperties;
             operationDescription += "<br />For example: .../" + entityName + "(Entity-Id)/<b>" + navProperties.get(0) + "</b>/.....";
             ArraySchema navArraySchema = addArraySchema(navProperties);
@@ -322,7 +305,7 @@ public class ODataV4Specification extends ODataSpecification {
         }
         ArraySchema selectArraySchema = addArraySchema(structProperties);
         operation.setDescription(operationDescription);
-        operation.addParametersItem(createParameter("$select", "Select properties to be returned, see [Select](http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionselect)", selectArraySchema, getExample(structProperties)));
+        operation.addParametersItem(createParameter("$select", "Select properties to be returned, see [Select](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionselect)", selectArraySchema, getExample(structProperties)));
         if (!idPath) { // When requesting with specific ID the following parameters are not required/meaningful
             operation.addParametersItem(createParameter("$filter", "Filter items by property values, see [Filtering](https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionfilter)", new StringSchema()));
             List<String> updatedStructProperties = addDescToProperties(structProperties);
@@ -353,7 +336,6 @@ public class ODataV4Specification extends ODataSpecification {
         operation.setOperationId("create" + entityName);
         operation.setDescription("Create a new entity in EntitySet: " + entityName);
         operation.setRequestBody(createRequestBody(edm, entityType, "The entity to create", true));
-
         responses = new ApiResponses()
                 .addApiResponse("201", createResponse("EntitySet " + entityName))
                 .addApiResponse("4XX", response4xx);
@@ -367,7 +349,6 @@ public class ODataV4Specification extends ODataSpecification {
         operation.setOperationId("update" + entityName);
         operation.setDescription("Update an existing entity: " + entityName);
         operation.setRequestBody(createRequestBody(edm, entityType, "The entity to update", true));
-
         responses = new ApiResponses()
                 .addApiResponse("200", createResponse("EntitySet " + entityName))
                 .addApiResponse("4XX", response4xx);
@@ -380,23 +361,12 @@ public class ODataV4Specification extends ODataSpecification {
         operation.setSummary("Delete " + entityName);
         operation.setOperationId("delete" + entityName);
         operation.setDescription("Delete an entity " + entityName);
-
         responses = new ApiResponses()
                 .addApiResponse("204", createResponse("Entity " + entityName + " successfully deleted"))
                 .addApiResponse("4XX", response4xx);
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.DELETE, operation);
-
         return pathItem;
-    }
-
-
-    public StringSchema getSchemaAllowedValues(Enum[] allowedValues) {
-        StringSchema schema = new StringSchema();
-        for (Enum allowedValue : allowedValues) {
-            schema.addEnumItemObject(allowedValue.name());
-        }
-        return schema;
     }
 
     private String getEntityIdPath(EdmEntitySet entityType) throws EdmException {
@@ -478,18 +448,6 @@ public class ODataV4Specification extends ODataSpecification {
     private ApiResponse createResponse(String description) throws EdmException {
         return createResponse(description, null);
     }
-
-    private ApiResponse createResponse(String description, Schema<?> schema) throws EdmException {
-        ApiResponse response = new ApiResponse();
-        response.setDescription(description);
-        Content content = new Content();
-        MediaType mediaType = new MediaType();
-        mediaType.setSchema(schema);
-        content.addMediaType("application/json", mediaType);
-        response.setContent(content);
-        return response;
-    }
-
     private RequestBody createRequestBody(Edm edm, EdmEntityType entityType, String description, boolean required) {
         RequestBody body = new RequestBody();
         body.setDescription(description);
@@ -501,11 +459,6 @@ public class ODataV4Specification extends ODataSpecification {
         body.setContent(content);
         return body;
     }
-
-
-	/*private Schema<?> getSchemaForType(EdmType type) throws EdmException {
-		return getSchemaForType(type, EdmMultiplicity.ONE);
-	}*/
 
     private Schema<?> getSchemaForType(Edm edm, EdmType type, boolean isCollection) {
         try {
@@ -526,7 +479,7 @@ public class ODataV4Specification extends ODataSpecification {
     private Schema<Object> getSchemaForType(Edm edm, EdmType type, boolean asRef, boolean isCollection) throws EdmException {
         Schema schema = null;
         if (type.getKind() == EdmTypeKind.PRIMITIVE) {
-            schema = (Schema<Object>) getSimpleSchema(type.getName());
+            schema = getSimpleSchema(type.getName());
         } else if (type.getKind() == EdmTypeKind.ENUM) {
             schema = new StringSchema();
             EdmEnumType enumType = (EdmEnumType) type;
@@ -552,13 +505,10 @@ public class ODataV4Specification extends ODataSpecification {
                     propSchema.setMaxLength(property.getMaxLength());
                     propSchema.setDefault(property.getDefaultValue());
                     propSchema.setNullable(property.isNullable());
-                    //propSchema.setTitle(property. );
-                    // propSchema.setDescription(property.);
-                    schema.addProperties(propertyName, propSchema);
+                    schema.addProperty(propertyName, propSchema);
                 }
                 EdmStructuredType typeImpl = (EdmStructuredType) type;
                 schema.setDescription(getDescription(typeImpl));
-                schema.setTitle(getTitle(typeImpl));
             }
             schemas.put(type.getName(), schema);
             if (asRef) {
@@ -578,184 +528,14 @@ public class ODataV4Specification extends ODataSpecification {
     }
 
     private String getDescription(EdmAnnotatable entity) {
-        try {
-            String summary = null;
-            String longDescription = null;
-            String quickInfo = getQuickInfo(entity);
-            if (entity.getAnnotations() == null) return null;
-            for (EdmAnnotation annoElem : entity.getAnnotations()) {
-				/*if("documentation".equals(annoElem. getName().toLowerCase())) {
-					for(EdmAnnotationElement child : annoElem.getChildElements()) {
-						if("summary".equals(child.getName().toLowerCase())) {
-							summary = child.getText();
-						}
-						if("longdescription".equals(child.getName().toLowerCase())) {
-							longDescription = child.getText();
-							continue;
-						}
-					}
-				}*/
-            }
-            if (summary == null && longDescription == null && quickInfo == null) return null;
-            String description = "";
-            if (quickInfo != null) description = quickInfo;
-            if (!description.equals("") && summary != null) description += "<br />";
-            if (summary != null) description += summary;
-            if (!description.equals("") && longDescription != null) description += "<br />";
-            if (longDescription != null) description += longDescription;
-            return description;
-        } catch (EdmException e) {
-            return null;
-        }
-    }
-
-    private String getTitle(EdmAnnotatable entity) {
-        return getFromAnnotationAttributes(entity, "label");
-    }
-
-    private String getQuickInfo(EdmAnnotatable entity) {
-        return getFromAnnotationAttributes(entity, "quickinfo");
-    }
-
-    private String getFromAnnotationAttributes(EdmAnnotatable entity, String annotationName) {
-        entity = entity;
-        try {
-			/*if(entity.getAnnotations()!=null && entity.getAnnotations().getAnnotationAttributes()!=null) {
-				for(EdmAnnotationAttribute attribute : entity.getAnnotations().getAnnotationAttributes()) {
-					if(annotationName.equals(attribute.getName().toLowerCase())) {
-						return attribute.getText();
-					}
-				}
-			}*/
-            return null;
-        } catch (EdmException e) {
-            return null;
-        }
+        return null;
     }
 
     private String getExample(List<String> possibleExamples) {
-        // Avoid providing a example such ID, id as it is in most cases not the best option for an example
+        // Avoid providing an example such ID, id as it is in most cases not the best option for an example
         for (String example : possibleExamples) {
             if (!example.equalsIgnoreCase("id")) return example;
         }
         return null;
-    }
-
-    private boolean isEntityInsertable(Edm edm, EdmEntitySet entity) {
-        EdmAnnotations annotations = getEntityAnnotations(entity);
-        EdmTerm term = edm.getTerm(new FullQualifiedName("SAP__self", "SAP__capabilities.SearchRestrictions"));
-        //annotations.getAnnotation(, null);
-        return annotations == null;
-
-		/*for(EdmAnnotation annotation : annotations.getAnnotationGroup().getAnnotations()) {
-			annotation = annotation;
-			EdmAnnotationsImp
-			//EdmTerm term = edm.getTerm(new FullQualifiedName("SAP__capabilities.SearchRestrictions"));
-
-		}*/
-    }
-
-    private EdmAnnotations getEntityAnnotations(EdmEntitySet entity) {
-        EdmEntityContainer container = entity.getEntityContainer();
-        // Check if an alias exists for the namespace, which might be used for annotation target
-        if (this.namespaceAliasMap.get(container.getNamespace()) != null) {
-            String namespaceAlias = this.namespaceAliasMap.get(container.getNamespace());
-            // Get the annotation using the alias instead of the namespace itself
-            return this.entityAnnotations.get(new FullQualifiedName(namespaceAlias, entity.getEntityContainer() + "/" + entity.getName()));
-        } else {
-            // Otherwise try to get the annotations
-            return this.entityAnnotations.get(null);
-        }
-    }
-
-    public static class Error {
-        String code;
-        String message;
-        String target;
-
-        List<Detail> details;
-        InnerError innerError;
-
-        public String getCode() {
-            return code;
-        }
-
-        public void setCode(String code) {
-            this.code = code;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public String getTarget() {
-            return target;
-        }
-
-        public void setTarget(String target) {
-            this.target = target;
-        }
-
-        public List<Detail> getDetails() {
-            return details;
-        }
-
-        public void setDetails(List<Detail> details) {
-            this.details = details;
-        }
-
-        public InnerError getInnerError() {
-            return innerError;
-        }
-
-        public void setInnerError(InnerError innerError) {
-            this.innerError = innerError;
-        }
-    }
-
-    public static class Detail {
-        String code;
-        String message;
-        String target;
-
-        public String getCode() {
-            return code;
-        }
-
-        public void setCode(String code) {
-            this.code = code;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public String getTarget() {
-            return target;
-        }
-
-        public void setTarget(String target) {
-            this.target = target;
-        }
-    }
-
-    public static class InnerError {
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        String description = "The structure of this object is service-specific";
     }
 }

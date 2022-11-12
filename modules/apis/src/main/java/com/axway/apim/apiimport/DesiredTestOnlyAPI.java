@@ -6,7 +6,6 @@ public class DesiredTestOnlyAPI extends DesiredAPI {
 
 	public DesiredTestOnlyAPI() throws AppException {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

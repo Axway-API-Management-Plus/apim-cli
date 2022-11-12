@@ -207,17 +207,14 @@ public class ImportTestAction extends AbstractTestAction {
 			
 			return replacedFilename;
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			if(os!=null)
 				try {
 					os.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}

@@ -7,7 +7,6 @@ import com.axway.apim.api.model.APIAccess;
 public class APIAccessComparator implements Comparator<APIAccess> {
 
 	public APIAccessComparator() {
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

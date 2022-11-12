@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.*;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +84,17 @@ public abstract class ODataSpecification extends APISpecification {
         new URL(pathToMetaData); // Try to parse it, only to see if it's a valid URL
         pathToMetaData = pathToMetaData.substring(0, pathToMetaData.lastIndexOf("/"));
         return pathToMetaData;
+    }
+
+    protected ApiResponse createResponse(String description, Schema<?> schema) {
+        ApiResponse response = new ApiResponse();
+        response.setDescription(description);
+        Content content = new Content();
+        MediaType mediaType = new MediaType();
+        mediaType.setSchema(schema);
+        content.addMediaType("application/json", mediaType);
+        response.setContent(content);
+        return response;
     }
 
     @Override

@@ -18,7 +18,6 @@ public abstract class OrgAdapter {
 	protected Result result;
 
 	public OrgAdapter() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public abstract void readConfig() throws AppException;

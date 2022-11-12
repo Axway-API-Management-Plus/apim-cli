@@ -1,28 +1,25 @@
 package com.axway.apim.api.definition;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-
+import com.axway.apim.api.apiSpecification.APISpecification;
+import com.axway.apim.api.apiSpecification.APISpecificationFactory;
+import com.axway.apim.api.apiSpecification.ODataV2Specification;
 import com.axway.apim.api.apiSpecification.ODataV4Specification;
+import com.axway.apim.api.model.APISpecificationFilter;
+import com.axway.apim.api.model.DesiredAPISpecification;
+import com.axway.apim.apiimport.lib.params.APIImportParams;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.axway.apim.api.apiSpecification.APISpecification;
-import com.axway.apim.api.apiSpecification.APISpecificationFactory;
-import com.axway.apim.api.apiSpecification.ODataV2Specification;
-import com.axway.apim.api.model.APISpecificationFilter;
-import com.axway.apim.api.model.DesiredAPISpecification;
-import com.axway.apim.apiimport.lib.params.APIImportParams;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class APISpecificationODataTest {
 	

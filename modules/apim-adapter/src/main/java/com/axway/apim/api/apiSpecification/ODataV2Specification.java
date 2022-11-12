@@ -298,16 +298,7 @@ public class ODataV2Specification extends ODataSpecification {
 		return createResponse(description, null);
 	}
 	
-	private ApiResponse createResponse(String description, Schema<?> schema) {
-		ApiResponse response = new ApiResponse();
-		response.setDescription(description);
-		Content content = new Content();
-		MediaType mediaType = new MediaType();
-		mediaType.setSchema(schema);
-		content.addMediaType("application/json", mediaType);
-		response.setContent(content);
-		return response;
-	}
+
 	
 	private RequestBody createRequestBody(EdmEntityType entityType, EdmMultiplicity multiplicity, String description, boolean required) {
 		RequestBody body = new RequestBody();

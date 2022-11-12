@@ -7,7 +7,6 @@ import com.axway.apim.api.model.apps.ClientApplication;
 public class ClientAppComparator implements Comparator<ClientApplication> {
 
 	public ClientAppComparator() {
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
