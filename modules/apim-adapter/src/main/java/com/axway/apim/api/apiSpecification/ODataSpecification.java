@@ -69,7 +69,7 @@ public abstract class ODataSpecification extends APISpecification {
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         mapper.setSerializationInclusion(Include.NON_NULL);
         FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-                SimpleBeanPropertyFilter.serializeAllExcept(new String[]{"exampleSetFlag"}));
+                SimpleBeanPropertyFilter.serializeAllExcept("exampleSetFlag"));
         mapper.setFilterProvider(filter);
         mapper.addMixIn(Object.class, OpenAPIMixIn.class);
         try {

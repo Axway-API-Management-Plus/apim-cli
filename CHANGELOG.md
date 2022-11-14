@@ -5,8 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.13.1] In progress
+### Fixed
 - Get API causes an error when related certificates contains slash character '/' in their CN (See issue [#315](https://github.com/Axway-API-Management-Plus/apim-cli/issues/315)
 - globalrequest and response polices are not handled correctly using apim settings import (See issue [#325](https://github.com/Axway-API-Management-Plus/apim-cli/issues/325)
+- Add support for OData V4 specifications  (See issue [#234](https://github.com/Axway-API-Management-Plus/apim-cli/issues/234)
+
+### Changed
+- Cleaned up some System.out.println to reduce console output
+
+### Added
+- command "api check-certs -days 90 -s api-env -o json" command writes json output on console
 
 ## [1.13.0] 2022-09-23
 

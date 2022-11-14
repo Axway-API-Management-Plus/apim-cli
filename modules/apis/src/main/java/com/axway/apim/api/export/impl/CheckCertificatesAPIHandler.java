@@ -86,17 +86,22 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
                     APICert apiCert = new APICert(id, apiName, path, version, commonName, validAfter, validBefore, md5);
                     apiCerts.add(apiCert);
                 }
-                ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-                try {
-                    mapper.writeValue(System.out, apiCerts);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                writeJSON(apiCerts);
             }
         } else {
-            System.out.println("No certificates found that will expire within the next " + checkCertParams.getNumberOfDays() + " days.");
+            LOG.info("No certificates found that will expire within the next " + checkCertParams.getNumberOfDays() + " days.");
+            writeJSON(new ArrayList<>());
         }
         LOG.info("Done!");
+    }
+
+    public void writeJSON(List<APICert> apiCerts){
+        ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        try {
+            mapper.writeValue(System.out, apiCerts);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
