@@ -1,0 +1,10 @@
+{
+  "name": "OData v4 TripPin API",
+  "path": "/odata/v4/trippin",
+  "state": "unpublished",
+  "version": "1.0.0",
+  "organization": "API Development",
+  "apiSpecification": {
+    "resource": "https://services.odata.org/TripPinRESTierService/(S(gnxtchg1e2of2ictemxrcv4r))/$metadata"
+  }
+}

@@ -27,6 +27,7 @@ public abstract class ODataSpecification extends APISpecification {
     protected OpenAPI openAPI;
     @Override
     public void configureBasePath(String backendBasePath, API api) throws AppException {
+        LOG.info("Overriding backend base path : {}", backendBasePath);
         if (backendBasePath == null || !CoreParameters.getInstance().isReplaceHostInSwagger()) {
             // Try to set up the Backend-Host + BasePath based on the given Metadata URL
             try {
@@ -43,8 +44,7 @@ public abstract class ODataSpecification extends APISpecification {
                 throw new AppException("Error importing OData API. Unknown backend host. "
                         + "You either have to provide the MetaData-File using an HTTP-Endpoint or configure a backendBasePath" + replaceHostInSwaggerDisabledNote + ".", ErrorCode.CANT_READ_API_DEFINITION_FILE);
             }
-        } else
-
+        } else {
             // Otherwise we are using the configured backendBasePath
             try {
                 URL url = new URL(backendBasePath); // Parse it to make sure it is valid
@@ -60,6 +60,7 @@ public abstract class ODataSpecification extends APISpecification {
             } catch (Exception e) {
                 LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
             }
+        }
     }
 
     @Override

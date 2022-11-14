@@ -14,7 +14,6 @@ import io.swagger.v3.oas.models.parameters.QueryParameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.apache.olingo.client.api.ODataClient;
 import org.apache.olingo.client.core.ODataClientFactory;
@@ -59,7 +58,6 @@ public class ODataV4Specification extends ODataSpecification {
             Components comp = new Components();
             this.openAPI.setComponents(comp);
             addTopSkipSearchAndCount(openAPI);
-            addServer(openAPI);
             addErrorSchema();
             addErrorResponse(openAPI);
             List<EdmSchema> edmSchemas = edm.getSchemas();
@@ -95,20 +93,6 @@ public class ODataV4Specification extends ODataSpecification {
             return false;
         }
     }
-
-    public void addServer(OpenAPI openAPI) {
-        String odataUrl = getApiSpecificationFile();
-        Server server = new Server();
-        if (odataUrl.startsWith("http")) {
-            server.setUrl(odataUrl);
-        } else {
-            server.setUrl("/");
-        }
-        List<Server> servers = new ArrayList<>();
-        servers.add(server);
-        openAPI.setServers(servers);
-    }
-
     public void addTopSkipSearchAndCount(OpenAPI openAPI) {
         Parameter topParameter = new Parameter();
         topParameter.setName("$top");
@@ -328,12 +312,17 @@ public class ODataV4Specification extends ODataSpecification {
         pathItem.operation(HttpMethod.GET, operation);
         operation.setDescription(operationDescription);
 
-        if (!idPath) return pathItem;
+
         // POST Method
         operation = new Operation();
         operation.setTags(tag);
-        operation.setSummary("Create a new entity " + entityName);
-        operation.setOperationId("create" + entityName);
+        if (idPath) {
+            operation.setSummary("Create a new entity " + entityName + " on Id");
+            operation.setOperationId("create" + entityName + "Id");
+        }else {
+            operation.setSummary("Create a new entity " + entityName);
+            operation.setOperationId("create" + entityName);
+        }
         operation.setDescription("Create a new entity in EntitySet: " + entityName);
         operation.setRequestBody(createRequestBody(edm, entityType, "The entity to create", true));
         responses = new ApiResponses()
@@ -342,6 +331,7 @@ public class ODataV4Specification extends ODataSpecification {
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.POST, operation);
 
+        if (!idPath) return pathItem;
         // PATCH Method
         operation = new Operation();
         operation.setTags(tag);
