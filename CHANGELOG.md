@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Get API causes an error when related certificates contains slash character '/' in their CN (See issue [#315](https://github.com/Axway-API-Management-Plus/apim-cli/issues/315)
 - globalrequest and response polices are not handled correctly using apim settings import (See issue [#325](https://github.com/Axway-API-Management-Plus/apim-cli/issues/325)
 - Add support for OData V4 specifications  (See issue [#234](https://github.com/Axway-API-Management-Plus/apim-cli/issues/234)
+- Security fix - Bump commons-text from 1.9 to 1.10.0
+- Security fix Bump jackson-databind from 2.13.3 to 2.13.4.1
 
 ### Changed
 - Cleaned up some System.out.println to reduce console output
