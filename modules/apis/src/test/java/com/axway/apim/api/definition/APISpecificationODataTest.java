@@ -279,7 +279,22 @@ public class APISpecificationODataTest {
 		OpenAPI generatedAPI = objectMapper.readValue(openAPI, api);
 		Assert.assertEquals(generatedAPI.getInfo().getTitle(), "Trippin OData Service");
 	}
-	
+
+
+	@Test
+	public void testOData4SAPSalesPricingReadOdataV4() throws IOException {
+		byte[] content = getAPISpecificationContent(TEST_PACKAGE+"/ODataV4_SAP_OP_SLSPRCGACCESSSEQUENCE_0001.edmx");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "https://any.odata.service", "OData-V4-SAP");
+		Assert.assertTrue(apiDefinition instanceof ODataV4Specification);
+		ODataV4Specification oDataV4Specification = (ODataV4Specification) apiDefinition;
+		byte[] openAPI = oDataV4Specification.getApiSpecificationContent();
+		ObjectMapper objectMapper = new ObjectMapper();
+		TypeReference<OpenAPI> api = new TypeReference<OpenAPI>(){};
+		OpenAPI generatedAPI = objectMapper.readValue(openAPI, api);
+		//System.out.println(new String(openAPI));
+		Assert.assertEquals(generatedAPI.getInfo().getTitle(), "com.sap.gateway.srvd_a2x.api_slsprcgaccesssequence.v0001 OData Service");
+	}
+
 	
 	private byte[] getAPISpecificationContent(String swaggerFile) throws AppException {
 		try {
