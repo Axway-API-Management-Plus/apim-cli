@@ -1,5 +1,6 @@
 package com.axway.apim.api.apiSpecification;
 
+import com.axway.apim.api.apiSpecification.filter.OpenAPI3SpecificationFilter;
 import com.axway.apim.lib.errorHandling.AppException;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -527,5 +528,11 @@ public class ODataV4Specification extends ODataSpecification {
             if (!example.equalsIgnoreCase("id")) return example;
         }
         return null;
+    }
+
+    @Override
+    public void filterAPISpecification() {
+        if(filterConfig == null) return;
+        OpenAPI3SpecificationFilter.filter(openAPI, filterConfig);
     }
 }

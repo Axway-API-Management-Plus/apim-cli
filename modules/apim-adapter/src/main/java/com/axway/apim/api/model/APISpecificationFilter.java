@@ -5,9 +5,8 @@ import java.util.List;
 
 public class APISpecificationFilter {
 	
-	private List<APISpecIncludeExcludeFilter> include = new ArrayList<APISpecIncludeExcludeFilter>();
-	private List<APISpecIncludeExcludeFilter> exclude = new ArrayList<APISpecIncludeExcludeFilter>();
-	
+	private List<APISpecIncludeExcludeFilter> include = new ArrayList<>();
+	private List<APISpecIncludeExcludeFilter> exclude = new ArrayList<>();
 
 	public List<APISpecIncludeExcludeFilter> getInclude() {
 		return include;
@@ -20,26 +19,6 @@ public class APISpecificationFilter {
 	}
 	public void setExclude(List<APISpecIncludeExcludeFilter> exclude) {
 		this.exclude = exclude;
-	}
-	
-	public List<APISpecIncludeExcludeFilter> getPathAndTagsExclude() {
-		List<APISpecIncludeExcludeFilter> result = new ArrayList<APISpecIncludeExcludeFilter>();
-		for(APISpecIncludeExcludeFilter filter : this.include) {
-			if(!filter.getPaths().isEmpty() && !filter.getTags().isEmpty()) {
-				result.add(filter);
-			}
-		}
-		return result;
-	}
-	
-	public List<APISpecIncludeExcludeFilter> getPathAndTagsInclude() {
-		List<APISpecIncludeExcludeFilter> result = new ArrayList<APISpecIncludeExcludeFilter>();
-		for(APISpecIncludeExcludeFilter filter : this.include) {
-			if(!filter.getPaths().isEmpty() && !filter.getTags().isEmpty()) {
-				result.add(filter);
-			}
-		}
-		return result;
 	}
 	
 	/**
@@ -88,5 +67,4 @@ public class APISpecificationFilter {
 		if(models!=null) filter.addModel(models);
 		this.exclude.add(filter);
 	}
-	
 }
