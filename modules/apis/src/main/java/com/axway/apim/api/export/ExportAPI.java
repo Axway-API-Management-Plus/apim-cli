@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.*;
 
-@JsonPropertyOrder({"name", "path", "state", "version", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost",
+@JsonPropertyOrder({"name", "path", "state", "version", "apiRoutingKey", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost",
         "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties",
         "corsProfiles", "caCerts", "applicationQuota", "systemQuota", "apiMethods"})
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
@@ -179,6 +179,10 @@ public class ExportAPI {
 
     public String getName() {
         return this.actualAPIProxy.getName();
+    }
+
+    public String getApiRoutingKey() {
+        return this.actualAPIProxy.getApiRoutingKey();
     }
 
 
