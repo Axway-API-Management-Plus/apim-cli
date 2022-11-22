@@ -22,7 +22,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 
 public abstract class APISpecification {
 	private final Logger LOG = LoggerFactory.getLogger(APISpecification.class);
-	
+
+	private byte[] originalApiSpecificationContentSize;
+
 	public enum APISpecType {
 		SWAGGER_API_1x("Swagger 1.x", ".json"),
 		SWAGGER_API_1x_YAML("Swagger 1.x (YAML)", ".yaml"),
@@ -38,10 +40,10 @@ public abstract class APISpecification {
 		ODATA_V4 ("OData V4", "$metadata"),
 		UNKNOWN ("Unknown", ".txt");
 		
-		String niceName;
-		String fileExtension;
-		String note;
-		String additionalNote;
+		final String niceName;
+		final String fileExtension;
+		final String note;
+		final String additionalNote;
 		
 		public String getNiceName() {
 			return niceName;
@@ -94,7 +96,12 @@ public abstract class APISpecification {
 		if(other == null) return false;
 		if(other instanceof APISpecification) {
 			APISpecification otherSwagger = (APISpecification)other;
-			boolean rc = (Arrays.hashCode(this.apiSpecificationContent)) == Arrays.hashCode(otherSwagger.getApiSpecificationContent()); 
+//			if(other instanceof Swagger2xSpecification){
+//				new OpenAPIParse
+//			}else if(other instanceof OAS3xSpecification){
+//
+//			}
+			boolean rc = (Arrays.hashCode(this.getOriginalApiSpecificationContentSize())) == Arrays.hashCode(otherSwagger.getOriginalApiSpecificationContentSize());
 			if(!rc) {
 				LOG.info("Detected API-Definition-Filesizes: API-Manager: " + this.apiSpecificationContent.length + " vs. Import: " + otherSwagger.getApiSpecificationContent().length);
 			}
@@ -107,11 +114,14 @@ public abstract class APISpecification {
 	public abstract void configureBasePath(String backendBasePath, API api) throws AppException;
 	
 	public abstract String getDescription();
+
+
 	
 	public abstract APISpecType getAPIDefinitionType() throws AppException;
 	
 	public boolean parse(byte[] apiSpecificationContent) throws AppException {
 		this.apiSpecificationContent = apiSpecificationContent;
+		this.originalApiSpecificationContentSize = apiSpecificationContent;
 		return true;
 	}
 	
@@ -146,7 +156,11 @@ public abstract class APISpecification {
 			break;
 		}
 	}
-	
+
+	public byte[] getOriginalApiSpecificationContentSize() {
+		return originalApiSpecificationContentSize;
+	}
+
 	public void filterAPISpecification() {
 	}
 
