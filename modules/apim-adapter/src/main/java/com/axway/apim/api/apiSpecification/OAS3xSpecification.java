@@ -14,9 +14,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 public class OAS3xSpecification extends APISpecification {
 	private final Logger LOG = LoggerFactory.getLogger(OAS3xSpecification.class);
 
@@ -65,16 +62,14 @@ public class OAS3xSpecification extends APISpecification {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		try {
 			if(backendBasePath!=null) {
-				URL url = new URL(backendBasePath); // Parse it to make sure it is valid
-				if(url.getPath()!=null && !url.getPath().equals("") && !backendBasePath.endsWith("/")) { // See issue #178
-					backendBasePath += "/";
-				}
 				if(openAPI.has("servers")) {
 					JsonNode server =  openAPI.get("servers").get(0); // takes the first entity -- currently not handling multiple URLs
 					JsonNode urlJsonNode = server.get("url");
 					if(urlJsonNode != null){
 						String serverUrl = urlJsonNode.asText();
-						backendBasePath = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
+						if(!serverUrl.startsWith("http")) {
+							backendBasePath = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
+						}
 					}
 					((ArrayNode) openAPI.get("servers")).removeAll();
 				}
@@ -84,8 +79,6 @@ public class OAS3xSpecification extends APISpecification {
 				((ObjectNode)openAPI).set("servers", mapper.createArrayNode().add(newServer));
 				this.apiSpecificationContent = this.mapper.writeValueAsBytes(openAPI);
 			}
-		} catch (MalformedURLException e) {
-			throw new AppException("The configured backendBasePath: '"+backendBasePath+"' is invalid.", ErrorCode.BACKEND_BASEPATH_IS_INVALID, e);
 		} catch (Exception e) {
 			LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
 		}

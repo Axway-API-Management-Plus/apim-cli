@@ -40,7 +40,7 @@ public class BackendBasepathChangedTestIT extends TestNGCitrusTestRunner {
 		swaggerImport.doExecute(context);
 		
 		echo("####### No-Change test for '${apiName}' on path: '${apiPath}' #######");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
+		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/serviceprofile/2_backend_basepath_test.json");
 		createVariable("backendBasepath", "https://swapi.co:443");
 		createVariable("state", "unpublished");

@@ -38,8 +38,7 @@
 		}
 	],
 	"schemes": [
-		"https",
-		"http"
+		"https"
 	],
 	"paths": {
 		"/pet": {
