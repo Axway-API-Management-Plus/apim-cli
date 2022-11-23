@@ -24,7 +24,6 @@ public class UnpublishedApiKeyTestIT extends TestNGCitrusTestDesigner {
 		variable("apiPath", "/api-key-test-${apiNumber}");
 		variable("apiName", "API Key Test ${apiNumber}");
 		variable("status", "unpublished");
-		
 
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("apiKeyFieldName", "KeyId");

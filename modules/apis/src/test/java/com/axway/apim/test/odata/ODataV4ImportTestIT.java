@@ -1,13 +1,5 @@
 package com.axway.apim.test.odata;
 
-import java.io.IOException;
-
-import org.springframework.http.HttpStatus;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
@@ -16,9 +8,15 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
+import org.springframework.http.HttpStatus;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 @Test
-public class ODataV2ImportTestIT extends TestNGCitrusTestRunner {
+public class ODataV4ImportTestIT extends TestNGCitrusTestRunner {
 
 	private ImportTestAction importAction;
 	
@@ -30,14 +28,14 @@ public class ODataV2ImportTestIT extends TestNGCitrusTestRunner {
 			description("Import an OData V2 specification that must be converted into an OpenAPI V3 specification.");
 			
 			variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-			variable("apiPath", "/odata-v2-api-${apiNumber}");
-			variable("apiName", "OData-V2-API-${apiNumber}");
-			variable("backendBasepath", "https://services.odata.org/V2/Northwind/Northwind.svc/");
+			variable("apiPath", "/odata-v4-api-${apiNumber}");
+			variable("apiName", "OData-V4-API-${apiNumber}");
+			variable("backendBasepath", "https://services.odata.org/TripPinRESTierService/(S(gnxtchg1e2of2ictemxrcv4r))");
 			
 			variable("state", "unpublished");
 	
 			echo("####### Importing OData V2 API: '${apiName}' on path: '${apiPath}' #######");
-			createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/api/definition/odata/ODataV2NorthWindMetadata.xml");
+			createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/api/definition/odata/ODataV4TrippinServiceMetadata.xml");
 			createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/minimal-config-with-backendBasepath.json");
 			createVariable("expectedReturnCode", "0");
 			importAction.doExecute(context);

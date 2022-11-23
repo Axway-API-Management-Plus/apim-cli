@@ -62,22 +62,7 @@ public class YamlAPITestIT extends TestNGCitrusTestRunner {
 			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 				.validate("$.[?(@.path=='${apiPath}')].id", "${apiId}")); // Must be the same API-ID as before!
-			
-			echo("####### Adjust the backend base-path of API: '${apiName}' to path: '${apiPath}'  #######");
-			createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/yaml-petstore.yaml");
-			createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/serviceprofile/2_backend_basepath_test.json");
-			createVariable("backendBasepath", "https://swapi.co");
-			createVariable("state", "unpublished");
-			createVariable("expectedReturnCode", "0");
-			swaggerImport.doExecute(context);
-			
-			echo("####### Validate API: '${apiName}' on path: '${apiPath}' has the correct backendBasePath configured. #######");
-			http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
-	
-			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-					.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-					.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
-					.validate("$.[?(@.path=='${apiPath}')].serviceProfiles._default.basePath", "${backendBasepath}"));
+
 		} else {
 			echo("####### Importing YAML API: '${apiName}' on path: '${apiPath}' for the first time #######");
 			createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/yaml-petstore.yaml");

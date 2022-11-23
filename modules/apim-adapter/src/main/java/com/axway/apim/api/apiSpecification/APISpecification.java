@@ -102,14 +102,12 @@ public abstract class APISpecification {
                 return compareJSON(otherSwagger, this);
             } else if (other instanceof ODataSpecification) {
                 ODataSpecification importSpec = (ODataSpecification) other;
-                ODataSpecification specFromGateway = (ODataSpecification) this;
-                return importSpec.openAPI.equals(specFromGateway.openAPI);
-            } else if (other instanceof WSDLSpecification || other instanceof WADLSpecification || other instanceof Swagger1xSpecification) {
-                boolean rc = new String(originalApiSpecificationContent, StandardCharsets.UTF_8).contentEquals(new String(otherSwagger.originalApiSpecificationContent, StandardCharsets.UTF_8));
-                if (!rc) {
-                    LOG.info("Detected API-Definition-File sizes: API-Manager: " + this.originalApiSpecificationContent.length + " vs. Import: " + otherSwagger.originalApiSpecificationContent.length);
-                }
-                return rc;
+                OAS3xSpecification specFromGateway = (OAS3xSpecification) this;
+                return compareString(importSpec.getApiSpecificationContent(), specFromGateway.getApiSpecificationContent());
+            } else if (other instanceof Swagger1xSpecification){
+                return compareJSON(otherSwagger, this);
+            }else if (other instanceof WSDLSpecification || other instanceof WADLSpecification) {
+                return compareString(otherSwagger.originalApiSpecificationContent, originalApiSpecificationContent);
             } else {
                 LOG.info("Unhandled specification : {}", other.getClass().getName());
                 return false;
@@ -173,6 +171,16 @@ public abstract class APISpecification {
             return false;
         }
     }
+
+    public boolean compareString(byte[] sourceSpec, byte[] gatewaySpec ){
+        boolean rc = new String(sourceSpec, StandardCharsets.UTF_8).contentEquals(new String(gatewaySpec, StandardCharsets.UTF_8));
+        if (!rc) {
+            LOG.info("Detected API-Definition-File sizes: API-Manager: " + gatewaySpec.length + " vs. Import: " + sourceSpec.length);
+        }
+        return rc;
+    }
+
+
 
     public void filterAPISpecification() {
     }

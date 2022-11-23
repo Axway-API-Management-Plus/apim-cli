@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Optional;
@@ -84,7 +85,7 @@ public class SimpleAPIExportTestIT extends TestNGCitrusTestRunner {
 		String exportedAPIConfigFile = context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/api-config.json";
 		
 		echo("####### Reading exported API-Config file: '"+exportedAPIConfigFile+"' #######");
-		JsonNode exportedAPIConfig = mapper.readTree(new FileInputStream(new File(exportedAPIConfigFile)));
+		JsonNode exportedAPIConfig = mapper.readTree(Files.newInputStream(new File(exportedAPIConfigFile).toPath()));
 		
 		assertEquals(exportedAPIConfig.get("version").asText(), 			"2.0.0");
 		assertEquals(exportedAPIConfig.get("organization").asText(),		"API Development "+context.getVariable("orgNumber"));
