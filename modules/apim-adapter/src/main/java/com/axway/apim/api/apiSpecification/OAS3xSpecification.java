@@ -80,7 +80,7 @@ public class OAS3xSpecification extends APISpecification {
 				this.apiSpecificationContent = this.mapper.writeValueAsBytes(openAPI);
 			}
 		} catch (Exception e) {
-			LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
+			LOG.error("Cannot replace host in provided Open API. Continue with given host.", e);
 		}
 	}
 	
