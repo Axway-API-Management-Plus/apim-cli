@@ -110,7 +110,7 @@ public class SimpleAPIExportTestIT extends TestNGCitrusTestRunner {
 		// Read the export Swagger-File
 		JsonNode exportedAPISpec = mapper.readTree(new FileInputStream(exportedAPISpecFile));
 		// Check the original basePath is set (See issue https://github.com/Axway-API-Management-Plus/apim-cli/issues/158)
-		assertEquals(exportedAPISpec.get("basePath").asText(), 			"/v2/");
+		assertEquals(exportedAPISpec.get("basePath").asText(), 			"/v2");
 		assertEquals(exportedAPISpec.get("host").asText(), 				"petstore.swagger.io");
 		assertEquals(exportedAPISpec.get("schemes").get(0).asText(), 	"https");
 		

@@ -91,6 +91,8 @@ public abstract class APISpecification {
 
     public abstract byte[] getApiSpecificationContent();
 
+    public abstract void updateBasePath(String basePath, String host);
+
     @Override
     public boolean equals(Object other) {
         if (other == null) return false;

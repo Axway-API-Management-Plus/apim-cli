@@ -1,12 +1,10 @@
 package com.axway.apim.api.apiSpecification;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import com.axway.apim.api.API;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -30,6 +28,17 @@ public class Swagger1xSpecification extends APISpecification {
     @Override
     public byte[] getApiSpecificationContent() {
         return this.apiSpecificationContent;
+    }
+
+    @Override
+    public void updateBasePath(String basePath, String host) {
+        try {
+            String url = Utils.handleOpenAPIServerUrl(host, basePath);
+            ((ObjectNode)swagger).put("basePath", url);
+            this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
+        } catch (Exception e) {
+            LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
+        }
     }
 
     @Override

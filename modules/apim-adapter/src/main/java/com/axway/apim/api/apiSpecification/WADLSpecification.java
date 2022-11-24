@@ -27,6 +27,11 @@ public class WADLSpecification extends APISpecification {
 	}
 
 	@Override
+	public void updateBasePath(String basePath, String host) {
+
+	}
+
+	@Override
 	public void configureBasePath(String backendBasePath, API api) throws AppException {
 		if(!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
 		try {

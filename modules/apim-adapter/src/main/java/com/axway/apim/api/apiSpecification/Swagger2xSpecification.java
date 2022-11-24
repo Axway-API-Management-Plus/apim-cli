@@ -44,6 +44,27 @@ public class Swagger2xSpecification extends APISpecification {
     }
 
     @Override
+    public void updateBasePath(String basePath, String host) {
+        try {
+            if (basePath != null) {
+                URL url = new URL(host);
+                String port = url.getPort() == -1 ? ":" + url.getDefaultPort() : ":" + url.getPort();
+                if (port.equals(":443") || port.equals(":80")) port = "";
+                ((ObjectNode) swagger).put("basePath", basePath);
+                ((ObjectNode) swagger).put("host", url.getHost()+port);
+                ArrayNode newSchemes = this.mapper.createArrayNode();
+                newSchemes.add(url.getProtocol());
+                ((ObjectNode) swagger).set("schemes", newSchemes);
+                this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
+            }
+        } catch (JsonProcessingException e) {
+            LOG.error("Cannot replace basePath in swagger.", e);
+        } catch (MalformedURLException e) {
+            LOG.error("Unable to parse URL", e);        }
+
+    }
+
+    @Override
     public void filterAPISpecification() {
         if (this.filterConfig == null) return;
         JsonNodeOpenAPI3SpecFilter.filter(swagger, filterConfig);

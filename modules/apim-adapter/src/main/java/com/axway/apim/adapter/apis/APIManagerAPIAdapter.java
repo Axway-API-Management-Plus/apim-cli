@@ -517,7 +517,7 @@ public class APIManagerAPIAdapter {
                     LOG.info("Successfully downloaded API-Specification with version " + specVersion + " from Frontend-API.");
                 }
                 String res = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-                String origFilename = "Unkown filename";
+                String origFilename = "Unknown filename";
                 if (httpResponse.containsHeader("Content-Disposition")) {
                     origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
                 }
@@ -569,7 +569,8 @@ public class APIManagerAPIAdapter {
             String basePath = jsonNode.get("basePath").asText();
             // Only adjust the API-Specification when exporting the FE-API-Spec otherwise we need the originally imported API-Spec
             if (exportFEAPIDefinition) {
-                apiDefinition.configureBasePath(basePath + resourcePath, null);
+                LOG.debug("Base Path : {}, Resource Path : {}", basePath, resourcePath);
+                apiDefinition.updateBasePath(resourcePath, basePath);
             }
             // In any case, we save the backend resource path, as it is necessary for the full backendBasepath in the exported API config.
             api.setBackendResourcePath(resourcePath);

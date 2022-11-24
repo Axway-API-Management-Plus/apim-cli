@@ -26,6 +26,9 @@ public class BackendBasepathChangeInSwaggerTestIT extends TestNGCitrusTestRunner
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		swaggerImport = new ImportTestAction();
 		description("Import Swagger Spec without any host");
+		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+		variable("apiPath", "/basepath-changed-in-swagger-test-${apiNumber}");
+		variable("apiName", "Basepath changed in Swagger Test ${apiNumber}");
 		echo("####### Try to import an API without having the host configured at all #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore-without-any-host.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/serviceprofile/2_backend_basepath_test.json");
@@ -35,14 +38,6 @@ public class BackendBasepathChangeInSwaggerTestIT extends TestNGCitrusTestRunner
 		createVariable("state", "unpublished");
 		createVariable("expectedReturnCode", "0");
 		swaggerImport.doExecute(context);
-		
-		echo("####### Also for this case, the server-certificates should have been loaded #######");
-		http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
 
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-				.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-				.validate("$.[?(@.path=='${apiPath}')].serviceProfiles._default.basePath", "${backendBasepath}")
-				.validate("$.[?(@.path=='${apiPath}')].caCerts[?(@.md5Fingerprint=='1B:73:FB:B3:57:7B:FC:8A:B4:C1:74:E3:BD:75:9B:93')].name", "@assertThat(containsString(*.swagger.io))@"));
 	}
 }

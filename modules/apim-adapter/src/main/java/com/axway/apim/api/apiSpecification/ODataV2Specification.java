@@ -46,7 +46,11 @@ public class ODataV2Specification extends ODataSpecification {
 		xml,
 		json
 	}
-	
+	@Override
+	public void updateBasePath(String basePath, String host) {
+
+	}
+
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
 		return APISpecType.ODATA_V2;

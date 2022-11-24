@@ -33,7 +33,6 @@ public class APISpecificationSwagger1xTest {
         byte[] content = getSwaggerContent(testPackage + "/swagger12.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
         apiDefinition.configureBasePath("https://petstore.swagger.io", null);
-
         Assert.assertTrue(apiDefinition instanceof Swagger1xSpecification, "Specification must be an Swagger12Specification");
         Assert.assertEquals(apiDefinition.getDescription(), "Swagger 1.2 Description");
         JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -46,7 +45,6 @@ public class APISpecificationSwagger1xTest {
         byte[] content = getSwaggerContent(testPackage + "/swagger11.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
         apiDefinition.configureBasePath("https://petstore.swagger.io:443/myapi/", null);
-
         Assert.assertTrue(apiDefinition instanceof Swagger1xSpecification, "Specification must be an Swagger12Specification");
         JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
         Assert.assertEquals(swagger.get("basePath").asText(), "http://emr-system:8081");

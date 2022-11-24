@@ -24,6 +24,12 @@ public class WSDLSpecification extends APISpecification {
 	}
 
 	@Override
+	public void updateBasePath(String basePath, String host) {
+
+	}
+
+
+	@Override
 	public void configureBasePath(String backendBasePath, API api) throws AppException {
 		// For SOAP services, the WSDL has not been adapted in any case, 
 		// so the necessary service profile is to be created here.

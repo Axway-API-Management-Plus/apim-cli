@@ -36,6 +36,11 @@ public class ODataV4Specification extends ODataSpecification {
     private final Map<FullQualifiedName, EdmAnnotations> entityAnnotations = new HashMap<>();
 
     @Override
+    public void updateBasePath(String basePath, String host) {
+
+    }
+
+    @Override
     public APISpecType getAPIDefinitionType() throws AppException {
         return APISpecType.ODATA_V4;
     }

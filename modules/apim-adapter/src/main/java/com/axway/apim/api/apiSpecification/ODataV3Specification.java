@@ -5,6 +5,12 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class ODataV3Specification extends ODataSpecification {
 
+
+	@Override
+	public void updateBasePath(String basePath, String host) {
+
+	}
+
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
 		return APISpecType.ODATA_V4;

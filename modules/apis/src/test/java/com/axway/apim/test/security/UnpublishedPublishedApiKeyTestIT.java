@@ -10,91 +10,93 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
 
-@Test(testName="UnpublishedPublishedApiKeyTest")
+@Test(testName = "UnpublishedPublishedApiKeyTest")
 public class UnpublishedPublishedApiKeyTestIT extends TestNGCitrusTestDesigner {
-	
-	@Autowired
-	private ImportTestAction swaggerImport;
-	
-	@CitrusTest(name = "UnpublishedPublishedApiKeyTest")
-	public void run() {
-		description("Some checks for the API-Key security device");
-		
-		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
-		variable("apiPath", "/api-key-test-${apiNumber}");
-		variable("apiName", "API Key Test ${apiNumber}");
-		
 
-		echo("####### Importing UNPUBLISHED API: '${apiName}' on path: '${apiPath}' with following settings: #######");
-		createVariable("apiKeyFieldName", "KeyId");
-		createVariable("takeFrom", "HEADER");
-		createVariable("removeCredentialsOnSuccess", "false");
-		createVariable("status", "unpublished");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/1_api-apikey.json");
-		createVariable("expectedReturnCode", "0");
-		action(swaggerImport);
-		
-		echo("####### Validate API: '${apiName}' on path: '${apiPath}' with correct settings #######");
-		http().client("apiManager")
-			.send()
-			.get("/proxies")
-			.name("api")
-			.header("Content-Type", "application/json");
+    @Autowired
+    private ImportTestAction swaggerImport;
 
-		http().client("apiManager")
-			.receive()
-			.response(HttpStatus.OK)
-			.messageType(MessageType.JSON)
-			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].type", "apiKey")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.takeFrom", "${takeFrom}")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.apiKeyFieldName", "${apiKeyFieldName}")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", "${removeCredentialsOnSuccess}")
-			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
-		
-		echo("####### Change the API-Security settings and at the same time set it to PUBLISHED #######");
-		createVariable("apiKeyFieldName", "KeyId-Test");
-		createVariable("takeFrom", "QUERY");
-		createVariable("removeCredentialsOnSuccess", "true");
-		createVariable("status", "published");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/1_api-apikey.json");
-		createVariable("expectedReturnCode", "0");
-		action(swaggerImport);
-		
-		echo("####### Validate the Security-Settings have been changed (without changing the API-ID) #######");
-		http().client("apiManager").send().get("/proxies/${apiId}").name("api").header("Content-Type", "application/json");
+    @CitrusTest(name = "UnpublishedPublishedApiKeyTest")
+    public void run() {
+        description("Some checks for the API-Key security device");
 
-		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.id=='${apiId}')].id", "${apiId}")
-			.validate("$.[?(@.id=='${apiId}')].securityProfiles[0].devices[0].properties.takeFrom", "${takeFrom}")
-			.validate("$.[?(@.id=='${apiId}')].securityProfiles[0].devices[0].properties.apiKeyFieldName", "${apiKeyFieldName}")
-			.validate("$.[?(@.id=='${apiId}')].securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", "${removeCredentialsOnSuccess}")
-			.validate("$.[?(@.id=='${apiId}')].state", "published");
-		
-		echo("####### Change some settings of the PUBLISHED API - Handled with a Re-Publish action #######");
-		createVariable("apiKeyFieldName", "KeyId-Test-Published");
-		createVariable("takeFrom", "HEADER");
-		createVariable("removeCredentialsOnSuccess", "false");
-		createVariable("status", "published");
-		createVariable("enforce", "true");
-		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/security/1_api-apikey.json");
-		createVariable("expectedReturnCode", "0");
-		action(swaggerImport);
-		
-		echo("####### Validate the Security-Settings have been changed (without changing the API-ID) #######");
-		http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
+        variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
+        variable("apiPath", "/api-key-test-${apiNumber}");
+        variable("apiName", "API Key Test ${apiNumber}");
 
-		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
-			.validate("$.[?(@.path=='${apiPath}')].state", "published")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].type", "apiKey")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.takeFrom", "${takeFrom}")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.apiKeyFieldName", "${apiKeyFieldName}")
-			.validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", "${removeCredentialsOnSuccess}");		
-	}
+
+        echo("####### Importing UNPUBLISHED API: '${apiName}' on path: '${apiPath}' with following settings: #######");
+        createVariable("apiKeyFieldName", "KeyId");
+        createVariable("takeFrom", "HEADER");
+        createVariable("removeCredentialsOnSuccess", "false");
+        createVariable("status", "unpublished");
+        createVariable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/security/petstore.json");
+        createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/security/1_api-apikey.json");
+        createVariable("expectedReturnCode", "0");
+        action(swaggerImport);
+
+        echo("####### Validate API: '${apiName}' on path: '${apiPath}' with correct settings #######");
+        http().client("apiManager")
+                .send()
+                .get("/proxies")
+                .name("api")
+                .header("Content-Type", "application/json");
+
+        http().client("apiManager")
+                .receive()
+                .response(HttpStatus.OK)
+                .messageType(MessageType.JSON)
+                .validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+                .validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
+                .validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].type", "apiKey")
+                .validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.takeFrom", "${takeFrom}")
+                .validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.apiKeyFieldName", "${apiKeyFieldName}")
+                .validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", "${removeCredentialsOnSuccess}")
+                .extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+
+        echo("####### Change the API-Security settings and at the same time set it to PUBLISHED #######");
+        createVariable("apiKeyFieldName", "KeyId-Test");
+        createVariable("takeFrom", "QUERY");
+        createVariable("removeCredentialsOnSuccess", "true");
+        createVariable("status", "published");
+        createVariable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/security/petstore.json");
+        createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/security/1_api-apikey.json");
+        createVariable("expectedReturnCode", "0");
+        action(swaggerImport);
+
+        echo("####### Validate the Security-Settings have been changed (without changing the API-ID) #######");
+        http().client("apiManager").send().get("/proxies/${apiId}").name("api").header("Content-Type", "application/json");
+
+        http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+                .validate("$.[?(@.id=='${apiId}')].id", "${apiId}")
+                .validate("$.[?(@.id=='${apiId}')].securityProfiles[0].devices[0].properties.takeFrom", "${takeFrom}")
+                .validate("$.[?(@.id=='${apiId}')].securityProfiles[0].devices[0].properties.apiKeyFieldName", "${apiKeyFieldName}")
+                .validate("$.[?(@.id=='${apiId}')].securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", "${removeCredentialsOnSuccess}")
+                .validate("$.[?(@.id=='${apiId}')].state", "published")
+                .extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
+
+
+        echo("####### Change some settings of the PUBLISHED API - Handled with a Re-Publish action #######");
+        createVariable("apiKeyFieldName", "KeyId-Test-Published");
+        createVariable("takeFrom", "HEADER");
+        createVariable("removeCredentialsOnSuccess", "false");
+        createVariable("status", "published");
+        createVariable("enforce", "true");
+        createVariable(ImportTestAction.API_DEFINITION, "/com/axway/apim/test/files/security/petstore.json");
+        createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/security/1_api-apikey.json");
+        createVariable("expectedReturnCode", "0");
+        action(swaggerImport);
+
+        echo("####### Validate the Security-Settings have been changed (without changing the API-ID) #######");
+        http().client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json");
+
+        http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
+                .validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
+                .validate("$.[?(@.path=='${apiPath}')].state", "published")
+                .validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].type", "apiKey")
+                .validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.takeFrom", "${takeFrom}")
+                .validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.apiKeyFieldName", "${apiKeyFieldName}")
+                .validate("$.[?(@.path=='${apiPath}')].securityProfiles[0].devices[0].properties.removeCredentialsOnSuccess", "${removeCredentialsOnSuccess}");
+    }
 
 }
