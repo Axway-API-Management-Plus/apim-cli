@@ -77,7 +77,7 @@ public abstract class APISpecification {
     protected String apiSpecificationFile = null;
 
     protected byte[] apiSpecificationContent = null;
-    protected byte[] originalApiSpecificationContent;
+   // protected byte[] originalApiSpecificationContent;
 
     protected APISpecificationFilter filterConfig = null;
 
@@ -109,7 +109,8 @@ public abstract class APISpecification {
             } else if (other instanceof Swagger1xSpecification){
                 return compareJSON(otherSwagger, this);
             }else if (other instanceof WSDLSpecification || other instanceof WADLSpecification) {
-                return compareString(otherSwagger.originalApiSpecificationContent, originalApiSpecificationContent);
+               // return compareString(otherSwagger.originalApiSpecificationContent, originalApiSpecificationContent);
+                return compareString(otherSwagger.apiSpecificationContent, apiSpecificationContent);
             } else {
                 LOG.info("Unhandled specification : {}", other.getClass().getName());
                 return false;
@@ -128,7 +129,7 @@ public abstract class APISpecification {
 
     public boolean parse(byte[] apiSpecificationContent) throws AppException {
         this.apiSpecificationContent = apiSpecificationContent;
-        this.originalApiSpecificationContent = apiSpecificationContent;
+        //this.originalApiSpecificationContent = apiSpecificationContent;
         return true;
     }
 
@@ -165,8 +166,10 @@ public abstract class APISpecification {
     }
     public boolean compareJSON(APISpecification apiSpecification, APISpecification gatewayApiSpecification ){
         try {
-            JsonNode swaggerFromImport = apiSpecification.mapper.readTree(apiSpecification.originalApiSpecificationContent);
-            JsonNode swaggerFromGateway = gatewayApiSpecification.mapper.readTree(gatewayApiSpecification.originalApiSpecificationContent);
+          //  JsonNode swaggerFromImport = apiSpecification.mapper.readTree(apiSpecification.originalApiSpecificationContent);
+            //JsonNode swaggerFromGateway = gatewayApiSpecification.mapper.readTree(gatewayApiSpecification.originalApiSpecificationContent);
+            JsonNode swaggerFromImport = apiSpecification.mapper.readTree(apiSpecification.apiSpecificationContent);
+            JsonNode swaggerFromGateway = gatewayApiSpecification.mapper.readTree(gatewayApiSpecification.apiSpecificationContent);
             return swaggerFromImport.equals(swaggerFromGateway);
         } catch (IOException e) {
             LOG.error("Error in parsing swagger", e);
