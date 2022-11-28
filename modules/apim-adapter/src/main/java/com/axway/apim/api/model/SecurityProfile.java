@@ -42,7 +42,11 @@ public class SecurityProfile {
 
     @Override
     public String toString() {
-        return "SecurityProfile [" + devices + "]";
+        return "SecurityProfile{" +
+                "name='" + name + '\'' +
+                ", isDefault=" + isDefault +
+                ", devices=" + devices +
+                '}';
     }
 
     @Override

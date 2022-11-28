@@ -122,7 +122,13 @@ public class SecurityDevice {
 
     @Override
     public String toString() {
-        return "SecurityDevice [type=" + type + "]";
+        return "SecurityDevice{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                ", order=" + order +
+                ", properties=" + properties +
+                ", convertPolicies=" + convertPolicies +
+                '}';
     }
 
     public Map<String, String> getProperties() throws AppException {
