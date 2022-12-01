@@ -26,8 +26,7 @@ public class RelaxedParser extends DefaultParser {
         		// should have an argument 
         		if(!option.hasArg()) {
         			// If not continue to the next argument
-        			continue;
-        		} else {
+				} else {
         			// If yes, grab the argument value and transfer it
         			String value = arguments[i];
         			knownArguments.add(value);
@@ -35,6 +34,6 @@ public class RelaxedParser extends DefaultParser {
         		}
         	}
         }
-        return super.parse(options, knownArguments.toArray(new String[knownArguments.size()]));
+        return super.parse(options, knownArguments.toArray(new String[0]));
     }
 }

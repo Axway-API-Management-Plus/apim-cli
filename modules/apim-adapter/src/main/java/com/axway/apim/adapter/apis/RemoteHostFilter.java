@@ -1,14 +1,11 @@
 package com.axway.apim.adapter.apis;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.RemoteHost;
-import com.axway.apim.lib.errorHandling.AppException;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RemoteHostFilter {
 
@@ -17,13 +14,10 @@ public class RemoteHostFilter {
 	private String name;
 	private Integer port;
 	private Organization organization;
-
 	private RemoteHostFilter() { }
-	
 	public String getAlias() {
 		return alias;
 	}
-
 	public void setAlias(String alias) {
 		this.alias = alias;
 	}
@@ -67,7 +61,7 @@ public class RemoteHostFilter {
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (this == obj) return true;
-		if(obj instanceof RemoteHostFilter == false) return false;
+		if(!(obj instanceof RemoteHostFilter)) return false;
 		RemoteHostFilter other = (RemoteHostFilter)obj;
 		return (
 				StringUtils.equals(other.getId(), this.getId()) && 
@@ -111,7 +105,7 @@ public class RemoteHostFilter {
 		if(this.getAlias()!=null) {
 			Pattern pattern = Pattern.compile(this.getAlias().replace("*", ".*"));
 			Matcher matcher = pattern.matcher(remoteHost.getAlias());
-			if(!matcher.matches()) return true;
+			return !matcher.matches();
 		}
 		return false;
 	}
@@ -157,12 +151,5 @@ public class RemoteHostFilter {
 			this.port = port;
 			return this;
 		}
-		
-		public Builder hasOrganization(String organizationName) throws AppException {
-			Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(organizationName);
-			this.organization = org;
-			return this;
-		}
 	}
-
 }

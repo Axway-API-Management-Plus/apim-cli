@@ -1,8 +1,16 @@
 package com.axway.apim.lib;
 
-import java.io.FileInputStream;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.APIMHttpClient;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
@@ -10,23 +18,16 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.rest.APIMHttpClient;
-
 public class EnvironmentProperties implements Map<String, String> {
 	
-	private static Logger LOG = LoggerFactory.getLogger(EnvironmentProperties.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EnvironmentProperties.class);
 	
-	private String stage;
+	private final String stage;
 	private String swaggerPromoteHome;
 	
 	private Properties mainProperties = new Properties();
 	private Properties stageProperties = new Properties();
-	private Properties systemProperties = System.getProperties();
+	private final Properties systemProperties = System.getProperties();
 
 	public EnvironmentProperties(String stage) throws AppException {
 		this(stage, null);
@@ -65,12 +66,12 @@ public class EnvironmentProperties implements Map<String, String> {
 		try {
 			if(swaggerPromoteHome!=null) {
 				pathToUse = (stage==null) ? swaggerPromoteHome + "/env.properties" : swaggerPromoteHome + "/env."+stage+".properties";
-				is = new FileInputStream(pathToUse);
+				is = Files.newInputStream(Paths.get(pathToUse));
 			} else {
 				pathToUse = (stage==null) ? "env.properties" : "env."+stage+".properties";
 				is = APIMHttpClient.class.getClassLoader().getResourceAsStream(pathToUse);
 			}
-			props.load(new StringReader(IOUtils.toString(is, "UTF-8").replace("\\", "\\\\")));
+			props.load(new StringReader(IOUtils.toString(is, StandardCharsets.UTF_8).replace("\\", "\\\\")));
 			LOG.debug("Loaded environment properties from file: " + pathToUse);
 		} catch (Exception e) {
 			LOG.debug("Trying to load environment properties from file: "+pathToUse+" ... not found.");

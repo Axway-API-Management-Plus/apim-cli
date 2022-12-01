@@ -6,7 +6,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 
 public class StandardImportCLIOptions extends CLIOptions {
 	
-	private CLIOptions cliOptions;
+	private final CLIOptions cliOptions;
 
 	public StandardImportCLIOptions(CLIOptions cliOptions) {
 		this.cliOptions = cliOptions;
@@ -18,7 +18,7 @@ public class StandardImportCLIOptions extends CLIOptions {
 
 		params.setEnabledCaches(getValue("enabledCaches"));
 		params.setStageConfig(getValue("stageConfig"));
-		return (Parameters) params;
+		return params;
 	}
 	
 	@Override

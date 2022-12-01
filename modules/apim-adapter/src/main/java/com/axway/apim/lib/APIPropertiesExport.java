@@ -1,15 +1,15 @@
 package com.axway.apim.lib;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.Properties;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.util.Properties;
+
 public class APIPropertiesExport {
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIPropertiesExport.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIPropertiesExport.class);
 	
 	Properties properties = new Properties();
 	
@@ -32,10 +32,6 @@ public class APIPropertiesExport {
 		properties.setProperty(key, value);
 	}
 
-	public void setPropertyComment(String propertyComment) {
-		this.propertyComment = propertyComment;
-	}
-	
 	public void store() {
 		if(properties.isEmpty()) return;
 		String exportFile = CoreParameters.getInstance().getDetailsExportFile();
@@ -47,7 +43,7 @@ public class APIPropertiesExport {
 				String baseDir = new File(configFile).getCanonicalFile().getParent();
 				file = new File(baseDir + File.separator + exportFile);
 			}
-			properties.store(new FileOutputStream(file), this.propertyComment);
+			properties.store(Files.newOutputStream(file.toPath()), this.propertyComment);
 			LOG.info("Created API-Properties file: '"+file+"'");
 		} catch (Exception e) {
 			LOG.error("Cant create API-Properties file based on filename: '"+exportFile+"'", e);

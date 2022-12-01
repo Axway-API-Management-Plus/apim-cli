@@ -26,13 +26,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class APIManagerOAuthClientProfilesAdapter {
 	
-	private static String CACHE_KEY = "OAUTH_CLIENT_CACHE_KEY";
+	private static final String CACHE_KEY = "OAUTH_CLIENT_CACHE_KEY";
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIManagerOAuthClientProfilesAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIManagerOAuthClientProfilesAdapter.class);
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
-	private CoreParameters cmd;
+	private final CoreParameters cmd;
 	
 	Cache<String, String> oauthClientCache = APIManagerAdapter.getCache(CacheType.oauthClientProviderCache, String.class, String.class);
 

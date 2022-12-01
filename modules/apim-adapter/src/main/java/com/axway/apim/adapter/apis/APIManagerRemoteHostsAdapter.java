@@ -112,10 +112,10 @@ public class APIManagerRemoteHostsAdapter {
             FilterProvider filter;
             if (actualRemoteHost == null) {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/remotehosts").build();
-                filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[]{"createdBy", "organization"}));
+                filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("createdBy", "organization"));
             } else {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/remotehosts/" + actualRemoteHost.getId()).build();
-                filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[]{"organization"}));
+                filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("organization"));
             }
             mapper.setFilterProvider(filter);
             mapper.registerModule(new SimpleModule().setSerializerModifier(new OrganizationSerializerModifier(false)));

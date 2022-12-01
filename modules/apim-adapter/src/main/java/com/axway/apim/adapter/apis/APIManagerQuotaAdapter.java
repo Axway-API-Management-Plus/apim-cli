@@ -40,7 +40,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class APIManagerQuotaAdapter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIManagerQuotaAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIManagerQuotaAdapter.class);
 	
 	public enum Quota {
 		SYSTEM_DEFAULT ("00000000-0000-0000-0000-000000000000", "System default"), 
@@ -49,7 +49,7 @@ public class APIManagerQuotaAdapter {
 		private final String quotaId;
 		private final String fiendlyName;
 		
-		private Quota(String quotaId, String fiendlyName) {
+		Quota(String quotaId, String fiendlyName) {
 			this.quotaId = quotaId;
 			this.fiendlyName = fiendlyName;
 		}
@@ -66,7 +66,7 @@ public class APIManagerQuotaAdapter {
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
-	private CoreParameters cmd;
+	private final CoreParameters cmd;
 
 	public APIManagerQuotaAdapter() {
 		cmd = CoreParameters.getInstance();
@@ -140,14 +140,14 @@ public class APIManagerQuotaAdapter {
 		return quotaConfig;
 	}
 	
-	public APIQuota saveQuota(APIQuota quotaConfig, String quotaId) throws AppException {
-		if(!APIManagerAdapter.hasAdminAccount()) return null;
+	public void saveQuota(APIQuota quotaConfig, String quotaId) throws AppException {
+		if(!APIManagerAdapter.hasAdminAccount()) return;
 		URI uri;
 		HttpEntity entity;
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/quotas/"+quotaId).build();
-			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"}));
+			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"));
 			mapper.setFilterProvider(filter);
 			entity = new StringEntity(mapper.writeValueAsString(quotaConfig), ContentType.APPLICATION_JSON);
 			
@@ -174,7 +174,7 @@ public class APIManagerQuotaAdapter {
 			}
 			// Force reload of this quota next time
 			applicationsQuotaCache.remove(quotaId);
-			return mapper.readValue(response, APIQuota.class);
+			mapper.readValue(response, APIQuota.class);
 		} catch (Exception e) {
 			throw new AppException("Can't update Quota-Configuration in API-Manager.", ErrorCode.UNXPECTED_ERROR, e);
 		} finally {

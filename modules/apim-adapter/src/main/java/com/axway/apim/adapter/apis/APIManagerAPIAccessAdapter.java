@@ -42,21 +42,19 @@ public class APIManagerAPIAccessAdapter {
 	public enum Type {
 		organizations("Organization"), 
 		applications("Application");
-		
-		String niceName;
-
+		final String niceName;
 		Type(String niceName) {
 			this.niceName = niceName;
 		}
 	}
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIManagerAPIAccessAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIManagerAPIAccessAdapter.class);
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
-	private CoreParameters cmd;
+	private final CoreParameters cmd;
 	
-	private Map<Type, Cache<String, String>> caches = new HashMap<>();
+	private final Map<Type, Cache<String, String>> caches = new HashMap<>();
 
 	public APIManagerAPIAccessAdapter() {
 		cmd = CoreParameters.getInstance();
@@ -159,7 +157,7 @@ public class APIManagerAPIAccessAdapter {
 		}
 	}
 	
-	public List<APIAccess> saveAPIAccess(List<APIAccess> apiAccess, AbstractEntity entity, Type type) throws AppException {
+	public void saveAPIAccess(List<APIAccess> apiAccess, AbstractEntity entity, Type type) throws AppException {
 		List<APIAccess> existingAPIAccess = getAPIAccess(entity, type);
 		
 		List<APIAccess> toBeRemovedAccesses = getMissingAPIAccesses(existingAPIAccess, apiAccess);
@@ -171,14 +169,13 @@ public class APIManagerAPIAccessAdapter {
 		for(APIAccess access : toBeAddedAccesses) {
 			createAPIAccess(access, entity, type);
 		}
-		return apiAccess;
 	}
 	
-	public APIAccess createAPIAccess(APIAccess apiAccess, AbstractEntity parentEntity, Type type) throws AppException {
+	public void createAPIAccess(APIAccess apiAccess, AbstractEntity parentEntity, Type type) throws AppException {
 		List<APIAccess> existingAPIAccess = getAPIAccess(parentEntity, type);
 		if(existingAPIAccess!=null && existingAPIAccess.contains(apiAccess)) {
 			apiAccess.setId(existingAPIAccess.get(0).getId());
-			return apiAccess;
+			return;
 		}
 		URI uri;
 		HttpResponse httpResponse = null;
@@ -186,7 +183,7 @@ public class APIManagerAPIAccessAdapter {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/"+type+"/"+parentEntity.getId()+"/apis").build();
 			mapper.setSerializationInclusion(Include.NON_NULL);
 			FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-					SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiName", "apiVersion"}));
+					SimpleBeanPropertyFilter.serializeAllExcept("apiName", "apiVersion"));
 			mapper.setFilterProvider(filter);
 			String json = mapper.writeValueAsString(apiAccess);
 			HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
@@ -209,16 +206,14 @@ public class APIManagerAPIAccessAdapter {
 					}
 				} else if(statusCode==409 && response.contains("resource already exists")) {
 					LOG.info("Unexpected response while creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'. Ignoring this error.");
-					return apiAccess;
+					return;
 				} else {
 					LOG.error("Error creating/updating API Access: "+apiAccess+". Response-Code: "+statusCode+". Got response: '"+response+"'");
 					throw new AppException("Error creating/updating API Access. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
 			}
-			apiAccess =  mapper.readValue(response, APIAccess.class);
 			// Clean cache for this ID (App/Org) to force reload next time
 			removeFromCache(parentEntity.getId(), type);
-			return apiAccess;
 		} catch (Exception e) {
 			throw new AppException("Error creating/updating API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
 		} finally {

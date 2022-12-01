@@ -25,7 +25,7 @@ public class OrgFilter implements CustomPropertiesFilter {
 	
 	private List<String> customProperties;
 
-	private List<NameValuePair> filters = new ArrayList<NameValuePair>();
+	private final List<NameValuePair> filters = new ArrayList<>();
 
 	private OrgFilter() { }
 
@@ -122,10 +122,6 @@ public class OrgFilter implements CustomPropertiesFilter {
 	public boolean isIncludeAPIAccess() {
 		return includeAPIAccess;
 	}
-	
-	public void setIncludeAPIAccess(boolean includeAPIAccess) {
-		this.includeAPIAccess = includeAPIAccess;
-	}
 
 	public List<String> getCustomProperties() {
 		return customProperties;
@@ -139,7 +135,7 @@ public class OrgFilter implements CustomPropertiesFilter {
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (this == obj) return true;
-		if(obj instanceof OrgFilter == false) return false;
+		if(!(obj instanceof OrgFilter)) return false;
 		OrgFilter other = (OrgFilter)obj;
 		return (
 				StringUtils.equals(other.getId(), this.getId()) && 
@@ -163,10 +159,7 @@ public class OrgFilter implements CustomPropertiesFilter {
 	}
 	
 	public boolean filter(Organization org) {
-		if(this.development!=null && Boolean.parseBoolean(this.development)!=org.isDevelopment()) { 
-			return true;
-		}
-		return false;
+		return this.development != null && Boolean.parseBoolean(this.development) != org.isDevelopment();
 	}
 
 
@@ -188,8 +181,6 @@ public class OrgFilter implements CustomPropertiesFilter {
 		boolean includeAPIAccess;
 		
 		private List<String> customProperties;
-
-		List<NameValuePair> filters = new ArrayList<NameValuePair>();
 
 		public Builder() {
 			super();
@@ -216,28 +207,13 @@ public class OrgFilter implements CustomPropertiesFilter {
 			return this;
 		}
 
-		public Builder hasApiId(String apiId) {
-			this.apiId = apiId;
-			return this;
-		}
-
 		public Builder hasDescription(String description) {
 			this.description = description;
 			return this;
 		}
 
-		public Builder hasEmail(String email) {
-			this.email = email;
-			return this;
-		}
-
 		public Builder hasName(String name) {
 			this.name = name;
-			return this;
-		}
-
-		public Builder hasPhone(String phone) {
-			this.phone = phone;
 			return this;
 		}
 

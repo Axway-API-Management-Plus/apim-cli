@@ -9,7 +9,7 @@ import com.axway.apim.adapter.APIManagerAdapter.CacheType;
 
 public class StandardImportParams extends CoreParameters {
 	
-	private static Logger LOG = LoggerFactory.getLogger(StandardImportParams.class);
+	private static final Logger LOG = LoggerFactory.getLogger(StandardImportParams.class);
 	
 	private String config;
 	
@@ -42,11 +42,7 @@ public class StandardImportParams extends CoreParameters {
 	@Override
 	public boolean isIgnoreCache() {
 		// Caches are disabled for import actions if not explicitly enabled
-		if(getEnabledCaches()==null || super.isIgnoreCache()) {
-			return true;
-		} else {
-			return false;
-		}
+		return getEnabledCaches() == null || super.isIgnoreCache();
 	}
 	
 	public String getEnabledCaches() {
