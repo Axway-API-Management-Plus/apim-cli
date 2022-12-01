@@ -33,10 +33,10 @@ public class JsonAPIExporter extends APIResultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(JsonAPIExporter.class);
 
 	/** Where to store the exported API-Definition */
-	private String givenExportFolder;
-	private boolean exportMethods;
+	private final String givenExportFolder;
+	private final boolean exportMethods;
 	
-	public JsonAPIExporter(APIExportParams params) throws AppException {
+	public JsonAPIExporter(APIExportParams params) {
 		super(params);
 		this.givenExportFolder = params.getTarget();
 		this.exportMethods = params.isExportMethods();
@@ -96,10 +96,10 @@ public class JsonAPIExporter extends APIResultHandler {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filters = new SimpleFilterProvider()
 				.addFilter("CaCertFilter",
-						SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"inbound", "outbound", "certFile" }))
+						SimpleBeanPropertyFilter.filterOutAllExcept("inbound", "outbound", "certFile"))
 				.addFilter("ProfileFilter",
-						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiMethodId" }))
-				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {}));
+						SimpleBeanPropertyFilter.serializeAllExcept("apiMethodId"))
+				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept());
 		mapper.setFilterProvider(filters);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);

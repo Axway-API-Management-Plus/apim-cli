@@ -17,12 +17,12 @@ import java.io.IOException;
 import java.util.List;
 
 public class DATAPIExporter extends APIResultHandler {
-	private static Logger LOG = LoggerFactory.getLogger(DATAPIExporter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DATAPIExporter.class);
 
 	/** Where to store the exported API-Definition */
-	private String givenExportFolder;
+	private final String givenExportFolder;
 	
-	private String datPassword;
+	private final String datPassword;
 
 	APIManagerAdapter apiManager = APIManagerAdapter.getInstance();
 	

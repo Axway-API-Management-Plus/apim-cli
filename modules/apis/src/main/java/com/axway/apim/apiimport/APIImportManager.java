@@ -15,9 +15,9 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class APIImportManager {
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIImportManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIImportManager.class);
 	
-	private boolean enforceBreakingChange = CoreParameters.getInstance().isForce();
+	private final boolean enforceBreakingChange = CoreParameters.getInstance().isForce();
 	
 	/**
 	 * This method is taking in the APIChangeState to decide about the strategy how to 

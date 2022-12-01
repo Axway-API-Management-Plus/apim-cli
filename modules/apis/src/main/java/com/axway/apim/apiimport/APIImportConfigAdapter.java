@@ -7,12 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
+import java.util.*;
 
 import com.axway.apim.api.model.*;
 import org.apache.commons.io.IOUtils;
@@ -55,20 +50,20 @@ public class APIImportConfigAdapter {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapter.class);
 	
-	private ObjectMapper mapper = new ObjectMapper();
+	private final ObjectMapper mapper = new ObjectMapper();
 	
 
 	/** This is the given path to WSDL or Swagger. It is either set using -a parameter or as part of the config file */
 	private String pathToAPIDefinition;
 	
 	/** The API-Config-File given by the user with -c parameter */
-	private File apiConfigFile;
+	private final File apiConfigFile;
 	
 	/** The APIConfig instance created by the APIConfigImporter */
 	private API apiConfig;
 	
 	/** If true, an OrgAdminUser is used to start the tool */
-	private boolean usingOrgAdmin;
+	private final boolean usingOrgAdmin;
 
 
 	public APIImportConfigAdapter(APIImportParams params) throws AppException {
@@ -99,13 +94,13 @@ public class APIImportConfigAdapter {
 			this.apiConfigFile = Utils.locateConfigFile(apiConfigFileName);
 			File stageConfigFile = Utils.getStageConfig(stage, stageConfig, this.apiConfigFile);
 			// Validate organization for the base config, if no staged-config is given
-			boolean validateOrganization = (stageConfigFile==null) ? true : false;
+			boolean validateOrganization = stageConfigFile == null;
 			ObjectReader reader = mapper.reader();
 			baseConfig = reader.withAttribute("validateOrganization", validateOrganization).forType(DesiredAPI.class).readValue(Utils.substituteVariables(this.apiConfigFile));
 			if(stageConfigFile!=null) {
 				try {
 					// If the baseConfig doesn't have a valid organization, the stage config must
-					validateOrganization = (baseConfig.getOrganization()==null) ? true : false;
+					validateOrganization = baseConfig.getOrganization() == null;
 					ObjectReader updater = mapper.readerForUpdating(baseConfig).withAttribute("validateOrganization", validateOrganization);
 					// Organization must be valid in staged configuration
 					apiConfig = updater.withAttribute("validateOrganization", true).readValue(Utils.substituteVariables(stageConfigFile));
@@ -258,7 +253,7 @@ public class APIImportConfigAdapter {
 	}
 	
 	private void addQuotaConfiguration(API apiConfig) throws AppException {
-		if(apiConfig.getState()==API.STATE_UNPUBLISHED) return;
+		if(Objects.equals(apiConfig.getState(), API.STATE_UNPUBLISHED)) return;
 		initQuota(apiConfig.getSystemQuota());
 		initQuota(apiConfig.getApplicationQuota());
 	}
@@ -277,56 +272,61 @@ public class APIImportConfigAdapter {
 	private void validateDescription(API apiConfig) throws AppException {
 		if(apiConfig.getDescriptionType()==null || apiConfig.getDescriptionType().equals("original")) return;
 		String descriptionType = apiConfig.getDescriptionType();
-		if(descriptionType.equals("manual")) {
-			if(apiConfig.getDescriptionManual()==null) {
-				throw new AppException("descriptionManual can't be null with descriptionType set to 'manual'", ErrorCode.CANT_READ_CONFIG_FILE);
-			}
-		} else if(descriptionType.equals("url")) {
-			if(apiConfig.getDescriptionUrl()==null) {
-				throw new AppException("descriptionUrl can't be null with descriptionType set to 'url'", ErrorCode.CANT_READ_CONFIG_FILE);
-			}
-		} else if(descriptionType.equals("markdown")) {
-			if(apiConfig.getDescriptionMarkdown()==null) {
-				throw new AppException("descriptionMarkdown can't be null with descriptionType set to 'markdown'", ErrorCode.CANT_READ_CONFIG_FILE);
-			}
-			if(!apiConfig.getDescriptionMarkdown().startsWith("${env.")) {
-				throw new AppException("descriptionMarkdown must start with an environment variable", ErrorCode.CANT_READ_CONFIG_FILE);
-			}
-		} else if(descriptionType.equals("markdownLocal")) {
-			if(apiConfig.getMarkdownLocal()==null) {
-				throw new AppException("markdownLocal can't be null with descriptionType set to 'markdownLocal'", ErrorCode.CANT_READ_CONFIG_FILE);
-			}
-			try {
-				String markdownDescription = "";
-				String newLine = "";
-				for(String markdownFilename : apiConfig.getMarkdownLocal()) {
-					if("ORIGINAL".equals(markdownFilename)) {
-						markdownDescription += newLine + apiConfig.getApiDefinition().getDescription();
-					} else {
-						File markdownFile = new File(markdownFilename);
-						if(!markdownFile.exists()) { // The file isn't provided with an absolute path, try to read it relative to the config file
-							LOG.trace("Error reading markdown description file (absolute): '" + markdownFile.getCanonicalPath() + "'");
-							String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
-							markdownFile = new File(baseDir + "/" + markdownFilename);
-						}
-						if(!markdownFile.exists()) {
-							LOG.trace("Error reading markdown description file (relative): '" + markdownFile.getCanonicalPath() + "'");
-							throw new AppException("Error reading markdown description file: " + markdownFilename, ErrorCode.CANT_READ_CONFIG_FILE);
-						}
-						LOG.debug("Reading local markdown description file: " + markdownFile.getPath());
-						markdownDescription += newLine + new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8);
-					}
-					newLine = "\n";
+		switch (descriptionType) {
+			case "manual":
+				if (apiConfig.getDescriptionManual() == null) {
+					throw new AppException("descriptionManual can't be null with descriptionType set to 'manual'", ErrorCode.CANT_READ_CONFIG_FILE);
 				}
-				apiConfig.setDescriptionManual(markdownDescription);
-				apiConfig.setDescriptionType("manual");
-			} catch (IOException e) {
-				throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE, e);
-			}
-		} else if(descriptionType.equals("original")) {
-			return;
-		} else {
-			throw new AppException("Unknown descriptionType: '"+descriptionType+"'", ErrorCode.CANT_READ_CONFIG_FILE);
+				break;
+			case "url":
+				if (apiConfig.getDescriptionUrl() == null) {
+					throw new AppException("descriptionUrl can't be null with descriptionType set to 'url'", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+				break;
+			case "markdown":
+				if (apiConfig.getDescriptionMarkdown() == null) {
+					throw new AppException("descriptionMarkdown can't be null with descriptionType set to 'markdown'", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+				if (!apiConfig.getDescriptionMarkdown().startsWith("${env.")) {
+					throw new AppException("descriptionMarkdown must start with an environment variable", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+				break;
+			case "markdownLocal":
+				if (apiConfig.getMarkdownLocal() == null) {
+					throw new AppException("markdownLocal can't be null with descriptionType set to 'markdownLocal'", ErrorCode.CANT_READ_CONFIG_FILE);
+				}
+				try {
+					StringBuilder markdownDescription = new StringBuilder();
+					String newLine = "";
+					for (String markdownFilename : apiConfig.getMarkdownLocal()) {
+						if ("ORIGINAL".equals(markdownFilename)) {
+							markdownDescription.append(newLine).append(apiConfig.getApiDefinition().getDescription());
+						} else {
+							File markdownFile = new File(markdownFilename);
+							if (!markdownFile.exists()) { // The file isn't provided with an absolute path, try to read it relative to the config file
+								LOG.trace("Error reading markdown description file (absolute): '" + markdownFile.getCanonicalPath() + "'");
+								String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
+								markdownFile = new File(baseDir + "/" + markdownFilename);
+							}
+							if (!markdownFile.exists()) {
+								LOG.trace("Error reading markdown description file (relative): '" + markdownFile.getCanonicalPath() + "'");
+								throw new AppException("Error reading markdown description file: " + markdownFilename, ErrorCode.CANT_READ_CONFIG_FILE);
+							}
+							LOG.debug("Reading local markdown description file: " + markdownFile.getPath());
+							markdownDescription.append(newLine).append(new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8));
+						}
+						newLine = "\n";
+					}
+					apiConfig.setDescriptionManual(markdownDescription.toString());
+					apiConfig.setDescriptionType("manual");
+				} catch (IOException e) {
+					throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE, e);
+				}
+				break;
+			case "original":
+				return;
+			default:
+				throw new AppException("Unknown descriptionType: '" + descriptionType + "'", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 	}
 
@@ -338,25 +338,29 @@ public class APIImportConfigAdapter {
 			if(descriptionType == null ){
 				throw new AppException("apiMethods descriptionType can't be null set default value as 'original'", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
-			if(descriptionType.equals("original"))
-				return;
-			else if(descriptionType.equals("manual")) {
-				if(apiMethod.getDescriptionManual()==null) {
-					throw new AppException("apiMethods descriptionManual can't be null with descriptionType set to 'manual'", ErrorCode.CANT_READ_CONFIG_FILE);
-				}
-			} else if(descriptionType.equals("url")) {
-				if(apiMethod.getDescriptionUrl()==null) {
-					throw new AppException("apiMethods descriptionUrl can't be null with descriptionType set to 'url'", ErrorCode.CANT_READ_CONFIG_FILE);
-				}
-			} else if(descriptionType.equals("markdown")) {
-				if (apiMethod.getDescriptionMarkdown() == null) {
-					throw new AppException("apiMethods descriptionMarkdown can't be null with descriptionType set to 'markdown'", ErrorCode.CANT_READ_CONFIG_FILE);
-				}
-				if (!apiMethod.getDescriptionMarkdown().startsWith("${env.")) {
-					throw new AppException("apiMethods descriptionMarkdown must start with an environment variable", ErrorCode.CANT_READ_CONFIG_FILE);
-				}
-			}else {
-				throw new AppException("apiMethods Unknown descriptionType: '"+descriptionType+"'", ErrorCode.CANT_READ_CONFIG_FILE);
+			switch (descriptionType) {
+				case "original":
+					return;
+				case "manual":
+					if (apiMethod.getDescriptionManual() == null) {
+						throw new AppException("apiMethods descriptionManual can't be null with descriptionType set to 'manual'", ErrorCode.CANT_READ_CONFIG_FILE);
+					}
+					break;
+				case "url":
+					if (apiMethod.getDescriptionUrl() == null) {
+						throw new AppException("apiMethods descriptionUrl can't be null with descriptionType set to 'url'", ErrorCode.CANT_READ_CONFIG_FILE);
+					}
+					break;
+				case "markdown":
+					if (apiMethod.getDescriptionMarkdown() == null) {
+						throw new AppException("apiMethods descriptionMarkdown can't be null with descriptionType set to 'markdown'", ErrorCode.CANT_READ_CONFIG_FILE);
+					}
+					if (!apiMethod.getDescriptionMarkdown().startsWith("${env.")) {
+						throw new AppException("apiMethods descriptionMarkdown must start with an environment variable", ErrorCode.CANT_READ_CONFIG_FILE);
+					}
+					break;
+				default:
+					throw new AppException("apiMethods Unknown descriptionType: '" + descriptionType + "'", ErrorCode.CANT_READ_CONFIG_FILE);
 			}
 		}
 	}
@@ -387,12 +391,10 @@ public class APIImportConfigAdapter {
 	 * Or, if the APP doesn't exists remove it from the list and log a warning message.
 	 * Additionally, for each application it's checked, that the organization has access 
 	 * to this API, otherwise it will be removed from the list as well and a warning message is logged.
-	 * @param apiConfig
-	 * @throws AppException
 	 */
 	private void completeClientApplications(API apiConfig) throws AppException {
 		if(CoreParameters.getInstance().isIgnoreClientApps()) return;
-		if(apiConfig.getState()==API.STATE_UNPUBLISHED) return;
+		if(Objects.equals(apiConfig.getState(), API.STATE_UNPUBLISHED)) return;
 		ClientApplication loadedApp = null;
 		ClientApplication app;
 		if(apiConfig.getApplications()!=null) {
@@ -514,12 +516,12 @@ public class APIImportConfigAdapter {
 		return is;
 	}
 	
-	private API validateInboundProfile(API importApi) throws AppException {
+	private void validateInboundProfile(API importApi) throws AppException {
 		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) {
 			Map<String, InboundProfile> def = new HashMap<>();
 			def.put("_default", InboundProfile.getDefaultInboundProfile());
 			importApi.setInboundProfiles(def);
-			return importApi;
+			return;
 		}
 		Iterator<String> it = importApi.getInboundProfiles().keySet().iterator();
 		// Check if a default inbound profile is given
@@ -548,10 +550,9 @@ public class APIImportConfigAdapter {
 			defaultProfile.setMonitorSubject("authentication.subject.id");
 			importApi.getInboundProfiles().put("_default", defaultProfile);
 		}
-		return importApi;
 	}
 	
-	private API addDefaultPassthroughSecurityProfile(API importApi) throws AppException {
+	private void addDefaultPassthroughSecurityProfile(API importApi) throws AppException {
 		boolean hasDefaultProfile = false;
 		if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<>());
 		List<SecurityProfile> profiles = importApi.getSecurityProfiles();
@@ -580,11 +581,10 @@ public class APIImportConfigAdapter {
 			
 			profiles.add(passthroughProfile);
 		}
-		return importApi;
 	}
 	
-	private API addDefaultAuthenticationProfile(API importApi) throws AppException {
-		if(importApi.getAuthenticationProfiles()==null) return importApi; // Nothing to add (no default is needed, as we don't send any Authn-Profile)
+	private void addDefaultAuthenticationProfile(API importApi) throws AppException {
+		if(importApi.getAuthenticationProfiles()==null) return; // Nothing to add (no default is needed, as we don't send any Authn-Profile)
 		boolean hasDefaultProfile = false;
 		List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
 		for(AuthenticationProfile profile : profiles) {
@@ -606,11 +606,10 @@ public class APIImportConfigAdapter {
 			noAuthNProfile.setType(AuthType.none);
 			profiles.add(noAuthNProfile);
 		}
-		return importApi;
 	}
 	
-	private API validateOutboundProfile(API importApi) throws AppException {
-		if(importApi.getOutboundProfiles()==null || importApi.getOutboundProfiles().size()==0) return importApi;
+	private void validateOutboundProfile(API importApi) throws AppException {
+		if(importApi.getOutboundProfiles()==null || importApi.getOutboundProfiles().size()==0) return;
 		Iterator<String> it = importApi.getOutboundProfiles().keySet().iterator();
 		boolean defaultProfileFound = false;
 		while(it.hasNext()) {
@@ -642,7 +641,6 @@ public class APIImportConfigAdapter {
 			defaultProfile.setRouteType("proxy");
 			importApi.getOutboundProfiles().put("_default", defaultProfile);
 		}
-		return importApi;
 	}
 	
 	private void validateOutboundAuthN(API importApi) throws AppException {
@@ -729,9 +727,9 @@ public class APIImportConfigAdapter {
 		}
 	}
 	
-	private API addImageContent(API importApi) throws AppException {
+	private void addImageContent(API importApi) throws AppException {
 		// No image declared do nothing
-		if(importApi.getImage()==null) return importApi;
+		if(importApi.getImage()==null) return;
 		File file;
 		try {
 			file = new File(importApi.getImage().getFilename());
@@ -744,7 +742,7 @@ public class APIImportConfigAdapter {
 				LOG.info("Loading image from: '"+file.getCanonicalFile()+"'");
 				try(InputStream is = Files.newInputStream(file.toPath())) {
 					importApi.getImage().setImageContent(IOUtils.toByteArray(is));
-					return importApi;
+					return;
 				}
 			}
 			// Try to read it from classpath
@@ -752,7 +750,7 @@ public class APIImportConfigAdapter {
 				if(is!=null) {
 					LOG.debug("Trying to load image from classpath");
 					importApi.getImage().setImageContent(IOUtils.toByteArray(is));
-					return importApi;
+					return;
 				}
 			}
 			// An image is configured, but not found
@@ -760,14 +758,6 @@ public class APIImportConfigAdapter {
 		} catch (Exception e) {
 			throw new AppException("Can't read configured image-file: "+importApi.getImage().getFilename()+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
 		}
-	}
-
-	public String getPathToAPIDefinition() {
-		return pathToAPIDefinition;
-	}
-
-	public void setPathToAPIDefinition(String pathToAPIDefinition) {
-		this.pathToAPIDefinition = pathToAPIDefinition;
 	}
 	
 	/*
@@ -790,7 +780,7 @@ public class APIImportConfigAdapter {
 		return null;
 	}
 	
-	private SecurityProfile getSecurityProfile(API api, String profileName) throws AppException {
+	private SecurityProfile getSecurityProfile(API api, String profileName) {
 		if(api.getSecurityProfiles()==null || api.getSecurityProfiles().size()==0) return null;
 		for(SecurityProfile profile : api.getSecurityProfiles()) {
 			if(profileName.equals(profile.getName())) return profile;

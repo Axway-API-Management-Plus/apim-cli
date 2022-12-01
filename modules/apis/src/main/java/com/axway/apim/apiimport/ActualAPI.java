@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * Concrete class that is used to reflect the actual API as it's stored in the API-Manager. 
  * On the other hand, the APIImportDefintion reflects the desired state of the API.
- * 
+ * <p>
  * Both classes extend the AbstractAPIDefinition which contains all the common API-Properties that 
  * are compared property by property in APIChangeState.
  * 
