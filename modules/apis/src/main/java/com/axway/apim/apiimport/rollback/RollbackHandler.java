@@ -1,15 +1,12 @@
 package com.axway.apim.apiimport.rollback;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
+import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.errorHandling.AppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RollbackHandler {
 	
@@ -17,11 +14,11 @@ public class RollbackHandler {
 	
 	private static RollbackHandler instance;
 	
-	private List<RollbackAction> rollbackActions;
+	private final List<RollbackAction> rollbackActions;
 
 	private RollbackHandler() {
 		super();
-		rollbackActions = new ArrayList<RollbackAction>();
+		rollbackActions = new ArrayList<>();
 	}
 	
 	public static RollbackHandler getInstance() {
@@ -45,15 +42,12 @@ public class RollbackHandler {
 			return;
 		}
 		if(rollbackActions.size()==0) return; // Nothing to roll back
-		Collections.sort(rollbackActions, new Comparator<RollbackAction>() {
-		    @Override
-		    public int compare(RollbackAction first, RollbackAction second) {  
-				if(first.getExecuteOrder()>second.getExecuteOrder()) {
-					return 1;
-				} else {
-					return -1;
-				}
-		    }
+		rollbackActions.sort((first, second) -> {
+			if (first.getExecuteOrder() > second.getExecuteOrder()) {
+				return 1;
+			} else {
+				return -1;
+			}
 		});
 		for(RollbackAction action : rollbackActions) {
 			try {

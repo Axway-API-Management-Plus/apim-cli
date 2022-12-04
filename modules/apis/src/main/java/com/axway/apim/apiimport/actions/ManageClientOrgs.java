@@ -19,8 +19,8 @@ public class ManageClientOrgs {
 	
 	APIManagerAdapter apiManager;
 	
-	private API desiredState;
-	private API actualState;
+	private final API desiredState;
+	private final API actualState;
 
 	public ManageClientOrgs(API desiredState, API actualState) throws AppException {
 		this.desiredState = desiredState;
@@ -44,7 +44,7 @@ public class ManageClientOrgs {
 		} else {
 			List<Organization> missingDesiredOrgs = getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations());
 			List<Organization> removingActualOrgs = getMissingOrgs(actualState.getClientOrganizations(), desiredState.getClientOrganizations());
-			if(removingActualOrgs.remove( desiredState.getOrganization())); // Don't try to remove the Owning-Organization
+			removingActualOrgs.remove(desiredState.getOrganization());// Don't try to remove the Owning-Organization
 			if(missingDesiredOrgs.size()==0) {
 				if(desiredState.getClientOrganizations()!=null) {
 					LOG.info("All desired organizations: "+desiredState.getClientOrganizations()+" have already access. Nothing to do.");
@@ -64,7 +64,7 @@ public class ManageClientOrgs {
 	}
 	
 	private List<Organization> getMissingOrgs(List<Organization> orgs, List<Organization> referenceOrgs) throws AppException {
-		List<Organization> missingOrgs = new ArrayList<Organization>();
+		List<Organization> missingOrgs = new ArrayList<>();
 		if(orgs==null) return missingOrgs;
 		if(referenceOrgs==null) return orgs; // Take over all orgs as missing
 		for(Organization org : orgs) {

@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.api.API;
-import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.CoreParameters.Mode;
@@ -27,17 +25,17 @@ public class RepublishToUpdateAPI {
 		Mode clientOrgsMode =  CoreParameters.getInstance().getClientOrgsMode();
 		// Get existing Orgs and Apps, as they will be lost when the API gets unpublished
 		if(clientAppsMode==Mode.add && actualAPI.getApplications()!=null) { 
-			if(changes.getDesiredAPI().getApplications()==null) changes.getDesiredAPI().setApplications(new ArrayList<ClientApplication>());
+			if(changes.getDesiredAPI().getApplications()==null) changes.getDesiredAPI().setApplications(new ArrayList<>());
 			mergeIntoList(changes.getDesiredAPI().getApplications(), actualAPI.getApplications());
 			// Reset the applications to have them re-created based the desired Apps
-			actualAPI.setApplications(new ArrayList<ClientApplication>());
+			actualAPI.setApplications(new ArrayList<>());
 		}
 		if(clientOrgsMode==Mode.add && actualAPI.getClientOrganizations()!=null) {
-			if(changes.getDesiredAPI().getClientOrganizations()==null) changes.getDesiredAPI().setClientOrganizations(new ArrayList<Organization>());
+			if(changes.getDesiredAPI().getClientOrganizations()==null) changes.getDesiredAPI().setClientOrganizations(new ArrayList<>());
 			// Take over existing organizations
 			mergeIntoList(changes.getDesiredAPI().getClientOrganizations(), actualAPI.getClientOrganizations());
 			// Delete them, so that they are re-created based on the desired orgs
-			actualAPI.setClientOrganizations(new ArrayList<Organization>());
+			actualAPI.setClientOrganizations(new ArrayList<>());
 		}
 		
 		// 1. Create BE- and FE-API (API-Proxy) / Including updating all belonging props!
@@ -62,12 +60,11 @@ public class RepublishToUpdateAPI {
 		LOG.debug("Existing API successfully updated: '"+actualAPI.getName()+"' (ID: "+actualAPI.getId()+")");
 	}
 	
-	private <T> List<T> mergeIntoList(List<T> targetList, List<T> source) {
+	private <T> void mergeIntoList(List<T> targetList, List<T> source) {
 		for(T element : source) {
 			if(!targetList.contains(element)) {
 				targetList.add(element);
 			}
 		}
-		return targetList;
 	}
 }
