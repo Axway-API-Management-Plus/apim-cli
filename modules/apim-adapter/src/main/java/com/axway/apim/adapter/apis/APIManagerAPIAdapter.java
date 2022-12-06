@@ -572,8 +572,13 @@ public class APIManagerAPIAdapter {
                 LOG.debug("Base Path : {}, Resource Path : {}", basePath, resourcePath);
                 apiDefinition.updateBasePath(resourcePath, basePath);
             }
+
+            String resourceUri = jsonNode.get("properties").get("ResourceUri").asText();
+            LOG.debug("Resource Uri : {}", resourceUri);
+            api.setBackendImportedUrl(resourceUri);
             // In any case, we save the backend resource path, as it is necessary for the full backendBasepath in the exported API config.
             api.setBackendResourcePath(resourcePath);
+
         } catch (Exception e) {
             throw new AppException("Cannot parse Backend-API for API: '" + api.toStringHuman() + "' in order to change API-Specification", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
         } finally {

@@ -6,6 +6,7 @@ import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.APISpecification;
+import com.axway.apim.api.apiSpecification.WSDLSpecification;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.jackson.serializer.APIExportSerializerModifier;
 import com.axway.apim.api.export.lib.params.APIExportParams;
@@ -84,8 +85,10 @@ public class JsonAPIExporter extends APIResultHandler {
 		String targetFile = null;
 		try {
 			targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName()+apiDef.getAPIDefinitionType().getFileExtension();
-			writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
-			exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName()+apiDef.getAPIDefinitionType().getFileExtension());
+			if(!(apiDef instanceof WSDLSpecification)) {
+				writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
+				exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension());
+			}
 		} catch (IOException e) {
 			throw new AppException("Can't save API-Definition locally to file: " + targetFile,
 					ErrorCode.UNXPECTED_ERROR, e);
