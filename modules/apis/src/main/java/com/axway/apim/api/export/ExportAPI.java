@@ -67,9 +67,10 @@ public class ExportAPI {
 
     public List<SecurityProfile> getSecurityProfiles() throws AppException {
         if (this.actualAPIProxy.getSecurityProfiles().size() == 1) {
-            if(this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().size() > 0)
-                if (this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().get(0).getType() == DeviceType.passThrough)
-                    return null;
+            if(this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().size() == 0)
+                return null;
+            if (this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().get(0).getType() == DeviceType.passThrough)
+                return null;
         }
         for (SecurityProfile profile : this.actualAPIProxy.getSecurityProfiles()) {
             for (SecurityDevice device : profile.getDevices()) {
