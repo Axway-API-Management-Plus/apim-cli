@@ -73,12 +73,8 @@ public abstract class APISpecification {
     }
 
     protected ObjectMapper mapper = null;
-
     protected String apiSpecificationFile = null;
-
     protected byte[] apiSpecificationContent = null;
-   // protected byte[] originalApiSpecificationContent;
-
     protected APISpecificationFilter filterConfig = null;
 
     public String getApiSpecificationFile() {
@@ -109,7 +105,6 @@ public abstract class APISpecification {
             } else if (other instanceof Swagger1xSpecification){
                 return compareJSON(otherSwagger, this);
             }else if (other instanceof WSDLSpecification || other instanceof WADLSpecification) {
-               // return compareString(otherSwagger.originalApiSpecificationContent, originalApiSpecificationContent);
                 return compareString(otherSwagger.apiSpecificationContent, apiSpecificationContent);
             } else {
                 LOG.info("Unhandled specification : {}", other.getClass().getName());
@@ -166,11 +161,15 @@ public abstract class APISpecification {
     }
     public boolean compareJSON(APISpecification apiSpecification, APISpecification gatewayApiSpecification ){
         try {
-          //  JsonNode swaggerFromImport = apiSpecification.mapper.readTree(apiSpecification.originalApiSpecificationContent);
-            //JsonNode swaggerFromGateway = gatewayApiSpecification.mapper.readTree(gatewayApiSpecification.originalApiSpecificationContent);
             JsonNode swaggerFromImport = apiSpecification.mapper.readTree(apiSpecification.apiSpecificationContent);
             JsonNode swaggerFromGateway = gatewayApiSpecification.mapper.readTree(gatewayApiSpecification.apiSpecificationContent);
-            return swaggerFromImport.equals(swaggerFromGateway);
+            boolean rc = swaggerFromImport.equals(swaggerFromGateway);
+            if (!rc) {
+                LOG.info("Detected API-Definition-File sizes: API-Manager: " + gatewayApiSpecification.apiSpecificationContent.length + " vs. Import: " + apiSpecification.apiSpecificationContent.length);
+                LOG.debug("Specification from Gateway : {}", new String(gatewayApiSpecification.apiSpecificationContent, StandardCharsets.UTF_8));
+                LOG.debug("Specification from Source : {}", new String(apiSpecification.apiSpecificationContent, StandardCharsets.UTF_8));
+            }
+            return rc;
         } catch (IOException e) {
             LOG.error("Error in parsing swagger", e);
             return false;
@@ -185,8 +184,6 @@ public abstract class APISpecification {
         return rc;
     }
 
-
-
     public void filterAPISpecification() {
     }
 
@@ -194,6 +191,4 @@ public abstract class APISpecification {
         this.filterConfig = filterConfig;
         return this;
     }
-
-
 }
