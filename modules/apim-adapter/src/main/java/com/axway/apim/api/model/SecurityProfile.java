@@ -6,60 +6,60 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 public class SecurityProfile {
-	
-	String name;
-	
-	boolean isDefault;
-	
-	List<SecurityDevice> devices;
 
+    private String name;
+    private boolean isDefault;
+    private List<SecurityDevice> devices;
 
-	public SecurityProfile() {
-		super();
-		this.devices = new ArrayList<SecurityDevice>();
-	}
+    public SecurityProfile() {
+        super();
+        this.devices = new ArrayList<>();
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public boolean getIsDefault() {
-		return isDefault;
-	}
+    public boolean getIsDefault() {
+        return isDefault;
+    }
 
-	public void setIsDefault(boolean isDefault) {
-		this.isDefault = isDefault;
-	}
+    public void setIsDefault(boolean isDefault) {
+        this.isDefault = isDefault;
+    }
 
-	public List<SecurityDevice> getDevices() {
-		return devices;
-	}
+    public List<SecurityDevice> getDevices() {
+        return devices;
+    }
 
-	public void setDevices(List<SecurityDevice> devices) {
-		this.devices = devices;
-	}
+    public void setDevices(List<SecurityDevice> devices) {
+        this.devices = devices;
+    }
 
-	@Override
-	public String toString() {
-		return "SecurityProfile [" + devices + "]";
-	}
+    @Override
+    public String toString() {
+        return "SecurityProfile{" +
+                "name='" + name + '\'' +
+                ", isDefault=" + isDefault +
+                ", devices=" + devices +
+                '}';
+    }
 
-	@Override
-	public boolean equals(Object other) {
-		if(other == null) return false;
-		if(other instanceof SecurityProfile) {
-			SecurityProfile securityProfile = (SecurityProfile)other;
-			
-			return
-					StringUtils.equals(securityProfile.getName(), this.getName()) &&
-					securityProfile.getIsDefault() == this.getIsDefault() &&
-					securityProfile.getDevices().equals(this.getDevices());
-		} else {
-			return false;
-		}
-	}
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) return false;
+        if (other instanceof SecurityProfile) {
+            SecurityProfile securityProfile = (SecurityProfile) other;
+            return
+                    StringUtils.equals(securityProfile.getName(), this.getName()) &&
+                            securityProfile.getIsDefault() == this.getIsDefault() &&
+                            securityProfile.getDevices().equals(this.getDevices());
+        } else {
+            return false;
+        }
+    }
 }

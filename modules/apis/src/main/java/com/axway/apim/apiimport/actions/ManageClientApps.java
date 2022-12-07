@@ -23,9 +23,9 @@ public class ManageClientApps {
 	
 	static Logger LOG = LoggerFactory.getLogger(ManageClientApps.class);
 	
-	private API desiredState;
-	private API actualState;
-	private API oldAPI;
+	private final API desiredState;
+	private final API actualState;
+	private final API oldAPI;
 	
 	APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
 	
@@ -52,7 +52,7 @@ public class ManageClientApps {
 			// Remove configured apps, for Non-Granted-Orgs!
 			removeNonGrantedClientApps(desiredState.getApplications());
 		}
-		List<ClientApplication> recreateActualApps = null;
+		List<ClientApplication> recreateActualApps;
 		// If an UNPUBLISHED API has been re-created, we have to create App-Subscriptions manually, as API-Manager Upgrade only works on PUBLISHED APIs
 		// But we only need to do this, if existing App-Subscriptions should be preserved (MODE_ADD).
 		if(reCreation && actualState.getState().equals(API.STATE_UNPUBLISHED) && CoreParameters.getInstance().getClientAppsMode().equals(CoreParameters.Mode.add)) {
@@ -74,7 +74,7 @@ public class ManageClientApps {
 		if(revomingActualApps.size()>0) {
 			if(CoreParameters.getInstance().getClientAppsMode().equals(CoreParameters.Mode.replace)) {
 				LOG.info("Removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName());
-				removeAppSubscription(revomingActualApps, actualState.getId());
+				removeAppSubscription(revomingActualApps);
 			} else {
 				LOG.info("NOT removing access for appplications: "+revomingActualApps+" from API: " + actualState.getName() + " as clientAppsMode NOT set to replace.");
 			}
@@ -90,7 +90,6 @@ public class ManageClientApps {
 			if(!hasClientAppPermission(app)) {
 				LOG.error("Organization of configured application: '" + app.getName() + "' has NO permission to this API. Ignoring this application.");
 				it.remove();
-				continue;
 			}
 		}
 	}
@@ -111,7 +110,7 @@ public class ManageClientApps {
 	private void createAppSubscription(List<ClientApplication> missingDesiredApps, String apiId) throws AppException {
 		if(missingDesiredApps.size()==0) return;
 		//List<ClientApplication> realMissingDesiredApps = missingDesiredApps.stream().distinct().collect(Collectors.toList());
-		LOG.info("Creating API-Access for the following apps: '"+missingDesiredApps.toString()+"'");
+		LOG.info("Creating API-Access for the following apps: '"+ missingDesiredApps +"'");
 		try {
 			for(ClientApplication app : missingDesiredApps) {
 				try {
@@ -129,9 +128,8 @@ public class ManageClientApps {
 		}
 	}
 	
-	private void removeAppSubscription(List<ClientApplication> revomingActualApps, String apiId) throws AppException {
+	private void removeAppSubscription(List<ClientApplication> revomingActualApps) throws AppException {
 		for(ClientApplication app : revomingActualApps) {
-			
 			// A Client-App that doesn't belong to a granted organization, can't have a subscription.
 			if(!hasClientAppPermission(app)) continue;
 			LOG.debug("Removing API-Access for application '"+app.getName()+"'");
@@ -146,10 +144,10 @@ public class ManageClientApps {
 		}
 	}
 	
-	private List<ClientApplication> getMissingApps(List<ClientApplication> apps, List<ClientApplication> otherApps) throws AppException {
-		List<ClientApplication> missingApps = new ArrayList<ClientApplication>();
-		if(otherApps == null) otherApps = new ArrayList<ClientApplication>();
-		if(apps == null) apps = new ArrayList<ClientApplication>();
+	private List<ClientApplication> getMissingApps(List<ClientApplication> apps, List<ClientApplication> otherApps) {
+		List<ClientApplication> missingApps = new ArrayList<>();
+		if(otherApps == null) otherApps = new ArrayList<>();
+		if(apps == null) apps = new ArrayList<>();
 		for(ClientApplication app : apps) {
 			if(otherApps.contains(app)) {
 				continue;

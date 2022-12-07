@@ -232,7 +232,7 @@ public class APIManagerAPIAdapter {
      */
     public <profile> void translateMethodIds(API api, String apiId, METHOD_TRANSLATION mode) throws AppException {
         if (mode == METHOD_TRANSLATION.NONE) return;
-        translateMethodIds(Arrays.asList(api), Arrays.asList(apiId), mode);
+        translateMethodIds(Collections.singletonList(api), Collections.singletonList(apiId), mode);
     }
 
     /**
@@ -246,9 +246,9 @@ public class APIManagerAPIAdapter {
     public <profile> void translateMethodIds(API api, METHOD_TRANSLATION mode) throws AppException {
         if (mode == METHOD_TRANSLATION.NONE) return;
         if (api.getOutboundProfiles() != null)
-            _translateMethodIds(api.getOutboundProfiles(), mode, Arrays.asList(api.getId()));
+            _translateMethodIds(api.getOutboundProfiles(), mode, Collections.singletonList(api.getId()));
         if (api.getInboundProfiles() != null)
-            _translateMethodIds(api.getInboundProfiles(), mode, Arrays.asList(api.getId()));
+            _translateMethodIds(api.getInboundProfiles(), mode, Collections.singletonList(api.getId()));
     }
 
     public <profile> void translateMethodIds(List<API> apis, List<String> apiIds, METHOD_TRANSLATION mode) throws AppException {
@@ -517,7 +517,7 @@ public class APIManagerAPIAdapter {
                     LOG.info("Successfully downloaded API-Specification with version " + specVersion + " from Frontend-API.");
                 }
                 String res = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-                String origFilename = "Unkown filename";
+                String origFilename = "Unknown filename";
                 if (httpResponse.containsHeader("Content-Disposition")) {
                     origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
                 }
@@ -569,10 +569,16 @@ public class APIManagerAPIAdapter {
             String basePath = jsonNode.get("basePath").asText();
             // Only adjust the API-Specification when exporting the FE-API-Spec otherwise we need the originally imported API-Spec
             if (exportFEAPIDefinition) {
-                apiDefinition.configureBasePath(basePath + resourcePath, null);
+                LOG.debug("Base Path : {}, Resource Path : {}", basePath, resourcePath);
+                apiDefinition.updateBasePath(resourcePath, basePath);
             }
+
+            String resourceUri = jsonNode.get("properties").get("ResourceUri").asText();
+            LOG.debug("Resource Uri : {}", resourceUri);
+            api.setBackendImportedUrl(resourceUri);
             // In any case, we save the backend resource path, as it is necessary for the full backendBasepath in the exported API config.
             api.setBackendResourcePath(resourcePath);
+
         } catch (Exception e) {
             throw new AppException("Cannot parse Backend-API for API: '" + api.toStringHuman() + "' in order to change API-Specification", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
         } finally {
@@ -655,11 +661,6 @@ public class APIManagerAPIAdapter {
             }
         }
     }
-
-//    public void deleteAPI(API api) throws AppException {
-//        APIStatusManager statusManager = new APIStatusManager();
-//        statusManager.update(api, API.STATE_DELETED, true);
-//    }
 
     public void deleteAPIProxy(API api) throws AppException {
         LOG.debug("Deleting API-Proxy");
@@ -807,9 +808,8 @@ public class APIManagerAPIAdapter {
     private boolean useAdminAccountForPublish() throws AppException {
         if (APIManagerAdapter.hasAdminAccount()) return true;
         // This flag can be set to false to stop OrgAdmin from a Publishing request (means Pending approval)
-        if (CoreParameters.getInstance().isAllowOrgAdminsToPublish()) return false;
+        return !CoreParameters.getInstance().isAllowOrgAdminsToPublish();
         // In all other cases, we use the Admin-Account
-        return true;
     }
 
     private String formatRetirementDate(Long retirementDate) {
@@ -993,7 +993,7 @@ public class APIManagerAPIAdapter {
                 if (updateAppQuota) {
                     LOG.info("Taking over existing quota config for application: '" + app.getName() + "' to newly created API.");
                     try {
-                        FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[]{"apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"}));
+                        FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"));
                         mapper.setFilterProvider(filter);
                         uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/quota").build();
                         entity = new StringEntity(mapper.writeValueAsString(app.getAppQuota()), ContentType.APPLICATION_JSON);
@@ -1100,18 +1100,18 @@ public class APIManagerAPIAdapter {
         HttpEntity entity;
         RestAPICall apiCall;
         HttpResponse httpResponse = null;
-        String formBody;
+        StringBuilder formBody;
         if (allOrgs) {
-            formBody = "action=all_orgs&apiId=" + api.getId();
+            formBody = new StringBuilder("action=all_orgs&apiId=" + api.getId());
         } else {
-            formBody = "action=orgs&apiId=" + api.getId();
+            formBody = new StringBuilder("action=orgs&apiId=" + api.getId());
             for (Organization org : grantAccessToOrgs) {
-                formBody += "&grantOrgId=" + org.getId();
+                formBody.append("&grantOrgId=").append(org.getId());
             }
         }
         try {
             uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/grantaccess").build();
-            entity = new StringEntity(formBody, ContentType.APPLICATION_FORM_URLENCODED);
+            entity = new StringEntity(formBody.toString(), ContentType.APPLICATION_FORM_URLENCODED);
             apiCall = new POSTRequest(entity, uri, true);
             httpResponse = apiCall.execute();
             int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -1160,13 +1160,11 @@ public class APIManagerAPIAdapter {
         return filterFields;
     }
 
-    public APIManagerAPIAdapter setAPIManagerResponse(APIFilter filter, String apiManagerResponse) {
+    public void setAPIManagerResponse(APIFilter filter, String apiManagerResponse) {
         this.apiManagerResponse.put(filter, apiManagerResponse);
-        return this;
     }
 
-    public APIManagerAPIAdapter setAPIManagerResponse(String apiId, Image image) {
+    public void setAPIManagerResponse(String apiId, Image image) {
         this.imagesResponse.put(apiId, image);
-        return this;
     }
 }

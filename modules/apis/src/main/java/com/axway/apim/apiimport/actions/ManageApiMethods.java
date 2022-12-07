@@ -60,8 +60,8 @@ public class ManageApiMethods {
             LOG.error("API Methods mismatch - Number of API Methods in API Manager : {} and Number of API Methods in API config file : {}", actualApiMethods.size(), desiredApiMethods.size());
             throw new AppException("API Methods mismatch", ErrorCode.BREAKING_CHANGE_DETECTED);
         }
-        List<String> desiredApiMethodsName = desiredApiMethods.stream().map(apiMethod -> apiMethod.getName()).collect(Collectors.toList());
-        List<String> actualApiMethodsName = actualApiMethods.stream().map(apiMethod -> apiMethod.getName()).collect(Collectors.toList());
+        List<String> desiredApiMethodsName = desiredApiMethods.stream().map(APIMethod::getName).collect(Collectors.toList());
+        List<String> actualApiMethodsName = actualApiMethods.stream().map(APIMethod::getName).collect(Collectors.toList());
         for (String desiredApiMethodName : desiredApiMethodsName) {
             if (!actualApiMethodsName.contains(desiredApiMethodName)) {
                 LOG.error("API Method mismatch - Name of API Method  - {} - in API config file is not matching with  name of API Method in API Manager", desiredApiMethodName);

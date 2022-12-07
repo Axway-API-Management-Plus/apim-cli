@@ -6,11 +6,13 @@ import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.APISpecification;
+import com.axway.apim.api.apiSpecification.WSDLSpecification;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.jackson.serializer.APIExportSerializerModifier;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -33,10 +35,10 @@ public class JsonAPIExporter extends APIResultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(JsonAPIExporter.class);
 
 	/** Where to store the exported API-Definition */
-	private String givenExportFolder;
-	private boolean exportMethods;
+	private final String givenExportFolder;
+	private final boolean exportMethods;
 	
-	public JsonAPIExporter(APIExportParams params) throws AppException {
+	public JsonAPIExporter(APIExportParams params) {
 		super(params);
 		this.givenExportFolder = params.getTarget();
 		this.exportMethods = params.isExportMethods();
@@ -84,8 +86,10 @@ public class JsonAPIExporter extends APIResultHandler {
 		String targetFile = null;
 		try {
 			targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName()+apiDef.getAPIDefinitionType().getFileExtension();
-			writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
-			exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName()+apiDef.getAPIDefinitionType().getFileExtension());
+			if(!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKED_URL)) {
+				writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
+				exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension());
+			}
 		} catch (IOException e) {
 			throw new AppException("Can't save API-Definition locally to file: " + targetFile,
 					ErrorCode.UNXPECTED_ERROR, e);
@@ -96,10 +100,10 @@ public class JsonAPIExporter extends APIResultHandler {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filters = new SimpleFilterProvider()
 				.addFilter("CaCertFilter",
-						SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"inbound", "outbound", "certFile" }))
+						SimpleBeanPropertyFilter.filterOutAllExcept("inbound", "outbound", "certFile"))
 				.addFilter("ProfileFilter",
-						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"apiMethodId" }))
-				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {}));
+						SimpleBeanPropertyFilter.serializeAllExcept("apiMethodId"))
+				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept());
 		mapper.setFilterProvider(filters);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);

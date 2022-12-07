@@ -39,8 +39,8 @@ public class APIChangeState {
     private boolean updateExistingAPI = true;
     private boolean recreateAPI = false;
     private boolean proxyUpdateRequired = false;
-    private List<String> breakingChanges = new Vector<>();
-    private List<String> nonBreakingChanges = new Vector<>();
+    private final List<String> breakingChanges = new Vector<>();
+    private final List<String> nonBreakingChanges = new Vector<>();
     private String isAdminAccountNeeded = null;
 
     /**
@@ -222,11 +222,7 @@ public class APIChangeState {
      * @return true, if a breakingChange or a nonBreakingChange was found otherwise false.
      */
     public boolean hasAnyChanges() {
-        if (this.breakingChanges.size() == 0 && this.nonBreakingChanges.size() == 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return this.breakingChanges.size() != 0 || this.nonBreakingChanges.size() != 0;
     }
 
     /**

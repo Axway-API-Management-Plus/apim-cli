@@ -26,9 +26,9 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 public class APIMCLICacheManager implements CacheManager {
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIMCLICacheManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIMCLICacheManager.class);
 	
-	private CacheManager cacheManager;
+	private final CacheManager cacheManager;
 	
 	private List<String> enabledCaches;
 
@@ -37,14 +37,10 @@ public class APIMCLICacheManager implements CacheManager {
 		this.cacheManager = cacheManager;
 	}
 
-	public List<String> getEnabledCaches() {
-		return enabledCaches;
-	}
-
 	public void setEnabledCaches(List<CacheType> enabledCaches) {
 		if(this.enabledCaches!=null) return;
 		if(enabledCaches==null || cacheManager instanceof DoNothingCacheManager) return;
-		this.enabledCaches = new ArrayList<String>();
+		this.enabledCaches = new ArrayList<>();
 		for(CacheType cacheType : enabledCaches) {
 			if(cacheType.supportsImportActions) {
 				this.enabledCaches.add(cacheType.name());
@@ -83,15 +79,14 @@ public class APIMCLICacheManager implements CacheManager {
 			// Caches not specified, return requested cache 
 			// however, cacheManager might be a DoNothingCacheManager if ignoreCache is set
 			Cache<K, V> plainCache = cacheManager.getCache(alias, keyType, valueType);
-			return new APIMCLICache<K, V>(plainCache, cachePrefix);
+			return new APIMCLICache<>(plainCache, cachePrefix);
 		} else {
 			if(this.enabledCaches.contains(alias)) {
 				LOG.debug("Using cache: " + alias + " as it is enabled.");
 				Cache<K, V> plainCache = cacheManager.getCache(alias, keyType, valueType);
-				return new APIMCLICache<K, V>(plainCache, cachePrefix);
+				return new APIMCLICache<>(plainCache, cachePrefix);
 			} else {
-				Cache<K, V> doNothingCache = new DoNothingCacheManager.DoNothingCache<K, V>();
-				return doNothingCache;
+				return new DoNothingCache<>();
 			}
 		}
 	}

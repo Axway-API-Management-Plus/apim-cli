@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Concrete class that is used to reflect the desired API as it's defined by the API-Developer. 
  * On the other hand, the APIManagerAPI reflects the actual state of the API inside the API-Manager.
- * 
+ * <p>
  * Both classes extend the AbstractAPIDefinition which contains all the common API-Properties that 
  * are compared property by property in APIChangeState.
  * 

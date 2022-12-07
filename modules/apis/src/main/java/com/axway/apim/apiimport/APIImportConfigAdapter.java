@@ -45,28 +45,28 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
- * The APIConfig reflects the given API-Configuration plus the API-Definition, which is either a 
+ * The APIConfig reflects the given API-Configuration plus the API-Definition, which is either a
  * Swagger-File or a WSDL.
  * This class will read the API-Configuration plus the optional set stage and the API-Definition.
- * 
+ *
  * @author cwiechmann
  */
 public class APIImportConfigAdapter {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapter.class);
-	
+
 	private ObjectMapper mapper = new ObjectMapper();
-	
+
 
 	/** This is the given path to WSDL or Swagger. It is either set using -a parameter or as part of the config file */
 	private String pathToAPIDefinition;
-	
+
 	/** The API-Config-File given by the user with -c parameter */
 	private File apiConfigFile;
-	
+
 	/** The APIConfig instance created by the APIConfigImporter */
 	private API apiConfig;
-	
+
 	/** If true, an OrgAdminUser is used to start the tool */
 	private boolean usingOrgAdmin;
 
@@ -74,9 +74,9 @@ public class APIImportConfigAdapter {
 	public APIImportConfigAdapter(APIImportParams params) throws AppException {
 		this(params.getConfig(), params.getStage(), params.getApiDefintion(), APIManagerAdapter.hasOrgAdmin(), params.getStageConfig());
 	}
-	
+
 	/**
-	 * Constructs the APIImportConfig 
+	 * Constructs the APIImportConfig
 	 * @param apiConfigFileName the API-Config given by the user
 	 * @param stage an optional stage used to load overrides and stage specific environment properties
 	 * @param pathToAPIDefinition an optional path to the API-Definition (Swagger / WSDL), can be in the config-file as well.
@@ -91,7 +91,7 @@ public class APIImportConfigAdapter {
 		// We would like to get back the original AppExcepption instead of a JsonMappingException
 		mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
 		mapper.registerModule(module);
-		
+
 		API baseConfig;
 		try {
 			this.pathToAPIDefinition = pathToAPIDefinition;
@@ -143,10 +143,10 @@ public class APIImportConfigAdapter {
 	 * - the API-Definition is read
 	 * - Additionally some validations and completions are made here
 	 * - in the future: This is the place to do some default handling.
-	 * 
-	 * @return IAPIDefintion with the desired state of the API. This state will be 
+	 *
+	 * @return IAPIDefintion with the desired state of the API. This state will be
 	 * the input to create the APIChangeState.
-	 * 
+	 *
 	 * @throws AppException if the state can't be created.
 	 */
 	public API getDesiredAPI() throws AppException {
@@ -180,7 +180,7 @@ public class APIImportConfigAdapter {
 			throw new AppException("Cannot validate/fulfill configuration file.", ErrorCode.CANT_READ_CONFIG_FILE, e);
 		}
 	}
-	
+
 	private void validateExposurePath(API apiConfig) throws AppException {
 		if(apiConfig.getPath()==null) {
 			throw new AppException("API-Config parameter: 'path' is missing. Please check your API-Config file.", ErrorCode.CANT_READ_CONFIG_FILE);
@@ -189,7 +189,7 @@ public class APIImportConfigAdapter {
 			throw new AppException("API-Config parameter: 'path' must start with a \"/\" following by a valid API-Path (e.g. /api/v1/customer).", ErrorCode.CANT_READ_CONFIG_FILE);
 		}
 	}
-	
+
 	private void validateOrganization(API apiConfig) throws AppException {
 		if(apiConfig instanceof DesiredTestOnlyAPI) return;
 		if(apiConfig.getOrganization()==null || !apiConfig.getOrganization().isDevelopment()) {
@@ -218,7 +218,7 @@ public class APIImportConfigAdapter {
 		apiSpecification.configureBasePath(((DesiredAPI)apiConfig).getBackendBasepath(), apiConfig);
 		apiConfig.setApiDefinition(apiSpecification);
 	}
-	
+
 	private void handleAllOrganizations(API apiConfig) throws AppException {
 		if(apiConfig.getClientOrganizations()==null) return;
 		if(apiConfig.getState().equals(API.STATE_UNPUBLISHED)) {
@@ -231,7 +231,7 @@ public class APIImportConfigAdapter {
 			apiConfig.getClientOrganizations().addAll(allOrgs);
 			apiConfig.setRequestForAllOrgs(true);
 		} else {
-			// As the API-Manager internally handles the owning organization in the same way, 
+			// As the API-Manager internally handles the owning organization in the same way,
 			// we have to add the Owning-Org as a desired org
 			if(!apiConfig.getClientOrganizations().contains(apiConfig.getOrganization())) {
 				apiConfig.getClientOrganizations().add(apiConfig.getOrganization());
@@ -256,13 +256,13 @@ public class APIImportConfigAdapter {
 			apiConfig.getClientOrganizations().addAll(foundOrgs);
 		}
 	}
-	
+
 	private void addQuotaConfiguration(API apiConfig) throws AppException {
 		if(apiConfig.getState()==API.STATE_UNPUBLISHED) return;
 		initQuota(apiConfig.getSystemQuota());
 		initQuota(apiConfig.getApplicationQuota());
 	}
-	
+
 	private void initQuota(APIQuota quotaConfig) {
 		if(quotaConfig==null) return;
 		if(quotaConfig.getType().equals("APPLICATION")) {
@@ -270,10 +270,10 @@ public class APIImportConfigAdapter {
 			quotaConfig.setDescription("Maximum message rates per application. Applied to each application unless an Application-Specific quota is configured");
 		} else {
 			quotaConfig.setName("System Default");
-			quotaConfig.setDescription(".....");			
+			quotaConfig.setDescription(".....");
 		}
 	}
-	
+
 	private void validateDescription(API apiConfig) throws AppException {
 		if(apiConfig.getDescriptionType()==null || apiConfig.getDescriptionType().equals("original")) return;
 		String descriptionType = apiConfig.getDescriptionType();
@@ -360,7 +360,7 @@ public class APIImportConfigAdapter {
 			}
 		}
 	}
-	
+
 	private void addDefaultCorsProfile(API apiConfig) throws AppException {
 		if(apiConfig.getCorsProfiles()==null) {
 			apiConfig.setCorsProfiles(new ArrayList<>());
@@ -380,12 +380,12 @@ public class APIImportConfigAdapter {
 			apiConfig.getCorsProfiles().add(CorsProfile.getDefaultCorsProfile());
 		}
 	}
-	
+
 	/**
-	 * Purpose of this method is to load the actual existing applications from API-Manager 
-	 * based on the provided criteria (App-Name, API-Key, OAuth-ClientId or Ext-ClientId). 
+	 * Purpose of this method is to load the actual existing applications from API-Manager
+	 * based on the provided criteria (App-Name, API-Key, OAuth-ClientId or Ext-ClientId).
 	 * Or, if the APP doesn't exists remove it from the list and log a warning message.
-	 * Additionally, for each application it's checked, that the organization has access 
+	 * Additionally, for each application it's checked, that the organization has access
 	 * to this API, otherwise it will be removed from the list as well and a warning message is logged.
 	 * @param apiConfig
 	 * @throws AppException
@@ -417,19 +417,19 @@ public class APIImportConfigAdapter {
 					if(loadedApp==null) {
 						it.remove();
 						continue;
-					} 
+					}
 				} else if(app.getOauthClientId()!=null) {
 					loadedApp = getAppForCredential(app.getOauthClientId(), APIManagerAdapter.CREDENTIAL_TYPE_OAUTH);
 					if(loadedApp==null) {
 						it.remove();
 						continue;
-					} 
+					}
 				} else if(app.getExtClientId()!=null) {
 					loadedApp = getAppForCredential(app.getExtClientId(), APIManagerAdapter.CREDENTIAL_TYPE_EXT_CLIENTID);
 					if(loadedApp==null) {
 						it.remove();
 						continue;
-					} 
+					}
 				}
 				if(!APIManagerAdapter.hasAdminAccount()) {
 					if(!apiConfig.getOrganization().equals(loadedApp.getOrganization())) {
@@ -442,7 +442,7 @@ public class APIImportConfigAdapter {
 			}
 		}
 	}
-	
+
 	private static ClientApplication getAppForCredential(String credential, String type) throws AppException {
 		LOG.debug("Searching application with configured credential (Type: "+type+"): '"+credential+"'");
 		ClientApplication app =  APIManagerAdapter.getInstance().getAppIdForCredential(credential, type);
@@ -452,7 +452,7 @@ public class APIImportConfigAdapter {
 		}
 		return app;
 	}
-	
+
 	private void completeCaCerts(API apiConfig) throws AppException {
 		if(apiConfig.getCaCerts()!=null) {
 			List<CaCert> completedCaCerts = new ArrayList<>();
@@ -471,13 +471,13 @@ public class APIImportConfigAdapter {
 			apiConfig.getCaCerts().addAll(completedCaCerts);
 		}
 	}
-	
+
 	private InputStream getInputStreamForCertFile(CaCert cert) throws AppException {
 		InputStream is;
 		File file;
 		// Certificates might be stored somewhere else, so try to load them directly
 		file = new File(cert.getCertFile());
-		if(file.exists()) { 
+		if(file.exists()) {
 			try {
 				is = new FileInputStream(file);
 				return is;
@@ -492,7 +492,7 @@ public class APIImportConfigAdapter {
 			throw new AppException("Can't read certificate file.", ErrorCode.CANT_READ_CONFIG_FILE, e1);
 		}
 		file = new File(baseDir + File.separator + cert.getCertFile());
-		if(file.exists()) { 
+		if(file.exists()) {
 			try {
 				is = new FileInputStream(file);
 			} catch (FileNotFoundException e) {
@@ -501,7 +501,7 @@ public class APIImportConfigAdapter {
 		} else {
 			LOG.debug("Can't read certifiate from file-location: " + file + ". Now trying to read it from the classpath.");
 			// Try to read it from classpath
-			is = APIManagerAdapter.class.getResourceAsStream(cert.getCertFile()); 
+			is = APIManagerAdapter.class.getResourceAsStream(cert.getCertFile());
 		}
 		if(is==null) {
 			LOG.error("Can't read certificate: "+cert.getCertFile()+" from file or classpath.");
@@ -513,7 +513,7 @@ public class APIImportConfigAdapter {
 		}
 		return is;
 	}
-	
+
 	private API validateInboundProfile(API importApi) throws AppException {
 		if(importApi.getInboundProfiles()==null || importApi.getInboundProfiles().size()==0) {
 			Map<String, InboundProfile> def = new HashMap<>();
@@ -526,7 +526,7 @@ public class APIImportConfigAdapter {
 		boolean defaultProfileFound = false;
 		while(it.hasNext()) {
 			String profileName = it.next();
-			if(profileName.equals("_default")) { 
+			if(profileName.equals("_default")) {
 				defaultProfileFound = true;
 				continue; // No need to check for the default profile
 			}
@@ -550,7 +550,7 @@ public class APIImportConfigAdapter {
 		}
 		return importApi;
 	}
-	
+
 	private API addDefaultPassthroughSecurityProfile(API importApi) throws AppException {
 		boolean hasDefaultProfile = false;
 		if(importApi.getSecurityProfiles()==null) importApi.setSecurityProfiles(new ArrayList<>());
@@ -563,7 +563,7 @@ public class APIImportConfigAdapter {
 				hasDefaultProfile=true;
 				// If the name is _default or flagged as default make it consistent!
 				profile.setName("_default");
-				profile.setIsDefault(true); 
+				profile.setIsDefault(true);
 			}
 		}
 		if(profiles==null || profiles.size()==0 || !hasDefaultProfile) {
@@ -577,12 +577,12 @@ public class APIImportConfigAdapter {
 			passthroughDevice.getProperties().put("subjectIdFieldName", "Pass Through");
 			passthroughDevice.getProperties().put("removeCredentialsOnSuccess", "true");
 			passthroughProfile.getDevices().add(passthroughDevice);
-			
+
 			profiles.add(passthroughProfile);
 		}
 		return importApi;
 	}
-	
+
 	private API addDefaultAuthenticationProfile(API importApi) throws AppException {
 		if(importApi.getAuthenticationProfiles()==null) return importApi; // Nothing to add (no default is needed, as we don't send any Authn-Profile)
 		boolean hasDefaultProfile = false;
@@ -595,7 +595,7 @@ public class APIImportConfigAdapter {
 				hasDefaultProfile=true;
 				// If the name is _default or flagged as default make it consistent!
 				profile.setName("_default");
-				profile.setIsDefault(true); 
+				profile.setIsDefault(true);
 			}
 		}
 		if(!hasDefaultProfile) {
@@ -608,7 +608,7 @@ public class APIImportConfigAdapter {
 		}
 		return importApi;
 	}
-	
+
 	private API validateOutboundProfile(API importApi) throws AppException {
 		if(importApi.getOutboundProfiles()==null || importApi.getOutboundProfiles().size()==0) return importApi;
 		Iterator<String> it = importApi.getOutboundProfiles().keySet().iterator();
@@ -619,7 +619,7 @@ public class APIImportConfigAdapter {
 			if(profileName.equals("_default")) {
 				defaultProfileFound = true;
 				// Validate the _default Outbound-Profile has an AuthN-Profile, otherwise we must add (See issue #133)
-				
+
 				if(profile.getAuthenticationProfile()==null) {
 					LOG.warn("Provided default outboundProfile doesn't contain AuthN-Profile - Setting it to default");
 					profile.setAuthenticationProfile("_default");
@@ -644,21 +644,21 @@ public class APIImportConfigAdapter {
 		}
 		return importApi;
 	}
-	
+
 	private void validateOutboundAuthN(API importApi) throws AppException {
 		// Request to use some specific Outbound-AuthN for this API
 		if(importApi.getAuthenticationProfiles()==null || importApi.getAuthenticationProfiles().size()==0) return;
-			
+
 		for(AuthenticationProfile authProfile : importApi.getAuthenticationProfiles()) {
-			if(authProfile.getType().equals(AuthType.ssl)) { 
+			if(authProfile.getType().equals(AuthType.ssl)) {
 				handleOutboundSSLAuthN(authProfile);
 			} else if(authProfile.getType().equals(AuthType.oauth)) {
 				handleOutboundOAuthAuthN(authProfile);
 			}
 		}
-		
+
 	}
-	
+
 	private void handleOutboundOAuthAuthN(AuthenticationProfile authnProfile) throws AppException {
 		if(!authnProfile.getType().equals(AuthType.oauth)) return;
 		String providerProfile = (String)authnProfile.getParameters().get("providerProfile");
@@ -673,7 +673,7 @@ public class APIImportConfigAdapter {
 		}
 		authnProfile.getParameters().put("providerProfile", clientProfile.getId());
 	}
-	
+
 	private void handleOutboundSSLAuthN(AuthenticationProfile authnProfile) throws AppException {
 		if(!authnProfile.getType().equals(AuthType.ssl)) return;
 		String keystore = (String)authnProfile.getParameters().get("certFile");
@@ -713,9 +713,9 @@ public class APIImportConfigAdapter {
 			authnProfile.getParameters().remove("certFile");
 		} catch (Exception e) {
 			throw new AppException("Can't read Client-Cert-File: "+keystore+" from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
-		} 
+		}
 	}
-	
+
 	private void validateHasQueryStringKey(API importApi) throws AppException {
 		if(importApi.getApiRoutingKey()==null) return; // Nothing to check
 		if(importApi instanceof DesiredTestOnlyAPI) return; // Do nothing when unit-testing
@@ -728,7 +728,7 @@ public class APIImportConfigAdapter {
 			LOG.debug("Can't check if QueryString for API is needed without Admin-Account.");
 		}
 	}
-	
+
 	private API addImageContent(API importApi) throws AppException {
 		// No image declared do nothing
 		if(importApi.getImage()==null) return importApi;
@@ -769,11 +769,11 @@ public class APIImportConfigAdapter {
 	public void setPathToAPIDefinition(String pathToAPIDefinition) {
 		this.pathToAPIDefinition = pathToAPIDefinition;
 	}
-	
+
 	/*
 	 * Refactor the following three method a Generic one
 	 */
-	
+
 	private CorsProfile getCorsProfile(API api, String profileName) {
 		if(api.getCorsProfiles()==null || api.getCorsProfiles().size()==0) return null;
 		for(CorsProfile cors : api.getCorsProfiles()) {
@@ -781,7 +781,7 @@ public class APIImportConfigAdapter {
 		}
 		return null;
 	}
-	
+
 	private AuthenticationProfile getAuthNProfile(API api, String profileName) {
 		if(api.getAuthenticationProfiles()==null || api.getAuthenticationProfiles().size()==0) return null;
 		for(AuthenticationProfile profile : api.getAuthenticationProfiles()) {
@@ -789,7 +789,7 @@ public class APIImportConfigAdapter {
 		}
 		return null;
 	}
-	
+
 	private SecurityProfile getSecurityProfile(API api, String profileName) throws AppException {
 		if(api.getSecurityProfiles()==null || api.getSecurityProfiles().size()==0) return null;
 		for(SecurityProfile profile : api.getSecurityProfiles()) {
@@ -797,7 +797,7 @@ public class APIImportConfigAdapter {
 		}
 		return null;
 	}
-	
+
 	private void handleVhost(API apiConfig) {
 		if(apiConfig.getVhost() == null) return;
 		// Consider an empty VHost as not set, as it is logically not possible to have an empty VHost.

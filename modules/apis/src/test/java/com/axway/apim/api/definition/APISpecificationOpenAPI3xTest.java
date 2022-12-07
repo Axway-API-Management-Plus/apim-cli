@@ -1,17 +1,10 @@
 package com.axway.apim.api.definition;
 
-import java.io.IOException;
-
-import org.apache.commons.io.IOUtils;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.apiSpecification.APISpecification;
+import com.axway.apim.api.apiSpecification.APISpecification.APISpecType;
 import com.axway.apim.api.apiSpecification.APISpecificationFactory;
 import com.axway.apim.api.apiSpecification.OAS3xSpecification;
-import com.axway.apim.api.apiSpecification.APISpecification.APISpecType;
 import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.api.model.DesiredAPISpecification;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
@@ -19,8 +12,14 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.apache.commons.io.IOUtils;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.Objects;
 
 public class APISpecificationOpenAPI3xTest {
 	
@@ -36,7 +35,7 @@ public class APISpecificationOpenAPI3xTest {
 	}
 	
 	@Test
-	public void backendHostAndBasePath() throws AppException, IOException {
+	public void backendHostAndBasePath() throws IOException {
 
 		byte[] content = getSwaggerContent(TEST_PACKAGE + "/petstore-openapi30.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
@@ -46,12 +45,11 @@ public class APISpecificationOpenAPI3xTest {
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
 		Assert.assertEquals(apiDefinition.getDescription(), "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.");
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
-		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).size(), 1, "Expected to get only one server url");
-		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).get(0).get("url").asText(), "https://myhost.customer.com:8767/api/v1/myAPI/v2");
+		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
 	}
 	
 	@Test
-	public void testBerlinGroupYAM_API() throws AppException, IOException {
+	public void testBerlinGroupYAM_API() throws IOException {
 		APIManagerAdapter.apiManagerVersion="7.7.0";
 		byte[] content = getSwaggerContent(TEST_PACKAGE + "/psd2-api_1.3.6_errata20200327.yaml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
@@ -60,20 +58,12 @@ public class APISpecificationOpenAPI3xTest {
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
 		JsonNode swagger = ymlMapper.readTree(apiDefinition.getApiSpecificationContent());
-		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).size(), 1, "Expected to get only one server url");
-		Assert.assertEquals( ((ArrayNode) swagger.get("servers")).get(0).get("url").asText(), "https://myhost.customer.com:8767/api/v1/myAPI/");
+		Assert.assertEquals( swagger.get("servers").size(), 1, "Expected to get only one server url");
 	}
-	
-	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasePath: 'An-Invalid-URL' is invalid.")
-	public void testInvalidBackendBasePath() throws AppException, IOException {
 
-		byte[] content = getSwaggerContent(TEST_PACKAGE + "/petstore-openapi30.json");
-		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-		apiDefinition.configureBasePath("An-Invalid-URL", null);
-	}
 	
 	@Test
-	public void testPetstoreSomeIncluded() throws AppException, IOException {
+	public void testPetstoreSomeIncluded() throws IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addInclude(new String[] {"/pet/{petId}:GET"}, null); // Only this single method should be included
@@ -82,8 +72,8 @@ public class APISpecificationOpenAPI3xTest {
 		desiredAPISpec.setFilter(filterConfig);
 		
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
-		
-		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.OPEN_API_30);
+
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		
 		Assert.assertEquals(filteredSpec.get("paths").size(), 1, "Only one remaining method should be left.");
@@ -91,7 +81,7 @@ public class APISpecificationOpenAPI3xTest {
 	}
 	
 	@Test
-	public void testPetstoreAllGetsIncluded() throws AppException, IOException {
+	public void testPetstoreAllGetsIncluded() throws IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addInclude(new String[] {"*:GET"}, null);
@@ -100,8 +90,8 @@ public class APISpecificationOpenAPI3xTest {
 		desiredAPISpec.setFilter(filterConfig);
 		
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
-		
-		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.OPEN_API_30);
+
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		
 		Assert.assertEquals(filteredSpec.get("paths").size(), 8, "/ GET Methods are expected");
@@ -109,22 +99,21 @@ public class APISpecificationOpenAPI3xTest {
 	}
 	
 	@Test
-	public void testPetstoreSomeExcluded() throws AppException, IOException {
+	public void testPetstoreSomeExcluded() throws IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addExclude(new String[] {"/pet/{petId}:DELETE"}, null); // No DELETE-Method anymore for this path
 		filterConfig.addExclude(new String[] {"/pet/{petId}/uploadImage:POST"}, null); // Last operation - Path should have been removed
 		filterConfig.addExclude(new String[] {"/store/order/{orderId}:*"}, null); // Remove all operations for this path
 		
-		
 		desiredAPISpec.setResource(TEST_PACKAGE+"/petstore-openapi30.json");
 		desiredAPISpec.setFilter(filterConfig);
 		
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
-		
-		
-		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.OPEN_API_30);
+
+
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		
 		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}").get("delete"), "/pet/{petId}:DELETE should have been removed.");
@@ -133,7 +122,7 @@ public class APISpecificationOpenAPI3xTest {
 	}
 	
 	@Test
-	public void testPetstoreAllDeletesExcluded() throws AppException, IOException {
+	public void testPetstoreAllDeletesExcluded() throws IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addExclude(new String[] {"*:DELETE"}, null);
@@ -142,8 +131,8 @@ public class APISpecificationOpenAPI3xTest {
 		desiredAPISpec.setFilter(filterConfig);
 		
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
-		
-		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.OPEN_API_30);
+
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		
 		Assert.assertEquals(filteredSpec.get("paths").size(), 14, "All DELETE Methods are excluded");
@@ -153,7 +142,7 @@ public class APISpecificationOpenAPI3xTest {
 	}
 	
 	@Test
-	public void testTagPetIncludedOnly() throws AppException, IOException {
+	public void testTagPetIncludedOnly() throws IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addInclude(null, new String[] {"pet"});
@@ -165,8 +154,8 @@ public class APISpecificationOpenAPI3xTest {
 		desiredAPISpec.setFilter(filterConfig);
 		
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
-		
-		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.OPEN_API_30);
+
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		
 		Assert.assertNull(filteredSpec.get("paths").get("/pet/{petId}/uploadImage"));
@@ -191,7 +180,7 @@ public class APISpecificationOpenAPI3xTest {
 	}
 	
 	@Test
-	public void testCombinedFilter() throws AppException, IOException {
+	public void testCombinedFilter() throws IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		// Include all GET-Methods from tags pet and store
@@ -204,8 +193,8 @@ public class APISpecificationOpenAPI3xTest {
 		desiredAPISpec.setFilter(filterConfig);
 		
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(desiredAPISpec, "Not required", "Test-API");
-		
-		Assert.assertTrue(apiDefinition.getAPIDefinitionType() == APISpecType.OPEN_API_30);
+
+		Assert.assertSame(apiDefinition.getAPIDefinitionType(), APISpecType.OPEN_API_30);
 		JsonNode filteredSpec = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		
 		Assert.assertNotNull(filteredSpec.get("paths").get("/pet/{petId}/uploadImage"));
@@ -237,7 +226,7 @@ public class APISpecificationOpenAPI3xTest {
 	
 	private byte[] getSwaggerContent(String swaggerFile) throws AppException {
 		try {
-			return IOUtils.toByteArray(this.getClass().getResourceAsStream(swaggerFile));
+			return IOUtils.toByteArray(Objects.requireNonNull(this.getClass().getResourceAsStream(swaggerFile)));
 		} catch (IOException e) {
 			throw new AppException("Can't read Swagger-File: '"+swaggerFile+"'", ErrorCode.CANT_READ_API_DEFINITION_FILE);
 		}

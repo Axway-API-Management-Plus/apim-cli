@@ -11,7 +11,7 @@ public class Result {
 	
 	private Object resultDetails;
 	
-	private List<ErrorCode> errorCodes = new ArrayList<ErrorCode>();
+	private final List<ErrorCode> errorCodes = new ArrayList<>();
 	
 	public ErrorCode getErrorCode() {
 		if(errorCodes.size()>0) {

@@ -34,11 +34,11 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class APIManagerConfigAdapter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIManagerConfigAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIManagerConfigAdapter.class);
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
-	private CoreParameters cmd;
+	private final CoreParameters cmd;
 
 	public APIManagerConfigAdapter() {
 		cmd = CoreParameters.getInstance();
@@ -60,8 +60,8 @@ public class APIManagerConfigAdapter {
 				"applicationScopeRestrictions", "strictCertificateChecking", "serverCertificateVerification", "advisoryBannerEnabled", "advisoryBannerText"
 				});
 		
-		private String[] ignoreFields;
-		private String managerVersion;
+		private final String[] ignoreFields;
+		private final String managerVersion;
 		
 		ConfigFields(String managerVersion, String[] ignoreFields) {
 			this.ignoreFields = ignoreFields;
@@ -125,9 +125,8 @@ public class APIManagerConfigAdapter {
 		}
 	}
 	
-	public Config updateConfiguration(Config desiredConfig) throws AppException {
+	public void updateConfiguration(Config desiredConfig) throws AppException {
 		HttpResponse httpResponse = null;
-		Config updatedConfig;
 		try {
 			if(!APIManagerAdapter.hasAdminAccount()) {
 				throw new AppException("An Admin Account is required to update the API-Manager configuration.", ErrorCode.NO_ADMIN_ROLE_USER);
@@ -149,7 +148,6 @@ public class APIManagerConfigAdapter {
 					LOG.error("Error updating API-Manager configuration. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 					throw new AppException("Error updating API-Manager configuration. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
-				updatedConfig = mapper.readValue(httpResponse.getEntity().getContent(), Config.class);
 			} catch (Exception e) {
 				throw new AppException("Error updating API-Manager configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			} finally {
@@ -158,7 +156,6 @@ public class APIManagerConfigAdapter {
 						((CloseableHttpResponse)httpResponse).close();
 				} catch (Exception ignore) { }
 			}
-			return updatedConfig;
 
 		} catch (Exception e) {
 			throw new AppException("Error updating API-Manager configuration.", ErrorCode.CANT_CREATE_API_PROXY, e);

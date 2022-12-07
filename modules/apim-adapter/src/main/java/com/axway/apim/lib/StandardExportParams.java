@@ -18,7 +18,11 @@ public class StandardExportParams extends CoreParameters {
 		dat;
 		
 		public static OutputFormat getFormat(String name) {
-			if(name==null || valueOf(name)==null) return console;
+			if(name == null) {
+				return console;
+			} else {
+				valueOf(name);
+			}
 			return valueOf(name);
 		}
 	}

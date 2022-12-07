@@ -32,7 +32,7 @@ public class APIManagerAPIMethodAdapter {
 
     ObjectMapper mapper = APIManagerAdapter.mapper;
 
-    private CoreParameters cmd;
+    private final CoreParameters cmd;
 
     public APIManagerAPIMethodAdapter() {
         cmd = CoreParameters.getInstance();
@@ -42,7 +42,6 @@ public class APIManagerAPIMethodAdapter {
 
     private void readMethodsFromAPIManager(String apiId) throws AppException {
         if (this.apiManagerResponse.get(apiId) != null) return;
-        String response = null;
         URI uri;
         HttpResponse httpResponse = null;
         try {
@@ -52,7 +51,7 @@ public class APIManagerAPIMethodAdapter {
             httpResponse = getRequest.execute();
             this.apiManagerResponse.put(apiId, EntityUtils.toString(httpResponse.getEntity()));
         } catch (Exception e) {
-            LOG.error("Error cant load API-Methods for API: '" + apiId + "' from API-Manager. Can't parse response: " + response, e);
+            LOG.error("Error cant load API-Methods for API: {}" + apiId, e);
             throw new AppException("Error cant load API-Methods for API: '" + apiId + "' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         } finally {
             try {
@@ -122,7 +121,7 @@ public class APIManagerAPIMethodAdapter {
                 LOG.info("Successfully updated API Method. Received Status-Code: " + statusCode);
             }
         } catch (Exception e) {
-            LOG.error("Error cant update API-Methods for API: '" + apiMethod.getVirtualizedApiId() + "' from API-Manager" , e);
+            LOG.error("Error cant update API-Methods for API: '" + apiMethod.getVirtualizedApiId() + "' from API-Manager", e);
             throw new AppException("Error cant load API-Methods for API: '" + apiMethod.getVirtualizedApiId() + "' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         } finally {
             try {

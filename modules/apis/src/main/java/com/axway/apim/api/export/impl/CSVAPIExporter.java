@@ -29,11 +29,11 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class CSVAPIExporter extends APIResultHandler {
-	private static Logger LOG = LoggerFactory.getLogger(CSVAPIExporter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CSVAPIExporter.class);
 	
 	DateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	private static enum HeaderFields {
+	private enum HeaderFields {
 		standard(new String[] {
 				"API ID", 
 				"API Name", 
@@ -78,15 +78,13 @@ public class CSVAPIExporter extends APIResultHandler {
 				"Created on"
 				});
 		
-		String[] headerFields;
+		final String[] headerFields;
 
-		private HeaderFields(String[] headerFields) {
+		HeaderFields(String[] headerFields) {
 			this.headerFields = headerFields;
 		}
 	}
 
-	APIManagerAdapter apiManager;
-	
 	public CSVAPIExporter(APIExportParams params) throws AppException {
 		super(params);
 	}
@@ -116,10 +114,9 @@ public class CSVAPIExporter extends APIResultHandler {
 				try {
 					csvPrinter.close(true);
 				} catch (Exception ignore) {
-					throw new AppException("Unable to close CSVWriter", ErrorCode.UNXPECTED_ERROR, ignore);
+					LOG.error("Unable to close CSVWriter", ignore);
 				}
 		}
-		return;
 	}
 	
 	private String createFileName() throws AppException {
@@ -132,7 +129,7 @@ public class CSVAPIExporter extends APIResultHandler {
 		return "api_export_"+host+"_"+APIManagerAdapter.getCurrentUser(false).getLoginName()+"_"+dateTime+".csv";
 	}
 	
-	private void writeRecords(CSVPrinter csvPrinter, List<API> apis, Wide wide) throws IOException, AppException {
+	private void writeRecords(CSVPrinter csvPrinter, List<API> apis, Wide wide) throws IOException {
 		apis.sort(new APIComparator());
 		int i=0;
 		for(API api : apis) {
@@ -160,11 +157,11 @@ public class CSVAPIExporter extends APIResultHandler {
 		csvPrinter.flush();
 	}
 	
-	private List<Organization> getClientOrganizations(API api) throws AppException {
+	private List<Organization> getClientOrganizations(API api) {
 		if(api.getClientOrganizations()==null || api.getClientOrganizations().size()==0) {
 			Organization org = new Organization();
 			org.setName("N/A");
-			List<Organization> ungranted = new ArrayList<Organization>();
+			List<Organization> ungranted = new ArrayList<>();
 			ungranted.add(org);
 			return ungranted;
 		} else {
@@ -172,14 +169,14 @@ public class CSVAPIExporter extends APIResultHandler {
 		}
 	}
 	
-	private List<ClientApplication> getClientApplications(API api) throws AppException {
+	private List<ClientApplication> getClientApplications(API api) {
 		if(api.getApplications()==null || api.getApplications().size()==0) {
 			ClientApplication app = new ClientApplication();
 			app.setName("N/A");
 			Organization org = new Organization();
 			org.setName("N/A");
 			app.setOrganization(org);
-			List<ClientApplication> subscribed = new ArrayList<ClientApplication>();
+			List<ClientApplication> subscribed = new ArrayList<>();
 			subscribed.add(app);
 			return subscribed;
 		} else {
@@ -187,7 +184,7 @@ public class CSVAPIExporter extends APIResultHandler {
 		}
 	}
 	
-	private void writeRecords(CSVPrinter csvPrinter, API api, ClientApplication app, Organization org, Wide wide) throws IOException, AppException {
+	private void writeRecords(CSVPrinter csvPrinter, API api, ClientApplication app, Organization org, Wide wide) throws IOException {
 		switch(wide) {
 		case standard:
 			writeStandardToCSV(csvPrinter, api);
@@ -203,7 +200,7 @@ public class CSVAPIExporter extends APIResultHandler {
 		}
 	}
 	
-	private void writeStandardToCSV(CSVPrinter csvPrinter, API api) throws IOException, AppException {
+	private void writeStandardToCSV(CSVPrinter csvPrinter, API api) throws IOException {
 		csvPrinter.printRecord(
 				api.getId(), 
 				api.getName(), 
@@ -213,7 +210,7 @@ public class CSVAPIExporter extends APIResultHandler {
 		);
 	}
 	
-	private void writeWideToCSV(CSVPrinter csvPrinter, API api) throws IOException, AppException {
+	private void writeWideToCSV(CSVPrinter csvPrinter, API api) throws IOException {
 		csvPrinter.printRecord(
 				api.getId(), 
 				api.getOrganization().getName(),
@@ -231,7 +228,7 @@ public class CSVAPIExporter extends APIResultHandler {
 		);
 	}
 	
-	private void writeAPIUltraToCSV(CSVPrinter csvPrinter, API api, ClientApplication app, Organization org) throws IOException, AppException {
+	private void writeAPIUltraToCSV(CSVPrinter csvPrinter, API api, ClientApplication app, Organization org) throws IOException {
 		csvPrinter.printRecord(
 				api.getId(), 
 				api.getOrganization().getName(),
@@ -279,8 +276,7 @@ public class CSVAPIExporter extends APIResultHandler {
 			builder.includeClientApplications(true);
 			builder.includeClientOrganizations(true);
 			break;
-		}		
-		APIFilter filter = builder.build();
-		return filter;
+		}
+		return builder.build();
 	}
 }

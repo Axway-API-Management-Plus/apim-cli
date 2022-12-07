@@ -170,7 +170,10 @@ public class API implements CustomPropertiesEntity {
 	protected String apiId = null;
 	
 	protected String deprecated = null;
-	
+
+	@JsonIgnore
+	protected String backendImportedUrl;
+
 	@JsonIgnore
 	protected String resourcePath = null;
 
@@ -546,5 +549,13 @@ public class API implements CustomPropertiesEntity {
 	 */
 	public void setRequestForAllOrgs(boolean requestForAllOrgs) {
 		this.requestForAllOrgs = requestForAllOrgs;
+	}
+
+	public String getBackendImportedUrl() {
+		return backendImportedUrl;
+	}
+
+	public void setBackendImportedUrl(String backendImportedUrl) {
+		this.backendImportedUrl = backendImportedUrl;
 	}
 }

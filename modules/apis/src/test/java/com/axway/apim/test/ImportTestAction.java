@@ -154,6 +154,8 @@ public class ImportTestAction extends AbstractTestAction {
 			}
 			args.add("-allowOrgAdminsToPublish");
 			args.add(allowOrgAdminsToPublish);
+			args.add("-disableCompression");
+
 			if(changeOrganization) {
 				args.add("-changeOrganization");
 			}

@@ -3,8 +3,10 @@ package com.axway.apim.api.export;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.APISpecification;
+import com.axway.apim.api.apiSpecification.WSDLSpecification;
 import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,7 +14,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @JsonPropertyOrder({"name", "path", "state", "version", "apiRoutingKey", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost",
         "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties",
@@ -38,7 +43,7 @@ public class ExportAPI {
         return this.actualAPIProxy.getApiDefinition();
     }
 
-    public Map<String, OutboundProfile> getOutboundProfiles() throws AppException {
+    public Map<String, OutboundProfile> getOutboundProfiles() {
         if (this.actualAPIProxy.getOutboundProfiles() == null) return null;
         if (this.actualAPIProxy.getOutboundProfiles().isEmpty()) return null;
         if (this.actualAPIProxy.getOutboundProfiles().size() == 1) {
@@ -63,6 +68,8 @@ public class ExportAPI {
 
     public List<SecurityProfile> getSecurityProfiles() throws AppException {
         if (this.actualAPIProxy.getSecurityProfiles().size() == 1) {
+            if(this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().size() == 0)
+                return null;
             if (this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().get(0).getType() == DeviceType.passThrough)
                 return null;
         }
@@ -299,7 +306,10 @@ public class ExportAPI {
     @JsonProperty("apiSpecification")
     public DesiredAPISpecification getApiDefinitionImport() {
         DesiredAPISpecification spec = new DesiredAPISpecification();
-        spec.setResource(this.getAPIDefinition().getApiSpecificationFile());
+        if( this.getAPIDefinition() instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKED_URL) {
+            spec.setResource(actualAPIProxy.getBackendImportedUrl());
+        } else
+            spec.setResource(this.getAPIDefinition().getApiSpecificationFile());
         return spec;
     }
 

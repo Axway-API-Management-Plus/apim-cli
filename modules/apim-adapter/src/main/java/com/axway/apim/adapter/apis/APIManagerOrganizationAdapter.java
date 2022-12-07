@@ -44,9 +44,9 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class APIManagerOrganizationAdapter {
 
-    private static Logger LOG = LoggerFactory.getLogger(APIManagerOrganizationAdapter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(APIManagerOrganizationAdapter.class);
 
-    private CoreParameters cmd;
+    private final CoreParameters cmd;
 
     ObjectMapper mapper = APIManagerAdapter.mapper;
 
@@ -105,15 +105,15 @@ public class APIManagerOrganizationAdapter {
         }
     }
 
-    public Organization updateOrganization(Organization desiredOrg, Organization actualOrg) throws AppException {
-        return createOrUpdateOrganization(desiredOrg, actualOrg);
+    public void updateOrganization(Organization desiredOrg, Organization actualOrg) throws AppException {
+        createOrUpdateOrganization(desiredOrg, actualOrg);
     }
 
-    public Organization createOrganization(Organization desiredOrg) throws AppException {
-        return createOrUpdateOrganization(desiredOrg, null);
+    public void createOrganization(Organization desiredOrg) throws AppException {
+        createOrUpdateOrganization(desiredOrg, null);
     }
 
-    public Organization createOrUpdateOrganization(Organization desiredOrg, Organization actualOrg) throws AppException {
+    public void createOrUpdateOrganization(Organization desiredOrg, Organization actualOrg) throws AppException {
         HttpResponse httpResponse = null;
         Organization createdOrg;
         try {
@@ -127,7 +127,7 @@ public class APIManagerOrganizationAdapter {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations/" + actualOrg.getId()).build();
             }
             FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-                    SimpleBeanPropertyFilter.serializeAllExcept(new String[]{"image", "createdOn", "apis"}));
+                    SimpleBeanPropertyFilter.serializeAllExcept("image", "createdOn", "apis"));
             mapper.setFilterProvider(filter);
             mapper.setSerializationInclusion(Include.NON_NULL);
             try {
@@ -164,7 +164,6 @@ public class APIManagerOrganizationAdapter {
             saveAPIAccess(desiredOrg, actualOrg);
             // Force reload of this organization next time
             organizationCache.remove(createdOrg.getId());
-            return createdOrg;
 
         } catch (Exception e) {
             throw new AppException("Error creating/updating organization", ErrorCode.CANT_CREATE_API_PROXY, e);
