@@ -4,20 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.13.1] In progress
+## [1.13.2] In progress
 
 ### Fixed
 
 - Export apiRoutingKey (See issue [#323](https://github.com/Axway-API-Management-Plus/apim-cli/issues/323))
 - apim-cli behaviour during restoration of 2 identical apis but exposed on two different virtual host  (See issue [#331](https://github.com/Axway-API-Management-Plus/apim-cli/issues/331))
 - APIM UI FeAPI via UI WSDL import, exported and imported by CLI fails, due to wsdl file reference api-config.json (See issue [#328](https://github.com/Axway-API-Management-Plus/apim-cli/issues/328))
-  - Added an environment variable **retain.backend.url** to add URL to api-config.json instead of writing WSDL to file system. 
-## [1.13.1] 2022-11-15
+  - Added an environment variable with value **retain.backend.url=true** to add URL used to import WSDL to api-config.json instead of writing WSDL to file system. 
+
+
+## [1.13.1] 2022-11-15 
 
 ### Fixed
-- Get API causes an error when related certificates contains slash character '/' in their CN (See issue [#315](https://github.com/Axway-API-Management-Plus/apim-cli/issues/315)
-- globalrequest and response polices are not handled correctly using apim settings import (See issue [#325](https://github.com/Axway-API-Management-Plus/apim-cli/issues/325)
-- Add support for OData V4 specifications  (See issue [#234](https://github.com/Axway-API-Management-Plus/apim-cli/issues/234)
+- Get API causes an error when related certificates contains slash character '/' in their CN (See issue [#315](https://github.com/Axway-API-Management-Plus/apim-cli/issues/315))
+- globalrequest and response polices are not handled correctly using apim settings import (See issue [#325](https://github.com/Axway-API-Management-Plus/apim-cli/issues/325))
+- Add support for OData V4 specifications  (See issue [#234](https://github.com/Axway-API-Management-Plus/apim-cli/issues/234))
 - Security fix - Bump commons-text from 1.9 to 1.10.0
 - Security fix Bump jackson-databind from 2.13.3 to 2.13.4.1
 
@@ -30,11 +32,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.13.0] 2022-09-23
 
 ### Fixed
-- Junit fix (See issue [#305](https://github.com/Axway-API-Management-Plus/apim-cli/issues/305)
-- Attempt to import WSDL API definition produces HTTP error code 400 when creating front end API (See issue [#308](https://github.com/Axway-API-Management-Plus/apim-cli/issues/308)
-- AXWAY_APIM_CLI_HOME in the environment may break tests (See issue [#306](https://github.com/Axway-API-Management-Plus/apim-cli/issues/306)
-- Allow override per method for tags (See issue [#162](https://github.com/Axway-API-Management-Plus/apim-cli/issues/162)
-- apim cli always use first org for api deployment if user is assigned to multiple org (See issue [#311](https://github.com/Axway-API-Management-Plus/apim-cli/issues/311)
+- Junit fix (See issue [#305](https://github.com/Axway-API-Management-Plus/apim-cli/issues/305))
+- Attempt to import WSDL API definition produces HTTP error code 400 when creating front end API (See issue [#308](https://github.com/Axway-API-Management-Plus/apim-cli/issues/308))
+- AXWAY_APIM_CLI_HOME in the environment may break tests (See issue [#306](https://github.com/Axway-API-Management-Plus/apim-cli/issues/306))
+- Allow override per method for tags (See issue [#162](https://github.com/Axway-API-Management-Plus/apim-cli/issues/162))
+- apim cli always use first org for api deployment if user is assigned to multiple org (See issue [#311](https://github.com/Axway-API-Management-Plus/apim-cli/issues/311))
 
 ### Added
 - Automate APIM CLI config file creation based on openapi specification
@@ -44,9 +46,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-- oas 3.0 base path handling (See issue [#297](https://github.com/Axway-API-Management-Plus/apim-cli/issues/297)
-- BackendBasepath problem exporting SOAP API with apim-cli (See issue [#299](https://github.com/Axway-API-Management-Plus/apim-cli/issues/299)
-- Importing SOAP API with apim-cli adds "+" instead of spaces for the Backend API name (See issue [#301](https://github.com/Axway-API-Management-Plus/apim-cli/issues/301)
+- oas 3.0 base path handling (See issue [#297](https://github.com/Axway-API-Management-Plus/apim-cli/issues/297))
+- BackendBasepath problem exporting SOAP API with apim-cli (See issue [#299](https://github.com/Axway-API-Management-Plus/apim-cli/issues/299))
+- Importing SOAP API with apim-cli adds "+" instead of spaces for the Backend API name (See issue [#301](https://github.com/Axway-API-Management-Plus/apim-cli/issues/301))
 
 ### Changed
 - Added new parameter disableCompression.  The parameter enables logging API Gateway responses for debugging.
