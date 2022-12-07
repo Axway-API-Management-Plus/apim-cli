@@ -5,6 +5,7 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ public class UnPublishAPIHandler extends APIResultHandler {
 				try {
 					statusManager.update(api, API.STATE_UNPUBLISHED, true);
 				} catch(Exception e) {
+					result.setError(ErrorCode.ERR_UNPUBSLISH_API);
 					LOG.error("Error unpublishing API: " + api.getName());
 				}
 			}
