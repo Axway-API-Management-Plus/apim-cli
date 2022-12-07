@@ -6,6 +6,7 @@ import com.axway.apim.api.apiSpecification.APISpecification;
 import com.axway.apim.api.apiSpecification.WSDLSpecification;
 import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -305,9 +306,9 @@ public class ExportAPI {
     @JsonProperty("apiSpecification")
     public DesiredAPISpecification getApiDefinitionImport() {
         DesiredAPISpecification spec = new DesiredAPISpecification();
-        if( this.getAPIDefinition() instanceof WSDLSpecification)
+        if( this.getAPIDefinition() instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKED_URL) {
             spec.setResource(actualAPIProxy.getBackendImportedUrl());
-        else
+        } else
             spec.setResource(this.getAPIDefinition().getApiSpecificationFile());
         return spec;
     }

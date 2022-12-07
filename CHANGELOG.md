@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.13.1] In progress
+
+### Fixed
+
+- Export apiRoutingKey (See issue [#323](https://github.com/Axway-API-Management-Plus/apim-cli/issues/323))
+- apim-cli behaviour during restoration of 2 identical apis but exposed on two different virtual host  (See issue [#331](https://github.com/Axway-API-Management-Plus/apim-cli/issues/331))
+- APIM UI FeAPI via UI WSDL import, exported and imported by CLI fails, due to wsdl file reference api-config.json (See issue [#328](https://github.com/Axway-API-Management-Plus/apim-cli/issues/328))
+  - Added an environment variable **retain.backend.url** to add URL to api-config.json instead of writing WSDL to file system. 
 ## [1.13.1] 2022-11-15
 
 ### Fixed

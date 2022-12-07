@@ -12,6 +12,7 @@ import com.axway.apim.api.export.jackson.serializer.APIExportSerializerModifier;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -85,7 +86,7 @@ public class JsonAPIExporter extends APIResultHandler {
 		String targetFile = null;
 		try {
 			targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName()+apiDef.getAPIDefinitionType().getFileExtension();
-			if(!(apiDef instanceof WSDLSpecification)) {
+			if(!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKED_URL)) {
 				writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
 				exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension());
 			}
