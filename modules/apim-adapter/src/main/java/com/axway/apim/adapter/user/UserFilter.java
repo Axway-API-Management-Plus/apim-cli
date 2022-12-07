@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.axway.apim.adapter.apis.FilterHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -73,14 +74,7 @@ public class UserFilter implements CustomPropertiesFilter {
 		if(name==null) return;
 		if(name.equals("*")) return;
 		this.name = name;
-		String op = "eq";
-		if(name.startsWith("*") || name.endsWith("*")) {
-			op = "like";
-			name = name.replace("*", "");
-		}
-		filters.add(new BasicNameValuePair("field", "name"));
-		filters.add(new BasicNameValuePair("op", op));
-		filters.add(new BasicNameValuePair("value", name));
+		FilterHelper.setFilter(name, filters);
 	}
 	
 	public void setLoginName(String loginName) {		

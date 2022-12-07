@@ -29,11 +29,11 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class APIManagerAlertsAdapter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIManagerAlertsAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIManagerAlertsAdapter.class);
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 	
-	private CoreParameters cmd;
+	private final CoreParameters cmd;
 
 	public APIManagerAlertsAdapter() {
 		cmd = CoreParameters.getInstance();
@@ -82,9 +82,8 @@ public class APIManagerAlertsAdapter {
 		}
 	}
 	
-	public Alerts updateAlerts(Alerts alerts) throws AppException {
+	public void updateAlerts(Alerts alerts) throws AppException {
 		HttpResponse httpResponse = null;
-		Alerts updatedAlerts;
 		try {
 			if(!APIManagerAdapter.hasAdminAccount()) {
 				throw new AppException("An Admin Account is required to update the API-Manager alerts configuration.", ErrorCode.NO_ADMIN_ROLE_USER);
@@ -105,7 +104,6 @@ public class APIManagerAlertsAdapter {
 					LOG.error("Error updating API-Manager alert configuration. Response-Code: "+statusCode+". Got response: '"+EntityUtils.toString(httpResponse.getEntity())+"'");
 					throw new AppException("Error updating API-Manager alert configuration. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
 				}
-				updatedAlerts = mapper.readValue(httpResponse.getEntity().getContent(), Alerts.class);
 			} catch (Exception e) {
 				throw new AppException("Error updating API-Manager alert configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 			} finally {
@@ -114,7 +112,6 @@ public class APIManagerAlertsAdapter {
 						((CloseableHttpResponse)httpResponse).close();
 				} catch (Exception ignore) { }
 			}
-			return updatedAlerts;
 
 		} catch (Exception e) {
 			throw new AppException("Error updating API-Manager alert configuration.", ErrorCode.CANT_CREATE_API_PROXY, e);

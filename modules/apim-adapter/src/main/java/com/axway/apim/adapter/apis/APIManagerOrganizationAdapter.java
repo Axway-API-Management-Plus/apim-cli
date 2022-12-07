@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -281,7 +282,7 @@ public class APIManagerOrganizationAdapter {
 
     private void saveAPIAccess(Organization org, Organization actualOrg) throws AppException {
         if (org.getApiAccess() == null || org.getApiAccess().size() == 0) return;
-        if (actualOrg != null && actualOrg.getApiAccess().size() == org.getApiAccess().size() && actualOrg.getApiAccess().containsAll(org.getApiAccess()))
+        if (actualOrg != null && actualOrg.getApiAccess().size() == org.getApiAccess().size() && new HashSet<>(actualOrg.getApiAccess()).containsAll(org.getApiAccess()))
             return;
         if (!APIManagerAdapter.hasAdminAccount()) {
             LOG.warn("Ignoring API-Access, as no admin account is given");

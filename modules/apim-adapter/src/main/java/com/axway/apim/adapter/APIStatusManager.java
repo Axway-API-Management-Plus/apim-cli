@@ -1,26 +1,24 @@
 package com.axway.apim.adapter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.api.API;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class APIStatusManager {
 	
 	static Logger LOG = LoggerFactory.getLogger(APIStatusManager.class);
 	
-	private APIManagerAdapter apimAdapter;
+	private final APIManagerAdapter apimAdapter;
 	
 	private boolean updateVHostRequired = false;
 
-	private static enum StatusChangeMap {
+	private enum StatusChangeMap {
 		unpublished(new String[] { "published", "deleted" }), 
 		published(new String[] { "unpublished", "deprecated" }),
 		deleted(new String[] {}), 
@@ -28,18 +26,18 @@ public class APIStatusManager {
 		undeprecated(new String[] { "published", "unpublished" }),
 		pending(new String[] { "deleted" });
 
-		private String[] possibleStates;
+		private final String[] possibleStates;
 
 		StatusChangeMap(String[] possibleStates) {
 			this.possibleStates = possibleStates;
 		}
 	}
 	
-	private static enum StatusChangeRequiresEnforce { 
+	private enum StatusChangeRequiresEnforce {
 		published(new String[] { "unpublished", "deleted" }),
 		deprecated(new String[] { "unpublished", "deleted" });
 
-		private List<String> enforceRequired = new ArrayList<String>();
+		private final List<String> enforceRequired;
 
 		StatusChangeRequiresEnforce(String[] enforceRequired) {
 			this.enforceRequired = Arrays.asList(enforceRequired);
@@ -67,11 +65,7 @@ public class APIStatusManager {
 	}
 	
 	public void update(API apiToUpdate, String desiredState, String vhost) throws AppException {
-		if(CoreParameters.getInstance().isForce()) {
-			update(apiToUpdate, desiredState, vhost, true);
-		} else {
-			update(apiToUpdate, desiredState, vhost, false);
-		}
+		update(apiToUpdate, desiredState, vhost, CoreParameters.getInstance().isForce());
 	}
 	
 	

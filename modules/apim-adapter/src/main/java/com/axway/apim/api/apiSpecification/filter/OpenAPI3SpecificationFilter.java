@@ -1,20 +1,17 @@
 package com.axway.apim.api.apiSpecification.filter;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.api.apiSpecification.filter.BaseAPISpecificationFIlter.FilterConfig;
 import com.axway.apim.api.model.APISpecificationFilter;
-
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.PathItem.HttpMethod;
 import io.swagger.v3.oas.models.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OpenAPI3SpecificationFilter {
 	
@@ -24,32 +21,28 @@ public class OpenAPI3SpecificationFilter {
 		Paths paths = openAPI.getPaths();
 		FilterConfig filter = new FilterConfig(filterConfig);
 		// If includes are given - Remove all others not defined as included
-		List<String> toBeRemoved = new ArrayList<String>();
-		List<String> pathsToBeRemoved = new ArrayList<String>();
-		List<String> modelsToBeRemoved = new ArrayList<String>();
+		List<String> toBeRemoved = new ArrayList<>();
+		List<String> pathsToBeRemoved = new ArrayList<>();
+		List<String> modelsToBeRemoved = new ArrayList<>();
 		// Iterate over the API specification and create a list of all paths 
 		// that must to be removed because they were not configured as included
-		Iterator<String> it = paths.keySet().iterator();
-		while(it.hasNext()) {
+		for (String s : paths.keySet()) {
 			boolean removePath = true;
-			String specPath = it.next();
-			PathItem operations = paths.get(specPath);
-			Iterator<HttpMethod> it2 = operations.readOperationsMap().keySet().iterator();
-			while(it2.hasNext()) {
-				HttpMethod next = it2.next();
+			PathItem operations = paths.get(s);
+			for (HttpMethod next : operations.readOperationsMap().keySet()) {
 				String httpMethod = next.toString().toLowerCase();
 				Operation operation = getOperation4HttpMethod(operations, httpMethod);
 				List<String> tags = operation.getTags();
 				// If path OR tag is excluded, if must be removed no matter if configured as included
-				if(filter.filterOperations(specPath, httpMethod, tags)) {
-					toBeRemoved.add(specPath+":"+httpMethod);
-					LOG.debug("Removed: " + specPath + ":"+httpMethod + " and tags: " + tags);
+				if (filter.filterOperations(s, httpMethod, tags)) {
+					toBeRemoved.add(s + ":" + httpMethod);
+					LOG.debug("Removed: " + s + ":" + httpMethod + " and tags: " + tags);
 				} else {
 					removePath = false;
 				}
 			}
-			if(removePath) {
-				pathsToBeRemoved.add(specPath);
+			if (removePath) {
+				pathsToBeRemoved.add(s);
 			}
 		}
 		for(String pathAndVerb : toBeRemoved) {
@@ -83,10 +76,8 @@ public class OpenAPI3SpecificationFilter {
 			}
 		}
 		if(openAPI.getComponents()!=null && openAPI.getComponents().getSchemas()!=null) {
-			Iterator<String> schemaNamesIt = openAPI.getComponents().getSchemas().keySet().iterator();
-			while(schemaNamesIt.hasNext()) {
-				String modelName = schemaNamesIt.next();
-				if(filter.filterModel(modelName)) {
+			for (String modelName : openAPI.getComponents().getSchemas().keySet()) {
+				if (filter.filterModel(modelName)) {
 					modelsToBeRemoved.add(modelName);
 					LOG.debug("Removed: " + modelName + " from API-Specification.");
 				}

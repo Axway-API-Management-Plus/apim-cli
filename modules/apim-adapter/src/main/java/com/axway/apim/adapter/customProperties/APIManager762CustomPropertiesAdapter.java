@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class APIManager762CustomPropertiesAdapter extends APIManagerCustomPropertiesAdapter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIManager762CustomPropertiesAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIManager762CustomPropertiesAdapter.class);
 
 	public APIManager762CustomPropertiesAdapter() {
 		super();
@@ -61,24 +61,6 @@ public class APIManager762CustomPropertiesAdapter extends APIManagerCustomProper
 			} catch (Exception ignore) {}
 		}
 	}
-	
-	/*public static Map<String, String> getAllConfiguredCustomProperties(CUSTOM_PROP_TYPE type) {
-		Map<String, String> allCustomProps = new HashMap<String, String>();
-		try {
-			JsonNode appConfig = readCustomPropertiesFromAPIManager();
-			JsonNode apiCustomProps = appConfig.get(type.name());
-			if(apiCustomProps==null) return null;
-			Iterator<Entry <String, JsonNode>> it = apiCustomProps.fields();
-			while(it.hasNext()) {
-				Entry<String, JsonNode> entry = it.next();
-				allCustomProps.put(entry.getKey(), null);
-			}
-			return allCustomProps;
-		} catch (Exception e) {
-			LOG.error("Error loading configured custom properties from API-Manager", e);
-			return null;
-		}
-	}*/
 	
 	/**
 	 * Helper method to validate that configured Custom-Properties are really configured 

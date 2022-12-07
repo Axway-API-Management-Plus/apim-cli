@@ -65,14 +65,7 @@ public class OrgFilter implements CustomPropertiesFilter {
 		if(name==null) return;
 		if(name.equals("*")) return;
 		this.name = name;
-		String op = "eq";
-		if(name.startsWith("*") || name.endsWith("*")) {
-			op = "like";
-			name = name.replace("*", "");
-		}
-		filters.add(new BasicNameValuePair("field", "name"));
-		filters.add(new BasicNameValuePair("op", op));
-		filters.add(new BasicNameValuePair("value", name));
+		FilterHelper.setFilter(name, filters);
 	}
 
 	public void setPhone(String phone) {
