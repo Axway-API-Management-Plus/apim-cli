@@ -11,16 +11,14 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 
-import java.util.HashSet;
-
 public class ClientAppImportManager {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ClientAppImportManager.class);
 
 	@SuppressWarnings("unused")
-	private final ClientAppAdapter sourceAppAdapter;
+	private ClientAppAdapter sourceAppAdapter;
 
-	private final APIMgrAppsAdapter apiMgrAppAdapter;
+	private APIMgrAppsAdapter apiMgrAppAdapter;
 	
 	private ClientApplication desiredApp;
 	
@@ -49,8 +47,16 @@ public class ClientAppImportManager {
 		}
 	}
 
+	public ClientApplication getDesiredApp() {
+		return desiredApp;
+	}
+
 	public void setDesiredApp(ClientApplication desiredApp) {
 		this.desiredApp = desiredApp;
+	}
+
+	public ClientApplication getActualApp() {
+		return actualApp;
 	}
 
 	public void setActualApp(ClientApplication actualApp) {
@@ -61,7 +67,7 @@ public class ClientAppImportManager {
 		return 
 			desiredApp.equals(actualApp) && 
 			(desiredApp.getApiAccess()==null || desiredApp.getApiAccess().equals(actualApp.getApiAccess())) && 
-			(desiredApp.getPermissions()==null || new HashSet<>(desiredApp.getPermissions()).containsAll(actualApp.getPermissions()))
+			(desiredApp.getPermissions()==null || desiredApp.getPermissions().containsAll(actualApp.getPermissions()))
 			;
 	}
 	
