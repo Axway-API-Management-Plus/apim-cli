@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 
 public class JSONUserAdapter extends UserAdapter {
 	
-	private ObjectMapper mapper = new ObjectMapper();
+	private final ObjectMapper mapper = new ObjectMapper();
 
 	public JSONUserAdapter(UserImportParams params) {
 		super(params);
@@ -53,7 +53,7 @@ public class JSONUserAdapter extends UserAdapter {
 						LOG.warn("No config file found for stage: '"+stage+"'");
 					}
 				}
-				this.users = new ArrayList<User>();
+				this.users = new ArrayList<>();
 				this.users.add(user);
 			} catch (Exception pe) {
 				throw new AppException("Cannot read user(s) from config file: " + config, ErrorCode.UNKNOWN_USER, pe);
@@ -68,7 +68,6 @@ public class JSONUserAdapter extends UserAdapter {
 		}
 		validateCustomProperties(users);
 		setInternalUser(users);
-		return;
 	}
 	
 	private void addImage(List<User> users, File parentFolder) throws AppException {
@@ -84,7 +83,7 @@ public class JSONUserAdapter extends UserAdapter {
 		}
 	}
 	
-	private void setInternalUser(List<User> users) throws AppException {
+	private void setInternalUser(List<User> users) {
 		for(User user : users) {
 			user.setType("internal"); // Default to internal, as external makes no sense using the CLI
 		}

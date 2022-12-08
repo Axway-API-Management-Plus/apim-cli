@@ -22,7 +22,7 @@ public abstract class ApplicationExporter {
 	
 	protected static Logger LOG = LoggerFactory.getLogger(ApplicationExporter.class);
 	
-	private HashMap<String, String> userIdToLogin = new HashMap<String, String>();
+	private final HashMap<String, String> userIdToLogin = new HashMap<>();
 	
 	public enum ResultHandler {
 		JSON_EXPORTER(JsonApplicationExporter.class),
@@ -33,7 +33,7 @@ public abstract class ApplicationExporter {
 		private final Class<ApplicationExporter> implClass;
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		private ResultHandler(Class clazz) {
+		ResultHandler(Class clazz) {
 			this.implClass = clazz;
 		}
 
@@ -51,9 +51,8 @@ public abstract class ApplicationExporter {
 		try {
 			Object[] intArgs = new Object[] { params, result };
 			Constructor<ApplicationExporter> constructor =
-					exportImpl.getClazz().getConstructor(new Class[]{AppExportParams.class, ExportResult.class});
-			ApplicationExporter exporter = constructor.newInstance(intArgs);
-			return exporter;
+					exportImpl.getClazz().getConstructor(AppExportParams.class, ExportResult.class);
+			return constructor.newInstance(intArgs);
 		} catch (Exception e) {
 			throw new AppException("Error initializing application exporter", ErrorCode.UNXPECTED_ERROR, e);
 		}
@@ -105,12 +104,11 @@ public abstract class ApplicationExporter {
 		String loginName;
 		if(userId == null) {
 			LOG.error("Application: " + app.toString() + " has no createdBy information.");
-			loginName = "N/A";
 		}
 		try {
 			loginName = APIManagerAdapter.getInstance().userAdapter.getUserForId(app.getCreatedBy()).getLoginName();
 		} catch (AppException e) {
-			LOG.error("Error getting createdBy user with Id: " + app.getCreatedBy() + " for application: " + app.toString());
+			LOG.error("Error getting createdBy user with Id: " + app.getCreatedBy() + " for application: " + app);
 			loginName = app.getCreatedBy();
 		}
 		this.userIdToLogin.put(userId, loginName);

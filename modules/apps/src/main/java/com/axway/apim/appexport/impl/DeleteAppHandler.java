@@ -41,7 +41,6 @@ public class DeleteAppHandler extends ApplicationExporter {
 			}
 		}
 		System.out.println("Done!");
-		return;
 	}
 
 	@Override

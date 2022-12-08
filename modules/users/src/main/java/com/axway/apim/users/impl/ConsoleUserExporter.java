@@ -34,44 +34,43 @@ public class ConsoleUserExporter extends UserResultHandler {
 			printUltra(users);
 			break;
 		}
-		return;
 	}
 	
 	private void printStandard(List<User> users) {
 		System.out.println(AsciiTable.getTable(borderStyle, users, Arrays.asList(
-				new Column().header("User-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(user -> user.getId()),
-				new Column().header("Login-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(user -> user.getLoginName()),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(user -> user.getName()),
-				new Column().header("Email").with(user -> user.getEmail()),
+				new Column().header("User-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getId),
+				new Column().header("Login-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getLoginName),
+				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getName),
+				new Column().header("Email").with(User::getEmail),
 				new Column().header("Enabled").with(user -> Boolean.toString(user.isEnabled()))
 				)));
 	}
 	
 	private void printWide(List<User> users) {
 		System.out.println(AsciiTable.getTable(borderStyle, users, Arrays.asList(
-				new Column().header("User-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(user -> user.getId()),
-				new Column().header("Login-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(user -> user.getLoginName()),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(user -> user.getName()),
-				new Column().header("Email").with(user -> user.getEmail()),
+				new Column().header("User-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getId),
+				new Column().header("Login-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getLoginName),
+				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getName),
+				new Column().header("Email").with(User::getEmail),
 				new Column().header("Enabled").with(user -> Boolean.toString(user.isEnabled())),
 				new Column().header("Organization").with(user -> user.getOrganization().getName()),
-				new Column().header("Role").with(user -> user.getRole())
+				new Column().header("Role").with(User::getRole)
 				)));
 	}
 	
 	private void printUltra(List<User> users) {
 		System.out.println(AsciiTable.getTable(borderStyle, users, Arrays.asList(
-				new Column().header("User-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(user -> user.getId()),
-				new Column().header("Login-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(user -> user.getLoginName()),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(user -> user.getName()),
-				new Column().header("Email").with(user -> user.getEmail()),
+				new Column().header("User-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getId),
+				new Column().header("Login-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getLoginName),
+				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getName),
+				new Column().header("Email").with(User::getEmail),
 				new Column().header("Enabled").with(user -> Boolean.toString(user.isEnabled())),
 				new Column().header("Organization").with(user -> user.getOrganization().getName()),
-				new Column().header("Role").with(user -> user.getRole()),
+				new Column().header("Role").with(User::getRole),
 				new Column().header("Created on").with(user -> new Date(user.getCreatedOn()).toString()),
 				//new Column().header("Last seen").with(user -> getLastSeen(user)), // Not supported by the REST-API - Only returned for the currentUser :-(
-				new Column().header("Type").with(user -> user.getType()),
-				new Column().header("State").with(user -> user.getState())
+				new Column().header("Type").with(User::getType),
+				new Column().header("State").with(User::getState)
 				)));
 	}
 
@@ -79,9 +78,5 @@ public class ConsoleUserExporter extends UserResultHandler {
 	public UserFilter getFilter() throws AppException {
 		return getBaseFilterBuilder().build();
 	}
-	
-	private String getLastSeen(User user) {
-		if(user.getAuthNUserAttributes()==null || user.getAuthNUserAttributes().getLastSeen()==null) return "N/A";
-		return new Date(user.getAuthNUserAttributes().getLastSeen()).toString();
-	}
+
 }

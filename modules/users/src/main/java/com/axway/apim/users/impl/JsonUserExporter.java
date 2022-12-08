@@ -36,7 +36,6 @@ public class JsonUserExporter extends UserResultHandler {
 		for(User user : users) {
 			saveUserLocally(new ExportUser(user));
 		}
-		return;
 	}
 	
 	private void saveUserLocally(ExportUser user) throws AppException {
@@ -65,8 +64,8 @@ public class JsonUserExporter extends UserResultHandler {
 		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
 		FilterProvider filters = new SimpleFilterProvider()
 				.addFilter("UserFilter",
-						SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "dn" }))
-				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {}));
+						SimpleBeanPropertyFilter.serializeAllExcept("id", "dn"))
+				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept());
 		mapper.setFilterProvider(filters);
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {

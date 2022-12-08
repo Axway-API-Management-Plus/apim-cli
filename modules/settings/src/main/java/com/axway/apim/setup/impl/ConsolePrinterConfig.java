@@ -22,7 +22,7 @@ public class ConsolePrinterConfig {
 	
 	StandardExportParams params;
 	
-	private String dots = ".....................................";
+	private final String dots = ".....................................";
 	
 	ConfigType[] standardFields = new ConfigType[] {
 			ConfigType.APIManager, 

@@ -39,7 +39,6 @@ public class DeleteUserHandler extends UserResultHandler {
 			}
 		}
 		System.out.println("Done!");
-		return;
 	}
 
 	@Override

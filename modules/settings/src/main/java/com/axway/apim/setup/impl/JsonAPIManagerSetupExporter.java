@@ -1,11 +1,5 @@
 package com.axway.apim.setup.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.RemoteHostFilter;
 import com.axway.apim.adapter.jackson.PolicySerializerModifier;
@@ -16,13 +10,16 @@ import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
 
 public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
 
@@ -64,8 +61,8 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
 			mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(true)));
 			mapper.registerModule(new SimpleModule().setSerializerModifier(new UserSerializerModifier(true)));
 			FilterProvider filters = new SimpleFilterProvider()
-					.addFilter("RemoteHostFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "organizationId"}))
-					.addFilter("APIManagerConfigFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"os", "architecture", "productVersion", "baseOAuth"}))
+					.addFilter("RemoteHostFilter", SimpleBeanPropertyFilter.serializeAllExcept("id", "organizationId"))
+					.addFilter("APIManagerConfigFilter", SimpleBeanPropertyFilter.serializeAllExcept("os", "architecture", "productVersion", "baseOAuth"))
 					.setFailOnUnknownId(false);
 			mapper.setFilterProvider(filters);
 			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/apimanager-config.json"), apimanagerConfig);
@@ -95,13 +92,5 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
 			return "";
 		}
 	}
-	
-	public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
 
-		try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {
-			fileOuputStream.write(bFile);
-		} catch (IOException e) {
-			throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
-		}
-	}
 }

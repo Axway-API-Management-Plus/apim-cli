@@ -11,9 +11,9 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class UserImportManager {
 	
-	private static Logger LOG = LoggerFactory.getLogger(UserImportManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UserImportManager.class);
 	
-	private APIManagerUserAdapter userAdapter;
+	private final APIManagerUserAdapter userAdapter;
 	
 	public UserImportManager() throws AppException {
 		super();
@@ -31,7 +31,6 @@ public class UserImportManager {
 			userAdapter.updateUser(desiredUser, actualUser);
 			LOG.info("Successfully replicated user: "+desiredUser.getName()+" into API-Manager");
 		}
-		return;
 	}
 	
 	private static boolean usersAreEqual(User desiredUser, User actualUser) {
