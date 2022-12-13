@@ -288,20 +288,20 @@ public class Config {
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIImport,
 			name = "Skip Enum validation",
-			description = "Specifies whether or not enum validation is performed during API Import. Currently enum validation is implemented for Swagger (1.x and 2.0) and OAS 3.0. This feature is switched on by default")
+			description = "Specifies whether or not skip enum validation on incoming API request")
 	private Boolean skipEnumValidation;
 
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIImport,
 			name = "Skip Required validation",
-			description = "Specifies whether or not required validation is performed during API Import. Currently required validation is implemented for Swagger (1.x and 2.0) and OAS 3.0. This feature is switched on by default")
+			description = "Specifies whether or not skip required validation on incoming API request")
 	private Boolean skipRequiredValidation;
 
 
 	@APIManagerConfigAnnotation(
 			configType = ConfigType.APIImport,
 			name = "Allow Empty values",
-			description = "Specifies whether or not allow empty values dyrubg API Import. Currently allow empty validation is implemented for Swagger (1.x and 2.0) and OAS 3.0. This feature is switched on by default")
+			description = "Specifies whether or not allow empty values on incoming API request")
 	private Boolean allowEmptyValue;
 
 
