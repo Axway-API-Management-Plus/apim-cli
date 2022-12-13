@@ -1,23 +1,9 @@
 package com.axway.apim.appimport.adapter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.AppCredentialsDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
@@ -43,12 +29,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(JSONConfigClientAppAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(JSONConfigClientAppAdapter.class);
 	
-	private ObjectMapper mapper = new ObjectMapper();
+	private final ObjectMapper mapper = new ObjectMapper();
 	
 	AppImportParams importParams;
 
@@ -95,7 +93,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 					}
 				}
 				
-				this.apps = new ArrayList<ClientApplication>();
+				this.apps = new ArrayList<>();
 				this.apps.add(app);
 			} catch (Exception pe) {
 				throw new AppException("Cannot read application(s) from config file: " + config, "Exception: " + pe.getClass().getName() + ": " + pe.getMessage(), ErrorCode.ERR_CREATING_APPLICATION, pe);
@@ -112,19 +110,6 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		addAPIAccess(apps, result);
 		validateCustomProperties(apps);
 		validateAppPermissions(apps);
-		return;
-	}
-	
-	public ClientApplication getApplication(ClientAppFilter filter) throws AppException {
-		return getApplicationByName(filter.getApplicationName());
-	}
-
-	private ClientApplication getApplicationByName(String applicationName) throws AppException {
-		if(this.apps==null) return null;
-		for(ClientApplication app : this.apps) {
-			if(applicationName.equals(app.getName())) return app;
-		}
-		return null;
 	}
 
 	private void addImage(List<ClientApplication> apps, File parentFolder) throws AppException {

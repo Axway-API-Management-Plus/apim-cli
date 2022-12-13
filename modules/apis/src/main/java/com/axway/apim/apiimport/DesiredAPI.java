@@ -1,11 +1,7 @@
 package com.axway.apim.apiimport;
 
-import java.util.LinkedHashMap;
-
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.DesiredAPISpecification;
-import com.axway.apim.api.model.ServiceProfile;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonAlias;
@@ -44,22 +40,23 @@ public class DesiredAPI extends API {
 	}
 
 	/**
-	 * BackendBasePath is a property which doesn't exists in API-Manager naturally. 
-	 * It simplifies the use of the tool. If the backendBasePath is set internally a 
+	 * BackendBasePath is a property which doesn't exists in API-Manager naturally.
+	 * It simplifies the use of the tool. If the backendBasePath is set internally a
 	 * ServiceProfile is created by this method.
 	 * @param backendBasepath the URL to the BE-API-Host.
 	 */
 	public void setBackendBasepath(String backendBasepath) {
+
 		// If the backendBasePath has been changed already in the Swagger-File, don't to it here again
 		// as it would duplicate the basePath
-		if(backendBasepath!=null && !CoreParameters.getInstance().isReplaceHostInSwagger()) {
-			ServiceProfile serviceProfile = new ServiceProfile();
-			serviceProfile.setBasePath(backendBasepath);
-			if(this.serviceProfiles == null) {
-				this.serviceProfiles = new LinkedHashMap<String, ServiceProfile>();
-			}
-			serviceProfiles.put("_default", serviceProfile);
-		}
+//		if(backendBasepath!=null && !CoreParameters.getInstance().isReplaceHostInSwagger()) {
+//			ServiceProfile serviceProfile = new ServiceProfile();
+//			serviceProfile.setBasePath(backendBasepath);
+//			if(this.serviceProfiles == null) {
+//				this.serviceProfiles = new LinkedHashMap<>();
+//			}
+//			serviceProfiles.put("_default", serviceProfile);
+//		}
 		this.backendBasepath = backendBasepath;
 	}
 

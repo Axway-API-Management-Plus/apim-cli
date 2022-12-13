@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.axway.apim.adapter.apis.FilterHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -26,7 +27,7 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class ClientAppFilter implements CustomPropertiesFilter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
 	
 	boolean includeQuota;
 	
@@ -58,7 +59,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 	
 	private List<String> customProperties;
 	
-	List<NameValuePair> filters = new ArrayList<NameValuePair>();
+	List<NameValuePair> filters = new ArrayList<>();
 
 	private ClientAppFilter() {	}
 	
@@ -164,14 +165,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 		// All applications are requested - We ignore this filter
 		if(applicationName.equals("*")) return;
 		this.applicationName = applicationName;
-		String op = "eq";
-		if(applicationName.startsWith("*") || applicationName.endsWith("*")) {
-			op = "like";
-			applicationName = applicationName.replace("*", "");
-		}
-		filters.add(new BasicNameValuePair("field", "name"));
-		filters.add(new BasicNameValuePair("op", op));
-		filters.add(new BasicNameValuePair("value", applicationName));
+		FilterHelper.setFilter(applicationName, filters);
 	}
 
 	public String getApplicationName() {
@@ -218,7 +212,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 	public boolean equals(Object obj) {
 		if (obj == null) return false;
 		if (this == obj) return true;
-		if(obj instanceof ClientAppFilter == false) return false;
+		if(!(obj instanceof ClientAppFilter)) return false;
 		ClientAppFilter other = (ClientAppFilter)obj;
 		return (
 				StringUtils.equals(other.getApplicationName(), this.getApplicationName()) && 
@@ -287,7 +281,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 				}
 			}
 			// None of the APIs matches
-			if(!apiAccessNameMatch) return true;
+			return !apiAccessNameMatch;
 		}
 		// Nothing filtered this application!
 		return false;
@@ -314,7 +308,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 					break;
 				}
 			}
-			if(!redirectUrlMatch) return false;
+			return redirectUrlMatch;
 		}
 		return true;
 	}
@@ -401,7 +395,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 			return this;
 		}
 		
-		public Builder hasOrganizationId(String organizationId) throws AppException {
+		public Builder hasOrganizationId(String organizationId) {
 			if(organizationId==null) return this;
 			Organization org = new Organization();
 			org.setId(organizationId);
@@ -417,18 +411,11 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 			return hasOrganization(org);
 		}
 		
-		public Builder hasOrganization(Organization organization) throws AppException {
+		public Builder hasOrganization(Organization organization) {
 			this.organization = organization;
 			return this;
 		}
-		
-		public Builder hasCreatedByUserId(String userId) throws AppException {
-			if(userId==null) return this;
-			User user = new User();
-			user.setId(userId);
-			return hasCreatedBy(user);
-		}
-		
+
 		public Builder hasCreatedByLoginName(String loginName) throws AppException {
 			if(loginName==null) return this;
 			User user = APIManagerAdapter.getInstance().userAdapter.getUserForLoginName(loginName);
@@ -438,7 +425,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 			return hasCreatedBy(user);
 		}
 		
-		public Builder hasCreatedBy(User user) throws AppException {
+		public Builder hasCreatedBy(User user) {
 			this.createdBy = user;
 			return this;
 		}

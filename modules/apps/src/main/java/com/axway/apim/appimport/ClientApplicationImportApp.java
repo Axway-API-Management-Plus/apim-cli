@@ -1,10 +1,5 @@
 package com.axway.apim.appimport;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
@@ -17,14 +12,15 @@ import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ImportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 	
-	private static Logger LOG = LoggerFactory.getLogger(ClientApplicationImportApp.class);
-	
-	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+	private static final Logger LOG = LoggerFactory.getLogger(ClientApplicationImportApp.class);
 
 	@Override
 	public String getName() {
@@ -104,7 +100,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 		}
 	}
 	
-	public static void main(String args[]) { 
+	public static void main(String[] args) {
 		int rc = importApp(args);
 		System.exit(rc);
 	}

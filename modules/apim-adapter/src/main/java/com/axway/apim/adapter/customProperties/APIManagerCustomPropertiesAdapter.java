@@ -1,20 +1,5 @@
 package com.axway.apim.adapter.customProperties;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.CustomProperties;
 import com.axway.apim.api.model.CustomProperties.Type;
@@ -25,10 +10,23 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class APIManagerCustomPropertiesAdapter {
 
-	private static Logger LOG = LoggerFactory.getLogger(APIManagerCustomPropertiesAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIManagerCustomPropertiesAdapter.class);
 
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 
@@ -82,12 +80,10 @@ public class APIManagerCustomPropertiesAdapter {
 	public Map<String, CustomProperty> getRequiredCustomProperties(Type type) throws AppException {
 		Map<String, CustomProperty> allCustomProps = getCustomProperties(type);
 		if(allCustomProps==null) return null;
-		Map<String, CustomProperty> requiredCustomProps = new HashMap<String, CustomProperty>();
-		Iterator<String> it = allCustomProps.keySet().iterator();
-		while(it.hasNext()) {
-			String propName = it.next();
+		Map<String, CustomProperty> requiredCustomProps = new HashMap<>();
+		for (String propName : allCustomProps.keySet()) {
 			CustomProperty prop = allCustomProps.get(propName);
-			if(prop.getRequired()) {
+			if (prop.getRequired()) {
 				requiredCustomProps.put(propName, prop);
 			}
 		}
@@ -111,15 +107,9 @@ public class APIManagerCustomPropertiesAdapter {
 		}
 	}
 
-	public CustomProperty getCustomProperty(Type type, String customPropertyName) throws AppException {
-		Map<String, CustomProperty> customProperties = getCustomProperties(type);
-		if(customProperties == null) return null;
-		return customProperties.get(customPropertyName);
-	}
-
 	public List<String> getCustomPropertyNames(Type type) throws AppException {
 		Map<String, CustomProperty> customProperties = getCustomProperties(type);
-		if(customProperties == null) return new ArrayList<String>();
+		if(customProperties == null) return new ArrayList<>();
 		return new ArrayList<>(customProperties.keySet());
 	}
 

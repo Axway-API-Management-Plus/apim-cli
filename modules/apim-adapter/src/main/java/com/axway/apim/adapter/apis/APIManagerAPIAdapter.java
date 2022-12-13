@@ -60,6 +60,8 @@ public class APIManagerAPIAdapter {
     ObjectMapper mapper = new ObjectMapper();
     private final CoreParameters cmd;
 
+    private final List<String>  queryStringPassThroughBreakingVersion = Arrays.asList("7.7.20220530","7.7.20220830", "7.7.20221130");
+
     /**
      * Maps the provided status to the REST-API endpoint to change the status!
      */
@@ -226,7 +228,7 @@ public class APIManagerAPIAdapter {
      *
      * @param <profile> An Outbound- or InboundProfile
      * @param api       in which the methods should be translated
-     * @param apiId     the methods are loaded based on this API-ID (this might be a another referenced API
+     * @param apiId     the methods are loaded based on this API-ID (this might be an another referenced API
      * @param mode      translation direction
      * @throws AppException when something goes wrong
      */
@@ -408,7 +410,7 @@ public class APIManagerAPIAdapter {
     private void addQuotaConfiguration(API api, boolean addQuota) throws AppException {
         if (!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
         APIQuota applicationQuota = null;
-        APIQuota systemQuota = null;
+        APIQuota systemQuota;
         try {
             applicationQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), api, false, false); // Get the Application-Default-Quota
             systemQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), api, false, false); // Get the Application-Default-QuotagetQuotaFromAPIManager(); // Get the System-Default-Quota
@@ -416,7 +418,6 @@ public class APIManagerAPIAdapter {
             api.setSystemQuota(systemQuota);
         } catch (AppException e) {
             LOG.error("Application-Default quota response: '" + applicationQuota + "'");
-            LOG.error("System-Default quota response: '" + systemQuota + "'");
             throw e;
         }
     }
@@ -625,7 +626,8 @@ public class APIManagerAPIAdapter {
         HttpEntity entity;
         String[] serializeAllExcept;
         // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
-        if (APIManagerAdapter.hasAPIManagerVersion("7.7.20220530") || APIManagerAdapter.hasAPIManagerVersion("7.7.20220830")) {
+       // if (APIManagerAdapter.hasAPIManagerVersion("7.7.20220530") || APIManagerAdapter.hasAPIManagerVersion("7.7.20220830")) {
+        if (queryStringPassThroughBreakingVersion.contains(APIManagerAdapter.getApiManagerVersion())){
             serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath","remoteHost"};
         } else {
             serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
@@ -776,13 +778,13 @@ public class APIManagerAPIAdapter {
             uri = new URIBuilder(cmd.getAPIManagerURL())
                     .setPath(cmd.getApiBasepath() + "/proxies/" + api.getId() + "/" + StatusEndpoint.valueOf(desiredState).endpoint)
                     .build();
+            HttpEntity entity;
             if (vhost != null && desiredState.equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
-                HttpEntity entity = new StringEntity("vhost=" + vhost, ContentType.APPLICATION_FORM_URLENCODED);
-                request = new POSTRequest(entity, uri, useAdminAccountForPublish());
+                entity = new StringEntity("vhost=" + vhost, ContentType.APPLICATION_FORM_URLENCODED);
             } else {
-                HttpEntity entity = new StringEntity("", ContentType.APPLICATION_FORM_URLENCODED);
-                request = new POSTRequest(entity, uri, useAdminAccountForPublish());
+                entity = new StringEntity("", ContentType.APPLICATION_FORM_URLENCODED);
             }
+            request = new POSTRequest(entity, uri, useAdminAccountForPublish());
             httpResponse = request.execute();
             int statusCode = httpResponse.getStatusLine().getStatusCode();
             if (statusCode != 201 && statusCode != 200) { // See issue: #134 The API-Manager also returns 200 on this request

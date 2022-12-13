@@ -1,12 +1,5 @@
 package com.axway.apim.appexport.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.ImageSerializer;
@@ -18,7 +11,6 @@ import com.axway.apim.appexport.impl.jackson.AppExportSerializerModifier;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.appexport.model.ExportApplication;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -28,6 +20,12 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 public class JsonApplicationExporter extends ApplicationExporter {
 
@@ -40,7 +38,6 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		for(ClientApplication app : apps) {
 			saveApplicationLocally(new ExportApplication(app));
 		}
-		return;
 	}
 	
 	private void saveApplicationLocally(ExportApplication app) throws AppException {
@@ -71,12 +68,12 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		mapper.registerModule(new SimpleModule().addSerializer(QuotaRestriction.class, new QuotaRestrictionSerializer(null)));
 		
 		FilterProvider filter = new SimpleFilterProvider()
-				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"id", "apiId", "createdBy", "createdOn", "enabled"}))
-				.addFilter("QuotaRestrictionFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"api", "apiId"})) // Is handled in ExportApplication
-				.addFilter("APIAccessFilter", SimpleBeanPropertyFilter.filterOutAllExcept(new String[] {"apiName", "apiVersion"}))
-				.addFilter("ApplicationPermissionFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"userId", "createdBy", "id" }))
-				.addFilter("ClientAppCredentialFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"applicationId", "id", "createdOn", "createdBy"}))
-				.addFilter("ClientAppOauthResourceFilter", SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"applicationId", "id", "uriprefix", "scopes", "enabled"}));
+				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("id", "apiId", "createdBy", "createdOn", "enabled"))
+				.addFilter("QuotaRestrictionFilter", SimpleBeanPropertyFilter.serializeAllExcept("api", "apiId")) // Is handled in ExportApplication
+				.addFilter("APIAccessFilter", SimpleBeanPropertyFilter.filterOutAllExcept("apiName", "apiVersion"))
+				.addFilter("ApplicationPermissionFilter", SimpleBeanPropertyFilter.serializeAllExcept("userId", "createdBy", "id"))
+				.addFilter("ClientAppCredentialFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "createdOn", "createdBy"))
+				.addFilter("ClientAppOauthResourceFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "uriprefix", "scopes", "enabled"));
 		mapper.setFilterProvider(filter);
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
@@ -119,13 +116,6 @@ public class JsonApplicationExporter extends ApplicationExporter {
 			writeBytesToFile(certBlob.getBytes(), localFolder + "/" + filename);
 		} catch (AppException e) {
 			throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
-		}
-	}
-	
-	protected void removeApplicationDefaultQuota(ClientApplication app) {
-		if(app.getAppQuota()==null) return;
-		if(app.getAppQuota().getId().equals(APIManagerAdapter.APPLICATION_DEFAULT_QUOTA)) {
-			app.setAppQuota(null);
 		}
 	}
 

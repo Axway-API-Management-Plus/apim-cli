@@ -16,11 +16,11 @@ import com.axway.apim.lib.errorHandling.AppException;
 
 public class ConsolePrinterAlerts {
 	
-	private static Logger LOG = LoggerFactory.getLogger(ConsolePrinterAlerts.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ConsolePrinterAlerts.class);
 	
 	APIManagerAdapter adapter;
 	
-	private String dots = ".....................................";
+	private final String dots = ".....................................";
 	
 	AlertType[] alertsTypes = new AlertType[] {
 			AlertType.Application, 

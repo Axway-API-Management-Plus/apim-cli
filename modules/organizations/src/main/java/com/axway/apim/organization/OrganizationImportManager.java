@@ -11,9 +11,9 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class OrganizationImportManager {
 	
-	private static Logger LOG = LoggerFactory.getLogger(OrganizationImportManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(OrganizationImportManager.class);
 	
-	private APIManagerOrganizationAdapter orgAdapter;
+	private final APIManagerOrganizationAdapter orgAdapter;
 	
 	public OrganizationImportManager() throws AppException {
 		super();

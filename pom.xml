@@ -14,7 +14,8 @@
 ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
@@ -163,22 +164,22 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.13.3</version>
+                <version>2.14.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.13.4.1</version>
+                <version>2.14.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-yaml</artifactId>
-                <version>2.13.3</version>
+                <version>2.14.1</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-xml</artifactId>
-                <version>2.13.3</version>
+                <version>2.14.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -209,6 +210,12 @@
                 <groupId>org.apache.olingo</groupId>
                 <artifactId>odata-client-core</artifactId>
                 <version>4.9.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
@@ -263,14 +270,21 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.36</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-slf4j-impl</artifactId>
-                <version>2.17.2</version>
+                <version>2.19.0</version>
             </dependency>
+
             <dependency>
                 <groupId>com.github.freva</groupId>
                 <artifactId>ascii-table</artifactId>
-                <version>1.2.0</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>org.ehcache</groupId>

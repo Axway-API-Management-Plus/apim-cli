@@ -6,12 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -75,7 +70,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class APIManagerAdapter {
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIManagerAdapter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIManagerAdapter.class);
 	
 	private static APIManagerAdapter instance;
 	
@@ -86,7 +81,7 @@ public class APIManagerAdapter {
 	
 	public static ObjectMapper mapper = new ObjectMapper();
 	
-	private static Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<String, ClientApplication>();
+	private static Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<>();
 	
 	private boolean usingOrgAdmin = false;
 	private boolean hasAdminAccount = false;
@@ -119,7 +114,7 @@ public class APIManagerAdapter {
 	public APIMgrAppsAdapter appAdapter;
 	public APIManagerUserAdapter userAdapter;
 	
-	public static enum CacheType {
+	public enum CacheType {
 		applicationAPIAccessCache, 
 		organizationAPIAccessCache, 
 		oauthClientProviderCache, 
@@ -130,13 +125,13 @@ public class APIManagerAdapter {
 		organizationCache,
 		userCache;
 		
-		public boolean supportsImportActions = false;
+		public boolean supportsImportActions;
 		
-		private CacheType() {
+		CacheType() {
 			this.supportsImportActions = false;
 		}
 
-		private CacheType(boolean supportsImportActions) {
+		CacheType(boolean supportsImportActions) {
 			this.supportsImportActions = supportsImportActions;
 		}
 	}
@@ -209,7 +204,7 @@ public class APIManagerAdapter {
 		HttpResponse httpResponse = null;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath()+"/login").build();
-			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			List<NameValuePair> params = new ArrayList<>();
 			String username;
 			String password;
 			if(useAdminClient) {
@@ -231,7 +226,6 @@ public class APIManagerAdapter {
 			httpResponse = loginRequest.execute();
 			int statusCode = httpResponse.getStatusLine().getStatusCode();
 			if(statusCode != 303 && (statusCode < 200 || statusCode > 299)) {
-				String response = EntityUtils.toString(httpResponse.getEntity());
 				LOG.warn("Login failed with statusCode: " +statusCode+ " ... Try again in "+cmd.getRetryDelay()+" milliseconds. (you may set -retryDelay <milliseconds>)");
 				Thread.sleep(cmd.getRetryDelay());
 				httpResponse = loginRequest.execute();
@@ -286,10 +280,9 @@ public class APIManagerAdapter {
 		}	
 	}
 	
-	private String[] getAdminUsernamePassword() throws AppException {
+	private String[] getAdminUsernamePassword() {
 		if(CoreParameters.getInstance().getAdminUsername()==null) return null;
-		String[] usernamePassword =  {CoreParameters.getInstance().getAdminUsername(), CoreParameters.getInstance().getAdminPassword()};
-		return usernamePassword;
+		return new String[]{CoreParameters.getInstance().getAdminUsername(), CoreParameters.getInstance().getAdminPassword()};
 	}
 	
 	public static User getCurrentUser(boolean useAdminClient) throws AppException {
@@ -435,8 +428,7 @@ public class APIManagerAdapter {
 		if(managerVersion.size()==3) {
 			try {
 				String dateVersion = managerVersion.get(2);
-				Date datedVersion=new SimpleDateFormat("yyyyMMdd").parse(dateVersion);				
-				return datedVersion;
+				return new SimpleDateFormat("yyyyMMdd").parse(dateVersion);
 			} catch (Exception e) {
 				LOG.trace("API-Manager version: '"+apiManagerVersion+"' seems not to contain a dated version");
 			}
@@ -458,16 +450,14 @@ public class APIManagerAdapter {
 	}
 	
 	private static List<String> getMajorVersions(String version) {
-		List<String> majorNumbers = new ArrayList<String>();
+		List<String> majorNumbers = new ArrayList<>();
 		String versionWithoutSP = version;
 		if(version.contains(" SP")) {
 			versionWithoutSP = version.substring(0, version.indexOf(" SP"));
 		}
 		try {
 			String[] versions = versionWithoutSP.split("\\.");
-			for(int i = 0; i<versions.length; i++) {
-				majorNumbers.add(versions[i]);
-			}
+			majorNumbers.addAll(Arrays.asList(versions));
 		} catch (Exception e){
 			LOG.trace("Can't parse major version numbers in: '"+version+"'");
 		}
@@ -590,7 +580,7 @@ public class APIManagerAdapter {
 	
 	public static JsonNode getCertInfo(InputStream certificate, String password, CaCert cert) throws AppException {
 		URI uri;
-		HttpResponse httpResponse = null;
+		HttpResponse httpResponse;
 		try {
 			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfo").build();
 			HttpEntity entity = MultipartEntityBuilder.create()
@@ -610,58 +600,12 @@ public class APIManagerAdapter {
 				}
 				throw new AppException("API-Manager failed to read certificate information from file. Got response: '"+response+"'", ErrorCode.API_MANAGER_COMMUNICATION);
 			}
-			JsonNode jsonResponse = mapper.readTree(response);
-			return jsonResponse;
+			return mapper.readTree(response);
 		} catch (Exception e) {
 			throw new AppException("API-Manager failed to read certificate information from file.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		}
 	}
-	
-	/**
-	 * Helper method to fulfill the given certificates by the API-Developer into the required 
-	 * format as it's needed by the API-Manager. 
-	 * @param certFile InputStream to the Certificate
-	 * @param cert the certificate itself
-	 * @param password the password 
-	 * @return JsonNode as it's required by the API-Manager.
-	 * @throws AppException if JSON-Node-Config can't be created
-	 */
-	public static JsonNode getCertInfoFromUrl(String certFile, String password, CaCert cert) throws AppException {
-		URI uri;
-		HttpResponse httpResponse = null;
-		try {
-			uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfoFromUrl").build();
-			
-			List <NameValuePair> parameters = new ArrayList <NameValuePair>();
-			parameters.add(new BasicNameValuePair("url", certFile));
-			parameters.add(new BasicNameValuePair("inbound", cert.getInbound()));
-			parameters.add(new BasicNameValuePair("outbound", cert.getOutbound()));
-			parameters.add(new BasicNameValuePair("password", password));
-			HttpEntity entity = new UrlEncodedFormEntity(parameters);
 
-			POSTRequest postRequest = new POSTRequest(entity, uri);
-			httpResponse = postRequest.execute();
-			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if( statusCode != 200){
-				String response = EntityUtils.toString(httpResponse.getEntity());
-				if(response!=null && response.contains("Bad password")) {
-					LOG.debug("API-Manager failed to read certificate information: " + cert.getCertFile() + ". Got response: '"+response+"'.");
-					throw new AppException("Password for keystore: '" + cert.getCertFile() + "' is wrong.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
-				}
-				throw new AppException("API-Manager failed to read certificate information: " + cert.getCertFile() + ". Got response: '"+response+"'.", ErrorCode.API_MANAGER_COMMUNICATION);
-			}
-			JsonNode jsonResponse = mapper.readTree(httpResponse.getEntity().getContent());
-			return jsonResponse;
-		} catch (Exception e) {
-			throw new AppException("API-Manager failed to read certificate information.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
-		}
-	}
-	
 	/**
 	 * Helper method to translate a Base64 encoded format 
 	 * as it's needed by the API-Manager.
@@ -682,8 +626,7 @@ public class APIManagerAdapter {
 					.build();
 			POSTRequest postRequest = new POSTRequest(entity, uri);
 			httpResponse = postRequest.execute();
-			JsonNode jsonResponse = mapper.readTree(httpResponse.getEntity().getContent());
-			return jsonResponse;
+			return mapper.readTree(httpResponse.getEntity().getContent());
 		} catch (Exception e) {
 			throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
 		} finally {

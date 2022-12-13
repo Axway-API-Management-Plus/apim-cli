@@ -17,7 +17,7 @@ import java.util.List;
 
 public class APIQuotaManager {
 	
-	static Logger LOG = LoggerFactory.getLogger(APIQuotaManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIQuotaManager.class);
 	
 	private final API desiredState;
 	
@@ -40,7 +40,6 @@ public class APIQuotaManager {
 		List<QuotaRestriction> actualRestrictions  = actualState!=null ? getRestrictions(actualState.getSystemQuota()) : null;
 		List<QuotaRestriction> desiredRestrictions = getRestrictions(desiredState.getSystemQuota());
 		updateRestrictions(actualRestrictions, desiredRestrictions, createdAPI, Quota.SYSTEM_DEFAULT, sameAPI);
-		
 		// Handle the application quota
 		actualRestrictions  = actualState!=null ? getRestrictions(actualState.getApplicationQuota()) : null;
 		desiredRestrictions = getRestrictions(desiredState.getApplicationQuota());

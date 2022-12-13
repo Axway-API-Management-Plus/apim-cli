@@ -13,11 +13,11 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class ClientAppImportManager {
 	
-	private static Logger LOG = LoggerFactory.getLogger(ClientAppImportManager.class);
-	
+	private static final Logger LOG = LoggerFactory.getLogger(ClientAppImportManager.class);
+
 	@SuppressWarnings("unused")
 	private ClientAppAdapter sourceAppAdapter;
-	
+
 	private APIMgrAppsAdapter apiMgrAppAdapter;
 	
 	private ClientApplication desiredApp;
@@ -45,7 +45,6 @@ public class ClientAppImportManager {
 				apiMgrAppAdapter.updateApplication(desiredApp, actualApp);
 			}
 		}
-		return;
 	}
 
 	public ClientApplication getDesiredApp() {

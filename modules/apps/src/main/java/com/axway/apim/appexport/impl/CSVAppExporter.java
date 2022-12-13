@@ -29,9 +29,9 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public class CSVAppExporter extends ApplicationExporter {
-	private static Logger LOG = LoggerFactory.getLogger(CSVAppExporter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CSVAppExporter.class);
 	
-	private static enum HeaderFields {
+	private enum HeaderFields {
 		standard(new String[] {
 				"ID", 
 				"Organization", 
@@ -70,9 +70,9 @@ public class CSVAppExporter extends ApplicationExporter {
 				"Access created on"
 				});
 		
-		String[] headerFields;
+		final String[] headerFields;
 
-		private HeaderFields(String[] headerFields) {
+		HeaderFields(String[] headerFields) {
 			this.headerFields = headerFields;
 		}
 	}
@@ -109,10 +109,9 @@ public class CSVAppExporter extends ApplicationExporter {
 				try {
 					csvPrinter.close(true);
 				} catch (Exception ignore) {
-					throw new AppException("Unable to close CSVWriter", ErrorCode.UNXPECTED_ERROR, ignore);
+					LOG.error("Unable to close CSVWriter", ignore);
 				}
 		}
-		return;
 	}
 	
 	private String createFileName() throws AppException {
@@ -125,7 +124,7 @@ public class CSVAppExporter extends ApplicationExporter {
 		return "app_export_"+host+"_"+APIManagerAdapter.getCurrentUser(false).getLoginName()+"_"+dateTime+".csv";
 	}
 	
-	private void writeRecords(CSVPrinter csvPrinter, List<ClientApplication> apps, Wide wide) throws IOException, AppException {
+	private void writeRecords(CSVPrinter csvPrinter, List<ClientApplication> apps, Wide wide) throws IOException {
 		apps.sort(new ApplicationComparator());
 		int i=0;
 		for(ClientApplication app : apps) {
@@ -157,7 +156,7 @@ public class CSVAppExporter extends ApplicationExporter {
 		csvPrinter.flush();
 	}
 	
-	private void writeRecords(CSVPrinter csvPrinter, ClientApplication app, APIAccess apiAccess, QuotaRestriction restriction, Wide wide) throws IOException, AppException {
+	private void writeRecords(CSVPrinter csvPrinter, ClientApplication app, APIAccess apiAccess, QuotaRestriction restriction, Wide wide) throws IOException {
 		switch(wide) {
 		case standard:
 			writeStandardToCSV(csvPrinter, app);
@@ -173,7 +172,7 @@ public class CSVAppExporter extends ApplicationExporter {
 		}
 	}
 	
-	private void writeStandardToCSV(CSVPrinter csvPrinter, ClientApplication app) throws IOException, AppException {
+	private void writeStandardToCSV(CSVPrinter csvPrinter, ClientApplication app) throws IOException {
 		csvPrinter.printRecord(
 				app.getId(),
 				app.getOrganization().getName(),
@@ -186,7 +185,7 @@ public class CSVAppExporter extends ApplicationExporter {
 		);
 	}
 	
-	private void writeWideToCSV(CSVPrinter csvPrinter, ClientApplication app, QuotaRestriction quotaRestriction) throws IOException, AppException {
+	private void writeWideToCSV(CSVPrinter csvPrinter, ClientApplication app, QuotaRestriction quotaRestriction) throws IOException {
 		csvPrinter.printRecord(
 				app.getId(),
 				app.getOrganization().getName(),
@@ -202,7 +201,7 @@ public class CSVAppExporter extends ApplicationExporter {
 		);
 	}
 	
-	private void writeUltraToCSV(CSVPrinter csvPrinter, ClientApplication app, APIAccess apiAccess) throws IOException, AppException {
+	private void writeUltraToCSV(CSVPrinter csvPrinter, ClientApplication app, APIAccess apiAccess) throws IOException {
 		csvPrinter.printRecord(
 				app.getId(),
 				app.getOrganization().getName(),
@@ -233,7 +232,7 @@ public class CSVAppExporter extends ApplicationExporter {
 		return quotaRestriction.getMethod().equals("*") ? "All Methods" : apiManager.methodAdapter.getMethodForId(restrictedAPI.getId(), quotaRestriction.getMethod()).getName();
 	}
 	
-	private String getQuotaConfig(QuotaRestriction quotaRestriction) throws AppException {
+	private String getQuotaConfig(QuotaRestriction quotaRestriction) {
 		if(quotaRestriction==null) return "N/A";
 		return ""+quotaRestriction.getConfig();
 	}
@@ -251,8 +250,7 @@ public class CSVAppExporter extends ApplicationExporter {
 		case ultra:
 			builder.includeAPIAccess(true);
 			break;
-		}		
-		ClientAppFilter filter = builder.build();
-		return filter;
+		}
+		return builder.build();
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter.Builder;
+import com.axway.apim.api.model.AbstractEntity;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.lib.ExportResult;
@@ -35,15 +36,14 @@ public class ConsoleAppExporter extends ApplicationExporter {
 			printUltra(apps);
 			break;
 		}
-		return;
 	}
 	
 	private void printStandard(List<ClientApplication> apps) {
 		System.out.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
-				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getId()),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getName()),
+				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
+				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
 				new Column().header("State").with(app -> app.getState().name()),
-				new Column().header("Email").with(app -> app.getEmail()),
+				new Column().header("Email").with(ClientApplication::getEmail),
 				new Column().header("Enabled").with(app -> Boolean.toString(app.isEnabled())),
 				new Column().header("Created by").with(app -> getCreatedBy(app.getCreatedBy(), app)
 				))));
@@ -51,10 +51,10 @@ public class ConsoleAppExporter extends ApplicationExporter {
 	
 	private void printWide(List<ClientApplication> apps) {
 		System.out.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
-				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getId()),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getName()),
+				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
+				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
 				new Column().header("State").with(app -> app.getState().name()),
-				new Column().header("Email").with(app -> app.getEmail()),
+				new Column().header("Email").with(ClientApplication::getEmail),
 				new Column().header("Enabled").with(app -> Boolean.toString(app.isEnabled())),
 				new Column().header("Created by").with(app -> getCreatedBy(app.getCreatedBy(), app)),
 				new Column().header("Created on").with(app -> getCreatedOn(app.getCreatedOn()).toString()),
@@ -64,10 +64,10 @@ public class ConsoleAppExporter extends ApplicationExporter {
 	
 	private void printUltra(List<ClientApplication> apps) {
 		System.out.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
-				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getId()),
-				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(app -> app.getName()),
+				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
+				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
 				new Column().header("State").with(app -> app.getState().name()),
-				new Column().header("Email").with(app -> app.getEmail()),
+				new Column().header("Email").with(ClientApplication::getEmail),
 				new Column().header("Enabled").with(app -> Boolean.toString(app.isEnabled())),
 				new Column().header("Created by").with(app -> getCreatedBy(app.getCreatedBy(), app)),
 				new Column().header("Created on").with(app -> getCreatedOn(app.getCreatedOn()).toString()),

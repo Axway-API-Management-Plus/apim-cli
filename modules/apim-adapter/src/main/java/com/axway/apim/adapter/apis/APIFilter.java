@@ -133,14 +133,7 @@ public class APIFilter implements CustomPropertiesFilter {
 		// All applications are requested - We ignore this filter
 		if(name.equals("*")) return;
 		this.name = name;
-		String op = "eq";
-		if(name.startsWith("*") || name.endsWith("*")) {
-			op = "like";
-			name = name.replace("*", "");
-		}
-		filters.add(new BasicNameValuePair("field", "name"));
-		filters.add(new BasicNameValuePair("op", op));
-		filters.add(new BasicNameValuePair("value", name));
+		FilterHelper.setFilter(name, filters);
 	}
 
 	public void setVhost(String vhost) {
@@ -264,24 +257,12 @@ public class APIFilter implements CustomPropertiesFilter {
 		this.translateMethodMode = translateMethodMode;
 	}
 
-	public POLICY_TRANSLATION getTranslatePolicyMode() {
-		return translatePolicyMode;
-	}
-
 	public void setTranslatePolicyMode(POLICY_TRANSLATION translatePolicyMode) {
 		this.translatePolicyMode = translatePolicyMode;
 	}
 
-	public boolean isLoadBackendAPI() {
-		return loadBackendAPI;
-	}
-
 	public void setLoadBackendAPI(boolean loadBackendAPI) {
 		this.loadBackendAPI = loadBackendAPI;
-	}
-
-	public boolean isIncludeOperations() {
-		return includeOperations;
 	}
 
 	public void setIncludeOperations(boolean includeOperations) {
@@ -316,10 +297,6 @@ public class APIFilter implements CustomPropertiesFilter {
 		return includeClientAppQuota;
 	}
 
-	public void setIncludeClientAppQuota(boolean includeClientAppQuota) {
-		this.includeClientAppQuota = includeClientAppQuota;
-	}	
-
 	public boolean isIncludeImage() {
 		return includeImage;
 	}
@@ -334,10 +311,6 @@ public class APIFilter implements CustomPropertiesFilter {
 
 	public void setIncludeRemoteHost(boolean includeRemoteHost) {
 		this.includeRemoteHost = includeRemoteHost;
-	}
-
-	public void setApiType(String apiType) {
-		this.apiType = apiType;
 	}
 
 	public boolean isDeprecated() {
@@ -387,10 +360,6 @@ public class APIFilter implements CustomPropertiesFilter {
 	
 	public String getCreatedOn() {
 		return createdOn;
-	}
-	
-	public FILTER_OP getCreatedOnOp() {
-		return createdOnOp;
 	}
 
 	public List<String> getCustomProperties() {
@@ -718,7 +687,6 @@ public class APIFilter implements CustomPropertiesFilter {
 				this.includeImage = true;
 				break;
 			case DESIRED_API:
-				break;
 			default:
 				break;
 			}
@@ -799,12 +767,7 @@ public class APIFilter implements CustomPropertiesFilter {
 			this.filters = filters;
 			return this;
 		}
-		
-		public Builder includeOperations(boolean includeOperations) {
-			this.includeOperations = includeOperations;
-			return this;
-		}
-		
+
 		public Builder includeQuotas(boolean includeQuotas) {
 			this.includeQuotas = includeQuotas;
 			return this;

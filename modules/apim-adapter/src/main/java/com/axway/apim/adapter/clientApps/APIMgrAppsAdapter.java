@@ -646,7 +646,7 @@ public class APIMgrAppsAdapter {
     }
 
     private void getScopes2AddOrUpdate(ClientApplication actualApp, ClientApplication desiredApp,
-                                       List<ClientAppOauthResource> scopes2Update, List<ClientAppOauthResource> scopes2Create, List<ClientAppOauthResource> scopes2Delete) throws AppException {
+                                       List<ClientAppOauthResource> scopes2Update, List<ClientAppOauthResource> scopes2Create, List<ClientAppOauthResource> scopes2Delete) {
         List<ClientAppOauthResource> existingScopes = null;
         List<ClientAppOauthResource> desiredScopes = desiredApp.getOauthResources();
         if (actualApp != null) {

@@ -67,7 +67,7 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 		
 		echo("####### Validate application: '${appName}' with id: ${appId} quota has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/quota").header("Content-Type", "application/json"));
-		
+		sleep(1000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.type", "APPLICATION")
 				.validate("$.restrictions[*].api", "@assertThat(hasSize(1))@")
@@ -169,10 +169,10 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 		variable("oauthCorsOrigins","*");
 		createVariable(PARAM_EXPECTED_RC, "0");
 		importApp.doExecute(context);
-		
+		sleep(1000);
+
 		echo("####### Validate application: '${appName}' with id: ${appId} OAuth has been changed #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/oauth").header("Content-Type", "application/json"));
-		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$[0].id", "ClientConfidentialApp-${appNumber}")
 				.validate("$[0].cert", "@assertThat(containsString(-----BEGIN CERTIFICATE-----))@")
@@ -181,7 +181,6 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 		
 		echo("####### Validate application: '${appName}' with id: ${appId} API-Key has been changed #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/apikeys").header("Content-Type", "application/json"));
-		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$[0].id", "6cd55c27-675a-444a-9bc7-ae9a7869184d-${appNumber}")
 				.validate("$[0].secret", "34f2b2d6-0334-4dcc-8442-e0e7009b8950")

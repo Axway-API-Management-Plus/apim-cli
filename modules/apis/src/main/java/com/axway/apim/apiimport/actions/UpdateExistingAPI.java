@@ -4,6 +4,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIMethod;
+import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -42,6 +43,16 @@ public class UpdateExistingAPI {
                 apiManager.apiAdapter.updateAPIProxy(changes.getActualAPI());
             }
             manageApiMethods.updateApiMethods(changes.getActualAPI().getId(),actualAPIMethods, desiredAPIMethods );
+
+            // Handle backendBasePath update
+            if(changes.getBreakingChanges().contains("serviceProfiles")){
+                String backendBasePath = changes.getDesiredAPI().getServiceProfiles().get("_default").getBasePath();
+                ServiceProfile actualServiceProfile = changes.getActualAPI().getServiceProfiles().get("_default");
+                LOG.info("Replacing existing API backendBasePath {} with new value : {}", actualServiceProfile.getBasePath(), backendBasePath);
+                actualServiceProfile.setBasePath(backendBasePath);
+                apiManager.apiAdapter.updateAPIProxy(changes.getActualAPI());
+            }
+
             // If image an include, update it
             if (changes.getAllChanges().contains("image")) {
                 apiManager.apiAdapter.updateAPIImage(changes.getActualAPI(), changes.getDesiredAPI().getImage());
