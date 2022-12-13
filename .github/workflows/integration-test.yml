@@ -4,7 +4,7 @@ on: [push]
 
 env:
   CASSANDRA_DOCKER_IMAGE: cassandra:2.2.12
-  APIM_DOCKER_IMAGE: docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7-20220830
+  APIM_DOCKER_IMAGE: docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7-20221130
 
 jobs:
   build:

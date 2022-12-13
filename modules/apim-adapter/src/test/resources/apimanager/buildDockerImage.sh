@@ -36,7 +36,7 @@ fi
 
 version=$1
 dockerScripts="APIGateway_7.7.20210330-DockerScripts-2.2.0-2.tar.gz"
-testSources="$HOME/apim-cli/modules/apim-adapter/src/test/resources/apimanager"
+testSources="$HOME/apimcli/apim-cli/modules/apim-adapter/src/test/resources/apimanager"
 buildDir="$HOME/apim-cli-dockerimage"
 
 echo "Creating docker image for version $version"
