@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Support for November 2022 APIM release (7.7-20221130)
+- 
 
 ## [1.13.1] 2022-11-15 
 
