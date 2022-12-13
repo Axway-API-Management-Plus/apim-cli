@@ -169,12 +169,10 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 		variable("oauthCorsOrigins","*");
 		createVariable(PARAM_EXPECTED_RC, "0");
 		importApp.doExecute(context);
-		
+		sleep(1000);
+
 		echo("####### Validate application: '${appName}' with id: ${appId} OAuth has been changed #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/oauth").header("Content-Type", "application/json"));
-
-		sleep(1000);
-		
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$[0].id", "ClientConfidentialApp-${appNumber}")
 				.validate("$[0].cert", "@assertThat(containsString(-----BEGIN CERTIFICATE-----))@")
