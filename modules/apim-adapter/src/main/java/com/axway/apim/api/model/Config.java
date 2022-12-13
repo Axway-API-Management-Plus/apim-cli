@@ -4,9 +4,12 @@ import com.axway.apim.adapter.jackson.PolicyDeserializer;
 import com.axway.apim.lib.APIManagerConfigAnnotation;
 import com.axway.apim.lib.APIManagerConfigAnnotation.ConfigType;
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonFilter("ConfigFilter")
+@JsonIgnoreProperties(ignoreUnknown = true)
+
 public class Config {
 	
 	@APIManagerConfigAnnotation(
@@ -287,8 +290,21 @@ public class Config {
 			name = "Skip Enum validation",
 			description = "Specifies whether or not enum validation is performed during API Import. Currently enum validation is implemented for Swagger (1.x and 2.0) and OAS 3.0. This feature is switched on by default")
 	private Boolean skipEnumValidation;
-	
-	
+
+	@APIManagerConfigAnnotation(
+			configType = ConfigType.APIImport,
+			name = "Skip Required validation",
+			description = "Specifies whether or not required validation is performed during API Import. Currently required validation is implemented for Swagger (1.x and 2.0) and OAS 3.0. This feature is switched on by default")
+	private Boolean skipRequiredValidation;
+
+
+	@APIManagerConfigAnnotation(
+			configType = ConfigType.APIImport,
+			name = "Allow Empty values",
+			description = "Specifies whether or not allow empty values dyrubg API Import. Currently allow empty validation is implemented for Swagger (1.x and 2.0) and OAS 3.0. This feature is switched on by default")
+	private Boolean allowEmptyValue;
+
+
 	private Boolean baseOAuth;
 	
 	private Boolean oadminSelfServiceEnabled;
@@ -763,5 +779,21 @@ public class Config {
 
 	public void setSkipEnumValidation(Boolean skipEnumValidation) {
 		this.skipEnumValidation = skipEnumValidation;
+	}
+
+	public Boolean getSkipRequiredValidation() {
+		return skipRequiredValidation;
+	}
+
+	public void setSkipRequiredValidation(Boolean skipRequiredValidation) {
+		this.skipRequiredValidation = skipRequiredValidation;
+	}
+
+	public Boolean getAllowEmptyValue() {
+		return allowEmptyValue;
+	}
+
+	public void setAllowEmptyValue(Boolean allowEmptyValue) {
+		this.allowEmptyValue = allowEmptyValue;
 	}
 }
