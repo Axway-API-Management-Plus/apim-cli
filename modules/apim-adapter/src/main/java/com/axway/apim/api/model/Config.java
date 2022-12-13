@@ -280,6 +280,13 @@ public class Config {
 			name = "Login response time (ms)",
 			description = "Login response time in milliseconds to mitigate user accounts enumeration.")
 	private Integer loginResponseTime;
+
+
+	@APIManagerConfigAnnotation(
+			configType = ConfigType.APIImport,
+			name = "Skip Enum validation",
+			description = "Specifies whether or not enum validation is performed during API Import. Currently enum validation is implemented for Swagger (1.x and 2.0) and OAS 3.0. This feature is switched on by default")
+	private Boolean skipEnumValidation;
 	
 	
 	private Boolean baseOAuth;
@@ -748,5 +755,13 @@ public class Config {
 
 	public void setSessionTimeout(Integer sessionTimeout) {
 		this.sessionTimeout = sessionTimeout;
+	}
+
+	public Boolean getSkipEnumValidation() {
+		return skipEnumValidation;
+	}
+
+	public void setSkipEnumValidation(Boolean skipEnumValidation) {
+		this.skipEnumValidation = skipEnumValidation;
 	}
 }
