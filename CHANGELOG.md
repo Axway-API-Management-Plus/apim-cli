@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+## [1.13.2] In progress
 
 ## [1.13.2] 2022-12-13
 
@@ -13,9 +14,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - APIM UI FeAPI via UI WSDL import, exported and imported by CLI fails, due to wsdl file reference api-config.json (See issue [#328](https://github.com/Axway-API-Management-Plus/apim-cli/issues/328))
     - Added an environment variable with value **retain.backend.url=true** to add URL used to import WSDL to API manger to api-config.json instead of writing WSDL to file system.
 - BUILD SUCCESSFUL despite errors during pipeline execution for publish and un-publish operations (See issue [#330](https://github.com/Axway-API-Management-Plus/apim-cli/issues/330))
+- Upgraded jackson, ascii-table and log4j jars to latest versions
 
 ### Added
 - Support for November 2022 APIM release (7.7-20221130)
+
+
 
 ## [1.13.1] 2022-11-15 
 
