@@ -43,7 +43,6 @@ public class UserChangePasswordHandler extends UserResultHandler {
 			}
 		}
 		System.out.println("Done!");
-		return;
 	}
 
 	@Override

@@ -25,7 +25,7 @@ public abstract class APIManagerSetupResultHandler {
 		private final Class<APIManagerSetupResultHandler> implClass;
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		private ResultHandler(Class clazz) {
+		ResultHandler(Class clazz) {
 			this.implClass = clazz;
 		}
 
@@ -43,9 +43,8 @@ public abstract class APIManagerSetupResultHandler {
 		try {
 			Object[] intArgs = new Object[] { params, result };
 			Constructor<APIManagerSetupResultHandler> constructor =
-					exportImpl.getClazz().getConstructor(new Class[]{APIManagerSetupExportParams.class, ExportResult.class});
-			APIManagerSetupResultHandler exporter = constructor.newInstance(intArgs);
-			return exporter;
+					exportImpl.getClazz().getConstructor(APIManagerSetupExportParams.class, ExportResult.class);
+			return constructor.newInstance(intArgs);
 		} catch (Exception e) {
 			throw new AppException("Error initializing config exporter", ErrorCode.UNXPECTED_ERROR, e);
 		}
@@ -63,10 +62,9 @@ public abstract class APIManagerSetupResultHandler {
 	}
 	
 	protected Builder getRemoteHostBaseFilterBuilder() {
-		Builder builder = new RemoteHostFilter.Builder()
+		return new Builder()
 				.hasName(params.getRemoteHostName())
 				.hasId(params.getRemoteHostId());
-		return builder;
 	}
 	
 	public abstract RemoteHostFilter getRemoteHostFilter() throws AppException;

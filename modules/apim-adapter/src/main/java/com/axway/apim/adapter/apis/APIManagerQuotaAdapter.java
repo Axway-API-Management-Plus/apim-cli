@@ -217,6 +217,4 @@ public class APIManagerQuotaAdapter {
 			throw new AppException("Can't parse quota from API-Manager", ErrorCode.UNXPECTED_ERROR, e);
 		}
 	}
-	
-
 }

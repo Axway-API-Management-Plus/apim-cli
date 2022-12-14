@@ -1,8 +1,5 @@
 package com.axway.apim.lib.errorHandling;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.axway.apim.lib.errorHandling.AppException.LogLevel;
 
 public enum ErrorCode {
@@ -62,6 +59,8 @@ public enum ErrorCode {
 	ERR_GRANTING_ACCESS_TO_API			(93, "Error granting access to an API.", false),
 	ERR_EXPORTING_API_DAT_FILE			(94, "Error exporting API-Date file.", false),
 	ERR_CREATING_APPLICATION			(95, "Error creating/updating an application.", false),
+	ERR_PUBLISH_API					(96, "API could not be changed to publish state", false),
+	ERR_UNPUBSLISH_API					(97, "API could not be changed to unpublish state", false),
 	UNXPECTED_ERROR						(99, "An unexpected error occured.", true),
 	CHECK_CERTS_UNXPECTED_ERROR			(100, "There was an unexpected error checking the expiration date of certificates.", false),
 	CHECK_CERTS_FOUND_CERTS				(101, "Certificates found that will expire within the given number of days.", false);
@@ -70,31 +69,15 @@ public enum ErrorCode {
 	private final String description;
 	private final Boolean printStackTrace;
 	private final LogLevel logLevel;
-	
-	private static Map<Integer, ErrorCode> rcToErrorCodeMapping = null;
-	
-	public static ErrorCode getErrorCodeForRC(int rc) {
-		if(rcToErrorCodeMapping==null)
-			initMapping();
-		return rcToErrorCodeMapping.get(rc);
-	}
-	
-	private static void initMapping() {
-		rcToErrorCodeMapping = new HashMap<Integer, ErrorCode>();
-		for(ErrorCode type : values()) {
-			rcToErrorCodeMapping.put(type.getCode(), type);
-		}
-	}
-	
-	private ErrorCode(int code, String description) {
+	ErrorCode(int code, String description) {
 		this(code, description, false, LogLevel.ERROR);
 	}
 	
-	private ErrorCode(int code, String description, Boolean printStackTrace) {
+	ErrorCode(int code, String description, Boolean printStackTrace) {
 		this(code, description, printStackTrace, LogLevel.ERROR);
 	}
 	
-	private ErrorCode(int code, String description, Boolean printStackTrace, LogLevel logLevel) {
+	ErrorCode(int code, String description, Boolean printStackTrace, LogLevel logLevel) {
 		this.code = code;
 		this.description = description;
 		this.printStackTrace = printStackTrace;

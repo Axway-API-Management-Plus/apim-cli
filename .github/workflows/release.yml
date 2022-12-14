@@ -1,15 +1,25 @@
 name: Release API CLI on github and Maven repository 
 
 on:
-  push:
-    tags:
-      - "*"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Verson Type'     
+        required: true
+        default: 'version-patch'
+        type: choice
+        options:
+        - version-major
+        - version-minor
+        - version-patch
+      tags:
+        description: 'Release Version Type'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up JDK 8
         uses: actions/setup-java@v3
         with:
@@ -18,4 +28,6 @@ jobs:
           cache: 'maven'
       - name: Maven Build and Unit Test 
         run: mvn clean test
+      - name: Release
+        uses: qcastel/github-actions-maven-release@master
     

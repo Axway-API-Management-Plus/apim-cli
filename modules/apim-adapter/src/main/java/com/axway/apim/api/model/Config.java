@@ -4,9 +4,12 @@ import com.axway.apim.adapter.jackson.PolicyDeserializer;
 import com.axway.apim.lib.APIManagerConfigAnnotation;
 import com.axway.apim.lib.APIManagerConfigAnnotation.ConfigType;
 import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonFilter("ConfigFilter")
+@JsonIgnoreProperties(ignoreUnknown = true)
+
 public class Config {
 	
 	@APIManagerConfigAnnotation(
@@ -280,8 +283,28 @@ public class Config {
 			name = "Login response time (ms)",
 			description = "Login response time in milliseconds to mitigate user accounts enumeration.")
 	private Integer loginResponseTime;
-	
-	
+
+
+	@APIManagerConfigAnnotation(
+			configType = ConfigType.APIImport,
+			name = "Skip Enum validation",
+			description = "Specifies whether or not skip enum validation on incoming API request")
+	private Boolean skipEnumValidation;
+
+	@APIManagerConfigAnnotation(
+			configType = ConfigType.APIImport,
+			name = "Skip Required validation",
+			description = "Specifies whether or not skip required validation on incoming API request")
+	private Boolean skipRequiredValidation;
+
+
+	@APIManagerConfigAnnotation(
+			configType = ConfigType.APIImport,
+			name = "Allow Empty values",
+			description = "Specifies whether or not allow empty values on incoming API request")
+	private Boolean allowEmptyValue;
+
+
 	private Boolean baseOAuth;
 	
 	private Boolean oadminSelfServiceEnabled;
@@ -748,5 +771,29 @@ public class Config {
 
 	public void setSessionTimeout(Integer sessionTimeout) {
 		this.sessionTimeout = sessionTimeout;
+	}
+
+	public Boolean getSkipEnumValidation() {
+		return skipEnumValidation;
+	}
+
+	public void setSkipEnumValidation(Boolean skipEnumValidation) {
+		this.skipEnumValidation = skipEnumValidation;
+	}
+
+	public Boolean getSkipRequiredValidation() {
+		return skipRequiredValidation;
+	}
+
+	public void setSkipRequiredValidation(Boolean skipRequiredValidation) {
+		this.skipRequiredValidation = skipRequiredValidation;
+	}
+
+	public Boolean getAllowEmptyValue() {
+		return allowEmptyValue;
+	}
+
+	public void setAllowEmptyValue(Boolean allowEmptyValue) {
+		this.allowEmptyValue = allowEmptyValue;
 	}
 }

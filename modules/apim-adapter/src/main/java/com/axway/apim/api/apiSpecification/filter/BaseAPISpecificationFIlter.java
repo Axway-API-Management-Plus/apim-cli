@@ -22,7 +22,7 @@ public class BaseAPISpecificationFIlter {
 				return false;
 			// Check if there is any SPECIFIC EXCLUDE filter is excluding the operation
 			for (APISpecIncludeExcludeFilter filter : filterConfig.getExclude()) {
-				if (filter.filter(path, verb, tags, false, true) == true) {
+				if (filter.filter(path, verb, tags, false, true)) {
 					// Must be filtered in any case, as it is specific, even it might be included as
 					// exclude overwrite includes
 					return true;
@@ -38,24 +38,21 @@ public class BaseAPISpecificationFIlter {
 			// Now, check for WILDCARD EXCLUDES, which have less priority, than the specific
 			// filters
 			for (APISpecIncludeExcludeFilter filter : filterConfig.getExclude()) {
-				if (filter.filter(path, verb, tags, true, false) == true) {
+				if (filter.filter(path, verb, tags, true, false)) {
 					// Should be filtered
 					return true;
 				}
 			}
 			// Check if there is any WILDCARD INCLUDE configured
 			for (APISpecIncludeExcludeFilter filter : filterConfig.getInclude()) {
-				if (filter.filter(path, verb, tags, true, false) == true) {
+				if (filter.filter(path, verb, tags, true, false)) {
 					return false;
 				}
 			}
 
-			if (!filterConfig.getInclude().isEmpty()) {
-				// If there is at least one include - Filter it anyway
-				return true;
-			} else {
-				return false; // Otherwise dont filter
-			}
+			// If there is at least one include - Filter it anyway
+			// Otherwise dont filter
+			return !filterConfig.getInclude().isEmpty();
 
 		}
 		
@@ -75,11 +72,7 @@ public class BaseAPISpecificationFIlter {
 				}
 			}
 			// If at least one model include is defined, then all others must be filtered.
-			if(modelIncludeFilterConfigured) {
-				return true;
-			} else {
-				return false;
-			}
+			return modelIncludeFilterConfigured;
 		}
 	}
 

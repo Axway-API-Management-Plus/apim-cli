@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 
 public class JSONOrgAdapter extends OrgAdapter {
 	
-	private ObjectMapper mapper = new ObjectMapper();
+	private final ObjectMapper mapper = new ObjectMapper();
 	
 	OrgImportParams importParams;
 
@@ -63,7 +63,7 @@ public class JSONOrgAdapter extends OrgAdapter {
 						LOG.warn("No config file found for stage: '"+stage+"'");
 					}
 				}
-				this.orgs = new ArrayList<Organization>();
+				this.orgs = new ArrayList<>();
 				this.orgs.add(org);
 			} catch (Exception pe) {
 				throw new AppException("Cannot read organization(s) from config file: " + config, ErrorCode.ACCESS_ORGANIZATION_ERR, pe);
@@ -78,7 +78,6 @@ public class JSONOrgAdapter extends OrgAdapter {
 		}
 		addAPIAccess(orgs, result);
 		validateCustomProperties(orgs);
-		return;
 	}
 	
 	private void addImage(List<Organization> orgs, File parentFolder) throws AppException {

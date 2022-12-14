@@ -41,7 +41,6 @@ public class DeleteOrgHandler extends OrgResultHandler {
 			}
 		}
 		System.out.println("Done!");
-		return;
 	}
 
 	@Override

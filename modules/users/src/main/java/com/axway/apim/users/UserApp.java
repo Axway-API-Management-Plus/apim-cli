@@ -31,7 +31,7 @@ import com.axway.apim.users.lib.params.UserExportParams;
 
 public class UserApp implements APIMCLIServiceProvider {
 
-	private static Logger LOG = LoggerFactory.getLogger(UserApp.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UserApp.class);
 
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 
@@ -56,7 +56,7 @@ public class UserApp implements APIMCLIServiceProvider {
 	}
 	
 	@CLIServiceMethod(name = "get", description = "Get users from API-Manager in different formats")
-	public static int export(String args[]) {
+	public static int export(String[] args) {
 		UserExportParams params;
 		try {
 			params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
@@ -73,11 +73,10 @@ public class UserApp implements APIMCLIServiceProvider {
 		try {
 			params.validateRequiredParameters();
 			switch(params.getOutputFormat()) {
-			case console:
-				return runExport(params, ResultHandler.CONSOLE_EXPORTER, result);
-			case json:
+				case json:
 				return runExport(params, ResultHandler.JSON_EXPORTER, result);
-			default:
+				case console:
+				default:
 				return runExport(params, ResultHandler.CONSOLE_EXPORTER, result);
 			}
 		} catch (AppException e) {
@@ -183,7 +182,7 @@ public class UserApp implements APIMCLIServiceProvider {
 	}
 	
 	@CLIServiceMethod(name = "delete", description = "Delete selected user(s) from the API-Manager")
-	public static int delete(String args[]) {
+	public static int delete(String[] args) {
 		UserExportParams params;
 		try {
 			params = (UserExportParams) UserDeleteCLIOptions.create(args).getParams();
@@ -210,7 +209,7 @@ public class UserApp implements APIMCLIServiceProvider {
 	}
 	
 	@CLIServiceMethod(name = "changepassword", description = "Changes the password of the selected users.")
-	public static int changePassword(String args[]) {
+	public static int changePassword(String[] args) {
 		UserChangePasswordParams params;
 		try {
 			params = (UserChangePasswordParams) UserChangePasswordCLIOptions.create(args).getParams();
@@ -233,7 +232,7 @@ public class UserApp implements APIMCLIServiceProvider {
 		}
 	}
 
-	public static void main(String args[]) { 
+	public static void main(String[] args) {
 		int rc = changePassword(args);
 		System.exit(rc);
 	}

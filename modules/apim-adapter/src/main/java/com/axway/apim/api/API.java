@@ -36,17 +36,17 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  * This class defines all common properties on an API and how each property should be 
  * treated during replication.
  * APIManagerAPI and APIImportDefintion are both an instance of this class.
- * 
+ * <p>
  * Annotations for each property are used by the APIChangeState to decide:
  * - Is it a breaking change?
  * - Can the change be applied to the existing API?
  * - Which Change-Handler should finally do the required actions to replicate the change into the APIManager
- * 
+ * <p>
  * When adding new properties, please make sure to create Getter and Setter as Jackson is used to create the Instances.
- * 
+ * <p>
  * Perhaps a way to simplify the code is to use for many of the properties is to use a SimplePropertyHandler 
  * as many properties are handled in the same way.
- * 
+ * <p>
  * 
  * @author cwiechmann@axway.com
  */
@@ -100,7 +100,7 @@ public class API implements CustomPropertiesEntity {
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
 	protected Map<String, OutboundProfile> outboundProfiles = null;
 	
-	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
+	@APIPropertyAnnotation(copyProp = false, isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
 	protected Map<String, ServiceProfile> serviceProfiles = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})

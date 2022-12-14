@@ -1,6 +1,8 @@
 package com.axway.apim.apiimport.actions;
 
 import com.axway.apim.api.model.APIMethod;
+import com.axway.apim.api.model.ServiceProfile;
+import com.axway.apim.apiimport.DesiredAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +18,7 @@ import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.errorHandling.AppException;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is used by the APIImportManager#applyChanges(APIChangeState, boolean) to create a new API.
@@ -62,6 +65,17 @@ public class CreateNewAPI {
 		try {
 			// ... here we basically need to add all props to initially bring the API in sync!
 			APIChangeState.initCreatedAPI(desiredAPI, createdAPI);
+			//handle backend base path update
+			String backendBasePath = ((DesiredAPI) desiredAPI).getBackendBasepath();
+			LOG.debug("backendBasePath from config : {}", backendBasePath);
+			if(backendBasePath != null){
+				Map<String, ServiceProfile> serviceProfiles =  createdAPI.getServiceProfiles();
+				if( serviceProfiles != null){
+					ServiceProfile serviceProfile = serviceProfiles.get("_default");
+					LOG.info("Updating API backendBasePath with value : {}", backendBasePath);
+					serviceProfile.setBasePath(backendBasePath);
+				}
+			}
 			// But without updating the Swagger, as we have just imported it!
 			createdAPI = apiAdapter.updateAPIProxy(createdAPI);
 			// If an image is included, update it

@@ -29,7 +29,7 @@ public abstract class UserResultHandler {
 		private final Class<UserResultHandler> implClass;
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		private ResultHandler(Class clazz) {
+		ResultHandler(Class clazz) {
 			this.implClass = clazz;
 		}
 
@@ -47,9 +47,8 @@ public abstract class UserResultHandler {
 		try {
 			Object[] intArgs = new Object[] { params, result };
 			Constructor<UserResultHandler> constructor =
-					exportImpl.getClazz().getConstructor(new Class[]{UserExportParams.class, ExportResult.class});
-			UserResultHandler exporter = constructor.newInstance(intArgs);
-			return exporter;
+					exportImpl.getClazz().getConstructor(UserExportParams.class, ExportResult.class);
+			return constructor.newInstance(intArgs);
 		} catch (Exception e) {
 			throw new AppException("Error initializing application exporter", ErrorCode.UNXPECTED_ERROR, e);
 		}
@@ -67,7 +66,7 @@ public abstract class UserResultHandler {
 	}
 	
 	protected Builder getBaseFilterBuilder() {
-		Builder builder = new UserFilter.Builder()
+		return new Builder()
 				.hasId(params.getId())
 				.hasLoginName(params.getLoginName())
 				.hasName(params.getName())
@@ -77,7 +76,6 @@ public abstract class UserResultHandler {
 				.hasRole(params.getRole())
 				.includeCustomProperties(getAPICustomProperties())
 				.isEnabled(params.isEnabled());
-		return builder;
 	}
 	
 	protected List<String> getAPICustomProperties() {

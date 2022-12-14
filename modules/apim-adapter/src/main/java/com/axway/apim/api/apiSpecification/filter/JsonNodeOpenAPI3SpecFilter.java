@@ -21,8 +21,8 @@ public class JsonNodeOpenAPI3SpecFilter  {
 		JsonNode paths = openAPISpec.get("paths");
 		FilterConfig filter = new FilterConfig(filterConfig);
 		// If includes are given - Remove all others not defined as included
-		List<String> toBeRemoved = new ArrayList<String>();
-		List<String> toBeRemovedModels = new ArrayList<String>();
+		List<String> toBeRemoved = new ArrayList<>();
+		List<String> toBeRemovedModels = new ArrayList<>();
 		// Iterate over the API specification and create a list of all paths 
 		// that must to be removed because they were not configured as included
 		Iterator<String> it = paths.fieldNames();
@@ -76,7 +76,7 @@ public class JsonNodeOpenAPI3SpecFilter  {
 	}
 	
 	private static List<String> toList(ArrayNode arrayNode) {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for(JsonNode node : arrayNode) {
 			list.add(node.asText());
 		}

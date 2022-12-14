@@ -42,9 +42,9 @@ public class ConsolePrinterPolicies {
 	
 	private void printPolicies(List<Policy> policies) {
 		System.out.println(AsciiTable.getTable(borderStyle, policies, Arrays.asList(
-				new Column().header("Policy-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(policy -> policy.getName()),
+				new Column().header("Policy-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Policy::getName),
 				new Column().header("Type").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(policy -> policy.getType().getNiceName()),
-				new Column().header("APIs").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(policy -> getNumberOfRelatedAPIs(policy))
+				new Column().header("APIs").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(ConsolePrinterPolicies::getNumberOfRelatedAPIs)
 				)));
 	}
 	
@@ -59,10 +59,6 @@ public class ConsolePrinterPolicies {
 	
 	private static List<API> getRelatedAPIs(Policy policy) throws AppException {
 		APIFilter apiFilter = new APIFilter.Builder().hasPolicyName(policy.getName()).build();
-		try {
-			return APIManagerAdapter.getInstance().apiAdapter.getAPIs(apiFilter, true);
-		} catch (AppException e) {
-			throw e;
-		}
+		return APIManagerAdapter.getInstance().apiAdapter.getAPIs(apiFilter, true);
 	}
 }

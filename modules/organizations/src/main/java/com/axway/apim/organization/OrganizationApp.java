@@ -27,7 +27,7 @@ import com.axway.apim.organization.lib.OrgImportParams;
 
 public class OrganizationApp implements APIMCLIServiceProvider {
 
-	private static Logger LOG = LoggerFactory.getLogger(OrganizationApp.class);
+	private static final Logger LOG = LoggerFactory.getLogger(OrganizationApp.class);
 
 	static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 
@@ -52,7 +52,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	}
 	
 	@CLIServiceMethod(name = "get", description = "Get Organizations from API-Manager in different formats")
-	public static int exportOrgs(String args[]) {
+	public static int exportOrgs(String[] args) {
 		OrgExportParams params;
 		try {
 			params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
@@ -69,11 +69,10 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		try {
 			params.validateRequiredParameters();
 			switch(params.getOutputFormat()) {
-			case console:
-				return exportOrgs(params, ResultHandler.CONSOLE_EXPORTER, result);
-			case json:
+				case json:
 				return exportOrgs(params, ResultHandler.JSON_EXPORTER, result);
-			default:
+				case console:
+				default:
 				return exportOrgs(params, ResultHandler.CONSOLE_EXPORTER, result);
 			}
 		} catch (AppException e) {
@@ -167,7 +166,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	}
 	
 	@CLIServiceMethod(name = "delete", description = "Delete selected organizatio(s) from the API-Manager")
-	public static int delete(String args[]) {
+	public static int delete(String[] args) {
 		try {
 			
 			OrgExportParams params = (OrgExportParams) OrgDeleteCLIOptions.create(args).getParams();
@@ -197,7 +196,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		}
 	}
 
-	public static void main(String args[]) { 
+	public static void main(String[] args) {
 		int rc = exportOrgs(args);
 		System.exit(rc);
 	}
