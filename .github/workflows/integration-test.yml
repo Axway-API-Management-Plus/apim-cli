@@ -3,7 +3,7 @@ name: APIM CLI Integration test
 on: [push]
 
 env:
-  CASSANDRA_DOCKER_IMAGE: cassandra:2.2.12
+  CASSANDRA_DOCKER_IMAGE: cassandra:3.11.14
   APIM_DOCKER_IMAGE: docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7-20221130
 
 jobs:
