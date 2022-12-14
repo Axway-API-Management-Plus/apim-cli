@@ -67,7 +67,7 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 		
 		echo("####### Validate application: '${appName}' with id: ${appId} quota has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/quota").header("Content-Type", "application/json"));
-		sleep(1000);
+		sleep(3000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.type", "APPLICATION")
 				.validate("$.restrictions[*].api", "@assertThat(hasSize(1))@")
@@ -153,7 +153,7 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 				.validate("$.restrictions[0].config.per", "1"));
 		
 		echo("####### Validate modified scopes for application: '${appName}' with id: ${appId} #######");
-		Thread.sleep(1000);
+		Thread.sleep(3000);
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/oauthresource").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.scope=='${scopeName2}')].enabled", "${scopeEnabled2}")
