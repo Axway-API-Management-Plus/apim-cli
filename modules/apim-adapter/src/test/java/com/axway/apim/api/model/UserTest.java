@@ -80,6 +80,7 @@ public class UserTest {
 		user.setOrganization(org);
 		user.setEmail("mail@customer.com");
 		user.setRole("admin");
+		user.setEnabled(true);
 		return user;
 	}
 }

@@ -574,9 +574,13 @@ public class APIManagerAPIAdapter {
                 apiDefinition.updateBasePath(resourcePath, basePath);
             }
 
-            String resourceUri = jsonNode.get("properties").get("ResourceUri").asText();
-            LOG.debug("Resource Uri : {}", resourceUri);
-            api.setBackendImportedUrl(resourceUri);
+            JsonNode resourceUriNode = jsonNode.get("properties").get("ResourceUri");
+            LOG.debug("Resource Uri : {}", resourceUriNode);
+            // resourceUriNode will be null if API is created manually. # https://github.com/Axway-API-Management-Plus/apim-cli/issues/337
+            if (resourceUriNode != null){
+                String resourceUri = resourceUriNode.asText();
+                api.setBackendImportedUrl(resourceUri);
+            }
             // In any case, we save the backend resource path, as it is necessary for the full backendBasepath in the exported API config.
             api.setBackendResourcePath(resourcePath);
 
