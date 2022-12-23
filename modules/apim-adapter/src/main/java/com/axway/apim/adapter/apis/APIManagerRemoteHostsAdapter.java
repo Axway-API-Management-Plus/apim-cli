@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
@@ -48,29 +47,22 @@ public class APIManagerRemoteHostsAdapter {
 
     private void readRemoteHostsFromAPIManager(RemoteHostFilter filter) throws AppException {
         if (apiManagerResponse.get(filter) != null) return;
-        URI uri;
-        HttpResponse httpResponse = null;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/remotehosts").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/remotehosts").build();
             RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load remote hosts from API-Manager using filter: " + filter);
-            httpResponse = getRequest.execute();
-            String response = EntityUtils.toString(httpResponse.getEntity());
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            if (statusCode < 200 || statusCode > 299) {
-                LOG.error("Error loading remoteHosts from API-Manager. Response-Code: " + statusCode + ". Got response: '" + response + "'");
-                throw new AppException("Error loading remoteHosts from API-Manager. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode < 200 || statusCode > 299) {
+                    LOG.error("Error loading remoteHosts from API-Manager. Response-Code: " + statusCode + ". Got response: '" + response + "'");
+                    throw new AppException("Error loading remoteHosts from API-Manager. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+                apiManagerResponse.put(filter, response);
             }
-            apiManagerResponse.put(filter, response);
         } catch (Exception e) {
-            LOG.error("Error cant read remoteHosts from API-Manager. Can't parse response: " + httpResponse, e);
+            LOG.error("Error cant read remoteHosts from API-Manager. Can't parse response: ", e);
             throw new AppException("Can't read remoteHosts from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
@@ -105,7 +97,6 @@ public class APIManagerRemoteHostsAdapter {
     }
 
     public void createOrUpdateRemoteHost(RemoteHost desiredRemoteHost, RemoteHost actualRemoteHost) throws AppException {
-        HttpResponse httpResponse = null;
         RemoteHost createdRemoteHost;
         try {
             URI uri;
@@ -135,21 +126,16 @@ public class APIManagerRemoteHostsAdapter {
                     HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
                     request = new PUTRequest(entity, uri, true);
                 }
-                httpResponse = request.execute();
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
-                if (statusCode < 200 || statusCode > 299) {
-                    LOG.error("Error creating/updating remote host. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
-                    throw new AppException("Error creating/updating remote host. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    if (statusCode < 200 || statusCode > 299) {
+                        LOG.error("Error creating/updating remote host. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                        throw new AppException("Error creating/updating remote host. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    }
+                    createdRemoteHost = mapper.readValue(httpResponse.getEntity().getContent(), RemoteHost.class);
                 }
-                createdRemoteHost = mapper.readValue(httpResponse.getEntity().getContent(), RemoteHost.class);
             } catch (Exception e) {
                 throw new AppException("Error creating/updating remote host.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
-            } finally {
-                try {
-                    if (httpResponse != null)
-                        ((CloseableHttpResponse) httpResponse).close();
-                } catch (Exception ignore) {
-                }
             }
             desiredRemoteHost.setId(createdRemoteHost.getId());
         } catch (Exception e) {

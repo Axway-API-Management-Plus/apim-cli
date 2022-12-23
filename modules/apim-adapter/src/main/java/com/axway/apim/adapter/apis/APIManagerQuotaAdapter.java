@@ -79,7 +79,6 @@ public class APIManagerQuotaAdapter {
 		if(!APIManagerAdapter.hasAdminAccount()) return;
 		if(this.apiManagerResponse.get(quotaId)!=null) return;
 		URI uri;
-		HttpResponse httpResponse = null;
 		try {
 			if(Quota.APPLICATION_DEFAULT.getQuotaId().equals(quotaId) || Quota.SYSTEM_DEFAULT.getQuotaId().equals(quotaId)) {
 				uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/quotas/"+quotaId).build();
@@ -93,23 +92,19 @@ public class APIManagerQuotaAdapter {
 			}
 			RestAPICall getRequest = new GETRequest(uri, true);
 			LOG.debug("Load quotas with ID: "+quotaId+" from API-Manager.");
-			httpResponse = getRequest.execute();
-			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
-			if( statusCode != 200){
-				throw new AppException("Can't read API-Manager Quota-Configuration. Got status code: " + statusCode + " for request: " + uri, ErrorCode.API_MANAGER_COMMUNICATION);
-			}
-			this.apiManagerResponse.put(quotaId,response);
-			if(!Quota.APPLICATION_DEFAULT.getQuotaId().equals(quotaId) && !Quota.SYSTEM_DEFAULT.getQuotaId().equals(quotaId)) {
-				applicationsQuotaCache.put(quotaId, response);
+			try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+				int statusCode = httpResponse.getStatusLine().getStatusCode();
+				String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
+				if (statusCode != 200) {
+					throw new AppException("Can't read API-Manager Quota-Configuration. Got status code: " + statusCode + " for request: " + uri, ErrorCode.API_MANAGER_COMMUNICATION);
+				}
+				this.apiManagerResponse.put(quotaId, response);
+				if (!Quota.APPLICATION_DEFAULT.getQuotaId().equals(quotaId) && !Quota.SYSTEM_DEFAULT.getQuotaId().equals(quotaId)) {
+					applicationsQuotaCache.put(quotaId, response);
+				}
 			}
 		} catch (URISyntaxException | UnsupportedOperationException | IOException e) {
 			throw new AppException("Can't get API-Manager Quota-Configuration.", ErrorCode.UNXPECTED_ERROR, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
 		}
 	}
 	

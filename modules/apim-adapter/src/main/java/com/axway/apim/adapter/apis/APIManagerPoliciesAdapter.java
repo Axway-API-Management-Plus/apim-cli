@@ -1,18 +1,5 @@
 package com.axway.apim.adapter.apis;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Policy;
 import com.axway.apim.lib.CoreParameters;
@@ -22,6 +9,17 @@ import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class APIManagerPoliciesAdapter {
 	
@@ -86,22 +84,17 @@ public class APIManagerPoliciesAdapter {
 	private void readPoliciesFromAPIManager(PolicyType type) throws AppException { 
 		if(apiManagerResponse.get(type)!=null) return;
 		CoreParameters cmd = CoreParameters.getInstance();
-		HttpResponse httpResponse = null;
 		try {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/policies")
 					.setParameter("type", type.getRestAPIKey()).build();
 			LOG.debug("Load policies with type: {} from API-Manager", type);
 			RestAPICall getRequest = new GETRequest(uri);
-			httpResponse = getRequest.execute();
-			apiManagerResponse.put(type, EntityUtils.toString(httpResponse.getEntity()));
+			try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+				apiManagerResponse.put(type, EntityUtils.toString(httpResponse.getEntity()));
+			}
 
 		} catch (Exception e) {
 			throw new AppException("Can't initialize policies for type: " + type, ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				assert httpResponse != null;
-				((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
 		}
 	}
 	

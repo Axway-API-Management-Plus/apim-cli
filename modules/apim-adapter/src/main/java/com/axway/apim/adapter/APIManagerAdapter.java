@@ -262,25 +262,18 @@ public class APIManagerAdapter {
     }
 
     public void logoutFromAPIManager(boolean orgAdmin) throws AppException {
-        URI uri;
-        HttpResponse httpResponse = null;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/login").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/login").build();
             DELRequest logoutRequest = new DELRequest(uri, orgAdmin);
-            httpResponse = logoutRequest.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            if (statusCode != 204) {
-                String response = EntityUtils.toString(httpResponse.getEntity());
-                LOG.warn("Logout failed with statusCode: " + statusCode + ". Got response: '" + response + "'");
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) logoutRequest.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode != 204) {
+                    String response = EntityUtils.toString(httpResponse.getEntity());
+                    LOG.warn("Logout failed with statusCode: " + statusCode + ". Got response: '" + response + "'");
+                }
             }
         } catch (Exception e) {
             throw new AppException("Can't logout from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
@@ -290,36 +283,29 @@ public class APIManagerAdapter {
     }
 
     public static User getCurrentUser(boolean useAdminClient) throws AppException {
-        URI uri;
-        HttpResponse httpResponse = null;
         String currentUser = null;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/currentuser").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/currentuser").build();
             GETRequest currentUserRequest = new GETRequest(uri, useAdminClient);
-            httpResponse = currentUserRequest.execute();
-            getCsrfToken(httpResponse, useAdminClient); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
-            currentUser = EntityUtils.toString(httpResponse.getEntity());
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            if (statusCode != 200) {
-                throw new AppException("Status-Code: " + statusCode + ", Can't get current-user (For admin: " + useAdminClient + ") information on response: '" + currentUser + "'",
-                        ErrorCode.API_MANAGER_COMMUNICATION);
+            try(CloseableHttpResponse httpResponse  = (CloseableHttpResponse) currentUserRequest.execute()) {
+                getCsrfToken(httpResponse, useAdminClient); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
+                currentUser = EntityUtils.toString(httpResponse.getEntity());
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode != 200) {
+                    throw new AppException("Status-Code: " + statusCode + ", Can't get current-user (For admin: " + useAdminClient + ") information on response: '" + currentUser + "'",
+                            ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+                User user = mapper.readValue(currentUser, User.class);
+                if (user == null) {
+                    throw new AppException("Can't get current-user information on response: '" + currentUser + "'",
+                            ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+                return user;
             }
-            User user = mapper.readValue(currentUser, User.class);
-            if (user == null) {
-                throw new AppException("Can't get current-user information on response: '" + currentUser + "'",
-                        ErrorCode.API_MANAGER_COMMUNICATION);
-            }
-            return user;
 
         } catch (Exception e) {
             throw new AppException("Error: '" + e.getMessage() + "' while parsing current-user information on response: '" + currentUser + "'",
                     ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
@@ -489,7 +475,6 @@ public class APIManagerAdapter {
         List<ClientApplication> allApps = this.appAdapter.getAllApplications(false); // Make sure, we loaded all apps before!
         LOG.debug("Searching credential (Type: " + type + "): '" + credential + "' in: " + allApps.size() + " apps.");
         Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
-        HttpResponse httpResponse = null;
         for (ClientApplication app : allApps) {
             if (appIds.contains(app)) continue;
             String response = null;
@@ -498,43 +483,38 @@ public class APIManagerAdapter {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/" + type + "").build();
                 LOG.debug("Loading credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
                 RestAPICall getRequest = new GETRequest(uri, true);
-                httpResponse = getRequest.execute();
-                response = EntityUtils.toString(httpResponse.getEntity());
-                LOG.trace("Response: " + response);
-                JsonNode clientIds = mapper.readTree(response);
-                if (clientIds.size() == 0) {
-                    LOG.debug("No credentials (Type: '" + type + "') found for application: '" + app.getName() + "'");
-                    continue;
-                }
-                for (JsonNode clientId : clientIds) {
-                    String key;
-                    if (type.equals(CREDENTIAL_TYPE_API_KEY)) {
-                        key = clientId.get("id").asText();
-                    } else if (type.equals(CREDENTIAL_TYPE_EXT_CLIENTID) || type.equals(CREDENTIAL_TYPE_OAUTH)) {
-                        if (clientId.get("clientId") == null) {
-                            key = "NOT_FOUND";
-                        } else {
-                            key = clientId.get("clientId").asText();
-                        }
-                    } else {
-                        throw new AppException("Unknown credential type: " + type, ErrorCode.UNXPECTED_ERROR);
+                try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+                    response = EntityUtils.toString(httpResponse.getEntity());
+                    LOG.trace("Response: " + response);
+                    JsonNode clientIds = mapper.readTree(response);
+                    if (clientIds.size() == 0) {
+                        LOG.debug("No credentials (Type: '" + type + "') found for application: '" + app.getName() + "'");
+                        continue;
                     }
-                    LOG.debug("Found credential (Type: '" + type + "'): '" + key + "' for application: '" + app.getName() + "'");
-                    clientCredentialToAppMap.put(type + "_" + key, app);
-                    if (key.equals(credential)) {
-                        LOG.info("Found existing application: '" + app.getName() + "' (" + app.getId() + ") based on credential (Type: '" + type + "'): '" + credential + "'");
-                        return app;
+                    for (JsonNode clientId : clientIds) {
+                        String key;
+                        if (type.equals(CREDENTIAL_TYPE_API_KEY)) {
+                            key = clientId.get("id").asText();
+                        } else if (type.equals(CREDENTIAL_TYPE_EXT_CLIENTID) || type.equals(CREDENTIAL_TYPE_OAUTH)) {
+                            if (clientId.get("clientId") == null) {
+                                key = "NOT_FOUND";
+                            } else {
+                                key = clientId.get("clientId").asText();
+                            }
+                        } else {
+                            throw new AppException("Unknown credential type: " + type, ErrorCode.UNXPECTED_ERROR);
+                        }
+                        LOG.debug("Found credential (Type: '" + type + "'): '" + key + "' for application: '" + app.getName() + "'");
+                        clientCredentialToAppMap.put(type + "_" + key, app);
+                        if (key.equals(credential)) {
+                            LOG.info("Found existing application: '" + app.getName() + "' (" + app.getId() + ") based on credential (Type: '" + type + "'): '" + credential + "'");
+                            return app;
+                        }
                     }
                 }
             } catch (Exception e) {
                 LOG.error("Can't load applications credentials. Can't parse response: " + response, e);
                 throw new AppException("Can't load applications credentials.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-            } finally {
-                try {
-                    if (httpResponse != null)
-                        ((CloseableHttpResponse) httpResponse).close();
-                } catch (Exception ignore) {
-                }
             }
         }
         LOG.error("No application found for credential (" + type + "): " + credential);
@@ -543,33 +523,29 @@ public class APIManagerAdapter {
 
     public static Image getImageFromAPIM(URI uri, String baseFilename) throws AppException {
         Image image = new Image();
-        HttpResponse httpResponse = null;
         try {
             RestAPICall getRequest = new GETRequest(uri, hasAdminAccount());
-            httpResponse = getRequest.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            if (statusCode == 404) return null; // No Image found
-            if (statusCode != 200) {
-                LOG.error("Can't read Image from API-Manager.. Message: '" + EntityUtils.toString(httpResponse.getEntity()) + "' Response-Code: " + statusCode + "");
-                throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode == 404) return null; // No Image found
+                if (statusCode != 200) {
+                    LOG.error("Can't read Image from API-Manager.. Message: '" + EntityUtils.toString(httpResponse.getEntity()) + "' Response-Code: " + statusCode + "");
+                    throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+                if (httpResponse == null || httpResponse.getEntity() == null)
+                    return null; // no Image found in API-Manager
+                try(InputStream is = httpResponse.getEntity().getContent()) {
+                    image.setImageContent(IOUtils.toByteArray(is));
+                }
+                if (httpResponse.containsHeader("Content-Type")) {
+                    String contentType = httpResponse.getHeaders("Content-Type")[0].getValue();
+                    image.setContentType(contentType);
+                }
+                image.setBaseFilename(baseFilename);
+                return image;
             }
-            if (httpResponse == null || httpResponse.getEntity() == null) return null; // no Image found in API-Manager
-            InputStream is = httpResponse.getEntity().getContent();
-            image.setImageContent(IOUtils.toByteArray(is));
-            if (httpResponse.containsHeader("Content-Type")) {
-                String contentType = httpResponse.getHeaders("Content-Type")[0].getValue();
-                image.setContentType(contentType);
-            }
-            image.setBaseFilename(baseFilename);
-            return image;
         } catch (Exception e) {
             throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
@@ -590,10 +566,8 @@ public class APIManagerAdapter {
     }
 
     public static JsonNode getCertInfo(InputStream certificate, String password, CaCert cert) throws AppException {
-        URI uri;
-        HttpResponse httpResponse;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfo").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfo").build();
             HttpEntity entity = MultipartEntityBuilder.create()
                     .addBinaryBody("file", certificate, ContentType.create("application/x-x509-ca-cert"), cert.getCertFile())
                     .addTextBody("inbound", cert.getInbound())
@@ -601,17 +575,18 @@ public class APIManagerAdapter {
                     .addTextBody("passphrase", password)
                     .build();
             POSTRequest postRequest = new POSTRequest(entity, uri);
-            httpResponse = postRequest.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            String response = EntityUtils.toString(httpResponse.getEntity());
-            if (statusCode != 200) {
-                if (response != null && response.contains("Bad password")) {
-                    LOG.debug("API-Manager failed to read certificate information: " + cert.getCertFile() + ". Got response: '" + response + "'.");
-                    throw new AppException("Password for keystore: '" + cert.getCertFile() + "' is wrong.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                if (statusCode != 200) {
+                    if (response != null && response.contains("Bad password")) {
+                        LOG.debug("API-Manager failed to read certificate information: " + cert.getCertFile() + ". Got response: '" + response + "'.");
+                        throw new AppException("Password for keystore: '" + cert.getCertFile() + "' is wrong.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
+                    }
+                    throw new AppException("API-Manager failed to read certificate information from file. Got response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-                throw new AppException("API-Manager failed to read certificate information from file. Got response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);
+                return mapper.readTree(response);
             }
-            return mapper.readTree(response);
         } catch (Exception e) {
             throw new AppException("API-Manager failed to read certificate information from file.", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
@@ -628,25 +603,18 @@ public class APIManagerAdapter {
      * @throws AppException when the certificate information can't be created
      */
     public static JsonNode getFileData(byte[] fileFontent, String filename, ContentType contentType) throws AppException {
-        URI uri;
-        HttpResponse httpResponse = null;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/filedata/").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/filedata/").build();
 
             HttpEntity entity = MultipartEntityBuilder.create()
                     .addBinaryBody("file", fileFontent, contentType, filename)
                     .build();
             POSTRequest postRequest = new POSTRequest(entity, uri);
-            httpResponse = postRequest.execute();
-            return mapper.readTree(httpResponse.getEntity().getContent());
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {
+                return mapper.readTree(httpResponse.getEntity().getContent());
+            }
         } catch (Exception e) {
             throw new AppException("Can't read certificate information from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
