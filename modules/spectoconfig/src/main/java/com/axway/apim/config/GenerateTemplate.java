@@ -242,7 +242,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         AuthType authType = null;
         try {
             authType = AuthType.valueOf(backendAuthType);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
         }
         if (authType == null) {
             for (AuthType authTypeEnum : AuthType.values()) {
@@ -282,7 +282,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         } else if (authType.equals(AuthType.ssl)) {
             parameters.put("source", "file");
             parameters.put("certFile", "../certificates/clientcert.pfx");
-            parameters.put("password", UUID.randomUUID());
+            parameters.put("password", "myClientCertPW");
             parameters.put("trustAll", true);
         }
         authNProfile.setParameters(parameters);
@@ -294,7 +294,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         DeviceType deviceType = null;
         try {
             deviceType = DeviceType.valueOf(frontendAuthType);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         if (deviceType == null) {
