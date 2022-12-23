@@ -1,14 +1,25 @@
 package com.axway.apim.adapter.clientApps;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.CacheType;
+import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
+import com.axway.apim.api.model.APIAccess;
+import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.User;
+import com.axway.apim.api.model.apps.*;
+import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.*;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -21,36 +32,10 @@ import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIManagerAdapter.CacheType;
-import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
-import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
-import com.axway.apim.api.model.APIAccess;
-import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.User;
-import com.axway.apim.api.model.apps.APIKey;
-import com.axway.apim.api.model.apps.ApplicationPermission;
-import com.axway.apim.api.model.apps.ClientAppCredential;
-import com.axway.apim.api.model.apps.ClientAppOauthResource;
-import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.api.model.apps.ExtClients;
-import com.axway.apim.api.model.apps.OAuth;
-import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.Utils;
-import com.axway.apim.lib.utils.rest.DELRequest;
-import com.axway.apim.lib.utils.rest.GETRequest;
-import com.axway.apim.lib.utils.rest.POSTRequest;
-import com.axway.apim.lib.utils.rest.PUTRequest;
-import com.axway.apim.lib.utils.rest.RestAPICall;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 
 public class APIMgrAppsAdapter {
 
@@ -70,11 +55,11 @@ public class APIMgrAppsAdapter {
     Cache<String, String> applicationsQuotaCache;
 
     public APIMgrAppsAdapter() {
-        applicationsCache = APIManagerAdapter.getCache(CacheType.applicationsCache, String.class, String.class);
-        applicationsSubscriptionCache = APIManagerAdapter.getCache(CacheType.applicationsSubscriptionCache, String.class, String.class);
-        applicationsCredentialCache = APIManagerAdapter.getCache(CacheType.applicationsCredentialCache, String.class, String.class);
+        applicationsCache = APIManagerAdapter.getCache(CacheType.APPLICATIONS_CACHE, String.class, String.class);
+        applicationsSubscriptionCache = APIManagerAdapter.getCache(CacheType.APPLICATIONS_SUBSCRIPTION_CACHE, String.class, String.class);
+        applicationsCredentialCache = APIManagerAdapter.getCache(CacheType.APPLICATIONS_CREDENTIAL_CACHE, String.class, String.class);
         // Must be refactored to use Quota-Adapter instead of doing this in
-        applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
+        applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.APPLICATIONS_QUOTA_CACHE, String.class, String.class);
     }
 
     /**

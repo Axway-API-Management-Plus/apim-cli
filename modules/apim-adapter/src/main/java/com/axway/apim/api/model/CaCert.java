@@ -183,7 +183,7 @@ public class CaCert {
 				filename = filename.replace(" ", "");
 				filename = filename.replace("*", "");
 				filename = filename.replace("/", "");
-				if(filename.startsWith(".")) filename = filename.replaceFirst(".", "");
+				if(filename.startsWith(".")) filename = filename.replaceFirst("\\.", "");
 			}
 			certFile = filename+".crt";
 			return certFile;

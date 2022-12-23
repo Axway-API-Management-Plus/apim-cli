@@ -32,9 +32,13 @@ import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.Utils.FedKeyType;
 
 public class APIFilter implements CustomPropertiesFilter {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
-	
+	public static final String FIELD = "field";
+	public static final String OP = "op";
+	public static final String VALUE = "value";
+	public static final String EQ = "eq";
+
 	public enum METHOD_TRANSLATION {
 		NONE, 
 		AS_NAME, 
@@ -70,7 +74,6 @@ public class APIFilter implements CustomPropertiesFilter {
 	private String outboundAuthentication;
 	private String organization;
 	private String createdOn;
-	private FILTER_OP createdOnOp;
 	private APIType type;
 	private String policyName;
 	private String tag;
@@ -119,9 +122,9 @@ public class APIFilter implements CustomPropertiesFilter {
 	public void setApiId(String apiId) {
 		if(apiId==null) return;
 		this.apiId = apiId;
-		filters.add(new BasicNameValuePair("field", "apiid"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", apiId));
+		filters.add(new BasicNameValuePair(FIELD, "apiid"));
+		filters.add(new BasicNameValuePair(OP, EQ));
+		filters.add(new BasicNameValuePair(VALUE, apiId));
 	}
 
 	public String getName() {
@@ -196,16 +199,16 @@ public class APIFilter implements CustomPropertiesFilter {
 	public void setApiPath(String apiPath) {
 		if(apiPath==null) return;
 		this.apiPath = apiPath;
-		String op = "eq";
+		String op = EQ;
 		if(apiPath.startsWith("*") || apiPath.endsWith("*")) {
 			op = "like";
 			apiPath = apiPath.replace("*", "");
 		}
 		// Only from version 7.7 on we can query for the path directly.
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-			filters.add(new BasicNameValuePair("field", "path"));
-			filters.add(new BasicNameValuePair("op", op));
-			filters.add(new BasicNameValuePair("value", apiPath));
+			filters.add(new BasicNameValuePair(FIELD, "path"));
+			filters.add(new BasicNameValuePair(OP, op));
+			filters.add(new BasicNameValuePair(VALUE, apiPath));
 		}
 	}
 
@@ -320,9 +323,9 @@ public class APIFilter implements CustomPropertiesFilter {
 	public void setDeprecated(boolean deprecated) {
 		if(this.deprecated==deprecated) return;
 		this.deprecated = deprecated;
-		filters.add(new BasicNameValuePair("field", "deprecated"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", (deprecated) ? "true" : "false"));
+		filters.add(new BasicNameValuePair(FIELD, "deprecated"));
+		filters.add(new BasicNameValuePair(OP, EQ));
+		filters.add(new BasicNameValuePair(VALUE, (deprecated) ? "true" : "false"));
 	}
 
 	public String getState() {
@@ -336,25 +339,25 @@ public class APIFilter implements CustomPropertiesFilter {
 	public void setRetired(boolean retired) {
 		if(this.retired==retired) return;
 		this.retired = retired;
-		filters.add(new BasicNameValuePair("field", "retired"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", (retired) ? "true" : "false"));
+		filters.add(new BasicNameValuePair(FIELD, "retired"));
+		filters.add(new BasicNameValuePair(OP, EQ));
+		filters.add(new BasicNameValuePair(VALUE, (retired) ? "true" : "false"));
 	}
 
 	public void setState(String state) {
 		if(state==null) return;
 		this.state = state;
-		filters.add(new BasicNameValuePair("field", "state"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", state));
+		filters.add(new BasicNameValuePair(FIELD, "state"));
+		filters.add(new BasicNameValuePair(OP, EQ));
+		filters.add(new BasicNameValuePair(VALUE, state));
 	}
 	
 	public void setCreatedOn(List<String[]> createdOn) {
 		if(createdOn==null) return;
 		for(String[] createdOnFilter : createdOn) {
-			filters.add(new BasicNameValuePair("field", "createdOn"));
-			filters.add(new BasicNameValuePair("op", createdOnFilter[1]));
-			filters.add(new BasicNameValuePair("value", createdOnFilter[0]));
+			filters.add(new BasicNameValuePair(FIELD, "createdOn"));
+			filters.add(new BasicNameValuePair(OP, createdOnFilter[1]));
+			filters.add(new BasicNameValuePair(VALUE, createdOnFilter[0]));
 		}
 	}
 	

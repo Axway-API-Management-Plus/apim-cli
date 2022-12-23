@@ -1,14 +1,5 @@
 package com.axway.apim.adapter.customProperties;
 
-import java.net.URI;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.api.model.CustomProperties;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -17,6 +8,13 @@ import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.URI;
 
 public class APIManager762CustomPropertiesAdapter extends APIManagerCustomPropertiesAdapter {
 	
@@ -29,36 +27,28 @@ public class APIManager762CustomPropertiesAdapter extends APIManagerCustomProper
 	@Override
 	public CustomProperties getCustomProperties() throws AppException {
 		if(customProperties!=null) return customProperties;
-		readCustomPropertiesFromAPIManager();
-		
+		readCustomProperties();
 		customProperties = parseAppConfig(apiManagerResponse);
-
 		return customProperties;
 	}
 	
-	private void readCustomPropertiesFromAPIManager() throws AppException {
+	private void readCustomProperties() throws AppException {
 		if(apiManagerResponse != null) return;
-		URI uri;
-		HttpResponse httpResponse = null;
-		try {			
-			uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
+		try {
+			URI uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath("/vordel/apiportal/app/app.config").build();
 			RestAPICall getRequest = new GETRequest(uri);
-			httpResponse = getRequest.execute();
-			String response = EntityUtils.toString(httpResponse.getEntity());
-			int statusCode = httpResponse.getStatusLine().getStatusCode();
-			if(statusCode < 200 || statusCode > 299){
-				LOG.error("Error loading custom-properties from API-Manager 7.6.2. Response-Code: "+statusCode+". Got response: '"+response+"'");
-				throw new AppException("Error loading custom-properties from API-Manager 7.6.2. Response-Code: "+statusCode+"", ErrorCode.API_MANAGER_COMMUNICATION);
+			try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+				String response = EntityUtils.toString(httpResponse.getEntity());
+				int statusCode = httpResponse.getStatusLine().getStatusCode();
+				if (statusCode < 200 || statusCode > 299) {
+					LOG.error("Error loading custom-properties from API-Manager 7.6.2. Response-Code: " + statusCode + ". Got response: '" + response + "'");
+					throw new AppException("Error loading custom-properties from API-Manager 7.6.2. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+				}
+				apiManagerResponse = response;
 			}
-			apiManagerResponse = response;
 		} catch (Exception e) {
-			LOG.error("Error cant read custom-properties from API-Manager. Can't parse response: " + httpResponse, e);
+			LOG.error("Error cant read custom-properties from API-Manager. Can't parse response: ", e);
 			throw new AppException("Can't read custom-properties from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-		} finally {
-			try {
-				if(httpResponse!=null) 
-					((CloseableHttpResponse)httpResponse).close();
-			} catch (Exception ignore) {}
 		}
 	}
 	

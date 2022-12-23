@@ -130,7 +130,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         String username = urlParser.getUsername();
         String password = urlParser.getPassword();
 
-        if (username != null & password != null) {
+        if (username != null && password != null) {
             String credential = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
             AuthorizationValue authorizationValue = new AuthorizationValue(HttpHeaders.AUTHORIZATION, credential, "header");
             authorizationValues.add(authorizationValue);
@@ -465,7 +465,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         } else {
             filename = filename.replace(" ", "");
             filename = filename.replace("*", "");
-            if (filename.startsWith(".")) filename = filename.replaceFirst(".", "");
+            if (filename.startsWith(".")) filename = filename.replaceFirst("\\.", "");
         }
         return filename + ".crt";
     }

@@ -1,8 +1,15 @@
 package com.axway.apim.lib;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.CacheType;
+import com.axway.apim.lib.DoNothingCacheManager.DoNothingCache;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.StateTransitionException;
@@ -13,16 +20,8 @@ import org.ehcache.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIManagerAdapter.CacheType;
-import com.axway.apim.lib.DoNothingCacheManager.DoNothingCache;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import java.util.ArrayList;
+import java.util.List;
 
 public class APIMCLICacheManager implements CacheManager {
 	
@@ -123,7 +122,7 @@ public class APIMCLICacheManager implements CacheManager {
 	 */
 	public void flipApiId(String oldApiId, String newApiId) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
-		Cache<String, String> appQuotaCached = getCache(CacheType.applicationsQuotaCache.name(), String.class, String.class);
+		Cache<String, String> appQuotaCached = getCache(CacheType.APPLICATIONS_QUOTA_CACHE.name(), String.class, String.class);
 		if(appQuotaCached instanceof DoNothingCache) return;
 		LOG.debug("Updating ApplicationQuotaCache: Flip API-ID: " + oldApiId + " --> " + newApiId);
 		try {

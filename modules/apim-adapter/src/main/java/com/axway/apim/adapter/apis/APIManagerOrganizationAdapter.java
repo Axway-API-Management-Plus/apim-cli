@@ -1,7 +1,7 @@
 package com.axway.apim.adapter.apis;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIManagerAdapter.CacheType;
+import com.axway.apim.adapter.CacheType;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
@@ -51,7 +51,7 @@ public class APIManagerOrganizationAdapter {
 
     public APIManagerOrganizationAdapter() {
         cmd = CoreParameters.getInstance();
-        organizationCache = APIManagerAdapter.getCache(CacheType.organizationCache, String.class, String.class);
+        organizationCache = APIManagerAdapter.getCache(CacheType.ORGANIZATION_CACHE, String.class, String.class);
     }
 
     private void readOrgsFromAPIManager(OrgFilter filter) throws AppException {
@@ -71,7 +71,7 @@ public class APIManagerOrganizationAdapter {
             RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
             LOG.debug("Load organizations from API-Manager using filter: " + filter);
             LOG.trace("Load organization with URI: " + uri);
-            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                     LOG.error("Sent request: " + uri);
                     LOG.error("Received Status-Code: " + httpResponse.getStatusLine().getStatusCode() + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
@@ -131,7 +131,7 @@ public class APIManagerOrganizationAdapter {
                     HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
                     request = new PUTRequest(entity, uri, true);
                 }
-                try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error creating/updating organization. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
@@ -157,7 +157,7 @@ public class APIManagerOrganizationAdapter {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations/" + org.getId()).build();
             RestAPICall request = new DELRequest(uri, true);
-            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
                     LOG.error("Error deleting organization. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
@@ -182,7 +182,7 @@ public class APIManagerOrganizationAdapter {
                 .build();
         try {
             RestAPICall apiCall = new POSTRequest(entity, uri);
-            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error saving/updating organization image. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");

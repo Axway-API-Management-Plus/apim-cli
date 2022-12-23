@@ -12,19 +12,27 @@ import java.util.List;
 
 public class APIStatusManager {
 	
-	static Logger LOG = LoggerFactory.getLogger(APIStatusManager.class);
+	private static Logger LOG = LoggerFactory.getLogger(APIStatusManager.class);
+
+	private static final String PUBLISHED = "published";
+	private static final String UNPUBLISHED = "unpublished";
+
+	private static final String DELETED = "deleted";
+	private static final String DEPRECATED = "deprecated";
+	private static final String UNDEPRECATED = "undeprecated";
+
 	
 	private final APIManagerAdapter apimAdapter;
 	
 	private boolean updateVHostRequired = false;
 
 	private enum StatusChangeMap {
-		unpublished(new String[] { "published", "deleted" }), 
-		published(new String[] { "unpublished", "deprecated" }),
-		deleted(new String[] {}), 
-		deprecated(new String[] { "unpublished", "undeprecated" }),
-		undeprecated(new String[] { "published", "unpublished" }),
-		pending(new String[] { "deleted" });
+		UNPUBLISHED(new String[] { APIStatusManager.PUBLISHED, APIStatusManager.DELETED }),
+		PUBLISHED(new String[] { APIStatusManager.UNPUBLISHED, APIStatusManager.DEPRECATED }),
+		DELETED(new String[] {}),
+		DEPRECATED(new String[] { APIStatusManager.UNPUBLISHED, APIStatusManager.UNDEPRECATED }),
+		UNDEPRECATED(new String[] { APIStatusManager.PUBLISHED, APIStatusManager.UNPUBLISHED }),
+		PENDING(new String[] { APIStatusManager.DELETED });
 
 		private final String[] possibleStates;
 

@@ -1,5 +1,12 @@
 package com.axway.apim.lib;
 
+import com.axway.apim.adapter.CacheType;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.TestIndicator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -9,17 +16,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.axway.apim.adapter.APIManagerAdapter.CacheType;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.TestIndicator;
-
 public class CoreParameters implements Parameters {
 	
-	private static Logger LOG = LoggerFactory.getLogger(CoreParameters.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CoreParameters.class);
 	
 	public enum Mode {
 		replace, 
@@ -194,7 +193,7 @@ public class CoreParameters implements Parameters {
 		} else {
 			if(getFromProperties("username")!=null) {
 				return getFromProperties("username");
-			};
+			}
 			// Perhaps the admin_username is given
 			return getAdminUsername();
 		}
@@ -210,7 +209,7 @@ public class CoreParameters implements Parameters {
 		} else {
 			if(getFromProperties("password")!=null) {
 				return getFromProperties("password");
-			};
+			}
 			// Perhaps the admin_password is given (hopefully in combination with the admin_username)
 			return getAdminPassword();
 		}
@@ -480,7 +479,7 @@ public class CoreParameters implements Parameters {
 	}
 	
 	protected List<CacheType> createCacheList(String configString) {
-		List<CacheType> cachesList = new ArrayList<CacheType>();
+		List<CacheType> cachesList = new ArrayList<>();
 		for(String cacheName : configString.split(",")) {
 			if(cacheName.equals("ALL")) cacheName = "*";
 			cacheName = cacheName.trim();
@@ -490,7 +489,6 @@ public class CoreParameters implements Parameters {
 					Matcher matcher = pattern.matcher(cacheType.name().toLowerCase());
 					if(matcher.matches()) {
 						cachesList.add(cacheType);
-						continue;
 					}
 				}
 			} else {

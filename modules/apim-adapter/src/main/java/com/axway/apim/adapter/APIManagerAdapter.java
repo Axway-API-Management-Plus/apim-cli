@@ -114,27 +114,7 @@ public class APIManagerAdapter {
     public APIMgrAppsAdapter appAdapter;
     public APIManagerUserAdapter userAdapter;
 
-    public enum CacheType {
-        applicationAPIAccessCache,
-        organizationAPIAccessCache,
-        oauthClientProviderCache,
-        applicationsCache,
-        applicationsSubscriptionCache,
-        applicationsQuotaCache(true),
-        applicationsCredentialCache,
-        organizationCache,
-        userCache;
 
-        public boolean supportsImportActions;
-
-        CacheType() {
-            this.supportsImportActions = false;
-        }
-
-        CacheType(boolean supportsImportActions) {
-            this.supportsImportActions = supportsImportActions;
-        }
-    }
 
     public static synchronized APIManagerAdapter getInstance() throws AppException {
         if (APIManagerAdapter.instance == null) {

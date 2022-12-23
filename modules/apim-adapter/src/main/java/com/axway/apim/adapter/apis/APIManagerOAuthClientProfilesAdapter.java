@@ -1,7 +1,7 @@
 package com.axway.apim.adapter.apis;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIManagerAdapter.CacheType;
+import com.axway.apim.adapter.CacheType;
 import com.axway.apim.api.model.OAuthClientProfile;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;

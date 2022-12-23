@@ -55,6 +55,8 @@ import java.util.*;
 public class APIManagerAPIAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerAPIAdapter.class);
+    public static final String PROXIES = "/proxies/";
+    public static final String APIREPO = "/apirepo/";
     Map<APIFilter, String> apiManagerResponse = new HashMap<>();
     Map<String, Image> imagesResponse = new HashMap<>();
     ObjectMapper mapper = new ObjectMapper();
@@ -65,22 +67,7 @@ public class APIManagerAPIAdapter {
     /**
      * Maps the provided status to the REST-API endpoint to change the status!
      */
-    public enum StatusEndpoint {
-        unpublished("unpublish"),
-        published("publish"),
-        deprecated("deprecate"),
-        undeprecated("undeprecate");
 
-        private final String endpoint;
-
-        StatusEndpoint(String endpoint) {
-            this.endpoint = endpoint;
-        }
-
-        public String getEndpoint() {
-            return endpoint;
-        }
-    }
 
     public APIManagerAPIAdapter() {
         cmd = CoreParameters.getInstance();
@@ -271,7 +258,7 @@ public class APIManagerAPIAdapter {
         URI uri;
         HttpResponse httpResponse = null;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + api.getId() + "/image").build();
+            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/image").build();
             RestAPICall getRequest = new GETRequest(uri);
             httpResponse = getRequest.execute();
             if (httpResponse == null || httpResponse.getEntity() == null || httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
@@ -339,7 +326,7 @@ public class APIManagerAPIAdapter {
         HttpResponse httpResponse = null;
 
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + api.getId() + "/image").build();
+            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/image").build();
 
             entity = MultipartEntityBuilder.create()
                     .addBinaryBody("file", api.getImage().getInputStream(), ContentType.create("image/jpeg"), api.getImage().getBaseFilename())
@@ -490,7 +477,6 @@ public class APIManagerAPIAdapter {
         String[] feAPISpecVersions = {"3.0", "2.0", "1.1"};
         URI uri;
         APISpecification apiDefinition;
-        HttpResponse httpResponse = null;
         try {
             for (String specVersion : feAPISpecVersions) {
                 if (filter.isUseFEAPIDefinition()) {
@@ -498,43 +484,38 @@ public class APIManagerAPIAdapter {
                             .setParameter("swaggerVersion", specVersion).build();
                     LOG.debug("Get API-Specification with version " + specVersion + " from Frontend-API.");
                 } else {
-                    uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/" + api.getApiId() + "/download")
+                    uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId() + "/download")
                             .setParameter("original", "true").build();
                 }
                 RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
-                httpResponse = getRequest.execute();
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
-                if (statusCode != 200) {
-                    if (filter.isUseFEAPIDefinition()) {
-                        LOG.debug("Failed to download API-Specification with version " + specVersion + " from Frontend-API. Received Status-Code: " + statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
-                        continue;
-                    } else {
-                        LOG.error("Failed to download original API-Specification. You may use the toggle -useFEAPIDefinition to download the Frontend-API specification instead.");
-                        // No need to continue when trying to download the original API-Specification
-                        break;
+                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    if (statusCode != 200) {
+                        if (filter.isUseFEAPIDefinition()) {
+                            LOG.debug("Failed to download API-Specification with version " + specVersion + " from Frontend-API. Received Status-Code: " + statusCode + ", Response: " + EntityUtils.toString(httpResponse.getEntity()));
+                            continue;
+                        } else {
+                            LOG.error("Failed to download original API-Specification. You may use the toggle -useFEAPIDefinition to download the Frontend-API specification instead.");
+                            // No need to continue when trying to download the original API-Specification
+                            break;
+                        }
                     }
+                    if (filter.isUseFEAPIDefinition()) {
+                        LOG.info("Successfully downloaded API-Specification with version " + specVersion + " from Frontend-API.");
+                    }
+                    String res = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+                    String origFilename = "Unknown filename";
+                    if (httpResponse.containsHeader("Content-Disposition")) {
+                        origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
+                    }
+                    apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=") + 9), api.getName(), filter.isFailOnError(), false);
+                    addBackendResourcePath(api, apiDefinition, filter.isUseFEAPIDefinition());
+                    api.setApiDefinition(apiDefinition);
+                    break;
                 }
-                if (filter.isUseFEAPIDefinition()) {
-                    LOG.info("Successfully downloaded API-Specification with version " + specVersion + " from Frontend-API.");
-                }
-                String res = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-                String origFilename = "Unknown filename";
-                if (httpResponse.containsHeader("Content-Disposition")) {
-                    origFilename = httpResponse.getHeaders("Content-Disposition")[0].getValue();
-                }
-                apiDefinition = APISpecificationFactory.getAPISpecification(res.getBytes(StandardCharsets.UTF_8), origFilename.substring(origFilename.indexOf("filename=") + 9), api.getName(), filter.isFailOnError(), false);
-                addBackendResourcePath(api, apiDefinition, filter.isUseFEAPIDefinition());
-                api.setApiDefinition(apiDefinition);
-                break;
             }
         } catch (Exception e) {
             throw new AppException("Cannot parse API-Definition for API: '" + api.getName() + "' (" + api.getVersion() + ") on path: '" + api.getPath() + "'", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
@@ -542,7 +523,7 @@ public class APIManagerAPIAdapter {
         URI uri;
         HttpResponse httpResponse = null;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/" + api.getApiId()).build();
+            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId()).build();
             RestAPICall request = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
             httpResponse = request.execute();
             int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -597,37 +578,27 @@ public class APIManagerAPIAdapter {
 
     public API createAPIProxy(API api) throws AppException {
         LOG.debug("Create Front-End API: '" + api.getName() + "' (API-Proxy)");
-        URI uri;
-        HttpEntity entity;
-        HttpResponse httpResponse = null;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies").build();
-            entity = new StringEntity("{\"apiId\":\"" + api.getApiId() + "\",\"organizationId\":\"" + api.getOrganization().getId() + "\"}", ContentType.APPLICATION_JSON);
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies").build();
+            HttpEntity entity = new StringEntity("{\"apiId\":\"" + api.getApiId() + "\",\"organizationId\":\"" + api.getOrganization().getId() + "\"}", ContentType.APPLICATION_JSON);
 
             RestAPICall request = new POSTRequest(entity, uri);
-            httpResponse = request.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            String response = EntityUtils.toString(httpResponse.getEntity());
-            if (statusCode != 201) {
-                LOG.error("Error creating API-Proxy (FE-API) using URI: " + uri + ". Received Status-Code: " + statusCode + ", Response: '" + response + "'");
-                throw new AppException("Error creating API-Proxy (FE-API). Received Status-Code: " + statusCode, ErrorCode.CANT_CREATE_API_PROXY);
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                if (statusCode != 201) {
+                    LOG.error("Error creating API-Proxy (FE-API) using URI: " + uri + ". Received Status-Code: " + statusCode + ", Response: '" + response + "'");
+                    throw new AppException("Error creating API-Proxy (FE-API). Received Status-Code: " + statusCode, ErrorCode.CANT_CREATE_API_PROXY);
+                }
+                return mapper.readValue(response, API.class);
             }
-            return mapper.readValue(response, API.class);
         } catch (Exception e) {
             throw new AppException("Can't create API-Proxy.", ErrorCode.CANT_CREATE_API_PROXY, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
     public API updateAPIProxy(API api) throws AppException {
         LOG.debug("Updating API-Proxy: '" + api.getName() + " " + api.getVersion() + " (" + api.getId() + ")'");
-        URI uri;
-        HttpEntity entity;
         String[] serializeAllExcept;
         // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
        // if (APIManagerAdapter.hasAPIManagerVersion("7.7.20220530") || APIManagerAdapter.hasAPIManagerVersion("7.7.20220830")) {
@@ -642,80 +613,59 @@ public class APIManagerAPIAdapter {
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIImportSerializerModifier(false)));
         mapper.setFilterProvider(filter);
         mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(false)));
-        HttpResponse httpResponse = null;
         translateMethodIds(api, api.getId(), METHOD_TRANSLATION.AS_ID);
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + api.getId()).build();
-            entity = new StringEntity(mapper.writeValueAsString(api), ContentType.APPLICATION_JSON);
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId()).build();
+            HttpEntity entity = new StringEntity(mapper.writeValueAsString(api), ContentType.APPLICATION_JSON);
             RestAPICall request = new PUTRequest(entity, uri);
-            httpResponse = request.execute();
-            String response = EntityUtils.toString(httpResponse.getEntity());
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            if (statusCode < 200 || statusCode > 299) {
-                LOG.error("Error updating API-Proxy. Response-Code: " + statusCode + ". Got response: '" + response + "'");
-                LOG.debug("Request sent:" + EntityUtils.toString(entity));
-                throw new AppException("Error updating API-Proxy. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode < 200 || statusCode > 299) {
+                    LOG.error("Error updating API-Proxy. Response-Code: " + statusCode + ". Got response: '" + response + "'");
+                    LOG.debug("Request sent:" + EntityUtils.toString(entity));
+                    throw new AppException("Error updating API-Proxy. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+                return mapper.readValue(response, API.class);
             }
-            return mapper.readValue(response, API.class);
         } catch (Exception e) {
             throw new AppException("Cannot update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
     public void deleteAPIProxy(API api) throws AppException {
         LOG.debug("Deleting API-Proxy");
-        URI uri;
-        HttpResponse httpResponse = null;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + api.getId()).build();
-
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId()).build();
             RestAPICall request = new DELRequest(uri);
-            httpResponse = request.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            if (statusCode != 204) {
-                LOG.error("Error deleting API-Proxy using URI: " + uri + ". Response-Code: " + statusCode + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
-                throw new AppException("Error deleting API-Proxy. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode != 204) {
+                    LOG.error("Error deleting API-Proxy using URI: " + uri + ". Response-Code: " + statusCode + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                    throw new AppException("Error deleting API-Proxy. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+                LOG.info("API: " + api.getName() + " " + api.getVersion() + " (" + api.getId() + ")" + " successfully deleted");
             }
-            LOG.info("API: " + api.getName() + " " + api.getVersion() + " (" + api.getId() + ")" + " successfully deleted");
         } catch (Exception e) {
             throw new AppException("Cannot delete API-Proxy.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
     public void deleteBackendAPI(API api) throws AppException {
         LOG.debug("Deleting API-Proxy");
-        URI uri;
-        HttpResponse httpResponse = null;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/" + api.getApiId()).build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId()).build();
 
             RestAPICall request = new DELRequest(uri);
-            httpResponse = request.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            if (statusCode != 204) {
-                LOG.error("Error deleting Backend-API using URI: " + uri + ". Response-Code: " + statusCode + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
-                throw new AppException("Error deleting Backend-API. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode != 204) {
+                    LOG.error("Error deleting Backend-API using URI: " + uri + ". Response-Code: " + statusCode + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                    throw new AppException("Error deleting Backend-API. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                }
             }
         } catch (Exception e) {
             throw new AppException("Cannot delete Backend-API.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
@@ -775,12 +725,9 @@ public class APIManagerAPIAdapter {
 
     public void updateAPIStatus(API api, String desiredState, String vhost) throws AppException {
         LOG.debug("Update API-Proxy status to: " + api.getState());
-        URI uri;
-        HttpResponse httpResponse = null;
-        RestAPICall request;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL())
-                    .setPath(cmd.getApiBasepath() + "/proxies/" + api.getId() + "/" + StatusEndpoint.valueOf(desiredState).endpoint)
+            URI uri = new URIBuilder(cmd.getAPIManagerURL())
+                    .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/" + StatusEndpoint.valueOf(desiredState).endpoint)
                     .build();
             HttpEntity entity;
             if (vhost != null && desiredState.equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
@@ -788,26 +735,21 @@ public class APIManagerAPIAdapter {
             } else {
                 entity = new StringEntity("", ContentType.APPLICATION_FORM_URLENCODED);
             }
-            request = new POSTRequest(entity, uri, useAdminAccountForPublish());
-            httpResponse = request.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            if (statusCode != 201 && statusCode != 200) { // See issue: #134 The API-Manager also returns 200 on this request
-                String response = EntityUtils.toString(httpResponse.getEntity());
-                if (statusCode == 403 && response.contains("API is already unpublished")) {
-                    LOG.warn("API: " + api.getName() + " " + api.getVersion() + " (" + api.getId() + ") is already unpublished");
-                    return;
+            RestAPICall request = new POSTRequest(entity, uri, useAdminAccountForPublish());
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode != 201 && statusCode != 200) { // See issue: #134 The API-Manager also returns 200 on this request
+                    String response = EntityUtils.toString(httpResponse.getEntity());
+                    if (statusCode == 403 && response.contains("API is already unpublished")) {
+                        LOG.warn("API: " + api.getName() + " " + api.getVersion() + " (" + api.getId() + ") is already unpublished");
+                        return;
+                    }
+                    LOG.error("Error updating API status. Received Status-Code: " + statusCode + ", Response: '" + response + "'");
+                    throw new AppException("Error updating API status. Received Status-Code: " + statusCode, ErrorCode.CANT_CREATE_BE_API);
                 }
-                LOG.error("Error updating API status. Received Status-Code: " + statusCode + ", Response: '" + response + "'");
-                throw new AppException("Error updating API status. Received Status-Code: " + statusCode, ErrorCode.CANT_CREATE_BE_API);
             }
         } catch (Exception e) {
             throw new AppException("Cannot update API-Proxy status.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
@@ -827,7 +769,6 @@ public class APIManagerAPIAdapter {
     }
 
     public void updateRetirementDate(API api, Long retirementDate) throws AppException {
-        HttpResponse httpResponse = null;
         try {
             if (retirementDate == null || retirementDate == 0) return;
             // Ignore the retirementDate if desiredState is not deprecated as it's used nowhere
@@ -836,23 +777,18 @@ public class APIManagerAPIAdapter {
                 return;
             }
             URI uri = new URIBuilder(cmd.getAPIManagerURL())
-                    .setPath(cmd.getApiBasepath() + "/proxies/" + api.getId() + "/deprecate").build();
+                    .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/deprecate").build();
             RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate=" + formatRetirementDate(retirementDate), ContentType.APPLICATION_FORM_URLENCODED), uri, true);
-            httpResponse = apiCall.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            String response = EntityUtils.toString(httpResponse.getEntity());
-            if (statusCode != 201) {
-                LOG.error("Error updating retirement data of API. Received Status-Code: " + statusCode + ", Response: '" + response + "'");
-                throw new AppException("Error updating retirement data of API.", ErrorCode.CANT_CREATE_BE_API);
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                if (statusCode != 201) {
+                    LOG.error("Error updating retirement data of API. Received Status-Code: " + statusCode + ", Response: '" + response + "'");
+                    throw new AppException("Error updating retirement data of API.", ErrorCode.CANT_CREATE_BE_API);
+                }
             }
         } catch (Exception e) {
             throw new AppException("Error while updating the retirementDate", ErrorCode.CANT_UPDATE_API_PROXY, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
@@ -881,7 +817,6 @@ public class APIManagerAPIAdapter {
         String pass;
         String wsdlUrl;
         String completeWsdlUrl;
-        HttpResponse httpResponse = null;
         if (api.getApiDefinition().getApiSpecificationFile().endsWith(".url")) {
             completeWsdlUrl = Utils.getAPIDefinitionUriFromFile(api.getApiDefinition().getApiSpecificationFile());
         } else {
@@ -895,7 +830,6 @@ public class APIManagerAPIAdapter {
         try {
             uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/importFromUrl/").build();
             List<NameValuePair> nameValuePairs = new ArrayList<>();
-
             nameValuePairs.add(new BasicNameValuePair("organizationId", api.getOrganization().getId()));
             nameValuePairs.add(new BasicNameValuePair("type", "wsdl"));
             nameValuePairs.add(new BasicNameValuePair("url", wsdlUrl));
@@ -906,31 +840,25 @@ public class APIManagerAPIAdapter {
             }
             HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
             RestAPICall importWSDL = new POSTRequest(entity, uri);
-            httpResponse = importWSDL.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            String response = EntityUtils.toString(httpResponse.getEntity());
-            if (statusCode != 201) {
-                LOG.error("Error importing WSDL. Received Status-Code: " + statusCode + ", Response: '" + response + "'");
-                throw new AppException("Can't import WSDL from URL / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) importWSDL.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                if (statusCode != 201) {
+                    LOG.error("Error importing WSDL. Received Status-Code: " + statusCode + ", Response: '" + response + "'");
+                    throw new AppException("Can't import WSDL from URL / Create BE-API.", ErrorCode.CANT_CREATE_BE_API);
+                }
+                return mapper.readTree(response);
             }
-            return mapper.readTree(response);
         } catch (AppException e) {
             throw e;
         } catch (Exception e) {
             throw new AppException("Unexpected error creating Backend-API based on WSDL. Error message: " + e.getMessage(), ErrorCode.CANT_CREATE_BE_API, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
     private JsonNode importFromSwagger(API api) throws URISyntaxException, IOException {
         URI uri;
-        HttpEntity entity;
-        HttpResponse httpResponse = null;
+
         if (APIManagerAdapter.hasAPIManagerVersion("7.6.2")) {
             uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/import/").build();
         } else {
@@ -939,31 +867,26 @@ public class APIManagerAPIAdapter {
                     .setParameter("field", "name").setParameter("op", "eq").setParameter("value", "API Development").build();
         }
         try {
-            entity = MultipartEntityBuilder.create()
+            HttpEntity entity = MultipartEntityBuilder.create()
                     .addTextBody("name", api.getName(), ContentType.create("text/plain", StandardCharsets.UTF_8))
                     .addTextBody("type", "swagger")
                     .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/json"), "filename")
                     .addTextBody("fileName", "XYZ").addTextBody("organizationId", api.getOrganization().getId(), ContentType.create("text/plain", StandardCharsets.UTF_8))
                     .addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
             RestAPICall importSwagger = new POSTRequest(entity, uri);
-            httpResponse = importSwagger.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            String response = EntityUtils.toString(httpResponse.getEntity());
-            if (statusCode != 201) {
-                LOG.error("Error importing API-Specification (" + api.getApiDefinition().getAPIDefinitionType().getNiceName() + ") to create Backend-API using URI: " + uri + ". Received Status-Code: " + statusCode + ", Response: '" + response + "'");
-                throw new AppException("Can't import API-Specification to create Backend-API.", ErrorCode.CANT_CREATE_BE_API);
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) importSwagger.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                if (statusCode != 201) {
+                    LOG.error("Error importing API-Specification (" + api.getApiDefinition().getAPIDefinitionType().getNiceName() + ") to create Backend-API using URI: " + uri + ". Received Status-Code: " + statusCode + ", Response: '" + response + "'");
+                    throw new AppException("Can't import API-Specification to create Backend-API.", ErrorCode.CANT_CREATE_BE_API);
+                }
+                return mapper.readTree(response);
             }
-            return mapper.readTree(response);
         } catch (AppException e) {
             throw e;
         } catch (Exception e) {
             throw new AppException("Unexpected error creating Backend-API based on API-Specification. Error message: " + e.getMessage(), ErrorCode.CANT_CREATE_BE_API, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 

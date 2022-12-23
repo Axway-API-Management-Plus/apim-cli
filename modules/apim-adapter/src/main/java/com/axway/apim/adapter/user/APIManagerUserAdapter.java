@@ -1,13 +1,20 @@
 package com.axway.apim.adapter.user;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.CacheType;
+import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.User;
+import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.*;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -21,25 +28,13 @@ import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIManagerAdapter.CacheType;
-import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.User;
-import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.Utils;
-import com.axway.apim.lib.utils.rest.DELRequest;
-import com.axway.apim.lib.utils.rest.GETRequest;
-import com.axway.apim.lib.utils.rest.POSTRequest;
-import com.axway.apim.lib.utils.rest.PUTRequest;
-import com.axway.apim.lib.utils.rest.RestAPICall;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class APIManagerUserAdapter {
 	
@@ -54,7 +49,7 @@ public class APIManagerUserAdapter {
 	Cache<String, String> userCache;
 	
 	public APIManagerUserAdapter() {
-		userCache = APIManagerAdapter.getCache(CacheType.userCache, String.class, String.class);
+		userCache = APIManagerAdapter.getCache(CacheType.USER_CACHE, String.class, String.class);
 	}
 	
 	private void readUsersFromAPIManager(UserFilter filter) throws AppException {

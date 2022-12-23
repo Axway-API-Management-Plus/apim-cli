@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIManagerAdapter.CacheType;
+import com.axway.apim.adapter.CacheType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Organization;
@@ -58,8 +58,8 @@ public class APIManagerAPIAccessAdapter {
 
 	public APIManagerAPIAccessAdapter() {
 		cmd = CoreParameters.getInstance();
-		caches.put(Type.applications, APIManagerAdapter.getCache(CacheType.applicationAPIAccessCache, String.class, String.class));
-		caches.put(Type.organizations, APIManagerAdapter.getCache(CacheType.organizationAPIAccessCache, String.class, String.class));
+		caches.put(Type.applications, APIManagerAdapter.getCache(CacheType.APPLICATION_API_ACCESS_CACHE, String.class, String.class));
+		caches.put(Type.organizations, APIManagerAdapter.getCache(CacheType.ORGANIZATION_API_ACCESS_CACHE, String.class, String.class));
 	}
 	
 	Map<Type, Map<String, String>> apiManagerResponse = new HashMap<>();
