@@ -73,8 +73,8 @@ public abstract class APIManagerMockBase {
 		apim.quotaAdapter.apiManagerResponse.put(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId(), systemQuotas);
 		apim.quotaAdapter.apiManagerResponse.put(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId(), applicationDefaultQuotas);
 		apim.quotaAdapter.apiManagerResponse.put("ecf109cd-d012-4c57-897a-b3e8b041889b", applicationQuota);
-		apim.accessAdapter.setAPIManagerTestResponse(APIManagerAPIAccessAdapter.Type.applications, "ecf109cd-d012-4c57-897a-b3e8b041889b", testAppAPIAccess);
-		apim.accessAdapter.setAPIManagerTestResponse(APIManagerAPIAccessAdapter.Type.organizations, "d9ea6280-8811-4baf-8b5b-011a97142840", testOrgsAPIAccess);
+		apim.accessAdapter.setAPIManagerTestResponse(APIManagerAPIAccessAdapter.Type.APPLICATIONS, "ecf109cd-d012-4c57-897a-b3e8b041889b", testAppAPIAccess);
+		apim.accessAdapter.setAPIManagerTestResponse(APIManagerAPIAccessAdapter.Type.ORGANIZATIONS, "d9ea6280-8811-4baf-8b5b-011a97142840", testOrgsAPIAccess);
 		apim.appAdapter.setTestApiManagerResponse(new ClientAppFilter.Builder().build(), testApplications);
 		apim.appAdapter.setTestSubscribedAppAPIManagerResponse("72745ed9-f75b-428c-959c-b483eea497a1", grantedAppsForAPI);
 		// Org: API-Development

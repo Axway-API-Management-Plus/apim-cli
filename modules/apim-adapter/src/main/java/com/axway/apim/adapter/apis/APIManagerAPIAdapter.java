@@ -433,7 +433,7 @@ public class APIManagerAPIAdapter {
         List<Organization> allOrgs = APIManagerAdapter.getInstance().orgAdapter.getAllOrgs();
         grantedOrgs = new ArrayList<>();
         for (Organization org : allOrgs) {
-            List<APIAccess> orgAPIAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(org, APIManagerAPIAccessAdapter.Type.organizations);
+            List<APIAccess> orgAPIAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(org, APIManagerAPIAccessAdapter.Type.ORGANIZATIONS);
             for (APIAccess access : orgAPIAccess) {
                 if (access.getApiId().equals(api.getId())) {
                     grantedOrgs.add(org);
@@ -460,7 +460,7 @@ public class APIManagerAPIAdapter {
                     .includeQuotas(filter.isIncludeClientAppQuota()).includeOauthResources(true)
                     .build(), false);
             for (ClientApplication app : apps) {
-                List<APIAccess> APIAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app, APIManagerAPIAccessAdapter.Type.applications, true);
+                List<APIAccess> APIAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app, APIManagerAPIAccessAdapter.Type.APPLICATIONS, true);
                 app.setApiAccess(APIAccess);
                 for (APIAccess access : APIAccess) {
                     if (access.getApiId().equals(api.getId())) {

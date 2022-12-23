@@ -3,7 +3,7 @@ package com.axway.apim.adapter;
 public enum CacheType {
     APPLICATION_API_ACCESS_CACHE,
     ORGANIZATION_API_ACCESS_CACHE,
-    oauthClientProviderCache,
+    OAUTH_CLIENT_PROVIDER_CACHE,
     APPLICATIONS_CACHE,
     APPLICATIONS_SUBSCRIPTION_CACHE,
     APPLICATIONS_QUOTA_CACHE(true),
