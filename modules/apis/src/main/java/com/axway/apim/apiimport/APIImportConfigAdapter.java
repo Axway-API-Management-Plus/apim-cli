@@ -55,7 +55,7 @@ public class APIImportConfigAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapter.class);
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
 
     /**
@@ -332,7 +332,6 @@ public class APIImportConfigAdapter {
                 throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE, e);
             }
         } else if (descriptionType.equals("original")) {
-            return;
         } else {
             throw new AppException("Unknown descriptionType: '" + descriptionType + "'", ErrorCode.CANT_READ_CONFIG_FILE);
         }
@@ -401,7 +400,7 @@ public class APIImportConfigAdapter {
      */
     private void completeClientApplications(API apiConfig) throws AppException {
         if (CoreParameters.getInstance().isIgnoreClientApps()) return;
-        if (apiConfig.getState() == API.STATE_UNPUBLISHED) return;
+        if (apiConfig.getState().equals(API.STATE_UNPUBLISHED)) return;
         ClientApplication loadedApp = null;
         ClientApplication app;
         if (apiConfig.getApplications() != null) {
@@ -523,12 +522,12 @@ public class APIImportConfigAdapter {
         return is;
     }
 
-    private API validateInboundProfile(API importApi) throws AppException {
+    private void validateInboundProfile(API importApi) throws AppException {
         if (importApi.getInboundProfiles() == null || importApi.getInboundProfiles().size() == 0) {
             Map<String, InboundProfile> def = new HashMap<>();
             def.put("_default", InboundProfile.getDefaultInboundProfile());
             importApi.setInboundProfiles(def);
-            return importApi;
+            return;
         }
         Iterator<String> it = importApi.getInboundProfiles().keySet().iterator();
         // Check if a default inbound profile is given
@@ -557,10 +556,9 @@ public class APIImportConfigAdapter {
             defaultProfile.setMonitorSubject("authentication.subject.id");
             importApi.getInboundProfiles().put("_default", defaultProfile);
         }
-        return importApi;
     }
 
-    private API addDefaultPassthroughSecurityProfile(API importApi) throws AppException {
+    private void addDefaultPassthroughSecurityProfile(API importApi) throws AppException {
         boolean hasDefaultProfile = false;
         if (importApi.getSecurityProfiles() == null) importApi.setSecurityProfiles(new ArrayList<>());
         List<SecurityProfile> profiles = importApi.getSecurityProfiles();
@@ -589,12 +587,11 @@ public class APIImportConfigAdapter {
 
             profiles.add(passthroughProfile);
         }
-        return importApi;
     }
 
-    private API addDefaultAuthenticationProfile(API importApi) throws AppException {
+    private void addDefaultAuthenticationProfile(API importApi) throws AppException {
         if (importApi.getAuthenticationProfiles() == null)
-            return importApi; // Nothing to add (no default is needed, as we don't send any Authn-Profile)
+            return; // Nothing to add (no default is needed, as we don't send any Authn-Profile)
         boolean hasDefaultProfile = false;
         List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
         for (AuthenticationProfile profile : profiles) {
@@ -616,11 +613,10 @@ public class APIImportConfigAdapter {
             noAuthNProfile.setType(AuthType.none);
             profiles.add(noAuthNProfile);
         }
-        return importApi;
     }
 
-    private API validateOutboundProfile(API importApi) throws AppException {
-        if (importApi.getOutboundProfiles() == null || importApi.getOutboundProfiles().size() == 0) return importApi;
+    private void validateOutboundProfile(API importApi) throws AppException {
+        if (importApi.getOutboundProfiles() == null || importApi.getOutboundProfiles().size() == 0) return;
         Iterator<String> it = importApi.getOutboundProfiles().keySet().iterator();
         boolean defaultProfileFound = false;
         while (it.hasNext()) {
@@ -652,7 +648,6 @@ public class APIImportConfigAdapter {
             defaultProfile.setRouteType("proxy");
             importApi.getOutboundProfiles().put("_default", defaultProfile);
         }
-        return importApi;
     }
 
     private void validateOutboundAuthN(API importApi) throws AppException {
@@ -739,9 +734,9 @@ public class APIImportConfigAdapter {
         }
     }
 
-    private API addImageContent(API importApi) throws AppException {
+    private void addImageContent(API importApi) throws AppException {
         // No image declared do nothing
-        if (importApi.getImage() == null) return importApi;
+        if (importApi.getImage() == null) return;
         File file;
         try {
             file = new File(importApi.getImage().getFilename());
@@ -754,7 +749,7 @@ public class APIImportConfigAdapter {
                 LOG.info("Loading image from: '" + file.getCanonicalFile() + "'");
                 try (InputStream is = Files.newInputStream(file.toPath())) {
                     importApi.getImage().setImageContent(IOUtils.toByteArray(is));
-                    return importApi;
+                    return;
                 }
             }
             // Try to read it from classpath
@@ -762,7 +757,7 @@ public class APIImportConfigAdapter {
                 if (is != null) {
                     LOG.debug("Trying to load image from classpath");
                     importApi.getImage().setImageContent(IOUtils.toByteArray(is));
-                    return importApi;
+                    return;
                 }
             }
             // An image is configured, but not found
@@ -800,7 +795,7 @@ public class APIImportConfigAdapter {
         return null;
     }
 
-    private SecurityProfile getSecurityProfile(API api, String profileName) throws AppException {
+    private SecurityProfile getSecurityProfile(API api, String profileName) {
         if (api.getSecurityProfiles() == null || api.getSecurityProfiles().size() == 0) return null;
         for (SecurityProfile profile : api.getSecurityProfiles()) {
             if (profileName.equals(profile.getName())) return profile;

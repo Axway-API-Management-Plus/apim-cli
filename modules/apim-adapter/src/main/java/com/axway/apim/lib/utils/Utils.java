@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -252,8 +253,9 @@ public class Utils {
         }
         // Finally check, if missing custom properties are left
         if (requiredConfiguredCustomProperties != null && requiredConfiguredCustomProperties.size() == 0) return;
-        List<String> missingCustomProperties = new ArrayList<>(requiredConfiguredCustomProperties.keySet());
-        throw new AppException("Missing required custom property / properties: '" + missingCustomProperties + "'", ErrorCode.CANT_READ_CONFIG_FILE);
+        //List<String> missingCustomProperties = new ArrayList<>(requiredConfiguredCustomProperties.keySet());
+        String missingCustomProperties = StringUtils.join( requiredConfiguredCustomProperties.keySet(),",");
+        throw new AppException("Missing required custom properties : '" + missingCustomProperties + "'", ErrorCode.CANT_READ_CONFIG_FILE);
     }
 
     public static void addCustomPropertiesForEntity(List<? extends CustomPropertiesEntity> entities, String json, CustomPropertiesFilter filter) throws IOException {
@@ -337,24 +339,6 @@ public class Utils {
         }
         return newBackendBasePath;
     }
-
-//	public static <T> boolean areEqualIgnoringOrder(List<T> list, List<T> listDesired, Comparator<? super T> comparator) {
-//
-//		// if not the same size, lists are not equal
-//		if (list.size() != listDesired.size()) {
-//			return false;
-//		}
-//		list.sort(comparator);
-//		listDesired.sort(comparator);
-//		for (int i = 0; i < list.size(); i++) {
-//			T t1 = list.get(i);
-//			T t2 = listDesired.get(i);
-//			if (!t1.equals(t2)) {
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
 
     public static boolean compareValues(Object actualValue, Object desiredValue) {
         if (actualValue instanceof List) {

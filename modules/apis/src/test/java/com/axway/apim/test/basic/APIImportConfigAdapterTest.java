@@ -21,18 +21,18 @@ import java.util.Map;
 
 public class APIImportConfigAdapterTest extends APIManagerMockBase {
 
-    private static Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapterTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapterTest.class);
     private String apimCliHome;
 
     @BeforeClass
-    private void initCommandParameters() throws AppException, IOException {
+    private void initCommandParameters() throws IOException {
         setupMockData();
         apimCliHome = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
     }
 
     // Make sure, you don't have configured APIM_CLI_HOME when running this test
     @Test
-    public void withoutStage() throws AppException, ParseException {
+    public void withoutStage() throws AppException {
         // Create Environment properties without any stage (basically loads env.properties)
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
@@ -46,7 +46,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 
     // Make sure, you don't have configured APIM_CLI_HOME when running this test
     @Test
-    public void withStage() throws AppException, ParseException {
+    public void withStage() throws AppException {
         // Providing a stage, it should load the env.variabletest.properties
         EnvironmentProperties props = new EnvironmentProperties("variabletest", apimCliHome);
         APIImportParams params = new APIImportParams();
@@ -60,7 +60,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
 
     // Make sure, you don't have configured APIM_CLI_HOME when running this test
     @Test
-    public void withManualStageConfig() throws AppException, ParseException {
+    public void withManualStageConfig() throws AppException {
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
         APIImportParams params = new APIImportParams();
         params.setConfig(testConfig);
@@ -93,7 +93,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void notDeclaredVariable() throws AppException, ParseException {
+    public void notDeclaredVariable() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
@@ -105,7 +105,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void configFileWithSpaces() throws AppException, ParseException {
+    public void configFileWithSpaces() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
@@ -117,7 +117,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void stageConfigInSubDirectory() throws AppException, ParseException {
+    public void stageConfigInSubDirectory() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
@@ -130,7 +130,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void outboundOAuthValidConfig() throws AppException, ParseException {
+    public void outboundOAuthValidConfig() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         props.put("myOAuthProfileName", "Sample OAuth Client Profile");
         APIImportParams params = new APIImportParams();
@@ -152,7 +152,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The OAuth provider profile is unkown: 'Invalid profile name'. Known profiles:.*")
-    public void outboundOAuthInValidConfig() throws AppException, ParseException {
+    public void outboundOAuthInValidConfig() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         props.put("myOAuthProfileName", "Invalid profile name");
         APIImportParams params = new APIImportParams();
@@ -167,7 +167,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void emptyVHostTest() throws AppException, ParseException {
+    public void emptyVHostTest() throws AppException {
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/empty-vhost-api-config.json").getFile();
 
         APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false, null);
@@ -177,7 +177,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void outboundProfileWithDefaultAuthOnlyTest() throws AppException, ParseException {
+    public void outboundProfileWithDefaultAuthOnlyTest() throws AppException {
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/methodLevel/method-level-outboundprofile-default-authn-only.json").getFile();
 
         APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
@@ -192,15 +192,15 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing routingPolicy when routeType is set to policy")
-    public void outboundProfileTypePolicyWithoutRoutingPolicy() throws AppException, ParseException {
+    public void outboundProfileTypePolicyWithoutRoutingPolicy() throws AppException {
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/policies/invalid-RouteType-Policy-NoRoutingPolicy.json").getFile();
 
         APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
         adapter.getDesiredAPI();
     }
 
-    @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required custom property: 'customProperty4'")
-    public void testMissingMandatoryCustomProperty() throws ParseException, IOException, InterruptedException {
+    @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required custom properties : 'customProperty4'")
+    public void testMissingMandatoryCustomProperty() throws IOException {
         String customPropertiesConfig = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "customProperties/customPropertiesConfig.json"));
         APIManagerAdapter.getInstance().customPropertiesAdapter.setAPIManagerTestResponse(customPropertiesConfig);
 
@@ -220,7 +220,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void apiSpecificationObject() throws AppException, ParseException {
+    public void apiSpecificationObject() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
@@ -234,7 +234,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void testMarkdownLocalClassic() throws AppException, ParseException {
+    public void testMarkdownLocalClassic() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
@@ -248,7 +248,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void testMarkdownLocalList() throws AppException, ParseException {
+    public void testMarkdownLocalList() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);

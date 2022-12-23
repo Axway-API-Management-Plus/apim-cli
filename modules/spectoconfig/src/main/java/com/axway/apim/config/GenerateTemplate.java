@@ -282,7 +282,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         } else if (authType.equals(AuthType.ssl)) {
             parameters.put("source", "file");
             parameters.put("certFile", "../certificates/clientcert.pfx");
-            parameters.put("password", "myClientCertPW");
+            parameters.put("password", UUID.randomUUID());
             parameters.put("trustAll", true);
         }
         authNProfile.setParameters(parameters);

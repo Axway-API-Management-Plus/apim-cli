@@ -1,11 +1,10 @@
 package com.axway.apim.api.model;
 
-import java.util.concurrent.ThreadLocalRandom;
-
+import com.fasterxml.jackson.annotation.JsonFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
+import java.util.UUID;
 
 @JsonFilter("CaCertFilter")
 public class CaCert {
@@ -177,7 +176,8 @@ public class CaCert {
 			}
 			if(filename == null) {
 				LOG.warn("Could not create filename for certificate based on alias: " + this.getAlias());
-				filename = "UnknownCertificate_" + ThreadLocalRandom.current().nextInt(1, 9999 + 1);
+
+				filename = "UnknownCertificate_" + UUID.randomUUID();
 				LOG.warn("Created a random filename: " + filename + ".ctr");
 			} else {
 				filename = filename.replace(" ", "");
@@ -223,8 +223,7 @@ public class CaCert {
 			CaCert otherCaCert = (CaCert)o;
 			if(!otherCaCert.getCertBlob().equals(this.getCertBlob())) return false;
 			if(!otherCaCert.getInbound().equals(this.getInbound())) return false;
-			if(!otherCaCert.getOutbound().equals(this.getOutbound())) return false;
-			return true;
+			return otherCaCert.getOutbound().equals(this.getOutbound());
 		} else {
 			return false;
 		}

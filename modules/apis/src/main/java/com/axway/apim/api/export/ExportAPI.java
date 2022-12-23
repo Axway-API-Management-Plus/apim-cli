@@ -51,7 +51,7 @@ public class ExportAPI {
             if (defaultProfile.getRouteType().equals("proxy")
                     && defaultProfile.getAuthenticationProfile().equals("_default")
                     && defaultProfile.getRequestPolicy() == null
-                    && defaultProfile.getRequestPolicy() == null
+                    && defaultProfile.getResponsePolicy() == null
                     && (APIManagerAdapter.hasAPIManagerVersion("7.6.2") && defaultProfile.getFaultHandlerPolicy() == null)
             ) return null;
         }
