@@ -99,6 +99,7 @@ public abstract class APIManagerMockBase {
 
 			apim.customPropertiesAdapter.setAPIManagerTestResponse(noCustomPropertiesConfig);
 		}catch (Exception e){
+			e.printStackTrace();
 			throw e;
 		}
 	}
