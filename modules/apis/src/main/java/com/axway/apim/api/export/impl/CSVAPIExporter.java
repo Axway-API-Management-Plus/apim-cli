@@ -1,19 +1,5 @@
 package com.axway.apim.api.export.impl;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
@@ -27,6 +13,19 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class CSVAPIExporter extends APIResultHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(CSVAPIExporter.class);
@@ -34,14 +33,14 @@ public class CSVAPIExporter extends APIResultHandler {
 	DateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	private enum HeaderFields {
-		standard(new String[] {
+		STANDARD(new String[] {
 				"API ID", 
 				"API Name", 
 				"API Path", 
 				"API Version",
 				"Created on"
 				}),
-		wide(new String[] {
+		WIDE(new String[] {
 				"API ID", 
 				"API Organization", 
 				"API Name", 
@@ -56,7 +55,7 @@ public class CSVAPIExporter extends APIResultHandler {
 				"Fault-Handler Policy",
 				"Created on"
 				}),
-		ultra(new String[] {
+		ULTRA(new String[] {
 				"API ID",
 				"API Organization", 
 				"API Name",
@@ -91,7 +90,7 @@ public class CSVAPIExporter extends APIResultHandler {
 	
 	@Override
 	public void execute(List<API> apis) throws AppException {
-		CSVPrinter csvPrinter = null;
+
 		Wide wide = params.getWide();
 		String givenTarget = params.getTarget();
 		try {
@@ -102,20 +101,15 @@ public class CSVAPIExporter extends APIResultHandler {
 			if(target.exists() && !params.isDeleteTarget()) {
 				throw new AppException("Targetfile: " + target.getCanonicalPath() + " already exists. You may set the flag -deleteTarget if you wish to overwrite it.", ErrorCode.EXPORT_FOLDER_EXISTS);
 			}
-			Appendable appendable = new FileWriter(target);
-			appendable.append("sep=,\n"); // Helps Excel to detect columns
-			csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader(HeaderFields.valueOf(wide.name()).headerFields));
-			writeRecords(csvPrinter, apis, wide);
-			LOG.info("API export successfully written to file: " + target.getCanonicalPath());
+			try(FileWriter appendable = new FileWriter(target)) {
+				appendable.append("sep=,\n"); // Helps Excel to detect columns
+				try (CSVPrinter csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader(HeaderFields.valueOf(wide.name()).headerFields))) {
+					writeRecords(csvPrinter, apis, wide);
+					LOG.info("API export successfully written to file: {}", target.getCanonicalPath());
+				}
+			}
 		} catch (IOException e1) {
 			throw new AppException("Cant open CSV-File: "+givenTarget+" for writing", ErrorCode.UNXPECTED_ERROR, e1);
-		} finally {
-			if(csvPrinter!=null)
-				try {
-					csvPrinter.close(true);
-				} catch (Exception ignore) {
-					LOG.error("Unable to close CSVWriter", ignore);
-				}
 		}
 	}
 	

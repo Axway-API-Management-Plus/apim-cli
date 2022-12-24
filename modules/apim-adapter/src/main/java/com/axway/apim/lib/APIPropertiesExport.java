@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.Properties;
 
@@ -43,8 +44,10 @@ public class APIPropertiesExport {
 				String baseDir = new File(configFile).getCanonicalFile().getParent();
 				file = new File(baseDir + File.separator + exportFile);
 			}
-			properties.store(Files.newOutputStream(file.toPath()), this.propertyComment);
-			LOG.info("Created API-Properties file: '"+file+"'");
+			try(OutputStream outputStream = Files.newOutputStream(file.toPath())){
+				properties.store(outputStream, this.propertyComment);
+				LOG.info("Created API-Properties file: {}",  file);
+			}
 		} catch (Exception e) {
 			LOG.error("Cant create API-Properties file based on filename: '"+exportFile+"'", e);
 		}

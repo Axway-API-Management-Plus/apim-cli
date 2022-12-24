@@ -1,18 +1,5 @@
 package com.axway.apim.appexport.impl;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter.Builder;
@@ -27,6 +14,18 @@ import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 public class CSVAppExporter extends ApplicationExporter {
 	private static final Logger LOG = LoggerFactory.getLogger(CSVAppExporter.class);
@@ -96,11 +95,12 @@ public class CSVAppExporter extends ApplicationExporter {
 			if(target.exists() && !params.isDeleteTarget()) {
 				throw new AppException("Targetfile: " + target.getCanonicalPath() + " already exists. You may set the flag -deleteTarget if you wish to overwrite it.", ErrorCode.EXPORT_FOLDER_EXISTS);
 			}
-			Appendable appendable = new FileWriter(target);
-			appendable.append("sep=,\n"); // Helps Excel to detect columns
-			try(CSVPrinter csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader(HeaderFields.valueOf(wide.name()).headerFields))) {
-				writeRecords(csvPrinter, apps, wide);
-				LOG.info("API export successfully written to file: {}" , target.getCanonicalPath());
+			try(FileWriter appendable = new FileWriter(target)) {
+				appendable.append("sep=,\n"); // Helps Excel to detect columns
+				try (CSVPrinter csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader(HeaderFields.valueOf(wide.name()).headerFields))) {
+					writeRecords(csvPrinter, apps, wide);
+					LOG.info("API export successfully written to file: {}", target.getCanonicalPath());
+				}
 			}
 		} catch (IOException e1) {
 			throw new AppException("Cant open CSV-File: "+givenTarget+" for writing", ErrorCode.UNXPECTED_ERROR, e1);
