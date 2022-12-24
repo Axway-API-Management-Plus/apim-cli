@@ -761,7 +761,7 @@ public class APIManagerAPIAdapter {
     }
 
     private String formatRetirementDate(Long retirementDate) {
-        Calendar cal = GregorianCalendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Z")));
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Z")));
         cal.setTimeInMillis(retirementDate);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
         format.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Z")));

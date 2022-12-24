@@ -29,7 +29,7 @@ import org.apache.http.ssl.SSLContextBuilder;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 
-public class HTTPClient {
+public class HTTPClient implements AutoCloseable {
 	
 	private URI url;
 	private String password;
@@ -77,8 +77,10 @@ public class HTTPClient {
 	public CloseableHttpResponse execute(HttpUriRequest request) throws Exception {
 		return httpClient.execute(request, clientContext);
 	}
-	
-	public void close() {
+
+
+	@Override
+	public void close() throws Exception {
 		try {
 			this.httpClient.close();
 		} catch (IOException e) {

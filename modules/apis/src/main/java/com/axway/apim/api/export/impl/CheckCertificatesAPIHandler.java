@@ -27,7 +27,7 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(CheckCertificatesAPIHandler.class);
     APICheckCertificatesParams checkCertParams;
-    Calendar cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
+    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
     DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     public CheckCertificatesAPIHandler(APIExportParams params) {
@@ -89,13 +89,13 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
                 writeJSON(apiCerts);
             }
         } else {
-            LOG.info("No certificates found that will expire within the next " + checkCertParams.getNumberOfDays() + " days.");
+            LOG.info("No certificates found that will expire within the next {} days.", checkCertParams.getNumberOfDays());
             writeJSON(new ArrayList<>());
         }
         LOG.info("Done!");
     }
 
-    public void writeJSON(List<APICert> apiCerts){
+    public void writeJSON(List<APICert> apiCerts) {
         ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         try {
             mapper.writeValue(System.out, apiCerts);
