@@ -30,7 +30,7 @@ jobs:
         id: cache-docker
         uses: actions/cache@v3
         with:
-          path: ~/docker-image-cache
+          path: ~/cache-docker
           key: docker-image-cache-${{ runner.os }}
       - if: steps.cache-docker.outputs.cache-hit != 'true'
         name: Login to Axway demo docker registry
@@ -43,14 +43,14 @@ jobs:
         name: Pull and Save docker images
         run: |
           docker pull $APIM_DOCKER_IMAGE
-          docker save -o ~/docker-image-cache/$CACHE_FILE_APIM $APIM_DOCKER_IMAGE
+          docker save -o ~/cache-docker/$CACHE_FILE_APIM $APIM_DOCKER_IMAGE
           docker pull $CASSANDRA_DOCKER_IMAGE
-          docker save -o ~/docker-image-cache/$CACHE_FILE_CASSANDRA $CASSANDRA_DOCKER_IMAGE
-      - if: steps.image-cache.outputs.cache-hit == 'true'
+          docker save -o ~/cache-docker/$CACHE_FILE_CASSANDRA $CASSANDRA_DOCKER_IMAGE
+      - if: steps.cache-docker.outputs.cache-hit == 'true'
         name: Load docker image from cache
         run: |
-          docker load -i ~/docker-image-cache/$CACHE_FILE_APIM
-          docker load -i ~/docker-image-cache/$CACHE_FILE_CASSANDRA
+          docker load -i ~/cache-docker/$CACHE_FILE_APIM
+          docker load -i ~/cache-docker$CACHE_FILE_CASSANDRA
           docker images
       - name: Run docker images
         run: |
