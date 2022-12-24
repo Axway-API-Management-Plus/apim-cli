@@ -5,12 +5,12 @@ on: [push]
 env:
   CASSANDRA_DOCKER_IMAGE: cassandra:3.11.14
   APIM_DOCKER_IMAGE: docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7-20221130
+  CACHE_FILE_APIM: api-manager_7_7_20221130.cache.tar
+  CACHE_FILE_CASSANDRA: cassandra_3_11_14.cache.tar
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    #timeout-minutes: 30
-
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 11
@@ -26,16 +26,34 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Maven Build and Unit Test 
         run: mvn clean test
-      - name: Login to Axway demo docker registry
+      - name: Cache docker images
+        id: cache-docker
+        uses: actions/cache@v3
+        with:
+          path: ~/docker-image-cache
+          key: docker-image-cache-${{ runner.os }}
+      - if: steps.cache-docker.outputs.cache-hit != 'true'
+        name: Login to Axway demo docker registry
         uses: docker/login-action@v2
         with:
           registry: docker-registry.demo.axway.com
           username: ${{ secrets.AXWAY_DOCKER_REG_USER }}
           password: ${{ secrets.AXWAY_DOCKER_REG_PASS }}
-      - name: Pull and Run docker images
+      - if: steps.cache-docker.outputs.cache-hit != 'true'
+        name: Pull and Save docker images
         run: |
           docker pull $APIM_DOCKER_IMAGE
+          docker save -o ~/image-cache/$CACHE_FILE_APIM
           docker pull $CASSANDRA_DOCKER_IMAGE
+          docker save -o ~/image-cache/$CACHE_FILE_CASSANDRA
+      - if: steps.image-cache.outputs.cache-hit == 'true'
+        name: Load docker image from cache
+        run: |
+          docker load -i ~/image-cache/$CACHE_FILE_APIM
+          docker load -i ~/image-cache/$CACHE_FILE_CASSANDRA
+          docker images
+      - name: Run docker images
+        run: |
           docker-compose run --rm start_cassandra
           docker-compose run --rm start_apimgmt
           docker-compose logs --tail 30 apimgmt
