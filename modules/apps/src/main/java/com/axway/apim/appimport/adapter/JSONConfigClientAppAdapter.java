@@ -82,14 +82,14 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 		// Try to read single application
 		} catch (MismatchedInputException me) {
 			try {
-				LOG.debug("Error reading single application: " + me.getMessage() + ". Trying to read single application now.");
+				LOG.debug("Error reading single application: {} Trying to read single application now.", me.getMessage());
 				ClientApplication app = mapper.readValue(Utils.substituteVariables(configFile), ClientApplication.class);
 				if(stageConfig!=null) {
 					try {
 						ObjectReader updater = mapper.readerForUpdating(app);
 						app = updater.readValue(Utils.substituteVariables(stageConfig));
 					} catch (FileNotFoundException e) {
-						LOG.warn("No config file found for stage: '"+stage+"'");
+						LOG.warn("No config file found for stage: {}", stage);
 					}
 				}
 				
@@ -151,13 +151,13 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 						.build()
 				, false);
 				if(apis==null || apis.size()==0) {
-					LOG.error("API with name: '" + apiAccess.getApiName() + "' not found. Ignoring this APIs.");
+					LOG.error("API with name: {} not found. Ignoring this APIs.", apiAccess.getApiName() );
 					result.setError(ErrorCode.UNKNOWN_API);
 					it.remove();
 					continue;
 				}
 				if(apis.size()>1 && apiAccess.getApiVersion()==null) {
-					LOG.error("Found: "+apis.size()+" APIs with name: " + apiAccess.getApiName() + " not providing a version. Ignoring this APIs.");
+					LOG.error("Found: {} APIs with name: {} not providing a version. Ignoring this APIs.", apis.size(), apiAccess.getApiName());
 					result.setError(ErrorCode.UNKNOWN_API);
 					it.remove();
 					continue;
@@ -205,7 +205,7 @@ public class JSONConfigClientAppAdapter extends ClientAppAdapter {
 				if(permission.getUser()!=null) continue;
 				User user = userAdapter.getUserForLoginName(permission.getUsername());
 				if(user==null) {
-					LOG.warn("Cannot share application with user: '"+permission.getUsername()+"', as user does not exists.");
+					LOG.warn("Cannot share application with user: {} as user does not exists.", permission.getUsername());
 					app.getPermissions().remove(i);
 					continue;
 				}

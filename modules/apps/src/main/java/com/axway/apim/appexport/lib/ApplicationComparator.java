@@ -7,6 +7,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 public class ApplicationComparator implements Comparator<ClientApplication> {
 
 	public ApplicationComparator() {
+		super();
 	}
 
 	@Override

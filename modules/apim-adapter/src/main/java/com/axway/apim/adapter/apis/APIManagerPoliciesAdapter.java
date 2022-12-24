@@ -74,7 +74,9 @@ public class APIManagerPoliciesAdapter {
 	
 	ObjectMapper mapper = APIManagerAdapter.mapper;
 
-	public APIManagerPoliciesAdapter() {}
+	public APIManagerPoliciesAdapter() {
+		super();
+	}
 	
 	Map<PolicyType, String> apiManagerResponse = new HashMap<>();
 	

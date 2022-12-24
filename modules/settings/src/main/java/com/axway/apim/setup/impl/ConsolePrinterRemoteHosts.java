@@ -20,7 +20,7 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
 public class ConsolePrinterRemoteHosts {
-	
+
 	protected static Logger LOG = LoggerFactory.getLogger(ConsolePrinterRemoteHosts.class);
 	
 	APIManagerAdapter adapter;
@@ -34,8 +34,7 @@ public class ConsolePrinterRemoteHosts {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			LOG.error("Unable to get APIManagerAdapter", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Unable to get APIManagerAdapter",e);
 		}
 	}
 
@@ -118,7 +117,7 @@ public class ConsolePrinterRemoteHosts {
 		try {
 			List<API> relatedAPIs = getRelatedAPIs(remoteHost.getName(), remoteHost.getPort());
 			for(API api : relatedAPIs) {
-				System.out.printf("%-25s (%s)\n", api.getName(), api.getVersion());
+				System.out.printf("%-25s (%s)", api.getName(), api.getVersion());
 			}
 			if(relatedAPIs==null || relatedAPIs.size()==0) {
 				System.out.println("No API found with backend: '" + remoteHost.getName() + "' and port: " + remoteHost.getPort());

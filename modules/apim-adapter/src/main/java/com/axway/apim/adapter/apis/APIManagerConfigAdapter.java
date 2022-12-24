@@ -52,8 +52,8 @@ public class APIManagerConfigAdapter {
 	 * This list is mainly used to filter out fields, when using an older API-Manager version.
 	 */
 	protected enum ConfigFields {
-		version7720200130 ("7.7.20200530", new String[] {"apiImportTimeout", "apiImportMimeValidation", "apiImportEditable", "lockUserAccount" }),
-		version77 ("7.7.0", new String[] {
+		VERSION_7720200130("7.7.20200530", new String[] {"apiImportTimeout", "apiImportMimeValidation", "apiImportEditable", "lockUserAccount" }),
+		VERSION_77("7.7.0", new String[] {
 				"userNameRegex", "changePasswordOnFirstLogin", "passwordExpiryEnabled", "passwordLifetimeDays",  
 				"applicationScopeRestrictions", "strictCertificateChecking", "serverCertificateVerification", "advisoryBannerEnabled", "advisoryBannerText"
 				});

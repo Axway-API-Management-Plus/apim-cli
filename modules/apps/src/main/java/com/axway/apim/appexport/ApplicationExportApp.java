@@ -52,7 +52,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		try {
 			params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " + e.getMessage());
+			LOG.error("Error {}" , e.getMessage());
 			return e.getError().getCode();
 		}
 		ApplicationExportApp app = new ApplicationExportApp();
@@ -65,7 +65,7 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		try {
 			params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " + e.getMessage());
+			LOG.error("Error {}" , e.getMessage());
 			return e.getError().getCode();
 		}
 		ApplicationExportApp app = new ApplicationExportApp();
@@ -113,7 +113,9 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 			try {
 				// make sure the cache is updated, even an exception is thrown
 				APIManagerAdapter.deleteInstance();
-			} catch (Exception ignore) { }
+			} catch (Exception ignore) {
+				LOG.error("Unable to delete instance",ignore);
+			}
 		}
 	}
 
@@ -128,19 +130,19 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
 		List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
 		if(apps.size()==0) {
 			if(LOG.isDebugEnabled()) {
-				LOG.info("No applications found using filter: " + exporter.getFilter());
+				LOG.info("No applications found using filter: {}" , exporter.getFilter());
 			} else {
 				LOG.info("No applications found based on the given filters.");
 			}
 		} else {
-			LOG.info("Found " + apps.size() + " application(s).");
+			LOG.info("Found {} application(s).", apps.size());
 			
 			exporter.export(apps);
 			if(exporter.hasError()) {
 				LOG.info("");
 				LOG.error("Please check the log. At least one error was recorded.");
 			} else {
-				LOG.debug("Successfully exported " + apps.size() + " application(s).");
+				LOG.debug("Successfully exported {} application(s).", apps.size());
 			}
 			APIManagerAdapter.deleteInstance();
 		}

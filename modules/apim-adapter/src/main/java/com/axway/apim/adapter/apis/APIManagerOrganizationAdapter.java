@@ -39,6 +39,7 @@ import java.util.Map;
 
 public class APIManagerOrganizationAdapter {
 
+    public static final String ORGANIZATIONS = "/organizations/";
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerOrganizationAdapter.class);
 
     private final CoreParameters cmd;
@@ -110,9 +111,9 @@ public class APIManagerOrganizationAdapter {
                 if (!APIManagerAdapter.hasAdminAccount()) {
                     throw new AppException("Admin account is required to create a new organization", ErrorCode.NO_ADMIN_ROLE_USER);
                 }
-                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations").build();
+                    uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations").build();
             } else {
-                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations/" + actualOrg.getId()).build();
+                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + ORGANIZATIONS + actualOrg.getId()).build();
             }
             FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                     SimpleBeanPropertyFilter.serializeAllExcept("image", "createdOn", "apis"));
@@ -155,7 +156,7 @@ public class APIManagerOrganizationAdapter {
 
     public void deleteOrganization(Organization org) throws AppException {
         try {
-            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations/" + org.getId()).build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + ORGANIZATIONS + org.getId()).build();
             RestAPICall request = new DELRequest(uri, true);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -175,7 +176,7 @@ public class APIManagerOrganizationAdapter {
     private void saveImage(Organization org, Organization actualOrg) throws URISyntaxException, AppException {
         if (org.getImage() == null) return;
         if (actualOrg != null && org.getImage().equals(actualOrg.getImage())) return;
-        URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations/" + org.getId() + "/image").build();
+        URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + ORGANIZATIONS + org.getId() + "/image").build();
         InputStream is = org.getImage().getInputStream();
         HttpEntity entity = MultipartEntityBuilder.create()
                 .addBinaryBody("file", is, ContentType.create("image/jpeg"), org.getImage().getBaseFilename())
@@ -261,7 +262,7 @@ public class APIManagerOrganizationAdapter {
         if (!addImage) return;
         URI uri;
         if (org.getImageUrl() == null) return;
-        uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations/" + org.getId() + "/image")
+        uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + ORGANIZATIONS + org.getId() + "/image")
                 .build();
         Image image = APIManagerAdapter.getImageFromAPIM(uri, "org-image");
         org.setImage(image);

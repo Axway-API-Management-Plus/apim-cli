@@ -17,8 +17,7 @@ public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			LOG.error("Unable to get APIManagerAdapter", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Unable to get APIManagerAdapter", e);
 		}
 	}
 	
@@ -35,7 +34,7 @@ public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler
 		}
 
 		if(params.isExportAlerts()) {
-			ConsolePrinterAlerts alertsExporter = new ConsolePrinterAlerts(params);
+			ConsolePrinterAlerts alertsExporter = new ConsolePrinterAlerts();
 			alertsExporter.export(config.getAlerts());
 		}
 		

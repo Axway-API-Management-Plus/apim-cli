@@ -12,7 +12,7 @@ import java.util.List;
 
 public class APIStatusManager {
 	
-	private static Logger LOG = LoggerFactory.getLogger(APIStatusManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIStatusManager.class);
 
 	private static final String PUBLISHED = "published";
 	private static final String UNPUBLISHED = "unpublished";
@@ -42,8 +42,8 @@ public class APIStatusManager {
 	}
 	
 	private enum StatusChangeRequiresEnforce {
-		published(new String[] { "unpublished", "deleted" }),
-		deprecated(new String[] { "unpublished", "deleted" });
+		PUBLISHED(new String[] { APIStatusManager.UNPUBLISHED, APIStatusManager.DELETED }),
+		DEPRECATED(new String[] { APIStatusManager.UNPUBLISHED, APIStatusManager.DELETED });
 
 		private final List<String> enforceRequired;
 

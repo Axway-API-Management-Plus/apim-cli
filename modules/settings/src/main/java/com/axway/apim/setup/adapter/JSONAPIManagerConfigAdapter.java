@@ -49,9 +49,9 @@ public class JSONAPIManagerConfigAdapter {
 				try {
 					ObjectReader updater = mapper.readerForUpdating(baseConfig);
 					this.managerConfig = updater.readValue(Utils.substituteVariables(stageConfig));
-					LOG.info("Successfully read stage configuration file: " + stageConfig);
+					LOG.info("Successfully read stage configuration file: {}" , stageConfig);
 				} catch (FileNotFoundException e) {
-					LOG.warn("No config file found for stage: '"+stage+"'");
+					LOG.warn("No config file found for stage: {}",stage);
 				}
 			} else {
 				this.managerConfig = baseConfig;

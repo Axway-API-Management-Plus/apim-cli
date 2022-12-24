@@ -59,8 +59,7 @@ public class ConsolePrinterConfig {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			LOG.error("Unable to get APIManagerAdapter", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Unable to get APIManagerAdapter", e);
 		}
 	}
 
@@ -88,7 +87,7 @@ public class ConsolePrinterConfig {
 				if (field.isAnnotationPresent(APIManagerConfigAnnotation.class)) {
 					APIManagerConfigAnnotation annotation = field.getAnnotation(APIManagerConfigAnnotation.class);
 					if(annotation.configType()==configType) {
-						System.out.printf("%s %s: %s\n", annotation.name() , dots.substring(annotation.name().length()), getFieldValue(field.getName(), config));
+						System.out.printf("%s %s: %s", annotation.name() , dots.substring(annotation.name().length()), getFieldValue(field.getName(), config));
 					}
 				}
 			}

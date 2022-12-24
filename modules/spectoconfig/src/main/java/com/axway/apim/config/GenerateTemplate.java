@@ -50,6 +50,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final Logger LOG = LoggerFactory.getLogger(GenerateTemplate.class);
+    public static final String DEFAULT = "_default";
 
     @Override
     public String getName() {
@@ -85,20 +86,18 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
             return e.getError().getCode();
         }
         GenerateTemplate app = new GenerateTemplate();
-        FileWriter fileWriter = null;
         try {
             APIConfig apiConfig = app.generateTemplate(params);
-            fileWriter = new FileWriter(params.getConfig());
-            String[] serializeAllExcept = new String[]{"useForInbound", "useForOutbound"};
-
-            FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
-            objectMapper.setFilterProvider(filter);
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-            JsonNode jsonNode = objectMapper.convertValue(apiConfig, JsonNode.class);
-            objectMapper.writeValue(fileWriter, jsonNode);
-            LOG.info("Writing APIM CLI configuration file to : {}", params.getConfig());
-
+            try(FileWriter fileWriter = new FileWriter(params.getConfig())) {
+                String[] serializeAllExcept = new String[]{"useForInbound", "useForOutbound"};
+                FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
+                objectMapper.setFilterProvider(filter);
+                objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+                JsonNode jsonNode = objectMapper.convertValue(apiConfig, JsonNode.class);
+                objectMapper.writeValue(fileWriter, jsonNode);
+                LOG.info("Writing APIM CLI configuration file to : {}", params.getConfig());
+            }
         } catch (IOException | CertificateEncodingException | NoSuchAlgorithmException | KeyManagementException e) {
             LOG.error("Error in processing :", e);
             if (e instanceof AppException) {
@@ -107,14 +106,6 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 return appException.getError().getCode();
             }
             return 1;
-        } finally {
-            if (fileWriter != null) {
-                try {
-                    fileWriter.close();
-                } catch (IOException e) {
-                    LOG.error("Problem in closing the file");
-                }
-            }
         }
         return 0;
     }
@@ -193,7 +184,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         corsProfile.setMaxAgeSeconds("0");
 
         CorsProfile corsProfileDefault = new CorsProfile();
-        corsProfileDefault.setName("_default");
+        corsProfileDefault.setName(DEFAULT);
         corsProfileDefault.setIsDefault(true);
         corsProfileDefault.setOrigins(new String[]{"*"});
         corsProfileDefault.setAllowedHeaders(new String[]{});
@@ -208,11 +199,11 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         Map<String, InboundProfile> inboundProfiles = new HashMap<>();
         InboundProfile profile = new InboundProfile();
         profile.setCorsProfile("Custom CORS");
-        profile.setSecurityProfile("_default");
+        profile.setSecurityProfile(DEFAULT);
         profile.setMonitorAPI(true);
         profile.setMonitorSubject("authentication.subject.id");
         profile.setQueryStringPassThrough(false);
-        inboundProfiles.put("_default", profile);
+        inboundProfiles.put(DEFAULT, profile);
         api.setInboundProfiles(inboundProfiles);
         String frontendAuthType = parameters.getFrontendAuthType();
         // If frontendAuthType is null, use authentication from openapi spec. If none found, set it as pass through
@@ -243,6 +234,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         try {
             authType = AuthType.valueOf(backendAuthType);
         } catch (IllegalArgumentException ignored) {
+            LOG.error("Invalid backend auth type", ignored);
         }
         if (authType == null) {
             for (AuthType authTypeEnum : AuthType.values()) {
@@ -265,7 +257,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         }
         List<AuthenticationProfile> authnProfiles = new ArrayList<>();
         AuthenticationProfile authNProfile = new AuthenticationProfile();
-        authNProfile.setName("_default");
+        authNProfile.setName(DEFAULT);
         authNProfile.setType(authType);
         authNProfile.setIsDefault(true);
         Map<String, Object> parameters = new LinkedHashMap<>();
@@ -295,6 +287,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         try {
             deviceType = DeviceType.valueOf(frontendAuthType);
         } catch (IllegalArgumentException ignored) {
+            LOG.error("Invalid Frontend AuthType", ignored);
         }
 
         if (deviceType == null) {
@@ -344,7 +337,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         }
         apiSecurity.setProperties(properties);
         Map<String, Object> securityProfile = new LinkedHashMap<>();
-        securityProfile.put("name", "_default");
+        securityProfile.put("name", DEFAULT);
         securityProfile.put("isDefault", true);
         List<APISecurity> apiSecurities = new ArrayList<>();
         apiSecurities.add(apiSecurity);
@@ -461,7 +454,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         if (filename == null) {
             LOG.warn("No CN");
             filename = "UnknownCertificate_" + UUID.randomUUID();
-            LOG.warn("Created a random filename: " + filename + ".ctr");
+            LOG.warn("Created a random filename: {}" , filename );
         } else {
             filename = filename.replace(" ", "");
             filename = filename.replace("*", "");

@@ -34,8 +34,7 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			LOG.error("Unable to get APIManagerAdapter", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Unable to get APIManagerAdapter", e);
 		}
 	}
 

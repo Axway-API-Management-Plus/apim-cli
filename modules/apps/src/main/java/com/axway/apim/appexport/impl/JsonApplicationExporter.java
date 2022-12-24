@@ -44,17 +44,17 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		String folderName = getExportFolder(app);
 		String targetFolder = params.getTarget();
 		File localFolder = new File(targetFolder +File.separator+ folderName);
-		LOG.info("Going to export applications into folder: " + localFolder);
+		LOG.info("Going to export applications into folder: {}" , localFolder);
 		if(localFolder.exists()) {
 			if(AppExportParams.getInstance().isDeleteTarget()) {
-				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
+				LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
 				try {
 					FileUtils.deleteDirectory(localFolder);
 				} catch (IOException e) {
 					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
 				}				
 			} else {
-				LOG.warn("Local export folder: " + localFolder + " already exists. Application will not be exported. (You may set -deleteTarget)");
+				LOG.warn("Local export folder: {} already exists. Application will not be exported. (You may set -deleteTarget)", localFolder);
 				this.hasError = true;
 				return;
 			}
@@ -86,7 +86,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		if(app.getImage()!=null) {
 			writeBytesToFile(app.getImage().getImageContent(), localFolder+File.separator + app.getImage().getBaseFilename());
 		}
-		LOG.info("Successfully exported application to folder: " + localFolder);
+		LOG.info("Successfully exported application to folder: {}" , localFolder);
 		if(!APIManagerAdapter.hasAdminAccount()) {
 			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
 			LOG.warn("- No Quotas has been exported for the API");

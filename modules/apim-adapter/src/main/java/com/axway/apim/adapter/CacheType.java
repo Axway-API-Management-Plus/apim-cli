@@ -11,7 +11,7 @@ public enum CacheType {
     ORGANIZATION_CACHE,
     USER_CACHE;
 
-    public boolean supportsImportActions;
+    public final boolean supportsImportActions;
 
     CacheType() {
         this.supportsImportActions = false;

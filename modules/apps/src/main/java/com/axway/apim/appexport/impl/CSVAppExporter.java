@@ -32,7 +32,7 @@ public class CSVAppExporter extends ApplicationExporter {
 	private static final Logger LOG = LoggerFactory.getLogger(CSVAppExporter.class);
 	
 	private enum HeaderFields {
-		standard(new String[] {
+		STANDARD(new String[] {
 				"ID", 
 				"Organization", 
 				"Name", 
@@ -42,7 +42,7 @@ public class CSVAppExporter extends ApplicationExporter {
 				"Enabled",
 				"Created by"
 				}),
-		wide(new String[] {
+		WIDE(new String[] {
 				"ID", 
 				"Organization", 
 				"Name", 
@@ -55,7 +55,7 @@ public class CSVAppExporter extends ApplicationExporter {
 				"API-Method",
 				"Quota Config"
 				}),
-		ultra(new String[] {
+		ULTRA(new String[] {
 				"ID", 
 				"Organization", 
 				"Name", 
@@ -86,7 +86,6 @@ public class CSVAppExporter extends ApplicationExporter {
 	
 	@Override
 	public void export(List<ClientApplication> apps) throws AppException {
-		CSVPrinter csvPrinter = null;
 		Wide wide = params.getWide();
 		String givenTarget = params.getTarget();
 		try {
@@ -99,18 +98,12 @@ public class CSVAppExporter extends ApplicationExporter {
 			}
 			Appendable appendable = new FileWriter(target);
 			appendable.append("sep=,\n"); // Helps Excel to detect columns
-			csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader(HeaderFields.valueOf(wide.name()).headerFields));
-			writeRecords(csvPrinter, apps, wide);
-			LOG.info("API export successfully written to file: " + target.getCanonicalPath());
+			try(CSVPrinter csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader(HeaderFields.valueOf(wide.name()).headerFields))) {
+				writeRecords(csvPrinter, apps, wide);
+				LOG.info("API export successfully written to file: {}" , target.getCanonicalPath());
+			}
 		} catch (IOException e1) {
 			throw new AppException("Cant open CSV-File: "+givenTarget+" for writing", ErrorCode.UNXPECTED_ERROR, e1);
-		} finally {
-			if(csvPrinter!=null)
-				try {
-					csvPrinter.close(true);
-				} catch (Exception ignore) {
-					LOG.error("Unable to close CSVWriter", ignore);
-				}
 		}
 	}
 	

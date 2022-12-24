@@ -12,6 +12,10 @@ import com.axway.apim.lib.CustomPropertiesFilter;
 
 public class OrgFilter implements CustomPropertiesFilter {
 
+	public static final String FIELD = "field";
+	public static final String OP = "op";
+	public static final String VALUE = "value";
+	public static final String EQ = "eq";
 	private String id;
 	String apiId;
 	String description;
@@ -32,33 +36,33 @@ public class OrgFilter implements CustomPropertiesFilter {
 	public void setApiId(String apiId) {
 		if(apiId==null) return;
 		this.apiId = apiId;
-		filters.add(new BasicNameValuePair("field", "apiid"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", apiId));
+		filters.add(new BasicNameValuePair(FIELD, "apiid"));
+		filters.add(new BasicNameValuePair(OP, EQ));
+		filters.add(new BasicNameValuePair(VALUE, apiId));
 	}
 
 	public void setDescription(String description) {
 		if(description==null) return;
 		this.description = description;
-		filters.add(new BasicNameValuePair("field", "description"));
-		filters.add(new BasicNameValuePair("op", "like"));
-		filters.add(new BasicNameValuePair("value", description));
+		filters.add(new BasicNameValuePair(FIELD, "description"));
+		filters.add(new BasicNameValuePair(OP, "like"));
+		filters.add(new BasicNameValuePair(VALUE, description));
 	}
 
 	public void setEmail(String email) {
 		if(email==null) return;
 		this.email = email;
-		filters.add(new BasicNameValuePair("field", "email"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", email));
+		filters.add(new BasicNameValuePair(FIELD, "email"));
+		filters.add(new BasicNameValuePair(OP, EQ));
+		filters.add(new BasicNameValuePair(VALUE, email));
 	}
 
 	public void setEnabled(boolean enabled) {
 		if(this.enabled==enabled) return;
 		this.enabled = enabled;
-		filters.add(new BasicNameValuePair("field", "enabled"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", (enabled) ? "enabled" : "disabled"));
+		filters.add(new BasicNameValuePair(FIELD, "enabled"));
+		filters.add(new BasicNameValuePair(OP, EQ));
+		filters.add(new BasicNameValuePair(VALUE, (enabled) ? "enabled" : "disabled"));
 	}
 
 	public void setName(String name) {
@@ -71,9 +75,9 @@ public class OrgFilter implements CustomPropertiesFilter {
 	public void setPhone(String phone) {
 		if(phone==null) return;
 		this.phone = phone;
-		filters.add(new BasicNameValuePair("field", "phone"));
-		filters.add(new BasicNameValuePair("op", "eq"));
-		filters.add(new BasicNameValuePair("value", phone));
+		filters.add(new BasicNameValuePair(FIELD, "phone"));
+		filters.add(new BasicNameValuePair(OP, EQ));
+		filters.add(new BasicNameValuePair(VALUE, phone));
 	}
 
 	public List<NameValuePair> getFilters() {

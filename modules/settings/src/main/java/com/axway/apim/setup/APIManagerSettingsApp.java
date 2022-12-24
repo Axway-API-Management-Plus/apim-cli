@@ -50,7 +50,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 		try {
 			params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " + e.getMessage());
+			LOG.error("Error {}", e.getMessage());
 			return e.getError().getCode();
 		}
 		APIManagerSettingsApp app = new APIManagerSettingsApp();
@@ -63,7 +63,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 		try {
 			params = (StandardImportParams) APIManagerSetupImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " + e.getMessage());
+			LOG.error("Error {}" , e.getMessage());
 			return e.getError().getCode();
 		}
 		APIManagerSettingsApp managerConfigApp = new APIManagerSettingsApp();
@@ -146,7 +146,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 				updatedAssets+="Remote-Hosts";
 				LOG.debug("API-Manager remote host(s) successfully updated.");
 			}
-			LOG.info("API-Manager configuration ("+updatedAssets+") successfully updated.");
+			LOG.info("API-Manager configuration {} successfully updated.", updatedAssets);
 			return result;
 		} catch (AppException ap) { 
 			ap.logException(LOG);
@@ -180,7 +180,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 				CLIServiceMethod cliServiceMethod = method.getAnnotation(CLIServiceMethod.class);
 				String name = cliServiceMethod.name();
 				if (serviceName.equals(name)) {
-					LOG.info("Calling Operation " + method.getName());
+					LOG.info("Calling Operation {}" , method.getName());
 					int rc = (int) method.invoke(null, (Object) args);
 					System.exit(rc);
 				}

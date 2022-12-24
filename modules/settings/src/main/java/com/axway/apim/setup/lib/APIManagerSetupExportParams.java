@@ -6,11 +6,11 @@ import com.axway.apim.lib.StandardExportParams;
 public class APIManagerSetupExportParams extends StandardExportParams {
 	
 	public enum Type {
-		config, 
-		alerts, 
-		remotehosts, 
-		policies,
-		customProperties
+		CONFIG,
+		ALERTS,
+		REMOTE_HOSTS,
+		POLICIES,
+		CUSTOM_PROPERTIES
 	}
 	
 	private Boolean exportConfig = true;
@@ -23,6 +23,7 @@ public class APIManagerSetupExportParams extends StandardExportParams {
 	private String RemoteHostId;
 
 	public APIManagerSetupExportParams() {
+		super();
 	}
 	
 	public static synchronized APIManagerSetupExportParams getInstance() {
@@ -89,19 +90,19 @@ public class APIManagerSetupExportParams extends StandardExportParams {
 		for(String givenType : givenTypes) {
 			Type type = Type.valueOf(givenType.trim());
 			switch(type) {
-			case config:
+			case CONFIG:
 				exportConfig = true;
 				break;
-			case alerts:
+			case ALERTS:
 				exportAlerts = true;
 				break;
-			case remotehosts:
+			case REMOTE_HOSTS:
 				exportRemoteHosts = true;
 				break;
-			case policies:
+			case POLICIES:
 				exportPolicies = true;
 				break;
-			case customProperties:
+			case CUSTOM_PROPERTIES:
 				exportCustomProperties = true;
 				break;
 			}

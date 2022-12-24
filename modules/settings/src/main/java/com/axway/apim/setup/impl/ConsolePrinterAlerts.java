@@ -1,18 +1,16 @@
 package com.axway.apim.setup.impl;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Alerts;
 import com.axway.apim.lib.APIManagerAlertsAnnotation;
 import com.axway.apim.lib.APIManagerAlertsAnnotation.AlertType;
-import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ConsolePrinterAlerts {
 	
@@ -34,12 +32,11 @@ public class ConsolePrinterAlerts {
 			AlertType.Quota
 	};
 
-	public ConsolePrinterAlerts(StandardExportParams params) {
+	public ConsolePrinterAlerts() {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			LOG.error("Unable to get APIManagerAdapter", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Unable to get APIManagerAdapter", e);
 		}
 	}
 
@@ -58,7 +55,7 @@ public class ConsolePrinterAlerts {
 				if (field.isAnnotationPresent(APIManagerAlertsAnnotation.class)) {
 					APIManagerAlertsAnnotation annotation = field.getAnnotation(APIManagerAlertsAnnotation.class);
 					if(annotation.alertType()==type) {
-						System.out.printf("%s %s: %s\n", annotation.name() , dots.substring(annotation.name().length()), getFieldValue(field.getName(), alerts));
+						System.out.printf("%s %s: %s", annotation.name() , dots.substring(annotation.name().length()), getFieldValue(field.getName(), alerts));
 					}
 				}
 			}

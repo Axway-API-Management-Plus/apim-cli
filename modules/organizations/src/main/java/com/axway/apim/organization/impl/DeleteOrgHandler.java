@@ -37,7 +37,7 @@ public class DeleteOrgHandler extends OrgResultHandler {
 				APIManagerAdapter.getInstance().orgAdapter.deleteOrganization(org);
 			} catch(Exception e) {
 				result.setError(ErrorCode.ERR_DELETING_ORG);
-				LOG.error("Error deleting Organization: " + org.getName());
+				LOG.error("Error deleting Organization: {}" , org.getName());
 			}
 		}
 		System.out.println("Done!");

@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 public class AppQuotaSerializer extends StdSerializer<APIQuota> {
 	
-	private final JsonSerializer<Object> defaultSerializer;
+	private final transient JsonSerializer<Object> defaultSerializer;
 	
 	private static final long serialVersionUID = 1L;
 	
