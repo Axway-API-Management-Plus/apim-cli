@@ -4,7 +4,7 @@
 	<ehcache:persistence directory="${java.io.tmpdir}/apim-cli-cache" />
 
 	<!-- Used for the endpoint: /applications/<applicationId>/apis (Not used anymore in version >7.7) -->
-	<ehcache:cache alias="applicationAPIAccessCache">
+	<ehcache:cache alias="APPLICATION_API_ACCESS_CACHE">
 		<ehcache:key-type>java.lang.String</ehcache:key-type>
 		<ehcache:value-type>java.lang.String</ehcache:value-type>
 		<ehcache:expiry>
@@ -17,7 +17,7 @@
 	</ehcache:cache>
 
 	<!-- Used for the endpoint: /organizations/<organizationId>/apis -->
-	<ehcache:cache alias="organizationAPIAccessCache">
+	<ehcache:cache alias="ORGANIZATION_API_ACCESS_CACHE">
 		<ehcache:key-type>java.lang.String</ehcache:key-type>
 		<ehcache:value-type>java.lang.String</ehcache:value-type>
 		<ehcache:expiry>
@@ -30,7 +30,7 @@
 	</ehcache:cache>
 	
 	<!-- Used for the endpoint: /oauthclientprofiles -->
-	<ehcache:cache alias="oauthClientProviderCache">
+	<ehcache:cache alias="OAUTH_CLIENT_PROVIDER_CACHE">
 		<ehcache:key-type>java.lang.String</ehcache:key-type>
 		<ehcache:value-type>java.lang.String</ehcache:value-type>
 		<ehcache:expiry>
@@ -43,7 +43,7 @@
 	</ehcache:cache>
 	
 	<!-- Used for the endpoint: /applications/<applicationId> -->
-	<ehcache:cache alias="applicationsCache">
+	<ehcache:cache alias="APPLICATIONS_CACHE">
 		<ehcache:key-type>java.lang.String</ehcache:key-type>
 		<ehcache:value-type>java.lang.String</ehcache:value-type>
 		<ehcache:expiry>
@@ -56,7 +56,7 @@
 	</ehcache:cache>
 	
 	<!-- Used for the endpoint: /proxies/<apiId>/applications" -->
-	<ehcache:cache alias="applicationsSubscriptionCache">
+	<ehcache:cache alias="APPLICATIONS_SUBSCRIPTION_CACHE">
 		<ehcache:key-type>java.lang.String</ehcache:key-type>
 		<ehcache:value-type>java.lang.String</ehcache:value-type>
 		<ehcache:expiry>
@@ -69,7 +69,7 @@
 	</ehcache:cache>
 	
 	<!-- Used for the endpoint: /applications/<applicationId>/quota" -->
-	<ehcache:cache alias="applicationsQuotaCache">
+	<ehcache:cache alias="APPLICATIONS_QUOTA_CACHE">
 		<ehcache:key-type>java.lang.String</ehcache:key-type>
 		<ehcache:value-type>java.lang.String</ehcache:value-type>
 		<ehcache:expiry>
@@ -82,7 +82,7 @@
 	</ehcache:cache>
 	
 	<!-- Used for the endpoint: /applications/<applicationId>/<oauth|apikeys|extclients>" -->
-	<ehcache:cache alias="applicationsCredentialCache">
+	<ehcache:cache alias="APPLICATIONS_CREDENTIAL_CACHE">
 		<ehcache:key-type>java.lang.String</ehcache:key-type>
 		<ehcache:value-type>java.lang.String</ehcache:value-type>
 		<ehcache:expiry>
@@ -95,7 +95,7 @@
 	</ehcache:cache>
 	
 	<!-- Used for the endpoint: /organizations/<orgId>" -->
-	<ehcache:cache alias="organizationCache">
+	<ehcache:cache alias="ORGANIZATION_CACHE">
 		<ehcache:key-type>java.lang.String</ehcache:key-type>
 		<ehcache:value-type>java.lang.String</ehcache:value-type>
 		<ehcache:expiry>
@@ -108,7 +108,7 @@
 	</ehcache:cache>
 	
 	<!-- Used for the endpoint: /users/<userId>" -->
-	<ehcache:cache alias="userCache">
+	<ehcache:cache alias="USER_CACHE">
 		<ehcache:key-type>java.lang.String</ehcache:key-type>
 		<ehcache:value-type>java.lang.String</ehcache:value-type>
 		<ehcache:expiry>
