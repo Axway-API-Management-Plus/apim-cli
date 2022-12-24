@@ -43,9 +43,9 @@ jobs:
         name: Pull and Save docker images
         run: |
           docker pull $APIM_DOCKER_IMAGE
-          docker save -o ~/image-cache/$CACHE_FILE_APIM
+          docker save -o ~/image-cache/$CACHE_FILE_APIM $APIM_DOCKER_IMAGE
           docker pull $CASSANDRA_DOCKER_IMAGE
-          docker save -o ~/image-cache/$CACHE_FILE_CASSANDRA
+          docker save -o ~/image-cache/$CACHE_FILE_CASSANDRA $CASSANDRA_DOCKER_IMAGE
       - if: steps.image-cache.outputs.cache-hit == 'true'
         name: Load docker image from cache
         run: |
@@ -57,6 +57,6 @@ jobs:
           docker-compose run --rm start_cassandra
           docker-compose run --rm start_apimgmt
           docker-compose logs --tail 30 apimgmt
-      - name: Maven Integration Test 
+      - name: Maven APIM Integration Test
         run: mvn verify -P integration-tests
       
