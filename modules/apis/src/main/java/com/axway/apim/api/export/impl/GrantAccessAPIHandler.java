@@ -55,10 +55,10 @@ public class GrantAccessAPIHandler extends APIResultHandler {
 		for(API api : apis) {
 			try {
 				APIManagerAdapter.getInstance().apiAdapter.grantClientOrganization(orgs, api, hasError);
-				LOG.info("API: "+api.toStringHuman()+" granted access to orgs: " + orgs.toString());
+				LOG.info("API: {} granted access to orgs: {}",api.toStringHuman(), orgs);
 			} catch(Exception e) {
 				result.setError(ErrorCode.ERR_GRANTING_ACCESS_TO_API);
-				LOG.error("Error granting access to API: " + api.toStringHuman() + " for organizations: "+orgs+" Error message: " + e.getMessage());
+				LOG.error("Error granting access to API:  {}  for organizations: {} Error message: {}" ,api.toStringHuman(), orgs, e.getMessage());
 			}
 		}
 		System.out.println("Done!");

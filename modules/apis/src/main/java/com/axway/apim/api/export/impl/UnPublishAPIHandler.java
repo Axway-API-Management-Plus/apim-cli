@@ -30,7 +30,7 @@ public class UnPublishAPIHandler extends APIResultHandler {
 					statusManager.update(api, API.STATE_UNPUBLISHED, true);
 				} catch(Exception e) {
 					result.setError(ErrorCode.ERR_UNPUBSLISH_API);
-					LOG.error("Error unpublishing API: " + api.getName());
+					LOG.error("Error un publishing API: {}" , api.getName());
 				}
 			}
 			System.out.println("Done!");

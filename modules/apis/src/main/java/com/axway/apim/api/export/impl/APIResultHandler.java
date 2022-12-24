@@ -70,12 +70,12 @@ public abstract class APIResultHandler {
         }
     }
 
-    public APIResultHandler(APIExportParams params) {
+    protected APIResultHandler(APIExportParams params) {
         this.params = params;
         this.result = new Result();
     }
 
-    public APIResultHandler(APIExportParams params, Result result) {
+    protected APIResultHandler(APIExportParams params, Result result) {
         this.params = params;
         this.result = result;
     }
@@ -248,14 +248,14 @@ public abstract class APIResultHandler {
     protected void validateFolder(File localFolder) throws AppException {
         if (localFolder.exists()) {
             if (params.isDeleteTarget()) {
-                LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
+                LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
                 try {
                     FileUtils.deleteDirectory(localFolder);
                 } catch (IOException e) {
                     throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
                 }
             } else {
-                LOG.warn("Local export folder: " + localFolder + " already exists. API will not be exported. (You may set -deleteTarget)");
+                LOG.warn("Local export folder: {} already exists. API will not be exported. (You may set -deleteTarget)", localFolder);
                 return;
             }
         }

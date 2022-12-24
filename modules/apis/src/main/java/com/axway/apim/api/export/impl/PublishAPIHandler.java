@@ -28,7 +28,7 @@ public class PublishAPIHandler extends APIResultHandler {
 				statusManager.update(api, API.STATE_PUBLISHED, api.getVhost(), true);
 			} catch(Exception e) {
 				result.setError(ErrorCode.ERR_PUBLISH_API);
-				LOG.error("Error publishing API: " + api.getName());
+				LOG.error("Error publishing API: {} " , api.getName());
 			}
 		}
 		System.out.println("Done!");

@@ -40,9 +40,9 @@ public class ApproveAPIHandler extends APIResultHandler {
 		for(API api : apis) {
 			try {
 				APIManagerAdapter.getInstance().apiAdapter.publishAPI(api, ((APIApproveParams)params).getPublishVhost());
-				LOG.info("API: "+api.getName()+" "+api.getVersion()+" ("+api.getId()+") successfully approved/published.");
+				LOG.info("API: {} {} {} successfully approved/published.", api.getName(), api.getVersion(), api.getId());
 			} catch(Exception e) {
-				LOG.error("Error approving API: " + api.getName()+" "+api.getVersion()+" ("+api.getId()+")");
+				LOG.error("Error approving API: {} {} {} " , api.getName(), api.getVersion(), api.getId());
 				result.setError(ErrorCode.ERR_APPROVING_API);
 			}
 		}

@@ -38,7 +38,7 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
     @Override
     public void execute(List<API> apis) throws AppException {
         cal.add(Calendar.DAY_OF_YEAR, checkCertParams.getNumberOfDays());
-        LOG.info("Going to check certificate expiration of: " + apis.size() + " selected API(s) within the next " + checkCertParams.getNumberOfDays() + " days (Not valid after: " + formatDate(cal.getTime().getTime()) + ").");
+        LOG.info("Going to check certificate expiration of: {} selected API(s) within the next {} days (Not valid after: {})", apis.size(), checkCertParams.getNumberOfDays(), formatDate(cal.getTime().getTime()));
         List<ApiPlusCert> expiredCerts = new ArrayList<>();
         for (API api : apis) {
             if (api.getCaCerts() == null) continue;

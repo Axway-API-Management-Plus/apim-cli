@@ -51,7 +51,6 @@ public class JsonAPIExporter extends APIResultHandler {
 			try {
 				saveAPILocally(exportAPI);
 			} catch (AppException e) {
-				LOG.error("Can't export API: " + e.getMessage() + " Please check in API-Manager UI the API is valid.", e);
 				throw e;
 			}
 		}
@@ -75,7 +74,7 @@ public class JsonAPIExporter extends APIResultHandler {
 
 		String apiPath = getAPIExportFolder(exportAPI.getPath());
 		File localFolder = new File(this.givenExportFolder +File.separator+ getVHost(exportAPI) + apiPath);
-		LOG.debug("Going to export API: '"+exportAPI.toStringShort()+"' into folder: " + localFolder);
+		LOG.debug("Going to export API: {} into folder: {} ", exportAPI.toStringShort(), localFolder);
 		validateFolder(localFolder);
 		APISpecification apiDef = exportAPI.getAPIDefinition();
 		// Skip processing if API definition is not available due to original API cloned and deleted.
@@ -96,7 +95,6 @@ public class JsonAPIExporter extends APIResultHandler {
 		}
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new APIExportSerializerModifier()));
-		//mapper.registerModule(new SimpleModule().addSerializer(new PolicyToNameSerializer()));
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		FilterProvider filters = new SimpleFilterProvider()
 				.addFilter("CaCertFilter",
@@ -118,7 +116,7 @@ public class JsonAPIExporter extends APIResultHandler {
 		if(exportAPI.getCaCerts()!=null && !exportAPI.getCaCerts().isEmpty()) {
 			storeCaCerts(localFolder, exportAPI.getCaCerts());
 		}
-		LOG.info("Successfully exported API: '"+exportAPI.toStringShort()+"' into folder: " + localFolder.getAbsolutePath());
+		LOG.info("Successfully exported API: {} into folder: {}",exportAPI.toStringShort() , localFolder.getAbsolutePath());
 		if(!APIManagerAdapter.hasAdminAccount()) {
 			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
 			LOG.warn("- No Quotas has been exported for the API");

@@ -39,7 +39,7 @@ public class DeleteAPIHandler extends APIResultHandler {
 				statusManager.update(api, API.STATE_DELETED, true);
 			} catch(Exception e) {
 				result.setError(ErrorCode.ERR_DELETING_API);
-				LOG.error("Error deleting API: " + api.getName());
+				LOG.error("Error deleting API: {}" , api.getName());
 			}
 		}
 		System.out.println("Done!");
