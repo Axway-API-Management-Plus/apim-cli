@@ -26,6 +26,8 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Maven Build and Unit Test 
         run: mvn clean test
+      - name: Crate docker cache directory
+        run: mkdir -p ~/cache-docker
       - name: Cache docker images
         id: cache-docker
         uses: actions/cache@v3
