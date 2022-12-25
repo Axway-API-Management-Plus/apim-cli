@@ -294,7 +294,7 @@ public class APIMgrAppsAdapter {
     void addAPIAccess(ClientApplication app, boolean addAPIAccess) throws AppException {
         if (!addAPIAccess) return;
         try {
-            List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app, Type.APPLICATIONS, true);
+            List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app, Type.applications, true);
             app.getApiAccess().addAll(apiAccess);
         } catch (AppException e) {
             throw new AppException("Error reading application API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
@@ -549,7 +549,7 @@ public class APIMgrAppsAdapter {
             return;
         }
         APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
-        accessAdapter.saveAPIAccess(app.getApiAccess(), app, Type.APPLICATIONS);
+        accessAdapter.saveAPIAccess(app.getApiAccess(), app, Type.applications);
     }
 
     private void manageOAuthResources(ClientApplication desiredApp, ClientApplication actualApp) throws AppException {

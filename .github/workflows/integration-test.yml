@@ -26,8 +26,6 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Maven Build and Unit Test 
         run: mvn clean test
-      - name: Crate docker cache directory
-        run: mkdir -p ~/cache-docker
       - name: Cache docker images
         id: cache-docker
         uses: actions/cache@v3
@@ -44,6 +42,7 @@ jobs:
       - if: steps.cache-docker.outputs.cache-hit != 'true'
         name: Pull and Save docker images
         run: |
+          mkdir -p ~/cache-docker
           docker pull $APIM_DOCKER_IMAGE
           docker save -o ~/cache-docker/$CACHE_FILE_APIM $APIM_DOCKER_IMAGE
           docker pull $CASSANDRA_DOCKER_IMAGE

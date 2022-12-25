@@ -239,7 +239,7 @@ public class APIManagerOrganizationAdapter {
     void addAPIAccess(Organization org, boolean addAPIAccess) throws Exception {
         if (!addAPIAccess) return;
         try {
-            List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(org, Type.ORGANIZATIONS, true);
+            List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(org, Type.organizations, true);
             org.getApiAccess().addAll(apiAccess);
         } catch (Exception e) {
             throw new AppException("Error reading organizations API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
@@ -255,7 +255,7 @@ public class APIManagerOrganizationAdapter {
             return;
         }
         APIManagerAPIAccessAdapter accessAdapter = APIManagerAdapter.getInstance().accessAdapter;
-        accessAdapter.saveAPIAccess(org.getApiAccess(), org, Type.ORGANIZATIONS);
+        accessAdapter.saveAPIAccess(org.getApiAccess(), org, Type.organizations);
     }
 
     void addImage(Organization org, boolean addImage) throws Exception {

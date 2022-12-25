@@ -40,8 +40,8 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 public class APIManagerAPIAccessAdapter {
 
     public enum Type {
-        ORGANIZATIONS("Organization"),
-        APPLICATIONS("Application");
+        organizations("Organization"),
+        applications("Application");
         final String niceName;
 
         Type(String niceName) {
@@ -59,8 +59,8 @@ public class APIManagerAPIAccessAdapter {
 
     public APIManagerAPIAccessAdapter() {
         cmd = CoreParameters.getInstance();
-        caches.put(Type.APPLICATIONS, APIManagerAdapter.getCache(CacheType.APPLICATION_API_ACCESS_CACHE, String.class, String.class));
-        caches.put(Type.ORGANIZATIONS, APIManagerAdapter.getCache(CacheType.ORGANIZATION_API_ACCESS_CACHE, String.class, String.class));
+        caches.put(Type.applications, APIManagerAdapter.getCache(CacheType.APPLICATION_API_ACCESS_CACHE, String.class, String.class));
+        caches.put(Type.organizations, APIManagerAdapter.getCache(CacheType.ORGANIZATION_API_ACCESS_CACHE, String.class, String.class));
     }
 
     Map<Type, Map<String, String>> apiManagerResponse = new HashMap<>();
@@ -241,11 +241,11 @@ public class APIManagerAPIAccessAdapter {
 
     public void removeClientOrganization(List<Organization> removingActualOrgs, String apiId) throws AppException {
         for (Organization org : removingActualOrgs) {
-            List<APIAccess> orgsApis = getAPIAccess(org, Type.ORGANIZATIONS);
+            List<APIAccess> orgsApis = getAPIAccess(org, Type.organizations);
             for (APIAccess apiAccess : orgsApis) {
                 if (apiAccess.getApiId().equals(apiId)) {
                     try {
-                        deleteAPIAccess(apiAccess, org, Type.ORGANIZATIONS);
+                        deleteAPIAccess(apiAccess, org, Type.organizations);
                     } catch (Exception e) {
                         LOG.error("Can't delete API-Access for organization. ");
                         throw new AppException("Can't delete API-Access for organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);

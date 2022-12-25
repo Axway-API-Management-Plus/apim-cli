@@ -1,10 +1,10 @@
 package com.axway.apim.adapter.apis;
 
 public enum StatusEndpoint {
-    UNPUBLISHED("unpublish"),
-    PUBLISHED("publish"),
-    DEPRECATED("deprecate"),
-    UNDEPRECATED("undeprecate");
+    unpublished("unpublish"),
+    published("publish"),
+    deprecated("deprecate"),
+    undeprecated("undeprecate");
 
     final String endpoint;
 

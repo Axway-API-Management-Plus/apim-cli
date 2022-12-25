@@ -27,12 +27,12 @@ public class APIStatusManager {
 	private boolean updateVHostRequired = false;
 
 	private enum StatusChangeMap {
-		UNPUBLISHED(new String[] { APIStatusManager.PUBLISHED, APIStatusManager.DELETED }),
-		PUBLISHED(new String[] { APIStatusManager.UNPUBLISHED, APIStatusManager.DEPRECATED }),
-		DELETED(new String[] {}),
-		DEPRECATED(new String[] { APIStatusManager.UNPUBLISHED, APIStatusManager.UNDEPRECATED }),
-		UNDEPRECATED(new String[] { APIStatusManager.PUBLISHED, APIStatusManager.UNPUBLISHED }),
-		PENDING(new String[] { APIStatusManager.DELETED });
+		unpublished(new String[] { APIStatusManager.PUBLISHED, APIStatusManager.DELETED }),
+		published(new String[] { APIStatusManager.UNPUBLISHED, APIStatusManager.DEPRECATED }),
+		deleted(new String[] {}),
+		deprecated(new String[] { APIStatusManager.UNPUBLISHED, APIStatusManager.UNDEPRECATED }),
+		undeprecated(new String[] { APIStatusManager.PUBLISHED, APIStatusManager.UNPUBLISHED }),
+		pending(new String[] { APIStatusManager.DELETED });
 
 		private final String[] possibleStates;
 
