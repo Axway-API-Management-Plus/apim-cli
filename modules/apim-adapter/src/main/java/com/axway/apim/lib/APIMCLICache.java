@@ -13,8 +13,8 @@ import org.ehcache.spi.loaderwriter.CacheWritingException;
 
 public class APIMCLICache<K, V> implements Cache<K, V> {
 	
-	private Cache<K, V> cache;
-	private String prefix;
+	private final Cache<K, V> cache;
+	private final String prefix;
 	
 	public APIMCLICache(Cache<K, V> cache, String prefix) {
 		super();

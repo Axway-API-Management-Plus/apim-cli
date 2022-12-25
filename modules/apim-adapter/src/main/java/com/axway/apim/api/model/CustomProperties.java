@@ -43,7 +43,7 @@ public class CustomProperties {
 		this.api = api;
 	}
 	
-	public static enum Type {
+	public enum Type {
 		api("API"), 
 		user("User"), 
 		organization("Organization"), 
@@ -51,7 +51,7 @@ public class CustomProperties {
 		
 		public String niceName;
 
-		private Type(String niceName) {
+		Type(String niceName) {
 			this.niceName = niceName;
 		}
 	}

@@ -149,7 +149,7 @@ public class ExportAPI {
     }
 
 
-    public TagMap<String, String[]> getTags() {
+    public TagMap getTags() {
         if (this.actualAPIProxy.getTags() == null) return null;
         if (this.actualAPIProxy.getTags().isEmpty()) return null;
         return this.actualAPIProxy.getTags();
@@ -341,7 +341,7 @@ public class ExportAPI {
             APIMethod apiMethod = new APIMethod();
             apiMethod.setName(actualMethod.getName());
             apiMethod.setSummary(actualMethod.getSummary());
-            TagMap<String, String[]> tagMap = actualMethod.getTags();
+            TagMap tagMap = actualMethod.getTags();
             if (tagMap != null && tagMap.size() > 0)
                 apiMethod.setTags(actualMethod.getTags());
             apiMethodsTransformed.add(apiMethod);

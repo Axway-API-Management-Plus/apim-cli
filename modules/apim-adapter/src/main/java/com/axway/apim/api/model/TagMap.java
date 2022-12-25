@@ -3,7 +3,7 @@ package com.axway.apim.api.model;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
-public class TagMap<K, V> extends LinkedHashMap<String, String[]> {
+public class TagMap extends LinkedHashMap<String, String[]> {
 
     /**
      *
@@ -16,7 +16,7 @@ public class TagMap<K, V> extends LinkedHashMap<String, String[]> {
     public boolean equals(Object o) {
         if (o == this) return true;
         if (!(o instanceof TagMap)) return false;
-        TagMap<String, String[]> otherTagMap = (TagMap<String, String[]>) o;
+        TagMap otherTagMap = (TagMap) o;
         if (otherTagMap.size() != size()) return false;
         for (String tagName : this.keySet()) {
             if (!otherTagMap.containsKey(tagName)) return false;

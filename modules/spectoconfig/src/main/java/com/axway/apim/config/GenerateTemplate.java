@@ -159,7 +159,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         }
 
         List<Tag> tags = openAPI.getTags();
-        TagMap<String, String[]> apiManagerTags = new TagMap<>();
+        TagMap apiManagerTags = new TagMap();
         for (Tag tag : tags) {
             String[] value = new String[1];
             value[0] = tag.getName();

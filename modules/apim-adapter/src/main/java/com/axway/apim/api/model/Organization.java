@@ -53,7 +53,7 @@ public class Organization extends AbstractEntity implements CustomPropertiesEnti
 	
 	@JsonSerialize (using = APIAccessSerializer.class)
 	@JsonProperty("apis")
-	private List<APIAccess> apiAccess = new ArrayList<APIAccess>();
+	private List<APIAccess> apiAccess = new ArrayList<>();
 	
 	public Organization() {
 		super();

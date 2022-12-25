@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD) //can use in method only.
 public @interface APIManagerConfigAnnotation {
 	
-	public enum ConfigType {
+	enum ConfigType {
 		APIManager("API Manager settings"),
 		APIPortal("API Portal settings"),
 		General("General settings"),
@@ -32,9 +32,9 @@ public @interface APIManagerConfigAnnotation {
 		}
 	}
 	
-	public ConfigType configType();
+	ConfigType configType();
 
-	public String description();
+	String description();
 	
-	public String name();
+	String name();
 }

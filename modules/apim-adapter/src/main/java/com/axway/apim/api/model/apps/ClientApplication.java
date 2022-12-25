@@ -62,17 +62,17 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 	
 	@JsonSerialize (using = APIAccessSerializer.class)
 	@JsonProperty("apis")
-	private List<APIAccess> apiAccess = new ArrayList<APIAccess>();
+	private List<APIAccess> apiAccess = new ArrayList<>();
 
 	@JsonProperty("permissions")
-	private List<ApplicationPermission> permissions = new ArrayList<ApplicationPermission>();	
+	private List<ApplicationPermission> permissions = new ArrayList<>();
 	
-	private List<ClientAppCredential> credentials = new ArrayList<ClientAppCredential>(); 
+	private List<ClientAppCredential> credentials = new ArrayList<>();
 	
 	private APIQuota appQuota;
 	
 	@JsonProperty("appScopes")
-	private List<ClientAppOauthResource> oauthResources = new ArrayList<ClientAppOauthResource>();
+	private List<ClientAppOauthResource> oauthResources = new ArrayList<>();
 	
 	@JsonDeserialize( using = OrganizationDeserializer.class)
 	@JsonAlias({ "organization", "organizationId" })	

@@ -307,7 +307,7 @@ public class APIFilterTest {
 	@Test
 	public void testTagFilter() throws AppException {
 		API testAPI = new API();
-		TagMap<String, String[]> tags = new TagMap<>();
+		TagMap tags = new TagMap();
 		tags.put("group1", new String[] {"tagValue1", "tagValue2"});
 		tags.put("group2", new String[] {"tagValue3", "tagValue4"});
 		testAPI.setTags(tags);

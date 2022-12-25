@@ -89,11 +89,4 @@ public class ApplicationPermission {
 	public String toString() {
 		return "ApplicationPermission [username=" + getUsername() + ", permission=" + getPermission() + "]";
 	}
-	
-	public static ApplicationPermission createAllPermissions(SharePermission perm) {
-		ApplicationPermission allPerm = new ApplicationPermission();
-		allPerm.setUsername("ALL");
-		allPerm.setPermission(perm);
-		return allPerm;
-	}
 }

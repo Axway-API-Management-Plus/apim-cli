@@ -95,7 +95,7 @@ public class DoNothingCacheManager implements CacheManager {
 
 	@Override
 	public <K, V> Cache<K, V> getCache(String arg0, Class<K> arg1, Class<V> arg2) {
-		return new DoNothingCache<K, V>();
+		return new DoNothingCache<>();
 	}
 
 	@Override

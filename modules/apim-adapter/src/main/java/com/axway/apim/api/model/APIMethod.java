@@ -21,7 +21,7 @@ public class APIMethod {
 	private String descriptionMarkdown;
 	private String descriptionUrl;
 	private String descriptionType;
-	private TagMap<String, String[]> tags = null;
+	private TagMap tags = null;
 
 	public String getId() {
 		return id;
@@ -103,11 +103,11 @@ public class APIMethod {
 		this.descriptionUrl = descriptionUrl;
 	}
 
-	public TagMap<String, String[]> getTags() {
+	public TagMap getTags() {
 		return tags;
 	}
 
-	public void setTags(TagMap<String, String[]> tags) {
+	public void setTags(TagMap tags) {
 		this.tags = tags;
 	}
 	public String getDescriptionType() {

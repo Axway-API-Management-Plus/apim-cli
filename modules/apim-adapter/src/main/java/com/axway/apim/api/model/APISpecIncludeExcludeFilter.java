@@ -10,11 +10,11 @@ public class APISpecIncludeExcludeFilter {
 	
 	private Map<String, List<String>> pathMap;
 	
-	private List<String> paths = new ArrayList<String>();
+	private List<String> paths = new ArrayList<>();
 	
-	private List<String> tags = new ArrayList<String>();
+	private List<String> tags = new ArrayList<>();
 	
-	private List<String> models = new ArrayList<String>();
+	private List<String> models = new ArrayList<>();
 	
 	public List<String> getPaths() {
 		return paths;
@@ -42,13 +42,13 @@ public class APISpecIncludeExcludeFilter {
 	
 	public List<String> getHttpMethods(String path, boolean includeWildcard) {
 		if(pathMap==null) {
-			pathMap = new HashMap<String, List<String>>();
+			pathMap = new HashMap<>();
 			for(String pathAndMethod : paths) {
 				String p = pathAndMethod.split(":")[0];
 				String v = pathAndMethod.split(":")[1];
 				List<String> verbs = pathMap.get(p);
 				if(verbs == null) {
-					verbs = new ArrayList<String>();
+					verbs = new ArrayList<>();
 				}
 				verbs.add(v.toLowerCase());
 				pathMap.put(p, verbs);
@@ -68,29 +68,17 @@ public class APISpecIncludeExcludeFilter {
 		// If filter has both configured check them in combination
 		if(pathMap!=null && !pathMap.isEmpty() && this.tags!=null && !this.tags.isEmpty()) {
 			if(httpMethods4Path==null) return false;
-			if((httpMethods4Path.contains(httpMethod.toLowerCase()) || httpMethods4Path.contains("*")) && containsTags(tags)) {
-				return true;
-			} else {
-				return false;
-			}
+			return (httpMethods4Path.contains(httpMethod.toLowerCase()) || httpMethods4Path.contains("*")) && containsTags(tags);
 		}
 		if(pathAndTags) return false;
 		// 
 		if(pathMap!=null && !pathMap.isEmpty()) {
 			if(httpMethods4Path==null) return false;
-			if(httpMethods4Path.contains(httpMethod.toLowerCase()) || httpMethods4Path.contains("*")) {
-				return true;
-			} else {
-				return false;
-			}
+			return httpMethods4Path.contains(httpMethod.toLowerCase()) || httpMethods4Path.contains("*");
 		}
 		// Check is the tag is configured
 		if(this.tags!=null && !this.tags.isEmpty()) {
-			if(containsTags(tags)) {
-				return true;
-			} else {
-				return false;
-			}
+			return containsTags(tags);
 		}
 		return false;
 	}

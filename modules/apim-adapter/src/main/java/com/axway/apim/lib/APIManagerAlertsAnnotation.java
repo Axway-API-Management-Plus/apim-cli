@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD) //can use in method only.
 public @interface APIManagerAlertsAnnotation {
 	
-	public enum AlertType {
+	enum AlertType {
 		Application("Application"),
 		ApplicationAPIAccess("Application - API access"),
 		ApplicationCredentials("Application Credentials"),
@@ -31,9 +31,9 @@ public @interface APIManagerAlertsAnnotation {
 		}
 	}
 	
-	public AlertType alertType();
+	AlertType alertType();
 
-	public String description() default "";
+	String description() default "";
 	
-	public String name();
+	String name();
 }

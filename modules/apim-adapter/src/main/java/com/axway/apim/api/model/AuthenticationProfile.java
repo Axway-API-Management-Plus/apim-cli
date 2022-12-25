@@ -38,7 +38,7 @@ public class AuthenticationProfile {
 	}
 	
 	public Map<String, Object> getParameters() {
-		if(parameters==null) return new HashMap<String, Object>();
+		if(parameters==null) return new HashMap<>();
 		return parameters;
 	}
 

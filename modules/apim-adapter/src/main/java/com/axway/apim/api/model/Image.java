@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
@@ -63,7 +64,7 @@ public class Image {
     }
 
     public String getFilename() {
-        if (filename.indexOf("/") != -1) {
+        if (filename.contains("/")) {
             return filename;
         } else {
             return filename.substring(filename.lastIndexOf("/") + 1);
@@ -112,7 +113,7 @@ public class Image {
     }
 
     public void setBaseFilename(String baseFilename) {
-        if (baseFilename.indexOf(".") == -1) {
+        if (!baseFilename.contains(".")) {
             baseFilename += getFileExtension();
         }
         this.baseFilename = baseFilename;
@@ -132,7 +133,7 @@ public class Image {
             image.setBaseFilename(file.getName());
             URL imageFromClasspath = Image.class.getClass().getResource(file.getCanonicalPath());
             if (file.exists()) {
-                try (InputStream inputStream = new FileInputStream(file)) {
+                try (InputStream inputStream = Files.newInputStream(file.toPath())) {
                     image.setImageContent(IOUtils.toByteArray(inputStream));
                     return image;
                 }

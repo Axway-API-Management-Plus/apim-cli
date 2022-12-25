@@ -97,7 +97,7 @@ public class APIConfig {
     }
 
 
-    public TagMap<String, String[]> getTags() {
+    public TagMap getTags() {
         return api.getTags();
     }
 
