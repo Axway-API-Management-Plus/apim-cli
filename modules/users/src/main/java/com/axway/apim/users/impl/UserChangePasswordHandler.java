@@ -39,7 +39,7 @@ public class UserChangePasswordHandler extends UserResultHandler {
 			try {
 				APIManagerAdapter.getInstance().userAdapter.changepassword(newPassword, user);
 			} catch(Exception e) {
-				LOG.error("Error changing password of user: " + user.getName());
+				LOG.error("Error changing password of user: {}", user.getName());
 			}
 		}
 		System.out.println("Done!");

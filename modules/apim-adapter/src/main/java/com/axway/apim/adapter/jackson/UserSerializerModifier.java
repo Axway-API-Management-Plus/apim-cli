@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
 public class UserSerializerModifier extends BeanSerializerModifier {
 	
-	boolean serializeAsName = false;
+	boolean serializeAsName;
 	
 	
 	public UserSerializerModifier(boolean serializeAsName) {
@@ -16,7 +16,6 @@ public class UserSerializerModifier extends BeanSerializerModifier {
 		this.serializeAsName = serializeAsName;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
 		if (beanDesc.getBeanClass() == User.class) {

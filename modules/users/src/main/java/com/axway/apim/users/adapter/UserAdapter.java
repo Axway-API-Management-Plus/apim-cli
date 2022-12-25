@@ -17,7 +17,7 @@ public abstract class UserAdapter {
 	
 	UserImportParams importParams;
 
-	public UserAdapter(UserImportParams importParams) {
+	protected UserAdapter(UserImportParams importParams) {
 		this.importParams = importParams;
 	}
 	

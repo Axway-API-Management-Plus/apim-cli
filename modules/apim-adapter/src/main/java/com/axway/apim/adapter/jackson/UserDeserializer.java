@@ -16,8 +16,8 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 public class UserDeserializer extends StdDeserializer<User> {
 	
-	public static enum Params {
-		useLoginName
+	public enum Params {
+		USE_LOGIN_NAME
 	}
 	
 	static Logger LOG = LoggerFactory.getLogger(UserDeserializer.class);
@@ -44,7 +44,7 @@ public class UserDeserializer extends StdDeserializer<User> {
 			try {
 				user = APIManagerAdapter.getInstance().userAdapter.getUserForLoginName(node.asText());
 			} catch (AppException e) {
-				LOG.error("Error reading user with loginName: " + node.asText() + " from API-Manager.");
+				LOG.error("Error reading user with loginName: {} from API-Manager.", node.asText());
 			}
 			if(user!=null) return user;
 			// User might be null in some situations, create a new user with base init
@@ -56,11 +56,11 @@ public class UserDeserializer extends StdDeserializer<User> {
 			try {
 				user = APIManagerAdapter.getInstance().userAdapter.getUserForId(node.asText());
 			} catch (AppException e) {
-				LOG.error("Error reading user with ID: " + node.asText() + " from API-Manager.");
+				LOG.error("Error reading user with ID: {} from API-Manager.", node.asText());
 			}
 			if(user!=null) return user;
 			// This this should never happen, as the ID must be a valid API-Manager User-ID
-			LOG.error("User with ID: " + node.asText() + " not found.");
+			LOG.error("User with ID: {} not found.", node.asText());
 			user = new User();
 			user.setId(node.asText());
 			return user;
@@ -68,7 +68,7 @@ public class UserDeserializer extends StdDeserializer<User> {
 	}
 	
 	private Boolean isUseLoginName(DeserializationContext ctxt) {
-		if(ctxt.getAttribute(Params.useLoginName)==null) return false;
-		return (Boolean)ctxt.getAttribute(Params.useLoginName);
+		if(ctxt.getAttribute(Params.USE_LOGIN_NAME)==null) return false;
+		return (Boolean)ctxt.getAttribute(Params.USE_LOGIN_NAME);
 	}
 }

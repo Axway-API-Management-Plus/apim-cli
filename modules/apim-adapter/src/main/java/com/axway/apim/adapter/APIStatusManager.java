@@ -82,7 +82,7 @@ public class APIStatusManager {
 			LOG.debug("Desired and actual status equal. No need to update status!");
 			return;
 		}
-		LOG.debug("Updating API-Status from: '" + apiToUpdate.getState() + "' to '" + desiredState + "'");
+		LOG.debug("Updating API-Status from: {} to {}", apiToUpdate.getState(),desiredState);
 		if(!enforceBreakingChange) { 
 			if(StatusChangeRequiresEnforce.getEnum(apiToUpdate.getState())!=null && 
 					StatusChangeRequiresEnforce.valueOf(apiToUpdate.getState()).enforceRequired.contains(desiredState)) {
@@ -114,19 +114,18 @@ public class APIStatusManager {
 			}
 			if (statusMovePossible) {
 				if(intermediateState!=null) {
-					LOG.debug("Required intermediate state: "+intermediateState);
+					LOG.debug("Required intermediate state: {}",intermediateState);
 					// In case, we can't process directly, we have to perform an intermediate state change
 					new APIStatusManager().update(apiToUpdate, intermediateState, vhost, enforceBreakingChange);
 					if(desiredState.equals(apiToUpdate.getState())) return;
 				}
 			} else {
-				LOG.error("The status change from: " + apiToUpdate.getState() + " to " + desiredState + " is not possible!");
+				LOG.error("The status change from: {} to: {} is not possible!", apiToUpdate.getState(), desiredState);
 				throw new AppException("The status change from: '" + apiToUpdate.getState() + "' to '" + desiredState + "' is not possible!", ErrorCode.CANT_UPDATE_API_STATUS);
 			}
 			apiToUpdate.setState(desiredState);
 			if(desiredState.equals(API.STATE_DELETED)) {
 				// If an API in state unpublished or pending, also an orgAdmin can delete it
-				//boolean useAdmin = (actualState.getState().equals(API.STATE_UNPUBLISHED) || actualState.getState().equals(API.STATE_PENDING)) ? false : true; 
 				apimAdapter.apiAdapter.deleteAPIProxy(apiToUpdate);
 				// Additionally we need to delete the BE-API
 				apimAdapter.apiAdapter.deleteBackendAPI(apiToUpdate);

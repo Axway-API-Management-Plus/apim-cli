@@ -1,13 +1,25 @@
 package com.axway.apim.adapter;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
+import com.axway.apim.adapter.apis.*;
+import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
+import com.axway.apim.adapter.customProperties.APIManager762CustomPropertiesAdapter;
+import com.axway.apim.adapter.customProperties.APIManagerCustomPropertiesAdapter;
+import com.axway.apim.adapter.user.APIManagerUserAdapter;
+import com.axway.apim.api.model.CaCert;
+import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.User;
+import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.lib.APIMCLICacheManager;
+import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.DoNothingCacheManager;
+import com.axway.apim.lib.StandardImportParams;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.TestIndicator;
+import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -29,39 +41,15 @@ import org.ehcache.xml.XmlConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
-import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
-import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
-import com.axway.apim.adapter.apis.APIManagerAlertsAdapter;
-import com.axway.apim.adapter.apis.APIManagerConfigAdapter;
-import com.axway.apim.adapter.apis.APIManagerOAuthClientProfilesAdapter;
-import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
-import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter;
-import com.axway.apim.adapter.apis.APIManagerQuotaAdapter;
-import com.axway.apim.adapter.apis.APIManagerRemoteHostsAdapter;
-import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
-import com.axway.apim.adapter.customProperties.APIManager762CustomPropertiesAdapter;
-import com.axway.apim.adapter.customProperties.APIManagerCustomPropertiesAdapter;
-import com.axway.apim.adapter.user.APIManagerUserAdapter;
-import com.axway.apim.api.model.CaCert;
-import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.User;
-import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.lib.APIMCLICacheManager;
-import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.DoNothingCacheManager;
-import com.axway.apim.lib.StandardImportParams;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.TestIndicator;
-import com.axway.apim.lib.utils.Utils;
-import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.lib.utils.rest.DELRequest;
-import com.axway.apim.lib.utils.rest.GETRequest;
-import com.axway.apim.lib.utils.rest.POSTRequest;
-import com.axway.apim.lib.utils.rest.RestAPICall;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * The APIContract reflects the actual existing API in the API-Manager.
@@ -114,17 +102,17 @@ public class APIManagerAdapter {
     public APIMgrAppsAdapter appAdapter;
     public APIManagerUserAdapter userAdapter;
 
-
+    private static final HttpHelper httpHelper = new HttpHelper();
 
     public static synchronized APIManagerAdapter getInstance() throws AppException {
         if (APIManagerAdapter.instance == null) {
             if (!TestIndicator.getInstance().isTestRunning()) {
                 APIManagerAdapter.instance = new APIManagerAdapter();
-                LOG.info("Successfully connected to API-Manager (" + getApiManagerVersion() + ") on: " + CoreParameters.getInstance().getAPIManagerURL());
+                LOG.info("Successfully connected to API-Manager ({}) on: {}",getApiManagerVersion(), CoreParameters.getInstance().getAPIManagerURL());
             } else {
                 APIManagerAdapter.apiManagerVersion = "7.7.0";
                 APIManagerAdapter.instance = new APIManagerAdapter();
-                LOG.info("Successfully connected to MOCKED API-Manager (" + getApiManagerVersion() + ")");
+                LOG.info("Successfully connected to MOCKED API-Manager {}", getApiManagerVersion());
             }
         }
         APIManagerAdapter.initialized = true;
@@ -183,7 +171,6 @@ public class APIManagerAdapter {
         URI uri = null;
         if (cmd.isIgnoreAdminAccount() && useAdminClient) return;
         if (hasAdminAccount && useAdminClient) return; // Already logged in with an Admin-Account.
-        HttpResponse httpResponse = null;
         try {
             uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/login").build();
             List<NameValuePair> params = new ArrayList<>();
@@ -194,32 +181,28 @@ public class APIManagerAdapter {
                 if (usernamePassword == null) return;
                 username = usernamePassword[0];
                 password = usernamePassword[1];
-                LOG.debug("Logging in with Admin-User: '" + username + "'");
+                LOG.debug("Logging in with Admin-User: {}", username);
             } else {
                 username = cmd.getUsername();
                 password = cmd.getPassword();
-                LOG.debug("Logging in with User: '" + username + "'");
+                LOG.debug("Logging in with User: {}", username);
             }
             // This forces to create a client which is re-used based on useAdmin
             APIMHttpClient client = APIMHttpClient.getInstance(useAdminClient);
             params.add(new BasicNameValuePair("username", username));
             params.add(new BasicNameValuePair("password", password));
             POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, useAdminClient);
-            httpResponse = loginRequest.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            int statusCode = httpHelper.execute(loginRequest);
             if (statusCode != 303 && (statusCode < 200 || statusCode > 299)) {
-                LOG.warn("Login failed with statusCode: " + statusCode + " ... Try again in " + cmd.getRetryDelay() + " milliseconds. (you may set -retryDelay <milliseconds>)");
+                LOG.warn("Login failed with statusCode: {} ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", statusCode, cmd.getRetryDelay());
                 Thread.sleep(cmd.getRetryDelay());
-                httpResponse = loginRequest.execute();
-                statusCode = httpResponse.getStatusLine().getStatusCode();
+                statusCode = httpHelper.execute(loginRequest);
                 if (statusCode != 303) {
-                    //LOG.error("Login finally failed with statusCode: " +statusCode+ ". Got response: '"+response+"'");
                     throw new AppException("Login finally failed with statusCode: " + statusCode, ErrorCode.API_MANAGER_LOGIN_FAILED);
                 } else {
-                    LOG.info("Successfully logged in on retry. Received Status-Code: " + statusCode);
+                    LOG.info("Successfully logged in on retry. Received Status-Code: {}" , statusCode);
                 }
             }
-
             User user = getCurrentUser(useAdminClient);
             if (user.getRole().equals("admin")) {
                 this.hasAdminAccount = true;
@@ -230,14 +213,8 @@ public class APIManagerAdapter {
             } else {
                 throw new AppException("Not supported user-role: " + user.getRole() + "", ErrorCode.API_MANAGER_COMMUNICATION);
             }
-        } catch (Exception e) {
+        } catch (IOException | URISyntaxException | InterruptedException  e) {
             throw new AppException("Can't login to API-Manager " + uri, ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
@@ -249,7 +226,7 @@ public class APIManagerAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
                     String response = EntityUtils.toString(httpResponse.getEntity());
-                    LOG.warn("Logout failed with statusCode: " + statusCode + ". Got response: '" + response + "'");
+                    LOG.warn("Logout failed with statusCode: {}  Got response: {}", statusCode, response);
                 }
             }
         } catch (Exception e) {
@@ -263,13 +240,12 @@ public class APIManagerAdapter {
     }
 
     public static User getCurrentUser(boolean useAdminClient) throws AppException {
-        String currentUser = null;
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/currentuser").build();
             GETRequest currentUserRequest = new GETRequest(uri, useAdminClient);
             try(CloseableHttpResponse httpResponse  = (CloseableHttpResponse) currentUserRequest.execute()) {
                 getCsrfToken(httpResponse, useAdminClient); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
-                currentUser = EntityUtils.toString(httpResponse.getEntity());
+                String currentUser = EntityUtils.toString(httpResponse.getEntity());
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 200) {
                     throw new AppException("Status-Code: " + statusCode + ", Can't get current-user (For admin: " + useAdminClient + ") information on response: '" + currentUser + "'",
@@ -282,9 +258,8 @@ public class APIManagerAdapter {
                 }
                 return user;
             }
-
         } catch (Exception e) {
-            throw new AppException("Error: '" + e.getMessage() + "' while parsing current-user information on response: '" + currentUser + "'",
+            throw new AppException("Error: '" + e.getMessage() + "' while parsing current-user information on response",
                     ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -332,7 +307,7 @@ public class APIManagerAdapter {
                     APIManagerAdapter.cacheManager = new APIMCLICacheManager(ehcacheManager);
                     APIManagerAdapter.cacheManager.init();
                 } catch (StateTransitionException e) {
-                    LOG.warn("Error initiliazing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 3 seconds. Attempts: " + initAttempts + "/" + maxAttempts);
+                    LOG.warn("Error initializing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 3 seconds. Attempts: {}/{}" , initAttempts, maxAttempts);
                     try {
                         Thread.sleep(3000);
                     } catch (InterruptedException ignore) {
@@ -353,7 +328,7 @@ public class APIManagerAdapter {
         Cache<K, V> cache = APIManagerAdapter.cacheManager.getCache(cacheType.name(), key, value);
         if (CoreParameters.getInstance().clearCaches() != null && CoreParameters.getInstance().clearCaches().contains(cacheType)) {
             cache.clear();
-            LOG.info("Cache: " + cacheType.name() + " successfully cleared.");
+            LOG.info("Cache: {} successfully cleared.",  cacheType.name());
         }
         return cache;
     }
@@ -392,7 +367,7 @@ public class APIManagerAdapter {
             if (requestedSP != 0 && datedManagerVersion != null) return true;
             if (managerSP < requestedSP) return false;
         } catch (Exception e) {
-            LOG.warn("Can't parse API-Manager version: '" + apiManagerVersion + "'. Requested version was: '" + version + "'. Returning false!");
+            LOG.warn("Can't parse API-Manager version: {} Requested version was: {} Returning false!", apiManagerVersion, version);
             return false;
         }
         return true;
@@ -404,7 +379,7 @@ public class APIManagerAdapter {
                 String dateVersion = managerVersion.get(2);
                 return new SimpleDateFormat("yyyyMMdd").parse(dateVersion);
             } catch (Exception e) {
-                LOG.trace("API-Manager version: '" + apiManagerVersion + "' seems not to contain a dated version");
+                LOG.trace("API-Manager version: {} seems not to contain a dated version", apiManagerVersion);
             }
         }
         return null;
@@ -417,7 +392,7 @@ public class APIManagerAdapter {
                 String spVersion = version.substring(version.indexOf(" SP") + 3);
                 spNumber = Integer.parseInt(spVersion);
             } catch (Exception e) {
-                LOG.trace("Can't parse service pack version in version: '" + version + "'");
+                LOG.trace("Can't parse service pack version in version: {}",version);
             }
         }
         return spNumber;
@@ -433,7 +408,7 @@ public class APIManagerAdapter {
             String[] versions = versionWithoutSP.split("\\.");
             majorNumbers.addAll(Arrays.asList(versions));
         } catch (Exception e) {
-            LOG.trace("Can't parse major version numbers in: '" + version + "'");
+            LOG.trace("Can't parse major version numbers in: {}", version);
         }
         return majorNumbers;
     }
@@ -585,7 +560,6 @@ public class APIManagerAdapter {
     public static JsonNode getFileData(byte[] fileFontent, String filename, ContentType contentType) throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/filedata/").build();
-
             HttpEntity entity = MultipartEntityBuilder.create()
                     .addBinaryBody("file", fileFontent, contentType, filename)
                     .build();

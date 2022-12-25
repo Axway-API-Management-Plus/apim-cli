@@ -35,7 +35,7 @@ public class DeleteUserHandler extends UserResultHandler {
 			try {
 				APIManagerAdapter.getInstance().userAdapter.deleteUser(user);
 			} catch(Exception e) {
-				LOG.error("Error deleting user: " + user.getName());
+				LOG.error("Error deleting user: {}", user.getName());
 			}
 		}
 		System.out.println("Done!");

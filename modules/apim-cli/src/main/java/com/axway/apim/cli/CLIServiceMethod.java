@@ -12,10 +12,10 @@ public @interface CLIServiceMethod {
 	/**
 	 * @return the description of the method
 	 */
-	public String description() default "";
+	String description() default "";
 	
 	/**
 	 * @return the name of the method if you don't want to use the original method name
 	 */
-	public String name() default "";
+	String name() default "";
 }

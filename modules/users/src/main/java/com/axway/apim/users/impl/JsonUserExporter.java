@@ -42,17 +42,17 @@ public class JsonUserExporter extends UserResultHandler {
 		String folderName = getExportFolder(user);
 		String targetFolder = params.getTarget();
 		File localFolder = new File(targetFolder +File.separator+ folderName);
-		LOG.info("Going to export users into folder: " + localFolder);
+		LOG.info("Going to export users into folder: {}", localFolder);
 		if(localFolder.exists()) {
 			if(UserExportParams.getInstance().isDeleteTarget()) {
-				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
+				LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
 				try {
 					FileUtils.deleteDirectory(localFolder);
 				} catch (IOException e) {
 					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
 				}				
 			} else {
-				LOG.warn("Local export folder: " + localFolder + " already exists. User will not be exported. (You may set -deleteTarget)");
+				LOG.warn("Local export folder: {} already exists. User will not be exported. (You may set -deleteTarget)", localFolder);
 				this.hasError = true;
 				return;
 			}
@@ -78,7 +78,7 @@ public class JsonUserExporter extends UserResultHandler {
 		if(user.getImage()!=null) {
 			writeBytesToFile(user.getImage().getImageContent(), localFolder+File.separator + user.getImage().getBaseFilename());
 		}
-		LOG.info("Successfully exported user into folder: " + localFolder);
+		LOG.info("Successfully exported user into folder: {}", localFolder);
 		if(!APIManagerAdapter.hasAdminAccount()) {
 			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted to its own organization.");
 		}

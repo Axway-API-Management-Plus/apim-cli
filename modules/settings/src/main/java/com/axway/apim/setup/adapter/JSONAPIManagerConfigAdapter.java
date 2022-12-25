@@ -41,7 +41,7 @@ public class JSONAPIManagerConfigAdapter {
 		try {
 			mapper.configOverride(Map.class).setMergeable(true);
 			baseConfig = mapper.reader()
-					.withAttribute(UserDeserializer.Params.useLoginName, true)
+					.withAttribute(UserDeserializer.Params.USE_LOGIN_NAME, true)
 					.withAttribute(RemotehostDeserializer.Params.validateRemoteHost, true)
 					.forType(APIManagerConfig.class)
 					.readValue(Utils.substituteVariables(configFile));

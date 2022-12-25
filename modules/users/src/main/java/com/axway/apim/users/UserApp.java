@@ -61,7 +61,7 @@ public class UserApp implements APIMCLIServiceProvider {
 		try {
 			params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " + e.getMessage());
+			LOG.error("Error {}" , e.getMessage());
 			return e.getError().getCode();
 		}
 		UserApp app = new UserApp();
@@ -101,19 +101,19 @@ public class UserApp implements APIMCLIServiceProvider {
 		List<User> users = adapter.userAdapter.getUsers(exporter.getFilter());
 		if(users.size()==0) {
 			if(LOG.isDebugEnabled()) {
-				LOG.info("No users found using filter: " + exporter.getFilter());
+				LOG.info("No users found using filter: {}" , exporter.getFilter());
 			} else {
 				LOG.info("No users found based on the given criteria.");
 			}
 		} else {
-			LOG.info("Found " + users.size() + " user(s).");
+			LOG.info("Found {} user(s).", users.size());
 			
 			exporter.export(users);
 			if(exporter.hasError()) {
 				LOG.info("");
 				LOG.error("Please check the log. At least one error was recorded.");
 			} else {
-				LOG.debug("Successfully exported " + users.size() + " organization(s).");
+				LOG.debug("Successfully exported {} user(s).", users.size());
 			}
 			APIManagerAdapter.deleteInstance();
 		}
@@ -126,11 +126,8 @@ public class UserApp implements APIMCLIServiceProvider {
 		try {
 			params = (UserImportParams) UserImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " + e.getMessage());
+			LOG.error("Error {}" , e.getMessage());
 			return e.getError().getCode();
-		/*} catch (ParseException e) {
-			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		UserApp app = new UserApp();
 		return app.importUsers(params).getRc();
@@ -159,7 +156,7 @@ public class UserApp implements APIMCLIServiceProvider {
 						.build());
 				User actualUserWithEmail = APIManagerAdapter.getInstance().userAdapter.getUser(new UserFilter.Builder().hasEmail(desiredUser.getEmail()).build());
 				if(actualUserWithEmail!=null && actualUser!=null && !actualUser.getId().equals(actualUserWithEmail.getId())) {
-					LOG.error("A different user: '"+actualUserWithEmail.getLoginName()+"' with the supplied email address: '"+desiredUser.getEmail()+"' already exists. ");
+					LOG.error("A different user: {} with the supplied email address: {} already exists. ", actualUserWithEmail.getLoginName(), desiredUser.getEmail());
 					continue;
 				}
 				importManager.replicate(desiredUser, actualUser);
@@ -177,7 +174,9 @@ public class UserApp implements APIMCLIServiceProvider {
 		} finally {
 			try {
 				APIManagerAdapter.deleteInstance();
-			} catch (AppException ignore) { }
+			} catch (AppException ignore) {
+				LOG.error("Error deleting instance", ignore);
+			}
 		}
 	}
 	
@@ -187,11 +186,8 @@ public class UserApp implements APIMCLIServiceProvider {
 		try {
 			params = (UserExportParams) UserDeleteCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " + e.getMessage());
+			LOG.error("Error {}", e.getMessage());
 			return e.getError().getCode();
-		/*} catch (ParseException e) {
-			LOG.error("Error " + e.getMessage());
-			return ErrorCode.MISSING_PARAMETER.getCode();*/
 		}
 		UserApp app = new UserApp();
 		return app.delete(params).getRc();
@@ -214,7 +210,7 @@ public class UserApp implements APIMCLIServiceProvider {
 		try {
 			params = (UserChangePasswordParams) UserChangePasswordCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " + e.getMessage());
+			LOG.error("Error {}", e.getMessage());
 			return e.getError().getCode();
 		}
 		UserApp app = new UserApp();

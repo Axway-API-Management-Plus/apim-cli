@@ -54,7 +54,7 @@ public abstract class UserResultHandler {
 		}
 	}
 
-	public UserResultHandler(UserExportParams params, ExportResult result) {
+	protected UserResultHandler(UserExportParams params, ExportResult result) {
 		this.params = params;
 		this.result = result;
 	}

@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 public class MarkdownLocalDeserializer extends StdDeserializer<List<String>> {
 	
-	public static enum Params {
+	public enum Params {
 		useLoginName
 	}
 	
@@ -39,11 +39,11 @@ public class MarkdownLocalDeserializer extends StdDeserializer<List<String>> {
 	public List<String> deserialize(JsonParser jp, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
 		JsonNode node = jp.getCodec().readTree(jp);
-		List<String> markdownLocal = new ArrayList<String>();
+		List<String> markdownLocal = new ArrayList<>();
 		if(node instanceof TextNode) {
 			markdownLocal.add(node.asText());
 		} else if(node instanceof ArrayNode) {
-			for(JsonNode items : (ArrayNode)node) {
+			for(JsonNode items : node) {
 				markdownLocal.add(items.asText());
 			}
 		} else {
