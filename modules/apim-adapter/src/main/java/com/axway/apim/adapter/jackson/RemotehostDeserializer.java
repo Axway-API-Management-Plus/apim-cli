@@ -38,11 +38,11 @@ public class RemotehostDeserializer extends StdDeserializer<RemoteHost> {
 			throws IOException, JsonProcessingException {
 		JsonNode node = jp.getCodec().readTree(jp);
 		String remoteHostName;
-		Integer remoteHostPort;
+		int remoteHostPort;
 		// This must have the format my.host.com:7889
 		String givenRemoteHost = node.asText();
 		// 
-		if(givenRemoteHost.indexOf(":")==-1) {
+		if(!givenRemoteHost.contains(":")) {
 			remoteHostName = givenRemoteHost;
 			remoteHostPort = 443;
 		} else {

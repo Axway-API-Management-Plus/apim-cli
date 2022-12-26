@@ -8,15 +8,12 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
 public class OrganizationSerializerModifier extends BeanSerializerModifier {
 	
-	boolean serializeAsName = false;
-	
-	
+	boolean serializeAsName;
 	public OrganizationSerializerModifier(boolean serializeAsName) {
 		super();
 		this.serializeAsName = serializeAsName;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
 		if (beanDesc.getBeanClass() == Organization.class) {
@@ -24,5 +21,4 @@ public class OrganizationSerializerModifier extends BeanSerializerModifier {
 		}
 		return super.modifySerializer(config, beanDesc, serializer);
 	}
-
 }

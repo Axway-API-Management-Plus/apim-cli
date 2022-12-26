@@ -88,7 +88,7 @@ public class ManageClientApps {
         ClientApplication app;
         while (it.hasNext()) {
             app = it.next();
-            if (!hasClientAppPermission(app)) {
+            if (hasClientAppPermission(app)) {
                 LOG.error("Organization of configured application: {} has NO permission to this API. Ignoring this application.", app.getName());
                 it.remove();
             }
@@ -101,14 +101,14 @@ public class ManageClientApps {
 
         String appsOrgId = app.getOrganization().getId();
         Organization appsOrgs = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(appsOrgId).build());
-        if (appsOrgs == null) return false;
+        if (appsOrgs == null) return true;
         // If the App belongs to the same Org as the API, it automatically has permission (esp. for Unpublished APIs)
-        if (app.getOrganization().equals((actualState).getOrganization())) return true;
+        if (app.getOrganization().equals((actualState).getOrganization())) return false;
         if (actualState.getClientOrganizations() == null) {
             LOG.debug("No Client-Orgs configured for this API, therefore other app has NO permission.");
-            return false;
+            return true;
         }
-        return actualState.getClientOrganizations().contains(appsOrgs);
+        return !actualState.getClientOrganizations().contains(appsOrgs);
     }
 
     private void createAppSubscription(List<ClientApplication> missingDesiredApps, String apiId) throws AppException {
@@ -130,7 +130,7 @@ public class ManageClientApps {
     private void removeAppSubscription(List<ClientApplication> removingActualApps) throws AppException {
         for (ClientApplication app : removingActualApps) {
             // A Client-App that doesn't belong to a granted organization, can't have a subscription.
-            if (!hasClientAppPermission(app)) continue;
+            if (hasClientAppPermission(app)) continue;
             LOG.debug("Removing API-Access for application {}", app.getName());
             try {
                 for (APIAccess apiAccess : app.getApiAccess()) {

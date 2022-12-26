@@ -25,7 +25,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
@@ -488,7 +487,7 @@ public class APIManagerAdapter {
                     LOG.error("Can't read Image from API-Manager.. Message: '" + EntityUtils.toString(httpResponse.getEntity()) + "' Response-Code: " + statusCode + "");
                     throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-                if (httpResponse == null || httpResponse.getEntity() == null)
+                if (httpResponse.getEntity() == null)
                     return null; // no Image found in API-Manager
                 try(InputStream is = httpResponse.getEntity().getContent()) {
                     image.setImageContent(IOUtils.toByteArray(is));

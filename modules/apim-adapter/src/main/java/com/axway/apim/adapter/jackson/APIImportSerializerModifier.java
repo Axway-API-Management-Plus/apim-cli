@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
 public class APIImportSerializerModifier extends BeanSerializerModifier {
 	
-	boolean serializeAsDeprecated = true;
+	boolean serializeAsDeprecated;
 
 	public APIImportSerializerModifier(boolean serializeAsDeprecated) {
 		super();

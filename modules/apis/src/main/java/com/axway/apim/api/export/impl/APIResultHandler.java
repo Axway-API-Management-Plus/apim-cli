@@ -38,7 +38,7 @@ import com.axway.apim.lib.utils.Utils;
 
 public abstract class APIResultHandler {
 
-    private static Logger LOG = LoggerFactory.getLogger(APIResultHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(APIResultHandler.class);
     APIExportParams params;
 
     protected Result result;
@@ -83,7 +83,7 @@ public abstract class APIResultHandler {
     public static APIResultHandler create(APIListImpl exportImpl, APIExportParams params) throws AppException {
         try {
             Object[] intArgs = new Object[]{params};
-            Constructor<APIResultHandler> constructor = exportImpl.getClazz().getConstructor(new Class[]{APIExportParams.class});
+            Constructor<APIResultHandler> constructor = exportImpl.getClazz().getConstructor(APIExportParams.class);
             return constructor.newInstance(intArgs);
         } catch (Exception e) {
             throw new AppException("Error initializing API export handler", ErrorCode.UNXPECTED_ERROR, e);

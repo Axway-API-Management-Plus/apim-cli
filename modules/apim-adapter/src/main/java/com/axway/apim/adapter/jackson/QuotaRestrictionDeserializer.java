@@ -25,8 +25,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestriction> {
 	
-	public enum DeserializeMode {apiManagerData, configFile};
-	
+	public enum DeserializeMode {apiManagerData, configFile}
+
 	private final static String validPeriods = "week|day|hour|minute|second";
 	
 	private DeserializeMode desiralizeMode;
@@ -52,7 +52,6 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		}
 	}
 
-	@SuppressWarnings("serial")
 	@Override
 	public QuotaRestriction deserialize(JsonParser jp, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
@@ -70,7 +69,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		} catch (IllegalArgumentException e) {
 			throw new AppException("Invalid quota config. The restriction type: " + type + " is invalid.", ErrorCode.INVALID_QUOTA_CONFIG);
 		}
-		Map<String, String> configMap = new LinkedHashMap<String, String>();
+		Map<String, String> configMap = new LinkedHashMap<>();
 		configMap.put("period", period);
 		configMap.put("per", per);
 		if(type.equals("throttle")) {
