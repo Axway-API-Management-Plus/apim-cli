@@ -82,7 +82,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			// Lookup existing APIs - If found the actualAPI is valid - desiredAPI is used to control what needs to be loaded
 			String vHostsMsg = desiredAPI.getVhost()!=null ? ", V-Host: " +  desiredAPI.getVhost() : "";
 			String RoutingKeyMsg = desiredAPI.getApiRoutingKey()!=null ? ", Query-String version: " +  desiredAPI.getApiRoutingKey() : "";
-			LOG.info("Lookup actual API based on Path: " + desiredAPI.getPath() + vHostsMsg + RoutingKeyMsg);
+			LOG.info("Lookup actual API based on Path: {} {} {}", desiredAPI.getPath() , vHostsMsg , RoutingKeyMsg);
 			APIFilter filter = new APIFilter.Builder(Builder.APIType.ACTUAL_API)
 					.hasApiPath(desiredAPI.getPath())
 					.hasVHost(desiredAPI.getVhost())

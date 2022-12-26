@@ -53,7 +53,6 @@ public class APIMCLICacheManager implements CacheManager {
     @Override
     public void close() throws StateTransitionException {
         cacheManager.close();
-
     }
 
     @Override

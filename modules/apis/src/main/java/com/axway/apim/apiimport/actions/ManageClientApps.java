@@ -96,6 +96,9 @@ public class ManageClientApps {
     }
 
     private boolean hasClientAppPermission(ClientApplication app) throws AppException {
+        LOG.info("Application name : {}", app.getName());
+        LOG.info("Organization  : {}", app.getOrganization());
+
         String appsOrgId = app.getOrganization().getId();
         Organization appsOrgs = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(appsOrgId).build());
         if (appsOrgs == null) return false;

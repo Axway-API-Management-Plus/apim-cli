@@ -118,9 +118,9 @@ public class APIImportConfigAdapter {
                     ObjectReader updater = mapper.readerForUpdating(baseConfig).withAttribute("validateOrganization", validateOrganization);
                     // Organization must be valid in staged configuration
                     apiConfig = updater.withAttribute("validateOrganization", true).readValue(Utils.substituteVariables(stageConfigFile));
-                    LOG.info("Loaded stage API-Config from file: " + stageConfigFile);
+                    LOG.info("Loaded stage API-Config from file: {}", stageConfigFile);
                 } catch (FileNotFoundException e) {
-                    LOG.warn("No config file found for stage: '" + stage + "'");
+                    LOG.warn("No config file found for stage: {}", stage);
                     apiConfig = baseConfig;
                 }
             } else {
@@ -203,10 +203,6 @@ public class APIImportConfigAdapter {
         if (apiConfig.getOrganization() == null || !apiConfig.getOrganization().isDevelopment()) {
             throw new AppException("The given organization: '" + apiConfig.getOrganization() + "' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
         }
-//		if(usingOrgAdmin) { // Hardcode the orgId to the organization of the used OrgAdmin
-//			//apiConfig.get
-//			apiConfig.getOrganization().setId(APIManagerAdapter.getCurrentUser(false).getOrganization().getId());
-//		}
     }
 
     private void addAPISpecification(API apiConfig) throws IOException {
@@ -252,7 +248,7 @@ public class APIImportConfigAdapter {
                 Organization desiredOrg = it.next();
                 Organization org = APIManagerAdapter.getInstance().orgAdapter.getOrgForName(desiredOrg.getName());
                 if (org == null) {
-                    LOG.warn("Unknown organization with name: '" + desiredOrg.getName() + "' configured. Ignoring this organization.");
+                    LOG.warn("Unknown organization with name: {} configured. Ignoring this organization.", desiredOrg.getName());
                     invalidClientOrgs = invalidClientOrgs == null ? desiredOrg.getName() : invalidClientOrgs + ", " + desiredOrg.getName();
                     APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_ORGANIZATIONS.name(), invalidClientOrgs);
                     it.remove();
@@ -313,15 +309,15 @@ public class APIImportConfigAdapter {
                     } else {
                         File markdownFile = new File(markdownFilename);
                         if (!markdownFile.exists()) { // The file isn't provided with an absolute path, try to read it relative to the config file
-                            LOG.trace("Error reading markdown description file (absolute): '" + markdownFile.getCanonicalPath() + "'");
+                            LOG.trace("Error reading markdown description file (absolute): {}", markdownFile.getCanonicalPath());
                             String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
                             markdownFile = new File(baseDir + "/" + markdownFilename);
                         }
                         if (!markdownFile.exists()) {
-                            LOG.trace("Error reading markdown description file (relative): '" + markdownFile.getCanonicalPath() + "'");
+                            LOG.trace("Error reading markdown description file (relative): {}", markdownFile.getCanonicalPath());
                             throw new AppException("Error reading markdown description file: " + markdownFilename, ErrorCode.CANT_READ_CONFIG_FILE);
                         }
-                        LOG.debug("Reading local markdown description file: " + markdownFile.getPath());
+                        LOG.debug("Reading local markdown description file: {}", markdownFile.getPath());
                         markdownDescription += newLine + new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8);
                     }
                     newLine = "\n";
@@ -413,13 +409,13 @@ public class APIImportConfigAdapter {
                     ClientAppFilter filter = new ClientAppFilter.Builder().hasName(app.getName()).build();
                     loadedApp = APIManagerAdapter.getInstance().appAdapter.getApplication(filter);
                     if (loadedApp == null) {
-                        LOG.warn("Unknown application with name: '" + filter.getApplicationName() + "' configured. Ignoring this application.");
+                        LOG.warn("Unknown application with name: {} configured. Ignoring this application.", filter.getApplicationName());
                         invalidClientApps = invalidClientApps == null ? app.getName() : invalidClientApps + ", " + app.getName();
                         APIPropertiesExport.getInstance().setProperty(ErrorCode.INVALID_CLIENT_APPLICATIONS.name(), invalidClientApps);
                         it.remove();
                         continue;
                     }
-                    LOG.info("Found existing application: '" + app.getName() + "' (" + app.getId() + ") based on given name '" + app.getName() + "'");
+                    LOG.info("Found existing application: {} ({}) based on given name {}",app.getName(),app.getId(),app.getName() );
                 } else if (app.getApiKey() != null) {
                     loadedApp = getAppForCredential(app.getApiKey(), APIManagerAdapter.CREDENTIAL_TYPE_API_KEY);
                     if (loadedApp == null) {
@@ -441,7 +437,7 @@ public class APIImportConfigAdapter {
                 }
                 if (!APIManagerAdapter.hasAdminAccount()) {
                     if (!apiConfig.getOrganization().equals(loadedApp.getOrganization())) {
-                        LOG.warn("OrgAdmin can't handle application: '" + loadedApp.getName() + "' belonging to a different organization. Ignoring this application.");
+                        LOG.warn("OrgAdmin can't handle application: {} belonging to a different organization. Ignoring this application.",loadedApp.getName());
                         it.remove();
                         continue;
                     }
@@ -452,10 +448,10 @@ public class APIImportConfigAdapter {
     }
 
     private static ClientApplication getAppForCredential(String credential, String type) throws AppException {
-        LOG.debug("Searching application with configured credential (Type: " + type + "): '" + credential + "'");
+        LOG.debug("Searching application with configured credential (Type: {}): {}",type,credential );
         ClientApplication app = APIManagerAdapter.getInstance().getAppIdForCredential(credential, type);
         if (app == null) {
-            LOG.warn("Unknown application with (" + type + "): '" + credential + "' configured. Ignoring this application.");
+            LOG.warn("Unknown application with ({}): {} configured. Ignoring this application.", type, credential);
             return null;
         }
         return app;
@@ -507,12 +503,12 @@ public class APIImportConfigAdapter {
                 throw new AppException("Cant read given certificate file", ErrorCode.CANT_READ_CONFIG_FILE);
             }
         } else {
-            LOG.debug("Can't read certifiate from file-location: " + file + ". Now trying to read it from the classpath.");
+            LOG.debug("Can't read certifiate from file-location: {}. Now trying to read it from the classpath.", file);
             // Try to read it from classpath
             is = APIManagerAdapter.class.getResourceAsStream(cert.getCertFile());
         }
         if (is == null) {
-            LOG.error("Can't read certificate: " + cert.getCertFile() + " from file or classpath.");
+            LOG.error("Can't read certificate: {} from file or classpath.", cert.getCertFile());
             LOG.error("Certificates in filesystem are either expected relative to the API-Config-File or as an absolute path.");
             LOG.error("In the same directory. 		Example: \"myCertFile.crt\"");
             LOG.error("Relative to it.         		Example: \"../../allMyCertsAreHere/myCertFile.crt\"");
@@ -746,7 +742,7 @@ public class APIImportConfigAdapter {
             }
             importApi.getImage().setBaseFilename(file.getName());
             if (file.exists()) {
-                LOG.info("Loading image from: '" + file.getCanonicalFile() + "'");
+                LOG.info("Loading image from: {}", file.getCanonicalFile());
                 try (InputStream is = Files.newInputStream(file.toPath())) {
                     importApi.getImage().setImageContent(IOUtils.toByteArray(is));
                     return;
@@ -780,7 +776,7 @@ public class APIImportConfigAdapter {
      */
 
     private CorsProfile getCorsProfile(API api, String profileName) {
-        if (api.getCorsProfiles() == null || api.getCorsProfiles().size() == 0) return null;
+        if (api.getCorsProfiles() == null || api.getCorsProfiles().isEmpty()) return null;
         for (CorsProfile cors : api.getCorsProfiles()) {
             if (profileName.equals(cors.getName())) return cors;
         }
@@ -788,7 +784,7 @@ public class APIImportConfigAdapter {
     }
 
     private AuthenticationProfile getAuthNProfile(API api, String profileName) {
-        if (api.getAuthenticationProfiles() == null || api.getAuthenticationProfiles().size() == 0) return null;
+        if (api.getAuthenticationProfiles() == null || api.getAuthenticationProfiles().isEmpty()) return null;
         for (AuthenticationProfile profile : api.getAuthenticationProfiles()) {
             if (profileName.equals(profile.getName())) return profile;
         }
@@ -796,7 +792,7 @@ public class APIImportConfigAdapter {
     }
 
     private SecurityProfile getSecurityProfile(API api, String profileName) {
-        if (api.getSecurityProfiles() == null || api.getSecurityProfiles().size() == 0) return null;
+        if (api.getSecurityProfiles() == null || api.getSecurityProfiles().isEmpty()) return null;
         for (SecurityProfile profile : api.getSecurityProfiles()) {
             if (profileName.equals(profile.getName())) return profile;
         }

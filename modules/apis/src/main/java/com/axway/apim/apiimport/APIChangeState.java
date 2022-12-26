@@ -91,8 +91,8 @@ public class APIChangeState {
                     Object desiredValue = method.invoke(desiredAPI, null);
                     Object actualValue = method2.invoke(actualAPI, null);
                     if (desiredValue == null && actualValue == null) continue;
-                    if(desiredValue == null) {
-                        LOG.debug("Ignoring Null-Property: " + field.getName() + "[Desired: '"+desiredValue+"' vs Actual: '"+actualValue+"']");
+                    if (desiredValue == null) {
+                        LOG.debug("Ignoring Null-Property: {} [Desired: {}  vs Actual: {}]", field.getName(), desiredValue, actualValue);
                         continue; // No change, if nothing is provided!
                     }
                     // desiredValue == null - This can be used to reset/clean a property! (Need to think about this!)
@@ -112,9 +112,9 @@ public class APIChangeState {
                         if (!isWritable(property, this.actualAPI.getState())) {
                             this.updateExistingAPI = false; // Found a NON-Changeable property, can't update the existing API
                         }
-                        LOG.debug("Changed property: " + field.getName() + "[Desired: '" + desiredValue + "' vs Actual: '" + actualValue + "']");
+                        LOG.debug("Changed property: {} [Desired: {} vs Actual: {}]", field.getName(), desiredValue, actualValue);
                     } else {
-                        LOG.debug("No change for property: " + field.getName() + "[Desired: '" + desiredValue + "' vs Actual: '" + actualValue + "']");
+                        LOG.debug("No change for property: {} [Desired: {} vs Actual: {}]", field.getName(), desiredValue, actualValue);
                     }
                 }
             } catch (Exception e) {

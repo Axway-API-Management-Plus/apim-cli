@@ -42,6 +42,7 @@ public class APIMHttpClient {
 
     private static Map<Boolean, APIMHttpClient> instances = new HashMap<>();
     private HttpClient httpClient;
+    private PoolingHttpClientConnectionManager httpClientConnectionManager;
     private HttpClientContext clientContext;
     private BasicCookieStore cookieStore = new BasicCookieStore();
     private String csrfToken;
@@ -72,7 +73,6 @@ public class APIMHttpClient {
     }
 
     private void createConnection(URI uri) throws AppException {
-        PoolingHttpClientConnectionManager httpClientConnectionManager;
         HttpHost targetHost;
         SSLContextBuilder builder = new SSLContextBuilder();
         try {
@@ -132,12 +132,17 @@ public class APIMHttpClient {
     public String getCsrfToken() {
         return csrfToken;
     }
-
     public void setCsrfToken(String csrfToken) {
         this.csrfToken = csrfToken;
     }
     @Override
     public String toString() {
         return "APIMHttpClient [cookieStore=" + cookieStore + ", csrfToken=" + csrfToken + "]";
+    }
+
+    public void close(){
+        if(httpClientConnectionManager != null){
+            httpClientConnectionManager.close();
+        }
     }
 }

@@ -56,7 +56,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
                 CLIServiceMethod cliServiceMethod = method.getAnnotation(CLIServiceMethod.class);
                 String name = cliServiceMethod.name();
                 if (serviceName.equals(name)) {
-                    LOG.info("Calling Operation " + method.getName());
+                    LOG.info("Calling Operation {}" , method.getName());
                     int rc = (int) method.invoke(null, (Object) args);
                     System.exit(rc);
                 }
@@ -71,7 +71,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
         try {
             params = (APIExportParams) CLIAPIExportOptions.create(args).getParams();
         } catch (AppException e) {
-            LOG.error("Error " + e.getMessage());
+            LOG.error("Error {}" , e.getMessage());
             return e.getError().getCode();
         }
         APIExportApp apiExportApp = new APIExportApp();
@@ -213,18 +213,17 @@ public class APIExportApp implements APIMCLIServiceProvider {
 
             if (apis.size() == 0) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.info("No APIs found using filter: " + filter);
+                    LOG.info("No APIs found using filter: {}" , filter);
                 } else {
                     LOG.info("No APIs found based on the given filters.");
                 }
             } else {
-                LOG.info(apis.size() + " API(s) selected.");
+                LOG.info( "{} API(s) selected.", apis.size());
                 resultHandler.execute(apis);
                 if (resultHandler.hasError()) {
-                    LOG.info("");
                     LOG.error("Please check the log. At least one error was recorded.");
                 } else {
-                    LOG.debug("Successfully selected " + apis.size() + " API(s).");
+                    LOG.debug("Successfully selected {}} API(s).", apis.size());
                 }
                 APIManagerAdapter.deleteInstance();
 
@@ -264,7 +263,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
             // Get the reference API from API-Manager
             API referenceAPI = apimanagerAdapter.apiAdapter.getAPI(params.getReferenceAPIFilter(), true);
             if (referenceAPI == null) {
-                LOG.info("Published reference API for upgrade access not found using filter: " + params.getReferenceAPIFilter());
+                LOG.info("Published reference API for upgrade access not found using filter: {}" , params.getReferenceAPIFilter());
                 return result;
             }
             params.setReferenceAPI(referenceAPI);
@@ -274,15 +273,15 @@ public class APIExportApp implements APIMCLIServiceProvider {
             List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(filter, true);
 
             if (apis.size() == 0) {
-                LOG.info("No published APIs found using filter: " + filter);
+                LOG.info("No published APIs found using filter: {}" , filter);
             } else {
-                LOG.info(apis.size() + " API(s) selected.");
+                LOG.info("{} API(s) selected.", apis.size());
                 resultHandler.execute(apis);
                 if (resultHandler.hasError()) {
                     LOG.info("");
                     LOG.error("Please check the log. At least one error was recorded.");
                 } else {
-                    LOG.debug("Successfully selected " + apis.size() + " API(s).");
+                    LOG.debug("Successfully selected {} API(s).", apis.size());
                 }
             }
             return result;
@@ -311,16 +310,16 @@ public class APIExportApp implements APIMCLIServiceProvider {
             // Get all organizations that should be granted
             List<Organization> orgs = apimanagerAdapter.orgAdapter.getOrgs(params.getOrganizationFilter());
             if (orgs == null || orgs.size() == 0) {
-                LOG.info("No organization found to grant access to using filter: " + params.getOrganizationFilter());
+                LOG.info("No organization found to grant access to using filter: {}" , params.getOrganizationFilter());
                 return result;
             }
             // Get all APIs that should be granted access
             List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(params.getAPIFilter(), true);
             if (apis == null || apis.size() == 0) {
-                LOG.info("No published APIs to grant access to found using filter: " + params.getAPIFilter());
+                LOG.info("No published APIs to grant access to found using filter: {}" , params.getAPIFilter());
                 return result;
             }
-            LOG.info(apis.size() + " API(s) and " + orgs.size() + " Organization(s) selected.");
+            LOG.info("{} API(s) and {} Organization(s) selected.",apis.size(),orgs.size());
             params.setOrgs(orgs);
             params.setApis(apis);
             APIResultHandler resultHandler = APIResultHandler.create(resultHandlerImpl, params);
@@ -329,7 +328,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
                 LOG.info("");
                 LOG.error("Please check the log. At least one error was recorded.");
             } else {
-                LOG.debug("Successfully selected " + apis.size() + " API(s).");
+                LOG.debug("Successfully selected {} API(s).",apis.size());
             }
             return result;
         } catch (AppException ap) {
