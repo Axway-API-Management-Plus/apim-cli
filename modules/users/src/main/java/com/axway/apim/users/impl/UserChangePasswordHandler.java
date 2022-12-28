@@ -28,8 +28,7 @@ public class UserChangePasswordHandler extends UserResultHandler {
 		if(CoreParameters.getInstance().isForce()) {
 			System.out.println("Force flag given to change the password for: "+users.size()+" User(s)");
 		} else {
-			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
-			} else {
+			if(!Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
 				System.out.println("Canceled.");
 				return;
 			}
@@ -37,7 +36,7 @@ public class UserChangePasswordHandler extends UserResultHandler {
 		System.out.println("Okay, going to change the password for: " + users.size() + " Users(s)");
 		for(User user : users) {
 			try {
-				APIManagerAdapter.getInstance().userAdapter.changepassword(newPassword, user);
+				APIManagerAdapter.getInstance().userAdapter.changePassword(newPassword, user);
 			} catch(Exception e) {
 				LOG.error("Error changing password of user: {}", user.getName());
 			}
