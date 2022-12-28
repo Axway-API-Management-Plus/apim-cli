@@ -16,11 +16,6 @@ import com.axway.apim.lib.errorHandling.AppException;
 
 public class UserFilter implements CustomPropertiesFilter {
 
-    public enum USER_TYPE {
-        internal,
-        external
-    }
-
     private String id;
     String description;
     String email;
@@ -37,7 +32,7 @@ public class UserFilter implements CustomPropertiesFilter {
 
     private List<String> customProperties;
 
-    private List<NameValuePair> filters = new ArrayList<>();
+    private final List<NameValuePair> filters = new ArrayList<>();
 
     private UserFilter() {
     }
@@ -197,7 +192,7 @@ public class UserFilter implements CustomPropertiesFilter {
         if (this.getOrganizationName() != null) {
             Pattern pattern = Pattern.compile(this.getOrganizationName().replace("*", ".*"));
             Matcher matcher = pattern.matcher(user.getOrganization().getName());
-            if (!matcher.matches()) return false;
+            return matcher.matches();
         }
         return true;
     }
@@ -273,11 +268,6 @@ public class UserFilter implements CustomPropertiesFilter {
 
         public Builder hasLoginName(String loginName) {
             this.loginName = loginName;
-            return this;
-        }
-
-        public Builder hasPhone(String phone) {
-            this.phone = phone;
             return this;
         }
 

@@ -213,13 +213,12 @@ public class APIManagerAPIAdapter {
     /**
      * Translates the methodIds of the given api. The operations are loaded from the API-Manager based on the apiId
      *
-     * @param <profile> An Outbound- or InboundProfile
      * @param api       in which the methods should be translated
      * @param apiId     the methods are loaded based on this API-ID (this might be an another referenced API
      * @param mode      translation direction
      * @throws AppException when something goes wrong
      */
-    public <profile> void translateMethodIds(API api, String apiId, METHOD_TRANSLATION mode) throws AppException {
+    public void translateMethodIds(API api, String apiId, METHOD_TRANSLATION mode) throws AppException {
         if (mode == METHOD_TRANSLATION.NONE) return;
         translateMethodIds(Collections.singletonList(api), Collections.singletonList(apiId), mode);
     }
@@ -229,10 +228,9 @@ public class APIManagerAPIAdapter {
      *
      * @param api       in which the methods should be translated
      * @param mode      translation direction
-     * @param <profile> the type of the profile
      * @throws AppException if methods cannot be translated
      */
-    public <profile> void translateMethodIds(API api, METHOD_TRANSLATION mode) throws AppException {
+    public void translateMethodIds(API api, METHOD_TRANSLATION mode) throws AppException {
         if (mode == METHOD_TRANSLATION.NONE) return;
         if (api.getOutboundProfiles() != null)
             _translateMethodIds(api.getOutboundProfiles(), mode, Collections.singletonList(api.getId()));
@@ -240,7 +238,7 @@ public class APIManagerAPIAdapter {
             _translateMethodIds(api.getInboundProfiles(), mode, Collections.singletonList(api.getId()));
     }
 
-    public <profile> void translateMethodIds(List<API> apis, List<String> apiIds, METHOD_TRANSLATION mode) throws AppException {
+    public void translateMethodIds(List<API> apis, List<String> apiIds, METHOD_TRANSLATION mode) throws AppException {
         if (mode == METHOD_TRANSLATION.NONE) return;
         for (API api : apis) {
             if (api.getOutboundProfiles() != null) _translateMethodIds(api.getOutboundProfiles(), mode, apiIds);
