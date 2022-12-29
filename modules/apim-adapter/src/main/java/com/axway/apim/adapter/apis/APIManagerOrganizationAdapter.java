@@ -70,12 +70,12 @@ public class APIManagerOrganizationAdapter {
                     .addParameters(filter.getFilters())
                     .build();
             RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
-            LOG.debug("Load organizations from API-Manager using filter: " + filter);
-            LOG.trace("Load organization with URI: " + uri);
+            LOG.debug("Load organizations from API-Manager using filter: {}", filter);
+            LOG.trace("Load organization with URI: {}", uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                    LOG.error("Sent request: " + uri);
-                    LOG.error("Received Status-Code: " + httpResponse.getStatusLine().getStatusCode() + ", Response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                    LOG.error("Sent request: {}", uri);
+                    LOG.error("Received Status-Code: {} Response: {}", httpResponse.getStatusLine().getStatusCode(), EntityUtils.toString(httpResponse.getEntity()));
                     throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 String response = EntityUtils.toString(httpResponse.getEntity());
@@ -111,7 +111,7 @@ public class APIManagerOrganizationAdapter {
                 if (!APIManagerAdapter.hasAdminAccount()) {
                     throw new AppException("Admin account is required to create a new organization", ErrorCode.NO_ADMIN_ROLE_USER);
                 }
-                    uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations").build();
+                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations").build();
             } else {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + ORGANIZATIONS + actualOrg.getId()).build();
             }
@@ -135,7 +135,7 @@ public class APIManagerOrganizationAdapter {
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error creating/updating organization. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                        LOG.error("Error creating/updating organization. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
                         throw new AppException("Error creating/updating organization. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                     }
                     createdOrg = mapper.readValue(httpResponse.getEntity().getContent(), Organization.class);
@@ -161,12 +161,12 @@ public class APIManagerOrganizationAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
-                    LOG.error("Error deleting organization. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                    LOG.error("Error deleting organization. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
                     throw new AppException("Error deleting organization. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 // Deleted org should also be deleted from the cache
                 organizationCache.remove(org.getId());
-                LOG.info("Organization: " + org.getName() + " (" + org.getId() + ")" + " successfully deleted");
+                LOG.info("Organization: {}  ( {} ) successfully deleted", org.getName(), org.getId());
             }
         } catch (Exception e) {
             throw new AppException("Error deleting organization", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
@@ -186,7 +186,7 @@ public class APIManagerOrganizationAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
-                    LOG.error("Error saving/updating organization image. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                    LOG.error("Error saving/updating organization image. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
                 }
             }
         } catch (Exception e) {
@@ -207,7 +207,7 @@ public class APIManagerOrganizationAdapter {
             Utils.addCustomPropertiesForEntity(allOrgs, this.apiManagerResponse.get(filter), filter);
             return allOrgs;
         } catch (Exception e) {
-            LOG.error("Error cant read orgs from API-Manager with filter: " + filter + ". Returned response: " + apiManagerResponse);
+            LOG.error("Error cant read orgs from API-Manager with filter: {} Returned response: {}", filter, apiManagerResponse);
             throw new AppException("Error cant read orgs from API-Manager with filter: " + filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -230,7 +230,7 @@ public class APIManagerOrganizationAdapter {
             throw new AppException("No unique Organization found for filter: " + filter, ErrorCode.UNKNOWN_API);
         }
         if (orgs.size() == 0) {
-            LOG.info("No organization found using filter: " + filter);
+            LOG.info("No organization found using filter: {}", filter);
             return null;
         }
         return orgs.get(0);

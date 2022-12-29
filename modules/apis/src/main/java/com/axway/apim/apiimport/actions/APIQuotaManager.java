@@ -51,10 +51,10 @@ public class APIQuotaManager {
         // If restrictions are equal and the API is not re-created, there is nothing to do
         if (actualRestrictions == null && desiredRestrictions == null) return;
         if (desiredRestrictions != null && desiredRestrictions.equals(actualRestrictions) && sameAPI) {
-            LOG.info("{} quota for API: {} is UN-CHANGED. Nothing to do.", type.getFiendlyName(), createdAPI.getName());
+            LOG.info("{} quota for API: {} is UN-CHANGED. Nothing to do.", type.getFriendlyName(), createdAPI.getName());
         } else {
-            LOG.info("Updating {} quota for API: {}", type.getFiendlyName(), createdAPI.getName());
-            LOG.debug("{}-Restrictions: Desired: {}, Actual: {}", type.getFiendlyName(), desiredRestrictions, actualRestrictions);
+            LOG.info("Updating {} quota for API: {}", type.getFriendlyName(), createdAPI.getName());
+            LOG.debug("{}-Restrictions: Desired: {}, Actual: {}", type.getFriendlyName(), desiredRestrictions, actualRestrictions);
             // In order to compare/merge the restrictions, we must translate the desired API-Method-Names, if not a "*", into the methodId of the createdAPI
             if (desiredRestrictions != null) {
                 for (QuotaRestriction desiredRestriction : desiredRestrictions) {

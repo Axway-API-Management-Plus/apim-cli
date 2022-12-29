@@ -192,11 +192,11 @@ public class APIManagerAdapter {
             params.add(new BasicNameValuePair("username", username));
             params.add(new BasicNameValuePair("password", password));
             POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, useAdminClient);
-            int statusCode = httpHelper.execute(loginRequest);
+            int statusCode = httpHelper.execute(loginRequest,false).getStatusCode();
             if (statusCode != 303 && (statusCode < 200 || statusCode > 299)) {
                 LOG.warn("Login failed with statusCode: {} ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", statusCode, cmd.getRetryDelay());
                 Thread.sleep(cmd.getRetryDelay());
-                statusCode = httpHelper.execute(loginRequest);
+                statusCode = httpHelper.execute(loginRequest, false).getStatusCode();
                 if (statusCode != 303) {
                     throw new AppException("Login finally failed with statusCode: " + statusCode, ErrorCode.API_MANAGER_LOGIN_FAILED);
                 } else {
