@@ -73,10 +73,6 @@ public class AppException extends JsonProcessingException {
 		return secondMessage;
 	}
 
-	public void setSecondMessage(String secondMessage) {
-		this.secondMessage = secondMessage;
-	}
-
 	public String getAllMessages() {
 		String message = getMessage();
 		String secondMessage = getSecondMessage();
