@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 public class APISpecificationFactory {
 
-    private static Logger LOG = LoggerFactory.getLogger(APISpecificationFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(APISpecificationFactory.class);
 
     private static final ArrayList<Class<?>> specificationTypes = new ArrayList<Class<?>>() {
         private static final long serialVersionUID = 1L;

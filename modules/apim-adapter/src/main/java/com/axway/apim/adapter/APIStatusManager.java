@@ -73,7 +73,11 @@ public class APIStatusManager {
 	}
 	
 	public void update(API apiToUpdate, String desiredState, String vhost) throws AppException {
-		update(apiToUpdate, desiredState, vhost, CoreParameters.getInstance().isForce());
+		if(CoreParameters.getInstance().isForce()) {
+			update(apiToUpdate, desiredState, vhost, true);
+		} else {
+			update(apiToUpdate, desiredState, vhost, false);
+		}
 	}
 	
 	

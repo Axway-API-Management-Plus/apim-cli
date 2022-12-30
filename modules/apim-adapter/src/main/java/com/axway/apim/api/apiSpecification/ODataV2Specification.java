@@ -190,9 +190,7 @@ public class ODataV2Specification extends ODataSpecification {
 		List<String> structProperties = entityType.getPropertyNames();
 		
 		if(entityType.getNavigationPropertyNames()!=null && entityType.getNavigationPropertyNames().size()>0) {
-			for(String navigationProperty : entityType.getNavigationPropertyNames()) {
-				navProperties.add(navigationProperty);
-			}
+			navProperties.addAll(entityType.getNavigationPropertyNames());
 			operationDescription += "<br /><br />The entity: " + entityName + " supports the following navigational properties: "+navProperties;
 			operationDescription += "<br />For example: .../" + entityName + "(Entity-Id)/<b>" + navProperties.get(0) + "</b>/.....";
 		} else {
@@ -298,7 +296,7 @@ public class ODataV2Specification extends ODataSpecification {
 		return param;
 	}
 	
-	private ApiResponse createResponse(String description) throws EdmException {
+	private ApiResponse createResponse(String description) {
 		return createResponse(description, null);
 	}
 	
@@ -337,8 +335,9 @@ public class ODataV2Specification extends ODataSpecification {
 			}
 		} catch (EdmException e) {
 			try {
-				LOG.error("Error getting schema for type: " + type.getName());
+				LOG.error("Error getting schema for type: {}", type.getName());
 			} catch (EdmException e1) {
+				LOG.error("Error getting schema", e1);
 			}
 			return null;
 		}
@@ -346,8 +345,7 @@ public class ODataV2Specification extends ODataSpecification {
 	
 	private Schema<Object> getSchemaForType(EdmType type, EdmMultiplicity multiplicity, boolean asRef) throws EdmException {
 		if(type.getKind()==EdmTypeKind.SIMPLE) {
-			Schema<Object> schema = (Schema<Object>)getSimpleSchema(type.getName());
-			return schema;
+			return (Schema<Object>)getSimpleSchema(type.getName());
 		} else if(type.getKind()==EdmTypeKind.ENTITY || type.getKind()==EdmTypeKind.COMPLEX) {
 			EdmStructuralType entityType;
 			if(type.getKind()==EdmTypeKind.ENTITY) {
