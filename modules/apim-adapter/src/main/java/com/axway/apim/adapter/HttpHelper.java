@@ -1,6 +1,7 @@
 package com.axway.apim.adapter;
 
 import com.axway.apim.lib.utils.rest.RestAPICall;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
 
@@ -12,8 +13,9 @@ public class HttpHelper {
         try(CloseableHttpResponse closeableHttpResponse = (CloseableHttpResponse) restAPICall.execute()){
             Response response = new Response();
             response.setStatusCode(closeableHttpResponse.getStatusLine().getStatusCode());
-            if(responseBody)
-                response.setResponse(EntityUtils.toString(closeableHttpResponse.getEntity()));
+            HttpEntity httpEntity = closeableHttpResponse.getEntity();
+            if(responseBody && httpEntity != null)
+                response.setResponse(EntityUtils.toString(httpEntity));
             return response;
         }
     }
