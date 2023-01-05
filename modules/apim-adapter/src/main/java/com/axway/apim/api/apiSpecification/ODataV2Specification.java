@@ -278,7 +278,8 @@ public class ODataV2Specification extends ODataSpecification {
 			if(paramImpl.getFacets().isNullable()!=null) {
 				parameter.setRequired(!paramImpl.getFacets().isNullable());
 			}
-			schema.setMaxLength(paramImpl.getFacets().getMaxLength());
+			if(schema != null)
+				schema.setMaxLength(paramImpl.getFacets().getMaxLength());
 		}
 		return parameter;
 	}

@@ -32,7 +32,10 @@ public class OpenAPI3SpecificationFilter {
 			for (HttpMethod next : operations.readOperationsMap().keySet()) {
 				String httpMethod = next.toString().toLowerCase();
 				Operation operation = getOperation4HttpMethod(operations, httpMethod);
-				List<String> tags = operation.getTags();
+				List<String> tags = null;
+				if (operation != null) {
+					tags = operation.getTags();
+				}
 				// If path OR tag is excluded, if must be removed no matter if configured as included
 				if (filter.filterOperations(s, httpMethod, tags)) {
 					toBeRemoved.add(s + ":" + httpMethod);

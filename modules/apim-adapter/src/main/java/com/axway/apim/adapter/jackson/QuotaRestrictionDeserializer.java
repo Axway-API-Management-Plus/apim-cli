@@ -97,7 +97,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 				}
 				restriction.setRestrictedAPI(api);
 			}
-			restriction.setApiId(api.getId());
+			restriction.setApiId(api != null ? api.getId() : null);
 		// If no API-Path is given,
 		} else if(node.has("api")) { // Field api might contain the API-ID (From API-Manager), the API-Name or a Star if restriction should be applied to all APIs.
 			if("*".equals(node.get("api").asText())) {
@@ -125,7 +125,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 						
 					}
 					restriction.setRestrictedAPI(api);
-					restriction.setApiId(api.getId());
+					restriction.setApiId(api != null ? api.getId() : null);
 				} else {
 					// As a fall back we take over the ID we got and add it to the restriction
 					restriction.setApiId(node.get("api").asText());

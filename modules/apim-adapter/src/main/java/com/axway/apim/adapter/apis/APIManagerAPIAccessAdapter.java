@@ -1,28 +1,13 @@
 package com.axway.apim.adapter.apis;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
-import org.ehcache.Cache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.CacheType;
+import com.axway.apim.adapter.HttpHelper;
+import com.axway.apim.adapter.Response;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
-import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.AbstractEntity;
+import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
@@ -36,6 +21,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
+import org.ehcache.Cache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class APIManagerAPIAccessAdapter {
 
@@ -56,6 +56,8 @@ public class APIManagerAPIAccessAdapter {
     private final CoreParameters cmd;
 
     private final Map<Type, Cache<String, String>> caches = new HashMap<>();
+    private static final HttpHelper httpHelper = new HttpHelper();
+
 
     public APIManagerAPIAccessAdapter() {
         cmd = CoreParameters.getInstance();
@@ -169,10 +171,8 @@ public class APIManagerAPIAccessAdapter {
             apiAccess.setId(existingAPIAccess.get(0).getId());
             return;
         }
-        URI uri;
-        HttpResponse httpResponse = null;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + parentEntity.getId() + "/apis").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + parentEntity.getId() + "/apis").build();
             mapper.setSerializationInclusion(Include.NON_NULL);
             FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                     SimpleBeanPropertyFilter.serializeAllExcept("apiName", "apiVersion"));
@@ -180,16 +180,16 @@ public class APIManagerAPIAccessAdapter {
             String json = mapper.writeValueAsString(apiAccess);
             HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
             RestAPICall request = new POSTRequest(entity, uri, APIManagerAdapter.hasAdminAccount());
-            httpResponse = request.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            String response = EntityUtils.toString(httpResponse.getEntity());
+            Response httpResponse = httpHelper.execute(request, true);
+            int statusCode = httpResponse.getStatusCode();
+            String response = httpResponse.getResponse();
             if (statusCode < 200 || statusCode > 299) {
                 if ((statusCode == 403 || statusCode == 404) && (response.contains("Unknown API") || response.contains("The entity could not be found"))) {
                     LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in " + cmd.getRetryDelay() + " milliseconds. (you may set -retryDelay <milliseconds>)");
                     Thread.sleep(cmd.getRetryDelay());
-                    httpResponse = request.execute();
-                    response = EntityUtils.toString(httpResponse.getEntity());
-                    statusCode = httpResponse.getStatusLine().getStatusCode();
+                    httpResponse = httpHelper.execute(request, true);
+                    response = httpResponse.getResponse();
+                    statusCode = httpResponse.getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error creating/updating API Access: " + apiAccess + ". Response-Code: " + statusCode + ". Got response: '" + response + "'");
                         throw new AppException("Error creating/updating API Access. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
@@ -208,11 +208,6 @@ public class APIManagerAPIAccessAdapter {
             removeFromCache(parentEntity.getId(), type);
         } catch (Exception e) {
             throw new AppException("Error creating/updating API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
-        } finally {
-            try {
-                ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 

@@ -213,9 +213,10 @@ public class Utils {
         }
         if (installFolder == null) {
             LOG.error("Could not determine install folder.");
-        }
-        if (!installFolder.isDirectory()) {
-            LOG.error("Determined install folder: " + installFolder + " is not a directory.");
+        }else {
+            if (!installFolder.isDirectory()) {
+                LOG.error("Determined install folder: " + installFolder + " is not a directory.");
+            }
         }
         return installFolder;
     }
@@ -252,10 +253,12 @@ public class Utils {
             }
         }
         // Finally check, if missing custom properties are left
-        if (requiredConfiguredCustomProperties != null && requiredConfiguredCustomProperties.size() == 0) return;
-        //List<String> missingCustomProperties = new ArrayList<>(requiredConfiguredCustomProperties.keySet());
-        String missingCustomProperties = StringUtils.join( requiredConfiguredCustomProperties.keySet(),",");
-        throw new AppException("Missing required custom properties : '" + missingCustomProperties + "'", ErrorCode.CANT_READ_CONFIG_FILE);
+        if (requiredConfiguredCustomProperties != null){
+            if(requiredConfiguredCustomProperties.isEmpty())
+                return;
+            String missingCustomProperties = StringUtils.join( requiredConfiguredCustomProperties.keySet(),",");
+            throw new AppException("Missing required custom properties : '" + missingCustomProperties + "'", ErrorCode.CANT_READ_CONFIG_FILE);
+        }
     }
 
     public static void addCustomPropertiesForEntity(List<? extends CustomPropertiesEntity> entities, String json, CustomPropertiesFilter filter) throws IOException {

@@ -69,7 +69,7 @@ public class APIMgrAppsAdapter {
      * @throws AppException if applications cannot be retrieved
      */
     private void readApplicationsFromAPIManager(ClientAppFilter filter) throws AppException {
-        if (this.apiManagerResponse != null && this.apiManagerResponse.get(filter) != null) return;
+        if (this.apiManagerResponse.get(filter) != null) return;
         try {
             String requestedId = "";
             if (filter.getApplicationId() != null) {

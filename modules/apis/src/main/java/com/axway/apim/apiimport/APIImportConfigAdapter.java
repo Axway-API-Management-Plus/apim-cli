@@ -436,7 +436,7 @@ public class APIImportConfigAdapter {
                     }
                 }
                 if (!APIManagerAdapter.hasAdminAccount()) {
-                    if (!apiConfig.getOrganization().equals(loadedApp.getOrganization())) {
+                    if (!apiConfig.getOrganization().equals(loadedApp != null ? loadedApp.getOrganization() : null)) {
                         LOG.warn("OrgAdmin can't handle application: {} belonging to a different organization. Ignoring this application.",loadedApp.getName());
                         it.remove();
                         continue;
@@ -569,7 +569,7 @@ public class APIImportConfigAdapter {
                 profile.setIsDefault(true);
             }
         }
-        if (profiles == null || profiles.size() == 0 || !hasDefaultProfile) {
+        if (profiles.isEmpty() || !hasDefaultProfile) {
             SecurityProfile passthroughProfile = new SecurityProfile();
             passthroughProfile.setName("_default");
             passthroughProfile.setIsDefault(true);
@@ -580,7 +580,6 @@ public class APIImportConfigAdapter {
             passthroughDevice.getProperties().put("subjectIdFieldName", "Pass Through");
             passthroughDevice.getProperties().put("removeCredentialsOnSuccess", "true");
             passthroughProfile.getDevices().add(passthroughDevice);
-
             profiles.add(passthroughProfile);
         }
     }

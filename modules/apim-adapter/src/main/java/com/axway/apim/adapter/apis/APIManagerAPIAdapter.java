@@ -345,18 +345,24 @@ public class APIManagerAPIAdapter {
                 ProfileType profileWithType = profiles.get(key);
                 Profile profile = (Profile) profileWithType;
                 if (profile instanceof OutboundProfile) {
-                    profile.setApiMethodId(method.getApiMethodId());
-                    profile.setApiMethodName(method.getName());
-                    profile.setApiId(method.getApiId());
+                    if (method != null) {
+                        profile.setApiMethodId(method.getApiMethodId());
+                        profile.setApiMethodName(method.getName());
+                        profile.setApiId(method.getApiId());
+                    }
                 } else {
-                    profile.setApiMethodId(method.getId());
-                    profile.setApiMethodName(method.getName());
-                    profile.setApiId(method.getVirtualizedApiId());
+                    if (method != null) {
+                        profile.setApiMethodId(method.getId());
+                        profile.setApiMethodName(method.getName());
+                        profile.setApiId(method.getVirtualizedApiId());
+                    }
                 }
                 if (mode == METHOD_TRANSLATION.AS_NAME) {
-                    updatedEntries.put(method.getName(), profileWithType);
+                    if (method != null)
+                        updatedEntries.put(method.getName(), profileWithType);
                 } else {
-                    updatedEntries.put(method.getId(), profileWithType);
+                    if (method != null)
+                        updatedEntries.put(method.getId(), profileWithType);
                 }
                 keys.remove();
             }

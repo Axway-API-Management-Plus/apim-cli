@@ -42,8 +42,8 @@ public class APIStatusManager {
 	}
 	
 	private enum StatusChangeRequiresEnforce {
-		PUBLISHED(new String[] { APIStatusManager.UNPUBLISHED, APIStatusManager.DELETED }),
-		DEPRECATED(new String[] { APIStatusManager.UNPUBLISHED, APIStatusManager.DELETED });
+		published(new String[] { APIStatusManager.UNPUBLISHED, APIStatusManager.DELETED }),
+		deprecated(new String[] { APIStatusManager.UNPUBLISHED, APIStatusManager.DELETED });
 
 		private final List<String> enforceRequired;
 
