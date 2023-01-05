@@ -43,13 +43,13 @@ public class APIManagerAPIMethodAdapter {
         if (this.apiManagerResponse.get(apiId) != null) return;
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + "/operations").build();
-            LOG.debug("Load API-Methods for API: " + apiId + " from API-Manager.");
+            LOG.debug("Load API-Methods for API: {} from API-Manager", apiId);
             RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
-            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 this.apiManagerResponse.put(apiId, EntityUtils.toString(httpResponse.getEntity()));
             }
         } catch (Exception e) {
-            LOG.error("Error cant load API-Methods for API: {}" + apiId, e);
+            LOG.error("Error cant load API-Methods for API: " + apiId, e);
             throw new AppException("Error cant load API-Methods for API: '" + apiId + "' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -69,7 +69,7 @@ public class APIManagerAPIMethodAdapter {
     public APIMethod getMethodForName(String apiId, String methodName) throws AppException {
         List<APIMethod> apiMethods = getAllMethodsForAPI(apiId);
         if (apiMethods.size() == 0) {
-            LOG.warn("No operations found for API with id: " + apiId);
+            LOG.warn("No operations found for API with id: {}", apiId);
             return null;
         }
         for (APIMethod method : apiMethods) {
@@ -84,7 +84,7 @@ public class APIManagerAPIMethodAdapter {
     public APIMethod getMethodForId(String apiId, String methodId) throws AppException {
         List<APIMethod> apiMethods = getAllMethodsForAPI(apiId);
         if (apiMethods.size() == 0) {
-            LOG.warn("No operations found for API with id: " + apiId);
+            LOG.warn("No operations found for API with id: {}", apiId);
             return null;
         }
         for (APIMethod method : apiMethods) {
@@ -93,7 +93,7 @@ public class APIManagerAPIMethodAdapter {
                 return method;
             }
         }
-        LOG.warn("No operation found with ID: '" + methodId + "' for API: '" + apiId + "'");
+        LOG.warn("No operation found with ID: {} for API: {}", methodId, apiId);
         return null;
     }
 
@@ -103,13 +103,13 @@ public class APIManagerAPIMethodAdapter {
             String json = mapper.writeValueAsString(apiMethod);
             HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
             RestAPICall putRequest = new PUTRequest(entity, uri, APIManagerAdapter.hasAdminAccount());
-            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) putRequest.execute()) {
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) putRequest.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
                 if (statusCode < 200 || statusCode > 299) {
                     throw new AppException("Can't update API-Manager Method. Response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);
                 } else {
-                    LOG.info("Successfully updated API Method. Received Status-Code: " + statusCode);
+                    LOG.info("Successfully updated API Method. Received Status-Code: {}", statusCode);
                 }
             }
         } catch (Exception e) {

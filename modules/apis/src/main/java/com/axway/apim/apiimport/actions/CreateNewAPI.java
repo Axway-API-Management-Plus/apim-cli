@@ -42,7 +42,7 @@ public class CreateNewAPI {
 
         API createdBEAPI = apiAdapter.importBackendAPI(desiredAPI);
         rollback.addRollbackAction(new RollbackBackendAPI(createdBEAPI));
-        LOG.info("Create " + desiredAPI.getState() + " API: '" + desiredAPI.getName() + "' " + desiredAPI.getVersion() + " based on " + desiredAPI.getApiDefinition().getAPIDefinitionType().getNiceName() + " specification.");
+        LOG.info("Create {} API: {} {}  based on {} specification.", desiredAPI.getState(), desiredAPI.getName(), desiredAPI.getVersion(), desiredAPI.getApiDefinition().getAPIDefinitionType().getNiceName());
         try {
             desiredAPI.setApiId(createdBEAPI.getApiId());
             createdAPI = apiAdapter.createAPIProxy(desiredAPI);

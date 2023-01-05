@@ -396,7 +396,7 @@ public class APIImportConfigAdapter {
      */
     private void completeClientApplications(API apiConfig) throws AppException {
         if (CoreParameters.getInstance().isIgnoreClientApps()) return;
-        if (apiConfig.getState().equals(API.STATE_UNPUBLISHED)) return;
+       // if (apiConfig.getState().equals(API.STATE_UNPUBLISHED)) return;
         ClientApplication loadedApp = null;
         ClientApplication app;
         if (apiConfig.getApplications() != null) {
