@@ -14,11 +14,11 @@ import org.slf4j.LoggerFactory;
 
 public class ImageComparision 
 { 
-	private static Logger LOG = LoggerFactory.getLogger(ImageComparision.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ImageComparision.class);
 	
 	public static boolean compare(byte[] image1, byte[] image2) { 
-		BufferedImage firstImage = null; 
-		BufferedImage secondImage = null; 
+		BufferedImage firstImage;
+		BufferedImage secondImage;
 		try {
 			firstImage = ImageIO.read(new ByteArrayInputStream(image1));
 			secondImage = ImageIO.read(new ByteArrayInputStream(image2));
@@ -58,7 +58,7 @@ public class ImageComparision
 			// Total number of blue pixels = width * height 
 			// Total number of green pixels = width * height 
 			// So total number of pixels = width * height * 3 
-			double total_pixels = width1 * height1 * 3; 
+			double total_pixels = (double) width1 * height1 * 3;
 
 			// Normalizing the value of different pixels 
 			// for accuracy(average pixels per color 
@@ -67,11 +67,8 @@ public class ImageComparision
 
 			// There are 255 values of pixels in total 
 			double percentage = (avg_different_pixels / 255) * 100;
-			
-			if(percentage>3) {
-				return false;
-			} 
-			return true; 
+
+			return !(percentage > 3);
 		} 
 	} 
 } 

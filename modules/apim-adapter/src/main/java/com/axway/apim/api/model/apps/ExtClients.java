@@ -3,6 +3,7 @@ package com.axway.apim.api.model.apps;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class ExtClients extends ClientAppCredential {
 	
@@ -32,6 +33,11 @@ public class ExtClients extends ClientAppCredential {
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(clientId);
 	}
 
 	@Override

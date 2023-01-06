@@ -2,6 +2,7 @@ package com.axway.apim.api.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -61,5 +62,10 @@ public class SecurityProfile {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, isDefault, devices);
     }
 }

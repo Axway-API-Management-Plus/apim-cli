@@ -1,6 +1,7 @@
 package com.axway.apim.api.model.apps;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -96,6 +97,11 @@ public abstract class ClientAppCredential {
 		}
 		return false;
 	}
-	
-	
+
+	@Override
+	public int hashCode() {
+		int result = Objects.hash(credentialType, enabled, secret);
+		result = 31 * result + Arrays.hashCode(corsOrigins);
+		return result;
+	}
 }

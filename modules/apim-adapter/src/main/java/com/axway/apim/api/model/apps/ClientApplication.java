@@ -1,9 +1,6 @@
 package com.axway.apim.api.model.apps;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -247,6 +244,12 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 		}
 		return false;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(email, phone, state, image, organization);
+	}
+
 	@Override
 	public String toString() {
 		return "[" + getName() + " ("+getId()+")]";

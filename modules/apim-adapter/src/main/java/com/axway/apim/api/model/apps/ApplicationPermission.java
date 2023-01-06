@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 @JsonFilter("ApplicationPermissionFilter")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ApplicationPermission {
@@ -83,6 +85,11 @@ public class ApplicationPermission {
 					;
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(username, permission);
 	}
 
 	@Override

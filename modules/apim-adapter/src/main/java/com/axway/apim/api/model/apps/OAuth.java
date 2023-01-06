@@ -67,6 +67,11 @@ public class OAuth extends ClientAppCredential {
 	}
 
 	@Override
+	public int hashCode() {
+		return Arrays.hashCode(redirectUrls);
+	}
+
+	@Override
 	public String toString() {
 		return "OAuth [type=" + type + ", credentialType=" + credentialType + ", id=" + id + ", enabled=" + enabled
 				+ "]";

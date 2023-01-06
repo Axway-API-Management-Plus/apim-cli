@@ -1,6 +1,7 @@
 package com.axway.apim.api.model.apps;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -95,6 +96,11 @@ public class ClientAppOauthResource {
 					otherAppCredential.isDefaultScope()==this.isDefaultScope() );
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(scope, defaultScope);
 	}
 
 	@Override

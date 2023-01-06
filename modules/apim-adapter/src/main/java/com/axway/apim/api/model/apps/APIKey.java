@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class APIKey extends ClientAppCredential {
 	
 	String deletedOn;
@@ -42,6 +44,12 @@ public class APIKey extends ClientAppCredential {
 		} else {
 			return false;
 		}
+	}
+
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), deletedOn);
 	}
 
 	@Override
