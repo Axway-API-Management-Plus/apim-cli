@@ -302,6 +302,7 @@ public class Utils {
             try {
                 retDate = format.parse(date);
             } catch (ParseException e) {
+                LOG.error("Formatting error", e);
             }
             if (retDate != null && retDate.after(new Date())) {
                 LOG.info("Parsed retirementDate: '" + date + "' using format: '" + dateFormat + "' to: '" + retDate + "'");
@@ -351,5 +352,9 @@ public class Utils {
         } else {
             return actualValue.equals(desiredValue);
         }
+    }
+
+    public static String getEncryptedPassword(){
+        return "********";
     }
 }

@@ -41,8 +41,7 @@ public class WADLSpecification extends APISpecification {
 					backendBasePath += "/";
 				}
 				// The WADL has the base path configured like so: <resources base="http://customer-api.ddns.net:8099/">
-				wadl = wadl.replaceFirst("(<resources.*base=\").*(\">)", "$1"+backendBasePath+"$2");
-
+				wadl = wadl.replaceFirst("(<resources.*base=\").*(\">)", "$1"+backendBasePath+"$2");//NOSONAR
 				this.apiSpecificationContent = wadl.getBytes();
 			}
 		} catch (MalformedURLException e) {

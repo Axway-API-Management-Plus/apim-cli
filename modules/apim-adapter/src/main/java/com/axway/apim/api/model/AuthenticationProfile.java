@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import com.axway.apim.lib.utils.Utils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.axway.apim.adapter.APIManagerAdapter;
@@ -103,7 +104,7 @@ public class AuthenticationProfile {
         if (type.equals(AuthType.ssl)) {
             String pfx = (String) parameters.get("pfx");
             if (pfx.length() > 50) pfx = pfx.substring(0, 49) + "...";
-            parametersString = "{trustAll=" + this.getParameters().get("trustAll") + ", password=********, pfx=" + pfx + "}";
+            parametersString = "{trustAll=" + this.getParameters().get("trustAll") + ", password=" + Utils.getEncryptedPassword() + ", pfx=" + pfx + "}";
         }
         return "AuthenticationProfile [name=" + name + ", isDefault=" + isDefault + ", parameters=" + parametersString
                 + ", type=" + type + "]";

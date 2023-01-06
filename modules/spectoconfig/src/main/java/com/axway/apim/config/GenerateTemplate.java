@@ -10,6 +10,7 @@ import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.URLParser;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -233,8 +234,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         AuthType authType = null;
         try {
             authType = AuthType.valueOf(backendAuthType);
-        } catch (IllegalArgumentException ignored) {
-            LOG.error("Invalid backend auth type", ignored);
+        } catch (IllegalArgumentException e) {
+            LOG.error("Invalid backend auth type", e);
         }
         if (authType == null) {
             for (AuthType authTypeEnum : AuthType.values()) {
@@ -274,7 +275,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         } else if (authType.equals(AuthType.ssl)) {
             parameters.put("source", "file");
             parameters.put("certFile", "../certificates/clientcert.pfx");
-            parameters.put("password", "********");
+            parameters.put("password", Utils.getEncryptedPassword());
             parameters.put("trustAll", true);
         }
         authNProfile.setParameters(parameters);
@@ -286,8 +287,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         DeviceType deviceType = null;
         try {
             deviceType = DeviceType.valueOf(frontendAuthType);
-        } catch (IllegalArgumentException ignored) {
-            LOG.error("Invalid Frontend AuthType", ignored);
+        } catch (IllegalArgumentException e) {
+            LOG.error("Invalid Frontend AuthType", e);
         }
 
         if (deviceType == null) {
