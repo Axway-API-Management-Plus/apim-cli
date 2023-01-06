@@ -303,17 +303,20 @@ public class APIManagerAdapter {
             // When running in a CI/CD pipeline, multiple CPIM-CLIs might be executed
             int initAttempts = 1;
             int maxAttempts = 100;
+            CacheManager ehcacheManager;
             do {
                 try {
-                    CacheManager ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
+                    ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
                     APIManagerAdapter.cacheManager = new APIMCLICacheManager(ehcacheManager);
                     APIManagerAdapter.cacheManager.init();
                 } catch (StateTransitionException e) {
                     LOG.warn("Error initializing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 3 seconds. Attempts: {}/{}" , initAttempts, maxAttempts);
                     try {
+                        cacheManager.close();
                         Thread.sleep(3000);
                     } catch (InterruptedException ignore) {
                         Thread.currentThread().interrupt();
+                    }catch (StateTransitionException exception){
                     }
                 }
                 initAttempts++;
