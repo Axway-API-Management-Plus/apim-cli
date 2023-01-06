@@ -77,7 +77,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
     public static int generate(String[] args) {
         // Trust all certificate and hostname for openapi parser
         System.setProperty("TRUST_ALL","true");
-        HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);
+        HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);//NOSONAR
         LOG.info("Generating APIM CLI configuration file");
         GenerateTemplateParameters params;
         try {
@@ -395,10 +395,10 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 return null;
             }
 
-            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {//NOSONAR
             }
 
-            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {//NOSONAR
             }
         }};
 
@@ -428,7 +428,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 if (parent != null) {
                     filename = file.toPath().getParent().toString() + File.separator + filename;
                 }
-                try (FileOutputStream fileOutputStream = new FileOutputStream(filename)) {
+                try (FileOutputStream fileOutputStream = new FileOutputStream(filename)) {//NOSONAR
                     fileOutputStream.write(certContent);
                 } catch (IOException e) {
                     throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
