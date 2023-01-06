@@ -305,7 +305,7 @@ public class APIManagerAdapter {
             int maxAttempts = 100;
             do {
                 try {
-                    CacheManager ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);
+                    CacheManager ehcacheManager = CacheManagerBuilder.newCacheManager(xmlConfig);//NOSONAR
                     APIManagerAdapter.cacheManager = new APIMCLICacheManager(ehcacheManager);
                     APIManagerAdapter.cacheManager.init();
                 } catch (StateTransitionException e) {
