@@ -31,7 +31,9 @@ import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -206,7 +208,9 @@ public class APIManagerAPIAccessAdapter {
             }
             // Clean cache for this ID (App/Org) to force reload next time
             removeFromCache(parentEntity.getId(), type);
-        } catch (Exception e) {
+        } catch (InterruptedException e){
+            Thread.currentThread().interrupt();
+        } catch(IOException | URISyntaxException e) {
             throw new AppException("Error creating/updating API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
         }
     }

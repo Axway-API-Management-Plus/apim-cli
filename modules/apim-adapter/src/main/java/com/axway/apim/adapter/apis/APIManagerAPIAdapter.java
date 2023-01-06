@@ -531,7 +531,6 @@ public class APIManagerAPIAdapter {
                 LOG.debug("Base Path : {}, Resource Path : {}", basePath, resourcePath);
                 apiDefinition.updateBasePath(resourcePath, basePath);
             }
-
             JsonNode resourceUriNode = jsonNode.get("properties").get("ResourceUri");
             LOG.debug("Resource Uri : {}", resourceUriNode);
             // resourceUriNode will be null if API is created manually. # https://github.com/Axway-API-Management-Plus/apim-cli/issues/337
@@ -542,8 +541,10 @@ public class APIManagerAPIAdapter {
             // In any case, we save the backend resource path, as it is necessary for the full backendBasepath in the exported API config.
             api.setBackendResourcePath(resourcePath);
 
-        } catch (Exception e) {
+        } catch (IOException | URISyntaxException e) {
             throw new AppException("Cannot parse Backend-API for API: '" + api.toStringHuman() + "' in order to change API-Specification", ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -900,8 +901,10 @@ public class APIManagerAPIAdapter {
                                 throw new AppException("Error taking over application quota to new API. Received Status-Code: " + statusCode, ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
                             }
                         }
-                    } catch (Exception e) {
+                    } catch (IOException | URISyntaxException e) {
                         throw new AppException("Can't update application quota. Error message: " + e.getMessage(), ErrorCode.CANT_UPDATE_QUOTA_CONFIG, e);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
                     }
                 }
             }
@@ -935,7 +938,11 @@ public class APIManagerAPIAdapter {
                 String response = httpResponse.getResponse();
                 if ((statusCode == 403 || statusCode == 404) && (response.contains("Unknown API") || response.contains("The entity could not be found"))) {
                     LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
-                    Thread.sleep(cmd.getRetryDelay());
+                    try {
+                        Thread.sleep(cmd.getRetryDelay());
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                     httpResponse = httpHelper.execute(request, true);
                     statusCode = httpResponse.getStatusCode();
                     if (statusCode != 204) {
@@ -950,7 +957,7 @@ public class APIManagerAPIAdapter {
                 }
             }
             return true;
-        } catch (Exception e) {
+        } catch (IOException | URISyntaxException e) {
             throw new AppException("Can't upgrade access to newer API!", ErrorCode.CANT_UPGRADE_API_ACCESS, e);
         }
     }
@@ -989,10 +996,12 @@ public class APIManagerAPIAdapter {
             // Update the actual state to reflect, which organizations now really have access to the API (this also includes prev. added orgs)
             if (api.getClientOrganizations() == null) api.setClientOrganizations(new ArrayList<>());
             api.getClientOrganizations().addAll(grantAccessToOrgs);
-        } catch (Exception e) {
+        } catch (IOException | URISyntaxException e) {
             LOG.error("grantAccessToOrgs: {}", grantAccessToOrgs);
             LOG.error("allOrgs: {}", allOrgs);
             throw new AppException("Can't grant access to organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 

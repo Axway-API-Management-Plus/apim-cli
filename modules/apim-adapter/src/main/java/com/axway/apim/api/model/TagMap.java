@@ -5,9 +5,6 @@ import java.util.Objects;
 
 public class TagMap extends LinkedHashMap<String, String[]> {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
     public TagMap() {
         super();
@@ -27,4 +24,8 @@ public class TagMap extends LinkedHashMap<String, String[]> {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

@@ -214,6 +214,8 @@ public class APIManagerAdapter {
                 throw new AppException("Not supported user-role: " + user.getRole() + "", ErrorCode.API_MANAGER_COMMUNICATION);
             }
         } catch (IOException | URISyntaxException | InterruptedException  e) {
+            if(e instanceof InterruptedException)
+                Thread.currentThread().interrupt();
             throw new AppException("Can't login to API-Manager " + uri, ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -311,6 +313,7 @@ public class APIManagerAdapter {
                     try {
                         Thread.sleep(3000);
                     } catch (InterruptedException ignore) {
+                        Thread.currentThread().interrupt();
                     }
                 }
                 initAttempts++;

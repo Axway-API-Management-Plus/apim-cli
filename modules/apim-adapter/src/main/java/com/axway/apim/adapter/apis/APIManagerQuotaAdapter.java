@@ -167,8 +167,10 @@ public class APIManagerQuotaAdapter {
             // Force reload of this quota next time
             applicationsQuotaCache.remove(quotaId);
             mapper.readValue(response, APIQuota.class);
-        } catch (Exception e) {
+        } catch (IOException | URISyntaxException e) {
             throw new AppException("Can't update Quota-Configuration in API-Manager.", ErrorCode.UNXPECTED_ERROR, e);
+        }catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
