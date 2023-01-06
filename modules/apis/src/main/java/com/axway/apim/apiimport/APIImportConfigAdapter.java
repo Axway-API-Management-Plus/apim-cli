@@ -391,8 +391,8 @@ public class APIImportConfigAdapter {
      * Additionally, for each application it's checked, that the organization has access
      * to this API, otherwise it will be removed from the list as well and a warning message is logged.
      *
-     * @param apiConfig
-     * @throws AppException
+     * @param apiConfig apiConfig
+     * @throws AppException AppException
      */
     private void completeClientApplications(API apiConfig) throws AppException {
         if (CoreParameters.getInstance().isIgnoreClientApps()) return;
@@ -437,7 +437,7 @@ public class APIImportConfigAdapter {
                 }
                 if (!APIManagerAdapter.hasAdminAccount()) {
                     if (!apiConfig.getOrganization().equals(loadedApp != null ? loadedApp.getOrganization() : null)) {
-                        LOG.warn("OrgAdmin can't handle application: {} belonging to a different organization. Ignoring this application.",loadedApp.getName());
+                        LOG.warn("OrgAdmin can't handle application: {} belonging to a different organization. Ignoring this application.", loadedApp != null ? loadedApp.getName() : null);
                         it.remove();
                         continue;
                     }

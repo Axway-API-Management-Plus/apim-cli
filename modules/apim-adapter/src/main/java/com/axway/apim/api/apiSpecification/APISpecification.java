@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public abstract class APISpecification {
     private final Logger LOG = LoggerFactory.getLogger(APISpecification.class);
@@ -112,7 +113,11 @@ public abstract class APISpecification {
             }
         }
         return false;
+    }
 
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(apiSpecificationContent);
     }
 
     public abstract void configureBasePath(String backendBasePath, API api) throws AppException;

@@ -59,6 +59,11 @@ public class Image {
         }
     }
 
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(imageContent);
+    }
+
     public InputStream getInputStream() {
         return new ByteArrayInputStream(this.imageContent);
     }

@@ -2,6 +2,8 @@ package com.axway.apim.api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Objects;
+
 @JsonIgnoreProperties(ignoreUnknown = true, value = {"original"})
 public class APIMethod {
     /**
@@ -139,6 +141,11 @@ public class APIMethod {
             return flag;
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, summary, descriptionType, tags);
     }
 }
 

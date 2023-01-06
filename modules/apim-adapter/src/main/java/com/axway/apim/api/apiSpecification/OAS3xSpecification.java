@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import java.util.Objects;
 
 public class OAS3xSpecification extends APISpecification {
     private final Logger LOG = LoggerFactory.getLogger(OAS3xSpecification.class);
@@ -132,5 +133,8 @@ public class OAS3xSpecification extends APISpecification {
         return super.equals(other);
     }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), openAPI);
+    }
 }

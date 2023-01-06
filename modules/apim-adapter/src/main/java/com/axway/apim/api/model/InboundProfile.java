@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Objects;
+
 @JsonIgnoreProperties(value = {"apiMethodId", "apiId", "apiMethodName"})
 public class InboundProfile extends Profile {
 	
@@ -71,6 +73,11 @@ public class InboundProfile extends Profile {
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(monitorAPI, queryStringPassThrough, monitorSubject, securityProfile, corsProfile);
 	}
 
 	@Override

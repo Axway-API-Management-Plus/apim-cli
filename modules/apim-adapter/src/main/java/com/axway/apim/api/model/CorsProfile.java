@@ -1,6 +1,7 @@
 package com.axway.apim.api.model;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -93,7 +94,16 @@ public class CorsProfile {
 			return false;
 		}
 	}
-	
+
+	@Override
+	public int hashCode() {
+		int result = Objects.hash(name, isDefault, supportCredentials, maxAgeSeconds);
+		result = 31 * result + Arrays.hashCode(origins);
+		result = 31 * result + Arrays.hashCode(allowedHeaders);
+		result = 31 * result + Arrays.hashCode(exposedHeaders);
+		return result;
+	}
+
 	public static CorsProfile getDefaultCorsProfile() {
 		CorsProfile defaultCorsProfile = new CorsProfile();
 		defaultCorsProfile.setName("_default");
