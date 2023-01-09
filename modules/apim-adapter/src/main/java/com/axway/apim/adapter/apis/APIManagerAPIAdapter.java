@@ -466,6 +466,7 @@ public class APIManagerAPIAdapter {
                     uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId() + "/download")
                             .setParameter("original", "true").build();
                 }
+                LOG.debug("Download API spec URL :{}",uri);
                 RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();

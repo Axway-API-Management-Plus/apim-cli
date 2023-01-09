@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/portal/v1.4/organizations/ba1c6dac-ee31-4b5d-9d18-493cc6f5088b"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "organization_by_id.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -51,6 +51,7 @@ public class JsonAPIExporter extends APIResultHandler {
 			try {
 				saveAPILocally(exportAPI);
 			} catch (AppException e) {
+				LOG.error("Error in export", e);
 				throw e;
 			}
 		}

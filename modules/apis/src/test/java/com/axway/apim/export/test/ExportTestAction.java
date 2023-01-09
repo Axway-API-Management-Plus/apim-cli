@@ -69,7 +69,7 @@ public class ExportTestAction extends AbstractTestAction {
 			args.add("-t");
 			args.add(context.replaceDynamicContentInString("${exportLocation}"));
 			args.add("-o");
-			args.add("json");
+			args.add("__files");
 		} else {
 			args.add("-a");
 			args.add(context.replaceDynamicContentInString("${exportApi}"));
@@ -86,7 +86,7 @@ public class ExportTestAction extends AbstractTestAction {
 			args.add("-s");
 			args.add(stage);
 			args.add("-o");
-			args.add("json");
+			args.add("__files");
 			if(ignoreAdminAccount) {
 				args.add("-ignoreAdminAccount");
 			}

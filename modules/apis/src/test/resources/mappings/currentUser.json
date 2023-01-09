@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/portal/v1.4/currentuser"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "current_user.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
