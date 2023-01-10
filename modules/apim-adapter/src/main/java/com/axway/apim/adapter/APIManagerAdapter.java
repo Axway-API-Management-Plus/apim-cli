@@ -126,10 +126,12 @@ public class APIManagerAdapter {
             LOG.trace("Cache Closed.");
         }
         if (APIManagerAdapter.instance != null) {
-            if (hasOrgAdmin())
-                APIManagerAdapter.instance.logoutFromAPIManager(false); // Logout potentially logged in OrgAdmin
-            if (hasAdminAccount())
-                APIManagerAdapter.instance.logoutFromAPIManager(true); // Logout potentially logged in Admin
+            if(!TestIndicator.getInstance().isTestRunning()) {
+                if (hasOrgAdmin())
+                    APIManagerAdapter.instance.logoutFromAPIManager(false); // Logout potentially logged in OrgAdmin
+                if (hasAdminAccount())
+                    APIManagerAdapter.instance.logoutFromAPIManager(true); // Logout potentially logged in Admin
+            }
             APIManagerAdapter.instance = null;
         }
         APIManagerAdapter.apiManagerVersion = null;

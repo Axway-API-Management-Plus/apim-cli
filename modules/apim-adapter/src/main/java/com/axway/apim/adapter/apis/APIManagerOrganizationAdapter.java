@@ -71,7 +71,7 @@ public class APIManagerOrganizationAdapter {
                     .build();
             RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
             LOG.debug("Load organizations from API-Manager using filter: {}", filter);
-            LOG.trace("Load organization with URI: {}", uri);
+            LOG.debug("Load organization with URI: {}", uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                     LOG.error("Sent request: {}", uri);
