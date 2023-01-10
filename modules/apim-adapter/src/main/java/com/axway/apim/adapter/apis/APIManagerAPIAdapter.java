@@ -107,7 +107,7 @@ public class APIManagerAPIAdapter {
         List<API> foundAPIs = getAPIs(filter, false);
         API api = getUniqueAPI(foundAPIs, filter);
         if (logMessage && api != null)
-            LOG.info("Found existing API: '" + api.getName() + "' (" + api.getState() + ") on path: '" + api.getPath() + "' (ID: '" + api.getId() + "')");
+            LOG.debug("Found existing API: '" + api.getName() + "' (" + api.getState() + ") on path: '" + api.getPath() + "' (ID: '" + api.getId() + "')");
         return api;
     }
 

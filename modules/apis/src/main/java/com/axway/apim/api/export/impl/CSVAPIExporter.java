@@ -32,14 +32,14 @@ public class CSVAPIExporter extends APIResultHandler {
     DateFormat isoDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private enum HeaderFields {
-        STANDARD(new String[]{
+        standard(new String[]{
                 "API ID",
                 "API Name",
                 "API Path",
                 "API Version",
                 "Created on"
         }),
-        WIDE(new String[]{
+        wide(new String[]{
                 "API ID",
                 "API Organization",
                 "API Name",
@@ -54,7 +54,7 @@ public class CSVAPIExporter extends APIResultHandler {
                 "Fault-Handler Policy",
                 "Created on"
         }),
-        ULTRA(new String[]{
+        ultra(new String[]{
                 "API ID",
                 "API Organization",
                 "API Name",
@@ -100,7 +100,6 @@ public class CSVAPIExporter extends APIResultHandler {
                 throw new AppException("Targetfile: " + target.getCanonicalPath() + " already exists. You may set the flag -deleteTarget if you wish to overwrite it.", ErrorCode.EXPORT_FOLDER_EXISTS);
             }
             try (FileWriter appendable = new FileWriter(target)) {
-                appendable.append("sep=,\n"); // Helps Excel to detect columns
                 try (CSVPrinter csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader(HeaderFields.valueOf(wide.name()).headerFields))) {
                     writeRecords(csvPrinter, apis, wide);
                     LOG.info("API export successfully written to file: {}", target.getCanonicalPath());

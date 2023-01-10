@@ -83,6 +83,7 @@ public class APIManagerOrganizationAdapter {
                     // Store it as an Array
                     response = "[" + response + "]";
                     apiManagerResponse.put(filter, response);
+                    LOG.debug("Organization id to be cached : {}", orgId);
                     organizationCache.put(orgId, response);
                 } else {
                     // We got an Array from API-Manager

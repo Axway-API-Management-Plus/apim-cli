@@ -94,7 +94,6 @@ public class CSVAppExporter extends ApplicationExporter {
                 throw new AppException("Targetfile: " + target.getCanonicalPath() + " already exists. You may set the flag -deleteTarget if you wish to overwrite it.", ErrorCode.EXPORT_FOLDER_EXISTS);
             }
             try (FileWriter appendable = new FileWriter(target)) {
-                appendable.append("sep=,\n"); // Helps Excel to detect columns
                 try (CSVPrinter csvPrinter = new CSVPrinter(appendable, CSVFormat.DEFAULT.withHeader(HeaderFields.valueOf(wide.name()).headerFields))) {
                     writeRecords(csvPrinter, apps, wide);
                     LOG.info("Application export successfully written to file: {}", target.getCanonicalPath());
