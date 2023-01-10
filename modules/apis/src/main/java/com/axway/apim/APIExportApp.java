@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
     public static void main(String[] args) throws InvocationTargetException, IllegalAccessException {
         String serviceName = args[1];
         if (serviceName == null) {
-            System.out.println("Invalid arguments - prefix commandline param with \"api get\"");
+            Console.println("Invalid arguments - prefix commandline param with \"api get\"");
             return;
         }
         for (final Method method : APIExportApp.class.getDeclaredMethods()) {
@@ -153,9 +154,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
     public static int approve(String[] args) {
         try {
             deleteInstances();
-
             APIApproveParams params = (APIApproveParams) CLIAPIApproveOptions.create(args).getParams();
-
             return execute(params, APIListImpl.API_APPROVE_HANDLER);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -223,7 +222,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
                 if (resultHandler.hasError()) {
                     LOG.error("Please check the log. At least one error was recorded.");
                 } else {
-                    LOG.debug("Successfully selected {}} API(s).", apis.size());
+                    LOG.debug("Successfully selected {} API(s).", apis.size());
                 }
                 APIManagerAdapter.deleteInstance();
 
@@ -247,7 +246,6 @@ public class APIExportApp implements APIMCLIServiceProvider {
             }
         }
     }
-
 
     public ExportResult upgradeAPI(APIUpgradeAccessParams params, APIListImpl resultHandlerImpl) {
         ExportResult result = new ExportResult();

@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class APIChangeHandler extends APIResultHandler {
@@ -99,7 +98,7 @@ public class APIChangeHandler extends APIResultHandler {
 
     private API changeBackendBasePath(API api, String newBackendBasepath, String oldBackendBasepath) throws AppException {
         if (oldBackendBasepath != null) {
-            String actualBackend = getActualBackendBasepath(api);
+            String actualBackend = getActualBackendBasePath(api);
             if (!oldBackendBasepath.equals(actualBackend)) {
                 LOG.warn("Backend of API: {} wont be changed as it has a different backend configured. Current: {} New: {}", api.getName(), actualBackend, oldBackendBasepath);
                 return api;
@@ -111,11 +110,9 @@ public class APIChangeHandler extends APIResultHandler {
         return api;
     }
 
-    private String getActualBackendBasepath(API api) throws AppException {
-        Iterator<ServiceProfile> it = api.getServiceProfiles().values().iterator();
+    private String getActualBackendBasePath(API api) throws AppException {
         String lastBasepath = null;
-        while (it.hasNext()) {
-            ServiceProfile profile = it.next();
+        for(ServiceProfile profile: api.getServiceProfiles().values()){
             if (lastBasepath != null && !lastBasepath.equals(profile.getBasePath())) {
                 throw new AppException("API has multiple backends configured. Please export - change - import the API to change it.", ErrorCode.UNSUPPORTED_FEATURE);
             }
@@ -123,5 +120,4 @@ public class APIChangeHandler extends APIResultHandler {
         }
         return lastBasepath;
     }
-
 }

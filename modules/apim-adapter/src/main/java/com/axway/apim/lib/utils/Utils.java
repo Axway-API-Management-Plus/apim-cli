@@ -11,6 +11,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.Permission;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
@@ -213,7 +214,7 @@ public class Utils {
         }
         if (installFolder == null) {
             LOG.error("Could not determine install folder.");
-        }else {
+        } else {
             if (!installFolder.isDirectory()) {
                 LOG.error("Determined install folder: " + installFolder + " is not a directory.");
             }
@@ -253,10 +254,10 @@ public class Utils {
             }
         }
         // Finally check, if missing custom properties are left
-        if (requiredConfiguredCustomProperties != null){
-            if(requiredConfiguredCustomProperties.isEmpty())
+        if (requiredConfiguredCustomProperties != null) {
+            if (requiredConfiguredCustomProperties.isEmpty())
                 return;
-            String missingCustomProperties = StringUtils.join( requiredConfiguredCustomProperties.keySet(),",");
+            String missingCustomProperties = StringUtils.join(requiredConfiguredCustomProperties.keySet(), ",");
             throw new AppException("Missing required custom properties : '" + missingCustomProperties + "'", ErrorCode.CANT_READ_CONFIG_FILE);
         }
     }
@@ -354,7 +355,16 @@ public class Utils {
         }
     }
 
-    public static String getEncryptedPassword(){
+    public static String getEncryptedPassword() {
         return "********";
+    }
+
+    public static String createFileName(String host, String stage, String prefix) throws AppException {
+        DateFormat df = new SimpleDateFormat("ddMMyyyy-HHmm");
+        String dateTime = df.format(new Date());
+        if (stage != null) {
+            host = stage;
+        }
+        return prefix + host + "_" + APIManagerAdapter.getCurrentUser(false).getLoginName() + "_" + dateTime + ".csv";
     }
 }

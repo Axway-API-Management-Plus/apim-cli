@@ -240,7 +240,7 @@ public abstract class APIResultHandler {
             }
             return grantedOrgs;
         } catch (Exception e) {
-            LOG.error("Error getting API client organization");
+            LOG.error("Error getting API client organization", e);
             return grantedOrgs;
         }
     }
