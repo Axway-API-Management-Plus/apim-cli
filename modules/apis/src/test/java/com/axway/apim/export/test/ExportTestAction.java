@@ -12,8 +12,7 @@ import com.consol.citrus.exceptions.ValidationException;
 public class ExportTestAction extends AbstractTestAction {
 	
 	public static String EXPORT_API			= "exportApi";
-	public static String EXPORT_LOCATION	= "exportLocation";
-	
+
 	@Override
 	public void doExecute(TestContext context) {
 		
@@ -27,31 +26,31 @@ public class ExportTestAction extends AbstractTestAction {
 
 		try {
 			stage 				= context.getVariable("stage");
-		} catch (CitrusRuntimeException ignore) {};
+		} catch (CitrusRuntimeException ignore) {}
 		
 		int expectedReturnCode = 0;
 		try {
 			expectedReturnCode 	= Integer.parseInt(context.getVariable("expectedReturnCode"));
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		
 		try {
 			useEnvironmentOnly 	= Boolean.parseBoolean(context.getVariable("useEnvironmentOnly"));
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		
 		try {
 			ignoreAdminAccount = Boolean.parseBoolean(context.getVariable("ignoreAdminAccount"));
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		try {
 			useFEAPIDefinition = Boolean.parseBoolean(context.getVariable("useFEAPIDefinition"));
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		
 		try {
 			vhostToExport = context.getVariable("vhostToExport");
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 
 		try {
 			exportMethods = Boolean.parseBoolean(context.getVariable("exportMethods"));
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 
 
 		if(stage==null) {
@@ -60,7 +59,7 @@ public class ExportTestAction extends AbstractTestAction {
 		if(vhostToExport==null) {
 			vhostToExport = "NOT_SET";
 		}
-		List<String> args = new ArrayList<String>();
+		List<String> args = new ArrayList<>();
 		if(useEnvironmentOnly) {
 			args.add("-a");
 			args.add(context.replaceDynamicContentInString("${exportApi}"));
@@ -69,7 +68,7 @@ public class ExportTestAction extends AbstractTestAction {
 			args.add("-t");
 			args.add(context.replaceDynamicContentInString("${exportLocation}"));
 			args.add("-o");
-			args.add("__files");
+			args.add("json");
 		} else {
 			args.add("-a");
 			args.add(context.replaceDynamicContentInString("${exportApi}"));
@@ -86,7 +85,7 @@ public class ExportTestAction extends AbstractTestAction {
 			args.add("-s");
 			args.add(stage);
 			args.add("-o");
-			args.add("__files");
+			args.add("json");
 			if(ignoreAdminAccount) {
 				args.add("-ignoreAdminAccount");
 			}
