@@ -172,7 +172,6 @@ public class Utils {
                 } else {
                     return null;
                 }
-
             }
         }
         LOG.debug("No stage provided");

@@ -1,0 +1,8 @@
+{
+  "name": "${apiName}",
+  "path": "/v1/api",
+  "state": "published",
+  "version": "v2",
+  "vhost":"api.axway.com",
+  "organization": "API Development ${orgNumber}"
+}

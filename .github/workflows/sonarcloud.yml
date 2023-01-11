@@ -5,6 +5,8 @@ on:
       - develop
   pull_request:
     types: [opened, synchronize, reopened]
+env:
+  LOG_LEVEL:debug
 jobs:
   build:
     name: Build and analyze
