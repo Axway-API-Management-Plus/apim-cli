@@ -72,6 +72,7 @@
         </repository>
     </distributionManagement>
     <modules>
+        <module>modules/apim-cli-tests</module>
         <module>modules/apim-adapter</module>
         <module>modules/apim-cli</module>
         <module>modules/apis</module>
@@ -81,7 +82,6 @@
         <module>modules/settings</module>
         <module>distribution</module>
         <module>modules/spectoconfig</module>
-        <module>modules/apim-cli-tests</module>
     </modules>
     <dependencyManagement>
         <dependencies>

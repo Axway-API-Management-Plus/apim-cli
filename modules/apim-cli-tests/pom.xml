@@ -10,8 +10,8 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>apim-cli-tests</artifactId>
-
+    <artifactId>apimcli-tests</artifactId>
+    <name>Axway API-Manager CLI Tests</name>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>

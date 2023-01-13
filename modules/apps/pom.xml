@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-            <artifactId>apim-cli-tests</artifactId>
+            <artifactId>apimcli-tests</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
