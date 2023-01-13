@@ -1,0 +1,8 @@
+{
+  "id": "00000000-0000-0000-0000-000000000001",
+  "type": "APPLICATION",
+  "name": "Application Default",
+  "description": "Maximum message rates per application. Applied to each application unless an Application-Specific quota is configured",
+  "restrictions": [],
+  "system": true
+}

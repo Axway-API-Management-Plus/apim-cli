@@ -29,7 +29,7 @@ public class CSVAppExporter extends ApplicationExporter {
     private static final Logger LOG = LoggerFactory.getLogger(CSVAppExporter.class);
 
     private enum HeaderFields {
-        STANDARD(new String[]{
+        standard(new String[]{
                 "ID",
                 "Organization",
                 "Name",
@@ -39,7 +39,7 @@ public class CSVAppExporter extends ApplicationExporter {
                 "Enabled",
                 "Created by"
         }),
-        WIDE(new String[]{
+        wide(new String[]{
                 "ID",
                 "Organization",
                 "Name",
@@ -52,7 +52,7 @@ public class CSVAppExporter extends ApplicationExporter {
                 "API-Method",
                 "Quota Config"
         }),
-        ULTRA(new String[]{
+        ultra(new String[]{
                 "ID",
                 "Organization",
                 "Name",

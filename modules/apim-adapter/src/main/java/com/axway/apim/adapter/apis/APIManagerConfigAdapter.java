@@ -88,7 +88,7 @@ public class APIManagerConfigAdapter {
         if (apiManagerResponse.get(useAdmin) != null) return;
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/config").build();
-            LOG.debug("Load API-Manager configuration.");
+            LOG.debug("API-Manager configuration URL : {}", uri);
             RestAPICall getRequest = new GETRequest(uri, useAdmin);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());

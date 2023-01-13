@@ -175,6 +175,7 @@ public class APIMgrAppsAdapter {
             URI uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + APPLICATIONS).build();
             RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
             LOG.debug("Load subscribed applications for API-ID: {} from API-Manager", apiId);
+            LOG.debug("Load subscribed applications URI: {}", uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 subscribedAppAPIManagerResponse.put(apiId, response);

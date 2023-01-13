@@ -31,6 +31,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apim-cli-tests</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
@@ -93,6 +99,8 @@
 		<dependency>
 			<groupId>com.github.tomakehurst</groupId>
 			<artifactId>wiremock-jre8-standalone</artifactId>
+			<version>${wiremock.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 		    <groupId>com.github.freva</groupId>

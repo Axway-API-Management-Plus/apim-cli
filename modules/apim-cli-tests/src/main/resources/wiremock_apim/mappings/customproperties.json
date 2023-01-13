@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/portal/v1.4/config/customproperties"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "customproperties.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
