@@ -91,7 +91,6 @@ public class APIManagerUserAdapter {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new AppException("Error cant read users from API-Manager with filter: " + filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }

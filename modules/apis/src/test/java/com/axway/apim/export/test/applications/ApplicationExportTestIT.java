@@ -1,22 +1,7 @@
 package com.axway.apim.export.test.applications;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.export.test.ExportTestAction;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -27,20 +12,27 @@ import com.consol.citrus.message.MessageType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+
+import static org.testng.Assert.*;
 
 @Test
 public class ApplicationExportTestIT extends TestNGCitrusTestRunner {
 
-	private ExportTestAction swaggerExport;
-	private ImportTestAction swaggerImport;
-	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {		
+	public void run(@Optional @CitrusResource TestContext context) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
-
-		swaggerExport = new ExportTestAction();
-		swaggerImport = new ImportTestAction();
+		ExportTestAction swaggerExport = new ExportTestAction();
+		ImportTestAction swaggerImport = new ImportTestAction();
 		description("Import an API including applications to export it afterwards");
 
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
@@ -79,7 +71,7 @@ public class ApplicationExportTestIT extends TestNGCitrusTestRunner {
 		String exportedAPIConfigFile = context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/api-config.json";
 		
 		echo("####### Reading exported API-Config file: '"+exportedAPIConfigFile+"' #######");
-		JsonNode exportedAPIConfig = mapper.readTree(new FileInputStream(new File(exportedAPIConfigFile)));
+		JsonNode exportedAPIConfig = mapper.readTree(Files.newInputStream(new File(exportedAPIConfigFile).toPath()));
 		
 		assertEquals(exportedAPIConfig.get("version").asText(), 			"1.0.1");
 		assertEquals(exportedAPIConfig.get("organization").asText(),		"API Development "+context.getVariable("orgNumber"));
@@ -90,8 +82,8 @@ public class ApplicationExportTestIT extends TestNGCitrusTestRunner {
 		assertEquals(exportedAPIConfig.get("caCerts").size(), 				4);
 		
 		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("certFile").asText(), 				"swagger.io.crt");
-		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("inbound").asBoolean(), 			false);
-		assertEquals(exportedAPIConfig.get("caCerts").get(0).get("outbound").asBoolean(), 			true);
+		assertFalse(exportedAPIConfig.get("caCerts").get(0).get("inbound").asBoolean());
+		assertTrue(exportedAPIConfig.get("caCerts").get(0).get("outbound").asBoolean());
 		
 		List<ClientApplication> exportedApps = mapper.convertValue(exportedAPIConfig.get("applications"), new TypeReference<List<ClientApplication>>(){});
 		assertEquals(exportedApps.size(), 1, "Number of exported apps not correct");
@@ -105,7 +97,6 @@ public class ApplicationExportTestIT extends TestNGCitrusTestRunner {
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/StarfieldServicesRootCertificateAuthority-G2.crt").exists(), "Certificate StarfieldServicesRootCertificateAuthority-G2.crt is missing");
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/AmazonRootCA1.crt").exists(), "Certificate AmazonRootCA1.crt is missing");
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/Amazon.crt").exists(), "Certificate Amazon.crt is missing");
-		
 		assertTrue(new File(context.getVariable("exportLocation")+"/"+context.getVariable("exportFolder")+"/"+context.getVariable("exportAPIName")).exists(), "Exported Swagger-File is missing");
 	}
 }

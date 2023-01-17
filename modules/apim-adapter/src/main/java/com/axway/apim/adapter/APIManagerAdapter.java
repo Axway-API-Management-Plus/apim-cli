@@ -248,7 +248,6 @@ public class APIManagerAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) currentUserRequest.execute()) {
                 getCsrfToken(httpResponse); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
                 String currentUser = EntityUtils.toString(httpResponse.getEntity());
-                LOG.info("Response : {}", currentUser);
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 200) {
                     throw new AppException("Status-Code: " + statusCode + ", Can't get current-user for user '" + currentUser + "'",
