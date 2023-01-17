@@ -108,7 +108,7 @@ public class APIManagerAdapter {
         if (APIManagerAdapter.instance == null) {
             if (!TestIndicator.getInstance().isTestRunning()) {
                 APIManagerAdapter.instance = new APIManagerAdapter();
-                LOG.info("Successfully connected to API-Manager ({}) on: {}",getApiManagerVersion(), CoreParameters.getInstance().getAPIManagerURL());
+                LOG.info("Successfully connected to API-Manager ({}) on: {}", getApiManagerVersion(), CoreParameters.getInstance().getAPIManagerURL());
             } else {
                 APIManagerAdapter.apiManagerVersion = "7.7.0";
                 APIManagerAdapter.instance = new APIManagerAdapter();
@@ -126,12 +126,8 @@ public class APIManagerAdapter {
             LOG.trace("Cache Closed.");
         }
         if (APIManagerAdapter.instance != null) {
-            if(!TestIndicator.getInstance().isTestRunning()) {
-                if (hasOrgAdmin())
-                    APIManagerAdapter.instance.logoutFromAPIManager(false); // Logout potentially logged in OrgAdmin
-                if (hasAdminAccount())
-                    APIManagerAdapter.instance.logoutFromAPIManager(true); // Logout potentially logged in Admin
-            }
+            if (!TestIndicator.getInstance().isTestRunning())
+                APIManagerAdapter.instance.logoutFromAPIManager();
             APIManagerAdapter.instance = null;
         }
         APIManagerAdapter.apiManagerVersion = null;
@@ -149,8 +145,7 @@ public class APIManagerAdapter {
             this.hasAdminAccount = true; // For unit tests we have an admin account
         } else {
             // No need to login, when running unit tests
-            loginToAPIManager(false); // Login with the provided user (might be an Org-Admin)
-            loginToAPIManager(true); // Second, login if needed with an admin account
+            loginToAPIManager();
             APIManagerAdapter.apiManagerVersion = configAdapter.getConfig(false).getProductVersion();
         }
 
@@ -169,32 +164,16 @@ public class APIManagerAdapter {
         this.userAdapter = new APIManagerUserAdapter();
     }
 
-    public void loginToAPIManager(boolean useAdminClient) throws AppException {
-        URI uri = null;
-        if (cmd.isIgnoreAdminAccount() && useAdminClient) return;
-        if (hasAdminAccount && useAdminClient) return; // Already logged in with an Admin-Account.
+    public void loginToAPIManager() throws AppException {
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/login").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/login").build();
             List<NameValuePair> params = new ArrayList<>();
-            String username;
-            String password;
-            if (useAdminClient) {
-                String[] usernamePassword = getAdminUsernamePassword();
-                if (usernamePassword == null) return;
-                username = usernamePassword[0];
-                password = usernamePassword[1];
-                LOG.debug("Logging in with Admin-User: {}", username);
-            } else {
-                username = cmd.getUsername();
-                password = cmd.getPassword();
-                LOG.debug("Logging in with User: {}", username);
-            }
-            // This forces to create a client which is re-used based on useAdmin
-            APIMHttpClient client = APIMHttpClient.getInstance(useAdminClient);
+            String username = cmd.getUsername();
+            String password = cmd.getPassword();
             params.add(new BasicNameValuePair("username", username));
             params.add(new BasicNameValuePair("password", password));
-            POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri, useAdminClient);
-            int statusCode = httpHelper.execute(loginRequest,false).getStatusCode();
+            POSTRequest loginRequest = new POSTRequest(new UrlEncodedFormEntity(params), uri);
+            int statusCode = httpHelper.execute(loginRequest, false).getStatusCode();
             if (statusCode != 303 && (statusCode < 200 || statusCode > 299)) {
                 LOG.warn("Login failed with statusCode: {} ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", statusCode, cmd.getRetryDelay());
                 Thread.sleep(cmd.getRetryDelay());
@@ -202,31 +181,54 @@ public class APIManagerAdapter {
                 if (statusCode != 303) {
                     throw new AppException("Login finally failed with statusCode: " + statusCode, ErrorCode.API_MANAGER_LOGIN_FAILED);
                 } else {
-                    LOG.info("Successfully logged in on retry. Received Status-Code: {}" , statusCode);
+                    LOG.info("Successfully logged in on retry. Received Status-Code: {}", statusCode);
                 }
             }
-            User user = getCurrentUser(useAdminClient);
-            if (user.getRole().equals("admin")) {
+            User user = getCurrentUser();
+            String role = getHigherRole(user);
+            if (role.equals("admin")) {
                 this.hasAdminAccount = true;
                 // Also register this client as an Admin-Client
-                APIMHttpClient.addInstance(true, client);
-            } else if (user.getRole().equals("oadmin")) {
+            } else if (role.equals("oadmin")) {
                 this.usingOrgAdmin = true;
             } else {
                 throw new AppException("Not supported user-role: " + user.getRole() + "", ErrorCode.API_MANAGER_COMMUNICATION);
             }
-        } catch (IOException | URISyntaxException | InterruptedException  e) {
-            if(e instanceof InterruptedException)
+        } catch (IOException | URISyntaxException | InterruptedException e) {
+            if (e instanceof InterruptedException)
                 Thread.currentThread().interrupt();
-            throw new AppException("Can't login to API-Manager " + uri, ErrorCode.API_MANAGER_COMMUNICATION, e);
+            throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
 
-    public void logoutFromAPIManager(boolean orgAdmin) throws AppException {
+    public String getHigherRole(User user) {
+        String role = user.getRole();
+        Map<String, String> organizations2Role = user.getOrgs2Role();
+        if (organizations2Role == null)
+            return role;
+        List<String> roles = new ArrayList<>();
+        if (role.equals("user")) {
+            for (String multiOrgRole : organizations2Role.values()) {
+                if (multiOrgRole.equals("user"))
+                    continue;
+                roles.add(multiOrgRole);
+            }
+        }
+        if (roles.isEmpty())
+            return role;
+        if (roles.contains("admin")) {
+            return "admin";
+        } else if (roles.contains("oadmin")) {
+            return "oadmin";
+        }
+        return role;
+    }
+
+    public void logoutFromAPIManager() throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/login").build();
-            DELRequest logoutRequest = new DELRequest(uri, orgAdmin);
-            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) logoutRequest.execute()) {
+            DELRequest logoutRequest = new DELRequest(uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) logoutRequest.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
                     String response = EntityUtils.toString(httpResponse.getEntity());
@@ -238,21 +240,18 @@ public class APIManagerAdapter {
         }
     }
 
-    private String[] getAdminUsernamePassword() {
-        if (CoreParameters.getInstance().getAdminUsername() == null) return null;
-        return new String[]{CoreParameters.getInstance().getAdminUsername(), CoreParameters.getInstance().getAdminPassword()};
-    }
 
-    public static User getCurrentUser(boolean useAdminClient) throws AppException {
+    public static User getCurrentUser() throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/currentuser").build();
-            GETRequest currentUserRequest = new GETRequest(uri, useAdminClient);
-            try(CloseableHttpResponse httpResponse  = (CloseableHttpResponse) currentUserRequest.execute()) {
-                getCsrfToken(httpResponse, useAdminClient); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
+            GETRequest currentUserRequest = new GETRequest(uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) currentUserRequest.execute()) {
+                getCsrfToken(httpResponse); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
                 String currentUser = EntityUtils.toString(httpResponse.getEntity());
+                LOG.info("Response : {}", currentUser);
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 200) {
-                    throw new AppException("Status-Code: " + statusCode + ", Can't get current-user (For admin: " + useAdminClient + ") information on response: '" + currentUser + "'",
+                    throw new AppException("Status-Code: " + statusCode + ", Can't get current-user for user '" + currentUser + "'",
                             ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 User user = mapper.readValue(currentUser, User.class);
@@ -268,10 +267,10 @@ public class APIManagerAdapter {
         }
     }
 
-    private static void getCsrfToken(HttpResponse response, boolean useAdminClient) throws AppException {
+    private static void getCsrfToken(HttpResponse response) throws AppException {
         for (Header header : response.getAllHeaders()) {
             if (header.getName().equalsIgnoreCase("csrf-token")) {
-                APIMHttpClient.getInstance(useAdminClient).setCsrfToken(header.getValue());
+                APIMHttpClient.getInstance().setCsrfToken(header.getValue());
                 break;
             }
         }
@@ -311,7 +310,7 @@ public class APIManagerAdapter {
                     APIManagerAdapter.cacheManager = new APIMCLICacheManager(ehcacheManager);
                     APIManagerAdapter.cacheManager.init();
                 } catch (StateTransitionException e) {
-                    LOG.warn("Error initializing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 3 seconds. Attempts: {}/{}" , initAttempts, maxAttempts);
+                    LOG.warn("Error initializing cache - Perhaps another APIM-CLI is running that locks the cache. Retry again in 3 seconds. Attempts: {}/{}", initAttempts, maxAttempts);
                     try {
                         Thread.sleep(3000);
                     } catch (InterruptedException ignore) {
@@ -333,7 +332,7 @@ public class APIManagerAdapter {
         Cache<K, V> cache = APIManagerAdapter.cacheManager.getCache(cacheType.name(), key, value);
         if (CoreParameters.getInstance().clearCaches() != null && CoreParameters.getInstance().clearCaches().contains(cacheType)) {
             cache.clear();
-            LOG.info("Cache: {} successfully cleared.",  cacheType.name());
+            LOG.info("Cache: {} successfully cleared.", cacheType.name());
         }
         return cache;
     }
@@ -397,7 +396,7 @@ public class APIManagerAdapter {
                 String spVersion = version.substring(version.indexOf(" SP") + 3);
                 spNumber = Integer.parseInt(spVersion);
             } catch (Exception e) {
-                LOG.trace("Can't parse service pack version in version: {}",version);
+                LOG.trace("Can't parse service pack version in version: {}", version);
             }
         }
         return spNumber;
@@ -442,8 +441,8 @@ public class APIManagerAdapter {
             try {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/" + type + "").build();
                 LOG.debug("Loading credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
-                RestAPICall getRequest = new GETRequest(uri, true);
-                try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+                RestAPICall getRequest = new GETRequest(uri);
+                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                     response = EntityUtils.toString(httpResponse.getEntity());
                     LOG.trace("Response: " + response);
                     JsonNode clientIds = mapper.readTree(response);
@@ -484,8 +483,8 @@ public class APIManagerAdapter {
     public static Image getImageFromAPIM(URI uri, String baseFilename) throws AppException {
         Image image = new Image();
         try {
-            RestAPICall getRequest = new GETRequest(uri, hasAdminAccount());
-            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+            RestAPICall getRequest = new GETRequest(uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode == 404) return null; // No Image found
                 if (statusCode != 200) {
@@ -494,7 +493,7 @@ public class APIManagerAdapter {
                 }
                 if (httpResponse.getEntity() == null)
                     return null; // no Image found in API-Manager
-                try(InputStream is = httpResponse.getEntity().getContent()) {
+                try (InputStream is = httpResponse.getEntity().getContent()) {
                     image.setImageContent(IOUtils.toByteArray(is));
                 }
                 if (httpResponse.containsHeader("Content-Type")) {
@@ -535,7 +534,7 @@ public class APIManagerAdapter {
                     .addTextBody("passphrase", password)
                     .build();
             POSTRequest postRequest = new POSTRequest(entity, uri);
-            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 200) {
@@ -569,7 +568,7 @@ public class APIManagerAdapter {
                     .addBinaryBody("file", fileFontent, contentType, filename)
                     .build();
             POSTRequest postRequest = new POSTRequest(entity, uri);
-            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) postRequest.execute()) {
                 return mapper.readTree(httpResponse.getEntity().getContent());
             }
         } catch (Exception e) {

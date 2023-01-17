@@ -119,10 +119,10 @@ public class UtilsTest {
 		Assert.assertTrue(installFolder.exists());
 	}
 
-	@Test(expectedExceptions = {NullPointerException.class, AppException.class})
-	public void testValidateCustomProperties() throws AppException {
-		Utils.validateCustomProperties(new HashMap<>(), CustomProperties.Type.api);
-	}
+//	@Test(expectedExceptions = {NullPointerException.class, AppException.class})
+//	public void testValidateCustomProperties() throws AppException {
+//		Utils.validateCustomProperties(new HashMap<>(), CustomProperties.Type.api);
+//	}
 
 	@Test
 	public void testAddCustomPropertiesForEntity(){

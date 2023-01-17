@@ -92,7 +92,7 @@ public class APIManagerQuotaAdapter {
                 }
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + quotaId + "/quota/").build();
             }
-            RestAPICall getRequest = new GETRequest(uri, true);
+            RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load quotas with ID: {} from API-Manager.", quotaId);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -144,7 +144,7 @@ public class APIManagerQuotaAdapter {
             FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"));
             mapper.setFilterProvider(filter);
             HttpEntity entity = new StringEntity(mapper.writeValueAsString(quotaConfig), ContentType.APPLICATION_JSON);
-            RestAPICall request = new PUTRequest(entity, uri, true);
+            RestAPICall request = new PUTRequest(entity, uri);
             Response httpResponse = httpHelper.execute(request, true);
             int statusCode = httpResponse.getStatusCode();
             String response = httpResponse.getResponse();

@@ -75,7 +75,7 @@ public class ConsoleUserExporter extends UserResultHandler {
 	}
 
 	@Override
-	public UserFilter getFilter() throws AppException {
+	public UserFilter getFilter() {
 		return getBaseFilterBuilder().build();
 	}
 

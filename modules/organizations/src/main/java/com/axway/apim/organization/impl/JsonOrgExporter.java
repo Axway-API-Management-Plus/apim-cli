@@ -91,7 +91,7 @@ public class JsonOrgExporter extends OrgResultHandler {
 	}
 
 	@Override
-	public OrgFilter getFilter() throws AppException {
+	public OrgFilter getFilter() {
 		return getBaseOrgFilterBuilder()
 				.includeImage(true)
 				.includeAPIAccess(true)

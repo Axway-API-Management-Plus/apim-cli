@@ -1,11 +1,10 @@
 package com.axway.apim.setup.remotehosts.lib;
 
-import org.apache.commons.cli.Option;
-
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.StandardExportCLIOptions;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
+import org.apache.commons.cli.Option;
 
 public class RemoteHostsExportCLIOptions extends CLIOptions {
 
@@ -38,16 +37,16 @@ public class RemoteHostsExportCLIOptions extends CLIOptions {
 	@Override
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);
-		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("How to get/export API-Manager remote hosts with different output formats");
-		System.out.println("Get the configuration on console using environment properties: env.api-env.properties:");
-		System.out.println(getBinaryName()+" remotehosts get -s api-env");
-		System.out.println("Same as before, but with output format JSON - As it is used to import configuration");
-		System.out.println(getBinaryName()+" remotehosts get -s api-env -o json");
-		System.out.println();
-		System.out.println();
-		System.out.println("For more information please visit:");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
+		Console.println("----------------------------------------------------------------------------------------");
+		Console.println("How to get/export API-Manager remote hosts with different output formats");
+		Console.println("Get the configuration on console using environment properties: env.api-env.properties:");
+		Console.println(getBinaryName()+" remotehosts get -s api-env");
+		Console.println("Same as before, but with output format JSON - As it is used to import configuration");
+		Console.println(getBinaryName()+" remotehosts get -s api-env -o json");
+		Console.println();
+		Console.println();
+		Console.println("For more information please visit:");
+		Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
 	}
 
 	@Override
@@ -55,7 +54,7 @@ public class RemoteHostsExportCLIOptions extends CLIOptions {
 		return "Remote-Hosts Export";
 	}
 	
-	public RemoteHostsExportParams getParams() throws AppException {
+	public RemoteHostsExportParams getParams() {
 		RemoteHostsExportParams params = new RemoteHostsExportParams();
 		params.setName(getValue("name"));
 		params.setId(getValue("id"));

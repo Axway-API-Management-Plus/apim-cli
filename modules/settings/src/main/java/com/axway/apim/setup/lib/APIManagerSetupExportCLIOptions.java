@@ -1,11 +1,9 @@
 package com.axway.apim.setup.lib;
 
-import org.apache.commons.cli.Option;
-
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.StandardExportCLIOptions;
-import com.axway.apim.lib.errorHandling.AppException;
+import org.apache.commons.cli.Option;
 
 public class APIManagerSetupExportCLIOptions extends CLIOptions {
 
@@ -65,7 +63,7 @@ public class APIManagerSetupExportCLIOptions extends CLIOptions {
 	}
 	
 	@Override
-	public APIManagerSetupExportParams getParams() throws AppException {
+	public APIManagerSetupExportParams getParams() {
 		APIManagerSetupExportParams params = new APIManagerSetupExportParams();
 		params.setConfigType(getValue("type"));
 		params.setRemoteHostName(getValue("name"));

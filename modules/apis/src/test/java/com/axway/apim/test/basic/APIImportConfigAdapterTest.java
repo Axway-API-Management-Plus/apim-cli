@@ -8,7 +8,6 @@ import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;

@@ -23,20 +23,14 @@ public class EnvironmentPropertiesTest {
 	@Test
 	public void testNoStage() {
 		EnvironmentProperties properties = new EnvironmentProperties("NOT_SET", apimCliHome);
-
 		Assert.assertEquals(properties.containsKey("doesnExists"), false);
-		Assert.assertEquals(properties.containsKey("admin_username"), true);
-
-		Assert.assertEquals(properties.get("admin_username"), "apiadmin");
-		Assert.assertEquals(properties.get("admin_password"), "changeme");
+		Assert.assertEquals(properties.containsKey("username"), true);
 	}
 
 	@Test
 	public void testStage() {
 		EnvironmentProperties properties = new EnvironmentProperties("anyOtherStage", apimCliHome);
 		Assert.assertEquals(properties.containsKey("thisKeyExists"), true);
-		Assert.assertEquals(properties.get("admin_username"), "anyOtherUser");
-		Assert.assertEquals(properties.get("admin_password"), "anyOtherPassword");
 	}
 	
 	@Test
@@ -49,10 +43,6 @@ public class EnvironmentPropertiesTest {
 
 		Assert.assertEquals(properties.containsKey("thisKeyExists"), true);
 		Assert.assertEquals(properties.get("thisKeyExists"), "keyFromSwaggerPromoteHome");
-		
-		
-		Assert.assertEquals(properties.get("admin_username"), "userFromSwaggerPromoteHome");
-		Assert.assertEquals(properties.get("admin_password"), "\\passwordFromSwagger\\PromoteHome");
 	}
 
 	@Test
@@ -65,10 +55,6 @@ public class EnvironmentPropertiesTest {
 
 		Assert.assertEquals(properties.containsKey("thisKeyExists"), true);
 		Assert.assertEquals(properties.get("thisKeyExists"), "stageKeyFromSwaggerPromoteHome");
-		
-		
-		Assert.assertEquals(properties.get("admin_username"), "stageUserFromSwaggerPromoteHome");
-		Assert.assertEquals(properties.get("admin_password"), "\\stagePasswordFrom\\SwaggerPromoteHome");
 	}
 	
 	@Test

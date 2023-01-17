@@ -4,7 +4,6 @@ import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
-import com.axway.apim.appexport.impl.CSVAppExporter;
 import com.axway.apim.appexport.impl.JsonApplicationExporter;
 import com.axway.apim.appexport.lib.AppExportCLIOptions;
 import com.axway.apim.appexport.lib.AppExportParams;
@@ -14,21 +13,17 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 public class JsonApplicationExporterTest extends WiremockWrapper {
 
     @BeforeClass
-    public void init() throws URISyntaxException {
-        URI version = this.getClass().getClassLoader().getResource("wiremock_apim").toURI();
-        System.out.println(version);
+    public void init() {
         initWiremock();
     }
 
     @AfterClass
-    public void stop(){
+    public void stop() {
         close();
     }
 

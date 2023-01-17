@@ -28,7 +28,7 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
     }
 
     @Override
-    public RemoteHostFilter getRemoteHostFilter() throws AppException {
+    public RemoteHostFilter getRemoteHostFilter() {
         return getRemoteHostBaseFilterBuilder().build();
     }
 

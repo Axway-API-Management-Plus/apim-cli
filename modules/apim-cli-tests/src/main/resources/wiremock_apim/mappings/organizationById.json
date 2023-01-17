@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/portal/v1.4/organizations/ba1c6dac-ee31-4b5d-9d18-493cc6f5088b"
+    "urlPathPattern": "/api/portal/v1.4/organizations/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
   },
   "response": {
     "status": 200,

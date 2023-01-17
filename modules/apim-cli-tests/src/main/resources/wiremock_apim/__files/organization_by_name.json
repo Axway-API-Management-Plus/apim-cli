@@ -1,0 +1,20 @@
+[
+  {
+    "id": "987b2afc-b027-41fd-a920-bef182eb4a94",
+    "name": "orga",
+    "description": null,
+    "email": "orga@axway.com",
+    "image": null,
+    "restricted": false,
+    "virtualHost": null,
+    "phone": null,
+    "enabled": true,
+    "development": false,
+    "dn": "o=orga,ou=organizations,ou=APIPortal",
+    "createdOn": 1673966327821,
+    "startTrialDate": null,
+    "endTrialDate": null,
+    "trialDuration": null,
+    "isTrial": null
+  }
+]

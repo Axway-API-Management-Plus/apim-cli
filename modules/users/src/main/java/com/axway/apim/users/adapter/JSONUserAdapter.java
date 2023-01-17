@@ -57,6 +57,7 @@ public class JSONUserAdapter extends UserAdapter {
                 this.users = new ArrayList<>();
                 this.users.add(user);
             } catch (Exception pe) {
+                pe.printStackTrace();
                 throw new AppException("Cannot read user(s) from config file: " + config, ErrorCode.UNKNOWN_USER, pe);
             }
         } catch (Exception e) {

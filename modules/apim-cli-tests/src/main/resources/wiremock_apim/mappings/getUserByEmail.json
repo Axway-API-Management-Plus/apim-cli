@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/portal/v1.4/users?field=email&op=eq&value=usera%40axway.com"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "user_by_loginname.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

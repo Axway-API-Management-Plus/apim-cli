@@ -22,8 +22,6 @@ public class APIImportCLIOptionsTest {
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "myUser");        // Taken from cmd directly
 		Assert.assertEquals(params.getPassword(), "myPassword");    // Taken from cmd directly
-		Assert.assertEquals(params.getAdminUsername(), "apiadmin"); // Loaded from env.properties
-		Assert.assertEquals(params.getAdminPassword(), "changeme"); // Loaded from env.properties
 		Assert.assertEquals(params.getConfig(), "myConfig.json");
 	}
 	

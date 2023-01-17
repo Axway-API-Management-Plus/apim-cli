@@ -29,7 +29,6 @@ import org.apache.http.ssl.SSLContextBuilder;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The interface to the API-Manager itself responsible to set up the underlying HTTPS-Communication.
@@ -40,34 +39,25 @@ import java.util.Map;
  */
 public class APIMHttpClient {
 
-    private static Map<Boolean, APIMHttpClient> instances = new HashMap<>();
+
     private HttpClient httpClient;
     private PoolingHttpClientConnectionManager httpClientConnectionManager;
     private HttpClientContext clientContext;
-    private BasicCookieStore cookieStore = new BasicCookieStore();
+    private final BasicCookieStore cookieStore = new BasicCookieStore();
     private String csrfToken;
-
-    public static void deleteInstances() {
-        instances = new HashMap<>();
-    }
-
-    public static void addInstance(boolean adminInstance, APIMHttpClient client) {
-        instances.put(adminInstance, client);
-    }
+    private static APIMHttpClient apimHttpClient;
 
     public static APIMHttpClient getInstance() throws AppException {
-        return getInstance(false);
-    }
-
-    public static APIMHttpClient getInstance(boolean adminInstance) throws AppException {
-        if (!APIMHttpClient.instances.containsKey(adminInstance)) {
-            APIMHttpClient client = new APIMHttpClient(adminInstance);
-            instances.put(adminInstance, client);
+        if(apimHttpClient == null){
+            apimHttpClient = new APIMHttpClient();
         }
-        return APIMHttpClient.instances.get(adminInstance);
+        return apimHttpClient;
     }
 
-    private APIMHttpClient(boolean adminInstance) throws AppException {
+    public static void deleteInstances() {
+        apimHttpClient = null;
+    }
+    private APIMHttpClient() throws AppException {
         CoreParameters params = CoreParameters.getInstance();
         createConnection(params.getAPIManagerURL());
     }

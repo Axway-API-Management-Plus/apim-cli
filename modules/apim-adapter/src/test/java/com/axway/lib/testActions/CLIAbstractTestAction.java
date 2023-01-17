@@ -64,8 +64,6 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 		params.setHostname(getVariable(context, PARAM_HOSTNAME));
 		params.setUsername(getVariable(context, PARAM_OADMIN_USERNAME));
 		params.setPassword(getVariable(context, PARAM_OADMIN_PASSWORD));
-		params.setAdminUsername(getVariable(context, PARAM_ADMIN_USERNAME));
-		params.setAdminUsername(getVariable(context, PARAM_ADMIN_PASSWORD));
 		params.setIgnoreAdminAccount(getIgnoreAdminAccount(context));
 		params.setStage(getVariable(context, PARAM_STAGE));
 		params.setProperties(new EnvironmentProperties(params.getStage(), null));

@@ -80,7 +80,7 @@ public class APIManagerAPIAccessAdapter {
         }
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + id + "/apis").build();
-            RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+            RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load API-Access with type: " + type + " from API-Manager with ID: " + id);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
@@ -181,7 +181,7 @@ public class APIManagerAPIAccessAdapter {
             mapper.setFilterProvider(filter);
             String json = mapper.writeValueAsString(apiAccess);
             HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-            RestAPICall request = new POSTRequest(entity, uri, APIManagerAdapter.hasAdminAccount());
+            RestAPICall request = new POSTRequest(entity, uri);
             Response httpResponse = httpHelper.execute(request, true);
             int statusCode = httpResponse.getStatusCode();
             String response = httpResponse.getResponse();
@@ -224,7 +224,7 @@ public class APIManagerAPIAccessAdapter {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + parentEntity.getId() + "/apis/" + apiAccess.getId()).build();
             // Use an admin account for this request
-            RestAPICall request = new DELRequest(uri, APIManagerAdapter.hasAdminAccount());
+            RestAPICall request = new DELRequest(uri);
             try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {

@@ -83,7 +83,7 @@ public class APIMgrAppsAdapter {
                     .addParameters(filter.getFilters())
                     .build();
             LOG.debug("Sending request to find existing applications: {}", uri);
-            RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+            RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode == 404) {
@@ -173,7 +173,7 @@ public class APIMgrAppsAdapter {
         }
         try {
             URI uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + APPLICATIONS).build();
-            RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+            RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load subscribed applications for API-ID: {} from API-Manager", apiId);
             LOG.debug("Load subscribed applications URI: {}", uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
@@ -523,9 +523,9 @@ public class APIMgrAppsAdapter {
             // Use an admin account for this request
             RestAPICall request;
             if (actualApp == null) {
-                request = new POSTRequest(entity, uri, true);
+                request = new POSTRequest(entity, uri);
             } else {
-                request = new PUTRequest(entity, uri, true);
+                request = new PUTRequest(entity, uri);
             }
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -599,7 +599,7 @@ public class APIMgrAppsAdapter {
         for (ClientAppOauthResource res : scopes2Delete) {
             try {
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + desiredApp.getId() + "/oauthresource/" + res.getId()).build();
-                RestAPICall request = new DELRequest(uri, true);
+                RestAPICall request = new DELRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != 204) {
@@ -746,7 +746,7 @@ public class APIMgrAppsAdapter {
         for (ApplicationPermission appPerm : permissions2Delete) {
             try {
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + desiredApp.getId() + "/permissions/" + appPerm.getId()).build();
-                RestAPICall request = new DELRequest(uri, true);
+                RestAPICall request = new DELRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != 204) {
@@ -764,7 +764,7 @@ public class APIMgrAppsAdapter {
     public void deleteApplication(ClientApplication app) throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId()).build();
-            RestAPICall request = new DELRequest(uri, true);
+            RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {

@@ -17,9 +17,7 @@ public class ConsolePrinterAlerts {
 	private static final Logger LOG = LoggerFactory.getLogger(ConsolePrinterAlerts.class);
 	
 	APIManagerAdapter adapter;
-	
-	private final String dots = ".....................................";
-	
+
 	AlertType[] alertsTypes = new AlertType[] {
 			AlertType.Application, 
 			AlertType.ApplicationAPIAccess, 
@@ -55,6 +53,7 @@ public class ConsolePrinterAlerts {
 				if (field.isAnnotationPresent(APIManagerAlertsAnnotation.class)) {
 					APIManagerAlertsAnnotation annotation = field.getAnnotation(APIManagerAlertsAnnotation.class);
 					if(annotation.alertType()==type) {
+						String dots = ".....................................";
 						System.out.printf("%s %s: %s", annotation.name() , dots.substring(annotation.name().length()), getFieldValue(field.getName(), alerts));
 					}
 				}

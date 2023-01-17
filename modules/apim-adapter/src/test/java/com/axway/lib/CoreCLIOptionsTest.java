@@ -58,9 +58,6 @@ public class CoreCLIOptionsTest {
         String[] args = {"-s", "yetAnotherStage", "-apimCLIHome", apimCliHome};
         CLIOptions options = SampleCLIOptions.create(args);
         CoreParameters params = (CoreParameters) options.getParams();
-
-        Assert.assertEquals(params.getAdminUsername(), "yetanotherUser");
-        Assert.assertEquals(params.getAdminPassword(), "yetanotherPassword");
         Assert.assertEquals(params.getProperties().get("yetAnotherProperty"), "HellImHere"); // from env.yetAnotherStage.properties
         Assert.assertEquals(params.getProperties().get("myTestVariable"), "resolvedToSomething"); // from env.properties
     }

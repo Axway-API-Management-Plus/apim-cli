@@ -23,7 +23,7 @@ public class ConsolePrinterCustomProperties {
 	
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 	
-	private List<CustomPropertyWithName> propertiesWithName;
+	private final List<CustomPropertyWithName> propertiesWithName;
 
 	public ConsolePrinterCustomProperties() {
 		try {
@@ -34,7 +34,7 @@ public class ConsolePrinterCustomProperties {
 		}
 	}
 
-	public void addProperties(Map<String, CustomProperty> customProperties, Type group) throws AppException {
+	public void addProperties(Map<String, CustomProperty> customProperties, Type group) {
 		if(customProperties == null || customProperties.size()==0) {
 			System.out.println("No custom properties configured for: " + group.niceName);
 			return;
@@ -72,12 +72,12 @@ public class ConsolePrinterCustomProperties {
 		return result;
 	}
 	
-	private class CustomPropertyWithName {
+	private static class CustomPropertyWithName {
 		private String name;
 		
 		private Type group;
 		
-		private CustomProperty customProperty;
+		private final CustomProperty customProperty;
 
 		public CustomPropertyWithName(CustomProperty customProperty) {
 			super();

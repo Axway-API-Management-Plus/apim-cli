@@ -11,16 +11,12 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 public class JsonOrgExporterTest extends WiremockWrapper {
 
     @BeforeClass
-    public void init() throws URISyntaxException {
-        URI version = this.getClass().getClassLoader().getResource("wiremock_apim").toURI();
-        System.out.println(version);
+    public void init() {
         initWiremock();
     }
 
@@ -36,8 +32,6 @@ public class JsonOrgExporterTest extends WiremockWrapper {
         APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
-
-
         OrgResultHandler exporter = OrgResultHandler.create(OrgResultHandler.ResultHandler.JSON_EXPORTER, params, result);
         List<Organization> organizations = apimanagerAdapter.orgAdapter.getOrgs(exporter.getFilter());
         JsonOrgExporter jsonOrgExporter = new JsonOrgExporter(params, result);

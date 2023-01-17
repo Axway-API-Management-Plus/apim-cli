@@ -45,7 +45,7 @@ public class APIManagerAlertsAdapter {
 		if(apiManagerResponse != null) return;
 		try {
 			URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/alerts").build();
-			RestAPICall getRequest = new GETRequest(uri, true);
+			RestAPICall getRequest = new GETRequest(uri);
 			LOG.debug("Load configured alerts from API-Manager using filter");
 			try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
 				String response = EntityUtils.toString(httpResponse.getEntity());
@@ -88,7 +88,7 @@ public class APIManagerAlertsAdapter {
 				RestAPICall request;
 				String json = mapper.writeValueAsString(alerts);
 				HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-				request = new POSTRequest(entity, uri, true);
+				request = new POSTRequest(entity, uri);
 				try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
 					int statusCode = httpResponse.getStatusLine().getStatusCode();
 					if (statusCode < 200 || statusCode > 299) {

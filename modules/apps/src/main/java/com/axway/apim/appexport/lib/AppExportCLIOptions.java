@@ -1,12 +1,10 @@
 package com.axway.apim.appexport.lib;
 
-import org.apache.commons.cli.Option;
-
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportCLIOptions;
-import com.axway.apim.lib.errorHandling.AppException;
+import org.apache.commons.cli.Option;
 
 public class AppExportCLIOptions extends CLIOptions {
 
@@ -95,7 +93,7 @@ public class AppExportCLIOptions extends CLIOptions {
 	}
 	
 	@Override
-	public Parameters getParams() throws AppException {
+	public Parameters getParams() {
 		AppExportParams params = new AppExportParams();
 
 		params.setName(getValue("name"));
