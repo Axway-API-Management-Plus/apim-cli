@@ -19,11 +19,10 @@ public class APIGrantToAllOrgsTestIT extends TestNGCitrusTestDesigner {
 	@CitrusTest(name = "APIGrantToAllOrgsTestIT")
 	public void run() {
 		description("Tool must fail is not all organizations are asigned to an API.");
-		
+		createVariable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/grant_all_orgs-api-${apiNumber}");
 		variable("apiName", "Grant access to all orgs API-${apiNumber}");
-
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		

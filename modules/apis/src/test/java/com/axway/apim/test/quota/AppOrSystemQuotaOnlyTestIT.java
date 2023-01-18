@@ -27,7 +27,8 @@ public class AppOrSystemQuotaOnlyTestIT extends TestNGCitrusTestRunner {
 		swaggerImport = new ImportTestAction();
 
 		description("Validates quota is set when only System- or Application-Quota is configured (see bug #55)");
-		
+
+		createVariable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/only-one-quota-api-${apiNumber}");
 		variable("apiName", "Only-One-Quota-API-${apiNumber}");

@@ -68,10 +68,6 @@ public class CoreParameters implements Parameters {
 
     private String password;
 
-    private Boolean ignoreAdminAccount = false;
-
-    private Boolean allowOrgAdminsToPublish = true;
-
     private Boolean force;
 
     private Boolean ignoreQuotas;
@@ -303,24 +299,6 @@ public class CoreParameters implements Parameters {
         } catch (URISyntaxException e) {
             throw new AppException("Error setting up API-Manager URL", ErrorCode.INVALID_PARAMETER, e);
         }
-    }
-
-    public Boolean isIgnoreAdminAccount() {
-        return ignoreAdminAccount;
-    }
-
-    public void setIgnoreAdminAccount(Boolean ignoreAdminAccount) {
-        if (ignoreAdminAccount == null) return;
-        this.ignoreAdminAccount = ignoreAdminAccount;
-    }
-
-    public Boolean isAllowOrgAdminsToPublish() {
-        return allowOrgAdminsToPublish;
-    }
-
-    public void setAllowOrgAdminsToPublish(Boolean allowOrgAdminsToPublish) {
-        if (allowOrgAdminsToPublish == null) return;
-        this.allowOrgAdminsToPublish = allowOrgAdminsToPublish;
     }
 
     public String getDetailsExportFile() {

@@ -6,6 +6,7 @@ import com.axway.apim.adapter.customProperties.APIManager762CustomPropertiesAdap
 import com.axway.apim.adapter.customProperties.APIManagerCustomPropertiesAdapter;
 import com.axway.apim.adapter.user.APIManagerUserAdapter;
 import com.axway.apim.api.model.CaCert;
+import com.axway.apim.api.model.Config;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ClientApplication;
@@ -138,17 +139,17 @@ public class APIManagerAdapter {
         super();
         cmd = CoreParameters.getInstance();
         cmd.validateRequiredParameters();
-
         this.configAdapter = new APIManagerConfigAdapter();
-
         if (TestIndicator.getInstance().isTestRunning()) {
             this.hasAdminAccount = true; // For unit tests we have an admin account
         } else {
             // No need to login, when running unit tests
             loginToAPIManager();
-            APIManagerAdapter.apiManagerVersion = configAdapter.getConfig(false).getProductVersion();
+            Config config = configAdapter.getConfig(false);
+            APIManagerAdapter.apiManagerVersion =config.getProductVersion();
+            if(usingOrgAdmin)
+                LOG.info("Organization Administrator Self Service Enabled : {}", config.getOadminSelfServiceEnabled());
         }
-
         // For now this okay, may be replaced with a Factory later
         this.customPropertiesAdapter = (hasAPIManagerVersion("7.7")) ? new APIManagerCustomPropertiesAdapter() : new APIManager762CustomPropertiesAdapter();
         this.alertsAdapter = new APIManagerAlertsAdapter();

@@ -35,6 +35,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		 * If all these keys are the same, the quota-setting is the same and should be overwritten!
 		 */
 
+		createVariable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/dont-overwrite-quota-restriction-api-${apiNumber}");
 		variable("apiName", "Quota-${apiNumber}-Multi-Restriction-API");

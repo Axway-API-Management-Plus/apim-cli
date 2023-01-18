@@ -7,7 +7,6 @@ public interface TestParams {
     String PARAM_HOSTNAME = "apiManagerHost";
     String PARAM_OADMIN_USERNAME = "oadminUsername1";
     String PARAM_OADMIN_PASSWORD = "oadminPassword1";
-    String PARAM_IGNORE_ADMIN_ACC = "ignoreAdminAccount";
     String PARAM_CONFIGFILE = "configFile";
     String PARAM_TARGET = "target";
     String PARAM_NAME = "name";

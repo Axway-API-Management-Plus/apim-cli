@@ -19,7 +19,8 @@ public class APIGrantOrganizationsTestIT extends TestNGCitrusTestDesigner {
 	@CitrusTest(name = "APIGrantOrganizationsTestIT")
 	public void run() {
 		description("Import an API can grant access to a number of defined orgs");
-		
+
+		createVariable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/grant_org-api-${apiNumber}");
 		variable("apiName", "Grant to some orgs API-${apiNumber}");

@@ -70,11 +70,6 @@ public class CLIAPIImportOptions extends CLIOptions {
 		option.setArgName("ignore|replace|add");
 		addOption(option);
 		
-		option = new Option("allowOrgAdminsToPublish", true, "If set to false, OrgAdmins cannot replicate an API with desired state published. Defaults to true.");
-		option.setRequired(false);
-		option.setArgName("false");
-		addInternalOption(option);
-		
 		option = new Option("replaceHostInSwagger", true, "Controls if you want to replace the host in your Swagger-File ");
 		option.setRequired(false);
 		option.setArgName("true");
@@ -144,7 +139,6 @@ public class CLIAPIImportOptions extends CLIOptions {
 		params.setDetailsExportFile(getValue("detailsExportFile"));
 		params.setValidateRemoteHost(Boolean.parseBoolean(getValue("validateRemoteHost")));
 		params.setZeroDowntimeUpdate(Boolean.parseBoolean(getValue("zeroDowntimeUpdate")));
-		if(getValue("allowOrgAdminsToPublish")!=null) params.setAllowOrgAdminsToPublish(Boolean.parseBoolean(getValue("allowOrgAdminsToPublish")));
 		return params;
 	}
 }

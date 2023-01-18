@@ -1,14 +1,6 @@
 package com.axway.apim.test.queryStringRouting;
 
-import java.io.IOException;
-
-import org.springframework.http.HttpStatus;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.axway.lib.APIManagerConfig;
 import com.consol.citrus.annotations.CitrusResource;
@@ -17,18 +9,22 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
+import org.springframework.http.HttpStatus;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 @Test
 public class ValidateQueryStringTestIT extends TestNGCitrusTestRunner {
 
-	private ImportTestAction swaggerImport;
-	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
-		swaggerImport = new ImportTestAction();
+	public void run(@Optional @CitrusResource TestContext context) throws IOException {
+		ImportTestAction swaggerImport = new ImportTestAction();
 		description("Validate query string routing can be controlled and works as expected.");
-		
+		createVariable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/query-string-api-${apiNumber}");
 		variable("apiName", "Query-String-API-${apiNumber}");
@@ -148,7 +144,7 @@ public class ValidateQueryStringTestIT extends TestNGCitrusTestRunner {
 		createVariable("apiPath", "/query-string-api-oadmin-${apiNumber}");
 		createVariable("apiName", "Query-String-API-OAdmin-${apiNumber}");
 		createVariable("state", "unpublished");
-		createVariable("ignoreAdminAccount", "true"); // This tests simulate to use only an Org-Admin-Account
+		createVariable("useApiAdmin", "false"); // This tests simulate to use only an Org-Admin-Account
 		createVariable("apiRoutingKey", "routeKeyD");
 		createVariable("apiName", "apiName-${apiRoutingKey}");
 		createVariable("expectedReturnCode", "0");

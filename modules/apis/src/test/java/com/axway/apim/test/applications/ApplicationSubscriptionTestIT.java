@@ -24,7 +24,7 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 		//TestIndicator.getInstance().setTestRunning(false);
 		ImportTestAction swaggerImport = new ImportTestAction();
 		description("Import an API, grant access to an org and create an application subscription.");
-		
+		createVariable("useApiAdmin", "true"); // use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/app-subscription-${apiNumber}");
 		variable("apiName", "App Subscription API-${apiNumber}");
@@ -265,7 +265,7 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 		createVariable("enforce", "false");
 		createVariable("orgName", "${orgName}");
 		createVariable("expectedReturnCode", "0");
-		createVariable("ignoreAdminAccount", "true"); // We need to ignore any given admin account!
+		createVariable("useApiAdmin", "false"); // We need to ignore any given admin account!
 		// We only provide two apps instead of three, but the existing third subscription must stay!
 		createVariable("testAppName1", "${consumingTestApp1Name}");
 		createVariable("testAppName2", "${consumingTestApp2Name}");		

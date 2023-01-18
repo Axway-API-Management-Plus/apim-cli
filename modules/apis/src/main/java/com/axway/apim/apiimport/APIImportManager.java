@@ -29,14 +29,12 @@ public class APIImportManager {
      * @throws AppException is the desired state can't be replicated into the API-Manager.
      */
     public void applyChanges(APIChangeState changeState, boolean forceUpdate, boolean updateOnly) throws AppException {
-        CoreParameters commands = CoreParameters.getInstance();
+        boolean orgAdminSelfService = APIManagerAdapter.getInstance().configAdapter.getConfig(APIManagerAdapter.hasAdminAccount()).getOadminSelfServiceEnabled();
         if (!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded()) {
-            if (commands.isAllowOrgAdminsToPublish()) {
-                LOG.debug("Desired API-State set to published using OrgAdmin account only. Going to create a publish request. "
-                        + "Set allowOrgAdminsToPublish to false to prevent orgAdmins from creating a publishing request.");
+            if (orgAdminSelfService) {
+                LOG.info("Desired API-State set to published using OrgAdmin account only. Going to create a publish request.");
             } else {
-                throw new AppException("OrgAdmin user only allowed to change/register unpublished APIs. "
-                        + "Set allowOrgAdminsToPublish to true (default) to allow orgAdmins to create a publishing request.", ErrorCode.NO_ADMIN_ROLE_USER);
+                LOG.info("OrgAdmin user only allowed to change/register unpublished APIs.");
             }
         }
         // No existing API found (means: No match for APIPath/V-Host & Query-Version), creating a complete new
@@ -86,7 +84,7 @@ public class APIImportManager {
                 republish.execute(changeState);
             }
         }
-        if (!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded() && commands.isAllowOrgAdminsToPublish()) {
+        if (!APIManagerAdapter.hasAdminAccount() && changeState.isAdminAccountNeeded() ) {
             LOG.info("Actual API has been created and is waiting for an approval by an administrator. "
                     + "You may update the pending API as often as you want before it is finally published.");
         }

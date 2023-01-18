@@ -24,7 +24,9 @@ public class MultiRestrictionQuotaTestIT extends TestNGCitrusTestRunner {
 		ImportTestAction swaggerImport = new ImportTestAction();
 		
 		description("Make sure you can configured multiple Quota-Restrictions for an API");
-		
+
+		variable("oadminUsername1","${apiManagerUser}");
+		variable("oadminPassword1","${apiManagerPass}");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/multi-quota-restriction--api-${apiNumber}");
 		variable("apiName", "Multi-Quota-Restriction-API-${apiNumber}");

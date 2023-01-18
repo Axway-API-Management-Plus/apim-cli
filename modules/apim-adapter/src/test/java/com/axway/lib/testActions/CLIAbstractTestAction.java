@@ -40,7 +40,7 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 		int expectedReturnCode = 0;
 		try {
 			expectedReturnCode 	= Integer.parseInt(context.getVariable(PARAM_EXPECTED_RC));
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		return expectedReturnCode;
 	}
 	
@@ -64,7 +64,6 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 		params.setHostname(getVariable(context, PARAM_HOSTNAME));
 		params.setUsername(getVariable(context, PARAM_OADMIN_USERNAME));
 		params.setPassword(getVariable(context, PARAM_OADMIN_PASSWORD));
-		params.setIgnoreAdminAccount(getIgnoreAdminAccount(context));
 		params.setStage(getVariable(context, PARAM_STAGE));
 		params.setProperties(new EnvironmentProperties(params.getStage(), null));
 	}
@@ -72,15 +71,10 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 	public String getVariable(TestContext context, String varname) {
 		try {
 			return context.getVariable(varname);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			LOG.error("Error reading variable", e);
+		}
 		return null;
-	}
-	
-	public Boolean getIgnoreAdminAccount(TestContext context) {
-		try {
-			return Boolean.parseBoolean(context.getVariable(PARAM_IGNORE_ADMIN_ACC));
-		} catch (Exception e) {}
-		return false;
 	}
 
 	public File getTestDirectory() {
