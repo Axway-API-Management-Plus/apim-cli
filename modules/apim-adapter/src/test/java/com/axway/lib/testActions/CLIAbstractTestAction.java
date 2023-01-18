@@ -26,7 +26,7 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 		super();
 		this.context = context;
 		this.randomNum = ThreadLocalRandom.current().nextInt(1, 9999 + 1);
-		this.testDirectory = createTestDirectory(this.context);
+		this.testDirectory = createTestDirectory();
 	}
 
 	@Override
@@ -44,8 +44,8 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 		return expectedReturnCode;
 	}
 	
-	protected File createTestDirectory(TestContext context) {
-		String testDirName = getTestDirName(context);
+	protected File createTestDirectory() {
+		String testDirName = getTestDirName();
 		String tmpDir = System.getProperty("java.io.tmpdir");
 		File testDir = new File(tmpDir + File.separator + testDirName);
 		if(testDir.mkdir()) {
@@ -56,14 +56,20 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 		return testDir;
 	}
 
-	protected String getTestDirName(TestContext context) {
+	protected String getTestDirName() {
 		return this.getClass().getSimpleName() + "-" + randomNum;
 	}
 	
 	protected void addParameters(CoreParameters params, TestContext context) {
 		params.setHostname(getVariable(context, PARAM_HOSTNAME));
-		params.setUsername(getVariable(context, PARAM_OADMIN_USERNAME));
-		params.setPassword(getVariable(context, PARAM_OADMIN_PASSWORD));
+		boolean useApiAdmin = Boolean.parseBoolean(getVariable(context,"useApiAdmin"));
+		if(useApiAdmin){
+			params.setUsername(getVariable(context, "apiManagerUser"));
+			params.setPassword(getVariable(context, "apiManagerPass"));
+		}else {
+			params.setUsername(getVariable(context, PARAM_OADMIN_USERNAME));
+			params.setPassword(getVariable(context, PARAM_OADMIN_PASSWORD));
+		}
 		params.setStage(getVariable(context, PARAM_STAGE));
 		params.setProperties(new EnvironmentProperties(params.getStage(), null));
 	}
