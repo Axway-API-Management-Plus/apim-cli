@@ -19,7 +19,7 @@ public class AppSubscriptionALLOrgsTestIT extends TestNGCitrusTestDesigner {
 	@CitrusTest(name = "AppSubscriptionALLOrgsTestIT")
 	public void run() {
 		description("Test to validate, that application subscription works, when using an ALL org-mapping");
-		
+		variable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/app-subs-mode-add-${apiNumber}");
 		variable("apiName", "App-Subscription-Mode Add Test API-${apiNumber}");

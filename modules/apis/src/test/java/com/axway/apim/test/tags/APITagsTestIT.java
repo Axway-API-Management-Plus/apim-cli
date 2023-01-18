@@ -19,7 +19,7 @@ public class APITagsTestIT extends TestNGCitrusTestDesigner {
 	@CitrusTest(name = "APITagsTest")
 	public void run() {
 		description("Verify that tags can be set for an API");
-		
+		variable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/api-tags-test-${apiNumber}");
 		variable("apiName", "API Tags Test ${apiNumber}");

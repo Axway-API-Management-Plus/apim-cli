@@ -19,7 +19,7 @@ public class UnpublishedPublishedApiKeyTestIT extends TestNGCitrusTestDesigner {
     @CitrusTest(name = "UnpublishedPublishedApiKeyTest")
     public void run() {
         description("Some checks for the API-Key security device");
-
+        variable("useApiAdmin", "true"); // Use apiadmin account
         variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
         variable("apiPath", "/api-key-test-${apiNumber}");
         variable("apiName", "API Key Test ${apiNumber}");

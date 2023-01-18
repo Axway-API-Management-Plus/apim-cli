@@ -24,7 +24,7 @@ public class APIDescriptionBasicTestIT extends TestNGCitrusTestRunner {
 	@Test @Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) {
 		description("Import an API with manual description first!");
-		
+		variable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/description-api-${apiNumber}");
 		variable("apiName", "Description-API-${apiNumber}");

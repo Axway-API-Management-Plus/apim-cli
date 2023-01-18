@@ -19,7 +19,7 @@ public class CustomPropertiesBasicTestIT extends TestNGCitrusTestDesigner {
 	@CitrusTest(name = "CustomPropertiesBasicTest")
 	public void run() {
 		description("Importing & validating custom-properties");
-		
+		variable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/api-custom-prop-test-${apiNumber}");
 		variable("apiName", "API Custom-Properties Test ${apiNumber}");

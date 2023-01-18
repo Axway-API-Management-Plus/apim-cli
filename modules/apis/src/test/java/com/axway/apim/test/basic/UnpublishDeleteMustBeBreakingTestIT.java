@@ -20,7 +20,7 @@ public class UnpublishDeleteMustBeBreakingTestIT extends TestNGCitrusTestRunner 
 	public void run(@Optional @CitrusResource TestContext context) throws IOException {
 		ImportTestAction swaggerImport = new ImportTestAction();
 		echo("####### This test makes sure, once an API is published, unpublishing or deleting it requires a force #######");
-		
+		variable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/check-is-breaking-${apiNumber}");
 		variable("apiName", "Check-is-Breaking-${apiNumber}");

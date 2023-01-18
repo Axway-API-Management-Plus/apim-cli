@@ -20,7 +20,7 @@ public class AppSubModeAddTestIT extends TestNGCitrusTestDesigner {
 	@CitrusTest(name = "AppSubModeAddTestIT")
 	public void run() {
 		description("Test to validate existing App-Subscription wont be overwritten with ClientAppMode ADD");
-		
+		variable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/app-subs-mode-add-${apiNumber}");
 		variable("apiName", "App-Subscription-Mode Add Test API-${apiNumber}");

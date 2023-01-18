@@ -100,7 +100,7 @@ public class CompleteAPIExportTestIT extends TestNGCitrusTestRunner {
 		
 		TagMap importedTags = mapper.convertValue(importedAPIConfig.get("tags"), new TypeReference<TagMap>(){});
 		TagMap exportedTags = mapper.convertValue(exportedAPIConfig.get("tags"), new TypeReference<TagMap>(){});
-		assertEquals(exportedTags.equals(importedTags), "Tags are not equal.");
+		assertTrue(exportedTags.equals(importedTags), "Tags are not equal.");
 		
 		List<CorsProfile> importedCorsProfiles = mapper.convertValue(importedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>(){});
 		List<CorsProfile> exportedCorsProfiles = mapper.convertValue(exportedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>(){});
