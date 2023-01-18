@@ -32,7 +32,7 @@ public class BackToPublishedFromDeprecatedTestIT extends TestNGCitrusTestRunner 
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		swaggerImport = new ImportTestAction();
 		description("Once an API in status deprecated, it must be possible to go back to published, basically remove the deperation status");
-		
+		variable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/my-test-api-${apiNumber}");
 		variable("apiName", "My-Test-API-${apiNumber}");

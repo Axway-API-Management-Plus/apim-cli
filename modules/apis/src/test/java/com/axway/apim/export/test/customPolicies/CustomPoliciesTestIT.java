@@ -97,10 +97,10 @@ public class CustomPoliciesTestIT extends TestNGCitrusTestRunner {
 		assertEquals(importedOutboundProfiles, exportedOutboundProfiles, "OutboundProfiles are not equal.");
 		assertFalse(exportedAPIConfig.get("outboundProfiles").get("_default").get("requestPolicy").asText().startsWith("<key"), "Request policy should not start with <key");
 		assertFalse(exportedAPIConfig.get("outboundProfiles").get("_default").get("responsePolicy").asText().startsWith("<key"), "Request policy should not start with <key");
-		
+
 		TagMap importedTags = mapper.convertValue(importedAPIConfig.get("tags"), new TypeReference<TagMap>(){});
 		TagMap exportedTags = mapper.convertValue(exportedAPIConfig.get("tags"), new TypeReference<TagMap>(){});
-		assertEquals(exportedTags, importedTags, "Tags are not equal.");
+		assertEquals(importedTags.equals(exportedTags), "Tags are not equal.");
 		
 		List<CorsProfile> importedCorsProfiles = mapper.convertValue(importedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>(){});
 		List<CorsProfile> exportedCorsProfiles = mapper.convertValue(exportedAPIConfig.get("corsProfiles"), new TypeReference<List<CorsProfile>>(){});

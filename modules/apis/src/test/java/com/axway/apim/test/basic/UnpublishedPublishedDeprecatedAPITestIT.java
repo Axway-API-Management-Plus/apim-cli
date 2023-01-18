@@ -26,7 +26,7 @@ public class UnpublishedPublishedDeprecatedAPITestIT extends TestNGCitrusTestRun
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		swaggerImport = new ImportTestAction();
 		description("Import an Unpublished-API, then publish it and finally deprecate it.");
-		
+		variable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/state-change-test-api-${apiNumber}");
 		variable("apiName", "State-Change-Test-API-${apiNumber}");

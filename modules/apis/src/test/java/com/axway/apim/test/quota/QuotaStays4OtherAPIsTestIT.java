@@ -23,7 +23,7 @@ public class QuotaStays4OtherAPIsTestIT extends TestNGCitrusTestRunner {
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, InterruptedException {
 		ImportTestAction swaggerImport = new ImportTestAction();
 		description("Making sure, APIs for other APIs are not influences by Quota-Management for the actual API.");
-		
+		variable("useApiAdmin", "true");
 		variable("firstApiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("firstApiPath", "/first-quota-api-${firstApiNumber}");
 		variable("firstApiName", "First Quota-API-${firstApiNumber}");

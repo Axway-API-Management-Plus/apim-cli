@@ -23,7 +23,7 @@ public class APIImageTestIT extends TestNGCitrusTestRunner {
 	public void run(@Optional @CitrusResource TestContext context) {
 		swaggerImport = new ImportTestAction();
 		description("Import an API including an image!");
-		
+		variable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/my-image-api-${apiNumber}");
 		variable("apiName", "My-Image-API-${apiNumber}");

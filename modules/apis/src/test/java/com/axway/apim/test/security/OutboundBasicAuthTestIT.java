@@ -24,6 +24,7 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestRunner {
 		ImportTestAction swaggerImport = new ImportTestAction();
 		description("Test to validate API-Outbound-AuthN set to HTTP-Basic.");
 
+		variable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/outbound-authn-test-${apiNumber}");
 		variable("apiName", "Outbound AuthN Test ${apiNumber}");

@@ -82,6 +82,7 @@
         <module>modules/settings</module>
         <module>distribution</module>
         <module>modules/spectoconfig</module>
+        <module>modules/commons</module>
     </modules>
     <dependencyManagement>
         <dependencies>
@@ -288,7 +289,6 @@
                 <version>6.14.3</version>
                 <scope>test</scope>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
     <build>

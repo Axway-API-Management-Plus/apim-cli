@@ -23,7 +23,7 @@ public class VhostConfigTestIT extends TestNGCitrusTestRunner {
 	public void run(@Optional @CitrusResource TestContext context) throws IOException {
 		ImportTestAction swaggerImport = new ImportTestAction();
 		description("Validate VHosts are handled correctly");
-		
+		variable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/vhost-test-${apiNumber}");
 		variable("apiName", "VHost Test ${apiNumber}");

@@ -23,7 +23,7 @@ public class PublishedAPIChangeImageTestIT extends TestNGCitrusTestRunner {
 	public void run(@Optional @CitrusResource TestContext context) {
 		swaggerImport = new ImportTestAction();
 		description("Import an API with state published including an image!");
-		
+		variable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/my-published-api-image-${apiNumber}");
 		variable("apiName", "My-published-api-Image-${apiNumber}");

@@ -24,7 +24,7 @@ public class UpdateOrgsAndAppsDuringReCreationTestIT extends TestNGCitrusTestRun
 	@Test @Parameters("context")
 	public void run(@Optional @CitrusResource TestContext context) {
 		description("Replicates a given scenario for issue: #58");
-		
+		variable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/update-orgs-apps-${apiNumber}");
 		variable("apiName", "Update Org and Apps-${apiNumber}");

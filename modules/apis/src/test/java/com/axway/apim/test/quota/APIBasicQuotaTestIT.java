@@ -23,7 +23,7 @@ public class APIBasicQuotaTestIT extends TestNGCitrusTestRunner {
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, InterruptedException {
 		ImportTestAction swaggerImport = new ImportTestAction();
 		description("Import an API containing a quota definition");
-		
+		variable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/quota-api-${apiNumber}");
 		variable("apiName", "Quota-API-${apiNumber}");
