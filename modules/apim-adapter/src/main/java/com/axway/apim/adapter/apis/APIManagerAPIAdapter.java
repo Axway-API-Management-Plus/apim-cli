@@ -126,7 +126,7 @@ public class APIManagerAPIAdapter {
         try {
             URI uri = getAPIRequestUri(filter);
             LOG.debug("Sending request to find existing APIs: {}", uri);
-            RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+            RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -467,7 +467,7 @@ public class APIManagerAPIAdapter {
                             .setParameter("original", "true").build();
                 }
                 LOG.debug("Download API spec URL :{}",uri);
-                RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+                RestAPICall getRequest = new GETRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != 200) {
@@ -502,7 +502,7 @@ public class APIManagerAPIAdapter {
     private void addBackendResourcePath(API api, APISpecification apiDefinition, boolean exportFEAPIDefinition) throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId()).build();
-            RestAPICall request = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+            RestAPICall request = new GETRequest(uri);
             Response httpResponse = httpHelper.execute(request, true);
             int statusCode = httpResponse.getStatusCode();
             String response = httpResponse.getResponse();
@@ -606,7 +606,7 @@ public class APIManagerAPIAdapter {
     }
 
     public void deleteAPIProxy(API api) throws AppException {
-        LOG.debug("Deleting API-Proxy");
+        LOG.debug("Deleting API-Proxy with Name : {} and Id: {}",api.getName(), api.getId());
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId()).build();
             RestAPICall request = new DELRequest(uri);
@@ -699,7 +699,7 @@ public class APIManagerAPIAdapter {
             } else {
                 entity = new StringEntity("", ContentType.APPLICATION_FORM_URLENCODED);
             }
-            RestAPICall request = new POSTRequest(entity, uri, useAdminAccountForPublish());
+            RestAPICall request = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 201 && statusCode != 200) { // See issue: #134 The API-Manager also returns 200 on this request
@@ -717,12 +717,6 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    private boolean useAdminAccountForPublish() throws AppException {
-        if (APIManagerAdapter.hasAdminAccount()) return true;
-        // This flag can be set to false to stop OrgAdmin from a Publishing request (means Pending approval)
-        return !CoreParameters.getInstance().isAllowOrgAdminsToPublish();
-        // In all other cases, we use the Admin-Account
-    }
 
     private String formatRetirementDate(Long retirementDate) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Z")));
@@ -742,7 +736,7 @@ public class APIManagerAPIAdapter {
             }
             URI uri = new URIBuilder(cmd.getAPIManagerURL())
                     .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/deprecate").build();
-            RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate=" + formatRetirementDate(retirementDate), ContentType.APPLICATION_FORM_URLENCODED), uri, true);
+            RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate=" + formatRetirementDate(retirementDate), ContentType.APPLICATION_FORM_URLENCODED), uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 String response = EntityUtils.toString(httpResponse.getEntity());
@@ -880,7 +874,7 @@ public class APIManagerAPIAdapter {
                         mapper.setFilterProvider(filter);
                         URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/quota").build();
                         HttpEntity entity = new StringEntity(mapper.writeValueAsString(app.getAppQuota()), ContentType.APPLICATION_JSON);
-                        RestAPICall request = new PUTRequest(entity, uri, true);
+                        RestAPICall request = new PUTRequest(entity, uri);
                         Response responseObj = httpHelper.execute(request, true);
                         int statusCode = responseObj.getStatusCode();
                         if (statusCode < 200 || statusCode > 299) {
@@ -932,7 +926,7 @@ public class APIManagerAPIAdapter {
                 params.add(new BasicNameValuePair("retirementDate", formatRetirementDate(retirementDateRefAPI)));
 
             HttpEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
-            RestAPICall request = new POSTRequest(entity, uri, true);
+            RestAPICall request = new POSTRequest(entity, uri);
             Response httpResponse = httpHelper.execute(request, true);
             int statusCode = httpResponse.getStatusCode();
             if (statusCode != 204) {
@@ -976,7 +970,7 @@ public class APIManagerAPIAdapter {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/grantaccess").build();
             HttpEntity entity = new StringEntity(formBody.toString(), ContentType.APPLICATION_FORM_URLENCODED);
-            RestAPICall apiCall = new POSTRequest(entity, uri, true);
+            RestAPICall apiCall = new POSTRequest(entity, uri);
             Response httpResponse = httpHelper.execute(apiCall, true);
             int statusCode = httpResponse.getStatusCode();
             if (statusCode != 204) {

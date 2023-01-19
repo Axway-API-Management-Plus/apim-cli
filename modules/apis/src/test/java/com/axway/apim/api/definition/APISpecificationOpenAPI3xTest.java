@@ -1,6 +1,7 @@
 package com.axway.apim.api.definition;
 
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapterTest;
 import com.axway.apim.api.apiSpecification.APISpecification;
 import com.axway.apim.api.apiSpecification.APISpecification.APISpecType;
 import com.axway.apim.api.apiSpecification.APISpecificationFactory;

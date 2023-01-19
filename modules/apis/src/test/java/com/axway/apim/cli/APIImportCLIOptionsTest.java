@@ -22,8 +22,6 @@ public class APIImportCLIOptionsTest {
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getUsername(), "myUser");        // Taken from cmd directly
 		Assert.assertEquals(params.getPassword(), "myPassword");    // Taken from cmd directly
-		Assert.assertEquals(params.getAdminUsername(), "apiadmin"); // Loaded from env.properties
-		Assert.assertEquals(params.getAdminPassword(), "changeme"); // Loaded from env.properties
 		Assert.assertEquals(params.getConfig(), "myConfig.json");
 	}
 	
@@ -56,19 +54,17 @@ public class APIImportCLIOptionsTest {
 	
 	@Test
 	public void testToggles() throws AppException {
-		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-allowOrgAdminsToPublish", "false", "-replaceHostInSwagger", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreAdminAccount", "-ignoreQuotas", "-updateOnly"};
+		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-replaceHostInSwagger", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreQuotas", "-updateOnly"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertTrue(params.isForce());
 		Assert.assertTrue(params.isForceUpdate());
 		Assert.assertTrue(params.isIgnoreCache());
 		Assert.assertTrue(params.isUpdateOnly());
-		Assert.assertFalse(params.isAllowOrgAdminsToPublish());
 		Assert.assertTrue(params.isChangeOrganization());
 		Assert.assertTrue(params.isReplaceHostInSwagger());
 		Assert.assertTrue(params.isUseFEAPIDefinition());
 		Assert.assertTrue(params.isIgnoreQuotas());
-		Assert.assertTrue(params.isIgnoreAdminAccount());
 		Assert.assertTrue(params.isRollback());
 	}
 	

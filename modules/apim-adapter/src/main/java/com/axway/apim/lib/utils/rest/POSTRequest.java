@@ -14,9 +14,7 @@ public class POSTRequest extends RestAPICall {
 		super(entity, uri);
 	}
 	
-	public POSTRequest(HttpEntity entity, URI uri, boolean useAdmin) {
-		super(entity, uri, useAdmin);
-	}
+
 
 	@Override
 	public HttpResponse execute() throws AppException {

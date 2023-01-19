@@ -52,7 +52,7 @@ public class APIManagerOrganizationAdapter {
 
     public APIManagerOrganizationAdapter() {
         cmd = CoreParameters.getInstance();
-        organizationCache = APIManagerAdapter.getCache(CacheType.ORGANIZATION_CACHE, String.class, String.class);
+        organizationCache = APIManagerAdapter.getCache(CacheType.organizationCache, String.class, String.class);
     }
 
     private void readOrgsFromAPIManager(OrgFilter filter) throws AppException {
@@ -69,7 +69,7 @@ public class APIManagerOrganizationAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/organizations" + orgId)
                     .addParameters(filter.getFilters())
                     .build();
-            RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+            RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load organizations from API-Manager using filter: {}", filter);
             LOG.debug("Load organization with URI: {}", uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
@@ -125,13 +125,13 @@ public class APIManagerOrganizationAdapter {
                 if (actualOrg == null) {
                     String json = mapper.writeValueAsString(desiredOrg);
                     HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                    request = new POSTRequest(entity, uri, true);
+                    request = new POSTRequest(entity, uri);
                 } else {
                     desiredOrg.setId(actualOrg.getId());
                     if (desiredOrg.getDn() == null) desiredOrg.setDn(actualOrg.getDn());
                     String json = mapper.writeValueAsString(desiredOrg);
                     HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                    request = new PUTRequest(entity, uri, true);
+                    request = new PUTRequest(entity, uri);
                 }
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -158,7 +158,7 @@ public class APIManagerOrganizationAdapter {
     public void deleteOrganization(Organization org) throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + ORGANIZATIONS + org.getId()).build();
-            RestAPICall request = new DELRequest(uri, true);
+            RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {

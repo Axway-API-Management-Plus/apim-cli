@@ -1,12 +1,11 @@
 package com.axway.apim.appexport.lib;
 
-import org.apache.commons.cli.Option;
-
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportCLIOptions;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
+import org.apache.commons.cli.Option;
 
 public class AppExportCLIOptions extends CLIOptions {
 
@@ -70,23 +69,23 @@ public class AppExportCLIOptions extends CLIOptions {
 	@Override
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);
-		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("How to get/export applications with different output formats");
-		System.out.println("Get all applications on console using environment properties: env.api-env.properties:");
-		System.out.println(getBinaryName()+" app get -s api-env");
-		System.out.println("Same as before, but with output format JSON - As it is used to import applications");
-		System.out.println(getBinaryName()+" api get -s api-env -o json");
-		System.out.println();
-		System.out.println();
-		System.out.println("How to filter the list of selected applications:");
-		System.out.println(getBinaryName()+" api get -s api-env -n \"Client App\" -o json");
-		System.out.println(getBinaryName()+" app get -s api-env -n \"Client App\" -t /tmp/exported_apps -o json -deleteTarget ");
-		System.out.println(getBinaryName()+" app get -s api-env -n \"App 123\" -t /tmp/exported_apps -o json -deleteTarget");
-		System.out.println(getBinaryName()+" app get -s api-env -redirectUrl \"localhost\"");
-		System.out.println(getBinaryName()+" app get -s api-env -credential 16378192");
-		System.out.println();
-		System.out.println("For more information and advanced examples please visit:");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
+		Console.println("----------------------------------------------------------------------------------------");
+		Console.println("How to get/export applications with different output formats");
+		Console.println("Get all applications on console using environment properties: env.api-env.properties:");
+		Console.println(getBinaryName()+" app get -s api-env");
+		Console.println("Same as before, but with output format JSON - As it is used to import applications");
+		Console.println(getBinaryName()+" api get -s api-env -o json");
+		Console.println();
+		Console.println();
+		Console.println("How to filter the list of selected applications:");
+		Console.println(getBinaryName()+" api get -s api-env -n \"Client App\" -o json");
+		Console.println(getBinaryName()+" app get -s api-env -n \"Client App\" -t /tmp/exported_apps -o json -deleteTarget ");
+		Console.println(getBinaryName()+" app get -s api-env -n \"App 123\" -t /tmp/exported_apps -o json -deleteTarget");
+		Console.println(getBinaryName()+" app get -s api-env -redirectUrl \"localhost\"");
+		Console.println(getBinaryName()+" app get -s api-env -credential 16378192");
+		Console.println();
+		Console.println("For more information and advanced examples please visit:");
+		Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
 	}
 
 	@Override
@@ -95,9 +94,8 @@ public class AppExportCLIOptions extends CLIOptions {
 	}
 	
 	@Override
-	public Parameters getParams() throws AppException {
+	public Parameters getParams() {
 		AppExportParams params = new AppExportParams();
-
 		params.setName(getValue("name"));
 		params.setId(getValue("id"));
 		params.setState(getValue("state"));

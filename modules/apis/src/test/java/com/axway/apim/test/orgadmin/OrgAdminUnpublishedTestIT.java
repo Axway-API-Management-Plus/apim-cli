@@ -23,14 +23,11 @@ public class OrgAdminUnpublishedTestIT extends TestNGCitrusTestDesigner {
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/org-admin-${apiNumber}");
 		variable("apiName", "OrgAdmin-Unpublished-${apiNumber}");
-		variable("ignoreAdminAccount", "true"); // This tests simulate to use only an Org-Admin-Account
 
 		echo("####### Calling the tool with a Non-Admin-User. #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/1_no-change-config.json");
 		createVariable("expectedReturnCode", "0");
-		createVariable("apiManagerUser", "${oadminUsername1}"); // This is an org-admin user
-		createVariable("apiManagerPass", "${oadminPassword1}");
 		action(swaggerImport);
 		
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' has been imported using OrgAdmin only #######");
@@ -51,8 +48,6 @@ public class OrgAdminUnpublishedTestIT extends TestNGCitrusTestDesigner {
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore2.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/basic/1_no-change-config.json");
 		createVariable("expectedReturnCode", "0");
-		createVariable("apiManagerUser", "${oadminUsername1}"); // This is an org-admin user
-		createVariable("apiManagerPass", "${oadminPassword1}");
 		action(swaggerImport);
 	}
 

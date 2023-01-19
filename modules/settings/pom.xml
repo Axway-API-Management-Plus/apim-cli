@@ -28,6 +28,12 @@
 		</dependency>
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+			<artifactId>apimcli-tests</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
 			<artifactId>apimcli-tool</artifactId>
 		</dependency>
 		<dependency>

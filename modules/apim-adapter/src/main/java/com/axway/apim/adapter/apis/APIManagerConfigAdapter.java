@@ -89,7 +89,7 @@ public class APIManagerConfigAdapter {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/config").build();
             LOG.debug("API-Manager configuration URL : {}", uri);
-            RestAPICall getRequest = new GETRequest(uri, useAdmin);
+            RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -132,7 +132,7 @@ public class APIManagerConfigAdapter {
                 RestAPICall request;
                 String json = mapper.writeValueAsString(desiredConfig);
                 HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                request = new PUTRequest(entity, uri, true);
+                request = new PUTRequest(entity, uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {

@@ -44,7 +44,7 @@ public class APIManagerAPIMethodAdapter {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + "/operations").build();
             LOG.debug("Load API-Methods for API: {} from API-Manager", apiId);
-            RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+            RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 this.apiManagerResponse.put(apiId, EntityUtils.toString(httpResponse.getEntity()));
             }
@@ -102,7 +102,7 @@ public class APIManagerAPIMethodAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiMethod.getVirtualizedApiId() + "/operations/" + apiMethod.getId()).build();
             String json = mapper.writeValueAsString(apiMethod);
             HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-            RestAPICall putRequest = new PUTRequest(entity, uri, APIManagerAdapter.hasAdminAccount());
+            RestAPICall putRequest = new PUTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) putRequest.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");

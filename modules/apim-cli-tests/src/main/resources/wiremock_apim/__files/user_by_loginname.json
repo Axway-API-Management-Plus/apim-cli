@@ -1,0 +1,21 @@
+[
+  {
+    "id": "2f126140-db10-4ccb-be9d-e430d9fe9c45",
+    "organizationId": "987b2afc-b027-41fd-a920-bef182eb4a94",
+    "name": "usera",
+    "loginName": "usera",
+    "email": "usera@axway.com",
+    "role": "oadmin",
+    "enabled": true,
+    "createdOn": 1673966387875,
+    "state": "approved",
+    "type": "internal",
+    "orgs2Role": {
+      "1038f4db-7453-4d47-9f29-121a057a6e1f": "user"
+    },
+    "orgs2Name": {
+      "1038f4db-7453-4d47-9f29-121a057a6e1f": "orgb"
+    },
+    "dn": "cn=usera,o=orga,ou=organizations,ou=APIPortal"
+  }
+]

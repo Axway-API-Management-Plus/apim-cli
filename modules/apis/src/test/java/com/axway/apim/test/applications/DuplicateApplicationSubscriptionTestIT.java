@@ -26,7 +26,7 @@ public class DuplicateApplicationSubscriptionTestIT extends TestNGCitrusTestRunn
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		swaggerImport = new ImportTestAction();
 		description("Verify subscription handling, if App isn't unique based on the name (See issue #217)");
-		
+		variable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/duplicate.app-subscription-${apiNumber}");
 		variable("apiName", "Duplicate-App Subscription API-${apiNumber}");

@@ -23,7 +23,8 @@ public class ValidateAppQuotaStaysTestIT extends TestNGCitrusTestRunner {
 		ImportTestAction swaggerImport = new ImportTestAction();
 		
 		description("Validates potentially configured application quota stay after re-importing an API.");
-		
+
+		createVariable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/app-quota-check-${apiNumber}");
 		variable("apiName", "App Quota Check ${apiNumber}");

@@ -21,9 +21,7 @@ public class ConsolePrinterConfig {
 	APIManagerAdapter adapter;
 	
 	StandardExportParams params;
-	
-	private final String dots = ".....................................";
-	
+
 	ConfigType[] standardFields = new ConfigType[] {
 			ConfigType.APIManager, 
 			ConfigType.APIPortal, 
@@ -87,6 +85,7 @@ public class ConsolePrinterConfig {
 				if (field.isAnnotationPresent(APIManagerConfigAnnotation.class)) {
 					APIManagerConfigAnnotation annotation = field.getAnnotation(APIManagerConfigAnnotation.class);
 					if(annotation.configType()==configType) {
+						String dots = ".....................................";
 						System.out.printf("%s %s: %s", annotation.name() , dots.substring(annotation.name().length()), getFieldValue(field.getName(), config));
 					}
 				}

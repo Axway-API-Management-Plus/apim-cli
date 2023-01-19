@@ -13,21 +13,17 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 public class CSVAppExporterTest extends WiremockWrapper {
 
     @BeforeClass
-    public void init() throws URISyntaxException {
-       URI version = this.getClass().getClassLoader().getResource("wiremock_apim").toURI();
-        System.out.println(version);
+    public void init() {
         initWiremock();
     }
 
     @AfterClass
-    public void stop(){
+    public void stop() {
         close();
     }
 

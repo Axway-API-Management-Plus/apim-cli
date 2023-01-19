@@ -1,0 +1,11 @@
+{
+  "name" : "usera",
+  "loginName" : "usera",
+  "email" : "usera@axway.com",
+  "role" : "user",
+  "organization" : "orga",
+  "type" : "internal",
+  "state" : "approved",
+  "createdOn" : 1673966415777,
+  "enabled" : true
+}

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/portal/v1.4/organizations?field=name&op=eq&value=orga"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "organization_by_name.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

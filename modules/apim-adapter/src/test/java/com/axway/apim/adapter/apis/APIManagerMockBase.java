@@ -2,13 +2,13 @@ package com.axway.apim.adapter.apis;
 
 import java.io.IOException;
 
+import com.axway.apim.adapter.APIManagerAdapter;
 import org.testng.reporters.Files;
 
-import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.APIManagerAdapterTest;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.Image;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,12 +30,9 @@ public abstract class APIManagerMockBase {
         APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "config/configAsAdmin.json")), true);
         APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse(Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "config/configAsOrgAdmin.json")), false);
         apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
-
         apim.configAdapter.setAPIManagerTestResponse("{ \"productVersion\": \"7.7.20200130\" }", false);
-
         apim.methodAdapter.setAPIManagerTestResponse("72745ed9-f75b-428c-959c-b483eea497a1", Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiMethods.json")));
         apim.methodAdapter.setAPIManagerTestResponse("72745ed9-f75b-428c-959c-99999999", Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiMethodsUsedWithMethodNames.json")));
-
         String testAPI1 = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiHavingMethods.json"));
         String testAPI2 = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiHavingMethodsWithMethodsNames.json"));
         String systemQuotas = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "quotas/systemAPIQuota.json"));

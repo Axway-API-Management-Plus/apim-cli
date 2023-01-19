@@ -6,7 +6,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 
 public class CoreCLIOptions extends CLIOptions {
 	
-	private CLIOptions cliOptions;
+	private final CLIOptions cliOptions;
 
 	public CoreCLIOptions(CLIOptions cliOptions) {
 		this.cliOptions = cliOptions;
@@ -26,14 +26,9 @@ public class CoreCLIOptions extends CLIOptions {
 		params.setPort((getValue("port")!=null) ? Integer.parseInt(getValue("port").trim()) : -1);
 		params.setUsername(getValue("username"));
 		params.setPassword(getValue("password"));
-		params.setAdminUsername(getValue("admin_username"));
-		params.setAdminPassword(getValue("admin_password"));
 		params.setClearCache(getValue("clearCache"));
-		
 		params.setReturnCodeMapping(getValue("returnCodeMapping"));
-		//
 		params.setForce(hasOption("force"));
-		params.setIgnoreAdminAccount(hasOption("ignoreAdminAccount"));
 		params.setIgnoreCache(hasOption("ignoreCache"));
 		if(getValue("rollback")!=null) params.setRollback(Boolean.parseBoolean(getValue("rollback")));
 		
@@ -118,10 +113,6 @@ public class CoreCLIOptions extends CLIOptions {
 		option = new Option("rollback", true, "Allows to disable the rollback feature");
 		option.setRequired(false);
 		option.setArgName("true");
-		cliOptions.addInternalOption(option);
-		
-		option = new Option("ignoreAdminAccount", "If set, the tool wont load the env.properties. This is used for testing only.");
-		option.setRequired(false);
 		cliOptions.addInternalOption(option);
 		
 		option = new Option("returnCodeMapping", true, "Optionally maps given return codes into a desired return code. Format: 10:0, 12:0");

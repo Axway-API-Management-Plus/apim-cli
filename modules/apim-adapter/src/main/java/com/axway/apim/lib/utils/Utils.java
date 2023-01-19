@@ -364,6 +364,6 @@ public class Utils {
         if (stage != null) {
             host = stage;
         }
-        return prefix + host + "_" + APIManagerAdapter.getCurrentUser(false).getLoginName() + "_" + dateTime + ".csv";
+        return prefix + host + "_" + APIManagerAdapter.getCurrentUser().getLoginName() + "_" + dateTime + ".csv";
     }
 }

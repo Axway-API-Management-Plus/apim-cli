@@ -19,10 +19,10 @@ public class CoreParametersTest {
 	@Test
 	public void testCleanSpecificCache() {
 		CoreParameters params = new CoreParameters();
-		params.setClearCache(CacheType.APPLICATIONS_QUOTA_CACHE.name());
+		params.setClearCache(CacheType.applicationsQuotaCache.name());
 
 		Assert.assertEquals(params.clearCaches().size(), 1);
-		Assert.assertEquals(params.clearCaches().get(0), CacheType.APPLICATIONS_QUOTA_CACHE);
+		Assert.assertEquals(params.clearCaches().get(0), CacheType.applicationsQuotaCache);
 	}
 	
 	@Test
@@ -31,20 +31,20 @@ public class CoreParametersTest {
 		params.setClearCache("*App*");
 
 		Assert.assertEquals(params.clearCaches().size(), 5);
-		Assert.assertTrue(params.clearCaches().contains(CacheType.APPLICATIONS_QUOTA_CACHE));
-		Assert.assertTrue(params.clearCaches().contains(CacheType.APPLICATIONS_CACHE));
-		Assert.assertTrue(params.clearCaches().contains(CacheType.APPLICATIONS_SUBSCRIPTION_CACHE));
-		Assert.assertTrue(params.clearCaches().contains(CacheType.APPLICATION_API_ACCESS_CACHE));
-		Assert.assertTrue(params.clearCaches().contains(CacheType.APPLICATIONS_CREDENTIAL_CACHE));
+		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationsQuotaCache));
+		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationsCache));
+		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationsSubscriptionCache));
+		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationAPIAccessCache));
+		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationsCredentialCache));
 	}
 	
 	@Test
 	public void testClearCacheCombined() {
 		CoreParameters params = new CoreParameters();
-		params.setClearCache(CacheType.APPLICATIONS_QUOTA_CACHE.name() + "," + CacheType.APPLICATION_API_ACCESS_CACHE.name());
+		params.setClearCache(CacheType.applicationsQuotaCache.name() + "," + CacheType.applicationAPIAccessCache.name());
 		Assert.assertEquals(params.clearCaches().size(), 2);
-		Assert.assertTrue(params.clearCaches().contains(CacheType.APPLICATIONS_QUOTA_CACHE));
-		Assert.assertTrue(params.clearCaches().contains(CacheType.APPLICATION_API_ACCESS_CACHE));
+		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationsQuotaCache));
+		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationAPIAccessCache));
 	}
 	
 	@Test

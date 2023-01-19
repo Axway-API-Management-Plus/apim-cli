@@ -13,9 +13,9 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CSVAPIExporterTest extends WiremockTest{
+public class CSVAPIExporterTest extends WiremockTest {
 
-   @Test
+    @Test
     public void exportCSV() throws AppException {
         String[] args = {"-host", "localhost", "-id", "e4ded8c8-0a40-4b50-bc13-552fb7209150", "-t", "openapi", "-o", "csv"};
         CLIOptions options = CLIAPIExportOptions.create(args);

@@ -1,15 +1,15 @@
 package com.axway.apim.adapter;
 
 public enum CacheType {
-    APPLICATION_API_ACCESS_CACHE,
-    ORGANIZATION_API_ACCESS_CACHE,
-    OAUTH_CLIENT_PROVIDER_CACHE,
-    APPLICATIONS_CACHE,
-    APPLICATIONS_SUBSCRIPTION_CACHE,
-    APPLICATIONS_QUOTA_CACHE(true),
-    APPLICATIONS_CREDENTIAL_CACHE,
-    ORGANIZATION_CACHE,
-    USER_CACHE;
+    applicationAPIAccessCache,
+    organizationAPIAccessCache,
+    oauthClientProviderCache,
+    applicationsCache,
+    applicationsSubscriptionCache,
+    applicationsQuotaCache(true),
+    applicationsCredentialCache,
+    organizationCache,
+    userCache;
 
     public final boolean supportsImportActions;
 

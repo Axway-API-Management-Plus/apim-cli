@@ -92,7 +92,7 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 	}
 
 	@Override
-	public OrgFilter getFilter() throws AppException {
+	public OrgFilter getFilter() {
 		return getBaseOrgFilterBuilder().build();
 	}
 	

@@ -91,7 +91,7 @@ public class JsonUserExporter extends UserResultHandler {
 	}
 
 	@Override
-	public UserFilter getFilter() throws AppException {
+	public UserFilter getFilter() {
 		return getBaseFilterBuilder().includeImage(true).build();
 	}
 	

@@ -19,11 +19,10 @@ public class ClientOrgModeAddTestIT extends TestNGCitrusTestDesigner {
 	@CitrusTest(name = "ClientOrgModeAddTestIT")
 	public void run() {
 		description("Validates the Client-Org-Mode: add is working as expected.");
-		
+		createVariable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/org-mode-add-api-${apiNumber}");
 		variable("apiName", "Org-Mode-Add Test API-${apiNumber}");
-
 		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
 		

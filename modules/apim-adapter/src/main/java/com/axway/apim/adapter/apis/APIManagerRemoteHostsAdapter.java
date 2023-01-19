@@ -117,14 +117,14 @@ public class APIManagerRemoteHostsAdapter {
                 if (actualRemoteHost == null) {
                     String json = mapper.writeValueAsString(desiredRemoteHost);
                     HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                    request = new POSTRequest(entity, uri, true);
+                    request = new POSTRequest(entity, uri);
                 } else {
                     desiredRemoteHost.setId(actualRemoteHost.getId());
                     desiredRemoteHost.setCreatedOn(actualRemoteHost.getCreatedOn());
                     desiredRemoteHost.setCreatedBy(actualRemoteHost.getCreatedBy());
                     String json = mapper.writeValueAsString(desiredRemoteHost);
                     HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                    request = new PUTRequest(entity, uri, true);
+                    request = new PUTRequest(entity, uri);
                 }
                 try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();

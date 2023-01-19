@@ -1,0 +1,165 @@
+{
+  "id": "e4ded8c8-0a40-4b50-bc13-552fb7209150",
+  "organizationId": "ba1c6dac-ee31-4b5d-9d18-493cc6f5088b",
+  "apiId": "1f4263ca-7f03-41d9-9d34-9eff79d29bd8",
+  "name": "petstore3",
+  "version": "1.0.17",
+  "apiRoutingKey": null,
+  "vhost": null,
+  "path": "/api/v3",
+  "descriptionType": "original",
+  "descriptionManual": null,
+  "descriptionMarkdown": null,
+  "descriptionUrl": null,
+  "summary": null,
+  "retired": false,
+  "expired": false,
+  "image": null,
+  "retirementDate": 0,
+  "deprecated": false,
+  "state": "unpublished",
+  "createdOn": 1673301449598,
+  "createdBy": "40dd53a4-0b13-4485-82e8-63c687404c2f",
+  "corsProfiles": [
+    {
+      "name": "_default",
+      "isDefault": true,
+      "origins": [
+        "*"
+      ],
+      "allowedHeaders": [],
+      "exposedHeaders": [
+        "X-CorrelationID"
+      ],
+      "supportCredentials": false,
+      "maxAgeSeconds": 0
+    }
+  ],
+  "securityProfiles": [
+    {
+      "name": "_default",
+      "isDefault": true,
+      "devices": [
+        {
+          "name": "API Key",
+          "type": "apiKey",
+          "order": 1,
+          "properties": {
+            "apiKeyFieldName": "KeyId",
+            "takeFrom": "HEADER",
+            "removeCredentialsOnSuccess": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "authenticationProfiles": [
+    {
+      "name": "_default",
+      "isDefault": true,
+      "parameters": {
+        "_id_": 0
+      },
+      "type": "none"
+    }
+  ],
+  "inboundProfiles": {
+    "_default": {
+      "securityProfile": "_default",
+      "corsProfile": "_default",
+      "monitorAPI": true,
+      "queryStringPassThrough": false,
+      "monitorSubject": "authentication.subject.id"
+    }
+  },
+  "outboundProfiles": {
+    "_default": {
+      "authenticationProfile": "_default",
+      "routeType": "proxy",
+      "requestPolicy": "<key type='FilterCircuit'><id field='name' value='Validate Size &amp; Token'/></key>",
+      "responsePolicy": "<key type='FilterCircuit'><id field='name' value='Remove Header &amp; Audit data'/></key>",
+      "routePolicy": null,
+      "faultHandlerPolicy": null,
+      "apiId": null,
+      "apiMethodId": null,
+      "parameters": []
+    }
+  },
+  "serviceProfiles": {
+    "_default": {
+      "apiId": "1f4263ca-7f03-41d9-9d34-9eff79d29bd8",
+      "basePath": "https://petstore3.swagger.io"
+    }
+  },
+  "caCerts": [
+    {
+      "certBlob": "MIIFzzCCBLegAwIBAgIQDUQAc/Ih27ctRbTPi9amODANBgkqhkiG9w0BAQsFADBGMQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRUwEwYDVQQLEwxTZXJ2ZXIgQ0EgMUIxDzANBgNVBAMTBkFtYXpvbjAeFw0yMjAyMjQwMDAwMDBaFw0yMzAzMjUyMzU5NTlaMBcxFTATBgNVBAMMDCouc3dhZ2dlci5pbzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJgo+KXHLbE6BKIwmxJIcg19Zkz+p2qdoYxAyLSPY3voLEbXuRLllFcaw/zcaNgwlARQqh8gduLHPsBsQCgNVsJ2jSa7cuLKLz79r/mVgba9FgP2e/vH7Ynqn3GHwwW4JNlm5M0IwVdhKcw6XyX87gl67VG9iC+X1ogVaKp9ggw7plJtNTLRMCJrbJd2+GOoNKVEv3Q2nOXFt6E8qS/n0UJAfmCgfXpqZeQgsnVBSyv10QJe673xHJfpmQwQPJ7TAu70XRZfC5ND1hmVEIqLpP2ba6My1dSGTvz531G7L+ydfxyV5KjJUofH3rjt+/v6d/oBruUpIRKt0TtBp3cGxgUCAwEAAaOCAuYwggLiMB8GA1UdIwQYMBaAFFmkZgZSoHuVkjyjlAcnlnRb+T3QMB0GA1UdDgQWBBSL9OguvK7zlhMPAAdQ8kAgQOo4bjAXBgNVHREEEDAOggwqLnN3YWdnZXIuaW8wDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjA9BgNVHR8ENjA0MDKgMKAuhixodHRwOi8vY3JsLnNjYTFiLmFtYXpvbnRydXN0LmNvbS9zY2ExYi0xLmNybDATBgNVHSAEDDAKMAgGBmeBDAECATB1BggrBgEFBQcBAQRpMGcwLQYIKwYBBQUHMAGGIWh0dHA6Ly9vY3NwLnNjYTFiLmFtYXpvbnRydXN0LmNvbTA2BggrBgEFBQcwAoYqaHR0cDovL2NydC5zY2ExYi5hbWF6b250cnVzdC5jb20vc2NhMWIuY3J0MAwGA1UdEwEB/wQCMAAwggF9BgorBgEEAdZ5AgQCBIIBbQSCAWkBZwB2AOg+0No+9QY1MudXKLyJa8kD08vREWvs62nhd31tBr1uAAABfyxv3C0AAAQDAEcwRQIhAMjo7LW7IZwiSZpDYP5uZk8m0ab9cVE3HNiv6b+Jy/CgAiAly2eefwD5gBISVEFiJvKJjgknXNzg35RgOxIw+tF9KAB2ADXPGRu/sWxXvw+tTG1Cy7u2JyAmUeo/4SrvqAPDO9ZMAAABfyxv2/0AAAQDAEcwRQIhAIoNPXnWHxpvMlOhmabAcUOiRxVndyEH0cuFDO/mBWV4AiBDm6vZIW53O2ZRSb+PUGRrI3Xf2zxSjc6CJXhCa/sldAB1ALNzdwfhhFD4Y4bWBancEQlKeS2xZwwLh9zwAw55NqWaAAABfyxv3BsAAAQDAEYwRAIgS5QAc/4co+20PCPDrjqKvEXmDc1loE7mxez2xevLp+YCIDwjN66vDDJrTN/t8c77JKanQboKDT77yNcW+UE1JsGVMA0GCSqGSIb3DQEBCwUAA4IBAQC3XMUisaT3CYjyqwri2uXcNhljrecJM+rO/X4pOczNkZL12sAz05tW+TkMLWNgiy9y1ZETZxDJ5/BZZJAK1siyETzukMabOWHhvIWEUgq/8k8koV0pz832VwbNQFcr0ZP658fupUTS9krQhFHr36vLvFt+voEXvULVfacrEnf/Jtmu+wBruEhqfGPViaXrRXYZhRhRZkSOATlaJD6fdZ06nr0Lidbenu/Dpzd5m7k9MlxdY8NbZhPuGLdb8IZP2Zq0MY6ZvItF8X83Z9+uPE3VlX40/dSVPITe/PkbNwhqr5+vH6L/4a1INGXxmdLQ1hL7ejycLosK9wb7RgQVsgIz",
+      "name": "CN=*.swagger.io",
+      "alias": "CN=*.swagger.io",
+      "subject": "CN=*.swagger.io",
+      "issuer": "CN=Amazon, OU=Server CA 1B, O=Amazon, C=US",
+      "version": 3,
+      "notValidBefore": 1645660800000,
+      "notValidAfter": 1679788799000,
+      "signatureAlgorithm": "RSA (2048 bits)",
+      "sha1Fingerprint": "5D:44:89:E6:82:24:66:57:9D:C7:11:D7:95:E8:25:0C:0A:8A:54:C2",
+      "md5Fingerprint": "1B:73:FB:B3:57:7B:FC:8A:B4:C1:74:E3:BD:75:9B:93",
+      "expired": false,
+      "notYetValid": false,
+      "inbound": false,
+      "outbound": true
+    },
+    {
+      "certBlob": "MIIESTCCAzGgAwIBAgITBn+UV4WH6Kx33rJTMlu8mYtWDTANBgkqhkiG9w0BAQsFADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6b24gUm9vdCBDQSAxMB4XDTE1MTAyMjAwMDAwMFoXDTI1MTAxOTAwMDAwMFowRjELMAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEVMBMGA1UECxMMU2VydmVyIENBIDFCMQ8wDQYDVQQDEwZBbWF6b24wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDCThZn3c68asg3Wuw6MLAd5tES6BIoSMzoKcG5blPVo+sDORrMd4f2AbnZcMzPa43j4wNxhplty6aUKk4T1qe9BOwKFjwK6zmxxLVYo7bHViXsPlJ6qOMpFge5blDP+18x+B26A0piiQOuPkfyDyeR4xQghfj66Yo19V+emU3nazfvpFA+ROz6WoVmB5x+F2pV8xeKNR7u6azDdU5YVX1TawprmxRC1+WsAYmz6qP+z8ArDITC2FMVy2fw0IjKOtEXc/VfmtTFch5+AfGYMGMqqvJ6LcXiAhqG5TI+Dr0RtM88k+8XUBCeQ8IGKuANaL7TiItKZYxK1MMuTJtV9IblAgMBAAGjggE7MIIBNzASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBhjAdBgNVHQ4EFgQUWaRmBlKge5WSPKOUByeWdFv5PdAwHwYDVR0jBBgwFoAUhBjMhTTsvAyUlC4IWZzHshBOCggwewYIKwYBBQUHAQEEbzBtMC8GCCsGAQUFBzABhiNodHRwOi8vb2NzcC5yb290Y2ExLmFtYXpvbnRydXN0LmNvbTA6BggrBgEFBQcwAoYuaHR0cDovL2NydC5yb290Y2ExLmFtYXpvbnRydXN0LmNvbS9yb290Y2ExLmNlcjA/BgNVHR8EODA2MDSgMqAwhi5odHRwOi8vY3JsLnJvb3RjYTEuYW1hem9udHJ1c3QuY29tL3Jvb3RjYTEuY3JsMBMGA1UdIAQMMAowCAYGZ4EMAQIBMA0GCSqGSIb3DQEBCwUAA4IBAQCFkr41u3nPo4FCHOTjY3NTOVI159Gt/a6ZiqyJEi+752+a1U5y6iAwYfmXss2lJwJFqMp2PphKg5625kXg8kP2CN5t6G7bMQcT8C8xDZNtYTd7WPD8UZiRKAJPBXa30/AbwuZe0GaFEQ8ugcYQgSn+IGBI8/LwhBNTZTUVEWuCUUBVV18YtbAiPq3yXqMB48Oz+ctBWuZSkbvkNodPLamkB2g1upRyzQ7qDn1X8nn8N8V7YJ6y68AtkHcNSRAnpTitxBKjtKPISLMVCx7i4hncxHZSyLyKQXhw2W2Xs0qLeC1etA+jTGDK4UfLeC0SF7FSi8o5LL21L8IzApar2pR/",
+      "name": "CN=Amazon, OU=Server CA 1B, O=Amazon, C=US",
+      "alias": "CN=Amazon, OU=Server CA 1B, O=Amazon, C=US",
+      "subject": "CN=Amazon, OU=Server CA 1B, O=Amazon, C=US",
+      "issuer": "CN=Amazon Root CA 1, O=Amazon, C=US",
+      "version": 3,
+      "notValidBefore": 1445472000000,
+      "notValidAfter": 1760832000000,
+      "signatureAlgorithm": "RSA (2048 bits)",
+      "sha1Fingerprint": "91:7E:73:2D:33:0F:9A:12:40:4F:73:D8:BE:A3:69:48:B9:29:DF:FC",
+      "md5Fingerprint": "EB:26:8E:55:D4:34:FE:BD:A3:6A:97:9A:44:65:4B:6D",
+      "expired": false,
+      "notYetValid": false,
+      "inbound": false,
+      "outbound": true
+    },
+    {
+      "certBlob": "MIIEkjCCA3qgAwIBAgITBn+USionzfP6wq4rAfkI7rnExjANBgkqhkiG9w0BAQsFADCBmDELMAkGA1UEBhMCVVMxEDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxJTAjBgNVBAoTHFN0YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xOzA5BgNVBAMTMlN0YXJmaWVsZCBTZXJ2aWNlcyBSb290IENlcnRpZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTE1MDUyNTEyMDAwMFoXDTM3MTIzMTAxMDAwMFowOTELMAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEZMBcGA1UEAxMQQW1hem9uIFJvb3QgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALJ4gHHKeNXjca9HgFB0fW7Y14h29Jlo91ghYPl0hAEvrAIthtOgQ3pOsqTQNroBvo3bSMgHFzZM9O6II8c+6zf1tRn4SWiw3te5djgdYZ6k/oI2peVKVuRF4fn9tBb6dNqcmzU5L/qwIFAGbHrQgLKm+a/sRxmPUDgH3KKHOVj4utWp+UhnMJbulHheb4mjUcAwhmahRWa6VOujw5H5SNz/0egwLX0tdHA114gk957EWW67c4cX8jJGKLhD+rcdqsq08p8kDi1L93FcXmn/6pUCyziKrlA4b9v7LWIbxcceVOF34GfID5yHI9Y/QCB/IIDEgEw+OyQmjgSubJrIqg0CAwEAAaOCATEwggEtMA8GA1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgGGMB0GA1UdDgQWBBSEGMyFNOy8DJSULghZnMeyEE4KCDAfBgNVHSMEGDAWgBScXwDfqgHXMCs4iKK4bUqc8hGRgzB4BggrBgEFBQcBAQRsMGowLgYIKwYBBQUHMAGGImh0dHA6Ly9vY3NwLnJvb3RnMi5hbWF6b250cnVzdC5jb20wOAYIKwYBBQUHMAKGLGh0dHA6Ly9jcnQucm9vdGcyLmFtYXpvbnRydXN0LmNvbS9yb290ZzIuY2VyMD0GA1UdHwQ2MDQwMqAwoC6GLGh0dHA6Ly9jcmwucm9vdGcyLmFtYXpvbnRydXN0LmNvbS9yb290ZzIuY3JsMBEGA1UdIAQKMAgwBgYEVR0gADANBgkqhkiG9w0BAQsFAAOCAQEAYjdCXLwQtT6LLOkMm2xF4gcAevnFWAu5CIw+7bMlPLVvUOTNNWqnkzSWMiGpSESrnO09tKpzbeR/FoCJbM8oAxiDR3mjEH4wW6w7sGDgd9QIpuEdfF7Au/maeyKdpwAJfqxGF4PcnCZXmTA5YpaP7dreqsXMGz7KQ2hsVxa81Q4gLv7/wmpdLqBKbRRYh5TmOTFffHPLkIhqhBGWJ6bt2YFGpn6jcgAKUj6DiAdjd4lpFw85hdKrCEVN0FE6/V1dN2RMfjCyVSRCnTawXZwXgWHxyvkQAiSr6w10kY17RSlQOYiypok1JR4UakcjMS9cmvqtmg5iUaQqqcT5NJ0hGA==",
+      "name": "CN=Amazon Root CA 1, O=Amazon, C=US",
+      "alias": "CN=Amazon Root CA 1, O=Amazon, C=US",
+      "subject": "CN=Amazon Root CA 1, O=Amazon, C=US",
+      "issuer": "CN=Starfield Services Root Certificate Authority - G2, O=\"Starfield Technologies, Inc.\", L=Scottsdale, ST=Arizona, C=US",
+      "version": 3,
+      "notValidBefore": 1432555200000,
+      "notValidAfter": 2145834000000,
+      "signatureAlgorithm": "RSA (2048 bits)",
+      "sha1Fingerprint": "06:B2:59:27:C4:2A:72:16:31:C1:EF:D9:43:1E:64:8F:A6:2E:1E:39",
+      "md5Fingerprint": "E8:65:A2:2A:AE:52:4D:26:86:9A:F0:44:8D:6F:D8:96",
+      "expired": false,
+      "notYetValid": false,
+      "inbound": false,
+      "outbound": true
+    },
+    {
+      "certBlob": "MIIEdTCCA12gAwIBAgIJAKcOSkw0grd/MA0GCSqGSIb3DQEBCwUAMGgxCzAJBgNVBAYTAlVTMSUwIwYDVQQKExxTdGFyZmllbGQgVGVjaG5vbG9naWVzLCBJbmMuMTIwMAYDVQQLEylTdGFyZmllbGQgQ2xhc3MgMiBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTAeFw0wOTA5MDIwMDAwMDBaFw0zNDA2MjgxNzM5MTZaMIGYMQswCQYDVQQGEwJVUzEQMA4GA1UECBMHQXJpem9uYTETMBEGA1UEBxMKU2NvdHRzZGFsZTElMCMGA1UEChMcU3RhcmZpZWxkIFRlY2hub2xvZ2llcywgSW5jLjE7MDkGA1UEAxMyU3RhcmZpZWxkIFNlcnZpY2VzIFJvb3QgQ2VydGlmaWNhdGUgQXV0aG9yaXR5IC0gRzIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDVDDrEKvlO4vW+GZdfjohTsR8/y8+fIBNtKTrID30892t2OGPZNmCom15cAICyL1l/9of5JUOG52kbUpqQ4XHj2C0NTm/2yEnZtvMaVq4rtnQU68/7JuMauh2WLmo7WJSJR1b/JaCTcFOD2oR0FMNnngRoOt+OQFodSk7PQ5E751bWAHDLUu57fa4657wx+UX2wmDPE1kCK4DMNEffud6QZW0CzyyRpqbn3oUYSXxmTqM6bam17jQuug0DuDPfR+uxa40l2ZvOgdFFRjKWcIfeAg5JQ4W2bHO7ZOphQazJ1FTfhy/HIrImzJ9ZVGif/L4qL8RVHHVAYBeFAlU5i38FAgMBAAGjgfAwge0wDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0OBBYEFJxfAN+qAdcwKziIorhtSpzyEZGDMB8GA1UdIwQYMBaAFL9ft9HO3R+G9FtVrNzXEMIOqYjnME8GCCsGAQUFBwEBBEMwQTAcBggrBgEFBQcwAYYQaHR0cDovL28uc3MyLnVzLzAhBggrBgEFBQcwAoYVaHR0cDovL3guc3MyLnVzL3guY2VyMCYGA1UdHwQfMB0wG6AZoBeGFWh0dHA6Ly9zLnNzMi51cy9yLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEBACMd44pXyn3pF3lM8R5V/cxTbj5HD9/GVfKyBDbtgB9TxF00KGu+x1X8Z+rLP3+QsjPNG1gQggL4+C/1E2DUBc7xgQjB3ad1l08YuW3e95ORCLp+QCztweq7dp4zBncdDQh/U90bZKuCJ/Fp1U1ervShw3WnWEQt8jxwmKy6abaVd38PMV4s/KCHOkdp8Hlf9BRUpJVeEXgSYCfOn8J3/yNTd126/+pZ59vPr5KW7ySaNRB6nJHGDn2Z9j8Z3/VyVOEVqQdZe4O/Ui5GjLIAZHYcSNPYeehuVsyuLAOQ1xk4meTKCRlb/weWsKh/NEnfVqn3sF/tM+2MR7cwA130A4w=",
+      "name": "CN=Starfield Services Root Certificate Authority - G2, O=\"Starfield Technologies, Inc.\", L=Scottsdale, ST=Arizona, C=US",
+      "alias": "CN=Starfield Services Root Certificate Authority - G2, O=\"Starfield Technologies, Inc.\", L=Scottsdale, ST=Arizona, C=US",
+      "subject": "CN=Starfield Services Root Certificate Authority - G2, O=\"Starfield Technologies, Inc.\", L=Scottsdale, ST=Arizona, C=US",
+      "issuer": "OU=Starfield Class 2 Certification Authority, O=\"Starfield Technologies, Inc.\", C=US",
+      "version": 3,
+      "notValidBefore": 1251849600000,
+      "notValidAfter": 2035129156000,
+      "signatureAlgorithm": "RSA (2048 bits)",
+      "sha1Fingerprint": "9E:99:A4:8A:99:60:B1:49:26:BB:7F:3B:02:E2:2D:A2:B0:AB:72:80",
+      "md5Fingerprint": "C6:15:09:25:CF:EA:59:41:DD:C7:FF:2A:0A:50:66:92",
+      "expired": false,
+      "notYetValid": false,
+      "inbound": false,
+      "outbound": true
+    }
+  ],
+  "tags": {}
+}

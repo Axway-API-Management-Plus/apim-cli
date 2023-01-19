@@ -26,7 +26,7 @@ public class PublishedSubscribeUpgradeAccessAPITestIT extends TestNGCitrusTestRu
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
 		swaggerImport = new ImportTestAction();
 		echo("####### Import a Published-API, subscribe to it and then Re-Import a new version. #######");
-		
+		variable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/my-test-api-${apiNumber}");
 		variable("apiName", "My-Test-API-${apiNumber}");

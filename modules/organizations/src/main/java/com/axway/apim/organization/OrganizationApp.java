@@ -158,8 +158,8 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		} finally {
 			try {
 				APIManagerAdapter.deleteInstance();
-			} catch (AppException ignore) {
-				LOG.error("Unable to clean Instances", ignore);
+			} catch (AppException e) {
+				LOG.error("Unable to clean Instances", e);
 			}
 		}
 	}

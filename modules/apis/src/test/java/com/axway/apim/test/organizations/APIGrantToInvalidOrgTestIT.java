@@ -17,7 +17,7 @@ public class APIGrantToInvalidOrgTestIT extends TestNGCitrusTestDesigner {
 	@CitrusTest(name = "APIGrantToInvalidOrgTestIT")
 	public void run() {
 		description("Tool must fail with a defined error, if a configured org is invalid");
-		
+		variable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/grant_invalid_org-api-${apiNumber}");
 		variable("apiName", "Grant to invalid orgs API-${apiNumber}");

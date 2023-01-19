@@ -48,7 +48,7 @@ public class APIManagerUserAdapter {
     Cache<String, String> userCache;
 
     public APIManagerUserAdapter() {
-        userCache = APIManagerAdapter.getCache(CacheType.USER_CACHE, String.class, String.class);
+        userCache = APIManagerAdapter.getCache(CacheType.userCache, String.class, String.class);
     }
 
     private void readUsersFromAPIManager(UserFilter filter) throws AppException {
@@ -69,14 +69,13 @@ public class APIManagerUserAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/users" + userId)
                     .addParameters(filter.getFilters())
                     .build();
-            RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
+            RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load users from API-Manager using filter: {}", filter);
-            LOG.trace("Load users with URI: {}", uri);
+            LOG.debug("Load users with URI: {}", uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                     throw new AppException("No user found for user id: " + userId, ErrorCode.UNKNOWN_USER);
                 } else if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                    LOG.error("Sent request: {}", uri);
                     LOG.error("Received Status-Code: {} Response: {}", httpResponse.getStatusLine().getStatusCode(), EntityUtils.toString(httpResponse.getEntity()));
                     throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
@@ -186,9 +185,9 @@ public class APIManagerUserAdapter {
                 String json = mapper.writeValueAsString(desiredUser);
                 HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
                 if (actualUser == null) {
-                    request = new POSTRequest(entity, uri, false);
+                    request = new POSTRequest(entity, uri);
                 } else {
-                    request = new PUTRequest(entity, uri, false);
+                    request = new PUTRequest(entity, uri);
                 }
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -219,9 +218,9 @@ public class APIManagerUserAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/users/" + actualUser.getId() + "/changepassword").build();
             HttpEntity entity = new StringEntity("newPassword=" + newPassword, ContentType.APPLICATION_FORM_URLENCODED);
             if ("oadmin".equals(actualUser.getRole())) { // An orgadmin cannot change the password of another orgadmin, even he has created that orgadmin
-                request = new POSTRequest(entity, uri, true);
+                request = new POSTRequest(entity, uri);
             } else {
-                request = new POSTRequest(entity, uri, false);
+                request = new POSTRequest(entity, uri);
             }
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -238,7 +237,7 @@ public class APIManagerUserAdapter {
     public void deleteUser(User user) throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/users/" + user.getId()).build();
-            RestAPICall request = new DELRequest(uri, true);
+            RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
@@ -262,7 +261,7 @@ public class APIManagerUserAdapter {
                 .addBinaryBody("file", user.getImage().getInputStream(), ContentType.create("image/jpeg"), user.getImage().getBaseFilename())
                 .build();
         try {
-            RestAPICall apiCall = new POSTRequest(entity, uri, false);
+            RestAPICall apiCall = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
