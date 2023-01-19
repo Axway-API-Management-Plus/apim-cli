@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/portal/v1.4/proxies?field=name&op=eq&value=petstore&field=state&op=eq&value=pending"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "frontend_api_pending.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

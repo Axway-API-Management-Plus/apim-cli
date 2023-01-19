@@ -606,7 +606,7 @@ public class APIManagerAPIAdapter {
     }
 
     public void deleteAPIProxy(API api) throws AppException {
-        LOG.debug("Deleting API-Proxy");
+        LOG.debug("Deleting API-Proxy with Name : {} and Id: {}",api.getName(), api.getId());
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId()).build();
             RestAPICall request = new DELRequest(uri);
