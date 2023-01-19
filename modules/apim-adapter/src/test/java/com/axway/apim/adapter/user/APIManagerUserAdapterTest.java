@@ -110,6 +110,7 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
         APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
         User user = apiManagerUserAdapter.getUser(userFilter);
+        user.setImageUrl("https://axway.com/favicon.ico");
         try {
             apiManagerUserAdapter.addImage(user, true);
         } catch (AppException appException) {

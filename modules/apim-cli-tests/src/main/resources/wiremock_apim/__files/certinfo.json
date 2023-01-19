@@ -1,0 +1,19 @@
+[
+  {
+    "certBlob": "YmxvYg==",
+    "name": "CN=Equifax Secure eBusiness CA-1, O=Equifax Secure Inc., C=US",
+    "alias": "CN=Equifax Secure eBusiness CA-1, O=Equifax Secure Inc., C=US",
+    "subject": "CN=Equifax Secure eBusiness CA-1, O=Equifax Secure Inc., C=US",
+    "issuer": "CN=Equifax Secure eBusiness CA-1, O=Equifax Secure Inc., C=US",
+    "version": 3,
+    "notValidBefore": 1364287486876,
+    "notValidAfter": 1364287486876,
+    "signatureAlgorithm": "RSA (2048 bits)",
+    "sha1Fingerprint": "BC:5C:0D:3E:47:58:DF:E8:42:A4:D2:34:C5:D4:97:14:DA:54:F4:CD",
+    "md5Fingerprint": "89:DD:C1:6C:C0:6E:1D:B1:75:0C:48:E5:E6:AC:76:B0",
+    "expired": true,
+    "notYetValid": false,
+    "inbound": false,
+    "outbound": true
+  }
+]

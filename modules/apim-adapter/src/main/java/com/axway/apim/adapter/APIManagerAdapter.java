@@ -70,7 +70,7 @@ public class APIManagerAdapter {
 
     public static final ObjectMapper mapper = new ObjectMapper();
 
-    private static Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<>();
+    private static final Map<String, ClientApplication> clientCredentialToAppMap = new HashMap<>();
 
     private boolean usingOrgAdmin = false;
     private boolean hasAdminAccount = false;
@@ -146,8 +146,8 @@ public class APIManagerAdapter {
             // No need to login, when running unit tests
             loginToAPIManager();
             Config config = configAdapter.getConfig(false);
-            APIManagerAdapter.apiManagerVersion =config.getProductVersion();
-            if(usingOrgAdmin)
+            APIManagerAdapter.apiManagerVersion = config.getProductVersion();
+            if (usingOrgAdmin)
                 LOG.info("Organization Administrator Self Service Enabled : {}", config.getOadminSelfServiceEnabled());
         }
         // For now this okay, may be replaced with a Factory later
@@ -428,26 +428,25 @@ public class APIManagerAdapter {
     public ClientApplication getAppIdForCredential(String credential, String type) throws AppException {
         if (clientCredentialToAppMap.containsKey(type + "_" + credential)) {
             ClientApplication app = clientCredentialToAppMap.get(type + "_" + credential);
-            LOG.info("Found existing application (in cache): '" + app.getName() + "' based on credential (Type: '" + type + "'): '" + credential + "'");
+            LOG.info("Found existing application (in cache): {} based on credential (Type: {}): {}", app.getName(), type, credential);
             return app;
         }
         List<ClientApplication> allApps = this.appAdapter.getAllApplications(false); // Make sure, we loaded all apps before!
-        LOG.debug("Searching credential (Type: " + type + "): '" + credential + "' in: " + allApps.size() + " apps.");
+        LOG.debug("Searching credential (Type: {}): {} in: {} apps.", type, credential, allApps.size());
         Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
         for (ClientApplication app : allApps) {
             if (appIds.contains(app)) continue;
             String response = null;
-            URI uri;
             try {
-                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/" + type + "").build();
-                LOG.debug("Loading credentials of type: '" + type + "' for application: '" + app.getName() + "' from API-Manager.");
+                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/" + type + "").build();
+                LOG.debug("Loading credentials of type: {} for application: {} from API-Manager.", type, type);
                 RestAPICall getRequest = new GETRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                     response = EntityUtils.toString(httpResponse.getEntity());
-                    LOG.trace("Response: " + response);
+                    LOG.trace("Response: {}", response);
                     JsonNode clientIds = mapper.readTree(response);
                     if (clientIds.size() == 0) {
-                        LOG.debug("No credentials (Type: '" + type + "') found for application: '" + app.getName() + "'");
+                        LOG.debug("No credentials (Type: {}) found for application: {}", type, app.getName());
                         continue;
                     }
                     for (JsonNode clientId : clientIds) {
@@ -463,20 +462,20 @@ public class APIManagerAdapter {
                         } else {
                             throw new AppException("Unknown credential type: " + type, ErrorCode.UNXPECTED_ERROR);
                         }
-                        LOG.debug("Found credential (Type: '" + type + "'): '" + key + "' for application: '" + app.getName() + "'");
+                        LOG.debug("Found credential (Type: {}): {} for application: {}", type, key, app.getName());
                         clientCredentialToAppMap.put(type + "_" + key, app);
                         if (key.equals(credential)) {
-                            LOG.info("Found existing application: '" + app.getName() + "' (" + app.getId() + ") based on credential (Type: '" + type + "'): '" + credential + "'");
+                            LOG.info("Found existing application: {} ( {} ) based on credential (Type: {}): {}", app.getName(), app.getId(), type, credential);
                             return app;
                         }
                     }
                 }
             } catch (Exception e) {
-                LOG.error("Can't load applications credentials. Can't parse response: " + response, e);
+                LOG.error("Can't load applications credentials. Can't parse response: {}", response, e);
                 throw new AppException("Can't load applications credentials.", ErrorCode.API_MANAGER_COMMUNICATION, e);
             }
         }
-        LOG.error("No application found for credential (" + type + "): " + credential);
+        LOG.error("No application found for credential ( {} ): {}", type, credential);
         return null;
     }
 
@@ -488,7 +487,7 @@ public class APIManagerAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode == 404) return null; // No Image found
                 if (statusCode != 200) {
-                    LOG.error("Can't read Image from API-Manager.. Message: '" + EntityUtils.toString(httpResponse.getEntity()) + "' Response-Code: " + statusCode + "");
+                    LOG.error("Can't read Image from API-Manager.. Message: {} Response-Code: {}", EntityUtils.toString(httpResponse.getEntity()), statusCode);
                     throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 if (httpResponse.getEntity() == null)
@@ -539,7 +538,7 @@ public class APIManagerAdapter {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 if (statusCode != 200) {
                     if (response != null && response.contains("Bad password")) {
-                        LOG.debug("API-Manager failed to read certificate information: " + cert.getCertFile() + ". Got response: '" + response + "'.");
+                        LOG.debug("API-Manager failed to read certificate information: {} Got response: {}", cert.getCertFile(), response);
                         throw new AppException("Password for keystore: '" + cert.getCertFile() + "' is wrong.", ErrorCode.WRONG_KEYSTORE_PASSWORD);
                     }
                     throw new AppException("API-Manager failed to read certificate information from file. Got response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);

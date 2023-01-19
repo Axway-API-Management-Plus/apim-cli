@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/api/portal/v1.4/certinfo"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "certinfo.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

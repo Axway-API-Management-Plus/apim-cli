@@ -1,0 +1,12 @@
+[
+  {
+    "id": "dd6227cd-0939-464e-bd3f-5d36104c3b74",
+    "clientId": "extclientid",
+    "enabled": true,
+    "createdBy": "40dd53a4-0b13-4485-82e8-63c687404c2f",
+    "createdOn": 1674155960010,
+    "corsOrigins": [
+      ""
+    ]
+  }
+]

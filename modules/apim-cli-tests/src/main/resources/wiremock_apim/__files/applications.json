@@ -1,0 +1,30 @@
+[
+  {
+    "id": "3be01ec6-7254-4ce3-a3f1-87636d59c614",
+    "name": "Test App 2008",
+    "description": null,
+    "organizationId": "9b4bb30a-1601-4c35-ab8d-36860021ef48",
+    "phone": null,
+    "email": null,
+    "createdBy": "40dd53a4-0b13-4485-82e8-63c687404c2f",
+    "managedBy": [],
+    "createdOn": 1674102255341,
+    "enabled": true,
+    "image": null,
+    "state": "approved"
+  },
+  {
+    "id": "f89b3b89-0ca8-4413-aefe-ca245c66a625",
+    "name": "Complete-App-5886",
+    "description": "My App-Description 5886",
+    "organizationId": "5df28ce7-783e-4239-8352-e17b4bdf3b82",
+    "phone": "123456789-5886",
+    "email": "newemail-5886@customer.com",
+    "createdBy": "40dd53a4-0b13-4485-82e8-63c687404c2f",
+    "managedBy": [],
+    "createdOn": 1674098585572,
+    "enabled": true,
+    "image": "/api/portal/v1.4/applications/f89b3b89-0ca8-4413-aefe-ca245c66a625/image",
+    "state": "approved"
+  }
+]
