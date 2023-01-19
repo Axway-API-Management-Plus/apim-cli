@@ -5,6 +5,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.TestIndicator;
 import com.axway.apim.users.impl.UserResultHandler;
 import com.axway.apim.users.lib.cli.UserExportCLIOptions;
 import com.axway.apim.users.lib.params.UserExportParams;
@@ -28,6 +29,7 @@ public class ConsoleUserExporterTest extends WiremockWrapper {
 
     @Test
     public void testConsoleExport() throws AppException {
+        TestIndicator.getInstance().setTestRunning(true);
         String[] args = {"-h", "localhost", "-loginName", "usera"};
         UserExportParams params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
         APIManagerAdapter.deleteInstance();
