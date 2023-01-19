@@ -52,7 +52,6 @@ jobs:
         run: |
           docker load -i ~/cache-docker/$CACHE_FILE_APIM
           docker load -i ~/cache-docker/$CACHE_FILE_CASSANDRA
-          docker images
       - name: Run docker images
         run: |
           docker-compose run --rm start_cassandra
