@@ -52,7 +52,7 @@ public class APIManagerOrganizationAdapter {
 
     public APIManagerOrganizationAdapter() {
         cmd = CoreParameters.getInstance();
-        organizationCache = APIManagerAdapter.getCache(CacheType.ORGANIZATION_CACHE, String.class, String.class);
+        organizationCache = APIManagerAdapter.getCache(CacheType.organizationCache, String.class, String.class);
     }
 
     private void readOrgsFromAPIManager(OrgFilter filter) throws AppException {

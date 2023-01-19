@@ -1,8 +1,7 @@
 package com.axway.apim.lib.errorHandling;
 
-import org.slf4j.Logger;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.slf4j.Logger;
 
 // Must extend JsonProcessingException to avoid wrapping in Jackson-Databind
 public class AppException extends JsonProcessingException {

@@ -72,7 +72,7 @@ public class APIManagerQuotaAdapter {
 
     public APIManagerQuotaAdapter() {
         cmd = CoreParameters.getInstance();
-        applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.APPLICATIONS_QUOTA_CACHE, String.class, String.class);
+        applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
     }
 
     Map<String, String> apiManagerResponse = new HashMap<>();

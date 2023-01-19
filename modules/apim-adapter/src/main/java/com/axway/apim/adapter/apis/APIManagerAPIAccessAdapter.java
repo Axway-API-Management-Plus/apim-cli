@@ -63,8 +63,8 @@ public class APIManagerAPIAccessAdapter {
 
     public APIManagerAPIAccessAdapter() {
         cmd = CoreParameters.getInstance();
-        caches.put(Type.applications, APIManagerAdapter.getCache(CacheType.APPLICATION_API_ACCESS_CACHE, String.class, String.class));
-        caches.put(Type.organizations, APIManagerAdapter.getCache(CacheType.ORGANIZATION_API_ACCESS_CACHE, String.class, String.class));
+        caches.put(Type.applications, APIManagerAdapter.getCache(CacheType.applicationAPIAccessCache, String.class, String.class));
+        caches.put(Type.organizations, APIManagerAdapter.getCache(CacheType.organizationAPIAccessCache, String.class, String.class));
     }
 
     Map<Type, Map<String, String>> apiManagerResponse = new HashMap<>();

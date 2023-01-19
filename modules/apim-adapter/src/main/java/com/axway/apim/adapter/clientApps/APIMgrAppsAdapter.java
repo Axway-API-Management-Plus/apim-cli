@@ -56,11 +56,11 @@ public class APIMgrAppsAdapter {
     Cache<String, String> applicationsQuotaCache;
 
     public APIMgrAppsAdapter() {
-        applicationsCache = APIManagerAdapter.getCache(CacheType.APPLICATIONS_CACHE, String.class, String.class);
-        applicationsSubscriptionCache = APIManagerAdapter.getCache(CacheType.APPLICATIONS_SUBSCRIPTION_CACHE, String.class, String.class);
-        applicationsCredentialCache = APIManagerAdapter.getCache(CacheType.APPLICATIONS_CREDENTIAL_CACHE, String.class, String.class);
+        applicationsCache = APIManagerAdapter.getCache(CacheType.applicationsCache, String.class, String.class);
+        applicationsSubscriptionCache = APIManagerAdapter.getCache(CacheType.applicationsSubscriptionCache, String.class, String.class);
+        applicationsCredentialCache = APIManagerAdapter.getCache(CacheType.applicationsCredentialCache, String.class, String.class);
         // Must be refactored to use Quota-Adapter instead of doing this in
-        applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.APPLICATIONS_QUOTA_CACHE, String.class, String.class);
+        applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
     }
 
     /**

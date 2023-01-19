@@ -48,7 +48,7 @@ public class APIManagerUserAdapter {
     Cache<String, String> userCache;
 
     public APIManagerUserAdapter() {
-        userCache = APIManagerAdapter.getCache(CacheType.USER_CACHE, String.class, String.class);
+        userCache = APIManagerAdapter.getCache(CacheType.userCache, String.class, String.class);
     }
 
     private void readUsersFromAPIManager(UserFilter filter) throws AppException {

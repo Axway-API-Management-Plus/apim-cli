@@ -122,7 +122,7 @@ public class APIMCLICacheManager implements CacheManager {
      */
     public void flipApiId(String oldApiId, String newApiId) throws AppException {
         ObjectMapper mapper = new ObjectMapper();
-        Cache<String, String> appQuotaCached = getCache(CacheType.APPLICATIONS_QUOTA_CACHE.name(), String.class, String.class);
+        Cache<String, String> appQuotaCached = getCache(CacheType.applicationsQuotaCache.name(), String.class, String.class);
         if (appQuotaCached instanceof DoNothingCache) return;
         LOG.debug("Updating ApplicationQuotaCache: Flip API-ID: {} --> {}" , oldApiId, newApiId);
         try {
