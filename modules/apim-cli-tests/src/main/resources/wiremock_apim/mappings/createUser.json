@@ -1,7 +1,7 @@
 {
   "request": {
-    "method": "PUT",
-    "urlPathPattern": "/api/portal/v1.4/users/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+    "method": "POST",
+    "url": "/api/portal/v1.4/users"
   },
   "response": {
     "status": 200,

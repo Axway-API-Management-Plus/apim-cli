@@ -186,9 +186,12 @@ public class APIManagerUserAdapter {
                 HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
                 if (actualUser == null) {
                     request = new POSTRequest(entity, uri);
+                    LOG.debug("Creating a new User with name : {}", desiredUser.getName());
                 } else {
                     request = new PUTRequest(entity, uri);
+                    LOG.debug("Updating a  User with name : {}", desiredUser.getName());
                 }
+                LOG.debug("Create/Update User Http Verb : {} URI : {}",request.getClass().getName(), uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
