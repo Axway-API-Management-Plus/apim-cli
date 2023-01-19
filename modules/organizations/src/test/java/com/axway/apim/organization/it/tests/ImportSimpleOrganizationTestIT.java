@@ -25,7 +25,7 @@ public class ImportSimpleOrganizationTestIT extends TestNGCitrusTestRunner imple
 		description("Import organization into API-Manager");
 		ExportOrganizationTestAction exportApp = new ExportOrganizationTestAction(context);
 		ImportOrganizationTestAction importApp = new ImportOrganizationTestAction(context);
-
+		variable("useApiAdmin", "true"); // Use apiadmin account
 		variable("orgName", "My-Org-"+importApp.getRandomNum());
 		variable("orgDescription", "A description for my org");
 		// This test must be executed with an Admin-Account as we need to create a new organization

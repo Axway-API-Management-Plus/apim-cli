@@ -32,7 +32,7 @@ public class ImportExportOrgWithCustomPropsTestIT extends TestNGCitrusTestRunner
 		description("Import organization with custom properties into API-Manager");
 		ExportOrganizationTestAction exportApp = new ExportOrganizationTestAction(context);
 		ImportOrganizationTestAction importApp = new ImportOrganizationTestAction(context);
-
+		variable("useApiAdmin", "true"); // Use apiadmin account
 		variable("orgName", "My-Custom-Prop-Org-"+importApp.getRandomNum());
 		variable("orgDescription", "A description for my custom properties org");
 

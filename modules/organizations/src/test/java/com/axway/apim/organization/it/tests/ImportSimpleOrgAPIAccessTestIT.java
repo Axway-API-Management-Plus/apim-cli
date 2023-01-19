@@ -29,7 +29,7 @@ public class ImportSimpleOrgAPIAccessTestIT extends TestNGCitrusTestRunner imple
 		description("Import organization into API-Manager including API Access");
 		ExportOrganizationTestAction exportApp = new ExportOrganizationTestAction(context);
 		ImportOrganizationTestAction importApp = new ImportOrganizationTestAction(context);
-
+		variable("useApiAdmin", "true"); // Use apiadmin account
 		variable("orgName", "My-Org-"+importApp.getRandomNum());
 		variable("orgDescription", "Org with API-Access");
 		
