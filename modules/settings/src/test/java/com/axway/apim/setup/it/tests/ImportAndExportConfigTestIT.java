@@ -33,20 +33,16 @@ public class ImportAndExportConfigTestIT extends TestNGCitrusTestRunner implemen
 		ImportManagerConfigTestAction configImport = new ImportManagerConfigTestAction(context);
 		ExportManagerConfigTestAction configExport = new ExportManagerConfigTestAction(context);
 		echo("####### Export the configuration #######");
-		createVariable("useApiAdmin", "true"); // Use oadmin account
+		createVariable("useApiAdmin", "true"); // Use admin account
 		createVariable(PARAM_EXPECTED_RC, "0");
 		createVariable(PARAM_TARGET, configExport.getTestDirectory().getPath());
 		createVariable(PARAM_OUTPUT_FORMAT, "json");
 		configExport.doExecute(context);
-		
 		String exportedConfig = configExport.getLastResult().getExportedFiles().get(0);
-		
 		JsonNode config = mapper.readTree(new File(exportedConfig));
-
 		Assert.assertTrue(config.get("config").get("registrationEnabled").asBoolean());
 		Assert.assertEquals(config.get("config").get("apiDefaultVirtualHost").asText(), "");
 		Assert.assertTrue(config.get("config").get("apiRoutingKeyLocation").isEmpty());
-		
 		echo("####### Re-Import unchanged exported configuration: "+exportedConfig+" #######");
 		createVariable(PARAM_CONFIGFILE, exportedConfig);
 		createVariable(PARAM_EXPECTED_RC, "0");
@@ -58,13 +54,12 @@ public class ImportAndExportConfigTestIT extends TestNGCitrusTestRunner implemen
 	public void runUpdateConfiguration(@Optional @CitrusResource TestContext context) {
 		description("Update API-Configuration with custom config file");
 		ImportManagerConfigTestAction configImport = new ImportManagerConfigTestAction(context);
-
-		echo("####### Import configuration #######");		
+		echo("####### Import configuration #######");
+		createVariable("useApiAdmin", "true"); // Use admin account
 		createVariable(PARAM_CONFIGFILE,  PACKAGE + "apimanager-config.json");
 		createVariable(PARAM_EXPECTED_RC, "0");
 		createVariable("portalName", "MY API-MANAGER NAME");
 		configImport.doExecute(context);
-		
 		echo("####### Validate configuration has been applied #######");
 		http(builder -> builder.client("apiManager").send().get("/config").header("Content-Type", "application/json"));
 		if(APIManagerAdapter.hasAPIManagerVersion("7.7.20200530")) {
@@ -76,8 +71,6 @@ public class ImportAndExportConfigTestIT extends TestNGCitrusTestRunner implemen
 			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 					.validate("$.portalName", "${portalName}"));
 		}
-
-		
 		echo("####### Import configuration #######");
 		createVariable(PARAM_CONFIGFILE,  PACKAGE + "apimanager-config.json");
 		createVariable(PARAM_EXPECTED_RC, "17");
