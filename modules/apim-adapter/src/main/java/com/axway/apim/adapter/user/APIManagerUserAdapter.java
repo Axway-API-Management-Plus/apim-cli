@@ -217,11 +217,7 @@ public class APIManagerUserAdapter {
             RestAPICall request;
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/users/" + actualUser.getId() + "/changepassword").build();
             HttpEntity entity = new StringEntity("newPassword=" + newPassword, ContentType.APPLICATION_FORM_URLENCODED);
-            if ("oadmin".equals(actualUser.getRole())) { // An orgadmin cannot change the password of another orgadmin, even he has created that orgadmin
-                request = new POSTRequest(entity, uri);
-            } else {
-                request = new POSTRequest(entity, uri);
-            }
+            request = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
