@@ -261,9 +261,8 @@ public class APIManagerOrganizationAdapter {
 
     void addImage(Organization org, boolean addImage) throws Exception {
         if (!addImage) return;
-        URI uri;
         if (org.getImageUrl() == null) return;
-        uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + ORGANIZATIONS + org.getId() + "/image")
+        URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + ORGANIZATIONS + org.getId() + "/image")
                 .build();
         Image image = APIManagerAdapter.getImageFromAPIM(uri, "org-image");
         org.setImage(image);
