@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/portal/v1.4/proxies?field=path&op=eq&value=%2Fv1%2Fapi"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "frontend_empty.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -9,7 +9,7 @@
     "virtualHost": null,
     "phone": null,
     "enabled": true,
-    "development": false,
+    "development": true,
     "dn": "o=orga,ou=organizations,ou=APIPortal",
     "createdOn": 1673966327821,
     "startTrialDate": null,

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/api/portal/v1.4/proxies"
+  },
+  "response": {
+    "status": 201,
+    "bodyFileName": "frontend_api_unpublished.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
