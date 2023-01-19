@@ -1,14 +1,6 @@
 package com.axway.apim.appimport.it.basic;
 
-import java.io.IOException;
-
-import org.springframework.http.HttpStatus;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
 import com.axway.apim.appimport.it.ImportAppTestAction;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.axway.lib.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
@@ -17,23 +9,27 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
+import org.springframework.http.HttpStatus;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
 
 @Test
 public class ImportApplicationWithAPIAccessTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
-	private ImportTestAction apiImport = new ImportTestAction();
+	private final ImportTestAction apiImport = new ImportTestAction();
 	
-	private static String PACKAGE = "/com/axway/apim/appimport/apps/basic/";
+	private static final String PACKAGE = "/com/axway/apim/appimport/apps/basic/";
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void importApplicationBasicTest(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+	public void importApplicationBasicTest(@Optional @CitrusResource TestContext context) {
 		description("Import application that has a subscription to an API");
 
 		ImportAppTestAction importApp = new ImportAppTestAction(context);
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
-		
+		variable("useApiAdmin", "true"); // Use apiadmin account
 
 		variable("apiPath", "/test-app-api1-${apiNumber}");
 		variable("apiName", "Test-App-API1-${apiNumber}");

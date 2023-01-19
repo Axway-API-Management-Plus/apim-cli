@@ -78,7 +78,7 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 		try {
 			return context.getVariable(varname);
 		} catch (Exception e) {
-			LOG.error("Error reading variable", e);
+			LOG.error("Error reading variable : {}", varname);
 		}
 		return null;
 	}

@@ -82,7 +82,6 @@
         <module>modules/settings</module>
         <module>distribution</module>
         <module>modules/spectoconfig</module>
-        <module>modules/commons</module>
     </modules>
     <dependencyManagement>
         <dependencies>
