@@ -18,11 +18,11 @@ import com.consol.citrus.message.MessageType;
 @Test
 public class ImportAndExportRemoteHostsTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
-	private static String PACKAGE = "/com/axway/apim/setup/it/tests/";
+	private static final String PACKAGE = "/com/axway/apim/setup/it/tests/";
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void runRemoteHostsImportExport(@Optional @CitrusResource TestContext context) throws Exception {
+	public void runRemoteHostsImportExport(@Optional @CitrusResource TestContext context) {
 		description("Export/Import RemoteHosts from and into the API-Manager");
 		ImportManagerConfigTestAction importApp = new ImportManagerConfigTestAction(context);
 		ExportManagerConfigTestAction exportApp = new ExportManagerConfigTestAction(context);

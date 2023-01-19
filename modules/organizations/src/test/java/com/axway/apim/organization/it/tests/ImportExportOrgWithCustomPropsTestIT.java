@@ -1,16 +1,6 @@
 package com.axway.apim.organization.it.tests;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.springframework.http.HttpStatus;
-import org.testng.Assert;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
 import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.organization.it.ExportOrganizationTestAction;
 import com.axway.apim.organization.it.ImportOrganizationTestAction;
 import com.axway.lib.testActions.TestParams;
@@ -20,17 +10,25 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.message.MessageType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
+import org.testng.Assert;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 @Test
 public class ImportExportOrgWithCustomPropsTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
-	private static String PACKAGE = "/com/axway/apim/organization/orgImport/";
+	private static final String PACKAGE = "/com/axway/apim/organization/orgImport/";
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+	public void run(@Optional @CitrusResource TestContext context) throws IOException {
 		description("Import organization with custom properties into API-Manager");
 		ExportOrganizationTestAction exportApp = new ExportOrganizationTestAction(context);
 		ImportOrganizationTestAction importApp = new ImportOrganizationTestAction(context);

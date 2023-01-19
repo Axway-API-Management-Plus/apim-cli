@@ -1,17 +1,7 @@
 package com.axway.apim.user.it.tests;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.springframework.http.HttpStatus;
-import org.testng.Assert;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.user.it.ExportUserTestAction;
 import com.axway.apim.user.it.ImportUserTestAction;
 import com.axway.lib.testActions.TestParams;
@@ -21,21 +11,29 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.message.MessageType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
+import org.testng.Assert;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 @Test
 public class ImportExportUserTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
-	private static String PACKAGE = "/com/axway/apim/users/userImport/";
+	private static final String PACKAGE = "/com/axway/apim/users/userImport/";
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+	public void run(@Optional @CitrusResource TestContext context) throws IOException {
 		description("Import user into API-Manager incl. custom properties");
 		ImportUserTestAction importApp = new ImportUserTestAction(context);
 		ExportUserTestAction exportApp = new ExportUserTestAction(context);
-		
+
 		variable("loginName", "My-User-"+importApp.getRandomNum());
 		variable("password", "changeme");
 		variable("phone", "+006856778789");

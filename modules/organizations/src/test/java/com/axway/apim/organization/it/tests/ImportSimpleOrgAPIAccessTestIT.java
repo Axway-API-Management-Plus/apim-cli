@@ -1,14 +1,5 @@
 package com.axway.apim.organization.it.tests;
 
-import java.io.IOException;
-
-import org.springframework.http.HttpStatus;
-import org.testng.Assert;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.organization.it.ExportOrganizationTestAction;
 import com.axway.apim.organization.it.ImportOrganizationTestAction;
 import com.axway.apim.test.ImportTestAction;
@@ -19,17 +10,22 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
+import org.springframework.http.HttpStatus;
+import org.testng.Assert;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
 
 @Test
 public class ImportSimpleOrgAPIAccessTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
-	private ImportTestAction apiImport = new ImportTestAction();
+	private final ImportTestAction apiImport = new ImportTestAction();
 	
-	private static String PACKAGE = "/com/axway/apim/organization/orgImport/";
+	private static final String PACKAGE = "/com/axway/apim/organization/orgImport/";
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+	public void run(@Optional @CitrusResource TestContext context) {
 		description("Import organization into API-Manager including API Access");
 		ExportOrganizationTestAction exportApp = new ExportOrganizationTestAction(context);
 		ImportOrganizationTestAction importApp = new ImportOrganizationTestAction(context);
