@@ -1,0 +1,43 @@
+[
+  {
+    "id": "dd976b0d-8bfa-4c14-8ec3-a1c83910ee22",
+    "alias": "api.axway.com",
+    "name": "api.axway.com",
+    "port": 443,
+    "createdOn": 1674184778339,
+    "createdBy": "40dd53a4-0b13-4485-82e8-63c687404c2f",
+    "organizationId": "987b2afc-b027-41fd-a920-bef182eb4a94",
+    "maxConnections": -1,
+    "allowHTTP11": true,
+    "includeContentLengthRequest": false,
+    "includeContentLengthResponse": false,
+    "offerTLSServerName": false,
+    "verifyServerHostname": true,
+    "connectionTimeout": 30000,
+    "activeTimeout": 30000,
+    "transactionTimeout": 240000,
+    "idleTimeout": 15000,
+    "maxReceiveBytes": 20971520,
+    "maxSendBytes": 20971520,
+    "inputBufferSize": 8192,
+    "outputBufferSize": 8192,
+    "addressCacheTimeout": 300000,
+    "sslSessionCacheSize": 32,
+    "inputEncodings": [
+      ".inherit"
+    ],
+    "outputEncodings": [
+      ".inherit"
+    ],
+    "exportCorrelationId": true,
+    "loadBalancing": "roundRobin",
+    "responseTimeDecay": 60000,
+    "addressing": {
+      "highestPriority": [],
+      "highPriority": [],
+      "mediumPriority": [],
+      "lowestPriority": []
+    },
+    "watchdog": null
+  }
+]

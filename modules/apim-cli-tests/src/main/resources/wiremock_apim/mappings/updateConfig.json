@@ -1,6 +1,6 @@
 {
   "request": {
-    "method": "GET",
+    "method": "PUT",
     "url": "/api/portal/v1.4/config"
   },
   "response": {
