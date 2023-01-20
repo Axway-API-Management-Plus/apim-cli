@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPathPattern": "/api/portal/v1.4/quotas/00000000-0000-0000-0000-000000000000"
+    "url": "/api/portal/v1.4/quotas/00000000-0000-0000-0000-000000000000"
   },
   "response": {
     "status": 200,
