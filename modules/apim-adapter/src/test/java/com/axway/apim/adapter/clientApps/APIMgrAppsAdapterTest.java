@@ -32,6 +32,13 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 		CoreParameters coreParameters = new CoreParameters();
 		coreParameters.setHostname(testHostname);
 		coreParameters.setPort(testPort);
+	}
+
+	public void setupParams() throws AppException {
+		APIManagerAdapter.deleteInstance();
+		CoreParameters coreParameters = new CoreParameters();
+		coreParameters.setHostname(testHostname);
+		coreParameters.setPort(testPort);
 		coreParameters.setUsername("test");
 		coreParameters.setPassword(Utils.getEncryptedPassword());
 	}
@@ -143,7 +150,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void getApplications() throws AppException {
-		APIManagerAdapter.deleteInstance();
+		setupParams();
 		APIMgrAppsAdapter appAdapter = APIManagerAdapter.getInstance().appAdapter;
 		List<ClientApplication> clientApplications = appAdapter.getAllApplications(false);
 		Assert.assertNotNull(clientApplications);
@@ -151,7 +158,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void getAppsSubscribedWithAPI() throws AppException {
-		APIManagerAdapter.deleteInstance();
+		setupParams();
 		APIMgrAppsAdapter appAdapter = APIManagerAdapter.getInstance().appAdapter;
 		List<ClientApplication> clientApplications = appAdapter.getAppsSubscribedWithAPI("e4ded8c8-0a40-4b50-bc13-552fb7209150");
 		Assert.assertNotNull(clientApplications);
@@ -159,7 +166,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void getApplication() throws AppException {
-		APIManagerAdapter.deleteInstance();
+		setupParams();
 		APIMgrAppsAdapter appAdapter = APIManagerAdapter.getInstance().appAdapter;
 		ClientApplication clientApplication = appAdapter.getApplication(new ClientAppFilter.Builder().hasName("Test App 2008").build());
 		Assert.assertEquals(clientApplication.getName(), "Test App 2008");
@@ -168,7 +175,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void deleteApplication() throws AppException {
-		APIManagerAdapter.deleteInstance();
+		setupParams();
 		APIMgrAppsAdapter appAdapter = APIManagerAdapter.getInstance().appAdapter;
 		ClientApplication clientApplication = appAdapter.getApplication(new ClientAppFilter.Builder().hasName("Test App 2008").build());
 		try {
@@ -181,7 +188,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void updateApplication() throws AppException {
-		APIManagerAdapter.deleteInstance();
+		setupParams();
 		APIMgrAppsAdapter appAdapter = APIManagerAdapter.getInstance().appAdapter;
 		ClientApplication clientApplication = appAdapter.getApplication(new ClientAppFilter.Builder().hasName("Test App 2008").build());
 
@@ -198,7 +205,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void createApplication() throws AppException {
-		APIManagerAdapter.deleteInstance();
+		setupParams();
 		APIMgrAppsAdapter appAdapter = APIManagerAdapter.getInstance().appAdapter;
 		ClientApplication clientApplication = new ClientApplication();
 		clientApplication.setName("test");
@@ -209,62 +216,4 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 			Assert.fail("unable to create application", appException);
 		}
 	}
-//
-//	@Test
-//	public void updateUser() throws AppException {
-//		setupParameters();
-//		APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
-//		APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
-//		UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
-//		User user = apiManagerUserAdapter.getUser(userFilter);
-//		User desiredUser = new User();
-//		desiredUser.setEmail("updated@axway.com");
-//		desiredUser.setName(user.getName());
-//		desiredUser.setLoginName(user.getLoginName());
-//		User newUser = apiManagerUserAdapter.updateUser(desiredUser, user);
-//		Assert.assertEquals(newUser.getEmail(), "updated@axway.com");
-//	}
-//
-//	@Test
-//	public void updateUserCreateNewUserFlow() throws AppException {
-//		setupParameters();
-//		APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
-//		APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
-//		User user = new User();
-//		user.setEmail("updated@axway.com");
-//		user.setName("usera");
-//		user.setLoginName("usera");
-//		User newUser = apiManagerUserAdapter.updateUser(user, null);
-//		Assert.assertEquals(newUser.getEmail(), "updated@axway.com");
-//	}
-//
-//	@Test
-//	public void changePassword() throws AppException {
-//		setupParameters();
-//		APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
-//		APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
-//		UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
-//		User user = apiManagerUserAdapter.getUser(userFilter);
-//		try {
-//			apiManagerUserAdapter.changePassword(Utils.getEncryptedPassword(), user);
-//		} catch (AppException appException) {
-//			Assert.fail("unable to change user password", appException);
-//		}
-//	}
-//
-//	@Test
-//	public void addImage() throws AppException {
-//		setupParameters();
-//		APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
-//		APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
-//		UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
-//		User user = apiManagerUserAdapter.getUser(userFilter);
-//		user.setImageUrl("https://axway.com/favicon.ico");
-//		try {
-//			apiManagerUserAdapter.addImage(user, true);
-//		} catch (AppException appException) {
-//			Assert.fail("unable to add Image", appException);
-//		}
-//	}
-	
 }
