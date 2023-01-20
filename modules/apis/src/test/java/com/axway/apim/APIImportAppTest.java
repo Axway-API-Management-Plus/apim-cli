@@ -1,10 +1,21 @@
 package com.axway.apim;
 
-import com.axway.apim.api.export.impl.WiremockTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class APIImportAppTest extends WiremockTest {
+public class APIImportAppTest extends WiremockWrapper {
+
+    @BeforeClass
+    public void initWiremock() {
+        super.initWiremock();
+    }
+
+    @AfterClass
+    public void close() {
+        super.close();
+    }
 
     @Test
     public void importApiTest() {

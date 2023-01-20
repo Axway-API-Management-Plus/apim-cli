@@ -1,5 +1,6 @@
 package com.axway.apim.api.export.impl;
 
+import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
@@ -8,12 +9,24 @@ import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.errorHandling.AppException;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CSVAPIExporterTest extends WiremockTest {
+public class CSVAPIExporterTest extends WiremockWrapper {
+
+    @BeforeClass
+    public void initWiremock() {
+        super.initWiremock();
+    }
+
+    @AfterClass
+    public void close() {
+        super.close();
+    }
 
     @Test
     public void exportCSV() throws AppException {

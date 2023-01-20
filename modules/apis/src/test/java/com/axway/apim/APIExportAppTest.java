@@ -1,7 +1,8 @@
 package com.axway.apim;
 
-import com.axway.apim.api.export.impl.WiremockTest;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
@@ -9,7 +10,17 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 
-public class APIExportAppTest extends WiremockTest {
+public class APIExportAppTest extends WiremockWrapper {
+
+    @BeforeClass
+    public void initWiremock() {
+        super.initWiremock();
+    }
+
+    @AfterClass
+    public void close() {
+        super.close();
+    }
 
     @Test
     public void testExportAPIWithName() {

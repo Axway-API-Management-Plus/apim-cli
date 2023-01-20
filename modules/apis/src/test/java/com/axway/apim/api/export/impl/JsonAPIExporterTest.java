@@ -1,5 +1,6 @@
 package com.axway.apim.api.export.impl;
 
+import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
@@ -11,6 +12,8 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -20,7 +23,17 @@ import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
-public class JsonAPIExporterTest extends WiremockTest {
+public class JsonAPIExporterTest extends WiremockWrapper {
+
+    @BeforeClass
+    public void initWiremock() {
+        super.initWiremock();
+    }
+
+    @AfterClass
+    public void close() {
+        super.close();
+    }
     private static final Logger LOG = LoggerFactory.getLogger(JsonAPIExporterTest.class);
 
     @Test
