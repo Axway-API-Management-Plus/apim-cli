@@ -167,7 +167,6 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "delete", description = "Delete selected organizatio(s) from the API-Manager")
 	public static int delete(String[] args) {
 		try {
-			
 			OrgExportParams params = (OrgExportParams) OrgDeleteCLIOptions.create(args).getParams();
 			OrganizationApp orgApp = new OrganizationApp();
 			return orgApp.delete(params).getRc();

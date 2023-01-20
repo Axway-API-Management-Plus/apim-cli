@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/portal/v1.4/applications?field=name&op=eq&value=Test+App+2008"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "application.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
