@@ -30,7 +30,7 @@ public class CSVAPIExporterTest extends WiremockWrapper {
 
     @Test
     public void exportCSV() throws AppException {
-        String[] args = {"-host", "localhost", "-id", "e4ded8c8-0a40-4b50-bc13-552fb7209150", "-t", "openapi", "-o", "csv"};
+        String[] args = {"-host", "localhost", "-id", "e4ded8c8-0a40-4b50-bc13-552fb7209150", "-t", "openapi", "-o", "csv", "-deleteTarget"};
         CLIOptions options = CLIAPIExportOptions.create(args);
         APIExportParams params = (APIExportParams) options.getParams();
         APIManagerAdapter.deleteInstance();

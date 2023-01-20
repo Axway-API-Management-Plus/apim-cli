@@ -1,13 +1,5 @@
 package com.axway.apim.organization.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.api.model.Image;
@@ -24,6 +16,12 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 public class JsonOrgExporter extends OrgResultHandler {
 
@@ -79,9 +77,6 @@ public class JsonOrgExporter extends OrgResultHandler {
 			writeBytesToFile(org.getImage().getImageContent(), localFolder+File.separator + org.getImage().getBaseFilename());
 		}
 		LOG.info("Successfully exported organization into folder: {}" , localFolder);
-		if(!APIManagerAdapter.hasAdminAccount()) {
-			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted to its own organization.");
-		}
 	}
 	
 	private String getExportFolder(ExportOrganization org) {

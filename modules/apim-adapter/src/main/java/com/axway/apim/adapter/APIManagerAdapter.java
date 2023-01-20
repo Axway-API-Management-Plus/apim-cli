@@ -192,8 +192,6 @@ public class APIManagerAdapter {
                 // Also register this client as an Admin-Client
             } else if (role.equals("oadmin")) {
                 this.usingOrgAdmin = true;
-            } else {
-                throw new AppException("Not supported user-role: " + user.getRole() + "", ErrorCode.API_MANAGER_COMMUNICATION);
             }
         } catch (IOException | URISyntaxException | InterruptedException e) {
             if (e instanceof InterruptedException)
@@ -581,13 +579,5 @@ public class APIManagerAdapter {
      */
     public static boolean hasAdminAccount() throws AppException {
         return APIManagerAdapter.getInstance().hasAdminAccount;
-    }
-
-    /**
-     * @return true, if an OrgAdmin is the primary user (additional Admin-Credentials may have provided anyway)
-     * @throws AppException when the API-Manager instance is not initialized
-     */
-    public static boolean hasOrgAdmin() throws AppException {
-        return APIManagerAdapter.getInstance().usingOrgAdmin;
     }
 }

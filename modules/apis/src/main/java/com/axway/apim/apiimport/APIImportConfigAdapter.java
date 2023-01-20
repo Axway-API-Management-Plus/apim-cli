@@ -73,14 +73,11 @@ public class APIImportConfigAdapter {
      */
     private API apiConfig;
 
-    /**
-     * If true, an OrgAdminUser is used to start the tool
-     */
-    private boolean usingOrgAdmin;
+
 
 
     public APIImportConfigAdapter(APIImportParams params) throws AppException {
-        this(params.getConfig(), params.getStage(), params.getApiDefintion(), APIManagerAdapter.hasOrgAdmin(), params.getStageConfig());
+        this(params.getConfig(), params.getStage(), params.getApiDefintion(),params.getStageConfig());
     }
 
     /**
@@ -89,22 +86,19 @@ public class APIImportConfigAdapter {
      * @param apiConfigFileName   the API-Config given by the user
      * @param stage               an optional stage used to load overrides and stage specific environment properties
      * @param pathToAPIDefinition an optional path to the API-Definition (Swagger / WSDL), can be in the config-file as well.
-     * @param usingOrgAdmin       access to API-Manager should be limited to the Org-Admin account
      * @param stageConfig         a stage config string
      * @throws AppException if the config-file can't be parsed for some reason
      */
-    public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, boolean usingOrgAdmin, String stageConfig) throws AppException {
+    public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, String stageConfig) throws AppException {
         super();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile, false));
         // We would like to get back the original AppExcepption instead of a JsonMappingException
         mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
         mapper.registerModule(module);
-
         API baseConfig;
         try {
             this.pathToAPIDefinition = pathToAPIDefinition;
-            this.usingOrgAdmin = usingOrgAdmin;
             this.apiConfigFile = Utils.locateConfigFile(apiConfigFileName);
             File stageConfigFile = Utils.getStageConfig(stage, stageConfig, this.apiConfigFile);
             // Validate organization for the base config, if no staged-config is given
@@ -762,13 +756,6 @@ public class APIImportConfigAdapter {
         }
     }
 
-    public String getPathToAPIDefinition() {
-        return pathToAPIDefinition;
-    }
-
-    public void setPathToAPIDefinition(String pathToAPIDefinition) {
-        this.pathToAPIDefinition = pathToAPIDefinition;
-    }
 
     /*
      * Refactor the following three method a Generic one

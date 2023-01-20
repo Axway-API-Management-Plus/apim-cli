@@ -33,7 +33,7 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 		String pathToConfigFile = this.getClass().getClassLoader().getResource(configFile).getFile();
 		String apiDefinition = "/api_definition_1/petstore.json";
 		
-		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(pathToConfigFile, null, apiDefinition, false, null);
+		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(pathToConfigFile, null, apiDefinition, null);
 		
 		API testAPI = importConfig.getApiConfig();
 		if(System.getenv("TRAVIS")!=null && System.getenv("TRAVIS").equals("true")) {
@@ -65,7 +65,7 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 		String pathToConfigFile = this.getClass().getClassLoader().getResource(configFile).getFile();
 		String apiDefinition = "/api_definition_1/petstore.json";
 		
-		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(pathToConfigFile, null, apiDefinition, false, null);
+		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(pathToConfigFile, null, apiDefinition, null);
 		
 		API testAPI = importConfig.getApiConfig();
 		
@@ -85,7 +85,7 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 		String pathToConfigFile = this.getClass().getClassLoader().getResource(configFile).getFile();
 		String apiDefinition = "/api_definition_1/petstore.json";
 		
-		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(pathToConfigFile, null, apiDefinition, false, null);
+		APIImportConfigAdapter importConfig = new APIImportConfigAdapter(pathToConfigFile, null, apiDefinition, null);
 		
 		API testAPI = importConfig.getApiConfig();
 		

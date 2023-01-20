@@ -1,13 +1,5 @@
 package com.axway.apim.users.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.Image;
@@ -24,6 +16,12 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 public class JsonUserExporter extends UserResultHandler {
 
@@ -79,9 +77,6 @@ public class JsonUserExporter extends UserResultHandler {
 			writeBytesToFile(user.getImage().getImageContent(), localFolder+File.separator + user.getImage().getBaseFilename());
 		}
 		LOG.info("Successfully exported user into folder: {}", localFolder);
-		if(!APIManagerAdapter.hasAdminAccount()) {
-			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted to its own organization.");
-		}
 	}
 	
 	private String getExportFolder(ExportUser user) {

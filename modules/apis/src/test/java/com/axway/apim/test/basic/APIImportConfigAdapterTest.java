@@ -38,7 +38,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getBackendBasepath(), "resolvedToSomething");
     }
@@ -52,7 +52,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getBackendBasepath(), "resolvedToSomethingElse");
     }
@@ -74,7 +74,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     public void usingOSEnvVariable() throws AppException {
         try {
             String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
-            APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
+            APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
             DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
             String osEnv = System.getenv().get("OS");
             // To ignore the check on OS as  MAC, Ubuntu does not have environment variable 'OS'
@@ -98,7 +98,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
     }
@@ -110,7 +110,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api config with spaces.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
     }
@@ -122,7 +122,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "notRelavantForThis Test", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "notRelavantForThis Test", null);
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getVersion(), "9.0.0");
         Assert.assertEquals(apiConfig.getName(), "API Config from testStageProd sub folder");
@@ -136,7 +136,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound-oauth-config.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "petstore.json", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "petstore.json", null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getVersion(), "kk1");
@@ -158,7 +158,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound-oauth-config.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getVersion(), "kk1");
@@ -169,7 +169,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     public void emptyVHostTest() throws AppException {
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/empty-vhost-api-config.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertNull(apiConfig.getVhost(), "Empty VHost should be considered as not set (null), as an empty VHost is logically not possible to have.");
@@ -179,7 +179,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     public void outboundProfileWithDefaultAuthOnlyTest() throws AppException {
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/methodLevel/method-level-outboundprofile-default-authn-only.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Map<String, OutboundProfile> outboundProfiles = apiConfig.getOutboundProfiles();
@@ -194,7 +194,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     public void outboundProfileTypePolicyWithoutRoutingPolicy() throws AppException {
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/policies/invalid-RouteType-Policy-NoRoutingPolicy.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", null);
         adapter.getDesiredAPI();
     }
 
@@ -214,7 +214,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         params.setProperties(props);
 
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/customproperties/1_custom-properties-config.json").getFile();
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", null);
         adapter.getDesiredAPI(); // Should fail, as a mandatory customProperty is missing
     }
 
@@ -225,7 +225,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-api-spec-object.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getName(), "API with API-Specification object");
@@ -239,7 +239,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/description/1_api_with_local_mark_down_classic.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getName(), "API with classic markdown local");
@@ -253,7 +253,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/description/1_api_with_local_mark_down_list.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getName(), "API with classic markdown local list");
