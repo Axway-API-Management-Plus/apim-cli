@@ -35,6 +35,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 	}
 
 	public void setupParams() throws AppException {
+		TestIndicator.getInstance().setTestRunning(true);
 		APIManagerAdapter.deleteInstance();
 		CoreParameters coreParameters = new CoreParameters();
 		coreParameters.setHostname(testHostname);
