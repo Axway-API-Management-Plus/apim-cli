@@ -93,7 +93,7 @@ public class APIManagerQuotaAdapter {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + quotaId + "/quota/").build();
             }
             RestAPICall getRequest = new GETRequest(uri);
-            LOG.debug("Load quotas with ID: {} from API-Manager.", quotaId);
+            LOG.debug("Load quotas with ID: {} from API-Manager URI : {}", quotaId, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
