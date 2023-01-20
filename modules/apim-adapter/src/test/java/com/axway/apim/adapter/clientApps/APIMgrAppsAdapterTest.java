@@ -214,6 +214,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 			appAdapter.createApplication(clientApplication);
 
 		} catch (AppException appException) {
+			appException.printStackTrace();
 			Assert.fail("unable to create application", appException);
 		}
 	}
