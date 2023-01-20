@@ -116,12 +116,6 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.github.tomakehurst</groupId>-->
-<!--            <artifactId>wiremock-jre8-standalone</artifactId>-->
-<!--            <version>${wiremock.version}</version>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
             <artifactId>apimcli-tests</artifactId>
