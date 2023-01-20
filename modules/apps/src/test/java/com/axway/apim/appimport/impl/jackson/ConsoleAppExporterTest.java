@@ -9,6 +9,7 @@ import com.axway.apim.appexport.lib.AppExportCLIOptions;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.TestIndicator;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -29,6 +30,7 @@ public class ConsoleAppExporterTest extends WiremockWrapper {
 
     @Test
     public void tesConsoleExport() throws AppException {
+        TestIndicator.getInstance().setTestRunning(true);
         String[] args = {"-h", "localhost"};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
         APIManagerAdapter.deleteInstance();
