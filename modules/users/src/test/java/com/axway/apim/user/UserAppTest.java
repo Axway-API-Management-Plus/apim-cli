@@ -23,8 +23,22 @@ public class UserAppTest extends WiremockWrapper {
         close();
     }
     @Test
-    public void exportUsers(){
+    public void exportUserByLoginName(){
         String[] args = {"-h", "localhost", "-loginName", "usera"};
+        int returnCode = UserApp.export(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
+    public void exportUsers(){
+        String[] args = {"-h", "localhost"};
+        int returnCode = UserApp.export(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
+    public void exportUserByName(){
+        String[] args = {"-h", "localhost", "-name", "usera"};
         int returnCode = UserApp.export(args);
         Assert.assertEquals(returnCode, 0);
     }
