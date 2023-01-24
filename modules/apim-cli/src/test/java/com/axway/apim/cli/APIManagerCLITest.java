@@ -71,4 +71,19 @@ public class APIManagerCLITest {
         int returnCode = apiManagerCLI.run(args);
         Assert.assertEquals(0, returnCode);
     }
+    @Test
+    public void testRunInvalidCommand() {
+        String[] args = new String[]{"api", "desc"};
+        APIManagerCLI apiManagerCLI = new APIManagerCLI(args);
+        int returnCode = apiManagerCLI.run(args);
+        Assert.assertEquals(0, returnCode);
+    }
+
+    @Test
+    public void testRunWithException() {
+        String[] args = new String[]{"api", "delete"};
+        APIManagerCLI apiManagerCLI = new APIManagerCLI(args);
+        int returnCode = apiManagerCLI.run(args);
+        Assert.assertEquals(99, returnCode);
+    }
 }

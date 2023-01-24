@@ -1,6 +1,7 @@
 package com.axway.apim.cli;
 
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,19 +103,19 @@ public class APIManagerCLI {
 
     void printUsage() {
         if (this.selectedServiceGroup == null) {
-            System.out.println("The Axway API-Management CLI supports the following commands.");
-            System.out.println("To get more information for each group, please run for instance: 'apim api'");
-            System.out.println();
-            System.out.println("Available command groups: ");
+            Console.println("The Axway API-Management CLI supports the following commands.");
+            Console.println("To get more information for each group, please run for instance: 'apim api'");
+            Console.println();
+            Console.println("Available command groups: ");
             for (String key : servicesMappedByGroup.keySet()) {
-                System.out.printf("%-20s %s \n", APIM_CLI_CDM + " " + key, servicesMappedByGroup.get(key).get(0).getGroupDescription());
+                Console.printf("%-20s %s \n", APIM_CLI_CDM + " " + key, servicesMappedByGroup.get(key).get(0).getGroupDescription());
                 // We just take the first registered service for a group to retrieve the group description
             }
         } else {
-            System.out.println("Available commands: ");
+            Console.println("Available commands: ");
             for (APIMCLIServiceProvider service : this.selectedServiceGroup) {
                 for (Method method : this.methodsMappedByService.get(service)) {
-                    System.out.printf("%-24s %s\n", APIM_CLI_CDM + " " + service.getGroupId() + " " + getMethodName(method), method.getAnnotation(CLIServiceMethod.class).description());
+                    Console.printf("%-24s %s\n", APIM_CLI_CDM + " " + service.getGroupId() + " " + getMethodName(method), method.getAnnotation(CLIServiceMethod.class).description());
                 }
             }
         }

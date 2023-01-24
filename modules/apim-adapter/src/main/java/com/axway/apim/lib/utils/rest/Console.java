@@ -8,6 +8,9 @@ public class Console {
 
     public static void println(){
         System.out.println();
-        System.out.println();
+    }
+
+    public static void printf(String format, Object ... args){
+        System.out.printf(format, args);
     }
 }
