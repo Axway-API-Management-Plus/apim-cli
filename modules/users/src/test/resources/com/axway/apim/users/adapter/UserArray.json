@@ -2,7 +2,7 @@
 	{
 	  "loginName" : "chris",
 	  "name" : "User Chris",
-	  "organization": "API Development",
+	  "organization": "orga",
 	  "description" : "An API-Management user",
 	  "email" : "mail.user@company.com",
 	  "phone" : "+006856778789",
@@ -18,7 +18,7 @@
 	{
 	  "loginName" : "mark",
 	  "name" : "User Mark",
-	  "organization": "API Development",
+	  "organization": "orga",
 	  "description" : "User for tests",
 	  "email" : "mail@company.com",
 	  "phone" : "+00655345389",

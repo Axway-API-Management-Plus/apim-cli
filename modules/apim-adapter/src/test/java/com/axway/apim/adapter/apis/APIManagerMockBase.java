@@ -49,8 +49,7 @@ public abstract class APIManagerMockBase {
         String fhirOrganization = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "organizations/fhir-organization.json"));
         String singleOrganization = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "organizations/singleOrg.json"));
         String testOrgsAPIAccess = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiaccess/organizationAPIAccess.json"));
-        String userApiAdmin = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "users/user-apiadmin.json"));
-        String userFred = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "users/user-fred.json"));
+
         String oauthClientProfile = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "clientProfiles/OAuthClientProfile.json"));
         String noCustomPropertiesConfig = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "customProperties/noCustomPropertiesConfig.json"));
 
@@ -82,12 +81,6 @@ public abstract class APIManagerMockBase {
         // Org: FHIR
         apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasId("2efca39a-2572-4b62-8d0f-53241d93d362").build(), fhirOrganization);
         apim.orgAdapter.setAPIManagerTestResponse(new OrgFilter.Builder().hasName("FHIR").build(), fhirOrganization);
-        // User: apiadmin
-        apim.userAdapter.setAPIManagerTestResponse(new UserFilter.Builder().hasId("f60e3e05-cdf3-4b70-affc-4cb61a10f4bb").build(), userApiAdmin);
-        apim.userAdapter.setAPIManagerTestResponse(new UserFilter.Builder().hasLoginName("apiadmin").build(), userApiAdmin);
-        // User: fred
-        apim.userAdapter.setAPIManagerTestResponse(new UserFilter.Builder().hasId("c888af4e-0728-4e82-880c-7cf490138220").build(), userFred);
-        apim.userAdapter.setAPIManagerTestResponse(new UserFilter.Builder().hasLoginName("fred").build(), userFred);
         // OAuth Client Profile: Sample OAuth Client Profile
         apim.oauthClientAdapter.setAPIManagerTestResponse(oauthClientProfile);
 

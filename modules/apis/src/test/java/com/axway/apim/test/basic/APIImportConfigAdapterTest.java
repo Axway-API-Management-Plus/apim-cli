@@ -29,7 +29,6 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         apimCliHome = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
     }
 
-    // Make sure, you don't have configured APIM_CLI_HOME when running this test
     @Test
     public void withoutStage() throws AppException {
         // Create Environment properties without any stage (basically loads env.properties)
@@ -193,7 +192,6 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing routingPolicy when routeType is set to policy")
     public void outboundProfileTypePolicyWithoutRoutingPolicy() throws AppException {
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/policies/invalid-RouteType-Policy-NoRoutingPolicy.json").getFile();
-
         APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", null);
         adapter.getDesiredAPI();
     }

@@ -1,35 +1,45 @@
 package com.axway.apim.adapter.apis;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
+import com.axway.apim.WiremockWrapper;
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.AppCredentialsDeserializer;
 import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
-public class ClientAppFilterTest extends APIManagerMockBase {
-	
-	private static String TEST_PACKAGE = "com/axway/apim/adapter/apimanager/testApps/";
-	
+import java.io.IOException;
+import java.io.InputStream;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+public class ClientAppFilterTest extends WiremockWrapper {
+
 	@BeforeClass
-	public void setupTestIndicator() throws AppException, IOException {
-		setupMockData();
+	public void initWiremock() {
+		super.initWiremock();
 	}
-	
+
+	@AfterClass
+	public void close() {
+		super.close();
+	}
+
+//	@BeforeClass
+//	public void setupTestIndicator() throws IOException {
+//		setupMockData();
+//	}
+//
 	@Test
 	public void hasFullWildCardName() throws AppException {
 		ClientAppFilter filter = new ClientAppFilter.Builder()
@@ -39,7 +49,7 @@ public class ClientAppFilterTest extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void credentialANDRedirectURLFilterTest() throws AppException, JsonParseException, JsonMappingException, IOException {
+	public void credentialANDRedirectURLFilterTest() throws IOException {
 		ClientApplication testApp = getTestApp("client-app-with-two-redirectUrls.json");
 		
 		ClientAppFilter filter = new ClientAppFilter.Builder()
@@ -87,7 +97,7 @@ public class ClientAppFilterTest extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void appWithoutCredentialTest() throws AppException, JsonParseException, JsonMappingException, IOException {
+	public void appWithoutCredentialTest() throws IOException {
 		ClientApplication testApp = getTestApp("client-app-with-two-redirectUrls.json");
 		testApp.setCredentials(null);
 		
@@ -103,7 +113,7 @@ public class ClientAppFilterTest extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void testAppHavingAPIKeyButNoClientID() throws AppException, JsonParseException, JsonMappingException, IOException {
+	public void testAppHavingAPIKeyButNoClientID() throws IOException {
 		ClientApplication testApp = getTestApp("client-app-with-two-api-key-only.json");
 		((APIKey)testApp.getCredentials().get(0)).setApiKey(null);
 		
@@ -114,7 +124,7 @@ public class ClientAppFilterTest extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void testAppHavingAccessToAPI() throws AppException, JsonParseException, JsonMappingException, IOException {
+	public void testAppHavingAccessToAPI() throws IOException {
 		ClientApplication testApp = getTestApp("client-app-with-apis.json");
 		
 		ClientAppFilter filter = new ClientAppFilter.Builder()
@@ -134,26 +144,30 @@ public class ClientAppFilterTest extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void testFilterAppCreatedByAndOrganization() throws AppException, JsonParseException, JsonMappingException, IOException {
-		
+	public void testFilterAppCreatedByAndOrganization()  throws IOException {
+		APIManagerAdapter.deleteInstance();
+		CoreParameters coreParameters = new CoreParameters();
+		coreParameters.setHostname("localhost");
+		coreParameters.setUsername("test");
+		coreParameters.setPassword(Utils.getEncryptedPassword());
 		ClientAppFilter filter = new ClientAppFilter.Builder()
-				.hasCreatedByLoginName("fred")
-				.hasOrganizationName("FHIR")
+				.hasCreatedByLoginName("usera")
+				.hasOrganizationName("orga")
 				.build();
 		Assert.assertEquals(filter.getFilters().size(), 6);
 		Assert.assertEquals(filter.getFilters().get(0).getValue(), "orgid");
 		Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
-		Assert.assertEquals(filter.getFilters().get(2).getValue(), "2efca39a-2572-4b62-8d0f-53241d93d362");
+		Assert.assertEquals(filter.getFilters().get(2).getValue(), "987b2afc-b027-41fd-a920-bef182eb4a94");
 		Assert.assertEquals(filter.getFilters().get(3).getValue(), "userid");
 		Assert.assertEquals(filter.getFilters().get(4).getValue(), "eq");
-		Assert.assertEquals(filter.getFilters().get(5).getValue(), "c888af4e-0728-4e82-880c-7cf490138220");
+		Assert.assertEquals(filter.getFilters().get(5).getValue(), "2f126140-db10-4ccb-be9d-e430d9fe9c45");
 	}
 	
-	private ClientApplication getTestApp(String appConfig) throws JsonParseException, JsonMappingException, IOException {
+	private ClientApplication getTestApp(String appConfig) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE+appConfig);
-		ClientApplication app = mapper.readValue(is, ClientApplication.class);
-		return app;
+		String TEST_PACKAGE = "com/axway/apim/adapter/apimanager/testApps/";
+		InputStream is = this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE +appConfig);
+		return mapper.readValue(is, ClientApplication.class);
 	}
 }

@@ -8,7 +8,6 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
@@ -72,16 +71,14 @@ public class APIManagerPoliciesAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerPoliciesAdapter.class);
 
-    ObjectMapper mapper = APIManagerAdapter.mapper;
-
     public APIManagerPoliciesAdapter() {
         super();
     }
 
     Map<PolicyType, String> apiManagerResponse = new HashMap<>();
 
-    Map<PolicyType, List<Policy>> mappedPolicies = new HashMap<>();
-    List<Policy> allPolicies = new ArrayList<>();
+    private final Map<PolicyType, List<Policy>> mappedPolicies = new HashMap<>();
+    private final List<Policy> allPolicies = new ArrayList<>();
 
     private void readPoliciesFromAPIManager(PolicyType type) throws AppException {
         if (apiManagerResponse.get(type) != null) return;
@@ -94,7 +91,6 @@ public class APIManagerPoliciesAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 apiManagerResponse.put(type, EntityUtils.toString(httpResponse.getEntity()));
             }
-
         } catch (Exception e) {
             throw new AppException("Can't initialize policies for type: " + type, ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
@@ -105,7 +101,7 @@ public class APIManagerPoliciesAdapter {
             readPoliciesFromAPIManager(type);
         }
         try {
-            List<Policy> policies = mapper.readValue(apiManagerResponse.get(type), new TypeReference<List<Policy>>() {
+            List<Policy> policies = APIManagerAdapter.mapper.readValue(apiManagerResponse.get(type), new TypeReference<List<Policy>>() {
             });
             for (Policy policy : policies) {
                 policy.setType(type);

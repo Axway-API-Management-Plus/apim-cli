@@ -271,8 +271,4 @@ public class APIManagerUserAdapter {
             throw new AppException("Error uploading user image", ErrorCode.CANT_CREATE_API_PROXY, e);
         }
     }
-
-    public void setAPIManagerTestResponse(UserFilter key, String response) {
-        this.apiManagerResponse.put(key, response);
-    }
 }
