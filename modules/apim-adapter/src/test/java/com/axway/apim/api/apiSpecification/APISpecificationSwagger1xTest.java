@@ -1,9 +1,6 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
-import com.axway.apim.api.apiSpecification.APISpecification;
-import com.axway.apim.api.apiSpecification.APISpecificationFactory;
-import com.axway.apim.api.apiSpecification.Swagger1xSpecification;
-import com.axway.apim.apiimport.lib.params.APIImportParams;
+import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,16 +15,15 @@ import java.util.Objects;
 
 public class APISpecificationSwagger1xTest {
 
-    private static final String testPackage = "/com/axway/apim/api/definition";
+    private static final String testPackage = "/com/axway/apim/adapter/spec";
 
     ObjectMapper mapper = new ObjectMapper();
 
     @BeforeClass
     private void initTestIndicator() {
-        APIImportParams params = new APIImportParams();
+        StandardImportParams params = new StandardImportParams();
         params.setReplaceHostInSwagger(true);
     }
-
     @Test
     public void testSwagger12() throws IOException {
         byte[] content = getSwaggerContent(testPackage + "/swagger12.json");

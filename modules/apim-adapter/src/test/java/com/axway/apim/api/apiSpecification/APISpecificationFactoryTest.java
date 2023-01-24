@@ -51,14 +51,14 @@ public class APISpecificationFactoryTest {
     @Test(expectedExceptions = AppException.class)
     public void getAPISpecificationOdataV3() throws AppException {
         ClassLoader classLoader = this.getClass().getClassLoader();
-        String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec").getFile();
+        String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec/odata").getFile();
         APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("ODataV3ODataDemoMetadata.xml", specDirPath, "petstore");
         Assert.assertEquals(APISpecification.APISpecType.valueOf("ODATA_V3"), apiSpecification.getAPIDefinitionType());
     }
     @Test
     public void getAPISpecificationOdataV4() throws AppException {
         ClassLoader classLoader = this.getClass().getClassLoader();
-        String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec").getFile();
+        String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec/odata").getFile();
         APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("ODataV4TrippinServiceMetadata.xml", specDirPath, "petstore");
         Assert.assertEquals(APISpecification.APISpecType.valueOf("ODATA_V4"), apiSpecification.getAPIDefinitionType());
         Assert.assertNotNull(apiSpecification.getApiSpecificationContent());

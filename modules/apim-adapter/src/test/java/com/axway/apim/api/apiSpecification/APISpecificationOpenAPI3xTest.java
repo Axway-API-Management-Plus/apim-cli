@@ -1,14 +1,10 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIManagerAdapterTest;
-import com.axway.apim.api.apiSpecification.APISpecification;
 import com.axway.apim.api.apiSpecification.APISpecification.APISpecType;
-import com.axway.apim.api.apiSpecification.APISpecificationFactory;
-import com.axway.apim.api.apiSpecification.OAS3xSpecification;
 import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.api.model.DesiredAPISpecification;
-import com.axway.apim.apiimport.lib.params.APIImportParams;
+import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,17 +20,16 @@ import java.util.Objects;
 
 public class APISpecificationOpenAPI3xTest {
 	
-	private static final String TEST_PACKAGE = "/com/axway/apim/api/definition";
+	private static final String TEST_PACKAGE = "/com/axway/apim/adapter/spec";
 	
 	ObjectMapper mapper = new ObjectMapper();
 	ObjectMapper ymlMapper = new ObjectMapper(new YAMLFactory());
-	
 	@BeforeClass
 	private void initTestIndicator() {
-		APIImportParams params = new APIImportParams();
+		StandardImportParams params = new StandardImportParams();
 		params.setReplaceHostInSwagger(true);
 	}
-	
+
 	@Test
 	public void backendHostAndBasePath() throws IOException {
 

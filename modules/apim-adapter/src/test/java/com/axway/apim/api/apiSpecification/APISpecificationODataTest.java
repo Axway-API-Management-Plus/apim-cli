@@ -1,12 +1,8 @@
-package com.axway.apim.api.definition;
+package com.axway.apim.api.apiSpecification;
 
-import com.axway.apim.api.apiSpecification.APISpecification;
-import com.axway.apim.api.apiSpecification.APISpecificationFactory;
-import com.axway.apim.api.apiSpecification.ODataV2Specification;
-import com.axway.apim.api.apiSpecification.ODataV4Specification;
 import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.api.model.DesiredAPISpecification;
-import com.axway.apim.apiimport.lib.params.APIImportParams;
+import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -25,16 +21,17 @@ public class APISpecificationODataTest {
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
-	private static String TEST_PACKAGE = "/com/axway/apim/api/definition/odata";
-	
+	private static final String TEST_PACKAGE = "/com/axway/apim/adapter/spec/odata";
+
 	@BeforeClass
 	private void initTestIndicator() {
-		APIImportParams params = new APIImportParams();
+		StandardImportParams params = new StandardImportParams();
 		params.setReplaceHostInSwagger(true);
 	}
+
 	
 	@Test
-	public void testODataV2API() throws AppException, IOException {
+	public void testODataV2API() throws IOException {
 		
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2NorthWindOpenAPI3.json");
@@ -50,7 +47,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testODataV2APIFilteredSomeExludes() throws AppException, IOException {
+	public void testODataV2APIFilteredSomeExludes() throws IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addExclude(new String[] {"*:DELETE"}, null); // Exclude all DELETE-Methods
@@ -71,7 +68,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testODataV2APIFilteredSomeIncludes() throws AppException, IOException {
+	public void testODataV2APIFilteredSomeIncludes() throws IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		filterConfig.addInclude(new String[] {"*:GET"}, null); // Include all GET-Methods
@@ -93,7 +90,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testODataV2APIFilteredWithTagsAndModels() throws AppException, IOException {
+	public void testODataV2APIFilteredWithTagsAndModels() throws IOException {
 		DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
 		APISpecificationFilter filterConfig = new APISpecificationFilter();
 		desiredAPISpec.setResource(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
@@ -126,7 +123,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testODataV2APIWithFunctions() throws AppException, IOException {
+	public void testODataV2APIWithFunctions() throws IOException {
 		
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2ODataDemoMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2ODataDemoOpenAPI.json");
@@ -141,7 +138,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testODataV2APIBackendFromMetadata() throws AppException, IOException {
+	public void testODataV2APIBackendFromMetadata() throws IOException {
 		
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/ODataV2NorthWindMetadata.xml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(odataMetadata, "https://services.odata.org/V2/Northwind/Northwind.svc/$metadata", "OData-V2-Test-API");
@@ -154,7 +151,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testSAPODataV2AccountDuplicateCheck() throws AppException, IOException {
+	public void testSAPODataV2AccountDuplicateCheck() throws IOException {
 		
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-AccountDuplicateCheckMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-AccountDuplicateCheckOpenAPI.json");
@@ -169,7 +166,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testSAPODataV2360ReviewsManagement() throws AppException, IOException {
+	public void testSAPODataV2360ReviewsManagement() throws IOException {
 		
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-PMGMMultiraterMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-PMGMMultiraterOpenAPI.json");
@@ -184,7 +181,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testSAPODataAccountsAndTransactionsAPI() throws AppException, IOException {
+	public void testSAPODataAccountsAndTransactionsAPI() throws IOException {
 		
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-AccountsAndTransactionsMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-AccountsAndTransactionsOpenAPI.json");
@@ -199,7 +196,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testSAPODataBusinessPartnerA2XAPI() throws AppException, IOException {
+	public void testSAPODataBusinessPartnerA2XAPI() throws IOException {
 		
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-BusinessPartnerA2XMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-BusinessPartnerA2XOpenAPI.json");
@@ -214,7 +211,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testSAPODataBasicProductAvailabilityInfoAPI() throws AppException, IOException {
+	public void testSAPODataBasicProductAvailabilityInfoAPI() throws IOException {
 		
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-BasicProductAvailabilityInfoMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-BasicProductAvailabilityInfoOpenAPI.json");
@@ -229,7 +226,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testSAPODataMasterDataForBusinessPartnerAPI() throws AppException, IOException {
+	public void testSAPODataMasterDataForBusinessPartnerAPI() throws IOException {
 		
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-MasterDataForBusinessPartnerMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-MasterDataForBusinessPartnerOpenAPI.json");
@@ -244,7 +241,7 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test
-	public void testSAPODataCustomerMaterialA2XAPI() throws AppException, IOException {
+	public void testSAPODataCustomerMaterialA2XAPI() throws IOException {
 		
 		byte[] odataMetadata = getAPISpecificationContent(TEST_PACKAGE+"/SAP-CustomerMaterialA2XMetadata.xml");
 		byte[] odataOpenAPI3 = getAPISpecificationContent(TEST_PACKAGE+"/SAP-CustomerMaterialA2XOpenAPI.json");
@@ -259,15 +256,14 @@ public class APISpecificationODataTest {
 	}
 	
 	@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Detected OData V3 specification, which is not yet supported by the APIM-CLI..*")
-	public void testODataV3API() throws AppException, IOException {
+	public void testODataV3API() throws IOException {
 		
 		byte[] content = getAPISpecificationContent(TEST_PACKAGE+"/ODataV3ODataDemoMetadata.xml");
 		APISpecificationFactory.getAPISpecification(content, "https://any.odata.service", "OData-V3-Test-API");
 	}
 	
-	//@Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Detected OData V4 specification, which is not yet supported by the APIM-CLI..*")
 	@Test
-	public void testODataV4API() throws AppException, IOException {
+	public void testODataV4API() throws IOException {
 		
 		byte[] content = getAPISpecificationContent(TEST_PACKAGE+"/ODataV4TrippinServiceMetadata.xml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "https://any.odata.service", "OData-V4-Test-API");
