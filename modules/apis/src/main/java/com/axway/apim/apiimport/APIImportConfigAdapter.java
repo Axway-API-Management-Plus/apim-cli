@@ -193,7 +193,6 @@ public class APIImportConfigAdapter {
     }
 
     private void validateOrganization(API apiConfig) throws AppException {
-        if (apiConfig instanceof DesiredTestOnlyAPI) return;
         if (apiConfig.getOrganization() == null || !apiConfig.getOrganization().isDevelopment()) {
             throw new AppException("The given organization: '" + apiConfig.getOrganization() + "' is either unknown or hasn't the Development flag.", ErrorCode.UNKNOWN_ORGANIZATION);
         }
@@ -691,7 +690,6 @@ public class APIImportConfigAdapter {
                 }
                 clientCertFile = new File(this.getClass().getResource(keystore).getFile());
             }
-            if (this.apiConfig instanceof DesiredTestOnlyAPI) return; // Skip here when testing
             JsonNode fileData;
             try (InputStream inputStream = Files.newInputStream(clientCertFile.toPath())) {
                 fileData = APIManagerAdapter.getFileData(IOUtils.toByteArray(inputStream), keystore, ContentType.create("application/x-pkcs12"));
@@ -712,7 +710,6 @@ public class APIImportConfigAdapter {
 
     private void validateHasQueryStringKey(API importApi) throws AppException {
         if (importApi.getApiRoutingKey() == null) return; // Nothing to check
-        if (importApi instanceof DesiredTestOnlyAPI) return; // Do nothing when unit-testing
         if (APIManagerAdapter.hasAdminAccount()) {
             Boolean apiRoutingKeyEnabled = APIManagerAdapter.getInstance().configAdapter.getConfig(true).getApiRoutingKeyEnabled();
             if (!apiRoutingKeyEnabled) {

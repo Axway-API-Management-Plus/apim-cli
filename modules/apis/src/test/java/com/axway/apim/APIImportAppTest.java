@@ -20,7 +20,7 @@ public class APIImportAppTest extends WiremockWrapper {
     @Test
     public void importApiTest() {
         ClassLoader classLoader = this.getClass().getClassLoader();
-        String specFile = classLoader.getResource("com/axway/apim/api/definition/petstore-openapi30.json").getFile();
+        String specFile = classLoader.getResource("api_definition_1/petstore-openapi30.json").getFile();
         String confFile = classLoader.getResource("com/axway/apim/test/files/basic/config.json").getFile();
         String[] args = {"-h", "localhost", "-c", confFile, "-a", specFile};
         int returnCode = APIImportApp.importAPI(args);
