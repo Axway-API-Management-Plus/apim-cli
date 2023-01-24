@@ -12,7 +12,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class UpdateExistingAPITest  extends WiremockWrapper {
+public class RepublishToUpdateAPITest extends WiremockWrapper {
 
     @BeforeClass
     public void initWiremock() {
@@ -25,14 +25,14 @@ public class UpdateExistingAPITest  extends WiremockWrapper {
     }
 
     @Test
-    public void testUpdateExistingApi() throws AppException {
+    public void testRepublishToUpdateApi() throws AppException {
         APIManagerAdapter.deleteInstance();
         CoreParameters coreParameters = new CoreParameters();
         coreParameters.setHostname("localhost");
         coreParameters.setUsername("test");
         coreParameters.setPassword(Utils.getEncryptedPassword());
         Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName("orga");
-        UpdateExistingAPI updateExistingAPI = new UpdateExistingAPI();
+        RepublishToUpdateAPI republishToUpdateAPI = new RepublishToUpdateAPI();
         API actualAPI = new API();
         actualAPI.setName("petstore");
         actualAPI.setOrganization(organization);
@@ -40,7 +40,7 @@ public class UpdateExistingAPITest  extends WiremockWrapper {
         actualAPI.setVersion("1.1");
         actualAPI.setDescriptionType("original");
         actualAPI.setSummary("Petstore api");
-        actualAPI.setState("unpublished");
+        actualAPI.setState("published");
         actualAPI.setId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
         API desiredAPI = new API();
         desiredAPI.setName("petstore");
@@ -49,8 +49,8 @@ public class UpdateExistingAPITest  extends WiremockWrapper {
         desiredAPI.setOrganization(organization);
         desiredAPI.setDescriptionType("original");
         desiredAPI.setSummary("Petstore api update");
-        desiredAPI.setState("unpublished");
+        desiredAPI.setState("published");
         APIChangeState apiChangeState = new APIChangeState(actualAPI, desiredAPI);
-        updateExistingAPI.execute(apiChangeState);
+        republishToUpdateAPI.execute(apiChangeState);
     }
 }

@@ -77,6 +77,7 @@ public class UpdateExistingAPI {
                 LOG.info("{} successfully updated {} API: {} {} (ID: {})", changes.waiting4Approval(), actualAPI.getState(), actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
             }
         } catch (Exception e) {
+            LOG.error("Error updating existing API", e);
             throw e;
         } finally {
             APIPropertiesExport.getInstance().setProperty("feApiId", changes.getActualAPI().getId());

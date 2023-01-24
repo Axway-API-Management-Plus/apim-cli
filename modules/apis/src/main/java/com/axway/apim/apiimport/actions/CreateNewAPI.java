@@ -98,6 +98,7 @@ public class CreateNewAPI {
             changes.getDesiredAPI().setId(createdAPI.getId());
             LOG.info("{} Successfully created {} API: {} {} (ID: {})", changes.waiting4Approval(), createdAPI.getState(), createdAPI.getName(), createdAPI.getVersion(), createdAPI.getId());
         } catch (Exception e) {
+            LOG.error("Error creating new API", e);
             throw e;
         } finally {
             if (createdAPI == null) {

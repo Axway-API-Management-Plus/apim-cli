@@ -15,7 +15,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 
 public class RepublishToUpdateAPI {
 
-    private static Logger LOG = LoggerFactory.getLogger(RepublishToUpdateAPI.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RepublishToUpdateAPI.class);
 
     public void execute(APIChangeState changes) throws AppException {
 

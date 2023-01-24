@@ -107,6 +107,11 @@ public class APIExportAppTest extends WiremockWrapper {
         int returnCode = APIExportApp.grantAccess(args);
         Assert.assertEquals(returnCode, 0);
     }
-
+    @Test
+    public void testCheckCertificates(){
+        String[] args = {"-h", "localhost", "-n", "petstore", "-days", "1000"};
+        int returnCode = APIExportApp.checkCertificates(args);
+        Assert.assertEquals(returnCode, 101);
+    }
 
 }

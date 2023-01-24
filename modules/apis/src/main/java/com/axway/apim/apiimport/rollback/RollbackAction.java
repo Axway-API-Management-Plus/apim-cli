@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public interface RollbackAction {
-	static Logger LOG = LoggerFactory.getLogger(RollbackAction.class);
+	Logger LOG = LoggerFactory.getLogger(RollbackAction.class);
 	
-	public void rollback() throws AppException;
+	void rollback() throws AppException;
 	
-	public int getExecuteOrder();
+	int getExecuteOrder();
 }
