@@ -4,6 +4,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
@@ -36,14 +37,14 @@ public class ConsolePrinterCustomProperties {
 
 	public void addProperties(Map<String, CustomProperty> customProperties, Type group) {
 		if(customProperties == null || customProperties.size()==0) {
-			System.out.println("No custom properties configured for: " + group.niceName);
+			Console.println("No custom properties configured for: " + group.niceName);
 			return;
 		}
 		propertiesWithName.addAll(getCustomPropertiesWithName(customProperties, group));
 	}
 	
 	public void printCustomProperties() {
-		System.out.println(AsciiTable.getTable(borderStyle, propertiesWithName, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, propertiesWithName, Arrays.asList(
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(CustomPropertyWithName::getName),
 				new Column().header("Group").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(CustomPropertyWithName::getGroup),
 				new Column().header("Label").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(prop -> prop.getCustomProperty().getLabel()),

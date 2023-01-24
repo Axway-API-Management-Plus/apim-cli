@@ -10,6 +10,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
@@ -39,7 +40,7 @@ public class ConsoleAppExporter extends ApplicationExporter {
 	}
 	
 	private void printStandard(List<ClientApplication> apps) {
-		System.out.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
 				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
 				new Column().header("State").with(app -> app.getState().name()),
@@ -50,7 +51,7 @@ public class ConsoleAppExporter extends ApplicationExporter {
 	}
 	
 	private void printWide(List<ClientApplication> apps) {
-		System.out.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
 				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
 				new Column().header("State").with(app -> app.getState().name()),
@@ -63,7 +64,7 @@ public class ConsoleAppExporter extends ApplicationExporter {
 	}
 	
 	private void printUltra(List<ClientApplication> apps) {
-		System.out.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, apps, Arrays.asList(
 				new Column().header("Application-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
 				new Column().header("State").with(app -> app.getState().name()),

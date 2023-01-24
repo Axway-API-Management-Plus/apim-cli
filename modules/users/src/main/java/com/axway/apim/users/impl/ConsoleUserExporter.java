@@ -8,6 +8,7 @@ import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.users.lib.params.UserExportParams;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
@@ -37,7 +38,7 @@ public class ConsoleUserExporter extends UserResultHandler {
 	}
 	
 	private void printStandard(List<User> users) {
-		System.out.println(AsciiTable.getTable(borderStyle, users, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, users, Arrays.asList(
 				new Column().header("User-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getId),
 				new Column().header("Login-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getLoginName),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getName),
@@ -47,7 +48,7 @@ public class ConsoleUserExporter extends UserResultHandler {
 	}
 	
 	private void printWide(List<User> users) {
-		System.out.println(AsciiTable.getTable(borderStyle, users, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, users, Arrays.asList(
 				new Column().header("User-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getId),
 				new Column().header("Login-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getLoginName),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getName),
@@ -59,7 +60,7 @@ public class ConsoleUserExporter extends UserResultHandler {
 	}
 	
 	private void printUltra(List<User> users) {
-		System.out.println(AsciiTable.getTable(borderStyle, users, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, users, Arrays.asList(
 				new Column().header("User-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getId),
 				new Column().header("Login-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getLoginName),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(User::getName),

@@ -39,4 +39,30 @@ public class ConsoleUserExporterTest extends WiremockWrapper {
         List<User> users = apimanagerAdapter.userAdapter.getUsers(exporter.getFilter());
         exporter.export(users);
     }
+
+    @Test
+    public void testConsoleExportWide() throws AppException {
+        TestIndicator.getInstance().setTestRunning(true);
+        String[] args = {"-h", "localhost", "-loginName", "usera", "-wide"};
+        UserExportParams params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
+        APIManagerAdapter.deleteInstance();
+        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
+        ExportResult result = new ExportResult();
+        UserResultHandler exporter = UserResultHandler.create(UserResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        List<User> users = apimanagerAdapter.userAdapter.getUsers(exporter.getFilter());
+        exporter.export(users);
+    }
+
+    @Test
+    public void testConsoleExportUltra() throws AppException {
+        TestIndicator.getInstance().setTestRunning(true);
+        String[] args = {"-h", "localhost", "-loginName", "usera", "-ultra"};
+        UserExportParams params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
+        APIManagerAdapter.deleteInstance();
+        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
+        ExportResult result = new ExportResult();
+        UserResultHandler exporter = UserResultHandler.create(UserResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        List<User> users = apimanagerAdapter.userAdapter.getUsers(exporter.getFilter());
+        exporter.export(users);
+    }
 }

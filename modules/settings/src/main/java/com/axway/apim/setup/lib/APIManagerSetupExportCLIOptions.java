@@ -3,6 +3,7 @@ package com.axway.apim.setup.lib;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.StandardExportCLIOptions;
+import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.Option;
 
 public class APIManagerSetupExportCLIOptions extends CLIOptions {
@@ -41,20 +42,20 @@ public class APIManagerSetupExportCLIOptions extends CLIOptions {
 	@Override
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);
-		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("How to get/export API-Manager configuration with different output formats");
-		System.out.println("Get the complete API-Manager on console using environment properties: env.api-env.properties:");
-		System.out.println(getBinaryName()+" setup get -s api-env");
-		System.out.println("Same as before, but with output format JSON - As it is used to import configuration");
-		System.out.println(getBinaryName()+" setup get -s api-env -o json");
-		System.out.println("Export configuration and alerts into JSON");
-		System.out.println(getBinaryName()+" setup get -s api-env -o json -type alerts,config");
-		System.out.println("Export remote hosts with specified name");
-		System.out.println(getBinaryName()+" setup get -s api-env -type remotehosts -name \"*.host.com*\"");
-		System.out.println();
-		System.out.println();
-		System.out.println("For more information please visit:");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
+		Console.println("----------------------------------------------------------------------------------------");
+		Console.println("How to get/export API-Manager configuration with different output formats");
+		Console.println("Get the complete API-Manager on console using environment properties: env.api-env.properties:");
+		Console.println(getBinaryName()+" setup get -s api-env");
+		Console.println("Same as before, but with output format JSON - As it is used to import configuration");
+		Console.println(getBinaryName()+" setup get -s api-env -o json");
+		Console.println("Export configuration and alerts into JSON");
+		Console.println(getBinaryName()+" setup get -s api-env -o json -type alerts,config");
+		Console.println("Export remote hosts with specified name");
+		Console.println(getBinaryName()+" setup get -s api-env -type remotehosts -name \"*.host.com*\"");
+		Console.println();
+		Console.println();
+		Console.println("For more information please visit:");
+		Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
 	}
 
 	@Override

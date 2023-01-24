@@ -1,5 +1,6 @@
 package com.axway.apim.api.export.lib.cli;
 
+import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.Option;
 
 import com.axway.apim.api.export.lib.params.APICheckCertificatesParams;
@@ -33,17 +34,17 @@ public class CLICheckCertificatesOptions extends CLIOptions {
 	@Override
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);
-		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("Changing APIs examples:");
-		System.out.println();
-		System.out.println("Changes the backend basepath of selected APIs from any to new");
-		System.out.println(getBinaryName()+" api change -s api-env <FILTER-APIs> -newBackend https://new.backend.host:6756/api");
-		System.out.println();
-		System.out.println("Changes the backend basepath of select APIs having the given oldBackend");
-		System.out.println(getBinaryName()+" api change -s api-env <FILTER-APIs> -newBackend https://new.backend.host:6756/api -oldBackend https://old.backend....");
-		System.out.println();
-		System.out.println("For more information and advanced examples please visit:");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
+		Console.println("----------------------------------------------------------------------------------------");
+		Console.println("Changing APIs examples:");
+		Console.println();
+		Console.println("Changes the backend basepath of selected APIs from any to new");
+		Console.println(getBinaryName()+" api change -s api-env <FILTER-APIs> -newBackend https://new.backend.host:6756/api");
+		Console.println();
+		Console.println("Changes the backend basepath of select APIs having the given oldBackend");
+		Console.println(getBinaryName()+" api change -s api-env <FILTER-APIs> -newBackend https://new.backend.host:6756/api -oldBackend https://old.backend....");
+		Console.println();
+		Console.println("For more information and advanced examples please visit:");
+		Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
 	}
 
 	@Override

@@ -287,7 +287,7 @@ public class APISpecificationODataTest {
 		ObjectMapper objectMapper = new ObjectMapper();
 		TypeReference<OpenAPI> api = new TypeReference<OpenAPI>(){};
 		OpenAPI generatedAPI = objectMapper.readValue(openAPI, api);
-		//System.out.println(new String(openAPI));
+		//Console.println(new String(openAPI));
 		Assert.assertEquals(generatedAPI.getInfo().getTitle(), "com.sap.gateway.srvd_a2x.api_slsprcgaccesssequence.v0001 OData Service");
 	}
 

@@ -10,6 +10,7 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.users.lib.params.UserChangePasswordParams;
 import com.axway.apim.users.lib.params.UserExportParams;
 
@@ -24,16 +25,16 @@ public class UserChangePasswordHandler extends UserResultHandler {
 
 	@Override
 	public void export(List<User> users) throws AppException {
-		System.out.println(users.size() + " user(s) selected to change the password.");
+		Console.println(users.size() + " user(s) selected to change the password.");
 		if(CoreParameters.getInstance().isForce()) {
-			System.out.println("Force flag given to change the password for: "+users.size()+" User(s)");
+			Console.println("Force flag given to change the password for: "+users.size()+" User(s)");
 		} else {
 			if(!Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
-				System.out.println("Canceled.");
+				Console.println("Canceled.");
 				return;
 			}
 		}
-		System.out.println("Okay, going to change the password for: " + users.size() + " Users(s)");
+		Console.println("Okay, going to change the password for: " + users.size() + " Users(s)");
 		for(User user : users) {
 			try {
 				APIManagerAdapter.getInstance().userAdapter.changePassword(newPassword, user);
@@ -41,7 +42,7 @@ public class UserChangePasswordHandler extends UserResultHandler {
 				LOG.error("Error changing password of user: {}", user.getName());
 			}
 		}
-		System.out.println("Done!");
+		Console.println("Done!");
 	}
 
 	@Override

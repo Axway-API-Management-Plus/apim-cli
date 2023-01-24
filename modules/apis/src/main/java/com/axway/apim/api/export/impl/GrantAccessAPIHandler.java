@@ -11,6 +11,7 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,20 +39,20 @@ public class GrantAccessAPIHandler extends APIResultHandler {
 			throw new AppException("List of Orgs to grant access to is missing.", ErrorCode.UNKNOWN_ORGANIZATION);
 		}
 		if(apis.size()==1) {
-			System.out.println("Selected organizations: " + orgs + " get access to API: "+apis.get(0).toStringHuman());
+			Console.println("Selected organizations: " + orgs + " get access to API: "+apis.get(0).toStringHuman());
 		} else {
-			System.out.println("Selected organizations: " + orgs + " get access to "+apis.size()+" selected APIs.");
+			Console.println("Selected organizations: " + orgs + " get access to "+apis.size()+" selected APIs.");
 		}
 		if(CoreParameters.getInstance().isForce()) {
-			System.out.println("Force flag given to grant access for selected organizations to: "+apis.size()+" API(s)");
+			Console.println("Force flag given to grant access for selected organizations to: "+apis.size()+" API(s)");
 		} else {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
 			} else {
-				System.out.println("Canceled.");
+				Console.println("Canceled.");
 				return;
 			}
 		}
-		System.out.println("Okay, going to grant access to: " + apis.size() + " API(s) for "+orgs.size()+" organizations.");
+		Console.println("Okay, going to grant access to: " + apis.size() + " API(s) for "+orgs.size()+" organizations.");
 		for(API api : apis) {
 			try {
 				APIManagerAdapter.getInstance().apiAdapter.grantClientOrganization(orgs, api, hasError);
@@ -61,7 +62,7 @@ public class GrantAccessAPIHandler extends APIResultHandler {
 				LOG.error("Error granting access to API:  {}  for organizations: {} Error message: {}" ,api.toStringHuman(), orgs, e.getMessage());
 			}
 		}
-		System.out.println("Done!");
+		Console.println("Done!");
 	}
 
 	@Override

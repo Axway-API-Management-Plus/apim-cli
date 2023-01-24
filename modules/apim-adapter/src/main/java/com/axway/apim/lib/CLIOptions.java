@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -90,9 +91,9 @@ public abstract class CLIOptions {
 		formatter.setWidth(140);
 		
 		formatter.printHelp(getAppName(), options, true);
-		System.out.println("\n");
-		System.out.println("ERROR: " + message);
-		System.out.println("\n");
+		Console.println("\n");
+		Console.println("ERROR: " + message);
+		Console.println("\n");
 	}
 	
 	protected String getAppName() {
@@ -143,9 +144,9 @@ public abstract class CLIOptions {
 		for(String arg : args) {
 			if("-returncodes".equals(arg)) {
 				String spaces = "                                   ";
-				System.out.println("Possible error codes and their meaning:\n");
+				Console.println("Possible error codes and their meaning:\n");
 				for(ErrorCode code : ErrorCode.values()) {
-					System.out.println(code.name() + spaces.substring(code.name().length()) + "("+code.getCode()+")" + ": " + code.getDescription());
+					Console.println(code.name() + spaces.substring(code.name().length()) + "("+code.getCode()+")" + ": " + code.getDescription());
 				}
 				System.exit(0);
 			}

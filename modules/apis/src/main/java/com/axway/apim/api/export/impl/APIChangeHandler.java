@@ -13,6 +13,7 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,16 +58,16 @@ public class APIChangeHandler extends APIResultHandler {
             }
         }
         if (apisToChange.size() == 0) {
-            System.out.println("No changes required for the selected APIs.");
+            Console.println("No changes required for the selected APIs.");
             return;
         }
         if (CoreParameters.getInstance().isForce()) {
-            System.out.println("Force flag given to change: " + apis.size() + " API(s)");
+            Console.println("Force flag given to change: " + apis.size() + " API(s)");
         } else {
-            System.out.println("Okay, going to change: " + apisToChange.size() + " API(s)");
+            Console.println("Okay, going to change: " + apisToChange.size() + " API(s)");
             if (Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
             } else {
-                System.out.println("Canceled.");
+                Console.println("Canceled.");
                 return;
             }
         }
@@ -79,7 +80,7 @@ public class APIChangeHandler extends APIResultHandler {
                 LOG.error("Error applying changes for API: " + changeState.getDesiredAPI().getName(), e);
             }
         }
-        System.out.println("Done!");
+        Console.println("Done!");
     }
 
     @Override

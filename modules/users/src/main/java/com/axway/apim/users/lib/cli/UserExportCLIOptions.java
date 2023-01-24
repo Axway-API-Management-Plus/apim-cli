@@ -4,7 +4,7 @@ import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportCLIOptions;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.users.lib.params.UserExportParams;
 
 public class UserExportCLIOptions extends CLIOptions {
@@ -31,21 +31,21 @@ public class UserExportCLIOptions extends CLIOptions {
 	@Override
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);
-		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("How to get/export user(s) with different output formats");
-		System.out.println("Get all users on console using environment properties: env.api-env.properties:");
-		System.out.println(getBinaryName()+" user get -s api-env");
-		System.out.println("Same as before, but with output format JSON - As it is used to import applications");
-		System.out.println(getBinaryName()+" user get -s api-env -o json");
-		System.out.println();
-		System.out.println();
-		System.out.println("How to filter the list of selected users:");
-		System.out.println(getBinaryName()+" user get -s api-env -n \"Mark*\" -o json");
-		System.out.println(getBinaryName()+" user get -s api-env -n \"Mike*\" -role admin -o json");
-		System.out.println(getBinaryName()+" user get -s api-env -n \"*Marcel*\" -t /tmp/exported_apps -o json -deleteTarget ");
-		System.out.println();
-		System.out.println("For more information and advanced examples please visit:");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
+		Console.println("----------------------------------------------------------------------------------------");
+		Console.println("How to get/export user(s) with different output formats");
+		Console.println("Get all users on console using environment properties: env.api-env.properties:");
+		Console.println(getBinaryName()+" user get -s api-env");
+		Console.println("Same as before, but with output format JSON - As it is used to import applications");
+		Console.println(getBinaryName()+" user get -s api-env -o json");
+		Console.println();
+		Console.println();
+		Console.println("How to filter the list of selected users:");
+		Console.println(getBinaryName()+" user get -s api-env -n \"Mark*\" -o json");
+		Console.println(getBinaryName()+" user get -s api-env -n \"Mike*\" -role admin -o json");
+		Console.println(getBinaryName()+" user get -s api-env -n \"*Marcel*\" -t /tmp/exported_apps -o json -deleteTarget ");
+		Console.println();
+		Console.println("For more information and advanced examples please visit:");
+		Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class UserExportCLIOptions extends CLIOptions {
 	}
 	
 	@Override
-	public Parameters getParams() throws AppException {
+	public Parameters getParams() {
 		return new UserExportParams();
 	}
 }

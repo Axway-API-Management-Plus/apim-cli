@@ -37,4 +37,30 @@ public class ConsoleOrgExporterTest extends WiremockWrapper {
         ConsoleOrgExporter consoleOrgExporter = new ConsoleOrgExporter(params, result);
         consoleOrgExporter.export(organizations);
     }
+
+    @Test
+    public void tesCVSExportWide() throws AppException {
+        String[] args = {"-h", "localhost", "-wide"};
+        OrgExportParams params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
+        APIManagerAdapter.deleteInstance();
+        ExportResult result = new ExportResult();
+        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
+        OrgResultHandler exporter = OrgResultHandler.create(OrgResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        List<Organization> organizations = apimanagerAdapter.orgAdapter.getOrgs(exporter.getFilter());
+        ConsoleOrgExporter consoleOrgExporter = new ConsoleOrgExporter(params, result);
+        consoleOrgExporter.export(organizations);
+    }
+
+    @Test
+    public void tesCVSExportUltra() throws AppException {
+        String[] args = {"-h", "localhost", "-ultra"};
+        OrgExportParams params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
+        APIManagerAdapter.deleteInstance();
+        ExportResult result = new ExportResult();
+        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
+        OrgResultHandler exporter = OrgResultHandler.create(OrgResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        List<Organization> organizations = apimanagerAdapter.orgAdapter.getOrgs(exporter.getFilter());
+        ConsoleOrgExporter consoleOrgExporter = new ConsoleOrgExporter(params, result);
+        consoleOrgExporter.export(organizations);
+    }
 }

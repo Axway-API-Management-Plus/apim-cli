@@ -223,11 +223,4 @@ public class UserApp implements APIMCLIServiceProvider {
             return result;
         }
     }
-
-    public static void main(String[] args) {
-        int rc = export(args);
-        System.exit(rc);
-    }
-
-
 }

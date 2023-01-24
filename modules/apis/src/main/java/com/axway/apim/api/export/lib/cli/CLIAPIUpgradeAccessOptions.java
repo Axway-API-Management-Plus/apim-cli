@@ -1,5 +1,6 @@
 package com.axway.apim.api.export.lib.cli;
 
+import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.Option;
 
 import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
@@ -63,18 +64,18 @@ public class CLIAPIUpgradeAccessOptions extends CLIOptions {
 
 	@Override
 	public void printUsage(String message, String[] args) {
-		super.printUsage(message, args);		
-		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("Upgrade access for one or more APIs based on the given reference API.");
-		System.out.println("App-Subscriptions and Granted orgs are taken over to all selected APIs based on the reference API.");
-		System.out.println("The reference API must be unique. APIs must be published to be considered.");
-		System.out.println(getBinaryName()+" api upgrade-access -s api-env -refAPIId <UUID-ID-OF-THE-REF-API> -id <UUID-ID-OF-THE-API>");
-		System.out.println(getBinaryName()+" api upgrade-access -s api-env -n \"*APIs-to-be-upgraded*\" -refAPIName \"*Name of Ref-API*\"");
-		System.out.println(getBinaryName()+" api upgrade-access -s api-env -n \"*APIs-to-be-upgraded*\" -refAPIName \"*Name of Ref-API*\" -refAPIDeprecate true");
-		System.out.println();
-		System.out.println();
-		System.out.println("For more information and advanced examples please visit:");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
+		super.printUsage(message, args);
+		Console.println("----------------------------------------------------------------------------------------");
+		Console.println("Upgrade access for one or more APIs based on the given reference API.");
+		Console.println("App-Subscriptions and Granted orgs are taken over to all selected APIs based on the reference API.");
+		Console.println("The reference API must be unique. APIs must be published to be considered.");
+		Console.println(getBinaryName()+" api upgrade-access -s api-env -refAPIId <UUID-ID-OF-THE-REF-API> -id <UUID-ID-OF-THE-API>");
+		Console.println(getBinaryName()+" api upgrade-access -s api-env -n \"*APIs-to-be-upgraded*\" -refAPIName \"*Name of Ref-API*\"");
+		Console.println(getBinaryName()+" api upgrade-access -s api-env -n \"*APIs-to-be-upgraded*\" -refAPIName \"*Name of Ref-API*\" -refAPIDeprecate true");
+		Console.println();
+		Console.println();
+		Console.println("For more information and advanced examples please visit:");
+		Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
 	}
 
 	@Override

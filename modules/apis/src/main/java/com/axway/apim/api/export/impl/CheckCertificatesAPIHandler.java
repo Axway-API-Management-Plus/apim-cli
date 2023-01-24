@@ -10,6 +10,7 @@ import com.axway.apim.api.model.CaCert;
 import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.rest.Console;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.freva.asciitable.AsciiTable;
@@ -59,10 +60,9 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
             this.result.setError(ErrorCode.CHECK_CERTS_FOUND_CERTS);
             this.result.setResultDetails(expiredCerts);
             StandardExportParams.OutputFormat outputFormat = params.getOutputFormat();
-            System.out.println(outputFormat);
             if (outputFormat.equals(StandardExportParams.OutputFormat.console)) {
-                System.out.println("The following certificates will expire in the next " + checkCertParams.getNumberOfDays() + " days.");
-                System.out.println(AsciiTable.getTable(AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS, expiredCerts, Arrays.asList(
+                Console.println("The following certificates will expire in the next " + checkCertParams.getNumberOfDays() + " days.");
+                Console.println(AsciiTable.getTable(AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS, expiredCerts, Arrays.asList(
                         new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.api.getId()),
                         new Column().header("API-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.api.getName()),
                         new Column().header("API-Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.api.getPath()),

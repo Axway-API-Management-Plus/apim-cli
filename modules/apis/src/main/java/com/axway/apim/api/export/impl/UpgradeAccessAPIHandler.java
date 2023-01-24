@@ -10,6 +10,7 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,18 +32,18 @@ public class UpgradeAccessAPIHandler extends APIResultHandler {
         if (referenceAPI == null) {
             throw new AppException("Reference API for upgrade is missing.", ErrorCode.UNKNOWN_API);
         }
-        System.out.println(apis.size() + " API(s) selected for upgrade based on reference/old API: " + referenceAPI.getName() + " " + referenceAPI.getVersion() + " (" + referenceAPI.getId() + ").");
-        System.out.println("Old/Reference API: deprecate: " + upgradeParams.getReferenceAPIDeprecate() + ", retired: " + upgradeParams.getReferenceAPIRetire() + ", retirementDate: " + getRetirementDate(upgradeParams.getReferenceAPIRetirementDate()));
+        Console.println(apis.size() + " API(s) selected for upgrade based on reference/old API: " + referenceAPI.getName() + " " + referenceAPI.getVersion() + " (" + referenceAPI.getId() + ").");
+        Console.println("Old/Reference API: deprecate: " + upgradeParams.getReferenceAPIDeprecate() + ", retired: " + upgradeParams.getReferenceAPIRetire() + ", retirementDate: " + getRetirementDate(upgradeParams.getReferenceAPIRetirementDate()));
         if (CoreParameters.getInstance().isForce()) {
-            System.out.println("Force flag given to upgrade: " + apis.size() + " API(s)");
+            Console.println("Force flag given to upgrade: " + apis.size() + " API(s)");
         } else {
             if (Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
             } else {
-                System.out.println("Canceled.");
+                Console.println("Canceled.");
                 return;
             }
         }
-        System.out.println("Okay, going to upgrade: " + apis.size() + " API(s) based on reference/old API: " + referenceAPI.getName() + " " + referenceAPI.getVersion() + " (" + referenceAPI.getId() + ").");
+        Console.println("Okay, going to upgrade: " + apis.size() + " API(s) based on reference/old API: " + referenceAPI.getName() + " " + referenceAPI.getVersion() + " (" + referenceAPI.getId() + ").");
         for (API api : apis) {
             try {
                 if (APIManagerAdapter.getInstance().apiAdapter.upgradeAccessToNewerAPI(api, referenceAPI,
@@ -53,7 +54,7 @@ public class UpgradeAccessAPIHandler extends APIResultHandler {
                 LOG.error("Error upgrading API: {} {} {} Error message:{}", api.getName(), api.getVersion(), api.getId(), e.getMessage());
             }
         }
-        System.out.println("Done!");
+        Console.println("Done!");
     }
 
     @Override

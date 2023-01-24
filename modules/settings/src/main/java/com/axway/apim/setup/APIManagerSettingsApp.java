@@ -13,6 +13,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
+import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.setup.adapter.JSONAPIManagerConfigAdapter;
 import com.axway.apim.setup.impl.APIManagerSetupResultHandler;
 import com.axway.apim.setup.impl.APIManagerSetupResultHandler.ResultHandler;
@@ -166,13 +167,13 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 	public static void main(String[] args) throws InvocationTargetException, IllegalAccessException {
 
 		if(args.length == 0){
-			System.out.println("Invalid arguments - prefix commandline param with \"settings get\"");
+			Console.println("Invalid arguments - prefix commandline param with \"settings get\"");
 			return;
 		}
 
 		String serviceName = args[1];
 		if (serviceName == null) {
-			System.out.println("Invalid arguments - prefix commandline param with \"settings get\"");
+			Console.println("Invalid arguments - prefix commandline param with \"settings get\"");
 			return;
 		}
 		for (final Method method : APIManagerSettingsApp.class.getDeclaredMethods()) {

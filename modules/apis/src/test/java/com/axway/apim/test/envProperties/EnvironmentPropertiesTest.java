@@ -61,7 +61,6 @@ public class EnvironmentPropertiesTest {
 	public void testEnvironementWithOSEnvVariables() throws IOException {
 		// For this test to run, the system must provide the environment properties CI & JAVA_HOME
 		EnvironmentProperties properties = new EnvironmentProperties("NOT_SET");
-		System.out.println(properties);
 		Assert.assertNotEquals(properties.get("variableFromOSEnvironmentVariable"), "${JAVA_HOME}");
 		String javaHome = System.getenv("JAVA_HOME");
 		if(javaHome == null){

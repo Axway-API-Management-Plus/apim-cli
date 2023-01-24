@@ -7,6 +7,7 @@ import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +23,9 @@ public class UnPublishAPIHandler extends APIResultHandler {
 	@Override
 	public void execute(List<API> apis) throws AppException {
 		APIStatusManager statusManager = new APIStatusManager();
-		System.out.println(apis.size() + " selected to unpublish.");
+		Console.println(apis.size() + " selected to unpublish.");
 		if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
-			System.out.println("Okay, going to unpublish: " + apis.size() + " API(s)");
+			Console.println("Okay, going to unpublish: " + apis.size() + " API(s)");
 			for(API api : apis) {
 				try {
 					statusManager.update(api, API.STATE_UNPUBLISHED, true);
@@ -33,7 +34,7 @@ public class UnPublishAPIHandler extends APIResultHandler {
 					LOG.error("Error un publishing API: {}" , api.getName());
 				}
 			}
-			System.out.println("Done!");
+			Console.println("Done!");
 		}
 	}
 

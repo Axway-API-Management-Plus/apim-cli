@@ -1,5 +1,6 @@
 package com.axway.apim.apiimport.lib.cli;
 
+import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.Option;
 
 import com.axway.apim.apiimport.lib.params.APIImportParams;
@@ -101,19 +102,19 @@ public class CLIAPIImportOptions extends CLIOptions {
 	@Override
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);		
-		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("How to import APIs");
-		System.out.println("Import an API including the API-Specification using environment properties file: env.api-env.properties:");
-		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config-api-specification.json -s api-env");
-		System.out.println(getBinaryName()+" api import -c samples/basic/minimal-config-api-specification-filtered.json -s api-env");
-		System.out.println(getBinaryName()+" api import -c samples/basic/odata-v2-northwind-api.json -s api-env");
-		System.out.println();
-		System.out.println();
-		System.out.println(getBinaryName()+" api import -c samples/complex/complete-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme");
-		System.out.println();
-		System.out.println("For more information and advanced examples please visit:");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/tree/develop/modules/api-import/assembly/samples");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
+		Console.println("----------------------------------------------------------------------------------------");
+		Console.println("How to import APIs");
+		Console.println("Import an API including the API-Specification using environment properties file: env.api-env.properties:");
+		Console.println(getBinaryName()+" api import -c samples/basic/minimal-config-api-specification.json -s api-env");
+		Console.println(getBinaryName()+" api import -c samples/basic/minimal-config-api-specification-filtered.json -s api-env");
+		Console.println(getBinaryName()+" api import -c samples/basic/odata-v2-northwind-api.json -s api-env");
+		Console.println();
+		Console.println();
+		Console.println(getBinaryName()+" api import -c samples/complex/complete-config.json -a ../petstore.json -h localhost -u apiadmin -p changeme");
+		Console.println();
+		Console.println("For more information and advanced examples please visit:");
+		Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/tree/develop/modules/api-import/assembly/samples");
+		Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
 	}
 
 	@Override

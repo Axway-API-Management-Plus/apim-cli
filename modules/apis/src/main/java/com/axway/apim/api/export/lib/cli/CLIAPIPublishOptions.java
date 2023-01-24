@@ -4,6 +4,7 @@ import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
+import com.axway.apim.lib.utils.rest.Console;
 
 public class CLIAPIPublishOptions extends CLIOptions {
 	
@@ -22,18 +23,18 @@ public class CLIAPIPublishOptions extends CLIOptions {
 
 	@Override
 	public void printUsage(String message, String[] args) {
-		super.printUsage(message, args);		
-		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("How to publish APIs using different filter options:");
-		System.out.println(getBinaryName()+" api publish -s api-env");
-		System.out.println(getBinaryName()+" api publish -s api-env -n \"*API*\"");
-		System.out.println(getBinaryName()+" api publish -s api-env -id f6106454-1651-430e-8a2f-e3514afad8ee");
-		System.out.println(getBinaryName()+" api publish -s api-env -policy \"*Policy ABC*\"");
-		System.out.println(getBinaryName()+" api publish -s api-env -name \"*API*\" -policy \"*Policy ABC*\"");
-		System.out.println();
-		System.out.println();
-		System.out.println("For more information and advanced examples please visit:");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
+		super.printUsage(message, args);
+		Console.println("----------------------------------------------------------------------------------------");
+		Console.println("How to publish APIs using different filter options:");
+		Console.println(getBinaryName()+" api publish -s api-env");
+		Console.println(getBinaryName()+" api publish -s api-env -n \"*API*\"");
+		Console.println(getBinaryName()+" api publish -s api-env -id f6106454-1651-430e-8a2f-e3514afad8ee");
+		Console.println(getBinaryName()+" api publish -s api-env -policy \"*Policy ABC*\"");
+		Console.println(getBinaryName()+" api publish -s api-env -name \"*API*\" -policy \"*Policy ABC*\"");
+		Console.println();
+		Console.println();
+		Console.println("For more information and advanced examples please visit:");
+		Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
 	}
 
 	@Override

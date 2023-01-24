@@ -1,5 +1,6 @@
 package com.axway.apim.api.export.lib.cli;
 
+import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.Option;
 
 import com.axway.apim.api.export.lib.params.APIGrantAccessParams;
@@ -40,15 +41,15 @@ public class CLIAPIGrantAccessOptions extends CLIOptions {
 	@Override
 	public void printUsage(String message, String[] args) {
 		super.printUsage(message, args);		
-		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("Grant access for selected organizations to one or more APIs.");
-		System.out.println("You can use all known API filters to select the desired APIs. However, only APIs that are in the Published status are considered.");
-		System.out.println(getBinaryName()+" api grant-access -s api-env -orgId <UUID-ID-OF-THE-ORG> -id <UUID-ID-OF-THE-API>");
-		System.out.println(getBinaryName()+" api grant-access -s api-env -orgName *MyOrg* -n *NameOfAPI*");
-		System.out.println();
-		System.out.println();
-		System.out.println("For more information and advanced examples please visit:");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
+		Console.println("----------------------------------------------------------------------------------------");
+		Console.println("Grant access for selected organizations to one or more APIs.");
+		Console.println("You can use all known API filters to select the desired APIs. However, only APIs that are in the Published status are considered.");
+		Console.println(getBinaryName()+" api grant-access -s api-env -orgId <UUID-ID-OF-THE-ORG> -id <UUID-ID-OF-THE-API>");
+		Console.println(getBinaryName()+" api grant-access -s api-env -orgName *MyOrg* -n *NameOfAPI*");
+		Console.println();
+		Console.println();
+		Console.println("For more information and advanced examples please visit:");
+		Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
 	}
 
 	@Override

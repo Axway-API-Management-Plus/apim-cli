@@ -8,6 +8,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ public class PublishAPIHandler extends APIResultHandler {
 	@Override
 	public void execute(List<API> apis) throws AppException {
 		APIStatusManager statusManager = new APIStatusManager();
-		System.out.println("Going to publish: " + apis.size() + " API(s)");
+		Console.println("Going to publish: " + apis.size() + " API(s)");
 		for(API api : apis) {
 			try {
 				statusManager.update(api, API.STATE_PUBLISHED, api.getVhost(), true);
@@ -31,7 +32,7 @@ public class PublishAPIHandler extends APIResultHandler {
 				LOG.error("Error publishing API: {} " , api.getName());
 			}
 		}
-		System.out.println("Done!");
+		Console.println("Done!");
 	}
 
 	@Override
