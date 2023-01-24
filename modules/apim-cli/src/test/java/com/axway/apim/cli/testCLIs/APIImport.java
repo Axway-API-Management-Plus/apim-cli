@@ -15,13 +15,13 @@ import com.axway.apim.cli.CLIServiceMethod;
  */
 public class APIImport implements APIMCLIServiceProvider {
 
-	public static void main(String args[]) { 
+	public static void main(String[] args) {
 		int rc = importAPI(args);
 		System.exit(rc);
 	}
 	
 	@CLIServiceMethod(name = "import", description = "Import APIs into the API-Manager")
-	public static int importAPI(String args[]) {
+	public static int importAPI(String[] args) {
 		return 0;
 	}
 

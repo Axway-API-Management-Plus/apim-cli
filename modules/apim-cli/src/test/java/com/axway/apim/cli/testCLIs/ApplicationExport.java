@@ -6,7 +6,6 @@ import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 
 public class ApplicationExport implements APIMCLIServiceProvider {
 
-	ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 
 	@Override
 	public String getName() {

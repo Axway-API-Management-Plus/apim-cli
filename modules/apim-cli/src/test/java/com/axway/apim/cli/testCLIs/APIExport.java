@@ -9,13 +9,13 @@ import com.axway.apim.cli.CLIServiceMethod;
  */
 public class APIExport implements APIMCLIServiceProvider {
 
-	public static void main(String args[]) { 
+	public static void main(String[] args) {
 		int rc = export(args);
 		System.exit(rc);
 	}
 	
 	@CLIServiceMethod(description = "Export APIs from the API-Manager")
-	public static int export(String args[]) {
+	public static int export(String[] args) {
 		return 0;
 	}
 	
