@@ -8,6 +8,7 @@ import com.axway.apim.api.apiSpecification.APISpecificationFactory;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.TestIndicator;
 import com.axway.apim.lib.utils.Utils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -349,6 +350,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
     public void setupParameters() throws AppException {
         APIManagerAdapter.deleteInstance();
+        TestIndicator.getInstance().setTestRunning(true);
         CoreParameters coreParameters = new CoreParameters();
         coreParameters.setHostname("localhost");
         coreParameters.setUsername("test");
