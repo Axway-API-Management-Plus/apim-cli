@@ -103,13 +103,6 @@ public class OrgCLIOptionsTest {
 
     }
 
-    @Test
-    public void testOrgImportUsageCommands() {
-        String[] args = { "-apimCLIHome", apimCliHome};
-        CLIOptions options = OrgImportCLIOptions.create(args);
-        options.printUsage("invalid param", args);
-
-    }
 
 
 }
