@@ -13,7 +13,6 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.setup.adapter.JSONAPIManagerConfigAdapter;
 import com.axway.apim.setup.impl.APIManagerSetupResultHandler;
 import com.axway.apim.setup.impl.APIManagerSetupResultHandler.ResultHandler;
@@ -22,9 +21,6 @@ import com.axway.apim.setup.lib.APIManagerSetupExportParams;
 import com.axway.apim.setup.lib.APIManagerSetupImportCLIOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 
@@ -162,31 +158,5 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 				APIManagerAdapter.deleteInstance();
 			} catch (AppException ignore) { }
 		}
-	}
-
-	public static void main(String[] args) throws InvocationTargetException, IllegalAccessException {
-
-		if(args.length == 0){
-			Console.println("Invalid arguments - prefix commandline param with \"settings get\"");
-			return;
-		}
-
-		String serviceName = args[1];
-		if (serviceName == null) {
-			Console.println("Invalid arguments - prefix commandline param with \"settings get\"");
-			return;
-		}
-		for (final Method method : APIManagerSettingsApp.class.getDeclaredMethods()) {
-			if (method.isAnnotationPresent(CLIServiceMethod.class)) {
-				CLIServiceMethod cliServiceMethod = method.getAnnotation(CLIServiceMethod.class);
-				String name = cliServiceMethod.name();
-				if (serviceName.equals(name)) {
-					LOG.info("Calling Operation {}" , method.getName());
-					int rc = (int) method.invoke(null, (Object) args);
-					System.exit(rc);
-				}
-			}
-		}
-		LOG.info("No matching method");
 	}
 }

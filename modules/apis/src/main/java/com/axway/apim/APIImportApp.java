@@ -39,11 +39,6 @@ import com.axway.apim.lib.utils.rest.APIMHttpClient;
 public class APIImportApp implements APIMCLIServiceProvider {
 
 	private static final Logger LOG = LoggerFactory.getLogger(APIImportApp.class);
-
-	public static void main(String[] args) {
-		int rc = importAPI(args);
-		System.exit(rc);
-	}
 	
 	@CLIServiceMethod(name = "import", description = "Import APIs into the API-Manager")
 	public static int importAPI(String[] args) {

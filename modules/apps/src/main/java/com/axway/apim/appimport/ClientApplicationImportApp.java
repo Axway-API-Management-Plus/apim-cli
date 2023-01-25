@@ -99,11 +99,4 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			} catch (AppException ignore) { }
 		}
 	}
-	
-	public static void main(String[] args) {
-		int rc = importApp(args);
-		System.exit(rc);
-	}
-
-
 }

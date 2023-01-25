@@ -67,14 +67,6 @@ public class APIExportAppTest extends WiremockWrapper {
     }
 
 
-
-    @Test
-    public void testMainNegative() throws InvocationTargetException, IllegalAccessException {
-        String[] args = {"api", "getAll", "-h", "localhost", "-n", "petstore"};
-        APIExportApp.main(args);
-        Assert.assertTrue(true);
-    }
-
     @Test
     public void testApproveAPIWithName() {
         String[] args = {"-h", "localhost", "-n", "petstore"};

@@ -9,53 +9,53 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RollbackHandler {
-	
-	static Logger LOG = LoggerFactory.getLogger(RollbackHandler.class);
-	
-	private static RollbackHandler instance;
-	
-	private final List<RollbackAction> rollbackActions;
 
-	private RollbackHandler() {
-		super();
-		rollbackActions = new ArrayList<>();
-	}
-	
-	public static RollbackHandler getInstance() {
-		if(instance==null) {
-			instance = new RollbackHandler();
-		}
-		return instance;
-	}	
-	
-	public static synchronized void deleteInstance () {
-		RollbackHandler.instance = null;
-	}
-	
-	public void addRollbackAction(RollbackAction action) {
-		rollbackActions.add(action);
-	}
-	
-	public void executeRollback() {
-		if(!CoreParameters.getInstance().isRollback()) {
-			LOG.info("Rollback is disabled.");
-			return;
-		}
-		if(rollbackActions.size()==0) return; // Nothing to roll back
-		rollbackActions.sort((first, second) -> {
-			if (first.getExecuteOrder() > second.getExecuteOrder()) {
-				return 1;
-			} else {
-				return -1;
-			}
-		});
-		for(RollbackAction action : rollbackActions) {
-			try {
-				action.rollback();
-			} catch (AppException e) {
-				LOG.error("Can't rollback ", e);
-			}
-		}
-		LOG.info("Rolled back: '"+rollbackActions+"'");
-	}
+    static Logger LOG = LoggerFactory.getLogger(RollbackHandler.class);
+
+    private static RollbackHandler instance;
+
+    private final List<RollbackAction> rollbackActions;
+
+    private RollbackHandler() {
+        super();
+        rollbackActions = new ArrayList<>();
+    }
+
+    public static RollbackHandler getInstance() {
+        if (instance == null) {
+            instance = new RollbackHandler();
+        }
+        return instance;
+    }
+
+    public static synchronized void deleteInstance() {
+        RollbackHandler.instance = null;
+    }
+
+    public void addRollbackAction(RollbackAction action) {
+        rollbackActions.add(action);
+    }
+
+    public void executeRollback() {
+        if (!CoreParameters.getInstance().isRollback()) {
+            LOG.info("Rollback is disabled.");
+            return;
+        }
+        if (rollbackActions.size() == 0) return; // Nothing to roll back
+        rollbackActions.sort((first, second) -> {
+            if (first.getExecuteOrder() > second.getExecuteOrder()) {
+                return 1;
+            } else {
+                return -1;
+            }
+        });
+        for (RollbackAction action : rollbackActions) {
+            try {
+                action.rollback();
+            } catch (AppException e) {
+                LOG.error("Can't rollback ", e);
+            }
+        }
+        LOG.info("Rolled back: {}", rollbackActions);
+    }
 }

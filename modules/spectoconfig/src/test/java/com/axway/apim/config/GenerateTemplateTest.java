@@ -126,11 +126,11 @@ public class GenerateTemplateTest {
     public void testLocalApiSpecJsonWithHttps() throws IOException {
 
         String[] args = {"template", "generate", "-c", "api-config.json", "-a", "https://localhost:8443/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey", "-o", "json"};
-        GenerateTemplate.generate(args);
+        int returnCode = GenerateTemplate.generate(args);
+        Assert.assertEquals(returnCode, 0);
         DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
         Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
         Assert.assertEquals("published", documentContext.read("$.state"));
         Assert.assertEquals("/api/v3", documentContext.read("$.path"));
-       // Assert.assertEquals(new File("openapi.json").exists(), true);
     }
 }

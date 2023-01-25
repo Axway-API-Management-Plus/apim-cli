@@ -1,32 +1,12 @@
 package com.axway.apim;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-
-import com.axway.apim.lib.utils.rest.Console;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.impl.APIResultHandler;
 import com.axway.apim.api.export.impl.APIResultHandler.APIListImpl;
-import com.axway.apim.api.export.lib.cli.CLIAPIApproveOptions;
-import com.axway.apim.api.export.lib.cli.CLIAPIDeleteOptions;
-import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
-import com.axway.apim.api.export.lib.cli.CLIAPIGrantAccessOptions;
-import com.axway.apim.api.export.lib.cli.CLIAPIUnpublishOptions;
-import com.axway.apim.api.export.lib.cli.CLIAPIUpgradeAccessOptions;
-import com.axway.apim.api.export.lib.cli.CLIChangeAPIOptions;
-import com.axway.apim.api.export.lib.cli.CLICheckCertificatesOptions;
-import com.axway.apim.api.export.lib.params.APIApproveParams;
-import com.axway.apim.api.export.lib.params.APIChangeParams;
-import com.axway.apim.api.export.lib.params.APICheckCertificatesParams;
-import com.axway.apim.api.export.lib.params.APIExportParams;
-import com.axway.apim.api.export.lib.params.APIGrantAccessParams;
-import com.axway.apim.api.export.lib.params.APIUpgradeAccessParams;
+import com.axway.apim.api.export.lib.cli.*;
+import com.axway.apim.api.export.lib.params.*;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
@@ -36,6 +16,10 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @author cwiechmann@axway.com
@@ -46,25 +30,6 @@ public class APIExportApp implements APIMCLIServiceProvider {
 
     static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 
-    public static void main(String[] args) throws InvocationTargetException, IllegalAccessException {
-        String serviceName = args[1];
-        if (serviceName == null) {
-            Console.println("Invalid arguments - prefix commandline param with \"api get\"");
-            return;
-        }
-        for (final Method method : APIExportApp.class.getDeclaredMethods()) {
-            if (method.isAnnotationPresent(CLIServiceMethod.class)) {
-                CLIServiceMethod cliServiceMethod = method.getAnnotation(CLIServiceMethod.class);
-                String name = cliServiceMethod.name();
-                if (serviceName.equals(name)) {
-                    LOG.info("Calling Operation {}" , method.getName());
-                    int rc = (int) method.invoke(null, (Object) args);
-                    System.exit(rc);
-                }
-            }
-        }
-        LOG.info("No matching method");
-    }
 
     @CLIServiceMethod(name = "get", description = "Get APIs from API-Manager in different formats")
     public static int exportAPI(String[] args) {

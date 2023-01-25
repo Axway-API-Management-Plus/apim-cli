@@ -223,13 +223,6 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
 
         return new APIConfig(api, apiSpecLocation, securityProfiles);
     }
-
-
-    public static void main(String[] args) {
-        int rc = generate(args);
-        System.exit(rc);
-    }
-
     private void addOutboundSecurityToAPI(API api, String backendAuthType) throws AppException {
         AuthType authType = null;
         try {
