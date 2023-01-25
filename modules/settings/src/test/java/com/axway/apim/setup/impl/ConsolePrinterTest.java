@@ -61,6 +61,31 @@ public class ConsolePrinterTest extends WiremockWrapper {
     }
 
     @Test
+    public void testConsoleExportRemoteHostsWide() throws AppException {
+        String[] args = {"-h", "localhost", "-c", "manager-config.json", "-type", "remotehosts","-wide"};
+        APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
+        ExportResult result = new ExportResult();
+        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
+        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        APIManagerConfig apiManagerConfig = new APIManagerConfig();
+        apiManagerConfig.setRemoteHosts(apimanagerAdapter.remoteHostsAdapter.getRemoteHosts(new RemoteHostFilter.Builder().build()));
+        exporter.export(apiManagerConfig);
+    }
+
+    @Test
+    public void testConsoleExportRemoteHostsUltra() throws AppException {
+        String[] args = {"-h", "localhost", "-c", "manager-config.json", "-type", "remotehosts","-ultra"};
+        APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
+        ExportResult result = new ExportResult();
+        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
+        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
+        APIManagerConfig apiManagerConfig = new APIManagerConfig();
+        apiManagerConfig.setRemoteHosts(apimanagerAdapter.remoteHostsAdapter.getRemoteHosts(new RemoteHostFilter.Builder().build()));
+        exporter.export(apiManagerConfig);
+    }
+
+
+    @Test
     public void testConsoleExportPolicesStandard() throws AppException {
         String[] args = {"-h", "localhost", "-c", "manager-config.json", "-type", "policies"};
         APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();

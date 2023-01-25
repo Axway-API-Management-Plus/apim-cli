@@ -39,4 +39,30 @@ public class CSVAppExporterTest extends WiremockWrapper {
         CSVAppExporter csvAppExporter = new CSVAppExporter(params, result);
         csvAppExporter.export(apps);
     }
+
+    @Test
+    public void tesCVSExportWide() throws AppException {
+        String[] args = {"-h", "localhost", "-wide"};
+        AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
+        APIManagerAdapter.deleteInstance();
+        ExportResult result = new ExportResult();
+        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
+        ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.CSV_EXPORTER, params, result);
+        List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
+        CSVAppExporter csvAppExporter = new CSVAppExporter(params, result);
+        csvAppExporter.export(apps);
+    }
+
+    @Test
+    public void tesCVSExportUltra() throws AppException {
+        String[] args = {"-h", "localhost", "-ultra"};
+        AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
+        APIManagerAdapter.deleteInstance();
+        ExportResult result = new ExportResult();
+        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
+        ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.CSV_EXPORTER, params, result);
+        List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
+        CSVAppExporter csvAppExporter = new CSVAppExporter(params, result);
+        csvAppExporter.export(apps);
+    }
 }
