@@ -1,7 +1,6 @@
 package com.axway.apim.appexport;
 
 import com.axway.apim.WiremockWrapper;
-import com.axway.apim.appexport.ApplicationExportApp;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -30,6 +29,13 @@ public class ApplicationExportAppTest extends WiremockWrapper {
     }
 
     @Test
+    public void exportInvalidApplication() {
+        String[] args = {"-h", "localhost", "-name", "Test App 2008 invalid"};
+        int returnCode = ApplicationExportApp.export(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
     public void exportApplications() {
         String[] args = {"-h", "localhost"};
         int returnCode = ApplicationExportApp.export(args);
@@ -39,6 +45,16 @@ public class ApplicationExportAppTest extends WiremockWrapper {
     @Test
     public void deleteApplication() {
         String[] args = {"-h", "localhost", "-name", "Test App 2008"};
+        String input = "Y";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+        int returnCode = ApplicationExportApp.delete(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
+    public void deleteApplicationInvalid() {
+        String[] args = {"-h", "localhost", "-name", "Test App 2008 Invalid"};
         String input = "Y";
         InputStream in = new ByteArrayInputStream(input.getBytes());
         System.setIn(in);

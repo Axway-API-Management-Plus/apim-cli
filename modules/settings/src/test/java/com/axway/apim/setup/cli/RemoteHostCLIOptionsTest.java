@@ -78,4 +78,11 @@ public class RemoteHostCLIOptionsTest {
         Assert.assertEquals(params.getStageConfig(), "myStagedSettings.json");
         Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
     }
+
+    @Test
+    public void testPrintMessage() throws AppException {
+        String[] args = {};
+        CLIOptions options = RemoteHostsExportCLIOptions.create(args);
+        options.printUsage("test", args);
+    }
 }

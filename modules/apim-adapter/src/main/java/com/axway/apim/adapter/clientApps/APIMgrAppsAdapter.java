@@ -175,7 +175,6 @@ public class APIMgrAppsAdapter {
             URI uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + APPLICATIONS).build();
             RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Load subscribed applications for API-ID: {} from API-Manager", apiId);
-            LOG.debug("Load subscribed applications URI: {}", uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 subscribedAppAPIManagerResponse.put(apiId, response);
@@ -371,7 +370,6 @@ public class APIMgrAppsAdapter {
             // Remove application from cache to force reload next time
             applicationsCache.remove(createdApp.getId());
             if (baseAppOnly) return;
-
             desiredApp.setId(createdApp.getId());
             saveImage(desiredApp, actualApp);
             saveAPIAccess(desiredApp, actualApp);
@@ -379,7 +377,6 @@ public class APIMgrAppsAdapter {
             manageOAuthResources(desiredApp, actualApp);
             manageAppPermissions(desiredApp, actualApp);
             saveQuota(desiredApp, actualApp);
-
         } catch (Exception e) {
             throw new AppException("Error creating/updating application. Error: " + e.getMessage(), ErrorCode.ERR_CREATING_APPLICATION, e);
         }
@@ -394,7 +391,6 @@ public class APIMgrAppsAdapter {
                 .build();
         RestAPICall apiCall = new POSTRequest(entity, uri);
         try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
-
             int statusCode = httpResponse.getStatusLine().getStatusCode();
             if (statusCode < 200 || statusCode > 299) {
                 LOG.error("Error saving/updating application image. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
@@ -415,14 +411,13 @@ public class APIMgrAppsAdapter {
             boolean update = false;
             FilterProvider filter;
             if (cred instanceof OAuth) {
-
                 endpoint = "oauth";
                 filter = new SimpleFilterProvider().setDefaultFilter(
                         SimpleBeanPropertyFilter.serializeAllExcept("credentialType", "clientId", "apiKey"));
                 final String credentialId = ((OAuth) cred).getClientId();
                 Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
                 if (opt.isPresent()) {
-                    LOG.info("Found oauth credential with same ID for application {}", actualApp.getId());
+                    LOG.info("Found oauth credential with same ID for application {}", actualApp != null ? actualApp.getId() : null);
                     //I found a credential with same id name but different in some properties, I have to update it
                     endpoint += "/" + credentialId;
                     update = true;
@@ -466,7 +461,6 @@ public class APIMgrAppsAdapter {
             } else {
                 throw new AppException("Unsupported credential: " + cred.getClass().getName(), ErrorCode.UNXPECTED_ERROR);
             }
-
             try {
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/" + endpoint).build();
                 mapper.setFilterProvider(filter);
@@ -646,10 +640,12 @@ public class APIMgrAppsAdapter {
         // finally iterate over all existing scopes and check if they are still desired
         for (ClientAppOauthResource existingScope : existingScopes) {
             boolean actualScopeFound = false;
-            for (ClientAppOauthResource desiredScope : desiredScopes) {
-                if (existingScope.getScope().equals(desiredScope.getScope())) {
-                    actualScopeFound = true;
-                    break; // As the actual scope is still desired
+            if( desiredScopes != null) {
+                for (ClientAppOauthResource desiredScope : desiredScopes) {
+                    if (existingScope.getScope().equals(desiredScope.getScope())) {
+                        actualScopeFound = true;
+                        break; // As the actual scope is still desired
+                    }
                 }
             }
             if (!actualScopeFound) scopes2Delete.add(existingScope);
@@ -699,10 +695,12 @@ public class APIMgrAppsAdapter {
         // finally iterate over all existing permissions and check if they are still desired
         for (ApplicationPermission existingPermission : existingPermissions) {
             boolean actualPermissionFound = false;
-            for (ApplicationPermission desiredPermission : desiredPermissions) {
-                if (existingPermission.getUsername().equals(desiredPermission.getUsername())) {
-                    actualPermissionFound = true;
-                    break; // As the actual scope is still desired
+            if (desiredPermissions != null) {
+                for (ApplicationPermission desiredPermission : desiredPermissions) {
+                    if (existingPermission.getUsername().equals(desiredPermission.getUsername())) {
+                        actualPermissionFound = true;
+                        break; // As the actual scope is still desired
+                    }
                 }
             }
             if (!actualPermissionFound) appPermissions2Delete.add(existingPermission);
@@ -777,7 +775,6 @@ public class APIMgrAppsAdapter {
             throw new AppException("Error deleting application", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
         }
     }
-
 
     public void setTestApiManagerResponse(ClientAppFilter filter, String apiManagerResponse) {
         this.apiManagerResponse.put(filter, apiManagerResponse);

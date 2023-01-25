@@ -3,7 +3,6 @@ package com.axway.apim.api.export.lib;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.impl.CheckCertificatesAPIHandler;
 import com.axway.apim.api.export.lib.params.APICheckCertificatesParams;
-import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
@@ -11,11 +10,10 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class CheckCertificatesAPIHandlerTest {
-    private APICheckCertificatesParams apiExportParams = new APICheckCertificatesParams();
+    private final APICheckCertificatesParams apiExportParams = new APICheckCertificatesParams();
 
 
     public  List<API> setup(){

@@ -59,6 +59,5 @@ public class JsonAPIExporterTest extends WiremockWrapper {
         assertEquals(documentContext.read("$.name", String.class), "petstore3");
         assertEquals(documentContext.read("$.outboundProfiles._default.requestPolicy", String.class), "Validate Size & Token");
         assertEquals(documentContext.read("$.outboundProfiles._default.responsePolicy", String.class), "Remove Header & Audit data");
-
     }
 }
