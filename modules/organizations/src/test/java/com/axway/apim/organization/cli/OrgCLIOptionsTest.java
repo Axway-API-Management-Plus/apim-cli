@@ -87,4 +87,29 @@ public class OrgCLIOptionsTest {
         Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
     }
 
+    @Test
+    public void testDeleteUsageCommands() {
+        String[] args = { "-apimCLIHome", apimCliHome};
+        CLIOptions options = OrgDeleteCLIOptions.create(args);
+        options.printUsage("invalid param", args);
+
+    }
+
+    @Test
+    public void testOrgExportUsageCommands() {
+        String[] args = { "-apimCLIHome", apimCliHome};
+        CLIOptions options = OrgExportCLIOptions.create(args);
+        options.printUsage("invalid param", args);
+
+    }
+
+    @Test
+    public void testOrgImportUsageCommands() {
+        String[] args = { "-apimCLIHome", apimCliHome};
+        CLIOptions options = OrgImportCLIOptions.create(args);
+        options.printUsage("invalid param", args);
+
+    }
+
+
 }

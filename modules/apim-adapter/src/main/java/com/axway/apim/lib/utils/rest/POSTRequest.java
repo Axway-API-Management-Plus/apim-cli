@@ -9,12 +9,9 @@ import org.apache.http.client.methods.HttpPost;
 import com.axway.apim.lib.errorHandling.AppException;
 
 public class POSTRequest extends RestAPICall {
-
 	public POSTRequest(HttpEntity entity, URI uri) {
 		super(entity, uri);
 	}
-	
-
 
 	@Override
 	public HttpResponse execute() throws AppException {

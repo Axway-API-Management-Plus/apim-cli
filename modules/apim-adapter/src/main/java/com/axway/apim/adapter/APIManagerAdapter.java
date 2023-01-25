@@ -193,10 +193,10 @@ public class APIManagerAdapter {
             } else if (role.equals("oadmin")) {
                 this.usingOrgAdmin = true;
             }
-        } catch (IOException | URISyntaxException | InterruptedException e) {
-            if (e instanceof InterruptedException)
-                Thread.currentThread().interrupt();
+        } catch (IOException | URISyntaxException e) {
             throw new AppException("Can't login to API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -288,13 +288,13 @@ public class APIManagerAdapter {
             try {
                 cacheConfigFile = new File(Utils.getInstallFolder() + "/conf/cacheConfig.xml");
                 if (cacheConfigFile.exists()) {
-                    LOG.debug("Using customer cache configuration file: " + cacheConfigFile);
+                    LOG.debug("Using customer cache configuration file: {}", cacheConfigFile);
                     cacheConfigUrl = cacheConfigFile.toURI().toURL();
                 } else {
                     cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
                 }
             } catch (MalformedURLException e1) {
-                LOG.trace("Error reading customer cache config file: " + cacheConfigFile + ". Using default configuration.");
+                LOG.trace("Error reading customer cache config file: {} Using default configuration.", cacheConfigFile);
                 cacheConfigUrl = APIManagerAdapter.class.getResource("/cacheConfig.xml");
             }
             XmlConfiguration xmlConfig = new XmlConfiguration(cacheConfigUrl);

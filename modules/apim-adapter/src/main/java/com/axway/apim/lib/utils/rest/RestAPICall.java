@@ -30,8 +30,6 @@ public abstract class RestAPICall {
 
     protected HttpHost target;
 
-    protected boolean logHTTPClientInfo = false;
-
     public RestAPICall(HttpEntity entity, URI uri) {
         super();
         this.entity = entity;
@@ -43,14 +41,11 @@ public abstract class RestAPICall {
     protected HttpResponse sendRequest(HttpUriRequest request) throws AppException {
         try {
             APIMHttpClient apimClient = APIMHttpClient.getInstance();
-            if (logHTTPClientInfo) {
-                LOG.info("Using APIM-Manager Client: {}", apimClient);
-                LOG.info("Send request: {} to: {}", this.getClass().getSimpleName(), request.getURI());
-            }
+            LOG.debug("Http verb:{} and URI: {}", request.getMethod(), request.getURI());
             if (apimClient.getCsrfToken() != null) request.addHeader("CSRF-Token", apimClient.getCsrfToken());
             return apimClient.getHttpClient().execute(request, apimClient.getClientContext());
         } catch (NoHttpResponseException e) {
-            throw new AppException("No response received for request: " + request.toString() + " from API-Manager within time limit. "
+            throw new AppException("No response received for request: " + request + " from API-Manager within time limit. "
                     + "Perhaps the API-Manager is overloaded or contains too many entities to process the request.", ErrorCode.UNXPECTED_ERROR, e);
         } catch (IOException e) {
             throw new AppException("Unable to send HTTP-Request.", ErrorCode.CANT_SEND_HTTP_REQUEST, e);

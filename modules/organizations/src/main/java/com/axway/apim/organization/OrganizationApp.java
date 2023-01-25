@@ -190,11 +190,4 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			return result;
 		}
 	}
-
-	public static void main(String[] args) {
-		int rc = exportOrgs(args);
-		System.exit(rc);
-	}
-
-
 }

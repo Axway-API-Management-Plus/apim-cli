@@ -1,12 +1,7 @@
 package com.axway.apim.lib.utils;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -19,21 +14,24 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.*;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
 public class HTTPClient implements AutoCloseable {
-	
-	private URI url;
-	private String password;
-	private String username;
+	static Logger LOG = LoggerFactory.getLogger(HTTPClient.class);
+
+	private final URI url;
+	private final String password;
+	private final String username;
 	
 	private CloseableHttpClient httpClient = null;
 	
@@ -84,6 +82,7 @@ public class HTTPClient implements AutoCloseable {
 		try {
 			this.httpClient.close();
 		} catch (IOException e) {
+			LOG.error("error closing http client", e);
 		}
 	}
 }
