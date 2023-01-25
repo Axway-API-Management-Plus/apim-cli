@@ -12,7 +12,7 @@
         <!--        </File>-->
     </Appenders>
     <Loggers>
-        <Logger name="com.axway.apim" level="${env:LOG_LEVEL:-info}"/>
+        <Logger name="com.axway.apim" level="${env:LOG_LEVEL:-debug}"/>
         <Logger name="com.consol.citrus" level="info"/>
         <Logger name="org.apache" level="info"/>
         <Logger name="org.ehcache" level="error"/>
