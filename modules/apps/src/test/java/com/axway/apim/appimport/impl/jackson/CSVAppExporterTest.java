@@ -29,7 +29,7 @@ public class CSVAppExporterTest extends WiremockWrapper {
 
     @Test
     public void tesCVSExport() throws AppException {
-        String[] args = {"-h", "localhost"};
+        String[] args = {"-h", "localhost", "-deleteTarget"};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
         APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
@@ -42,7 +42,7 @@ public class CSVAppExporterTest extends WiremockWrapper {
 
     @Test
     public void tesCVSExportWide() throws AppException {
-        String[] args = {"-h", "localhost", "-wide"};
+        String[] args = {"-h", "localhost", "-wide", "-deleteTarget"};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
         APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
@@ -55,7 +55,7 @@ public class CSVAppExporterTest extends WiremockWrapper {
 
     @Test
     public void tesCVSExportUltra() throws AppException {
-        String[] args = {"-h", "localhost", "-ultra"};
+        String[] args = {"-h", "localhost", "-ultra", "-deleteTarget"};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
         APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
