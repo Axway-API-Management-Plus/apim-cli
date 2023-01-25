@@ -61,7 +61,7 @@ public enum ErrorCode {
 	ERR_CREATING_APPLICATION			(95, "Error creating/updating an application.", false),
 	ERR_PUBLISH_API					(96, "API could not be changed to publish state", false),
 	ERR_UNPUBSLISH_API					(97, "API could not be changed to unpublish state", false),
-	UNXPECTED_ERROR						(99, "An unexpected error occured.", true),
+	UNXPECTED_ERROR						(99, "An unexpected error occurred.", true),
 	CHECK_CERTS_UNXPECTED_ERROR			(100, "There was an unexpected error checking the expiration date of certificates.", false),
 	CHECK_CERTS_FOUND_CERTS				(101, "Certificates found that will expire within the given number of days.", false);
 

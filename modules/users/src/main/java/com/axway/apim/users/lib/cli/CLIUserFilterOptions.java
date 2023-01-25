@@ -10,7 +10,7 @@ import com.axway.apim.users.lib.params.UserFilterParams;
 
 public class CLIUserFilterOptions extends CLIOptions {
 	
-	private CLIOptions cliOptions;
+	private final CLIOptions cliOptions;
 
 	public CLIUserFilterOptions(CLIOptions cliOptions) {
 		super();
@@ -36,7 +36,7 @@ public class CLIUserFilterOptions extends CLIOptions {
 	}
 
 	@Override
-	public void parse() {
+	public void parse() throws AppException{
 		cliOptions.parse();
 	}
 

@@ -64,7 +64,7 @@ public class StandardExportCLIOptions extends CLIOptions {
     }
 
     @Override
-    public void parse() {
+    public void parse() throws AppException {
         cliOptions.parse();
     }
 

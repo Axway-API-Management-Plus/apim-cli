@@ -15,7 +15,7 @@ public class CLIAPIUpgradeAccessOptions extends CLIOptions {
 		super(args);
 	}
 	
-	public static CLIOptions create(String[] args) {
+	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new CLIAPIUpgradeAccessOptions(args);
 		cliOptions = new CLIAPIFilterOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);

@@ -15,9 +15,9 @@ import java.util.*;
 
 public class CLIAPIFilterOptions extends CLIOptions {
 	
-	private static Logger LOG = LoggerFactory.getLogger(CLIAPIFilterOptions.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CLIAPIFilterOptions.class);
 	
-	private CLIOptions cliOptions;
+	private final CLIOptions cliOptions;
 
 	public CLIAPIFilterOptions(CLIOptions cliOptions) {
 		super();
@@ -111,7 +111,7 @@ public class CLIAPIFilterOptions extends CLIOptions {
 	}
 
 	@Override
-	public void parse() {
+	public void parse() throws AppException {
 		cliOptions.parse();
 	}
 

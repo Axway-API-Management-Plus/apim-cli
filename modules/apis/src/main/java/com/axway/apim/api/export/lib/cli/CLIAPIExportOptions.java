@@ -1,5 +1,6 @@
 package com.axway.apim.api.export.lib.cli;
 
+import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.Option;
 
@@ -15,7 +16,7 @@ public class CLIAPIExportOptions extends CLIOptions {
 		super(args);
 	}
 	
-	public static CLIOptions create(String[] args) {
+	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new CLIAPIExportOptions(args);
 		cliOptions = new CLIAPIFilterOptions(cliOptions);
 		cliOptions = new StandardExportCLIOptions(cliOptions);

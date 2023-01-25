@@ -4,6 +4,7 @@ import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportCLIOptions;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.organization.lib.cli.CLIOrgFilterOptions;
 
@@ -13,7 +14,7 @@ public class OrgExportCLIOptions extends CLIOptions {
         super(args);
     }
 
-    public static CLIOptions create(String[] args) {
+    public static CLIOptions create(String[] args) throws AppException {
         CLIOptions cliOptions = new OrgExportCLIOptions(args);
         cliOptions = new CLIOrgFilterOptions(cliOptions);
         cliOptions = new StandardExportCLIOptions(cliOptions);

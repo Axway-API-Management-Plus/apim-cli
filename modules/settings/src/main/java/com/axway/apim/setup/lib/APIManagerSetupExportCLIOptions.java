@@ -3,6 +3,7 @@ package com.axway.apim.setup.lib;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.StandardExportCLIOptions;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.Option;
 
@@ -12,7 +13,7 @@ public class APIManagerSetupExportCLIOptions extends CLIOptions {
 		super(args);
 	}
 	
-	public static CLIOptions create(String[] args) {
+	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new APIManagerSetupExportCLIOptions(args);
 		cliOptions = new StandardExportCLIOptions(cliOptions);
 		cliOptions = new CoreCLIOptions(cliOptions);

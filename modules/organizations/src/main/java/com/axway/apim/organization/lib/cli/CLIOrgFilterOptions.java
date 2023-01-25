@@ -10,7 +10,7 @@ import com.axway.apim.organization.lib.OrgFilterParams;
 
 public class CLIOrgFilterOptions extends CLIOptions {
 	
-	private CLIOptions cliOptions;
+	private final CLIOptions cliOptions;
 
 	public CLIOrgFilterOptions(CLIOptions cliOptions) {
 		super();
@@ -28,7 +28,7 @@ public class CLIOrgFilterOptions extends CLIOptions {
 	}
 
 	@Override
-	public void parse() {
+	public void parse() throws AppException{
 		cliOptions.parse();
 	}
 

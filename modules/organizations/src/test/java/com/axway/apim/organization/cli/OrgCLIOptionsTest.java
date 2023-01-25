@@ -22,14 +22,15 @@ import java.nio.file.Paths;
 public class OrgCLIOptionsTest {
 
     private String apimCliHome;
+
     @BeforeClass
     private void init() throws IOException, URISyntaxException {
         URI uri = this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI();
-        apimCliHome =  Paths.get(uri) + File.separator + "apimcli";
+        apimCliHome = Paths.get(uri) + File.separator + "apimcli";
         String confPath = String.valueOf(Files.createDirectories(Paths.get(apimCliHome + "/conf")).toAbsolutePath());
         try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("env.properties");
-             OutputStream outputStream= Files.newOutputStream(new File(confPath, "env.properties").toPath())){
-            IOUtils.copy(inputStream,outputStream );
+             OutputStream outputStream = Files.newOutputStream(new File(confPath, "env.properties").toPath())) {
+            IOUtils.copy(inputStream, outputStream);
         }
     }
 
@@ -88,21 +89,24 @@ public class OrgCLIOptionsTest {
     }
 
     @Test
-    public void testDeleteUsageCommands() {
-        String[] args = { "-apimCLIHome", apimCliHome};
+    public void testDeleteUsageCommands() throws AppException {
+        String[] args = {"-apimCLIHome", apimCliHome};
         CLIOptions options = OrgDeleteCLIOptions.create(args);
         options.printUsage("invalid param", args);
-
     }
 
     @Test
-    public void testOrgExportUsageCommands() {
-        String[] args = { "-apimCLIHome", apimCliHome};
+    public void testOrgExportUsageCommands() throws AppException {
+        String[] args = {"-apimCLIHome", apimCliHome};
         CLIOptions options = OrgExportCLIOptions.create(args);
         options.printUsage("invalid param", args);
-
     }
 
-
-
+    @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required option: c")
+    public void testOrgImportUsageCommands() throws AppException {
+        String[] args = {"-apimCLIHome", apimCliHome};
+        CLIOptions options = OrgImportCLIOptions.create(args);
+        OrgImportParams params = (OrgImportParams) options.getParams();
+        params.validateRequiredParameters();
+    }
 }
