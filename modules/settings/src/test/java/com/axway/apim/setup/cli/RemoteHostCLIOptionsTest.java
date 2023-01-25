@@ -5,6 +5,7 @@ import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.setup.lib.APIManagerSetupExportCLIOptions;
 import com.axway.apim.setup.lib.APIManagerSetupImportCLIOptions;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportCLIOptions;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportParams;
@@ -80,9 +81,25 @@ public class RemoteHostCLIOptionsTest {
     }
 
     @Test
-    public void testPrintMessage() throws AppException {
+    public void testPrintMessageRemoteHost() throws AppException {
         String[] args = {};
         CLIOptions options = RemoteHostsExportCLIOptions.create(args);
         options.printUsage("test", args);
     }
+
+    @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required option: c")
+    public void testPrintMessagesApiManagerImportSetup() throws AppException {
+        String[] args = {};
+        CLIOptions options = APIManagerSetupImportCLIOptions.create(args);
+        options.printUsage("test", args);
+    }
+
+    @Test
+    public void testPrintMessagesApiManagerExportSetup() throws AppException {
+        String[] args = {};
+        CLIOptions options = APIManagerSetupExportCLIOptions.create(args);
+        options.printUsage("test", args);
+    }
+
+
 }
