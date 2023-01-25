@@ -267,8 +267,20 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     }
 
     @Test
-    public void getAPIDatFile() {
-
+    public void getAPIDatFile() throws AppException {
+        setupParameters();
+        APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
+        Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName("orga");
+        API api = new API();
+        api.setName("petstore");
+        api.setPath("/api/v3");
+        api.setVersion("1.1");
+        api.setDescriptionType("original");
+        api.setSummary("Petstore api");
+        api.setState("published");
+        api.setOrganization(organization);
+        byte[] apiExportDat = apiManagerAPIAdapter.getAPIDatFile(api, Utils.getEncryptedPassword());
+        Assert.assertNotNull(apiExportDat);
     }
 
     @Test
@@ -294,7 +306,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     }
 
     @Test
-    public void updateRetirementDate() throws AppException {
+    public void updateRetirementDateDoNothing() throws AppException {
         setupParameters();
         APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
         Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName("orga");
@@ -305,6 +317,30 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         api.setDescriptionType("original");
         api.setSummary("Petstore api");
         api.setState("unpublished");
+        api.setOrganization(organization);
+        api.setId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, 30);
+
+        try {
+            apiManagerAPIAdapter.updateRetirementDate(api, calendar.getTimeInMillis());
+        } catch (AppException e) {
+            Assert.fail("Unable to update Retirement status", e);
+        }
+    }
+
+    @Test
+    public void updateRetirementDate() throws AppException {
+        setupParameters();
+        APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
+        Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName("orga");
+        API api = new API();
+        api.setName("petstore");
+        api.setPath("/api/v3");
+        api.setVersion("1.1");
+        api.setDescriptionType("original");
+        api.setSummary("Petstore api");
+        api.setState("deprecated");
         api.setOrganization(organization);
         api.setId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
         Calendar calendar = Calendar.getInstance();
@@ -333,6 +369,27 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         ClassLoader classLoader = this.getClass().getClassLoader();
         String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec/").getFile();
         APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("openapi.json", specDirPath, "petstore");
+        api.setApiDefinition(apiSpecification);
+        API importedAPI = apiManagerAPIAdapter.importBackendAPI(api);
+        Assert.assertNotNull(importedAPI);
+    }
+
+    @Test
+    public void importBackendAPIWsdl() throws AppException {
+        setupParameters();
+        APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
+        Organization organization = APIManagerAdapter.getInstance().orgAdapter.getOrgForName("orga");
+        API api = new API();
+        api.setName("petstore");
+        api.setPath("/api/v3");
+        api.setVersion("1.1");
+        api.setDescriptionType("original");
+        api.setSummary("Petstore api");
+        api.setState("unpublished");
+        api.setOrganization(organization);
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec/").getFile();
+        APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("sample.wsdl", specDirPath, "wsdl");
         api.setApiDefinition(apiSpecification);
         API importedAPI = apiManagerAPIAdapter.importBackendAPI(api);
         Assert.assertNotNull(importedAPI);
