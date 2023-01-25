@@ -7,7 +7,6 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 
 public class APIExportAppTest extends WiremockWrapper {
@@ -32,6 +31,36 @@ public class APIExportAppTest extends WiremockWrapper {
     @Test
     public void testExportAPIWithId() {
         String[] args = {"-h", "localhost", "-id", "e4ded8c8-0a40-4b50-bc13-552fb7209150"};
+        int returnCode = APIExportApp.exportAPI(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
+    public void testExportApiCsv() {
+        String[] args = {"-h", "localhost", "-o", "csv", "-deleteTarget"};
+        int returnCode = APIExportApp.exportAPI(args);
+        Assert.assertEquals(returnCode, 0);
+
+    }
+
+    @Test
+    public void testExportApiJson() {
+        String[] args = {"-h", "localhost", "-o", "json", "-id", "e4ded8c8-0a40-4b50-bc13-552fb7209150", "-deleteTarget"};
+        int returnCode = APIExportApp.exportAPI(args);
+        Assert.assertEquals(returnCode, 0);
+
+    }
+
+    @Test
+    public void testExportApiDat() {
+        String[] args = {"-h", "localhost", "-id", "e4ded8c8-0a40-4b50-bc13-552fb7209150", "-o", "dat", "-deleteTarget"};
+        int returnCode = APIExportApp.exportAPI(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
+    public void testExportDefault() {
+        String[] args = {"-h", "localhost", "-deleteTarget"};
         int returnCode = APIExportApp.exportAPI(args);
         Assert.assertEquals(returnCode, 0);
     }
@@ -99,8 +128,9 @@ public class APIExportAppTest extends WiremockWrapper {
         int returnCode = APIExportApp.grantAccess(args);
         Assert.assertEquals(returnCode, 0);
     }
+
     @Test
-    public void testCheckCertificates(){
+    public void testCheckCertificates() {
         String[] args = {"-h", "localhost", "-n", "petstore", "-days", "1000"};
         int returnCode = APIExportApp.checkCertificates(args);
         Assert.assertEquals(returnCode, 101);
