@@ -5,8 +5,13 @@ import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.errorHandling.AppException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RollbackAPIProxy extends AbstractRollbackAction implements RollbackAction {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RollbackAPIProxy.class);
+
 
     /**
      * This is the API to be deleted
