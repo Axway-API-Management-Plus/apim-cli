@@ -31,17 +31,29 @@ public class APISpecificationOpenAPI3xTest {
 	}
 
 	@Test
-	public void backendHostAndBasePath() throws IOException {
+	public void keepOneUrlInOpenApiServers() throws IOException {
 
 		byte[] content = getSwaggerContent(TEST_PACKAGE + "/petstore-openapi30.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
-		
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
 		Assert.assertEquals(apiDefinition.getDescription(), "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.");
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
+	}
+
+	@Test
+	public void replaceServerURLIfHostNameIsNotPresent() throws IOException {
+
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
+		// Check if the Swagger-File has been changed
+		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
+		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
+		Assert.assertEquals("https://myhost.customer.com:8767/api/v3", swagger.get("servers").get(0).get("url").asText());
 	}
 	
 	@Test
@@ -49,10 +61,10 @@ public class APISpecificationOpenAPI3xTest {
 		APIManagerAdapter.apiManagerVersion="7.7.0";
 		byte[] content = getSwaggerContent(TEST_PACKAGE + "/psd2-api_1.3.6_errata20200327.yaml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
-		
-		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
+
+		// Check if the Swagger-File has been changed
 		JsonNode swagger = ymlMapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals( swagger.get("servers").size(), 1, "Expected to get only one server url");
 	}
