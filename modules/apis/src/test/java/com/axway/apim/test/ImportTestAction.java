@@ -184,8 +184,11 @@ public class ImportTestAction extends AbstractTestAction {
 		try {
 			if(inputFile.exists()) { 
 				is = Files.newInputStream(Paths.get(pathToFile));
+				LOG.info("Loading file {} from relative path", pathToFile);
 			} else {
 				is = this.getClass().getResourceAsStream(pathToFile);
+				LOG.info("Loading file {} from class path", pathToFile);
+
 			}
 			if(is == null) {
 				throw new IOException("Unable to read swagger file from: " + pathToFile);
