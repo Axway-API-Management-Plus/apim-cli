@@ -63,7 +63,7 @@ public class ImportCompleteApplicationTestIT extends TestNGCitrusTestRunner impl
 		
 		echo("####### Validate application: '${appName}' with id: ${appId} quota has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/applications/${appId}/quota").header("Content-Type", "application/json"));
-		sleep(10000);
+		sleep(30000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.type", "APPLICATION")
 				.validate("$.restrictions[*].api", "@assertThat(hasSize(1))@")

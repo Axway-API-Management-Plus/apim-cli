@@ -87,19 +87,19 @@ public class OAS3xSpecification extends APISpecification {
     public void configureBasePath(String backendBasePath, API api) throws AppException {
         if (!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
         try {
-            if (backendBasePath != null) {
-                if (openAPI.has("servers")) {
-                    ArrayNode servers = (ArrayNode) openAPI.get("servers");
-                    if (!servers.isEmpty()) {
-                        // Remove remaining server nodes
-                        for (int i = 1; i < servers.size(); i++) {
-                            servers.remove(i);
-                        }
-                        JsonNode server = servers.get(0); // takes the first entity -- currently not handling multiple URLs
+            if (openAPI.has("servers")) {
+                ArrayNode servers = (ArrayNode) openAPI.get("servers");
+                if (!servers.isEmpty()) {
+                    // Remove remaining server nodes as  currently not handling multiple URLs
+                    for (int i = 1; i < servers.size(); i++) {
+                        servers.remove(i);
+                    }
+                    if (backendBasePath != null) {
+                        JsonNode server = servers.get(0);
                         JsonNode urlJsonNode = server.get("url");
                         if (urlJsonNode != null) {
                             String serverUrl = urlJsonNode.asText();
-                            if (!serverUrl.startsWith("http")) {
+                            if (!serverUrl.startsWith("http")) { // If url does not have hostname, add hostname from backendBasePath
                                 backendBasePath = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
                                 LOG.info("Updating openapi Servers url with value : {}", backendBasePath);
                                 ObjectNode newServer = createObjectNode("url", backendBasePath);
@@ -107,13 +107,15 @@ public class OAS3xSpecification extends APISpecification {
                             }
                         }
                     }
-                }else {
+                }
+            }else {
+                if(backendBasePath != null) {
                     ObjectNode newServer = createObjectNode("url", backendBasePath);
                     ((ObjectNode) openAPI).set("servers", mapper.createArrayNode().add(newServer));
                     LOG.warn("Adding openapi Servers url with value : {}", backendBasePath);
                 }
-                this.apiSpecificationContent = this.mapper.writeValueAsBytes(openAPI);
             }
+            this.apiSpecificationContent = this.mapper.writeValueAsBytes(openAPI);
         } catch (Exception e) {
             LOG.error("Cannot replace host in provided Open API. Continue with given host.", e);
         }
