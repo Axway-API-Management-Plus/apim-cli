@@ -274,6 +274,8 @@ public class APIManagerAPIAdapter {
         String backendBasePath = null;
         try {
             backendBasePath = api.getServiceProfiles().get("_default").getBasePath();
+            if(backendBasePath.contains("${env")) // issue #332
+                return;
             URL url = new URL(backendBasePath);
             RemoteHost remoteHost = APIManagerAdapter.getInstance().remoteHostsAdapter.getRemoteHost(url.getHost(), url.getPort());
             api.setRemotehost(remoteHost);
