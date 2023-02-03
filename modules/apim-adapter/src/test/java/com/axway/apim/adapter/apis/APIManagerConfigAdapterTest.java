@@ -35,11 +35,6 @@ public class APIManagerConfigAdapterTest {
 		Assert.assertNotNull(ignoreFields);
 		Assert.assertEquals(ignoreFields.length, 4); // Only brand new fields are returned to be ignored
 
-		APIManagerAdapter.apiManagerVersion = "7.6.2";
-		ignoreFields = APIManagerConfigAdapter.ConfigFields.getIgnoredFields();
-		Assert.assertNotNull(ignoreFields);
-		// 7.6.2 doesn't support all of the new fields
-		Assert.assertEquals(ignoreFields.length, 13);
 	}
 	
 	@Test

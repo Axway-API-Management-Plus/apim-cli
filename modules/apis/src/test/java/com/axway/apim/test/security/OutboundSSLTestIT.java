@@ -39,7 +39,7 @@ public class OutboundSSLTestIT extends TestNGCitrusTestRunner {
 		echo("####### Validate API: '${apiName}' has a been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
 		
-		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5") || APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
 			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 				.validate("$.[?(@.path=='${apiPath}')].state", "${state}")
@@ -89,7 +89,7 @@ public class OutboundSSLTestIT extends TestNGCitrusTestRunner {
 		echo("####### Validate the Client-Certificate has been updated #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").name("api").header("Content-Type", "application/json"));
 		
-		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5") || APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) { 
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.[?(@.id=='${apiId}')].name", "${apiName}")
 				.validate("$.[?(@.id=='${apiId}')].state", "${state}")

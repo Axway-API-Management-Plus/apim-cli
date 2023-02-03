@@ -69,7 +69,7 @@ public class AuthenticationProfile {
             // Passwords are no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
             Object otherPassword = null;
             Object thisPassword = null;
-            if (APIManagerAdapter.hasAPIManagerVersion("7.7 SP1") || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
+            if (APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
                 // Empty password handling - Make sure, there is a password set
                 if (!thisParameters.containsKey("password") || thisParameters.get("password") == null)
                     thisParameters.put("password", "");

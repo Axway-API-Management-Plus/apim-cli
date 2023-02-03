@@ -52,8 +52,8 @@ public class ExportAPI {
                     && defaultProfile.getAuthenticationProfile().equals("_default")
                     && defaultProfile.getRequestPolicy() == null
                     && defaultProfile.getResponsePolicy() == null
-                    && (APIManagerAdapter.hasAPIManagerVersion("7.6.2") && defaultProfile.getFaultHandlerPolicy() == null)
-            ) return null;
+                    && defaultProfile.getFaultHandlerPolicy() == null)
+                return null;
         }
         for (OutboundProfile profile : this.actualAPIProxy.getOutboundProfiles().values()) {
             profile.setApiId(null);
@@ -68,7 +68,7 @@ public class ExportAPI {
 
     public List<SecurityProfile> getSecurityProfiles() throws AppException {
         if (this.actualAPIProxy.getSecurityProfiles().size() == 1) {
-            if(this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().size() == 0)
+            if (this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().size() == 0)
                 return null;
             if (this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().get(0).getType() == DeviceType.passThrough)
                 return null;
@@ -306,7 +306,7 @@ public class ExportAPI {
     @JsonProperty("apiSpecification")
     public DesiredAPISpecification getApiDefinitionImport() {
         DesiredAPISpecification spec = new DesiredAPISpecification();
-        if( this.getAPIDefinition() instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKED_URL) {
+        if (this.getAPIDefinition() instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKED_URL) {
             spec.setResource(actualAPIProxy.getBackendImportedUrl());
         } else
             spec.setResource(this.getAPIDefinition().getApiSpecificationFile());

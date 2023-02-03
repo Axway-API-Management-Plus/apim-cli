@@ -2,7 +2,6 @@ package com.axway.apim.adapter;
 
 import com.axway.apim.adapter.apis.*;
 import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
-import com.axway.apim.adapter.customProperties.APIManager762CustomPropertiesAdapter;
 import com.axway.apim.adapter.customProperties.APIManagerCustomPropertiesAdapter;
 import com.axway.apim.adapter.user.APIManagerUserAdapter;
 import com.axway.apim.api.model.CaCert;
@@ -151,7 +150,7 @@ public class APIManagerAdapter {
                 LOG.info("Organization Administrator Self Service Enabled : {}", config.getOadminSelfServiceEnabled());
         }
         // For now this okay, may be replaced with a Factory later
-        this.customPropertiesAdapter = (hasAPIManagerVersion("7.7")) ? new APIManagerCustomPropertiesAdapter() : new APIManager762CustomPropertiesAdapter();
+        this.customPropertiesAdapter = new APIManagerCustomPropertiesAdapter();
         this.alertsAdapter = new APIManagerAlertsAdapter();
         this.remoteHostsAdapter = new APIManagerRemoteHostsAdapter();
         this.apiAdapter = new APIManagerAPIAdapter();
@@ -245,7 +244,7 @@ public class APIManagerAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/currentuser").build();
             GETRequest currentUserRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) currentUserRequest.execute()) {
-                getCsrfToken(httpResponse); // Starting from 7.6.2 SP3 the CSRF token is returned on CurrentUser request
+                getCsrfToken(httpResponse);
                 String currentUser = EntityUtils.toString(httpResponse.getEntity());
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 200) {

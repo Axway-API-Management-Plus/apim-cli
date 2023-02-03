@@ -79,17 +79,7 @@ public class APIFilterTest {
 		Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
 		Assert.assertEquals(filter.getFilters().get(2).getValue(), "/v1/api");
 	}
-	
-	@Test
-	public void filterWithPathOn762() {
-		// For this test, we must simulate API-Manager version >7.7
-		APIManagerAdapter.apiManagerVersion = "7.6.2 SP4";
-		APIFilter filter = new APIFilter.Builder()
-				.hasApiPath("/v1/api")
-				.build();
-		Assert.assertEquals(filter.getFilters().size(), 0);
-		Assert.assertEquals(filter.getApiPath(), "/v1/api");
-	}
+
 	
 	@Test
 	public void filterWithName() {

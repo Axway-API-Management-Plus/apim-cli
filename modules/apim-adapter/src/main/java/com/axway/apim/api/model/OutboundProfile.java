@@ -140,8 +140,7 @@ public class OutboundProfile extends Profile {
             OutboundProfile otherOutboundProfile = (OutboundProfile) other;
             List<Object> otherParameters = otherOutboundProfile.getParameters();
             List<Object> thisParameters = this.getParameters();
-            if (APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")
-                    || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
+            if (APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
                 // Passwords no longer exposed by API-Manager REST-API - Can't use it anymore to
                 // compare the state
                 if (otherParameters != null)

@@ -811,14 +811,7 @@ public class APIManagerAPIAdapter {
     }
 
     private JsonNode importFromSwagger(API api) throws URISyntaxException, IOException {
-        URI uri;
-        if (APIManagerAdapter.hasAPIManagerVersion("7.6.2")) {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/import/").build();
-        } else {
-            // Not sure, if 7.5.3 still needs it that way!
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/import/")
-                    .setParameter("field", "name").setParameter("op", "eq").setParameter("value", "API Development").build();
-        }
+        URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/import/").build();
         try {
             HttpEntity entity = MultipartEntityBuilder.create()
                     .addTextBody("name", api.getName(), ContentType.create("text/plain", StandardCharsets.UTF_8))

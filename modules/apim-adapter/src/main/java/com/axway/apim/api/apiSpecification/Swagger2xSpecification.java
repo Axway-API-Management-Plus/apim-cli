@@ -87,6 +87,9 @@ public class Swagger2xSpecification extends APISpecification {
         }
         try {
             if (backendBasePath != null) {
+                if (backendBasePath.contains("${env")) { // issue #332
+                    return;
+                }
                 URL url = new URL(backendBasePath);
                 String port = url.getPort() == -1 ? ":" + url.getDefaultPort() : ":" + url.getPort();
                 if (port.equals(":443") || port.equals(":80")) port = "";

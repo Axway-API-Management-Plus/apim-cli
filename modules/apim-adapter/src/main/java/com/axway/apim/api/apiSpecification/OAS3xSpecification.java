@@ -94,7 +94,7 @@ public class OAS3xSpecification extends APISpecification {
                     for (int i = 1; i < servers.size(); i++) {
                         servers.remove(i);
                     }
-                    if (backendBasePath != null) {
+                    if (backendBasePath != null && !backendBasePath.contains("${env")) { // issue #332
                         JsonNode server = servers.get(0);
                         JsonNode urlJsonNode = server.get("url");
                         if (urlJsonNode != null) {

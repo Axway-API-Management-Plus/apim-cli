@@ -40,7 +40,7 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestRunner {
 		echo("####### Validate API: '${apiName}' on path: '${apiPath}' with outbound security set to HTTP-Basic. #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies").name("api").header("Content-Type", "application/json"));
 
-		if(APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5") || APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
+		if(APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
 			http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 					.validate("$.[?(@.path=='${apiPath}')].name", "${apiName}")
 					.validate("$.[?(@.path=='${apiPath}')].state", "unpublished")
