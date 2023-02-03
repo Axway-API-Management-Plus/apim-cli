@@ -36,10 +36,10 @@ Please note, that you need Write-Permissions to the Docker-Repository to push th
 
 To enable the image, please adjust the image referred in the Travis-CI configuration file:
 ```
-edit .travis.yml
+edit .github/workflows/integration-test.yml
 and change:
 Add/register your new Docker-Image and reference it in the following environment variables:
-- DOCKER_IMAGE_TO_USE=$APIM_DOCKER_IMAGE_7_6_2
-- CACHE_FILE_TO_USE=$CACHE_FILE_APIM_7_6_2
+- DOCKER_IMAGE_TO_USE=docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7-20221130
+- CACHE_FILE_APIM=api-manager_7_7_20221130.cache.tar
 ```
-After checkin & commit a Travis-CI build is started using the provided Docker-Image.
+After checkin & commit a Github Action build is started using the provided Docker-Image.
