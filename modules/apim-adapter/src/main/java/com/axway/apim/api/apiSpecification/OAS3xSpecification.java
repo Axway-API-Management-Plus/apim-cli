@@ -2,7 +2,6 @@ package com.axway.apim.api.apiSpecification;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.filter.JsonNodeOpenAPI3SpecFilter;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -85,7 +84,6 @@ public class OAS3xSpecification extends APISpecification {
 
     @Override
     public void configureBasePath(String backendBasePath, API api) throws AppException {
-        if (!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
         try {
             if (openAPI.has("servers")) {
                 ArrayNode servers = (ArrayNode) openAPI.get("servers");

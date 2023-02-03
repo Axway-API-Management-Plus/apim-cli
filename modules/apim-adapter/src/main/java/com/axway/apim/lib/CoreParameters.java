@@ -80,8 +80,6 @@ public class CoreParameters implements Parameters {
 
     private String detailsExportFile;
 
-    private Boolean replaceHostInSwagger = true;
-
     private Boolean rollback = true;
 
     private String confDir;
@@ -307,15 +305,6 @@ public class CoreParameters implements Parameters {
 
     public void setDetailsExportFile(String detailsExportFile) {
         this.detailsExportFile = detailsExportFile;
-    }
-
-    public boolean isReplaceHostInSwagger() {
-        return replaceHostInSwagger;
-    }
-
-    public void setReplaceHostInSwagger(Boolean replaceHostInSwagger) {
-        if (replaceHostInSwagger == null) return;
-        this.replaceHostInSwagger = replaceHostInSwagger;
     }
 
     public Boolean isRollback() {

@@ -1,10 +1,6 @@
 package com.axway.apim.api.apiSpecification;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import com.axway.apim.api.API;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -14,7 +10,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.*;
 import io.swagger.v3.oas.models.responses.ApiResponse;
@@ -22,13 +17,16 @@ import io.swagger.v3.oas.models.servers.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public abstract class ODataSpecification extends APISpecification {
     private final Logger LOG = LoggerFactory.getLogger(ODataSpecification.class);
     protected OpenAPI openAPI;
     @Override
     public void configureBasePath(String backendBasePath, API api) throws AppException {
         LOG.info("Overriding backend base path : {}", backendBasePath);
-        if (backendBasePath == null || !CoreParameters.getInstance().isReplaceHostInSwagger()) {
+        if (backendBasePath == null) {
             // Try to set up the Backend-Host + BasePath based on the given Metadata URL
             try {
                 String backend = getBasePath(apiSpecificationFile);
@@ -37,12 +35,8 @@ public abstract class ODataSpecification extends APISpecification {
                 server.setUrl(backend);
                 openAPI.addServersItem(server);
             } catch (MalformedURLException e) {
-                String replaceHostInSwaggerDisabledNote = "";
-                if (!CoreParameters.getInstance().isReplaceHostInSwagger()) {
-                    replaceHostInSwaggerDisabledNote = " with parameter: replaceHostInSwagger set to true";
-                }
                 throw new AppException("Error importing OData API. Unknown backend host. "
-                        + "You either have to provide the MetaData-File using an HTTP-Endpoint or configure a backendBasePath" + replaceHostInSwaggerDisabledNote + ".", ErrorCode.CANT_READ_API_DEFINITION_FILE);
+                        + "You either have to provide the MetaData-File using an HTTP-Endpoint or configure a backendBasePath", ErrorCode.CANT_READ_API_DEFINITION_FILE);
             }
         } else {
             // Otherwise we are using the configured backendBasePath

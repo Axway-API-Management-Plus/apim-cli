@@ -62,7 +62,6 @@ public class APIImportCLIOptionsTest {
 		Assert.assertTrue(params.isIgnoreCache());
 		Assert.assertTrue(params.isUpdateOnly());
 		Assert.assertTrue(params.isChangeOrganization());
-		Assert.assertTrue(params.isReplaceHostInSwagger());
 		Assert.assertTrue(params.isUseFEAPIDefinition());
 		Assert.assertTrue(params.isIgnoreQuotas());
 		Assert.assertTrue(params.isRollback());

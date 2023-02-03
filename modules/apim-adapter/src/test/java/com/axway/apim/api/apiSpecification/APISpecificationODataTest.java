@@ -2,7 +2,6 @@ package com.axway.apim.api.apiSpecification;
 
 import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.api.model.DesiredAPISpecification;
-import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -11,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -23,11 +21,6 @@ public class APISpecificationODataTest {
 	
 	private static final String TEST_PACKAGE = "/com/axway/apim/adapter/spec/odata";
 
-	@BeforeClass
-	private void initTestIndicator() {
-		StandardImportParams params = new StandardImportParams();
-		params.setReplaceHostInSwagger(true);
-	}
 
 	
 	@Test

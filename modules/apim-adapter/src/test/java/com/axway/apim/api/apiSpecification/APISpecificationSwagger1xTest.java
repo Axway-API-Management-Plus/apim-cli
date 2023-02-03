@@ -1,13 +1,11 @@
 package com.axway.apim.api.apiSpecification;
 
-import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -19,11 +17,6 @@ public class APISpecificationSwagger1xTest {
 
     ObjectMapper mapper = new ObjectMapper();
 
-    @BeforeClass
-    private void initTestIndicator() {
-        StandardImportParams params = new StandardImportParams();
-        params.setReplaceHostInSwagger(true);
-    }
     @Test
     public void testSwagger12() throws IOException {
         byte[] content = getSwaggerContent(testPackage + "/swagger12.json");

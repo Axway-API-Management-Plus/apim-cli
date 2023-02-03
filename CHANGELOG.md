@@ -12,7 +12,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - BackendBasepath not handled properly for open api specification (See issue [#341](https://github.com/Axway-API-Management-Plus/apim-cli/issues/341))
 
 ## Added
+
+- APIM Multiple Organization support
 - Sonar cloud code coverage -  [SonarCloud](https://sonarcloud.io/summary/new_code?id=Axway-API-Management-Plus_apim-cli). 
+
+## Removed
+- APIM 7.6.2 support
+- Parameters ignoreAdminAccount and allowOrgAdminsToPublish in favor of multi organization support
+- Parameter replaceHostInSwagger. 
 
 ## [1.13.2] 2022-12-13
 

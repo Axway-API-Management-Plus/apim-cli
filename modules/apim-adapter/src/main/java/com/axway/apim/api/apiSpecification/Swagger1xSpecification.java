@@ -1,7 +1,6 @@
 package com.axway.apim.api.apiSpecification;
 
 import com.axway.apim.api.API;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -52,12 +51,6 @@ public class Swagger1xSpecification extends APISpecification {
 
     @Override
     public void configureBasePath(String backendBasePath, API api) throws AppException {
-        if (!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
-        try {
-            this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
-        } catch (Exception e) {
-            LOG.error("Cannot replace host in provided Swagger-File. Continue with given host.", e);
-        }
     }
 
     @Override

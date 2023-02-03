@@ -130,7 +130,6 @@ public class CLIAPIImportOptions extends CLIOptions {
 		params.setApiDefintion(getValue("apidefinition"));
 		params.setForceUpdate(hasOption("forceUpdate"));
 		params.setChangeOrganization(hasOption("changeOrganization"));
-		if(getValue("replaceHostInSwagger")!=null) params.setReplaceHostInSwagger(Boolean.parseBoolean(getValue("replaceHostInSwagger")));
 		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
 		params.setIgnoreQuotas(hasOption("ignoreQuotas"));
 		params.setUpdateOnly(hasOption("updateOnly"));

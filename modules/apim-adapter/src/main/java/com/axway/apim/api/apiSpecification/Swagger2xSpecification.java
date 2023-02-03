@@ -1,11 +1,7 @@
 package com.axway.apim.api.apiSpecification;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.filter.JsonNodeOpenAPI3SpecFilter;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,6 +11,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class Swagger2xSpecification extends APISpecification {
     private final Logger LOG = LoggerFactory.getLogger(Swagger2xSpecification.class);
@@ -81,7 +80,6 @@ public class Swagger2xSpecification extends APISpecification {
 
     @Override
     public void configureBasePath(String backendBasePath, API api) throws AppException {
-        if (!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
         if (backendBasePath == null && swagger.get("host") == null) {
             throw new AppException("The API specification doesn't contain a host and no backend basePath is given.", ErrorCode.CANT_READ_API_DEFINITION_FILE);
         }

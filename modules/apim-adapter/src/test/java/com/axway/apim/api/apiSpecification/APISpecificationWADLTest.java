@@ -1,13 +1,11 @@
 package com.axway.apim.api.apiSpecification;
 
-import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -16,11 +14,6 @@ public class APISpecificationWADLTest {
 
     XmlMapper xmlMapper = new XmlMapper();
 
-    @BeforeClass
-    private void initTestIndicator() {
-        StandardImportParams params = new StandardImportParams();
-        params.setReplaceHostInSwagger(true);
-    }
 
     private static final String testPackage = "/com/axway/apim/adapter/spec";
 
