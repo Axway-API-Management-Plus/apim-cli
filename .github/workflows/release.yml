@@ -27,6 +27,10 @@ jobs:
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: Configure Git user
+        run: |
+          git config user.email "rathnapandi.n@gmail.com"
+          git config user.name $github.actor
       - name: Prepare Release
         run: mvn -Darguments=-DskipTests release:prepare -P release -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
         env:
