@@ -3,17 +3,14 @@ name: Release API CLI on github and Maven repository
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: 'Verson Type'     
+      releaseVersion:
+        description: "Default version to use when preparing a release."
         required: true
-        default: 'version-patch'
-        type: choice
-        options:
-        - version-major
-        - version-minor
-        - version-patch
-      tags:
-        description: 'Release Version Type'
+        default: "1.14.0"
+      developmentVersion:
+        description: "Default version to use for new local working copy."
+        required: true
+        default: "1.14.1-SNAPSHOT"
 
 jobs:
   build:
@@ -30,12 +27,21 @@ jobs:
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: Prepare Release
+        run: mvn -Darguments=-DskipTests release:prepare -P release -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish package
-        run: mvn deploy
+        run: mvn -Darguments=-DskipTests release:perform -P release
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+#      - name: RollBack Release
+#        if: ${{ failure() }}
+#        run: mvn release:rollback
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
     

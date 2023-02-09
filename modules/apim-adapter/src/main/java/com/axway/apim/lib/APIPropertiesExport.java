@@ -49,7 +49,7 @@ public class APIPropertiesExport {
                 LOG.info("Created API-Properties file: {}", file);
             }
         } catch (Exception e) {
-            LOG.error("Cant create API-Properties file based on filename: '" + exportFile + "'", e);
+            LOG.error("Cant create API-Properties file based on filename: {}", exportFile, e);
         }
     }
 }

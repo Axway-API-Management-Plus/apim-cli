@@ -160,8 +160,9 @@ public class CoreParameters implements Parameters {
 
     public int getPort2() {
         if (port == -1) {
-            if (getFromProperties("port") != null) {
-                return Integer.parseInt(getFromProperties("port"));
+            String portStr = getFromProperties("port");
+            if (portStr != null) {
+                return Integer.parseInt(portStr);
             } else {
                 return defaultPort;
             }
