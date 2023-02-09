@@ -37,6 +37,13 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Create Github Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: APIM-CLI ${{ github.event.inputs.releaseVersion }}
+          tag: ${{ github.event.inputs.releaseVersion }}
+          artifacts: "distribution/target/*.tar.gz,distribution/target/*.zip"
+          draft: true
 #      - name: RollBack Release
 #        if: ${{ failure() }}
 #        run: mvn release:rollback
