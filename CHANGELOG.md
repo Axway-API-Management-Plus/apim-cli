@@ -3,7 +3,8 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
-## [1.13.3] In progress
+
+## [1.13.3] 2023-02-08
 
 ### Fixed
 - Special characters in Policy name used request, response or routing policy of an API (See issue [#336](https://github.com/Axway-API-Management-Plus/apim-cli/issues/336))
