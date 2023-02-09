@@ -9,19 +9,15 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
 public class APIExportSerializerModifier extends BeanSerializerModifier {
-	
-	
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-		if (beanDesc.getBeanClass() == APIQuota.class) {
-			return new APIQuotaSerializer((JsonSerializer<Object>) serializer);
-		}
-		if (beanDesc.getBeanClass() == Policy.class) {
-			return new PolicySerializer(true);
-		}
-		return super.modifySerializer(config, beanDesc, serializer);
-	}
-
+    @SuppressWarnings("unchecked")
+    @Override
+    public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+        if (beanDesc.getBeanClass() == APIQuota.class) {
+            return new APIQuotaSerializer((JsonSerializer<Object>) serializer);
+        }
+        if (beanDesc.getBeanClass() == Policy.class) {
+            return new PolicySerializer(true);
+        }
+        return super.modifySerializer(config, beanDesc, serializer);
+    }
 }

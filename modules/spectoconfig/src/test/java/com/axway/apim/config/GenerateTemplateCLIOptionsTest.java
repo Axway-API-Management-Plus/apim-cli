@@ -181,7 +181,7 @@ public class GenerateTemplateCLIOptionsTest {
         Assert.assertEquals("ssl", documentContext.read("$.authenticationProfiles[0].type"));
         Assert.assertEquals("file", documentContext.read("$.authenticationProfiles[0].parameters.source"));
         Assert.assertEquals("../certificates/clientcert.pfx", documentContext.read("$.authenticationProfiles[0].parameters.certFile"));
-        Assert.assertEquals("myClientCertPW", documentContext.read("$.authenticationProfiles[0].parameters.password"));
+        Assert.assertEquals("********", documentContext.read("$.authenticationProfiles[0].parameters.password"));
         Assert.assertTrue(documentContext.read("$.authenticationProfiles[0].parameters.trustAll", Boolean.class));
         Assert.assertTrue(documentContext.read("$.authenticationProfiles[0].isDefault", Boolean.class));
     }

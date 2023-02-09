@@ -6,6 +6,7 @@ import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardExportCLIOptions;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.Option;
 
 public class GenerateTemplateCLIOptions extends CLIOptions {
@@ -14,7 +15,7 @@ public class GenerateTemplateCLIOptions extends CLIOptions {
         super(args);
     }
 
-    public static CLIOptions create(String[] args) {
+    public static CLIOptions create(String[] args) throws AppException {
         CLIOptions cliOptions = new GenerateTemplateCLIOptions(args);
         cliOptions = new StandardExportCLIOptions(cliOptions);
         cliOptions = new CoreCLIOptions(cliOptions);
@@ -28,14 +29,14 @@ public class GenerateTemplateCLIOptions extends CLIOptions {
     public void addOptions() {
         // Define command line options required for Application export
         Option option = new Option("a", "apidefinition", true, "(Optional) The API Specification either as OpenAPI (JSON/YAML) or a WSDL for SOAP-Services:\n"
-            + "- in local filesystem using a relative or absolute path. Example: swagger_file.json\n"
-            + "  Please note: Local filesystem is not supported for WSDLs. Please use direct URL or a URL-Reference-File.\n"
-            + "- a URL providing the Swagger-File or WSDL-File. Examples:\n"
-            + "  [username/password@]https://any.host.com/my/path/to/swagger.json\n"
-            + "  [username/password@]http://www.dneonline.com/calculator.asmx?wsdl\n"
-            + "- a reference file called anyname-i-want.url which contains a line with the URL\n"
-            + "  (same format as above for OpenAPI or WSDL)."
-            + "  If not specified, the API Specification configuration is read directly from the API-Config file.");
+                + "- in local filesystem using a relative or absolute path. Example: swagger_file.json\n"
+                + "  Please note: Local filesystem is not supported for WSDLs. Please use direct URL or a URL-Reference-File.\n"
+                + "- a URL providing the Swagger-File or WSDL-File. Examples:\n"
+                + "  [username/password@]https://any.host.com/my/path/to/swagger.json\n"
+                + "  [username/password@]http://www.dneonline.com/calculator.asmx?wsdl\n"
+                + "- a reference file called anyname-i-want.url which contains a line with the URL\n"
+                + "  (same format as above for OpenAPI or WSDL)."
+                + "  If not specified, the API Specification configuration is read directly from the API-Config file.");
         option.setRequired(true);
         option.setArgName("swagger_file.json");
         addOption(option);
@@ -45,11 +46,11 @@ public class GenerateTemplateCLIOptions extends CLIOptions {
         option.setArgName("api_config.json");
         addOption(option);
 
-        option = new Option( "backendAuthType", true, "Backend API Authentication Type - Supported type - httpbasic, httpdigest, apikey, oauth and mutualssl");
+        option = new Option("backendAuthType", true, "Backend API Authentication Type - Supported type - httpbasic, httpdigest, apikey, oauth and mutualssl");
         option.setArgName("httpbasic");
         addOption(option);
 
-        option = new Option( "frontendAuthType", true, "Frontend API Authentication Type - Supported type - apikey, httpbasic, oauth, oauthext, passthrough, aws-sign-header, aws-sign-query and mutualssl");
+        option = new Option("frontendAuthType", true, "Frontend API Authentication Type - Supported type - apikey, httpbasic, oauth, oauthext, passthrough, aws-sign-header, aws-sign-query and mutualssl");
         option.setArgName("oauth");
         addOption(option);
 
@@ -59,12 +60,12 @@ public class GenerateTemplateCLIOptions extends CLIOptions {
     @Override
     public void printUsage(String message, String[] args) {
         super.printUsage(message, args);
-        System.out.println("----------------------------------------------------------------------------------------");
-        System.out.println("How to Generate Config files");
-        System.out.println("Generate API manager configuration file based on Open API Specification");
-        System.out.println(getBinaryName()+" template generate -c samples/config-api-specification.json -a samples/openapi.json");
-        System.out.println("For more information and advanced examples please visit:");
-        System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
+        Console.println("----------------------------------------------------------------------------------------");
+        Console.println("How to Generate Config files");
+        Console.println("Generate API manager configuration file based on Open API Specification");
+        Console.println(getBinaryName() + " template generate -c samples/config-api-specification.json -a samples/openapi.json");
+        Console.println("For more information and advanced examples please visit:");
+        Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
     }
 
     @Override
@@ -73,18 +74,18 @@ public class GenerateTemplateCLIOptions extends CLIOptions {
     }
 
     @Override
-    public Parameters getParams() throws AppException {
+    public Parameters getParams() {
         GenerateTemplateParameters params = new GenerateTemplateParameters();
         params.setApiDefinition(getValue("apidefinition"));
         params.setConfig(getValue("config"));
         String backendAuthType = getValue("backendAuthType");
-        if(backendAuthType == null){
+        if (backendAuthType == null) {
             backendAuthType = "none";
         }
         params.setBackendAuthType(backendAuthType);
 
         String frontendAuthType = getValue("frontendAuthType");
-        if(frontendAuthType == null){
+        if (frontendAuthType == null) {
             frontendAuthType = "none";
         }
         params.setFrontendAuthType(frontendAuthType);

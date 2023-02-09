@@ -1,13 +1,5 @@
 package com.axway.apim.organization.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.api.model.Image;
@@ -24,6 +16,12 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 public class JsonOrgExporter extends OrgResultHandler {
 
@@ -42,17 +40,17 @@ public class JsonOrgExporter extends OrgResultHandler {
 		String folderName = getExportFolder(org);
 		String targetFolder = params.getTarget();
 		File localFolder = new File(targetFolder +File.separator+ folderName);
-		LOG.info("Going to export organizations into folder: " + localFolder);
+		LOG.info("Going to export organizations into folder: {}", localFolder);
 		if(localFolder.exists()) {
 			if(OrgExportParams.getInstance().isDeleteTarget()) {
-				LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
+				LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
 				try {
 					FileUtils.deleteDirectory(localFolder);
 				} catch (IOException e) {
 					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
 				}				
 			} else {
-				LOG.warn("Local export folder: " + localFolder + " already exists. Organization will not be exported. (You may set -deleteTarget)");
+				LOG.warn("Local export folder: {} already exists. Organization will not be exported. (You may set -deleteTarget)", localFolder);
 				this.hasError = true;
 				return;
 			}
@@ -78,10 +76,7 @@ public class JsonOrgExporter extends OrgResultHandler {
 		if(org.getImage()!=null) {
 			writeBytesToFile(org.getImage().getImageContent(), localFolder+File.separator + org.getImage().getBaseFilename());
 		}
-		LOG.info("Successfully exported organization into folder: " + localFolder);
-		if(!APIManagerAdapter.hasAdminAccount()) {
-			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted to its own organization.");
-		}
+		LOG.info("Successfully exported organization into folder: {}" , localFolder);
 	}
 	
 	private String getExportFolder(ExportOrganization org) {
@@ -91,7 +86,7 @@ public class JsonOrgExporter extends OrgResultHandler {
 	}
 
 	@Override
-	public OrgFilter getFilter() throws AppException {
+	public OrgFilter getFilter() {
 		return getBaseOrgFilterBuilder()
 				.includeImage(true)
 				.includeAPIAccess(true)

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/portal/v1.4/apirepo/1f4263ca-7f03-41d9-9d34-9eff79d29bd8"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "backend_api_by_id.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -1,14 +1,6 @@
 package com.axway.apim.test.applications;
 
-import java.io.IOException;
-
-import org.springframework.http.HttpStatus;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
 import com.axway.apim.lib.CoreParameters.Mode;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -16,20 +8,23 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
+import org.springframework.http.HttpStatus;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 @Test
 public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
-	
-	private ImportTestAction swaggerImport;
-	
+
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+	public void run(@Optional @CitrusResource TestContext context) throws IOException {
 		//TestIndicator.getInstance().setTestRunning(false);
-		swaggerImport = new ImportTestAction();
-		swaggerImport = new ImportTestAction();
+		ImportTestAction swaggerImport = new ImportTestAction();
 		description("Import an API, grant access to an org and create an application subscription.");
-		
+		createVariable("useApiAdmin", "true"); // use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
 		variable("apiPath", "/app-subscription-${apiNumber}");
 		variable("apiName", "App Subscription API-${apiNumber}");
@@ -270,7 +265,7 @@ public class ApplicationSubscriptionTestIT extends TestNGCitrusTestRunner {
 		createVariable("enforce", "false");
 		createVariable("orgName", "${orgName}");
 		createVariable("expectedReturnCode", "0");
-		createVariable("ignoreAdminAccount", "true"); // We need to ignore any given admin account!
+		createVariable("useApiAdmin", "false"); // We need to ignore any given admin account!
 		// We only provide two apps instead of three, but the existing third subscription must stay!
 		createVariable("testAppName1", "${consumingTestApp1Name}");
 		createVariable("testAppName2", "${consumingTestApp2Name}");		

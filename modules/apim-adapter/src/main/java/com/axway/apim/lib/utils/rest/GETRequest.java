@@ -13,14 +13,11 @@ public class GETRequest extends RestAPICall {
 		super(null, uri);
 	}
 	
-	public GETRequest(URI uri, boolean useAdmin) {
-		super(null, uri, useAdmin);
-	}
+
 
 	@Override
 	public HttpResponse execute() throws AppException {
 		HttpGet httpGet = new HttpGet(uri);
-		//httpGet.setHeader("Content-type", this.contentType);
 		HttpResponse response = sendRequest(httpGet);
 		return response;
 	}

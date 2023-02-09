@@ -53,7 +53,7 @@ public abstract class OrgResultHandler {
 		}
 	}
 
-	public OrgResultHandler(OrgExportParams params, ExportResult result) {
+	protected OrgResultHandler(OrgExportParams params, ExportResult result) {
 		this.params = params;
 		this.result = result;
 	}

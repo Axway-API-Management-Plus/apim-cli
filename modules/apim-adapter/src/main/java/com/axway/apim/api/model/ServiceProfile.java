@@ -1,5 +1,7 @@
 package com.axway.apim.api.model;
 
+import java.util.Objects;
+
 public class ServiceProfile {
 
 	String apiId;
@@ -41,5 +43,10 @@ public class ServiceProfile {
 		if (basePath == null) {
 			return other.basePath == null;
 		} else return basePath.equals(other.basePath);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(basePath);
 	}
 }

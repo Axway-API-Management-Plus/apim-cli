@@ -6,6 +6,7 @@ import com.axway.apim.api.model.Policy;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class PolicySerializer extends StdSerializer<Policy> {
 	
@@ -25,7 +26,8 @@ public class PolicySerializer extends StdSerializer<Policy> {
 	@Override
 	public void serialize(Policy policy, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 		if(serializeAsName) {
-			jgen.writeString(policy.getName());
+			String policyName = StringEscapeUtils.unescapeHtml4(policy.getName());
+			jgen.writeString(policyName);
 		} else {
 			jgen.writeString(policy.getId());
 		}

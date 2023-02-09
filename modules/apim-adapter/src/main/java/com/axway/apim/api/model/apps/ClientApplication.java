@@ -1,9 +1,6 @@
 package com.axway.apim.api.model.apps;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -62,17 +59,17 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 	
 	@JsonSerialize (using = APIAccessSerializer.class)
 	@JsonProperty("apis")
-	private List<APIAccess> apiAccess = new ArrayList<APIAccess>();
+	private List<APIAccess> apiAccess = new ArrayList<>();
 
 	@JsonProperty("permissions")
-	private List<ApplicationPermission> permissions = new ArrayList<ApplicationPermission>();	
+	private List<ApplicationPermission> permissions = new ArrayList<>();
 	
-	private List<ClientAppCredential> credentials = new ArrayList<ClientAppCredential>(); 
+	private List<ClientAppCredential> credentials = new ArrayList<>();
 	
 	private APIQuota appQuota;
 	
 	@JsonProperty("appScopes")
-	private List<ClientAppOauthResource> oauthResources = new ArrayList<ClientAppOauthResource>();
+	private List<ClientAppOauthResource> oauthResources = new ArrayList<>();
 	
 	@JsonDeserialize( using = OrganizationDeserializer.class)
 	@JsonAlias({ "organization", "organizationId" })	
@@ -247,6 +244,12 @@ public class ClientApplication extends AbstractEntity implements CustomPropertie
 		}
 		return false;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(email, phone, state, image, organization);
+	}
+
 	@Override
 	public String toString() {
 		return "[" + getName() + " ("+getId()+")]";

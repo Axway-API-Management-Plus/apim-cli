@@ -12,6 +12,7 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,27 +27,27 @@ public class ApproveAPIHandler extends APIResultHandler {
 	@Override
 	public void execute(List<API> apis) throws AppException {
 		String vhostToUse = ( ((APIApproveParams) params).getPublishVhost()==null) ? "Default" : ((APIApproveParams)params).getPublishVhost();
-		System.out.println(apis.size() + " API(s) selected for approval/publish on V-Host: "+vhostToUse+".");
+		Console.println(apis.size() + " API(s) selected for approval/publish on V-Host: "+vhostToUse+".");
 		if(CoreParameters.getInstance().isForce()) {
-			System.out.println("Force flag given to approve/publish: "+apis.size()+" API(s) on V-Host: " + vhostToUse);
+			Console.println("Force flag given to approve/publish: "+apis.size()+" API(s) on V-Host: " + vhostToUse);
 		} else {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
 			} else {
-				System.out.println("Canceled.");
+				Console.println("Canceled.");
 				return;
 			}
 		}
-		System.out.println("Okay, going to approve: " + apis.size() + " API(s) on V-Host: " + vhostToUse);
+		Console.println("Okay, going to approve: " + apis.size() + " API(s) on V-Host: " + vhostToUse);
 		for(API api : apis) {
 			try {
 				APIManagerAdapter.getInstance().apiAdapter.publishAPI(api, ((APIApproveParams)params).getPublishVhost());
-				LOG.info("API: "+api.getName()+" "+api.getVersion()+" ("+api.getId()+") successfully approved/published.");
+				LOG.info("API: {} {} {} successfully approved/published.", api.getName(), api.getVersion(), api.getId());
 			} catch(Exception e) {
-				LOG.error("Error approving API: " + api.getName()+" "+api.getVersion()+" ("+api.getId()+")");
+				LOG.error("Error approving API: {} {} {} " , api.getName(), api.getVersion(), api.getId());
 				result.setError(ErrorCode.ERR_APPROVING_API);
 			}
 		}
-		System.out.println("Done!");
+		Console.println("Done!");
 	}
 
 	@Override

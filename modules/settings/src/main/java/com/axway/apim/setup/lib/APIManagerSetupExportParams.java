@@ -6,9 +6,9 @@ import com.axway.apim.lib.StandardExportParams;
 public class APIManagerSetupExportParams extends StandardExportParams {
 	
 	public enum Type {
-		config, 
-		alerts, 
-		remotehosts, 
+		config,
+		alerts,
+		remotehosts,
 		policies,
 		customProperties
 	}
@@ -23,6 +23,7 @@ public class APIManagerSetupExportParams extends StandardExportParams {
 	private String RemoteHostId;
 
 	public APIManagerSetupExportParams() {
+		super();
 	}
 	
 	public static synchronized APIManagerSetupExportParams getInstance() {

@@ -22,9 +22,6 @@ import com.axway.apim.setup.lib.APIManagerSetupImportCLIOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 
 	private static final Logger LOG = LoggerFactory.getLogger(APIManagerSettingsApp.class);
@@ -50,7 +47,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 		try {
 			params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " + e.getMessage());
+			LOG.error("Error {}", e.getMessage());
 			return e.getError().getCode();
 		}
 		APIManagerSettingsApp app = new APIManagerSettingsApp();
@@ -63,7 +60,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 		try {
 			params = (StandardImportParams) APIManagerSetupImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " + e.getMessage());
+			LOG.error("Error {}" , e.getMessage());
 			return e.getError().getCode();
 		}
 		APIManagerSettingsApp managerConfigApp = new APIManagerSettingsApp();
@@ -146,7 +143,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 				updatedAssets+="Remote-Hosts";
 				LOG.debug("API-Manager remote host(s) successfully updated.");
 			}
-			LOG.info("API-Manager configuration ("+updatedAssets+") successfully updated.");
+			LOG.info("API-Manager configuration {} successfully updated.", updatedAssets);
 			return result;
 		} catch (AppException ap) { 
 			ap.logException(LOG);
@@ -161,31 +158,5 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 				APIManagerAdapter.deleteInstance();
 			} catch (AppException ignore) { }
 		}
-	}
-
-	public static void main(String[] args) throws InvocationTargetException, IllegalAccessException {
-
-		if(args.length == 0){
-			System.out.println("Invalid arguments - prefix commandline param with \"settings get\"");
-			return;
-		}
-
-		String serviceName = args[1];
-		if (serviceName == null) {
-			System.out.println("Invalid arguments - prefix commandline param with \"settings get\"");
-			return;
-		}
-		for (final Method method : APIManagerSettingsApp.class.getDeclaredMethods()) {
-			if (method.isAnnotationPresent(CLIServiceMethod.class)) {
-				CLIServiceMethod cliServiceMethod = method.getAnnotation(CLIServiceMethod.class);
-				String name = cliServiceMethod.name();
-				if (serviceName.equals(name)) {
-					LOG.info("Calling Operation " + method.getName());
-					int rc = (int) method.invoke(null, (Object) args);
-					System.exit(rc);
-				}
-			}
-		}
-		LOG.info("No matching method");
 	}
 }

@@ -3,6 +3,7 @@ package com.axway.apim.setup.impl;
 import java.util.Arrays;
 import java.util.List;
 
+import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,21 +28,20 @@ public class ConsolePrinterPolicies {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			LOG.error("Unable to get APIManagerAdapter", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Unable to get APIManagerAdapter", e);
 		}
 	}
 
 	public void export(List<Policy> policies) throws AppException {
-		System.out.println();
-		System.out.println("Policies for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
-		System.out.println();
+		Console.println();
+		Console.println("Policies for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
+		Console.println();
 		printPolicies(policies);
-		System.out.println("You may use 'apim api get -policy <PolicyName> -s api-env' to list all APIs using this policy");
+		Console.println("You may use 'apim api get -policy <PolicyName> -s api-env' to list all APIs using this policy");
 	}
 	
 	private void printPolicies(List<Policy> policies) {
-		System.out.println(AsciiTable.getTable(borderStyle, policies, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, policies, Arrays.asList(
 				new Column().header("Policy-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Policy::getName),
 				new Column().header("Type").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(policy -> policy.getType().getNiceName()),
 				new Column().header("APIs").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(ConsolePrinterPolicies::getNumberOfRelatedAPIs)

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/portal/v1.4/proxies/e4ded8c8-0a40-4b50-bc13-552fb7209150/operations"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "frontend_api_by_id_methods.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

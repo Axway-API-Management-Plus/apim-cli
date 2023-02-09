@@ -10,6 +10,7 @@ import com.axway.apim.api.model.CaCert;
 import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.rest.Console;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.freva.asciitable.AsciiTable;
@@ -27,7 +28,7 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(CheckCertificatesAPIHandler.class);
     APICheckCertificatesParams checkCertParams;
-    Calendar cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
+    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
     DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     public CheckCertificatesAPIHandler(APIExportParams params) {
@@ -38,7 +39,7 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
     @Override
     public void execute(List<API> apis) throws AppException {
         cal.add(Calendar.DAY_OF_YEAR, checkCertParams.getNumberOfDays());
-        LOG.info("Going to check certificate expiration of: " + apis.size() + " selected API(s) within the next " + checkCertParams.getNumberOfDays() + " days (Not valid after: " + formatDate(cal.getTime().getTime()) + ").");
+        LOG.info("Going to check certificate expiration of: {} selected API(s) within the next {} days (Not valid after: {})", apis.size(), checkCertParams.getNumberOfDays(), formatDate(cal.getTime().getTime()));
         List<ApiPlusCert> expiredCerts = new ArrayList<>();
         for (API api : apis) {
             if (api.getCaCerts() == null) continue;
@@ -59,10 +60,9 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
             this.result.setError(ErrorCode.CHECK_CERTS_FOUND_CERTS);
             this.result.setResultDetails(expiredCerts);
             StandardExportParams.OutputFormat outputFormat = params.getOutputFormat();
-            System.out.println(outputFormat);
             if (outputFormat.equals(StandardExportParams.OutputFormat.console)) {
-                System.out.println("The following certificates will expire in the next " + checkCertParams.getNumberOfDays() + " days.");
-                System.out.println(AsciiTable.getTable(AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS, expiredCerts, Arrays.asList(
+                Console.println("The following certificates will expire in the next " + checkCertParams.getNumberOfDays() + " days.");
+                Console.println(AsciiTable.getTable(AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS, expiredCerts, Arrays.asList(
                         new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.api.getId()),
                         new Column().header("API-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.api.getName()),
                         new Column().header("API-Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.api.getPath()),
@@ -89,13 +89,13 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
                 writeJSON(apiCerts);
             }
         } else {
-            LOG.info("No certificates found that will expire within the next " + checkCertParams.getNumberOfDays() + " days.");
+            LOG.info("No certificates found that will expire within the next {} days.", checkCertParams.getNumberOfDays());
             writeJSON(new ArrayList<>());
         }
         LOG.info("Done!");
     }
 
-    public void writeJSON(List<APICert> apiCerts){
+    public void writeJSON(List<APICert> apiCerts) {
         ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         try {
             mapper.writeValue(System.out, apiCerts);

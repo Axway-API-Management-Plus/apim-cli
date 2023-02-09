@@ -2,7 +2,7 @@ package com.axway.apim.api.model;
 
 public class LockUserAccount {
 	
-	public static enum TimePeriodUnit {
+	public enum TimePeriodUnit {
 		week, 
 		day,
 		hour,

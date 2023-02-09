@@ -17,7 +17,7 @@ public abstract class OrgAdapter {
 	
 	protected Result result;
 
-	public OrgAdapter() {
+	protected OrgAdapter() {
 	}
 	
 	public abstract void readConfig() throws AppException;

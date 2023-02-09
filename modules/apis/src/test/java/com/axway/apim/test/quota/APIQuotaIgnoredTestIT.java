@@ -1,15 +1,14 @@
 package com.axway.apim.test.quota;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.testng.annotations.Test;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestDesigner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.testng.annotations.Test;
 
 @Test(testName="APIQuotaIgnoredTestIT")
 public class APIQuotaIgnoredTestIT extends TestNGCitrusTestDesigner {
@@ -54,13 +53,13 @@ public class APIQuotaIgnoredTestIT extends TestNGCitrusTestDesigner {
 			.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId");
 		
 		echo("####### Check that the API-ID doesn't exists in the System-Quotas #######");
-		http().client("apiManager").send().get("/quotas/"+APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json");
+		http().client("apiManager").send().get("/quotas/"+ APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json");
 		
 		http().client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions[*].api", "@assertThat(not(containsString(${apiId})))@");
 		
 		echo("####### Check that the API-ID doesn't exists in the Application-Quotas #######");
-		http().client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json");
+		http().client("apiManager").send().get("/quotas/"+ APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json");
 
 		http().client("apiManager")	.receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions[*].api", "@assertThat(not(containsString(${apiId})))@");

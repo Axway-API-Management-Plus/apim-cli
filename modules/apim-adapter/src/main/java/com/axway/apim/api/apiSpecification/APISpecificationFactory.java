@@ -23,11 +23,10 @@ import java.util.ArrayList;
 
 public class APISpecificationFactory {
 
-    static Logger LOG = LoggerFactory.getLogger(APISpecificationFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(APISpecificationFactory.class);
 
     private static final ArrayList<Class<?>> specificationTypes = new ArrayList<Class<?>>() {
         private static final long serialVersionUID = 1L;
-
         {
             add(Swagger2xSpecification.class);
             add(Swagger1xSpecification.class);
@@ -65,14 +64,14 @@ public class APISpecificationFactory {
                 APISpecification spec = (APISpecification) constructor.newInstance();
                 spec.setApiSpecificationFile(apiDefinitionFile);
                 if (!spec.parse(apiSpecificationContent)) {
-                    LOG.debug("Can't handle API specification with class: " + clazz.getName());
+                    LOG.debug("Can't handle API specification with class: {} " , clazz.getName());
                 } else {
                     String addNote = "";
                     if (spec.getAPIDefinitionType().getAdditionalNote() != null) {
                         addNote = "\n                                 | " + spec.getAPIDefinitionType().getAdditionalNote();
                     }
                     if (logDetectedVersion) {
-                        LOG.info("Detected: " + spec.getAPIDefinitionType().niceName + " specification. " + spec.getAPIDefinitionType().getNote() + addNote);
+                        LOG.info("Detected: {} specification. {}{}" , spec.getAPIDefinitionType().niceName, spec.getAPIDefinitionType().getNote(), addNote);
                     }
                     return spec;
                 }
@@ -85,10 +84,10 @@ public class APISpecificationFactory {
             }
         }
         if (!failOnError) {
-            LOG.error("API: '" + apiName + "' has a unknown/invalid API-Specification: '" + getContentStart(apiSpecificationContent) + "'");
+            LOG.error("API: {} has a unknown/invalid API-Specification: {}" , apiName, getContentStart(apiSpecificationContent));
             return new UnknownAPISpecification(apiName);
         }
-        LOG.error("API: '" + apiName + "' has a unknown/invalid API-Specification: '" + getContentStart(apiSpecificationContent) + "'");
+        LOG.error("API: {} has a unknown/invalid API-Specification: {}" , apiName, getContentStart(apiSpecificationContent));
         throw new AppException("Can't handle API specification. No suitable API-Specification implementation available.", ErrorCode.UNSUPPORTED_API_SPECIFICATION);
     }
 
@@ -120,11 +119,11 @@ public class APISpecificationFactory {
             try {
                 File inputFile = new File(apiDefinitionFile);
                 if (inputFile.exists()) {
-                    LOG.info("Reading API-Definition (Swagger/WSDL) from file: '" + apiDefinitionFile + "' (relative path)");
+                    LOG.info("Reading API-Definition (Swagger/WSDL) from file: {} (relative path)", apiDefinitionFile);
                     is = Files.newInputStream(Paths.get(apiDefinitionFile));
                 } else {
                     inputFile = new File(configBaseDir + File.separator + apiDefinitionFile);
-                    LOG.info("Reading API-Definition (Swagger/WSDL) from file: '" + inputFile.getCanonicalFile() + "' (absolute path)");
+                    LOG.info("Reading API-Definition (Swagger/WSDL) from file: {} (absolute path)",  inputFile.getCanonicalFile());
                     if (inputFile.exists()) {
                         is = Files.newInputStream(inputFile.toPath());
                     } else {
@@ -148,36 +147,25 @@ public class APISpecificationFactory {
         String uri = url.getUri();
         String username = url.getUsername();
         String password = url.getPassword();
-        CloseableHttpResponse httpResponse = null;
-
-        HTTPClient httpClient = new HTTPClient(uri, username, password);
-
-        try {
+        try(HTTPClient httpClient = new HTTPClient(uri, username, password)){
             RequestConfig config = RequestConfig.custom()
                     .setRelativeRedirectsAllowed(true)
                     .setCircularRedirectsAllowed(true)
                     .build();
             HttpGet httpGet = new HttpGet(uri);
             httpGet.setConfig(config);
-
-            httpResponse = httpClient.execute(httpGet);
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            String response = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-            if (statusCode >= 200 && statusCode < 300) {
-                return new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8));
-            } else {
-                throw new AppException("Cannot load API-Specification from URI. Received Status-Code: " + statusCode + ", Response: '" + response + "'",
-                        ErrorCode.CANT_READ_API_DEFINITION_FILE);
+            try(CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+                if (statusCode >= 200 && statusCode < 300) {
+                    return new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8));
+                } else {
+                    throw new AppException("Cannot load API-Specification from URI. Received Status-Code: " + statusCode + ", Response: '" + response + "'",
+                            ErrorCode.CANT_READ_API_DEFINITION_FILE);
+                }
             }
         } catch (Exception e) {
             throw new AppException("Cannot load API-Specification from URI: " + uri, ErrorCode.CANT_READ_API_DEFINITION_FILE, e);
-        } finally {
-            try {
-                httpClient.close();
-                if (httpResponse != null)
-                    httpResponse.close();
-            } catch (Exception ignore) {
-            }
         }
     }
 }

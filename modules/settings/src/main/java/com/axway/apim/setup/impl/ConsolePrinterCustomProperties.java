@@ -4,6 +4,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
@@ -23,28 +24,27 @@ public class ConsolePrinterCustomProperties {
 	
 	Character[] borderStyle = AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS;
 	
-	private List<CustomPropertyWithName> propertiesWithName;
+	private final List<CustomPropertyWithName> propertiesWithName;
 
 	public ConsolePrinterCustomProperties() {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 			propertiesWithName = new ArrayList<>();
 		} catch (AppException e) {
-			LOG.error("Unable to get APIManagerAdapter", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Unable to get APIManagerAdapter", e);
 		}
 	}
 
-	public void addProperties(Map<String, CustomProperty> customProperties, Type group) throws AppException {
+	public void addProperties(Map<String, CustomProperty> customProperties, Type group) {
 		if(customProperties == null || customProperties.size()==0) {
-			System.out.println("No custom properties configured for: " + group.niceName);
+			Console.println("No custom properties configured for: " + group.niceName);
 			return;
 		}
 		propertiesWithName.addAll(getCustomPropertiesWithName(customProperties, group));
 	}
 	
 	public void printCustomProperties() {
-		System.out.println(AsciiTable.getTable(borderStyle, propertiesWithName, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, propertiesWithName, Arrays.asList(
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(CustomPropertyWithName::getName),
 				new Column().header("Group").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(CustomPropertyWithName::getGroup),
 				new Column().header("Label").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(prop -> prop.getCustomProperty().getLabel()),
@@ -73,12 +73,12 @@ public class ConsolePrinterCustomProperties {
 		return result;
 	}
 	
-	private class CustomPropertyWithName {
+	private static class CustomPropertyWithName {
 		private String name;
 		
 		private Type group;
 		
-		private CustomProperty customProperty;
+		private final CustomProperty customProperty;
 
 		public CustomPropertyWithName(CustomProperty customProperty) {
 			super();

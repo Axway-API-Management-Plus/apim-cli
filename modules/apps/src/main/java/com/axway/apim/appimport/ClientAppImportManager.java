@@ -41,7 +41,7 @@ public class ClientAppImportManager {
 				LOG.debug("No changes detected between Desired- and Actual-App. Exiting now...");
 				throw new AppException("No changes detected between Desired- and Actual-App.", ErrorCode.NO_CHANGE);			
 			} else {
-				LOG.info("Update existing application: " + actualApp.getName() + " ("+actualApp.getId()+")");
+				LOG.info("Update existing application: {} Id {}", actualApp.getName(), actualApp.getId());
 				apiMgrAppAdapter.updateApplication(desiredApp, actualApp);
 			}
 		}
@@ -88,7 +88,7 @@ public class ClientAppImportManager {
 					}
 				}
 				if(!found) {
-					LOG.info("Taking over permission of the user ("+actualPerm.getUserId()+") initially created the application.");
+					LOG.info("Taking over permission of the user {} initially created the application.", actualPerm.getUserId());
 					desiredApp.getPermissions().add(actualPerm);
 					return;
 				}

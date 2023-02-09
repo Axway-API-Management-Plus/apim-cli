@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 
 public class ConsolePrinterRemoteHosts {
-	
+
 	protected static Logger LOG = LoggerFactory.getLogger(ConsolePrinterRemoteHosts.class);
 	
 	APIManagerAdapter adapter;
@@ -34,15 +35,14 @@ public class ConsolePrinterRemoteHosts {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			LOG.error("Unable to get APIManagerAdapter", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Unable to get APIManagerAdapter",e);
 		}
 	}
 
 	public void export(Map<String, RemoteHost> remoteHosts) throws AppException {
-		System.out.println();
-		System.out.println("Remote hosts for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
-		System.out.println();
+		Console.println();
+		Console.println("Remote hosts for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
+		Console.println();
 		switch(params.getWide()) {
 		case standard:
 			printStandard(remoteHosts.values());
@@ -56,7 +56,7 @@ public class ConsolePrinterRemoteHosts {
 	}
 	
 	private void printStandard(Collection<RemoteHost> remoteHosts) {
-		System.out.println(AsciiTable.getTable(borderStyle, remoteHosts, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, remoteHosts, Arrays.asList(
 				new Column().header("Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getId),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getName),
 				new Column().header("Port").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getPort())),
@@ -67,7 +67,7 @@ public class ConsolePrinterRemoteHosts {
 	}
 	
 	private void printWide(Collection<RemoteHost> remoteHosts) {
-		System.out.println(AsciiTable.getTable(borderStyle, remoteHosts, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, remoteHosts, Arrays.asList(
 				new Column().header("Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getId),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getName),
 				new Column().header("Port").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getPort())),
@@ -81,7 +81,7 @@ public class ConsolePrinterRemoteHosts {
 	}
 	
 	private void printUltra(Collection<RemoteHost> remoteHosts) {
-		System.out.println(AsciiTable.getTable(borderStyle, remoteHosts, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, remoteHosts, Arrays.asList(
 				new Column().header("Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getId),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(RemoteHost::getName),
 				new Column().header("Port").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(remoteHost -> Integer.toString(remoteHost.getPort())),
@@ -102,29 +102,29 @@ public class ConsolePrinterRemoteHosts {
 		if(remoteHosts.size()!=1) return;
 		RemoteHost remoteHost = remoteHosts.iterator().next();
 		// If wide isn't ultra, we have to reload some more information for the detail view
-		System.out.println();
-		System.out.println("R E M O T E - H O S T  -  D E T A I L S");
-		System.out.println(String.format("%-30s", "Organization: ") + remoteHost.getOrganization().getName());
-		System.out.println(String.format("%-30s", "Created On: ") + new Date(remoteHost.getCreatedOn()));
-		System.out.println(String.format("%-30s", "Created By: ") + getCreatedBy(remoteHost));
-		System.out.println(String.format("%-30s", "Content-Length in request: ") + remoteHost.getIncludeContentLengthRequest());
-		System.out.println(String.format("%-30s", "Content-Length in response: ") + remoteHost.getIncludeContentLengthResponse());
-		System.out.println(String.format("%-30s", "Transaction timeout: ") + remoteHost.getTransactionTimeout());
-		System.out.println(String.format("%-30s", "Idle timeout: ") + remoteHost.getIdleTimeout());
-		System.out.println(String.format("%-30s", "Include correlation ID: ") + remoteHost.getExportCorrelationId());
-		System.out.println(String.format("%-30s", "Input Encodings: ") + Arrays.asList(remoteHost.getInputEncodings()));
-		System.out.println(String.format("%-30s", "Output Encodings: ") + Arrays.asList(remoteHost.getOutputEncodings()));
-		System.out.println(String.format("%-30s", "Related APIs (using the same backend): "));
+		Console.println();
+		Console.println("R E M O T E - H O S T  -  D E T A I L S");
+		Console.println(String.format("%-30s", "Organization: ") + remoteHost.getOrganization().getName());
+		Console.println(String.format("%-30s", "Created On: ") + new Date(remoteHost.getCreatedOn()));
+		Console.println(String.format("%-30s", "Created By: ") + getCreatedBy(remoteHost));
+		Console.println(String.format("%-30s", "Content-Length in request: ") + remoteHost.getIncludeContentLengthRequest());
+		Console.println(String.format("%-30s", "Content-Length in response: ") + remoteHost.getIncludeContentLengthResponse());
+		Console.println(String.format("%-30s", "Transaction timeout: ") + remoteHost.getTransactionTimeout());
+		Console.println(String.format("%-30s", "Idle timeout: ") + remoteHost.getIdleTimeout());
+		Console.println(String.format("%-30s", "Include correlation ID: ") + remoteHost.getExportCorrelationId());
+		Console.println(String.format("%-30s", "Input Encodings: ") + Arrays.asList(remoteHost.getInputEncodings()));
+		Console.println(String.format("%-30s", "Output Encodings: ") + Arrays.asList(remoteHost.getOutputEncodings()));
+		Console.println(String.format("%-30s", "Related APIs (using the same backend): "));
 		try {
 			List<API> relatedAPIs = getRelatedAPIs(remoteHost.getName(), remoteHost.getPort());
 			for(API api : relatedAPIs) {
-				System.out.printf("%-25s (%s)\n", api.getName(), api.getVersion());
+				Console.printf("%-25s (%s)", api.getName(), api.getVersion());
 			}
 			if(relatedAPIs==null || relatedAPIs.size()==0) {
-				System.out.println("No API found with backend: '" + remoteHost.getName() + "' and port: " + remoteHost.getPort());
+				Console.println("No API found with backend: '" + remoteHost.getName() + "' and port: " + remoteHost.getPort());
 			}
 		} catch (AppException e) {
-			System.out.println("ERR");
+			Console.println("ERR");
 		}
 	}
 	

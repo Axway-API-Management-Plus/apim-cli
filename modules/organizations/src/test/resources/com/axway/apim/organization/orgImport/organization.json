@@ -1,0 +1,9 @@
+{
+  "name" : "orga",
+  "description" : "Development org",
+  "email": "orga@axway.com",
+  "restricted" : false,
+  "enabled" : true,
+  "development" : true,
+  "image": "organization-image.png"
+}

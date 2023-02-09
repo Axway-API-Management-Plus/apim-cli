@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "PUT",
+    "urlPathPattern": "/api/portal/v1.4/remotehosts/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "remotehost.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -3,31 +3,52 @@ name: Release API CLI on github and Maven repository
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: 'Verson Type'     
+      releaseVersion:
+        description: "Default version to use when preparing a release."
         required: true
-        default: 'version-patch'
-        type: choice
-        options:
-        - version-major
-        - version-minor
-        - version-patch
-      tags:
-        description: 'Release Version Type'
+        default: "1.14.0"
+      developmentVersion:
+        description: "Default version to use for new local working copy."
+        required: true
+        default: "1.14.1-SNAPSHOT"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 8
+      - name: Set up Maven Central Repository
         uses: actions/setup-java@v3
         with:
           java-version: '8'
           distribution: 'zulu'
-          cache: 'maven'
-      - name: Maven Build and Unit Test 
-        run: mvn clean test
-      - name: Release
-        uses: qcastel/github-actions-maven-release@master
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: Prepare Release
+        run: mvn -Darguments=-DskipTests release:prepare -P release -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish package
+        run: mvn -Darguments=-DskipTests release:perform -P release
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Create Github Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: APIM-CLI ${{ github.event.inputs.releaseVersion }}
+          tag: ${{ github.event.inputs.releaseVersion }}
+          artifacts: "distribution/target/*.tar.gz,distribution/target/*.zip"
+          draft: true
+#      - name: RollBack Release
+#        if: ${{ failure() }}
+#        run: mvn release:rollback
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
     

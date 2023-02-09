@@ -1,0 +1,12 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/api/portal/v1.4/login"
+  },
+  "response": {
+    "status": 303,
+    "headers": {
+      "Content-Type": "text/plain"
+    }
+  }
+}

@@ -13,8 +13,8 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 public class AppCredentialsSerializer extends StdSerializer<ClientAppCredential> {
-	
-	private final JsonSerializer<Object> defaultSerializer;
+
+	private final transient JsonSerializer<Object> defaultSerializer;
 	
 	private File localFolder;
 	

@@ -1,6 +1,7 @@
 package com.axway.apim.api.model;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -103,6 +104,11 @@ public class QuotaRestriction {
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(method, type, config);
 	}
 
 	@Override

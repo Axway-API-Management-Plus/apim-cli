@@ -1,14 +1,6 @@
 package com.axway.apim.test.quota;
 
-import java.io.IOException;
-
-import org.springframework.http.HttpStatus;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -16,19 +8,25 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
+import org.springframework.http.HttpStatus;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 @Test
 public class MultiRestrictionQuotaTestIT extends TestNGCitrusTestRunner {
 
-	private ImportTestAction swaggerImport;
-	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException, InterruptedException {
-		swaggerImport = new ImportTestAction();
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, InterruptedException {
+		ImportTestAction swaggerImport = new ImportTestAction();
 		
 		description("Make sure you can configured multiple Quota-Restrictions for an API");
-		
+
+		variable("oadminUsername1","${apiManagerUser}");
+		variable("oadminPassword1","${apiManagerPass}");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/multi-quota-restriction--api-${apiNumber}");
 		variable("apiName", "Multi-Quota-Restriction-API-${apiNumber}");

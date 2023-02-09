@@ -72,10 +72,14 @@ public class EnvironmentProperties implements Map<String, String> {
                 pathToUse = (stage == null) ? "env.properties" : "env." + stage + ".properties";
                 is = APIMHttpClient.class.getClassLoader().getResourceAsStream(pathToUse);
             }
+            if(is == null){
+                LOG.debug("Trying to load environment properties from file: {} ... not found.", pathToUse);
+                return props;
+            }
             props.load(new StringReader(IOUtils.toString(is, StandardCharsets.UTF_8).replace("\\", "\\\\")));
-            LOG.debug("Loaded environment properties from file: " + pathToUse);
+            LOG.debug("Loaded environment properties from file: {}", pathToUse);
         } catch (Exception e) {
-            LOG.debug("Trying to load environment properties from file: " + pathToUse + " ... not found.");
+            LOG.debug("Trying to load environment properties from file: {} ... not found.", pathToUse);
         }
         return props;
     }
@@ -97,10 +101,12 @@ public class EnvironmentProperties implements Map<String, String> {
         if (null == value) {
             return null;
         }
-        if (value.indexOf("${") == -1) {
+        if (value.contains("${env")) { // issue #332
             return value;
         }
-
+        if (!value.contains("${")) {
+            return value;
+        }
         Pattern p = Pattern.compile("\\$\\{(\\w+)\\}|\\$(\\w+)");
         Matcher m = p.matcher(value);
         StringBuffer sb = new StringBuffer();

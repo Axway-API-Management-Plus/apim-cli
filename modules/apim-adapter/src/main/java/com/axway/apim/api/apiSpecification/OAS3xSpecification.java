@@ -2,7 +2,6 @@ package com.axway.apim.api.apiSpecification;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.filter.JsonNodeOpenAPI3SpecFilter;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -15,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import java.util.Objects;
 
 public class OAS3xSpecification extends APISpecification {
     private final Logger LOG = LoggerFactory.getLogger(OAS3xSpecification.class);
@@ -76,7 +76,7 @@ public class OAS3xSpecification extends APISpecification {
         }
     }
 
-    public ObjectNode createObjectNode(String key, String value){
+    public ObjectNode createObjectNode(String key, String value) {
         ObjectNode newServer = this.mapper.createObjectNode();
         newServer.put(key, value);
         return newServer;
@@ -84,25 +84,36 @@ public class OAS3xSpecification extends APISpecification {
 
     @Override
     public void configureBasePath(String backendBasePath, API api) throws AppException {
-        if (!CoreParameters.getInstance().isReplaceHostInSwagger()) return;
         try {
-            if (backendBasePath != null) {
-                if (openAPI.has("servers")) {
-                    JsonNode server = openAPI.get("servers").get(0); // takes the first entity -- currently not handling multiple URLs
-                    JsonNode urlJsonNode = server.get("url");
-                    if (urlJsonNode != null) {
-                        String serverUrl = urlJsonNode.asText();
-                        if (serverUrl.startsWith("http")) {
-                            backendBasePath = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
+            if (openAPI.has("servers")) {
+                ArrayNode servers = (ArrayNode) openAPI.get("servers");
+                if (!servers.isEmpty()) {
+                    // Remove remaining server nodes as  currently not handling multiple URLs
+                    for (int i = 1; i < servers.size(); i++) {
+                        servers.remove(i);
+                    }
+                    if (backendBasePath != null && !backendBasePath.contains("${env")) { // issue #332
+                        JsonNode server = servers.get(0);
+                        JsonNode urlJsonNode = server.get("url");
+                        if (urlJsonNode != null) {
+                            String serverUrl = urlJsonNode.asText();
+                            if (!serverUrl.startsWith("http")) { // If url does not have hostname, add hostname from backendBasePath
+                                backendBasePath = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
+                                LOG.info("Updating openapi Servers url with value : {}", backendBasePath);
+                                ObjectNode newServer = createObjectNode("url", backendBasePath);
+                                ((ObjectNode) openAPI).set("servers", mapper.createArrayNode().add(newServer));
+                            }
                         }
                     }
-                    ((ArrayNode) openAPI.get("servers")).removeAll();
                 }
-                LOG.info("Backend BasePath of API " + backendBasePath);
-                ObjectNode newServer = createObjectNode("url", backendBasePath);
-                ((ObjectNode) openAPI).set("servers", mapper.createArrayNode().add(newServer));
-                this.apiSpecificationContent = this.mapper.writeValueAsBytes(openAPI);
+            }else {
+                if(backendBasePath != null) {
+                    ObjectNode newServer = createObjectNode("url", backendBasePath);
+                    ((ObjectNode) openAPI).set("servers", mapper.createArrayNode().add(newServer));
+                    LOG.warn("Adding openapi Servers url with value : {}", backendBasePath);
+                }
             }
+            this.apiSpecificationContent = this.mapper.writeValueAsBytes(openAPI);
         } catch (Exception e) {
             LOG.error("Cannot replace host in provided Open API. Continue with given host.", e);
         }
@@ -132,5 +143,8 @@ public class OAS3xSpecification extends APISpecification {
         return super.equals(other);
     }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), openAPI);
+    }
 }

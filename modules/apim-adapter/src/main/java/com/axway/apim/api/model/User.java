@@ -244,7 +244,7 @@ public class User implements CustomPropertiesEntity {
                             otherUser.getOrganization().equals(this.getOrganization()) &&
                             StringUtils.equals(otherUser.getPhone(), this.getPhone()) &&
                             StringUtils.equals(otherUser.getEmail().toLowerCase(), this.getEmail().toLowerCase()) &&
-                            (otherUser.isEnabled() == this.isEnabled()) &&
+                            (otherUser.isEnabled().equals(this.isEnabled())) &&
                             StringUtils.equals(otherUser.getDescription(), this.getDescription()) &&
                             (this.getImage() == null || this.getImage().equals(otherUser.getImage())) &&
                             (this.getCustomProperties() == null || this.getCustomProperties().equals(otherUser.getCustomProperties()));

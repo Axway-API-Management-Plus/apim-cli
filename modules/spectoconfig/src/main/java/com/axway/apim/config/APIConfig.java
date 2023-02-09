@@ -19,6 +19,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class APIConfig {
 
+    public static final String DEFAULT = "_default";
     private API api;
     private String apiDefinition;
     private Map<String, Object> securityProfiles;
@@ -33,9 +34,9 @@ public class APIConfig {
         if (api.getOutboundProfiles() == null) return null;
         if (api.getOutboundProfiles().isEmpty()) return null;
         if (api.getOutboundProfiles().size() == 1) {
-            OutboundProfile defaultProfile = api.getOutboundProfiles().get("_default");
+            OutboundProfile defaultProfile = api.getOutboundProfiles().get(DEFAULT);
             if (defaultProfile.getRouteType().equals("proxy")
-                    && defaultProfile.getAuthenticationProfile().equals("_default")
+                    && defaultProfile.getAuthenticationProfile().equals(DEFAULT)
                     && defaultProfile.getRequestPolicy() == null
                     && defaultProfile.getResponsePolicy() == null
             ) return null;
@@ -43,7 +44,7 @@ public class APIConfig {
         for (OutboundProfile profile : api.getOutboundProfiles().values()) {
             profile.setApiId(null);
             // If the AuthenticationProfile is _default there is no need to export it, hence null is returned
-            if ("_default".equals(profile.getAuthenticationProfile())) {
+            if (DEFAULT.equals(profile.getAuthenticationProfile())) {
                 profile.setAuthenticationProfile(null);
             }
         }
@@ -62,15 +63,14 @@ public class APIConfig {
         return list;
     }
 
-    public String getPath(){
+    public String getPath() {
         return api.getPath();
     }
 
 
     public List<AuthenticationProfile> getAuthenticationProfiles() {
-        if (api.getAuthenticationProfiles().size() == 1) {
-            if (api.getAuthenticationProfiles().get(0).getType() == AuthType.none)
-                return null;
+        if (api.getAuthenticationProfiles().size() == 1 && api.getAuthenticationProfiles().get(0).getType() == AuthType.none) {
+            return null;
         }
         return api.getAuthenticationProfiles();
     }
@@ -79,9 +79,9 @@ public class APIConfig {
         if (api.getInboundProfiles() == null) return null;
         if (api.getInboundProfiles().isEmpty()) return null;
         if (api.getInboundProfiles().size() == 1) {
-            InboundProfile defaultProfile = api.getInboundProfiles().get("_default");
-            if (defaultProfile.getSecurityProfile().equals("_default")
-                && defaultProfile.getCorsProfile().equals("_default")) return null;
+            InboundProfile defaultProfile = api.getInboundProfiles().get(DEFAULT);
+            if (defaultProfile.getSecurityProfile().equals(DEFAULT)
+                    && defaultProfile.getCorsProfile().equals(DEFAULT)) return null;
         }
         return api.getInboundProfiles();
     }
@@ -97,7 +97,7 @@ public class APIConfig {
     }
 
 
-    public TagMap<String, String[]> getTags() {
+    public TagMap getTags() {
         return api.getTags();
     }
 

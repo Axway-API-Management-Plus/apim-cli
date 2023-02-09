@@ -2,6 +2,8 @@ package com.axway.apim.api.model;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
+
 public class OAuthClientProfile {
 	
 	private String id;
@@ -32,4 +34,10 @@ public class OAuthClientProfile {
 		}
 		return false;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name);
+	}
 }
+

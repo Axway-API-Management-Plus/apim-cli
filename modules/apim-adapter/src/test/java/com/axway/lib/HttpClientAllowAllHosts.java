@@ -9,6 +9,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import com.axway.apim.lib.utils.rest.Console;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
@@ -32,18 +33,18 @@ public class HttpClientAllowAllHosts {
 			// set up a TrustManager that trusts everything
 			sslContext.init(null, new TrustManager[] { new X509TrustManager() {
 			            public X509Certificate[] getAcceptedIssuers() {
-			                    System.out.println("getAcceptedIssuers =============");
+			                    Console.println("getAcceptedIssuers =============");
 			                    return null;
 			            }
 
 			            public void checkClientTrusted(X509Certificate[] certs,
 			                            String authType) {
-			                    System.out.println("checkClientTrusted =============");
+			                    Console.println("checkClientTrusted =============");
 			            }
 
 			            public void checkServerTrusted(X509Certificate[] certs,
 			                            String authType) {
-			                    System.out.println("checkServerTrusted =============");
+			                    Console.println("checkServerTrusted =============");
 			            }
 			} }, new SecureRandom());
 			// We have to use deprecated stuff, as only the "DefaultHttpClient" can be used by class:
@@ -56,13 +57,10 @@ public class HttpClientAllowAllHosts {
 			
 			// apache HttpClient version >4.2 should use BasicClientConnectionManager
 			ClientConnectionManager cm = new SingleClientConnManager(schemeRegistry);
-			HttpClient httpClient = new DefaultHttpClient(cm);
+
+			return new DefaultHttpClient(cm);
 			
-			return httpClient;
-			
-		} catch (NoSuchAlgorithmException e) {
-			throw new BeanCreationException("Failed to create http client for ssl connection", e);
-		} catch (KeyManagementException e) {
+		} catch (NoSuchAlgorithmException | KeyManagementException e) {
 			throw new BeanCreationException("Failed to create http client for ssl connection", e);
 		}
 	}

@@ -307,7 +307,7 @@ public class Config {
 
 	private Boolean baseOAuth;
 	
-	private Boolean oadminSelfServiceEnabled;
+	private Boolean oadminSelfServiceEnabled = Boolean.FALSE;
 	
 	private String externalUserName;
 	

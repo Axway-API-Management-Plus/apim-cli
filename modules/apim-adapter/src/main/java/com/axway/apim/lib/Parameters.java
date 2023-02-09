@@ -1,7 +1,7 @@
 package com.axway.apim.lib;
 
 public interface Parameters {
-	public Boolean isZeroDowntimeUpdate();
+	Boolean isZeroDowntimeUpdate();
 	
-	public void setZeroDowntimeUpdate(Boolean zeroDowntimeUpdate);
+	void setZeroDowntimeUpdate(Boolean zeroDowntimeUpdate);
 }

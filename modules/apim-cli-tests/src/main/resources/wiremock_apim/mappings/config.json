@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/portal/v1.4/config"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "config.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

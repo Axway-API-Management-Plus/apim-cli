@@ -1,18 +1,10 @@
 package com.axway.apim.test;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
+import com.axway.apim.APIImportApp;
+import com.consol.citrus.actions.AbstractTestAction;
+import com.consol.citrus.context.TestContext;
+import com.consol.citrus.exceptions.CitrusRuntimeException;
+import com.consol.citrus.exceptions.ValidationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -20,11 +12,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.APIImportApp;
-import com.consol.citrus.actions.AbstractTestAction;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.exceptions.CitrusRuntimeException;
-import com.consol.citrus.exceptions.ValidationException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ImportTestAction extends AbstractTestAction {
 	
@@ -67,16 +61,13 @@ public class ImportTestAction extends AbstractTestAction {
 
 		boolean enforce = false;
 		boolean ignoreQuotas = false;
-		boolean ignoreAdminAccount = false;
 		boolean ignoreCache = false;
-		String allowOrgAdminsToPublish = "true";
 		boolean changeOrganization = false;
 		String clientOrgsMode = null;
 		String clientAppsMode = null;
 		String quotaMode = null;
 		boolean exportMethods = false;
-		
-		
+		boolean useApiAdmin = false;
 		try {
 			enforce = Boolean.parseBoolean(context.getVariable("enforce"));
 		} catch (Exception ignore) {}
@@ -92,12 +83,7 @@ public class ImportTestAction extends AbstractTestAction {
 		try {
 			clientAppsMode = context.getVariable("clientAppsMode");
 		} catch (Exception ignore) {}
-		try {
-			ignoreAdminAccount = Boolean.parseBoolean(context.getVariable("ignoreAdminAccount"));
-		} catch (Exception ignore) {}
-		try {
-			allowOrgAdminsToPublish = context.getVariable("allowOrgAdminsToPublish");
-		} catch (Exception ignore) {}
+
 		try {
 			changeOrganization = Boolean.parseBoolean(context.getVariable("changeOrganization"));
 		} catch (Exception ignore) {}
@@ -108,7 +94,9 @@ public class ImportTestAction extends AbstractTestAction {
 		try {
 			exportMethods = Boolean.parseBoolean(context.getVariable("exportMethods"));
 		} catch (Exception ignore) {}
-		
+		try {
+			useApiAdmin = Boolean.parseBoolean(context.getVariable("useApiAdmin"));
+		} catch (Exception ignore) {}
 		
 		if(stage==null) {
 			stage = "NOT_SET";
@@ -135,9 +123,16 @@ public class ImportTestAction extends AbstractTestAction {
 			args.add("-h");
 			args.add(context.replaceDynamicContentInString("${apiManagerHost}"));
 			args.add("-u");
-			args.add(context.replaceDynamicContentInString("${oadminUsername1}"));
+			if(useApiAdmin)
+				args.add(context.replaceDynamicContentInString("${apiManagerUser}"));
+			else
+				args.add(context.replaceDynamicContentInString("${oadminUsername1}"));
 			args.add("-p");
-			args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
+			if(useApiAdmin)
+				args.add(context.replaceDynamicContentInString("${apiManagerPass}"));
+			else
+				args.add(context.replaceDynamicContentInString("${oadminPassword1}"));
+
 			args.add("-s");
 			args.add(stage);
 			if(quotaMode!=null) {
@@ -152,8 +147,7 @@ public class ImportTestAction extends AbstractTestAction {
 				args.add("-clientAppsMode");
 				args.add(clientAppsMode);
 			}
-			args.add("-allowOrgAdminsToPublish");
-			args.add(allowOrgAdminsToPublish);
+
 			args.add("-disableCompression");
 
 			if(changeOrganization) {
@@ -168,15 +162,12 @@ public class ImportTestAction extends AbstractTestAction {
 			if(ignoreCache) {
 				args.add("-ignoreCache");
 			}
-			if(ignoreAdminAccount) {
-				args.add("-ignoreAdminAccount");
-			}
 			if(exportMethods){
 				args.add("-exportMethods");
 			}
 		}
-		LOG.info("Ignoring admin account: '"+ignoreAdminAccount+"' | Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);
-		int rc = APIImportApp.importAPI(args.toArray(new String[args.size()]));
+		LOG.info("Enforce breaking change: " + enforce + " | useEnvironmentOnly: " + useEnvironmentOnly);
+		int rc = APIImportApp.importAPI(args.toArray(new String[0]));
 		if(expectedReturnCode!=rc) {
 			throw new ValidationException("Expected RC was: " + expectedReturnCode + " but got: " + rc);
 		}
@@ -192,9 +183,12 @@ public class ImportTestAction extends AbstractTestAction {
 		OutputStream os = null;
 		try {
 			if(inputFile.exists()) { 
-				is = new FileInputStream(pathToFile);
+				is = Files.newInputStream(Paths.get(pathToFile));
+				LOG.info("Loading file {} from relative path", pathToFile);
 			} else {
 				is = this.getClass().getResourceAsStream(pathToFile);
+				LOG.info("Loading file {} from class path", pathToFile);
+
 			}
 			if(is == null) {
 				throw new IOException("Unable to read swagger file from: " + pathToFile);
@@ -204,12 +198,10 @@ public class ImportTestAction extends AbstractTestAction {
 
 			String jsonReplaced = context.replaceDynamicContentInString(jsonData);
 
-			os = new FileOutputStream(replacedFilename);
+			os = Files.newOutputStream(Paths.get(replacedFilename));
 			IOUtils.write(jsonReplaced, os, StandardCharsets.UTF_8);
 			
 			return replacedFilename;
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -262,7 +254,7 @@ public class ImportTestAction extends AbstractTestAction {
 				return;
 			}
 		}
-		FileFilter filter = new WildcardFileFilter(new String[] {"*.crt", "*.jpg", "*.png", "*.pem", "*.md"});
+		FileFilter filter = new WildcardFileFilter("*.crt", "*.jpg", "*.png", "*.pem", "*.md");
 		try {
 			LOG.info("Copy certificates and images from source: "+sourceDir+" into test-dir: '"+testDir+"' (Filter: \"*.crt\", \"*.jpg\", \"*.png\", \"*.pem\", \"*.md\")");
 			FileUtils.copyDirectory(sourceDir, testDir, filter);

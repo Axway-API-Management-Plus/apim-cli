@@ -26,7 +26,7 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 		super();
 		this.context = context;
 		this.randomNum = ThreadLocalRandom.current().nextInt(1, 9999 + 1);
-		this.testDirectory = createTestDirectory(this.context);
+		this.testDirectory = createTestDirectory();
 	}
 
 	@Override
@@ -40,12 +40,12 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 		int expectedReturnCode = 0;
 		try {
 			expectedReturnCode 	= Integer.parseInt(context.getVariable(PARAM_EXPECTED_RC));
-		} catch (Exception ignore) {};
+		} catch (Exception ignore) {}
 		return expectedReturnCode;
 	}
 	
-	protected File createTestDirectory(TestContext context) {
-		String testDirName = getTestDirName(context);
+	protected File createTestDirectory() {
+		String testDirName = getTestDirName();
 		String tmpDir = System.getProperty("java.io.tmpdir");
 		File testDir = new File(tmpDir + File.separator + testDirName);
 		if(testDir.mkdir()) {
@@ -56,17 +56,20 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 		return testDir;
 	}
 
-	protected String getTestDirName(TestContext context) {
+	protected String getTestDirName() {
 		return this.getClass().getSimpleName() + "-" + randomNum;
 	}
 	
 	protected void addParameters(CoreParameters params, TestContext context) {
 		params.setHostname(getVariable(context, PARAM_HOSTNAME));
-		params.setUsername(getVariable(context, PARAM_OADMIN_USERNAME));
-		params.setPassword(getVariable(context, PARAM_OADMIN_PASSWORD));
-		params.setAdminUsername(getVariable(context, PARAM_ADMIN_USERNAME));
-		params.setAdminUsername(getVariable(context, PARAM_ADMIN_PASSWORD));
-		params.setIgnoreAdminAccount(getIgnoreAdminAccount(context));
+		boolean useApiAdmin = Boolean.parseBoolean(getVariable(context,"useApiAdmin"));
+		if(useApiAdmin){
+			params.setUsername(getVariable(context, "apiManagerUser"));
+			params.setPassword(getVariable(context, "apiManagerPass"));
+		}else {
+			params.setUsername(getVariable(context, PARAM_OADMIN_USERNAME));
+			params.setPassword(getVariable(context, PARAM_OADMIN_PASSWORD));
+		}
 		params.setStage(getVariable(context, PARAM_STAGE));
 		params.setProperties(new EnvironmentProperties(params.getStage(), null));
 	}
@@ -74,15 +77,10 @@ public abstract class CLIAbstractTestAction extends AbstractTestAction implement
 	public String getVariable(TestContext context, String varname) {
 		try {
 			return context.getVariable(varname);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			LOG.error("Error reading variable : {}", varname);
+		}
 		return null;
-	}
-	
-	public Boolean getIgnoreAdminAccount(TestContext context) {
-		try {
-			return Boolean.parseBoolean(context.getVariable(PARAM_IGNORE_ADMIN_ACC));
-		} catch (Exception e) {}
-		return false;
 	}
 
 	public File getTestDirectory() {

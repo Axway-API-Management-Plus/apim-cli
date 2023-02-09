@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 public class RemotehostDeserializer extends StdDeserializer<RemoteHost> {
 	
-	public static enum Params {
+	public enum Params {
 		validateRemoteHost
 	}
 	
@@ -38,11 +38,11 @@ public class RemotehostDeserializer extends StdDeserializer<RemoteHost> {
 			throws IOException, JsonProcessingException {
 		JsonNode node = jp.getCodec().readTree(jp);
 		String remoteHostName;
-		Integer remoteHostPort;
+		int remoteHostPort;
 		// This must have the format my.host.com:7889
 		String givenRemoteHost = node.asText();
 		// 
-		if(givenRemoteHost.indexOf(":")==-1) {
+		if(!givenRemoteHost.contains(":")) {
 			remoteHostName = givenRemoteHost;
 			remoteHostPort = 443;
 		} else {
@@ -55,7 +55,7 @@ public class RemotehostDeserializer extends StdDeserializer<RemoteHost> {
 			if(validateRemoteHost(ctxt)) {
 				throw new AppException("The given remote host: '"+remoteHostName+":"+remoteHostPort+"' is unknown.", ErrorCode.UNKNOWN_REMOTE_HOST);
 			} else {
-				LOG.warn("The given remote host: '"+remoteHostName+":"+remoteHostPort+"' is unknown.");
+				LOG.warn("The given remote host: {}:{} is unknown.",remoteHostName,remoteHostPort);
 			}
 		}
 		return remoteHost;

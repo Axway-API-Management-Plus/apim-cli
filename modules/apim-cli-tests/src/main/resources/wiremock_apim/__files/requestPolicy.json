@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Validate Size & Token",
+    "id": "<key type='FilterCircuit'><id field='name' value='Validate Size &amp; Token'/></key>"
+  },
+  {
+    "name": "Amazon V2 - DescribeInstances",
+    "id": "<key type='CircuitContainer'><id field='name' value='API Keys'/><key type='FilterCircuit'><id field='name' value='Amazon V2 - DescribeInstances'/></key></key>"
+  }
+]

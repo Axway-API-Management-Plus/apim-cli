@@ -4,6 +4,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +22,7 @@ public class ConsolePrinterConfig {
 	APIManagerAdapter adapter;
 	
 	StandardExportParams params;
-	
-	private final String dots = ".....................................";
-	
+
 	ConfigType[] standardFields = new ConfigType[] {
 			ConfigType.APIManager, 
 			ConfigType.APIPortal, 
@@ -59,15 +58,14 @@ public class ConsolePrinterConfig {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			LOG.error("Unable to get APIManagerAdapter", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Unable to get APIManagerAdapter", e);
 		}
 	}
 
 	public void export(Config config) throws AppException {
-		System.out.println();
-		System.out.println("Configuration for: '" + config.getPortalName() + "' Version: " + config.getProductVersion());
-		System.out.println();
+		Console.println();
+		Console.println("Configuration for: '" + config.getPortalName() + "' Version: " + config.getProductVersion());
+		Console.println();
 		switch(params.getWide()) {
 		case standard:
 			print(config, standardFields);
@@ -82,17 +80,18 @@ public class ConsolePrinterConfig {
 	
 	private void print(Config config, ConfigType[] configTypes) {
 		for(ConfigType configType : configTypes) {
-			System.out.println(configType.getClearName()+":");
+			Console.println(configType.getClearName()+":");
 			Field[] fields = Config.class.getDeclaredFields();
 			for (Field field : fields) {
 				if (field.isAnnotationPresent(APIManagerConfigAnnotation.class)) {
 					APIManagerConfigAnnotation annotation = field.getAnnotation(APIManagerConfigAnnotation.class);
 					if(annotation.configType()==configType) {
-						System.out.printf("%s %s: %s\n", annotation.name() , dots.substring(annotation.name().length()), getFieldValue(field.getName(), config));
+						String dots = ".....................................";
+						Console.printf("%s %s: %s", annotation.name() , dots.substring(annotation.name().length()), getFieldValue(field.getName(), config));
 					}
 				}
 			}
-			System.out.println();
+			Console.println();
 		}
 	}
 	

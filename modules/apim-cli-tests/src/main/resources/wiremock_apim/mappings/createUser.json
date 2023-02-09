@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/api/portal/v1.4/users"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "update_user.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

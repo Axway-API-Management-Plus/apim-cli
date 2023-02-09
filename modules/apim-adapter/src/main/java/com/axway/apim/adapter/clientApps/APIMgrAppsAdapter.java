@@ -1,16 +1,26 @@
 package com.axway.apim.adapter.clientApps;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.CacheType;
+import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
+import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
+import com.axway.apim.api.model.APIAccess;
+import com.axway.apim.api.model.Image;
+import com.axway.apim.api.model.User;
+import com.axway.apim.api.model.apps.*;
+import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.*;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
@@ -21,40 +31,16 @@ import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIManagerAdapter.CacheType;
-import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
-import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
-import com.axway.apim.api.model.APIAccess;
-import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.User;
-import com.axway.apim.api.model.apps.APIKey;
-import com.axway.apim.api.model.apps.ApplicationPermission;
-import com.axway.apim.api.model.apps.ClientAppCredential;
-import com.axway.apim.api.model.apps.ClientAppOauthResource;
-import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.api.model.apps.ExtClients;
-import com.axway.apim.api.model.apps.OAuth;
-import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.Utils;
-import com.axway.apim.lib.utils.rest.DELRequest;
-import com.axway.apim.lib.utils.rest.GETRequest;
-import com.axway.apim.lib.utils.rest.POSTRequest;
-import com.axway.apim.lib.utils.rest.PUTRequest;
-import com.axway.apim.lib.utils.rest.RestAPICall;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 
 public class APIMgrAppsAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIMgrAppsAdapter.class);
+    public static final String APPLICATIONS = "/applications";
+    public static final String ERROR_CREATING_APPLICATION_ERROR = "Error creating application. Error: ";
 
     Map<ClientAppFilter, String> apiManagerResponse = new HashMap<>();
 
@@ -83,8 +69,7 @@ public class APIMgrAppsAdapter {
      * @throws AppException if applications cannot be retrieved
      */
     private void readApplicationsFromAPIManager(ClientAppFilter filter) throws AppException {
-        if (this.apiManagerResponse != null && this.apiManagerResponse.get(filter) != null) return;
-        HttpResponse httpResponse = null;
+        if (this.apiManagerResponse.get(filter) != null) return;
         try {
             String requestedId = "";
             if (filter.getApplicationId() != null) {
@@ -94,34 +79,29 @@ public class APIMgrAppsAdapter {
                 }
                 requestedId = "/" + filter.getApplicationId();
             }
-            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications" + requestedId)
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + requestedId)
                     .addParameters(filter.getFilters())
                     .build();
-            LOG.debug("Sending request to find existing applications: " + uri);
-            RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
-            httpResponse = getRequest.execute();
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            if (statusCode == 404) {
-                // Nothing found - Simulate an empty response
-                this.apiManagerResponse.put(filter, "[]");
-                return;
-            }
-            String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
-            if (response.startsWith("{")) { // Got a single response!
-                response = "[" + response + "]";
-            }
-            this.apiManagerResponse.put(filter, response);
-            if (filter.getApplicationId() != null) {
-                applicationsCache.put(filter.getApplicationId(), response);
+            LOG.debug("Sending request to find existing applications: {}", uri);
+            RestAPICall getRequest = new GETRequest(uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode == 404) {
+                    // Nothing found - Simulate an empty response
+                    this.apiManagerResponse.put(filter, "[]");
+                    return;
+                }
+                String response = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
+                if (response.startsWith("{")) { // Got a single response!
+                    response = "[" + response + "]";
+                }
+                this.apiManagerResponse.put(filter, response);
+                if (filter.getApplicationId() != null) {
+                    applicationsCache.put(filter.getApplicationId(), response);
+                }
             }
         } catch (Exception e) {
             throw new AppException("Can't initialize API-Manager App-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
@@ -131,7 +111,7 @@ public class APIMgrAppsAdapter {
         if (filter.getApplicationId() != null) {
             requestedId = "/" + filter.getApplicationId();
         }
-        return new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications" + requestedId)
+        return new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + requestedId)
                 .addParameters(filter.getFilters())
                 .build();
     }
@@ -143,7 +123,7 @@ public class APIMgrAppsAdapter {
             if (this.apiManagerResponse.get(filter) == null) return null;
             apps = mapper.readValue(this.apiManagerResponse.get(filter), new TypeReference<List<ClientApplication>>() {
             });
-            LOG.debug("Found: " + apps.size() + " applications");
+            LOG.debug("Found: {} applications", apps.size());
             for (int i = 0; i < apps.size(); i++) {
                 ClientApplication app = apps.get(i);
                 addImage(app, filter.isIncludeImage());
@@ -177,7 +157,6 @@ public class APIMgrAppsAdapter {
             subscribedApps = mapper.readValue(this.subscribedAppAPIManagerResponse.get(apiId), new TypeReference<List<ClientApplication>>() {
             });
         } catch (IOException e) {
-            LOG.error("Error cant load subscribes applications from API-Manager. Can't parse response: " + this.subscribedAppAPIManagerResponse.get(apiId), e);
             throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
         return subscribedApps;
@@ -189,30 +168,20 @@ public class APIMgrAppsAdapter {
             subscribedAppAPIManagerResponse.put(apiId, applicationsSubscriptionCache.get(apiId));
             return;
         }
-
-        String response = null;
-        URI uri;
-        HttpResponse httpResponse = null;
         if (!APIManagerAdapter.hasAPIManagerVersion("7.7")) {
             throw new AppException("API-Manager: " + APIManagerAdapter.apiManagerVersion + " doesn't support /proxies/<apiId>/applications", ErrorCode.UNXPECTED_ERROR);
         }
         try {
-            uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + "/applications").build();
-            RestAPICall getRequest = new GETRequest(uri, APIManagerAdapter.hasAdminAccount());
-            LOG.debug("Load subscribed applications for API-ID: " + apiId + " from API-Manager");
-            httpResponse = getRequest.execute();
-            response = EntityUtils.toString(httpResponse.getEntity());
-            subscribedAppAPIManagerResponse.put(apiId, response);
-            applicationsSubscriptionCache.put(apiId, response);
-        } catch (Exception e) {
-            LOG.error("Error cant load subscribes applications from API-Manager. Can't parse response: " + response, e);
-            throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
+            URI uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + APPLICATIONS).build();
+            RestAPICall getRequest = new GETRequest(uri);
+            LOG.debug("Load subscribed applications for API-ID: {} from API-Manager", apiId);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                subscribedAppAPIManagerResponse.put(apiId, response);
+                applicationsSubscriptionCache.put(apiId, response);
             }
+        } catch (Exception e) {
+            throw new AppException("Error cant load subscribes applications from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
 
@@ -230,7 +199,7 @@ public class APIMgrAppsAdapter {
         return apps.get(0);
     }
 
-    void addApplicationCredentials(ClientApplication app, boolean addCredentials) throws Exception {
+    void addApplicationCredentials(ClientApplication app, boolean addCredentials) throws AppException {
         if (!addCredentials) return;
         String response;
         List<ClientAppCredential> credentials;
@@ -244,15 +213,15 @@ public class APIMgrAppsAdapter {
                 String type = types[i];
                 TypeReference<List<ClientAppCredential>> classType = classTypes[i];
                 if (!applicationsCredentialCache.containsKey(app.getId() + "|" + type)) {
-                    URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/" + type)
+                    URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/" + type)
                             .build();
                     RestAPICall getRequest = new GETRequest(uri);
                     try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                         response = EntityUtils.toString(httpResponse.getEntity());
                         int statusCode = httpResponse.getStatusLine().getStatusCode();
                         if (statusCode != 200) {
-                            LOG.error("Error reading application credentials. Response-Code: " + statusCode + ". Got response: '" + response + "'");
-                            throw new AppException("Error creating application' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                            LOG.error("Error reading application credentials. Response-Code: {} Got response: {}", statusCode, response);
+                            throw new AppException("Error creating application' Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                         }
                         applicationsCredentialCache.put(app.getId() + "|" + type, response);
                     }
@@ -271,14 +240,14 @@ public class APIMgrAppsAdapter {
         if (!includeOauthResources) return;
         String endpoint = "oauthresource";
         try {
-            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/" + endpoint)
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/" + endpoint)
                     .build();
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 200) {
-                    LOG.error("Error reading application oauth resources. Response-Code: " + statusCode + ". Got response: '" + response + "'");
+                    LOG.error("Error reading application oauth resources. Response-Code: {} Got response: {}", statusCode, response);
                     throw new AppException("Error reading application oauth resources' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 TypeReference<List<ClientAppOauthResource>> classType = new TypeReference<List<ClientAppOauthResource>>() {
@@ -295,14 +264,14 @@ public class APIMgrAppsAdapter {
     private void addApplicationPermissions(ClientApplication app, boolean includeApplicationPermissions) throws AppException {
         if (!includeApplicationPermissions) return;
         try {
-            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/permissions")
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/permissions")
                     .build();
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 200) {
-                    LOG.error("Error reading application permissions. Response-Code: " + statusCode + ". Got response: '" + response + "'");
+                    LOG.error("Error reading application permissions. Response-Code: {} Got response: {}", statusCode, response);
                     throw new AppException("Error reading application permissions' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 TypeReference<List<ApplicationPermission>> classType = new TypeReference<List<ApplicationPermission>>() {
@@ -321,21 +290,21 @@ public class APIMgrAppsAdapter {
         }
     }
 
-    void addAPIAccess(ClientApplication app, boolean addAPIAccess) throws Exception {
+    void addAPIAccess(ClientApplication app, boolean addAPIAccess) throws AppException {
         if (!addAPIAccess) return;
         try {
             List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app, Type.applications, true);
             app.getApiAccess().addAll(apiAccess);
-        } catch (Exception e) {
+        } catch (AppException e) {
             throw new AppException("Error reading application API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
         }
     }
 
-    void addImage(ClientApplication app, boolean addImage) throws Exception {
+    void addImage(ClientApplication app, boolean addImage) throws AppException, URISyntaxException {
         if (!addImage) return;
         URI uri;
         if (app.getImageUrl() == null) return;
-        uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/image")
+        uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/image")
                 .build();
         Image image = APIManagerAdapter.getImageFromAPIM(uri, "app-image");
         app.setImage(image);
@@ -356,15 +325,14 @@ public class APIMgrAppsAdapter {
     private void createOrUpdateApplication(ClientApplication desiredApp, ClientApplication actualApp, boolean baseAppOnly) throws AppException {
         ClientApplication createdApp;
         try {
-            CoreParameters cmd = CoreParameters.getInstance();
             URI uri;
             if (actualApp == null) {
-                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications").build();
+                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS).build();
             } else {
                 if (desiredApp.getApiAccess() != null && desiredApp.getApiAccess().size() == 0)
                     desiredApp.setApiAccess(null);
                 desiredApp.setId(actualApp.getId());
-                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + actualApp.getId()).build();
+                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + actualApp.getId()).build();
             }
             mapper.setSerializationInclusion(Include.NON_NULL);
             try {
@@ -387,7 +355,7 @@ public class APIMgrAppsAdapter {
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error creating/updating application. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                        LOG.error("Error creating/updating application. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
                         throw new AppException("Error creating/updating application. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                     }
                     createdApp = mapper.readValue(httpResponse.getEntity().getContent(), ClientApplication.class);
@@ -402,7 +370,6 @@ public class APIMgrAppsAdapter {
             // Remove application from cache to force reload next time
             applicationsCache.remove(createdApp.getId());
             if (baseAppOnly) return;
-
             desiredApp.setId(createdApp.getId());
             saveImage(desiredApp, actualApp);
             saveAPIAccess(desiredApp, actualApp);
@@ -410,7 +377,6 @@ public class APIMgrAppsAdapter {
             manageOAuthResources(desiredApp, actualApp);
             manageAppPermissions(desiredApp, actualApp);
             saveQuota(desiredApp, actualApp);
-
         } catch (Exception e) {
             throw new AppException("Error creating/updating application. Error: " + e.getMessage(), ErrorCode.ERR_CREATING_APPLICATION, e);
         }
@@ -419,16 +385,15 @@ public class APIMgrAppsAdapter {
     private void saveImage(ClientApplication app, ClientApplication actualApp) throws URISyntaxException, AppException {
         if (app.getImage() == null) return;
         if (actualApp != null && app.getImage().equals(actualApp.getImage())) return;
-        URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/image").build();
+        URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/image").build();
         HttpEntity entity = MultipartEntityBuilder.create()
                 .addBinaryBody("file", app.getImage().getInputStream(), ContentType.create("image/jpeg"), app.getImage().getBaseFilename())
                 .build();
         RestAPICall apiCall = new POSTRequest(entity, uri);
         try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
-
             int statusCode = httpResponse.getStatusLine().getStatusCode();
             if (statusCode < 200 || statusCode > 299) {
-                LOG.error("Error saving/updating application image. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                LOG.error("Error saving/updating application image. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
             }
         } catch (Exception e) {
             throw new AppException("Error uploading application image. Error: " + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
@@ -446,14 +411,13 @@ public class APIMgrAppsAdapter {
             boolean update = false;
             FilterProvider filter;
             if (cred instanceof OAuth) {
-
                 endpoint = "oauth";
                 filter = new SimpleFilterProvider().setDefaultFilter(
                         SimpleBeanPropertyFilter.serializeAllExcept("credentialType", "clientId", "apiKey"));
                 final String credentialId = ((OAuth) cred).getClientId();
                 Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
                 if (opt.isPresent()) {
-                    LOG.info("Found oauth credential with same ID for application {}", actualApp.getId());
+                    LOG.info("Found oauth credential with same ID for application {}", actualApp != null ? actualApp.getId() : null);
                     //I found a credential with same id name but different in some properties, I have to update it
                     endpoint += "/" + credentialId;
                     update = true;
@@ -497,9 +461,8 @@ public class APIMgrAppsAdapter {
             } else {
                 throw new AppException("Unsupported credential: " + cred.getClass().getName(), ErrorCode.UNXPECTED_ERROR);
             }
-
             try {
-                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/" + endpoint).build();
+                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/" + endpoint).build();
                 mapper.setFilterProvider(filter);
                 mapper.setSerializationInclusion(Include.NON_NULL);
                 String json = mapper.writeValueAsString(cred);
@@ -509,12 +472,12 @@ public class APIMgrAppsAdapter {
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error saving/updating application credentials. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                        LOG.error("Error saving/updating application credentials. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
                         throw new AppException("Error creating application' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                     }
                 }
             } catch (Exception e) {
-                throw new AppException("Error creating application. Error: " + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
+                throw new AppException(ERROR_CREATING_APPLICATION_ERROR + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
             }
         }
     }
@@ -545,7 +508,7 @@ public class APIMgrAppsAdapter {
             return;
         }
         try {
-            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/quota").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/quota").build();
             FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"));
             mapper.setFilterProvider(filter);
             mapper.setSerializationInclusion(Include.NON_NULL);
@@ -554,14 +517,14 @@ public class APIMgrAppsAdapter {
             // Use an admin account for this request
             RestAPICall request;
             if (actualApp == null) {
-                request = new POSTRequest(entity, uri, true);
+                request = new POSTRequest(entity, uri);
             } else {
-                request = new PUTRequest(entity, uri, true);
+                request = new PUTRequest(entity, uri);
             }
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
-                    LOG.error("Error creating/updating application quota. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                    LOG.error("Error creating/updating application quota. Response-Code: {}  Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
                     throw new AppException("Error creating application' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 // Force reload of this quota next time
@@ -610,34 +573,34 @@ public class APIMgrAppsAdapter {
                 mapper.setSerializationInclusion(Include.NON_NULL);
                 String json = mapper.writeValueAsString(res);
                 HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + desiredApp.getId() + "/" + endpoint).build();
+                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + desiredApp.getId() + "/" + endpoint).build();
                 RestAPICall request = (update ? new PUTRequest(entity, uri) : new POSTRequest(entity, uri));
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error saving/updating application oauth resource. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                        LOG.error("Error saving/updating application oauth resource. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
                         throw new AppException("Error creating application' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                     }
                 }
             } catch (Exception e) {
-                throw new AppException("Error creating application. Error: " + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
+                throw new AppException(ERROR_CREATING_APPLICATION_ERROR + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
             }
         }
     }
 
     private void deleteOAuthResources(ClientApplication desiredApp, List<ClientAppOauthResource> scopes2Delete) throws AppException {
-        if (scopes2Delete == null || scopes2Delete.size() == 0) return;
+        if (scopes2Delete == null || scopes2Delete.isEmpty()) return;
         for (ClientAppOauthResource res : scopes2Delete) {
             try {
-                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + desiredApp.getId() + "/oauthresource/" + res.getId()).build();
-                RestAPICall request = new DELRequest(uri, true);
+                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + desiredApp.getId() + "/oauthresource/" + res.getId()).build();
+                RestAPICall request = new DELRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != 204) {
-                        LOG.error("Error deleting application scope. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                        LOG.error("Error deleting application scope. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
                         throw new AppException("Error deleting application scope. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                     }
-                    LOG.info("Application scope: " + res.getScope() + " for application: " + desiredApp.getName() + " successfully deleted");
+                    LOG.info("Application scope: {} for application: {} successfully deleted", res.getScope(), desiredApp.getName());
                 }
             } catch (Exception e) {
                 throw new AppException("Error deleting application scope. Error: " + e.getMessage(), ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -677,10 +640,12 @@ public class APIMgrAppsAdapter {
         // finally iterate over all existing scopes and check if they are still desired
         for (ClientAppOauthResource existingScope : existingScopes) {
             boolean actualScopeFound = false;
-            for (ClientAppOauthResource desiredScope : desiredScopes) {
-                if (existingScope.getScope().equals(desiredScope.getScope())) {
-                    actualScopeFound = true;
-                    break; // As the actual scope is still desired
+            if( desiredScopes != null) {
+                for (ClientAppOauthResource desiredScope : desiredScopes) {
+                    if (existingScope.getScope().equals(desiredScope.getScope())) {
+                        actualScopeFound = true;
+                        break; // As the actual scope is still desired
+                    }
                 }
             }
             if (!actualScopeFound) scopes2Delete.add(existingScope);
@@ -730,10 +695,12 @@ public class APIMgrAppsAdapter {
         // finally iterate over all existing permissions and check if they are still desired
         for (ApplicationPermission existingPermission : existingPermissions) {
             boolean actualPermissionFound = false;
-            for (ApplicationPermission desiredPermission : desiredPermissions) {
-                if (existingPermission.getUsername().equals(desiredPermission.getUsername())) {
-                    actualPermissionFound = true;
-                    break; // As the actual scope is still desired
+            if (desiredPermissions != null) {
+                for (ApplicationPermission desiredPermission : desiredPermissions) {
+                    if (existingPermission.getUsername().equals(desiredPermission.getUsername())) {
+                        actualPermissionFound = true;
+                        break; // As the actual scope is still desired
+                    }
                 }
             }
             if (!actualPermissionFound) appPermissions2Delete.add(existingPermission);
@@ -742,7 +709,6 @@ public class APIMgrAppsAdapter {
 
     private void saveOrUpdateApplicationPermissions(ClientApplication desiredApp, List<ApplicationPermission> permissions2Create, boolean update) throws AppException {
         if (permissions2Create == null || permissions2Create.size() == 0) return;
-        HttpResponse httpResponse = null;
         for (ApplicationPermission appPerm : permissions2Create) {
             String endpoint = "permissions";
             try {
@@ -758,38 +724,34 @@ public class APIMgrAppsAdapter {
                 mapper.setSerializationInclusion(Include.NON_NULL);
                 String json = mapper.writeValueAsString(appPerm);
                 HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + desiredApp.getId() + "/" + endpoint).build();
+                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + desiredApp.getId() + "/" + endpoint).build();
                 RestAPICall request = (update ? new PUTRequest(entity, uri) : new POSTRequest(entity, uri));
-                httpResponse = request.execute();
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
-                if (statusCode < 200 || statusCode > 299) {
-                    LOG.error("Error saving/updating application permission. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
-                    throw new AppException("Error saving/updating application permission' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    if (statusCode < 200 || statusCode > 299) {
+                        LOG.error("Error saving/updating application permission. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                        throw new AppException("Error saving/updating application permission' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    }
                 }
             } catch (Exception e) {
-                throw new AppException("Error creating application. Error: " + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
-            } finally {
-                try {
-                    ((CloseableHttpResponse) httpResponse).close();
-                } catch (Exception ignore) {
-                }
+                throw new AppException(ERROR_CREATING_APPLICATION_ERROR + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
             }
         }
     }
 
     private void deleteApplicationPermissions(ClientApplication desiredApp, List<ApplicationPermission> permissions2Delete) throws AppException {
-        if (permissions2Delete == null || permissions2Delete.size() == 0) return;
+        if (permissions2Delete == null || permissions2Delete.isEmpty()) return;
         for (ApplicationPermission appPerm : permissions2Delete) {
             try {
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + desiredApp.getId() + "/permissions/" + appPerm.getId()).build();
-                RestAPICall request = new DELRequest(uri, true);
+                RestAPICall request = new DELRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != 204) {
-                        LOG.error("Error deleting application permission. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                        LOG.error("Error deleting application permission. Response-Code: {} Got response: {}'", statusCode, EntityUtils.toString(httpResponse.getEntity()));
                         throw new AppException("Error deleting application permission. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                     }
-                    LOG.info("Application permission for user: " + appPerm.getUsername() + " for application: " + desiredApp.getName() + " successfully deleted");
+                    LOG.info("Application permission for user: {} for application: {} successfully deleted", appPerm.getUsername(), desiredApp.getName());
                 }
             } catch (Exception e) {
                 throw new AppException("Error deleting application permission. Error: " + e.getMessage(), ErrorCode.API_MANAGER_COMMUNICATION, e);
@@ -800,20 +762,19 @@ public class APIMgrAppsAdapter {
     public void deleteApplication(ClientApplication app) throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId()).build();
-            RestAPICall request = new DELRequest(uri, true);
+            RestAPICall request = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
-                    LOG.error("Error deleting application. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                    LOG.error("Error deleting application. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
                     throw new AppException("Error deleting application. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-                LOG.info("Application: " + app.getName() + " (" + app.getId() + ")" + " successfully deleted");
+                LOG.info("Application {} with id {} is successfully deleted", app.getName(), app.getId());
             }
         } catch (Exception e) {
             throw new AppException("Error deleting application", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
         }
     }
-
 
     public void setTestApiManagerResponse(ClientAppFilter filter, String apiManagerResponse) {
         this.apiManagerResponse.put(filter, apiManagerResponse);

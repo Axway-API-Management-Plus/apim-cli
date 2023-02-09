@@ -20,14 +20,11 @@ public class APIRemoveAccessForAnOrgTestIT extends TestNGCitrusTestDesigner {
 	@CitrusTest
 	public void run() {
 		description("Import an API can grant access to a number of defined orgs");
-		
+		variable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/grant_org-api-${apiNumber}");
 		variable("apiName", "Grant to some orgs API-${apiNumber}");
-
-		
 		echo("####### Importing API: '${apiName}' on path: '${apiPath}' for the first time #######");
-		
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
 		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/organizations/1_api-with-client-orgs.json");
 		createVariable("state", "published");

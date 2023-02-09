@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class OutboundProfile extends Profile {
 
@@ -139,8 +140,7 @@ public class OutboundProfile extends Profile {
             OutboundProfile otherOutboundProfile = (OutboundProfile) other;
             List<Object> otherParameters = otherOutboundProfile.getParameters();
             List<Object> thisParameters = this.getParameters();
-            if (APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")
-                    || APIManagerAdapter.hasAPIManagerVersion("7.6.2 SP5")) {
+            if (APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
                 // Passwords no longer exposed by API-Manager REST-API - Can't use it anymore to
                 // compare the state
                 if (otherParameters != null)
@@ -159,6 +159,11 @@ public class OutboundProfile extends Profile {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(routeType, requestPolicy, responsePolicy, routePolicy, faultHandlerPolicy, authenticationProfile, parameters);
     }
 
     @Override

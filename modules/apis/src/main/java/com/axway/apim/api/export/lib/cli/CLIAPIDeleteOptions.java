@@ -4,53 +4,53 @@ import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
 
 public class CLIAPIDeleteOptions extends CLIOptions {
 
-	private CLIAPIDeleteOptions(String[] args) {
-		super(args);
-	}
-	
-	public static CLIOptions create(String[] args) {
-		CLIOptions cliOptions = new CLIAPIDeleteOptions(args);
-		cliOptions = new CLIAPIFilterOptions(cliOptions);
-		cliOptions = new CoreCLIOptions(cliOptions);
-		cliOptions.addOptions();
-		cliOptions.parse();
-		return cliOptions;
-	}
+    private CLIAPIDeleteOptions(String[] args) {
+        super(args);
+    }
 
-	@Override
-	public void printUsage(String message, String[] args) {
-		super.printUsage(message, args);
-		System.out.println("----------------------------------------------------------------------------------------");
-		System.out.println("How to delete APIs using different filter options:");
-		System.out.println(getBinaryName()+" api delete -s api-env");
-		System.out.println(getBinaryName()+" api delete -s api-env -n \"*API*\"");
-		System.out.println(getBinaryName()+" api delete -s api-env -id f6106454-1651-430e-8a2f-e3514afad8ee");
-		System.out.println(getBinaryName()+" api delete -s api-env -policy \"*Policy ABC*\"");
-		System.out.println(getBinaryName()+" api delete -s api-env -name \"*API*\" -policy \"*Policy ABC*\"");
-		System.out.println();
-		System.out.println();
-		System.out.println("For more information and advanced examples please visit:");
-		System.out.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
-	}
+    public static CLIOptions create(String[] args) throws AppException {
+        CLIOptions cliOptions = new CLIAPIDeleteOptions(args);
+        cliOptions = new CLIAPIFilterOptions(cliOptions);
+        cliOptions = new CoreCLIOptions(cliOptions);
+        cliOptions.addOptions();
+        cliOptions.parse();
+        return cliOptions;
+    }
 
-	@Override
-	protected String getAppName() {
-		return "Delete APIs";
-	}
+    @Override
+    public void printUsage(String message, String[] args) {
+        super.printUsage(message, args);
+        Console.println("----------------------------------------------------------------------------------------");
+        Console.println("How to delete APIs using different filter options:");
+        Console.println(getBinaryName() + " api delete -s api-env");
+        Console.println(getBinaryName() + " api delete -s api-env -n \"*API*\"");
+        Console.println(getBinaryName() + " api delete -s api-env -id f6106454-1651-430e-8a2f-e3514afad8ee");
+        Console.println(getBinaryName() + " api delete -s api-env -policy \"*Policy ABC*\"");
+        Console.println(getBinaryName() + " api delete -s api-env -name \"*API*\" -policy \"*Policy ABC*\"");
+        Console.println();
+        Console.println();
+        Console.println("For more information and advanced examples please visit:");
+        Console.println("https://github.com/Axway-API-Management-Plus/apim-cli/wiki");
+    }
 
-	@Override
-	public Parameters getParams() {
-		return new APIExportParams();
-	}
+    @Override
+    protected String getAppName() {
+        return "Delete APIs";
+    }
 
-	@Override
-	public void addOptions() {
-		// No additional specific options
-		return;
-	}
+    @Override
+    public Parameters getParams() {
+        return new APIExportParams();
+    }
+
+    @Override
+    public void addOptions() {
+    }
 
 
 }

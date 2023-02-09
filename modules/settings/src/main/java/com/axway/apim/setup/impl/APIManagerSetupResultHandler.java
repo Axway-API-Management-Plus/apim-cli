@@ -50,7 +50,7 @@ public abstract class APIManagerSetupResultHandler {
 		}
 	}
 
-	public APIManagerSetupResultHandler(APIManagerSetupExportParams params, ExportResult result) {
+	protected APIManagerSetupResultHandler(APIManagerSetupExportParams params, ExportResult result) {
 		this.params = params;
 		this.result = result;
 	}

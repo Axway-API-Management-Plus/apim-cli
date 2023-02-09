@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 @JsonFilter("ApplicationPermissionFilter")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ApplicationPermission {
@@ -86,14 +88,12 @@ public class ApplicationPermission {
 	}
 
 	@Override
+	public int hashCode() {
+		return Objects.hash(username, permission);
+	}
+
+	@Override
 	public String toString() {
 		return "ApplicationPermission [username=" + getUsername() + ", permission=" + getPermission() + "]";
-	}
-	
-	public static ApplicationPermission createAllPermissions(SharePermission perm) {
-		ApplicationPermission allPerm = new ApplicationPermission();
-		allPerm.setUsername("ALL");
-		allPerm.setPermission(perm);
-		return allPerm;
 	}
 }

@@ -1,11 +1,10 @@
 package com.axway.apim.lib;
 
-import java.util.List;
-
+import com.axway.apim.adapter.CacheType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.APIManagerAdapter.CacheType;
+import java.util.List;
 
 public class StandardImportParams extends CoreParameters {
 	

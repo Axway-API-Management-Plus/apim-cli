@@ -11,10 +11,6 @@ public class DELRequest extends RestAPICall {
 	public DELRequest(URI uri) {
 		super(null, uri);
 	}
-	
-	public DELRequest(URI uri, boolean useAdmin) {
-		super(null, uri, useAdmin);
-	}
 
 	@Override
 	public HttpResponse execute() throws AppException {

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/portal/v1.4/policies?type=request"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "requestPolicy.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

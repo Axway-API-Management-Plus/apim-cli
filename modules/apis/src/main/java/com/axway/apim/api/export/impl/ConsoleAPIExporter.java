@@ -9,6 +9,7 @@ import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
@@ -46,7 +47,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	}
 	
 	private void printStandard(List<API> apis) {
-		System.out.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
 				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
 				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
@@ -57,7 +58,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	}
 	
 	private void printWide(List<API> apis) {
-		System.out.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
 				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
 				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
@@ -74,7 +75,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 	}
 	
 	private void printUltra(List<API> apis) {
-		System.out.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, apis, Arrays.asList(
 				new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getId),
 				new Column().header("Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getPath),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(API::getName),
@@ -121,19 +122,18 @@ public class ConsoleAPIExporter extends APIResultHandler {
 				APIManagerAdapter.getInstance().apiAdapter.addClientOrganizations(api);
 				APIManagerAdapter.getInstance().apiAdapter.addQuotaConfiguration(api);
 			} catch (AppException e) {
-				LOG.error("Error loading API details. " + e.getMessage());
+				LOG.error("Error loading API details." , e);
 			}
 		}
-		System.out.println();
-		System.out.println("A P I  -  D E T A I L S");
-		System.out.println(String.format("%-25s", "Organization: ") + api.getOrganization().getName());
-		System.out.println(String.format("%-25s", "Created On: ") + new Date(api.getCreatedOn()));
-		System.out.println(String.format("%-25s", "Created By: ") + getCreatedBy(api));
-		System.out.println(String.format("%-25s", "Granted Organizations: ") + getGrantedOrganizations(api).toString().replace("[", "").replace("]", ""));
-		System.out.println(String.format("%-25s", "Subscribed applications: ") + getSubscribedApplications(api));
-		System.out.println(String.format("%-25s", "Custom-Policies: ") + getUsedPolicies(api));
-		System.out.println(String.format("%-25s", "Tags: ") + getTags(api));
-		System.out.println(String.format("%-25s", "Custom-Properties: ") + getCustomProps(api));
+		Console.println("A P I  -  D E T A I L S");
+		Console.println(String.format("%-25s", "Organization: ") + api.getOrganization().getName());
+		Console.println(String.format("%-25s", "Created On: ") + new Date(api.getCreatedOn()));
+		Console.println(String.format("%-25s", "Created By: ") + getCreatedBy(api));
+		Console.println(String.format("%-25s", "Granted Organizations: ") + getGrantedOrganizations(api).toString().replace("[", "").replace("]", ""));
+		Console.println(String.format("%-25s", "Subscribed applications: ") + getSubscribedApplications(api));
+		Console.println(String.format("%-25s", "Custom-Policies: ") + getUsedPolicies(api));
+		Console.println(String.format("%-25s", "Tags: ") + getTags(api));
+		Console.println(String.format("%-25s", "Custom-Properties: ") + getCustomProps(api));
 	}
 	
 	private boolean hasQuota(API api) {
@@ -154,7 +154,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 		try {
 			return APIManagerAdapter.getInstance().userAdapter.getUserForId(api.getCreatedBy()).getName();
 		} catch (Exception e) {
-			LOG.error("Error getting created by user");
+			LOG.error("Error getting created by user", e);
 			return "Err";
 		}
 	}

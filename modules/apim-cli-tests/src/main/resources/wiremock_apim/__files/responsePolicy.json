@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Remove Header & Audit data",
+    "id": "<key type='FilterCircuit'><id field='name' value='Remove Header &amp; Audit data'/></key>"
+  },
+  {
+    "name": "Routing",
+    "id": "<key type='FilterCircuit'><id field='name' value='Routing'/></key>"
+  }
+]

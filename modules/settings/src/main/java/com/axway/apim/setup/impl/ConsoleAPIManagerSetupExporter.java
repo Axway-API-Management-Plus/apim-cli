@@ -6,6 +6,7 @@ import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
 
 public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler {
@@ -17,13 +18,12 @@ public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			LOG.error("Unable to get APIManagerAdapter", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Unable to get APIManagerAdapter", e);
 		}
 	}
 	
 	@Override
-	public RemoteHostFilter getRemoteHostFilter() throws AppException {
+	public RemoteHostFilter getRemoteHostFilter() {
 		return getRemoteHostBaseFilterBuilder().build();
 	}
 
@@ -35,7 +35,7 @@ public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler
 		}
 
 		if(params.isExportAlerts()) {
-			ConsolePrinterAlerts alertsExporter = new ConsolePrinterAlerts(params);
+			ConsolePrinterAlerts alertsExporter = new ConsolePrinterAlerts();
 			alertsExporter.export(config.getAlerts());
 		}
 		
@@ -50,7 +50,7 @@ public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler
 		}
 		
 		if(params.isExportCustomProperties()) {
-			System.out.println("Configured custom properties for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
+			Console.println("Configured custom properties for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
 			ConsolePrinterCustomProperties propertiesPrinter = new ConsolePrinterCustomProperties();
 			for(Type type: Type.values()) {
 				propertiesPrinter.addProperties(adapter.customPropertiesAdapter.getCustomProperties(type), type);

@@ -48,7 +48,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 		try {
 			params = (AppImportParams) AppImportCLIOptions.create(args).getParams();
 		} catch (AppException e) {
-			LOG.error("Error " + e.getMessage());
+			LOG.error("Error {}" , e.getMessage());
 			return e.getError().getCode();
 		}
 		ClientApplicationImportApp app = new ClientApplicationImportApp();
@@ -82,7 +82,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 				importManager.setDesiredApp(desiredApp);
 				importManager.setActualApp(actualApp);
 				importManager.replicate();
-				LOG.info("Successfully replicated application: "+desiredApp.getName()+" into API-Manager");
+				LOG.info("Successfully replicated application: {} into API-Manager", desiredApp.getName());
 			}
 			return result;
 		} catch (AppException ap) {
@@ -99,11 +99,4 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			} catch (AppException ignore) { }
 		}
 	}
-	
-	public static void main(String[] args) {
-		int rc = importApp(args);
-		System.exit(rc);
-	}
-
-
 }

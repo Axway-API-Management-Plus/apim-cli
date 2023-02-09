@@ -1,30 +1,23 @@
 package com.axway.apim.api.export.lib.cli;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
-
-import org.apache.commons.cli.Option;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.api.export.lib.params.APIFilterParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
+import org.apache.commons.cli.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class CLIAPIFilterOptions extends CLIOptions {
 	
-	private static Logger LOG = LoggerFactory.getLogger(CLIAPIFilterOptions.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CLIAPIFilterOptions.class);
 	
-	private CLIOptions cliOptions;
+	private final CLIOptions cliOptions;
 
 	public CLIAPIFilterOptions(CLIOptions cliOptions) {
 		super();
@@ -84,8 +77,6 @@ public class CLIAPIFilterOptions extends CLIOptions {
 			params.setCreatedOnAfter(""+startDate.getTime());
 			params.setCreatedOnBefore(""+endDate.getTime());
 		} catch (Exception e) {
-			LOG.error(e.getMessage());
-			LOG.info("");
 			LOG.info("Valid createdOn filter examples: 2020-01-01:2020-12-31   2020:2021   2020-06:now");
 			throw e;
 		}
@@ -93,7 +84,7 @@ public class CLIAPIFilterOptions extends CLIOptions {
 	
 	private static Date parseDate(String inputDate, String pattern, int endOrStart) {
 		if(inputDate.equals("now")) return new Date();
-		Calendar cal = GregorianCalendar.getInstance(Locale.ENGLISH);
+		Calendar cal = Calendar.getInstance(Locale.ENGLISH);
 		cal.setTimeZone(TimeZone.getTimeZone("GMT"));
 		SimpleDateFormat df = new SimpleDateFormat(pattern, Locale.ENGLISH);
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -120,7 +111,7 @@ public class CLIAPIFilterOptions extends CLIOptions {
 	}
 
 	@Override
-	public void parse() {
+	public void parse() throws AppException {
 		cliOptions.parse();
 	}
 

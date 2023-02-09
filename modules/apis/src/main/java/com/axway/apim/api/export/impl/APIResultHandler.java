@@ -38,7 +38,7 @@ import com.axway.apim.lib.utils.Utils;
 
 public abstract class APIResultHandler {
 
-    private static Logger LOG = LoggerFactory.getLogger(APIResultHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(APIResultHandler.class);
     APIExportParams params;
 
     protected Result result;
@@ -70,12 +70,12 @@ public abstract class APIResultHandler {
         }
     }
 
-    public APIResultHandler(APIExportParams params) {
+    protected APIResultHandler(APIExportParams params) {
         this.params = params;
         this.result = new Result();
     }
 
-    public APIResultHandler(APIExportParams params, Result result) {
+    protected APIResultHandler(APIExportParams params, Result result) {
         this.params = params;
         this.result = result;
     }
@@ -83,7 +83,7 @@ public abstract class APIResultHandler {
     public static APIResultHandler create(APIListImpl exportImpl, APIExportParams params) throws AppException {
         try {
             Object[] intArgs = new Object[]{params};
-            Constructor<APIResultHandler> constructor = exportImpl.getClazz().getConstructor(new Class[]{APIExportParams.class});
+            Constructor<APIResultHandler> constructor = exportImpl.getClazz().getConstructor(APIExportParams.class);
             return constructor.newInstance(intArgs);
         } catch (Exception e) {
             throw new AppException("Error initializing API export handler", ErrorCode.UNXPECTED_ERROR, e);
@@ -240,7 +240,7 @@ public abstract class APIResultHandler {
             }
             return grantedOrgs;
         } catch (Exception e) {
-            LOG.error("Error getting API client organization");
+            LOG.error("Error getting API client organization", e);
             return grantedOrgs;
         }
     }
@@ -248,14 +248,14 @@ public abstract class APIResultHandler {
     protected void validateFolder(File localFolder) throws AppException {
         if (localFolder.exists()) {
             if (params.isDeleteTarget()) {
-                LOG.debug("Existing local export folder: " + localFolder + " already exists and will be deleted.");
+                LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
                 try {
                     FileUtils.deleteDirectory(localFolder);
                 } catch (IOException e) {
                     throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
                 }
             } else {
-                LOG.warn("Local export folder: " + localFolder + " already exists. API will not be exported. (You may set -deleteTarget)");
+                LOG.warn("Local export folder: {} already exists. API will not be exported. (You may set -deleteTarget)", localFolder);
                 return;
             }
         }

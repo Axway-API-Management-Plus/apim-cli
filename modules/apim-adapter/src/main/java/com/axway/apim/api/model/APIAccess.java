@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 
+import java.util.Objects;
+
 @JsonFilter("APIAccessFilter")
 public class APIAccess {
 	String id;
@@ -107,5 +109,10 @@ public class APIAccess {
 	@Override
 	public String toString() {
 		return "APIAccess [apiName=" + apiName + ", apiVersion=" + apiVersion + ", id=" + id + ", apiId=" + apiId + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(apiId, apiName, apiVersion);
 	}
 }

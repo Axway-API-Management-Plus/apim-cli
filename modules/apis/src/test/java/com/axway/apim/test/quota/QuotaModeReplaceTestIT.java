@@ -28,7 +28,7 @@ public class QuotaModeReplaceTestIT extends TestNGCitrusTestRunner {
 	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException, InterruptedException {
 		swaggerImport = new ImportTestAction();
 		description("If the Quota-Mode is set to replace, evtl. existing quotas should be replaced.");
-		
+		variable("useApiAdmin", "true");
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/quota-replace-api-${apiNumber}");
 		variable("apiName", "Quota-${apiNumber}-Replace-API");

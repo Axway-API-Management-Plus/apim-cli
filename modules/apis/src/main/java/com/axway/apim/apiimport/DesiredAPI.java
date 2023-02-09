@@ -26,7 +26,7 @@ public class DesiredAPI extends API {
 	@JsonProperty("apiDefinition")
 	public String apiDefinitionImport = null;
 	
-	public DesiredAPI() throws AppException {
+	public DesiredAPI() {
 		super();
 	}
 

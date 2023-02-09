@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/api/portal/v1.4/proxies/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}/publish"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "frontend_api_by_id.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "request": {
+    "method": "DELETE",
+    "url": "/api/portal/v1.4/login"
+  },
+  "response": {
+    "status": 204,
+    "headers": {
+      "Content-Type": "text/plain"
+    }
+  }
+}

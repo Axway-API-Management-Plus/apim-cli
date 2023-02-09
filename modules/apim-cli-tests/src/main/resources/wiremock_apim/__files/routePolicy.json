@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Proxy Routing",
+    "id": "<key type='FilterCircuit'><id field='name' value='Https Proxy Routing'/></key>"
+  },
+  {
+    "name": "Client App Registry Static Content Protection Policy",
+    "id": "<key type='FilterCircuit'><id field='name' value='Client App Registry Static Content Protection Policy'/></key>"
+  }
+]

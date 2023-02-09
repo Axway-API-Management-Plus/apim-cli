@@ -21,6 +21,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class SecurityDevice {
 
@@ -206,5 +207,10 @@ public class SecurityDevice {
             }
         }
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type, properties);
     }
 }

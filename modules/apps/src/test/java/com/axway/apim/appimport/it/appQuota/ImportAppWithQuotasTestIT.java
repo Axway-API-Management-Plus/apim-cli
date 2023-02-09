@@ -1,14 +1,5 @@
 package com.axway.apim.appimport.it.appQuota;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.springframework.http.HttpStatus;
-import org.testng.Assert;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.api.model.APIQuota;
@@ -16,7 +7,6 @@ import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appimport.it.ExportAppTestAction;
 import com.axway.apim.appimport.it.ImportAppTestAction;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.axway.lib.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
@@ -26,16 +16,24 @@ import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.message.MessageType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.springframework.http.HttpStatus;
+import org.testng.Assert;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 @Test
 public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
-	private static String PACKAGE = "/com/axway/apim/appimport/apps/appQuota/";
+	private static final String PACKAGE = "/com/axway/apim/appimport/apps/appQuota/";
 	
 	@CitrusTest
 	@Test
 	@Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
+	public void run(@Optional @CitrusResource TestContext context) throws IOException {
 		description("Import application into API-Manager");
 		
 		ImportAppTestAction importApp = new ImportAppTestAction(context);
@@ -44,7 +42,7 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner implements
 		ObjectMapper mapper = new ObjectMapper();
 		
 		int randomId = importApp.getRandomNum();
-		
+		variable("useApiAdmin", "true"); // Use apiadmin account
 		variable("appName", "My-App-"+randomId);
 		variable("apiName", "Test-API-"+randomId);
 		variable("apiPath", "/test/api/"+randomId);

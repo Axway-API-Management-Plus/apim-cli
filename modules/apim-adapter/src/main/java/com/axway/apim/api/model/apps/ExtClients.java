@@ -1,13 +1,9 @@
 package com.axway.apim.api.model.apps;
 
-import java.util.Arrays;
-
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class ExtClients extends ClientAppCredential {
 	
@@ -37,6 +33,11 @@ public class ExtClients extends ClientAppCredential {
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(clientId);
 	}
 
 	@Override

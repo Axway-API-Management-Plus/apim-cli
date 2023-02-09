@@ -1,0 +1,38 @@
+[
+  {
+    "id": "06679911-ee47-4570-bd23-89ab7c765415",
+    "name": "Community",
+    "description": "Unverified untrusted developer users. Not intended for production-level client applications",
+    "email": null,
+    "image": null,
+    "restricted": true,
+    "virtualHost": null,
+    "phone": null,
+    "enabled": true,
+    "development": false,
+    "dn": "o=Community,ou=organizations,ou=APIPortal",
+    "createdOn": 1670957709351,
+    "startTrialDate": null,
+    "endTrialDate": null,
+    "trialDuration": null,
+    "isTrial": null
+  },
+  {
+    "id": "ba1c6dac-ee31-4b5d-9d18-493cc6f5088b",
+    "name": "API Development",
+    "description": null,
+    "email": null,
+    "image": null,
+    "restricted": false,
+    "virtualHost": null,
+    "phone": null,
+    "enabled": true,
+    "development": true,
+    "dn": "o=API Development,ou=organizations,ou=APIPortal",
+    "createdOn": 1670957855661,
+    "startTrialDate": null,
+    "endTrialDate": null,
+    "trialDuration": null,
+    "isTrial": null
+  }
+]

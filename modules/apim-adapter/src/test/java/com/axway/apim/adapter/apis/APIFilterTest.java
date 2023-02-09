@@ -1,7 +1,16 @@
 package com.axway.apim.adapter.apis;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
+import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
+import com.axway.apim.api.API;
+import com.axway.apim.api.model.*;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.TestIndicator;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,28 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
-import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
-import com.axway.apim.api.API;
-import com.axway.apim.api.model.AuthType;
-import com.axway.apim.api.model.AuthenticationProfile;
-import com.axway.apim.api.model.DeviceType;
-import com.axway.apim.api.model.InboundProfile;
-import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.OutboundProfile;
-import com.axway.apim.api.model.Policy;
-import com.axway.apim.api.model.SecurityDevice;
-import com.axway.apim.api.model.SecurityProfile;
-import com.axway.apim.api.model.ServiceProfile;
-import com.axway.apim.api.model.TagMap;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class APIFilterTest {
 	
@@ -49,10 +38,10 @@ public class APIFilterTest {
 	@Test
 	public void testStandardActualAPI() {
 		APIFilter filter = new APIFilter.Builder(APIType.ACTUAL_API).build();
-		Assert.assertEquals(filter.isIncludeClientApplications(), true);
-		Assert.assertEquals(filter.isIncludeClientOrganizations(), true);
-		Assert.assertEquals(filter.isIncludeQuotas(), true);
-		Assert.assertEquals(filter.isIncludeOriginalAPIDefinition(), true);
+		assertTrue(filter.isIncludeClientApplications());
+		assertTrue(filter.isIncludeClientOrganizations());
+		assertTrue(filter.isIncludeQuotas());
+		assertTrue(filter.isIncludeOriginalAPIDefinition());
 	}
 	
 	@Test
@@ -62,10 +51,10 @@ public class APIFilterTest {
 				.includeClientOrganizations(false)
 				.includeQuotas(false)
 				.build();
-		Assert.assertEquals(filter.isIncludeClientApplications(), false);
-		Assert.assertEquals(filter.isIncludeClientOrganizations(), false);
-		Assert.assertEquals(filter.isIncludeQuotas(), false);
-		Assert.assertEquals(filter.isIncludeOriginalAPIDefinition(), true);
+		assertFalse(filter.isIncludeClientApplications());
+		assertFalse(filter.isIncludeClientOrganizations());
+		assertFalse(filter.isIncludeQuotas());
+		assertTrue(filter.isIncludeOriginalAPIDefinition());
 	}
 	
 	@Test
@@ -78,7 +67,7 @@ public class APIFilterTest {
 	}
 	
 	@Test
-	public void filterWithPath() throws IOException, AppException {
+	public void filterWithPath() throws IOException {
 		// For this test, we must simulate API-Manager version >7.7
 		APIManagerAdapter.apiManagerVersion = null;
 		APIManagerAdapter.getInstance().configAdapter.setAPIManagerTestResponse("{ \"productVersion\": \"7.7.20200130\" }", false);
@@ -90,18 +79,7 @@ public class APIFilterTest {
 		Assert.assertEquals(filter.getFilters().get(1).getValue(), "eq");
 		Assert.assertEquals(filter.getFilters().get(2).getValue(), "/v1/api");
 	}
-	
-	@Test
-	public void filterWithPathOn762() throws IOException, AppException {
-		// For this test, we must simulate API-Manager version >7.7
-		APIManagerAdapter.apiManagerVersion = null;
-		APIManagerAdapter.apiManagerVersion = "7.6.2 SP4";
-		APIFilter filter = new APIFilter.Builder()
-				.hasApiPath("/v1/api")
-				.build();
-		Assert.assertEquals(filter.getFilters().size(), 0);
-		Assert.assertEquals(filter.getApiPath(), "/v1/api");
-	}
+
 	
 	@Test
 	public void filterWithName() {
@@ -195,7 +173,7 @@ public class APIFilterTest {
 	}
 	
 	@Test
-	public void testBackendBasepathFilter() throws AppException {
+	public void testBackendBasepathFilter() {
 		APIFilter filter = new APIFilter.Builder()
 				.hasBackendBasepath("*emr-system*")
 				.build();
@@ -216,7 +194,7 @@ public class APIFilterTest {
 	}
 	
 	@Test
-	public void filterAPIsWithOrganization() throws IOException, AppException {
+	public void filterAPIsWithOrganization() {
 		API testAPI = new API();
 		Organization testOrg = new Organization();
 		testOrg.setName("Another Org");
@@ -305,9 +283,9 @@ public class APIFilterTest {
 	}
 	
 	@Test
-	public void testTagFilter() throws AppException {
+	public void testTagFilter() {
 		API testAPI = new API();
-		TagMap<String, String[]> tags = new TagMap<>();
+		TagMap tags = new TagMap();
 		tags.put("group1", new String[] {"tagValue1", "tagValue2"});
 		tags.put("group2", new String[] {"tagValue3", "tagValue4"});
 		testAPI.setTags(tags);
@@ -336,7 +314,7 @@ public class APIFilterTest {
 	}
 	
 	@Test
-	public void testInboundSecurityPolicyFilter() throws AppException {
+	public void testInboundSecurityPolicyFilter() {
 		API testAPI = new API();
 		addInboundSecurityPolicy(testAPI, "Inbound Security Policy 1");
 		
@@ -347,7 +325,7 @@ public class APIFilterTest {
 	}
 	
 	@Test
-	public void testInboundSecurity() throws AppException {
+	public void testInboundSecurity() {
 		API testAPI = new API();
 		addInboundSecurityPolicy(testAPI, "Inbound Security Policy 1");
 		
@@ -367,7 +345,7 @@ public class APIFilterTest {
 		
 		testAPI = new API();
 		addInboundSecurityToAPI(testAPI, DeviceType.oauthExternal);
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		properties.put("tokenStore", "My Token information policy");
 
 		filter = new APIFilter.Builder().hasInboundSecurity("oauth-ext").build();
@@ -391,7 +369,7 @@ public class APIFilterTest {
 		testAPI = new API();
 		addOutboundSecurityToAPI(testAPI, AuthType.oauth);
 		
-		Map<String, Object> parameters = new HashMap<String, Object>();
+		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("providerProfile", "<key type='AuthProfilesGroup'><id field='name' value='Auth Profiles'/><key type='OAuthGroup'><id field='name' value='OAuth2'/><key type='OAuthProviderProfile'><id field='name' value='API Gateway'/><key type='OAuthAppProfile'><id field='name' value='Sample Client Authzcode App'/></key></key></key></key>");
 		testAPI.getAuthenticationProfiles().get(0).setParameters(parameters);
 		filter = new APIFilter.Builder().hasOutboundAuthentication("oauth").build();
@@ -407,13 +385,13 @@ public class APIFilterTest {
 		API api = new API();
 		ServiceProfile serviceProfile = new ServiceProfile();
 		serviceProfile.setBasePath(basePath);
-		Map<String, ServiceProfile> serviceProfiles = new HashMap<String, ServiceProfile>();
+		Map<String, ServiceProfile> serviceProfiles = new HashMap<>();
 		serviceProfiles.put("_default", serviceProfile);
 		api.setServiceProfiles(serviceProfiles);
 		return api;
 	}
 	
-	private API addPolicy(API api, String policyName, PolicyType type) throws AppException {
+	private void addPolicy(API api, String policyName, PolicyType type) throws AppException {
 		OutboundProfile outboundProfile = new OutboundProfile();
 		Policy policy = new Policy(policyName);
 		switch(type) {
@@ -432,71 +410,67 @@ public class APIFilterTest {
 		default:
 			break;			
 		}
-		Map<String, OutboundProfile> outboundProfiles = new HashMap<String, OutboundProfile>();
+		Map<String, OutboundProfile> outboundProfiles = new HashMap<>();
 		outboundProfiles.put("_default", outboundProfile);
 		api.setOutboundProfiles(outboundProfiles);
-		return api;
 	}
 	
-	private API addInboundSecurityPolicy(API api, String policyName) throws AppException {
-		Map<String, String> properties = new HashMap<String, String>();
+	private void addInboundSecurityPolicy(API api, String policyName) {
+		Map<String, String> properties = new HashMap<>();
 		properties.put("authenticationPolicy", "<key type='CircuitContainer'><id field='name' value='API Keys'/><key type='FilterCircuit'><id field='name' value='"+policyName+"'/></key></key>");
 		SecurityDevice securityDevice = new SecurityDevice();
 		securityDevice.setType(DeviceType.authPolicy);
 		securityDevice.setConvertPolicies(false);
 		securityDevice.setProperties(properties);
-		List<SecurityDevice> devices = new ArrayList<SecurityDevice>();
+		List<SecurityDevice> devices = new ArrayList<>();
 		devices.add(securityDevice);
 		SecurityProfile securityProfile = new SecurityProfile();
 		securityProfile.setName("_default");
 		securityProfile.setDevices(devices);
-		List<SecurityProfile> securityProfiles = new ArrayList<SecurityProfile>();
+		List<SecurityProfile> securityProfiles = new ArrayList<>();
 		securityProfiles.add(securityProfile);
 		api.setSecurityProfiles(securityProfiles);
 		
 		InboundProfile inboundProfile = new InboundProfile();
 		inboundProfile.setSecurityProfile("_default");
-		Map<String, InboundProfile> inboundProfiles = new HashMap<String, InboundProfile>();
+		Map<String, InboundProfile> inboundProfiles = new HashMap<>();
 		inboundProfiles.put("_default", inboundProfile);
 		api.setInboundProfiles(inboundProfiles);
-		return api;
 	}
 	
-	private API addInboundSecurityToAPI(API api, DeviceType deviceType) throws AppException {
+	private void addInboundSecurityToAPI(API api, DeviceType deviceType) {
 		SecurityDevice securityDevice = new SecurityDevice();
 		securityDevice.setType(deviceType);
-		List<SecurityDevice> devices = new ArrayList<SecurityDevice>();
+		List<SecurityDevice> devices = new ArrayList<>();
 		devices.add(securityDevice);
 		SecurityProfile securityProfile = new SecurityProfile();
 		securityProfile.setName("_default");
 		securityProfile.setDevices(devices);
-		List<SecurityProfile> securityProfiles = new ArrayList<SecurityProfile>();
+		List<SecurityProfile> securityProfiles = new ArrayList<>();
 		securityProfiles.add(securityProfile);
 		api.setSecurityProfiles(securityProfiles);
 		
 		InboundProfile inboundProfile = new InboundProfile();
 		inboundProfile.setSecurityProfile("_default");
-		Map<String, InboundProfile> inboundProfiles = new HashMap<String, InboundProfile>();
+		Map<String, InboundProfile> inboundProfiles = new HashMap<>();
 		inboundProfiles.put("_default", inboundProfile);
 		api.setInboundProfiles(inboundProfiles);
-		return api;
 	}
 	
-	private API addOutboundSecurityToAPI(API api, AuthType authType) throws AppException {
-		List<AuthenticationProfile> authnProfiles = new ArrayList<AuthenticationProfile>();
+	private void addOutboundSecurityToAPI(API api, AuthType authType) throws AppException {
+		List<AuthenticationProfile> authnProfiles = new ArrayList<>();
 		AuthenticationProfile authNProfile = new AuthenticationProfile();
 		authNProfile.setName("_default");
 		authNProfile.setType(authType);
 		authnProfiles.add(authNProfile);
 		
-		Map<String, OutboundProfile> outboundProfiles = new HashMap<String, OutboundProfile>();
+		Map<String, OutboundProfile> outboundProfiles = new HashMap<>();
 		OutboundProfile outboundProfile = new OutboundProfile();
 		outboundProfile.setAuthenticationProfile("_default");
 		
 		outboundProfiles.put("_default", outboundProfile);
 		api.setAuthenticationProfiles(authnProfiles);
 		api.setOutboundProfiles(outboundProfiles);
-		return api;
 	}
 }
 

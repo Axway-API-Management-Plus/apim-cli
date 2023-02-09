@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/portal/v1.4/proxies?field=apiid&op=eq&value=9296da32-0a74-4eac-b9ee-6c6684b14848"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "frontend_empty.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

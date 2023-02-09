@@ -13,7 +13,6 @@ import org.testng.annotations.Test;
 import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.APISpecification;
-import com.axway.apim.api.apiSpecification.APISpecificationFactory;
 import com.axway.apim.api.apiSpecification.Swagger2xSpecification;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.InboundProfile;
@@ -87,7 +86,7 @@ public class APIChangeStateTest extends APIManagerMockBase {
 	
 	@Test
 	public void testTagsAreChanged() throws JsonParseException, JsonMappingException, IOException, AppException {
-		TagMap<String, String[]> newTags = new TagMap<String, String[]>();
+		TagMap newTags = new TagMap();
 		newTags.put("Group A", new String[] {"Value 1", "Value 2"});
 		testAPI2.setTags(newTags);
 		APIChangeState changeState = new APIChangeState(testAPI1, testAPI2);

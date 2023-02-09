@@ -3,7 +3,7 @@ package com.axway.lib;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.axway.apim.adapter.APIManagerAdapter.CacheType;
+import com.axway.apim.adapter.CacheType;
 import com.axway.apim.lib.CoreParameters;
 
 public class CoreParametersTest {
@@ -39,10 +39,9 @@ public class CoreParametersTest {
 	}
 	
 	@Test
-	public void testclearCacheCombined() {
+	public void testClearCacheCombined() {
 		CoreParameters params = new CoreParameters();
-		params.setClearCache("*Quota*, applicationAPIAccessCache");
-
+		params.setClearCache(CacheType.applicationsQuotaCache.name() + "," + CacheType.applicationAPIAccessCache.name());
 		Assert.assertEquals(params.clearCaches().size(), 2);
 		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationsQuotaCache));
 		Assert.assertTrue(params.clearCaches().contains(CacheType.applicationAPIAccessCache));

@@ -25,8 +25,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestriction> {
 	
-	public enum DeserializeMode {apiManagerData, configFile};
-	
+	public enum DeserializeMode {apiManagerData, configFile}
+
 	private final static String validPeriods = "week|day|hour|minute|second";
 	
 	private DeserializeMode desiralizeMode;
@@ -52,7 +52,6 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		}
 	}
 
-	@SuppressWarnings("serial")
 	@Override
 	public QuotaRestriction deserialize(JsonParser jp, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
@@ -70,7 +69,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 		} catch (IllegalArgumentException e) {
 			throw new AppException("Invalid quota config. The restriction type: " + type + " is invalid.", ErrorCode.INVALID_QUOTA_CONFIG);
 		}
-		Map<String, String> configMap = new LinkedHashMap<String, String>();
+		Map<String, String> configMap = new LinkedHashMap<>();
 		configMap.put("period", period);
 		configMap.put("per", per);
 		if(type.equals("throttle")) {
@@ -98,7 +97,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 				}
 				restriction.setRestrictedAPI(api);
 			}
-			restriction.setApiId(api.getId());
+			restriction.setApiId(api != null ? api.getId() : null);
 		// If no API-Path is given,
 		} else if(node.has("api")) { // Field api might contain the API-ID (From API-Manager), the API-Name or a Star if restriction should be applied to all APIs.
 			if("*".equals(node.get("api").asText())) {
@@ -126,7 +125,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 						
 					}
 					restriction.setRestrictedAPI(api);
-					restriction.setApiId(api.getId());
+					restriction.setApiId(api != null ? api.getId() : null);
 				} else {
 					// As a fall back we take over the ID we got and add it to the restriction
 					restriction.setApiId(node.get("api").asText());

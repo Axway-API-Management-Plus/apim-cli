@@ -95,7 +95,7 @@ public class API implements CustomPropertiesEntity {
 	protected List<AuthenticationProfile> authenticationProfiles = null;
 	
 	@APIPropertyAnnotation(writableStates = {API.STATE_UNPUBLISHED})
-	protected TagMap<String, String[]> tags = null;
+	protected TagMap tags = null;
 	
 	@APIPropertyAnnotation(isBreaking = true, writableStates = {API.STATE_UNPUBLISHED})
 	protected Map<String, OutboundProfile> outboundProfiles = null;
@@ -243,7 +243,7 @@ public class API implements CustomPropertiesEntity {
 		this.vhost = vhost;
 	}
 
-	public TagMap<String, String[]> getTags() {
+	public TagMap getTags() {
 		return tags;
 	}
 	
@@ -427,7 +427,7 @@ public class API implements CustomPropertiesEntity {
 		return serviceProfiles;
 	}
 
-	public void setTags(TagMap<String, String[]> tags) {
+	public void setTags(TagMap tags) {
 		this.tags = tags;
 	}
 

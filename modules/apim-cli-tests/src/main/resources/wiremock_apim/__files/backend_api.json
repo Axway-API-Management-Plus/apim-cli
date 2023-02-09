@@ -1,0 +1,751 @@
+{
+  "id": "9296da32-0a74-4eac-b9ee-6c6684b14848",
+  "name": "Test-App-API1-2285",
+  "summary": "",
+  "description": "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
+  "version": "1.0.0",
+  "basePath": "https://petstore.swagger.io",
+  "resourcePath": "/v2",
+  "models": {
+    "Order": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "petId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "shipDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "Order Status",
+          "enum": [
+            "placed",
+            "approved",
+            "delivered"
+          ]
+        },
+        "complete": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "xml": {
+        "name": "Order"
+      }
+    },
+    "Category": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "Category"
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "username": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "userStatus": {
+          "type": "integer",
+          "format": "int32",
+          "description": "User Status"
+        }
+      },
+      "xml": {
+        "name": "User"
+      }
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "xml": {
+        "name": "Tag"
+      }
+    },
+    "Pet": {
+      "type": "object",
+      "required": [
+        "name",
+        "photoUrls"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "category": {
+          "$ref": "#/definitions/Category"
+        },
+        "name": {
+          "type": "string",
+          "example": "doggie"
+        },
+        "photoUrls": {
+          "type": "array",
+          "xml": {
+            "name": "photoUrl",
+            "wrapped": true
+          },
+          "items": {
+            "type": "string"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "xml": {
+            "name": "tag",
+            "wrapped": true
+          },
+          "items": {
+            "$ref": "#/definitions/Tag"
+          }
+        },
+        "status": {
+          "type": "string",
+          "description": "pet status in the store",
+          "enum": [
+            "available",
+            "pending",
+            "sold"
+          ]
+        }
+      },
+      "xml": {
+        "name": "Pet"
+      }
+    },
+    "ApiResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "consumes": [],
+  "produces": [],
+  "integral": true,
+  "createdOn": 1674100419643,
+  "createdBy": "40dd53a4-0b13-4485-82e8-63c687404c2f",
+  "organizationId": "e47e89cb-e1f0-4812-a594-0c2b66afa021",
+  "serviceType": "rest",
+  "hasOriginalDefinition": true,
+  "importUrl": "file:///home/axway/Axway-7.7.0-nov2022/apigateway/system/conf/e1b77fc55d8b4b5e92c75b036e018a5f/Test-App-API1-2285",
+  "properties": {
+    "license.name": "Apache 2.0",
+    "backendUrls": "[\"https://petstore.swagger.io/v2\",\"http://petstore.swagger.io/v2\"]",
+    "ResourceUri": "file:///home/axway/Axway-7.7.0-nov2022/apigateway/system/conf/e1b77fc55d8b4b5e92c75b036e018a5f/Test-App-API1-2285",
+    "ResourceIdentifier": "SG42Q5IUZAIVNTILUQ2ERHDKZ2MR3LKK",
+    "contact.email": "apiteam@swagger.io",
+    "ResourceType": "swagger20",
+    "license.url": "http://www.apache.org/licenses/LICENSE-2.0.html",
+    "termsOfService": "http://swagger.io/terms/",
+    "info.title": "Swagger Petstore",
+    "externalDocs.description": "Find out more about Swagger",
+    "externalDocs.url": "http://swagger.io",
+    "tags": "[{\"name\":\"pet\",\"description\":\"Everything about your Pets\",\"externalDocs\":{\"description\":\"Find out more\",\"url\":\"http://swagger.io\"}},{\"name\":\"store\",\"description\":\"Access to Petstore orders\"},{\"name\":\"user\",\"description\":\"Operations about user\",\"externalDocs\":{\"description\":\"Find out more about our store\",\"url\":\"http://swagger.io\"}}]"
+  }
+},
+{
+"id": "178d34cf-ed24-4156-9bc7-a486b3f12284",
+"name": "Test-App-API2-2285",
+"summary": "",
+"description": "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
+"version": "1.0.0",
+"basePath": "https://petstore.swagger.io",
+"resourcePath": "/v2",
+"models": {
+"Order": {
+"type": "object",
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64"
+},
+"petId": {
+"type": "integer",
+"format": "int64"
+},
+"quantity": {
+"type": "integer",
+"format": "int32"
+},
+"shipDate": {
+"type": "string",
+"format": "date-time"
+},
+"status": {
+"type": "string",
+"description": "Order Status",
+"enum": [
+"placed",
+"approved",
+"delivered"
+]
+},
+"complete": {
+"type": "boolean",
+"default": false
+}
+},
+"xml": {
+"name": "Order"
+}
+},
+"Category": {
+"type": "object",
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64"
+},
+"name": {
+"type": "string"
+}
+},
+"xml": {
+"name": "Category"
+}
+},
+"User": {
+"type": "object",
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64"
+},
+"username": {
+"type": "string"
+},
+"firstName": {
+"type": "string"
+},
+"lastName": {
+"type": "string"
+},
+"email": {
+"type": "string"
+},
+"password": {
+"type": "string"
+},
+"phone": {
+"type": "string"
+},
+"userStatus": {
+"type": "integer",
+"format": "int32",
+"description": "User Status"
+}
+},
+"xml": {
+"name": "User"
+}
+},
+"Tag": {
+"type": "object",
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64"
+},
+"name": {
+"type": "string"
+}
+},
+"xml": {
+"name": "Tag"
+}
+},
+"Pet": {
+"type": "object",
+"required": [
+"name",
+"photoUrls"
+],
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64"
+},
+"category": {
+"$ref": "#/definitions/Category"
+},
+"name": {
+"type": "string",
+"example": "doggie"
+},
+"photoUrls": {
+"type": "array",
+"xml": {
+"name": "photoUrl",
+"wrapped": true
+},
+"items": {
+"type": "string"
+}
+},
+"tags": {
+"type": "array",
+"xml": {
+"name": "tag",
+"wrapped": true
+},
+"items": {
+"$ref": "#/definitions/Tag"
+}
+},
+"status": {
+"type": "string",
+"description": "pet status in the store",
+"enum": [
+"available",
+"pending",
+"sold"
+]
+}
+},
+"xml": {
+"name": "Pet"
+}
+},
+"ApiResponse": {
+"type": "object",
+"properties": {
+"code": {
+"type": "integer",
+"format": "int32"
+},
+"type": {
+"type": "string"
+},
+"message": {
+"type": "string"
+}
+}
+}
+},
+"consumes": [],
+"produces": [],
+"integral": true,
+"createdOn": 1674100424512,
+"createdBy": "40dd53a4-0b13-4485-82e8-63c687404c2f",
+"organizationId": "e47e89cb-e1f0-4812-a594-0c2b66afa021",
+"serviceType": "rest",
+"hasOriginalDefinition": true,
+"importUrl": "file:///home/axway/Axway-7.7.0-nov2022/apigateway/system/conf/62be211cb00141a99fb7036b640e8c97/Test-App-API2-2285",
+"properties": {
+"license.name": "Apache 2.0",
+"backendUrls": "[\"https://petstore.swagger.io/v2\",\"http://petstore.swagger.io/v2\"]",
+"ResourceUri": "file:///home/axway/Axway-7.7.0-nov2022/apigateway/system/conf/62be211cb00141a99fb7036b640e8c97/Test-App-API2-2285",
+"ResourceIdentifier": "ZFZZQXJGP24H3RKAOKDIHYG72UCRYSLO",
+"contact.email": "apiteam@swagger.io",
+"ResourceType": "swagger20",
+"license.url": "http://www.apache.org/licenses/LICENSE-2.0.html",
+"termsOfService": "http://swagger.io/terms/",
+"info.title": "Swagger Petstore",
+"externalDocs.description": "Find out more about Swagger",
+"externalDocs.url": "http://swagger.io",
+"tags": "[{\"name\":\"pet\",\"description\":\"Everything about your Pets\",\"externalDocs\":{\"description\":\"Find out more\",\"url\":\"http://swagger.io\"}},{\"name\":\"store\",\"description\":\"Access to Petstore orders\"},{\"name\":\"user\",\"description\":\"Operations about user\",\"externalDocs\":{\"description\":\"Find out more about our store\",\"url\":\"http://swagger.io\"}}]"
+}
+},
+{
+"id": "1f4263ca-7f03-41d9-9d34-9eff79d29bd8",
+"name": "petstore3",
+"summary": "",
+"description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about\nSwagger at [http://swagger.io](http://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!\nYou can now help us improve the API whether it's by making changes to the definition itself or to the code.\nThat way, with time, we can improve the API in general, and expose some of the new features in OAS3.\n\nSome useful links:\n- [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)\n- [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)",
+"version": "1.0.17",
+"basePath": "https://petstore3.swagger.io",
+"resourcePath": "/api/v3",
+"models": {
+"Order": {
+"type": "object",
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64",
+"example": 10,
+"exampleSetFlag": true
+},
+"petId": {
+"type": "integer",
+"format": "int64",
+"example": 198772,
+"exampleSetFlag": true
+},
+"quantity": {
+"type": "integer",
+"format": "int32",
+"example": 7,
+"exampleSetFlag": true
+},
+"shipDate": {
+"type": "string",
+"format": "date-time",
+"exampleSetFlag": false
+},
+"status": {
+"type": "string",
+"description": "Order Status",
+"example": "approved",
+"exampleSetFlag": true,
+"enum": [
+"placed",
+"approved",
+"delivered"
+]
+},
+"complete": {
+"type": "boolean",
+"exampleSetFlag": false
+}
+},
+"xml": {
+"name": "order"
+},
+"exampleSetFlag": false
+},
+"Category": {
+"type": "object",
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64",
+"example": 1,
+"exampleSetFlag": true
+},
+"name": {
+"type": "string",
+"example": "Dogs",
+"exampleSetFlag": true
+}
+},
+"xml": {
+"name": "category"
+},
+"exampleSetFlag": false
+},
+"User": {
+"type": "object",
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64",
+"example": 10,
+"exampleSetFlag": true
+},
+"username": {
+"type": "string",
+"example": "theUser",
+"exampleSetFlag": true
+},
+"firstName": {
+"type": "string",
+"example": "John",
+"exampleSetFlag": true
+},
+"lastName": {
+"type": "string",
+"example": "James",
+"exampleSetFlag": true
+},
+"email": {
+"type": "string",
+"example": "john@email.com",
+"exampleSetFlag": true
+},
+"password": {
+"type": "string",
+"example": "12345",
+"exampleSetFlag": true
+},
+"phone": {
+"type": "string",
+"example": "12345",
+"exampleSetFlag": true
+},
+"userStatus": {
+"type": "integer",
+"description": "User Status",
+"format": "int32",
+"example": 1,
+"exampleSetFlag": true
+}
+},
+"xml": {
+"name": "user"
+},
+"exampleSetFlag": false
+},
+"Address": {
+"type": "object",
+"properties": {
+"street": {
+"type": "string",
+"example": "437 Lytton",
+"exampleSetFlag": true
+},
+"city": {
+"type": "string",
+"example": "Palo Alto",
+"exampleSetFlag": true
+},
+"state": {
+"type": "string",
+"example": "CA",
+"exampleSetFlag": true
+},
+"zip": {
+"type": "string",
+"example": "94301",
+"exampleSetFlag": true
+}
+},
+"xml": {
+"name": "address"
+},
+"exampleSetFlag": false
+},
+"Customer": {
+"type": "object",
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64",
+"example": 100000,
+"exampleSetFlag": true
+},
+"username": {
+"type": "string",
+"example": "fehguy",
+"exampleSetFlag": true
+},
+"address": {
+"type": "array",
+"xml": {
+"name": "addresses",
+"wrapped": true
+},
+"exampleSetFlag": false,
+"items": {
+"$ref": "#/components/schemas/Address",
+"exampleSetFlag": false
+}
+}
+},
+"xml": {
+"name": "customer"
+},
+"exampleSetFlag": false
+},
+"Tag": {
+"type": "object",
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64",
+"exampleSetFlag": false
+},
+"name": {
+"type": "string",
+"exampleSetFlag": false
+}
+},
+"xml": {
+"name": "tag"
+},
+"exampleSetFlag": false
+},
+"Pet": {
+"required": [
+"name",
+"photoUrls"
+],
+"type": "object",
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64",
+"example": 10,
+"exampleSetFlag": true
+},
+"name": {
+"type": "string",
+"example": "doggie",
+"exampleSetFlag": true
+},
+"category": {
+"type": "object",
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64",
+"example": 1,
+"exampleSetFlag": true
+},
+"name": {
+"type": "string",
+"example": "Dogs",
+"exampleSetFlag": true
+}
+},
+"xml": {
+"name": "category"
+},
+"exampleSetFlag": false
+},
+"photoUrls": {
+"type": "array",
+"xml": {
+"wrapped": true
+},
+"exampleSetFlag": false,
+"items": {
+"type": "string",
+"xml": {
+"name": "photoUrl"
+},
+"exampleSetFlag": false
+}
+},
+"tags": {
+"type": "array",
+"xml": {
+"wrapped": true
+},
+"exampleSetFlag": false,
+"items": {
+"type": "object",
+"properties": {
+"id": {
+"type": "integer",
+"format": "int64",
+"exampleSetFlag": false
+},
+"name": {
+"type": "string",
+"exampleSetFlag": false
+}
+},
+"xml": {
+"name": "tag"
+},
+"exampleSetFlag": false
+}
+},
+"status": {
+"type": "string",
+"description": "pet status in the store",
+"exampleSetFlag": false,
+"enum": [
+"available",
+"pending",
+"sold"
+]
+}
+},
+"xml": {
+"name": "pet"
+},
+"exampleSetFlag": false
+},
+"ApiResponse": {
+"type": "object",
+"properties": {
+"code": {
+"type": "integer",
+"format": "int32",
+"exampleSetFlag": false
+},
+"type": {
+"type": "string",
+"exampleSetFlag": false
+},
+"message": {
+"type": "string",
+"exampleSetFlag": false
+}
+},
+"xml": {
+"name": "##default"
+},
+"exampleSetFlag": false
+}
+},
+"consumes": [],
+"produces": [],
+"integral": true,
+"createdOn": 1673301440004,
+"createdBy": "40dd53a4-0b13-4485-82e8-63c687404c2f",
+"organizationId": "ba1c6dac-ee31-4b5d-9d18-493cc6f5088b",
+"serviceType": "rest",
+"hasOriginalDefinition": true,
+"importUrl": "https://petstore3.swagger.io/api/v3/openapi.json",
+"properties": {
+"license.name": "Apache 2.0",
+"ResourceUri": "https://petstore3.swagger.io/api/v3/openapi.json",
+"ResourceIdentifier": "TRD727N7TPEXNHZLVDDRKU5CRUDUJA6H",
+"contact.email": "apiteam@swagger.io",
+"ResourceType": "oas30",
+"license.url": "http://www.apache.org/licenses/LICENSE-2.0.html",
+"termsOfService": "http://swagger.io/terms/",
+"externalDocs.description": "Find out more about Swagger",
+"externalDocs.url": "http://swagger.io",
+"tags": "[{\"name\":\"pet\",\"description\":\"Everything about your Pets\",\"externalDocs\":{\"description\":\"Find out more\",\"url\":\"http://swagger.io\"}},{\"name\":\"store\",\"description\":\"Access to Petstore orders\",\"externalDocs\":{\"description\":\"Find out more about our store\",\"url\":\"http://swagger.io\"}},{\"name\":\"user\",\"description\":\"Operations about user\"}]"
+}
+}

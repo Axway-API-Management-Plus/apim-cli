@@ -8,52 +8,82 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class APIManagerCLITest {
-	
-  @Test
-  public void testArgsIsNull() {
-	  APIManagerCLI cli = new APIManagerCLI(null);
-	  Assert.assertNull(cli.selectedService);
-	  Assert.assertNull(cli.selectedMethod);
-  }
-  
-  @Test
-  public void testEmptyArgs() {
-	  APIManagerCLI cli = new APIManagerCLI(new String[] {});
-	  // These tests required to have the app- and api modules available in the classpath
-	  Assert.assertTrue(cli.servicesMappedByGroup instanceof Map);
-	  Assert.assertTrue(cli.servicesMappedByGroup.containsKey("api"));
-	  Assert.assertTrue(cli.servicesMappedByGroup.containsKey("app"));
-	  Assert.assertTrue(cli.servicesMappedByGroup.get("api").size()==2);
-	  Assert.assertNull(cli.selectedService);
-	  Assert.assertNull(cli.selectedMethod);
-  }
-  
-  @Test
-  public void testWithServiceIdOnly() {
-	  APIManagerCLI cli = new APIManagerCLI(new String[] {"api"});
-	  Assert.assertNotNull(cli.selectedServiceGroup);
-	  Assert.assertTrue(cli.selectedServiceGroup instanceof List, "cli.service is type: " + cli.selectedServiceGroup.getClass().getName());
-	  Assert.assertNull(cli.selectedMethod);
-  }
-  
-  @Test
-  public void testWithServiceIdAndMethod() {
-	  APIManagerCLI cli = new APIManagerCLI(new String[] {"api", "import"});
-	  Assert.assertNotNull(cli.selectedServiceGroup);
-	  Assert.assertTrue(cli.selectedServiceGroup instanceof List, "cli.service is type: " + cli.selectedServiceGroup.getClass().getName());
-	  Assert.assertNotNull(cli.selectedMethod);
-	  Assert.assertTrue(cli.selectedService instanceof APIMCLIServiceProvider, "cli.selectedService is type: " + cli.selectedService.getClass().getName());
-	  Assert.assertTrue(cli.selectedMethod instanceof Method);
-	  Assert.assertEquals(cli.selectedMethod.getName(), "importAPI");
-  }
-  
-  @Test
-  public void simulateChocoExecution() {
-	  APIManagerCLI cli = new APIManagerCLI(new String[] {"choco", "api", "import"});
-	  Assert.assertNotNull(cli.selectedServiceGroup);
-	  Assert.assertTrue(cli.selectedServiceGroup instanceof List, "cli.service is type: " + cli.selectedServiceGroup.getClass().getName());
-	  Assert.assertNotNull(cli.selectedMethod);
-	  Assert.assertTrue(cli.selectedService instanceof APIMCLIServiceProvider, "cli.selectedService is type: " + cli.selectedService.getClass().getName());
-	  Assert.assertEquals(cli.selectedMethod.getName(), "importAPI");
-  }
+
+    @Test
+    public void testArgsIsNull() {
+        APIManagerCLI cli = new APIManagerCLI(null);
+        Assert.assertNull(cli.selectedService);
+        Assert.assertNull(cli.selectedMethod);
+    }
+
+    @Test
+    public void testEmptyArgs() {
+        APIManagerCLI cli = new APIManagerCLI(new String[]{});
+        // These tests required to have the app- and api modules available in the classpath
+        Assert.assertTrue(cli.servicesMappedByGroup instanceof Map);
+        Assert.assertTrue(cli.servicesMappedByGroup.containsKey("api"));
+        Assert.assertTrue(cli.servicesMappedByGroup.containsKey("app"));
+        Assert.assertTrue(cli.servicesMappedByGroup.get("api").size() == 2);
+        Assert.assertNull(cli.selectedService);
+        Assert.assertNull(cli.selectedMethod);
+    }
+
+    @Test
+    public void testWithServiceIdOnly() {
+        APIManagerCLI cli = new APIManagerCLI(new String[]{"api"});
+        Assert.assertNotNull(cli.selectedServiceGroup);
+        Assert.assertTrue(cli.selectedServiceGroup instanceof List, "cli.service is type: " + cli.selectedServiceGroup.getClass().getName());
+        Assert.assertNull(cli.selectedMethod);
+    }
+
+    @Test
+    public void testWithServiceIdAndMethod() {
+        APIManagerCLI cli = new APIManagerCLI(new String[]{"api", "import"});
+        Assert.assertNotNull(cli.selectedServiceGroup);
+        Assert.assertTrue(cli.selectedServiceGroup instanceof List, "cli.service is type: " + cli.selectedServiceGroup.getClass().getName());
+        Assert.assertNotNull(cli.selectedMethod);
+        Assert.assertTrue(cli.selectedService instanceof APIMCLIServiceProvider, "cli.selectedService is type: " + cli.selectedService.getClass().getName());
+        Assert.assertTrue(cli.selectedMethod instanceof Method);
+        Assert.assertEquals(cli.selectedMethod.getName(), "importAPI");
+    }
+
+    @Test
+    public void simulateChocoExecution() {
+        APIManagerCLI cli = new APIManagerCLI(new String[]{"choco", "api", "import"});
+        Assert.assertNotNull(cli.selectedServiceGroup);
+        Assert.assertTrue(cli.selectedServiceGroup instanceof List, "cli.service is type: " + cli.selectedServiceGroup.getClass().getName());
+        Assert.assertNotNull(cli.selectedMethod);
+        Assert.assertTrue(cli.selectedService instanceof APIMCLIServiceProvider, "cli.selectedService is type: " + cli.selectedService.getClass().getName());
+        Assert.assertEquals(cli.selectedMethod.getName(), "importAPI");
+    }
+
+    @Test
+    public void testRunWithoutArguments() {
+        APIManagerCLI apiManagerCLI = new APIManagerCLI(null);
+        int returnCode = apiManagerCLI.run(null);
+        Assert.assertEquals(0, returnCode);
+    }
+
+    @Test
+    public void testRun() {
+        String[] args = new String[]{"api", "import"};
+        APIManagerCLI apiManagerCLI = new APIManagerCLI(args);
+        int returnCode = apiManagerCLI.run(args);
+        Assert.assertEquals(0, returnCode);
+    }
+    @Test
+    public void testRunInvalidCommand() {
+        String[] args = new String[]{"api", "desc"};
+        APIManagerCLI apiManagerCLI = new APIManagerCLI(args);
+        int returnCode = apiManagerCLI.run(args);
+        Assert.assertEquals(0, returnCode);
+    }
+
+    @Test
+    public void testRunWithException() {
+        String[] args = new String[]{"api", "delete"};
+        APIManagerCLI apiManagerCLI = new APIManagerCLI(args);
+        int returnCode = apiManagerCLI.run(args);
+        Assert.assertEquals(99, returnCode);
+    }
 }

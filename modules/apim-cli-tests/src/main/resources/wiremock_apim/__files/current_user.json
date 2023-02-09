@@ -1,0 +1,22 @@
+{
+  "id": "40dd53a4-0b13-4485-82e8-63c687404c2f",
+  "name": "API Administrator",
+  "description": "API Administrator",
+  "loginName": "apiadmin",
+  "email": "apiadmin@localhost",
+  "role": "admin",
+  "enabled": true,
+  "createdOn": 1670957709050,
+  "state": "approved",
+  "type": "internal",
+  "authAttrs": {
+    "firstLogin": false,
+    "isSSOLogin": false,
+    "userDn": "cn=apiadmin,ou=organizations,ou=APIPortal",
+    "lastSeen": 1672984561148,
+    "passwordSetOn": 1670957878095,
+    "changePassword": false,
+    "changePasswordMessage": null
+  },
+  "dn": "cn=apiadmin,ou=organizations,ou=APIPortal"
+}

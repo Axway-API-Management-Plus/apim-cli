@@ -1,27 +1,24 @@
 package com.axway.apim.setup.impl;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Alerts;
 import com.axway.apim.lib.APIManagerAlertsAnnotation;
 import com.axway.apim.lib.APIManagerAlertsAnnotation.AlertType;
-import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ConsolePrinterAlerts {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ConsolePrinterAlerts.class);
 	
 	APIManagerAdapter adapter;
-	
-	private final String dots = ".....................................";
-	
+
 	AlertType[] alertsTypes = new AlertType[] {
 			AlertType.Application, 
 			AlertType.ApplicationAPIAccess, 
@@ -34,35 +31,35 @@ public class ConsolePrinterAlerts {
 			AlertType.Quota
 	};
 
-	public ConsolePrinterAlerts(StandardExportParams params) {
+	public ConsolePrinterAlerts() {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			LOG.error("Unable to get APIManagerAdapter", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Unable to get APIManagerAdapter", e);
 		}
 	}
 
 	public void export(Alerts alerts) throws AppException {
-		System.out.println();
-		System.out.println("Alerts for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
-		System.out.println();
+		Console.println();
+		Console.println("Alerts for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
+		Console.println();
 		print(alerts, alertsTypes);
 	}
 	
 	private void print(Alerts alerts, AlertType[] alertTypes) {
 		for(AlertType type : alertTypes) {
-			System.out.println(type.getClearName()+":");
+			Console.println(type.getClearName()+":");
 			Field[] fields = Alerts.class.getDeclaredFields();
 			for (Field field : fields) {
 				if (field.isAnnotationPresent(APIManagerAlertsAnnotation.class)) {
 					APIManagerAlertsAnnotation annotation = field.getAnnotation(APIManagerAlertsAnnotation.class);
 					if(annotation.alertType()==type) {
-						System.out.printf("%s %s: %s\n", annotation.name() , dots.substring(annotation.name().length()), getFieldValue(field.getName(), alerts));
+						String dots = ".....................................";
+						Console.printf("%s %s: %s", annotation.name() , dots.substring(annotation.name().length()), getFieldValue(field.getName(), alerts));
 					}
 				}
 			}
-			System.out.println();
+			Console.println();
 		}
 	}
 	

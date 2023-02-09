@@ -30,12 +30,12 @@ public class RecreateToUpdateAPI {
 		// 1. Create BE- and FE-API (API-Proxy) / Including updating all belonging props!
 		// This also includes all CONFIGURED application subscriptions and client-orgs
 		// But not potentially existing Subscriptions or manually created Client-Orgs
-		LOG.info("Create new API to update existing: '"+actualAPI.getName()+"' (ID: "+actualAPI.getId()+")");
+		LOG.info("Create new API to update existing: {} (ID: {})", actualAPI.getName(), actualAPI.getId());
 		
 		CreateNewAPI createNewAPI = new CreateNewAPI();
 		createNewAPI.execute(changes, true);
 
-		LOG.info("New API successfuly created. Going to delete old API: '"+actualAPI.getName()+"' "+actualAPI.getVersion()+" (ID: "+actualAPI.getId()+")");
+		LOG.info("New API successfully created. Going to delete old API: {} {} (ID: {})", actualAPI.getName(), actualAPI.getVersion(), actualAPI.getId());
 		// Delete the existing old API!
 		new APIStatusManager().update(actualAPI, API.STATE_DELETED, true);
 		

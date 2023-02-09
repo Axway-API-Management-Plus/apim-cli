@@ -3,6 +3,7 @@ package com.axway.apim.api.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -53,7 +54,7 @@ public class Organization extends AbstractEntity implements CustomPropertiesEnti
 	
 	@JsonSerialize (using = APIAccessSerializer.class)
 	@JsonProperty("apis")
-	private List<APIAccess> apiAccess = new ArrayList<APIAccess>();
+	private List<APIAccess> apiAccess = new ArrayList<>();
 	
 	public Organization() {
 		super();
@@ -203,7 +204,12 @@ public class Organization extends AbstractEntity implements CustomPropertiesEnti
 		}
 		return false;
 	}
-	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dn);
+	}
+
 	public boolean deepEquals(Object other) {
 		if(other == null) return false;
 		if(other instanceof Organization) {

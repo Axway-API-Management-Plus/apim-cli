@@ -1,0 +1,6 @@
+[
+  {
+    "name": "Default Fault Handler",
+    "id": "<key type='CircuitContainer'><id field='name' value='Generated Policies'/><key type='CircuitContainer'><id field='name' value='REST API&apos;s'/><key type='CircuitContainer'><id field='name' value='Templates'/><key type='FilterCircuit'><id field='name' value='Default Fault Handler'/></key></key></key></key>"
+  }
+]

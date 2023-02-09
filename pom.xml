@@ -43,28 +43,24 @@
             <organizationUrl>http://www.axway.com</organizationUrl>
         </developer>
     </developers>
-
     <properties>
-        <revision>1.6.2-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.version>3.8.1</maven.compiler.version>
-
         <project.scm.id>github</project.scm.id>
-
         <!-- Only unit tests are run by default. -->
         <skip.integration.tests>true</skip.integration.tests>
         <skip.unit.tests>false</skip.unit.tests>
+        <sonar.organization>axway-api-management-plus</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <wiremock.version>2.35.0</wiremock.version>
     </properties>
-
     <scm>
         <connection>scm:git:https://github.com/Axway-API-Management-Plus/apim-cli.git</connection>
         <developerConnection>scm:git:https://github.com/Axway-API-Management-Plus/apim-cli.git</developerConnection>
         <url>https://github.com/Axway-API-Management-Plus/apim-cli</url>
         <tag>apimcli-1.3.0</tag>
     </scm>
-
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -75,8 +71,8 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-
     <modules>
+        <module>modules/apim-cli-tests</module>
         <module>modules/apim-adapter</module>
         <module>modules/apim-cli</module>
         <module>modules/apis</module>
@@ -87,7 +83,6 @@
         <module>distribution</module>
         <module>modules/spectoconfig</module>
     </modules>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -233,6 +228,31 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.36</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>2.19.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.freva</groupId>
+                <artifactId>ascii-table</artifactId>
+                <version>1.8.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ehcache</groupId>
+                <artifactId>ehcache</artifactId>
+                <version>3.9.9</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>2.3.6</version>
+            </dependency>
+            <dependency>
                 <groupId>com.consol.citrus</groupId>
                 <artifactId>citrus-core</artifactId>
                 <version>2.7.7</version>
@@ -268,36 +288,8 @@
                 <version>6.14.3</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.7.36</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-slf4j-impl</artifactId>
-                <version>2.19.0</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.freva</groupId>
-                <artifactId>ascii-table</artifactId>
-                <version>1.8.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.ehcache</groupId>
-                <artifactId>ehcache</artifactId>
-                <version>3.9.9</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.jaxb</groupId>
-                <artifactId>jaxb-runtime</artifactId>
-                <version>2.3.6</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
-
     <build>
         <plugins>
             <plugin>
@@ -351,9 +343,39 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.8</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-prepare-agent-integration</id>
+                        <goals>
+                            <goal>prepare-agent-integration</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report-integration</id>
+                        <goals>
+                            <goal>report-integration</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-
     <profiles>
         <profile>
             <id>release</id>
@@ -456,5 +478,4 @@
             <url>https://repository.springsource.com/maven/bundles/external</url>
         </repository>
     </repositories>
-
 </project>

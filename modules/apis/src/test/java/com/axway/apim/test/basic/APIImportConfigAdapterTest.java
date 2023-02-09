@@ -8,7 +8,6 @@ import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.errorHandling.AppException;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -21,46 +20,45 @@ import java.util.Map;
 
 public class APIImportConfigAdapterTest extends APIManagerMockBase {
 
-    private static Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapterTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapterTest.class);
     private String apimCliHome;
 
     @BeforeClass
-    private void initCommandParameters() throws AppException, IOException {
+    private void initCommandParameters() throws IOException {
         setupMockData();
         apimCliHome = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
     }
 
-    // Make sure, you don't have configured APIM_CLI_HOME when running this test
     @Test
-    public void withoutStage() throws AppException, ParseException {
+    public void withoutStage() throws AppException {
         // Create Environment properties without any stage (basically loads env.properties)
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getBackendBasepath(), "resolvedToSomething");
     }
 
     // Make sure, you don't have configured APIM_CLI_HOME when running this test
     @Test
-    public void withStage() throws AppException, ParseException {
+    public void withStage() throws AppException {
         // Providing a stage, it should load the env.variabletest.properties
         EnvironmentProperties props = new EnvironmentProperties("variabletest", apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getBackendBasepath(), "resolvedToSomethingElse");
     }
 
     // Make sure, you don't have configured APIM_CLI_HOME when running this test
     @Test
-    public void withManualStageConfig() throws AppException, ParseException {
+    public void withManualStageConfig() throws AppException {
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
         APIImportParams params = new APIImportParams();
         params.setConfig(testConfig);
@@ -75,7 +73,7 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     public void usingOSEnvVariable() throws AppException {
         try {
             String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
-            APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
+            APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
             DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
             String osEnv = System.getenv().get("OS");
             // To ignore the check on OS as  MAC, Ubuntu does not have environment variable 'OS'
@@ -93,51 +91,51 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void notDeclaredVariable() throws AppException, ParseException {
+    public void notDeclaredVariable() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
     }
 
     @Test
-    public void configFileWithSpaces() throws AppException, ParseException {
+    public void configFileWithSpaces() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api config with spaces.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getVersion(), "${notDeclared}");
     }
 
     @Test
-    public void stageConfigInSubDirectory() throws AppException, ParseException {
+    public void stageConfigInSubDirectory() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "notRelavantForThis Test", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "notRelavantForThis Test", null);
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getVersion(), "9.0.0");
         Assert.assertEquals(apiConfig.getName(), "API Config from testStageProd sub folder");
     }
 
     @Test
-    public void outboundOAuthValidConfig() throws AppException, ParseException {
+    public void outboundOAuthValidConfig() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         props.put("myOAuthProfileName", "Sample OAuth Client Profile");
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound-oauth-config.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "petstore.json", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, "testStageProd", "petstore.json", null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getVersion(), "kk1");
@@ -152,14 +150,14 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The OAuth provider profile is unkown: 'Invalid profile name'. Known profiles:.*")
-    public void outboundOAuthInValidConfig() throws AppException, ParseException {
+    public void outboundOAuthInValidConfig() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         props.put("myOAuthProfileName", "Invalid profile name");
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/outbound-oauth-config.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getVersion(), "kk1");
@@ -167,20 +165,20 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void emptyVHostTest() throws AppException, ParseException {
+    public void emptyVHostTest() throws AppException {
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/empty-vhost-api-config.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertNull(apiConfig.getVhost(), "Empty VHost should be considered as not set (null), as an empty VHost is logically not possible to have.");
     }
 
     @Test
-    public void outboundProfileWithDefaultAuthOnlyTest() throws AppException, ParseException {
+    public void outboundProfileWithDefaultAuthOnlyTest() throws AppException {
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/methodLevel/method-level-outboundprofile-default-authn-only.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Map<String, OutboundProfile> outboundProfiles = apiConfig.getOutboundProfiles();
@@ -192,15 +190,14 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing routingPolicy when routeType is set to policy")
-    public void outboundProfileTypePolicyWithoutRoutingPolicy() throws AppException, ParseException {
+    public void outboundProfileTypePolicyWithoutRoutingPolicy() throws AppException {
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/policies/invalid-RouteType-Policy-NoRoutingPolicy.json").getFile();
-
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", null);
         adapter.getDesiredAPI();
     }
 
-    @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required custom property: 'customProperty4'")
-    public void testMissingMandatoryCustomProperty() throws ParseException, IOException, InterruptedException {
+    @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Missing required custom properties : 'customProperty4'")
+    public void testMissingMandatoryCustomProperty() throws IOException {
         String customPropertiesConfig = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "customProperties/customPropertiesConfig.json"));
         APIManagerAdapter.getInstance().customPropertiesAdapter.setAPIManagerTestResponse(customPropertiesConfig);
 
@@ -215,18 +212,18 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
         params.setProperties(props);
 
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/customproperties/1_custom-properties-config.json").getFile();
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "../basic/petstore.json", null);
         adapter.getDesiredAPI(); // Should fail, as a mandatory customProperty is missing
     }
 
     @Test
-    public void apiSpecificationObject() throws AppException, ParseException {
+    public void apiSpecificationObject() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-api-spec-object.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getName(), "API with API-Specification object");
@@ -234,13 +231,13 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void testMarkdownLocalClassic() throws AppException, ParseException {
+    public void testMarkdownLocalClassic() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/description/1_api_with_local_mark_down_classic.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getName(), "API with classic markdown local");
@@ -248,13 +245,13 @@ public class APIImportConfigAdapterTest extends APIManagerMockBase {
     }
 
     @Test
-    public void testMarkdownLocalList() throws AppException, ParseException {
+    public void testMarkdownLocalList() throws AppException {
         EnvironmentProperties props = new EnvironmentProperties(null, apimCliHome);
         APIImportParams params = new APIImportParams();
         params.setProperties(props);
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/description/1_api_with_local_mark_down_list.json").getFile();
 
-        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, false, null);
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, null);
         adapter.getDesiredAPI();
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getName(), "API with classic markdown local list");

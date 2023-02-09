@@ -15,6 +15,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.organization.lib.OrgExportParams;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
@@ -34,8 +35,7 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 		try {
 			adapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
-			LOG.error("Unable to get APIManagerAdapter", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("Unable to get APIManagerAdapter", e);
 		}
 	}
 
@@ -54,7 +54,7 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 	}
 	
 	private void printStandard(List<Organization> orgs) {
-		System.out.println(AsciiTable.getTable(borderStyle, orgs, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, orgs, Arrays.asList(
 				new Column().header("Organization-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
 				new Column().header("V-Host").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
@@ -65,7 +65,7 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 	}
 	
 	private void printWide(List<Organization> orgs) {
-		System.out.println(AsciiTable.getTable(borderStyle, orgs, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, orgs, Arrays.asList(
 				new Column().header("Organization-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
 				new Column().header("V-Host").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
@@ -78,7 +78,7 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 	}
 	
 	private void printUltra(List<Organization> orgs) {
-		System.out.println(AsciiTable.getTable(borderStyle, orgs, Arrays.asList(
+		Console.println(AsciiTable.getTable(borderStyle, orgs, Arrays.asList(
 				new Column().header("Organization-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getId),
 				new Column().header("Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(AbstractEntity::getName),
 				new Column().header("V-Host").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(Organization::getVirtualHost),
@@ -93,7 +93,7 @@ public class ConsoleOrgExporter extends OrgResultHandler {
 	}
 
 	@Override
-	public OrgFilter getFilter() throws AppException {
+	public OrgFilter getFilter() {
 		return getBaseOrgFilterBuilder().build();
 	}
 	

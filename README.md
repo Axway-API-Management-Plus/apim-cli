@@ -1,5 +1,11 @@
 # Axway API-Management CLI
 
+[![License Apache2](https://img.shields.io/hexpm/l/plug.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+![Latest Release](https://img.shields.io/github/v/release/Axway-API-Management-Plus/apim-cli)
+
+![downloads](https://img.shields.io/github/downloads/Axway-API-Management-Plus/apim-cli/total)
+
+
 This CLI allows you to control the Axway API management solution without access through the Web UI. You can call the CLI manually or integrate it into a CI/CD pipeline. The CLI is based on [Swagger-Promote](https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote), which has been refactored to support more use-cases than only API-Import and -Export.
 
 ## Everything as code

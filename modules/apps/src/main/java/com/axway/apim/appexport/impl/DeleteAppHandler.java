@@ -12,6 +12,7 @@ import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.rest.Console;
 
 public class DeleteAppHandler extends ApplicationExporter {
 
@@ -21,26 +22,26 @@ public class DeleteAppHandler extends ApplicationExporter {
 
 	@Override
 	public void export(List<ClientApplication> apps) throws AppException {
-		System.out.println(apps.size() + " applications selected for deletion.");
+		Console.println(apps.size() + " applications selected for deletion.");
 		if(CoreParameters.getInstance().isForce()) {
-			System.out.println("Force flag given to delete: "+apps.size()+" Application(s)");
+			Console.println("Force flag given to delete: "+apps.size()+" Application(s)");
 		} else {
 			if(Utils.askYesNo("Do you wish to proceed? (Y/N)")) {
 			} else {
-				System.out.println("Canceled.");
+				Console.println("Canceled.");
 				return;
 			}
 		}
-		System.out.println("Okay, going to delete: " + apps.size() + " Application(s)");
+		Console.println("Okay, going to delete: " + apps.size() + " Application(s)");
 		for(ClientApplication app : apps) {
 			try {
 				APIManagerAdapter.getInstance().appAdapter.deleteApplication(app);
 			} catch(Exception e) {
 				result.setError(ErrorCode.ERR_DELETING_ORG);
-				LOG.error("Error deleting application: " + app.getName());
+				LOG.error("Error deleting application: {}" , app.getName());
 			}
 		}
-		System.out.println("Done!");
+		Console.println("Done!");
 	}
 
 	@Override

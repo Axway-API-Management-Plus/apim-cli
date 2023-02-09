@@ -1,14 +1,6 @@
 package com.axway.apim.test.quota;
 
-import java.io.IOException;
-
-import org.springframework.http.HttpStatus;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -16,16 +8,20 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
+import org.springframework.http.HttpStatus;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 @Test
 public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 
-	private ImportTestAction swaggerImport;
-	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException, InterruptedException {
-		swaggerImport = new ImportTestAction();
+	public void run(@Optional @CitrusResource TestContext context) throws IOException, InterruptedException {
+		ImportTestAction swaggerImport = new ImportTestAction();
 		
 		description("Swagger-Promote Quota should only overwrite configured Quota-Information and leave manual Quota unchanged!");
 		/*
@@ -39,6 +35,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		 * If all these keys are the same, the quota-setting is the same and should be overwritten!
 		 */
 
+		createVariable("useApiAdmin", "true"); // Use apiadmin account
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
 		variable("apiPath", "/dont-overwrite-quota-restriction-api-${apiNumber}");
 		variable("apiName", "Quota-${apiNumber}-Multi-Restriction-API");
@@ -68,8 +65,8 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 				.extractFromPayload("$.[?(@.name=='updateUser')].id", "testMethodId4"));
 		
 		echo("####### Define a manual application- and system-quotas for the API: ${apiId} on specific methods #######"); 
-		http(builder -> builder.client("apiManager").send().put("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json")
-		.payload("{\"id\":\""+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA+"\", \"type\":\"APPLICATION\",\"name\":\"Application Default\","
+		http(builder -> builder.client("apiManager").send().put("/quotas/"+ APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json")
+		.payload("{\"id\":\""+ APIManagerAdapter.APPLICATION_DEFAULT_QUOTA+"\", \"type\":\"APPLICATION\",\"name\":\"Application Default\","
 				+ "\"description\":\"Maximum message rates per application. Applied to each application unless an Application-Specific quota is configured\","
 				+ "\"restrictions\":["
 					+ "{\"api\":\"${apiId}\",\"method\":\"${testMethodId1}\",\"type\":\"throttlemb\",\"config\":{\"period\":\"hour\",\"per\":1,\"mb\":700}}, "
@@ -77,8 +74,8 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 				+ "],"
 				+ "\"system\":true}"));
 		
-		http(builder -> builder.client("apiManager").send().put("/quotas/"+APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json")
-		.payload("{\"id\":\""+APIManagerAdapter.SYSTEM_API_QUOTA+"\", \"type\":\"API\",\"name\":\"System\","
+		http(builder -> builder.client("apiManager").send().put("/quotas/"+ APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json")
+		.payload("{\"id\":\""+ APIManagerAdapter.SYSTEM_API_QUOTA+"\", \"type\":\"API\",\"name\":\"System\","
 				+ "\"description\":\"Maximum message rates aggregated across all client applications\","
 				+ "\"restrictions\":["
 					+ "{\"api\":\"${apiId}\",\"method\":\"${testMethodId3}\",\"type\":\"throttle\",\"config\":{\"period\":\"hour\",\"per\":3,\"messages\":1003}}, "
@@ -112,7 +109,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		echo("####### Validate all previously configured APPLICATION quotas (manually configured) do exists #######");
 		echo("####### ############ Sleep 2 seconds ##################### #######");
 		Thread.sleep(2000);
-		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").send().get("/quotas/"+ APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].type", "throttlemb")
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].config.per", "1")
@@ -123,7 +120,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId2}')].config.messages", "100000"));
 		
 		echo("####### Validate all previously configured SYSTEM quotas (manually configured) do exists #######");
-		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").send().get("/quotas/"+ APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
 		Thread.sleep(5000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].type", "throttle")
@@ -148,7 +145,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		echo("####### Validate all APPLICATION quotas (manually configured & API-Config) do exists #######");
 		echo("####### ############ Sleep 2 seconds ##################### #######");
 		Thread.sleep(2000);
-		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").send().get("/quotas/"+ APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].type", "throttlemb")
 			//.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].config.period", "hour")
@@ -168,7 +165,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		echo("####### Validate all SYSTEM quotas (manually configured & API-Config) do exists #######");
 		echo("####### ############ Sleep 2 seconds ##################### #######");
 		Thread.sleep(2000);
-		http(builder -> builder.client("apiManager").send().get("/quotas/"+APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
+		http(builder -> builder.client("apiManager").send().get("/quotas/"+ APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].type", "throttle")
 				//.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].config.period", "hour")
