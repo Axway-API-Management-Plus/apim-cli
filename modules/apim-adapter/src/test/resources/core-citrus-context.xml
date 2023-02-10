@@ -1,81 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:citrus="http://www.citrusframework.org/schema/config"
-	xmlns:citrus-http="http://www.citrusframework.org/schema/http/config"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:citrus="http://www.citrusframework.org/schema/config"
+       xmlns:citrus-http="http://www.citrusframework.org/schema/http/config"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.citrusframework.org/schema/config http://www.citrusframework.org/schema/config/citrus-config.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 	http://www.citrusframework.org/schema/http/config
 	http://www.citrusframework.org/schema/http/config/citrus-http-config.xsd">
-	
-	<citrus:schema-repository id="schemaRepository" />
-	<context:component-scan base-package="com.axway.apim.test.lib" />
-	
-	<bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations">
-			<list><value>citrus-global-variables.properties</value></list>
-		</property>
-		<property name="placeholderPrefix" value="${" />
-    </bean>
-    
-    <bean id="CoreBeforeSuite" class="com.axway.lib.CoreInitializationTestIT"/>
-    <bean class="com.axway.lib.HttpClientAllowAllHosts"/>
-    
-    <citrus:global-variables>
-    	<citrus:variable name="apiManagerHost" value="${apiManagerHost}"/>
-    	<citrus:variable name="apiManagerUser" value="${apiManagerUser}"/>
-    	<citrus:variable name="apiManagerPass" value="${apiManagerPass}"/>
-    	<citrus:variable name="API_VERSION" value="/api/portal/v1.4"/>
-	</citrus:global-variables>
 
-	
-	<citrus-http:client id="apiManager"
-          request-url="https://${apiManagerHost}:8075/api/portal/v1.4"
-          request-method="GET"
-          content-type="application/json"
-          charset="UTF-8"
-          timeout="60000"
-          interceptors="clientInterceptors"
-          rest-template="customizedRestTemplate"/>
-          
-	<citrus-http:client id="gatewayPlain"
-          request-url="http://${apiManagerHost}:8080"
-          request-method="GET"
-          content-type="application/json"
-          charset="UTF-8"
-          timeout="60000"/>
-          
-	<bean id="basicAuthFactory" class="com.consol.citrus.http.client.BasicAuthClientHttpRequestFactory">
-		<property name="authScope">
-			<bean class="org.apache.http.auth.AuthScope">
-				<constructor-arg value="${apiManagerHost}"/>
-				<constructor-arg value="8075"/>
-				<constructor-arg value=""/>
-				<constructor-arg value="basic"/>
-			</bean>
-		</property>
-		<property name="credentials">
-			<bean class="org.apache.http.auth.UsernamePasswordCredentials">
-				<constructor-arg value="${apiManagerUser}"/>
-				<constructor-arg value="${apiManagerPass}"/>
-			</bean>
-		</property>
-		<property name="httpClient">
-			<ref bean="httpClient" />
-		</property>
-	</bean>
-	
-	<bean name="customizedRestTemplate" class="org.springframework.web.client.RestTemplate">
-		<property name="requestFactory">
-			<ref bean="basicAuthFactory"/>
-		</property>
-	</bean>
-	
-	<util:list id="clientInterceptors">
-  		<bean class="com.consol.citrus.http.interceptor.LoggingClientInterceptor"/>
-	</util:list>
+    <citrus:schema-repository id="schemaRepository"/>
+
+    <bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>citrus-global-variables.properties</value>
+            </list>
+        </property>
+        <property name="placeholderPrefix" value="${"/>
+    </bean>
+
+    <bean id="CoreBeforeSuite" class="com.axway.lib.CoreInitializationTestIT"/>
+
+    <citrus:global-variables>
+        <citrus:variable name="apiManagerHost" value="${apiManagerHost}"/>
+        <citrus:variable name="apiManagerUser" value="${apiManagerUser}"/>
+        <citrus:variable name="apiManagerPass" value="${apiManagerPass}"/>
+        <citrus:variable name="API_VERSION" value="/api/portal/v1.4"/>
+    </citrus:global-variables>
+
+    <bean id="httpClientAllowAllHosts" class="com.axway.lib.HttpClientAllowAllHosts"/>
+
+    <citrus-http:client id="apiManager"
+                        request-url="https://${apiManagerHost}:${apiManagerPort}/api/portal/v1.4"
+                        request-method="GET"
+                        content-type="application/json"
+                        charset="UTF-8"
+                        timeout="60000"
+                        interceptors="clientInterceptors"
+                        request-factory="sslRequestFactory"
+                        />
+    <bean id="httpClient" factory-bean="httpClientAllowAllHosts" factory-method="httpClient"/>
+
+    <bean id="sslRequestFactory" factory-bean="httpClientAllowAllHosts" factory-method="sslRequestFactory"/>
+
+    <util:list id="clientInterceptors">
+        <bean class="com.consol.citrus.http.interceptor.LoggingClientInterceptor"/>
+        <bean class="com.axway.lib.BasicAuthInterceptor"/>
+    </util:list>
 </beans>

@@ -66,12 +66,16 @@
 			<artifactId>jackson-dataformat-xml</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.github.freva</groupId>
+			<artifactId>ascii-table</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.consol.citrus</groupId>
-			<artifactId>citrus-core</artifactId>
+			<artifactId>citrus-base</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.consol.citrus</groupId>
@@ -79,15 +83,27 @@
 		</dependency>
 		<dependency>
 			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-testng</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-validation-json</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
 			<artifactId>citrus-java-dsl</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.consol.citrus</groupId>
-			<artifactId>citrus-ws</artifactId>
+			<artifactId>citrus-spring</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>com.github.freva</groupId>
-		    <artifactId>ascii-table</artifactId>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-sql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.consol.citrus</groupId>
+			<artifactId>citrus-groovy</artifactId>
 		</dependency>
 	</dependencies>
 </project>

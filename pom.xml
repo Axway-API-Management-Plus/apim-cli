@@ -54,6 +54,7 @@
         <sonar.organization>axway-api-management-plus</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <wiremock.version>2.35.0</wiremock.version>
+        <citrus.version>3.4.0</citrus.version>
     </properties>
     <scm>
         <connection>scm:git:https://github.com/Axway-API-Management-Plus/apim-cli.git</connection>
@@ -158,22 +159,22 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.14.1</version>
+                <version>2.14.2</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.14.1</version>
+                <version>2.14.2</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-yaml</artifactId>
-                <version>2.14.1</version>
+                <version>2.14.2</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
                 <artifactId>jackson-dataformat-xml</artifactId>
-                <version>2.14.1</version>
+                <version>2.14.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -214,12 +215,12 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-models</artifactId>
-                <version>2.2.0</version>
+                <version>2.2.8</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger.parser.v3</groupId>
                 <artifactId>swagger-parser</artifactId>
-                <version>2.0.33</version>
+                <version>2.1.11</version>
                 <exclusions>
                     <exclusion>
                         <groupId>io.swagger.parser.v3</groupId>
@@ -254,38 +255,56 @@
             </dependency>
             <dependency>
                 <groupId>com.consol.citrus</groupId>
-                <artifactId>citrus-core</artifactId>
-                <version>2.7.7</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.consol.citrus</groupId>
-                <artifactId>citrus-jms</artifactId>
-                <version>2.7.7</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.consol.citrus</groupId>
-                <artifactId>citrus-ws</artifactId>
-                <version>2.7.7</version>
+                <artifactId>citrus-base</artifactId>
+                <version>${citrus.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.consol.citrus</groupId>
                 <artifactId>citrus-http</artifactId>
-                <version>2.7.7</version>
+                <version>${citrus.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.consol.citrus</groupId>
+                <artifactId>citrus-testng</artifactId>
+                <version>${citrus.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.consol.citrus</groupId>
+                <artifactId>citrus-validation-json</artifactId>
+                <version>${citrus.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.consol.citrus</groupId>
                 <artifactId>citrus-java-dsl</artifactId>
-                <version>2.7.7</version>
+                <version>${citrus.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.consol.citrus</groupId>
+                <artifactId>citrus-spring</artifactId>
+                <version>${citrus.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.consol.citrus</groupId>
+                <artifactId>citrus-groovy</artifactId>
+                <version>${citrus.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.consol.citrus</groupId>
+                <artifactId>citrus-sql</artifactId>
+                <version>${citrus.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>6.14.3</version>
+                <version>7.7.1</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
