@@ -1,7 +1,7 @@
 package com.axway.apim.test.basic;
 
-import com.axway.apim.APIManagerMockBase;
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.DesiredAPI;

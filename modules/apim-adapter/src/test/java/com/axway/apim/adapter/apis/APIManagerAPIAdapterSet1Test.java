@@ -25,12 +25,12 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	private static final String testPackage = "com/axway/apim/adapter/apimanager/testSet1/";
 	
 	@BeforeClass
-	private void initTestIndicator() throws AppException, IOException {
+	private void initTestIndicator() throws IOException {
 		setupMockData();
 	}
 	
 	@Test
-	public void loadActualAPI() throws AppException, IOException {		
+	public void loadActualAPI() throws IOException {
 		APIFilter filter = new APIFilter.Builder()
 				.hasId("72745ed9-f75b-428c-959c-b483eea497a1")
 				.build();
@@ -40,7 +40,7 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void testTranslateMethodToName() throws AppException, IOException {		
+	public void testTranslateMethodToName() throws IOException {
 		APIFilter filter = new APIFilter.Builder()
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.hasId("72745ed9-f75b-428c-959c-b483eea497a1")
@@ -62,7 +62,7 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void testTranslateMethodToId() throws AppException, IOException {		
+	public void testTranslateMethodToId() throws IOException {
 		APIFilter filter = new APIFilter.Builder()
 				.translateMethods(METHOD_TRANSLATION.AS_ID)
 				.hasId("72745ed9-f75b-428c-959c-99999999")
@@ -81,7 +81,7 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void testTranslatePolicyToExternalName() throws AppException, IOException {
+	public void testTranslatePolicyToExternalName() throws IOException {
 		// Get the API to test with
 		APIFilter filter = new APIFilter.Builder()
 				.translatePolicies(POLICY_TRANSLATION.TO_NAME)
@@ -97,7 +97,7 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void loadAPIIncludingQuota() throws AppException, IOException {		
+	public void loadAPIIncludingQuota() throws IOException {
 		APIFilter filter = new APIFilter.Builder()
 				.includeQuotas(true)
 				.includeClientApplications(true)
@@ -118,7 +118,7 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void loadAPIIncludingClientOrgs() throws AppException, IOException {		
+	public void loadAPIIncludingClientOrgs() throws IOException {
 		APIFilter filter = new APIFilter.Builder()
 				.includeClientOrganizations(true)
 				.hasId("72745ed9-f75b-428c-959c-b483eea497a1")
@@ -131,7 +131,7 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void loadAPIIncludingClientApps() throws AppException, IOException {		
+	public void loadAPIIncludingClientApps() throws IOException {
 		APIFilter filter = new APIFilter.Builder()
 				.includeClientApplications(true)
 				.includeQuotas(true)
@@ -148,7 +148,7 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void testGetAllAPIMethods() throws AppException, IOException {
+	public void testGetAllAPIMethods() throws IOException {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiMethods.json"));
 		assertNotNull(apiManagerResponse);
 		APIManagerAPIMethodAdapter methodAdapter = new APIManagerAPIMethodAdapter();
@@ -165,7 +165,7 @@ public class APIManagerAPIAdapterSet1Test extends APIManagerMockBase {
 	}
 	
 	@Test
-	public void testGetMethodForName() throws AppException, IOException {
+	public void testGetMethodForName() throws IOException {
 		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream(testPackage + "apiMethods.json"));
 		assertNotNull(apiManagerResponse);
 		APIManagerAPIMethodAdapter methodAdapter = new APIManagerAPIMethodAdapter();

@@ -1,6 +1,6 @@
 package com.axway.apim.test.changestate;
 
-import com.axway.apim.APIManagerMockBase;
+import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.APISpecification;
 import com.axway.apim.api.apiSpecification.Swagger2xSpecification;

@@ -1,6 +1,6 @@
 package com.axway.apim.test.envProperties;
 
-import com.axway.apim.APIManagerMockBase;
+import com.axway.apim.adapter.apis.APIManagerMockBase;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.lib.CoreParameters;

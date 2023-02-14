@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.axway.apim.APIManagerMockBase;
+import com.axway.apim.adapter.apis.APIManagerMockBase;
 import org.apache.commons.cli.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
