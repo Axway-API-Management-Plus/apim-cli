@@ -1,6 +1,7 @@
 package com.axway.apim.appimport.it;
 
 import com.axway.apim.EndpointConfig;
+import com.axway.apim.test.CoreInitializationTestIT;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.context.TestContext;
 import org.springframework.context.annotation.Bean;
@@ -19,5 +20,9 @@ public class ApplicationsConfiguration {
     @Bean
     public ExportAppTestAction exportAppTestAction(){
         return new ExportAppTestAction(context);
+    }
+    @Bean
+    public CoreInitializationTestIT coreInitializationTestIT(){
+        return new CoreInitializationTestIT();
     }
 }

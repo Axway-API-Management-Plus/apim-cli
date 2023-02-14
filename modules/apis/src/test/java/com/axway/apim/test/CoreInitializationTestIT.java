@@ -211,9 +211,8 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                     globalVariables.getVariables().put("orgId", testContext.getVariable("orgId"));
                     globalVariables.getVariables().put("orgId2", testContext.getVariable("orgId2"));
                     globalVariables.getVariables().put("orgId3", testContext.getVariable("orgId3"));
-
                     globalVariables.getVariables().put("testAppId", testContext.getVariable("testAppId"));
-                    globalVariables.getVariables().put("oadminUserId1", testContext.getVariable("testAppId"));
+                    globalVariables.getVariables().put("oadminUserId1", testContext.getVariable("oadminUserId1"));
                 }
             });
 

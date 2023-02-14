@@ -1,42 +1,38 @@
 package com.axway.apim.appimport.it.share;
 
-import java.io.File;
-import java.io.IOException;
-
-import com.axway.apim.testActions.TestParams;
-import org.springframework.http.HttpStatus;
-import org.testng.Assert;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appimport.it.ExportAppTestAction;
 import com.axway.apim.appimport.it.ImportAppTestAction;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.message.MessageType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
+import org.testng.Assert;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 @Test
 public class ImportAppWithPermissionsTestIT extends TestNGCitrusTestRunner implements TestParams {
 	
-	private static String PACKAGE = "/com/axway/apim/appimport/apps/appPermissions/";
+	private static final String PACKAGE = "/com/axway/apim/appimport/apps/appPermissions/";
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException, InterruptedException {
+	public void run(@Optional @CitrusResource TestContext context) throws IOException {
 		description("Import application incl. shares into API-Manager");
 		
 		ImportAppTestAction importApp = new ImportAppTestAction(context);
-		
 		int no = importApp.getRandomNum();
-		
 		createVariable("username1", "User-A-"+no);
 		createVariable("username2", "User-B-"+no);
 		createVariable("username3", "User-C-"+no);
