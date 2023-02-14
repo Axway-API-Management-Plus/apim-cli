@@ -111,6 +111,38 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                         .extractFromPayload("$.id", "orgId2"));
                 testRunner.echo("####### Extracted organization id: ${orgId2} as attribute: orgId2 #######");
             }
+
+            testRunner.echo("Creating third organization");
+            String orgName3 = URLEncoder.encode((String) globalVariables.getVariables().get("orgName3"), "UTF-8");
+            httpGet = new HttpGet(url + "/organizations?field=name&op=eq&value=" + orgName3);
+            httpGet.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
+            httpResponse = httpClient.execute(httpGet);
+            response = EntityUtils.toString(httpResponse.getEntity());
+
+            if (!response.equals("[]")) {
+                testRunner.echo("Organization ${orgName3} Already exists");
+                documentContext = JsonPath.parse(response);
+                String orgId = documentContext.read("$.[0].id");
+                testRunner.variable("orgId3", orgId);
+            } else {
+                testRunner.echo("Creating Organization ${orgName3}");
+                testRunner.http(action -> action.client(apiManager)
+                        .send()
+                        .post("/organizations")
+                        .name("orgCreatedRequest")
+                        .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                        .payload("{\"name\": \"${orgName3}\", \"description\": \"Test Org 3\", \"enabled\": true, \"development\": true }"));
+                testRunner.echo("####### Validate Test-Organisation: ${orgName} has been created #######");
+                testRunner.http(action -> action.client(apiManager)
+                        .receive()
+                        .response(HttpStatus.CREATED)
+                        .messageType(MessageType.JSON)
+                        .validate("$.name", "${orgName3}")
+                        .extractFromPayload("$.id", "orgId3"));
+                testRunner.echo("####### Extracted organization id: ${orgId3} as attribute: orgId2 #######");
+            }
+
+
             String userName = (String) globalVariables.getVariables().get("oadminUsername1");
             httpGet = new HttpGet(url + "/users?field=loginName&op=eq&value=" + userName);
             httpGet.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
@@ -178,6 +210,8 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                 public void doExecute(TestContext testContext) {
                     globalVariables.getVariables().put("orgId", testContext.getVariable("orgId"));
                     globalVariables.getVariables().put("orgId2", testContext.getVariable("orgId2"));
+                    globalVariables.getVariables().put("orgId3", testContext.getVariable("orgId3"));
+
                     globalVariables.getVariables().put("testAppId", testContext.getVariable("testAppId"));
                     globalVariables.getVariables().put("oadminUserId1", testContext.getVariable("testAppId"));
                 }

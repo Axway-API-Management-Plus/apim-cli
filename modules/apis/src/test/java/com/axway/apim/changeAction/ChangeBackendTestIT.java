@@ -54,6 +54,7 @@ public class ChangeBackendTestIT extends TestNGCitrusTestRunner {
 		echo("####### Try to change the backend of this published API, but without giving a force flag #######");
 		createVariable("expectedReturnCode", "15");
 		createVariable("name", "${apiName}");
+		createVariable("enforce", "false");
 		createVariable("newBackend", "http://petstore.swagger.io");
 		changeAction.doExecute(context);
 		
