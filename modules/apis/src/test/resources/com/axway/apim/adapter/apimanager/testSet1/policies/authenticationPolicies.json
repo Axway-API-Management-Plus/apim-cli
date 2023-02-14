@@ -1,6 +1,0 @@
-[
-    {
-        "name": "API Manager Protection Policy",
-        "id": "<key type='CircuitContainer'><id field='name' value='API Manager Policies'/><key type='FilterCircuit'><id field='name' value='API Manager Protection Policy'/></key></key>"
-    }
-]

@@ -22,7 +22,7 @@ public class ODataV4ImportTestIT extends TestNGCitrusTestRunner {
     @Parameters("context")
     public void run(@Optional @CitrusResource TestContext context) throws IOException {
         ImportTestAction importAction = new ImportTestAction();
-        description("Import an OData V2 specification that must be converted into an OpenAPI V3 specification.");
+        description("Import an OData V4 specification that must be converted into an OpenAPI V3 specification.");
 
         variable("apiNumber", RandomNumberFunction.getRandomNumber(3, true));
         variable("apiPath", "/odata-v4-api-${apiNumber}");
@@ -36,7 +36,7 @@ public class ODataV4ImportTestIT extends TestNGCitrusTestRunner {
         createVariable("expectedReturnCode", "0");
         importAction.doExecute(context);
 
-        echo("####### Validate OData V2 API: '${apiName}' on path: '${apiPath}' has been imported #######");
+        echo("####### Validate OData V4 API: '${apiName}' on path: '${apiPath}' has been imported #######");
         http(builder -> builder.client("apiManager").send().get("/proxies").header("Content-Type", "application/json"));
 
         http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
@@ -47,6 +47,4 @@ public class ODataV4ImportTestIT extends TestNGCitrusTestRunner {
         createVariable("expectedReturnCode", "10");
         importAction.doExecute(context);
     }
-
-
 }

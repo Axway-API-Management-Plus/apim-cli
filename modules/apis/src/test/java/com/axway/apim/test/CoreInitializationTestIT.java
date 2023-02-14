@@ -61,10 +61,10 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
             String response = EntityUtils.toString(httpResponse.getEntity());
             DocumentContext documentContext = JsonPath.parse(response);
             if (!response.equals("[]")) {
+                testRunner.echo("Organization Already exists");
                 String orgId = documentContext.read("$.[0].id");
                 testRunner.variable("orgId", orgId);
             } else {
-
                 testRunner.echo("Creating Organization");
                 testRunner.http(action -> action.client(apiManager)
                         .send()
@@ -72,7 +72,6 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                         .name("orgCreatedRequest")
                         .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                         .payload("{\"name\": \"${orgName}\", \"description\": \"Test Org ${orgNumber}\", \"enabled\": true, \"development\": true }"));
-
                 testRunner.echo("####### Validate Test-Organisation: ${orgName} has been created #######");
                 testRunner.http(action -> action.client(apiManager)
                         .receive()
@@ -80,43 +79,44 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                         .messageType(MessageType.JSON)
                         .validate("$.name", "${orgName}")
                         .extractFromPayload("$.id", "orgId"));
-
                 testRunner.echo("####### Extracted organization id: ${orgId} as attribute: orgId #######");
-
-                String userName = (String) globalVariables.getVariables().get("oadminUsername1");
-                httpGet = new HttpGet(url + "/users?field=name&op=eq&value=" + userName);
-                httpGet.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
-                httpResponse = httpClient.execute(httpGet);
-                response = EntityUtils.toString(httpResponse.getEntity());
-                if (!response.equals("[]")) {
-                    String userId = documentContext.read("$.[0].id");
-                    testRunner.variable("oadminUserId1", userId);
-                } else {
-
-                    testRunner.echo("Creating oadmin user ${oadminUsername1}");
-                    testRunner.http(action -> action.client(apiManager)
-                            .send()
-                            .post("/users")
-                            .header("Content-Type", "application/json")
-                            .payload("{\"enabled\":true,\"loginName\":\"${oadminUsername1}\",\"name\":\"Anna Owen ${orgNumber}\",\"email\":\"anna-${orgNumber}@axway.com\",\"role\":\"oadmin\",\"organizationId\":\"${orgId}\"}"));
-                    testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.CREATED).messageType(MessageType.JSON)
-                            .extractFromPayload("$.id", "oadminUserId1")
-                            .extractFromPayload("$.loginName", "oadminUsername1"));
-                }
-                testRunner.echo("Updating password for oadmin user ${oadminUsername1}");
-                testRunner.http(action -> action.client(apiManager).send()
-                        .post("/users/${oadminUserId1}/changepassword/")
-                        .header("Content-Type", "application/x-www-form-urlencoded")
-                        .payload("newPassword=${oadminPassword1}"));
-
-                testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.NO_CONTENT));
             }
+            String userName = (String) globalVariables.getVariables().get("oadminUsername1");
+            httpGet = new HttpGet(url + "/users?field=loginName&op=eq&value=" + userName);
+            httpGet.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
+            httpResponse = httpClient.execute(httpGet);
+            response = EntityUtils.toString(httpResponse.getEntity());
+            System.out.println("****" + response);
+            if (!response.equals("[]")) {
+                testRunner.echo("User Already exists");
+                String userId = documentContext.read("$.[0].id");
+                testRunner.variable("oadminUserId1", userId);
+            } else {
+                testRunner.echo("Creating oadmin user ${oadminUsername1}");
+                testRunner.http(action -> action.client(apiManager)
+                        .send()
+                        .post("/users")
+                        .header("Content-Type", "application/json")
+                        .payload("{\"enabled\":true,\"loginName\":\"${oadminUsername1}\",\"name\":\"Anna Owen ${orgNumber}\",\"email\":\"anna-${orgNumber}@axway.com\",\"role\":\"oadmin\",\"organizationId\":\"${orgId}\"}"));
+                testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.CREATED).messageType(MessageType.JSON)
+                        .extractFromPayload("$.id", "oadminUserId1")
+                        .extractFromPayload("$.loginName", "oadminUsername1"));
+            }
+            testRunner.echo("Updating password for oadmin user ${oadminUsername1}");
+            testRunner.http(action -> action.client(apiManager).send()
+                    .post("/users/${oadminUserId1}/changepassword/")
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .payload("newPassword=${oadminPassword1}"));
+
+            testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.NO_CONTENT));
+
             String appName = (String) globalVariables.getVariables().get("testAppName");
             httpGet = new HttpGet(url + "/applications?field=name&op=eq&value=" + appName);
             httpGet.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
             httpResponse = httpClient.execute(httpGet);
             response = EntityUtils.toString(httpResponse.getEntity());
             if (!response.equals("[]")) {
+                testRunner.echo("Application Already exists");
                 String testAppId = documentContext.read("$.[0].id");
                 testRunner.variable("testAppId", testAppId);
 
@@ -134,10 +134,9 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                         .messageType(MessageType.JSON)
                         .extractFromPayload("$.id", "testAppId")
                         .extractFromPayload("$.name", "testAppName"));
+                testRunner.echo("####### Created a application: '${testAppName}' ID: '${testAppId}' (testAppName/testAppId) #######");
+
             }
-
-            testRunner.echo("####### Created a application: '${testAppName}' ID: '${testAppId}' (testAppName/testAppId) #######");
-
             // Adjusting the API-Manager config in preparation to run integration tests
             testRunner.echo("Turn off changePasswordOnFirstLogin and passwordExpiryEnabled validation to run integration tests");
             testRunner.http(action -> action.client(apiManager).send().put("/config").header("Content-Type", "application/json")
@@ -147,7 +146,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                 public void doExecute(TestContext testContext) {
                     globalVariables.getVariables().put("orgId", testContext.getVariable("orgId"));
                     globalVariables.getVariables().put("testAppId", testContext.getVariable("testAppId"));
-                    globalVariables.getVariables().put("oadminUserId1", testContext.getVariable("oadminUserId1"));
+                    globalVariables.getVariables().put("oadminUserId1", testContext.getVariable("testAppId"));
                 }
             });
 

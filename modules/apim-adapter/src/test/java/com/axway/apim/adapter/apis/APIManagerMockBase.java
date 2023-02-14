@@ -5,9 +5,7 @@ import java.io.IOException;
 import com.axway.apim.adapter.APIManagerAdapter;
 import org.testng.reporters.Files;
 
-import com.axway.apim.adapter.APIManagerAdapterTest;
 import com.axway.apim.adapter.clientApps.ClientAppFilter;
-import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.lib.utils.TestIndicator;
 import com.fasterxml.jackson.databind.ObjectMapper;
