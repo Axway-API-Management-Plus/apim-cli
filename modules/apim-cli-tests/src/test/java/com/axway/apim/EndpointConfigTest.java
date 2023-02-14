@@ -30,5 +30,10 @@ public class EndpointConfigTest extends TestNGCitrusSpringSupport {
         BasicAuthInterceptor basicAuthInterceptor =  context.getBean("basicAuthInterceptor", BasicAuthInterceptor.class);
         String basicAuthHeaderValue = basicAuthInterceptor.getAuthorizationHeaderValue();
         Assert.assertNotNull(basicAuthHeaderValue);
+
+        // get cached value
+        basicAuthHeaderValue = basicAuthInterceptor.getAuthorizationHeaderValue();
+        Assert.assertNotNull(basicAuthHeaderValue);
+
     }
 }

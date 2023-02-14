@@ -119,7 +119,7 @@ public class APIManagerPoliciesAdapter {
         List<Policy> policies = this.mappedPolicies.get(type);
 
         for (Policy policy : policies) {
-            LOG.info("{}", policy.getName());
+            LOG.info("Policy Name : {}", policy.getName());
             if (policy.getName().equals(name)) {
                 return policy;
             }
