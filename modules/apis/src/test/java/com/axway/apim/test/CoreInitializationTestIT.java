@@ -89,6 +89,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
             System.out.println("****" + response);
             if (!response.equals("[]")) {
                 testRunner.echo("User Already exists");
+                documentContext = JsonPath.parse(response);
                 String userId = documentContext.read("$.[0].id");
                 testRunner.variable("oadminUserId1", userId);
             } else {
@@ -116,6 +117,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
             httpResponse = httpClient.execute(httpGet);
             response = EntityUtils.toString(httpResponse.getEntity());
             if (!response.equals("[]")) {
+                documentContext = JsonPath.parse(response);
                 testRunner.echo("Application Already exists");
                 String testAppId = documentContext.read("$.[0].id");
                 testRunner.variable("testAppId", testAppId);

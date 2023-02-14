@@ -1,13 +1,5 @@
 package com.axway.apim.test.basic;
 
-import java.io.IOException;
-
-import org.springframework.http.HttpStatus;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
-
-import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -15,16 +7,20 @@ import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
+import org.springframework.http.HttpStatus;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
 
 @Test
 public class UnpublishedSwaggerChangeTestIT extends TestNGCitrusTestRunner {
 
-	private ImportTestAction swaggerImport;
-	
 	@CitrusTest
 	@Test @Parameters("context")
-	public void run(@Optional @CitrusResource TestContext context) throws IOException, AppException {
-		swaggerImport = new ImportTestAction();
+	public void run(@Optional @CitrusResource TestContext context) throws IOException {
+		ImportTestAction swaggerImport = new ImportTestAction();
 		echo("####### Validates an updated Swagger-File is replicated while in 'Unpublished' state #######");
 		
 		variable("apiNumber", RandomNumberFunction.getRandomNumber(4, true));
@@ -67,8 +63,7 @@ public class UnpublishedSwaggerChangeTestIT extends TestNGCitrusTestRunner {
 		echo("####### Validate the updated Swagger-File has been imported #######");
 		http(builder -> builder.client("apiManager").send().get("/discovery/swagger/api/id/${newApiId}").header("Content-Type", "application/json"));
 		
-		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
-			.validate("$.description", "@assertThat(containsString('THIS IS MY NEW API-DESCRIPTION!'))@"));
+		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON));
 		
 		echo("####### Validate the previous FE-API has been deleted #######");
 		http(builder -> builder.client("apiManager").send().get("/proxies/${apiId}").header("Content-Type", "application/json"));

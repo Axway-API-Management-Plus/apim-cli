@@ -2,13 +2,15 @@ package com.axway.apim.test.queryStringRouting;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
-import com.axway.apim.APIManagerConfig;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
 import com.consol.citrus.message.MessageType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
@@ -18,6 +20,8 @@ import java.io.IOException;
 
 @Test
 public class ValidateQueryStringTestIT extends TestNGCitrusTestRunner {
+
+	private static final ObjectMapper mapper = new ObjectMapper();
 
 	@CitrusTest
 	@Test @Parameters("context")
@@ -34,7 +38,7 @@ public class ValidateQueryStringTestIT extends TestNGCitrusTestRunner {
 		echo("Turn Query-String feature ON in API-Manager to test it");
 		http(builder -> builder.client("apiManager").send().get("/config").header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON).extractFromPayload("$", "managerConfig"));
-		variable("updatedConfig", APIManagerConfig.enableQueryBasedRouting(context.getVariable("managerConfig"), "abc"));
+		variable("updatedConfig", enableQueryBasedRouting(context.getVariable("managerConfig"), "abc"));
 		echo("updatedConfig: ${updatedConfig}");
 		http(builder -> builder.client("apiManager").send().put("/config").header("Content-Type", "application/json")
 				.payload("${updatedConfig}"));
@@ -120,7 +124,7 @@ public class ValidateQueryStringTestIT extends TestNGCitrusTestRunner {
 		swaggerImport.doExecute(context);
 		
 		// Turn Query-Based-Routing OFF
-		variable("updatedConfig", APIManagerConfig.disableQueryBasedRouting(context.getVariable("managerConfig")));
+		variable("updatedConfig", disableQueryBasedRouting(context.getVariable("managerConfig")));
 		http(builder -> builder.client("apiManager").send().put("/config").header("Content-Type", "application/json")
 				.payload("${updatedConfig}"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON));
@@ -155,5 +159,20 @@ public class ValidateQueryStringTestIT extends TestNGCitrusTestRunner {
 				.validate("$.[?(@.path=='${apiPath}' && @.apiRoutingKey=='${apiRoutingKey}')].name", "${apiName}")
 				.validate("$.[?(@.path=='${apiPath}' && @.apiRoutingKey=='${apiRoutingKey}')].state", "${state}")
 				.validate("$.[?(@.path=='${apiPath}' && @.apiRoutingKey=='${apiRoutingKey}')].apiRoutingKey", "${apiRoutingKey}"));
+	}
+
+	public static String enableQueryBasedRouting(String managerConfig, String versionParameter) throws IOException {
+		// "apiRoutingKeyLocation": null, --> This is what we have
+		// "apiRoutingKeyLocation":"query|ver", --> This is what we need
+		JsonNode config = mapper.readTree(managerConfig);
+		((ObjectNode) config).put("apiRoutingKeyEnabled", true);
+		((ObjectNode) config).put("apiRoutingKeyLocation", "query|"+versionParameter);
+		return mapper.writeValueAsString(config);
+	}
+
+	public static String disableQueryBasedRouting(String managerConfig) throws IOException {
+		JsonNode config = mapper.readTree(managerConfig);
+		((ObjectNode) config).put("apiRoutingKeyEnabled", false);
+		return mapper.writeValueAsString(config);
 	}
 }
