@@ -51,7 +51,7 @@ public class ChangeBackendTestIT extends TestNGCitrusTestRunner {
         createVariable("expectedReturnCode", "15");
         createVariable("name", "${apiName}");
         createVariable("enforce", "false");
-        createVariable("newBackend", "https://petstore.swagger.io");
+        createVariable("newBackend", "https://api.axway.com");
         changeAction.doExecute(context);
 
         echo("####### Change the backend of this published API - Enforcing it! #######");
