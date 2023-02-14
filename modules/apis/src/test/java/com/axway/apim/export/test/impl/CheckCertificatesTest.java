@@ -1,6 +1,6 @@
 package com.axway.apim.export.test.impl;
 
-import com.axway.apim.adapter.apis.APIManagerMockBase;
+import com.axway.apim.APIManagerMockBase;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.impl.CheckCertificatesAPIHandler;
 import com.axway.apim.api.export.lib.cli.CLICheckCertificatesOptions;

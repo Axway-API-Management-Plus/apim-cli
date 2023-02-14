@@ -118,7 +118,7 @@ public class APIManagerAPIMethodAdapter {
         }
     }
 
-    void setAPIManagerTestResponse(String apiId, String response) {
+    public void setAPIManagerTestResponse(String apiId, String response) {
         this.apiManagerResponse.put(apiId, response);
     }
 }

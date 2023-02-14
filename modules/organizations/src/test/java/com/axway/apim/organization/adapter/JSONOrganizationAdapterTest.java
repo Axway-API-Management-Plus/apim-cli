@@ -1,30 +1,37 @@
 package com.axway.apim.organization.adapter;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import com.axway.apim.WiremockWrapper;
+import com.axway.apim.api.model.Organization;
+import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.organization.lib.OrgImportParams;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
-import com.axway.apim.adapter.apis.APIManagerMockBase;
-import com.axway.apim.api.model.Organization;
-import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.organization.lib.OrgImportParams;
+public class JSONOrganizationAdapterTest extends WiremockWrapper {
 
-public class JSONOrganizationAdapterTest extends APIManagerMockBase {
-	
+	@BeforeClass
+	public void init() {
+		initWiremock();
+	}
+
+	@AfterClass
+	public void stop() {
+		close();
+	}
+
 	private static final String testPackage = "/com/axway/apim/organization/adapter";
 	
 	@BeforeClass
 	private void initTestIndicator() throws AppException, IOException {
 		new CoreParameters();
-		setupMockData();
 	}
 	
 	@Test

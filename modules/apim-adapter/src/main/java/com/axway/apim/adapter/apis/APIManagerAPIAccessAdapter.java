@@ -267,7 +267,7 @@ public class APIManagerAPIAccessAdapter {
         return missingAccess;
     }
 
-    void setAPIManagerTestResponse(Type type, String id, String response) {
+    public void setAPIManagerTestResponse(Type type, String id, String response) {
         Map<String, String> map = new HashMap<>();
         map.put(id, response);
         this.apiManagerResponse.put(type, map);

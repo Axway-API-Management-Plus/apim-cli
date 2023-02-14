@@ -75,7 +75,7 @@ public class APIManagerQuotaAdapter {
         applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
     }
 
-    Map<String, String> apiManagerResponse = new HashMap<>();
+    public Map<String, String> apiManagerResponse = new HashMap<>();
 
     private void readQuotaFromAPIManager(String quotaId) throws AppException {
         if (!APIManagerAdapter.hasAdminAccount()) return;

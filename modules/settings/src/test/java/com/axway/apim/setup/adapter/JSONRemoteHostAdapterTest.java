@@ -1,19 +1,16 @@
 package com.axway.apim.setup.adapter;
 
-import java.io.IOException;
-import java.util.Map;
-
 import com.axway.apim.WiremockWrapper;
+import com.axway.apim.api.model.RemoteHost;
+import com.axway.apim.lib.StandardImportParams;
+import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.axway.apim.adapter.apis.APIManagerMockBase;
-import com.axway.apim.api.model.RemoteHost;
-import com.axway.apim.lib.StandardImportParams;
-import com.axway.apim.lib.errorHandling.AppException;
+import java.util.Map;
 
 public class JSONRemoteHostAdapterTest  extends WiremockWrapper {
 

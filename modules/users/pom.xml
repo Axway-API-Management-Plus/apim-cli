@@ -22,13 +22,6 @@
         </dependency>
         <dependency>
             <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-            <artifactId>apimcli-apim-adapter</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
             <artifactId>apimcli-tests</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -60,38 +53,6 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-base</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-http</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-testng</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-validation-json</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-java-dsl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-spring</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-sql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-groovy</artifactId>
         </dependency>
     </dependencies>
 </project>

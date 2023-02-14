@@ -1,10 +1,10 @@
 [
 	{
 		"name": "Application 1", 
-		"organization": "API Development" 
+		"organization": "orga"
 	}, 
 	{
 		"name": "Application 2", 
-		"organization": "API Development" 
+		"organization": "orga"
 	}
 ]

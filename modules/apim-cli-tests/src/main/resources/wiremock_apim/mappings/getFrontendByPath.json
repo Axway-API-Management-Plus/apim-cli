@@ -5,7 +5,7 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "frontend_empty.json",
+    "bodyFileName": "frontend_api_by_id.json",
     "headers": {
       "Content-Type": "application/json"
     }

@@ -75,7 +75,7 @@ public class APIManagerPoliciesAdapter {
         super();
     }
 
-    Map<PolicyType, String> apiManagerResponse = new HashMap<>();
+    public Map<PolicyType, String> apiManagerResponse = new HashMap<>();
 
     private final Map<PolicyType, List<Policy>> mappedPolicies = new HashMap<>();
     private final List<Policy> allPolicies = new ArrayList<>();

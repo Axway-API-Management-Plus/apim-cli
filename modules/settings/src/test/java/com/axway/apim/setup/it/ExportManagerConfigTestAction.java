@@ -1,13 +1,13 @@
 package com.axway.apim.setup.it;
 
+import com.axway.apim.setup.it.testActions.CLIAbstractExportTestAction;
+import com.axway.apim.testActions.TestParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.setup.APIManagerSettingsApp;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
-import com.axway.lib.testActions.CLIAbstractExportTestAction;
-import com.axway.lib.testActions.TestParams;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.ValidationException;
 

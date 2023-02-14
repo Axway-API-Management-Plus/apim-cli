@@ -2,7 +2,7 @@ package com.axway.apim.test.queryStringRouting;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
-import com.axway.lib.APIManagerConfig;
+import com.axway.apim.APIManagerConfig;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;

@@ -2,9 +2,9 @@ package com.axway.apim.user.it.tests;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.testActions.TestParams;
 import com.axway.apim.user.it.ExportUserTestAction;
 import com.axway.apim.user.it.ImportUserTestAction;
-import com.axway.lib.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;

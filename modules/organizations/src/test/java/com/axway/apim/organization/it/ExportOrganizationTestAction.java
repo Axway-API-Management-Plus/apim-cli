@@ -1,13 +1,13 @@
 package com.axway.apim.organization.it;
 
+import com.axway.apim.testActions.TestParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.organization.OrganizationApp;
 import com.axway.apim.organization.lib.OrgExportParams;
-import com.axway.lib.testActions.CLIAbstractExportTestAction;
-import com.axway.lib.testActions.TestParams;
+import com.axway.apim.organization.it.testActions.CLIAbstractExportTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.ValidationException;
 

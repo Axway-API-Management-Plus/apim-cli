@@ -148,7 +148,7 @@ public class APIManagerConfigAdapter {
         }
     }
 
-    void setAPIManagerTestResponse(String jsonResponse, boolean useAdmin) {
+    public void setAPIManagerTestResponse(String jsonResponse, boolean useAdmin) {
         if (jsonResponse == null) {
             LOG.error("Test-Response is empty. Ignoring!");
             return;

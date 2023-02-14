@@ -124,7 +124,6 @@ public class APIManagerAPIAdapter {
         if (this.apiManagerResponse.get(filter) != null) return;
         try {
             URI uri = getAPIRequestUri(filter);
-            LOG.debug("Sending request to find existing APIs: {}", uri);
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());

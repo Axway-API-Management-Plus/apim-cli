@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.appimport.ClientApplicationImportApp;
 import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.lib.ImportResult;
-import com.axway.lib.testActions.CLIAbstractImportTestAction;
+import com.axway.apim.testActions.CLIAbstractImportTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.ValidationException;
 

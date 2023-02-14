@@ -1,24 +1,29 @@
 package com.axway.apim.setup.adapter;
 
-import java.io.IOException;
-
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import com.axway.apim.adapter.apis.APIManagerMockBase;
+import com.axway.apim.WiremockWrapper;
 import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
-public class JSONAPIManagerConfigAdapterTest extends APIManagerMockBase {
+public class JSONAPIManagerConfigAdapterTest extends WiremockWrapper {
+
+	@BeforeClass
+	public void init() {
+		initWiremock();
+	}
+
+	@AfterClass
+	public void stop() {
+		close();
+	}
 	
 	private static final String PACKAGE = "com/axway/apim/setup/adapter/";
 	
-	@BeforeClass
-	public void setupTestIndicator() throws AppException, IOException {
-		setupMockData();
-	}
+
 	
 	@Test
 	public void testNonStagedConfig() throws AppException {
