@@ -21,7 +21,6 @@ import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
@@ -55,7 +54,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
         String url = "https://" + host + ":" + port + "/api/portal/v1.4";
 
         try {
-            String orgName = URLEncoder.encode((String) globalVariables.getVariables().get("orgName"), StandardCharsets.UTF_8);
+            String orgName = URLEncoder.encode((String) globalVariables.getVariables().get("orgName"), "UTF-8");
             HttpGet httpGet = new HttpGet(url + "/organizations?field=name&op=eq&value=" + orgName);
             httpGet.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
             HttpResponse httpResponse = httpClient.execute(httpGet);
