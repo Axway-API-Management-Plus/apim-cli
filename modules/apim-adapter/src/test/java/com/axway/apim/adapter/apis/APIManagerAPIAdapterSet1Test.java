@@ -1,22 +1,7 @@
 package com.axway.apim.adapter.apis;
 
-import static org.testng.Assert.assertNotNull;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.APIStatusManager;
-import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.utils.Utils;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import org.testng.reporters.Files;
-
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.apis.APIFilter.POLICY_TRANSLATION;
 import com.axway.apim.api.API;
@@ -24,7 +9,17 @@ import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.QuotaRestrictiontype;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.Utils;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 
@@ -38,7 +33,6 @@ public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 		super.close();
 	}
 	
-	private static final String testPackage = "com/axway/apim/adapter/apimanager/testSet1/";
 
 	public void setupParameters() throws AppException {
 		APIManagerAdapter.deleteInstance();
@@ -89,7 +83,6 @@ public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 		setupParameters();
 		APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
 		APIFilter filter = new APIFilter.Builder()
-				.translateMethods(METHOD_TRANSLATION.AS_ID)
 				.hasId("e4ded8c8-0a40-4b50-bc13-552fb7209150")
 				.build();
 		API api = apiManagerAPIAdapter.getAPI(filter, true);

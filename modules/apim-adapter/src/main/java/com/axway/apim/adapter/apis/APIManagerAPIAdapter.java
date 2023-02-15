@@ -334,12 +334,9 @@ public class APIManagerAPIAdapter {
                 APIMethod method = null;
                 for (String apiId : apiIds) {
                     if (mode == METHOD_TRANSLATION.AS_NAME) {
-                        LOG.debug("Translating method names");
-                        APIMethod apiMethod = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(apiId, key);
-                        method = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(apiId, apiMethod.getName());
-                    } else {
-                        LOG.debug("Translating method ids");
                         method = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(apiId, key);
+                    } else {
+                        method = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(apiId, key);
                     }
                     if (method != null) break;
                 }
