@@ -80,8 +80,4 @@ public class APIManagerOAuthClientProfilesAdapter {
 		}
 		return null;
 	}
-	
-	public void setAPIManagerTestResponse(String response) {
-		this.apiManagerResponse =  response;
-	}
 }

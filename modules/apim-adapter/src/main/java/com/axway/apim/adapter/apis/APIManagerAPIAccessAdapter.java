@@ -81,7 +81,7 @@ public class APIManagerAPIAccessAdapter {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + id + "/apis").build();
             RestAPICall getRequest = new GETRequest(uri);
-            LOG.debug("Load API-Access with type: " + type + " from API-Manager with ID: " + id);
+            LOG.debug("Load API-Access with type: {} from API-Manager with ID: {}", type, id);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -97,7 +97,7 @@ public class APIManagerAPIAccessAdapter {
                 putToCache(id, type, response);
             }
         } catch (Exception e) {
-            LOG.error("Error loading API-Access from API-Manager for " + type + " from API-Manager: ", e);
+            LOG.error("Error loading API-Access from API-Manager for {} from API-Manager: ", type, e);
             throw new AppException("Error loading API-Access from API-Manager for " + type + " from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -125,7 +125,7 @@ public class APIManagerAPIAccessAdapter {
             }
             return allApiAccess;
         } catch (Exception e) {
-            LOG.error("Error loading API-Access for " + type + " from API-Manager. Can't process response: " + apiAccessResponse, e);
+            LOG.error("Error loading API-Access for {} from API-Manager. Can't process response: {}", type, apiAccessResponse, e);
             throw new AppException("Error loading API-Access for " + type + " from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -133,10 +133,10 @@ public class APIManagerAPIAccessAdapter {
     private String getFromCache(String id, Type type) {
         Cache<String, String> usedCache = caches.get(type);
         if (usedCache != null && caches.get(type).get(id) != null) {
-            LOG.trace("Return APIAccess for " + type + ": " + id + " from cache.");
+            LOG.trace("Return APIAccess for {} : {} from cache.", type, id);
             return caches.get(type).get(id);
         } else {
-            LOG.trace("No cache hit for APIAccess " + type + " " + id);
+            LOG.trace("No cache hit for APIAccess {} : {}", type, id);
             return null;
         }
     }
@@ -187,30 +187,30 @@ public class APIManagerAPIAccessAdapter {
             String response = httpResponse.getResponse();
             if (statusCode < 200 || statusCode > 299) {
                 if ((statusCode == 403 || statusCode == 404) && (response.contains("Unknown API") || response.contains("The entity could not be found"))) {
-                    LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in " + cmd.getRetryDelay() + " milliseconds. (you may set -retryDelay <milliseconds>)");
+                    LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
                     Thread.sleep(cmd.getRetryDelay());
                     httpResponse = httpHelper.execute(request, true);
                     response = httpResponse.getResponse();
                     statusCode = httpResponse.getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error creating/updating API Access: " + apiAccess + ". Response-Code: " + statusCode + ". Got response: '" + response + "'");
+                        LOG.error("Error creating/updating API Access: {} Response-Code: {} Response Body: {}", apiAccess, statusCode, response);
                         throw new AppException("Error creating/updating API Access. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                     } else {
                         LOG.info("Successfully created API-Access on retry. Received Status-Code: " + statusCode);
                     }
                 } else if (statusCode == 409 && response.contains("resource already exists")) {
-                    LOG.info("Unexpected response while creating/updating API Access: " + apiAccess + ". Response-Code: " + statusCode + ". Got response: '" + response + "'. Ignoring this error.");
+                    LOG.info("Unexpected response while creating/updating API Access: {} Response-Code: {} Response Body: {} Ignoring this error.", apiAccess, statusCode, response);
                     return;
                 } else {
-                    LOG.error("Error creating/updating API Access: " + apiAccess + ". Response-Code: " + statusCode + ". Got response: '" + response + "'");
+                    LOG.error("Error creating/updating API Access: {} Response-Code: {} Response Body: {}", apiAccess, statusCode, response);
                     throw new AppException("Error creating/updating API Access. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
             }
             // Clean cache for this ID (App/Org) to force reload next time
             removeFromCache(parentEntity.getId(), type);
-        } catch (InterruptedException e){
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-        } catch(IOException | URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             throw new AppException("Error creating/updating API Access.", ErrorCode.CANT_CREATE_API_PROXY, e);
         }
     }
@@ -225,10 +225,10 @@ public class APIManagerAPIAccessAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + parentEntity.getId() + "/apis/" + apiAccess.getId()).build();
             // Use an admin account for this request
             RestAPICall request = new DELRequest(uri);
-            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
-                    LOG.error("Can't delete API access requests for application. Response-Code: {}. Got response: {}", statusCode,  EntityUtils.toString(httpResponse.getEntity()));
+                    LOG.error("Can't delete API access requests for application. Response-Code: {}. Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
                     throw new AppException("Can't delete API access requests for application. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 removeFromCache(parentEntity.getId(), type);
@@ -265,11 +265,5 @@ public class APIManagerAPIAccessAdapter {
             missingAccess.add(access);
         }
         return missingAccess;
-    }
-
-    public void setAPIManagerTestResponse(Type type, String id, String response) {
-        Map<String, String> map = new HashMap<>();
-        map.put(id, response);
-        this.apiManagerResponse.put(type, map);
     }
 }

@@ -267,8 +267,4 @@ public class APIManagerOrganizationAdapter {
         Image image = APIManagerAdapter.getImageFromAPIM(uri, "org-image");
         org.setImage(image);
     }
-
-    public void setAPIManagerTestResponse(OrgFilter key, String response) {
-        this.apiManagerResponse.put(key, response);
-    }
 }
