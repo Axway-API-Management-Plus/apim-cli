@@ -29,7 +29,7 @@ public class CustomPropertiesBasicTestIT extends TestNGCitrusTestDesigner {
 		echo("####### 1. Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "unpublished");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config_IT.json");
 		createVariable("customProperty1", "Test-Input 1");
 		createVariable("customProperty2", "1");
 		createVariable("customProperty3", "true");

@@ -24,7 +24,7 @@ public class OrgAdminCustomPropertiesTestIT extends TestNGCitrusTestDesigner {
 
 		echo("####### Calling the tool with a Non-Admin-User. #######");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/basic/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config_IT.json");
 		createVariable("status", "unpublished");
 		createVariable("customProperty1", "Test-Input 1");
 		createVariable("customProperty2", "1");

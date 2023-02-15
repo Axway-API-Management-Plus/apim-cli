@@ -1,0 +1,13 @@
+	
+{
+	"name": "${apiName}",
+	"path": "${apiPath}",
+	"state": "${status}",
+	"version": "1.0.0",
+	"organization": "API Development",
+	"customProperties": {
+		"customProperty1": "${customProperty1}",
+		"customProperty2": "${customProperty2}",
+		"customProperty3": "${customProperty3}"	
+	}
+}
