@@ -3,6 +3,27 @@
   "type": "API",
   "name": "System",
   "description": "Maximum message rates aggregated across all client applications",
-  "restrictions": [],
+  "restrictions": [
+    {
+      "api": "9170e76e-ee7a-45ae-8afe-32a32a5da65c",
+      "method": "*",
+      "type": "throttle",
+      "config": {
+        "messages": "1000",
+        "period": "week",
+        "per": "2"
+      }
+    },
+    {
+      "api": "e4ded8c8-0a40-4b50-bc13-552fb7209150",
+      "method": "*",
+      "type": "throttle",
+      "config": {
+        "messages": "1000",
+        "period": "second",
+        "per": "2"
+      }
+    }
+  ],
   "system": true
 }

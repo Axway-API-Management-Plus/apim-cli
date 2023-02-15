@@ -70,6 +70,13 @@
       "monitorAPI": true,
       "queryStringPassThrough": false,
       "monitorSubject": "authentication.subject.id"
+    },
+    "a544b66c-6f2b-4c00-999c-6816d482bcde": {
+      "securityProfile": null,
+      "corsProfile": null,
+      "monitorAPI": true,
+      "queryStringPassThrough": false,
+      "monitorSubject": null
     }
   },
   "outboundProfiles": {
@@ -78,10 +85,21 @@
       "routeType": "proxy",
       "requestPolicy": "<key type='FilterCircuit'><id field='name' value='Validate Size &amp; Token'/></key>",
       "responsePolicy": "<key type='FilterCircuit'><id field='name' value='Remove Header &amp; Audit data'/></key>",
-      "routePolicy": null,
-      "faultHandlerPolicy": null,
+      "routePolicy":  "<key type='FilterCircuit'><id field='name' value='Http Proxy Router'/></key>",
+      "faultHandlerPolicy":  "<key type='FilterCircuit'><id field='name' value='Default Fault Handler'/></key>",
       "apiId": null,
       "apiMethodId": null,
+      "parameters": []
+    },
+    "bf742930-5fdd-4e49-b9ae-b8fdecd37ffa": {
+      "authenticationProfile": null,
+      "routeType": null,
+      "requestPolicy": null,
+      "responsePolicy": null,
+      "routePolicy": null,
+      "faultHandlerPolicy": null,
+      "apiId": "1f4263ca-7f03-41d9-9d34-9eff79d29bd8",
+      "apiMethodId": "7a0c6ce1-187b-47bc-b4dc-cfa1f12aa042",
       "parameters": []
     }
   },

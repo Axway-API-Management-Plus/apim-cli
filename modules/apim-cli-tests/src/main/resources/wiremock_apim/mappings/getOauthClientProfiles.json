@@ -1,11 +1,11 @@
 {
   "request": {
     "method": "GET",
-    "url": "/api/portal/v1.4/quotas/00000000-0000-0000-0000-000000000001"
+    "url": "/api/portal/v1.4/oauthclientprofiles"
   },
   "response": {
     "status": 200,
-    "bodyFileName": "quotas_application_system.json",
+    "bodyFileName": "oauthclientprofiles.json",
     "headers": {
       "Content-Type": "application/json"
     }

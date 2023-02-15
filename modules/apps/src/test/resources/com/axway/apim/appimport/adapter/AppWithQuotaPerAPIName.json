@@ -35,5 +35,8 @@
         }
       }
     ]
+  },
+  "customProperties":{
+    "publicApp":true
   }
 }

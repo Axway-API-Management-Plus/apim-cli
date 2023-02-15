@@ -1,6 +1,7 @@
 package com.axway.apim.test.changestate;
 
-import com.axway.apim.adapter.apis.APIManagerMockBase;
+import com.axway.apim.WiremockWrapper;
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.apiSpecification.APISpecification;
 import com.axway.apim.api.apiSpecification.Swagger2xSpecification;
@@ -8,7 +9,10 @@ import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.TagMap;
 import com.axway.apim.apiimport.APIChangeState;
+import com.axway.apim.lib.utils.TestIndicator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -18,14 +22,27 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class APIChangeStateTest extends APIManagerMockBase {
+public class APIChangeStateTest extends WiremockWrapper {
 
+    @BeforeClass
+    public void initWiremock() {
+        super.initWiremock();
+        TestIndicator.getInstance().setTestRunning(true);
+    }
+
+    @AfterClass
+    public void close() {
+        super.close();
+    }
+
+
+    private final ObjectMapper mapper = new ObjectMapper();
     API testAPI1;
     API testAPI2;
 
     @BeforeClass
-    private void initTestIndicator() throws IOException {
-        setupMockData();
+    private void initTestIndicator() {
+        APIManagerAdapter.apiManagerVersion = "7.7.20221130";
     }
 
     @BeforeMethod

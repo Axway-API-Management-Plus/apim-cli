@@ -78,6 +78,7 @@ public class APIManagerAPIMethodAdapter {
                 return method;
             }
         }
+        LOG.debug("{} - {}",apiId, methodName);
         throw new AppException("No operation found with name: '" + methodName + "'", ErrorCode.API_OPERATION_NOT_FOUND);
     }
 
@@ -116,9 +117,5 @@ public class APIManagerAPIMethodAdapter {
             LOG.error("Error cant update API-Methods for API: '" + apiMethod.getVirtualizedApiId() + "' from API-Manager", e);
             throw new AppException("Error cant load API-Methods for API: '" + apiMethod.getVirtualizedApiId() + "' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
-    }
-
-    public void setAPIManagerTestResponse(String apiId, String response) {
-        this.apiManagerResponse.put(apiId, response);
     }
 }

@@ -3,6 +3,10 @@
 	"path": "/sample/minimal/api/v1",
 	"state": "unpublished",
 	"version": "1.0.0",
-	"organization": "API Development",
-	"vhost" : ""
+	"organization": "orga",
+	"vhost" : "",
+	"customProperties": {
+		"customProperty1": "public",
+		"customProperty4": "true"
+	}
 }

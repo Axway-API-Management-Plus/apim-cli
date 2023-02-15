@@ -1,6 +1,9 @@
 [
 	{
 		"name": "Application 1 Test", 
-		"organization": "orga"
+		"organization": "orga",
+		"customProperties":{
+			"publicApp":true
+		}
 	}
 ]

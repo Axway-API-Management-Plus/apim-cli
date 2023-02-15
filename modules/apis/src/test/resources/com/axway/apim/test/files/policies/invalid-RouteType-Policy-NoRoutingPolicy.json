@@ -4,7 +4,7 @@
 	"description": "Must fail, as the routing policy for routeType policy is missing",
 	"state": "unpublished",
 	"version": "1.0.0",
-	"organization": "API Development",
+	"organization": "orga",
 	"outboundProfiles": {
 		"_default": {
 			"routeType":"policy",

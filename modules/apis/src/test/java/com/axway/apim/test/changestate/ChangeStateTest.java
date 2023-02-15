@@ -1,28 +1,26 @@
 package com.axway.apim.test.changestate;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.axway.apim.adapter.apis.APIManagerMockBase;
-import org.apache.commons.cli.ParseException;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
-public class ChangeStateTest extends APIManagerMockBase {
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ChangeStateTest {
 
     @BeforeClass
-    public void prepareTest() throws AppException, IOException {
-        setupMockData();
+    public void prepareTest() {
+        APIManagerAdapter.apiManagerVersion = "7.7.20221130";
         TestIndicator.getInstance().setTestRunning(true);
     }
 
@@ -32,13 +30,13 @@ public class ChangeStateTest extends APIManagerMockBase {
     }
 
     @Test
-    public void testOrderMakesNoChange() throws AppException, IOException, ParseException {
+    public void testOrderMakesNoChange() throws IOException {
 
         API importAPI = getTestAPI();
         API managerAPI = getTestAPI();
 
-        List<Organization> importOrgs = new ArrayList<Organization>();
-        List<Organization> managerOrgs = new ArrayList<Organization>();
+        List<Organization> importOrgs = new ArrayList<>();
+        List<Organization> managerOrgs = new ArrayList<>();
 
 
         importOrgs.add(new Organization.Builder().hasName("orgA").hasId("123").build());
@@ -64,8 +62,8 @@ public class ChangeStateTest extends APIManagerMockBase {
         API importAPI = getTestAPI();
         API managerAPI = getTestAPI();
 
-        ((ActualAPI) importAPI).setVhost("abc.xyz.com");
-        ((ActualAPI) managerAPI).setVhost("123.xyz.com");
+        importAPI.setVhost("abc.xyz.com");
+        managerAPI.setVhost("123.xyz.com");
 
         APIChangeState changeState = new APIChangeState(managerAPI, importAPI);
         Assert.assertEquals(changeState.isBreaking(), true);
@@ -76,12 +74,12 @@ public class ChangeStateTest extends APIManagerMockBase {
         API importAPI = getTestAPI();
         API managerAPI = getTestAPI();
 
-        ((ActualAPI) importAPI).setState(API.STATE_DELETED);
-        ((ActualAPI) importAPI).setDescriptionType("ANY-TYPE");
+        importAPI.setState(API.STATE_DELETED);
+        importAPI.setDescriptionType("ANY-TYPE");
 
 
-        ((ActualAPI) managerAPI).setState(API.STATE_PUBLISHED);
-        ((ActualAPI) importAPI).setDescriptionType("ANY-OTHER-TYPE");
+        managerAPI.setState(API.STATE_PUBLISHED);
+        importAPI.setDescriptionType("ANY-OTHER-TYPE");
 
         APIChangeState changeState = new APIChangeState(managerAPI, importAPI);
         // As the API should be deleted anyway, desiredChanges should be ignored - The API should just be deleted

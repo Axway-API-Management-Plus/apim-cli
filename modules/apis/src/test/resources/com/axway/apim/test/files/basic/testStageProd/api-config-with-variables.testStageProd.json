@@ -4,6 +4,6 @@
 	"path": "doesntMatter",
 	"state": "notUsed ${os.arch}",
 	"version": "9.0.0",
-	"organization": "API Development", 
+	"organization": "orga",
 	"backendBasepath": "${myTestVariable}"
 }

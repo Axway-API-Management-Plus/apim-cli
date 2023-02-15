@@ -36,12 +36,4 @@ public class APIManagerConfigAdapterTest {
 		Assert.assertEquals(ignoreFields.length, 4); // Only brand new fields are returned to be ignored
 
 	}
-	
-	@Test
-	public void testAPIManager77March2021Config() throws IOException {
-		APIManagerConfigAdapter configAdapter = new APIManagerConfigAdapter();
-		String apiManagerResponse = Files.readFile(this.getClass().getClassLoader().getResourceAsStream("apimanager/config/apimanager-config-77-2021-March.json"));
-		configAdapter.setAPIManagerTestResponse(apiManagerResponse, true);
-		configAdapter.getConfig(true);
-	}
 }

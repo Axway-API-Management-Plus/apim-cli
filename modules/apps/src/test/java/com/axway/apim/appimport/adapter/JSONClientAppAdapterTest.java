@@ -8,7 +8,6 @@ import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.QuotaRestrictiontype;
 import com.axway.apim.api.model.apps.*;
 import com.axway.apim.appimport.lib.AppImportParams;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.TestIndicator;
 import org.testng.annotations.AfterClass;
@@ -27,7 +26,6 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
     @BeforeClass
     public void init() {
         initWiremock();
-        new CoreParameters();
         TestIndicator.getInstance().setTestRunning(true);
     }
 

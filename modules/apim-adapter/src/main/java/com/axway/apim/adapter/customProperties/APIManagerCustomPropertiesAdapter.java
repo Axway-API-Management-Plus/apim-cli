@@ -114,13 +114,4 @@ public class APIManagerCustomPropertiesAdapter {
         if (customProperties == null) return new ArrayList<>();
         return new ArrayList<>(customProperties.keySet());
     }
-
-    public void setAPIManagerTestResponse(String jsonResponse) {
-        if (jsonResponse == null) {
-            LOG.error("Test-Response is empty. Ignoring!");
-            return;
-        }
-        this.customProperties = null; // Reset it, if new test data is provided
-        this.apiManagerResponse = jsonResponse;
-    }
 }

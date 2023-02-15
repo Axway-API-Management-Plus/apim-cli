@@ -1,6 +1,6 @@
 package com.axway.apim.export.test.impl;
 
-import com.axway.apim.adapter.apis.APIManagerMockBase;
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.impl.ConsoleAPIExporter;
 import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.List;
 
-public class ConsoleAPIExportTest extends APIManagerMockBase {
+public class ConsoleAPIExportTest  {
 	
 	private static final String TEST_PACKAGE = "test/export/files/apiLists/";
 	
@@ -23,14 +23,14 @@ public class ConsoleAPIExportTest extends APIManagerMockBase {
 	
 	@BeforeClass
 	public void setTest() throws  IOException {
-		setupMockData();
+		APIManagerAdapter.apiManagerVersion = "7.7.20221130";
 		mapper.disable(MapperFeature.USE_ANNOTATIONS);
 	}
 	
 	@Test
 	public void runStandardConsoleAPIExport() throws  IOException  {
-		List<API> apis = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + "three-apis-no-clientOrgs-and-clientApps.json"), new TypeReference<List<API>>(){});
-		
+		List<API> apis = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + "three-apis-no-clientOrgs-and-clientApps.json"), new TypeReference<>() {
+		});
 		APIExportParams cmdParams = (APIExportParams) CLIAPIExportOptions.create(new String[] {}).getParams();
 		ConsoleAPIExporter consoleExp = new ConsoleAPIExporter(cmdParams);
 		consoleExp.execute(apis);
@@ -38,7 +38,8 @@ public class ConsoleAPIExportTest extends APIManagerMockBase {
 	
 	@Test
 	public void runWideConsoleAPIExport() throws  IOException  {
-		List<API> apis = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + "three-apis-no-clientOrgs-and-clientApps.json"), new TypeReference<List<API>>(){});
+		List<API> apis = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + "three-apis-no-clientOrgs-and-clientApps.json"), new TypeReference<>() {
+		});
 		
 		APIExportParams cmdParams = (APIExportParams) CLIAPIExportOptions.create(new String[] {"-wide"}).getParams();
 		ConsoleAPIExporter consoleExp = new ConsoleAPIExporter(cmdParams);
@@ -47,7 +48,8 @@ public class ConsoleAPIExportTest extends APIManagerMockBase {
 	
 	@Test
 	public void runUltraConsoleAPIExport() throws  IOException  {
-		List<API> apis = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + "three-apis-no-clientOrgs-and-clientApps.json"), new TypeReference<List<API>>(){});
+		List<API> apis = mapper.readValue(this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + "three-apis-no-clientOrgs-and-clientApps.json"), new TypeReference<>() {
+		});
 		
 		APIExportParams cmdParams = (APIExportParams) CLIAPIExportOptions.create(new String[] {"-ultra"}).getParams();
 		ConsoleAPIExporter consoleExp = new ConsoleAPIExporter(cmdParams);

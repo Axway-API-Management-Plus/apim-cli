@@ -168,9 +168,6 @@ public class APIMgrAppsAdapter {
             subscribedAppAPIManagerResponse.put(apiId, applicationsSubscriptionCache.get(apiId));
             return;
         }
-        if (!APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-            throw new AppException("API-Manager: " + APIManagerAdapter.apiManagerVersion + " doesn't support /proxies/<apiId>/applications", ErrorCode.UNXPECTED_ERROR);
-        }
         try {
             URI uri = new URIBuilder(CoreParameters.getInstance().getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + apiId + APPLICATIONS).build();
             RestAPICall getRequest = new GETRequest(uri);
@@ -774,13 +771,5 @@ public class APIMgrAppsAdapter {
         } catch (Exception e) {
             throw new AppException("Error deleting application", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
         }
-    }
-
-    public void setTestApiManagerResponse(ClientAppFilter filter, String apiManagerResponse) {
-        this.apiManagerResponse.put(filter, apiManagerResponse);
-    }
-
-    public void setTestSubscribedAppAPIManagerResponse(String apiId, String subscribedAppAPIManagerResponse) {
-        this.subscribedAppAPIManagerResponse.put(apiId, subscribedAppAPIManagerResponse);
     }
 }

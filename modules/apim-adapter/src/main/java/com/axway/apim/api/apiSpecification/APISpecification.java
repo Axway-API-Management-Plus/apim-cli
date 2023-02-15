@@ -1,11 +1,9 @@
 package com.axway.apim.api.apiSpecification;
 
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.jackson.YAMLFactoryExt;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.format.DataFormatDetector;
 import com.fasterxml.jackson.core.format.DataFormatMatcher;
@@ -156,9 +154,6 @@ public abstract class APISpecification {
             case "yaml":
                 this.mapper = new ObjectMapper(yamlFactory);
                 LOG.trace("YAML API-Definition detected");
-                if (!APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-                    throw new AppException("YAML API-Definition not supported by your API-Manager version", ErrorCode.UNSUPPORTED_FEATURE);
-                }
                 break;
             default:
                 break;

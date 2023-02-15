@@ -1,3 +1,6 @@
 {
-	"name": "Staged Application" 
+	"name": "Staged Application",
+	"customProperties":{
+		"publicApp":true
+	}
 }

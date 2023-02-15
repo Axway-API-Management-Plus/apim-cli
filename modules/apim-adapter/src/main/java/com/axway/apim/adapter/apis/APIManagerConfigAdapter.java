@@ -88,7 +88,6 @@ public class APIManagerConfigAdapter {
         if (apiManagerResponse.get(useAdmin) != null) return;
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/config").build();
-            LOG.debug("API-Manager configuration URL : {}", uri);
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
@@ -146,13 +145,5 @@ public class APIManagerConfigAdapter {
         } catch (Exception e) {
             throw new AppException("Error updating API-Manager configuration.", ErrorCode.CANT_CREATE_API_PROXY, e);
         }
-    }
-
-    public void setAPIManagerTestResponse(String jsonResponse, boolean useAdmin) {
-        if (jsonResponse == null) {
-            LOG.error("Test-Response is empty. Ignoring!");
-            return;
-        }
-        this.apiManagerResponse.put(useAdmin, jsonResponse);
     }
 }

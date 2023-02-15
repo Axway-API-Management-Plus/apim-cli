@@ -4,7 +4,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.HttpHelper;
 import com.axway.apim.adapter.Response;
 import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.APIImportSerializerModifier;
 import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.api.API;
@@ -60,7 +59,6 @@ public class APIManagerAPIAdapter {
     public static final String PROXIES = "/proxies/";
     public static final String APIREPO = "/apirepo/";
     Map<APIFilter, String> apiManagerResponse = new HashMap<>();
-    Map<String, Image> imagesResponse = new HashMap<>();
     ObjectMapper mapper = new ObjectMapper();
     private final CoreParameters cmd;
 
@@ -273,7 +271,7 @@ public class APIManagerAPIAdapter {
         String backendBasePath = null;
         try {
             backendBasePath = api.getServiceProfiles().get("_default").getBasePath();
-            if(backendBasePath.contains("${env")) // issue #332
+            if (backendBasePath.contains("${env")) // issue #332
                 return;
             URL url = new URL(backendBasePath);
             RemoteHost remoteHost = APIManagerAdapter.getInstance().remoteHostsAdapter.getRemoteHost(url.getHost(), url.getPort());
@@ -336,9 +334,12 @@ public class APIManagerAPIAdapter {
                 APIMethod method = null;
                 for (String apiId : apiIds) {
                     if (mode == METHOD_TRANSLATION.AS_NAME) {
-                        method = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(apiId, key);
+                        LOG.debug("Translating method names");
+                        APIMethod apiMethod = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(apiId, key);
+                        method = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(apiId, apiMethod.getName());
                     } else {
-                        method = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(apiId, key);
+                        LOG.debug("Translating method ids");
+                        method = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(apiId, key);
                     }
                     if (method != null) break;
                 }
@@ -429,27 +430,9 @@ public class APIManagerAPIAdapter {
 
     private void addClientApplications(API api, APIFilter filter) throws AppException {
         if (!filter.isIncludeClientApplications()) return;
-        List<ClientApplication> existingClientApps = new ArrayList<>();
         List<ClientApplication> apps;
-        // With version >7.7 we can retrieve the subscribed apps directly
-        if (APIManagerAdapter.hasAPIManagerVersion("7.7")) {
-            apps = APIManagerAdapter.getInstance().appAdapter.getAppsSubscribedWithAPI(api.getId());
-            api.setApplications(apps);
-        } else {
-            apps = APIManagerAdapter.getInstance().appAdapter.getApplications(new ClientAppFilter.Builder()
-                    .includeQuotas(filter.isIncludeClientAppQuota()).includeOauthResources(true)
-                    .build(), false);
-            for (ClientApplication app : apps) {
-                List<APIAccess> APIAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(app, APIManagerAPIAccessAdapter.Type.applications, true);
-                app.setApiAccess(APIAccess);
-                for (APIAccess access : APIAccess) {
-                    if (access.getApiId().equals(api.getId())) {
-                        existingClientApps.add(app);
-                    }
-                }
-            }
-            api.setApplications(existingClientApps);
-        }
+        apps = APIManagerAdapter.getInstance().appAdapter.getAppsSubscribedWithAPI(api.getId());
+        api.setApplications(apps);
     }
 
     private void addOriginalAPIDefinitionFromAPIM(API api, APIFilter filter) throws AppException {
@@ -466,7 +449,7 @@ public class APIManagerAPIAdapter {
                     uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId() + "/download")
                             .setParameter("original", "true").build();
                 }
-                LOG.debug("Download API spec URL :{}",uri);
+                LOG.debug("Download API spec URL :{}", uri);
                 RestAPICall getRequest = new GETRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -606,7 +589,7 @@ public class APIManagerAPIAdapter {
     }
 
     public void deleteAPIProxy(API api) throws AppException {
-        LOG.debug("Deleting API-Proxy with Name : {} and Id: {}",api.getName(), api.getId());
+        LOG.debug("Deleting API-Proxy with Name : {} and Id: {}", api.getName(), api.getId());
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId()).build();
             RestAPICall request = new DELRequest(uri);
@@ -1005,13 +988,5 @@ public class APIManagerAPIAdapter {
         }
         filterFields += "]";
         return filterFields;
-    }
-
-    public void setAPIManagerResponse(APIFilter filter, String apiManagerResponse) {
-        this.apiManagerResponse.put(filter, apiManagerResponse);
-    }
-
-    public void setAPIManagerResponse(String apiId, Image image) {
-        this.imagesResponse.put(apiId, image);
     }
 }

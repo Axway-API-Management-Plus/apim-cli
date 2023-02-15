@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "5feb31fe-fb8b-4c21-8132-39f01e2c6440",
+    "name": "Test_Consumer",
+    "description": null,
+    "organizationId": "9379ee58-312e-46b3-a06c-dc413d593603",
+    "phone": null,
+    "email": null,
+    "createdBy": "40dd53a4-0b13-4485-82e8-63c687404c2f",
+    "managedBy": [],
+    "createdOn": 1676353351369,
+    "enabled": true,
+    "image": null,
+    "state": "approved"
+  }
+]

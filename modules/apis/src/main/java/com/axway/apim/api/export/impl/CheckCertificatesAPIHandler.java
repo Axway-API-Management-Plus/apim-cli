@@ -90,7 +90,6 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
             }
         } else {
             LOG.info("No certificates found that will expire within the next {} days.", checkCertParams.getNumberOfDays());
-            writeJSON(new ArrayList<>());
         }
         LOG.info("Done!");
     }

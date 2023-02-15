@@ -25,11 +25,7 @@ public class JSONRemoteHostAdapterTest  extends WiremockWrapper {
 	}
 	
 	private static final String PACKAGE = "com/axway/apim/setup/adapter/";
-	
-//	@BeforeClass
-//	public void setupTestIndicator() throws AppException, IOException {
-//		setupMockData();
-//	}
+
 	
 	@Test
 	public void testNonStagedMultiRemoteHosts() throws AppException {

@@ -65,5 +65,8 @@
       "enabled": true,
       "isDefault": true
     }
-  ]
+  ],
+  "customProperties":{
+    "publicApp":true
+  }
 }

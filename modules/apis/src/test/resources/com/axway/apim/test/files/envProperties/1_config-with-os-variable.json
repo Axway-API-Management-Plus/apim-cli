@@ -4,7 +4,7 @@
 	"path": "${OS_AND_MAIN_ENV_PROPERTY}",
 	"state": "${state}",
 	"version": "${USERNAME}",
-	"organization": "API Development",
+	"organization": "orga",
 	"descriptionType": "${descriptionType}", 
 	"descriptionManual": "${OS_MAIN_AND_STAGE_ENV_PROPERTY}",
 	"vhost": "${GITHUB_ACTION}"
