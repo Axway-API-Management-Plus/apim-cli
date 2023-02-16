@@ -2,8 +2,10 @@ package com.axway.apim.setup.adapter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Map;
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,21 +19,18 @@ import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
-public class JSONAPIManagerConfigAdapter {
+public class APIManagerConfigAdapter {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(JSONAPIManagerConfigAdapter.class);
-	
-	private final ObjectMapper mapper = new ObjectMapper();
-	
+	private static final Logger LOG = LoggerFactory.getLogger(APIManagerConfigAdapter.class);
 	APIManagerConfig managerConfig;
-	
 	StandardImportParams importParams;
 
-	public JSONAPIManagerConfigAdapter(StandardImportParams params) {
+	public APIManagerConfigAdapter(StandardImportParams params) {
 		this.importParams = params;
 	}
 
 	private void readConfig() throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
 		String config = importParams.getConfig();
 		String stage = importParams.getStage();
 		File configFile = Utils.locateConfigFile(config);
@@ -39,6 +38,14 @@ public class JSONAPIManagerConfigAdapter {
 		File stageConfig = Utils.getStageConfig(stage, importParams.getStageConfig(), configFile);
 		APIManagerConfig baseConfig;
 		try {
+			try {
+				// Check the config file is json
+				mapper.readTree(configFile);
+				LOG.debug("Handling JSON Configuration file: {}", configFile);
+			}catch (IOException ioException){
+				mapper = new ObjectMapper(new YAMLFactory());
+				LOG.debug("Handling Yaml Configuration file: {}", configFile);
+			}
 			mapper.configOverride(Map.class).setMergeable(true);
 			baseConfig = mapper.reader()
 					.withAttribute(UserDeserializer.Params.USE_LOGIN_NAME, true)

@@ -11,7 +11,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 
 public abstract class OrgAdapter {
 	
-	static Logger LOG = LoggerFactory.getLogger(JSONOrgAdapter.class);
+	static Logger LOG = LoggerFactory.getLogger(OrgConfigAdapter.class);
 	
 	List<Organization> orgs;
 	

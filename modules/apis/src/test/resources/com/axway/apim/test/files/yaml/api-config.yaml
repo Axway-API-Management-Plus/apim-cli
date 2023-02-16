@@ -1,0 +1,78 @@
+---
+name: petstore3
+path: /api/v3
+state: published
+version: 1.0.17
+organization: orga
+apiSpecification:
+  resource: /api_definition_1/petstore-openapi30.json
+backendBasepath: https://petstore3.swagger.io
+inboundProfiles:
+  _default:
+    monitorAPI: true
+    queryStringPassThrough: false
+    monitorSubject: authentication.subject.id
+    securityProfile: _default
+    corsProfile: _default
+  createUser:
+    monitorAPI: true
+    queryStringPassThrough: false
+outboundProfiles:
+  _default:
+    requestPolicy: Validate Size & Token
+    responsePolicy: Remove Header & Audit data
+    authenticationProfile: _default
+  deletePet:
+    routeType: proxy
+    authenticationProfile: _default
+securityProfiles:
+  - name: _default
+    isDefault: true
+    devices:
+      - name: API Key
+        type: apiKey
+        order: 1
+        properties:
+          apiKeyFieldName: KeyId
+          takeFrom: HEADER
+          removeCredentialsOnSuccess: true
+caCerts:
+  - certFile: swagger.io.crt
+    inbound: false
+    outbound: true
+  - certFile: Amazon.crt
+    inbound: false
+    outbound: true
+  - certFile: AmazonRootCA1.crt
+    inbound: false
+    outbound: true
+  - certFile: StarfieldServicesRootCertificateAuthority-G2.crt
+    inbound: false
+    outbound: true
+applicationQuota:
+  restrictions:
+    - method: "*"
+      type: throttle
+      config:
+        period: second
+        per: 2
+        messages: 1000
+systemQuota:
+  restrictions:
+    - method: "*"
+      type: throttle
+      config:
+        period: second
+        per: 2
+        messages: 1000
+clientOrganizations:
+  - orga
+applications:
+  - name: Test App 2008
+    enabled: true
+    state: approved
+    permissions: []
+    appScopes: []
+customProperties:
+  customProperty1: public
+  customProperty4: true

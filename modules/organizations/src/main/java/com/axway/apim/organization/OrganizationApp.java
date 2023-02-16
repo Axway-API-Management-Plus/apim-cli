@@ -15,7 +15,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.organization.adapter.JSONOrgAdapter;
+import com.axway.apim.organization.adapter.OrgConfigAdapter;
 import com.axway.apim.organization.adapter.OrgAdapter;
 import com.axway.apim.organization.impl.OrgResultHandler;
 import com.axway.apim.organization.impl.OrgResultHandler.ResultHandler;
@@ -137,7 +137,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the organization
-			OrgAdapter orgAdapter = new JSONOrgAdapter(params);
+			OrgAdapter orgAdapter = new OrgConfigAdapter(params);
 			List<Organization> desiredOrgs = orgAdapter.getOrganizations();
 			OrganizationImportManager importManager = new OrganizationImportManager();
 			for(Organization desiredOrg : desiredOrgs) {

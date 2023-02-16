@@ -4,7 +4,7 @@ import com.axway.apim.WiremockWrapper;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
-import com.axway.apim.users.adapter.JSONUserAdapter;
+import com.axway.apim.users.adapter.UserConfigAdapter;
 import com.axway.apim.users.lib.UserImportParams;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.testng.Assert.*;
 
-public class JSONUserAdapterTest extends WiremockWrapper {
+public class UserConfigAdapterTest extends WiremockWrapper {
 
 	@BeforeClass
 	public void init() {
@@ -32,14 +32,14 @@ public class JSONUserAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void readSingleUserTest() throws AppException {
-		String testFile = JSONUserAdapterTest.class.getResource(testPackage + "/SingleUser.json").getPath();
+		String testFile = UserConfigAdapterTest.class.getResource(testPackage + "/SingleUser.json").getPath();
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		UserImportParams params = new UserImportParams();
 		params.setConfig(testFile);
 		params.setUsername("orgadmin");
 		params.setPassword(Utils.getEncryptedPassword());
 		params.setHostname("localhost");
-		JSONUserAdapter adapter = new JSONUserAdapter(params);
+		UserConfigAdapter adapter = new UserConfigAdapter(params);
 		List<User> users = adapter.getUsers();
 		assertEquals(users.size(), 1, "Expected 1 user returned from the Adapter");
 		User user = users.get(0);
@@ -51,21 +51,21 @@ public class JSONUserAdapterTest extends WiremockWrapper {
 	
 	@Test
 	public void readManyOrgsTest() throws AppException {
-		String testFile = JSONUserAdapterTest.class.getResource(testPackage + "/UserArray.json").getPath();
+		String testFile = UserConfigAdapterTest.class.getResource(testPackage + "/UserArray.json").getPath();
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		UserImportParams params = new UserImportParams();
 		params.setUsername("orgadmin");
 		params.setPassword(Utils.getEncryptedPassword());
 		params.setHostname("localhost");
 		params.setConfig(testFile);
-		JSONUserAdapter adapter = new JSONUserAdapter(params);
+		UserConfigAdapter adapter = new UserConfigAdapter(params);
 		List<User> users = adapter.getUsers();
 		assertEquals(users.size(), 2, "Expected 2 users returned from the Adapter");
 	}
 	
 	@Test
 	public void readSingleUserTestWithStagedConfig() throws AppException {
-		String testFile = JSONUserAdapterTest.class.getResource(testPackage + "/SingleUser.json").getPath();
+		String testFile = UserConfigAdapterTest.class.getResource(testPackage + "/SingleUser.json").getPath();
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		UserImportParams params = new UserImportParams();
 		params.setConfig(testFile);
@@ -73,7 +73,7 @@ public class JSONUserAdapterTest extends WiremockWrapper {
 		params.setUsername("orgadmin");
 		params.setPassword(Utils.getEncryptedPassword());
 		params.setHostname("localhost");
-		JSONUserAdapter adapter = new JSONUserAdapter(params);
+		UserConfigAdapter adapter = new UserConfigAdapter(params);
 		List<User> users = adapter.getUsers();
 		assertEquals(users.size(), 1, "Expected 1 user returned from the Adapter");
 		User user = users.get(0);
@@ -83,7 +83,7 @@ public class JSONUserAdapterTest extends WiremockWrapper {
 	
 	@Test
 	public void readSingleUserTestWithStage() throws AppException {
-		String testFile = JSONUserAdapterTest.class.getResource(testPackage + "/SingleUser.json").getPath();
+		String testFile = UserConfigAdapterTest.class.getResource(testPackage + "/SingleUser.json").getPath();
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		UserImportParams params = new UserImportParams();
 		params.setConfig(testFile);
@@ -91,7 +91,7 @@ public class JSONUserAdapterTest extends WiremockWrapper {
 		params.setUsername("orgadmin");
 		params.setPassword(Utils.getEncryptedPassword());
 		params.setHostname("localhost");
-		JSONUserAdapter adapter = new JSONUserAdapter(params);
+		UserConfigAdapter adapter = new UserConfigAdapter(params);
 		List<User> users = adapter.getUsers();
 		assertEquals(users.size(), 1, "Expected 1 user returned from the Adapter");
 		User user = users.get(0);

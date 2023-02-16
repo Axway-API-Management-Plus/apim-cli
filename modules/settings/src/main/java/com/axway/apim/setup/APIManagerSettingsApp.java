@@ -13,7 +13,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.setup.adapter.JSONAPIManagerConfigAdapter;
+import com.axway.apim.setup.adapter.APIManagerConfigAdapter;
 import com.axway.apim.setup.impl.APIManagerSetupResultHandler;
 import com.axway.apim.setup.impl.APIManagerSetupResultHandler.ResultHandler;
 import com.axway.apim.setup.lib.APIManagerSetupExportCLIOptions;
@@ -123,7 +123,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 			APIMHttpClient.deleteInstances();
 			errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
 			APIManagerAdapter apimAdapter = APIManagerAdapter.getInstance();
-			APIManagerConfig desiredConfig = new JSONAPIManagerConfigAdapter(params).getManagerConfig();
+			APIManagerConfig desiredConfig = new APIManagerConfigAdapter(params).getManagerConfig();
 			if(desiredConfig.getConfig()!=null) {
 				apimAdapter.configAdapter.updateConfiguration(desiredConfig.getConfig());
 				updatedAssets+="Config ";

@@ -2,6 +2,7 @@ package com.axway.apim.users.adapter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,16 +17,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-public class JSONUserAdapter extends UserAdapter {
+public class UserConfigAdapter extends UserAdapter {
 
-    private final ObjectMapper mapper = new ObjectMapper();
-
-    public JSONUserAdapter(UserImportParams params) {
+    public UserConfigAdapter(UserImportParams params) {
         super(params);
     }
 
     public void readConfig() throws AppException {
+        ObjectMapper mapper = new ObjectMapper();
         String config = importParams.getConfig();
         String stage = importParams.getStage();
 
@@ -35,6 +36,14 @@ public class JSONUserAdapter extends UserAdapter {
         List<User> baseUsers;
         // Try to read a list of users
         try {
+            try {
+                // Check the config file is json
+                mapper.readTree(configFile);
+                LOG.debug("Handling JSON Configuration file: {}", configFile);
+            }catch (IOException ioException){
+                mapper = new ObjectMapper(new YAMLFactory());
+                LOG.debug("Handling Yaml Configuration file: {}", configFile);
+            }
             baseUsers = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<List<User>>() {
             });
             if (stageConfig != null) {

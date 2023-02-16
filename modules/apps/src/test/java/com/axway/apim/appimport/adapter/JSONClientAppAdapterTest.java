@@ -41,7 +41,7 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         AppImportParams importParams = new AppImportParams();
         importParams.setHostname("localhost");
         importParams.setConfig(testFile);
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
     }
@@ -53,7 +53,7 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         AppImportParams importParams = new AppImportParams();
         importParams.setHostname("localhost");
         importParams.setConfig(testFile);
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
     }
@@ -66,7 +66,7 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         importParams.setHostname("localhost");
         importParams.setConfig(testFile);
         importParams.setStage("test-stage");
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
         ClientApplication app = apps.get(0);
@@ -81,7 +81,7 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         AppImportParams importParams = new AppImportParams();
         importParams.setHostname("localhost");
         importParams.setConfig(testFile);
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 2, "Expected 2 app returned from the Adapter");
     }
@@ -96,7 +96,7 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         importParams.setStage("test-stage");
         importParams.setHostname("localhost");
 
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
         adapter.getApplications();
     }
 
@@ -107,7 +107,7 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         AppImportParams importParams = new AppImportParams();
         importParams.setHostname("localhost");
         importParams.setConfig(testFile);
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
 
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
@@ -159,7 +159,7 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         AppImportParams importParams = new AppImportParams();
         importParams.setHostname("localhost");
         importParams.setConfig(testFile);
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
 
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
@@ -197,7 +197,7 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         AppImportParams importParams = new AppImportParams();
         importParams.setConfig(testFile);
         importParams.setHostname("localhost");
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
 
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");

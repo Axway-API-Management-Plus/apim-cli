@@ -39,7 +39,7 @@ public class JSONOrganizationAdapterTest extends WiremockWrapper {
 		OrgImportParams importParams = new OrgImportParams();
 		importParams.setConfig(testFile);
 		importParams.setHostname("localhost");
-		JSONOrgAdapter adapter = new JSONOrgAdapter(importParams);
+		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 1, "Expected 1 org returned from the Adapter");
 		Organization org = orgs.get(0);
@@ -53,7 +53,7 @@ public class JSONOrganizationAdapterTest extends WiremockWrapper {
 		OrgImportParams importParams = new OrgImportParams();
 		importParams.setConfig(testFile);
 		importParams.setHostname("localhost");
-		JSONOrgAdapter adapter = new JSONOrgAdapter(importParams);
+		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 2, "Expected 2 apps returned from the Adapter");
 	}
@@ -66,7 +66,7 @@ public class JSONOrganizationAdapterTest extends WiremockWrapper {
 		importParams.setConfig(testFile);
 		importParams.setStage("test-stage");
 		importParams.setHostname("localhost");
-		JSONOrgAdapter adapter = new JSONOrgAdapter(importParams);
+		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		// Stage for a list of organizations is not supported!
 		adapter.getOrganizations();
 	}
@@ -79,7 +79,7 @@ public class JSONOrganizationAdapterTest extends WiremockWrapper {
 		importParams.setConfig(testFile);
 		importParams.setStage("test-stage");
 		importParams.setHostname("localhost");
-		JSONOrgAdapter adapter = new JSONOrgAdapter(importParams);
+		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 1, "Expected 1 org returned from the Adapter");
 		Organization org = orgs.get(0);
@@ -94,7 +94,7 @@ public class JSONOrganizationAdapterTest extends WiremockWrapper {
 		importParams.setConfig(testFile);
 		importParams.setStageConfig("StagedSingleOrganization.json");
 		importParams.setHostname("localhost");
-		JSONOrgAdapter adapter = new JSONOrgAdapter(importParams);
+		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 1, "Expected 1 org returned from the Adapter");
 		Organization org = orgs.get(0);

@@ -17,7 +17,7 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.users.adapter.JSONUserAdapter;
+import com.axway.apim.users.adapter.UserConfigAdapter;
 import com.axway.apim.users.adapter.UserAdapter;
 import com.axway.apim.users.impl.UserResultHandler;
 import com.axway.apim.users.impl.UserResultHandler.ResultHandler;
@@ -139,7 +139,7 @@ public class UserApp implements APIMCLIServiceProvider {
             APIMHttpClient.deleteInstances();
             APIManagerAdapter.getInstance();
             // Load the desired state of the organization
-            UserAdapter userAdapter = new JSONUserAdapter(params);
+            UserAdapter userAdapter = new UserConfigAdapter(params);
             List<User> desiredUsers = userAdapter.getUsers();
             UserImportManager importManager = new UserImportManager();
 

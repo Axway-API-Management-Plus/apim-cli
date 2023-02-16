@@ -46,6 +46,7 @@ public abstract class APIResultHandler {
 
     public enum APIListImpl {
         JSON_EXPORTER(JsonAPIExporter.class),
+        YAML_EXPORTER(YamlAPIExporter.class),
         CONSOLE_EXPORTER(ConsoleAPIExporter.class),
         CSV_EXPORTER(CSVAPIExporter.class),
         DAT_EXPORTER(DATAPIExporter.class),
