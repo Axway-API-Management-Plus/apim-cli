@@ -132,8 +132,8 @@ public class Utils {
         Map<String, String> properties = CoreParameters.getInstance().getProperties();
         Map<String, String> environmentVariables = System.getenv();
         if (properties != null)
-            environmentVariables.putAll(properties);
-        return StringSubstitutor.replace(givenConfig,environmentVariables );
+            properties.putAll(environmentVariables);
+        return StringSubstitutor.replace(givenConfig, properties);
     }
 
     /**
