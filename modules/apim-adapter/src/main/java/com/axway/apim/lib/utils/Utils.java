@@ -129,12 +129,10 @@ public class Utils {
      */
     public static String substituteVariables(File inputFile) throws IOException {
         String givenConfig = new String(Files.readAllBytes(inputFile.toPath()), StandardCharsets.UTF_8);
-        Map<String, String> properties = CoreParameters.getInstance().getProperties();
-        Map<String, String> environmentVariables = System.getenv();
-        if (properties == null)
-            properties = new HashMap<>();
-        properties.putAll(environmentVariables);
-        return StringSubstitutor.replace(givenConfig, properties);
+        givenConfig = StringSubstitutor.replace(givenConfig, System.getenv());
+        if (CoreParameters.getInstance().getProperties() == null) return givenConfig;
+        StringSubstitutor stringSubstitutor = new StringSubstitutor(CoreParameters.getInstance().getProperties());
+        return stringSubstitutor.replace(givenConfig);
     }
 
     /**
