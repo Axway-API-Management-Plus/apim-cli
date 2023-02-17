@@ -131,8 +131,9 @@ public class Utils {
         String givenConfig = new String(Files.readAllBytes(inputFile.toPath()), StandardCharsets.UTF_8);
         Map<String, String> properties = CoreParameters.getInstance().getProperties();
         Map<String, String> environmentVariables = System.getenv();
-        if (properties != null)
-            properties.putAll(environmentVariables);
+        if (properties == null)
+            properties = new HashMap<>();
+        properties.putAll(environmentVariables);
         return StringSubstitutor.replace(givenConfig, properties);
     }
 
