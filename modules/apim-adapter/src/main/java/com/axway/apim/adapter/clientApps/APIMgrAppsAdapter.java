@@ -139,7 +139,7 @@ public class APIMgrAppsAdapter {
             }
             apps.removeIf(filter::filter);
             Utils.addCustomPropertiesForEntity(apps, this.apiManagerResponse.get(filter), filter);
-            if (logProgress && apps.size() > 5) System.out.print("\n");
+            if (logProgress && apps.size() > 5) Console.print("\n");
         } catch (Exception e) {
             throw new AppException("Can't initialize API-Manager API-Representation.", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }

@@ -1,10 +1,5 @@
 package com.axway.apim.setup.impl;
 
-import java.lang.reflect.Constructor;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.apis.RemoteHostFilter;
 import com.axway.apim.adapter.apis.RemoteHostFilter.Builder;
 import com.axway.apim.api.model.APIManagerConfig;
@@ -14,12 +9,12 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
 
+import java.lang.reflect.Constructor;
+
 public abstract class APIManagerSetupResultHandler {
-	
-	protected static Logger LOG = LoggerFactory.getLogger(APIManagerSetupResultHandler.class);
-	
 	public enum ResultHandler {
 		JSON_EXPORTER(JsonAPIManagerSetupExporter.class),
+		YAML_EXPORTER(YamlAPIManagerSetupExporter.class),
 		CONSOLE_EXPORTER(ConsoleAPIManagerSetupExporter.class);
 		
 		private final Class<APIManagerSetupResultHandler> implClass;

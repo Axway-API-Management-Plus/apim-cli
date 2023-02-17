@@ -22,6 +22,7 @@ public abstract class UserResultHandler {
 	
 	public enum ResultHandler {
 		JSON_EXPORTER(JsonUserExporter.class),
+		YAML_EXPORTER(YamlUserExporter.class),
 		CONSOLE_EXPORTER(ConsoleUserExporter.class),
 		USER_DELETE_HANDLER(DeleteUserHandler.class),
 		USER_CHANGE_PASSWORD_HANDLER(UserChangePasswordHandler.class);

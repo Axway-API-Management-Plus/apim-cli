@@ -71,9 +71,10 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 		ExportResult result = new ExportResult();
 		try {
 			params.validateRequiredParameters();
-			if (params.getOutputFormat() == StandardExportParams.OutputFormat.json) {
+			if (params.getOutputFormat() == StandardExportParams.OutputFormat.json)
 				return exportAPIManagerSetup(params, ResultHandler.JSON_EXPORTER, result);
-			}
+			if (params.getOutputFormat() == StandardExportParams.OutputFormat.yaml)
+				return exportAPIManagerSetup(params, ResultHandler.YAML_EXPORTER, result);
 			return exportAPIManagerSetup(params, ResultHandler.CONSOLE_EXPORTER, result);
 		} catch (AppException e) {
 			e.logException(LOG);

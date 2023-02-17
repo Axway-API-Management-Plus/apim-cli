@@ -13,8 +13,11 @@ import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.Console;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeleteAppHandler extends ApplicationExporter {
+	private static final Logger LOG = LoggerFactory.getLogger(DeleteAppHandler.class);
 
 	public DeleteAppHandler(AppExportParams params, ExportResult result) {
 		super(params, result);

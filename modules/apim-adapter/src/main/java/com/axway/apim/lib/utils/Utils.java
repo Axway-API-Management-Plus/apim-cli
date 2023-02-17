@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.*;
 
+import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
@@ -80,9 +81,9 @@ public class Utils {
             bareDone.append(icon);
         }
         String bareRemain = bare.substring(remainPercent);
-        System.out.print("\r" + bareDone + bareRemain + " " + remainPercent * 10 + "%");
+        Console.print("\r" + bareDone + bareRemain + " " + remainPercent * 10 + "%");
         if (remain == total) {
-            System.out.print("\n");
+            Console.print("\n");
         }
     }
 
@@ -97,7 +98,7 @@ public class Utils {
         negative = negative.toUpperCase();
         String answer;
         do {
-            System.out.print(question + " ");
+            Console.print(question + " ");
             answer = input.next().trim().toUpperCase();
         } while (!answer.matches(positive) && !answer.matches(negative));
         input.close();

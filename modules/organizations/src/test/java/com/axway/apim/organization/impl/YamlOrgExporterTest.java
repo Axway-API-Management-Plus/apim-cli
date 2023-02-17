@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-public class JsonOrgExporterTest extends WiremockWrapper {
+public class YamlOrgExporterTest extends WiremockWrapper {
 
     @BeforeClass
     public void init() {
@@ -26,15 +26,15 @@ public class JsonOrgExporterTest extends WiremockWrapper {
     }
 
     @Test
-    public void testJsonExport() throws AppException {
-        String[] args = {"-h", "localhost", "-o", "json", "-deleteTarget"};
+    public void testYamlExport() throws AppException {
+        String[] args = {"-h", "localhost", "-o", "yaml", "-deleteTarget"};
         OrgExportParams params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
         APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
-        OrgResultHandler exporter = OrgResultHandler.create(OrgResultHandler.ResultHandler.JSON_EXPORTER, params, result);
+        OrgResultHandler exporter = OrgResultHandler.create(OrgResultHandler.ResultHandler.YAML_EXPORTER, params, result);
         List<Organization> organizations = apimanagerAdapter.orgAdapter.getOrgs(exporter.getFilter());
-        JsonOrgExporter jsonOrgExporter = new JsonOrgExporter(params, result);
-        jsonOrgExporter.export(organizations);
+        YamlOrgExporter yamlOrgExporter = new YamlOrgExporter(params, result);
+        yamlOrgExporter.export(organizations);
     }
 }

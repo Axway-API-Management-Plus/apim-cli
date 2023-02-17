@@ -71,6 +71,8 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			switch(params.getOutputFormat()) {
 				case json:
 				return exportOrgs(params, ResultHandler.JSON_EXPORTER, result);
+				case yaml:
+					return exportOrgs(params, ResultHandler.YAML_EXPORTER, result);
 				case console:
 				default:
 				return exportOrgs(params, ResultHandler.CONSOLE_EXPORTER, result);

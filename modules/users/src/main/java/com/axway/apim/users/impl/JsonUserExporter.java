@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -32,11 +33,11 @@ public class JsonUserExporter extends UserResultHandler {
 	@Override
 	public void export(List<User> users) throws AppException {
 		for(User user : users) {
-			saveUserLocally(new ExportUser(user));
+			saveUserLocally(new ExportUser(user), this);
 		}
 	}
 	
-	private void saveUserLocally(ExportUser user) throws AppException {
+	public void saveUserLocally(ExportUser user, UserResultHandler userResultHandler) throws AppException {
 		String folderName = getExportFolder(user);
 		String targetFolder = params.getTarget();
 		File localFolder = new File(targetFolder +File.separator+ folderName);
@@ -58,7 +59,15 @@ public class JsonUserExporter extends UserResultHandler {
 		if (!localFolder.mkdirs()) {
 			throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
-		ObjectMapper mapper = new ObjectMapper();
+		ObjectMapper mapper;
+		String configFile;
+		if(userResultHandler instanceof YamlUserExporter){
+			mapper = new ObjectMapper(new YAMLFactory());
+			configFile = "/user-config.yaml";
+		}else {
+			mapper = new ObjectMapper();
+			configFile = "/user-config.json";
+		}
 		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
 		FilterProvider filters = new SimpleFilterProvider()
 				.addFilter("UserFilter",
@@ -68,8 +77,8 @@ public class JsonUserExporter extends UserResultHandler {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/user-config.json"), user);
-			this.result.addExportedFile(localFolder.getCanonicalPath() + "/user-config.json");
+			mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), user);
+			this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
 		} catch (Exception e) {
 			throw new AppException("Can't write configuration file for user: '"+user.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
 		}

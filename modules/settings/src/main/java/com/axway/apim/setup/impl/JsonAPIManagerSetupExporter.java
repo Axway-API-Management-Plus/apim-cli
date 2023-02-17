@@ -16,13 +16,16 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 
 public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
-
+    protected static Logger LOG = LoggerFactory.getLogger(JsonAPIManagerSetupExporter.class);
     public JsonAPIManagerSetupExporter(APIManagerSetupExportParams params, ExportResult result) {
         super(params, result);
     }
@@ -34,6 +37,11 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
 
     @Override
     public void export(APIManagerConfig apimanagerConfig) throws AppException {
+        exportToFile(apimanagerConfig, this);
+    }
+
+
+    public void exportToFile(APIManagerConfig apimanagerConfig, APIManagerSetupResultHandler apiManagerSetupResultHandler) throws AppException {
         String folderName = getExportFolder(apimanagerConfig.getConfig());
         String targetFolder = params.getTarget();
         File localFolder = new File(targetFolder + File.separator + folderName);
@@ -55,7 +63,15 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
         if (!localFolder.mkdirs()) {
             throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
         }
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper;
+        String configFile;
+        if(apiManagerSetupResultHandler instanceof YamlAPIManagerSetupExporter){
+            mapper = new ObjectMapper(new YAMLFactory());
+            configFile = "/apimanager-config.yaml";
+        }else {
+            mapper = new ObjectMapper();
+            configFile = "/apimanager-config.json";
+        }
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(true)));
@@ -65,12 +81,12 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
                     .addFilter("APIManagerConfigFilter", SimpleBeanPropertyFilter.serializeAllExcept("os", "architecture", "productVersion", "baseOAuth"))
                     .setFailOnUnknownId(false);
             mapper.setFilterProvider(filters);
-            mapper.writeValue(new File(localFolder.getCanonicalPath() + "/apimanager-config.json"), apimanagerConfig);
-            result.addExportedFile(localFolder.getCanonicalPath() + "/apimanager-config.json");
+            mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), apimanagerConfig);
+            result.addExportedFile(localFolder.getCanonicalPath() + configFile);
         } catch (Exception e) {
             throw new AppException("Can't create configuration export", ErrorCode.UNXPECTED_ERROR, e);
         }
-        LOG.info("Successfully exported API-Manager configuration into: {}{}apimanager-config.json", localFolder, File.separator);
+        LOG.info("Successfully exported API-Manager configuration into: {}{}", localFolder, configFile);
         if (!APIManagerAdapter.hasAdminAccount()) {
             LOG.warn("Export has been done with an Org-Admin account only. Export of configuration restricted.");
         }

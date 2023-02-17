@@ -24,6 +24,21 @@ public class APIManagerSettingsAppTest extends WiremockWrapper {
         int returnCode = APIManagerSettingsApp.exportConfig(args);
         Assert.assertEquals(returnCode, 0);
     }
+
+    @Test
+    public void exportConfigJson() {
+        String[] args = {"-h", "localhost", "-type", "config,alerts,remotehosts", "-o", "json", "-deleteTarget"};
+        int returnCode = APIManagerSettingsApp.exportConfig(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
+    public void exportConfigYaml() {
+        String[] args = {"-h", "localhost", "-type", "config,alerts,remotehosts", "-o", "yaml", "-deleteTarget"};
+        int returnCode = APIManagerSettingsApp.exportConfig(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
     @Test
     public void importConfig() {
         ClassLoader classLoader = this.getClass().getClassLoader();

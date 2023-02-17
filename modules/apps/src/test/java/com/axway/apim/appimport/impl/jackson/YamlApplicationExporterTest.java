@@ -4,7 +4,7 @@ import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.ApplicationExporter;
-import com.axway.apim.appexport.impl.JsonApplicationExporter;
+import com.axway.apim.appexport.impl.YamlApplicationExporter;
 import com.axway.apim.appexport.lib.AppExportCLIOptions;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.lib.ExportResult;
@@ -15,7 +15,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-public class JsonApplicationExporterTest extends WiremockWrapper {
+public class YamlApplicationExporterTest extends WiremockWrapper {
 
     @BeforeClass
     public void init() {
@@ -28,15 +28,15 @@ public class JsonApplicationExporterTest extends WiremockWrapper {
     }
 
     @Test
-    public void testJsonExport() throws AppException {
+    public void testYamlExport() throws AppException {
         String[] args = {"-h", "localhost", "-deleteTarget"};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
         APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
-        ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.JSON_EXPORTER, params, result);
+        ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.YAML_EXPORTER, params, result);
         List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
-        JsonApplicationExporter jsonApplicationExporter = new JsonApplicationExporter(params, result);
-        jsonApplicationExporter.export(apps);
+        YamlApplicationExporter yamlApplicationExporter = new YamlApplicationExporter(params, result);
+        yamlApplicationExporter.export(apps);
     }
 }

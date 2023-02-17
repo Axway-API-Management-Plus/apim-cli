@@ -75,6 +75,8 @@ public class UserApp implements APIMCLIServiceProvider {
             switch (params.getOutputFormat()) {
                 case json:
                     return runExport(params, ResultHandler.JSON_EXPORTER, result);
+                case yaml:
+                    return runExport(params, ResultHandler.YAML_EXPORTER, result);
                 case console:
                 default:
                     return runExport(params, ResultHandler.CONSOLE_EXPORTER, result);
@@ -107,7 +109,6 @@ public class UserApp implements APIMCLIServiceProvider {
             LOG.info("Found {} user(s).", users.size());
             exporter.export(users);
             if (exporter.hasError()) {
-                LOG.info("");
                 LOG.error("Please check the log. At least one error was recorded.");
             } else {
                 LOG.debug("Successfully exported {} user(s).", users.size());

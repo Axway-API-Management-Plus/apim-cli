@@ -13,8 +13,12 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.organization.lib.OrgExportParams;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeleteOrgHandler extends OrgResultHandler {
+	private static final Logger LOG = LoggerFactory.getLogger(DeleteOrgHandler.class);
+
 
 	public DeleteOrgHandler(OrgExportParams params, ExportResult result) {
 		super(params, result);

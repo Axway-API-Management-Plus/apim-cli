@@ -26,7 +26,7 @@ public class ConsoleOrgExporterTest extends WiremockWrapper {
     }
 
     @Test
-    public void tesCVSExport() throws AppException {
+    public void testConsoleExport() throws AppException {
         String[] args = {"-h", "localhost"};
         OrgExportParams params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
         APIManagerAdapter.deleteInstance();
