@@ -79,8 +79,6 @@ public class CoreParameters implements Parameters {
 
     private Boolean rollback = true;
 
-    private String confDir;
-
     private Boolean ignoreCache = false;
 
     private String apimCLIHome;
@@ -312,13 +310,6 @@ public class CoreParameters implements Parameters {
         this.rollback = rollback;
     }
 
-    public String getConfDir() {
-        return confDir;
-    }
-
-    public void setConfDir(String confDir) {
-        this.confDir = confDir;
-    }
 
     public boolean isIgnoreCache() {
         return ignoreCache;
