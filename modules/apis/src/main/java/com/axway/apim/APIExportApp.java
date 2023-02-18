@@ -37,7 +37,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
         try {
             params = (APIExportParams) CLIAPIExportOptions.create(args).getParams();
         } catch (AppException e) {
-            LOG.error("Error {}", e.getMessage());
+            LOG.error("Error", e);
             return e.getError().getCode();
         }
         APIExportApp apiExportApp = new APIExportApp();

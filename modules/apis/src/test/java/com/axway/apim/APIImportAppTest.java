@@ -36,7 +36,7 @@ public class APIImportAppTest extends WiremockWrapper {
 
     @Test
     public void importApiMCliVersion() {
-        String[] args = {"-v"};
+        String[] args = {"-version"};
         int returnCode = APIImportApp.importAPI(args);
         Assert.assertEquals(returnCode, 0);
     }

@@ -26,13 +26,8 @@ public abstract class CLIOptions {
      * This cmd contains all options visible in the usage when using help
      */
     private CommandLine cmd;
-
-
     private EnvironmentProperties envProperties;
-
     protected String executable = "apim";
-
-
 
     protected CLIOptions() {
         // Define core command line parameters!
@@ -48,12 +43,12 @@ public abstract class CLIOptions {
 
     public abstract void addOptions();
 
-    public void addHelpAndVersion(){
+    public void addHelpAndVersion() {
         Option option = new Option("help", "Print the help");
         option.setRequired(false);
         optionalOptions.addOption(option);
 
-        option = new Option("v", "version", false, "Print the APIM CLI Version number");
+        option = new Option("version", "Print the APIM CLI Version number");
         option.setRequired(false);
         optionalOptions.addOption(option);
     }
@@ -62,7 +57,7 @@ public abstract class CLIOptions {
     public String getValue(String key) {
         if (this.cmd != null && this.cmd.getOptionValue(key) != null) {
             return this.cmd.getOptionValue(key);
-        }  else if (this.envProperties != null && this.envProperties.containsKey(key)) {
+        } else if (this.envProperties != null && this.envProperties.containsKey(key)) {
             return this.envProperties.get(key);
         } else {
             return null;
@@ -86,7 +81,7 @@ public abstract class CLIOptions {
             if (commandLine.hasOption("help")) {
                 printUsage("Usage information", args);
                 throw new AppException("help", ErrorCode.SUCCESS);
-            }else if(commandLine.hasOption('v')) {
+            } else if (commandLine.hasOption("version")) {
                 Console.println(CLIOptions.class.getPackage().getImplementationVersion());
                 throw new AppException("version", ErrorCode.SUCCESS);
             }
