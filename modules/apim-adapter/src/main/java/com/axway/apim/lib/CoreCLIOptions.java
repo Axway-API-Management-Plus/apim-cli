@@ -20,7 +20,6 @@ public class CoreCLIOptions extends CLIOptions {
         params.setStage(getValue("stage"));
         params.setHostname(getValue("host"));
         params.setAPIManagerURL(getValue("apimanagerUrl"));
-        params.setApiBasepath(getValue("apiBasepath"));
         params.setPort((getValue("port") != null) ? Integer.parseInt(getValue("port").trim()) : -1);
         params.setUsername(getValue("username"));
         params.setPassword(getValue("password"));
@@ -38,6 +37,7 @@ public class CoreCLIOptions extends CLIOptions {
         params.setProxyUsername(getValue("httpProxyUsername"));
         params.setProxyPassword(getValue("httpProxyPassword"));
         params.setRetryDelay(getValue("retryDelay"));
+        params.setTimeout(getValue("timeout"));
         params.setDisableCompression(hasOption("disableCompression"));
         return params;
     }
@@ -137,6 +137,13 @@ public class CoreCLIOptions extends CLIOptions {
         option.setRequired(false);
         option.setArgName("true");
         cliOptions.addOption(option);
+
+
+        option = new Option("timeout", true, "API Manager timeout in milliseconds");
+        option.setRequired(false);
+        option.setArgName("true");
+        cliOptions.addOption(option);
+
 
         option = new Option("disableCompression", false, "Disable Http Client gzip Compression");
         option.setRequired(false);

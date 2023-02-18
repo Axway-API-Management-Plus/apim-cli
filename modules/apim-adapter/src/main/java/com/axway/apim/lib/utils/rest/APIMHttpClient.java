@@ -26,6 +26,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 
@@ -38,9 +40,7 @@ import java.net.URI;
  */
 public class APIMHttpClient {
 
-    int timeout = 30000;
-
-
+    private static final Logger LOG = LoggerFactory.getLogger(APIMHttpClient.class);
     private HttpClient httpClient;
     private PoolingHttpClientConnectionManager httpClientConnectionManager;
     private HttpClientContext clientContext;
@@ -85,13 +85,14 @@ public class APIMHttpClient {
             clientContext.setCookieStore(cookieStore);
             httpClientConnectionManager.setMaxPerRoute(new HttpRoute(targetHost), 2);
             // We have make sure, that cookies are correclty parsed!
-
+            CoreParameters params = CoreParameters.getInstance();
+            int timeout = params.getTimeout();
+            LOG.debug("API Manager CLI timeout : {}", timeout);
             RequestConfig.Builder defaultRequestConfig = RequestConfig.custom()
                     .setConnectTimeout(timeout)
                     .setSocketTimeout(timeout)
                     .setConnectionRequestTimeout(timeout)
                     .setCookieSpec(CookieSpecs.STANDARD);
-            CoreParameters params = CoreParameters.getInstance();
             HttpClientBuilder clientBuilder = HttpClientBuilder.create()
                     .disableRedirectHandling()
                     .setConnectionManager(httpClientConnectionManager)
@@ -99,10 +100,12 @@ public class APIMHttpClient {
 
             // Check if a proxy is configured
             if (params.getProxyHost() != null) {
+                LOG.debug("API Manager CLI using Http(s) proxy : {}", params.getProxyHost());
                 HttpHost proxyHost = new HttpHost(params.getProxyHost(), params.getProxyPort());
                 HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost);
                 clientBuilder.setRoutePlanner(routePlanner);
                 if (params.getProxyUsername() != null) {
+                    LOG.debug("API Manager CLI using Http(s) proxy Authentication");
                     CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                     credentialsProvider.setCredentials(new AuthScope(params.getProxyHost(), params.getProxyPort()), new UsernamePasswordCredentials(params.getProxyUsername(), params.getProxyPassword()));
                     clientBuilder.setDefaultCredentialsProvider(credentialsProvider);
