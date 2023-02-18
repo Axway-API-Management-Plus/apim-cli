@@ -3,6 +3,7 @@ package com.axway.apim.organization.adapter;
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.organization.lib.OrgImportParams;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -35,6 +36,8 @@ public class JSONOrganizationAdapterTest extends WiremockWrapper {
 		OrgImportParams importParams = new OrgImportParams();
 		importParams.setConfig(testFile);
 		importParams.setHostname("localhost");
+		importParams.setUsername("apiadmin");
+		importParams.setPassword(Utils.getEncryptedPassword());
 		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 1, "Expected 1 org returned from the Adapter");
@@ -49,6 +52,8 @@ public class JSONOrganizationAdapterTest extends WiremockWrapper {
 		OrgImportParams importParams = new OrgImportParams();
 		importParams.setConfig(testFile);
 		importParams.setHostname("localhost");
+		importParams.setUsername("apiadmin");
+		importParams.setPassword(Utils.getEncryptedPassword());
 		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 2, "Expected 2 apps returned from the Adapter");
@@ -62,6 +67,8 @@ public class JSONOrganizationAdapterTest extends WiremockWrapper {
 		importParams.setConfig(testFile);
 		importParams.setStage("test-stage");
 		importParams.setHostname("localhost");
+		importParams.setUsername("apiadmin");
+		importParams.setPassword(Utils.getEncryptedPassword());
 		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		// Stage for a list of organizations is not supported!
 		adapter.getOrganizations();
@@ -75,6 +82,8 @@ public class JSONOrganizationAdapterTest extends WiremockWrapper {
 		importParams.setConfig(testFile);
 		importParams.setStage("test-stage");
 		importParams.setHostname("localhost");
+		importParams.setUsername("apiadmin");
+		importParams.setPassword(Utils.getEncryptedPassword());
 		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 1, "Expected 1 org returned from the Adapter");
@@ -90,6 +99,8 @@ public class JSONOrganizationAdapterTest extends WiremockWrapper {
 		importParams.setConfig(testFile);
 		importParams.setStageConfig("StagedSingleOrganization.json");
 		importParams.setHostname("localhost");
+		importParams.setUsername("apiadmin");
+		importParams.setPassword(Utils.getEncryptedPassword());
 		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 1, "Expected 1 org returned from the Adapter");
