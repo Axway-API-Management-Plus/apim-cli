@@ -3,9 +3,10 @@ package com.axway.apim.user.adapter.impl;
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.User;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.users.impl.UserResultHandler;
 import com.axway.apim.users.lib.cli.UserExportCLIOptions;
 import com.axway.apim.users.lib.params.UserExportParams;
@@ -17,9 +18,21 @@ import java.util.List;
 
 public class ConsoleUserExporterTest extends WiremockWrapper {
 
+    private APIManagerAdapter apimanagerAdapter;
+
     @BeforeClass
     public void init() {
-        initWiremock();
+        try {
+            initWiremock();
+            APIManagerAdapter.deleteInstance();
+            CoreParameters coreParameters = new CoreParameters();
+            coreParameters.setHostname("localhost");
+            coreParameters.setUsername("apiadmin");
+            coreParameters.setPassword(Utils.getEncryptedPassword());
+            apimanagerAdapter = APIManagerAdapter.getInstance();
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @AfterClass
@@ -29,11 +42,8 @@ public class ConsoleUserExporterTest extends WiremockWrapper {
 
     @Test
     public void testConsoleExport() throws AppException {
-        TestIndicator.getInstance().setTestRunning(true);
-        String[] args = {"-h", "localhost", "-loginName", "usera"};
+        String[] args = {"-loginName", "usera"};
         UserExportParams params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
-        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         ExportResult result = new ExportResult();
         UserResultHandler exporter = UserResultHandler.create(UserResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
         List<User> users = apimanagerAdapter.userAdapter.getUsers(exporter.getFilter());
@@ -42,11 +52,8 @@ public class ConsoleUserExporterTest extends WiremockWrapper {
 
     @Test
     public void testConsoleExportWide() throws AppException {
-        TestIndicator.getInstance().setTestRunning(true);
-        String[] args = {"-h", "localhost", "-loginName", "usera", "-wide"};
+        String[] args = {"-loginName", "usera", "-wide"};
         UserExportParams params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
-        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         ExportResult result = new ExportResult();
         UserResultHandler exporter = UserResultHandler.create(UserResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
         List<User> users = apimanagerAdapter.userAdapter.getUsers(exporter.getFilter());
@@ -55,11 +62,8 @@ public class ConsoleUserExporterTest extends WiremockWrapper {
 
     @Test
     public void testConsoleExportUltra() throws AppException {
-        TestIndicator.getInstance().setTestRunning(true);
-        String[] args = {"-h", "localhost", "-loginName", "usera", "-ultra"};
+        String[] args = {"-loginName", "usera", "-ultra"};
         UserExportParams params = (UserExportParams) UserExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
-        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         ExportResult result = new ExportResult();
         UserResultHandler exporter = UserResultHandler.create(UserResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
         List<User> users = apimanagerAdapter.userAdapter.getUsers(exporter.getFilter());

@@ -44,11 +44,6 @@ public class CLIUserFilterOptions extends CLIOptions {
 	public void addOption(Option option) {
 		cliOptions.addOption(option);
 	}
-
-	@Override
-	public void addInternalOption(Option option) {
-		cliOptions.addInternalOption(option);
-	}
 	
 	@Override
 	public String getValue(String key) {

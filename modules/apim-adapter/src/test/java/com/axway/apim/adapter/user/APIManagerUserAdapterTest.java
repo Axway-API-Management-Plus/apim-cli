@@ -11,13 +11,23 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.List;
-
 public class APIManagerUserAdapterTest extends WiremockWrapper {
 
+    private APIManagerAdapter apiManagerAdapter;
+
     @BeforeClass
-    public void initWiremock() {
-        super.initWiremock();
+    public void init() {
+        try {
+            initWiremock();
+            APIManagerAdapter.deleteInstance();
+            CoreParameters coreParameters = new CoreParameters();
+            coreParameters.setHostname("localhost");
+            coreParameters.setUsername("apiadmin");
+            coreParameters.setPassword(Utils.getEncryptedPassword());
+            apiManagerAdapter = APIManagerAdapter.getInstance();
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @AfterClass
@@ -28,19 +38,8 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
     // APIManagerUserAdapter apiManagerUserAdapter = new APIManagerUserAdapter();
     String loginName = "usera";
 
-    public void setupParameters() throws AppException {
-        APIManagerAdapter.deleteInstance();
-        CoreParameters coreParameters = new CoreParameters();
-        coreParameters.setHostname("localhost");
-        coreParameters.setUsername("test");
-        coreParameters.setPassword(Utils.getEncryptedPassword());
-
-    }
-
     @Test
     public void getUsers() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
         User user = apiManagerUserAdapter.getUser(userFilter);
@@ -49,8 +48,6 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     @Test
     public void deleteUser() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
         User user = apiManagerUserAdapter.getUser(userFilter);
@@ -63,8 +60,6 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     @Test
     public void updateUser() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
         User user = apiManagerUserAdapter.getUser(userFilter);
@@ -78,8 +73,6 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     @Test
     public void updateUserCreateNewUserFlow() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         User user = new User();
         user.setEmail("updated@axway.com");
@@ -91,8 +84,6 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     @Test
     public void changePassword() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
         User user = apiManagerUserAdapter.getUser(userFilter);
@@ -105,8 +96,6 @@ public class APIManagerUserAdapterTest extends WiremockWrapper {
 
     @Test
     public void addImage() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         APIManagerUserAdapter apiManagerUserAdapter = apiManagerAdapter.userAdapter;
         UserFilter userFilter = new UserFilter.Builder().hasLoginName(loginName).build();
         User user = apiManagerUserAdapter.getUser(userFilter);

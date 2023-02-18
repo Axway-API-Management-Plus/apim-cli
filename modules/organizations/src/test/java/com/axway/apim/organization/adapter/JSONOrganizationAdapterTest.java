@@ -2,9 +2,7 @@ package com.axway.apim.organization.adapter;
 
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
 import com.axway.apim.organization.lib.OrgImportParams;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -20,8 +18,6 @@ public class JSONOrganizationAdapterTest extends WiremockWrapper {
 	@BeforeClass
 	public void init() {
 		initWiremock();
-		new CoreParameters();
-		TestIndicator.getInstance().setTestRunning(true);
 	}
 
 	@AfterClass

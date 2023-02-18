@@ -4,7 +4,6 @@ import com.axway.apim.WiremockWrapper;
 import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -15,7 +14,6 @@ public class APIManagerConfigAdapterTest extends WiremockWrapper {
 	@BeforeClass
 	public void init() {
 		initWiremock();
-		TestIndicator.getInstance().setTestRunning(true);
 	}
 
 	@AfterClass

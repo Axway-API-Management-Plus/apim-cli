@@ -58,10 +58,6 @@ public class StandardExportCLIOptions extends CLIOptions {
         cliOptions.addOption(option);
     }
 
-    @Override
-    public void addInternalOption(Option option) {
-        cliOptions.addInternalOption(option);
-    }
 
     @Override
     public void parse() throws AppException {

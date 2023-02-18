@@ -15,7 +15,6 @@ import com.axway.apim.lib.DoNothingCacheManager;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.TestIndicator;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.*;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -106,14 +105,8 @@ public class APIManagerAdapter {
 
     public static synchronized APIManagerAdapter getInstance() throws AppException {
         if (APIManagerAdapter.instance == null) {
-            if (!TestIndicator.getInstance().isTestRunning()) {
-                APIManagerAdapter.instance = new APIManagerAdapter();
-                LOG.info("Successfully connected to API-Manager ({}) on: {}", getApiManagerVersion(), CoreParameters.getInstance().getAPIManagerURL());
-            } else {
-                APIManagerAdapter.apiManagerVersion = "7.7.0";
-                APIManagerAdapter.instance = new APIManagerAdapter();
-                LOG.info("Successfully connected to MOCKED API-Manager {}", getApiManagerVersion());
-            }
+            APIManagerAdapter.instance = new APIManagerAdapter();
+            LOG.info("Successfully connected to API-Manager ({}) on: {}", getApiManagerVersion(), CoreParameters.getInstance().getAPIManagerURL());
         }
         APIManagerAdapter.initialized = true;
         return APIManagerAdapter.instance;
@@ -126,8 +119,7 @@ public class APIManagerAdapter {
             LOG.trace("Cache Closed.");
         }
         if (APIManagerAdapter.instance != null) {
-            if (!TestIndicator.getInstance().isTestRunning())
-                APIManagerAdapter.instance.logoutFromAPIManager();
+            APIManagerAdapter.instance.logoutFromAPIManager();
             APIManagerAdapter.instance = null;
         }
         APIManagerAdapter.apiManagerVersion = null;
@@ -139,16 +131,11 @@ public class APIManagerAdapter {
         cmd = CoreParameters.getInstance();
         cmd.validateRequiredParameters();
         this.configAdapter = new APIManagerConfigAdapter();
-        if (TestIndicator.getInstance().isTestRunning()) {
-            this.hasAdminAccount = true; // For unit tests we have an admin account
-        } else {
-            // No need to login, when running unit tests
-            loginToAPIManager();
-            Config config = configAdapter.getConfig(false);
-            APIManagerAdapter.apiManagerVersion = config.getProductVersion();
-            if (usingOrgAdmin)
-                LOG.info("Organization Administrator Self Service Enabled : {}", config.getOadminSelfServiceEnabled());
-        }
+        loginToAPIManager();
+        Config config = configAdapter.getConfig(false);
+        APIManagerAdapter.apiManagerVersion = config.getProductVersion();
+        if (usingOrgAdmin)
+            LOG.info("Organization Administrator Self Service Enabled : {}", config.getOadminSelfServiceEnabled());
         // For now this okay, may be replaced with a Factory later
         this.customPropertiesAdapter = new APIManagerCustomPropertiesAdapter();
         this.alertsAdapter = new APIManagerAlertsAdapter();

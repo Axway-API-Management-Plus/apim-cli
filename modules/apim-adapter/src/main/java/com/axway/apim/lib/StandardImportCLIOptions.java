@@ -38,11 +38,7 @@ public class StandardImportCLIOptions extends CLIOptions {
 	public void addOption(Option option) {
 		cliOptions.addOption(option);
 	}
-
-	@Override
-	public void addInternalOption(Option option) {
-		cliOptions.addInternalOption(option);
-	}
+	
 
 	@Override
 	public void parse() throws AppException{

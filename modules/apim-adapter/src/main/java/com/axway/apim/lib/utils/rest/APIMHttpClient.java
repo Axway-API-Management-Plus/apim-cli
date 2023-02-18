@@ -28,7 +28,6 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 
 import java.net.URI;
-import java.util.HashMap;
 
 /**
  * The interface to the API-Manager itself responsible to set up the underlying HTTPS-Communication.
@@ -39,6 +38,8 @@ import java.util.HashMap;
  */
 public class APIMHttpClient {
 
+    int timeout = 30000;
+
 
     private HttpClient httpClient;
     private PoolingHttpClientConnectionManager httpClientConnectionManager;
@@ -48,7 +49,7 @@ public class APIMHttpClient {
     private static APIMHttpClient apimHttpClient;
 
     public static APIMHttpClient getInstance() throws AppException {
-        if(apimHttpClient == null){
+        if (apimHttpClient == null) {
             apimHttpClient = new APIMHttpClient();
         }
         return apimHttpClient;
@@ -57,6 +58,7 @@ public class APIMHttpClient {
     public static void deleteInstances() {
         apimHttpClient = null;
     }
+
     private APIMHttpClient() throws AppException {
         CoreParameters params = CoreParameters.getInstance();
         createConnection(params.getAPIManagerURL());
@@ -83,7 +85,11 @@ public class APIMHttpClient {
             clientContext.setCookieStore(cookieStore);
             httpClientConnectionManager.setMaxPerRoute(new HttpRoute(targetHost), 2);
             // We have make sure, that cookies are correclty parsed!
+
             RequestConfig.Builder defaultRequestConfig = RequestConfig.custom()
+                    .setConnectTimeout(timeout)
+                    .setSocketTimeout(timeout)
+                    .setConnectionRequestTimeout(timeout)
                     .setCookieSpec(CookieSpecs.STANDARD);
             CoreParameters params = CoreParameters.getInstance();
             HttpClientBuilder clientBuilder = HttpClientBuilder.create()
@@ -106,7 +112,6 @@ public class APIMHttpClient {
             if (params.isDisableCompression())
                 clientBuilder.disableContentCompression();
             clientBuilder.setDefaultRequestConfig(defaultRequestConfig.build());
-           // clientBuilder.addInterceptorLast()
             this.httpClient = clientBuilder.build();
         } catch (Exception e) {
             throw new AppException("Can't create connection to API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
@@ -116,22 +121,26 @@ public class APIMHttpClient {
     public HttpClient getHttpClient() {
         return httpClient;
     }
+
     public HttpClientContext getClientContext() {
         return clientContext;
     }
+
     public String getCsrfToken() {
         return csrfToken;
     }
+
     public void setCsrfToken(String csrfToken) {
         this.csrfToken = csrfToken;
     }
+
     @Override
     public String toString() {
         return "APIMHttpClient [cookieStore=" + cookieStore + ", csrfToken=" + csrfToken + "]";
     }
 
-    public void close(){
-        if(httpClientConnectionManager != null){
+    public void close() {
+        if (httpClientConnectionManager != null) {
             httpClientConnectionManager.close();
         }
     }

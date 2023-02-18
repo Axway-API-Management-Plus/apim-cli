@@ -3,7 +3,6 @@ package com.axway.apim.lib;
 import com.axway.apim.adapter.CacheType;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.TestIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +105,7 @@ public class CoreParameters implements Parameters {
     }
 
     public static synchronized CoreParameters getInstance() {
-        if (CoreParameters.instance == null && TestIndicator.getInstance().isTestRunning()) {
+        if (CoreParameters.instance == null) {
             try {
                 return new CoreParameters(); // Skip this, just return an empty CommandParams to avoid NPE
             } catch (Exception ignore) {
@@ -440,7 +439,6 @@ public class CoreParameters implements Parameters {
 
 
     public void validateRequiredParameters() throws AppException {
-        if (TestIndicator.getInstance().isTestRunning()) return;
         boolean parameterMissing = false;
         if (getUsername() == null) {
             parameterMissing = true;

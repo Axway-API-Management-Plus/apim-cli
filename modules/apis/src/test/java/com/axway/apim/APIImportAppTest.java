@@ -26,4 +26,18 @@ public class APIImportAppTest extends WiremockWrapper {
         int returnCode = APIImportApp.importAPI(args);
         Assert.assertEquals(returnCode, 7);
     }
+
+    @Test
+    public void importApiMCliHelp() {
+        String[] args = {"-help"};
+        int returnCode = APIImportApp.importAPI(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
+    public void importApiMCliVersion() {
+        String[] args = {"-v"};
+        int returnCode = APIImportApp.importAPI(args);
+        Assert.assertEquals(returnCode, 0);
+    }
 }

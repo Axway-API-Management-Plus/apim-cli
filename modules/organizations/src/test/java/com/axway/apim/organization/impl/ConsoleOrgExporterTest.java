@@ -3,8 +3,10 @@ package com.axway.apim.organization.impl;
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.organization.lib.OrgExportCLIOptions;
 import com.axway.apim.organization.lib.OrgExportParams;
 import org.testng.annotations.AfterClass;
@@ -15,9 +17,21 @@ import java.util.List;
 
 public class ConsoleOrgExporterTest extends WiremockWrapper {
 
+    private APIManagerAdapter apimanagerAdapter;
+
     @BeforeClass
     public void init() {
-        initWiremock();
+        try {
+            initWiremock();
+            APIManagerAdapter.deleteInstance();
+            CoreParameters coreParameters = new CoreParameters();
+            coreParameters.setHostname("localhost");
+            coreParameters.setUsername("apiadmin");
+            coreParameters.setPassword(Utils.getEncryptedPassword());
+            apimanagerAdapter = APIManagerAdapter.getInstance();
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @AfterClass
@@ -27,11 +41,9 @@ public class ConsoleOrgExporterTest extends WiremockWrapper {
 
     @Test
     public void testConsoleExport() throws AppException {
-        String[] args = {"-h", "localhost"};
+        String[] args = {};
         OrgExportParams params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
-        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         OrgResultHandler exporter = OrgResultHandler.create(OrgResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
         List<Organization> organizations = apimanagerAdapter.orgAdapter.getOrgs(exporter.getFilter());
         ConsoleOrgExporter consoleOrgExporter = new ConsoleOrgExporter(params, result);
@@ -40,11 +52,9 @@ public class ConsoleOrgExporterTest extends WiremockWrapper {
 
     @Test
     public void tesCVSExportWide() throws AppException {
-        String[] args = {"-h", "localhost", "-wide"};
+        String[] args = {"localhost", "-wide"};
         OrgExportParams params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
-        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         OrgResultHandler exporter = OrgResultHandler.create(OrgResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
         List<Organization> organizations = apimanagerAdapter.orgAdapter.getOrgs(exporter.getFilter());
         ConsoleOrgExporter consoleOrgExporter = new ConsoleOrgExporter(params, result);
@@ -53,11 +63,9 @@ public class ConsoleOrgExporterTest extends WiremockWrapper {
 
     @Test
     public void tesCVSExportUltra() throws AppException {
-        String[] args = {"-h", "localhost", "-ultra"};
+        String[] args = {"-ultra"};
         OrgExportParams params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
-        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         OrgResultHandler exporter = OrgResultHandler.create(OrgResultHandler.ResultHandler.CONSOLE_EXPORTER, params, result);
         List<Organization> organizations = apimanagerAdapter.orgAdapter.getOrgs(exporter.getFilter());
         ConsoleOrgExporter consoleOrgExporter = new ConsoleOrgExporter(params, result);
