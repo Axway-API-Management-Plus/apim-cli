@@ -6,7 +6,6 @@ import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.*;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -25,13 +24,11 @@ public class APIFilterTest {
 	
 	@BeforeClass
 	public void setupTestIndicator() {
-		TestIndicator.getInstance().setTestRunning(true);
 		APIManagerAdapter.apiManagerVersion = "7.7";
 	}
 	
 	@AfterClass
 	public void removeTestIndicator() {
-		TestIndicator.getInstance().setTestRunning(false);
 		APIManagerAdapter.apiManagerVersion = null;
 	}
 	
@@ -67,7 +64,7 @@ public class APIFilterTest {
 	}
 	
 	@Test
-	public void filterWithPath() throws IOException {
+	public void filterWithPath() {
 		// For this test, we must simulate API-Manager version >7.7
 		APIManagerAdapter.apiManagerVersion = "7.7.20200130";
 		APIFilter filter = new APIFilter.Builder()

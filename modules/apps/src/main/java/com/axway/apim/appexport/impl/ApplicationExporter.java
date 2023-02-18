@@ -20,12 +20,14 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 
 public abstract class ApplicationExporter {
 
-    protected static Logger LOG = LoggerFactory.getLogger(ApplicationExporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationExporter.class);
 
     private final HashMap<String, String> userIdToLogin = new HashMap<>();
 
     public enum ResultHandler {
         JSON_EXPORTER(JsonApplicationExporter.class),
+        YAML_EXPORTER(YamlApplicationExporter.class),
+
         CONSOLE_EXPORTER(ConsoleAppExporter.class),
         CSV_EXPORTER(CSVAppExporter.class),
         DELETE_APP_HANDLER(DeleteAppHandler.class);

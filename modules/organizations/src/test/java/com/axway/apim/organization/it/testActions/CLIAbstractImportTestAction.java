@@ -10,6 +10,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 public abstract class CLIAbstractImportTestAction extends CLIAbstractTestAction implements TestParams {
 
@@ -52,13 +53,13 @@ public abstract class CLIAbstractImportTestAction extends CLIAbstractTestAction 
 		OutputStream os = null;
 		try {
 			String baseFileName = configFile.getName();
-			String config = IOUtils.toString(new FileInputStream(configFile), StandardCharsets.UTF_8); 
+			String config = IOUtils.toString(Files.newInputStream(configFile.toPath()), StandardCharsets.UTF_8);
 			String replacedConfig = context.replaceDynamicContentInString(config);
 			
 			configFile = new File(testDirectory, baseFileName);
 			configFile.createNewFile();
 			
-			os = new FileOutputStream(configFile);
+			os = Files.newOutputStream(configFile.toPath());
 			IOUtils.write(replacedConfig, os, StandardCharsets.UTF_8);
 			LOG.info("Successfully created test configuration file: " + configFile);
 			return configFile;
@@ -79,7 +80,7 @@ public abstract class CLIAbstractImportTestAction extends CLIAbstractTestAction 
 		if(!sourceDir.exists()) {
 			throw new ValidationException("Unable to copy test assets to test directory: '"+testDir+"'. Could not find sourceDir: '"+sourceDir+"'");
 		}
-		FileFilter filter = new WildcardFileFilter(new String[] {"*.crt", "*.jpg", "*.png", "*.pem"});
+		FileFilter filter = new WildcardFileFilter("*.crt", "*.jpg", "*.png", "*.pem");
 		try {
 			LOG.info("Copy *.crt, *.jpg, *.png, *.pem from source: "+sourceDir+" into test-dir: '"+testDir+"'");
 			FileUtils.copyDirectory(sourceDir, testDir, filter, true);

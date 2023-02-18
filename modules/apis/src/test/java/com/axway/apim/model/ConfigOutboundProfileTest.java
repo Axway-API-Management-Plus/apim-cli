@@ -4,7 +4,6 @@ import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.utils.TestIndicator;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
@@ -32,7 +31,6 @@ public class ConfigOutboundProfileTest extends WiremockWrapper {
 	
 	@Test
 	public void testProfilesEquality() throws IOException {
-		TestIndicator.getInstance().setTestRunning(true);
 		APIManagerAdapter.deleteInstance();
 		CoreParameters coreParameters = new CoreParameters();
 		coreParameters.setHostname("localhost");

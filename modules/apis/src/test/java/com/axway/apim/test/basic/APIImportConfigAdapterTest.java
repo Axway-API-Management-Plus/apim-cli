@@ -75,7 +75,6 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         params.setProperties(props);
         params.setHostname("localhost");
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/api-config-with-variables.json").getFile();
-
         APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "notRelavantForThis Test", null);
         DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
         Assert.assertEquals(apiConfig.getBackendBasepath(), "resolvedToSomethingElse");
@@ -279,5 +278,29 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         Assert.assertEquals(apiConfig.getDescriptionManual(), "THIS IS THE API-DESCRIPTION FROM A LOCAL MARKDOWN!\n"
                 + "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.\n"
                 + "THIS IS THE SECOND API-DESCRIPTION FROM A LOCAL MARKDOWN!");
+    }
+
+    @Test
+    public void testYamlConfig() throws AppException {
+        APIImportParams params = new APIImportParams();
+        params.setHostname("localhost");
+        params.setUsername("apiadmin");
+        params.setPassword(Utils.getEncryptedPassword());
+        String testConfig = this.getClass().getResource("/com/axway/apim/test/files/yaml/api-config.yaml").getFile();
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, null);
+        adapter.getDesiredAPI();
+        DesiredAPI apiConfig = (DesiredAPI) adapter.getApiConfig();
+        Assert.assertNotNull(apiConfig);
+    }
+
+    @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Error reading API-Config file\\(s\\)")
+    public void testInvalidConfig() throws AppException {
+        APIImportParams params = new APIImportParams();
+        params.setHostname("localhost");
+        params.setUsername("apiadmin");
+        params.setPassword(Utils.getEncryptedPassword());
+        String testConfig = this.getClass().getResource("/com/axway/apim/test/files/yaml/invalid-config.xml").getFile();
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, null);
+        adapter.getDesiredAPI();
     }
 }

@@ -4,18 +4,16 @@ import com.axway.apim.WiremockWrapper;
 import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.lib.StandardImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class JSONAPIManagerConfigAdapterTest extends WiremockWrapper {
+public class APIManagerConfigAdapterTest extends WiremockWrapper {
 
 	@BeforeClass
 	public void init() {
 		initWiremock();
-		TestIndicator.getInstance().setTestRunning(true);
 	}
 
 	@AfterClass
@@ -33,7 +31,7 @@ public class JSONAPIManagerConfigAdapterTest extends WiremockWrapper {
 		String configFileName = this.getClass().getClassLoader().getResource(PACKAGE + "apimanager-config.json").getFile();
 		importParams.setConfig(configFileName);
 		importParams.setHostname("localhost");
-		JSONAPIManagerConfigAdapter adapter = new JSONAPIManagerConfigAdapter(importParams);
+		APIManagerConfigAdapter adapter = new APIManagerConfigAdapter(importParams);
 		APIManagerConfig managerConfig = adapter.getManagerConfig();
 		Assert.assertEquals(managerConfig.getConfig().getPortalName(), "My API Manager");
 		Assert.assertTrue(managerConfig.getConfig().getGlobalFaultHandlerPolicy().getId().startsWith("<key"));
@@ -47,7 +45,7 @@ public class JSONAPIManagerConfigAdapterTest extends WiremockWrapper {
 		importParams.setConfig(configFileName);
 		importParams.setStage("test-stage");
 		importParams.setHostname("localhost");
-		JSONAPIManagerConfigAdapter adapter = new JSONAPIManagerConfigAdapter(importParams);
+		APIManagerConfigAdapter adapter = new APIManagerConfigAdapter(importParams);
 		APIManagerConfig managerConfig = adapter.getManagerConfig();
 		Assert.assertEquals(managerConfig.getConfig().getPortalName(), "Axway API Manager Test-Stage");
 	}
@@ -59,7 +57,7 @@ public class JSONAPIManagerConfigAdapterTest extends WiremockWrapper {
 		importParams.setConfig(configFileName);
 		importParams.setStage("invalid-stage");
 		importParams.setHostname("localhost");
-		JSONAPIManagerConfigAdapter adapter = new JSONAPIManagerConfigAdapter(importParams);
+		APIManagerConfigAdapter adapter = new APIManagerConfigAdapter(importParams);
 		APIManagerConfig managerConfig = adapter.getManagerConfig();
 		Assert.assertEquals(managerConfig.getConfig().getPortalName(), "My API Manager");
 	}
@@ -71,7 +69,7 @@ public class JSONAPIManagerConfigAdapterTest extends WiremockWrapper {
 		importParams.setConfig(configFileName);
 		importParams.setHostname("localhost");
 		importParams.setStageConfig("staged-apimanager-config.json");
-		JSONAPIManagerConfigAdapter adapter = new JSONAPIManagerConfigAdapter(importParams);
+		APIManagerConfigAdapter adapter = new APIManagerConfigAdapter(importParams);
 		APIManagerConfig managerConfig = adapter.getManagerConfig();
 		Assert.assertEquals(managerConfig.getConfig().getPortalHostname(), "staged-portal-hostname");
 	}

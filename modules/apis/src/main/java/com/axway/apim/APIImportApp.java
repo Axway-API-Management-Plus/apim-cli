@@ -96,8 +96,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			APIPropertiesExport.getInstance().store();
 			return 0;
 		} catch (AppException ap) {
-			APIPropertiesExport.getInstance().store(); // Try to create it, even 
-			
+			APIPropertiesExport.getInstance().store(); // Try to create it, even
 			if(!ap.getError().equals(ErrorCode.NO_CHANGE)) {
 				RollbackHandler rollback = RollbackHandler.getInstance();
 				rollback.executeRollback();

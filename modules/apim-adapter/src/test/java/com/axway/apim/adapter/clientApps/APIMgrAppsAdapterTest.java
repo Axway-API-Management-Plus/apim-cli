@@ -5,7 +5,6 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
 import com.axway.apim.lib.utils.Utils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -25,21 +24,21 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 	private final String testHostname = "localhost";
 	private final int testPort = 8075;
 
-	@BeforeClass
-	public void initWiremock() {
-		super.initWiremock();
-		CoreParameters coreParameters = new CoreParameters();
-		coreParameters.setHostname(testHostname);
-		coreParameters.setPort(testPort);
-	}
+	private APIManagerAdapter apiManagerAdapter;
 
-	public void setupParams() throws AppException {
-		APIManagerAdapter.deleteInstance();
-		CoreParameters coreParameters = new CoreParameters();
-		coreParameters.setHostname(testHostname);
-		coreParameters.setPort(testPort);
-		coreParameters.setUsername("test");
-		coreParameters.setPassword(Utils.getEncryptedPassword());
+	@BeforeClass
+	public void init() {
+		try {
+			initWiremock();
+			APIManagerAdapter.deleteInstance();
+			CoreParameters coreParameters = new CoreParameters();
+			coreParameters.setHostname("localhost");
+			coreParameters.setUsername("apiadmin");
+			coreParameters.setPassword(Utils.getEncryptedPassword());
+			apiManagerAdapter = APIManagerAdapter.getInstance();
+		} catch (AppException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@AfterClass
@@ -149,24 +148,21 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void getApplications() throws AppException {
-		setupParams();
-		APIMgrAppsAdapter appAdapter = APIManagerAdapter.getInstance().appAdapter;
+		APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
 		List<ClientApplication> clientApplications = appAdapter.getAllApplications(false);
 		Assert.assertNotNull(clientApplications);
 	}
 
 	@Test
 	public void getAppsSubscribedWithAPI() throws AppException {
-		setupParams();
-		APIMgrAppsAdapter appAdapter = APIManagerAdapter.getInstance().appAdapter;
+		APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
 		List<ClientApplication> clientApplications = appAdapter.getAppsSubscribedWithAPI("e4ded8c8-0a40-4b50-bc13-552fb7209150");
 		Assert.assertNotNull(clientApplications);
 	}
 
 	@Test
 	public void getApplication() throws AppException {
-		setupParams();
-		APIMgrAppsAdapter appAdapter = APIManagerAdapter.getInstance().appAdapter;
+		APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
 		ClientApplication clientApplication = appAdapter.getApplication(new ClientAppFilter.Builder().hasName("Test App 2008").build());
 		Assert.assertEquals(clientApplication.getName(), "Test App 2008");
 	}
@@ -174,8 +170,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void deleteApplication() throws AppException {
-		setupParams();
-		APIMgrAppsAdapter appAdapter = APIManagerAdapter.getInstance().appAdapter;
+		APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
 		ClientApplication clientApplication = appAdapter.getApplication(new ClientAppFilter.Builder().hasName("Test App 2008").build());
 		try {
 			appAdapter.deleteApplication(clientApplication);
@@ -187,10 +182,8 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
 	@Test
 	public void updateApplication() throws AppException {
-		setupParams();
-		APIMgrAppsAdapter appAdapter = APIManagerAdapter.getInstance().appAdapter;
+		APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
 		ClientApplication clientApplication = appAdapter.getApplication(new ClientAppFilter.Builder().hasName("Test App 2008").build());
-
 		ClientApplication updatedApplication = new ClientApplication();
 		updatedApplication.setName("test");
 		updatedApplication.setId(clientApplication.getId());
@@ -203,9 +196,8 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 	}
 
 	@Test
-	public void createApplication() throws AppException {
-		setupParams();
-		APIMgrAppsAdapter appAdapter = APIManagerAdapter.getInstance().appAdapter;
+	public void createApplication() {
+		APIMgrAppsAdapter appAdapter = apiManagerAdapter.appAdapter;
 		ClientApplication clientApplication = new ClientApplication();
 		clientApplication.setName("test");
 		try {

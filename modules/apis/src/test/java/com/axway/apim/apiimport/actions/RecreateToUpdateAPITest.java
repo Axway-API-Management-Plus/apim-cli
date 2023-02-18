@@ -10,7 +10,6 @@ import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
 import com.axway.apim.lib.utils.Utils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -23,7 +22,6 @@ public class RecreateToUpdateAPITest extends WiremockWrapper {
     @BeforeClass
     public void initWiremock() {
         super.initWiremock();
-        TestIndicator.getInstance().setTestRunning(true);
     }
 
     @AfterClass

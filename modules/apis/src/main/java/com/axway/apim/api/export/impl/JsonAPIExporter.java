@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ public class JsonAPIExporter extends APIResultHandler {
         for (API api : apis) {
             ExportAPI exportAPI = new ExportAPI(api);
             try {
-                saveAPILocally(exportAPI);
+                saveAPILocally(exportAPI, this);
             } catch (AppException e) {
                 LOG.error("Error in export", e);
                 throw e;
@@ -73,7 +74,7 @@ public class JsonAPIExporter extends APIResultHandler {
         return builder.build();
     }
 
-    private void saveAPILocally(ExportAPI exportAPI) throws AppException {
+    public void saveAPILocally(ExportAPI exportAPI, APIResultHandler apiResultHandler) throws AppException {
 
         String apiPath = getAPIExportFolder(exportAPI.getPath());
         File localFolder = new File(this.givenExportFolder + File.separator + getVHost(exportAPI) + apiPath);
@@ -86,6 +87,7 @@ public class JsonAPIExporter extends APIResultHandler {
             return;
         }
         String targetFile = null;
+        String configFile;
         try {
             targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension();
             if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKED_URL)) {
@@ -95,7 +97,14 @@ public class JsonAPIExporter extends APIResultHandler {
         } catch (IOException e) {
             throw new AppException("Can't save API-Definition locally to file: " + targetFile, ErrorCode.UNXPECTED_ERROR, e);
         }
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper;
+        if(apiResultHandler instanceof YamlAPIExporter){
+            mapper = new ObjectMapper(new YAMLFactory());
+            configFile = "/api-config.yaml";
+        }else {
+            mapper = new ObjectMapper();
+            configFile = "/api-config.json";
+        }
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIExportSerializerModifier()));
         mapper.setSerializationInclusion(Include.NON_NULL);
         FilterProvider filters = new SimpleFilterProvider()
@@ -107,7 +116,7 @@ public class JsonAPIExporter extends APIResultHandler {
         mapper.setFilterProvider(filters);
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File(localFolder.getCanonicalPath() + "/api-config.json"), exportAPI);
+            mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), exportAPI);
         } catch (Exception e) {
             throw new AppException("Can't create API-Configuration file for API: '" + exportAPI.getName() + "' exposed on path: '" + exportAPI.getPath() + "'.", ErrorCode.UNXPECTED_ERROR, e);
         }

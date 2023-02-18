@@ -3,7 +3,6 @@ package com.axway.apim.lib;
 import com.axway.apim.adapter.CacheType;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.utils.TestIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,7 @@ public class CoreParameters implements Parameters {
 
     public static String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
 
-    public static String DEFAULT_API_BASEPATH = "/api/portal/v1.4";
+    private static final String DEFAULT_API_BASEPATH = "/api/portal/v1.4";
 
     private URI apiManagerUrl = null;
 
@@ -60,8 +59,6 @@ public class CoreParameters implements Parameters {
 
     private String hostname;
 
-    private String apiBasepath;
-
     private int port = -1;
 
     private String username;
@@ -82,8 +79,6 @@ public class CoreParameters implements Parameters {
 
     private Boolean rollback = true;
 
-    private String confDir;
-
     private Boolean ignoreCache = false;
 
     private String apimCLIHome;
@@ -98,6 +93,8 @@ public class CoreParameters implements Parameters {
 
     private int retryDelay;
 
+    private int timeout;
+
     private boolean disableCompression;
 
     public CoreParameters() {
@@ -106,7 +103,7 @@ public class CoreParameters implements Parameters {
     }
 
     public static synchronized CoreParameters getInstance() {
-        if (CoreParameters.instance == null && TestIndicator.getInstance().isTestRunning()) {
+        if (CoreParameters.instance == null) {
             try {
                 return new CoreParameters(); // Skip this, just return an empty CommandParams to avoid NPE
             } catch (Exception ignore) {
@@ -170,13 +167,9 @@ public class CoreParameters implements Parameters {
         return port;
     }
 
-    public void setApiBasepath(String apiBasepath) {
-        this.apiBasepath = apiBasepath;
-    }
 
     public String getApiBasepath() {
-        if (apiBasepath == null) return DEFAULT_API_BASEPATH;
-        return apiBasepath;
+        return DEFAULT_API_BASEPATH;
     }
 
     public String getUsername() {
@@ -193,7 +186,7 @@ public class CoreParameters implements Parameters {
     }
 
     public String getPassword() {
-        if(password != null)
+        if (password != null)
             return password;
         if (getFromProperties("password") != null) {
             return getFromProperties("password");
@@ -317,13 +310,6 @@ public class CoreParameters implements Parameters {
         this.rollback = rollback;
     }
 
-    public String getConfDir() {
-        return confDir;
-    }
-
-    public void setConfDir(String confDir) {
-        this.confDir = confDir;
-    }
 
     public boolean isIgnoreCache() {
         return ignoreCache;
@@ -387,14 +373,27 @@ public class CoreParameters implements Parameters {
         }
         try {
             this.retryDelay = Integer.parseInt(retryDelay);
-            LOG.info("Retrying unexpected API-Manager REST-API responses with a delay of " + this.retryDelay + " milliseconds.");
+            LOG.info("Retrying unexpected API-Manager REST-API responses with a delay of {} milliseconds.", this.retryDelay);
         } catch (Exception e) {
-            LOG.error("Error while parsing given retryDelay: '" + retryDelay + "' as a milliseconds. Using default of 1000 milliseconds.");
+            LOG.error("Error while parsing given retryDelay: {} as a milliseconds. Using default of 1000 milliseconds.", retryDelay);
         }
     }
 
-    public void setRetryDelay(int retryDelay) {
-        this.retryDelay = retryDelay;
+    public int getTimeout() {
+        if (timeout == 0) return 30000;
+        return timeout;
+    }
+
+    public void setTimeout(String timeout) {
+        if (timeout == null) {
+            return;
+        }
+        try {
+            this.timeout = Integer.parseInt(timeout);
+            LOG.info("API Manager timeout : {} milliseconds", timeout);
+        } catch (Exception e) {
+            LOG.error("Error while parsing given timeout : {}", timeout);
+        }
     }
 
     public Boolean isZeroDowntimeUpdate() {
@@ -430,8 +429,8 @@ public class CoreParameters implements Parameters {
                 try {
                     cachesList.add(CacheType.valueOf(cacheName));
                 } catch (IllegalArgumentException e) {
-                    LOG.error("Unknown cache: " + cacheName + " configured.");
-                    LOG.error("Available caches: " + Arrays.asList(CacheType.values()));
+                    LOG.error("Unknown cache: {} configured.", cacheName);
+                    LOG.error("Available caches: {}", Arrays.asList(CacheType.values()));
                 }
             }
         }
@@ -440,7 +439,6 @@ public class CoreParameters implements Parameters {
 
 
     public void validateRequiredParameters() throws AppException {
-        if (TestIndicator.getInstance().isTestRunning()) return;
         boolean parameterMissing = false;
         if (getUsername() == null) {
             parameterMissing = true;

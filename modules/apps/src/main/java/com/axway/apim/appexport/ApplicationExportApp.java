@@ -90,6 +90,8 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
             switch (params.getOutputFormat()) {
                 case json:
                     return runExport(params, ResultHandler.JSON_EXPORTER, result);
+                case yaml:
+                    return runExport(params, ResultHandler.YAML_EXPORTER, result);
                 case csv:
                     return runExport(params, ResultHandler.CSV_EXPORTER, result);
                 default:

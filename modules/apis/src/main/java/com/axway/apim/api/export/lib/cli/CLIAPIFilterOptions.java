@@ -120,10 +120,6 @@ public class CLIAPIFilterOptions extends CLIOptions {
 		cliOptions.addOption(option);
 	}
 
-	@Override
-	public void addInternalOption(Option option) {
-		cliOptions.addInternalOption(option);
-	}
 	
 	@Override
 	public String getValue(String key) {

@@ -52,6 +52,14 @@ public class APIExportAppTest extends WiremockWrapper {
     }
 
     @Test
+    public void testExportApiYaml() {
+        String[] args = {"-h", "localhost", "-o", "yaml", "-id", "e4ded8c8-0a40-4b50-bc13-552fb7209150", "-deleteTarget"};
+        int returnCode = APIExportApp.exportAPI(args);
+        Assert.assertEquals(returnCode, 0);
+
+    }
+
+    @Test
     public void testExportApiDat() {
         String[] args = {"-h", "localhost", "-id", "e4ded8c8-0a40-4b50-bc13-552fb7209150", "-o", "dat", "-deleteTarget"};
         int returnCode = APIExportApp.exportAPI(args);
@@ -103,6 +111,14 @@ public class APIExportAppTest extends WiremockWrapper {
         InputStream in = new ByteArrayInputStream(input.getBytes());
         System.setIn(in);
         int returnCode = APIExportApp.approve(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+
+    @Test
+    public void testChange() {
+        String[] args = {"-h", "localhost", "-n", "petstore", "-newBackend", "https://api.axway.com", "-force"};
+        int returnCode = APIExportApp.change(args);
         Assert.assertEquals(returnCode, 0);
     }
 

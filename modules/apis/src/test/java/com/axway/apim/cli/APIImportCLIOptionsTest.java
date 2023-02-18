@@ -54,7 +54,7 @@ public class APIImportCLIOptionsTest {
 	
 	@Test
 	public void testToggles() throws AppException {
-		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-replaceHostInSwagger", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreQuotas", "-updateOnly"};
+		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreQuotas", "-updateOnly"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertTrue(params.isForce());

@@ -28,8 +28,8 @@ public class JsonApplicationExporterTest extends WiremockWrapper {
     }
 
     @Test
-    public void tesJsonExport() throws AppException {
-        String[] args = {"-h", "localhost"};
+    public void testJsonExport() throws AppException {
+        String[] args = {"-h", "localhost", "-deleteTarget"};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
         APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();

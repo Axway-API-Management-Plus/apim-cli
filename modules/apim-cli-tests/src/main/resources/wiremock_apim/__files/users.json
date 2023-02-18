@@ -1,15 +1,15 @@
 [
   {
-    "id": "40dd53a4-0b13-4485-82e8-63c687404c2f",
-    "name": "API Administrator",
-    "description": "API Administrator",
-    "loginName": "apiadmin",
-    "email": "apiadmin@localhost",
-    "role": "admin",
+    "id": "7463fb84-25ff-4a0c-8bb0-0c548f821e7b",
+    "organizationId": "9379ee58-312e-46b3-a06c-dc413d593603",
+    "name": "Anna Owen 2172",
+    "loginName": "testoadmin",
+    "email": "anna-2172@axway.com",
+    "role": "oadmin",
     "enabled": true,
-    "createdOn": 1670957709050,
+    "createdOn": 1676353349983,
     "state": "approved",
     "type": "internal",
-    "dn": "cn=apiadmin,ou=organizations,ou=APIPortal"
+    "dn": "cn=testoadmin,o=API Development 2172,ou=organizations,ou=APIPortal"
   }
 ]

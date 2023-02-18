@@ -17,11 +17,12 @@ import com.axway.apim.lib.errorHandling.ErrorCode;
 import com.axway.apim.organization.lib.OrgExportParams;
 
 public abstract class OrgResultHandler {
-	
-	protected static Logger LOG = LoggerFactory.getLogger(OrgResultHandler.class);
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(OrgResultHandler.class);
+
 	public enum ResultHandler {
 		JSON_EXPORTER(JsonOrgExporter.class),
+		YAML_EXPORTER(YamlOrgExporter.class),
 		CONSOLE_EXPORTER(ConsoleOrgExporter.class),
 		ORG_DELETE_HANDLER(DeleteOrgHandler.class);
 		

@@ -23,9 +23,21 @@ import java.util.Map;
 
 public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 
+	private APIManagerAdapter apiManagerAdapter;
+
 	@BeforeClass
-	public void initWiremock() {
-		super.initWiremock();
+	public void init() {
+		try {
+			initWiremock();
+			APIManagerAdapter.deleteInstance();
+			CoreParameters coreParameters = new CoreParameters();
+			coreParameters.setHostname("localhost");
+			coreParameters.setUsername("apiadmin");
+			coreParameters.setPassword(Utils.getEncryptedPassword());
+			apiManagerAdapter = APIManagerAdapter.getInstance();
+		} catch (AppException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@AfterClass
@@ -34,19 +46,9 @@ public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 	}
 	
 
-	public void setupParameters() throws AppException {
-		APIManagerAdapter.deleteInstance();
-		CoreParameters coreParameters = new CoreParameters();
-		coreParameters.setHostname("localhost");
-		coreParameters.setUsername("test");
-		coreParameters.setPassword(Utils.getEncryptedPassword());
-
-	}
 	@Test
 	public void loadActualAPI() throws IOException {
-
-		setupParameters();
-		APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
+		APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
 		APIFilter filter = new APIFilter.Builder()
 				.hasId("e4ded8c8-0a40-4b50-bc13-552fb7209150")
 				.build();
@@ -56,8 +58,7 @@ public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 	
 	@Test
 	public void testTranslateMethodToName() throws IOException {
-		setupParameters();
-		APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
+		APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
 		APIFilter filter = new APIFilter.Builder()
 				.translateMethods(METHOD_TRANSLATION.AS_NAME)
 				.hasId("e4ded8c8-0a40-4b50-bc13-552fb7209150")
@@ -80,8 +81,7 @@ public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 	
 	@Test
 	public void testTranslateMethodToId() throws IOException {
-		setupParameters();
-		APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
+		APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
 		APIFilter filter = new APIFilter.Builder()
 				.hasId("e4ded8c8-0a40-4b50-bc13-552fb7209150")
 				.build();
@@ -100,9 +100,7 @@ public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 	
 	@Test
 	public void testTranslatePolicyToExternalName() throws IOException {
-
-		setupParameters();
-		APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
+		APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
 		// Get the API to test with
 		APIFilter filter = new APIFilter.Builder()
 				.translatePolicies(POLICY_TRANSLATION.TO_NAME)
@@ -119,8 +117,7 @@ public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 	
 	@Test
 	public void loadAPIIncludingQuota() throws IOException {
-		setupParameters();
-		APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
+		APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
 		APIFilter filter = new APIFilter.Builder()
 				.includeQuotas(true)
 				.includeClientApplications(true)
@@ -142,9 +139,7 @@ public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 	
 	@Test
 	public void loadAPIIncludingClientOrgs() throws IOException {
-
-		setupParameters();
-		APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
+		APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
 		APIFilter filter = new APIFilter.Builder()
 				.includeClientOrganizations(true)
 				.hasId("e4ded8c8-0a40-4b50-bc13-552fb7209150")
@@ -158,9 +153,7 @@ public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 	
 	@Test
 	public void loadAPIIncludingClientApps() throws IOException {
-
-		setupParameters();
-		APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
+		APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
 		APIFilter filter = new APIFilter.Builder()
 				.includeClientApplications(true)
 				.includeQuotas(true)
@@ -178,9 +171,7 @@ public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 	
 	@Test
 	public void testGetAllAPIMethods() throws IOException {
-
-		setupParameters();
-		APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().methodAdapter;
+		APIManagerAPIMethodAdapter methodAdapter = apiManagerAdapter.methodAdapter;
 		List<APIMethod> methods = methodAdapter.getAllMethodsForAPI("e4ded8c8-0a40-4b50-bc13-552fb7209150");
 
 		// We must find two APIs, as we not limited the search to the VHost
@@ -193,8 +184,7 @@ public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 	
 	@Test
 	public void testGetMethodForName() throws IOException {
-		setupParameters();
-		APIManagerAPIMethodAdapter methodAdapter = APIManagerAdapter.getInstance().methodAdapter;
+		APIManagerAPIMethodAdapter methodAdapter = apiManagerAdapter.methodAdapter;
 		APIMethod method = methodAdapter.getMethodForName("e4ded8c8-0a40-4b50-bc13-552fb7209150", "deletePet");
 		Assert.assertEquals(method.getName(), "deletePet");
 	}

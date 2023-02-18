@@ -2,6 +2,7 @@ package com.axway.apim.organization.adapter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -23,19 +24,19 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-public class JSONOrgAdapter extends OrgAdapter {
-
-    private final ObjectMapper mapper = new ObjectMapper();
+public class OrgConfigAdapter extends OrgAdapter {
 
     OrgImportParams importParams;
 
-    public JSONOrgAdapter(OrgImportParams params) {
+    public OrgConfigAdapter(OrgImportParams params) {
         this.importParams = params;
         this.result = new Result(); // Not used, to be refactored
     }
 
     public void readConfig() throws AppException {
+        ObjectMapper mapper = new ObjectMapper();
         String config = importParams.getConfig();
         String stage = importParams.getStage();
 
@@ -45,6 +46,14 @@ public class JSONOrgAdapter extends OrgAdapter {
         List<Organization> baseOrgs;
         // Try to read a list of organizations
         try {
+            try {
+                // Check the config file is json
+                mapper.readTree(configFile);
+                LOG.debug("Handling JSON Configuration file: {}", configFile);
+            }catch (IOException ioException){
+                mapper = new ObjectMapper(new YAMLFactory());
+                LOG.debug("Handling Yaml Configuration file: {}", configFile);
+            }
             baseOrgs = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<List<Organization>>() {
             });
             if (stageConfig != null) {

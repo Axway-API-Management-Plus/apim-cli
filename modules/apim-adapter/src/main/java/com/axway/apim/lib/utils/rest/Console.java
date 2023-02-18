@@ -6,6 +6,10 @@ public class Console {
         System.out.println(message);
     }
 
+    public static void print(String message){
+        System.out.print(message);
+    }
+
     public static void println(){
         System.out.println();
     }

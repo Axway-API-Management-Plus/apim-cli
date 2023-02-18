@@ -9,7 +9,7 @@ import com.axway.apim.api.model.QuotaRestrictiontype;
 import com.axway.apim.api.model.apps.*;
 import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
+import com.axway.apim.lib.utils.Utils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -22,11 +22,9 @@ import static org.testng.Assert.*;
 public class JSONClientAppAdapterTest extends WiremockWrapper {
     private static final String testPackage = "/com/axway/apim/appimport/adapter";
 
-
     @BeforeClass
     public void init() {
         initWiremock();
-        TestIndicator.getInstance().setTestRunning(true);
     }
 
     @AfterClass
@@ -40,8 +38,10 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         assertTrue(new File(testFile).exists(), "Test file doesn't exists");
         AppImportParams importParams = new AppImportParams();
         importParams.setHostname("localhost");
+        importParams.setUsername("apiadmin");
+        importParams.setPassword(Utils.getEncryptedPassword());
         importParams.setConfig(testFile);
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
     }
@@ -52,8 +52,10 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         assertTrue(new File(testFile).exists(), "Test file doesn't exists");
         AppImportParams importParams = new AppImportParams();
         importParams.setHostname("localhost");
+        importParams.setUsername("apiadmin");
+        importParams.setPassword(Utils.getEncryptedPassword());
         importParams.setConfig(testFile);
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
     }
@@ -64,9 +66,11 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         assertTrue(new File(testFile).exists(), "Test file doesn't exists");
         AppImportParams importParams = new AppImportParams();
         importParams.setHostname("localhost");
+        importParams.setUsername("apiadmin");
+        importParams.setPassword(Utils.getEncryptedPassword());
         importParams.setConfig(testFile);
         importParams.setStage("test-stage");
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
         ClientApplication app = apps.get(0);
@@ -80,8 +84,10 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         assertTrue(new File(testFile).exists(), "Test file doesn't exists");
         AppImportParams importParams = new AppImportParams();
         importParams.setHostname("localhost");
+        importParams.setUsername("apiadmin");
+        importParams.setPassword(Utils.getEncryptedPassword());
         importParams.setConfig(testFile);
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 2, "Expected 2 app returned from the Adapter");
     }
@@ -93,10 +99,10 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         AppImportParams importParams = new AppImportParams();
         importParams.setConfig(testFile);
         importParams.setHostname("localhost");
+        importParams.setUsername("apiadmin");
+        importParams.setPassword(Utils.getEncryptedPassword());
         importParams.setStage("test-stage");
-        importParams.setHostname("localhost");
-
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
         adapter.getApplications();
     }
 
@@ -106,8 +112,10 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         assertTrue(new File(testFile).exists(), "Test file doesn't exists");
         AppImportParams importParams = new AppImportParams();
         importParams.setHostname("localhost");
+        importParams.setUsername("apiadmin");
+        importParams.setPassword(Utils.getEncryptedPassword());
         importParams.setConfig(testFile);
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
 
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
@@ -158,8 +166,10 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         assertTrue(new File(testFile).exists(), "Test file doesn't exists");
         AppImportParams importParams = new AppImportParams();
         importParams.setHostname("localhost");
+        importParams.setUsername("apiadmin");
+        importParams.setPassword(Utils.getEncryptedPassword());
         importParams.setConfig(testFile);
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
 
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");
@@ -197,7 +207,9 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         AppImportParams importParams = new AppImportParams();
         importParams.setConfig(testFile);
         importParams.setHostname("localhost");
-        ClientAppAdapter adapter = new JSONConfigClientAppAdapter(importParams);
+        importParams.setUsername("apiadmin");
+        importParams.setPassword(Utils.getEncryptedPassword());
+        ClientAppAdapter adapter = new ClientAppConfigAdapter(importParams);
 
         List<ClientApplication> apps = adapter.getApplications();
         assertEquals(apps.size(), 1, "Expected 1 app returned from the Adapter");

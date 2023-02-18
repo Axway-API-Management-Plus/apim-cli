@@ -13,28 +13,32 @@ import org.testng.annotations.Test;
 
 public class APIStatusManagerTest extends WiremockWrapper {
 
+    private APIManagerAdapter apiManagerAdapter;
+
     @BeforeClass
-    public void initWiremock() {
-        super.initWiremock();
+    public void init() {
+        try {
+            initWiremock();
+            APIManagerAdapter.deleteInstance();
+            CoreParameters coreParameters = new CoreParameters();
+            coreParameters.setHostname("localhost");
+            coreParameters.setUsername("apiadmin");
+            coreParameters.setPassword(Utils.getEncryptedPassword());
+            apiManagerAdapter = APIManagerAdapter.getInstance();
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @AfterClass
     public void close() {
         super.close();
     }
-    public void setupParameters() throws AppException {
-        APIManagerAdapter.deleteInstance();
-        CoreParameters coreParameters = new CoreParameters();
-        coreParameters.setHostname("localhost");
-        coreParameters.setUsername("test");
-        coreParameters.setPassword(Utils.getEncryptedPassword());
 
-    }
     @Test
     public void updateStateUnpublished() throws AppException {
-        setupParameters();
         APIStatusManager apiStatusManager = new APIStatusManager();
-        APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
+        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
         APIFilter apiFilter = new APIFilter.Builder().hasName("petstore").build();
         API api = apiManagerAPIAdapter.getAPI(apiFilter, false);
         apiStatusManager.update(api, "unpublished", true);
@@ -42,11 +46,10 @@ public class APIStatusManagerTest extends WiremockWrapper {
 
     @Test
     public void updateStateUnpublishedAndVhost() throws AppException {
-        setupParameters();
         APIStatusManager apiStatusManager = new APIStatusManager();
-        APIManagerAPIAdapter apiManagerAPIAdapter = APIManagerAdapter.getInstance().apiAdapter;
+        APIManagerAPIAdapter apiManagerAPIAdapter = apiManagerAdapter.apiAdapter;
         APIFilter apiFilter = new APIFilter.Builder().hasName("petstore").build();
         API api = apiManagerAPIAdapter.getAPI(apiFilter, false);
-        apiStatusManager.update(api, "published",  "api.axway.com", true);
+        apiStatusManager.update(api, "published", "api.axway.com", true);
     }
 }

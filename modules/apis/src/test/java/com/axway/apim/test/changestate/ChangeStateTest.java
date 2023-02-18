@@ -6,9 +6,7 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.ActualAPI;
 import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -21,12 +19,6 @@ public class ChangeStateTest {
     @BeforeClass
     public void prepareTest() {
         APIManagerAdapter.apiManagerVersion = "7.7.20221130";
-        TestIndicator.getInstance().setTestRunning(true);
-    }
-
-    @AfterClass
-    public void afterTest() {
-        TestIndicator.getInstance().setTestRunning(false);
     }
 
     @Test

@@ -1,6 +1,9 @@
 package com.axway.apim.config;
 
 import com.axway.apim.api.API;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.eclipse.jetty.http.HttpVersion;
@@ -87,23 +90,34 @@ public class GenerateTemplateTest {
         HttpsURLConnection.setDefaultHostnameVerifier ((hostname, session) -> true);
         GenerateTemplate generateTemplate = new GenerateTemplate();
         API api = new API();
-        generateTemplate.downloadCertificates(api, "config.json", "https://localhost:8443");
+        String filePath = generateTemplate.downloadCertificatesAndContent(api, "config.json", "https://localhost:8443/openapi.json");
+        Assert.assertNotNull(filePath);
         Assert.assertEquals(1, api.getCaCerts().size());
     }
 
     @Test
+    public void testDownloadContent() throws IOException {
+        GenerateTemplate generateTemplate = new GenerateTemplate();
+        String filePath = generateTemplate.downloadContent( "config.json", "http://localhost:7070/openapi.json");
+        Assert.assertNotNull(filePath);
+    }
+
+    @Test
     public void testGenerateAPIConfigWithHttpEndpoint() throws IOException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "http://localhost:7070/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey"};
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "http://localhost:7070/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "apiKey"};
         GenerateTemplate.generate(args);
         DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
         Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
         Assert.assertEquals("published", documentContext.read("$.state"));
         Assert.assertEquals("/api/v3", documentContext.read("$.path"));
+        Assert.assertEquals("apiKey", documentContext.read("$.securityProfiles[0].devices[0].type"));
+        Assert.assertEquals("apiKey", documentContext.read("$.authenticationProfiles[0].type"));
+
     }
 
     @Test
     public void testGenerateAPIConfigWithHttpsEndpoint() throws IOException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "https://localhost:8443/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey"};
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "https://localhost:8443/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "apiKey"};
         GenerateTemplate.generate(args);
         DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
         Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
@@ -113,19 +127,22 @@ public class GenerateTemplateTest {
 
     @Test
     public void testLocalApiSpecYaml() throws IOException {
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "http://localhost:7070/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey", "-o", "yaml"};
+        String[] args = {"template", "generate", "-c", "api-config.yaml", "-a", "http://localhost:7070/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "apiKey", "-o", "yaml"};
         GenerateTemplate.generate(args);
-        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
+        ObjectMapper objectMapperYaml = new ObjectMapper(new YAMLFactory());
+        JsonNode jsonNode = objectMapperYaml.readTree(Files.newInputStream(Paths.get("api-config.yaml")));
+        ObjectMapper objectMapper = new ObjectMapper();
+        DocumentContext documentContext = JsonPath.parse(objectMapper.writeValueAsString(jsonNode));
         Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
         Assert.assertEquals("published", documentContext.read("$.state"));
         Assert.assertEquals("/api/v3", documentContext.read("$.path"));
-        Assert.assertTrue(new File("openapi.yaml").exists());
+
     }
 
     @Test
     public void testLocalApiSpecJsonWithHttps() throws IOException {
 
-        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "https://localhost:8443/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apikey", "-frontendAuthType", "apikey", "-o", "json"};
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "https://localhost:8443/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "apiKey", "-o", "json"};
         int returnCode = GenerateTemplate.generate(args);
         Assert.assertEquals(returnCode, 0);
         DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));

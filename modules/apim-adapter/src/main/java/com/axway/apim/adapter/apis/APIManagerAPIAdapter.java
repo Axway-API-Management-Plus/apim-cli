@@ -93,7 +93,7 @@ public class APIManagerAPIAdapter {
                     Utils.progressPercentage(i, apis.size(), "Loading details of " + apis.size() + " APIs");
             }
             Utils.addCustomPropertiesForEntity(apis, this.apiManagerResponse.get(filter), filter);
-            if (logProgress && apis.size() > 5) System.out.print("\n");
+            if (logProgress && apis.size() > 5) Console.print("\n");
         } catch (IOException e) {
             throw new AppException("Cannot read APIs from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
