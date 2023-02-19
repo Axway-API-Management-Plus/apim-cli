@@ -142,7 +142,7 @@ public class CoreParameters implements Parameters {
         this.hostname = hostname;
     }
 
-    public String getHostname2() throws URISyntaxException {
+    public String getHostname2() {
         if (this.apiManagerUrl != null) {
             return this.apiManagerUrl.getHost();
         } else {
@@ -473,9 +473,6 @@ public class CoreParameters implements Parameters {
         return this.properties.get(key);
     }
 
-    public List<CacheType> getEnabledCacheTypes() {
-        return null;
-    }
 
     public boolean isDisableCompression() {
         return disableCompression;
