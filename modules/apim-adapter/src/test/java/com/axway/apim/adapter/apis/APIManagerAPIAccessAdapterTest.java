@@ -8,6 +8,7 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.errorHandling.AppException;
 import com.axway.apim.lib.utils.Utils;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -34,6 +35,11 @@ public class APIManagerAPIAccessAdapterTest extends WiremockWrapper {
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @AfterClass
+    public void close() {
+        super.close();
     }
 
     @Test
