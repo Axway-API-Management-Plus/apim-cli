@@ -28,7 +28,6 @@ public class APIManagerAlertsAdapterTest extends WiremockWrapper {
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @AfterClass

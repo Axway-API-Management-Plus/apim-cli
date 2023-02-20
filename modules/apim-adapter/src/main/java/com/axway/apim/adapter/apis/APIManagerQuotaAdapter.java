@@ -69,13 +69,14 @@ public class APIManagerQuotaAdapter {
     ObjectMapper mapper = new ObjectMapper();
 
     private final CoreParameters cmd;
+    private final Map<String, String> apiManagerResponse = new HashMap<>();
+
 
     public APIManagerQuotaAdapter() {
         cmd = CoreParameters.getInstance();
         applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
     }
 
-    public Map<String, String> apiManagerResponse = new HashMap<>();
 
     private void readQuotaFromAPIManager(String quotaId) throws AppException {
         if (!APIManagerAdapter.hasAdminAccount()) return;
@@ -196,7 +197,7 @@ public class APIManagerQuotaAdapter {
                     apiRestrictions.add(restriction);
                 }
             }
-            if (apiRestrictions.size() == 0) return null;
+            if (apiRestrictions.isEmpty()) return null;
             APIQuota apiQuota = new APIQuota();
             apiQuota.setDescription(quotaConfig.getDescription());
             apiQuota.setName(quotaConfig.getName());
