@@ -61,7 +61,6 @@ public class APIManagerRemoteHostsAdapter {
                 apiManagerResponse.put(filter, response);
             }
         } catch (Exception e) {
-            LOG.error("Error cant read remoteHosts from API-Manager. Can't parse response: ", e);
             throw new AppException("Can't read remoteHosts from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }

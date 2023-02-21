@@ -196,7 +196,7 @@ public class APIManagerAPIAccessAdapter {
                         LOG.error("Error creating/updating API Access: {} Response-Code: {} Response Body: {}", apiAccess, statusCode, response);
                         throw new AppException("Error creating/updating API Access. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                     } else {
-                        LOG.info("Successfully created API-Access on retry. Received Status-Code: " + statusCode);
+                        LOG.info("Successfully created API-Access on retry. Received Status-Code: {}", statusCode);
                     }
                 } else if (statusCode == 409 && response.contains("resource already exists")) {
                     LOG.info("Unexpected response while creating/updating API Access: {} Response-Code: {} Response Body: {} Ignoring this error.", apiAccess, statusCode, response);

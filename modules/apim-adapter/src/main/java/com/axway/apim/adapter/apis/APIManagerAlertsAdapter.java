@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 public class APIManagerAlertsAdapter {
 
@@ -56,8 +57,7 @@ public class APIManagerAlertsAdapter {
                 }
                 apiManagerResponse = response;
             }
-        } catch (Exception e) {
-            LOG.error("Error cant read alerts from API-Manager. Can't parse response: ", e);
+        } catch (IOException | URISyntaxException e) {
             throw new AppException("Can't read alerts from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -84,22 +84,18 @@ public class APIManagerAlertsAdapter {
                     SimpleBeanPropertyFilter.serializeAllExcept());
             mapper.setFilterProvider(filter);
             mapper.setSerializationInclusion(Include.NON_NULL);
-            try {
-                RestAPICall request;
-                String json = mapper.writeValueAsString(alerts);
-                HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                request = new POSTRequest(entity, uri);
-                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
-                    if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error updating API-Manager alert configuration. Response-Code: {} Response Body: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()) + "'");
-                        throw new AppException("Error updating API-Manager alert configuration. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
-                    }
+            RestAPICall request;
+            String json = mapper.writeValueAsString(alerts);
+            HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+            request = new POSTRequest(entity, uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode < 200 || statusCode > 299) {
+                    LOG.error("Error updating API-Manager alert configuration. Response-Code: {} Response Body: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                    throw new AppException("Error updating API-Manager alert configuration. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-            } catch (Exception e) {
-                throw new AppException("Error updating API-Manager alert configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
             }
-        } catch (Exception e) {
+        } catch (URISyntaxException | IOException e) {
             throw new AppException("Error updating API-Manager alert configuration.", ErrorCode.CANT_CREATE_API_PROXY, e);
         }
     }

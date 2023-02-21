@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
@@ -51,12 +50,7 @@ public class JsonAPIExporter extends APIResultHandler {
     public void execute(List<API> apis) throws AppException {
         for (API api : apis) {
             ExportAPI exportAPI = new ExportAPI(api);
-            try {
-                saveAPILocally(exportAPI, this);
-            } catch (AppException e) {
-                LOG.error("Error in export", e);
-                throw e;
-            }
+            saveAPILocally(exportAPI, this);
         }
     }
 
@@ -78,7 +72,7 @@ public class JsonAPIExporter extends APIResultHandler {
 
         String apiPath = getAPIExportFolder(exportAPI.getPath());
         File localFolder = new File(this.givenExportFolder + File.separator + getVHost(exportAPI) + apiPath);
-        LOG.debug("Going to export API: {} into folder: {} ", exportAPI.toStringShort(), localFolder);
+        LOG.debug("Going to export API: {} into folder: {} ", exportAPI, localFolder);
         validateFolder(localFolder);
         APISpecification apiDef = exportAPI.getAPIDefinition();
         // Skip processing if API definition is not available due to original API cloned and deleted.
@@ -127,7 +121,7 @@ public class JsonAPIExporter extends APIResultHandler {
         if (exportAPI.getCaCerts() != null && !exportAPI.getCaCerts().isEmpty()) {
             storeCaCerts(localFolder, exportAPI.getCaCerts());
         }
-        LOG.info("Successfully exported API: {} into folder: {}", exportAPI.toStringShort(), localFolder.getAbsolutePath());
+        LOG.info("Successfully exported API: {} into folder: {}", exportAPI.getName(), localFolder.getAbsolutePath());
         if (!APIManagerAdapter.hasAdminAccount()) {
             LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
             LOG.warn("- No Quotas has been exported for the API");
@@ -160,22 +154,5 @@ public class JsonAPIExporter extends APIResultHandler {
                 }
             }
         }
-    }
-
-    private static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
-        try (FileOutputStream fileOutputStream = new FileOutputStream(fileDest)) {
-            fileOutputStream.write(bFile);
-        } catch (IOException e) {
-            throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
-        }
-    }
-
-    private String getAPIExportFolder(String apiExposurePath) {
-        if (apiExposurePath.startsWith("/"))
-            apiExposurePath = apiExposurePath.replaceFirst("/", "");
-        if (apiExposurePath.endsWith("/"))
-            apiExposurePath = apiExposurePath.substring(0, apiExposurePath.length() - 1);
-        apiExposurePath = apiExposurePath.replace("/", "-");
-        return apiExposurePath;
     }
 }
