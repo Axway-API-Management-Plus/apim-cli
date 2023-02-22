@@ -21,9 +21,9 @@ import com.axway.apim.apiimport.rollback.RollbackHandler;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.APIPropertiesExport;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 
 /**

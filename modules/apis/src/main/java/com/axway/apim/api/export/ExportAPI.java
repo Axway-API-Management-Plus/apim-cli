@@ -2,12 +2,12 @@ package com.axway.apim.api.export;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.apiSpecification.APISpecification;
-import com.axway.apim.api.apiSpecification.WSDLSpecification;
+import com.axway.apim.api.specification.APISpecification;
+import com.axway.apim.api.specification.WSDLSpecification;
 import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

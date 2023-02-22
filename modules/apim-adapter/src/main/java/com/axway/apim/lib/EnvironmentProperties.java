@@ -1,6 +1,6 @@
 package com.axway.apim.lib;
 
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;

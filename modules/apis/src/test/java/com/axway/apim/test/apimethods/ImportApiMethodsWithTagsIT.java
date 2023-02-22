@@ -1,7 +1,7 @@
 package com.axway.apim.test.apimethods;
 
 import com.axway.apim.export.test.ExportTestAction;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;

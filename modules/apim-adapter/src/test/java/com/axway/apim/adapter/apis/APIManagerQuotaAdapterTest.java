@@ -4,7 +4,7 @@ import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

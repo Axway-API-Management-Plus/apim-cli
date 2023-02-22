@@ -5,7 +5,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.ActualAPI;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

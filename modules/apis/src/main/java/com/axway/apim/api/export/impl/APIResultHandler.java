@@ -33,8 +33,8 @@ import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.lib.Result;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 
 public abstract class APIResultHandler {

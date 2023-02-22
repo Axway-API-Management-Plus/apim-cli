@@ -2,7 +2,7 @@ package com.axway.apim.lib;
 
 import org.apache.commons.cli.Option;
 
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public class CoreCLIOptions extends CLIOptions {
 

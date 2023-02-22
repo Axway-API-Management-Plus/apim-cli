@@ -1,6 +1,6 @@
 package com.axway.apim.api.export.lib.cli;
 
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.Option;
 

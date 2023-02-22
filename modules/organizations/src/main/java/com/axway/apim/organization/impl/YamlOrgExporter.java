@@ -2,7 +2,7 @@ package com.axway.apim.organization.impl;
 
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.organization.lib.ExportOrganization;
 import com.axway.apim.organization.lib.OrgExportParams;
 import org.slf4j.Logger;

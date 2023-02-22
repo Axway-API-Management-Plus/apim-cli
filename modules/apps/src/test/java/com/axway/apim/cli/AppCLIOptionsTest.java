@@ -7,7 +7,7 @@ import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -28,7 +28,7 @@ public class AppCLIOptionsTest {
     @BeforeClass
     private void init() throws IOException, URISyntaxException {
         URI uri = this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI();
-        apimCliHome =  Paths.get(uri) + File.separator + "apimcli";
+        apimCliHome = Paths.get(uri) + File.separator + "apimcli";
         String confPath = String.valueOf(Files.createDirectories(Paths.get(apimCliHome + "/conf")).toAbsolutePath());
         try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("env.properties");
              OutputStream outputStream = Files.newOutputStream(new File(confPath, "env.properties").toPath())) {
@@ -75,6 +75,15 @@ public class AppCLIOptionsTest {
         Assert.assertEquals(params.getCredential(), "*9877979779*");
         Assert.assertEquals(params.getRedirectUrl(), "*localhost*");
         Assert.assertNotNull(params.getProperties(), "Properties should never be null. They must be created as a base or per stage.");
+    }
+
+    @Test
+    public void testPrintUsage() {
+        String[] args = {"-help"};
+        try {
+            AppImportCLIOptions.create(args);
+        } catch (AppException e) {
+        }
     }
 
 }

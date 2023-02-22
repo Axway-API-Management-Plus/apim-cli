@@ -3,7 +3,7 @@ package com.axway.apim.setup.impl;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.CustomProperty;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;

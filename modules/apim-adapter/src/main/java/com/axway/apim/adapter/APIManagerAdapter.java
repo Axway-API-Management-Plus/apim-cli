@@ -1,8 +1,8 @@
 package com.axway.apim.adapter;
 
 import com.axway.apim.adapter.apis.*;
-import com.axway.apim.adapter.clientApps.APIMgrAppsAdapter;
-import com.axway.apim.adapter.customProperties.APIManagerCustomPropertiesAdapter;
+import com.axway.apim.adapter.client.apps.APIMgrAppsAdapter;
+import com.axway.apim.adapter.custom.properties.APIManagerCustomPropertiesAdapter;
 import com.axway.apim.adapter.user.APIManagerUserAdapter;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Config;
@@ -13,8 +13,8 @@ import com.axway.apim.lib.APIMCLICacheManager;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.DoNothingCacheManager;
 import com.axway.apim.lib.StandardImportParams;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.*;
 import com.fasterxml.jackson.databind.JsonNode;

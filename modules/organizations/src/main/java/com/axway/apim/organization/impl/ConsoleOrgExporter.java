@@ -14,7 +14,7 @@ import com.axway.apim.api.model.AbstractEntity;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.organization.lib.OrgExportParams;
 import com.github.freva.asciitable.AsciiTable;

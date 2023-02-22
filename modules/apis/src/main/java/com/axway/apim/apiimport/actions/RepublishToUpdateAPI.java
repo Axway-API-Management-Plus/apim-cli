@@ -11,7 +11,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.CoreParameters.Mode;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public class RepublishToUpdateAPI {
 

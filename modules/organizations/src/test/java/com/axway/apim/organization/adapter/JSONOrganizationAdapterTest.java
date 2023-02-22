@@ -2,7 +2,7 @@ package com.axway.apim.organization.adapter;
 
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.organization.lib.OrgImportParams;
 import org.testng.annotations.AfterClass;

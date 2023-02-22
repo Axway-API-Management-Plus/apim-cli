@@ -12,8 +12,8 @@ import com.axway.apim.adapter.user.UserFilter.Builder;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.users.lib.params.UserExportParams;
 
 public abstract class UserResultHandler {

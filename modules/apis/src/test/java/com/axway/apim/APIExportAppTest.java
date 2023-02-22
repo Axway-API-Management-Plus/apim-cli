@@ -1,5 +1,6 @@
 package com.axway.apim;
 
+import com.beust.ah.A;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -150,6 +151,24 @@ public class APIExportAppTest extends WiremockWrapper {
         String[] args = {"-h", "localhost", "-n", "petstore", "-days", "1000"};
         int returnCode = APIExportApp.checkCertificates(args);
         Assert.assertEquals(returnCode, 101);
+    }
+
+    @Test
+    public void testGetName(){
+        APIExportApp apiExportApp = new APIExportApp();
+        Assert.assertEquals(apiExportApp.getName(), "API - E X P O R T / U T I L S");
+    }
+
+    @Test
+    public void testGetGroupDescription(){
+        APIExportApp apiExportApp = new APIExportApp();
+        Assert.assertEquals(apiExportApp.getGroupDescription(), "Manage your APIs");
+    }
+
+    @Test
+    public void testGroupId(){
+        APIExportApp apiExportApp = new APIExportApp();
+        Assert.assertEquals(apiExportApp.getGroupId(), "api");
     }
 
 }

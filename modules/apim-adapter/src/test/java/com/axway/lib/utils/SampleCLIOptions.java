@@ -4,7 +4,7 @@ import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.Parameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public class SampleCLIOptions extends CLIOptions {
 

@@ -15,7 +15,7 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.lib.StandardExportParams;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;

@@ -3,14 +3,14 @@ package com.axway.apim.appexport.impl;
 import java.util.List;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter.Builder;
+import com.axway.apim.adapter.client.apps.ClientAppFilter;
+import com.axway.apim.adapter.client.apps.ClientAppFilter.Builder;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;

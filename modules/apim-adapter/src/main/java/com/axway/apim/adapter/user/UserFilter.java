@@ -12,7 +12,7 @@ import org.apache.http.message.BasicNameValuePair;
 
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.CustomPropertiesFilter;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public class UserFilter implements CustomPropertiesFilter {
 

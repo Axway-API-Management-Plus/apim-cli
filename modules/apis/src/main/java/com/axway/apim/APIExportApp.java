@@ -12,9 +12,9 @@ import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.Result;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,7 +177,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
             Result result = resultHandler.getResult();
             List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(filter, true);
 
-            if (apis.size() == 0) {
+            if (apis.isEmpty()) {
                 if (LOG.isDebugEnabled()) {
                     LOG.info("No APIs found using filter: {}", filter);
                 } else {
@@ -210,6 +210,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
                 // make sure the cache is updated, even an exception is thrown
                 APIManagerAdapter.deleteInstance();
             } catch (Exception ignore) {
+                LOG.error("Problem in  deleteInstance");
             }
         }
     }
@@ -237,7 +238,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
             APIFilter filter = resultHandler.getFilter();
             List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(filter, true);
 
-            if (apis.size() == 0) {
+            if (apis.isEmpty()) {
                 LOG.info("No published APIs found using filter: {}", filter);
             } else {
                 LOG.info("{} API(s) selected.", apis.size());

@@ -2,7 +2,7 @@ package com.axway.apim.config;
 
 import com.axway.apim.config.model.GenerateTemplateParameters;
 import com.axway.apim.lib.CLIOptions;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.testng.Assert;

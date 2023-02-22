@@ -2,7 +2,7 @@ package com.axway.lib;
 
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.lib.utils.SampleCLIOptions;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;

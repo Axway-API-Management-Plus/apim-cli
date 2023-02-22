@@ -3,7 +3,7 @@ package com.axway.apim.apiimport;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.DesiredAPISpecification;
 import com.axway.apim.api.model.ServiceProfile;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -61,7 +61,7 @@ public class DesiredAPI extends API {
         }
         this.backendBasepath = backendBasepath;
     }
-
+    @Override
     public String getApiDefinitionImport() {
         return apiDefinitionImport;
     }

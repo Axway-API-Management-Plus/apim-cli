@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Retry-Delay does not appear in help text (See issue [#349](https://github.com/Axway-API-Management-Plus/apim-cli/issues/349))
 - Dat file is not exported if Export API with an Organization that have a virtual host containing a ":" (See issue [#352](https://github.com/Axway-API-Management-Plus/apim-cli/issues/352))
+- backendBasepath not working correctly when server url missing in swagger (See issue [#348](https://github.com/Axway-API-Management-Plus/apim-cli/issues/348))
 
 ### Added
 - Support yaml configuration for apim cli

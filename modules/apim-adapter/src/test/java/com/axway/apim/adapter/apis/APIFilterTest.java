@@ -5,13 +5,12 @@ import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.*;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

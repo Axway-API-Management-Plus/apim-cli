@@ -4,7 +4,7 @@ import com.axway.apim.apiimport.lib.cli.CLIAPIImportOptions;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreParameters.Mode;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

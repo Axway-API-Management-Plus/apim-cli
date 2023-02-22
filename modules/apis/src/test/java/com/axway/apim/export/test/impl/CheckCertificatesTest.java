@@ -7,7 +7,7 @@ import com.axway.apim.api.export.lib.cli.CLICheckCertificatesOptions;
 import com.axway.apim.api.export.lib.params.APICheckCertificatesParams;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.lib.Result;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.ErrorCode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

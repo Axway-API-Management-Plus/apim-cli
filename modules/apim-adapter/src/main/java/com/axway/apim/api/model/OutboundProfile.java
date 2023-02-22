@@ -2,7 +2,7 @@ package com.axway.apim.api.model;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.jackson.PolicyDeserializer;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.commons.lang3.StringUtils;

@@ -7,7 +7,7 @@ import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.lib.APIPropertiesExport;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

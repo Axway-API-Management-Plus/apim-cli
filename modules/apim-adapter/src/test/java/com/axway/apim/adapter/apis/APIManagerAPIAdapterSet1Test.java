@@ -10,7 +10,7 @@ import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.QuotaRestrictiontype;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;

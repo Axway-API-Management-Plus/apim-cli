@@ -1,6 +1,6 @@
 package com.axway.lib;
 
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

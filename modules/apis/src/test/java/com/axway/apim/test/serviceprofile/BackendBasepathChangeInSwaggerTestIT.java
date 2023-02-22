@@ -2,19 +2,17 @@ package com.axway.apim.test.serviceprofile;
 
 import java.io.IOException;
 
-import org.springframework.http.HttpStatus;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.dsl.testng.TestNGCitrusTestRunner;
 import com.consol.citrus.functions.core.RandomNumberFunction;
-import com.consol.citrus.message.MessageType;
 
 @Test
 public class BackendBasepathChangeInSwaggerTestIT extends TestNGCitrusTestRunner {

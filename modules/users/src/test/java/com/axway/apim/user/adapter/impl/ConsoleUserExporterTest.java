@@ -5,7 +5,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.users.impl.UserResultHandler;
 import com.axway.apim.users.lib.cli.UserExportCLIOptions;

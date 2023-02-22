@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerOrganizationAdapter;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 
 public class OrganizationImportManager {
 	

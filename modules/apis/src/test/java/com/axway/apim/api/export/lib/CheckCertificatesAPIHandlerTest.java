@@ -5,7 +5,7 @@ import com.axway.apim.api.export.impl.CheckCertificatesAPIHandler;
 import com.axway.apim.api.export.lib.params.APICheckCertificatesParams;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.lib.StandardExportParams;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;

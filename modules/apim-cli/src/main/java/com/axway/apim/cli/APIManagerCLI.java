@@ -1,6 +1,6 @@
 package com.axway.apim.cli;
 
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

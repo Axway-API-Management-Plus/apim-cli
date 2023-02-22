@@ -6,7 +6,7 @@ import com.axway.apim.api.export.lib.params.*;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

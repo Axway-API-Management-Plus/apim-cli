@@ -6,6 +6,7 @@ import java.io.FilePermission;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -31,8 +32,8 @@ import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.CustomProperty.Option;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.CustomPropertiesFilter;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -343,6 +344,14 @@ public class Utils {
             else newBackendBasePath = backendBasePath + "/" + serverUrl;
         }
         return newBackendBasePath;
+    }
+
+    public static String ignoreBasePath(String serverUrl) {
+        if (isHttpUri(serverUrl) && serverUrl.contains("/")) {
+            URI uri = URI.create(serverUrl);
+            return serverUrl.substring(0, serverUrl.length() - uri.getPath().length());
+        }
+        return serverUrl;
     }
 
     public static boolean compareValues(Object actualValue, Object desiredValue) {

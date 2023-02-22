@@ -2,8 +2,8 @@ package com.axway.apim.adapter;
 
 import com.axway.apim.api.API;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
