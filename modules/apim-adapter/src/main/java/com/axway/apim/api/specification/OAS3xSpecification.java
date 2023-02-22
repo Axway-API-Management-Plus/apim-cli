@@ -84,6 +84,9 @@ public class OAS3xSpecification extends APISpecification {
 
     @Override
     public void configureBasePath(String backendBasePath, API api) throws AppException {
+        if (backendBasePath == null && !openAPI.has("servers")) {
+            throw new AppException("The open API specification doesn't contain a servers section and no backend basePath is given", ErrorCode.CANT_READ_API_DEFINITION_FILE);
+        }
         try {
             if (openAPI.has("servers")) {
                 ArrayNode servers = (ArrayNode) openAPI.get("servers");
@@ -92,33 +95,32 @@ public class OAS3xSpecification extends APISpecification {
                     for (int i = 1; i < servers.size(); i++) {
                         servers.remove(i);
                     }
-                    if (backendBasePath != null && !backendBasePath.contains("${env")) { // issue #332
+                    if (!backendBasePath.contains("${env")) { // issue #332
                         JsonNode server = servers.get(0);
                         JsonNode urlJsonNode = server.get("url");
                         if (urlJsonNode != null) {
                             String serverUrl = urlJsonNode.asText();
                             if (!serverUrl.startsWith("http")) { // If url does not have hostname, add hostname from backendBasePath
-                                String backendBasePathWithoutBasePath = Utils.ignoreBasePath(backendBasePath);
-                                backendBasePath = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePathWithoutBasePath);
-                                LOG.info("Updating openapi Servers url with value : {}", backendBasePath);
-                                ObjectNode newServer = createObjectNode("url", backendBasePath);
-                                ((ObjectNode) openAPI).set("servers", mapper.createArrayNode().add(newServer));
+                               updateServerSection(backendBasePath, serverUrl);
                             }
                         }
                     }
                 }
-            }else {
-                if(backendBasePath == null) {
-                    backendBasePath = "/";
-                }
-                ObjectNode newServer = createObjectNode("url", backendBasePath);
-                ((ObjectNode) openAPI).set("servers", mapper.createArrayNode().add(newServer));
-                LOG.warn("Adding openapi Servers url with value : {}", backendBasePath);
+            } else {
+                updateServerSection(backendBasePath, "/");
             }
             this.apiSpecificationContent = this.mapper.writeValueAsBytes(openAPI);
         } catch (Exception e) {
             LOG.error("Cannot replace host in provided Open API. Continue with given host.", e);
         }
+    }
+
+    public void updateServerSection(String backendBasePath, String serverUrl) throws MalformedURLException {
+        String ignoreBasePath = Utils.ignoreBasePath(backendBasePath);
+        backendBasePath = Utils.handleOpenAPIServerUrl(serverUrl, ignoreBasePath);
+        LOG.info("Updating openapi Servers url with value : {}", backendBasePath);
+        ObjectNode newServer = createObjectNode("url", backendBasePath);
+        ((ObjectNode) openAPI).set("servers", mapper.createArrayNode().add(newServer));
     }
 
     @Override
