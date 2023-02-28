@@ -18,6 +18,7 @@ import java.util.Objects;
 
 public class OAS3xSpecification extends APISpecification {
     private static final Logger LOG = LoggerFactory.getLogger(OAS3xSpecification.class);
+    public static final String SERVERS = "servers";
 
     private JsonNode openAPI = null;
 
@@ -64,7 +65,7 @@ public class OAS3xSpecification extends APISpecification {
         try {
             String url = Utils.handleOpenAPIServerUrl(host, basePath);
             ObjectNode newServer = createObjectNode("url", url);
-            ((ObjectNode) openAPI).set("servers", mapper.createArrayNode().add(newServer));
+            ((ObjectNode) openAPI).set(SERVERS, mapper.createArrayNode().add(newServer));
             configureBasePath(basePath, null);
             this.apiSpecificationContent = this.mapper.writeValueAsBytes(openAPI);
         } catch (AppException e) {
@@ -84,18 +85,18 @@ public class OAS3xSpecification extends APISpecification {
 
     @Override
     public void configureBasePath(String backendBasePath, API api) throws AppException {
-        if (backendBasePath == null && !openAPI.has("servers")) {
+        if (backendBasePath == null && !openAPI.has(SERVERS)) {
             throw new AppException("The open API specification doesn't contain a servers section and no backend basePath is given", ErrorCode.CANT_READ_API_DEFINITION_FILE);
         }
         try {
-            if (openAPI.has("servers")) {
-                ArrayNode servers = (ArrayNode) openAPI.get("servers");
+            if (openAPI.has(SERVERS)) {
+                ArrayNode servers = (ArrayNode) openAPI.get(SERVERS);
                 if (!servers.isEmpty()) {
                     // Remove remaining server nodes as  currently not handling multiple URLs
                     for (int i = 1; i < servers.size(); i++) {
                         servers.remove(i);
                     }
-                    if (!backendBasePath.contains("${env")) { // issue #332
+                    if (backendBasePath != null && !backendBasePath.contains("${env")) { // issue #332
                         JsonNode server = servers.get(0);
                         JsonNode urlJsonNode = server.get("url");
                         if (urlJsonNode != null) {
@@ -120,7 +121,7 @@ public class OAS3xSpecification extends APISpecification {
         backendBasePath = Utils.handleOpenAPIServerUrl(serverUrl, ignoreBasePath);
         LOG.info("Updating openapi Servers url with value : {}", backendBasePath);
         ObjectNode newServer = createObjectNode("url", backendBasePath);
-        ((ObjectNode) openAPI).set("servers", mapper.createArrayNode().add(newServer));
+        ((ObjectNode) openAPI).set(SERVERS, mapper.createArrayNode().add(newServer));
     }
 
     @Override
