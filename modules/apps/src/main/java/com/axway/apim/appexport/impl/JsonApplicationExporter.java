@@ -1,7 +1,7 @@
 package com.axway.apim.appexport.impl;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.adapter.client.apps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionSerializer;
 import com.axway.apim.api.model.Image;
@@ -11,8 +11,8 @@ import com.axway.apim.appexport.impl.jackson.AppExportSerializerModifier;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.appexport.model.ExportApplication;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

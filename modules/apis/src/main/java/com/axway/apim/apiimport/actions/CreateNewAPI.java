@@ -15,7 +15,7 @@ import com.axway.apim.apiimport.rollback.RollbackAPIProxy;
 import com.axway.apim.apiimport.rollback.RollbackBackendAPI;
 import com.axway.apim.apiimport.rollback.RollbackHandler;
 import com.axway.apim.lib.APIPropertiesExport;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 import java.util.List;
 import java.util.Map;
@@ -98,7 +98,6 @@ public class CreateNewAPI {
             changes.getDesiredAPI().setId(createdAPI.getId());
             LOG.info("{} Successfully created {} API: {} {} (ID: {})", changes.waiting4Approval(), createdAPI.getState(), createdAPI.getName(), createdAPI.getVersion(), createdAPI.getId());
         } catch (Exception e) {
-            LOG.error("Error creating new API", e);
             throw e;
         } finally {
             if (createdAPI == null) {

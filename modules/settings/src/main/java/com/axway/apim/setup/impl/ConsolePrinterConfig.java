@@ -13,7 +13,7 @@ import com.axway.apim.api.model.Config;
 import com.axway.apim.lib.APIManagerConfigAnnotation;
 import com.axway.apim.lib.APIManagerConfigAnnotation.ConfigType;
 import com.axway.apim.lib.StandardExportParams;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public class ConsolePrinterConfig {
 	

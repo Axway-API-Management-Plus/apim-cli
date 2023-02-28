@@ -1,7 +1,7 @@
 package com.axway.apim.apiimport.actions;
 
 import com.axway.apim.api.model.APIMethod;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

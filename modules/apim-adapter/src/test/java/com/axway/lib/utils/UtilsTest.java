@@ -3,7 +3,7 @@ package com.axway.lib.utils;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -193,6 +193,31 @@ public class UtilsTest {
         String result = Utils.handleOpenAPIServerUrl(serverUrl, backendBasePath);
         Assert.assertEquals(result, "http://backend/api/api/v3");
     }
+
+    @Test
+    public void ignoreBasePath(){
+        String serverUrl = "https://petstore3.swagger.io/api/v3";
+        String result = Utils.ignoreBasePath(serverUrl);
+        Assert.assertEquals(result, "https://petstore3.swagger.io");
+
+    }
+
+    @Test
+    public void ignoreBasePathWithSlash(){
+        String serverUrl = "https://petstore3.swagger.io/";
+        String result = Utils.ignoreBasePath(serverUrl);
+        Assert.assertEquals(result, "https://petstore3.swagger.io");
+
+    }
+
+    @Test
+    public void ignoreBaseDoNothing(){
+        String serverUrl = "https://petstore3.swagger.io";
+        String result = Utils.ignoreBasePath(serverUrl);
+        Assert.assertEquals(result, "https://petstore3.swagger.io");
+
+    }
+
 
     @Test
     public void testGetEncryptedPassword() {

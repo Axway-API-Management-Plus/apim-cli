@@ -3,8 +3,8 @@ package com.axway.apim.api.export.lib.params;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.lib.Parameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 
 public class APIUpgradeAccessParams extends APIExportParams implements Parameters, APIFilterParams {

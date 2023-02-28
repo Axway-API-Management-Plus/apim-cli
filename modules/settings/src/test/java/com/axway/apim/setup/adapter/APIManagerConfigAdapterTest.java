@@ -3,7 +3,7 @@ package com.axway.apim.setup.adapter;
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.lib.StandardImportParams;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;

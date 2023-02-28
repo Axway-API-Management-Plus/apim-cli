@@ -3,17 +3,19 @@ package com.axway.apim.adapter.apis;
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.apiSpecification.APISpecification;
-import com.axway.apim.api.apiSpecification.APISpecificationFactory;
+import com.axway.apim.api.model.Image;
+import com.axway.apim.api.specification.APISpecification;
+import com.axway.apim.api.specification.APISpecificationFactory;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -379,12 +381,63 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     }
 
     @Test
+    public void getAPIWithId() throws AppException {
+        API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+        Assert.assertNotNull(api);
+    }
+
+    @Test
+    public void updateAPIImage(){
+        try {
+            API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+            String filePath = this.getClass().getClassLoader().getResource("com/axway/apim/images/API-Logo.jpg").getFile();
+            System.out.println(filePath);
+            Image image = Image.createImageFromFile(new File(filePath));
+            apiManagerAPIAdapter.updateAPIImage(api, image);
+        }catch (AppException e){
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void addClientApplications(){
+        try {
+            API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+            apiManagerAPIAdapter.addClientApplications(api);
+        }catch (AppException e){
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void grantClientOrganizationAll(){
+        try {
+            Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+            List<Organization> organizations = new ArrayList<>();
+            organizations.add(organization);
+            API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+            apiManagerAPIAdapter.grantClientOrganization(organizations, api, true);
+        }catch (AppException e){
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void grantClientOrganization(){
+        try {
+            Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+            List<Organization> organizations = new ArrayList<>();
+            organizations.add(organization);
+            API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+            apiManagerAPIAdapter.grantClientOrganization(organizations, api, false);
+        }catch (AppException e){
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
     public void upgradeAccessToNewerAPI() {
 
     }
 
-    @Test
-    public void grantClientOrganization() {
-
-    }
 }

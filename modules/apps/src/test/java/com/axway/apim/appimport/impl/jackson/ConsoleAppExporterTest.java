@@ -9,7 +9,7 @@ import com.axway.apim.appexport.lib.AppExportCLIOptions;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;

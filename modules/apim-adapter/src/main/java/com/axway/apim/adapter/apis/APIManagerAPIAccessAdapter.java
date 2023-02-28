@@ -9,8 +9,8 @@ import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.AbstractEntity;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.DELRequest;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
@@ -96,8 +96,7 @@ public class APIManagerAPIAccessAdapter {
                 apiManagerResponse.put(type, mappedResponse);
                 putToCache(id, type, response);
             }
-        } catch (Exception e) {
-            LOG.error("Error loading API-Access from API-Manager for {} from API-Manager: ", type, e);
+        } catch (IOException | URISyntaxException e) {
             throw new AppException("Error loading API-Access from API-Manager for " + type + " from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }

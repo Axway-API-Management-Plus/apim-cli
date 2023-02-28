@@ -1,14 +1,14 @@
 package com.axway.apim.appimport.adapter;
 
 import com.axway.apim.WiremockWrapper;
-import com.axway.apim.adapter.clientApps.ClientAppAdapter;
+import com.axway.apim.adapter.client.apps.ClientAppAdapter;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.QuotaRestrictiontype;
 import com.axway.apim.api.model.apps.*;
 import com.axway.apim.appimport.lib.AppImportParams;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;

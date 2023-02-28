@@ -1,8 +1,8 @@
 package com.axway.apim.appexport.impl;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter.Builder;
+import com.axway.apim.adapter.client.apps.ClientAppFilter;
+import com.axway.apim.adapter.client.apps.ClientAppFilter.Builder;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.QuotaRestriction;
@@ -12,8 +12,8 @@ import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.appexport.lib.ApplicationComparator;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.StandardExportParams.Wide;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;

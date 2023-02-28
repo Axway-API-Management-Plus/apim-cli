@@ -16,8 +16,8 @@ import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 
 public class ManageClientApps {
 

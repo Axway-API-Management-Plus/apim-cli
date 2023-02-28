@@ -9,7 +9,7 @@ import com.axway.apim.apiimport.DesiredAPI;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

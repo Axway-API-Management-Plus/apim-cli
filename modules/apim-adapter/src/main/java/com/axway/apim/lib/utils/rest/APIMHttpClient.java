@@ -1,8 +1,8 @@
 package com.axway.apim.lib.utils.rest;
 
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -81,10 +81,9 @@ public class APIMHttpClient {
             targetHost = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
             // Add AuthCache to the execution context
             clientContext = HttpClientContext.create();
-            //clientContext.setAuthCache(authCache);
             clientContext.setCookieStore(cookieStore);
             httpClientConnectionManager.setMaxPerRoute(new HttpRoute(targetHost), 2);
-            // We have make sure, that cookies are correclty parsed!
+            // We have make sure, that cookies are correctly parsed!
             CoreParameters params = CoreParameters.getInstance();
             int timeout = params.getTimeout();
             LOG.debug("API Manager CLI timeout : {}", timeout);

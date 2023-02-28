@@ -3,7 +3,7 @@ package com.axway.apim.api.export.impl;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.lib.params.APIExportParams;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

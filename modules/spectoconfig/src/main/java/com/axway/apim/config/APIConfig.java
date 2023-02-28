@@ -3,7 +3,7 @@ package com.axway.apim.config;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.*;
 import com.axway.apim.config.model.APISecurity;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

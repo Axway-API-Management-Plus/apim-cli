@@ -5,7 +5,7 @@ import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.testng.Assert;

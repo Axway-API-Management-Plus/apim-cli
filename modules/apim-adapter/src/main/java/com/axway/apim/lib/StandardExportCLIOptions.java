@@ -4,7 +4,7 @@ import org.apache.commons.cli.Option;
 
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public class StandardExportCLIOptions extends CLIOptions {
 

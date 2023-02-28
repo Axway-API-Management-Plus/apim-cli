@@ -10,8 +10,8 @@ import com.axway.apim.apiimport.actions.RepublishToUpdateAPI;
 import com.axway.apim.apiimport.actions.UpdateExistingAPI;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 
 public class APIImportManager {
 

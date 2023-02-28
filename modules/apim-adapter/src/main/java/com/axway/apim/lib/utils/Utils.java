@@ -6,6 +6,7 @@ import java.io.FilePermission;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -31,19 +32,17 @@ import com.axway.apim.api.model.CustomProperty;
 import com.axway.apim.api.model.CustomProperty.Option;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.CustomPropertiesFilter;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Utils {
 
-
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
     public enum FedKeyType {
-        FilterCircuit("<key type='FilterCircuit'>"),
-        OAuthAppProfile("<key type='OAuthAppProfile'>");
+        FilterCircuit("<key type='FilterCircuit'>"), OAuthAppProfile("<key type='OAuthAppProfile'>");
 
         private final String keyType;
 
@@ -161,7 +160,7 @@ public class Utils {
             // Perhaps the stageConfigFile is relative to the main base config
             File stageFile = new File(baseConfigFile.getParent() + File.separator + stageConfig);
             if (stageFile.exists()) return stageFile;
-            LOG.warn("No stage configuration file found with name: '" + stageConfig + "'. It must be either absolute or relative to the main config file.");
+            LOG.warn("No stage configuration file found with name: {} It must be either absolute or relative to the main config file.", stageConfig);
         } else {
             if (!stage.equals("NOT_SET")) {
                 File stageFile = new File(baseConfig.substring(0, baseConfig.lastIndexOf(".") + 1) + stage + baseConfig.substring(baseConfig.lastIndexOf(".")));
@@ -216,7 +215,7 @@ public class Utils {
             LOG.error("Could not determine install folder.");
         } else {
             if (!installFolder.isDirectory()) {
-                LOG.error("Determined install folder: " + installFolder + " is not a directory.");
+                LOG.error("Determined install folder: {} is not a directory.", installFolder);
             }
         }
         return installFolder;
@@ -236,7 +235,7 @@ public class Utils {
                     boolean valueFound = false;
                     List<Option> knownOptions = configuredCustomProperty.getOptions();
                     if (knownOptions == null) {
-                        LOG.warn("Skipping custom property validation, as the custom-property: '" + desiredCustomProperty + "' with type: " + configuredCustomProperty.getType() + " has no options configured. Please check your custom properties configuration.");
+                        LOG.warn("Skipping custom property validation, as the custom-property: {} with type: {} has no options configured. Please check your custom properties configuration.", desiredCustomProperty, configuredCustomProperty.getType());
                         break;
                     }
                     for (Option knownOption : knownOptions) {
@@ -255,8 +254,7 @@ public class Utils {
         }
         // Finally check, if missing custom properties are left
         if (requiredConfiguredCustomProperties != null) {
-            if (requiredConfiguredCustomProperties.isEmpty())
-                return;
+            if (requiredConfiguredCustomProperties.isEmpty()) return;
             String missingCustomProperties = StringUtils.join(requiredConfiguredCustomProperties.keySet(), ",");
             throw new AppException("Missing required custom properties : '" + missingCustomProperties + "'", ErrorCode.CANT_READ_CONFIG_FILE);
         }
@@ -265,7 +263,7 @@ public class Utils {
     public static void addCustomPropertiesForEntity(List<? extends CustomPropertiesEntity> entities, String json, CustomPropertiesFilter filter) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         // Custom-Properties will be added depending on the given Properties in the filter
-        if (filter.getCustomProperties() == null || entities.size() == 0) {
+        if (filter.getCustomProperties() == null || entities.isEmpty()) {
             return;
         }
         Map<String, JsonNode> enitityAsJsonMappedWithId = new HashMap<>();
@@ -306,7 +304,7 @@ public class Utils {
                 LOG.error("Formatting error", e);
             }
             if (retDate != null && retDate.after(new Date())) {
-                LOG.info("Parsed retirementDate: '" + date + "' using format: '" + dateFormat + "' to: '" + retDate + "'");
+                LOG.info("Parsed retirementDate: {} using format: {} to: {}", date, dateFormat, retDate);
                 break;
             }
         }
@@ -333,8 +331,7 @@ public class Utils {
             String path = openApiUrl.getPath();
             if (backendBasePath.endsWith("/")) {
                 newBackendBasePath = backendBasePath.substring(0, backendBasePath.length() - 1) + path;
-            } else
-                newBackendBasePath = backendBasePath + path;
+            } else newBackendBasePath = backendBasePath + path;
         } else {
             if (serverUrl.startsWith("/") && !backendBasePath.endsWith("/"))
                 newBackendBasePath = backendBasePath + serverUrl;
@@ -345,11 +342,17 @@ public class Utils {
         return newBackendBasePath;
     }
 
+    public static String ignoreBasePath(String serverUrl) {
+        if (isHttpUri(serverUrl)) {
+            URI uri = URI.create(serverUrl);
+            return serverUrl.substring(0, serverUrl.length() - uri.getPath().length());
+        }
+        return serverUrl;
+    }
+
     public static boolean compareValues(Object actualValue, Object desiredValue) {
         if (actualValue instanceof List) {
-            return ((List<?>) actualValue).size() == ((List<?>) desiredValue).size() &&
-                    ((List<?>) actualValue).containsAll((List<?>) desiredValue) &&
-                    ((List<?>) desiredValue).containsAll((List<?>) actualValue);
+            return ((List<?>) actualValue).size() == ((List<?>) desiredValue).size() && ((List<?>) actualValue).containsAll((List<?>) desiredValue) && ((List<?>) desiredValue).containsAll((List<?>) actualValue);
         } else {
             return actualValue.equals(desiredValue);
         }

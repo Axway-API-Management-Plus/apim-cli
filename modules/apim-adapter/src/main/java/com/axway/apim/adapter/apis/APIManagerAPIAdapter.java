@@ -7,14 +7,14 @@ import com.axway.apim.adapter.apis.APIFilter.METHOD_TRANSLATION;
 import com.axway.apim.adapter.jackson.APIImportSerializerModifier;
 import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.api.API;
-import com.axway.apim.api.apiSpecification.APISpecification;
-import com.axway.apim.api.apiSpecification.APISpecification.APISpecType;
-import com.axway.apim.api.apiSpecification.APISpecificationFactory;
+import com.axway.apim.api.specification.APISpecification;
+import com.axway.apim.api.specification.APISpecification.APISpecType;
+import com.axway.apim.api.specification.APISpecificationFactory;
 import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.URLParser;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.*;
@@ -62,7 +62,7 @@ public class APIManagerAPIAdapter {
     ObjectMapper mapper = new ObjectMapper();
     private final CoreParameters cmd;
 
-    private final List<String> queryStringPassThroughBreakingVersion = Arrays.asList("7.7.20220530", "7.7.20220830", "7.7.20221130");
+    private final List<String> queryStringPassThroughBreakingVersion = Arrays.asList("7.7.20220530", "7.7.20220830", "7.7.20221130", "7.7.20230228");
 
     /**
      * Maps the provided status to the REST-API endpoint to change the status!
@@ -76,7 +76,7 @@ public class APIManagerAPIAdapter {
     public List<API> getAPIs(APIFilter filter, boolean logProgress) throws AppException {
         List<API> apis;
         try {
-            _readAPIsFromAPIManager(filter);
+            readAPIsFromAPIManager(filter);
             apis = filterAPIs(filter);
             for (int i = 0; i < apis.size(); i++) {
                 API api = apis.get(i);
@@ -104,7 +104,7 @@ public class APIManagerAPIAdapter {
         List<API> foundAPIs = getAPIs(filter, false);
         API api = getUniqueAPI(foundAPIs, filter);
         if (logMessage && api != null)
-            LOG.debug("Found existing API: '" + api.getName() + "' (" + api.getState() + ") on path: '" + api.getPath() + "' (ID: '" + api.getId() + "')");
+            LOG.debug("Found existing API: {}", api);
         return api;
     }
 
@@ -118,7 +118,7 @@ public class APIManagerAPIAdapter {
      *
      * @throws AppException if the API representation cannot be created
      */
-    private void _readAPIsFromAPIManager(APIFilter filter) throws AppException {
+    private void readAPIsFromAPIManager(APIFilter filter) throws AppException {
         if (this.apiManagerResponse.get(filter) != null) return;
         try {
             URI uri = getAPIRequestUri(filter);
@@ -157,7 +157,7 @@ public class APIManagerAPIAdapter {
     }
 
     API getUniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
-        if (foundAPIs.size() == 0) return null;
+        if (foundAPIs.isEmpty()) return null;
         // If filtered resultSet contains more than one API, here we try to find a unique API based on the logical
         // criteria (apiPath, VHost and QueryVersion)
         // This can occur if the DesiredAPI does not define a QueryStringVersion and/or VHost. Then it will filter
@@ -191,7 +191,7 @@ public class APIManagerAPIAdapter {
         });
         apis.removeIf(filter::filter);
 
-        if (apis.size() != 0) {
+        if (!apis.isEmpty()) {
             String dbgCrit = "";
             if (apis.size() > 1)
                 dbgCrit = " (apiPath: '" + filter.getApiPath() + "', filter: " + filter + ", vhost: '" + filter.getVhost() + "', requestedType: " + filter.getApiType() + ")";
@@ -225,16 +225,16 @@ public class APIManagerAPIAdapter {
     public void translateMethodIds(API api, METHOD_TRANSLATION mode) throws AppException {
         if (mode == METHOD_TRANSLATION.NONE) return;
         if (api.getOutboundProfiles() != null)
-            _translateMethodIds(api.getOutboundProfiles(), mode, Collections.singletonList(api.getId()));
+            translateMethodIds(api.getOutboundProfiles(), mode, Collections.singletonList(api.getId()));
         if (api.getInboundProfiles() != null)
-            _translateMethodIds(api.getInboundProfiles(), mode, Collections.singletonList(api.getId()));
+            translateMethodIds(api.getInboundProfiles(), mode, Collections.singletonList(api.getId()));
     }
 
     public void translateMethodIds(List<API> apis, List<String> apiIds, METHOD_TRANSLATION mode) throws AppException {
         if (mode == METHOD_TRANSLATION.NONE) return;
         for (API api : apis) {
-            if (api.getOutboundProfiles() != null) _translateMethodIds(api.getOutboundProfiles(), mode, apiIds);
-            if (api.getInboundProfiles() != null) _translateMethodIds(api.getInboundProfiles(), mode, apiIds);
+            if (api.getOutboundProfiles() != null) translateMethodIds(api.getOutboundProfiles(), mode, apiIds);
+            if (api.getInboundProfiles() != null) translateMethodIds(api.getInboundProfiles(), mode, apiIds);
         }
     }
 
@@ -291,7 +291,7 @@ public class APIManagerAPIAdapter {
             api.setApiMethods(apiMethods);
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
-                LOG.error("Error setting Front end API  methods for API " + api.getName(), e);
+                LOG.error("Error setting Front end API  methods for API {} ", api.getName(), e);
             }
             throw new AppException("Can't read Frontend API Methods from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
@@ -303,7 +303,7 @@ public class APIManagerAPIAdapter {
             return;
         }
         api.setImage(image);
-        LOG.debug("Updating API-Proxy-Image from file: {}", api.getImage().getFilename());
+        LOG.debug("Updating API-Proxy-Image from file: {}", api.getImage().getBaseFilename());
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/image").build();
             HttpEntity entity = MultipartEntityBuilder.create()
@@ -323,9 +323,8 @@ public class APIManagerAPIAdapter {
         }
     }
 
-    private <ProfileType> void _translateMethodIds(Map<String, ProfileType> profiles, METHOD_TRANSLATION mode, List<String> apiIds) throws AppException {
+    private <ProfileType> void translateMethodIds(Map<String, ProfileType> profiles, METHOD_TRANSLATION mode, List<String> apiIds) throws AppException {
         Map<String, ProfileType> updatedEntries = new HashMap<>();
-
         if (profiles != null) {
             Iterator<String> keys = profiles.keySet().iterator();
             while (keys.hasNext()) {
@@ -382,18 +381,18 @@ public class APIManagerAPIAdapter {
             api.setApplicationQuota(applicationQuota);
             api.setSystemQuota(systemQuota);
         } catch (AppException e) {
-            LOG.error("Application-Default quota response: '" + applicationQuota + "'");
+            LOG.error("Application-Default quota response: {}", applicationQuota);
             throw e;
         }
     }
 
     private void addExistingClientAppQuotas(API api, boolean addQuota) throws AppException {
         if (!addQuota || !APIManagerAdapter.hasAdminAccount()) return;
-        if (api.getApplications() == null || api.getApplications().size() == 0) return;
+        if (api.getApplications() == null || api.getApplications().isEmpty()) return;
         if (api.getApplications().size() > 1000) {
-            LOG.info("Loading application quotas for " + api.getApplications().size() + " subscribed applications. This might take a few minutes ...");
+            LOG.info("Loading application quotas for {} subscribed applications. This might take a few minutes ...", api.getApplications().size());
         } else {
-            LOG.info("Loading application quotas for " + api.getApplications().size() + " subscribed applications.");
+            LOG.info("Loading application quotas for {} subscribed applications.", api.getApplications().size());
         }
         for (ClientApplication app : api.getApplications()) {
             APIQuota appQuota = APIManagerAdapter.getInstance().quotaAdapter.getQuota(app.getId(), null, true, true);
@@ -452,7 +451,7 @@ public class APIManagerAPIAdapter {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != 200) {
                         if (filter.isUseFEAPIDefinition()) {
-                            LOG.debug("Failed to download API-Specification with version {} from Frontend-API. Received Status-Code: {} Response: {}" + specVersion, statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                            LOG.debug("Failed to download API-Specification with version {} from Frontend-API. Received Status-Code: {} Response: {}", specVersion, statusCode, EntityUtils.toString(httpResponse.getEntity()));
                             continue;
                         } else {
                             LOG.error("Failed to download original API-Specification. You may use the toggle -useFEAPIDefinition to download the Frontend-API specification instead.");
@@ -553,7 +552,6 @@ public class APIManagerAPIAdapter {
         LOG.debug("Updating API-Proxy: {} {} ( {} )", api.getName(), api.getVersion(), api.getId());
         String[] serializeAllExcept;
         // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
-        // if (APIManagerAdapter.hasAPIManagerVersion("7.7.20220530") || APIManagerAdapter.hasAPIManagerVersion("7.7.20220830")) {
         if (queryStringPassThroughBreakingVersion.contains(APIManagerAdapter.getApiManagerVersion())) {
             serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
         } else {
@@ -575,7 +573,6 @@ public class APIManagerAPIAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error updating API-Proxy. Response-Code: {} Got response: {}", statusCode, response);
-                    LOG.debug("Request sent:" + EntityUtils.toString(entity));
                     throw new AppException("Error updating API-Proxy. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 return mapper.readValue(response, API.class);
@@ -604,7 +601,7 @@ public class APIManagerAPIAdapter {
     }
 
     public void deleteBackendAPI(API api) throws AppException {
-        LOG.debug("Deleting API-Proxy");
+        LOG.debug("Deleting Backend API : {}", api.getApiId());
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId()).build();
 
@@ -821,8 +818,8 @@ public class APIManagerAPIAdapter {
         // APIManagerAdapter.getInstance().addClientApplications(inTransitState, actualState);
         // Additionally we need to preserve existing (maybe manually created) application quotas
         boolean updateAppQuota = false;
-        if (referenceAPI.getApplications().size() != 0) {
-            LOG.debug("Found: " + referenceAPI.getApplications().size() + " subscribed applications for this API. Taking over potentially configured quota configuration.");
+        if (!referenceAPI.getApplications().isEmpty()) {
+            LOG.debug("Found: {} subscribed applications for this API. Taking over potentially configured quota configuration.", referenceAPI.getApplications().size());
             for (ClientApplication app : referenceAPI.getApplications()) {
                 if (app.getAppQuota() == null) continue;
                 // REST-API for App-Quota is also returning Default-Quotas, but we have to ignore them here!

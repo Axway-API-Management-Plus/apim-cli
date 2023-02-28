@@ -5,7 +5,7 @@ import com.axway.apim.adapter.apis.RemoteHostFilter;
 import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
 

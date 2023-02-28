@@ -3,7 +3,7 @@ package com.axway.apim.organization.cli;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.organization.lib.*;
 import org.apache.commons.io.IOUtils;
 import org.testng.Assert;

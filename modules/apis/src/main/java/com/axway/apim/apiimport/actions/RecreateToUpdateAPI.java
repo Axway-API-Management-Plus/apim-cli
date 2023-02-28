@@ -7,7 +7,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.APIStatusManager;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIChangeState;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 /**
  * This class is used by the APIImportManager#applyChanges(APIChangeState, boolean) to re-create an API. 

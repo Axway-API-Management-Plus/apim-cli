@@ -3,7 +3,7 @@ package com.axway.apim.lib;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.ErrorCode;
 
 public class Result {
 	

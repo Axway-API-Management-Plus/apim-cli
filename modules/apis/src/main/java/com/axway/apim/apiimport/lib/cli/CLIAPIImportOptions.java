@@ -9,7 +9,7 @@ import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardImportCLIOptions;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public class CLIAPIImportOptions extends CLIOptions {
 

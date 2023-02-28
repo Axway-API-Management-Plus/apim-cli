@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.adapter.client.apps.ClientAppFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.AuthType;
 import com.axway.apim.api.model.AuthenticationProfile;
@@ -27,7 +27,7 @@ import com.axway.apim.api.model.Policy;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.lib.CustomPropertiesFilter;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.Utils.FedKeyType;
 

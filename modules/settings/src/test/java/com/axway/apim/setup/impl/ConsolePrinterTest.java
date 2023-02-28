@@ -5,7 +5,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.RemoteHostFilter;
 import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.setup.lib.APIManagerSetupExportCLIOptions;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
 import org.testng.annotations.AfterClass;

@@ -5,7 +5,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.organization.lib.OrgExportCLIOptions;
 import com.axway.apim.organization.lib.OrgExportParams;

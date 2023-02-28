@@ -10,8 +10,8 @@ import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.ImageComparision;
 
 public class Image {

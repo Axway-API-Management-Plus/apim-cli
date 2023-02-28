@@ -4,7 +4,7 @@ import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
 import com.axway.apim.lib.StandardImportParams;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.setup.lib.APIManagerSetupExportCLIOptions;
 import com.axway.apim.setup.lib.APIManagerSetupImportCLIOptions;
 import com.axway.apim.setup.remotehosts.lib.RemoteHostsExportCLIOptions;

@@ -4,7 +4,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Alerts;
 import com.axway.apim.lib.APIManagerAlertsAnnotation;
 import com.axway.apim.lib.APIManagerAlertsAnnotation.AlertType;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
