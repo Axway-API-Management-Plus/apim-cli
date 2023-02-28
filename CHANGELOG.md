@@ -4,14 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.13.4] In progress
+## [1.13.4] 2023-02-28
+
 ### Fixed
 - Retry-Delay does not appear in help text (See issue [#349](https://github.com/Axway-API-Management-Plus/apim-cli/issues/349))
 - Dat file is not exported if Export API with an Organization that have a virtual host containing a ":" (See issue [#352](https://github.com/Axway-API-Management-Plus/apim-cli/issues/352))
 - backendBasepath not working correctly when server url missing in swagger (See issue [#348](https://github.com/Axway-API-Management-Plus/apim-cli/issues/348))
 
 ### Added
-- Support yaml configuration for apim cli
+- Support yaml configuration for apim cli (Beta)
+- Support for APIM February 2023 release [#346](https://github.com/Axway-API-Management-Plus/apim-cli/issues/346))
 
 
 ## [1.13.3] 2023-02-08
