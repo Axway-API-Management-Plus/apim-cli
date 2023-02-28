@@ -3,7 +3,7 @@ package com.axway.apim.user.cli;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
 import com.axway.apim.lib.StandardExportParams.Wide;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.users.lib.UserImportParams;
 import com.axway.apim.users.lib.cli.UserChangePasswordCLIOptions;
 import com.axway.apim.users.lib.cli.UserExportCLIOptions;

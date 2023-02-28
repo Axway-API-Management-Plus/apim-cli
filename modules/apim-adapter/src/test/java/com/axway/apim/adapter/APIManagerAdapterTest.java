@@ -5,15 +5,13 @@ import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.User;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import wiremock.org.checkerframework.checker.units.qual.A;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -23,9 +21,21 @@ import java.util.Map;
 
 public class APIManagerAdapterTest extends WiremockWrapper {
 
+    private APIManagerAdapter apiManagerAdapter;
+
     @BeforeClass
-    public void initWiremock() {
-        super.initWiremock();
+    public void init() {
+        try {
+            initWiremock();
+            APIManagerAdapter.deleteInstance();
+            CoreParameters coreParameters = new CoreParameters();
+            coreParameters.setHostname("localhost");
+            coreParameters.setUsername("apiadmin");
+            coreParameters.setPassword(Utils.getEncryptedPassword());
+            apiManagerAdapter = APIManagerAdapter.getInstance();
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @AfterClass
@@ -35,27 +45,21 @@ public class APIManagerAdapterTest extends WiremockWrapper {
 
 
     @Test
-    public void testGetHigherRoleAdmin() throws AppException {
-        TestIndicator.getInstance().setTestRunning(true);
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+    public void testGetHigherRoleAdmin() {
         User user = new User();
         user.setRole("admin");
         Assert.assertEquals("admin", apiManagerAdapter.getHigherRole(user));
     }
 
     @Test
-    public void testGetHigherRoleOadmin() throws AppException {
-        TestIndicator.getInstance().setTestRunning(true);
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+    public void testGetHigherRoleOadmin() {
         User user = new User();
         user.setRole("oadmin");
         Assert.assertEquals("oadmin", apiManagerAdapter.getHigherRole(user));
     }
 
     @Test
-    public void testGetHigherRoleUserOAdmin() throws AppException {
-        TestIndicator.getInstance().setTestRunning(true);
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+    public void testGetHigherRoleUserOAdmin() {
         User user = new User();
         user.setRole("user");
         Map<String, String> orgs2Role = new HashMap<>();
@@ -65,9 +69,7 @@ public class APIManagerAdapterTest extends WiremockWrapper {
     }
 
     @Test
-    public void testGetHigherRoleUserAdmin() throws AppException {
-        TestIndicator.getInstance().setTestRunning(true);
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+    public void testGetHigherRoleUserAdmin() {
         User user = new User();
         user.setRole("user");
         Map<String, String> orgs2Role = new HashMap<>();
@@ -77,19 +79,9 @@ public class APIManagerAdapterTest extends WiremockWrapper {
         Assert.assertEquals("admin", apiManagerAdapter.getHigherRole(user));
     }
 
-    public void setupParameters() throws AppException {
-        APIManagerAdapter.deleteInstance();
-        CoreParameters coreParameters = new CoreParameters();
-        coreParameters.setHostname("localhost");
-        coreParameters.setUsername("test");
-        coreParameters.setPassword(Utils.getEncryptedPassword());
-
-    }
 
     @Test
-    public void loginToAPIManager() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+    public void loginToAPIManager() {
         try {
             apiManagerAdapter.loginToAPIManager();
         } catch (AppException appException) {
@@ -98,9 +90,7 @@ public class APIManagerAdapterTest extends WiremockWrapper {
     }
 
     @Test
-    public void logoutFromAPIManager() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+    public void logoutFromAPIManager() {
         try {
             apiManagerAdapter.logoutFromAPIManager();
         } catch (AppException appException) {
@@ -110,16 +100,12 @@ public class APIManagerAdapterTest extends WiremockWrapper {
 
     @Test
     public void getCurrentUser() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         User user = apiManagerAdapter.getCurrentUser();
         Assert.assertNotNull(user);
     }
 
     @Test
     public void getAppIdForCredential() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         ClientApplication clientApplication = apiManagerAdapter.getAppIdForCredential("extclientid", APIManagerAdapter.CREDENTIAL_TYPE_EXT_CLIENTID);
         Assert.assertNotNull(clientApplication);
 
@@ -127,17 +113,13 @@ public class APIManagerAdapterTest extends WiremockWrapper {
 
     @Test
     public void getAppIdForCredentialUnknown() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         ClientApplication clientApplication = apiManagerAdapter.getAppIdForCredential("extclientid-unknown", APIManagerAdapter.CREDENTIAL_TYPE_EXT_CLIENTID);
         Assert.assertNull(clientApplication);
 
     }
 
     @Test
-    public void getCertInfo() throws AppException {
-        setupParameters();
-        APIManagerAdapter.getInstance();
+    public void getCertInfo() {
         try (InputStream inputStream = new ByteArrayInputStream("test".getBytes())) {
             CaCert caCert = new CaCert();
             caCert.setAlias("CN=test");

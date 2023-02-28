@@ -5,7 +5,7 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "application_subscriptions_frontend_api_by_id.json",
+    "bodyFileName": "organization_subscriptions_frontend_api_by_id.json",
     "headers": {
       "Content-Type": "application/json"
     }

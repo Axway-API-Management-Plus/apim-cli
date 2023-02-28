@@ -8,7 +8,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appimport.it.ExportAppTestAction;
 import com.axway.apim.appimport.it.ImportAppTestAction;
 import com.axway.apim.test.ImportTestAction;
-import com.axway.lib.testActions.TestParams;
+import com.axway.apim.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;

@@ -6,7 +6,7 @@ import java.util.Map;
 import com.axway.apim.adapter.jackson.MarkdownLocalDeserializer;
 import com.axway.apim.adapter.jackson.OrganizationDeserializer;
 import com.axway.apim.adapter.jackson.RemotehostDeserializer;
-import com.axway.apim.api.apiSpecification.APISpecification;
+import com.axway.apim.api.specification.APISpecification;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.AuthenticationProfile;
@@ -469,15 +469,20 @@ public class API implements CustomPropertiesEntity {
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + " [path=" + path + ", id (FE-API)=" + id + ", apiId (BE-API)=" + apiId + ", vhost=" + vhost + ", apiRoutingKey=" + apiRoutingKey + "]";
+		return "API{" +
+				"path='" + path + '\'' +
+				", state='" + state + '\'' +
+				", version='" + version + '\'' +
+				", vhost='" + vhost + '\'' +
+				", name='" + name + '\'' +
+				", apiRoutingKey='" + apiRoutingKey + '\'' +
+				", id='" + id + '\'' +
+				", apiId='" + apiId + '\'' +
+				'}';
 	}
-	
+
 	public String toStringHuman() {
 		return getName() + " ("+getVersion()+") exposed on path: " + getPath();
-	}
-	
-	public String toStringShort() {
-		return getName() + " ("+getVersion()+")";
 	}
 
 	public String getApiDefinitionImport() {

@@ -1,30 +1,54 @@
 package com.axway.apim.test.envProperties;
 
-import com.axway.apim.adapter.apis.APIManagerMockBase;
+import com.axway.apim.TestSetup;
+import com.axway.apim.WiremockWrapper;
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.lib.utils.TestIndicator;
+import com.axway.apim.lib.utils.Utils;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
-public class SubstituteVariablesTest extends APIManagerMockBase {
+public class SubstituteVariablesTest  extends WiremockWrapper {
+
 
     private static String OS = null;
 
     @BeforeClass
-    private void initCommandParameters() throws IOException {
-        setupMockData();
-        TestIndicator.getInstance().setTestRunning(true);
+    public void init() {
+        try {
+            APIManagerAdapter.apiManagerVersion = "7.7.20221130";
+            new TestSetup().initCliHome();
+            initWiremock();
+            APIManagerAdapter.deleteInstance();
+            CoreParameters coreParameters = new CoreParameters();
+            coreParameters.setHostname("localhost");
+            coreParameters.setUsername("apiadmin");
+            coreParameters.setPassword(Utils.getEncryptedPassword());
+            APIManagerAdapter.getInstance();
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
+    @AfterClass
+    public void close() {
+        super.close();
+    }
+
+
+
 
     @Test
     public void validateSystemOSAreSubstituted() throws IOException {
+
         String configFile = "com/axway/apim/test/files/envProperties/1_config-with-os-variable.json";
         String pathToConfigFile = this.getClass().getClassLoader().getResource(configFile).getFile();
         String apiDefinition = "/api_definition_1/petstore.json";
@@ -70,6 +94,7 @@ public class SubstituteVariablesTest extends APIManagerMockBase {
 
     @Test
     public void validateStageEnvOveridesAll() throws IOException {
+
         String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
         Properties props = System.getProperties();
         props.setProperty("OS_MAIN_AND_STAGE_ENV_PROPERTY", "valueFromOS");

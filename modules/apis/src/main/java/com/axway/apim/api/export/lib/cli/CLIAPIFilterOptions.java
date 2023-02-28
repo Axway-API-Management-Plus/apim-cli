@@ -4,8 +4,8 @@ import com.axway.apim.api.export.lib.params.APIFilterParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.Parameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import org.apache.commons.cli.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,10 +120,6 @@ public class CLIAPIFilterOptions extends CLIOptions {
 		cliOptions.addOption(option);
 	}
 
-	@Override
-	public void addInternalOption(Option option) {
-		cliOptions.addInternalOption(option);
-	}
 	
 	@Override
 	public String getValue(String key) {

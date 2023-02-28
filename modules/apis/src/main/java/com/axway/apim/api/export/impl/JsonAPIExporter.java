@@ -5,16 +5,16 @@ import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.apiSpecification.APISpecification;
-import com.axway.apim.api.apiSpecification.WSDLSpecification;
+import com.axway.apim.api.specification.APISpecification;
+import com.axway.apim.api.specification.WSDLSpecification;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.jackson.serializer.APIExportSerializerModifier;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -22,11 +22,11 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
@@ -50,12 +50,7 @@ public class JsonAPIExporter extends APIResultHandler {
     public void execute(List<API> apis) throws AppException {
         for (API api : apis) {
             ExportAPI exportAPI = new ExportAPI(api);
-            try {
-                saveAPILocally(exportAPI);
-            } catch (AppException e) {
-                LOG.error("Error in export", e);
-                throw e;
-            }
+            saveAPILocally(exportAPI, this);
         }
     }
 
@@ -73,11 +68,11 @@ public class JsonAPIExporter extends APIResultHandler {
         return builder.build();
     }
 
-    private void saveAPILocally(ExportAPI exportAPI) throws AppException {
+    public void saveAPILocally(ExportAPI exportAPI, APIResultHandler apiResultHandler) throws AppException {
 
         String apiPath = getAPIExportFolder(exportAPI.getPath());
         File localFolder = new File(this.givenExportFolder + File.separator + getVHost(exportAPI) + apiPath);
-        LOG.debug("Going to export API: {} into folder: {} ", exportAPI.toStringShort(), localFolder);
+        LOG.debug("Going to export API: {} into folder: {} ", exportAPI, localFolder);
         validateFolder(localFolder);
         APISpecification apiDef = exportAPI.getAPIDefinition();
         // Skip processing if API definition is not available due to original API cloned and deleted.
@@ -86,6 +81,7 @@ public class JsonAPIExporter extends APIResultHandler {
             return;
         }
         String targetFile = null;
+        String configFile;
         try {
             targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension();
             if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKED_URL)) {
@@ -95,7 +91,14 @@ public class JsonAPIExporter extends APIResultHandler {
         } catch (IOException e) {
             throw new AppException("Can't save API-Definition locally to file: " + targetFile, ErrorCode.UNXPECTED_ERROR, e);
         }
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper;
+        if(apiResultHandler instanceof YamlAPIExporter){
+            mapper = new ObjectMapper(new YAMLFactory());
+            configFile = "/api-config.yaml";
+        }else {
+            mapper = new ObjectMapper();
+            configFile = "/api-config.json";
+        }
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIExportSerializerModifier()));
         mapper.setSerializationInclusion(Include.NON_NULL);
         FilterProvider filters = new SimpleFilterProvider()
@@ -107,7 +110,7 @@ public class JsonAPIExporter extends APIResultHandler {
         mapper.setFilterProvider(filters);
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File(localFolder.getCanonicalPath() + "/api-config.json"), exportAPI);
+            mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), exportAPI);
         } catch (Exception e) {
             throw new AppException("Can't create API-Configuration file for API: '" + exportAPI.getName() + "' exposed on path: '" + exportAPI.getPath() + "'.", ErrorCode.UNXPECTED_ERROR, e);
         }
@@ -118,7 +121,7 @@ public class JsonAPIExporter extends APIResultHandler {
         if (exportAPI.getCaCerts() != null && !exportAPI.getCaCerts().isEmpty()) {
             storeCaCerts(localFolder, exportAPI.getCaCerts());
         }
-        LOG.info("Successfully exported API: {} into folder: {}", exportAPI.toStringShort(), localFolder.getAbsolutePath());
+        LOG.info("Successfully exported API: {} into folder: {}", exportAPI.getName(), localFolder.getAbsolutePath());
         if (!APIManagerAdapter.hasAdminAccount()) {
             LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
             LOG.warn("- No Quotas has been exported for the API");
@@ -151,22 +154,5 @@ public class JsonAPIExporter extends APIResultHandler {
                 }
             }
         }
-    }
-
-    private static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
-        try (FileOutputStream fileOutputStream = new FileOutputStream(fileDest)) {
-            fileOutputStream.write(bFile);
-        } catch (IOException e) {
-            throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
-        }
-    }
-
-    private String getAPIExportFolder(String apiExposurePath) {
-        if (apiExposurePath.startsWith("/"))
-            apiExposurePath = apiExposurePath.replaceFirst("/", "");
-        if (apiExposurePath.endsWith("/"))
-            apiExposurePath = apiExposurePath.substring(0, apiExposurePath.length() - 1);
-        apiExposurePath = apiExposurePath.replace("/", "-");
-        return apiExposurePath;
     }
 }

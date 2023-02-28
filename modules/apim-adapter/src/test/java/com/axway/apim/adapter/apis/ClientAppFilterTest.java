@@ -2,13 +2,13 @@ package com.axway.apim.adapter.apis;
 
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.adapter.client.apps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.AppCredentialsDeserializer;
 import com.axway.apim.api.model.apps.APIKey;
 import com.axway.apim.api.model.apps.ClientAppCredential;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -35,11 +35,6 @@ public class ClientAppFilterTest extends WiremockWrapper {
 		super.close();
 	}
 
-//	@BeforeClass
-//	public void setupTestIndicator() throws IOException {
-//		setupMockData();
-//	}
-//
 	@Test
 	public void hasFullWildCardName() throws AppException {
 		ClientAppFilter filter = new ClientAppFilter.Builder()
@@ -114,7 +109,7 @@ public class ClientAppFilterTest extends WiremockWrapper {
 	
 	@Test
 	public void testAppHavingAPIKeyButNoClientID() throws IOException {
-		ClientApplication testApp = getTestApp("client-app-with-two-api-key-only.json");
+   		ClientApplication testApp = getTestApp("client-app-with-two-api-key-only.json");
 		((APIKey)testApp.getCredentials().get(0)).setApiKey(null);
 		
 		ClientAppFilter filter = new ClientAppFilter.Builder()

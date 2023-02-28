@@ -3,8 +3,8 @@ package com.axway.apim.apiimport.actions;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.api.model.APIMethod;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

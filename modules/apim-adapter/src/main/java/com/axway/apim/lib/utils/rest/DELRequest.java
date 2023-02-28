@@ -1,6 +1,6 @@
 package com.axway.apim.lib.utils.rest;
 
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 

@@ -1,7 +1,7 @@
 package com.axway.lib;
 
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
+import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.ErrorCodeMapper;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

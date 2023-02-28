@@ -1,7 +1,7 @@
 package com.axway.apim.lib.utils.rest;
 
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -23,7 +23,7 @@ import java.net.URI;
  */
 public abstract class RestAPICall {
 
-    static Logger LOG = LoggerFactory.getLogger(RestAPICall.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RestAPICall.class);
 
     protected HttpEntity entity;
     protected URI uri;

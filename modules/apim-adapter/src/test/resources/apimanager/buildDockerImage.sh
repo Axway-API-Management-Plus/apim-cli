@@ -9,6 +9,7 @@ function exitScript() {
 	cd $currentDir
 	if [[ $rc = 10 ]]; then
 		echo "Supported versions"
+		echo "`basename $0` 7.7-20230228"
 		echo "`basename $0` 7.7-20221130"
 		echo "`basename $0` 7.7-20220830"
 		echo "`basename $0` 7.7-20220530"
@@ -23,7 +24,6 @@ function exitScript() {
 		echo "`basename $0` 7.7-20200331"
 		echo "`basename $0` 7.7-20200130"
 		echo "`basename $0` 7.7-SP2"
-		echo "`basename $0` 7.6.2-SP5"
 	fi
 	exit $rc
 }
@@ -42,6 +42,11 @@ buildDir="$HOME/apim-cli-dockerimage"
 echo "Creating docker image for version $version"
 
 case "$version" in
+  7.7-20230228)
+    fedFile="swagger-promote-7.7-20230228.fed"
+    installer="APIGateway_7.7.20230228_Install_linux-x86-64_BN01.run"
+    dockerScripts="APIGateway_7.7.20230228-DockerScripts-2.8.0.tar.gz"
+    dockerScriptsDir="apigw-emt-scripts-2.8.0";;
 	7.7-20221130)
 		fedFile="swagger-promote-7.7-20221130.fed"
 		installer="APIGateway_7.7.20221130_Install_linux-x86-64_BN03.run"
@@ -98,10 +103,6 @@ case "$version" in
 		fedFile="swagger-promote-7.7.fed"
 		installer="APIGateway_7.7_SP2_linux-x86-64_BN201912201.run"
 		dockerScripts="APIGateway_7.7-1_DockerScripts.tar.gz";;
-	7.6.2-SP5)
-		fedFile="swagger-promote-7.6.2.fed"
-		installer="APIGateway_7.6.2_SP5_Install_linux-x86-64_BN20200717.run"
-		dockerScripts="APIGateway_7.6.2-8_ScriptsPackageDocker_linux-x86-64_BN27072018.tar.gz";;
 	*)
 		echo "Unknown version $version"
 		exitScript 10;;

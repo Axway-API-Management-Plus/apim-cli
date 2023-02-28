@@ -2,7 +2,7 @@ package com.axway.apim.lib;
 
 import org.apache.commons.cli.Option;
 
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public class StandardImportCLIOptions extends CLIOptions {
 	
@@ -38,11 +38,7 @@ public class StandardImportCLIOptions extends CLIOptions {
 	public void addOption(Option option) {
 		cliOptions.addOption(option);
 	}
-
-	@Override
-	public void addInternalOption(Option option) {
-		cliOptions.addInternalOption(option);
-	}
+	
 
 	@Override
 	public void parse() throws AppException{

@@ -5,8 +5,8 @@ import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.organization.lib.ExportOrganization;
 import com.axway.apim.organization.lib.OrgExportParams;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -16,7 +16,10 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class JsonOrgExporter extends OrgResultHandler {
+	private static final Logger LOG = LoggerFactory.getLogger(JsonOrgExporter.class);
 
 	public JsonOrgExporter(OrgExportParams params, ExportResult result) {
 		super(params, result);
@@ -32,11 +36,11 @@ public class JsonOrgExporter extends OrgResultHandler {
 	@Override
 	public void export(List<Organization> orgs) throws AppException {
 		for(Organization org : orgs) {
-			saveOrganizationLocally(new ExportOrganization(org));
+			saveOrganizationLocally(new ExportOrganization(org), this);
 		}
 	}
 	
-	private void saveOrganizationLocally(ExportOrganization org) throws AppException {
+	public void saveOrganizationLocally(ExportOrganization org, OrgResultHandler orgResultHandler) throws AppException {
 		String folderName = getExportFolder(org);
 		String targetFolder = params.getTarget();
 		File localFolder = new File(targetFolder +File.separator+ folderName);
@@ -58,7 +62,15 @@ public class JsonOrgExporter extends OrgResultHandler {
 		if (!localFolder.mkdirs()) {
 			throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
-		ObjectMapper mapper = new ObjectMapper();
+		ObjectMapper mapper;
+		String configFile;
+		if(orgResultHandler instanceof YamlOrgExporter){
+			mapper = new ObjectMapper(new YAMLFactory());
+			configFile = "/org-config.yaml";
+		}else {
+			mapper = new ObjectMapper();
+			configFile = "/org-config.json";
+		}
 		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
 		FilterProvider filters = new SimpleFilterProvider()
 				.addFilter("OrganizationFilter", SimpleBeanPropertyFilter.serializeAllExcept("id", "dn"))
@@ -68,8 +80,8 @@ public class JsonOrgExporter extends OrgResultHandler {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/org-config.json"), org);
-			this.result.addExportedFile(localFolder.getCanonicalPath() + "/org-config.json");
+			mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), org);
+			this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
 		} catch (Exception e) {
 			throw new AppException("Can't write configuration file for organization: '"+org.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
 		}

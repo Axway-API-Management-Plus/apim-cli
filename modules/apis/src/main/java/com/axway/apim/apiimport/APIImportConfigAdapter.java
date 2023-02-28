@@ -7,14 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
+import java.util.*;
 
 import com.axway.apim.api.model.*;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
@@ -22,19 +18,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.adapter.client.apps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.api.API;
-import com.axway.apim.api.apiSpecification.APISpecification;
-import com.axway.apim.api.apiSpecification.APISpecificationFactory;
+import com.axway.apim.api.specification.APISpecification;
+import com.axway.apim.api.specification.APISpecificationFactory;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -55,9 +51,6 @@ public class APIImportConfigAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapter.class);
 
-    private final ObjectMapper mapper = new ObjectMapper();
-
-
     /**
      * This is the given path to WSDL or Swagger. It is either set using -a parameter or as part of the config file
      */
@@ -66,15 +59,12 @@ public class APIImportConfigAdapter {
     /**
      * The API-Config-File given by the user with -c parameter
      */
-    private File apiConfigFile;
+    private final File apiConfigFile;
 
     /**
      * The APIConfig instance created by the APIConfigImporter
      */
     private API apiConfig;
-
-
-
 
     public APIImportConfigAdapter(APIImportParams params) throws AppException {
         this(params.getConfig(), params.getStage(), params.getApiDefintion(),params.getStageConfig());
@@ -90,25 +80,34 @@ public class APIImportConfigAdapter {
      * @throws AppException if the config-file can't be parsed for some reason
      */
     public APIImportConfigAdapter(String apiConfigFileName, String stage, String pathToAPIDefinition, String stageConfig) throws AppException {
-        super();
+        ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile, false));
-        // We would like to get back the original AppExcepption instead of a JsonMappingException
-        mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
-        mapper.registerModule(module);
         API baseConfig;
         try {
             this.pathToAPIDefinition = pathToAPIDefinition;
             this.apiConfigFile = Utils.locateConfigFile(apiConfigFileName);
             File stageConfigFile = Utils.getStageConfig(stage, stageConfig, this.apiConfigFile);
             // Validate organization for the base config, if no staged-config is given
-            boolean validateOrganization = (stageConfigFile == null) ? true : false;
+            boolean validateOrganization = stageConfigFile == null;
+            try {
+                // Check the config file is json file
+                mapper.readTree(this.apiConfigFile);
+                LOG.debug("Handling JSON Configuration file : {}", apiConfigFile);
+            }catch (IOException ioException){
+                //Handle Yaml config
+                mapper = new ObjectMapper(new YAMLFactory());
+                LOG.debug("Handling Yaml Configuration file: {}", apiConfigFile);
+            }
+            module.addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile, false));
+            // We would like to get back the original AppExcepption instead of a JsonMappingException
+            mapper.disable(DeserializationFeature.WRAP_EXCEPTIONS);
+            mapper.registerModule(module);
             ObjectReader reader = mapper.reader();
             baseConfig = reader.withAttribute("validateOrganization", validateOrganization).forType(DesiredAPI.class).readValue(Utils.substituteVariables(this.apiConfigFile));
             if (stageConfigFile != null) {
                 try {
                     // If the baseConfig doesn't have a valid organization, the stage config must
-                    validateOrganization = (baseConfig.getOrganization() == null) ? true : false;
+                    validateOrganization = baseConfig.getOrganization() == null;
                     ObjectReader updater = mapper.readerForUpdating(baseConfig).withAttribute("validateOrganization", validateOrganization);
                     // Organization must be valid in staged configuration
                     apiConfig = updater.withAttribute("validateOrganization", true).readValue(Utils.substituteVariables(stageConfigFile));
@@ -274,55 +273,61 @@ public class APIImportConfigAdapter {
     private void validateDescription(API apiConfig) throws AppException {
         if (apiConfig.getDescriptionType() == null || apiConfig.getDescriptionType().equals("original")) return;
         String descriptionType = apiConfig.getDescriptionType();
-        if (descriptionType.equals("manual")) {
-            if (apiConfig.getDescriptionManual() == null) {
-                throw new AppException("descriptionManual can't be null with descriptionType set to 'manual'", ErrorCode.CANT_READ_CONFIG_FILE);
-            }
-        } else if (descriptionType.equals("url")) {
-            if (apiConfig.getDescriptionUrl() == null) {
-                throw new AppException("descriptionUrl can't be null with descriptionType set to 'url'", ErrorCode.CANT_READ_CONFIG_FILE);
-            }
-        } else if (descriptionType.equals("markdown")) {
-            if (apiConfig.getDescriptionMarkdown() == null) {
-                throw new AppException("descriptionMarkdown can't be null with descriptionType set to 'markdown'", ErrorCode.CANT_READ_CONFIG_FILE);
-            }
-            if (!apiConfig.getDescriptionMarkdown().startsWith("${env.")) {
-                throw new AppException("descriptionMarkdown must start with an environment variable", ErrorCode.CANT_READ_CONFIG_FILE);
-            }
-        } else if (descriptionType.equals("markdownLocal")) {
-            if (apiConfig.getMarkdownLocal() == null) {
-                throw new AppException("markdownLocal can't be null with descriptionType set to 'markdownLocal'", ErrorCode.CANT_READ_CONFIG_FILE);
-            }
-            try {
-                String markdownDescription = "";
-                String newLine = "";
-                for (String markdownFilename : apiConfig.getMarkdownLocal()) {
-                    if ("ORIGINAL".equals(markdownFilename)) {
-                        markdownDescription += newLine + apiConfig.getApiDefinition().getDescription();
-                    } else {
-                        File markdownFile = new File(markdownFilename);
-                        if (!markdownFile.exists()) { // The file isn't provided with an absolute path, try to read it relative to the config file
-                            LOG.trace("Error reading markdown description file (absolute): {}", markdownFile.getCanonicalPath());
-                            String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
-                            markdownFile = new File(baseDir + "/" + markdownFilename);
-                        }
-                        if (!markdownFile.exists()) {
-                            LOG.trace("Error reading markdown description file (relative): {}", markdownFile.getCanonicalPath());
-                            throw new AppException("Error reading markdown description file: " + markdownFilename, ErrorCode.CANT_READ_CONFIG_FILE);
-                        }
-                        LOG.debug("Reading local markdown description file: {}", markdownFile.getPath());
-                        markdownDescription += newLine + new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8);
-                    }
-                    newLine = "\n";
+        switch (descriptionType) {
+            case "manual":
+                if (apiConfig.getDescriptionManual() == null) {
+                    throw new AppException("descriptionManual can't be null with descriptionType set to 'manual'", ErrorCode.CANT_READ_CONFIG_FILE);
                 }
-                apiConfig.setDescriptionManual(markdownDescription);
-                apiConfig.setDescriptionType("manual");
-            } catch (IOException e) {
-                throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE, e);
-            }
-        } else if (descriptionType.equals("original")) {
-        } else {
-            throw new AppException("Unknown descriptionType: '" + descriptionType + "'", ErrorCode.CANT_READ_CONFIG_FILE);
+                break;
+            case "url":
+                if (apiConfig.getDescriptionUrl() == null) {
+                    throw new AppException("descriptionUrl can't be null with descriptionType set to 'url'", ErrorCode.CANT_READ_CONFIG_FILE);
+                }
+                break;
+            case "markdown":
+                if (apiConfig.getDescriptionMarkdown() == null) {
+                    throw new AppException("descriptionMarkdown can't be null with descriptionType set to 'markdown'", ErrorCode.CANT_READ_CONFIG_FILE);
+                }
+                if (!apiConfig.getDescriptionMarkdown().startsWith("${env.")) {
+                    throw new AppException("descriptionMarkdown must start with an environment variable", ErrorCode.CANT_READ_CONFIG_FILE);
+                }
+                break;
+            case "markdownLocal":
+                if (apiConfig.getMarkdownLocal() == null) {
+                    throw new AppException("markdownLocal can't be null with descriptionType set to 'markdownLocal'", ErrorCode.CANT_READ_CONFIG_FILE);
+                }
+                try {
+                    StringBuilder markdownDescription = new StringBuilder();
+                    String newLine = "";
+                    for (String markdownFilename : apiConfig.getMarkdownLocal()) {
+                        if ("ORIGINAL".equals(markdownFilename)) {
+                            markdownDescription.append(newLine).append(apiConfig.getApiDefinition().getDescription());
+                        } else {
+                            File markdownFile = new File(markdownFilename);
+                            if (!markdownFile.exists()) { // The file isn't provided with an absolute path, try to read it relative to the config file
+                                LOG.trace("Error reading markdown description file (absolute): {}", markdownFile.getCanonicalPath());
+                                String baseDir = this.apiConfigFile.getCanonicalFile().getParent();
+                                markdownFile = new File(baseDir + "/" + markdownFilename);
+                            }
+                            if (!markdownFile.exists()) {
+                                LOG.trace("Error reading markdown description file (relative): {}", markdownFile.getCanonicalPath());
+                                throw new AppException("Error reading markdown description file: " + markdownFilename, ErrorCode.CANT_READ_CONFIG_FILE);
+                            }
+                            LOG.debug("Reading local markdown description file: {}", markdownFile.getPath());
+                            markdownDescription.append(newLine).append(new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8));
+                        }
+                        newLine = "\n";
+                    }
+                    apiConfig.setDescriptionManual(markdownDescription.toString());
+                    apiConfig.setDescriptionType("manual");
+                } catch (IOException e) {
+                    throw new AppException("Error reading markdown description file: " + apiConfig.getMarkdownLocal(), ErrorCode.CANT_READ_CONFIG_FILE, e);
+                }
+                break;
+            case "original":
+                break;
+            default:
+                throw new AppException("Unknown descriptionType: '" + descriptionType + "'", ErrorCode.CANT_READ_CONFIG_FILE);
         }
     }
 
@@ -334,25 +339,29 @@ public class APIImportConfigAdapter {
             if (descriptionType == null) {
                 throw new AppException("apiMethods descriptionType can't be null set default value as 'original'", ErrorCode.CANT_READ_CONFIG_FILE);
             }
-            if (descriptionType.equals("original"))
-                return;
-            else if (descriptionType.equals("manual")) {
-                if (apiMethod.getDescriptionManual() == null) {
-                    throw new AppException("apiMethods descriptionManual can't be null with descriptionType set to 'manual'", ErrorCode.CANT_READ_CONFIG_FILE);
-                }
-            } else if (descriptionType.equals("url")) {
-                if (apiMethod.getDescriptionUrl() == null) {
-                    throw new AppException("apiMethods descriptionUrl can't be null with descriptionType set to 'url'", ErrorCode.CANT_READ_CONFIG_FILE);
-                }
-            } else if (descriptionType.equals("markdown")) {
-                if (apiMethod.getDescriptionMarkdown() == null) {
-                    throw new AppException("apiMethods descriptionMarkdown can't be null with descriptionType set to 'markdown'", ErrorCode.CANT_READ_CONFIG_FILE);
-                }
-                if (!apiMethod.getDescriptionMarkdown().startsWith("${env.")) {
-                    throw new AppException("apiMethods descriptionMarkdown must start with an environment variable", ErrorCode.CANT_READ_CONFIG_FILE);
-                }
-            } else {
-                throw new AppException("apiMethods Unknown descriptionType: '" + descriptionType + "'", ErrorCode.CANT_READ_CONFIG_FILE);
+            switch (descriptionType) {
+                case "original":
+                    return;
+                case "manual":
+                    if (apiMethod.getDescriptionManual() == null) {
+                        throw new AppException("apiMethods descriptionManual can't be null with descriptionType set to 'manual'", ErrorCode.CANT_READ_CONFIG_FILE);
+                    }
+                    break;
+                case "url":
+                    if (apiMethod.getDescriptionUrl() == null) {
+                        throw new AppException("apiMethods descriptionUrl can't be null with descriptionType set to 'url'", ErrorCode.CANT_READ_CONFIG_FILE);
+                    }
+                    break;
+                case "markdown":
+                    if (apiMethod.getDescriptionMarkdown() == null) {
+                        throw new AppException("apiMethods descriptionMarkdown can't be null with descriptionType set to 'markdown'", ErrorCode.CANT_READ_CONFIG_FILE);
+                    }
+                    if (!apiMethod.getDescriptionMarkdown().startsWith("${env.")) {
+                        throw new AppException("apiMethods descriptionMarkdown must start with an environment variable", ErrorCode.CANT_READ_CONFIG_FILE);
+                    }
+                    break;
+                default:
+                    throw new AppException("apiMethods Unknown descriptionType: '" + descriptionType + "'", ErrorCode.CANT_READ_CONFIG_FILE);
             }
         }
     }
@@ -451,6 +460,7 @@ public class APIImportConfigAdapter {
     }
 
     private void completeCaCerts(API apiConfig) throws AppException {
+        ObjectMapper mapper = new ObjectMapper();
         if (apiConfig.getCaCerts() != null) {
             List<CaCert> completedCaCerts = new ArrayList<>();
             for (CaCert cert : apiConfig.getCaCerts()) {
@@ -688,7 +698,7 @@ public class APIImportConfigAdapter {
                 if (this.getClass().getResource(keystore) == null) {
                     throw new AppException("Can't read Client-Certificate-Keystore: " + keystore + " from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR);
                 }
-                clientCertFile = new File(this.getClass().getResource(keystore).getFile());
+                clientCertFile = new File(Objects.requireNonNull(this.getClass().getResource(keystore)).getFile());
             }
             JsonNode fileData;
             try (InputStream inputStream = Files.newInputStream(clientCertFile.toPath())) {

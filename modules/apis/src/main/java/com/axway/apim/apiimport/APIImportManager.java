@@ -10,8 +10,8 @@ import com.axway.apim.apiimport.actions.RepublishToUpdateAPI;
 import com.axway.apim.apiimport.actions.UpdateExistingAPI;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 
 public class APIImportManager {
 
@@ -58,6 +58,7 @@ public class APIImportManager {
                 throw new AppException("No changes detected between Import- and API-Manager-API: '" + changeState.getActualAPI().getName() + "' (" + changeState.getActualAPI().getId() + ")", ErrorCode.NO_CHANGE);
             }
             LOG.info("Recognized the following changes. Potentially Breaking: {} plus Non-Breaking: {}", changeState.getBreakingChanges(), changeState.getNonBreakingChanges());
+            LOG.info("Is Breaking changes : {} Enforce Breaking changes : {}", changeState.isBreaking(), enforceBreakingChange);
             if (changeState.isBreaking()) { // Make sure, breaking changes aren't applied without enforcing it.
                 if (!enforceBreakingChange) {
                     throw new AppException("A potentially breaking change can't be applied without enforcing it! Try option: -force", ErrorCode.BREAKING_CHANGE_DETECTED);

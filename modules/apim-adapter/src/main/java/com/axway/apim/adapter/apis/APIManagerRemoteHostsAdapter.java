@@ -4,8 +4,8 @@ import com.axway.apim.adapter.jackson.OrganizationSerializerModifier;
 import com.axway.apim.adapter.jackson.UserSerializerModifier;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.POSTRequest;
 import com.axway.apim.lib.utils.rest.PUTRequest;
@@ -50,18 +50,17 @@ public class APIManagerRemoteHostsAdapter {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/remotehosts").build();
             RestAPICall getRequest = new GETRequest(uri);
-            LOG.debug("Load remote hosts from API-Manager using filter: " + filter);
-            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+            LOG.debug("Load remote hosts from API-Manager using filter: {}", filter);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
-                    LOG.error("Error loading remoteHosts from API-Manager. Response-Code: " + statusCode + ". Got response: '" + response + "'");
+                    LOG.error("Error loading remoteHosts from API-Manager. Response-Code: {} Got Response Body:{}", statusCode, response);
                     throw new AppException("Error loading remoteHosts from API-Manager. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 apiManagerResponse.put(filter, response);
             }
         } catch (Exception e) {
-            LOG.error("Error cant read remoteHosts from API-Manager. Can't parse response: ", e);
             throw new AppException("Can't read remoteHosts from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -126,10 +125,10 @@ public class APIManagerRemoteHostsAdapter {
                     HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
                     request = new PUTRequest(entity, uri);
                 }
-                try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error creating/updating remote host. Response-Code: " + statusCode + ". Got response: '" + EntityUtils.toString(httpResponse.getEntity()) + "'");
+                        LOG.error("Error creating/updating remote host. Response-Code: {}  Response Body: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
                         throw new AppException("Error creating/updating remote host. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                     }
                     createdRemoteHost = mapper.readValue(httpResponse.getEntity().getContent(), RemoteHost.class);

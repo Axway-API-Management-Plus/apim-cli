@@ -1,7 +1,7 @@
 package com.axway.apim.lib.utils;
 
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -33,7 +33,7 @@ public class HTTPClient implements AutoCloseable {
 	private final String password;
 	private final String username;
 	
-	private CloseableHttpClient httpClient = null;
+	private CloseableHttpClient closeableHttpClient = null;
 	
 	private HttpClientContext clientContext;
 	
@@ -66,21 +66,21 @@ public class HTTPClient implements AutoCloseable {
 				clientContext.setAuthCache(authCache);
 				httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
 			}
-			this.httpClient = httpClientBuilder.build();
+			this.closeableHttpClient = httpClientBuilder.build();
 		} catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
 			throw new AppException("Error creating HTTP-Client.", ErrorCode.UNXPECTED_ERROR, e);
 		}
 	}
 	
-	public CloseableHttpResponse execute(HttpUriRequest request) throws Exception {
-		return httpClient.execute(request, clientContext);
+	public CloseableHttpResponse execute(HttpUriRequest request) throws IOException {
+		return closeableHttpClient.execute(request, clientContext);
 	}
 
 
 	@Override
 	public void close() throws Exception {
 		try {
-			this.httpClient.close();
+			this.closeableHttpClient.close();
 		} catch (IOException e) {
 			LOG.error("error closing http client", e);
 		}

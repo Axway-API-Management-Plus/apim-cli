@@ -2,12 +2,12 @@ package com.axway.apim.api.export;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.apiSpecification.APISpecification;
-import com.axway.apim.api.apiSpecification.WSDLSpecification;
+import com.axway.apim.api.specification.APISpecification;
+import com.axway.apim.api.specification.WSDLSpecification;
 import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,7 +26,7 @@ import java.util.Map;
 public class ExportAPI {
     API actualAPIProxy = null;
 
-    public String getPath() throws AppException {
+    public String getPath() {
         return this.actualAPIProxy.getPath();
     }
 
@@ -68,7 +68,7 @@ public class ExportAPI {
 
     public List<SecurityProfile> getSecurityProfiles() throws AppException {
         if (this.actualAPIProxy.getSecurityProfiles().size() == 1) {
-            if (this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().size() == 0)
+            if (this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().isEmpty())
                 return null;
             if (this.actualAPIProxy.getSecurityProfiles().get(0).getDevices().get(0).getType() == DeviceType.passThrough)
                 return null;
@@ -156,7 +156,7 @@ public class ExportAPI {
     }
 
 
-    public String getState() throws AppException {
+    public String getState() {
         return this.actualAPIProxy.getState();
     }
 
@@ -247,7 +247,7 @@ public class ExportAPI {
 
     public List<CaCert> getCaCerts() {
         if (this.actualAPIProxy.getCaCerts() == null) return null;
-        if (this.actualAPIProxy.getCaCerts().size() == 0) return null;
+        if (this.actualAPIProxy.getCaCerts().isEmpty()) return null;
         return this.actualAPIProxy.getCaCerts();
     }
 
@@ -277,7 +277,7 @@ public class ExportAPI {
 
     public List<String> getClientOrganizations() throws AppException {
         if (!APIManagerAdapter.hasAdminAccount()) return null;
-        if (this.actualAPIProxy.getClientOrganizations().size() == 0) return null;
+        if (this.actualAPIProxy.getClientOrganizations().isEmpty()) return null;
         if (this.actualAPIProxy.getClientOrganizations().size() == 1 &&
                 this.actualAPIProxy.getClientOrganizations().get(0).getName().equals(getOrganization()))
             return null;
@@ -289,7 +289,7 @@ public class ExportAPI {
     }
 
     public List<ClientApplication> getApplications() {
-        if (this.actualAPIProxy.getApplications().size() == 0) return null;
+        if (this.actualAPIProxy.getApplications().isEmpty()) return null;
         List<ClientApplication> exportApps = new ArrayList<>();
         for (ClientApplication app : this.actualAPIProxy.getApplications()) {
             ClientApplication exportApp = new ClientApplication();
@@ -315,7 +315,7 @@ public class ExportAPI {
 
 
     public String getBackendBasepath() {
-        //if(this.actualAPIProxy.getResourcePath()!=null) {
+
         // The API Manager composes the actual backend path from the host + path and backend resource path
         // specified in the frontend.
         // So if the backend was imported with the resourcepath /v2 and the backend is configured with
@@ -327,15 +327,12 @@ public class ExportAPI {
 
         //ISSUE-299
         // Resource path is part of API specification (like open api servers.url or swagger basePath) and we don't need to manage it in config file.
-        //	return this.getServiceProfiles().get("_default").getBasePath() + this.actualAPIProxy.getResourcePath();
-        //} else {
         return this.getServiceProfiles().get("_default").getBasePath();
-        //}
     }
 
     public List<APIMethod> getApiMethods() {
         List<APIMethod> apiMethods = this.actualAPIProxy.getApiMethods();
-        if (apiMethods == null || apiMethods.size() == 0) return null;
+        if (apiMethods == null || apiMethods.isEmpty()) return null;
         List<APIMethod> apiMethodsTransformed = new ArrayList<>();
         for (APIMethod actualMethod : apiMethods) {
             APIMethod apiMethod = new APIMethod();
@@ -356,9 +353,5 @@ public class ExportAPI {
             apiMethod.setDescriptionType(descriptionType);
         }
         return apiMethodsTransformed;
-    }
-
-    public String toStringShort() {
-        return this.actualAPIProxy.toStringShort();
     }
 }

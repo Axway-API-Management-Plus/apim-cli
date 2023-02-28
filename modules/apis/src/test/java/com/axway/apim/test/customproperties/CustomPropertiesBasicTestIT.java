@@ -29,7 +29,7 @@ public class CustomPropertiesBasicTestIT extends TestNGCitrusTestDesigner {
 		echo("####### 1. Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "unpublished");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config_IT.json");
 		createVariable("customProperty1", "Test-Input 1");
 		createVariable("customProperty2", "1");
 		createVariable("customProperty3", "true");
@@ -57,7 +57,7 @@ public class CustomPropertiesBasicTestIT extends TestNGCitrusTestDesigner {
 		echo("####### 2. Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "published");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config_IT.json");
 		createVariable("customProperty1", "Test-Input 0815");
 		createVariable("customProperty2", "2");
 		createVariable("customProperty3", "false");
@@ -85,7 +85,7 @@ public class CustomPropertiesBasicTestIT extends TestNGCitrusTestDesigner {
 		echo("####### 3. Re-Import with No-Change #######");
 		createVariable("status", "published");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config_IT.json");
 		createVariable("customProperty1", "Test-Input 0815");
 		createVariable("customProperty2", "2");
 		createVariable("customProperty3", "false");
@@ -96,7 +96,7 @@ public class CustomPropertiesBasicTestIT extends TestNGCitrusTestDesigner {
 		echo("####### 4. Importing API: '${apiName}' on path: '${apiPath}' with following settings: #######");
 		createVariable("status", "published");
 		createVariable(ImportTestAction.API_DEFINITION,  "/com/axway/apim/test/files/security/petstore.json");
-		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config.json");
+		createVariable(ImportTestAction.API_CONFIG,  "/com/axway/apim/test/files/customproperties/1_custom-properties-config_IT.json");
 		createVariable("customProperty1", "Test-Input Final");
 		createVariable("customProperty2", "3");
 		createVariable("customProperty3", "false");

@@ -12,16 +12,17 @@ import com.axway.apim.adapter.apis.OrgFilter.Builder;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.organization.lib.OrgExportParams;
 
 public abstract class OrgResultHandler {
-	
-	protected static Logger LOG = LoggerFactory.getLogger(OrgResultHandler.class);
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(OrgResultHandler.class);
+
 	public enum ResultHandler {
 		JSON_EXPORTER(JsonOrgExporter.class),
+		YAML_EXPORTER(YamlOrgExporter.class),
 		CONSOLE_EXPORTER(ConsoleOrgExporter.class),
 		ORG_DELETE_HANDLER(DeleteOrgHandler.class);
 		

@@ -9,7 +9,7 @@ import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.CoreParameters.Mode;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.StandardImportCLIOptions;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public class CLIAPIImportOptions extends CLIOptions {
 
@@ -70,20 +70,16 @@ public class CLIAPIImportOptions extends CLIOptions {
 		option = new Option("quotaMode", true, "Controls how quotas are managed in API-Manager. Defaults to add!");
 		option.setArgName("ignore|replace|add");
 		addOption(option);
-		
-		option = new Option("replaceHostInSwagger", true, "Controls if you want to replace the host in your Swagger-File ");
-		option.setRequired(false);
-		option.setArgName("true");
-		addInternalOption(option);
+
 		
 		option = new Option("validateRemoteHost", true, "Disables the remote host validation which is turned on by default if a remote host is given");
 		option.setRequired(false);
 		option.setArgName("false");
-		addInternalOption(option);
+		addOption(option);
 		
 		option = new Option("changeOrganization", "Set this flag to allow to change the organization of an existing API.");
 		option.setRequired(false);
-		addInternalOption(option);
+		addOption(option);
 		
 		option = new Option("detailsExportFile", true, "Configure a filename, to get a Key=Value file containing information about the created API.");
 		option.setRequired(false);
@@ -96,7 +92,7 @@ public class CLIAPIImportOptions extends CLIOptions {
 		
 		option = new Option("zeroDowntimeUpdate", "Always update a published APIs by creating a new API and switch clients to it. Defaults to false");
 		option.setRequired(false);
-		addInternalOption(option);
+		addOption(option);
 	}
 
 	@Override

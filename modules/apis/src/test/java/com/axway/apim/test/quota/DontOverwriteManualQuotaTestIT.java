@@ -108,7 +108,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		
 		echo("####### Validate all previously configured APPLICATION quotas (manually configured) do exists #######");
 		echo("####### ############ Sleep 2 seconds ##################### #######");
-		Thread.sleep(2000);
+		sleep(2000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+ APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].type", "throttlemb")
@@ -121,7 +121,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		
 		echo("####### Validate all previously configured SYSTEM quotas (manually configured) do exists #######");
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+ APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
-		Thread.sleep(5000);
+		sleep(10000);
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].type", "throttle")
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].config.per", "3")
@@ -144,7 +144,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		
 		echo("####### Validate all APPLICATION quotas (manually configured & API-Config) do exists #######");
 		echo("####### ############ Sleep 2 seconds ##################### #######");
-		Thread.sleep(2000);
+		sleep(5000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+ APIManagerAdapter.APPLICATION_DEFAULT_QUOTA).header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 			.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId1}')].type", "throttlemb")
@@ -164,7 +164,7 @@ public class DontOverwriteManualQuotaTestIT extends TestNGCitrusTestRunner {
 		
 		echo("####### Validate all SYSTEM quotas (manually configured & API-Config) do exists #######");
 		echo("####### ############ Sleep 2 seconds ##################### #######");
-		Thread.sleep(2000);
+		sleep(5000);
 		http(builder -> builder.client("apiManager").send().get("/quotas/"+ APIManagerAdapter.SYSTEM_API_QUOTA).header("Content-Type", "application/json"));
 		http(builder -> builder.client("apiManager").receive().response(HttpStatus.OK).messageType(MessageType.JSON)
 				.validate("$.restrictions.[?(@.api=='${apiId}' && @.method=='${testMethodId3}')].type", "throttle")

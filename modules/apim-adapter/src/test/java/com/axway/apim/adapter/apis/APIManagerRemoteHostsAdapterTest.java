@@ -4,7 +4,7 @@ import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -15,44 +15,47 @@ import java.util.Map;
 
 public class APIManagerRemoteHostsAdapterTest extends WiremockWrapper {
 
+    private APIManagerAdapter apiManagerAdapter;
+
     @BeforeClass
-    public void initWiremock() {
-        super.initWiremock();
+    public void init() {
+        try {
+            initWiremock();
+            APIManagerAdapter.deleteInstance();
+            CoreParameters coreParameters = new CoreParameters();
+            coreParameters.setHostname("localhost");
+            coreParameters.setUsername("apiadmin");
+            coreParameters.setPassword(Utils.getEncryptedPassword());
+            apiManagerAdapter = APIManagerAdapter.getInstance();
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
     }
+
 
     @AfterClass
     public void close() {
         super.close();
     }
 
-    public void setupParameters() throws AppException {
-        APIManagerAdapter.deleteInstance();
-        CoreParameters coreParameters = new CoreParameters();
-        coreParameters.setHostname("localhost");
-        coreParameters.setUsername("test");
-        coreParameters.setPassword(Utils.getEncryptedPassword());
-    }
 
     @Test
     public void getRemoteHosts() throws AppException {
-        setupParameters();
-        APIManagerRemoteHostsAdapter apiManagerRemoteHostsAdapter = APIManagerAdapter.getInstance().remoteHostsAdapter;
+        APIManagerRemoteHostsAdapter apiManagerRemoteHostsAdapter = apiManagerAdapter.remoteHostsAdapter;
         Map<String, RemoteHost> remoteHostMap = apiManagerRemoteHostsAdapter.getRemoteHosts(new RemoteHostFilter.Builder().build());
         Assert.assertNotNull(remoteHostMap);
     }
 
     @Test
     public void getRemoteHost() throws AppException {
-        setupParameters();
-        APIManagerRemoteHostsAdapter apiManagerRemoteHostsAdapter = APIManagerAdapter.getInstance().remoteHostsAdapter;
+        APIManagerRemoteHostsAdapter apiManagerRemoteHostsAdapter = apiManagerAdapter.remoteHostsAdapter;
         RemoteHost remoteHost = apiManagerRemoteHostsAdapter.getRemoteHost("api.axway.com", 443);
         Assert.assertNotNull(remoteHost);
     }
 
     @Test
     public void addRemoteHost() throws AppException {
-        setupParameters();
-        APIManagerRemoteHostsAdapter apiManagerRemoteHostsAdapter = APIManagerAdapter.getInstance().remoteHostsAdapter;
+        APIManagerRemoteHostsAdapter apiManagerRemoteHostsAdapter = apiManagerAdapter.remoteHostsAdapter;
         RemoteHost remoteHost = apiManagerRemoteHostsAdapter.getRemoteHost("api.axway.com", 443);
         Assert.assertNotNull(remoteHost);
         apiManagerRemoteHostsAdapter.createOrUpdateRemoteHost(remoteHost, null);
@@ -60,8 +63,7 @@ public class APIManagerRemoteHostsAdapterTest extends WiremockWrapper {
 
     @Test
     public void updateRemoteHost() throws AppException {
-        setupParameters();
-        APIManagerRemoteHostsAdapter apiManagerRemoteHostsAdapter = APIManagerAdapter.getInstance().remoteHostsAdapter;
+        APIManagerRemoteHostsAdapter apiManagerRemoteHostsAdapter = apiManagerAdapter.remoteHostsAdapter;
         RemoteHost remoteHost = apiManagerRemoteHostsAdapter.getRemoteHost("api.axway.com", 443);
         Assert.assertNotNull(remoteHost);
         RemoteHost updatedRemoteHost = new RemoteHost();

@@ -10,8 +10,8 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
@@ -69,13 +69,14 @@ public class APIManagerQuotaAdapter {
     ObjectMapper mapper = new ObjectMapper();
 
     private final CoreParameters cmd;
+    private final Map<String, String> apiManagerResponse = new HashMap<>();
+
 
     public APIManagerQuotaAdapter() {
         cmd = CoreParameters.getInstance();
         applicationsQuotaCache = APIManagerAdapter.getCache(CacheType.applicationsQuotaCache, String.class, String.class);
     }
 
-    Map<String, String> apiManagerResponse = new HashMap<>();
 
     private void readQuotaFromAPIManager(String quotaId) throws AppException {
         if (!APIManagerAdapter.hasAdminAccount()) return;
@@ -196,7 +197,7 @@ public class APIManagerQuotaAdapter {
                     apiRestrictions.add(restriction);
                 }
             }
-            if (apiRestrictions.size() == 0) return null;
+            if (apiRestrictions.isEmpty()) return null;
             APIQuota apiQuota = new APIQuota();
             apiQuota.setDescription(quotaConfig.getDescription());
             apiQuota.setName(quotaConfig.getName());

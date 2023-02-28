@@ -4,8 +4,8 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.api.model.Config;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -88,7 +89,6 @@ public class APIManagerConfigAdapter {
         if (apiManagerResponse.get(useAdmin) != null) return;
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/config").build();
-            LOG.debug("API-Manager configuration URL : {}", uri);
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
@@ -100,7 +100,6 @@ public class APIManagerConfigAdapter {
                 apiManagerResponse.put(useAdmin, response);
             }
         } catch (Exception e) {
-            LOG.error("Error cant read configuration from API-Manager. Can't parse response: ", e);
             throw new AppException("Can't read configuration from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -128,31 +127,19 @@ public class APIManagerConfigAdapter {
             mapper.setFilterProvider(filter);
             mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(false)));
             mapper.setSerializationInclusion(Include.NON_NULL);
-            try {
-                RestAPICall request;
-                String json = mapper.writeValueAsString(desiredConfig);
-                HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                request = new PUTRequest(entity, uri);
-                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
-                    if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error updating API-Manager configuration. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException("Error updating API-Manager configuration. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
-                    }
+            RestAPICall request;
+            String json = mapper.writeValueAsString(desiredConfig);
+            HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+            request = new PUTRequest(entity, uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode < 200 || statusCode > 299) {
+                    LOG.error("Error updating API-Manager configuration. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                    throw new AppException("Error updating API-Manager configuration. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-            } catch (Exception e) {
-                throw new AppException("Error updating API-Manager configuration.", ErrorCode.API_MANAGER_COMMUNICATION, e);
             }
-        } catch (Exception e) {
+        } catch (IOException | URISyntaxException e) {
             throw new AppException("Error updating API-Manager configuration.", ErrorCode.CANT_CREATE_API_PROXY, e);
         }
-    }
-
-    void setAPIManagerTestResponse(String jsonResponse, boolean useAdmin) {
-        if (jsonResponse == null) {
-            LOG.error("Test-Response is empty. Ignoring!");
-            return;
-        }
-        this.apiManagerResponse.put(useAdmin, jsonResponse);
     }
 }

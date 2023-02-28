@@ -3,6 +3,7 @@ package com.axway.apim.appimport.it.customProperties;
 import java.io.File;
 import java.io.IOException;
 
+import com.axway.apim.testActions.TestParams;
 import org.springframework.http.HttpStatus;
 import org.testng.Assert;
 import org.testng.annotations.Optional;
@@ -12,8 +13,7 @@ import org.testng.annotations.Test;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appimport.it.ExportAppTestAction;
 import com.axway.apim.appimport.it.ImportAppTestAction;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.lib.testActions.TestParams;
+import com.axway.apim.lib.error.AppException;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;

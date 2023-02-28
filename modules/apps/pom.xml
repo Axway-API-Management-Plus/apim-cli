@@ -25,29 +25,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-            <artifactId>apimcli-apim-adapter</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
             <artifactId>apimcli-apis</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-            <artifactId>apimcli-apis</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
-            <artifactId>apimcli-tests</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -66,26 +44,6 @@
             <artifactId>jackson-dataformat-xml</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-http</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-java-dsl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.consol.citrus</groupId>
-            <artifactId>citrus-ws</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
         </dependency>
@@ -94,13 +52,23 @@
             <artifactId>ascii-table</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-jre8-standalone</artifactId>
-            <version>${wiremock.version}</version>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+            <artifactId>apimcli-apis</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
+            <artifactId>apimcli-tests</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

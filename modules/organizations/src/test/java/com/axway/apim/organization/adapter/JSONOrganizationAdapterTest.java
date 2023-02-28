@@ -1,31 +1,33 @@
 package com.axway.apim.organization.adapter;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
+import com.axway.apim.WiremockWrapper;
+import com.axway.apim.api.model.Organization;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.organization.lib.OrgImportParams;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.axway.apim.adapter.apis.APIManagerMockBase;
-import com.axway.apim.api.model.Organization;
-import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.organization.lib.OrgImportParams;
+import java.io.File;
+import java.util.List;
 
-public class JSONOrganizationAdapterTest extends APIManagerMockBase {
-	
-	private static final String testPackage = "/com/axway/apim/organization/adapter";
-	
+import static org.testng.Assert.*;
+
+public class JSONOrganizationAdapterTest extends WiremockWrapper {
+
 	@BeforeClass
-	private void initTestIndicator() throws AppException, IOException {
-		new CoreParameters();
-		setupMockData();
+	public void init() {
+		initWiremock();
 	}
+
+	@AfterClass
+	public void stop() {
+		close();
+	}
+
+	private static final String testPackage = "/com/axway/apim/organization/adapter";
+
 	
 	@Test
 	public void readSingleOrgTest() throws AppException {
@@ -33,8 +35,10 @@ public class JSONOrganizationAdapterTest extends APIManagerMockBase {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		OrgImportParams importParams = new OrgImportParams();
 		importParams.setConfig(testFile);
-		
-		JSONOrgAdapter adapter = new JSONOrgAdapter(importParams);
+		importParams.setHostname("localhost");
+		importParams.setUsername("apiadmin");
+		importParams.setPassword(Utils.getEncryptedPassword());
+		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 1, "Expected 1 org returned from the Adapter");
 		Organization org = orgs.get(0);
@@ -47,8 +51,10 @@ public class JSONOrganizationAdapterTest extends APIManagerMockBase {
 		assertTrue(new File(testFile).exists(), "Test file doesn't exists");
 		OrgImportParams importParams = new OrgImportParams();
 		importParams.setConfig(testFile);
-		
-		JSONOrgAdapter adapter = new JSONOrgAdapter(importParams);
+		importParams.setHostname("localhost");
+		importParams.setUsername("apiadmin");
+		importParams.setPassword(Utils.getEncryptedPassword());
+		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 2, "Expected 2 apps returned from the Adapter");
 	}
@@ -60,8 +66,10 @@ public class JSONOrganizationAdapterTest extends APIManagerMockBase {
 		OrgImportParams importParams = new OrgImportParams();
 		importParams.setConfig(testFile);
 		importParams.setStage("test-stage");
-		
-		JSONOrgAdapter adapter = new JSONOrgAdapter(importParams);
+		importParams.setHostname("localhost");
+		importParams.setUsername("apiadmin");
+		importParams.setPassword(Utils.getEncryptedPassword());
+		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		// Stage for a list of organizations is not supported!
 		adapter.getOrganizations();
 	}
@@ -73,8 +81,10 @@ public class JSONOrganizationAdapterTest extends APIManagerMockBase {
 		OrgImportParams importParams = new OrgImportParams();
 		importParams.setConfig(testFile);
 		importParams.setStage("test-stage");
-		
-		JSONOrgAdapter adapter = new JSONOrgAdapter(importParams);
+		importParams.setHostname("localhost");
+		importParams.setUsername("apiadmin");
+		importParams.setPassword(Utils.getEncryptedPassword());
+		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 1, "Expected 1 org returned from the Adapter");
 		Organization org = orgs.get(0);
@@ -88,8 +98,10 @@ public class JSONOrganizationAdapterTest extends APIManagerMockBase {
 		OrgImportParams importParams = new OrgImportParams();
 		importParams.setConfig(testFile);
 		importParams.setStageConfig("StagedSingleOrganization.json");
-		
-		JSONOrgAdapter adapter = new JSONOrgAdapter(importParams);
+		importParams.setHostname("localhost");
+		importParams.setUsername("apiadmin");
+		importParams.setPassword(Utils.getEncryptedPassword());
+		OrgConfigAdapter adapter = new OrgConfigAdapter(importParams);
 		List<Organization> orgs = adapter.getOrganizations();
 		assertEquals(orgs.size(), 1, "Expected 1 org returned from the Adapter");
 		Organization org = orgs.get(0);

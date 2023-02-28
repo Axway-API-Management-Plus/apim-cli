@@ -5,7 +5,7 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "quotas_application.json",
+    "bodyFileName": "quotas_application_system.json",
     "headers": {
       "Content-Type": "application/json"
     }

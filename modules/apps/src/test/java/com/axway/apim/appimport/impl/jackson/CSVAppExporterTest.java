@@ -8,7 +8,7 @@ import com.axway.apim.appexport.impl.CSVAppExporter;
 import com.axway.apim.appexport.lib.AppExportCLIOptions;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

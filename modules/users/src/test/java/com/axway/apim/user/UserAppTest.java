@@ -22,29 +22,44 @@ public class UserAppTest extends WiremockWrapper {
     public void stop() {
         close();
     }
+
     @Test
-    public void exportUserByLoginName(){
+    public void exportUserByLoginName() {
         String[] args = {"-h", "localhost", "-loginName", "usera"};
         int returnCode = UserApp.export(args);
         Assert.assertEquals(returnCode, 0);
     }
 
     @Test
-    public void exportUsers(){
+    public void exportUsers() {
         String[] args = {"-h", "localhost"};
         int returnCode = UserApp.export(args);
         Assert.assertEquals(returnCode, 0);
     }
 
     @Test
-    public void exportUserByName(){
+    public void exportUsersJson() {
+        String[] args = {"-h", "localhost", "-o", "json", "-deleteTarget"};
+        int returnCode = UserApp.export(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
+    public void exportUsersYaml() {
+        String[] args = {"-h", "localhost", "-o", "yaml", "-deleteTarget"};
+        int returnCode = UserApp.export(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
+    public void exportUserByName() {
         String[] args = {"-h", "localhost", "-name", "usera"};
         int returnCode = UserApp.export(args);
         Assert.assertEquals(returnCode, 0);
     }
 
     @Test
-    public void importUsers(){
+    public void importUsers() {
         ClassLoader classLoader = this.getClass().getClassLoader();
         String userFile = classLoader.getResource("com/axway/apim/users/userImport/user.json").getFile();
         String[] args = {"-h", "localhost", "-c", userFile};
@@ -53,7 +68,7 @@ public class UserAppTest extends WiremockWrapper {
     }
 
     @Test
-    public void deleteUsers(){
+    public void deleteUsers() {
         String[] args = {"-h", "localhost", "-loginName", "usera"};
         String input = "Y";
         InputStream in = new ByteArrayInputStream(input.getBytes());
@@ -63,7 +78,7 @@ public class UserAppTest extends WiremockWrapper {
     }
 
     @Test
-    public void changePassword(){
+    public void changePassword() {
         String[] args = {"-h", "localhost", "-loginName", "usera", "-newpassword", Utils.getEncryptedPassword()};
         String input = "Y";
         InputStream in = new ByteArrayInputStream(input.getBytes());

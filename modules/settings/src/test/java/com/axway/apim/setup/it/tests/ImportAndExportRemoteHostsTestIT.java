@@ -1,5 +1,6 @@
 package com.axway.apim.setup.it.tests;
 
+import com.axway.apim.testActions.TestParams;
 import org.springframework.http.HttpStatus;
 import org.testng.Assert;
 import org.testng.annotations.Optional;
@@ -8,7 +9,6 @@ import org.testng.annotations.Test;
 
 import com.axway.apim.setup.it.ExportManagerConfigTestAction;
 import com.axway.apim.setup.it.ImportManagerConfigTestAction;
-import com.axway.lib.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;

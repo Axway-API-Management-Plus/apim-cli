@@ -3,7 +3,7 @@
    "path":"/api/method/level/outbound/profile",
    "state":"published",
    "version":"1.0.7",
-   "organization":"API Development",
+   "organization":"orga",
    "outboundProfiles":{
       "_default":{
          "authenticationProfile":"_default",
@@ -32,5 +32,9 @@
             }
          ]
       }
+   },
+   "customProperties": {
+      "customProperty1": "public",
+      "customProperty4": "true"
    }
 }

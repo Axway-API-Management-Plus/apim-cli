@@ -8,7 +8,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.StandardExportParams.Wide;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;

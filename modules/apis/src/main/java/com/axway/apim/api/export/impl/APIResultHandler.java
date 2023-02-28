@@ -1,6 +1,7 @@
 package com.axway.apim.api.export.impl;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -32,8 +33,8 @@ import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.api.model.SecurityDevice;
 import com.axway.apim.api.model.SecurityProfile;
 import com.axway.apim.lib.Result;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 
 public abstract class APIResultHandler {
@@ -46,6 +47,7 @@ public abstract class APIResultHandler {
 
     public enum APIListImpl {
         JSON_EXPORTER(JsonAPIExporter.class),
+        YAML_EXPORTER(YamlAPIExporter.class),
         CONSOLE_EXPORTER(ConsoleAPIExporter.class),
         CSV_EXPORTER(CSVAPIExporter.class),
         DAT_EXPORTER(DATAPIExporter.class),
@@ -247,7 +249,7 @@ public abstract class APIResultHandler {
 
     protected void validateFolder(File localFolder) throws AppException {
         if (localFolder.exists()) {
-            if (params.isDeleteTarget()) {
+            if (Boolean.TRUE.equals(params.isDeleteTarget())) {
                 LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
                 try {
                     FileUtils.deleteDirectory(localFolder);
@@ -263,4 +265,23 @@ public abstract class APIResultHandler {
             throw new AppException("Cant create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
         }
     }
+
+    protected String getAPIExportFolder(String apiExposurePath) {
+        if (apiExposurePath.startsWith("/"))
+            apiExposurePath = apiExposurePath.replaceFirst("/", "");
+        if (apiExposurePath.endsWith("/"))
+            apiExposurePath = apiExposurePath.substring(0, apiExposurePath.length() - 1);
+        apiExposurePath = apiExposurePath.replace("/", "-");
+        return apiExposurePath;
+    }
+
+    protected void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
+
+        try (FileOutputStream fileOutputStream = new FileOutputStream(fileDest)) {
+            fileOutputStream.write(bFile);
+        } catch (IOException e) {
+            throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
+        }
+    }
+
 }

@@ -6,13 +6,12 @@ import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.OrgFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -37,11 +36,7 @@ public class DATAPIExporter extends APIResultHandler {
     @Override
     public void execute(List<API> apis) throws AppException {
         for (API api : apis) {
-            try {
-                saveAPILocally(api);
-            } catch (AppException e) {
-                throw e;
-            }
+            saveAPILocally(api);
         }
     }
 
@@ -51,10 +46,11 @@ public class DATAPIExporter extends APIResultHandler {
         return builder.build();
     }
 
-    private void saveAPILocally(API api) throws AppException {
+    public void saveAPILocally(API api) throws AppException {
         String apiPath = getAPIExportFolder(api.getPath());
-        File localFolder = new File(this.givenExportFolder + File.separator + getVHost(api) + apiPath);
-        LOG.debug("Going to export API: {} into folder: {}", api.toStringShort(), localFolder);
+        String vhost = getVHost(api).replace(":", "_");
+        File localFolder = new File(this.givenExportFolder + File.separator + vhost + File.separator + apiPath);
+        LOG.debug("Going to export API: {} into folder: {}", api, localFolder);
         validateFolder(localFolder);
         byte[] datFileContent = apiManager.apiAdapter.getAPIDatFile(api, datPassword);
         String targetFile = null;
@@ -65,32 +61,13 @@ public class DATAPIExporter extends APIResultHandler {
             throw new AppException("Can't save API-DAT file locally: " + targetFile,
                     ErrorCode.UNXPECTED_ERROR, e);
         }
-        LOG.info("Successfully exported API: {} as DAT-File into folder: {}", api.toStringShort(), localFolder.getAbsolutePath());
+        LOG.info("Successfully exported API: {} as DAT-File into folder: {}", api.getName(), localFolder.getAbsolutePath());
     }
 
     private String getVHost(API api) throws AppException {
-        if (api.getVhost() != null) return api.getVhost() + File.separator;
+        if (api.getVhost() != null) return api.getVhost();
         String orgVHost = APIManagerAdapter.getInstance().orgAdapter.getOrg(new OrgFilter.Builder().hasId(api.getOrganizationId()).build()).getVirtualHost();
-        if (orgVHost != null) return orgVHost + File.separator;
+        if (orgVHost != null) return orgVHost;
         return "";
-    }
-
-
-    private static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
-
-        try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {
-            fileOuputStream.write(bFile);
-        } catch (IOException e) {
-            throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
-        }
-    }
-
-    private String getAPIExportFolder(String apiExposurePath) {
-        if (apiExposurePath.startsWith("/"))
-            apiExposurePath = apiExposurePath.replaceFirst("/", "");
-        if (apiExposurePath.endsWith("/"))
-            apiExposurePath = apiExposurePath.substring(0, apiExposurePath.length() - 1);
-        apiExposurePath = apiExposurePath.replace("/", "-");
-        return apiExposurePath;
     }
 }

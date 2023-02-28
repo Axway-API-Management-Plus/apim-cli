@@ -3,8 +3,8 @@ package com.axway.apim.adapter.apis;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Policy;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -75,7 +75,7 @@ public class APIManagerPoliciesAdapter {
         super();
     }
 
-    Map<PolicyType, String> apiManagerResponse = new HashMap<>();
+    public Map<PolicyType, String> apiManagerResponse = new HashMap<>();
 
     private final Map<PolicyType, List<Policy>> mappedPolicies = new HashMap<>();
     private final List<Policy> allPolicies = new ArrayList<>();
@@ -109,7 +109,7 @@ public class APIManagerPoliciesAdapter {
             mappedPolicies.put(type, policies);
             allPolicies.addAll(policies);
         } catch (Exception e) {
-            LOG.error("Error reading configured custom-policies. Can't parse response: " + apiManagerResponse.get(type), e);
+            LOG.error("Error reading configured custom-policies. Can't parse response: {}", apiManagerResponse.get(type), e);
             throw new AppException("Can't initialize policies for type: " + type, ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -119,7 +119,7 @@ public class APIManagerPoliciesAdapter {
         List<Policy> policies = this.mappedPolicies.get(type);
 
         for (Policy policy : policies) {
-            LOG.info("{}", policy.getName());
+            LOG.info("Policy Name : {}", policy.getName());
             if (policy.getName().equals(name)) {
                 return policy;
             }

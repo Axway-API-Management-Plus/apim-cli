@@ -4,7 +4,7 @@ import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.organization.lib.OrgExportCLIOptions;
 import com.axway.apim.organization.lib.OrgExportParams;
 import org.testng.annotations.AfterClass;
@@ -26,8 +26,8 @@ public class JsonOrgExporterTest extends WiremockWrapper {
     }
 
     @Test
-    public void tesCVSExport() throws AppException {
-        String[] args = {"-h", "localhost"};
+    public void testJsonExport() throws AppException {
+        String[] args = {"-h", "localhost", "-o", "json", "-deleteTarget"};
         OrgExportParams params = (OrgExportParams) OrgExportCLIOptions.create(args).getParams();
         APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();

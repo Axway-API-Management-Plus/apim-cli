@@ -1,7 +1,7 @@
 package com.axway.apim.apiimport.rollback;
 
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

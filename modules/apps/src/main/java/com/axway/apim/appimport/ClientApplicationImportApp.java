@@ -1,17 +1,17 @@
 package com.axway.apim.appimport;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.adapter.client.apps.ClientAppAdapter;
+import com.axway.apim.adapter.client.apps.ClientAppFilter;
 import com.axway.apim.api.model.apps.ClientApplication;
-import com.axway.apim.appimport.adapter.JSONConfigClientAppAdapter;
+import com.axway.apim.appimport.adapter.ClientAppConfigAdapter;
 import com.axway.apim.appimport.lib.AppImportCLIOptions;
 import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ImportResult;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +65,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the application
-			ClientAppAdapter desiredAppsAdapter = new JSONConfigClientAppAdapter(params, result);
+			ClientAppAdapter desiredAppsAdapter = new ClientAppConfigAdapter(params, result);
 			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
 			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter);
 			for(ClientApplication desiredApp : desiredApps) {

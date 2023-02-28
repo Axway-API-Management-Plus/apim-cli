@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.Result;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public abstract class OrgAdapter {
 	
-	static Logger LOG = LoggerFactory.getLogger(JSONOrgAdapter.class);
+	static Logger LOG = LoggerFactory.getLogger(OrgConfigAdapter.class);
 	
 	List<Organization> orgs;
 	

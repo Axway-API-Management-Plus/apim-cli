@@ -7,7 +7,7 @@ import com.axway.apim.api.export.lib.params.APIGrantAccessParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public class CLIAPIGrantAccessOptions extends CLIOptions {
 	

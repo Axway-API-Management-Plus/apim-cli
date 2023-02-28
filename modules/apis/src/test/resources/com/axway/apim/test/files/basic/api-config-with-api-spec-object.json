@@ -3,23 +3,31 @@
   "path": "/api/v1/Some.Services/XmlApi",
   "state": "published",
   "version": "1.0.0",
-  "organization": "API Development",
+  "organization": "orga",
   "apiSpecification": {
-  	"resource": "petstore.json",
-  	"filter": {
-  		"include": [ { 
-	  		"paths": [ 
-	  			"/test2:GET",
-	  			"test3:GET",
-	  			"test:PUT" 
-	  		]
-	  	}],
-	  	"exclude": [ { 
-	  		"paths": [ 
-	  			"abc:DELETE",
-	  			"xyz:DELETE"
-	  		]
-  		}]
-  	} 
+    "resource": "petstore.json",
+    "filter": {
+      "include": [
+        {
+          "paths": [
+            "/test2:GET",
+            "test3:GET",
+            "test:PUT"
+          ]
+        }
+      ],
+      "exclude": [
+        {
+          "paths": [
+            "abc:DELETE",
+            "xyz:DELETE"
+          ]
+        }
+      ]
+    }
+  },
+  "customProperties": {
+    "customProperty1": "public",
+    "customProperty4": "true"
   }
 }

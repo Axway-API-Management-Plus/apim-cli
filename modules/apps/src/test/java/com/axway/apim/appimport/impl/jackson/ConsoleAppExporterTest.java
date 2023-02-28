@@ -7,9 +7,10 @@ import com.axway.apim.appexport.impl.ApplicationExporter;
 import com.axway.apim.appexport.impl.ConsoleAppExporter;
 import com.axway.apim.appexport.lib.AppExportCLIOptions;
 import com.axway.apim.appexport.lib.AppExportParams;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.utils.TestIndicator;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.utils.Utils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -18,11 +19,22 @@ import java.util.List;
 
 public class ConsoleAppExporterTest extends WiremockWrapper {
 
+    private APIManagerAdapter apimanagerAdapter;
+
     @BeforeClass
     public void init() {
-        initWiremock();
+        try {
+            initWiremock();
+            APIManagerAdapter.deleteInstance();
+            CoreParameters coreParameters = new CoreParameters();
+            coreParameters.setHostname("localhost");
+            coreParameters.setUsername("apiadmin");
+            coreParameters.setPassword(Utils.getEncryptedPassword());
+            apimanagerAdapter = APIManagerAdapter.getInstance();
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
     }
-
     @AfterClass
     public void stop() {
         close();
@@ -30,12 +42,9 @@ public class ConsoleAppExporterTest extends WiremockWrapper {
 
     @Test
     public void tesConsoleExport() throws AppException {
-        TestIndicator.getInstance().setTestRunning(true);
-        String[] args = {"-h", "localhost"};
+        String[] args = {};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
-        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.CONSOLE_EXPORTER, params, result);
         List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
         ConsoleAppExporter consoleAppExporter = new ConsoleAppExporter(params, result);
@@ -44,12 +53,9 @@ public class ConsoleAppExporterTest extends WiremockWrapper {
 
     @Test
     public void tesConsoleExportWide() throws AppException {
-        TestIndicator.getInstance().setTestRunning(true);
-        String[] args = {"-h", "localhost", "-wide"};
+        String[] args = {"-wide"};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
-        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.CONSOLE_EXPORTER, params, result);
         List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
         ConsoleAppExporter consoleAppExporter = new ConsoleAppExporter(params, result);
@@ -58,12 +64,9 @@ public class ConsoleAppExporterTest extends WiremockWrapper {
 
     @Test
     public void tesConsoleExportUltra() throws AppException {
-        TestIndicator.getInstance().setTestRunning(true);
-        String[] args = {"-h", "localhost", "-ultra"};
+        String[] args = {"-ultra"};
         AppExportParams params = (AppExportParams) AppExportCLIOptions.create(args).getParams();
-        APIManagerAdapter.deleteInstance();
         ExportResult result = new ExportResult();
-        APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
         ApplicationExporter exporter = ApplicationExporter.create(ApplicationExporter.ResultHandler.CONSOLE_EXPORTER, params, result);
         List<ClientApplication> apps = apimanagerAdapter.appAdapter.getApplications(exporter.getFilter(), true);
         ConsoleAppExporter consoleAppExporter = new ConsoleAppExporter(params, result);

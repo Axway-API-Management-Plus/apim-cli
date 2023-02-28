@@ -5,14 +5,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import com.axway.apim.lib.utils.rest.Console;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
+import org.apache.commons.cli.*;
 
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 
 public abstract class CLIOptions {
 
@@ -21,26 +17,25 @@ public abstract class CLIOptions {
     private String[] args;
 
     private final Options options = new Options();
-    private final Options internalOptions = new Options();
+
+    // to handle help and version
+    private final Options optionalOptions = new Options();
+
 
     /**
      * This cmd contains all options visible in the usage when using help
      */
     private CommandLine cmd;
-    /**
-     * This CommandLine contains support, but hidden commands. Some of them are used to control testing
-     */
-    private CommandLine internalCmd = null;
-
     private EnvironmentProperties envProperties;
-
     protected String executable = "apim";
 
     protected CLIOptions() {
+        // Define core command line parameters!
+        addHelpAndVersion();
     }
 
     public CLIOptions(String[] args) {
-        super();
+        addHelpAndVersion();
         this.args = args;
     }
 
@@ -48,11 +43,20 @@ public abstract class CLIOptions {
 
     public abstract void addOptions();
 
+    public void addHelpAndVersion() {
+        Option option = new Option("help", "Print the help");
+        option.setRequired(false);
+        optionalOptions.addOption(option);
+
+        option = new Option("version", "Print the APIM CLI Version number");
+        option.setRequired(false);
+        optionalOptions.addOption(option);
+    }
+
+
     public String getValue(String key) {
         if (this.cmd != null && this.cmd.getOptionValue(key) != null) {
             return this.cmd.getOptionValue(key);
-        } else if (this.internalCmd != null && this.internalCmd.getOptionValue(key) != null) {
-            return this.internalCmd.getOptionValue(key);
         } else if (this.envProperties != null && this.envProperties.containsKey(key)) {
             return this.envProperties.get(key);
         } else {
@@ -62,7 +66,6 @@ public abstract class CLIOptions {
 
     public boolean hasOption(String key) {
         return ((this.cmd != null && this.cmd.hasOption(key)) ||
-                (this.cmd != null && this.internalCmd.hasOption(key)) ||
                 (this.envProperties != null && this.envProperties.containsKey(key)));
     }
 
@@ -74,16 +77,19 @@ public abstract class CLIOptions {
      */
     public void parse() throws AppException {
         try {
+            CommandLine commandLine = parser.parse(optionalOptions, args);
+            if (commandLine.hasOption("help")) {
+                printUsage("Usage information", args);
+                throw new AppException("help", ErrorCode.SUCCESS);
+            } else if (commandLine.hasOption("version")) {
+                Console.println(CLIOptions.class.getPackage().getImplementationVersion());
+                throw new AppException("version", ErrorCode.SUCCESS);
+            }
             cmd = parser.parse(options, args);
-            internalCmd = parser.parse(internalOptions, args);
             this.envProperties = new EnvironmentProperties(cmd.getOptionValue("stage"), getValue("apimCLIHome"));
-        } catch (Exception e) {
+        } catch (ParseException e) {
             printUsage(e.getMessage(), args);
             throw new AppException(e.getMessage(), ErrorCode.UNXPECTED_ERROR, e);
-        }
-        if (cmd.hasOption("help")) {
-            printUsage("Usage information", args);
-            System.exit(0);
         }
     }
 
@@ -94,7 +100,7 @@ public abstract class CLIOptions {
 
         formatter.printHelp(getAppName(), options, true);
         Console.println("\n");
-        Console.println("ERROR: " + message);
+        Console.println(message);
         Console.println("\n");
     }
 
@@ -119,9 +125,6 @@ public abstract class CLIOptions {
         this.options.addOption(option);
     }
 
-    public void addInternalOption(Option option) {
-        this.internalOptions.addOption(option);
-    }
 
     /**
      * @return name of the binary to call (.sh, .bat or .exe when using choco)

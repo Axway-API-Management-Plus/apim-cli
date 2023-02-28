@@ -2,12 +2,9 @@ package com.axway.apim.adapter.apis;
 
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.user.APIManagerUserAdapter;
-import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.Organization;
-import com.axway.apim.api.model.User;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -16,32 +13,33 @@ import org.testng.annotations.Test;
 
 public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
 
+    private APIManagerAdapter apiManagerAdapter;
+    String orgName = "orga";
+
     @BeforeClass
-    public void initWiremock() {
-        super.initWiremock();
+    public void init() {
+        try {
+            initWiremock();
+            APIManagerAdapter.deleteInstance();
+            CoreParameters coreParameters = new CoreParameters();
+            coreParameters.setHostname("localhost");
+            coreParameters.setUsername("apiadmin");
+            coreParameters.setPassword(Utils.getEncryptedPassword());
+            apiManagerAdapter = APIManagerAdapter.getInstance();
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
     }
+
 
     @AfterClass
     public void close() {
         super.close();
     }
 
-    // APIManagerUserAdapter apiManagerUserAdapter = new APIManagerUserAdapter();
-    String orgName = "orga";
-
-    public void setupParameters() throws AppException {
-        APIManagerAdapter.deleteInstance();
-        CoreParameters coreParameters = new CoreParameters();
-        coreParameters.setHostname("localhost");
-        coreParameters.setUsername("test");
-        coreParameters.setPassword(Utils.getEncryptedPassword());
-
-    }
 
     @Test
     public void getOrgForName() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         APIManagerOrganizationAdapter apiManagerOrganizationAdapter = apiManagerAdapter.orgAdapter;
         Organization organization = apiManagerOrganizationAdapter.getOrgForName(orgName);
         Assert.assertEquals(organization.getName(), orgName);
@@ -49,8 +47,6 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
 
     @Test
     public void deleteOrganization() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         APIManagerOrganizationAdapter apiManagerOrganizationAdapter = apiManagerAdapter.orgAdapter;
         Organization organization = apiManagerOrganizationAdapter.getOrgForName(orgName);
         try {
@@ -61,9 +57,8 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
     }
 
     @Test
-    public void createOrganization() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
+    public void createOrganization() {
+
         APIManagerOrganizationAdapter apiManagerOrganizationAdapter = apiManagerAdapter.orgAdapter;
         Organization organization = new Organization();
         organization.setName(orgName);
@@ -77,12 +72,11 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
     }
 
     @Test
-    public void updateOrganization() throws AppException {
-        setupParameters();
+    public void updateOrganization() {
 
     }
 
-//    @Test
+    //    @Test
 //    public void updateUserCreateNewUserFlow() throws AppException {
 //        setupParameters();
 //        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
@@ -111,8 +105,6 @@ public class APIManagerOrganizationAdapterTest extends WiremockWrapper {
 //
     @Test
     public void addImage() throws AppException {
-        setupParameters();
-        APIManagerAdapter apiManagerAdapter = APIManagerAdapter.getInstance();
         APIManagerOrganizationAdapter apiManagerOrganizationAdapter = apiManagerAdapter.orgAdapter;
         OrgFilter orgFilter = new OrgFilter.Builder().hasName(orgName).build();
         Organization organization = apiManagerOrganizationAdapter.getOrg(orgFilter);

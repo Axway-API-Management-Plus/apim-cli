@@ -6,7 +6,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public class POSTRequest extends RestAPICall {
 	public POSTRequest(HttpEntity entity, URI uri) {

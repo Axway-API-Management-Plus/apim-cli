@@ -1,7 +1,7 @@
 package com.axway.lib;
 
 import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;

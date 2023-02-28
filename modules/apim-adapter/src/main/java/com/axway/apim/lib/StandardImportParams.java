@@ -48,7 +48,6 @@ public class StandardImportParams extends CoreParameters {
 		return enabledCaches;
 	}
 
-	@Override
 	public List<CacheType> getEnabledCacheTypes() {
 		if(isIgnoreCache()) return null;
 		if(getEnabledCaches()==null) return null;

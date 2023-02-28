@@ -13,11 +13,11 @@ import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.ImportResult;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
-import com.axway.apim.users.adapter.JSONUserAdapter;
+import com.axway.apim.users.adapter.UserConfigAdapter;
 import com.axway.apim.users.adapter.UserAdapter;
 import com.axway.apim.users.impl.UserResultHandler;
 import com.axway.apim.users.impl.UserResultHandler.ResultHandler;
@@ -75,6 +75,8 @@ public class UserApp implements APIMCLIServiceProvider {
             switch (params.getOutputFormat()) {
                 case json:
                     return runExport(params, ResultHandler.JSON_EXPORTER, result);
+                case yaml:
+                    return runExport(params, ResultHandler.YAML_EXPORTER, result);
                 case console:
                 default:
                     return runExport(params, ResultHandler.CONSOLE_EXPORTER, result);
@@ -107,7 +109,6 @@ public class UserApp implements APIMCLIServiceProvider {
             LOG.info("Found {} user(s).", users.size());
             exporter.export(users);
             if (exporter.hasError()) {
-                LOG.info("");
                 LOG.error("Please check the log. At least one error was recorded.");
             } else {
                 LOG.debug("Successfully exported {} user(s).", users.size());
@@ -139,7 +140,7 @@ public class UserApp implements APIMCLIServiceProvider {
             APIMHttpClient.deleteInstances();
             APIManagerAdapter.getInstance();
             // Load the desired state of the organization
-            UserAdapter userAdapter = new JSONUserAdapter(params);
+            UserAdapter userAdapter = new UserConfigAdapter(params);
             List<User> desiredUsers = userAdapter.getUsers();
             UserImportManager importManager = new UserImportManager();
 

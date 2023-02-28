@@ -8,7 +8,7 @@ import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
 import com.axway.apim.api.model.QuotaRestrictiontype;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

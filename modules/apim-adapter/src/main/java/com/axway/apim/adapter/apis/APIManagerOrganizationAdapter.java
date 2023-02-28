@@ -7,8 +7,8 @@ import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.lib.utils.rest.*;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -74,7 +74,6 @@ public class APIManagerOrganizationAdapter {
             LOG.debug("Load organization with URI: {}", uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                    LOG.error("Sent request: {}", uri);
                     LOG.error("Received Status-Code: {} Response: {}", httpResponse.getStatusLine().getStatusCode(), EntityUtils.toString(httpResponse.getEntity()));
                     throw new AppException("", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
@@ -91,7 +90,6 @@ public class APIManagerOrganizationAdapter {
                 }
             }
         } catch (Exception e) {
-            LOG.error("Error cant read orgs from API-Manager with filter: " + filter + ". Can't parse response: ", e);
             throw new AppException("Error cant read orgs from API-Manager with filter: " + filter, ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -230,14 +228,14 @@ public class APIManagerOrganizationAdapter {
         if (orgs.size() > 1) {
             throw new AppException("No unique Organization found for filter: " + filter, ErrorCode.UNKNOWN_API);
         }
-        if (orgs.size() == 0) {
+        if (orgs.isEmpty()) {
             LOG.info("No organization found using filter: {}", filter);
             return null;
         }
         return orgs.get(0);
     }
 
-    void addAPIAccess(Organization org, boolean addAPIAccess) throws Exception {
+    void addAPIAccess(Organization org, boolean addAPIAccess) throws AppException {
         if (!addAPIAccess) return;
         try {
             List<APIAccess> apiAccess = APIManagerAdapter.getInstance().accessAdapter.getAPIAccess(org, Type.organizations, true);
@@ -248,7 +246,7 @@ public class APIManagerOrganizationAdapter {
     }
 
     private void saveAPIAccess(Organization org, Organization actualOrg) throws AppException {
-        if (org.getApiAccess() == null || org.getApiAccess().size() == 0) return;
+        if (org.getApiAccess() == null || org.getApiAccess().isEmpty()) return;
         if (actualOrg != null && actualOrg.getApiAccess().size() == org.getApiAccess().size() && new HashSet<>(actualOrg.getApiAccess()).containsAll(org.getApiAccess()))
             return;
         if (!APIManagerAdapter.hasAdminAccount()) {
@@ -259,16 +257,12 @@ public class APIManagerOrganizationAdapter {
         accessAdapter.saveAPIAccess(org.getApiAccess(), org, Type.organizations);
     }
 
-    void addImage(Organization org, boolean addImage) throws Exception {
+    void addImage(Organization org, boolean addImage) throws URISyntaxException, AppException {
         if (!addImage) return;
         if (org.getImageUrl() == null) return;
         URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + ORGANIZATIONS + org.getId() + "/image")
                 .build();
         Image image = APIManagerAdapter.getImageFromAPIM(uri, "org-image");
         org.setImage(image);
-    }
-
-    public void setAPIManagerTestResponse(OrgFilter key, String response) {
-        this.apiManagerResponse.put(key, response);
     }
 }

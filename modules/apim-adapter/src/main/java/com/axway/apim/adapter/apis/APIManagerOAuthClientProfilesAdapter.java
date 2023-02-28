@@ -4,8 +4,8 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.CacheType;
 import com.axway.apim.api.model.OAuthClientProfile;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -79,9 +79,5 @@ public class APIManagerOAuthClientProfilesAdapter {
 			}
 		}
 		return null;
-	}
-	
-	void setAPIManagerTestResponse(String response) {
-		this.apiManagerResponse =  response;
 	}
 }

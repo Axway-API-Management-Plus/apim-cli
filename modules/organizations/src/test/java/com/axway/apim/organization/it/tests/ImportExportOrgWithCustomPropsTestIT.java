@@ -3,7 +3,7 @@ package com.axway.apim.organization.it.tests;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.organization.it.ExportOrganizationTestAction;
 import com.axway.apim.organization.it.ImportOrganizationTestAction;
-import com.axway.lib.testActions.TestParams;
+import com.axway.apim.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;

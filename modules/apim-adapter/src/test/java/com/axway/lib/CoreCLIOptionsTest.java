@@ -2,7 +2,7 @@ package com.axway.lib;
 
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.lib.utils.SampleCLIOptions;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -108,14 +108,6 @@ public class CoreCLIOptionsTest {
         Assert.assertNull(params.getProxyPassword());
     }
 
-    @Test
-    public void testAPIBasePathParam() throws AppException {
-        String[] args = {"-h", "my-manager", "-apiBasepath", "/fr/apim/v13/portal"};
-        CLIOptions options = SampleCLIOptions.create(args);
-        CoreParameters params = (CoreParameters) options.getParams();
-
-        Assert.assertEquals(params.getApiBasepath(), "/fr/apim/v13/portal");
-    }
 
     @Test
     public void testDisableCompression() throws AppException {

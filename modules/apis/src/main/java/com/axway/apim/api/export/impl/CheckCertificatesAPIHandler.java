@@ -8,8 +8,8 @@ import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.APICert;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.lib.StandardExportParams;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.Console;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -90,7 +90,6 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
             }
         } else {
             LOG.info("No certificates found that will expire within the next {} days.", checkCertParams.getNumberOfDays());
-            writeJSON(new ArrayList<>());
         }
         LOG.info("Done!");
     }

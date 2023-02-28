@@ -4,5 +4,8 @@
   "state": "approved",
   "enabled": true,
   "email": "user@domain.com",
-  "phone": "654654646234"
+  "phone": "654654646234",
+  "customProperties":{
+    "publicApp":true
+  }
 }]

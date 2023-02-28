@@ -5,5 +5,8 @@
 	"image" : "app-image.jpg",
 	"enabled" : true,
 	"email" : "sample@sampleapp.com",
-	"phone" : "012345678"
+	"phone" : "012345678",
+	"customProperties":{
+		"publicApp":true
+	}
 }

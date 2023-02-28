@@ -4,10 +4,14 @@
 	"path": "/api/path",
 	"state": "${state}",
 	"version": "1.0.0",
-	"organization": "API Development",
+	"organization": "orga",
 	"descriptionType": "markdownLocal", 
 	"markdownLocal": "MyLocalMarkdown.md", 
 	"apiSpecification": {
 		"resource": "../basic/petstore.json" 
+	},
+	"customProperties": {
+		"customProperty1": "public",
+		"customProperty4": "true"
 	}
 }

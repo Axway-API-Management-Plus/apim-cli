@@ -1,7 +1,7 @@
 package com.axway.apim.appimport.it.basic;
 
 import com.axway.apim.appimport.it.ImportAppTestAction;
-import com.axway.lib.testActions.TestParams;
+import com.axway.apim.testActions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;

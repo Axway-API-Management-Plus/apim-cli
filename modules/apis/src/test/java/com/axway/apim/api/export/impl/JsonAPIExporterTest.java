@@ -56,7 +56,6 @@ public class JsonAPIExporterTest extends WiremockWrapper {
         jsonAPIExporter.execute(apis);
         DocumentContext documentContext = JsonPath.parse(new File(tmpDir + "/api-v3/api-config.json"));
         assertEquals(documentContext.read("$.name", String.class), "petstore3");
-        assertEquals(documentContext.read("$.name", String.class), "petstore3");
         assertEquals(documentContext.read("$.outboundProfiles._default.requestPolicy", String.class), "Validate Size & Token");
         assertEquals(documentContext.read("$.outboundProfiles._default.responsePolicy", String.class), "Remove Header & Audit data");
     }

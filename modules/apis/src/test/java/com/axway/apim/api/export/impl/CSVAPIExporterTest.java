@@ -8,7 +8,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.cli.CLIAPIExportOptions;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.lib.CLIOptions;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

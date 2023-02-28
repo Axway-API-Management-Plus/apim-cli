@@ -1,10 +1,16 @@
 [
 	{
 		"name": "Application 1", 
-		"organization": "API Development" 
+		"organization": "orga",
+		"customProperties":{
+			"publicApp":true
+		}
 	}, 
 	{
 		"name": "Application 2", 
-		"organization": "API Development" 
+		"organization": "orga",
+		"customProperties":{
+			"publicApp":true
+		}
 	}
 ]

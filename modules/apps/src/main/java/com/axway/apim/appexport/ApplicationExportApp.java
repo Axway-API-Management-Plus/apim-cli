@@ -9,9 +9,9 @@ import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +90,8 @@ public class ApplicationExportApp implements APIMCLIServiceProvider {
             switch (params.getOutputFormat()) {
                 case json:
                     return runExport(params, ResultHandler.JSON_EXPORTER, result);
+                case yaml:
+                    return runExport(params, ResultHandler.YAML_EXPORTER, result);
                 case csv:
                     return runExport(params, ResultHandler.CSV_EXPORTER, result);
                 default:

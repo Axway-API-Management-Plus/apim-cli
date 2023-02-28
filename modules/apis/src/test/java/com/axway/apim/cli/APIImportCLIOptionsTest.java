@@ -4,7 +4,7 @@ import com.axway.apim.apiimport.lib.cli.CLIAPIImportOptions;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreParameters.Mode;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -54,7 +54,7 @@ public class APIImportCLIOptionsTest {
 	
 	@Test
 	public void testToggles() throws AppException {
-		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-replaceHostInSwagger", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreQuotas", "-updateOnly"};
+		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreQuotas", "-updateOnly"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertTrue(params.isForce());

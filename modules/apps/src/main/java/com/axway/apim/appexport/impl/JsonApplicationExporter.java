@@ -1,7 +1,7 @@
 package com.axway.apim.appexport.impl;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.clientApps.ClientAppFilter;
+import com.axway.apim.adapter.client.apps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionSerializer;
 import com.axway.apim.api.model.Image;
@@ -11,8 +11,8 @@ import com.axway.apim.appexport.impl.jackson.AppExportSerializerModifier;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.appexport.model.ExportApplication;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -20,7 +20,10 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,6 +32,9 @@ import java.util.List;
 
 public class JsonApplicationExporter extends ApplicationExporter {
 
+	private static final Logger LOG = LoggerFactory.getLogger(JsonApplicationExporter.class);
+
+
 	public JsonApplicationExporter(AppExportParams params, ExportResult result) {
 		super(params, result);
 	}
@@ -36,11 +42,11 @@ public class JsonApplicationExporter extends ApplicationExporter {
 	@Override
 	public void export(List<ClientApplication> apps) throws AppException {
 		for(ClientApplication app : apps) {
-			saveApplicationLocally(new ExportApplication(app));
+			saveApplicationLocally(new ExportApplication(app), this);
 		}
 	}
 	
-	private void saveApplicationLocally(ExportApplication app) throws AppException {
+	public void saveApplicationLocally(ExportApplication app, ApplicationExporter applicationExporter) throws AppException {
 		String folderName = getExportFolder(app);
 		String targetFolder = params.getTarget();
 		File localFolder = new File(targetFolder +File.separator+ folderName);
@@ -62,7 +68,15 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		if (!localFolder.mkdirs()) {
 			throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
 		}
-		ObjectMapper mapper = new ObjectMapper();
+		ObjectMapper mapper;
+		String configFile;
+		if(applicationExporter instanceof YamlApplicationExporter){
+			mapper = new ObjectMapper(new YAMLFactory());
+			configFile = "/application-config.yaml";
+		}else {
+			mapper = new ObjectMapper();
+			configFile = "/application-config.json";
+		}
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new AppExportSerializerModifier(localFolder)));
 		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
 		mapper.registerModule(new SimpleModule().addSerializer(QuotaRestriction.class, new QuotaRestrictionSerializer(null)));
@@ -78,8 +92,8 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.writeValue(new File(localFolder.getCanonicalPath() + "/application-config.json"), app);
-			this.result.addExportedFile(localFolder.getCanonicalPath() + "/application-config.json");
+			mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), app);
+			this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
 		} catch (Exception e) {
 			throw new AppException("Can't write Application-Configuration file for application: '"+app.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
 		}

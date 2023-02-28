@@ -12,9 +12,9 @@ import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.Result;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
-import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
         try {
             params = (APIExportParams) CLIAPIExportOptions.create(args).getParams();
         } catch (AppException e) {
-            LOG.error("Error {}" , e.getMessage());
+            LOG.error("Error", e);
             return e.getError().getCode();
         }
         APIExportApp apiExportApp = new APIExportApp();
@@ -51,6 +51,8 @@ public class APIExportApp implements APIMCLIServiceProvider {
             switch (params.getOutputFormat()) {
                 case json:
                     return execute(params, APIListImpl.JSON_EXPORTER);
+                case yaml:
+                    return execute(params, APIListImpl.YAML_EXPORTER);
                 case csv:
                     return execute(params, APIListImpl.CSV_EXPORTER);
                 case dat:
@@ -175,14 +177,14 @@ public class APIExportApp implements APIMCLIServiceProvider {
             Result result = resultHandler.getResult();
             List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(filter, true);
 
-            if (apis.size() == 0) {
+            if (apis.isEmpty()) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.info("No APIs found using filter: {}" , filter);
+                    LOG.info("No APIs found using filter: {}", filter);
                 } else {
                     LOG.info("No APIs found based on the given filters.");
                 }
             } else {
-                LOG.info( "{} API(s) selected.", apis.size());
+                LOG.info("{} API(s) selected.", apis.size());
                 resultHandler.execute(apis);
                 if (resultHandler.hasError()) {
                     LOG.error("Please check the log. At least one error was recorded.");
@@ -208,6 +210,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
                 // make sure the cache is updated, even an exception is thrown
                 APIManagerAdapter.deleteInstance();
             } catch (Exception ignore) {
+                LOG.error("Problem in  deleteInstance");
             }
         }
     }
@@ -226,7 +229,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
             // Get the reference API from API-Manager
             API referenceAPI = apimanagerAdapter.apiAdapter.getAPI(params.getReferenceAPIFilter(), true);
             if (referenceAPI == null) {
-                LOG.info("Published reference API for upgrade access not found using filter: {}" , params.getReferenceAPIFilter());
+                LOG.info("Published reference API for upgrade access not found using filter: {}", params.getReferenceAPIFilter());
                 return result;
             }
             params.setReferenceAPI(referenceAPI);
@@ -235,8 +238,8 @@ public class APIExportApp implements APIMCLIServiceProvider {
             APIFilter filter = resultHandler.getFilter();
             List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(filter, true);
 
-            if (apis.size() == 0) {
-                LOG.info("No published APIs found using filter: {}" , filter);
+            if (apis.isEmpty()) {
+                LOG.info("No published APIs found using filter: {}", filter);
             } else {
                 LOG.info("{} API(s) selected.", apis.size());
                 resultHandler.execute(apis);
@@ -272,26 +275,25 @@ public class APIExportApp implements APIMCLIServiceProvider {
             }
             // Get all organizations that should be granted
             List<Organization> orgs = apimanagerAdapter.orgAdapter.getOrgs(params.getOrganizationFilter());
-            if (orgs == null || orgs.size() == 0) {
-                LOG.info("No organization found to grant access to using filter: {}" , params.getOrganizationFilter());
+            if (orgs == null || orgs.isEmpty()) {
+                LOG.info("No organization found to grant access to using filter: {}", params.getOrganizationFilter());
                 return result;
             }
             // Get all APIs that should be granted access
             List<API> apis = apimanagerAdapter.apiAdapter.getAPIs(params.getAPIFilter(), true);
-            if (apis == null || apis.size() == 0) {
-                LOG.info("No published APIs to grant access to found using filter: {}" , params.getAPIFilter());
+            if (apis == null || apis.isEmpty()) {
+                LOG.info("No published APIs to grant access to found using filter: {}", params.getAPIFilter());
                 return result;
             }
-            LOG.info("{} API(s) and {} Organization(s) selected.",apis.size(),orgs.size());
+            LOG.info("{} API(s) and {} Organization(s) selected.", apis.size(), orgs.size());
             params.setOrgs(orgs);
             params.setApis(apis);
             APIResultHandler resultHandler = APIResultHandler.create(resultHandlerImpl, params);
             resultHandler.execute(apis);
             if (resultHandler.hasError()) {
-                LOG.info("");
                 LOG.error("Please check the log. At least one error was recorded.");
             } else {
-                LOG.debug("Successfully selected {} API(s).",apis.size());
+                LOG.debug("Successfully selected {} API(s).", apis.size());
             }
             return result;
         } catch (AppException ap) {

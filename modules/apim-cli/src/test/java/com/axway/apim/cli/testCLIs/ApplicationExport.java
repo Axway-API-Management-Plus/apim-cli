@@ -2,7 +2,6 @@ package com.axway.apim.cli.testCLIs;
 
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
-import com.axway.apim.lib.errorHandling.ErrorCodeMapper;
 
 public class ApplicationExport implements APIMCLIServiceProvider {
 

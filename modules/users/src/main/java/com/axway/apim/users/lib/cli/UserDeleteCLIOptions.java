@@ -3,7 +3,7 @@ package com.axway.apim.users.lib.cli;
 import com.axway.apim.lib.CLIOptions;
 import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.users.lib.params.UserExportParams;
 

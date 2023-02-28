@@ -1,0 +1,19 @@
+{
+  "id": "00000000-0000-0000-0000-000000000001",
+  "type": "APPLICATION",
+  "name": "Application Default",
+  "description": "Maximum message rates per application. Applied to each application unless an Application-Specific quota is configured",
+  "restrictions": [
+    {
+      "api": "e4ded8c8-0a40-4b50-bc13-552fb7209150",
+      "method": "*",
+      "type": "throttle",
+      "config": {
+        "messages": "1000",
+        "period": "second",
+        "per": "2"
+      }
+    }
+  ],
+  "system": true
+}

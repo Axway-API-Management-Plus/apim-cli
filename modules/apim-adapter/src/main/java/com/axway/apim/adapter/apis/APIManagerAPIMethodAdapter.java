@@ -3,8 +3,8 @@ package com.axway.apim.adapter.apis;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.lib.CoreParameters;
-import com.axway.apim.lib.errorHandling.AppException;
-import com.axway.apim.lib.errorHandling.ErrorCode;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.PUTRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
@@ -49,7 +49,6 @@ public class APIManagerAPIMethodAdapter {
                 this.apiManagerResponse.put(apiId, EntityUtils.toString(httpResponse.getEntity()));
             }
         } catch (Exception e) {
-            LOG.error("Error cant load API-Methods for API: " + apiId, e);
             throw new AppException("Error cant load API-Methods for API: '" + apiId + "' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -68,7 +67,7 @@ public class APIManagerAPIMethodAdapter {
 
     public APIMethod getMethodForName(String apiId, String methodName) throws AppException {
         List<APIMethod> apiMethods = getAllMethodsForAPI(apiId);
-        if (apiMethods.size() == 0) {
+        if (apiMethods.isEmpty()) {
             LOG.warn("No operations found for API with id: {}", apiId);
             return null;
         }
@@ -78,12 +77,13 @@ public class APIManagerAPIMethodAdapter {
                 return method;
             }
         }
+        LOG.debug("{} - {}",apiId, methodName);
         throw new AppException("No operation found with name: '" + methodName + "'", ErrorCode.API_OPERATION_NOT_FOUND);
     }
 
     public APIMethod getMethodForId(String apiId, String methodId) throws AppException {
         List<APIMethod> apiMethods = getAllMethodsForAPI(apiId);
-        if (apiMethods.size() == 0) {
+        if (apiMethods.isEmpty()) {
             LOG.warn("No operations found for API with id: {}", apiId);
             return null;
         }
@@ -113,12 +113,7 @@ public class APIManagerAPIMethodAdapter {
                 }
             }
         } catch (Exception e) {
-            LOG.error("Error cant update API-Methods for API: '" + apiMethod.getVirtualizedApiId() + "' from API-Manager", e);
             throw new AppException("Error cant load API-Methods for API: '" + apiMethod.getVirtualizedApiId() + "' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
-    }
-
-    void setAPIManagerTestResponse(String apiId, String response) {
-        this.apiManagerResponse.put(apiId, response);
     }
 }

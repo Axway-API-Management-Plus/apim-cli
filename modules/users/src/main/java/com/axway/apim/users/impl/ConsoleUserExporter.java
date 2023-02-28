@@ -7,7 +7,7 @@ import java.util.List;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.User;
 import com.axway.apim.lib.ExportResult;
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.users.lib.params.UserExportParams;
 import com.github.freva.asciitable.AsciiTable;

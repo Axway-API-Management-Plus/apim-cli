@@ -3,7 +3,7 @@ package com.axway.apim.api.model;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.axway.apim.lib.errorHandling.AppException;
+import com.axway.apim.lib.error.AppException;
 
 public class OutboundProfileTest {
 	@Test

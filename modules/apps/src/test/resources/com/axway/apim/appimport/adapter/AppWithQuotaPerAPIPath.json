@@ -6,7 +6,7 @@
     "restrictions": [
       {
         "api": "Not used",
-        "apiPath": "/query-string-api-oadmin-839",
+        "apiPath": "/v1/api",
         "method": "*",
         "type": "throttle",
         "config": {
@@ -16,5 +16,8 @@
         }
       }
     ]
+  },
+  "customProperties":{
+    "publicApp":true
   }
 }
