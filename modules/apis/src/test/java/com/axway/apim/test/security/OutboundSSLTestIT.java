@@ -1,6 +1,5 @@
 package com.axway.apim.test.security;
 
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -44,7 +43,6 @@ public class OutboundSSLTestIT extends TestNGCitrusTestRunner {
                 .validate("$.[?(@.path=='${apiPath}')].state", "${state}")
                 .validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
                 .validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "ssl")
-                .validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.password", "${password}")
                 .validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.trustAll", true)
                 .validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.pfx", "@assertThat(startsWith(data:application/x-pkcs12;base64,MIIJ0QIBAzCCCZcGCSqGSIb3DQEHAaCCCYgEggmEMIIJgDCCBDcGCSqGSIb3DQEHBqCCBCgwggQk))@")
                 .extractFromPayload("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.trustAll", "trustAll")
@@ -82,7 +80,6 @@ public class OutboundSSLTestIT extends TestNGCitrusTestRunner {
                 .validate("$.[?(@.id=='${apiId}')].state", "${state}")
                 .validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].name", "_default")
                 .validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].type", "ssl")
-                .validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].parameters.password", "${password}")
                 .validate("$.[?(@.id=='${apiId}')].authenticationProfiles[0].parameters.pfx", "@assertThat(startsWith(data:application/x-pkcs12;base64,MIIJ2QIBAzCCCZ8GCSqGSIb3DQEHAaCCCZAEggmMMIIJiDCCBD8GCSqGSIb3DQEHBqCCBDAwggQs))@"));
 
     }

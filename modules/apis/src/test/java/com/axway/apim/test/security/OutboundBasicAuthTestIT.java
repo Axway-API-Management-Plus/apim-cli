@@ -47,7 +47,6 @@ public class OutboundBasicAuthTestIT extends TestNGCitrusTestRunner {
 					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].name", "_default")
 					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].type", "http_basic")
 					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].isDefault", "true")
-					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.password", "password")
 					.validate("$.[?(@.path=='${apiPath}')].authenticationProfiles[0].parameters.username", "${username}")
 					.extractFromPayload("$.[?(@.path=='${apiPath}')].id", "apiId"));
 

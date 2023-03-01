@@ -64,13 +64,21 @@ public class AuthenticationProfile {
             Map<String, Object> thisParameters = this.getParameters();
             otherParameters.remove("_id_");
             thisParameters.remove("_id_");
-            return StringUtils.equals(authenticationProfile.getName(), this.getName())
+            if(StringUtils.equals(authenticationProfile.getName(), this.getName())
                     && authenticationProfile.getIsDefault() == this.getIsDefault()
-                    && StringUtils.equals(authenticationProfile.getType().name(), this.getType().name())
-                    && otherParameters.equals(thisParameters);
-        } else {
-            return false;
+                    && StringUtils.equals(authenticationProfile.getType().name(), this.getType().name())){
+                if(authenticationProfile.getType().equals(AuthType.ssl) || authenticationProfile.getType().equals(AuthType.http_basic)){
+                    Map<String, Object> otherParametersCopy = new HashMap<>(otherParameters);
+                    otherParametersCopy.remove("password");
+                    Map<String, Object> thisParametersCopy = new HashMap<>(thisParameters);
+                    thisParametersCopy.remove("password");
+                    return otherParametersCopy.equals(thisParametersCopy);
+                }else {
+                    return otherParameters.equals(thisParameters);
+                }
+            }
         }
+        return false;
     }
 
     @Override
