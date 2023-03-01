@@ -1,7 +1,7 @@
 package com.axway.apim.appimport.adapter;
 
+import com.axway.apim.ClientAppAdapter;
 import com.axway.apim.WiremockWrapper;
-import com.axway.apim.adapter.client.apps.ClientAppAdapter;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.QuotaRestriction;

@@ -1,9 +1,9 @@
 package com.axway.apim.appimport.adapter;
 
+import com.axway.apim.ClientAppAdapter;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
-import com.axway.apim.adapter.client.apps.ClientAppAdapter;
 import com.axway.apim.adapter.jackson.AppCredentialsDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
@@ -72,17 +72,18 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
         List<ClientApplication> baseApps;
         // Try to read a list of applications
         try {
-            try {
-                // Check the config file is json
-                mapper.readTree(configFile);
-                LOG.debug("Handling JSON Configuration file: {}", configFile);
-            }catch (IOException ioException){
-                mapper = new ObjectMapper(new YAMLFactory());
-                LOG.debug("Handling Yaml Configuration file: {}", configFile);
-            }
+            // Check the config file is json
+            mapper.readTree(configFile);
+            LOG.debug("Handling JSON Configuration file: {}", configFile);
+        } catch (IOException ioException) {
+            mapper = new ObjectMapper(new YAMLFactory());
+            LOG.debug("Handling Yaml Configuration file: {}", configFile);
+        }
+        try {
             mapper.registerModule(new SimpleModule().addDeserializer(ClientAppCredential.class, new AppCredentialsDeserializer()));
             mapper.registerModule(new SimpleModule().addDeserializer(QuotaRestriction.class, new QuotaRestrictionDeserializer(DeserializeMode.configFile)));
-            baseApps = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<List<ClientApplication>>() {});
+            baseApps = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<List<ClientApplication>>() {
+            });
             if (stageConfig != null) {
                 throw new AppException("Stage overrides are not supported for application lists.", ErrorCode.CANT_READ_CONFIG_FILE);
             } else {
@@ -158,7 +159,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
                                 .hasName(apiAccess.getApiName())
                                 .build()
                         , false);
-                if (apis == null || apis.size() == 0) {
+                if (apis == null || apis.isEmpty()) {
                     LOG.error("API with name: {} not found. Ignoring this APIs.", apiAccess.getApiName());
                     result.setError(ErrorCode.UNKNOWN_API);
                     it.remove();
@@ -185,7 +186,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
     private void validateAppPermissions(List<ClientApplication> apps) throws AppException {
         APIManagerUserAdapter userAdapter = APIManagerAdapter.getInstance().userAdapter;
         for (ClientApplication app : apps) {
-            if (app.getPermissions() == null || app.getPermissions().size() == 0) continue;
+            if (app.getPermissions() == null || app.getPermissions().isEmpty()) continue;
             // First check, if there is an ALL User
             for (ApplicationPermission permission : app.getPermissions()) {
                 if ("ALL".equals(permission.getUsername())) {
