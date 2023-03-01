@@ -1,13 +1,11 @@
 package com.axway.apim.api.model;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 import com.axway.apim.lib.utils.Utils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.axway.apim.adapter.APIManagerAdapter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class AuthenticationProfile {
 
@@ -69,22 +67,6 @@ public class AuthenticationProfile {
             // Passwords are no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
             Object otherPassword = null;
             Object thisPassword = null;
-            if (APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
-                // Empty password handling - Make sure, there is a password set
-                if (!thisParameters.containsKey("password") || thisParameters.get("password") == null)
-                    thisParameters.put("password", "");
-                if (!otherParameters.containsKey("password") || otherParameters.get("password") == null)
-                    otherParameters.put("password", "");
-                if (otherParameters.containsKey("password")) otherPassword = otherParameters.get("password");
-                if (thisParameters.containsKey("password")) thisPassword = thisParameters.get("password");
-                // Keep comparing passwords only if both have values (possible only if com.axway.apimanager.api.model.disable.confidential.fields=false in API Gateway)
-                // If at least one password is missing, skip comparison
-                if ((thisPassword != null && thisPassword.equals("")) || (otherPassword != null && otherPassword.equals(""))) {
-                    thisParameters.remove("password");
-                    otherParameters.remove("password");
-                }
-            }
-
             boolean rc = StringUtils.equals(authenticationProfile.getName(), this.getName())
                     && authenticationProfile.getIsDefault() == this.getIsDefault()
                     && StringUtils.equals(authenticationProfile.getType().name(), this.getType().name())

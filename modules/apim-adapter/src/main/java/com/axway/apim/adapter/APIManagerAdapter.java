@@ -60,6 +60,7 @@ public class APIManagerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerAdapter.class);
     public static final String ADMIN = "admin";
     public static final String OADMIN = "oadmin";
+    public static final String USER = "user";
 
     private static APIManagerAdapter instance;
 
@@ -109,11 +110,6 @@ public class APIManagerAdapter {
             instance = new APIManagerAdapter();
             cmd = CoreParameters.getInstance();
             cmd.validateRequiredParameters();
-            try{
-                throw new Exception("debug");
-            }catch (Exception e){
-                e.printStackTrace();
-            }
             instance.loginToAPIManager();
             instance.setApiManagerVersion();
             initialized = true;
@@ -205,9 +201,9 @@ public class APIManagerAdapter {
         if (organizations2Role == null)
             return role;
         List<String> roles = new ArrayList<>();
-        if (role.equals("user")) {
+        if (role.equals(USER)) {
             for (String multiOrgRole : organizations2Role.values()) {
-                if (multiOrgRole.equals("user"))
+                if (multiOrgRole.equals(USER))
                     continue;
                 roles.add(multiOrgRole);
             }
@@ -224,12 +220,6 @@ public class APIManagerAdapter {
 
     public void logoutFromAPIManager() throws AppException {
         try {
-            LOG.info("Cmd : {}", cmd);
-            try {
-                throw new Exception("debug");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/login").build();
             DELRequest logoutRequest = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) logoutRequest.execute()) {

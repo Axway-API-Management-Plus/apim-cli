@@ -55,8 +55,8 @@ public class UserTest {
 	public void testDifferentUserCustomProperties() {
 		User user1 = getTestUser();
 		User user2 = getTestUser();
-		HashMap<String, String> customProp1 = new HashMap<String, String>();
-		HashMap<String, String> customProp2 = new HashMap<String, String>();
+		HashMap<String, String> customProp1 = new HashMap<>();
+		HashMap<String, String> customProp2 = new HashMap<>();
 		customProp1.put("customPropA", "Some value");
 		customProp2.put("customPropA", "Value has changed");
 		user1.setCustomProperties(customProp1);
