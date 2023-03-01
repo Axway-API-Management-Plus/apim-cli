@@ -64,17 +64,10 @@ public class AuthenticationProfile {
             Map<String, Object> thisParameters = this.getParameters();
             otherParameters.remove("_id_");
             thisParameters.remove("_id_");
-            // Passwords are no longer exposed by API-Manager REST-API - Can't use it anymore to compare the state
-            Object otherPassword = null;
-            Object thisPassword = null;
-            boolean rc = StringUtils.equals(authenticationProfile.getName(), this.getName())
+            return StringUtils.equals(authenticationProfile.getName(), this.getName())
                     && authenticationProfile.getIsDefault() == this.getIsDefault()
                     && StringUtils.equals(authenticationProfile.getType().name(), this.getType().name())
                     && otherParameters.equals(thisParameters);
-            // Restore that password, that have been removed
-            if (otherPassword != null) otherParameters.put("password", otherPassword);
-            if (thisPassword != null) thisParameters.put("password", thisPassword);
-            return rc;
         } else {
             return false;
         }
