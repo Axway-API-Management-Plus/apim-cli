@@ -16,7 +16,6 @@ public class CaCertTest {
         String fileName = caCert.getCertFile();
         logger.info("Filename : {}", fileName);
         Assert.assertTrue(!fileName.contains("/"));
-
     }
 
 

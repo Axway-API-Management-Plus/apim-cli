@@ -109,6 +109,11 @@ public class APIManagerAdapter {
             instance = new APIManagerAdapter();
             cmd = CoreParameters.getInstance();
             cmd.validateRequiredParameters();
+            try{
+                throw new Exception("debug");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             instance.loginToAPIManager();
             instance.setApiManagerVersion();
             initialized = true;
@@ -138,12 +143,11 @@ public class APIManagerAdapter {
             LOG.info("Organization Administrator Self Service Enabled : {}", config.getOadminSelfServiceEnabled());
     }
 
-    public void setApiManagerVersion(String apiManagerVersion){
+    public void setApiManagerVersion(String apiManagerVersion) {
         this.apiManagerVersion = apiManagerVersion;
     }
 
-    private APIManagerAdapter() throws AppException {
-        super();
+    private APIManagerAdapter() {
         // For now this okay, may be replaced with a Factory later
         this.configAdapter = new APIManagerConfigAdapter();
         this.customPropertiesAdapter = new APIManagerCustomPropertiesAdapter();
@@ -221,9 +225,9 @@ public class APIManagerAdapter {
     public void logoutFromAPIManager() throws AppException {
         try {
             LOG.info("Cmd : {}", cmd);
-            try{
+            try {
                 throw new Exception("debug");
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/login").build();
