@@ -38,11 +38,6 @@ public class APIChangeStateTest extends WiremockWrapper {
     API testAPI1;
     API testAPI2;
 
-    @BeforeClass
-    private void initTestIndicator() {
-        APIManagerAdapter.apiManagerVersion = "7.7.20221130";
-    }
-
     @BeforeMethod
     private void setupTestAPIs() throws IOException {
         testAPI1 = getTestAPI("ChangeStateTestAPI.json");

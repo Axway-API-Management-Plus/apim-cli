@@ -1,4 +1,4 @@
-package com.axway.apim.testActions;
+package com.axway.apim.test.actions;
 
 public interface TestParams {
 

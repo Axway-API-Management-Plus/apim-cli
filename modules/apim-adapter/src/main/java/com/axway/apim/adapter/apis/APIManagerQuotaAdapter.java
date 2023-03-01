@@ -148,13 +148,13 @@ public class APIManagerQuotaAdapter {
             RestAPICall request = new PUTRequest(entity, uri);
             Response httpResponse = httpHelper.execute(request, true);
             int statusCode = httpResponse.getStatusCode();
-            String response = httpResponse.getResponse();
+            String response = httpResponse.getResponseBody();
             if (statusCode < 200 || statusCode > 299) {
                 if ((statusCode == 400) && (response.contains("API not found"))) {
                     LOG.warn("Got unexpected error: 'API not found' while saving quota configuration ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
                     Thread.sleep(cmd.getRetryDelay());
                     httpResponse = httpHelper.execute(request, true);
-                    response = httpResponse.getResponse();
+                    response = httpResponse.getResponseBody();
                     statusCode = httpResponse.getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
                         throw new AppException("Can't update API-Manager Quota-Configuration. Response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);

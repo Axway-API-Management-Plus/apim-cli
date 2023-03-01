@@ -4,7 +4,7 @@ import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.StandardExportParams.OutputFormat;
-import com.axway.apim.testActions.TestParams;
+import com.axway.apim.test.actions.TestParams;
 import com.consol.citrus.context.TestContext;
 
 import java.io.File;

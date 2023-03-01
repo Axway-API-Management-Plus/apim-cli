@@ -1,7 +1,7 @@
 package com.axway.apim.setup.it;
 
 import com.axway.apim.setup.it.testActions.CLIAbstractExportTestAction;
-import com.axway.apim.testActions.TestParams;
+import com.axway.apim.test.actions.TestParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

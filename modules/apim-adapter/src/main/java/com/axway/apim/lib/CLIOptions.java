@@ -34,7 +34,7 @@ public abstract class CLIOptions {
         addHelpAndVersion();
     }
 
-    public CLIOptions(String[] args) {
+    protected CLIOptions(String[] args) {
         addHelpAndVersion();
         this.args = args;
     }

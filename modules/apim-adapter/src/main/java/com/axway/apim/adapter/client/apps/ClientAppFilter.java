@@ -263,6 +263,8 @@ public class ClientAppFilter implements CustomPropertiesFilter {
                     case "apikeys":
                         match = filterCredential(((APIKey) cred).getApiKey(), null, app.getName());
                         break;
+                    default:
+                        break;
                 }
                 if (match) break;
             }
@@ -271,7 +273,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
         }
         if (this.getApiName() != null) {
             // App has no access to any API
-            if (app.getApiAccess() == null || app.getApiAccess().size() == 0) return true;
+            if (app.getApiAccess() == null || app.getApiAccess().isEmpty()) return true;
             boolean apiAccessNameMatch = false;
             Pattern pattern = Pattern.compile(this.apiName.replace("*", ".*"));
             for (APIAccess apiAccess : app.getApiAccess()) {
@@ -290,7 +292,7 @@ public class ClientAppFilter implements CustomPropertiesFilter {
 
     private boolean filterCredential(String appCredential, String[] appRedirectUrls, String appName) {
         if (appCredential == null) {
-            LOG.warn("Inconsistent application: '" + appName + "' found. API-Key/Client-ID is NULL for credential.");
+            LOG.warn("Inconsistent application: {} found. API-Key/Client-ID is NULL for credential.", appName);
             return false;
         }
         if (this.credential != null) {

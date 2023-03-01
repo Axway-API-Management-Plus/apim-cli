@@ -1,6 +1,6 @@
 package com.axway.apim.setup.it.tests;
 
-import com.axway.apim.testActions.TestParams;
+import com.axway.apim.test.actions.TestParams;
 import org.springframework.http.HttpStatus;
 import org.testng.Assert;
 import org.testng.annotations.Optional;

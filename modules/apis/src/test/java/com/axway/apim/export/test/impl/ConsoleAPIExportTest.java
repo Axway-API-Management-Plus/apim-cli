@@ -22,8 +22,7 @@ public class ConsoleAPIExportTest  {
 	
 	
 	@BeforeClass
-	public void setTest() throws  IOException {
-		APIManagerAdapter.apiManagerVersion = "7.7.20221130";
+	public void setTest() {
 		mapper.disable(MapperFeature.USE_ANNOTATIONS);
 	}
 	

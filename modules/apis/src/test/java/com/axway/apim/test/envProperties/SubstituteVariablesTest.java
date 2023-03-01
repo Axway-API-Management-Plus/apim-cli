@@ -25,7 +25,6 @@ public class SubstituteVariablesTest  extends WiremockWrapper {
     @BeforeClass
     public void init() {
         try {
-            APIManagerAdapter.apiManagerVersion = "7.7.20221130";
             new TestSetup().initCliHome();
             initWiremock();
             APIManagerAdapter.deleteInstance();

@@ -3,7 +3,7 @@ package com.axway.apim.appimport.it.share;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appimport.it.ExportAppTestAction;
 import com.axway.apim.appimport.it.ImportAppTestAction;
-import com.axway.apim.testActions.TestParams;
+import com.axway.apim.test.actions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;

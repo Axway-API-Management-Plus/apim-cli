@@ -7,6 +7,10 @@ import java.util.List;
 
 public class FilterHelper {
 
+    private FilterHelper(){
+
+    }
+
     public static void setFilter(String name, List<NameValuePair> filters) {
         String op = "eq";
         if(name.startsWith("*") || name.endsWith("*")) {

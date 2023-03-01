@@ -9,147 +9,151 @@ import java.util.regex.Pattern;
 
 public class RemoteHostFilter {
 
-	private String alias;
-	private String id;
-	private String name;
-	private Integer port;
-	private Organization organization;
-	private RemoteHostFilter() { }
-	public String getAlias() {
-		return alias;
-	}
-	public void setAlias(String alias) {
-		this.alias = alias;
-	}
+    private String alias;
+    private String id;
+    private String name;
+    private Integer port;
+    private Organization organization;
 
-	public void setId(String id) {
-		if(id==null) return;
-		this.id = id;
-	}
-	
-	public String getId() {
-		return id;
-	}
+    private RemoteHostFilter() {
+    }
 
-	public void setName(String name) {
-		if(name==null) return;
-		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
-	}
+    public String getAlias() {
+        return alias;
+    }
 
-	public Integer getPort() {
-		return port;
-	}
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
 
-	public void setPort(Integer port) {
-		if(port == null) return;
-		this.port = port;
-	}
+    public void setId(String id) {
+        if (id == null) return;
+        this.id = id;
+    }
 
-	public Organization getOrganization() {
-		return organization;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setOrganization(Organization organization) {
-		this.organization = organization;
-	}
+    public void setName(String name) {
+        if (name == null) return;
+        this.name = name;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) return false;
-		if (this == obj) return true;
-		if(!(obj instanceof RemoteHostFilter)) return false;
-		RemoteHostFilter other = (RemoteHostFilter)obj;
-		return (
-				StringUtils.equals(other.getId(), this.getId()) && 
-				StringUtils.equals(other.getName(), this.getName())
-				);
-	}
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public int hashCode() {
-		int hashCode = 0;
-		hashCode += (this.id!=null) ? this.id.hashCode() : 0;
-		hashCode += (this.name!=null) ? this.name.hashCode() : 0;
-		return hashCode;
-	}
+    public Integer getPort() {
+        return port;
+    }
 
-	@Override
-	public String toString() {
-		return "UserFilter [name=" + name + ", id=" + id + "]";
-	}
-	
-	public boolean filter(RemoteHost remoteHost) {
-		if(this.getName()==null && this.getPort()==null && this.getOrganization()==null && this.getId()==null && this.getAlias()==null) { // Nothing given to filter out.
-			return false;
-		}
-		if(this.getName()!=null) {
-			Pattern pattern = Pattern.compile(this.getName().replace("*", ".*"));
-			Matcher matcher = pattern.matcher(remoteHost.getName());
-			if(!matcher.matches()) return true;
-		}
-		if(this.getPort()!=null) {
-			if(!this.getPort().equals(remoteHost.getPort())) return true;
-		}
-		if(this.getId()!=null) {
-			if(!this.getId().equals(remoteHost.getId())) return true;
-		}
-		if(this.getOrganization()!=null) {
-			Pattern pattern = Pattern.compile(this.getOrganization().getName().replace("*", ".*"));
-			Matcher matcher = pattern.matcher(remoteHost.getOrganization().getName());
-			if(!matcher.matches()) return true;
-		}
-		if(this.getAlias()!=null) {
-			Pattern pattern = Pattern.compile(this.getAlias().replace("*", ".*"));
-			Matcher matcher = pattern.matcher(remoteHost.getAlias());
-			return !matcher.matches();
-		}
-		return false;
-	}
+    public void setPort(Integer port) {
+        if (port == null) return;
+        this.port = port;
+    }
 
-	public static class Builder {
+    public Organization getOrganization() {
+        return organization;
+    }
 
-		String alias;
-		String id;
-		String name;
-		Integer port;
-		Organization organization;
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+    }
 
-		public Builder() {
-			super();
-		}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (!(obj instanceof RemoteHostFilter)) return false;
+        RemoteHostFilter other = (RemoteHostFilter) obj;
+        return (
+                StringUtils.equals(other.getId(), this.getId()) &&
+                        StringUtils.equals(other.getName(), this.getName())
+        );
+    }
 
-		public RemoteHostFilter build() {
-			RemoteHostFilter filter = new RemoteHostFilter();
-			filter.setAlias(this.alias);
-			filter.setId(this.id);
-			filter.setName(this.name);
-			filter.setPort(this.port);
-			filter.setOrganization(this.organization);
-			return filter;
-		}
-		
-		public Builder hasAlias(String alias) {
-			this.alias = alias;
-			return this;
-		}
+    @Override
+    public int hashCode() {
+        int hashCode = 0;
+        hashCode += (this.id != null) ? this.id.hashCode() : 0;
+        hashCode += (this.name != null) ? this.name.hashCode() : 0;
+        return hashCode;
+    }
 
-		public Builder hasId(String id) {
-			this.id = id;
-			return this;
-		}
+    @Override
+    public String toString() {
+        return "UserFilter [name=" + name + ", id=" + id + "]";
+    }
 
-		public Builder hasName(String name) {
-			this.name = name;
-			return this;
-		}
-		
-		public Builder hasPort(Integer port) {
-			this.port = port;
-			return this;
-		}
-	}
+    public boolean filter(RemoteHost remoteHost) {
+        if (this.getName() == null && this.getPort() == null && this.getOrganization() == null && this.getId() == null && this.getAlias() == null) { // Nothing given to filter out.
+            return false;
+        }
+        if (this.getName() != null) {
+            Pattern pattern = Pattern.compile(this.getName().replace("*", ".*"));
+            Matcher matcher = pattern.matcher(remoteHost.getName());
+            if (!matcher.matches()) return true;
+        }
+        if (this.getPort() != null && !this.getPort().equals(remoteHost.getPort())) {
+            return true;
+        }
+        if (this.getId() != null && !this.getId().equals(remoteHost.getId())) {
+            return true;
+        }
+        if (this.getOrganization() != null) {
+            Pattern pattern = Pattern.compile(this.getOrganization().getName().replace("*", ".*"));
+            Matcher matcher = pattern.matcher(remoteHost.getOrganization().getName());
+            if (!matcher.matches()) return true;
+        }
+        if (this.getAlias() != null) {
+            Pattern pattern = Pattern.compile(this.getAlias().replace("*", ".*"));
+            Matcher matcher = pattern.matcher(remoteHost.getAlias());
+            return !matcher.matches();
+        }
+        return false;
+    }
+
+    public static class Builder {
+
+        String alias;
+        String id;
+        String name;
+        Integer port;
+        Organization organization;
+
+        public Builder() {
+            super();
+        }
+
+        public RemoteHostFilter build() {
+            RemoteHostFilter filter = new RemoteHostFilter();
+            filter.setAlias(this.alias);
+            filter.setId(this.id);
+            filter.setName(this.name);
+            filter.setPort(this.port);
+            filter.setOrganization(this.organization);
+            return filter;
+        }
+
+        public Builder hasAlias(String alias) {
+            this.alias = alias;
+            return this;
+        }
+
+        public Builder hasId(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder hasName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder hasPort(Integer port) {
+            this.port = port;
+            return this;
+        }
+    }
 }

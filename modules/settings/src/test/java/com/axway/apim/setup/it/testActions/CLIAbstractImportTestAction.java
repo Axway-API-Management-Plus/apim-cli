@@ -1,6 +1,6 @@
 package com.axway.apim.setup.it.testActions;
 
-import com.axway.apim.testActions.TestParams;
+import com.axway.apim.test.actions.TestParams;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.ValidationException;
 import org.apache.commons.io.FileUtils;

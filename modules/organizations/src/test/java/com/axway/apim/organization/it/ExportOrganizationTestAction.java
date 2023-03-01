@@ -1,6 +1,6 @@
 package com.axway.apim.organization.it;
 
-import com.axway.apim.testActions.TestParams;
+import com.axway.apim.test.actions.TestParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

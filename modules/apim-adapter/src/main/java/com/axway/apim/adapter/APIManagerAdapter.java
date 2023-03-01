@@ -58,10 +58,12 @@ import java.util.*;
 public class APIManagerAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerAdapter.class);
+    public static final String ADMIN = "admin";
+    public static final String OADMIN = "oadmin";
 
     private static APIManagerAdapter instance;
 
-    public static String apiManagerVersion = null;
+    private String apiManagerVersion = null;
     public static String apiManagerName = null;
 
     public static boolean initialized = false;
@@ -104,39 +106,47 @@ public class APIManagerAdapter {
     private static final HttpHelper httpHelper = new HttpHelper();
 
     public static synchronized APIManagerAdapter getInstance() throws AppException {
-        if (APIManagerAdapter.instance == null) {
-            APIManagerAdapter.instance = new APIManagerAdapter();
-            LOG.info("Successfully connected to API-Manager ({}) on: {}", getApiManagerVersion(), CoreParameters.getInstance().getAPIManagerURL());
+        if (instance == null) {
+            instance = new APIManagerAdapter();
+            cmd = CoreParameters.getInstance();
+            cmd.validateRequiredParameters();
+            instance.loginToAPIManager();
+            instance.setApiManagerVersion();
+            initialized = true;
+            LOG.info("Successfully connected to API-Manager ({}) on: {}", instance.getApiManagerVersion(), cmd.getAPIManagerURL());
         }
-        APIManagerAdapter.initialized = true;
-        return APIManagerAdapter.instance;
+        return instance;
     }
 
     public static synchronized void deleteInstance() throws AppException {
-        if (APIManagerAdapter.cacheManager != null && APIManagerAdapter.cacheManager.getStatus() == Status.AVAILABLE) {
+        if (cacheManager != null && cacheManager.getStatus() == Status.AVAILABLE) {
             LOG.debug("Closing cache ...");
-            APIManagerAdapter.cacheManager.close();
+            cacheManager.close();
             LOG.trace("Cache Closed.");
         }
-        if (APIManagerAdapter.instance != null) {
-            APIManagerAdapter.instance.logoutFromAPIManager();
-            APIManagerAdapter.instance = null;
+        if (instance != null) {
+            instance.logoutFromAPIManager();
+            instance.apiManagerVersion = null;
+            instance = null;
         }
-        APIManagerAdapter.apiManagerVersion = null;
-        APIManagerAdapter.initialized = false;
+        initialized = false;
+    }
+
+    private void setApiManagerVersion() throws AppException {
+        Config config = configAdapter.getConfig(false);
+        apiManagerVersion = config.getProductVersion();
+        if (usingOrgAdmin)
+            LOG.info("Organization Administrator Self Service Enabled : {}", config.getOadminSelfServiceEnabled());
+    }
+
+    public void setApiManagerVersion(String apiManagerVersion){
+        this.apiManagerVersion = apiManagerVersion;
     }
 
     private APIManagerAdapter() throws AppException {
         super();
-        cmd = CoreParameters.getInstance();
-        cmd.validateRequiredParameters();
-        this.configAdapter = new APIManagerConfigAdapter();
-        loginToAPIManager();
-        Config config = configAdapter.getConfig(false);
-        APIManagerAdapter.apiManagerVersion = config.getProductVersion();
-        if (usingOrgAdmin)
-            LOG.info("Organization Administrator Self Service Enabled : {}", config.getOadminSelfServiceEnabled());
         // For now this okay, may be replaced with a Factory later
+        this.configAdapter = new APIManagerConfigAdapter();
         this.customPropertiesAdapter = new APIManagerCustomPropertiesAdapter();
         this.alertsAdapter = new APIManagerAlertsAdapter();
         this.remoteHostsAdapter = new APIManagerRemoteHostsAdapter();
@@ -173,10 +183,10 @@ public class APIManagerAdapter {
             }
             User user = getCurrentUser();
             String role = getHigherRole(user);
-            if (role.equals("admin")) {
+            if (role.equals(ADMIN)) {
                 this.hasAdminAccount = true;
                 // Also register this client as an Admin-Client
-            } else if (role.equals("oadmin")) {
+            } else if (role.equals(OADMIN)) {
                 this.usingOrgAdmin = true;
             }
         } catch (IOException | URISyntaxException e) {
@@ -201,10 +211,10 @@ public class APIManagerAdapter {
         }
         if (roles.isEmpty())
             return role;
-        if (roles.contains("admin")) {
-            return "admin";
-        } else if (roles.contains("oadmin")) {
-            return "oadmin";
+        if (roles.contains(ADMIN)) {
+            return ADMIN;
+        } else if (roles.contains(OADMIN)) {
+            return OADMIN;
         }
         return role;
     }
@@ -316,7 +326,7 @@ public class APIManagerAdapter {
         Cache<K, V> cache = APIManagerAdapter.cacheManager.getCache(cacheType.name(), key, value);
         if (CoreParameters.getInstance().clearCaches() != null && CoreParameters.getInstance().clearCaches().contains(cacheType)) {
             cache.clear();
-            LOG.info("Cache: {} successfully cleared.", cacheType.name());
+            LOG.info("Cache: {} successfully cleared.", cacheType);
         }
         return cache;
     }
@@ -338,12 +348,14 @@ public class APIManagerAdapter {
      * @return false if API-Manager doesn't have this version otherwise true
      */
     public static boolean hasAPIManagerVersion(String version) {
+        String apiGatewayVersion = null;
         try {
-            List<String> managerVersion = getMajorVersions(getApiManagerVersion());
+            apiGatewayVersion = getInstance().getApiManagerVersion();
+            List<String> managerVersion = getMajorVersions(apiGatewayVersion);
             List<String> requestedVersion = getMajorVersions(version);
             Date datedManagerVersion = getDateVersion(managerVersion);
             Date datedRequestedVersion = getDateVersion(requestedVersion);
-            int managerSP = getServicePackVersion(getApiManagerVersion());
+            int managerSP = getServicePackVersion(apiGatewayVersion);
             int requestedSP = getServicePackVersion(version);
             for (int i = 0; i < requestedVersion.size(); i++) {
                 int managerVer = Integer.parseInt(managerVersion.get(i));
@@ -355,7 +367,7 @@ public class APIManagerAdapter {
             if (requestedSP != 0 && datedManagerVersion != null) return true;
             if (managerSP < requestedSP) return false;
         } catch (Exception e) {
-            LOG.warn("Can't parse API-Manager version: {} Requested version was: {} Returning false!", apiManagerVersion, version);
+            LOG.warn("Can't parse API-Manager version: {} Requested version was: {} Returning false!", apiGatewayVersion, version);
             return false;
         }
         return true;
@@ -367,7 +379,7 @@ public class APIManagerAdapter {
                 String dateVersion = managerVersion.get(2);
                 return new SimpleDateFormat("yyyyMMdd").parse(dateVersion);
             } catch (Exception e) {
-                LOG.trace("API-Manager version: {} seems not to contain a dated version", apiManagerVersion);
+                LOG.trace("API-Manager version does not to contain a dated version");
             }
         }
         return null;
@@ -455,7 +467,6 @@ public class APIManagerAdapter {
                     }
                 }
             } catch (Exception e) {
-                LOG.error("Can't load applications credentials. Can't parse response: {}", response, e);
                 throw new AppException("Can't load applications credentials.", ErrorCode.API_MANAGER_COMMUNICATION, e);
             }
         }
@@ -471,7 +482,8 @@ public class APIManagerAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode == 404) return null; // No Image found
                 if (statusCode != 200) {
-                    LOG.error("Can't read Image from API-Manager.. Message: {} Response-Code: {}", EntityUtils.toString(httpResponse.getEntity()), statusCode);
+                    String response = EntityUtils.toString(httpResponse.getEntity());
+                    LOG.error("Can't read Image from API-Manager.. Message: {} Response-Code: {}", response, statusCode);
                     throw new AppException("Can't read Image from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 if (httpResponse.getEntity() == null)
@@ -491,12 +503,12 @@ public class APIManagerAdapter {
         }
     }
 
-    public static String getApiManagerVersion() throws AppException {
-        if (APIManagerAdapter.apiManagerVersion != null) {
+    public String getApiManagerVersion() throws AppException {
+        if (apiManagerVersion != null) {
             return apiManagerVersion;
         }
-        APIManagerAdapter.apiManagerVersion = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getProductVersion();
-        return APIManagerAdapter.apiManagerVersion;
+        apiManagerVersion = APIManagerAdapter.getInstance().configAdapter.getConfig(false).getProductVersion();
+        return apiManagerVersion;
     }
 
     public static String getApiManagerName() throws AppException {

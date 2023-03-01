@@ -16,8 +16,6 @@ import java.util.Objects;
 
 public class OutboundProfile extends Profile {
 
-    protected static Logger LOG = LoggerFactory.getLogger(OutboundProfile.class);
-
     String routeType;
 
     @JsonDeserialize(using = PolicyDeserializer.class)

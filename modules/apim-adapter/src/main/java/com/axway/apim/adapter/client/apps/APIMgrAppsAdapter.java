@@ -41,6 +41,7 @@ public class APIMgrAppsAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(APIMgrAppsAdapter.class);
     public static final String APPLICATIONS = "/applications";
     public static final String ERROR_CREATING_APPLICATION_ERROR = "Error creating application. Error: ";
+    public static final String ERROR_CREATING_APPLICATION_RESPONSE_CODE = "Error creating application Response-Code: ";
 
     Map<ClientAppFilter, String> apiManagerResponse = new HashMap<>();
 
@@ -192,7 +193,7 @@ public class APIMgrAppsAdapter {
         if (apps.size() > 1) {
             throw new AppException("No unique application found", ErrorCode.APP_NAME_IS_NOT_UNIQUE);
         }
-        if (apps.size() == 0) return null;
+        if (apps.isEmpty()) return null;
         return apps.get(0);
     }
 
@@ -218,7 +219,7 @@ public class APIMgrAppsAdapter {
                         int statusCode = httpResponse.getStatusLine().getStatusCode();
                         if (statusCode != 200) {
                             LOG.error("Error reading application credentials. Response-Code: {} Got response: {}", statusCode, response);
-                            throw new AppException("Error creating application' Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                            throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                         }
                         applicationsCredentialCache.put(app.getId() + "|" + type, response);
                     }
@@ -326,7 +327,7 @@ public class APIMgrAppsAdapter {
             if (actualApp == null) {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS).build();
             } else {
-                if (desiredApp.getApiAccess() != null && desiredApp.getApiAccess().size() == 0)
+                if (desiredApp.getApiAccess() != null && desiredApp.getApiAccess().isEmpty())
                     desiredApp.setApiAccess(null);
                 desiredApp.setId(actualApp.getId());
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + actualApp.getId()).build();
@@ -398,7 +399,7 @@ public class APIMgrAppsAdapter {
     }
 
     private void saveCredentials(ClientApplication app, ClientApplication actualApp) throws JsonProcessingException {
-        if (app.getCredentials() == null || app.getCredentials().size() == 0) return;
+        if (app.getCredentials() == null || app.getCredentials().isEmpty()) return;
         String endpoint;
         for (ClientAppCredential cred : app.getCredentials()) {
 
@@ -470,7 +471,7 @@ public class APIMgrAppsAdapter {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error saving/updating application credentials. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException("Error creating application' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                        throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                     }
                 }
             } catch (Exception e) {
@@ -498,7 +499,7 @@ public class APIMgrAppsAdapter {
     }
 
     private void saveQuota(ClientApplication app, ClientApplication actualApp) throws AppException {
-        if (app.getAppQuota() == null || app.getAppQuota().getRestrictions().size() == 0) return;
+        if (app.getAppQuota() == null || app.getAppQuota().getRestrictions().isEmpty()) return;
         if (actualApp != null && app.getAppQuota().equals(actualApp.getAppQuota())) return;
         if (!APIManagerAdapter.hasAdminAccount()) {
             LOG.warn("Ignoring quota, as no admin account is given");
@@ -522,7 +523,7 @@ public class APIMgrAppsAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error creating/updating application quota. Response-Code: {}  Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                    throw new AppException("Error creating application' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 // Force reload of this quota next time
                 applicationsQuotaCache.remove(app.getId());
@@ -533,7 +534,7 @@ public class APIMgrAppsAdapter {
     }
 
     private void saveAPIAccess(ClientApplication app, ClientApplication actualApp) throws AppException {
-        if (app.getApiAccess() == null || app.getApiAccess().size() == 0) return;
+        if (app.getApiAccess() == null || app.getApiAccess().isEmpty()) return;
         if (actualApp != null && app.getApiAccess().equals(actualApp.getApiAccess())) return;
         if (!APIManagerAdapter.hasAdminAccount()) {
             LOG.warn("Ignoring API-Access, as no admin account is given");
@@ -554,7 +555,7 @@ public class APIMgrAppsAdapter {
     }
 
     private void saveOrUpdateOAuthResources(ClientApplication desiredApp, List<ClientAppOauthResource> scopes2Create, boolean update) throws AppException {
-        if (scopes2Create == null || scopes2Create.size() == 0) return;
+        if (scopes2Create == null || scopes2Create.isEmpty()) return;
         for (ClientAppOauthResource res : scopes2Create) {
             String endpoint = "oauthresource";
             try {
@@ -576,7 +577,7 @@ public class APIMgrAppsAdapter {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error saving/updating application oauth resource. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException("Error creating application' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                        throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                     }
                 }
             } catch (Exception e) {
@@ -705,7 +706,7 @@ public class APIMgrAppsAdapter {
     }
 
     private void saveOrUpdateApplicationPermissions(ClientApplication desiredApp, List<ApplicationPermission> permissions2Create, boolean update) throws AppException {
-        if (permissions2Create == null || permissions2Create.size() == 0) return;
+        if (permissions2Create == null || permissions2Create.isEmpty()) return;
         for (ApplicationPermission appPerm : permissions2Create) {
             String endpoint = "permissions";
             try {

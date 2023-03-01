@@ -15,7 +15,7 @@ public class HttpHelper {
             response.setStatusCode(closeableHttpResponse.getStatusLine().getStatusCode());
             HttpEntity httpEntity = closeableHttpResponse.getEntity();
             if(responseBody && httpEntity != null)
-                response.setResponse(EntityUtils.toString(httpEntity));
+                response.setResponseBody(EntityUtils.toString(httpEntity));
             return response;
         }
     }

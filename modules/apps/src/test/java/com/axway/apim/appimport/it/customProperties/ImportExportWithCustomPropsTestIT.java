@@ -3,7 +3,7 @@ package com.axway.apim.appimport.it.customProperties;
 import java.io.File;
 import java.io.IOException;
 
-import com.axway.apim.testActions.TestParams;
+import com.axway.apim.test.actions.TestParams;
 import org.springframework.http.HttpStatus;
 import org.testng.Assert;
 import org.testng.annotations.Optional;

@@ -1,4 +1,4 @@
-package com.axway.apim.testActions;
+package com.axway.apim.test.actions;
 
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;

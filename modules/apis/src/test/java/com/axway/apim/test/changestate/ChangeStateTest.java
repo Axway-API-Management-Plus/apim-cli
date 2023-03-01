@@ -16,11 +16,6 @@ import java.util.List;
 
 public class ChangeStateTest {
 
-    @BeforeClass
-    public void prepareTest() {
-        APIManagerAdapter.apiManagerVersion = "7.7.20221130";
-    }
-
     @Test
     public void testOrderMakesNoChange() throws IOException {
 

@@ -124,7 +124,6 @@ public class APIManagerAPIAccessAdapter {
             }
             return allApiAccess;
         } catch (Exception e) {
-            LOG.error("Error loading API-Access for {} from API-Manager. Can't process response: {}", type, apiAccessResponse, e);
             throw new AppException("Error loading API-Access for " + type + " from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
@@ -183,13 +182,13 @@ public class APIManagerAPIAccessAdapter {
             RestAPICall request = new POSTRequest(entity, uri);
             Response httpResponse = httpHelper.execute(request, true);
             int statusCode = httpResponse.getStatusCode();
-            String response = httpResponse.getResponse();
+            String response = httpResponse.getResponseBody();
             if (statusCode < 200 || statusCode > 299) {
                 if ((statusCode == 403 || statusCode == 404) && (response.contains("Unknown API") || response.contains("The entity could not be found"))) {
                     LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
                     Thread.sleep(cmd.getRetryDelay());
                     httpResponse = httpHelper.execute(request, true);
-                    response = httpResponse.getResponse();
+                    response = httpResponse.getResponseBody();
                     statusCode = httpResponse.getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error creating/updating API Access: {} Response-Code: {} Response Body: {}", apiAccess, statusCode, response);
@@ -227,7 +226,8 @@ public class APIManagerAPIAccessAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
-                    LOG.error("Can't delete API access requests for application. Response-Code: {}. Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                    String errorResponse = EntityUtils.toString(httpResponse.getEntity());
+                    LOG.error("Can't delete API access requests for application. Response-Code: {}. Got response: {}", statusCode, errorResponse);
                     throw new AppException("Can't delete API access requests for application. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 removeFromCache(parentEntity.getId(), type);

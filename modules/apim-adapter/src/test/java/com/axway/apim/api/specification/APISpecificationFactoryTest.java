@@ -81,7 +81,6 @@ public class APISpecificationFactoryTest {
     }
     @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "Can't handle API specification. No suitable API-Specification implementation available.")
     public void getAPISpecificationUnknown() throws AppException {
-        APIManagerAdapter.apiManagerVersion = "7.7";
         ClassLoader classLoader = this.getClass().getClassLoader();
         String specDirPath = classLoader.getResource("com/axway/apim/adapter/spec").getFile();
         APISpecification apiSpecification = APISpecificationFactory.getAPISpecification("unknown.txt", specDirPath, "petstore");

@@ -1,4 +1,4 @@
-package com.axway.apim.testActions;
+package com.axway.apim.test.actions;
 
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.ValidationException;

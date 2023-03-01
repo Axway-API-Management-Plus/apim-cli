@@ -412,27 +412,43 @@ public class APIFilter implements CustomPropertiesFilter {
 
 	@Override
 	public String toString() {
-		if(LOG.isTraceEnabled()) {
-			return "APIFilter [id=" + id + ", apiId=" + apiId + ", name=" + name + ", vhost=" + vhost + ", apiPath="
-					+ apiPath + ", queryStringVersion=" + queryStringVersion + ", state=" + state + ", customProperties="
-					+ customProperties + ", deprecated=" + deprecated + ", retired=" + retired + ", apiType=" + apiType
-					+ ", translateMethodMode=" + translateMethodMode + ", loadBackendAPI=" + loadBackendAPI
-					+ ", includeOperations=" + includeOperations + ", includeQuotas=" + includeQuotas
-					+ ", includeClientOrganizations=" + includeClientOrganizations + ", includeClientApplications="
-					+ includeClientApplications + ", includeImage=" + includeImage + ", includeOriginalAPIDefinition="
-					+ includeOriginalAPIDefinition + ", translatePolicyMode=" + translatePolicyMode + ", filters=" + filters
-					+ "]";
-		} else if(LOG.isDebugEnabled()) {
-			return "APIFilter [id=" + id + ", name=" + name + ", vhost=" + vhost + ", apiPath=" + apiPath
-					+ ", queryStringVersion=" + queryStringVersion + ", state=" + state + ", deprecated=" + deprecated
-					+ ", retired=" + retired + ", loadBackendAPI=" + loadBackendAPI + "]";
-		} else {
-			return "APIFilter [id=" + id + ", name=" + name + ", vhost=" + vhost + ", apiPath=" + apiPath
-					+ ", queryStringVersion=" + queryStringVersion + "]";			
-		}
+		return "APIFilter{" +
+				"id='" + id + '\'' +
+				", apiId='" + apiId + '\'' +
+				", name='" + name + '\'' +
+				", vhost='" + vhost + '\'' +
+				", apiPath='" + apiPath + '\'' +
+				", queryStringVersion='" + queryStringVersion + '\'' +
+				", state='" + state + '\'' +
+				", backendBasepath='" + backendBasepath + '\'' +
+				", inboundSecurity='" + inboundSecurity + '\'' +
+				", outboundAuthentication='" + outboundAuthentication + '\'' +
+				", organization='" + organization + '\'' +
+				", createdOn='" + createdOn + '\'' +
+				", type=" + type +
+				", policyName='" + policyName + '\'' +
+				", tag='" + tag + '\'' +
+				", customProperties=" + customProperties +
+				", deprecated=" + deprecated +
+				", retired=" + retired +
+				", apiType='" + apiType + '\'' +
+				", translateMethodMode=" + translateMethodMode +
+				", loadBackendAPI=" + loadBackendAPI +
+				", includeOperations=" + includeOperations +
+				", includeQuotas=" + includeQuotas +
+				", includeClientOrganizations=" + includeClientOrganizations +
+				", includeClientApplications=" + includeClientApplications +
+				", includeClientAppQuota=" + includeClientAppQuota +
+				", includeImage=" + includeImage +
+				", includeRemoteHost=" + includeRemoteHost +
+				", includeOriginalAPIDefinition=" + includeOriginalAPIDefinition +
+				", useFEAPIDefinition=" + useFEAPIDefinition +
+				", failOnError=" + failOnError +
+				", includeMethods=" + includeMethods +
+				", translatePolicyMode=" + translatePolicyMode +
+				'}';
 	}
-	
-	
+
 	public boolean filter(API api) {
 		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null && this.getBackendBasepath()==null 
 				&& this.getTag()==null && this.getInboundSecurity()==null && this.getOutboundAuthentication()==null && this.getOrganization()==null) { // Nothing given to filter out.
@@ -872,7 +888,7 @@ public class APIFilter implements CustomPropertiesFilter {
 			for (OutboundProfile profile : api.getOutboundProfiles().values()) {
 				for (Policy policy : profile.getAllPolices()) {
 					if (policy.getName() == null) {
-						LOG.warn("Cannot check policy: " + policy + " as policy name is empty.");
+						LOG.warn("Cannot check policy: {} as policy name is empty.", policy);
 						continue;
 					}
 					Matcher matcher = pattern.matcher(policy.getName().toLowerCase());

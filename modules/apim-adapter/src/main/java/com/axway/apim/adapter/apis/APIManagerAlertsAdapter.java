@@ -91,7 +91,8 @@ public class APIManagerAlertsAdapter {
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
-                    LOG.error("Error updating API-Manager alert configuration. Response-Code: {} Response Body: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                    String errorResponse = EntityUtils.toString(httpResponse.getEntity());
+                    LOG.error("Error updating API-Manager alert configuration. Response-Code: {} Response Body: {}", statusCode, errorResponse);
                     throw new AppException("Error updating API-Manager alert configuration. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
             }

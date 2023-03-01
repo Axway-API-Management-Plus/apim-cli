@@ -2,7 +2,7 @@ package com.axway.apim.setup.it.testActions;
 
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;
-import com.axway.apim.testActions.TestParams;
+import com.axway.apim.test.actions.TestParams;
 import com.consol.citrus.actions.AbstractTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.ValidationException;

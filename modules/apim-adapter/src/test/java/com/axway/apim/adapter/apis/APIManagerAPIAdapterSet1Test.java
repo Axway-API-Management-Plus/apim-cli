@@ -28,12 +28,12 @@ public class APIManagerAPIAdapterSet1Test extends WiremockWrapper {
 	@BeforeClass
 	public void init() {
 		try {
-			initWiremock();
-			APIManagerAdapter.deleteInstance();
+			super.initWiremock();
 			CoreParameters coreParameters = new CoreParameters();
 			coreParameters.setHostname("localhost");
 			coreParameters.setUsername("apiadmin");
 			coreParameters.setPassword(Utils.getEncryptedPassword());
+			APIManagerAdapter.deleteInstance();
 			apiManagerAdapter = APIManagerAdapter.getInstance();
 		} catch (AppException e) {
 			throw new RuntimeException(e);

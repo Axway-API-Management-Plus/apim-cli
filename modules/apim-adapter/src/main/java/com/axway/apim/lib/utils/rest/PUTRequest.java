@@ -17,7 +17,6 @@ public class PUTRequest extends RestAPICall {
 	public HttpResponse execute() throws AppException {
 		HttpPut httpPut = new HttpPut(uri);
 		httpPut.setEntity(entity);
-		HttpResponse response = sendRequest(httpPut);
-		return response;
+		return sendRequest(httpPut);
 	}
 }

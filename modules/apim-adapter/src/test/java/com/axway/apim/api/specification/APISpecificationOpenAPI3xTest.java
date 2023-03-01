@@ -64,12 +64,10 @@ public class APISpecificationOpenAPI3xTest {
 	
 	@Test
 	public void testBerlinGroupYAM_API() throws IOException {
-		APIManagerAdapter.apiManagerVersion="7.7.0";
 		byte[] content = getSwaggerContent(TEST_PACKAGE + "/psd2-api_1.3.6_errata20200327.yaml");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
 		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
-
 		// Check if the Swagger-File has been changed
 		JsonNode swagger = ymlMapper.readTree(apiDefinition.getApiSpecificationContent());
 		Assert.assertEquals( swagger.get("servers").size(), 1, "Expected to get only one server url");

@@ -3,7 +3,7 @@ package com.axway.apim.setup.it.tests;
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.setup.it.ExportManagerConfigTestAction;
 import com.axway.apim.setup.it.ImportManagerConfigTestAction;
-import com.axway.apim.testActions.TestParams;
+import com.axway.apim.test.actions.TestParams;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
