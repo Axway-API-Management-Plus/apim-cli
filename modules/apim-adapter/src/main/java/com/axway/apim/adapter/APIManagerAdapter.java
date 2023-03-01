@@ -124,11 +124,11 @@ public class APIManagerAdapter {
             cacheManager.close();
             LOG.trace("Cache Closed.");
         }
-        if (instance != null) {
+        if (instance != null && cmd != null) {
             instance.logoutFromAPIManager();
-            instance.apiManagerVersion = null;
-            instance = null;
         }
+        instance.apiManagerVersion = null;
+        instance = null;
         initialized = false;
     }
 
