@@ -88,7 +88,6 @@ public class APIManagerAdapter {
     private static CoreParameters cmd;
 
     public static APIMCLICacheManager cacheManager;
-
     public APIManagerConfigAdapter configAdapter;
     public APIManagerCustomPropertiesAdapter customPropertiesAdapter;
     public APIManagerAlertsAdapter alertsAdapter;
@@ -222,6 +221,11 @@ public class APIManagerAdapter {
     public void logoutFromAPIManager() throws AppException {
         try {
             LOG.info("Cmd : {}", cmd);
+            try{
+                throw new Exception("debug");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/login").build();
             DELRequest logoutRequest = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) logoutRequest.execute()) {
