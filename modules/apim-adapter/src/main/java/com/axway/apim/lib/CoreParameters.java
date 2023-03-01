@@ -435,6 +435,12 @@ public class CoreParameters implements Parameters {
 
 
     public void validateRequiredParameters() throws AppException {
+        LOG.info("Cmd : {}", this);
+        try {
+            throw new Exception("debug");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         boolean parameterMissing = false;
         if (getUsername() == null) {
             parameterMissing = true;
