@@ -98,18 +98,14 @@ public class CoreParameters implements Parameters {
     private boolean disableCompression;
 
     public CoreParameters() {
-        super();
-        CoreParameters.instance = this;
+        instance = this;
     }
 
     public static synchronized CoreParameters getInstance() {
-        if (CoreParameters.instance == null) {
-            try {
-                return new CoreParameters(); // Skip this, just return an empty CommandParams to avoid NPE
-            } catch (Exception ignore) {
-            }
+        if (instance == null) {
+            instance = new CoreParameters();
         }
-        return CoreParameters.instance;
+        return instance;
     }
 
     public String getStage() {

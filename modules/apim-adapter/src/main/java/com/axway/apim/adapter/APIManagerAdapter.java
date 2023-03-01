@@ -124,11 +124,11 @@ public class APIManagerAdapter {
             cacheManager.close();
             LOG.trace("Cache Closed.");
         }
-        if (instance != null && cmd != null) {
+        if (instance != null) {
             instance.logoutFromAPIManager();
+            instance.apiManagerVersion = null;
+            instance = null;
         }
-        instance.apiManagerVersion = null;
-        instance = null;
         initialized = false;
     }
 
@@ -221,6 +221,7 @@ public class APIManagerAdapter {
 
     public void logoutFromAPIManager() throws AppException {
         try {
+            LOG.info("Cmd : {}", cmd);
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/login").build();
             DELRequest logoutRequest = new DELRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) logoutRequest.execute()) {
