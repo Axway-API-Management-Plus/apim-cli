@@ -1,0 +1,13 @@
+{
+  "id": "bf742930-5fdd-4e49-b9ae-b8fdecd37ffa",
+  "virtualizedApiId": "e4ded8c8-0a40-4b50-bc13-552fb7209150",
+  "name": "deletePet",
+  "apiId": "1f4263ca-7f03-41d9-9d34-9eff79d29bd8",
+  "apiMethodId": "7a0c6ce1-187b-47bc-b4dc-cfa1f12aa042",
+  "summary": "Deletes a pet",
+  "descriptionType": "original",
+  "descriptionManual": null,
+  "descriptionMarkdown": null,
+  "descriptionUrl": null,
+  "tags": {}
+}
