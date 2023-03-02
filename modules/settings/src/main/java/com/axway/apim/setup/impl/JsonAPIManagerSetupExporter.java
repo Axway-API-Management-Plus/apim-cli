@@ -4,12 +4,12 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.RemoteHostFilter;
 import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.adapter.jackson.UserSerializerModifier;
-import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.api.model.Config;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
+import com.axway.apim.setup.model.APIManagerConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -25,7 +25,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
-    protected static Logger LOG = LoggerFactory.getLogger(JsonAPIManagerSetupExporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JsonAPIManagerSetupExporter.class);
     public JsonAPIManagerSetupExporter(APIManagerSetupExportParams params, ExportResult result) {
         super(params, result);
     }

@@ -1,15 +1,15 @@
-package com.axway.apim.api.model;
+package com.axway.apim.api.export.model;
 
 public class APICert {
 
-    String id;
-    String name;
-    String path;
-    String version;
-    String commonName;
-    long validAfter;
-    long validBefore;
-    String md5FingerPrint;
+    private String id;
+    private String name;
+    private String path;
+    private String version;
+    private String commonName;
+    private long validAfter;
+    private long validBefore;
+    private String md5FingerPrint;
 
     public APICert(String id, String name, String path, String version, String commonName, long validAfter, long validBefore, String md5FingerPrint) {
         this.id = id;

@@ -10,7 +10,7 @@ import java.util.Map;
 public class AuthenticationProfileTest {
 
     @Test
-    public void compareTwoAuthProfiles(){
+    public void compareTwoSslAuthProfiles(){
 
         AuthenticationProfile authenticationProfile = new AuthenticationProfile();
         authenticationProfile.setName("_default");
@@ -119,5 +119,83 @@ public class AuthenticationProfileTest {
                 "zpVz38ACAggA");
         authenticationProfileFromGateway.setParameters(parameters);
         Assert.assertTrue(authenticationProfile.equals(authenticationProfileFromGateway));
+    }
+
+    @Test
+    public void compareBasicAuthProfiles(){
+        AuthenticationProfile authenticationProfile = new AuthenticationProfile();
+        authenticationProfile.setName("_default");
+        authenticationProfile.setType(AuthType.http_basic);
+        authenticationProfile.setIsDefault(true);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("username","admin");
+        parameters.put("password", Utils.getEncryptedPassword());
+        parameters.put("_id_", 0);
+
+        authenticationProfile.setParameters(parameters);
+        AuthenticationProfile authenticationProfileFromGateway = new AuthenticationProfile();
+        authenticationProfileFromGateway.setName("_default");
+        authenticationProfileFromGateway.setIsDefault(true);
+        authenticationProfileFromGateway.setType(AuthType.http_basic);
+
+        parameters = new HashMap<>();
+        parameters.put("username","admin");
+        parameters.put("_id_", 0);
+
+        authenticationProfileFromGateway.setParameters(parameters);
+        Assert.assertTrue(authenticationProfile.equals(authenticationProfileFromGateway));
+    }
+
+    @Test
+    public void compareApikeyAuthProfiles(){
+        AuthenticationProfile authenticationProfile = new AuthenticationProfile();
+        authenticationProfile.setName("_default");
+        authenticationProfile.setType(AuthType.apiKey);
+        authenticationProfile.setIsDefault(true);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("apiKey","abcdedg");
+        parameters.put("apiKeyField","QUERYSTRING_PARAMETER");
+        parameters.put("_id_", 0);
+
+        authenticationProfile.setParameters(parameters);
+        AuthenticationProfile authenticationProfileFromGateway = new AuthenticationProfile();
+        authenticationProfileFromGateway.setName("_default");
+        authenticationProfileFromGateway.setIsDefault(true);
+        authenticationProfileFromGateway.setType(AuthType.apiKey);
+
+        parameters = new HashMap<>();
+        parameters.put("apiKey","abcdedg");
+        parameters.put("apiKeyField","QUERYSTRING_PARAMETER");
+        parameters.put("_id_", 0);
+
+        authenticationProfileFromGateway.setParameters(parameters);
+        Assert.assertTrue(authenticationProfile.equals(authenticationProfileFromGateway));
+    }
+
+    @Test
+    public void compareApikeyAuthProfilesWithDifferentKeys(){
+        AuthenticationProfile authenticationProfile = new AuthenticationProfile();
+        authenticationProfile.setName("_default");
+        authenticationProfile.setType(AuthType.apiKey);
+        authenticationProfile.setIsDefault(true);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("apiKey","abcdedg1");
+        parameters.put("apiKeyField","QUERYSTRING_PARAMETER");
+        parameters.put("_id_", 0);
+
+        authenticationProfile.setParameters(parameters);
+        AuthenticationProfile authenticationProfileFromGateway = new AuthenticationProfile();
+        authenticationProfileFromGateway.setName("_default");
+        authenticationProfileFromGateway.setIsDefault(true);
+        authenticationProfileFromGateway.setType(AuthType.apiKey);
+
+        parameters = new HashMap<>();
+        parameters.put("apiKey","abcdedg");
+        parameters.put("apiKeyField","QUERYSTRING_PARAMETER");
+        parameters.put("_id_", 0);
+
+        authenticationProfileFromGateway.setParameters(parameters);
+        Assert.assertFalse(authenticationProfile.equals(authenticationProfileFromGateway));
+        Assert.assertNotNull(authenticationProfile.toString());
     }
 }

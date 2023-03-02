@@ -5,7 +5,7 @@ import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APICheckCertificatesParams;
 import com.axway.apim.api.export.lib.params.APIExportParams;
-import com.axway.apim.api.model.APICert;
+import com.axway.apim.api.export.model.APICert;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.lib.StandardExportParams;
 import com.axway.apim.lib.error.AppException;
@@ -56,7 +56,7 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
                 }
             }
         }
-        if (expiredCerts.size() > 0) {
+        if (!expiredCerts.isEmpty()) {
             this.result.setError(ErrorCode.CHECK_CERTS_FOUND_CERTS);
             this.result.setResultDetails(expiredCerts);
             StandardExportParams.OutputFormat outputFormat = params.getOutputFormat();
