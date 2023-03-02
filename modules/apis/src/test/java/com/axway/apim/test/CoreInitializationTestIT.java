@@ -148,7 +148,6 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
             httpGet.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
             httpResponse = httpClient.execute(httpGet);
             response = EntityUtils.toString(httpResponse.getEntity());
-            System.out.println("****" + response);
             if (!response.equals("[]")) {
                 testRunner.echo("User Already exists");
                 documentContext = JsonPath.parse(response);

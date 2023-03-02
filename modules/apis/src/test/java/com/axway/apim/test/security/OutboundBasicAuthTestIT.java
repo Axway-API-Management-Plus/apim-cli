@@ -1,6 +1,5 @@
 package com.axway.apim.test.security;
 
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.test.ImportTestAction;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
