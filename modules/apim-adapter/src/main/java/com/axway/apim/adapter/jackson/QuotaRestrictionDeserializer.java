@@ -24,11 +24,15 @@ import java.util.regex.Pattern;
 
 public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestriction> {
 
+    public static final String PERIOD = "period";
+    public static final String METHOD = "method";
+    public static final String MESSAGES = "messages";
+
     public enum DeserializeMode {apiManagerData, configFile}
 
-    private final static String validPeriods = "week|day|hour|minute|second";
+    private static final String VALID_PERIODS = "week|day|hour|minute|second";
 
-    private final DeserializeMode desiralizeMode;
+    private final DeserializeMode deserializeMode;
 
     private final boolean addRestrictedAPI;
 
@@ -41,7 +45,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 
     public QuotaRestrictionDeserializer(DeserializeMode deserializeMode, boolean addRestrictedAPI) {
         super();
-        this.desiralizeMode = deserializeMode;
+        this.deserializeMode = deserializeMode;
         this.addRestrictedAPI = addRestrictedAPI;
         try {
             this.apiAdapter = APIManagerAdapter.getInstance().apiAdapter;
@@ -58,7 +62,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
         String type = node.get("type").asText();
         JsonNode quotaConfig = node.get("config");
 
-        String period = quotaConfig.get("period").asText();
+        String period = quotaConfig.get(PERIOD).asText();
         String per = quotaConfig.get("per").asText();
 
         QuotaRestriction restriction = new QuotaRestriction();
@@ -68,10 +72,10 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
             throw new AppException("Invalid quota config. The restriction type: " + type + " is invalid.", ErrorCode.INVALID_QUOTA_CONFIG);
         }
         Map<String, String> configMap = new LinkedHashMap<>();
-        configMap.put("period", period);
+        configMap.put(PERIOD, period);
         configMap.put("per", per);
         if (type.equals("throttle")) {
-            configMap.put("messages", quotaConfig.get("messages").asText());
+            configMap.put(MESSAGES, quotaConfig.get(MESSAGES).asText());
         } else {
             configMap.put("mb", quotaConfig.get("mb").asText());
         }
@@ -103,11 +107,11 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
                  */
                 if (addRestrictedAPI) {
                     // If data comes from API-Manager api contains the API-ID
-                    if (desiralizeMode == DeserializeMode.apiManagerData) {
+                    if (deserializeMode == DeserializeMode.apiManagerData) {
                         // api contains the ID of the API
                         api = APIManagerAdapter.getInstance().apiAdapter.getAPIWithId(node.get("api").asText());
                         // In the API-Config file the api contains the apiName
-                    } else if (desiralizeMode == DeserializeMode.configFile) {
+                    } else if (deserializeMode == DeserializeMode.configFile) {
                         // If the apiPath is given, it takes precedence and the API-Name and API-Version is completely ignored
                         APIFilter apiFilter = new APIFilter.Builder().hasName(node.get("api").asText()).build();
                         api = apiAdapter.getAPI(apiFilter, false);
@@ -127,24 +131,24 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
         } else {
             restriction.setApiId("*");
         }
-        if (!node.has("method") || "*".equals(node.get("method").asText())) {
+        if (!node.has(METHOD) || "*".equals(node.get(METHOD).asText())) {
             restriction.setMethod("*");
         } else {
             if (addRestrictedAPI) {
                 // Specific method defined. Translate it into the methodId, but only for applications as otherwise it is related to the API anyway
-                if (desiralizeMode == DeserializeMode.configFile) {
-                    APIMethod method = apiMethodAdapter.getMethodForName(restriction.getApiId(), node.get("method").asText());
+                if (deserializeMode == DeserializeMode.configFile) {
+                    APIMethod method = apiMethodAdapter.getMethodForName(restriction.getApiId(), node.get(METHOD).asText());
                     if (method == null) {
-                        throw new AppException("Invalid quota configuration. Method: " + node.get("method").asText() + " not found for API with ID: " + restriction.getApiId(), ErrorCode.INVALID_QUOTA_CONFIG);
+                        throw new AppException("Invalid quota configuration. Method: " + node.get(METHOD).asText() + " not found for API with ID: " + restriction.getApiId(), ErrorCode.INVALID_QUOTA_CONFIG);
                     }
                     restriction.setMethod(method.getId());
-                } else if (desiralizeMode == DeserializeMode.apiManagerData) {
+                } else if (deserializeMode == DeserializeMode.apiManagerData) {
                     // Take over the ID given by API-Manager is translated into method name in QuotaRestrictionSerializer
-                    restriction.setMethod(node.get("method").asText());
+                    restriction.setMethod(node.get(METHOD).asText());
                 }
             } else {
                 // Take over the given method name
-                restriction.setMethod(node.get("method").asText());
+                restriction.setMethod(node.get(METHOD).asText());
             }
         }
 
@@ -154,21 +158,20 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 
     private void validateRestriction(QuotaRestriction restriction) throws AppException {
         if (restriction.getType() == QuotaRestrictiontype.throttlemb) {
-            if (restriction.getConfig().get("period") == null || restriction.getConfig().get("per") == null || restriction.getConfig().get("mb") == null) {
+            if (restriction.getConfig().get(PERIOD) == null || restriction.getConfig().get("per") == null || restriction.getConfig().get("mb") == null) {
                 throw new AppException("Invalid quota config. For type 'throttlemb' the following configs are required: period, per, mb", ErrorCode.INVALID_QUOTA_CONFIG);
             }
         } else if (restriction.getType() == QuotaRestrictiontype.throttle) {
-            if (restriction.getConfig().get("period") == null || restriction.getConfig().get("per") == null || restriction.getConfig().get("messages") == null) {
+            if (restriction.getConfig().get(PERIOD) == null || restriction.getConfig().get("per") == null || restriction.getConfig().get(MESSAGES) == null) {
                 throw new AppException("Invalid quota config. For type 'throttle' the following configs are required: period, per, messages", ErrorCode.INVALID_QUOTA_CONFIG);
             }
         } else {
             throw new AppException("Unsupported Quota-Type: '" + restriction.getType() + "'. Must be either: throttle or throttlemb", ErrorCode.INVALID_QUOTA_CONFIG);
         }
-
-        Pattern pattern = Pattern.compile("^(" + validPeriods + ")$");
-        Matcher matcher = pattern.matcher(restriction.getConfig().get("period"));
+        Pattern pattern = Pattern.compile("^(" + VALID_PERIODS + ")$");
+        Matcher matcher = pattern.matcher(restriction.getConfig().get(PERIOD));
         if (!matcher.matches()) {
-            throw new AppException("Invalid quota period: '" + restriction.getConfig().get("period") + "'. Must be one of the following: " + validPeriods, ErrorCode.INVALID_QUOTA_CONFIG);
+            throw new AppException("Invalid quota period: '" + restriction.getConfig().get(PERIOD) + "'. Must be one of the following: " + VALID_PERIODS, ErrorCode.INVALID_QUOTA_CONFIG);
         }
     }
 }

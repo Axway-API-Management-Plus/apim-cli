@@ -119,6 +119,7 @@ public class AuthenticationProfileTest {
                 "zpVz38ACAggA");
         authenticationProfileFromGateway.setParameters(parameters);
         Assert.assertTrue(authenticationProfile.equals(authenticationProfileFromGateway));
+        Assert.assertNotNull(authenticationProfile.toString());
     }
 
     @Test

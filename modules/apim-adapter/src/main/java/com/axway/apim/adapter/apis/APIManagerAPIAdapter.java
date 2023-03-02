@@ -58,6 +58,7 @@ public class APIManagerAPIAdapter {
 
     public static final String PROXIES = "/proxies/";
     public static final String APIREPO = "/apirepo/";
+    public static final String UNKNOWN_API = "Unknown API";
     Map<APIFilter, String> apiManagerResponse = new HashMap<>();
     ObjectMapper mapper = new ObjectMapper();
     private final CoreParameters cmd;
@@ -486,7 +487,7 @@ public class APIManagerAPIAdapter {
             int statusCode = httpResponse.getStatusCode();
             String response = httpResponse.getResponseBody();
             if (statusCode != 200) {
-                if ((statusCode >= 400 && statusCode <= 499) && response.contains("Unknown API")) {
+                if ((statusCode >= 400 && statusCode <= 499) && response.contains(UNKNOWN_API)) {
                     LOG.warn("Got unexpected error: 'Unknown API' while trying to read Backend-API ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
                     Thread.sleep(cmd.getRetryDelay());
                     httpResponse = httpHelper.execute(request, true);
@@ -901,7 +902,7 @@ public class APIManagerAPIAdapter {
             int statusCode = httpResponse.getStatusCode();
             if (statusCode != 204) {
                 String response = httpResponse.getResponseBody();
-                if ((statusCode == 403 || statusCode == 404) && (response.contains("Unknown API") || response.contains("The entity could not be found"))) {
+                if ((statusCode == 403 || statusCode == 404) && (response.contains(UNKNOWN_API) || response.contains("The entity could not be found"))) {
                     LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
                     try {
                         Thread.sleep(cmd.getRetryDelay());
@@ -945,7 +946,7 @@ public class APIManagerAPIAdapter {
             int statusCode = httpResponse.getStatusCode();
             if (statusCode != 204) {
                 String response = httpResponse.getResponseBody();
-                if ((statusCode == 403 || statusCode == 404) && response.contains("Unknown API")) {
+                if ((statusCode == 403 || statusCode == 404) && response.contains(UNKNOWN_API)) {
                     LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
                     Thread.sleep(cmd.getRetryDelay());
                     httpResponse = httpHelper.execute(apiCall, true);
