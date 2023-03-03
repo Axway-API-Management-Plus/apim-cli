@@ -32,10 +32,10 @@ public class GrantAccessAPIHandler extends APIResultHandler {
 
 	@Override
 	public void execute(List<API> apis) throws AppException {
-		if(apis == null || apis.size() == 0) {
+		if(apis == null || apis.isEmpty()) {
 			throw new AppException("List of APIs to grant access to is missing.", ErrorCode.UNKNOWN_API);
 		}
-		if(orgs == null || orgs.size() == 0) {
+		if(orgs == null || orgs.isEmpty()) {
 			throw new AppException("List of Orgs to grant access to is missing.", ErrorCode.UNKNOWN_ORGANIZATION);
 		}
 		if(apis.size()==1) {

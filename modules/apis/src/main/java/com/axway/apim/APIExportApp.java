@@ -27,6 +27,8 @@ import java.util.List;
 public class APIExportApp implements APIMCLIServiceProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIExportApp.class);
+    public static final String CHECK_THE_LOG_AT_LEAST_ONE_ERROR_WAS_RECORDED = "Please check the log. At least one error was recorded.";
+    public static final String SUCCESSFULLY_SELECTED_API_S = "Successfully selected {} API(s).";
 
     static ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
 
@@ -187,9 +189,9 @@ public class APIExportApp implements APIMCLIServiceProvider {
                 LOG.info("{} API(s) selected.", apis.size());
                 resultHandler.execute(apis);
                 if (resultHandler.hasError()) {
-                    LOG.error("Please check the log. At least one error was recorded.");
+                    LOG.error(CHECK_THE_LOG_AT_LEAST_ONE_ERROR_WAS_RECORDED);
                 } else {
-                    LOG.debug("Successfully selected {} API(s).", apis.size());
+                    LOG.debug(SUCCESSFULLY_SELECTED_API_S, apis.size());
                 }
                 APIManagerAdapter.deleteInstance();
 
@@ -245,9 +247,9 @@ public class APIExportApp implements APIMCLIServiceProvider {
                 resultHandler.execute(apis);
                 if (resultHandler.hasError()) {
                     LOG.info("");
-                    LOG.error("Please check the log. At least one error was recorded.");
+                    LOG.error(CHECK_THE_LOG_AT_LEAST_ONE_ERROR_WAS_RECORDED);
                 } else {
-                    LOG.debug("Successfully selected {} API(s).", apis.size());
+                    LOG.debug(SUCCESSFULLY_SELECTED_API_S, apis.size());
                 }
             }
             return result;
@@ -291,9 +293,9 @@ public class APIExportApp implements APIMCLIServiceProvider {
             APIResultHandler resultHandler = APIResultHandler.create(resultHandlerImpl, params);
             resultHandler.execute(apis);
             if (resultHandler.hasError()) {
-                LOG.error("Please check the log. At least one error was recorded.");
+                LOG.error(CHECK_THE_LOG_AT_LEAST_ONE_ERROR_WAS_RECORDED);
             } else {
-                LOG.debug("Successfully selected {} API(s).", apis.size());
+                LOG.debug(SUCCESSFULLY_SELECTED_API_S, apis.size());
             }
             return result;
         } catch (AppException ap) {

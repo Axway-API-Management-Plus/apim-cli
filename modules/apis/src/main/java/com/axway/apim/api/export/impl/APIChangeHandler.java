@@ -57,7 +57,7 @@ public class APIChangeHandler extends APIResultHandler {
                 LOG.error("Error preparing required changes for API: " + api.getName(), e);
             }
         }
-        if (apisToChange.size() == 0) {
+        if (apisToChange.isEmpty()) {
             Console.println("No changes required for the selected APIs.");
             return;
         }

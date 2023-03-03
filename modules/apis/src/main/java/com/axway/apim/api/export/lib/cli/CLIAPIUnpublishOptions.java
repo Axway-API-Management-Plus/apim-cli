@@ -51,7 +51,6 @@ public class CLIAPIUnpublishOptions extends CLIOptions {
 
     @Override
     public void addOptions() {
+        //empty
     }
-
-
 }

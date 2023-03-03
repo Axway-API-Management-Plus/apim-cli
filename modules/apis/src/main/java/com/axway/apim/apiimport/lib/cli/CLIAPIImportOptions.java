@@ -13,6 +13,8 @@ import com.axway.apim.lib.error.AppException;
 
 public class CLIAPIImportOptions extends CLIOptions {
 
+	public static final String IGNORE_REPLACE_ADD = "ignore|replace|add";
+
 	private CLIAPIImportOptions(String[] args) {
 		super(args);
 	}
@@ -34,7 +36,7 @@ public class CLIAPIImportOptions extends CLIOptions {
 				+ "  Please note: Local filesystem is not supported for WSDLs. Please use direct URL or a URL-Reference-File.\n"
 				+ "- a URL providing the Swagger-File or WSDL-File. Examples:\n"
 				+ "  [username/password@]https://any.host.com/my/path/to/swagger.json\n"
-				+ "  [username/password@]http://www.dneonline.com/calculator.asmx?wsdl\n"
+				+ "  [username/password@]https://www.dneonline.com/calculator.asmx?wsdl\n"
 				+ "- a reference file called anyname-i-want.url which contains a line with the URL\n"
 				+ "  (same format as above for OpenAPI or WSDL)."
 				+ "  If not specified, the API Specification configuration is read directly from the API-Config file.");
@@ -60,15 +62,15 @@ public class CLIAPIImportOptions extends CLIOptions {
 		addOption(option);
 		
 		option = new Option("clientOrgsMode", true, "Controls how configured Client-Organizations are treated. Defaults to add!");
-		option.setArgName("ignore|replace|add");
+		option.setArgName(IGNORE_REPLACE_ADD);
 		addOption(option);
 		
 		option = new Option("clientAppsMode", true, "Controls how configured Client-Applications are treated. Defaults to add!");
-		option.setArgName("ignore|replace|add");
+		option.setArgName(IGNORE_REPLACE_ADD);
 		addOption(option);
 		
 		option = new Option("quotaMode", true, "Controls how quotas are managed in API-Manager. Defaults to add!");
-		option.setArgName("ignore|replace|add");
+		option.setArgName(IGNORE_REPLACE_ADD);
 		addOption(option);
 
 		

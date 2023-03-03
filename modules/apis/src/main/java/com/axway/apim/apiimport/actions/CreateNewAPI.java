@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class CreateNewAPI {
 
-    static Logger LOG = LoggerFactory.getLogger(CreateNewAPI.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CreateNewAPI.class);
 
     private API createdAPI = null;
 

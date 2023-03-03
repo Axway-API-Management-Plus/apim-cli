@@ -25,7 +25,7 @@ public class ManageApiMethods {
                     .collect(Collectors.toList());
             desiredApiMethods.removeAll(differences);
             LOG.info("Total number of methods to be updated : {}", desiredApiMethods.size());
-            if (desiredApiMethods.size() > 0) {
+            if (!desiredApiMethods.isEmpty()) {
                 APIManagerAPIMethodAdapter apiManagerAPIMethodAdapter = apiManager.methodAdapter;
                 List<APIMethod> apiMethods = apiManagerAPIMethodAdapter.getAllMethodsForAPI(frontendApiId);
                 List<String> updatedMethodNames = new ArrayList<>();

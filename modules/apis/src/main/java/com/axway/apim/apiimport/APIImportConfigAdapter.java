@@ -1,31 +1,15 @@
 package com.axway.apim.apiimport;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.*;
-
-import com.axway.apim.api.model.*;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.entity.ContentType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.client.apps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.api.API;
-import com.axway.apim.api.specification.APISpecification;
-import com.axway.apim.api.specification.APISpecificationFactory;
+import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.api.specification.APISpecification;
+import com.axway.apim.api.specification.APISpecificationFactory;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
@@ -39,6 +23,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.entity.ContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.*;
 
 /**
  * The APIConfig reflects the given API-Configuration plus the API-Definition, which is either a
@@ -67,7 +61,7 @@ public class APIImportConfigAdapter {
     private API apiConfig;
 
     public APIImportConfigAdapter(APIImportParams params) throws AppException {
-        this(params.getConfig(), params.getStage(), params.getApiDefintion(),params.getStageConfig());
+        this(params.getConfig(), params.getStage(), params.getApiDefintion(), params.getStageConfig());
     }
 
     /**
@@ -93,7 +87,7 @@ public class APIImportConfigAdapter {
                 // Check the config file is json file
                 mapper.readTree(this.apiConfigFile);
                 LOG.debug("Handling JSON Configuration file : {}", apiConfigFile);
-            }catch (IOException ioException){
+            } catch (IOException ioException) {
                 //Handle Yaml config
                 mapper = new ObjectMapper(new YAMLFactory());
                 LOG.debug("Handling Yaml Configuration file: {}", apiConfigFile);
@@ -314,7 +308,7 @@ public class APIImportConfigAdapter {
                                 throw new AppException("Error reading markdown description file: " + markdownFilename, ErrorCode.CANT_READ_CONFIG_FILE);
                             }
                             LOG.debug("Reading local markdown description file: {}", markdownFile.getPath());
-                            markdownDescription.append(newLine).append(new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8));
+                            markdownDescription.append(newLine).append(Files.readString(markdownFile.toPath()));
                         }
                         newLine = "\n";
                     }
@@ -366,7 +360,7 @@ public class APIImportConfigAdapter {
         }
     }
 
-    private void addDefaultCorsProfile(API apiConfig) throws AppException {
+    private void addDefaultCorsProfile(API apiConfig) {
         if (apiConfig.getCorsProfiles() == null) {
             apiConfig.setCorsProfiles(new ArrayList<>());
         }
@@ -398,7 +392,6 @@ public class APIImportConfigAdapter {
      */
     private void completeClientApplications(API apiConfig) throws AppException {
         if (CoreParameters.getInstance().isIgnoreClientApps()) return;
-       // if (apiConfig.getState().equals(API.STATE_UNPUBLISHED)) return;
         ClientApplication loadedApp = null;
         ClientApplication app;
         if (apiConfig.getApplications() != null) {
@@ -417,7 +410,7 @@ public class APIImportConfigAdapter {
                         it.remove();
                         continue;
                     }
-                    LOG.info("Found existing application: {} ({}) based on given name {}",app.getName(),app.getId(),app.getName() );
+                    LOG.info("Found existing application: {} ({}) based on given name {}", app.getName(), app.getId(), app.getName());
                 } else if (app.getApiKey() != null) {
                     loadedApp = getAppForCredential(app.getApiKey(), APIManagerAdapter.CREDENTIAL_TYPE_API_KEY);
                     if (loadedApp == null) {
@@ -450,7 +443,7 @@ public class APIImportConfigAdapter {
     }
 
     private static ClientApplication getAppForCredential(String credential, String type) throws AppException {
-        LOG.debug("Searching application with configured credential (Type: {}): {}",type,credential );
+        LOG.debug("Searching application with configured credential (Type: {}): {}", type, credential);
         ClientApplication app = APIManagerAdapter.getInstance().getAppIdForCredential(credential, type);
         if (app == null) {
             LOG.warn("Unknown application with ({}): {} configured. Ignoring this application.", type, credential);
@@ -650,7 +643,7 @@ public class APIImportConfigAdapter {
 
     private void validateOutboundAuthN(API importApi) throws AppException {
         // Request to use some specific Outbound-AuthN for this API
-        if (importApi.getAuthenticationProfiles() == null || importApi.getAuthenticationProfiles().size() == 0) return;
+        if (importApi.getAuthenticationProfiles() == null || importApi.getAuthenticationProfiles().isEmpty()) return;
 
         for (AuthenticationProfile authProfile : importApi.getAuthenticationProfiles()) {
             if (authProfile.getType().equals(AuthType.ssl)) {
