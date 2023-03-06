@@ -518,7 +518,7 @@ public class APIManagerAdapter {
         return APIManagerAdapter.apiManagerName;
     }
 
-    public static JsonNode getCertInfo(InputStream certificate, String password, CaCert cert) throws AppException {
+    public static String getCertInfo(InputStream certificate, String password, CaCert cert) throws AppException {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/certinfo").build();
             HttpEntity entity = MultipartEntityBuilder.create()
@@ -538,7 +538,7 @@ public class APIManagerAdapter {
                     }
                     throw new AppException("API-Manager failed to read certificate information from file. Got response: '" + response + "'", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-                return mapper.readTree(response);
+                return response;
             }
         } catch (Exception e) {
             throw new AppException("API-Manager failed to read certificate information from file.", ErrorCode.API_MANAGER_COMMUNICATION, e);

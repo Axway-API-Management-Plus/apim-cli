@@ -17,6 +17,7 @@ import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,6 +45,7 @@ import java.util.*;
 public class APIImportConfigAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapter.class);
+    public static final String DEFAULT = "_default";
 
     /**
      * This is the given path to WSDL or Swagger. It is either set using -a parameter or as part of the config file
@@ -247,7 +249,7 @@ public class APIImportConfigAdapter {
         }
     }
 
-    private void addQuotaConfiguration(API apiConfig) throws AppException {
+    private void addQuotaConfiguration(API apiConfig) {
         if (apiConfig.getState().equals(API.STATE_UNPUBLISHED)) return;
         initQuota(apiConfig.getSystemQuota());
         initQuota(apiConfig.getApplicationQuota());
@@ -367,13 +369,13 @@ public class APIImportConfigAdapter {
         // Check if there is a default cors profile declared otherwise create one internally
         boolean defaultCorsFound = false;
         for (CorsProfile profile : apiConfig.getCorsProfiles()) {
-            if (profile.getName().equals("_default")) {
+            if (profile.getName().equals(DEFAULT)) {
                 defaultCorsFound = true;
                 break;
             }
         }
         if (apiConfig.getCorsProfiles().size() == 1) { // Make this CORS-Profile default, even if it's not named default
-            apiConfig.getInboundProfiles().get("_default").setCorsProfile(apiConfig.getCorsProfiles().get(0).getName());
+            apiConfig.getInboundProfiles().get(DEFAULT).setCorsProfile(apiConfig.getCorsProfiles().get(0).getName());
         }
         if (!defaultCorsFound) {
             apiConfig.getCorsProfiles().add(CorsProfile.getDefaultCorsProfile());
@@ -452,16 +454,16 @@ public class APIImportConfigAdapter {
         return app;
     }
 
-    private void completeCaCerts(API apiConfig) throws AppException {
+    public void completeCaCerts(API apiConfig) throws AppException {
         ObjectMapper mapper = new ObjectMapper();
         if (apiConfig.getCaCerts() != null) {
             List<CaCert> completedCaCerts = new ArrayList<>();
             for (CaCert cert : apiConfig.getCaCerts()) {
                 if (cert.getCertBlob() == null) {
                     try (InputStream is = getInputStreamForCertFile(cert)) {
-                        JsonNode certInfo = APIManagerAdapter.getCertInfo(is, "", cert);
-                        CaCert completedCert = mapper.readValue(certInfo.get(0).toString(), CaCert.class);
-                        completedCaCerts.add(completedCert);
+                        String certInfo = APIManagerAdapter.getCertInfo(is, "", cert);
+                        List<CaCert> completedCerts = mapper.readValue(certInfo, new TypeReference<>() {});
+                        completedCaCerts.addAll(completedCerts);
                     } catch (Exception e) {
                         throw new AppException("Can't initialize given certificate.", ErrorCode.CANT_READ_CONFIG_FILE, e);
                     }
@@ -517,7 +519,7 @@ public class APIImportConfigAdapter {
     private void validateInboundProfile(API importApi) throws AppException {
         if (importApi.getInboundProfiles() == null || importApi.getInboundProfiles().size() == 0) {
             Map<String, InboundProfile> def = new HashMap<>();
-            def.put("_default", InboundProfile.getDefaultInboundProfile());
+            def.put(DEFAULT, InboundProfile.getDefaultInboundProfile());
             importApi.setInboundProfiles(def);
             return;
         }
@@ -526,7 +528,7 @@ public class APIImportConfigAdapter {
         boolean defaultProfileFound = false;
         while (it.hasNext()) {
             String profileName = it.next();
-            if (profileName.equals("_default")) {
+            if (profileName.equals(DEFAULT)) {
                 defaultProfileFound = true;
                 continue; // No need to check for the default profile
             }
@@ -542,11 +544,11 @@ public class APIImportConfigAdapter {
         /// If not, create a PassThrough!
         if (!defaultProfileFound) {
             InboundProfile defaultProfile = new InboundProfile();
-            defaultProfile.setSecurityProfile("_default");
-            defaultProfile.setCorsProfile("_default");
+            defaultProfile.setSecurityProfile(DEFAULT);
+            defaultProfile.setCorsProfile(DEFAULT);
             defaultProfile.setMonitorAPI(true);
             defaultProfile.setMonitorSubject("authentication.subject.id");
-            importApi.getInboundProfiles().put("_default", defaultProfile);
+            importApi.getInboundProfiles().put(DEFAULT, defaultProfile);
         }
     }
 
@@ -555,19 +557,19 @@ public class APIImportConfigAdapter {
         if (importApi.getSecurityProfiles() == null) importApi.setSecurityProfiles(new ArrayList<>());
         List<SecurityProfile> profiles = importApi.getSecurityProfiles();
         for (SecurityProfile profile : importApi.getSecurityProfiles()) {
-            if (profile.getIsDefault() || profile.getName().equals("_default")) {
+            if (profile.getIsDefault() || profile.getName().equals(DEFAULT)) {
                 if (hasDefaultProfile) {
                     throw new AppException("You can have only one _default SecurityProfile.", ErrorCode.CANT_READ_CONFIG_FILE);
                 }
                 hasDefaultProfile = true;
                 // If the name is _default or flagged as default make it consistent!
-                profile.setName("_default");
+                profile.setName(DEFAULT);
                 profile.setIsDefault(true);
             }
         }
         if (profiles.isEmpty() || !hasDefaultProfile) {
             SecurityProfile passthroughProfile = new SecurityProfile();
-            passthroughProfile.setName("_default");
+            passthroughProfile.setName(DEFAULT);
             passthroughProfile.setIsDefault(true);
             SecurityDevice passthroughDevice = new SecurityDevice();
             passthroughDevice.setName("Pass Through");
@@ -586,20 +588,20 @@ public class APIImportConfigAdapter {
         boolean hasDefaultProfile = false;
         List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
         for (AuthenticationProfile profile : profiles) {
-            if (profile.getIsDefault() || profile.getName().equals("_default")) {
+            if (profile.getIsDefault() || profile.getName().equals(DEFAULT)) {
                 if (hasDefaultProfile) {
                     throw new AppException("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE);
                 }
                 hasDefaultProfile = true;
                 // If the name is _default or flagged as default make it consistent!
-                profile.setName("_default");
+                profile.setName(DEFAULT);
                 profile.setIsDefault(true);
             }
         }
         if (!hasDefaultProfile) {
             LOG.warn("THERE IS NO DEFAULT authenticationProfile CONFIGURED. Auto-Creating a No-Authentication outbound profile as default!");
             AuthenticationProfile noAuthNProfile = new AuthenticationProfile();
-            noAuthNProfile.setName("_default");
+            noAuthNProfile.setName(DEFAULT);
             noAuthNProfile.setIsDefault(true);
             noAuthNProfile.setType(AuthType.none);
             profiles.add(noAuthNProfile);
@@ -613,17 +615,17 @@ public class APIImportConfigAdapter {
         while (it.hasNext()) {
             String profileName = it.next();
             OutboundProfile profile = importApi.getOutboundProfiles().get(profileName);
-            if (profileName.equals("_default")) {
+            if (profileName.equals(DEFAULT)) {
                 defaultProfileFound = true;
                 // Validate the _default Outbound-Profile has an AuthN-Profile, otherwise we must add (See issue #133)
 
                 if (profile.getAuthenticationProfile() == null) {
                     LOG.warn("Provided default outboundProfile doesn't contain AuthN-Profile - Setting it to default");
-                    profile.setAuthenticationProfile("_default");
+                    profile.setAuthenticationProfile(DEFAULT);
                 }
             }
             // Check the referenced authentication profile exists
-            if (!profile.getAuthenticationProfile().equals("_default")) {
+            if (!profile.getAuthenticationProfile().equals(DEFAULT)) {
                 if (profile.getAuthenticationProfile() != null && getAuthNProfile(importApi, profile.getAuthenticationProfile()) == null) {
                     throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '" + profile.getAuthenticationProfile() + "'", ErrorCode.REFERENCED_PROFILE_INVALID);
                 }
@@ -635,9 +637,9 @@ public class APIImportConfigAdapter {
         }
         if (!defaultProfileFound) {
             OutboundProfile defaultProfile = new OutboundProfile();
-            defaultProfile.setAuthenticationProfile("_default");
+            defaultProfile.setAuthenticationProfile(DEFAULT);
             defaultProfile.setRouteType("proxy");
-            importApi.getOutboundProfiles().put("_default", defaultProfile);
+            importApi.getOutboundProfiles().put(DEFAULT, defaultProfile);
         }
     }
 

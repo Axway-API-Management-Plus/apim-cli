@@ -3,6 +3,8 @@ package com.axway.apim.test.basic;
 import com.axway.apim.TestSetup;
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.api.API;
+import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.OutboundProfile;
 import com.axway.apim.apiimport.APIImportConfigAdapter;
 import com.axway.apim.apiimport.DesiredAPI;
@@ -20,6 +22,8 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class APIImportConfigAdapterTest extends WiremockWrapper {
@@ -32,6 +36,11 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         apimCliHome = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "apimcli";
         try {
             new TestSetup().initCliHome();
+            APIManagerAdapter.deleteInstance();
+            CoreParameters coreParameters = new CoreParameters();
+            coreParameters.setHostname("localhost");
+            coreParameters.setUsername("test");
+            coreParameters.setPassword(Utils.getEncryptedPassword());
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -42,14 +51,6 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         super.close();
     }
 
-    public void setupParameters() throws AppException {
-        APIManagerAdapter.deleteInstance();
-        CoreParameters coreParameters = new CoreParameters();
-        coreParameters.setHostname("localhost");
-        coreParameters.setUsername("test");
-        coreParameters.setPassword(Utils.getEncryptedPassword());
-
-    }
 
     @Test
     public void withoutStage() throws AppException {
@@ -190,7 +191,6 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
 
     @Test
     public void emptyVHostTest() throws AppException {
-        setupParameters();
         String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/empty-vhost-api-config.json").getFile();
         APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", null);
         adapter.getDesiredAPI();
@@ -303,4 +303,22 @@ public class APIImportConfigAdapterTest extends WiremockWrapper {
         APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, null, null);
         adapter.getDesiredAPI();
     }
+
+    @Test
+    public void completeCaCertsWithCertChain() throws AppException {
+        String testConfig = this.getClass().getResource("/com/axway/apim/test/files/basic/empty-vhost-api-config.json").getFile();
+        APIImportConfigAdapter adapter = new APIImportConfigAdapter(testConfig, null, "petstore.json", null);
+        API api = new API();
+        CaCert caCert = new CaCert();
+      //  caCert.setAlias("CN=test");
+        caCert.setInbound("true");
+        caCert.setOutbound("false");
+        caCert.setCertFile("certchain.pem");
+        List<CaCert> caCerts = new ArrayList<>();
+        caCerts.add(caCert);
+        api.setCaCerts(caCerts);
+        adapter.completeCaCerts(api);
+        Assert.assertEquals(api.getCaCerts().size(), 3);
+    }
+
 }
