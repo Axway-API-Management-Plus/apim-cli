@@ -10,11 +10,8 @@ public class APIImportParams extends StandardImportParams implements Parameters 
     private Boolean useFEAPIDefinition;
     private Boolean validateRemoteHost;
     private Boolean updateOnly = false;
-
     private Boolean changeOrganization = false;
-
-    private String apiDefintion;
-
+    private String apiDefinition;
     public static synchronized APIImportParams getInstance() {
         return (APIImportParams) CoreParameters.getInstance();
     }
@@ -47,12 +44,12 @@ public class APIImportParams extends StandardImportParams implements Parameters 
         this.validateRemoteHost = validateRemoteHost;
     }
 
-    public String getApiDefintion() {
-        return apiDefintion;
+    public String getApiDefinition() {
+        return apiDefinition;
     }
 
-    public void setApiDefintion(String apiDefintion) {
-        this.apiDefintion = apiDefintion;
+    public void setApiDefinition(String apiDefinition) {
+        this.apiDefinition = apiDefinition;
     }
 
     public Boolean isUpdateOnly() {

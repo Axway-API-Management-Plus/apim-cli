@@ -35,67 +35,41 @@ public class CoreParameters implements Parameters {
     }
 
     public static String APIM_CLI_HOME = "AXWAY_APIM_CLI_HOME";
-
     private static final String DEFAULT_API_BASEPATH = "/api/portal/v1.4";
-
     private URI apiManagerUrl = null;
-
     private static CoreParameters instance;
-
     private List<CacheType> cachesToClear = null;
-
     int defaultPort = 8075;
 
     /**
      * These properties are used for instance to translate key in given config files
      */
     private Map<String, String> properties;
-
     private String stage;
-
     private String returnCodeMapping;
-
     private String clearCache;
-
     private String hostname;
-
     private int port = -1;
-
     private String username;
-
     private String password;
-
     private Boolean force;
-
     private Boolean ignoreQuotas;
-
     private Boolean zeroDowntimeUpdate;
-
     private Mode quotaMode;
     private Mode clientAppsMode;
     private Mode clientOrgsMode;
-
     private String detailsExportFile;
-
     private Boolean rollback = true;
-
     private Boolean ignoreCache = false;
-
     private String apimCLIHome;
-
     private String proxyHost;
-
     private Integer proxyPort;
-
     private String proxyUsername;
-
     private String proxyPassword;
-
     private int retryDelay;
-
     private int timeout;
-
     private boolean disableCompression;
+    private boolean overrideSpecBasePath;
 
     public CoreParameters() {
         instance = this;
@@ -476,6 +450,14 @@ public class CoreParameters implements Parameters {
 
     public void setDisableCompression(boolean disableCompression) {
         this.disableCompression = disableCompression;
+    }
+
+    public boolean isOverrideSpecBasePath() {
+        return overrideSpecBasePath;
+    }
+
+    public void setOverrideSpecBasePath(boolean overrideSpecBasePath) {
+        this.overrideSpecBasePath = overrideSpecBasePath;
     }
 
     @Override

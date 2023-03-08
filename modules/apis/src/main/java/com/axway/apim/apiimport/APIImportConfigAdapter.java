@@ -63,7 +63,7 @@ public class APIImportConfigAdapter {
     private API apiConfig;
 
     public APIImportConfigAdapter(APIImportParams params) throws AppException {
-        this(params.getConfig(), params.getStage(), params.getApiDefintion(), params.getStageConfig());
+        this(params.getConfig(), params.getStage(), params.getApiDefinition(), params.getStageConfig());
     }
 
     /**

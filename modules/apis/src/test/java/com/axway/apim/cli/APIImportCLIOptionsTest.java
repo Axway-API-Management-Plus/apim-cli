@@ -24,7 +24,7 @@ public class APIImportCLIOptionsTest {
 		Assert.assertEquals(params.getPassword(), "myPassword");    // Taken from cmd directly
 		Assert.assertEquals(params.getConfig(), "myConfig.json");
 	}
-	
+
 	@Test
 	public void testUserDetailsFromStage() throws AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json", "-apimCLIHome", apimCliHome};
@@ -35,7 +35,7 @@ public class APIImportCLIOptionsTest {
 		Assert.assertEquals(params.getPassword(), "changeme");
 		Assert.assertEquals(params.getAPIManagerURL().toString(), "https://localhost:8075");
 	}
-	
+
 	@Test
 	public void testAPIImportParameter() throws AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json", "-clientOrgsMode", "replace", "-clientAppsMode", "replace", "-quotaMode", "replace", "-detailsExportFile", "myExportFile.txt", "-stageConfig", "myStageConfigFile.json", "-enabledCaches", "applicationsQuotaCache,*API*", "-apimCLIHome", apimCliHome};
@@ -51,7 +51,7 @@ public class APIImportCLIOptionsTest {
 		Assert.assertEquals(params.getStageConfig(), "myStageConfigFile.json");
 		Assert.assertEquals(params.getEnabledCaches(), "applicationsQuotaCache,*API*");
 	}
-	
+
 	@Test
 	public void testToggles() throws AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json", "-rollback", "true", "-force", "-forceUpdate", "-ignoreCache", "-useFEAPIDefinition", "-changeOrganization", "-ignoreQuotas", "-updateOnly"};
@@ -66,7 +66,7 @@ public class APIImportCLIOptionsTest {
 		Assert.assertTrue(params.isIgnoreQuotas());
 		Assert.assertTrue(params.isRollback());
 	}
-	
+
 	@Test
 	public void testModeParameterDefaults() throws AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json"};
@@ -76,13 +76,13 @@ public class APIImportCLIOptionsTest {
 		Assert.assertFalse(params.isIgnoreClientOrgs(), "Should be false, as the default is add");
 		Assert.assertFalse(params.isUpdateOnly());
 	}
-	
+
 	@Test
 	public void testAPIDefinitionAsCLIArg() throws AppException {
 		String[] args = {"-s", "prod", "-c", "myConfig.json", "-a", "thisIsMyAPIDefinition"};
 		CLIOptions options = CLIAPIImportOptions.create(args);
 		APIImportParams params = (APIImportParams) options.getParams();
 		Assert.assertEquals(params.getConfig(), "myConfig.json");
-		Assert.assertEquals(params.getApiDefintion(), "thisIsMyAPIDefinition");
+		Assert.assertEquals(params.getApiDefinition(), "thisIsMyAPIDefinition");
 	}
 }

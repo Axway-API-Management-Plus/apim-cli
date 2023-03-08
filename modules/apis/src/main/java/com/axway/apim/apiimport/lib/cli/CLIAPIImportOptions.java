@@ -18,7 +18,7 @@ public class CLIAPIImportOptions extends CLIOptions {
 	private CLIAPIImportOptions(String[] args) {
 		super(args);
 	}
-	
+
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new CLIAPIImportOptions(args);
 		cliOptions = new StandardImportCLIOptions(cliOptions);
@@ -48,58 +48,62 @@ public class CLIAPIImportOptions extends CLIOptions {
 		option.setRequired(true);
 		option.setArgName("api_config.json");
 		addOption(option);
-		
+
 		option = new Option("ignoreQuotas", "Use this flag to ignore configured API quotas.");
 		option.setRequired(false);
 		addOption(option);
-		
+
 		option = new Option("updateOnly", "If set, an existing actual API will be updated. If no actual API is found, the CLI stops.");
 		option.setRequired(false);
 		addOption(option);
-		
+
 		option = new Option("useFEAPIDefinition", "If this flag is set, the Actual-API contains the API-Definition (e.g. Swagger) from the FE-API instead of the original imported API.");
 		option.setRequired(false);
 		addOption(option);
-		
+
 		option = new Option("clientOrgsMode", true, "Controls how configured Client-Organizations are treated. Defaults to add!");
 		option.setArgName(IGNORE_REPLACE_ADD);
 		addOption(option);
-		
+
 		option = new Option("clientAppsMode", true, "Controls how configured Client-Applications are treated. Defaults to add!");
 		option.setArgName(IGNORE_REPLACE_ADD);
 		addOption(option);
-		
+
 		option = new Option("quotaMode", true, "Controls how quotas are managed in API-Manager. Defaults to add!");
 		option.setArgName(IGNORE_REPLACE_ADD);
 		addOption(option);
 
-		
+
 		option = new Option("validateRemoteHost", true, "Disables the remote host validation which is turned on by default if a remote host is given");
 		option.setRequired(false);
 		option.setArgName("false");
 		addOption(option);
-		
+
 		option = new Option("changeOrganization", "Set this flag to allow to change the organization of an existing API.");
 		option.setRequired(false);
 		addOption(option);
-		
+
 		option = new Option("detailsExportFile", true, "Configure a filename, to get a Key=Value file containing information about the created API.");
 		option.setRequired(false);
 		option.setArgName("APIDetails.properties");
 		addOption(option);
-		
+
 		option = new Option("forceUpdate", "If set, the API is Re-Created even if the Desired- and Actual-State are equal.");
 		option.setRequired(false);
 		addOption(option);
-		
+
 		option = new Option("zeroDowntimeUpdate", "Always update a published APIs by creating a new API and switch clients to it. Defaults to false");
 		option.setRequired(false);
 		addOption(option);
+
+        option = new Option("overrideSpecBasePath", "Override API Specification ( open api, Swagger 2)  Base Path");
+        option.setRequired(false);
+        addOption(option);
 	}
 
 	@Override
 	public void printUsage(String message, String[] args) {
-		super.printUsage(message, args);		
+		super.printUsage(message, args);
 		Console.println("----------------------------------------------------------------------------------------");
 		Console.println("How to import APIs");
 		Console.println("Import an API including the API-Specification using environment properties file: env.api-env.properties:");
@@ -119,13 +123,13 @@ public class CLIAPIImportOptions extends CLIOptions {
 	protected String getAppName() {
 		return "API-Import";
 	}
-	
+
 	@Override
 	public Parameters getParams() {
 		APIImportParams params = new APIImportParams();
 		params.setConfig(getValue("config"));
 		params.setStageConfig(getValue("stagedConfig"));
-		params.setApiDefintion(getValue("apidefinition"));
+		params.setApiDefinition(getValue("apidefinition"));
 		params.setForceUpdate(hasOption("forceUpdate"));
 		params.setChangeOrganization(hasOption("changeOrganization"));
 		params.setUseFEAPIDefinition(hasOption("useFEAPIDefinition"));
@@ -137,6 +141,6 @@ public class CLIAPIImportOptions extends CLIOptions {
 		params.setDetailsExportFile(getValue("detailsExportFile"));
 		params.setValidateRemoteHost(Boolean.parseBoolean(getValue("validateRemoteHost")));
 		params.setZeroDowntimeUpdate(Boolean.parseBoolean(getValue("zeroDowntimeUpdate")));
-		return params;
+        return params;
 	}
 }
