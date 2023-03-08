@@ -25,7 +25,7 @@ public class WSDLSpecification extends APISpecification {
 
     @Override
     public void updateBasePath(String basePath, String host) {
-
+        // Not required
     }
 
     @Override

@@ -11,16 +11,16 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-public abstract class CLIAbstractImportTestAction extends CLIAbstractTestAction implements TestParams {
+public abstract class CLIAbstractImportTestAction extends CLIAbstractTestAction  {
 
 	protected File configFile;
-	
+
 	protected File srcConfigFileName;
 
 	public CLIAbstractImportTestAction(TestContext context) {
 		super(context);
 	}
-	
+
 	@Override
 	public void doExecute(TestContext context, File testDirectory) {
 		this.srcConfigFileName = getConfigFile(context);
@@ -28,12 +28,12 @@ public abstract class CLIAbstractImportTestAction extends CLIAbstractTestAction 
 		copyTestAssets(srcConfigFileName.getParentFile(), testDirectory);
 		runTest(context);
 	}
-	
+
 	public abstract void runTest(TestContext context);
-	
-	
+
+
 	protected File getConfigFile(TestContext context) {
-		String configFileName = context.getVariable(PARAM_CONFIGFILE);
+		String configFileName = context.getVariable(TestParams.PARAM_CONFIGFILE);
 		File configFile = new File(configFileName);
 		if(!configFile.exists()) {
 			URL filename = this.getClass().getResource(configFileName);
@@ -44,7 +44,7 @@ public abstract class CLIAbstractImportTestAction extends CLIAbstractTestAction 
 		}
 		return configFile;
 	}
-	
+
 	/**
 	 * To make testing easier we allow reading test-files from classpath as well
 	 */
@@ -52,12 +52,12 @@ public abstract class CLIAbstractImportTestAction extends CLIAbstractTestAction 
 		OutputStream os = null;
 		try {
 			String baseFileName = configFile.getName();
-			String config = IOUtils.toString(new FileInputStream(configFile), StandardCharsets.UTF_8); 
+			String config = IOUtils.toString(new FileInputStream(configFile), StandardCharsets.UTF_8);
 			String replacedConfig = context.replaceDynamicContentInString(config);
-			
+
 			configFile = new File(testDirectory, baseFileName);
 			configFile.createNewFile();
-			
+
 			os = new FileOutputStream(configFile);
 			IOUtils.write(replacedConfig, os, StandardCharsets.UTF_8);
 			LOG.info("Successfully created test configuration file: " + configFile);
@@ -74,7 +74,7 @@ public abstract class CLIAbstractImportTestAction extends CLIAbstractTestAction 
 		}
 		throw new ValidationException("Unable to create test config file.");
 	}
-	
+
 	private void copyTestAssets(File sourceDir, File testDir) {
 		if(!sourceDir.exists()) {
 			throw new ValidationException("Unable to copy test assets to test directory: '"+testDir+"'. Could not find sourceDir: '"+sourceDir+"'");

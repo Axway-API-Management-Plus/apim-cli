@@ -51,6 +51,7 @@ public class Swagger1xSpecification extends APISpecification {
 
     @Override
     public void configureBasePath(String backendBasePath, API api) throws AppException {
+        // Not required
     }
 
     @Override

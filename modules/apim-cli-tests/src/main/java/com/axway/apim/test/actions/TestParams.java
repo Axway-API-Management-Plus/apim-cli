@@ -1,18 +1,18 @@
 package com.axway.apim.test.actions;
 
-public interface TestParams {
+public final class TestParams {
 
-    String PARAM_EXPECTED_RC = "expectedReturnCode";
-    String PARAM_STAGE = "stage";
-    String PARAM_HOSTNAME = "apiManagerHost";
-    String PARAM_OADMIN_USERNAME = "oadminUsername1";
-    String PARAM_OADMIN_PASSWORD = "oadminPassword1";
-    String PARAM_CONFIGFILE = "configFile";
-    String PARAM_TARGET = "target";
-    String PARAM_NAME = "name";
-    String PARAM_LOGINNAME = "loginName";
-    String PARAM_ID = "id";
-    String PARAM_OUTPUT_FORMAT = "outputFormat";
+    public static final String PARAM_EXPECTED_RC = "expectedReturnCode";
+    public static final String PARAM_STAGE = "stage";
+    public static final String PARAM_HOSTNAME = "apiManagerHost";
+    public static final String PARAM_OADMIN_USERNAME = "oadminUsername1";
+    public static final String PARAM_OADMIN_PASSWORD = "oadminPassword1";
+    public static final String PARAM_CONFIGFILE = "configFile";
+    public static final String PARAM_TARGET = "target";
+    public static final  String PARAM_NAME = "name";
+    public static final String PARAM_LOGINNAME = "loginName";
+    public static final String PARAM_ID = "id";
+    public static final String PARAM_OUTPUT_FORMAT = "outputFormat";
 }
 
 

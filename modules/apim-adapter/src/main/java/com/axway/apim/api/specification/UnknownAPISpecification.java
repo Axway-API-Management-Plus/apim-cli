@@ -16,7 +16,8 @@ public class UnknownAPISpecification extends APISpecification {
 
 	@Override
 	public void configureBasePath(String backendBasePath, API api) throws AppException {
-	}
+        // Not required
+    }
 
 	@Override
 	public APISpecType getAPIDefinitionType() throws AppException {
@@ -36,8 +37,8 @@ public class UnknownAPISpecification extends APISpecification {
 
 	@Override
 	public void updateBasePath(String basePath, String host) {
-
-	}
+        // Not required
+    }
 
 	@Override
 	public String getDescription() {

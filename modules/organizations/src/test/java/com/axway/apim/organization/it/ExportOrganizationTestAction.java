@@ -11,27 +11,27 @@ import com.axway.apim.organization.it.testActions.CLIAbstractExportTestAction;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.exceptions.ValidationException;
 
-public class ExportOrganizationTestAction extends CLIAbstractExportTestAction implements TestParams {
+public class ExportOrganizationTestAction extends CLIAbstractExportTestAction {
 
-	private static Logger LOG = LoggerFactory.getLogger(ExportOrganizationTestAction.class);
-	
-	public ExportOrganizationTestAction(TestContext context) {
-		super(context);
-	}
-	
-	@Override
-	public ExportResult runTest(TestContext context) {
-		OrgExportParams params = new OrgExportParams();
-		addParameters(params, context);
-		params.setName(getVariable(context, PARAM_NAME));
-		
-		OrganizationApp app = new OrganizationApp();
-		LOG.info("Running "+app.getClass().getSimpleName()+" with params: "+params);
-		
-		ExportResult result = app.exportOrgs(params);
-		if(this.getExpectedReturnCode(context)!=result.getRc()) {
-			throw new ValidationException("Expected RC was: " + this.getExpectedReturnCode(context) + " but got: " + result.getRc());
-		}
-		return result;
-	}
+    private static Logger LOG = LoggerFactory.getLogger(ExportOrganizationTestAction.class);
+
+    public ExportOrganizationTestAction(TestContext context) {
+        super(context);
+    }
+
+    @Override
+    public ExportResult runTest(TestContext context) {
+        OrgExportParams params = new OrgExportParams();
+        addParameters(params, context);
+        params.setName(getVariable(context, TestParams.PARAM_NAME));
+
+        OrganizationApp app = new OrganizationApp();
+        LOG.info("Running " + app.getClass().getSimpleName() + " with params: " + params);
+
+        ExportResult result = app.exportOrgs(params);
+        if (this.getExpectedReturnCode(context) != result.getRc()) {
+            throw new ValidationException("Expected RC was: " + this.getExpectedReturnCode(context) + " but got: " + result.getRc());
+        }
+        return result;
+    }
 }

@@ -9,14 +9,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -25,19 +24,14 @@ import java.util.Objects;
 
 public class SecurityDevice {
 
-    protected static Logger LOG = LoggerFactory.getLogger(SecurityDevice.class);
-
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityDevice.class);
     private static Map<String, String> oauthTokenStores;
     private static Map<String, String> oauthInfoPolicies;
     private static Map<String, String> authenticationPolicies;
-
-    String name;
-
-    DeviceType type;
-
+    private String name;
+    private DeviceType type;
     int order;
-
-    Map<String, String> properties;
+    private Map<String, String> properties;
 
     /**
      * Flag to control if Policy-Names should be translated or not - Currently used by the API-Export
@@ -50,12 +44,10 @@ public class SecurityDevice {
         this.properties = new LinkedHashMap<>();
     }
 
-    private static Map<String, String> initCustomPolicies(String type) throws AppException {
+    public Map<String, String> initCustomPolicies(String type) throws AppException {
         ObjectMapper mapper = new ObjectMapper();
         HashMap<String, String> policyMap = new HashMap<>();
         CoreParameters cmd = CoreParameters.getInstance();
-        HttpResponse httpResponse = null;
-        InputStream is = null;
         JsonNode jsonResponse = null;
         URI uri;
         try {
@@ -63,36 +55,24 @@ public class SecurityDevice {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/tokenstores").build();
             } else {
                 uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/policies")
-                        .setParameter("type", type).build();
+                    .setParameter("type", type).build();
             }
             RestAPICall getRequest = new GETRequest(uri);
-            httpResponse = getRequest.execute();
-            try {
-                is = httpResponse.getEntity().getContent();
-                jsonResponse = mapper.readTree(is);
+            try(CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()){
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                jsonResponse = mapper.readTree(response);
                 for (JsonNode node : jsonResponse) {
                     policyMap.put(node.get("name").asText(), node.get("id").asText());
                 }
             } catch (IOException e) {
                 throw new AppException("Can't read " + type + " from response: '" + jsonResponse + "'. "
-                        + "Please make sure that you use an Admin-Role user.",
-                        ErrorCode.API_MANAGER_COMMUNICATION, e);
+                    + "Please make sure that you use an Admin-Role user.",
+                    ErrorCode.API_MANAGER_COMMUNICATION, e);
             }
         } catch (Exception e) {
             throw new AppException("Can't read " + type + " from response: '" + jsonResponse + "'. "
-                    + "Please make sure that you use an Admin-Role user.",
-                    ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (is != null)
-                    is.close();
-            } catch (Exception ignore) {
-            }
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
+                + "Please make sure that you use an Admin-Role user.",
+                ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
         return policyMap;
     }
@@ -124,12 +104,12 @@ public class SecurityDevice {
     @Override
     public String toString() {
         return "SecurityDevice{" +
-                "name='" + name + '\'' +
-                ", type=" + type +
-                ", order=" + order +
-                ", properties=" + properties +
-                ", convertPolicies=" + convertPolicies +
-                '}';
+            "name='" + name + '\'' +
+            ", type=" + type +
+            ", order=" + order +
+            ", properties=" + properties +
+            ", convertPolicies=" + convertPolicies +
+            '}';
     }
 
     public Map<String, String> getProperties() throws AppException {
@@ -140,8 +120,8 @@ public class SecurityDevice {
             if (tokenStore.startsWith("<key")) return properties;
             String esTokenStore = oauthTokenStores.get(tokenStore);
             if (esTokenStore == null) {
-                LOG.error("The tokenstore: '" + tokenStore + "' is not configured in this API-Manager");
-                LOG.error("Available token stores: " + oauthTokenStores.keySet());
+                LOG.error("The tokenstore: {} is not configured in this API-Manager", tokenStore);
+                LOG.error("Available token stores: {}", oauthTokenStores.keySet());
                 throw new AppException("The tokenstore: '" + tokenStore + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
             } else {
                 properties.put("tokenStore", esTokenStore);
@@ -155,8 +135,8 @@ public class SecurityDevice {
             if (infoPolicy.startsWith("<key")) return properties;
             String esInfoPolicy = oauthInfoPolicies.get(infoPolicy);
             if (esInfoPolicy == null) {
-                LOG.error("The Information-Policy: '" + infoPolicy + "' is not configured in this API-Manager");
-                LOG.error("Available information policies: " + oauthInfoPolicies.keySet());
+                LOG.error("The Information-Policy: {} is not configured in this API-Manager", infoPolicy);
+                LOG.error("Available information policies: {}", oauthInfoPolicies.keySet());
                 throw new AppException("The Information-Policy: '" + infoPolicy + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
             } else {
                 properties.put("tokenStore", esInfoPolicy);
@@ -171,14 +151,13 @@ public class SecurityDevice {
             if (authPolicy.startsWith("<key")) return properties;
             String esAuthPolicy = authenticationPolicies.get(authPolicy);
             if (esAuthPolicy == null) {
-                LOG.error("The Authentication-Policy: '" + authPolicy + "' is not configured in this API-Manager");
-                LOG.error("Available authentication policies: " + authenticationPolicies.keySet());
+                LOG.error("The Authentication-Policy: {} is not configured in this API-Manager", authPolicy);
+                LOG.error("Available authentication policies: {}", authenticationPolicies.keySet());
                 throw new AppException("The Authentication-Policy: '" + authPolicy + "' is not configured in this API-Manager", ErrorCode.UNKNOWN_CUSTOM_POLICY);
             } else {
                 properties.put("authenticationPolicy", esAuthPolicy);
             }
         }
-
         return properties;
     }
 
