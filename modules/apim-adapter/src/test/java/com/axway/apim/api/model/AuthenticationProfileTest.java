@@ -118,7 +118,7 @@ public class AuthenticationProfileTest {
                 "mIoMh0hWjBRVbMzm5AT4MDEwITAJBgUrDgMCGgUABBSDTrC6vHHhfv4XlItsYxYIoHGi2gQINKfm\n" +
                 "zpVz38ACAggA");
         authenticationProfileFromGateway.setParameters(parameters);
-        Assert.assertTrue(authenticationProfile.equals(authenticationProfileFromGateway));
+        Assert.assertEquals(authenticationProfileFromGateway, authenticationProfile);
         Assert.assertNotNull(authenticationProfile.toString());
     }
 
@@ -144,7 +144,7 @@ public class AuthenticationProfileTest {
         parameters.put("_id_", 0);
 
         authenticationProfileFromGateway.setParameters(parameters);
-        Assert.assertTrue(authenticationProfile.equals(authenticationProfileFromGateway));
+        Assert.assertEquals(authenticationProfileFromGateway, authenticationProfile);
     }
 
     @Test
@@ -170,7 +170,7 @@ public class AuthenticationProfileTest {
         parameters.put("_id_", 0);
 
         authenticationProfileFromGateway.setParameters(parameters);
-        Assert.assertTrue(authenticationProfile.equals(authenticationProfileFromGateway));
+        Assert.assertEquals(authenticationProfileFromGateway, authenticationProfile);
     }
 
     @Test
@@ -196,7 +196,7 @@ public class AuthenticationProfileTest {
         parameters.put("_id_", 0);
 
         authenticationProfileFromGateway.setParameters(parameters);
-        Assert.assertFalse(authenticationProfile.equals(authenticationProfileFromGateway));
+        Assert.assertNotEquals(authenticationProfileFromGateway, authenticationProfile);
         Assert.assertNotNull(authenticationProfile.toString());
     }
 }

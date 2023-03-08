@@ -3,6 +3,7 @@ package com.axway.apim.apiimport.actions;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.apiimport.DesiredAPI;
+import com.axway.apim.lib.CoreParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,7 @@ public class CreateNewAPI {
             //handle backend base path update
             String backendBasePath = ((DesiredAPI) desiredAPI).getBackendBasepath();
             LOG.debug("backendBasePath from config : {}", backendBasePath);
-            if (backendBasePath != null) {
+            if (backendBasePath != null && !CoreParameters.getInstance().isOverrideSpecBasePath()) {
                 Map<String, ServiceProfile> serviceProfiles = createdAPI.getServiceProfiles();
                 if (serviceProfiles != null) {
                     ServiceProfile serviceProfile = serviceProfiles.get("_default");
