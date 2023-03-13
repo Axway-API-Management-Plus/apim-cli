@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - apim does not import the whole chain in a PEM certificate (See issue [#361](https://github.com/Axway-API-Management-Plus/apim-cli/issues/361))
 - Field BackendBasePath in api-config.json not used (See issue [#354](https://github.com/Axway-API-Management-Plus/apim-cli/issues/354))
+- APIM-CLI Fails to export API WSDL Specifications starting with comments (See issue [#364](https://github.com/Axway-API-Management-Plus/apim-cli/issues/364))
+- APIM-CLI - parsing valid metadata fails for OdataV4 api (See issue [#363](https://github.com/Axway-API-Management-Plus/apim-cli/issues/363))
 
 ### Added
 - Introduced new parameter **overrideSpecBasePath** to fix issue [#354](https://github.com/Axway-API-Management-Plus/apim-cli/issues/354)

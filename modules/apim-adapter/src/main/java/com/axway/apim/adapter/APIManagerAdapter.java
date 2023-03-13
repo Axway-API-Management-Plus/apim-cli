@@ -431,14 +431,13 @@ public class APIManagerAdapter {
         Collection<ClientApplication> appIds = clientCredentialToAppMap.values();
         for (ClientApplication app : allApps) {
             if (appIds.contains(app)) continue;
-            String response = null;
+            String response;
             try {
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/" + type + "").build();
                 LOG.debug("Loading credentials of type: {} for application: {} from API-Manager.", type, type);
                 RestAPICall getRequest = new GETRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                     response = EntityUtils.toString(httpResponse.getEntity());
-                    LOG.trace("Response: {}", response);
                     JsonNode clientIds = mapper.readTree(response);
                     if (clientIds.size() == 0) {
                         LOG.debug("No credentials (Type: {}) found for application: {}", type, app.getName());

@@ -107,7 +107,7 @@ public class APIManagerAPIAccessAdapter {
 
     public List<APIAccess> getAPIAccess(AbstractEntity entity, Type type, boolean includeAPIName) throws AppException {
         readAPIAccessFromAPIManager(type, entity.getId());
-        String apiAccessResponse = null;
+        String apiAccessResponse;
         try {
             apiAccessResponse = apiManagerResponse.get(type).get(entity.getId());
             List<APIAccess> allApiAccess = mapper.readValue(apiAccessResponse, new TypeReference<List<APIAccess>>() {

@@ -6,7 +6,13 @@ import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 
 public class WSDLSpecification extends APISpecification {
@@ -54,10 +60,18 @@ public class WSDLSpecification extends APISpecification {
             apiSpecificationFile.toLowerCase().endsWith("?singlewsdl")) {
             return true;
         }
-        if (new String(apiSpecificationContent, 0, 500).contains("wsdl")) {
-            return true;
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            Document document = factory.newDocumentBuilder().parse(new ByteArrayInputStream(apiSpecificationContent));
+            String wsdlNamespace = document.getDocumentElement().getNamespaceURI();
+            if (wsdlNamespace != null && wsdlNamespace.contains("http://schemas.xmlsoap.org/wsdl"))
+                return true;
+        } catch (SAXException | IOException | ParserConfigurationException e) {
+            LOG.error("Error parsing WSDL", e);
+            return false;
         }
-        LOG.debug("No WSDL specification. Specification doesn't contain wsdl in the first 500 characters.");
+        LOG.debug("Not a WSDL specification..");
         return false;
     }
 
