@@ -10,6 +10,8 @@ import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.TagMap;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
+import com.axway.apim.lib.CoreParameters;
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -27,7 +29,10 @@ public class APIChangeStateTest extends WiremockWrapper {
     @BeforeClass
     public void initWiremock() {
         super.initWiremock();
-    }
+        CoreParameters coreParameters = new CoreParameters();
+        coreParameters.setHostname("localhost");
+        coreParameters.setUsername("test");
+        coreParameters.setPassword(Utils.getEncryptedPassword());    }
 
     @AfterClass
     public void close() {
