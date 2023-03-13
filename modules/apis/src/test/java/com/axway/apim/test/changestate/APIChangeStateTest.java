@@ -9,6 +9,7 @@ import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.TagMap;
 import com.axway.apim.apiimport.APIChangeState;
+import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -77,6 +78,7 @@ public class APIChangeStateTest extends WiremockWrapper {
     @Test
     public void testAPINameHasChanged() throws IOException {
         testAPI2.setName("New Name for API");
+        APIImportParams.getInstance().setChangeOrganization(true);
         APIChangeState changeState = new APIChangeState(testAPI1, testAPI2);
         Assert.assertTrue(changeState.hasAnyChanges(), "There must be a change");
         Assert.assertEquals(changeState.getAllChanges().size(), 1, "One change");
