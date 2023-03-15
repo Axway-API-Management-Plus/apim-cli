@@ -1,4 +1,4 @@
-name: Release API CLI on github and Maven repository 
+name: Release API CLI on github and Maven repository
 
 on:
   workflow_dispatch:
@@ -22,7 +22,7 @@ jobs:
       - name: Set up Java to deploy to OSSRH
         uses: actions/setup-java@v3
         with:
-          java-version: '8'
+          java-version: '11'
           distribution: 'zulu'
           server-id: ossrh
           server-username: MAVEN_USERNAME
@@ -34,7 +34,7 @@ jobs:
           git config user.email "rathnapandi.n@gmail.com"
           git config user.name $github.actor
       - name: Prepare & PublishRelease
-        run: mvn -Dmaven.test.skip=true -pl '!modules/apim-cli-tests' release:prepare  release:perform -P release -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
+        run: mvn -Dmaven.test.skip=true release:prepare  release:perform -P release -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }}
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
@@ -60,4 +60,4 @@ jobs:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-    
+
