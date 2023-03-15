@@ -30,7 +30,7 @@ public class ODataV2ImportTestIT extends TestNGCitrusTestRunner {
         variable("backendBasepath", "https://services.odata.org/V2/Northwind/Northwind.svc/");
         variable("state", "unpublished");
         echo("####### Importing OData V2 API: '${apiName}' on path: '${apiPath}' #######");
-        createVariable(ImportTestAction.API_DEFINITION, "/com/axway/apim/adapter/spec/odata/ODataV2NorthWindMetadata.xml");
+        createVariable(ImportTestAction.API_DEFINITION, "/api_definition_1/ODataV2NorthWindMetadata.xml");
         createVariable(ImportTestAction.API_CONFIG, "/com/axway/apim/test/files/basic/minimal-config-with-backendBasepath.json");
         createVariable("expectedReturnCode", "0");
         importAction.doExecute(context);

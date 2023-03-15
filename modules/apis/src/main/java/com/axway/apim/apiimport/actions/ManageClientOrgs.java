@@ -15,7 +15,7 @@ import com.axway.apim.lib.error.ErrorCode;
 
 public class ManageClientOrgs {
 
-    static Logger LOG = LoggerFactory.getLogger(ManageClientOrgs.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ManageClientOrgs.class);
 
     APIManagerAdapter apiManager;
 
@@ -45,14 +45,14 @@ public class ManageClientOrgs {
             List<Organization> missingDesiredOrgs = getMissingOrgs(desiredState.getClientOrganizations(), actualState.getClientOrganizations());
             List<Organization> removingActualOrgs = getMissingOrgs(actualState.getClientOrganizations(), desiredState.getClientOrganizations());
             removingActualOrgs.remove(desiredState.getOrganization());// Don't try to remove the Owning-Organization
-            if (missingDesiredOrgs.size() == 0) {
+            if (missingDesiredOrgs.isEmpty()) {
                 if (desiredState.getClientOrganizations() != null) {
                     LOG.info("All desired organizations: {} have already access. Nothing to do.", desiredState.getClientOrganizations());
                 }
             } else {
                 apiManager.apiAdapter.grantClientOrganization(missingDesiredOrgs, actualState, false);
             }
-            if (removingActualOrgs.size() > 0) {
+            if (!removingActualOrgs.isEmpty()) {
                 if (CoreParameters.getInstance().getClientOrgsMode().equals(CoreParameters.Mode.replace)) {
                     LOG.info("Removing access for orgs: {} from API: {}", removingActualOrgs, actualState.getName());
                     apiManager.accessAdapter.removeClientOrganization(removingActualOrgs, actualState.getId());

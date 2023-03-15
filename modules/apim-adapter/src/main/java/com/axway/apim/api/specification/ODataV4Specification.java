@@ -74,13 +74,15 @@ public class ODataV4Specification extends ODataSpecification {
                     logger.info("Target path : {}", annotationGroup.getTargetPath());
                     entityAnnotations.put(new FullQualifiedName(annotationGroup.getTargetPath()), annotationGroup);
                 }
-                for (EdmEntitySet entityType : schema.getEntityContainer().getEntitySets()) {
-                    openAPI.path(getEntityPath(entityType), getPathItemForEntity(edm, entityType, false));
-                    openAPI.path(getEntityIdPath(entityType), getPathItemForEntity(edm, entityType, true));
-                }
-                for (EdmSingleton edmSingleton : schema.getEntityContainer().getSingletons()) {
-                    openAPI.path(getSingletonPath(edmSingleton), getPathItemForEntity(edm, edmSingleton, false));
-                    openAPI.path(getSingletonIdPath(edmSingleton), getPathItemForEntity(edm, edmSingleton, true));
+                if (schema.getEntityContainer() != null) {
+                    for (EdmEntitySet entityType : schema.getEntityContainer().getEntitySets()) {
+                        openAPI.path(getEntityPath(entityType), getPathItemForEntity(edm, entityType, false));
+                        openAPI.path(getEntityIdPath(entityType), getPathItemForEntity(edm, entityType, true));
+                    }
+                    for (EdmSingleton edmSingleton : schema.getEntityContainer().getSingletons()) {
+                        openAPI.path(getSingletonPath(edmSingleton), getPathItemForEntity(edm, edmSingleton, false));
+                        openAPI.path(getSingletonIdPath(edmSingleton), getPathItemForEntity(edm, edmSingleton, true));
+                    }
                 }
                 for (EdmFunction function : schema.getFunctions()) {
                     openAPI.path("/" + function.getName(), getPathItemForFunction(edm, function));
@@ -99,6 +101,7 @@ public class ODataV4Specification extends ODataSpecification {
             return false;
         }
     }
+
     public void addTopSkipSearchAndCount(OpenAPI openAPI) {
         Parameter topParameter = new Parameter();
         topParameter.setName("$top");
@@ -281,7 +284,7 @@ public class ODataV4Specification extends ODataSpecification {
         }
 
         String operationDescription = "Returns the entity: " + entityName + ". "
-                + "For more information on how to access entities visit: <a target=\"_blank\" href=\"https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#sec_AddressingEntities\">Addressing Entities</a>";
+            + "For more information on how to access entities visit: <a target=\"_blank\" href=\"https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#sec_AddressingEntities\">Addressing Entities</a>";
         List<String> structProperties = entityType.getPropertyNames();
         if (entityType.getNavigationPropertyNames() != null && entityType.getNavigationPropertyNames().size() > 0) {
             List<String> navProperties = new ArrayList<>(entityType.getNavigationPropertyNames());
@@ -311,8 +314,8 @@ public class ODataV4Specification extends ODataSpecification {
         ApiResponse response4xx = new ApiResponse();
         response4xx.$ref("error");
         responses = new ApiResponses()
-                .addApiResponse("200", createResponse("EntitySet " + entityName,
-                        getSchemaForType(edm, entityType, idPath))).addApiResponse("4XX", response4xx);
+            .addApiResponse("200", createResponse("EntitySet " + entityName,
+                getSchemaForType(edm, entityType, idPath))).addApiResponse("4XX", response4xx);
 
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.GET, operation);
@@ -325,15 +328,15 @@ public class ODataV4Specification extends ODataSpecification {
         if (idPath) {
             operation.setSummary("Create a new entity " + entityName + " on Id");
             operation.setOperationId("create" + entityName + "Id");
-        }else {
+        } else {
             operation.setSummary("Create a new entity " + entityName);
             operation.setOperationId("create" + entityName);
         }
         operation.setDescription("Create a new entity in EntitySet: " + entityName);
         operation.setRequestBody(createRequestBody(edm, entityType, "The entity to create", true));
         responses = new ApiResponses()
-                .addApiResponse("201", createResponse("EntitySet " + entityName))
-                .addApiResponse("4XX", response4xx);
+            .addApiResponse("201", createResponse("EntitySet " + entityName))
+            .addApiResponse("4XX", response4xx);
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.POST, operation);
 
@@ -346,8 +349,8 @@ public class ODataV4Specification extends ODataSpecification {
         operation.setDescription("Update an existing entity: " + entityName);
         operation.setRequestBody(createRequestBody(edm, entityType, "The entity to update", true));
         responses = new ApiResponses()
-                .addApiResponse("200", createResponse("EntitySet " + entityName))
-                .addApiResponse("4XX", response4xx);
+            .addApiResponse("200", createResponse("EntitySet " + entityName))
+            .addApiResponse("4XX", response4xx);
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.PATCH, operation);
 
@@ -358,8 +361,8 @@ public class ODataV4Specification extends ODataSpecification {
         operation.setOperationId("delete" + entityName);
         operation.setDescription("Delete an entity " + entityName);
         responses = new ApiResponses()
-                .addApiResponse("204", createResponse("Entity " + entityName + " successfully deleted"))
-                .addApiResponse("4XX", response4xx);
+            .addApiResponse("204", createResponse("Entity " + entityName + " successfully deleted"))
+            .addApiResponse("4XX", response4xx);
         operation.setResponses(responses);
         pathItem.operation(HttpMethod.DELETE, operation);
         return pathItem;
@@ -388,7 +391,7 @@ public class ODataV4Specification extends ODataSpecification {
         boolean hasReturnType = function.getReturnType() != null;
         // Add functions to the same group as the entity itself that is returned, but only if already presents
         if (hasReturnType && function.getReturnType().getType().getKind() == EdmTypeKind.ENTITY
-                && knownEntityTags.containsKey(function.getReturnType().getType().getName())) {
+            && knownEntityTags.containsKey(function.getReturnType().getType().getName())) {
             tag.add(function.getReturnType().getType().getName());
         } else {
             tag.add("Service operations");
@@ -403,19 +406,19 @@ public class ODataV4Specification extends ODataSpecification {
         pathItem.operation(HttpMethod.valueOf("GET"), operation);
         try {
             ApiResponses responses = new ApiResponses()
-                    .addApiResponse("200", createResponse(
-                            function.getReturnType().getType().getName(),
-                            getSchemaForType(edm, function.getReturnType().getType(), function.getReturnType().isCollection())))
-                    ._default(createResponse("Unexpected error"));
+                .addApiResponse("200", createResponse(
+                    function.getReturnType().getType().getName(),
+                    getSchemaForType(edm, function.getReturnType().getType(), function.getReturnType().isCollection())))
+                ._default(createResponse("Unexpected error"));
             operation.setResponses(responses);
         } catch (Exception e) {
             // Happens for instance, when the given returnType cannot be resolved or is null
             if (hasReturnType) {
-                logger.error("Error setting response for function: " + function.getName() + ". Creating standard response.", e);
+                logger.error("Error setting response for function: {} Creating standard response.", function.getName(), e);
             }
             ApiResponses responses = new ApiResponses()
-                    .addApiResponse("200", createResponse(function.getName(), new StringSchema()))
-                    ._default(createResponse("Unexpected error"));
+                .addApiResponse("200", createResponse(function.getName(), new StringSchema()))
+                ._default(createResponse("Unexpected error"));
             operation.setResponses(responses);
         }
         return pathItem;
@@ -444,6 +447,7 @@ public class ODataV4Specification extends ODataSpecification {
     private ApiResponse createResponse(String description) throws EdmException {
         return createResponse(description, null);
     }
+
     private RequestBody createRequestBody(Edm edm, EdmEntityType entityType, String description, boolean required) {
         RequestBody body = new RequestBody();
         body.setDescription(description);
@@ -465,7 +469,7 @@ public class ODataV4Specification extends ODataSpecification {
             }
         } catch (EdmException e) {
             try {
-                logger.error("Error getting schema for type: " + type.getName());
+                logger.error("Error getting schema for type: {}", type.getName());
             } catch (EdmException e1) {
             }
             return null;
@@ -537,7 +541,7 @@ public class ODataV4Specification extends ODataSpecification {
 
     @Override
     public void filterAPISpecification() {
-        if(filterConfig == null) return;
+        if (filterConfig == null) return;
         OpenAPI3SpecificationFilter.filter(openAPI, filterConfig);
     }
 }

@@ -29,7 +29,6 @@ public class CheckCertificatesTest  {
 
     @BeforeClass
     public void setTest() {
-        APIManagerAdapter.apiManagerVersion = "7.7.20221130";
         mapper.disable(MapperFeature.USE_ANNOTATIONS);
     }
 

@@ -41,7 +41,7 @@ public class ConsolePrinterRemoteHosts {
 
 	public void export(Map<String, RemoteHost> remoteHosts) throws AppException {
 		Console.println();
-		Console.println("Remote hosts for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
+		Console.println("Remote hosts for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getInstance().getApiManagerVersion());
 		Console.println();
 		switch(params.getWide()) {
 		case standard:

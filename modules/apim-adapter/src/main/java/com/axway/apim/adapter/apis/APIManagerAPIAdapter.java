@@ -58,6 +58,7 @@ public class APIManagerAPIAdapter {
 
     public static final String PROXIES = "/proxies/";
     public static final String APIREPO = "/apirepo/";
+    public static final String UNKNOWN_API = "Unknown API";
     Map<APIFilter, String> apiManagerResponse = new HashMap<>();
     ObjectMapper mapper = new ObjectMapper();
     private final CoreParameters cmd;
@@ -484,14 +485,14 @@ public class APIManagerAPIAdapter {
             RestAPICall request = new GETRequest(uri);
             Response httpResponse = httpHelper.execute(request, true);
             int statusCode = httpResponse.getStatusCode();
-            String response = httpResponse.getResponse();
+            String response = httpResponse.getResponseBody();
             if (statusCode != 200) {
-                if ((statusCode >= 400 && statusCode <= 499) && response.contains("Unknown API")) {
+                if ((statusCode >= 400 && statusCode <= 499) && response.contains(UNKNOWN_API)) {
                     LOG.warn("Got unexpected error: 'Unknown API' while trying to read Backend-API ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
                     Thread.sleep(cmd.getRetryDelay());
                     httpResponse = httpHelper.execute(request, true);
                     statusCode = httpResponse.getStatusCode();
-                    response = httpResponse.getResponse();
+                    response = httpResponse.getResponseBody();
                     if (statusCode != 200) {
                         LOG.error("Error reading backend API in order to update API-Specification. Received Status-Code: {} Response: {}", statusCode, response);
                         throw new AppException("Error reading backend API in order to update API-Specification. Received Status-Code: " + statusCode, ErrorCode.CANT_CREATE_BE_API);
@@ -552,7 +553,7 @@ public class APIManagerAPIAdapter {
         LOG.debug("Updating API-Proxy: {} {} ( {} )", api.getName(), api.getVersion(), api.getId());
         String[] serializeAllExcept;
         // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
-        if (queryStringPassThroughBreakingVersion.contains(APIManagerAdapter.getApiManagerVersion())) {
+        if (queryStringPassThroughBreakingVersion.contains(APIManagerAdapter.getInstance().getApiManagerVersion())) {
             serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
         } else {
             serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
@@ -848,13 +849,13 @@ public class APIManagerAPIAdapter {
                         Response responseObj = httpHelper.execute(request, true);
                         int statusCode = responseObj.getStatusCode();
                         if (statusCode < 200 || statusCode > 299) {
-                            String response = responseObj.getResponse();
+                            String response = responseObj.getResponseBody();
                             if ((statusCode == 404 || statusCode == 400)) { // Status-Code 400 is returned by 7.7-20200331 ?!
                                 LOG.warn("Got unexpected error {} ({}) while taking over application quota to newer API ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", response, statusCode, cmd.getRetryDelay());
                                 Thread.sleep(cmd.getRetryDelay());
                                 responseObj = httpHelper.execute(request, true);
                                 statusCode = responseObj.getStatusCode();
-                                response = responseObj.getResponse();
+                                response = responseObj.getResponseBody();
                                 if (statusCode < 200 || statusCode > 299) {
                                     LOG.error("Error taking over application quota to new API. Received Status-Code: {} Response: {}", statusCode, response);
                                     throw new AppException("Error taking over application quota to new API. Received Status-Code: " + statusCode, ErrorCode.CANT_UPDATE_QUOTA_CONFIG);
@@ -900,8 +901,8 @@ public class APIManagerAPIAdapter {
             Response httpResponse = httpHelper.execute(request, true);
             int statusCode = httpResponse.getStatusCode();
             if (statusCode != 204) {
-                String response = httpResponse.getResponse();
-                if ((statusCode == 403 || statusCode == 404) && (response.contains("Unknown API") || response.contains("The entity could not be found"))) {
+                String response = httpResponse.getResponseBody();
+                if ((statusCode == 403 || statusCode == 404) && (response.contains(UNKNOWN_API) || response.contains("The entity could not be found"))) {
                     LOG.warn("Got unexpected error: 'Unknown API' while granting access to newer API ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
                     try {
                         Thread.sleep(cmd.getRetryDelay());
@@ -911,7 +912,7 @@ public class APIManagerAPIAdapter {
                     httpResponse = httpHelper.execute(request, true);
                     statusCode = httpResponse.getStatusCode();
                     if (statusCode != 204) {
-                        LOG.error("Error upgrading access to newer API. Received Status-Code:{} Response: {}", statusCode, httpResponse.getResponse());
+                        LOG.error("Error upgrading access to newer API. Received Status-Code:{} Response: {}", statusCode, httpResponse.getResponseBody());
                         throw new AppException("Error upgrading access to newer API. Received Status-Code: " + statusCode, ErrorCode.CANT_CREATE_BE_API);
                     } else {
                         LOG.info("Successfully granted access to newer API on retry. Received Status-Code: {}", statusCode);
@@ -944,14 +945,14 @@ public class APIManagerAPIAdapter {
             Response httpResponse = httpHelper.execute(apiCall, true);
             int statusCode = httpResponse.getStatusCode();
             if (statusCode != 204) {
-                String response = httpResponse.getResponse();
-                if ((statusCode == 403 || statusCode == 404) && response.contains("Unknown API")) {
+                String response = httpResponse.getResponseBody();
+                if ((statusCode == 403 || statusCode == 404) && response.contains(UNKNOWN_API)) {
                     LOG.warn("Got unexpected error: 'Unknown API' while creating API-Access ... Try again in {} milliseconds. (you may set -retryDelay <milliseconds>)", cmd.getRetryDelay());
                     Thread.sleep(cmd.getRetryDelay());
                     httpResponse = httpHelper.execute(apiCall, true);
                     statusCode = httpResponse.getStatusCode();
                     if (statusCode != 204) {
-                        LOG.error("Error granting access to API: {}  (ID: {}) Received Status-Code: {} Response: {}", api.getName(), api.getId(), statusCode, httpResponse.getResponse());
+                        LOG.error("Error granting access to API: {}  (ID: {}) Received Status-Code: {} Response: {}", api.getName(), api.getId(), statusCode, httpResponse.getResponseBody());
                         throw new AppException("Error granting API access. Received Status-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                     } else {
                         LOG.info("Successfully created API-Access on retry. Received Status-Code: {}", statusCode);

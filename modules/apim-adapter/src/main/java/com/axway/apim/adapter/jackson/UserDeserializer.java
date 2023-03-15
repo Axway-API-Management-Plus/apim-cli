@@ -20,7 +20,7 @@ public class UserDeserializer extends StdDeserializer<User> {
 		USE_LOGIN_NAME
 	}
 	
-	static Logger LOG = LoggerFactory.getLogger(UserDeserializer.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UserDeserializer.class);
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -59,8 +59,8 @@ public class UserDeserializer extends StdDeserializer<User> {
 				LOG.error("Error reading user with ID: {} from API-Manager.", node.asText());
 			}
 			if(user!=null) return user;
-			// This this should never happen, as the ID must be a valid API-Manager User-ID
-			LOG.error("User with ID: {} not found.", node.asText());
+			// This  should never happen, as the ID must be a valid API-Manager User-ID
+			LOG.error("User with ID: {} not found.", node);
 			user = new User();
 			user.setId(node.asText());
 			return user;

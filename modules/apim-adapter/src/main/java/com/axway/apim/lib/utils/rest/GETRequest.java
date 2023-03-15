@@ -12,8 +12,6 @@ public class GETRequest extends RestAPICall {
 	public GETRequest(URI uri) {
 		super(null, uri);
 	}
-	
-
 
 	@Override
 	public HttpResponse execute() throws AppException {

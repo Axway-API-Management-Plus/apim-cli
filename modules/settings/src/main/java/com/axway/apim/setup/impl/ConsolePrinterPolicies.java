@@ -34,7 +34,7 @@ public class ConsolePrinterPolicies {
 
 	public void export(List<Policy> policies) throws AppException {
 		Console.println();
-		Console.println("Policies for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
+		Console.println("Policies for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getInstance().getApiManagerVersion());
 		Console.println();
 		printPolicies(policies);
 		Console.println("You may use 'apim api get -policy <PolicyName> -s api-env' to list all APIs using this policy");

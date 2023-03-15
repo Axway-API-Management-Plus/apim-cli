@@ -1,8 +1,11 @@
-package com.axway.apim.api.model;
+package com.axway.apim.setup.model;
+
+import com.axway.apim.api.model.Alerts;
+import com.axway.apim.api.model.Config;
+import com.axway.apim.api.model.RemoteHost;
+import com.fasterxml.jackson.annotation.JsonFilter;
 
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonFilter;
 
 @JsonFilter("APIManagerConfigFilter")
 public class APIManagerConfig {

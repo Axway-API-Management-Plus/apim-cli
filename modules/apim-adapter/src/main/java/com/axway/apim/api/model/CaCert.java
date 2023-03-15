@@ -10,7 +10,7 @@ import java.util.UUID;
 @JsonFilter("CaCertFilter")
 public class CaCert {
 
-    static Logger LOG = LoggerFactory.getLogger(CaCert.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CaCert.class);
 
     String certFile;
 
@@ -176,10 +176,10 @@ public class CaCert {
                 }
             }
             if (filename == null) {
-                LOG.warn("Could not create filename for certificate based on alias: " + this.getAlias());
+                LOG.warn("Could not create filename for certificate based on alias: {}", this.getAlias());
 
                 filename = "UnknownCertificate_" + UUID.randomUUID();
-                LOG.warn("Created a random filename: " + filename + ".ctr");
+                LOG.warn("Created a random filename: {}.ctr", filename);
             } else {
                 filename = filename.replace(" ", "");
                 filename = filename.replace("*", "");

@@ -10,7 +10,7 @@ import java.util.List;
 
 public class RollbackHandler {
 
-    static Logger LOG = LoggerFactory.getLogger(RollbackHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RollbackHandler.class);
 
     private static RollbackHandler instance;
 
@@ -41,7 +41,7 @@ public class RollbackHandler {
             LOG.info("Rollback is disabled.");
             return;
         }
-        if (rollbackActions.size() == 0) return; // Nothing to roll back
+        if (rollbackActions.isEmpty()) return; // Nothing to roll back
         rollbackActions.sort((first, second) -> {
             if (first.getExecuteOrder() > second.getExecuteOrder()) {
                 return 1;

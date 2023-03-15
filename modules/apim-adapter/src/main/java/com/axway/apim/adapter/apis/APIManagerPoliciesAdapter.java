@@ -109,7 +109,6 @@ public class APIManagerPoliciesAdapter {
             mappedPolicies.put(type, policies);
             allPolicies.addAll(policies);
         } catch (Exception e) {
-            LOG.error("Error reading configured custom-policies. Can't parse response: {}", apiManagerResponse.get(type), e);
             throw new AppException("Can't initialize policies for type: " + type, ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }

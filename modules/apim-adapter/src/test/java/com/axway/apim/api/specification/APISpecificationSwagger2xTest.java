@@ -3,6 +3,7 @@ package com.axway.apim.api.specification;
 import com.axway.apim.api.specification.APISpecification.APISpecType;
 import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.api.model.DesiredAPISpecification;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,12 +20,9 @@ public class APISpecificationSwagger2xTest {
     ObjectMapper mapper = new ObjectMapper();
     private static final String testPackage = "/com/axway/apim/adapter/spec";
 
-
-
-
     @Test
     public void testAirportsAPI() throws IOException {
-
+        CoreParameters.getInstance().setOverrideSpecBasePath(false);
         byte[] content = getSwaggerContent(testPackage + "/airports_swagger_20.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "airports_swagger_20.json", "Test-API");
         apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
@@ -84,6 +82,7 @@ public class APISpecificationSwagger2xTest {
 
     @Test
     public void swaggerWithoutSchemes() throws IOException {
+        CoreParameters.getInstance().setOverrideSpecBasePath(false);
         byte[] content = getSwaggerContent(testPackage + "/petstore-without-schemes.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
         apiDefinition.configureBasePath("https://myhost.customer.com/", null);
@@ -211,5 +210,20 @@ public class APISpecificationSwagger2xTest {
         } catch (IOException e) {
             throw new AppException("Can't read Swagger-File: '" + swaggerFile + "'", ErrorCode.CANT_READ_API_DEFINITION_FILE);
         }
+    }
+
+    @Test
+    public void overrideBackendBasePath() throws IOException {
+        CoreParameters.getInstance().setOverrideSpecBasePath(true);
+        byte[] content = getSwaggerContent(testPackage + "/petstore-only-https-scheme.json");
+        APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
+        apiDefinition.configureBasePath("https://petstore.swagger.io/test", null);
+
+        Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
+        JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
+        Assert.assertEquals(swagger.get("host").asText(), "petstore.swagger.io");
+        Assert.assertEquals(swagger.get("basePath").asText(), "/test");
+        Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
+        Assert.assertEquals(swagger.get("schemes").size(), 1);
     }
 }

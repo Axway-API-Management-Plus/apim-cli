@@ -139,7 +139,7 @@ public class CSVAPIExporter extends APIResultHandler {
     }
 
     private List<Organization> getClientOrganizations(API api) {
-        if (api.getClientOrganizations() == null || api.getClientOrganizations().size() == 0) {
+        if (api.getClientOrganizations() == null || api.getClientOrganizations().isEmpty()) {
             Organization org = new Organization();
             org.setName("N/A");
             List<Organization> ungranted = new ArrayList<>();
@@ -151,7 +151,7 @@ public class CSVAPIExporter extends APIResultHandler {
     }
 
     private List<ClientApplication> getClientApplications(API api) {
-        if (api.getApplications() == null || api.getApplications().size() == 0) {
+        if (api.getApplications() == null || api.getApplications().isEmpty()) {
             ClientApplication app = new ClientApplication();
             app.setName("N/A");
             Organization org = new Organization();

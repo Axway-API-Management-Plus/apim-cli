@@ -29,7 +29,6 @@ public class QuotaRestrictionSerializer extends StdSerializer<QuotaRestriction> 
 			jgen.writeObjectField("method", "*");
 		} else { // API-Specific quota
 			// Don't write the API-Name as it's confusing it is ignored during import when the API-Path is given.
-			// jgen.writeObjectField("api", quotaRestriction.getRestrictedAPI().getName());
 			jgen.writeObjectField("apiPath", quotaRestriction.getRestrictedAPI().getPath());
 			if(quotaRestriction.getRestrictedAPI().getVhost()!=null) {
 				jgen.writeObjectField("vhost", quotaRestriction.getRestrictedAPI().getVhost());

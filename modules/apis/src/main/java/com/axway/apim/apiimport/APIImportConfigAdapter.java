@@ -1,31 +1,15 @@
 package com.axway.apim.apiimport;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.*;
-
-import com.axway.apim.api.model.*;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.entity.ContentType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.client.apps.ClientAppFilter;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.api.API;
-import com.axway.apim.api.specification.APISpecification;
-import com.axway.apim.api.specification.APISpecificationFactory;
+import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.api.specification.APISpecification;
+import com.axway.apim.api.specification.APISpecificationFactory;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.APIPropertiesExport;
 import com.axway.apim.lib.CoreParameters;
@@ -33,12 +17,23 @@ import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.entity.ContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.*;
 
 /**
  * The APIConfig reflects the given API-Configuration plus the API-Definition, which is either a
@@ -50,6 +45,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 public class APIImportConfigAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIImportConfigAdapter.class);
+    public static final String DEFAULT = "_default";
 
     /**
      * This is the given path to WSDL or Swagger. It is either set using -a parameter or as part of the config file
@@ -67,7 +63,7 @@ public class APIImportConfigAdapter {
     private API apiConfig;
 
     public APIImportConfigAdapter(APIImportParams params) throws AppException {
-        this(params.getConfig(), params.getStage(), params.getApiDefintion(),params.getStageConfig());
+        this(params.getConfig(), params.getStage(), params.getApiDefinition(), params.getStageConfig());
     }
 
     /**
@@ -93,7 +89,7 @@ public class APIImportConfigAdapter {
                 // Check the config file is json file
                 mapper.readTree(this.apiConfigFile);
                 LOG.debug("Handling JSON Configuration file : {}", apiConfigFile);
-            }catch (IOException ioException){
+            } catch (IOException ioException) {
                 //Handle Yaml config
                 mapper = new ObjectMapper(new YAMLFactory());
                 LOG.debug("Handling Yaml Configuration file: {}", apiConfigFile);
@@ -253,7 +249,7 @@ public class APIImportConfigAdapter {
         }
     }
 
-    private void addQuotaConfiguration(API apiConfig) throws AppException {
+    private void addQuotaConfiguration(API apiConfig) {
         if (apiConfig.getState().equals(API.STATE_UNPUBLISHED)) return;
         initQuota(apiConfig.getSystemQuota());
         initQuota(apiConfig.getApplicationQuota());
@@ -314,7 +310,7 @@ public class APIImportConfigAdapter {
                                 throw new AppException("Error reading markdown description file: " + markdownFilename, ErrorCode.CANT_READ_CONFIG_FILE);
                             }
                             LOG.debug("Reading local markdown description file: {}", markdownFile.getPath());
-                            markdownDescription.append(newLine).append(new String(Files.readAllBytes(markdownFile.toPath()), StandardCharsets.UTF_8));
+                            markdownDescription.append(newLine).append(Files.readString(markdownFile.toPath()));
                         }
                         newLine = "\n";
                     }
@@ -366,20 +362,20 @@ public class APIImportConfigAdapter {
         }
     }
 
-    private void addDefaultCorsProfile(API apiConfig) throws AppException {
+    private void addDefaultCorsProfile(API apiConfig) {
         if (apiConfig.getCorsProfiles() == null) {
             apiConfig.setCorsProfiles(new ArrayList<>());
         }
         // Check if there is a default cors profile declared otherwise create one internally
         boolean defaultCorsFound = false;
         for (CorsProfile profile : apiConfig.getCorsProfiles()) {
-            if (profile.getName().equals("_default")) {
+            if (profile.getName().equals(DEFAULT)) {
                 defaultCorsFound = true;
                 break;
             }
         }
         if (apiConfig.getCorsProfiles().size() == 1) { // Make this CORS-Profile default, even if it's not named default
-            apiConfig.getInboundProfiles().get("_default").setCorsProfile(apiConfig.getCorsProfiles().get(0).getName());
+            apiConfig.getInboundProfiles().get(DEFAULT).setCorsProfile(apiConfig.getCorsProfiles().get(0).getName());
         }
         if (!defaultCorsFound) {
             apiConfig.getCorsProfiles().add(CorsProfile.getDefaultCorsProfile());
@@ -398,7 +394,6 @@ public class APIImportConfigAdapter {
      */
     private void completeClientApplications(API apiConfig) throws AppException {
         if (CoreParameters.getInstance().isIgnoreClientApps()) return;
-       // if (apiConfig.getState().equals(API.STATE_UNPUBLISHED)) return;
         ClientApplication loadedApp = null;
         ClientApplication app;
         if (apiConfig.getApplications() != null) {
@@ -417,7 +412,7 @@ public class APIImportConfigAdapter {
                         it.remove();
                         continue;
                     }
-                    LOG.info("Found existing application: {} ({}) based on given name {}",app.getName(),app.getId(),app.getName() );
+                    LOG.info("Found existing application: {} ({}) based on given name {}", app.getName(), app.getId(), app.getName());
                 } else if (app.getApiKey() != null) {
                     loadedApp = getAppForCredential(app.getApiKey(), APIManagerAdapter.CREDENTIAL_TYPE_API_KEY);
                     if (loadedApp == null) {
@@ -450,7 +445,7 @@ public class APIImportConfigAdapter {
     }
 
     private static ClientApplication getAppForCredential(String credential, String type) throws AppException {
-        LOG.debug("Searching application with configured credential (Type: {}): {}",type,credential );
+        LOG.debug("Searching application with configured credential (Type: {}): {}", type, credential);
         ClientApplication app = APIManagerAdapter.getInstance().getAppIdForCredential(credential, type);
         if (app == null) {
             LOG.warn("Unknown application with ({}): {} configured. Ignoring this application.", type, credential);
@@ -459,16 +454,16 @@ public class APIImportConfigAdapter {
         return app;
     }
 
-    private void completeCaCerts(API apiConfig) throws AppException {
+    public void completeCaCerts(API apiConfig) throws AppException {
         ObjectMapper mapper = new ObjectMapper();
         if (apiConfig.getCaCerts() != null) {
             List<CaCert> completedCaCerts = new ArrayList<>();
             for (CaCert cert : apiConfig.getCaCerts()) {
                 if (cert.getCertBlob() == null) {
                     try (InputStream is = getInputStreamForCertFile(cert)) {
-                        JsonNode certInfo = APIManagerAdapter.getCertInfo(is, "", cert);
-                        CaCert completedCert = mapper.readValue(certInfo.get(0).toString(), CaCert.class);
-                        completedCaCerts.add(completedCert);
+                        String certInfo = APIManagerAdapter.getCertInfo(is, "", cert);
+                        List<CaCert> completedCerts = mapper.readValue(certInfo, new TypeReference<>() {});
+                        completedCaCerts.addAll(completedCerts);
                     } catch (Exception e) {
                         throw new AppException("Can't initialize given certificate.", ErrorCode.CANT_READ_CONFIG_FILE, e);
                     }
@@ -524,7 +519,7 @@ public class APIImportConfigAdapter {
     private void validateInboundProfile(API importApi) throws AppException {
         if (importApi.getInboundProfiles() == null || importApi.getInboundProfiles().size() == 0) {
             Map<String, InboundProfile> def = new HashMap<>();
-            def.put("_default", InboundProfile.getDefaultInboundProfile());
+            def.put(DEFAULT, InboundProfile.getDefaultInboundProfile());
             importApi.setInboundProfiles(def);
             return;
         }
@@ -533,7 +528,7 @@ public class APIImportConfigAdapter {
         boolean defaultProfileFound = false;
         while (it.hasNext()) {
             String profileName = it.next();
-            if (profileName.equals("_default")) {
+            if (profileName.equals(DEFAULT)) {
                 defaultProfileFound = true;
                 continue; // No need to check for the default profile
             }
@@ -549,11 +544,11 @@ public class APIImportConfigAdapter {
         /// If not, create a PassThrough!
         if (!defaultProfileFound) {
             InboundProfile defaultProfile = new InboundProfile();
-            defaultProfile.setSecurityProfile("_default");
-            defaultProfile.setCorsProfile("_default");
+            defaultProfile.setSecurityProfile(DEFAULT);
+            defaultProfile.setCorsProfile(DEFAULT);
             defaultProfile.setMonitorAPI(true);
             defaultProfile.setMonitorSubject("authentication.subject.id");
-            importApi.getInboundProfiles().put("_default", defaultProfile);
+            importApi.getInboundProfiles().put(DEFAULT, defaultProfile);
         }
     }
 
@@ -562,19 +557,19 @@ public class APIImportConfigAdapter {
         if (importApi.getSecurityProfiles() == null) importApi.setSecurityProfiles(new ArrayList<>());
         List<SecurityProfile> profiles = importApi.getSecurityProfiles();
         for (SecurityProfile profile : importApi.getSecurityProfiles()) {
-            if (profile.getIsDefault() || profile.getName().equals("_default")) {
+            if (profile.getIsDefault() || profile.getName().equals(DEFAULT)) {
                 if (hasDefaultProfile) {
                     throw new AppException("You can have only one _default SecurityProfile.", ErrorCode.CANT_READ_CONFIG_FILE);
                 }
                 hasDefaultProfile = true;
                 // If the name is _default or flagged as default make it consistent!
-                profile.setName("_default");
+                profile.setName(DEFAULT);
                 profile.setIsDefault(true);
             }
         }
         if (profiles.isEmpty() || !hasDefaultProfile) {
             SecurityProfile passthroughProfile = new SecurityProfile();
-            passthroughProfile.setName("_default");
+            passthroughProfile.setName(DEFAULT);
             passthroughProfile.setIsDefault(true);
             SecurityDevice passthroughDevice = new SecurityDevice();
             passthroughDevice.setName("Pass Through");
@@ -593,20 +588,20 @@ public class APIImportConfigAdapter {
         boolean hasDefaultProfile = false;
         List<AuthenticationProfile> profiles = importApi.getAuthenticationProfiles();
         for (AuthenticationProfile profile : profiles) {
-            if (profile.getIsDefault() || profile.getName().equals("_default")) {
+            if (profile.getIsDefault() || profile.getName().equals(DEFAULT)) {
                 if (hasDefaultProfile) {
                     throw new AppException("You can have only one AuthenticationProfile configured as default", ErrorCode.CANT_READ_CONFIG_FILE);
                 }
                 hasDefaultProfile = true;
                 // If the name is _default or flagged as default make it consistent!
-                profile.setName("_default");
+                profile.setName(DEFAULT);
                 profile.setIsDefault(true);
             }
         }
         if (!hasDefaultProfile) {
             LOG.warn("THERE IS NO DEFAULT authenticationProfile CONFIGURED. Auto-Creating a No-Authentication outbound profile as default!");
             AuthenticationProfile noAuthNProfile = new AuthenticationProfile();
-            noAuthNProfile.setName("_default");
+            noAuthNProfile.setName(DEFAULT);
             noAuthNProfile.setIsDefault(true);
             noAuthNProfile.setType(AuthType.none);
             profiles.add(noAuthNProfile);
@@ -620,17 +615,17 @@ public class APIImportConfigAdapter {
         while (it.hasNext()) {
             String profileName = it.next();
             OutboundProfile profile = importApi.getOutboundProfiles().get(profileName);
-            if (profileName.equals("_default")) {
+            if (profileName.equals(DEFAULT)) {
                 defaultProfileFound = true;
                 // Validate the _default Outbound-Profile has an AuthN-Profile, otherwise we must add (See issue #133)
 
                 if (profile.getAuthenticationProfile() == null) {
                     LOG.warn("Provided default outboundProfile doesn't contain AuthN-Profile - Setting it to default");
-                    profile.setAuthenticationProfile("_default");
+                    profile.setAuthenticationProfile(DEFAULT);
                 }
             }
             // Check the referenced authentication profile exists
-            if (!profile.getAuthenticationProfile().equals("_default")) {
+            if (!profile.getAuthenticationProfile().equals(DEFAULT)) {
                 if (profile.getAuthenticationProfile() != null && getAuthNProfile(importApi, profile.getAuthenticationProfile()) == null) {
                     throw new AppException("OutboundProfile is referencing a unknown AuthenticationProfile: '" + profile.getAuthenticationProfile() + "'", ErrorCode.REFERENCED_PROFILE_INVALID);
                 }
@@ -642,15 +637,15 @@ public class APIImportConfigAdapter {
         }
         if (!defaultProfileFound) {
             OutboundProfile defaultProfile = new OutboundProfile();
-            defaultProfile.setAuthenticationProfile("_default");
+            defaultProfile.setAuthenticationProfile(DEFAULT);
             defaultProfile.setRouteType("proxy");
-            importApi.getOutboundProfiles().put("_default", defaultProfile);
+            importApi.getOutboundProfiles().put(DEFAULT, defaultProfile);
         }
     }
 
     private void validateOutboundAuthN(API importApi) throws AppException {
         // Request to use some specific Outbound-AuthN for this API
-        if (importApi.getAuthenticationProfiles() == null || importApi.getAuthenticationProfiles().size() == 0) return;
+        if (importApi.getAuthenticationProfiles() == null || importApi.getAuthenticationProfiles().isEmpty()) return;
 
         for (AuthenticationProfile authProfile : importApi.getAuthenticationProfiles()) {
             if (authProfile.getType().equals(AuthType.ssl)) {

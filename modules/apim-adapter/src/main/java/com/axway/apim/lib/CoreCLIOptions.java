@@ -28,10 +28,8 @@ public class CoreCLIOptions extends CLIOptions {
         params.setForce(hasOption("force"));
         params.setIgnoreCache(hasOption("ignoreCache"));
         if (getValue("rollback") != null) params.setRollback(Boolean.parseBoolean(getValue("rollback")));
-
         // Also support -f for backwards compatibility
         if (!params.isForce()) params.setForce(Boolean.parseBoolean(getValue("f")));
-
         params.setProxyHost(getValue("httpProxyHost"));
         params.setProxyPort((getValue("httpProxyPort") != null) ? Integer.valueOf(getValue("httpProxyPort")) : null);
         params.setProxyUsername(getValue("httpProxyUsername"));
@@ -39,6 +37,7 @@ public class CoreCLIOptions extends CLIOptions {
         params.setRetryDelay(getValue("retryDelay"));
         params.setTimeout(getValue("timeout"));
         params.setDisableCompression(hasOption("disableCompression"));
+        params.setOverrideSpecBasePath(hasOption("overrideSpecBasePath"));
         return params;
     }
 
@@ -148,6 +147,10 @@ public class CoreCLIOptions extends CLIOptions {
         option = new Option("disableCompression", false, "Disable Http Client gzip Compression");
         option.setRequired(false);
         cliOptions.addOption(option);
+
+        option = new Option("overrideSpecBasePath", "Override API Specification ( open api, Swagger 2)  using backendBasepath");
+        option.setRequired(false);
+        addOption(option);
     }
 
     @Override

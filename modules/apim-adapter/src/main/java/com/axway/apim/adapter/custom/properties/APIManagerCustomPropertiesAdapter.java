@@ -10,7 +10,6 @@ import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.rest.GETRequest;
 import com.axway.apim.lib.utils.rest.RestAPICall;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
@@ -33,6 +32,7 @@ public class APIManagerCustomPropertiesAdapter {
     CoreParameters cmd = CoreParameters.getInstance();
 
     public APIManagerCustomPropertiesAdapter() {
+        // Default constructor
     }
 
     String apiManagerResponse;
@@ -41,29 +41,21 @@ public class APIManagerCustomPropertiesAdapter {
 
     private void readCustomPropertiesFromAPIManager() throws AppException {
         if (apiManagerResponse != null) return;
-        URI uri;
-        HttpResponse httpResponse = null;
         try {
-            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/config/customproperties").build();
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/config/customproperties").build();
             RestAPICall getRequest = new GETRequest(uri);
             LOG.debug("Read configured custom properties from API-Manager");
-            httpResponse = getRequest.execute();
-            String response = EntityUtils.toString(httpResponse.getEntity());
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            if (statusCode < 200 || statusCode > 299) {
-                LOG.error("Error loading custom-properties from API-Manager. Response-Code: {} Response Body: {}", statusCode, response);
-                throw new AppException("Error loading custom-properties from API-Manager. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode < 200 || statusCode > 299) {
+                    LOG.error("Error loading custom-properties from API-Manager. Response-Code: {} Response Body: {}", statusCode, response);
+                    throw new AppException("Error loading custom-properties from API-Manager. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+                apiManagerResponse = response;
             }
-            apiManagerResponse = response;
         } catch (Exception e) {
-            LOG.error("Error cant read configuration from API-Manager. Can't parse response: {}", httpResponse, e);
             throw new AppException("Can't read configuration from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
-        } finally {
-            try {
-                if (httpResponse != null)
-                    ((CloseableHttpResponse) httpResponse).close();
-            } catch (Exception ignore) {
-            }
         }
     }
 
@@ -93,25 +85,25 @@ public class APIManagerCustomPropertiesAdapter {
     }
 
     public Map<String, CustomProperty> getCustomProperties(Type type) throws AppException {
-        CustomProperties customProperties = getCustomProperties();
-        if (customProperties == null) return null;
+        CustomProperties customPropertiesLocal = getCustomProperties();
+        if (customPropertiesLocal == null) return null;
         switch (type) {
             case api:
-                return customProperties.getApi();
+                return customPropertiesLocal.getApi();
             case application:
-                return customProperties.getApplication();
+                return customPropertiesLocal.getApplication();
             case user:
-                return customProperties.getUser();
+                return customPropertiesLocal.getUser();
             case organization:
-                return customProperties.getOrganization();
+                return customPropertiesLocal.getOrganization();
             default:
                 throw new AppException("Unknown custom properties type: " + type, ErrorCode.UNXPECTED_ERROR);
         }
     }
 
     public List<String> getCustomPropertyNames(Type type) throws AppException {
-        Map<String, CustomProperty> customProperties = getCustomProperties(type);
-        if (customProperties == null) return new ArrayList<>();
-        return new ArrayList<>(customProperties.keySet());
+        Map<String, CustomProperty> customPropertiesLocal = getCustomProperties(type);
+        if (customPropertiesLocal == null) return new ArrayList<>();
+        return new ArrayList<>(customPropertiesLocal.keySet());
     }
 }

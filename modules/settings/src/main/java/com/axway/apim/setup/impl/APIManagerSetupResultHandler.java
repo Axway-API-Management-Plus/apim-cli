@@ -2,12 +2,12 @@ package com.axway.apim.setup.impl;
 
 import com.axway.apim.adapter.apis.RemoteHostFilter;
 import com.axway.apim.adapter.apis.RemoteHostFilter.Builder;
-import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.Result;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
+import com.axway.apim.setup.model.APIManagerConfig;
 
 import java.lang.reflect.Constructor;
 

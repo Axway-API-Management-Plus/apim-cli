@@ -6,6 +6,7 @@ import com.axway.apim.api.specification.APISpecification;
 import com.axway.apim.api.specification.WSDLSpecification;
 import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
@@ -20,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 @JsonPropertyOrder({"name", "path", "state", "version", "apiRoutingKey", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost",
-        "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties",
-        "corsProfiles", "caCerts", "applicationQuota", "systemQuota", "apiMethods"})
+    "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties",
+    "corsProfiles", "caCerts", "applicationQuota", "systemQuota", "apiMethods"})
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class ExportAPI {
     API actualAPIProxy = null;
@@ -49,10 +50,10 @@ public class ExportAPI {
         if (this.actualAPIProxy.getOutboundProfiles().size() == 1) {
             OutboundProfile defaultProfile = this.actualAPIProxy.getOutboundProfiles().get("_default");
             if (defaultProfile.getRouteType().equals("proxy")
-                    && defaultProfile.getAuthenticationProfile().equals("_default")
-                    && defaultProfile.getRequestPolicy() == null
-                    && defaultProfile.getResponsePolicy() == null
-                    && defaultProfile.getFaultHandlerPolicy() == null)
+                && defaultProfile.getAuthenticationProfile().equals("_default")
+                && defaultProfile.getRequestPolicy() == null
+                && defaultProfile.getResponsePolicy() == null
+                && defaultProfile.getFaultHandlerPolicy() == null)
                 return null;
         }
         for (OutboundProfile profile : this.actualAPIProxy.getOutboundProfiles().values()) {
@@ -117,7 +118,7 @@ public class ExportAPI {
         if (this.actualAPIProxy.getInboundProfiles().size() == 1) {
             InboundProfile defaultProfile = this.actualAPIProxy.getInboundProfiles().get("_default");
             if (defaultProfile.getSecurityProfile().equals("_default")
-                    && defaultProfile.getCorsProfile().equals("_default")) return null;
+                && defaultProfile.getCorsProfile().equals("_default")) return null;
         }
         return this.actualAPIProxy.getInboundProfiles();
     }
@@ -279,7 +280,7 @@ public class ExportAPI {
         if (!APIManagerAdapter.hasAdminAccount()) return null;
         if (this.actualAPIProxy.getClientOrganizations().isEmpty()) return null;
         if (this.actualAPIProxy.getClientOrganizations().size() == 1 &&
-                this.actualAPIProxy.getClientOrganizations().get(0).getName().equals(getOrganization()))
+            this.actualAPIProxy.getClientOrganizations().get(0).getName().equals(getOrganization()))
             return null;
         List<String> orgs = new ArrayList<>();
         for (Organization org : this.actualAPIProxy.getClientOrganizations()) {
@@ -315,19 +316,13 @@ public class ExportAPI {
 
 
     public String getBackendBasepath() {
-
-        // The API Manager composes the actual backend path from the host + path and backend resource path
-        // specified in the frontend.
-        // So if the backend was imported with the resourcepath /v2 and the backend is configured with
-        // https://my.backend.host.com/another/path, the following backend results: https://my.backend.host.com/another/path/v2.
-        // So, in order for the exported backendBasepath to exactly match the configured backend, it must be
-        // composed of both properties.
-        // See issue: https://github.com/Axway-API-Management-Plus/apim-cli/issues/158
-        // https://github.com/Axway-API-Management-Plus/apim-cli/blob/develop/misc/images/behavior-useFEAPIDefinition.png
-
         //ISSUE-299
         // Resource path is part of API specification (like open api servers.url or swagger basePath) and we don't need to manage it in config file.
-        return this.getServiceProfiles().get("_default").getBasePath();
+        String backendBasePath = this.getServiceProfiles().get("_default").getBasePath();
+        if (CoreParameters.getInstance().isOverrideSpecBasePath() && this.actualAPIProxy.getResourcePath() != null) { //Issue 354
+            backendBasePath = backendBasePath + this.actualAPIProxy.getResourcePath();
+        }
+        return backendBasePath;
     }
 
     public List<APIMethod> getApiMethods() {

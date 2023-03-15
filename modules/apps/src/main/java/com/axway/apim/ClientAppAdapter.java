@@ -1,18 +1,13 @@
-package com.axway.apim.adapter.client.apps;
-
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package com.axway.apim;
 
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.Result;
 import com.axway.apim.lib.error.AppException;
 
+import java.util.List;
+
 public abstract class ClientAppAdapter {
-	
-	protected static Logger LOG = LoggerFactory.getLogger(ClientAppAdapter.class);
-	
+
 	protected List<ClientApplication> apps;
 	
 	protected Result result;

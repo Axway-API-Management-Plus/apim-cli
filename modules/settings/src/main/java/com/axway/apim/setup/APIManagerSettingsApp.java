@@ -1,7 +1,6 @@
 package com.axway.apim.setup;
 
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.api.model.RemoteHost;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
@@ -19,6 +18,7 @@ import com.axway.apim.setup.impl.APIManagerSetupResultHandler.ResultHandler;
 import com.axway.apim.setup.lib.APIManagerSetupExportCLIOptions;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
 import com.axway.apim.setup.lib.APIManagerSetupImportCLIOptions;
+import com.axway.apim.setup.model.APIManagerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

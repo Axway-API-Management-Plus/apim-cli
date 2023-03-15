@@ -32,7 +32,7 @@ public abstract class APISpecification {
         WSDL_API("WSDL", ".xml"),
         WADL_API("Web Application Description Language (WADL)", ".wadl"),
         ODATA_V2("OData V2 (converted to OpenAPI 3.0.1)", "$metadata", "Given OData specification is converted into an OpenAPI 3 specification.",
-                "Please note: You need to use the OData-Routing policy for this API. See: https://github.com/Axway-API-Management-Plus/odata-routing-policy"),
+            "Please note: You need to use the OData-Routing policy for this API. See: https://github.com/Axway-API-Management-Plus/odata-routing-policy"),
         ODATA_V3("OData V4", "$metadata"),
         ODATA_V4("OData V4", "$metadata"),
         UNKNOWN("Unknown", ".txt");
@@ -101,9 +101,9 @@ public abstract class APISpecification {
                 ODataSpecification importSpec = (ODataSpecification) other;
                 OAS3xSpecification specFromGateway = (OAS3xSpecification) this;
                 return compareString(importSpec.getApiSpecificationContent(), specFromGateway.getApiSpecificationContent());
-            } else if (other instanceof Swagger1xSpecification){
+            } else if (other instanceof Swagger1xSpecification) {
                 return compareJSON(otherSwagger, this);
-            }else if (other instanceof WSDLSpecification || other instanceof WADLSpecification) {
+            } else if (other instanceof WSDLSpecification || other instanceof WADLSpecification) {
                 return compareString(otherSwagger.apiSpecificationContent, apiSpecificationContent);
             } else {
                 LOG.info("Unhandled specification : {}", other.getClass().getName());
@@ -127,7 +127,6 @@ public abstract class APISpecification {
 
     public boolean parse(byte[] apiSpecificationContent) throws AppException {
         this.apiSpecificationContent = apiSpecificationContent;
-        //this.originalApiSpecificationContent = apiSpecificationContent;
         return true;
     }
 
@@ -143,7 +142,7 @@ public abstract class APISpecification {
             return;
         }
         if (formatMatcher.getMatchStrength() == MatchStrength.INCONCLUSIVE ||
-                formatMatcher.getMatchStrength() == MatchStrength.NO_MATCH) {
+            formatMatcher.getMatchStrength() == MatchStrength.NO_MATCH) {
             this.mapper = new ObjectMapper();
         }
         switch (formatMatcher.getMatchedFormatName().toLowerCase()) {
@@ -159,13 +158,14 @@ public abstract class APISpecification {
                 break;
         }
     }
-    public boolean compareJSON(APISpecification apiSpecification, APISpecification gatewayApiSpecification ){
+
+    public boolean compareJSON(APISpecification apiSpecification, APISpecification gatewayApiSpecification) {
         try {
             JsonNode swaggerFromImport = apiSpecification.mapper.readTree(apiSpecification.apiSpecificationContent);
             JsonNode swaggerFromGateway = gatewayApiSpecification.mapper.readTree(gatewayApiSpecification.apiSpecificationContent);
             boolean rc = swaggerFromImport.equals(swaggerFromGateway);
             if (!rc) {
-                LOG.info("Detected API-Definition-File sizes: API-Manager: " + gatewayApiSpecification.apiSpecificationContent.length + " vs. Import: " + apiSpecification.apiSpecificationContent.length);
+                LOG.info("Detected API-Definition-File sizes: API-Manager: {} vs Import: {}", gatewayApiSpecification.apiSpecificationContent.length, apiSpecification.apiSpecificationContent.length);
                 LOG.debug("Specification from Gateway : {}", new String(gatewayApiSpecification.apiSpecificationContent, StandardCharsets.UTF_8));
                 LOG.debug("Specification from Source : {}", new String(apiSpecification.apiSpecificationContent, StandardCharsets.UTF_8));
             }
@@ -176,10 +176,10 @@ public abstract class APISpecification {
         }
     }
 
-    public boolean compareString(byte[] sourceSpec, byte[] gatewaySpec ){
+    public boolean compareString(byte[] sourceSpec, byte[] gatewaySpec) {
         boolean rc = new String(sourceSpec, StandardCharsets.UTF_8).contentEquals(new String(gatewaySpec, StandardCharsets.UTF_8));
         if (!rc) {
-            LOG.info("Detected API-Definition-File sizes: API-Manager: " + gatewaySpec.length + " vs. Import: " + sourceSpec.length);
+            LOG.info("Detected API-Definition-File sizes: API-Manager: {} vs Import: {}", gatewaySpec.length, sourceSpec.length);
         }
         return rc;
     }

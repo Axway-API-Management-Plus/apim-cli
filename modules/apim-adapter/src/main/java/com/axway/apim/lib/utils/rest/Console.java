@@ -2,6 +2,9 @@ package com.axway.apim.lib.utils.rest;
 
 public class Console {
 
+    private Console(){
+    }
+
     public static void println(String message){
         System.out.println(message);
     }

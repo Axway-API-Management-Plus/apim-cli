@@ -1,11 +1,11 @@
 package com.axway.apim.appimport;
 
+import com.axway.apim.ClientAppAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.client.apps.APIMgrAppsAdapter;
-import com.axway.apim.adapter.client.apps.ClientAppAdapter;
 import com.axway.apim.api.model.apps.ApplicationPermission;
 import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.lib.error.AppException;

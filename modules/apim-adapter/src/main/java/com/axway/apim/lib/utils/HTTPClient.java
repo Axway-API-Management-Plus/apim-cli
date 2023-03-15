@@ -27,7 +27,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 
 public class HTTPClient implements AutoCloseable {
-	static Logger LOG = LoggerFactory.getLogger(HTTPClient.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HTTPClient.class);
 
 	private final URI url;
 	private final String password;

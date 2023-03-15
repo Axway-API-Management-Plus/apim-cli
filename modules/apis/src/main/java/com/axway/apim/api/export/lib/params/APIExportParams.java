@@ -141,7 +141,7 @@ public class APIExportParams extends StandardExportParams implements APIFilterPa
 
     public boolean isUseFEAPIDefinition() {
         if (useFEAPIDefinition == null) return false;
-        return useFEAPIDefinition.booleanValue();
+        return useFEAPIDefinition;
     }
 
     public void setUseFEAPIDefinition(Boolean useFEAPIDefinition) {

@@ -2,6 +2,7 @@ package com.axway.apim.api.specification;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.specification.filter.JsonNodeOpenAPI3SpecFilter;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -50,7 +51,7 @@ public class Swagger2xSpecification extends APISpecification {
                 String port = url.getPort() == -1 ? ":" + url.getDefaultPort() : ":" + url.getPort();
                 if (port.equals(":443") || port.equals(":80")) port = "";
                 ((ObjectNode) swagger).put("basePath", basePath);
-                ((ObjectNode) swagger).put("host", url.getHost()+port);
+                ((ObjectNode) swagger).put("host", url.getHost() + port);
                 ArrayNode newSchemes = this.mapper.createArrayNode();
                 newSchemes.add(url.getProtocol());
                 ((ObjectNode) swagger).set("schemes", newSchemes);
@@ -59,7 +60,8 @@ public class Swagger2xSpecification extends APISpecification {
         } catch (JsonProcessingException e) {
             LOG.error("Cannot replace basePath in swagger.", e);
         } catch (MalformedURLException e) {
-            LOG.error("Unable to parse URL", e);        }
+            LOG.error("Unable to parse URL", e);
+        }
 
     }
 
@@ -92,18 +94,24 @@ public class Swagger2xSpecification extends APISpecification {
                 String port = url.getPort() == -1 ? ":" + url.getDefaultPort() : ":" + url.getPort();
                 if (port.equals(":443") || port.equals(":80")) port = "";
                 if (swagger.get("host") == null) {
-                    LOG.debug("Adding new host '" + url.getHost() + port + "' to Swagger-File based on backendBasePath: '" + backendBasePath + "'");
+                    LOG.debug("Adding new host {}{} to Swagger-File based on backendBasePath: {}", url.getHost(), port, backendBasePath);
                     ((ObjectNode) swagger).put("host", url.getHost() + port);
-                    LOG.info("Used the backendBasePath: '" + backendBasePath + "' to adjust the API-Specification.");
+                    LOG.info("Used the backendBasePath: {} to adjust host the API-Specification.", backendBasePath);
                 }
                 if (swagger.get("schemes") == null) {
                     ArrayNode newSchemes = this.mapper.createArrayNode();
                     newSchemes.add(url.getProtocol());
-                    LOG.debug("Adding protocol: '" + url.getProtocol() + "' to Swagger-Definition");
+                    LOG.debug("Adding protocol: {} to Swagger-Definition", url.getProtocol());
                     ((ObjectNode) swagger).set("schemes", newSchemes);
                 }
                 if (swagger.get("basePath") == null) {
+                    LOG.info("Adding default basePath / to swagger");
                     ((ObjectNode) swagger).put("basePath", "/"); // to adhere the spec - if basePath is empty, serve the traffic on / - Ref -> https://swagger.io/specification/v2/
+                }
+                if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
+                    String basePath = url.getPath();
+                    LOG.info("Overriding Swagger basePath with value : {}", basePath);
+                    ((ObjectNode) swagger).put("basePath", basePath);
                 }
                 this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
             }

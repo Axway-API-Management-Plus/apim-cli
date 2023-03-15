@@ -1,7 +1,6 @@
 package com.axway.apim.apiimport;
 
 import com.axway.apim.api.API;
-import com.axway.apim.lib.error.AppException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -24,7 +23,7 @@ public class ActualAPI extends API {
 	@JsonIgnore
 	private String actualState;
 
-	public ActualAPI() throws AppException {
+	public ActualAPI() {
 		super();
 	}
 

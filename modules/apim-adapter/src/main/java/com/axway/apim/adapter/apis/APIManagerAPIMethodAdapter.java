@@ -28,6 +28,7 @@ import java.util.Map;
 public class APIManagerAPIMethodAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerAPIMethodAdapter.class);
+    public static final String ERROR_CANT_LOAD_API_METHODS_FOR_API = "Error cant load API-Methods for API: '";
 
     ObjectMapper mapper = APIManagerAdapter.mapper;
 
@@ -49,7 +50,7 @@ public class APIManagerAPIMethodAdapter {
                 this.apiManagerResponse.put(apiId, EntityUtils.toString(httpResponse.getEntity()));
             }
         } catch (Exception e) {
-            throw new AppException("Error cant load API-Methods for API: '" + apiId + "' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+            throw new AppException(ERROR_CANT_LOAD_API_METHODS_FOR_API + apiId + "' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
 
@@ -60,7 +61,7 @@ public class APIManagerAPIMethodAdapter {
             apiMethods = mapper.readValue(this.apiManagerResponse.get(apiId), new TypeReference<List<APIMethod>>() {
             });
         } catch (IOException e) {
-            throw new AppException("Error cant load API-Methods for API: '" + apiId + "' from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
+            throw new AppException(ERROR_CANT_LOAD_API_METHODS_FOR_API + apiId + "' from API-Manager.", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
         return apiMethods;
     }
@@ -113,7 +114,7 @@ public class APIManagerAPIMethodAdapter {
                 }
             }
         } catch (Exception e) {
-            throw new AppException("Error cant load API-Methods for API: '" + apiMethod.getVirtualizedApiId() + "' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
+            throw new AppException(ERROR_CANT_LOAD_API_METHODS_FOR_API + apiMethod.getVirtualizedApiId() + "' from API-Manager", ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
 }

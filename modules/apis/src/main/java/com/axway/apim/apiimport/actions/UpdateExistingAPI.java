@@ -7,6 +7,7 @@ import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.ServiceProfile;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.lib.APIPropertiesExport;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +46,12 @@ public class UpdateExistingAPI {
             // Handle backendBasePath update
             if(changes.getBreakingChanges().contains("serviceProfiles")){
                 String backendBasePath = changes.getDesiredAPI().getServiceProfiles().get("_default").getBasePath();
-                ServiceProfile actualServiceProfile = changes.getActualAPI().getServiceProfiles().get("_default");
-                LOG.info("Replacing existing API backendBasePath {} with new value : {}", actualServiceProfile.getBasePath(), backendBasePath);
-                actualServiceProfile.setBasePath(backendBasePath);
-                apiManager.apiAdapter.updateAPIProxy(changes.getActualAPI());
+                if(backendBasePath != null && !CoreParameters.getInstance().isOverrideSpecBasePath()) {
+                    ServiceProfile actualServiceProfile = changes.getActualAPI().getServiceProfiles().get("_default");
+                    LOG.info("Replacing existing API backendBasePath {} with new value : {}", actualServiceProfile.getBasePath(), backendBasePath);
+                    actualServiceProfile.setBasePath(backendBasePath);
+                    apiManager.apiAdapter.updateAPIProxy(changes.getActualAPI());
+                }
             }
             // If image an include, update it
             if (changes.getAllChanges().contains("image")) {

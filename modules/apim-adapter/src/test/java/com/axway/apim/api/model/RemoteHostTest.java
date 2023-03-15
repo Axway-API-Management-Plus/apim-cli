@@ -103,11 +103,11 @@ public class RemoteHostTest extends WiremockWrapper {
 
     @Test
     public void createRemoteHost() throws IOException {
-        APIManagerAdapter.deleteInstance();
         CoreParameters coreParameters = new CoreParameters();
         coreParameters.setHostname("localhost");
         coreParameters.setUsername("test");
         coreParameters.setPassword(Utils.getEncryptedPassword());
+        APIManagerAdapter.deleteInstance();
         APIManagerAdapter.getInstance();
         List<RemoteHost> remoteHosts = mapper.readValue(remoteHostResponse, new TypeReference<List<RemoteHost>>() {
         });

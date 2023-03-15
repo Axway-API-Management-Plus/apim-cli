@@ -111,30 +111,27 @@ public class APIManagerRemoteHostsAdapter {
             mapper.registerModule(new SimpleModule().setSerializerModifier(new OrganizationSerializerModifier(false)));
             mapper.registerModule(new SimpleModule().setSerializerModifier(new UserSerializerModifier(false)));
             mapper.setSerializationInclusion(Include.NON_NULL);
-            try {
-                RestAPICall request;
-                if (actualRemoteHost == null) {
-                    String json = mapper.writeValueAsString(desiredRemoteHost);
-                    HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                    request = new POSTRequest(entity, uri);
-                } else {
-                    desiredRemoteHost.setId(actualRemoteHost.getId());
-                    desiredRemoteHost.setCreatedOn(actualRemoteHost.getCreatedOn());
-                    desiredRemoteHost.setCreatedBy(actualRemoteHost.getCreatedBy());
-                    String json = mapper.writeValueAsString(desiredRemoteHost);
-                    HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                    request = new PUTRequest(entity, uri);
+            RestAPICall request;
+            if (actualRemoteHost == null) {
+                String json = mapper.writeValueAsString(desiredRemoteHost);
+                HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+                request = new POSTRequest(entity, uri);
+            } else {
+                desiredRemoteHost.setId(actualRemoteHost.getId());
+                desiredRemoteHost.setCreatedOn(actualRemoteHost.getCreatedOn());
+                desiredRemoteHost.setCreatedBy(actualRemoteHost.getCreatedBy());
+                String json = mapper.writeValueAsString(desiredRemoteHost);
+                HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+                request = new PUTRequest(entity, uri);
+            }
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode < 200 || statusCode > 299) {
+                    String errorResponse = EntityUtils.toString(httpResponse.getEntity());
+                    LOG.error("Error creating/updating remote host. Response-Code: {}  Response Body: {}", statusCode, errorResponse);
+                    throw new AppException("Error creating/updating remote host. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
                 }
-                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
-                    if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error creating/updating remote host. Response-Code: {}  Response Body: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException("Error creating/updating remote host. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
-                    }
-                    createdRemoteHost = mapper.readValue(httpResponse.getEntity().getContent(), RemoteHost.class);
-                }
-            } catch (Exception e) {
-                throw new AppException("Error creating/updating remote host.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+                createdRemoteHost = mapper.readValue(httpResponse.getEntity().getContent(), RemoteHost.class);
             }
             desiredRemoteHost.setId(createdRemoteHost.getId());
         } catch (Exception e) {

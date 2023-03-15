@@ -21,7 +21,7 @@ import com.axway.apim.lib.error.AppException;
  */
 public class RecreateToUpdateAPI {
 	
-	static Logger LOG = LoggerFactory.getLogger(RecreateToUpdateAPI.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RecreateToUpdateAPI.class);
 
 	public void execute(APIChangeState changes) throws AppException {
 		

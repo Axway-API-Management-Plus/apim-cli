@@ -1,11 +1,13 @@
 package com.axway.apim.api.model;
 
+import com.axway.apim.lib.CoreParameters;
+
 import java.util.Objects;
 
 public class ServiceProfile {
 
 	String apiId;
-	
+
 	String basePath;
 
 	public String getApiId() {
@@ -38,11 +40,17 @@ public class ServiceProfile {
 		if (getClass() != obj.getClass())
 			return false;
 		ServiceProfile other = (ServiceProfile) obj;
-
 		// No need to compare apiId as desired state does not contain apiId
 		if (basePath == null) {
 			return other.basePath == null;
-		} else return basePath.equals(other.basePath);
+		} else{
+            if(CoreParameters.getInstance().isOverrideSpecBasePath()){
+               // The api config file backendBasepath contains resource path.
+                return other.basePath.contains(basePath);
+            }else {
+                return basePath.equals(other.basePath);
+            }
+        }
 	}
 
 	@Override

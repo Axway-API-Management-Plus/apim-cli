@@ -12,13 +12,13 @@ public class Response {
         this.statusCode = statusCode;
     }
 
-    public String getResponse() {
-        return response;
+    public String getResponseBody() {
+        return responseBody;
     }
 
-    public void setResponse(String response) {
-        this.response = response;
+    public void setResponseBody(String responseBody) {
+        this.responseBody = responseBody;
     }
 
-    private String response;
+    private String responseBody;
 }

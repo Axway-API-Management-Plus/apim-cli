@@ -41,7 +41,7 @@ public class ConsolePrinterAlerts {
 
 	public void export(Alerts alerts) throws AppException {
 		Console.println();
-		Console.println("Alerts for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
+		Console.println("Alerts for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getInstance().getApiManagerVersion());
 		Console.println();
 		print(alerts, alertsTypes);
 	}

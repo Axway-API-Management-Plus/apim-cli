@@ -2,6 +2,7 @@ package com.axway.apim.api.specification;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.specification.filter.JsonNodeOpenAPI3SpecFilter;
+import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.axway.apim.lib.utils.Utils;
@@ -101,8 +102,10 @@ public class OAS3xSpecification extends APISpecification {
                         JsonNode urlJsonNode = server.get("url");
                         if (urlJsonNode != null) {
                             String serverUrl = urlJsonNode.asText();
-                            if (!serverUrl.startsWith("http")) { // If url does not have hostname, add hostname from backendBasePath
-                               updateServerSection(backendBasePath, serverUrl);
+                            if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
+                                overrideServerSection(backendBasePath); // override openapi url with backendBaseapath
+                            } else if (!serverUrl.startsWith("http")) { // If url does not have hostname, add hostname from backendBasepath
+                                updateServerSection(backendBasePath, serverUrl);
                             }
                         }
                     }
@@ -120,6 +123,14 @@ public class OAS3xSpecification extends APISpecification {
         String ignoreBasePath = Utils.ignoreBasePath(backendBasePath);
         backendBasePath = Utils.handleOpenAPIServerUrl(serverUrl, ignoreBasePath);
         LOG.info("Updating openapi Servers url with value : {}", backendBasePath);
+        ObjectNode newServer = createObjectNode("url", backendBasePath);
+        ((ObjectNode) openAPI).set(SERVERS, mapper.createArrayNode().add(newServer));
+    }
+
+    public void overrideServerSection(String backendBasePath) {
+        if (backendBasePath.endsWith("/"))
+            backendBasePath = backendBasePath.substring(0, backendBasePath.length() - 1);
+        LOG.info("overriding openapi Servers url with value : {}", backendBasePath);
         ObjectNode newServer = createObjectNode("url", backendBasePath);
         ((ObjectNode) openAPI).set(SERVERS, mapper.createArrayNode().add(newServer));
     }

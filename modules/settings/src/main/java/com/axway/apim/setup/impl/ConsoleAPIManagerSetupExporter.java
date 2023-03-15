@@ -2,12 +2,12 @@ package com.axway.apim.setup.impl;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.RemoteHostFilter;
-import com.axway.apim.api.model.APIManagerConfig;
 import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
+import com.axway.apim.setup.model.APIManagerConfig;
 
 public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler {
 	
@@ -50,7 +50,7 @@ public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler
 		}
 		
 		if(params.isExportCustomProperties()) {
-			Console.println("Configured custom properties for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getApiManagerVersion());
+			Console.println("Configured custom properties for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getInstance().getApiManagerVersion());
 			ConsolePrinterCustomProperties propertiesPrinter = new ConsolePrinterCustomProperties();
 			for(Type type: Type.values()) {
 				propertiesPrinter.addProperties(adapter.customPropertiesAdapter.getCustomProperties(type), type);

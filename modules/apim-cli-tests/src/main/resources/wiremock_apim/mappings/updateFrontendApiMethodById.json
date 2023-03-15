@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "PUT",
+    "url": "/api/portal/v1.4/proxies/e4ded8c8-0a40-4b50-bc13-552fb7209150/operations/bf742930-5fdd-4e49-b9ae-b8fdecd37ffa"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "update_frontend_api_by_id_method.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

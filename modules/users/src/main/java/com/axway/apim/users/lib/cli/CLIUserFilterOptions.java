@@ -9,7 +9,8 @@ import com.axway.apim.lib.error.AppException;
 import com.axway.apim.users.lib.params.UserFilterParams;
 
 public class CLIUserFilterOptions extends CLIOptions {
-	
+
+	public static final String ENABLED = "enabled";
 	private final CLIOptions cliOptions;
 
 	public CLIUserFilterOptions(CLIOptions cliOptions) {
@@ -27,8 +28,8 @@ public class CLIUserFilterOptions extends CLIOptions {
 		params.setOrg(getValue("org"));
 		params.setRole(getValue("role"));
 		params.setState(getValue("state"));
-		if(getValue("enabled")!=null) {
-			params.setEnabled(Boolean.parseBoolean(getValue("enabled")));
+		if(getValue(ENABLED)!=null) {
+			params.setEnabled(Boolean.parseBoolean(getValue(ENABLED)));
 		}
 		params.setId(getValue("id"));
 		
@@ -102,7 +103,7 @@ public class CLIUserFilterOptions extends CLIOptions {
 		option.setArgName("approved|pending");
 		addOption(option);
 		
-		option = new  Option("enabled", true, "Filter users based on the enablement flag. By default enabled users are include by default.");
+		option = new  Option(ENABLED, true, "Filter users based on the enablement flag. By default enabled users are include by default.");
 		option.setRequired(false);
 		option.setArgName("true|false");
 		addOption(option);

@@ -16,8 +16,6 @@ import java.util.Objects;
 
 public class OutboundProfile extends Profile {
 
-    protected static Logger LOG = LoggerFactory.getLogger(OutboundProfile.class);
-
     String routeType;
 
     @JsonDeserialize(using = PolicyDeserializer.class)
@@ -140,14 +138,6 @@ public class OutboundProfile extends Profile {
             OutboundProfile otherOutboundProfile = (OutboundProfile) other;
             List<Object> otherParameters = otherOutboundProfile.getParameters();
             List<Object> thisParameters = this.getParameters();
-            if (APIManagerAdapter.hasAPIManagerVersion("7.7 SP1")) {
-                // Passwords no longer exposed by API-Manager REST-API - Can't use it anymore to
-                // compare the state
-                if (otherParameters != null)
-                    otherParameters.remove("password");
-                if (thisParameters != null)
-                    thisParameters.remove("password");
-            }
             return policiesAreEqual(this.getFaultHandlerPolicy(), otherOutboundProfile.getFaultHandlerPolicy())
                     && policiesAreEqual(this.getRequestPolicy(), otherOutboundProfile.getRequestPolicy())
                     && policiesAreEqual(this.getResponsePolicy(), otherOutboundProfile.getResponsePolicy())
