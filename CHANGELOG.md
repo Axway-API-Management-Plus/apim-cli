@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.13.5] In progress
+## [1.13.5] 2023-03-15
 
 ### Fixed
 - apim does not import the whole chain in a PEM certificate (See issue [#361](https://github.com/Axway-API-Management-Plus/apim-cli/issues/361))
