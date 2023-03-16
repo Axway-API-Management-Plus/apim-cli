@@ -523,7 +523,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
 
         Assert.assertNotNull(api.getSystemQuota(), "Should have a system quota");
         Assert.assertEquals(api.getSystemQuota().getRestrictions().size(), 1, "Expected one system quota restrictions");
-        Assert.assertEquals(api.getSystemQuota().getRestrictions().get(0).getType(), QuotaRestrictiontype.throttle);
+        Assert.assertEquals(api.getSystemQuota().getRestrictions().get(0).getType(), QuotaRestrictionType.throttle);
         Assert.assertEquals(api.getSystemQuota().getRestrictions().get(0).getConfig().get("messages"), "1000");
         Assert.assertEquals(api.getSystemQuota().getRestrictions().get(0).getConfig().get("period"), "second");
         Assert.assertEquals(api.getSystemQuota().getRestrictions().get(0).getConfig().get("per"), "2");

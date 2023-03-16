@@ -1,6 +1,6 @@
 package com.axway.apim.api.model;
 
-public enum QuotaRestrictiontype {
-	throttle, 
+public enum QuotaRestrictionType {
+	throttle,
 	throttlemb
 }

@@ -7,7 +7,7 @@ import com.axway.apim.adapter.apis.APIManagerAPIMethodAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.QuotaRestriction;
-import com.axway.apim.api.model.QuotaRestrictiontype;
+import com.axway.apim.api.model.QuotaRestrictionType;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
 import com.fasterxml.jackson.core.JsonParser;
@@ -67,7 +67,7 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
 
         QuotaRestriction restriction = new QuotaRestriction();
         try {
-            restriction.setType(QuotaRestrictiontype.valueOf(type));
+            restriction.setType(QuotaRestrictionType.valueOf(type));
         } catch (IllegalArgumentException e) {
             throw new AppException("Invalid quota config. The restriction type: " + type + " is invalid.", ErrorCode.INVALID_QUOTA_CONFIG);
         }
@@ -157,11 +157,11 @@ public class QuotaRestrictionDeserializer extends JsonDeserializer<QuotaRestrict
     }
 
     private void validateRestriction(QuotaRestriction restriction) throws AppException {
-        if (restriction.getType() == QuotaRestrictiontype.throttlemb) {
+        if (restriction.getType() == QuotaRestrictionType.throttlemb) {
             if (restriction.getConfig().get(PERIOD) == null || restriction.getConfig().get("per") == null || restriction.getConfig().get("mb") == null) {
                 throw new AppException("Invalid quota config. For type 'throttlemb' the following configs are required: period, per, mb", ErrorCode.INVALID_QUOTA_CONFIG);
             }
-        } else if (restriction.getType() == QuotaRestrictiontype.throttle) {
+        } else if (restriction.getType() == QuotaRestrictionType.throttle) {
             if (restriction.getConfig().get(PERIOD) == null || restriction.getConfig().get("per") == null || restriction.getConfig().get(MESSAGES) == null) {
                 throw new AppException("Invalid quota config. For type 'throttle' the following configs are required: period, per, messages", ErrorCode.INVALID_QUOTA_CONFIG);
             }
