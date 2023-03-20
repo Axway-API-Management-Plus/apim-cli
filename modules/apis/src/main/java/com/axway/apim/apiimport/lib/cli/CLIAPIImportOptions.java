@@ -92,13 +92,9 @@ public class CLIAPIImportOptions extends CLIOptions {
 		option.setRequired(false);
 		addOption(option);
 
-		option = new Option("zeroDowntimeUpdate", "Always update a published APIs by creating a new API and switch clients to it. Defaults to false");
+		option = new Option("zeroDowntimeUpdate", true,"Always update a published APIs by creating a new API and switch clients to it. Defaults to false");
 		option.setRequired(false);
 		addOption(option);
-
-        option = new Option("overrideSpecBasePath", "Override API Specification ( open api, Swagger 2)  Base Path");
-        option.setRequired(false);
-        addOption(option);
 	}
 
 	@Override
