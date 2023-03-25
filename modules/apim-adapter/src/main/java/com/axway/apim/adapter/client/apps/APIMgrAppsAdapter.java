@@ -81,8 +81,8 @@ public class APIMgrAppsAdapter {
                 requestedId = "/" + filter.getApplicationId();
             }
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + requestedId)
-                    .addParameters(filter.getFilters())
-                    .build();
+                .addParameters(filter.getFilters())
+                .build();
             LOG.debug("Sending request to find existing applications: {}", uri);
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
@@ -113,8 +113,8 @@ public class APIMgrAppsAdapter {
             requestedId = "/" + filter.getApplicationId();
         }
         return new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + requestedId)
-                .addParameters(filter.getFilters())
-                .build();
+            .addParameters(filter.getFilters())
+            .build();
     }
 
     public List<ClientApplication> getApplications(ClientAppFilter filter, boolean logProgress) throws AppException {
@@ -212,7 +212,7 @@ public class APIMgrAppsAdapter {
                 TypeReference<List<ClientAppCredential>> classType = classTypes[i];
                 if (!applicationsCredentialCache.containsKey(app.getId() + "|" + type)) {
                     URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/" + type)
-                            .build();
+                        .build();
                     RestAPICall getRequest = new GETRequest(uri);
                     try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                         response = EntityUtils.toString(httpResponse.getEntity());
@@ -239,7 +239,7 @@ public class APIMgrAppsAdapter {
         String endpoint = "oauthresource";
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/" + endpoint)
-                    .build();
+                .build();
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
@@ -263,7 +263,7 @@ public class APIMgrAppsAdapter {
         if (!includeApplicationPermissions) return;
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/permissions")
-                    .build();
+                .build();
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                 String response = EntityUtils.toString(httpResponse.getEntity());
@@ -303,7 +303,7 @@ public class APIMgrAppsAdapter {
         URI uri;
         if (app.getImageUrl() == null) return;
         uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/image")
-                .build();
+            .build();
         Image image = APIManagerAdapter.getImageFromAPIM(uri, "app-image");
         app.setImage(image);
     }
@@ -337,14 +337,14 @@ public class APIMgrAppsAdapter {
                 RestAPICall request;
                 if (actualApp == null) {
                     FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-                            SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "appScopes", "permissions"));
+                        SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "appScopes", "permissions"));
                     mapper.setFilterProvider(filter);
                     String json = mapper.writeValueAsString(desiredApp);
                     HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
                     request = new POSTRequest(entity, uri);
                 } else {
                     FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-                            SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "apis", "appScopes", "permissions"));
+                        SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "apis", "appScopes", "permissions"));
                     mapper.setFilterProvider(filter);
                     String json = mapper.writeValueAsString(desiredApp);
                     HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
@@ -385,8 +385,8 @@ public class APIMgrAppsAdapter {
         if (actualApp != null && app.getImage().equals(actualApp.getImage())) return;
         URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/image").build();
         HttpEntity entity = MultipartEntityBuilder.create()
-                .addBinaryBody("file", app.getImage().getInputStream(), ContentType.create("image/jpeg"), app.getImage().getBaseFilename())
-                .build();
+            .addBinaryBody("file", app.getImage().getInputStream(), ContentType.create("image/jpeg"), app.getImage().getBaseFilename())
+            .build();
         RestAPICall apiCall = new POSTRequest(entity, uri);
         try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
             int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -411,7 +411,7 @@ public class APIMgrAppsAdapter {
             if (cred instanceof OAuth) {
                 endpoint = "oauth";
                 filter = new SimpleFilterProvider().setDefaultFilter(
-                        SimpleBeanPropertyFilter.serializeAllExcept("credentialType", "clientId", "apiKey"));
+                    SimpleBeanPropertyFilter.serializeAllExcept("credentialType", "clientId", "apiKey"));
                 final String credentialId = ((OAuth) cred).getClientId();
                 Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
                 if (opt.isPresent()) {
@@ -428,7 +428,7 @@ public class APIMgrAppsAdapter {
                 final String credentialId = ((ExtClients) cred).getClientId();
                 endpoint = "extclients";
                 filter = new SimpleFilterProvider().setDefaultFilter(
-                        SimpleBeanPropertyFilter.serializeAllExcept("credentialType", "apiKey", "applicationId"));
+                    SimpleBeanPropertyFilter.serializeAllExcept("credentialType", "apiKey", "applicationId"));
                 Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
                 if (opt.isPresent()) {
                     LOG.info("Found extclients credential with same ID");
@@ -443,7 +443,7 @@ public class APIMgrAppsAdapter {
                 final String credentialId = ((APIKey) cred).getApiKey();
                 endpoint = "apikeys";
                 filter = new SimpleFilterProvider().setDefaultFilter(
-                        SimpleBeanPropertyFilter.serializeAllExcept("credentialType", "clientId", "apiKey"));
+                    SimpleBeanPropertyFilter.serializeAllExcept("credentialType", "clientId", "apiKey"));
                 Optional<ClientAppCredential> opt = searchForExistingCredential(actualApp, credentialId);
                 if (opt.isPresent()) {
                     LOG.info("Found apikey credential with same ID");
@@ -498,7 +498,21 @@ public class APIMgrAppsAdapter {
 
     }
 
-    private void saveQuota(ClientApplication app, ClientApplication actualApp) throws AppException {
+    public RestAPICall createUpsertUri(HttpEntity entity, URI uri, ClientApplication actualApp) {
+        RestAPICall request;
+        if (actualApp == null) {
+            request = new POSTRequest(entity, uri);
+        } else {
+            if (actualApp.getAppQuota() == null) { // fix #371
+                request = new POSTRequest(entity, uri);
+            } else {
+                request = new PUTRequest(entity, uri);
+            }
+        }
+        return request;
+    }
+
+    public void saveQuota(ClientApplication app, ClientApplication actualApp) throws AppException {
         if (app.getAppQuota() == null || app.getAppQuota().getRestrictions().isEmpty()) return;
         if (actualApp != null && app.getAppQuota().equals(actualApp.getAppQuota())) return;
         if (!APIManagerAdapter.hasAdminAccount()) {
@@ -513,12 +527,7 @@ public class APIMgrAppsAdapter {
             String json = mapper.writeValueAsString(app.getAppQuota());
             HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
             // Use an admin account for this request
-            RestAPICall request;
-            if (actualApp == null) {
-                request = new POSTRequest(entity, uri);
-            } else {
-                request = new PUTRequest(entity, uri);
-            }
+            RestAPICall request = createUpsertUri(entity, uri, actualApp);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
@@ -566,7 +575,7 @@ public class APIMgrAppsAdapter {
                     LOG.debug("Oauth resource not found, creating");
                 }
                 FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-                        SimpleBeanPropertyFilter.serializeAllExcept("scopes", "enabled"));
+                    SimpleBeanPropertyFilter.serializeAllExcept("scopes", "enabled"));
                 mapper.setFilterProvider(filter);
                 mapper.setSerializationInclusion(Include.NON_NULL);
                 String json = mapper.writeValueAsString(res);
@@ -638,7 +647,7 @@ public class APIMgrAppsAdapter {
         // finally iterate over all existing scopes and check if they are still desired
         for (ClientAppOauthResource existingScope : existingScopes) {
             boolean actualScopeFound = false;
-            if( desiredScopes != null) {
+            if (desiredScopes != null) {
                 for (ClientAppOauthResource desiredScope : desiredScopes) {
                     if (existingScope.getScope().equals(desiredScope.getScope())) {
                         actualScopeFound = true;
@@ -717,7 +726,7 @@ public class APIMgrAppsAdapter {
                     LOG.debug("Application permission not found, creating it.");
                 }
                 FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-                        SimpleBeanPropertyFilter.serializeAllExcept("user"));
+                    SimpleBeanPropertyFilter.serializeAllExcept("user"));
                 mapper.setFilterProvider(filter);
                 mapper.setSerializationInclusion(Include.NON_NULL);
                 String json = mapper.writeValueAsString(appPerm);

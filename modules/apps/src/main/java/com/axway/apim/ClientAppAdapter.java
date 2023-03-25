@@ -8,31 +8,32 @@ import java.util.List;
 
 public abstract class ClientAppAdapter {
 
-	protected List<ClientApplication> apps;
-	
-	protected Result result;
+    protected List<ClientApplication> apps;
 
-	protected ClientAppAdapter() {
+    protected Result result;
 
-	}
-	
-	/**
-	 * Returns a list of application according to the provided filter
-	 * @return applications according to the provided filter
-	 * @throws AppException when something goes wrong
-	 */
-	public List<ClientApplication> getApplications() throws AppException {
-		if(this.apps==null) readConfig();
-		return this.apps;
-	}
-	
-	protected abstract void readConfig() throws AppException;
+    protected ClientAppAdapter() {
 
-	public Result getResult() {
-		return result;
-	}
+    }
 
-	public void setResult(Result result) {
-		this.result = result;
-	}
+    /**
+     * Returns a list of application according to the provided filter
+     *
+     * @return applications according to the provided filter
+     * @throws AppException when something goes wrong
+     */
+    public List<ClientApplication> getApplications() throws AppException {
+        if (this.apps == null) readConfig();
+        return this.apps;
+    }
+
+    protected abstract void readConfig() throws AppException;
+
+    public Result getResult() {
+        return result;
+    }
+
+    public void setResult(Result result) {
+        this.result = result;
+    }
 }

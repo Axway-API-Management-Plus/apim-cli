@@ -1,5 +1,6 @@
 package com.axway.apim.api.model;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -73,7 +74,7 @@ public class APIQuota {
         if (other == null) return false;
         if (other instanceof APIQuota) {
             APIQuota apiQuota = (APIQuota) other;
-            return apiQuota.getRestrictions().equals(this.getRestrictions());
+            return new HashSet<>(apiQuota.getRestrictions()).containsAll(this.getRestrictions());
         } else {
             return false;
         }
