@@ -9,8 +9,6 @@ import com.axway.apim.lib.error.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-
 public class ClientAppImportManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClientAppImportManager.class);
@@ -55,7 +53,7 @@ public class ClientAppImportManager {
         return
             desiredApp.equals(actualApp) &&
                 (desiredApp.getApiAccess() == null || desiredApp.getApiAccess().equals(actualApp.getApiAccess())) &&
-                (desiredApp.getPermissions() == null || new HashSet<>(desiredApp.getPermissions()).containsAll(actualApp.getPermissions())) &&
+                (desiredApp.getPermissions() == null || desiredApp.getPermissions().containsAll(actualApp.getPermissions())) &&
                 (desiredApp.getAppQuota() == null ||  desiredApp.getAppQuota().equals(actualApp.getAppQuota()));
     }
 
