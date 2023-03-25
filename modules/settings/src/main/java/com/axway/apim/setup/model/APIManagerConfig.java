@@ -9,12 +9,14 @@ import java.util.Map;
 
 @JsonFilter("APIManagerConfigFilter")
 public class APIManagerConfig {
-	
+
 	private Config config;
-	
+
 	private Map<String, RemoteHost> remoteHosts;
-	
+
 	private Alerts alerts;
+
+    private Quotas quotas;
 
 	public Config getConfig() {
 		return config;
@@ -39,4 +41,12 @@ public class APIManagerConfig {
 	public void setAlerts(Alerts alerts) {
 		this.alerts = alerts;
 	}
+
+    public Quotas getQuotas() {
+        return quotas;
+    }
+
+    public void setQuotas(Quotas quotas) {
+        this.quotas = quotas;
+    }
 }
