@@ -196,8 +196,6 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 
     public void upsertGlobalQuota(Quotas quotas) throws AppException {
         APIManagerAdapter adapter = APIManagerAdapter.getInstance();
-        QuotaRestriction applicationQuotaRestriction = quotas.getApplicationQuota();
-
         QuotaRestriction systemQuotaRestriction = quotas.getSystemQuota();
         if (systemQuotaRestriction != null) {
             LOG.debug("Updating System Global Quota : {}", systemQuotaRestriction);
@@ -210,11 +208,13 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
                         LOG.debug("Removing exiting System Global Quota for update");
                     }
                 }
-                systemQuota.getRestrictions().add(applicationQuotaRestriction);
+                systemQuota.getRestrictions().add(systemQuotaRestriction);
             }
             adapter.quotaAdapter.saveQuota(systemQuota, APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId());
             LOG.debug("System Global Quota is updated");
         }
+
+        QuotaRestriction applicationQuotaRestriction = quotas.getApplicationQuota();
         if (applicationQuotaRestriction != null) {
             LOG.debug("Updating Application Global Quota : {}", applicationQuotaRestriction);
             APIQuota applicationQuota = adapter.quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT);
