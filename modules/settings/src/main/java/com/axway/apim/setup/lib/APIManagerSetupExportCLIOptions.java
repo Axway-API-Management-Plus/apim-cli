@@ -12,7 +12,7 @@ public class APIManagerSetupExportCLIOptions extends CLIOptions {
 	private APIManagerSetupExportCLIOptions(String[] args) {
 		super(args);
 	}
-	
+
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new APIManagerSetupExportCLIOptions(args);
 		cliOptions = new StandardExportCLIOptions(cliOptions);
@@ -26,14 +26,14 @@ public class APIManagerSetupExportCLIOptions extends CLIOptions {
 	public void addOptions() {
 		Option option = new Option("type", true, "Limit the configuration with a comma separated list. (config|alerts|remotehosts|policies|customProperties). If not given everything is exported. Policies and Custom-Properties configuration are printed on console only.");
 		option.setRequired(false);
-		option.setArgName("config,alerts,remotehosts,policies");
+		option.setArgName("config,alerts,remotehosts,policies,globalquotas");
 		addOption(option);
-		
+
 		option = new  Option("n", "name", true, "Filter based on the name. Wildcards are supported. Actually only remote hosts are using this filter.");
 		option.setRequired(false);
 		option.setArgName("*backendhost.com");
 		addOption(option);
-		
+
 		option = new  Option("id", true, "Filter on given ID. Actually only remote hosts are using this filter.");
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-REMOTE-HOST");
@@ -63,7 +63,7 @@ public class APIManagerSetupExportCLIOptions extends CLIOptions {
 	protected String getAppName() {
 		return "Configuration-Export";
 	}
-	
+
 	@Override
 	public APIManagerSetupExportParams getParams() {
 		APIManagerSetupExportParams params = new APIManagerSetupExportParams();

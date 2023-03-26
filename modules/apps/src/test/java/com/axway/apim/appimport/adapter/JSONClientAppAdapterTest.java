@@ -5,7 +5,7 @@ import com.axway.apim.WiremockWrapper;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.QuotaRestriction;
-import com.axway.apim.api.model.QuotaRestrictiontype;
+import com.axway.apim.api.model.QuotaRestrictionType;
 import com.axway.apim.api.model.apps.*;
 import com.axway.apim.appimport.lib.AppImportParams;
 import com.axway.apim.lib.error.AppException;
@@ -147,7 +147,7 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         QuotaRestriction restr = appQuota.getRestrictions().get(0);
         assertEquals(restr.getApiId(), "*");
         assertEquals(restr.getMethod(), "*");
-        assertEquals(restr.getType(), QuotaRestrictiontype.throttle);
+        assertEquals(restr.getType(), QuotaRestrictionType.throttle);
         assertEquals(restr.getConfig().get("messages"), "9999");
         assertEquals(restr.getConfig().get("period"), "week");
         assertEquals(restr.getConfig().get("per"), "1");
@@ -187,7 +187,7 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
 
         assertEquals(restr1.getApiId(), "*");
         assertEquals(restr1.getMethod(), "*");
-        assertEquals(restr1.getType(), QuotaRestrictiontype.throttle);
+        assertEquals(restr1.getType(), QuotaRestrictionType.throttle);
         assertEquals(restr1.getConfig().get("messages"), "9999");
         assertEquals(restr1.getConfig().get("period"), "week");
         assertEquals(restr1.getConfig().get("per"), "1");
@@ -226,7 +226,7 @@ public class JSONClientAppAdapterTest extends WiremockWrapper {
         assertEquals(restr1.getRestrictedAPI().getName(), "petstore3");
         assertEquals(restr1.getRestrictedAPI().getPath(), "/api/v3");
         assertEquals(restr1.getMethod(), "*");
-        assertEquals(restr1.getType(), QuotaRestrictiontype.throttle);
+        assertEquals(restr1.getType(), QuotaRestrictionType.throttle);
         assertEquals(restr1.getConfig().get("messages"), "9999");
         assertEquals(restr1.getConfig().get("period"), "week");
         assertEquals(restr1.getConfig().get("per"), "1");

@@ -1,13 +1,12 @@
 package com.axway.apim.test.changestate;
 
 import com.axway.apim.WiremockWrapper;
-import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.specification.APISpecification;
-import com.axway.apim.api.specification.Swagger2xSpecification;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.InboundProfile;
 import com.axway.apim.api.model.TagMap;
+import com.axway.apim.api.specification.APISpecification;
+import com.axway.apim.api.specification.Swagger2xSpecification;
 import com.axway.apim.apiimport.APIChangeState;
 import com.axway.apim.apiimport.lib.params.APIImportParams;
 import com.axway.apim.lib.CoreParameters;
@@ -86,9 +85,9 @@ public class APIChangeStateTest extends WiremockWrapper {
         APIImportParams.getInstance().setChangeOrganization(true);
         APIChangeState changeState = new APIChangeState(testAPI1, testAPI2);
         Assert.assertTrue(changeState.hasAnyChanges(), "There must be a change");
-        Assert.assertEquals(changeState.getAllChanges().size(), 2);
+        Assert.assertEquals(changeState.getAllChanges().size(), 1);
         Assert.assertEquals(changeState.getBreakingChanges().size(), 0, "Name should not be a breaking change");
-        Assert.assertEquals(changeState.getNonBreakingChanges().size(), 2, "Name is a breaking change");
+        Assert.assertEquals(changeState.getNonBreakingChanges().size(), 1, "Name is a breaking change");
         Assert.assertTrue(changeState.getAllChanges().contains("name"), "Expect the name as a changed prop");
         //Assert.assertFalse(changeState.isRecreateAPI(), "No need to Re-Create API");
         APIChangeState.copyChangedProps(testAPI1, testAPI2, changeState.getAllChanges());

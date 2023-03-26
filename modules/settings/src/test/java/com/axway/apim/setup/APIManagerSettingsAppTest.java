@@ -27,14 +27,14 @@ public class APIManagerSettingsAppTest extends WiremockWrapper {
 
     @Test
     public void exportConfigJson() {
-        String[] args = {"-h", "localhost", "-type", "config,alerts,remotehosts", "-o", "json", "-deleteTarget"};
+        String[] args = {"-h", "localhost", "-type", "config,alerts,remotehosts,globalquotas", "-o", "json", "-deleteTarget"};
         int returnCode = APIManagerSettingsApp.exportConfig(args);
         Assert.assertEquals(returnCode, 0);
     }
 
     @Test
     public void exportConfigYaml() {
-        String[] args = {"-h", "localhost", "-type", "config,alerts,remotehosts", "-o", "yaml", "-deleteTarget"};
+        String[] args = {"-h", "localhost", "-type", "config,alerts,remotehosts,globalquotas", "-o", "yaml", "-deleteTarget"};
         int returnCode = APIManagerSettingsApp.exportConfig(args);
         Assert.assertEquals(returnCode, 0);
     }
@@ -53,6 +53,15 @@ public class APIManagerSettingsAppTest extends WiremockWrapper {
         ClassLoader classLoader = this.getClass().getClassLoader();
         String configFile = classLoader.getResource("com/axway/apim/setup/adapter/two-remotehosts-config.json").getFile();
         String[] args = {"-h", "localhost", "-c", configFile, "-type", "remotehosts"};
+        int returnCode = APIManagerSettingsApp.importConfig(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
+    public void importGlobalQuotas() {
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        String configFile = classLoader.getResource("com/axway/apim/setup/adapter/global-quotas.json").getFile();
+        String[] args = {"-h", "localhost", "-c", configFile, "-type", "globalquotas"};
         int returnCode = APIManagerSettingsApp.importConfig(args);
         Assert.assertEquals(returnCode, 0);
     }

@@ -38,7 +38,7 @@ public class APISpecificationSwagger2xTest {
 
     @Test
     public void backendHostAndBasePath() throws IOException {
-
+        CoreParameters.getInstance().setOverrideSpecBasePath(false);
         byte[] content = getSwaggerContent(testPackage + "/petstore.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
         apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v1/myAPI", null);
@@ -54,6 +54,7 @@ public class APISpecificationSwagger2xTest {
 
     @Test
     public void backendHostOnly() throws IOException {
+        CoreParameters.getInstance().setOverrideSpecBasePath(false);
         byte[] content = getSwaggerContent(testPackage + "/petstore.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
         apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
@@ -68,6 +69,7 @@ public class APISpecificationSwagger2xTest {
 
     @Test
     public void backendHostBasisBasePath() throws IOException {
+        CoreParameters.getInstance().setOverrideSpecBasePath(false);
         byte[] content = getSwaggerContent(testPackage + "/petstore.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
         apiDefinition.configureBasePath("https://myhost.customer.com/", null);
@@ -97,6 +99,7 @@ public class APISpecificationSwagger2xTest {
 
     @Test
     public void backendBasepathChangesNothing() throws IOException {
+        CoreParameters.getInstance().setOverrideSpecBasePath(false);
         byte[] content = getSwaggerContent(testPackage + "/petstore-only-https-scheme.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
         apiDefinition.configureBasePath("https://petstore.swagger.io", null);
@@ -111,7 +114,7 @@ public class APISpecificationSwagger2xTest {
 
     @Test
     public void testWithoutBackendBasepath() throws IOException {
-
+        CoreParameters.getInstance().setOverrideSpecBasePath(false);
         byte[] content = getSwaggerContent(testPackage + "/petstore.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
 
@@ -125,6 +128,7 @@ public class APISpecificationSwagger2xTest {
 
     @Test
     public void testPetstoreFiltered() throws IOException {
+        CoreParameters.getInstance().setOverrideSpecBasePath(false);
         DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
         APISpecificationFilter filterConfig = new APISpecificationFilter();
         filterConfig.addInclude(new String[]{"/pet/findByStatus:GET"}, null);
@@ -154,6 +158,7 @@ public class APISpecificationSwagger2xTest {
 
     @Test
     public void testPetstoreFilteredWithTagsAndPaths() throws IOException {
+        CoreParameters.getInstance().setOverrideSpecBasePath(false);
         DesiredAPISpecification desiredAPISpec = new DesiredAPISpecification();
         APISpecificationFilter filterConfig = new APISpecificationFilter();
         filterConfig.addInclude(new String[]{"/user/{username}:*"}, null);
@@ -197,7 +202,7 @@ public class APISpecificationSwagger2xTest {
 
     @Test(expectedExceptions = AppException.class, expectedExceptionsMessageRegExp = "The configured backendBasePath: 'An-Invalid-URL' is invalid.")
     public void testInvalidBackendBasepath() throws IOException {
-
+        CoreParameters.getInstance().setOverrideSpecBasePath(false);
         byte[] content = getSwaggerContent(testPackage + "/petstore.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
         apiDefinition.configureBasePath("An-Invalid-URL", null);

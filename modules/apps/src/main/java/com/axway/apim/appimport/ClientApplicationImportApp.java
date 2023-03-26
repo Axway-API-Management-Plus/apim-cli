@@ -19,14 +19,14 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class ClientApplicationImportApp implements APIMCLIServiceProvider {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(ClientApplicationImportApp.class);
 
 	@Override
 	public String getName() {
 		return "Application - I M P O R T";
 	}
-	
+
 	@Override
 	public String getVersion() {
 		return ClientApplicationImportApp.class.getPackage().getImplementationVersion();
@@ -36,12 +36,12 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 	public String getGroupId() {
 		return "app";
 	}
-	
+
 	@Override
 	public String getGroupDescription() {
 		return "Manage your applications";
 	}
-	
+
 	@CLIServiceMethod(name = "import", description = "Import application(s) into the API-Manager")
 	public static int importApp(String[] args) {
 		AppImportParams params;
@@ -62,12 +62,12 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			APIMHttpClient.deleteInstances();
-			
+
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the application
 			ClientAppAdapter desiredAppsAdapter = new ClientAppConfigAdapter(params, result);
 			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
-			ClientAppImportManager importManager = new ClientAppImportManager(desiredAppsAdapter);
+			ClientAppImportManager importManager = new ClientAppImportManager();
 			for(ClientApplication desiredApp : desiredApps) {
 				//I'm reading customProps from desiredApp, what if the desiredApp has no customProps and actualApp has many?
 				ClientApplication actualApp = APIManagerAdapter.getInstance().appAdapter.getApplication(new ClientAppFilter.Builder()
