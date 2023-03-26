@@ -1,0 +1,24 @@
+{
+  "quotas": {
+    "systemQuota": {
+      "method": "*",
+      "type": "throttle",
+      "config": {
+        "messages": "10000",
+        "period": "second",
+        "per": "1"
+      },
+      "api": "*"
+    },
+    "applicationQuota": {
+      "method": "*",
+      "type": "throttle",
+      "config": {
+        "messages": "1000",
+        "period": "second",
+        "per": "2"
+      },
+      "api": "*"
+    }
+  }
+}

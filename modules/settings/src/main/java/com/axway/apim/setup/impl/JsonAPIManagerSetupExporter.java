@@ -26,6 +26,7 @@ import java.io.IOException;
 
 public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
     private static final Logger LOG = LoggerFactory.getLogger(JsonAPIManagerSetupExporter.class);
+
     public JsonAPIManagerSetupExporter(APIManagerSetupExportParams params, ExportResult result) {
         super(params, result);
     }
@@ -65,21 +66,23 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
         }
         ObjectMapper mapper;
         String configFile;
-        if(apiManagerSetupResultHandler instanceof YamlAPIManagerSetupExporter){
+        if (apiManagerSetupResultHandler instanceof YamlAPIManagerSetupExporter) {
             mapper = new ObjectMapper(new YAMLFactory());
             configFile = "/apimanager-config.yaml";
-        }else {
+        } else {
             mapper = new ObjectMapper();
             configFile = "/apimanager-config.json";
         }
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
             mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(true)));
             mapper.registerModule(new SimpleModule().setSerializerModifier(new UserSerializerModifier(true)));
             FilterProvider filters = new SimpleFilterProvider()
-                    .addFilter("RemoteHostFilter", SimpleBeanPropertyFilter.serializeAllExcept("id", "organizationId"))
-                    .addFilter("APIManagerConfigFilter", SimpleBeanPropertyFilter.serializeAllExcept("os", "architecture", "productVersion", "baseOAuth"))
-                    .setFailOnUnknownId(false);
+                .addFilter("RemoteHostFilter", SimpleBeanPropertyFilter.serializeAllExcept("id", "organizationId"))
+                .addFilter("APIManagerConfigFilter", SimpleBeanPropertyFilter.serializeAllExcept("os", "architecture", "productVersion", "baseOAuth"))
+                .addFilter("QuotaRestrictionFilter", SimpleBeanPropertyFilter.serializeAllExcept( "apiId")) // Is handled in ExportApplication
+                .setFailOnUnknownId(false);
             mapper.setFilterProvider(filters);
             mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), apimanagerConfig);
             result.addExportedFile(localFolder.getCanonicalPath() + configFile);
@@ -101,7 +104,7 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
             name = name.replace(" ", "-");
             return name;
         } catch (Exception e) {
-            LOG.warn("Error defining export folder. Error message: {}" , e.getMessage());
+            LOG.warn("Error defining export folder. Error message: {}", e.getMessage());
             if (LOG.isDebugEnabled()) {
                 LOG.error("Error defining export folder.", e);
             }

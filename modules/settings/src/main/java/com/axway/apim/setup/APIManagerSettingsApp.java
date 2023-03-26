@@ -26,6 +26,8 @@ import com.axway.apim.setup.model.Quotas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
+
 public class APIManagerSettingsApp implements APIMCLIServiceProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerSettingsApp.class);
@@ -130,9 +132,9 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
         APIQuota systemQuota = adapter.quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT);
         APIQuota applicationQuota = adapter.quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT);
         QuotaRestriction systemQuotaRestriction = systemQuota.getRestrictions().stream().filter(
-            quotaRestriction -> quotaRestriction.getApi().equals("*")).findFirst().get();
+            quotaRestriction -> quotaRestriction.getApi().equals("*")).findFirst().orElse(null);
         QuotaRestriction applicationQuotaRestriction = applicationQuota.getRestrictions().stream().filter(
-            quotaRestriction -> quotaRestriction.getApi().equals("*")).findFirst().get();
+            quotaRestriction -> quotaRestriction.getApi().equals("*")).findFirst().orElse(null);
         quotas.setSystemQuota(systemQuotaRestriction);
         quotas.setApplicationQuota(applicationQuotaRestriction);
         return quotas;
@@ -157,7 +159,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
             }
             if (desiredConfig.getAlerts() != null) {
                 apimAdapter.alertsAdapter.updateAlerts(desiredConfig.getAlerts());
-                updatedAssets.append( "Alerts ");
+                updatedAssets.append("Alerts ");
                 LOG.debug("API-Manager alerts successfully updated.");
             }
             if (desiredConfig.getRemoteHosts() != null) {
@@ -168,8 +170,11 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
                 updatedAssets.append("Remote-Hosts ");
                 LOG.debug("API-Manager remote host(s) successfully updated.");
             }
-            if(desiredConfig.getQuotas() != null){
+            if (desiredConfig.getQuotas() != null) {
                 updatedAssets.append("GlobalQuotas");
+                upsertGlobalQuota(desiredConfig.getQuotas());
+                LOG.debug("API-Manager Global Quotas successfully updated.");
+
             }
             LOG.info("API-Manager configuration {} successfully updated.", updatedAssets);
             return result;
@@ -186,6 +191,45 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
                 APIManagerAdapter.deleteInstance();
             } catch (AppException ignore) {
             }
+        }
+    }
+
+    public void upsertGlobalQuota(Quotas quotas) throws AppException {
+        APIManagerAdapter adapter = APIManagerAdapter.getInstance();
+        QuotaRestriction applicationQuotaRestriction = quotas.getApplicationQuota();
+
+        QuotaRestriction systemQuotaRestriction = quotas.getSystemQuota();
+        if (systemQuotaRestriction != null) {
+            LOG.debug("Updating System Global Quota : {}", systemQuotaRestriction);
+            APIQuota systemQuota = adapter.quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT);
+            if (systemQuota.getRestrictions() != null) {
+                for (Iterator<QuotaRestriction> iterator = systemQuota.getRestrictions().iterator(); iterator.hasNext(); ) {
+                    QuotaRestriction quotaRestriction = iterator.next();
+                    if (quotaRestriction.getApi().equals("*")) {
+                        iterator.remove();
+                        LOG.debug("Removing exiting System Global Quota for update");
+                    }
+                }
+                systemQuota.getRestrictions().add(applicationQuotaRestriction);
+            }
+            adapter.quotaAdapter.saveQuota(systemQuota, APIManagerQuotaAdapter.Quota.SYSTEM_DEFAULT.getQuotaId());
+            LOG.debug("System Global Quota is updated");
+        }
+        if (applicationQuotaRestriction != null) {
+            LOG.debug("Updating Application Global Quota : {}", applicationQuotaRestriction);
+            APIQuota applicationQuota = adapter.quotaAdapter.getDefaultQuota(APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT);
+            if (applicationQuota.getRestrictions() != null) {
+                for (Iterator<QuotaRestriction> iterator = applicationQuota.getRestrictions().iterator(); iterator.hasNext(); ) {
+                    QuotaRestriction quotaRestriction = iterator.next();
+                    if (quotaRestriction.getApi().equals("*")) {
+                        iterator.remove();
+                        LOG.debug("Removing exiting Application Global Quota for update");
+                    }
+                }
+                applicationQuota.getRestrictions().add(applicationQuotaRestriction);
+            }
+            adapter.quotaAdapter.saveQuota(applicationQuota, APIManagerQuotaAdapter.Quota.APPLICATION_DEFAULT.getQuotaId());
+            LOG.debug("Application Global Quota is updated");
         }
     }
 }
