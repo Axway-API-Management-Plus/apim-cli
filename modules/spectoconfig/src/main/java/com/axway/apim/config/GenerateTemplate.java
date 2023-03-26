@@ -225,7 +225,8 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
 
         return new APIConfig(api, apiSpecLocation, securityProfiles);
     }
-    private void addOutboundSecurityToAPI(API api, String backendAuthType) throws AppException {
+
+    public AuthType matchAuthType(String backendAuthType){
         AuthType authType = null;
         try {
             authType = AuthType.valueOf(backendAuthType);
@@ -248,6 +249,10 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 }
             }
         }
+        return authType;
+    }
+    private void addOutboundSecurityToAPI(API api, String backendAuthType) throws AppException {
+        AuthType authType = matchAuthType(backendAuthType);
         if (authType == null) {
             throw new AppException("backendAuthType : " + backendAuthType + "  is invalid", ErrorCode.INVALID_PARAMETER);
         }
@@ -278,12 +283,12 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
         api.setAuthenticationProfiles(authnProfiles);
     }
 
-    private Map<String, Object> addInboundSecurityToAPI(String frontendAuthType) throws AppException {
+    public DeviceType matchDeviceType(String frontendAuthType){
         DeviceType deviceType = null;
         try {
             deviceType = DeviceType.valueOf(frontendAuthType);
         } catch (IllegalArgumentException e) {
-            LOG.error("Invalid Frontend AuthType", e);
+            LOG.debug("Invalid Frontend AuthType : {} going to try with alternate names", frontendAuthType);
         }
 
         if (deviceType == null) {
@@ -302,6 +307,12 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
                 }
             }
         }
+        return deviceType;
+    }
+
+    private Map<String, Object> addInboundSecurityToAPI(String frontendAuthType) throws AppException {
+        DeviceType deviceType = matchDeviceType(frontendAuthType);
+        LOG.info("Frontend Authentication type : {}", frontendAuthType );
         if (deviceType == null) {
             throw new AppException("frontendAuthType : " + frontendAuthType + "  is invalid", ErrorCode.INVALID_PARAMETER);
         }

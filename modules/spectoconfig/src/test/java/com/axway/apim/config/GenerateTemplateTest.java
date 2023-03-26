@@ -150,4 +150,28 @@ public class GenerateTemplateTest {
         Assert.assertEquals("published", documentContext.read("$.state"));
         Assert.assertEquals("/api/v3", documentContext.read("$.path"));
     }
+
+    @Test
+    public void testWithDefaultFrontendAndBackendAuth() throws IOException {
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "http://localhost:7070/openapi.json", "-apimCLIHome", apimCliHome};
+        GenerateTemplate.generate(args);
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
+        Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
+        Assert.assertEquals("published", documentContext.read("$.state"));
+        Assert.assertEquals("/api/v3", documentContext.read("$.path"));
+        Assert.assertEquals("passThrough", documentContext.read("$.securityProfiles[0].devices[0].type"));
+    }
+
+    @Test
+    public void testWithFrontendAuthAlternateName() throws IOException {
+        String[] args = {"template", "generate", "-c", "api-config.json", "-a", "http://localhost:7070/openapi.json", "-apimCLIHome", apimCliHome, "-frontendAuthType", "passthrough"};
+        GenerateTemplate.generate(args);
+        DocumentContext documentContext = JsonPath.parse(Files.newInputStream(Paths.get("api-config.json")));
+        Assert.assertEquals("Swagger Petstore - OpenAPI 3.0", documentContext.read("$.name"));
+        Assert.assertEquals("published", documentContext.read("$.state"));
+        Assert.assertEquals("/api/v3", documentContext.read("$.path"));
+        Assert.assertEquals("passThrough", documentContext.read("$.securityProfiles[0].devices[0].type"));
+    }
+
+
 }
