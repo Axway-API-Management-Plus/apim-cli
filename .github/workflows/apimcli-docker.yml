@@ -1,6 +1,7 @@
 name: APIM CLI Docker
 
 on:
+  workflow_dispatch:
 #  release:
 #    types: [published]
 
