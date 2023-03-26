@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Command Line Option "zeroDowntimeUpdate" is not working (See issue [#370](https://github.com/Axway-API-Management-Plus/apim-cli/issues/370))
+- Error updating existing app quota that has no pre-existing quota (See issue [#371](https://github.com/Axway-API-Management-Plus/apim-cli/issues/371))
+
+### Added
+- Support of All / Global quotas for API and application. (See issue [#362](https://github.com/Axway-API-Management-Plus/apim-cli/issues/362))
+
 
 ## [1.13.5] 2023-03-15
 
