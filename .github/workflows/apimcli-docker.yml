@@ -1,0 +1,36 @@
+name: APIM CLI Docker Docker
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-apim-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Checkout
+
+      - name: Fetch release package
+        uses: wyozi/download-gh-release-asset@master
+        with:
+          args: axway-apimcli-${{ github.event.release.tag_name }}.tar.gz
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          build-args: |
+            APIM_CLI_ARCHIVE=${{ github.event.release.tag_name }}.tar.gz
+          file: Dockerfile
+          push: true
+          tags: axway-apimcli-${{ github.event.release.tag_name }}

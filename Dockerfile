@@ -1,4 +1,4 @@
-FROM eclipse-temurin:8u332-b09-jre-alpine  as base
+FROM eclipse-temurin:8u362-b09-jre-alpine  as base
 ENV APP_HOME=/opt/apim-cli
 ENV APP_USER=axway
 ARG APIM_CLI_ARCHIVE
