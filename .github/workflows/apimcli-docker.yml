@@ -1,19 +1,8 @@
 name: APIM CLI Docker
 
 on:
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
-        type: choice
-        options:
-          - info
-          - warning
-          - debug
-#  release:
-#    types: [published]
+  release:
+    types: [edited]
 
 jobs:
   build-apim-docker-image:
@@ -42,7 +31,7 @@ jobs:
         with:
           context: .
           build-args: |
-            "APIM_CLI_ARCHIVE= axway-apimcli-${{ RELEASE_NO }}.tar.gz"
+            "APIM_CLI_ARCHIVE= axway-apimcli-${{ github.event.release.tag_name }}.tar.gz"
           file: Dockerfile
           push: true
-          tags: axway-apimcli-${{ RELEASE_NO }}
+          tags: axway-apimcli-${{ github.event.release.tag_name }}
