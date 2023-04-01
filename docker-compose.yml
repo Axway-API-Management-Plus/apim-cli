@@ -11,7 +11,7 @@ services:
     # image: docker-registry.demo.axway.com/swagger-promote/api-mgr-with-policies:7.7
     image: ${APIM_DOCKER_IMAGE}
     volumes:
-      - ${GITHUB_WORKSPACE}/license:/opt/Axway/apigateway/conf/licenses
+      - /home/runner/work/apim-cli/apim-cli/license:/opt/Axway/apigateway/conf/licenses
     environment:
       - ACCEPT_GENERAL_CONDITIONS=yes
     ports:
