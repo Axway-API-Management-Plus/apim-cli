@@ -14,6 +14,8 @@ on:
           - debug
 #  release:
 #    types: [published]
+env:
+  RELEASE_NO: 0
 jobs:
   build-apim-docker-image:
     runs-on: ubuntu-latest
@@ -23,7 +25,7 @@ jobs:
 
       - name: Download Artifact
         run: |
-          gh release download RELEASE_NO -p *.tar.gz
+          gh release download $RELEASE_NO -p *.tar.gz
           ls -l
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
