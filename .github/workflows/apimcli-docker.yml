@@ -40,7 +40,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           flavor: latest=false
-          images: ghcr.io/axway_api_management_plus/apimcli
+          images: ghcr.io/axway-api-management-plus/apimcli
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
