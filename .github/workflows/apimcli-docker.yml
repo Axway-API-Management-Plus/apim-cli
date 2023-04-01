@@ -14,8 +14,6 @@ on:
           - debug
 #  release:
 #    types: [published]
-env:
-  RELEASE_NO: 1.13.6
 jobs:
   build-apim-docker-image:
     runs-on: ubuntu-latest
