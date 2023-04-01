@@ -24,7 +24,7 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Maven Build and Unit Test 
+      - name: Maven Build and Unit Test
         run: mvn clean test
       - name: Cache docker images
         id: cache-docker
@@ -54,9 +54,11 @@ jobs:
           docker load -i ~/cache-docker/$CACHE_FILE_CASSANDRA
       - name: Run docker images
         run: |
+          mkdir license
+          echo echo ${{ secrets.APIM_LIC }} | base64 -d > license/apim.lic
           docker-compose run --rm start_cassandra
           docker-compose run --rm start_apimgmt
           docker-compose logs --tail 30 apimgmt
       - name: Maven APIM Integration Test
         run: mvn verify -P integration-tests
-      
+
