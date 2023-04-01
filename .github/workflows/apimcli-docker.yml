@@ -26,7 +26,6 @@ jobs:
       - name: Download Artifact
         run: |
           gh release download $RELEASE_NO -p *.tar.gz
-          ls -l
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_NO: ${{ github.event.release.tag_name }}
@@ -43,7 +42,7 @@ jobs:
         with:
           context: .
           build-args: |
-            "APIM_CLI_ARCHIVE=axway-apimcli-${RELEASE_NO}.tar.gz"
+            "APIM_CLI_ARCHIVE=axway-apimcli-${{ github.event.release.tag_name }}.tar.gz"
           file: Dockerfile
           push: true
-          tags: axway-apimcli-${RELEASE_NO}
+          tags: axway-apimcli-${{ github.event.release.tag_name }}
