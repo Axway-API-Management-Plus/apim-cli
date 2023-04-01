@@ -13,6 +13,7 @@ jobs:
       - name: Download Artifact
         run: |
           gh release download $RELEASE_NO -p *.tar.gz
+          export
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_NO: ${{ github.event.release.tag_name }}
