@@ -6,11 +6,12 @@ import com.axway.apim.api.model.CustomProperties.Type;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.Console;
+import com.axway.apim.setup.APIManagerSettingsApp;
 import com.axway.apim.setup.lib.APIManagerSetupExportParams;
 import com.axway.apim.setup.model.APIManagerConfig;
 
 public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler {
-	
+
 	APIManagerAdapter adapter;
 
 	public ConsoleAPIManagerSetupExporter(APIManagerSetupExportParams params, ExportResult result) {
@@ -21,7 +22,7 @@ public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler
 			throw new RuntimeException("Unable to get APIManagerAdapter", e);
 		}
 	}
-	
+
 	@Override
 	public RemoteHostFilter getRemoteHostFilter() {
 		return getRemoteHostBaseFilterBuilder().build();
@@ -38,17 +39,17 @@ public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler
 			ConsolePrinterAlerts alertsExporter = new ConsolePrinterAlerts();
 			alertsExporter.export(config.getAlerts());
 		}
-		
+
 		if(params.isExportRemoteHosts()) {
 			ConsolePrinterRemoteHosts remoteHostsExporter = new ConsolePrinterRemoteHosts(params);
 			remoteHostsExporter.export(config.getRemoteHosts());
 		}
-		
+
 		if(params.isExportPolicies()) {
 			ConsolePrinterPolicies policiesPrinter = new ConsolePrinterPolicies();
 			policiesPrinter.export(adapter.policiesAdapter.getAllPolicies());
 		}
-		
+
 		if(params.isExportCustomProperties()) {
 			Console.println("Configured custom properties for: '" + APIManagerAdapter.getApiManagerName() + "' Version: " + APIManagerAdapter.getInstance().getApiManagerVersion());
 			ConsolePrinterCustomProperties propertiesPrinter = new ConsolePrinterCustomProperties();
@@ -57,5 +58,10 @@ public class ConsoleAPIManagerSetupExporter extends APIManagerSetupResultHandler
 			}
 			propertiesPrinter.printCustomProperties();
 		}
+
+        if(params.isExportQuotas()) {
+            ConsolePrinterGlobalQuotas policiesPrinter = new ConsolePrinterGlobalQuotas();
+            policiesPrinter.export(new APIManagerSettingsApp().getGlobalQuotas(adapter));
+        }
 	}
 }

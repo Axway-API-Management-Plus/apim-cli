@@ -23,6 +23,16 @@
         "period": "second",
         "per": "2"
       }
+    },
+    {
+      "api": "*",
+      "method": "*",
+      "type": "throttle",
+      "config": {
+        "messages": "10000",
+        "period": "second",
+        "per": "1"
+      }
     }
   ],
   "system": true

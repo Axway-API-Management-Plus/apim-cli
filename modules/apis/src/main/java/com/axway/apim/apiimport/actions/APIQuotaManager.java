@@ -6,7 +6,7 @@ import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIMethod;
 import com.axway.apim.api.model.APIQuota;
 import com.axway.apim.api.model.QuotaRestriction;
-import com.axway.apim.api.model.QuotaRestrictiontype;
+import com.axway.apim.api.model.QuotaRestrictionType;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ public class APIQuotaManager {
         updateRestrictions(actualRestrictions, desiredRestrictions, createdAPI, Quota.APPLICATION_DEFAULT, sameAPI);
     }
 
-    private void updateRestrictions(List<QuotaRestriction> actualRestrictions, List<QuotaRestriction> desiredRestrictions, API createdAPI, Quota type, boolean sameAPI) throws AppException {
+    public void updateRestrictions(List<QuotaRestriction> actualRestrictions, List<QuotaRestriction> desiredRestrictions, API createdAPI, Quota type, boolean sameAPI) throws AppException {
         // If restrictions are equal and the API is not re-created, there is nothing to do
         if (actualRestrictions == null && desiredRestrictions == null) return;
         if (desiredRestrictions != null && desiredRestrictions.equals(actualRestrictions) && sameAPI) {
@@ -65,18 +65,7 @@ public class APIQuotaManager {
             // Load the entire current default quota
             APIQuota currentDefaultQuota = APIManagerAdapter.getInstance().quotaAdapter.getDefaultQuota(type);
             List<QuotaRestriction> mergedRestrictions = addOrMergeRestriction(actualRestrictions, desiredRestrictions);
-            for (QuotaRestriction restriction : mergedRestrictions) {
-                // Update the API-ID for the API-Restrictions as the API might be re-created.
-                restriction.setApiId(createdAPI.getId());
-                if (restriction.getMethod().equals("*")) continue;
-                // Additionally, we have to change the methodId
-                // Load the method for actualAPI to get the name of the method to which the existing quota is applied to
-                APIMethod actualMethod = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(actualState.getId(), restriction.getMethod());
-                // Now load the new method based on the name for the createdAPI
-                APIMethod newMethod = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(createdAPI.getId(), actualMethod.getName());
-                // Finally modify the restriction
-                restriction.setMethod(newMethod.getId());
-            }
+            populateMethodId(createdAPI, mergedRestrictions);
             // If there is an actual API, remove the restrictions for the current actual API
             if (actualState != null) {
                 currentDefaultQuota.getRestrictions().removeIf(restriction -> restriction.getApiId().equals(actualState.getId()));
@@ -87,7 +76,7 @@ public class APIQuotaManager {
         }
     }
 
-    private List<QuotaRestriction> addOrMergeRestriction(List<QuotaRestriction> existingRestrictions, List<QuotaRestriction> desiredRestrictions) {
+    public List<QuotaRestriction> addOrMergeRestriction(List<QuotaRestriction> existingRestrictions, List<QuotaRestriction> desiredRestrictions) {
         List<QuotaRestriction> mergedRestrictions = new ArrayList<>();
         if (existingRestrictions == null) existingRestrictions = new ArrayList<>();
         boolean existingRestrictionFound = false;
@@ -106,7 +95,7 @@ public class APIQuotaManager {
                     // It's considered as the same restriction when type, method, period & per are equal
                     if (desiredRestriction.isSameRestriction(existingRestriction, true)) {
                         // If it is the same restriction, we need to update the restriction configuration
-                        if (existingRestriction.getType() == QuotaRestrictiontype.throttle) {
+                        if (existingRestriction.getType() == QuotaRestrictionType.throttle) {
                             existingRestriction.getConfig().put("messages", desiredRestriction.getConfig().get("messages"));
                         } else {
                             existingRestriction.getConfig().put("mb", desiredRestriction.getConfig().get("mb"));
@@ -120,6 +109,21 @@ public class APIQuotaManager {
             }
         }
         return mergedRestrictions;
+    }
+
+    public void populateMethodId(API createdAPI, List<QuotaRestriction> mergedRestrictions) throws AppException{
+        for (QuotaRestriction restriction : mergedRestrictions) {
+            // Update the API-ID for the API-Restrictions as the API might be re-created.
+            restriction.setApiId(createdAPI.getId());
+            if (restriction.getMethod().equals("*")) continue;
+            // Additionally, we have to change the methodId
+            // Load the method for actualAPI to get the name of the method to which the existing quota is applied to
+            APIMethod actualMethod = APIManagerAdapter.getInstance().methodAdapter.getMethodForId(actualState.getId(), restriction.getMethod());
+            // Now load the new method based on the name for the createdAPI
+            APIMethod newMethod = APIManagerAdapter.getInstance().methodAdapter.getMethodForName(createdAPI.getId(), actualMethod.getName());
+            // Finally modify the restriction
+            restriction.setMethod(newMethod.getId());
+        }
     }
 
     private List<QuotaRestriction> getRestrictions(APIQuota quota) {

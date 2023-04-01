@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.13.6] In progress
+
+### Fixed
+- Command Line Option "zeroDowntimeUpdate" is not working (See issue [#370](https://github.com/Axway-API-Management-Plus/apim-cli/issues/370))
+- Error updating existing app quota that has no pre-existing quota (See issue [#371](https://github.com/Axway-API-Management-Plus/apim-cli/issues/371))
+- [APIExportApp] ERROR: An error happened during export. Please check the log (See issue [#376](https://github.com/Axway-API-Management-Plus/apim-cli/issues/376))
+
+### Added
+- Support of All / Global quotas for API and application. (See issue [#362](https://github.com/Axway-API-Management-Plus/apim-cli/issues/362))
+
+
 ## [1.13.5] 2023-03-15
 
 ### Fixed

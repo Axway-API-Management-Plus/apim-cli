@@ -1,0 +1,54 @@
+name: APIM CLI Docker
+
+#on:
+#  release:
+#    types: [published]
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: "Provide git tag version like 1.13.5"
+        required: true
+
+jobs:
+  build-apim-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      #gh release download $RELEASE_NO -p *.tar.gz
+
+      - name: Download Artifact
+        run: |
+          gh release download $RELEASE_NO -p *.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          #RELEASE_NO: ${{ github.event.release.tag_name }}
+          RELEASE_NO: ${{ github.event.inputs.releaseVersion }}
+      - name : Get Binary name
+        run: |
+          echo  | find ./ -name 'axway-apimcli-*.tar.gz'  | sed 's|^.//||'
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          flavor: latest=false
+          images: ghcr.io/axway-api-management-plus/apimcli
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          build-args: |
+            "APIM_CLI_ARCHIVE=axway-apimcli-${{ github.event.inputs.releaseVersion }}.tar.gz"
+          file: Dockerfile
+          push: true
+          tags: ghcr.io/axway-api-management-plus/apimcli:${{ github.event.inputs.releaseVersion }}
+          labels: ${{ steps.meta.outputs.labels }}

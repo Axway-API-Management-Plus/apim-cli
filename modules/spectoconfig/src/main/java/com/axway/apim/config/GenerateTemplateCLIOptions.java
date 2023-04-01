@@ -86,7 +86,7 @@ public class GenerateTemplateCLIOptions extends CLIOptions {
 
         String frontendAuthType = getValue("frontendAuthType");
         if (frontendAuthType == null) {
-            frontendAuthType = "none";
+            frontendAuthType = "passThrough";
         }
         params.setFrontendAuthType(frontendAuthType);
         return params;

@@ -53,7 +53,12 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner  {
 		createVariable("expectedReturnCode", "0");
 		apiImport.doExecute(context);
 
-		echo("####### Import application: '${appName}' incl. quotas #######");
+        echo("####### Import application: '${appName}' without quotas #######");
+        createVariable(TestParams.PARAM_CONFIGFILE,  PACKAGE + "AppWithNoQuotas.json");
+        createVariable(TestParams.PARAM_EXPECTED_RC, "0");
+        importApp.doExecute(context);
+
+		echo("####### Import Same application: '${appName}' incl. quotas #######");
 		createVariable(TestParams.PARAM_CONFIGFILE,  PACKAGE + "AppWithQuotas.json");
 		createVariable(TestParams.PARAM_EXPECTED_RC, "0");
 		importApp.doExecute(context);
@@ -100,14 +105,11 @@ public class ImportAppWithQuotasTestIT extends TestNGCitrusTestRunner  {
 		}
 		Assert.assertNotNull(allAPIsRestri, "Expected a restriction for all APIs.");
 		Assert.assertNotNull(APIRestri, "Expected a restriction for a specific APIs");
-
 		Assert.assertEquals(allAPIsRestri.getApiId(), "*");
 		Assert.assertEquals(allAPIsRestri.getMethod(), "*");
-
 		Assert.assertEquals(APIRestri.getRestrictedAPI().getName(), context.getVariable("apiName"));
 		Assert.assertEquals(APIRestri.getRestrictedAPI().getPath(), context.getVariable("apiPath"));
 		Assert.assertEquals(APIRestri.getMethod(), "*");
-
 		Assert.assertNotEquals(APIMethodRestri.getMethod(), "*");
 	}
 }

@@ -11,7 +11,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class JsonAPIManagerSetupExporterTest extends WiremockWrapper {
+public class YamlAPIManagerSetupExporterTest extends WiremockWrapper {
 
     @BeforeClass
     public void init() {
@@ -24,12 +24,12 @@ public class JsonAPIManagerSetupExporterTest extends WiremockWrapper {
     }
 
     @Test
-    public void testJsonExport() throws AppException {
-        String[] args = {"-h", "localhost", "-c", "manager-config.json", "-o", "json", "-deleteTarget"};
+    public void testYamlExport() throws AppException {
+        String[] args = {"-h", "localhost", "-c", "manager-config.yaml", "-o", "yaml"};
         APIManagerSetupExportParams params = (APIManagerSetupExportParams) APIManagerSetupExportCLIOptions.create(args).getParams();
         ExportResult result = new ExportResult();
         APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
-        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.JSON_EXPORTER, params, result);
+        APIManagerSetupResultHandler exporter = APIManagerSetupResultHandler.create(APIManagerSetupResultHandler.ResultHandler.YAML_EXPORTER, params, result);
         APIManagerConfig apiManagerConfig = new APIManagerConfig();
         apiManagerConfig.setConfig(apimanagerAdapter.configAdapter.getConfig(APIManagerAdapter.hasAdminAccount()));
         exporter.export(apiManagerConfig);

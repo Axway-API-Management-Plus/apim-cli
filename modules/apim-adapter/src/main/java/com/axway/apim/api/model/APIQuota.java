@@ -1,9 +1,9 @@
 package com.axway.apim.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.List;
 import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class APIQuota {
@@ -73,7 +73,7 @@ public class APIQuota {
         if (other == null) return false;
         if (other instanceof APIQuota) {
             APIQuota apiQuota = (APIQuota) other;
-            return apiQuota.getRestrictions().equals(this.getRestrictions());
+            return apiQuota.getRestrictions().containsAll(this.getRestrictions());
         } else {
             return false;
         }

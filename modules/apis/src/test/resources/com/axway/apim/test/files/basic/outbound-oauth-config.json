@@ -6,7 +6,6 @@
   "organization": "orga",
   "apiDefinition": "the-api-definition.json",
   "backendBasepath": "https://the.backend.of.the.service/Some.Services/XmlApi",
-  "replaceHostInSwagger": false,
   "authenticationProfiles": [
     {
       "name": "_default",
