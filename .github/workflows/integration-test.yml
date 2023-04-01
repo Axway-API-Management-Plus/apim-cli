@@ -55,9 +55,10 @@ jobs:
       - name: Run docker images
         run: |
           mkdir licenses
-          echo echo ${{ secrets.APIM_LIC }} | base64 -di > licenses/apim.lic
+          echo ${{ secrets.APIM_LIC }} | base64 -di > licenses/apim.lic
           pwd
           ls -l
+          echo licenses/apim.lic
           docker-compose run --rm start_cassandra
           docker-compose run --rm start_apimgmt
           docker-compose logs --tail 30 apimgmt
