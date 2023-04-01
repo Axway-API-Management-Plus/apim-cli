@@ -40,7 +40,9 @@ jobs:
         with:
           context: .
           build-args: |
-            APIM_CLI_ARCHIVE=${{ github.event.release.tag_name }}.tar.gz
+            APIM_CLI_ARCHIVE=$CLI_ARCHIVE
           file: Dockerfile
           push: true
           tags: axway-apimcli-${{ github.event.release.tag_name }}
+          env:
+            CLI_ARCHIVE: ${{ github.event.release.tag_name }}.tar.gz

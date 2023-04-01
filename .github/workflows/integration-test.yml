@@ -54,8 +54,8 @@ jobs:
           docker load -i ~/cache-docker/$CACHE_FILE_CASSANDRA
       - name: Run docker images
         run: |
-          mkdir license
-          echo echo ${{ secrets.APIM_LIC }} | base64 -di > license/apim.lic
+          mkdir licenses
+          echo echo ${{ secrets.APIM_LIC }} | base64 -di > licenses/apim.lic
           pwd
           ls -l
           docker-compose run --rm start_cassandra
