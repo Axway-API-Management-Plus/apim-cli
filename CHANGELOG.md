@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.13.6] In progress
+## [1.13.6]
 
 ### Fixed
 - Command Line Option "zeroDowntimeUpdate" is not working (See issue [#370](https://github.com/Axway-API-Management-Plus/apim-cli/issues/370))
@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Support of All / Global quotas for API and application. (See issue [#362](https://github.com/Axway-API-Management-Plus/apim-cli/issues/362))
+- Host docker cli images on github docker registry [#373](https://github.com/Axway-API-Management-Plus/apim-cli/issues/373))
 
 
 ## [1.13.5] 2023-03-15
