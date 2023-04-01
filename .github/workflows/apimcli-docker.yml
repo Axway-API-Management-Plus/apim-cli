@@ -19,8 +19,8 @@ jobs:
   build-apim-docker-image:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
       - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Fetch release package
         uses: wyozi/download-gh-release-asset@master
