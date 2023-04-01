@@ -2,7 +2,7 @@ name: APIM CLI Docker
 
 on:
   release:
-    types: [edited]
+    types: [prereleased]
 
 jobs:
   build-apim-docker-image:
