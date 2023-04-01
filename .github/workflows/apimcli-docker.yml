@@ -24,11 +24,11 @@ jobs:
 
       - name: Download Artifact
         run: |
-          gh release download $RELEASE -p *.tar.gz
+          gh release download RELEASE_NO -p *.tar.gz
           ls -l
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE: ${{ github.event.release.tag_name }}
+          RELEASE_NO: ${{ github.event.release.tag_name }}
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
@@ -42,7 +42,7 @@ jobs:
         with:
           context: .
           build-args: |
-            "APIM_CLI_ARCHIVE=${{ github.event.release.tag_name }}.tar.gz"
+            "APIM_CLI_ARCHIVE= axway-apimcli-${{ RELEASE_NO }}.tar.gz"
           file: Dockerfile
           push: true
-          tags: axway-apimcli-${{ github.event.release.tag_name }}
+          tags: axway-apimcli-${{ RELEASE_NO }}
