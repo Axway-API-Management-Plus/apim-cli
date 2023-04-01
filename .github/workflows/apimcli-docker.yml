@@ -1,8 +1,8 @@
 name: APIM CLI Docker
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+
 jobs:
   build-apim-docker-image:
     runs-on: ubuntu-latest
@@ -23,13 +23,20 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          flavor: latest=false
+          images: ghcr.io/axway_api_management_plus/apimcli
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
           build-args: |
-            "APIM_CLI_ARCHIVE=axway-apimcli-${{ github.event.release.tag_name }}.tar.gz"
+            "APIM_CLI_ARCHIVE=axway-apimcli-${{ steps.meta.outputs.tags }}.tar.gz"
           file: Dockerfile
           push: true
-          tags: axway-apimcli-${{ github.event.release.tag_name }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
