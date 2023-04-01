@@ -50,5 +50,5 @@ jobs:
             "APIM_CLI_ARCHIVE=axway-apimcli-${{ github.event.inputs.releaseVersion }}.tar.gz"
           file: Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ github.event.inputs.releaseVersion }}
           labels: ${{ steps.meta.outputs.labels }}
