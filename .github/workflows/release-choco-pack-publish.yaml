@@ -1,8 +1,8 @@
 name: Publish Choco package
 
-on:
-  release:
-    types: [published]
+#on:
+#  release:
+#    types: [published]
 
 jobs:
   publish-choco-package:
@@ -14,7 +14,7 @@ jobs:
     - name: Fetch release package
       uses: wyozi/download-gh-release-asset@master
       with:
-        args: axway-apimcli-${{ github.event.release.tag_name }}.zip 
+        args: axway-apimcli-${{ github.event.release.tag_name }}.zip
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
     - name: Move release to tools
@@ -28,7 +28,7 @@ jobs:
         sed -i "s/\$fileLocation = Join-Path \$toolsDir 'axway-apimcli-.*.zip'/\$fileLocation = Join-Path \$toolsDir 'axway-apimcli-${{ github.event.release.tag_name }}.zip'"/g tools/choco/axway-apim-cli/tools/chocolateyinstall.ps1
         cat tools/choco/axway-apim-cli/tools/chocolateyinstall.ps1
     - uses: crazy-max/ghaction-chocolatey@v1
-      name: Choco pack 
+      name: Choco pack
       with:
         args: pack tools/choco/axway-apim-cli/axway-apim-cli.nuspec
     - uses: crazy-max/ghaction-chocolatey@v1

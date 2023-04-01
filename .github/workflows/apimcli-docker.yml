@@ -1,21 +1,8 @@
 name: APIM CLI Docker
 
 on:
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
-        type: choice
-        options:
-          - info
-          - warning
-          - debug
-#  release:
-#    types: [published]
-env:
-  RELEASE_NO: 0
+  release:
+    types: [published]
 jobs:
   build-apim-docker-image:
     runs-on: ubuntu-latest
