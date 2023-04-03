@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.13.6]
+## [1.13.6] 2023-04-03
 
 ### Fixed
 - Command Line Option "zeroDowntimeUpdate" is not working (See issue [#370](https://github.com/Axway-API-Management-Plus/apim-cli/issues/370))
