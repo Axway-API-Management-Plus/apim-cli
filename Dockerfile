@@ -1,4 +1,4 @@
-FROM eclipse-temurin:8u362-b09-jre-alpine  as base
+FROM eclipse-temurin:8-alpine  as base
 ENV APP_HOME=/opt/apim-cli
 ENV APP_USER=axway
 ARG APIM_CLI_ARCHIVE
@@ -7,7 +7,7 @@ COPY $APIM_CLI_ARCHIVE /
 RUN apk add --no-cache tar
 RUN addgroup $APP_USER && adduser --system $APP_USER --ingroup $APP_USER
 RUN mkdir $APP_HOME && tar -xvzf $APIM_CLI_ARCHIVE -C $APP_HOME --strip-components 1 && rm /$APIM_CLI_ARCHIVE
-FROM eclipse-temurin:8u332-b09-jre-alpine
+FROM eclipse-temurin:8-alpine
 USER $APP_USER
 ENV AXWAY_APIM_CLI_HOME $APP_HOME
 COPY --from=base $APP_HOME $APP_HOME
