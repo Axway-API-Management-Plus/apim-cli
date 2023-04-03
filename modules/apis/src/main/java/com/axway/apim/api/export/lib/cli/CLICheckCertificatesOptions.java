@@ -1,13 +1,11 @@
 package com.axway.apim.api.export.lib.cli;
 
+import com.axway.apim.lib.*;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.cli.Option;
 
 import com.axway.apim.api.export.lib.params.APICheckCertificatesParams;
-import com.axway.apim.lib.CLIOptions;
-import com.axway.apim.lib.CoreCLIOptions;
-import com.axway.apim.lib.Parameters;
 
 public class CLICheckCertificatesOptions extends CLIOptions {
 
@@ -18,6 +16,7 @@ public class CLICheckCertificatesOptions extends CLIOptions {
     public static CLIOptions create(String[] args) throws AppException {
         CLIOptions cliOptions = new CLICheckCertificatesOptions(args);
         cliOptions = new CLIAPIFilterOptions(cliOptions);
+        cliOptions = new StandardExportCLIOptions(cliOptions);
         cliOptions = new CoreCLIOptions(cliOptions);
         cliOptions.addOptions();
         cliOptions.parse();

@@ -19,7 +19,10 @@ import com.github.freva.asciitable.HorizontalAlign;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -63,14 +66,14 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
             if (outputFormat.equals(StandardExportParams.OutputFormat.console)) {
                 Console.println("The following certificates will expire in the next " + checkCertParams.getNumberOfDays() + " days.");
                 Console.println(AsciiTable.getTable(AsciiTable.BASIC_ASCII_NO_DATA_SEPARATORS, expiredCerts, Arrays.asList(
-                        new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.api.getId()),
-                        new Column().header("API-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.api.getName()),
-                        new Column().header("API-Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.api.getPath()),
-                        new Column().header("API-Ver.").with(expired -> expired.api.getVersion()),
-                        new Column().header("Certificate-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.certificate.getName()),
-                        new Column().header("Not valid after").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> formatDate(expired.certificate.getNotValidAfter())),
-                        new Column().header("Not valid before").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> formatDate(expired.certificate.getNotValidBefore())),
-                        new Column().header("MD5-Fingerprint").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.certificate.getMd5Fingerprint())
+                    new Column().header("API-Id").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.api.getId()),
+                    new Column().header("API-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.api.getName()),
+                    new Column().header("API-Path").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.api.getPath()),
+                    new Column().header("API-Ver.").with(expired -> expired.api.getVersion()),
+                    new Column().header("Certificate-Name").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.certificate.getName()),
+                    new Column().header("Not valid after").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> formatDate(expired.certificate.getNotValidAfter())),
+                    new Column().header("Not valid before").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> formatDate(expired.certificate.getNotValidBefore())),
+                    new Column().header("MD5-Fingerprint").headerAlign(HorizontalAlign.LEFT).dataAlign(HorizontalAlign.LEFT).with(expired -> expired.certificate.getMd5Fingerprint())
                 )));
             } else if (outputFormat.equals(StandardExportParams.OutputFormat.json)) {
                 List<APICert> apiCerts = new ArrayList<>();
@@ -95,9 +98,17 @@ public class CheckCertificatesAPIHandler extends APIResultHandler {
     }
 
     public void writeJSON(List<APICert> apiCerts) {
-        ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         try {
-            mapper.writeValue(System.out, apiCerts);
+            String givenTarget = params.getTarget();
+            File localFolder = new File(givenTarget);
+            LOG.debug("Going to export expired certificates details into folder: {}", localFolder);
+            validateFolder(localFolder);
+            String filePath = localFolder.getCanonicalPath() + File.separator + "certificates.json";
+            ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+            try (Writer writer = new FileWriter(filePath)) {
+                mapper.writeValue(writer, apiCerts);
+            }
+            LOG.debug("Successfully exported Certificate Expiry Data to file : {}", filePath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
