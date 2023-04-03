@@ -16,3 +16,4 @@ COPY --from=base /etc/group /etc/group
 WORKDIR /opt/apim-cli
 ENTRYPOINT ["java", "-cp", "lib/*", "com.axway.apim.cli.APIManagerCLI"]
 CMD ["arg1", "arg2"]
+
