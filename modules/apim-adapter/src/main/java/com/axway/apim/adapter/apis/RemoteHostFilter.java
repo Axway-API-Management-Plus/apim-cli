@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RemoteHostFilter {
+public class    RemoteHostFilter {
 
     private String alias;
     private String id;

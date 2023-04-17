@@ -72,7 +72,7 @@ public class JsonAPIExporter extends APIResultHandler {
 
         String apiPath = getAPIExportFolder(exportAPI.getPath());
         File localFolder = new File(this.givenExportFolder + File.separator + getVHost(exportAPI) + apiPath);
-        LOG.debug("Going to export API: {} into folder: {} ", exportAPI, localFolder);
+        LOG.debug("Going to export API: {} into folder: {} ", exportAPI.getName(), localFolder);
         validateFolder(localFolder);
         APISpecification apiDef = exportAPI.getAPIDefinition();
         // Skip processing if API definition is not available due to original API cloned and deleted.
