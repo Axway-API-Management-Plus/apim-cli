@@ -1,17 +1,13 @@
 package com.axway.apim.api.specification;
 
-import com.axway.apim.adapter.jackson.YAMLFactoryExt;
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APISpecificationFilter;
 import com.axway.apim.lib.error.AppException;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.format.DataFormatDetector;
-import com.fasterxml.jackson.core.format.DataFormatMatcher;
-import com.fasterxml.jackson.core.format.MatchStrength;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,31 +127,22 @@ public abstract class APISpecification {
     }
 
     protected void setMapperForDataFormat() throws AppException {
-        YAMLFactory yamlFactory = new YAMLFactoryExt().disable(Feature.WRITE_DOC_START_MARKER);
-        JsonFactory jsonFactory = new JsonFactory();
-        DataFormatDetector detector = new DataFormatDetector(yamlFactory, jsonFactory);
-        DataFormatMatcher formatMatcher;
         try {
-            formatMatcher = detector.findFormat(this.apiSpecificationContent);
-        } catch (IOException e) {
-            LOG.error("Error detecting dataformat", e);
-            return;
-        }
-        if (formatMatcher.getMatchStrength() == MatchStrength.INCONCLUSIVE ||
-            formatMatcher.getMatchStrength() == MatchStrength.NO_MATCH) {
-            this.mapper = new ObjectMapper();
-        }
-        switch (formatMatcher.getMatchedFormatName().toLowerCase()) {
-            case "json":
-                this.mapper = new ObjectMapper(jsonFactory);
-                LOG.trace("JSON API-Definition detected");
-                break;
-            case "yaml":
-                this.mapper = new ObjectMapper(yamlFactory);
-                LOG.trace("YAML API-Definition detected");
-                break;
-            default:
-                break;
+            JsonFactory jsonFactory = new JsonFactory();
+            mapper = new ObjectMapper(jsonFactory);
+            // Check the config file is json
+            mapper.readTree(apiSpecificationContent);
+            LOG.debug("JSON API-Definition detected");
+        } catch (IOException ioException) {
+            YAMLFactory yamlFactory = CustomYamlFactory.createYamlFactory();
+            mapper = new ObjectMapper(yamlFactory);
+            try {
+                mapper.readTree(apiSpecificationContent);
+                LOG.debug("YAML API-Definition detected");
+            } catch (IOException e) {
+                mapper = null;
+                LOG.debug("Not an JSON / Yaml format");
+            }
         }
     }
 

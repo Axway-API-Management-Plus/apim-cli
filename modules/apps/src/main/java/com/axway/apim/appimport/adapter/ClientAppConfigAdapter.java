@@ -5,6 +5,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
 import com.axway.apim.adapter.jackson.AppCredentialsDeserializer;
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionDeserializer.DeserializeMode;
 import com.axway.apim.adapter.user.APIManagerUserAdapter;
@@ -29,7 +30,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +76,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
             mapper.readTree(configFile);
             LOG.debug("Handling JSON Configuration file: {}", configFile);
         } catch (IOException ioException) {
-            mapper = new ObjectMapper(new YAMLFactory());
+            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
             LOG.debug("Handling Yaml Configuration file: {}", configFile);
         }
         try {

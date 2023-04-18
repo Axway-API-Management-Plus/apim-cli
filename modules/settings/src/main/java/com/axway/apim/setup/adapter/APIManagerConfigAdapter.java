@@ -1,5 +1,6 @@
 package com.axway.apim.setup.adapter;
 
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.RemotehostDeserializer;
 import com.axway.apim.adapter.jackson.UserDeserializer;
 import com.axway.apim.lib.StandardImportParams;
@@ -9,7 +10,6 @@ import com.axway.apim.lib.utils.Utils;
 import com.axway.apim.setup.model.APIManagerConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ public class APIManagerConfigAdapter {
             mapper.readTree(configFile);
             LOG.debug("Handling JSON Configuration file: {}", configFile);
         } catch (IOException ioException) {
-            mapper = new ObjectMapper(new YAMLFactory());
+            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
             LOG.debug("Handling Yaml Configuration file: {}", configFile);
         }
         try {

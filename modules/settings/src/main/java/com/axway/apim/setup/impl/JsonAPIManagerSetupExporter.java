@@ -2,6 +2,7 @@ package com.axway.apim.setup.impl;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.RemoteHostFilter;
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.adapter.jackson.UserSerializerModifier;
 import com.axway.apim.api.model.Config;
@@ -16,7 +17,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
         ObjectMapper mapper;
         String configFile;
         if (apiManagerSetupResultHandler instanceof YamlAPIManagerSetupExporter) {
-            mapper = new ObjectMapper(new YAMLFactory());
+            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
             configFile = "/apimanager-config.yaml";
         } else {
             mapper = new ObjectMapper();

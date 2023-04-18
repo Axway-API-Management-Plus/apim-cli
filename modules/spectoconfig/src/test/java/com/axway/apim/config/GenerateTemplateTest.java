@@ -1,9 +1,9 @@
 package com.axway.apim.config;
 
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.api.API;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.eclipse.jetty.http.HttpVersion;
@@ -49,6 +49,7 @@ public class GenerateTemplateTest {
                 HttpConfiguration http_config = new HttpConfiguration();
                 http_config.setSecureScheme("https");
                 http_config.setSecurePort(8443);
+
                 http_config.setOutputBufferSize(32768);
                 HttpConfiguration https_config = new HttpConfiguration(http_config);
                 SecureRequestCustomizer src = new SecureRequestCustomizer();
@@ -56,7 +57,7 @@ public class GenerateTemplateTest {
                 src.setStsIncludeSubDomains(true);
                 https_config.addCustomizer(src);
                 SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
-                sslContextFactory.setKeyStorePath(resourcePath + File.separator + "test.keystore");
+                sslContextFactory.setKeyStorePath(resourcePath + File.separator + "keystore.jks");
                 sslContextFactory.setKeyStorePassword("changeit");
                 sslContextFactory.setKeyManagerPassword("changeit");
                 try (ServerConnector https = new ServerConnector(server,
@@ -64,6 +65,7 @@ public class GenerateTemplateTest {
                         new HttpConnectionFactory(https_config))) {
 
                     https.setPort(8443);
+                    https.setHost("0.0.0.0");
                     https.setIdleTimeout(500000);
                     server.setConnectors(new Connector[]{connector, https});
                     ServletHandler handler = new ServletHandler();
@@ -129,7 +131,7 @@ public class GenerateTemplateTest {
     public void testLocalApiSpecYaml() throws IOException {
         String[] args = {"template", "generate", "-c", "api-config.yaml", "-a", "http://localhost:7070/openapi.json", "-apimCLIHome", apimCliHome, "-backendAuthType", "apiKey", "-frontendAuthType", "apiKey", "-o", "yaml"};
         GenerateTemplate.generate(args);
-        ObjectMapper objectMapperYaml = new ObjectMapper(new YAMLFactory());
+        ObjectMapper objectMapperYaml = new ObjectMapper(CustomYamlFactory.createYamlFactory());
         JsonNode jsonNode = objectMapperYaml.readTree(Files.newInputStream(Paths.get("api-config.yaml")));
         ObjectMapper objectMapper = new ObjectMapper();
         DocumentContext documentContext = JsonPath.parse(objectMapper.writeValueAsString(jsonNode));

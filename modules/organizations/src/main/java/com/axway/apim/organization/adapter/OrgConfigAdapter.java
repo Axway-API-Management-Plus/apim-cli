@@ -1,15 +1,9 @@
 package com.axway.apim.organization.adapter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIManagerAPIAdapter;
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIAccess;
 import com.axway.apim.api.model.CustomProperties.Type;
@@ -24,7 +18,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class OrgConfigAdapter extends OrgAdapter {
 
@@ -51,7 +51,7 @@ public class OrgConfigAdapter extends OrgAdapter {
                 mapper.readTree(configFile);
                 LOG.debug("Handling JSON Configuration file: {}", configFile);
             }catch (IOException ioException){
-                mapper = new ObjectMapper(new YAMLFactory());
+                mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
                 LOG.debug("Handling Yaml Configuration file: {}", configFile);
             }
             baseOrgs = mapper.readValue(Utils.substituteVariables(configFile), new TypeReference<List<Organization>>() {
