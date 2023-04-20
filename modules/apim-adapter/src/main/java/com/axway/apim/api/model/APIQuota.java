@@ -1,5 +1,6 @@
 package com.axway.apim.api.model;
 
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
@@ -73,7 +74,7 @@ public class APIQuota {
         if (other == null) return false;
         if (other instanceof APIQuota) {
             APIQuota apiQuota = (APIQuota) other;
-            return apiQuota.getRestrictions().containsAll(this.getRestrictions());
+            return Utils.compareValues(apiQuota.getRestrictions(), this.getRestrictions());
         } else {
             return false;
         }
