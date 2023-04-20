@@ -171,13 +171,13 @@ public class APIExportAppTest extends WiremockWrapper {
     }
 
 
-    @Test
-    public void testApi() {
-        String[] args = {"-h", "10.133.132.116", "-n", "dev_calponia.yaml_2023-04-17T13 34 51Z.yaml", "-o", "json", "-deleteTarget"};
-
-        int returnCode = APIExportApp.exportAPI(args);
-        System.out.println(returnCode);
-
-    }
+//    @Test
+//    public void testApi() {
+//        String[] args = {"-h", "10.133.132.116", "-n", "dev_calponia.yaml_2023-04-17T13 34 51Z.yaml", "-o", "json", "-deleteTarget"};
+//
+//        int returnCode = APIExportApp.exportAPI(args);
+//        System.out.println(returnCode);
+//
+//    }
 
 }
