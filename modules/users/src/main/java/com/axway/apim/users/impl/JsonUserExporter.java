@@ -1,5 +1,6 @@
 package com.axway.apim.users.impl;
 
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.Image;
@@ -16,7 +17,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -36,7 +36,7 @@ public class JsonUserExporter extends UserResultHandler {
 			saveUserLocally(new ExportUser(user), this);
 		}
 	}
-	
+
 	public void saveUserLocally(ExportUser user, UserResultHandler userResultHandler) throws AppException {
 		String folderName = getExportFolder(user);
 		String targetFolder = params.getTarget();
@@ -49,7 +49,7 @@ public class JsonUserExporter extends UserResultHandler {
 					FileUtils.deleteDirectory(localFolder);
 				} catch (IOException e) {
 					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
-				}				
+				}
 			} else {
 				LOG.warn("Local export folder: {} already exists. User will not be exported. (You may set -deleteTarget)", localFolder);
 				this.hasError = true;
@@ -62,7 +62,7 @@ public class JsonUserExporter extends UserResultHandler {
 		ObjectMapper mapper;
 		String configFile;
 		if(userResultHandler instanceof YamlUserExporter){
-			mapper = new ObjectMapper(new YAMLFactory());
+			mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
 			configFile = "/user-config.yaml";
 		}else {
 			mapper = new ObjectMapper();
@@ -87,7 +87,7 @@ public class JsonUserExporter extends UserResultHandler {
 		}
 		LOG.info("Successfully exported user into folder: {}", localFolder);
 	}
-	
+
 	private String getExportFolder(ExportUser user) {
 		String loginName = user.getLoginName();
 		loginName = loginName.replace(" ", "-");
@@ -98,7 +98,7 @@ public class JsonUserExporter extends UserResultHandler {
 	public UserFilter getFilter() {
 		return getBaseFilterBuilder().includeImage(true).build();
 	}
-	
+
 	public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
 
 		try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {

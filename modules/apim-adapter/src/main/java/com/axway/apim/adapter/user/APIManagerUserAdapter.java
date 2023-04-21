@@ -196,7 +196,7 @@ public class APIManagerUserAdapter {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error creating/updating user. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException("Error creating/updating user. Response-Code: " + statusCode + "", ErrorCode.UNXPECTED_ERROR);
+                        throw new AppException("Error creating/updating user. Response-Code: " + statusCode, ErrorCode.UNXPECTED_ERROR);
                     }
                     createdUser = mapper.readValue(httpResponse.getEntity().getContent(), User.class);
                     desiredUser.setId(createdUser.getId());
@@ -225,7 +225,7 @@ public class APIManagerUserAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
                     LOG.error("Error changing password of user. Response-Code: {}  Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                    throw new AppException("Error changing password of user. Response-Code: " + statusCode + "", ErrorCode.ERROR_CHANGEPASSWORD);
+                    throw new AppException("Error changing password of user. Response-Code: " + statusCode, ErrorCode.ERROR_CHANGEPASSWORD);
                 }
             }
         } catch (Exception e) {
@@ -241,7 +241,7 @@ public class APIManagerUserAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
                     LOG.error("Error deleting user. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                    throw new AppException("Error deleting user. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error deleting user. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 // Also remove this user from cache
                 userCache.remove(user.getId());

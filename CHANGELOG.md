@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.13.7] In progress
+
+
+- Add output for apim.sh api check-cert (See issue [#374](https://github.com/Axway-API-Management-Plus/apim-cli/issues/374))
+- A change in application quota is not detected (See issue [#382](https://github.com/Axway-API-Management-Plus/apim-cli/issues/382))
+- Snakeyaml size limitation (Nullpointer Exception when downloading API Spec via apim CLI) (See issue [#384](https://github.com/Axway-API-Management-Plus/apim-cli/issues/384))
+
 ## [1.13.6] 2023-04-03
 
 ### Fixed

@@ -2,6 +2,7 @@ package com.axway.apim.appexport.impl;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.client.apps.ClientAppFilter;
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.adapter.jackson.QuotaRestrictionSerializer;
 import com.axway.apim.api.model.Image;
@@ -20,7 +21,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 			saveApplicationLocally(new ExportApplication(app), this);
 		}
 	}
-	
+
 	public void saveApplicationLocally(ExportApplication app, ApplicationExporter applicationExporter) throws AppException {
 		String folderName = getExportFolder(app);
 		String targetFolder = params.getTarget();
@@ -58,7 +58,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 					FileUtils.deleteDirectory(localFolder);
 				} catch (IOException e) {
 					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
-				}				
+				}
 			} else {
 				LOG.warn("Local export folder: {} already exists. Application will not be exported. (You may set -deleteTarget)", localFolder);
 				this.hasError = true;
@@ -71,7 +71,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		ObjectMapper mapper;
 		String configFile;
 		if(applicationExporter instanceof YamlApplicationExporter){
-			mapper = new ObjectMapper(new YAMLFactory());
+			mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
 			configFile = "/application-config.yaml";
 		}else {
 			mapper = new ObjectMapper();
@@ -80,7 +80,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 		mapper.registerModule(new SimpleModule().setSerializerModifier(new AppExportSerializerModifier(localFolder)));
 		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
 		mapper.registerModule(new SimpleModule().addSerializer(QuotaRestriction.class, new QuotaRestrictionSerializer(null)));
-		
+
 		FilterProvider filter = new SimpleFilterProvider()
 				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("id", "apiId", "createdBy", "createdOn", "enabled"))
 				.addFilter("QuotaRestrictionFilter", SimpleBeanPropertyFilter.serializeAllExcept("api", "apiId")) // Is handled in ExportApplication
@@ -108,13 +108,13 @@ public class JsonApplicationExporter extends ApplicationExporter {
 			LOG.warn("- Only subscribed applications from the Org-Admins organization");
 		}
 	}
-	
+
 	private String getExportFolder(ExportApplication app) {
 		String appName = app.getName();
 		appName = appName.replace(" ", "-");
 		return appName;
 	}
-	
+
 	public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
 
 		try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {
@@ -123,7 +123,7 @@ public class JsonApplicationExporter extends ApplicationExporter {
 			throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
 		}
 	}
-	
+
 	public static void storeCaCert(File localFolder, String certBlob, String filename) throws AppException {
 		if(certBlob==null) return;
 		try {

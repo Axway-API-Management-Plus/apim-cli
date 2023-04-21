@@ -4,14 +4,15 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
 import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.OrgFilter;
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.api.API;
-import com.axway.apim.api.specification.APISpecification;
-import com.axway.apim.api.specification.WSDLSpecification;
 import com.axway.apim.api.export.ExportAPI;
 import com.axway.apim.api.export.jackson.serializer.APIExportSerializerModifier;
 import com.axway.apim.api.export.lib.params.APIExportParams;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.Image;
+import com.axway.apim.api.specification.APISpecification;
+import com.axway.apim.api.specification.WSDLSpecification;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
@@ -22,7 +23,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +72,7 @@ public class JsonAPIExporter extends APIResultHandler {
 
         String apiPath = getAPIExportFolder(exportAPI.getPath());
         File localFolder = new File(this.givenExportFolder + File.separator + getVHost(exportAPI) + apiPath);
-        LOG.debug("Going to export API: {} into folder: {} ", exportAPI, localFolder);
+        LOG.debug("Going to export API: {} into folder: {} ", exportAPI.getName(), localFolder);
         validateFolder(localFolder);
         APISpecification apiDef = exportAPI.getAPIDefinition();
         // Skip processing if API definition is not available due to original API cloned and deleted.
@@ -93,7 +93,7 @@ public class JsonAPIExporter extends APIResultHandler {
         }
         ObjectMapper mapper;
         if(apiResultHandler instanceof YamlAPIExporter){
-            mapper = new ObjectMapper(new YAMLFactory());
+            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
             configFile = "/api-config.yaml";
         }else {
             mapper = new ObjectMapper();

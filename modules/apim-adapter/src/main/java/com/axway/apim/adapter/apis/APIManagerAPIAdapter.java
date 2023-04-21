@@ -134,7 +134,7 @@ public class APIManagerAPIAdapter {
                         return;
                     }
                     LOG.error("Error loading APIs from API-Manager. Response-Code: {} Got response: {}", statusCode, response);
-                    throw new AppException("Error loading APIs from API-Manager. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error loading APIs from API-Manager. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 if (response.startsWith("{")) { // Got a single response!
                     response = "[" + response + "]";
@@ -574,7 +574,7 @@ public class APIManagerAPIAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error updating API-Proxy. Response-Code: {} Got response: {}", statusCode, response);
-                    throw new AppException("Error updating API-Proxy. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error updating API-Proxy. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 return mapper.readValue(response, API.class);
             }
@@ -592,7 +592,7 @@ public class APIManagerAPIAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
                     LOG.error("Error deleting API-Proxy using URI: {} Response-Code: {} Response: {}", uri, statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                    throw new AppException("Error deleting API-Proxy. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error deleting API-Proxy. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 LOG.info("API: {} {} ( {} ) successfully deleted", api.getName(), api.getVersion(), api.getId());
             }
@@ -611,7 +611,7 @@ public class APIManagerAPIAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
                     LOG.error("Error deleting Backend-API using URI: {}. Response-Code: {} Response: {}", uri, statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                    throw new AppException("Error deleting Backend-API. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error deleting Backend-API. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
             }
         } catch (Exception e) {

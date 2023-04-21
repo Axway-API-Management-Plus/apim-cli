@@ -142,6 +142,7 @@ public class OAS3xSpecification extends APISpecification {
             setMapperForDataFormat();
             if (this.mapper == null) return false;
             openAPI = this.mapper.readTree(apiSpecificationContent);
+            LOG.debug("openapi tag value : {}", openAPI.get("openapi"));
             return openAPI.has("openapi") && openAPI.get("openapi").asText().startsWith("3.0.");
         } catch (AppException e) {
             if (e.getError() == ErrorCode.UNSUPPORTED_FEATURE) {
@@ -149,7 +150,9 @@ public class OAS3xSpecification extends APISpecification {
             }
             return false;
         } catch (Exception e) {
-            LOG.trace("No OpenAPI 3.0 specification.", e);
+            if (LOG.isDebugEnabled()) {
+                LOG.error("No OpenAPI 3.0 specification.", e);
+            }
             return false;
         }
     }

@@ -1,5 +1,6 @@
 package com.axway.apim.config;
 
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.*;
 import com.axway.apim.cli.APIMCLIServiceProvider;
@@ -17,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -90,7 +90,7 @@ public class GenerateTemplate implements APIMCLIServiceProvider {
             APIConfig apiConfig = app.generateTemplate(params);
             try(FileWriter fileWriter = new FileWriter(params.getConfig())) {
                 if(params.getOutputFormat().equals(StandardExportParams.OutputFormat.yaml))
-                    objectMapper = new ObjectMapper(new YAMLFactory());
+                    objectMapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
                 else
                     objectMapper = new ObjectMapper();
                 String[] serializeAllExcept = new String[]{"useForInbound", "useForOutbound"};

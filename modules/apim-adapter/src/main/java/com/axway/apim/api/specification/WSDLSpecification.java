@@ -76,7 +76,9 @@ public class WSDLSpecification extends APISpecification {
             if (wsdlNamespace != null && wsdlNamespace.contains("http://schemas.xmlsoap.org/wsdl"))
                 return true;
         } catch (SAXException | IOException | ParserConfigurationException e) {
-            LOG.error("Error parsing WSDL : {}", e.getMessage());
+            if (LOG.isDebugEnabled()) {
+                LOG.error("Error parsing WSDL", e);
+            }
             return false;
         }
         LOG.debug("Not a WSDL specification..");

@@ -97,7 +97,9 @@ public class ODataV4Specification extends ODataSpecification {
             createBatchResource(openAPI);
             return true;
         } catch (Exception e) {
-            logger.error("Error parsing OData V4 MetaData.", e);
+            if(logger.isDebugEnabled()) {
+                logger.error("Error parsing OData V4 MetaData.", e);
+            }
             return false;
         }
     }

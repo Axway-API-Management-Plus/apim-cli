@@ -1,6 +1,7 @@
 package com.axway.apim.organization.impl;
 
 import com.axway.apim.adapter.apis.OrgFilter;
+import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.Organization;
@@ -16,7 +17,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class JsonOrgExporter extends OrgResultHandler {
 			saveOrganizationLocally(new ExportOrganization(org), this);
 		}
 	}
-	
+
 	public void saveOrganizationLocally(ExportOrganization org, OrgResultHandler orgResultHandler) throws AppException {
 		String folderName = getExportFolder(org);
 		String targetFolder = params.getTarget();
@@ -52,7 +52,7 @@ public class JsonOrgExporter extends OrgResultHandler {
 					FileUtils.deleteDirectory(localFolder);
 				} catch (IOException e) {
 					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
-				}				
+				}
 			} else {
 				LOG.warn("Local export folder: {} already exists. Organization will not be exported. (You may set -deleteTarget)", localFolder);
 				this.hasError = true;
@@ -65,7 +65,7 @@ public class JsonOrgExporter extends OrgResultHandler {
 		ObjectMapper mapper;
 		String configFile;
 		if(orgResultHandler instanceof YamlOrgExporter){
-			mapper = new ObjectMapper(new YAMLFactory());
+			mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
 			configFile = "/org-config.yaml";
 		}else {
 			mapper = new ObjectMapper();
@@ -90,7 +90,7 @@ public class JsonOrgExporter extends OrgResultHandler {
 		}
 		LOG.info("Successfully exported organization into folder: {}" , localFolder);
 	}
-	
+
 	private String getExportFolder(ExportOrganization org) {
 		String name = org.getName();
 		name = name.replace(" ", "-");
@@ -104,7 +104,7 @@ public class JsonOrgExporter extends OrgResultHandler {
 				.includeAPIAccess(true)
 				.build();
 	}
-	
+
 	public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
 		try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {
 			fileOuputStream.write(bFile);

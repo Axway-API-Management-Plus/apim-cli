@@ -56,7 +56,7 @@ public class APIManagerRemoteHostsAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error loading remoteHosts from API-Manager. Response-Code: {} Got Response Body:{}", statusCode, response);
-                    throw new AppException("Error loading remoteHosts from API-Manager. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error loading remoteHosts from API-Manager. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 apiManagerResponse.put(filter, response);
             }
@@ -129,7 +129,7 @@ public class APIManagerRemoteHostsAdapter {
                 if (statusCode < 200 || statusCode > 299) {
                     String errorResponse = EntityUtils.toString(httpResponse.getEntity());
                     LOG.error("Error creating/updating remote host. Response-Code: {}  Response Body: {}", statusCode, errorResponse);
-                    throw new AppException("Error creating/updating remote host. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error creating/updating remote host. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 createdRemoteHost = mapper.readValue(httpResponse.getEntity().getContent(), RemoteHost.class);
             }
