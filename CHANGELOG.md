@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.13.7] In progress
+## [1.13.7] 2023-04-21
 
 
 - Add output for apim.sh api check-cert (See issue [#374](https://github.com/Axway-API-Management-Plus/apim-cli/issues/374))
