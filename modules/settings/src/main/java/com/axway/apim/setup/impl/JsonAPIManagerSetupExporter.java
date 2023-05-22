@@ -6,6 +6,7 @@ import com.axway.apim.adapter.jackson.CustomYamlFactory;
 import com.axway.apim.adapter.jackson.PolicySerializerModifier;
 import com.axway.apim.adapter.jackson.UserSerializerModifier;
 import com.axway.apim.api.model.Config;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
@@ -75,7 +76,6 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
         }
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-
             mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(true)));
             mapper.registerModule(new SimpleModule().setSerializerModifier(new UserSerializerModifier(true)));
             FilterProvider filters = new SimpleFilterProvider()
@@ -84,7 +84,11 @@ public class JsonAPIManagerSetupExporter extends APIManagerSetupResultHandler {
                 .addFilter("QuotaRestrictionFilter", SimpleBeanPropertyFilter.serializeAllExcept( "apiId")) // Is handled in ExportApplication
                 .setFailOnUnknownId(false);
             mapper.setFilterProvider(filters);
-            mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), apimanagerConfig);
+            if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+                mapper.writeValue(System.out, apimanagerConfig);
+            }else {
+                mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), apimanagerConfig);
+            }
             result.addExportedFile(localFolder.getCanonicalPath() + configFile);
         } catch (Exception e) {
             throw new AppException("Can't create configuration export", ErrorCode.UNXPECTED_ERROR, e);

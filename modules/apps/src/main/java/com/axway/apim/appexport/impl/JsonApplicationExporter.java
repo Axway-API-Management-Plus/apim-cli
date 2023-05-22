@@ -11,6 +11,7 @@ import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.appexport.impl.jackson.AppExportSerializerModifier;
 import com.axway.apim.appexport.lib.AppExportParams;
 import com.axway.apim.appexport.model.ExportApplication;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
@@ -32,116 +33,120 @@ import java.util.List;
 
 public class JsonApplicationExporter extends ApplicationExporter {
 
-	private static final Logger LOG = LoggerFactory.getLogger(JsonApplicationExporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JsonApplicationExporter.class);
 
 
-	public JsonApplicationExporter(AppExportParams params, ExportResult result) {
-		super(params, result);
-	}
+    public JsonApplicationExporter(AppExportParams params, ExportResult result) {
+        super(params, result);
+    }
 
-	@Override
-	public void export(List<ClientApplication> apps) throws AppException {
-		for(ClientApplication app : apps) {
-			saveApplicationLocally(new ExportApplication(app), this);
-		}
-	}
+    @Override
+    public void export(List<ClientApplication> apps) throws AppException {
+        for (ClientApplication app : apps) {
+            saveApplicationLocally(new ExportApplication(app), this);
+        }
+    }
 
-	public void saveApplicationLocally(ExportApplication app, ApplicationExporter applicationExporter) throws AppException {
-		String folderName = getExportFolder(app);
-		String targetFolder = params.getTarget();
-		File localFolder = new File(targetFolder +File.separator+ folderName);
-		LOG.info("Going to export applications into folder: {}" , localFolder);
-		if(localFolder.exists()) {
-			if(AppExportParams.getInstance().isDeleteTarget()) {
-				LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
-				try {
-					FileUtils.deleteDirectory(localFolder);
-				} catch (IOException e) {
-					throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
-				}
-			} else {
-				LOG.warn("Local export folder: {} already exists. Application will not be exported. (You may set -deleteTarget)", localFolder);
-				this.hasError = true;
-				return;
-			}
-		}
-		if (!localFolder.mkdirs()) {
-			throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
-		}
-		ObjectMapper mapper;
-		String configFile;
-		if(applicationExporter instanceof YamlApplicationExporter){
-			mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
-			configFile = "/application-config.yaml";
-		}else {
-			mapper = new ObjectMapper();
-			configFile = "/application-config.json";
-		}
-		mapper.registerModule(new SimpleModule().setSerializerModifier(new AppExportSerializerModifier(localFolder)));
-		mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
-		mapper.registerModule(new SimpleModule().addSerializer(QuotaRestriction.class, new QuotaRestrictionSerializer(null)));
+    public void saveApplicationLocally(ExportApplication app, ApplicationExporter applicationExporter) throws AppException {
+        String folderName = getExportFolder(app);
+        String targetFolder = params.getTarget();
+        File localFolder = new File(targetFolder + File.separator + folderName);
+        LOG.info("Going to export applications into folder: {}", localFolder);
+        if (localFolder.exists()) {
+            if (AppExportParams.getInstance().isDeleteTarget()) {
+                LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
+                try {
+                    FileUtils.deleteDirectory(localFolder);
+                } catch (IOException e) {
+                    throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
+                }
+            } else {
+                LOG.warn("Local export folder: {} already exists. Application will not be exported. (You may set -deleteTarget)", localFolder);
+                this.hasError = true;
+                return;
+            }
+        }
+        if (!localFolder.mkdirs()) {
+            throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
+        }
+        ObjectMapper mapper;
+        String configFile;
+        if (applicationExporter instanceof YamlApplicationExporter) {
+            mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
+            configFile = "/application-config.yaml";
+        } else {
+            mapper = new ObjectMapper();
+            configFile = "/application-config.json";
+        }
+        mapper.registerModule(new SimpleModule().setSerializerModifier(new AppExportSerializerModifier(localFolder)));
+        mapper.registerModule(new SimpleModule().addSerializer(Image.class, new ImageSerializer()));
+        mapper.registerModule(new SimpleModule().addSerializer(QuotaRestriction.class, new QuotaRestrictionSerializer(null)));
 
-		FilterProvider filter = new SimpleFilterProvider()
-				.setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("id", "apiId", "createdBy", "createdOn", "enabled"))
-				.addFilter("QuotaRestrictionFilter", SimpleBeanPropertyFilter.serializeAllExcept("api", "apiId")) // Is handled in ExportApplication
-				.addFilter("APIAccessFilter", SimpleBeanPropertyFilter.filterOutAllExcept("apiName", "apiVersion"))
-				.addFilter("ApplicationPermissionFilter", SimpleBeanPropertyFilter.serializeAllExcept("userId", "createdBy", "id"))
-				.addFilter("ClientAppCredentialFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "createdOn", "createdBy"))
-				.addFilter("ClientAppOauthResourceFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "uriprefix", "scopes", "enabled"));
-		mapper.setFilterProvider(filter);
-		mapper.setSerializationInclusion(Include.NON_NULL);
-		try {
-			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), app);
-			this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
-		} catch (Exception e) {
-			throw new AppException("Can't write Application-Configuration file for application: '"+app.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
-		}
-		if(app.getImage()!=null) {
-			writeBytesToFile(app.getImage().getImageContent(), localFolder+File.separator + app.getImage().getBaseFilename());
-		}
-		LOG.info("Successfully exported application to folder: {}" , localFolder);
-		if(!APIManagerAdapter.hasAdminAccount()) {
-			LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
-			LOG.warn("- No Quotas has been exported for the API");
-			LOG.warn("- No Client-Organizations");
-			LOG.warn("- Only subscribed applications from the Org-Admins organization");
-		}
-	}
+        FilterProvider filter = new SimpleFilterProvider()
+            .setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("id", "apiId", "createdBy", "createdOn", "enabled"))
+            .addFilter("QuotaRestrictionFilter", SimpleBeanPropertyFilter.serializeAllExcept("api", "apiId")) // Is handled in ExportApplication
+            .addFilter("APIAccessFilter", SimpleBeanPropertyFilter.filterOutAllExcept("apiName", "apiVersion"))
+            .addFilter("ApplicationPermissionFilter", SimpleBeanPropertyFilter.serializeAllExcept("userId", "createdBy", "id"))
+            .addFilter("ClientAppCredentialFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "createdOn", "createdBy"))
+            .addFilter("ClientAppOauthResourceFilter", SimpleBeanPropertyFilter.serializeAllExcept("applicationId", "id", "uriprefix", "scopes", "enabled"));
+        mapper.setFilterProvider(filter);
+        mapper.setSerializationInclusion(Include.NON_NULL);
+        try {
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            if(EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+                mapper.writeValue(System.out, app);
+            }else {
+                mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), app);
+            }
+            this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
+        } catch (Exception e) {
+            throw new AppException("Can't write Application-Configuration file for application: '" + app.getName() + "'", ErrorCode.UNXPECTED_ERROR, e);
+        }
+        if (app.getImage() != null) {
+            writeBytesToFile(app.getImage().getImageContent(), localFolder + File.separator + app.getImage().getBaseFilename());
+        }
+        LOG.info("Successfully exported application to folder: {}", localFolder);
+        if (!APIManagerAdapter.hasAdminAccount()) {
+            LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
+            LOG.warn("- No Quotas has been exported for the API");
+            LOG.warn("- No Client-Organizations");
+            LOG.warn("- Only subscribed applications from the Org-Admins organization");
+        }
+    }
 
-	private String getExportFolder(ExportApplication app) {
-		String appName = app.getName();
-		appName = appName.replace(" ", "-");
-		return appName;
-	}
+    private String getExportFolder(ExportApplication app) {
+        String appName = app.getName();
+        appName = appName.replace(" ", "-");
+        return appName;
+    }
 
-	public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
+    public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
 
-		try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {
-			fileOuputStream.write(bFile);
-		} catch (IOException e) {
-			throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
-		}
-	}
+        try (FileOutputStream fileOutputStream = new FileOutputStream(fileDest)) {
+            fileOutputStream.write(bFile);
+        } catch (IOException e) {
+            throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
+        }
+    }
 
-	public static void storeCaCert(File localFolder, String certBlob, String filename) throws AppException {
-		if(certBlob==null) return;
-		try {
-			writeBytesToFile(certBlob.getBytes(), localFolder + "/" + filename);
-		} catch (AppException e) {
-			throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
-		}
-	}
+    public static void storeCaCert(File localFolder, String certBlob, String filename) throws AppException {
+        if (certBlob == null) return;
+        try {
+            writeBytesToFile(certBlob.getBytes(), localFolder + "/" + filename);
+        } catch (AppException e) {
+            throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
+        }
+    }
 
-	@Override
-	public ClientAppFilter getFilter() throws AppException {
-		return getBaseFilterBuilder()
-				.includeQuotas(true)
-				.includeCredentials(true)
-				.includeAPIAccess(true)
-				.includeImage(true)
-				.includeOauthResources(true)
-				.includeAppPermissions(true)
-				.build();
-	}
+    @Override
+    public ClientAppFilter getFilter() throws AppException {
+        return getBaseFilterBuilder()
+            .includeQuotas(true)
+            .includeCredentials(true)
+            .includeAPIAccess(true)
+            .includeImage(true)
+            .includeOauthResources(true)
+            .includeAppPermissions(true)
+            .build();
+    }
 }

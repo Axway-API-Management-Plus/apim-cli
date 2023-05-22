@@ -72,8 +72,10 @@ public class JsonAPIExporter extends APIResultHandler {
 
         String apiPath = getAPIExportFolder(exportAPI.getPath());
         File localFolder = new File(this.givenExportFolder + File.separator + getVHost(exportAPI) + apiPath);
-        LOG.debug("Going to export API: {} into folder: {} ", exportAPI.getName(), localFolder);
-        validateFolder(localFolder);
+        if(!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+            LOG.debug("Going to export API: {} into folder: {} ", exportAPI.getName(), localFolder);
+            validateFolder(localFolder);
+        }
         APISpecification apiDef = exportAPI.getAPIDefinition();
         // Skip processing if API definition is not available due to original API cloned and deleted.
         if (apiDef == null) {
@@ -84,7 +86,7 @@ public class JsonAPIExporter extends APIResultHandler {
         String configFile;
         try {
             targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension();
-            if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKED_URL)) {
+            if ((!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) || !EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
                 writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
                 exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension());
             }
@@ -99,6 +101,18 @@ public class JsonAPIExporter extends APIResultHandler {
             mapper = new ObjectMapper();
             configFile = "/api-config.json";
         }
+        Image image = exportAPI.getAPIImage();
+        if (image != null) {
+            if(EnvironmentProperties.PRINT_CONFIG_CONSOLE){
+
+            }else {
+                writeBytesToFile(image.getImageContent(), localFolder + File.separator + image.getBaseFilename());
+            }
+        }
+        if (exportAPI.getCaCerts() != null && !exportAPI.getCaCerts().isEmpty()) {
+            storeCaCerts(localFolder, exportAPI.getCaCerts());
+        }
+
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIExportSerializerModifier()));
         mapper.setSerializationInclusion(Include.NON_NULL);
         FilterProvider filters = new SimpleFilterProvider()
@@ -110,17 +124,15 @@ public class JsonAPIExporter extends APIResultHandler {
         mapper.setFilterProvider(filters);
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), exportAPI);
+            if(EnvironmentProperties.PRINT_CONFIG_CONSOLE){
+                mapper.writeValue(System.out, exportAPI);
+            }else {
+                mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), exportAPI);
+            }
         } catch (Exception e) {
             throw new AppException("Can't create API-Configuration file for API: '" + exportAPI.getName() + "' exposed on path: '" + exportAPI.getPath() + "'.", ErrorCode.UNXPECTED_ERROR, e);
         }
-        Image image = exportAPI.getAPIImage();
-        if (image != null) {
-            writeBytesToFile(image.getImageContent(), localFolder + File.separator + image.getBaseFilename());
-        }
-        if (exportAPI.getCaCerts() != null && !exportAPI.getCaCerts().isEmpty()) {
-            storeCaCerts(localFolder, exportAPI.getCaCerts());
-        }
+
         LOG.info("Successfully exported API: {} into folder: {}", exportAPI.getName(), localFolder.getAbsolutePath());
         if (!APIManagerAdapter.hasAdminAccount()) {
             LOG.warn("Export has been done with an Org-Admin account only. Export is restricted by the following: ");
@@ -138,19 +150,24 @@ public class JsonAPIExporter extends APIResultHandler {
     }
 
     private void storeCaCerts(File localFolder, List<CaCert> caCerts) throws AppException {
+        Base64.Decoder decoder = Base64.getDecoder();
+        Base64.Encoder encoder = Base64.getMimeEncoder(64, System.getProperty("line.separator").getBytes());
         for (CaCert caCert : caCerts) {
             if (caCert.getCertBlob() == null) {
                 LOG.warn("- Ignoring cert export for null certBlob for alias: {}", caCert.getAlias());
             } else {
-                String filename = caCert.getCertFile();
-                Base64.Encoder encoder = Base64.getMimeEncoder(64, System.getProperty("line.separator").getBytes());
-                Base64.Decoder decoder = Base64.getDecoder();
-                final String encodedCertText = new String(encoder.encode(decoder.decode(caCert.getCertBlob())));
-                byte[] certContent = ("-----BEGIN CERTIFICATE-----\n" + encodedCertText + "\n-----END CERTIFICATE-----").getBytes();
-                try {
-                    writeBytesToFile(certContent, localFolder + "/" + filename);
-                } catch (AppException e) {
-                    throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
+                if(EnvironmentProperties.PRINT_CONFIG_CONSOLE){
+                    final String encodedCertText = "data:base64," + caCert.getCertBlob();
+                    caCert.setCertFile(encodedCertText);
+                }else {
+                    String filename = caCert.getCertFile();
+                    final String encodedCertText = new String(encoder.encode(decoder.decode(caCert.getCertBlob())));
+                    byte[] certContent = ("-----BEGIN CERTIFICATE-----\n" + encodedCertText + "\n-----END CERTIFICATE-----").getBytes();
+                    try {
+                        writeBytesToFile(certContent, localFolder + "/" + filename);
+                    } catch (AppException e) {
+                        throw new AppException("Can't write certificate to disc", ErrorCode.UNXPECTED_ERROR, e);
+                    }
                 }
             }
         }

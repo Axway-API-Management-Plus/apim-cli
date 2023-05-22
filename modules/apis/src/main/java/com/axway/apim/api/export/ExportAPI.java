@@ -2,28 +2,25 @@ package com.axway.apim.api.export;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
-import com.axway.apim.api.specification.APISpecification;
-import com.axway.apim.api.specification.WSDLSpecification;
 import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.apps.ClientApplication;
+import com.axway.apim.api.specification.APISpecification;
+import com.axway.apim.api.specification.WSDLSpecification;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @JsonPropertyOrder({"name", "path", "state", "version", "apiRoutingKey", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost",
     "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties",
     "corsProfiles", "caCerts", "applicationQuota", "systemQuota", "apiMethods"})
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonInclude(value= JsonInclude.Include.NON_EMPTY, content= JsonInclude.Include.NON_NULL)
 public class ExportAPI {
     API actualAPIProxy = null;
 
@@ -113,14 +110,9 @@ public class ExportAPI {
     }
 
     public Map<String, InboundProfile> getInboundProfiles() {
-        if (this.actualAPIProxy.getInboundProfiles() == null) return null;
-        if (this.actualAPIProxy.getInboundProfiles().isEmpty()) return null;
-        if (this.actualAPIProxy.getInboundProfiles().size() == 1) {
-            InboundProfile defaultProfile = this.actualAPIProxy.getInboundProfiles().get("_default");
-            if (defaultProfile.getSecurityProfile().equals("_default")
-                && defaultProfile.getCorsProfile().equals("_default")) return null;
-        }
-        return this.actualAPIProxy.getInboundProfiles();
+        if (actualAPIProxy.getInboundProfiles() == null) return null;
+        if (actualAPIProxy.getInboundProfiles().isEmpty()) return null;
+        return actualAPIProxy.getInboundProfiles();
     }
 
 
@@ -307,10 +299,13 @@ public class ExportAPI {
     @JsonProperty("apiSpecification")
     public DesiredAPISpecification getApiDefinitionImport() {
         DesiredAPISpecification spec = new DesiredAPISpecification();
-        if (this.getAPIDefinition() instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKED_URL) {
+        if (this.getAPIDefinition() instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) {
             spec.setResource(actualAPIProxy.getBackendImportedUrl());
-        } else
+        } else if(EnvironmentProperties.PRINT_CONFIG_CONSOLE){
+            spec.setResource("data:base64," + Base64.getEncoder().encodeToString(this.getAPIDefinition().getApiSpecificationContent()));
+        }else {
             spec.setResource(this.getAPIDefinition().getApiSpecificationFile());
+        }
         return spec;
     }
 
@@ -338,12 +333,16 @@ public class ExportAPI {
                 apiMethod.setTags(actualMethod.getTags());
             apiMethodsTransformed.add(apiMethod);
             String descriptionType = actualMethod.getDescriptionType();
-            if (descriptionType.equals("manual")) {
-                apiMethod.setDescriptionManual(actualMethod.getDescriptionManual());
-            } else if (descriptionType.equals("url")) {
-                apiMethod.setDescriptionUrl(actualMethod.getDescriptionUrl());
-            } else if (descriptionType.equals("markdown")) {
-                apiMethod.setDescriptionMarkdown(actualMethod.getDescriptionMarkdown());
+            switch (descriptionType) {
+                case "manual":
+                    apiMethod.setDescriptionManual(actualMethod.getDescriptionManual());
+                    break;
+                case "url":
+                    apiMethod.setDescriptionUrl(actualMethod.getDescriptionUrl());
+                    break;
+                case "markdown":
+                    apiMethod.setDescriptionMarkdown(actualMethod.getDescriptionMarkdown());
+                    break;
             }
             apiMethod.setDescriptionType(descriptionType);
         }

@@ -5,6 +5,7 @@ import com.axway.apim.adapter.jackson.ImageSerializer;
 import com.axway.apim.adapter.user.UserFilter;
 import com.axway.apim.api.model.Image;
 import com.axway.apim.api.model.User;
+import com.axway.apim.lib.EnvironmentProperties;
 import com.axway.apim.lib.ExportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
@@ -77,7 +78,11 @@ public class JsonUserExporter extends UserResultHandler {
 		mapper.setSerializationInclusion(Include.NON_NULL);
 		try {
 			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-			mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), user);
+            if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+                mapper.writeValue(System.out, user);
+            }else {
+                mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), user);
+            }
 			this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
 		} catch (Exception e) {
 			throw new AppException("Can't write configuration file for user: '"+user.getName()+"'", ErrorCode.UNXPECTED_ERROR, e);
