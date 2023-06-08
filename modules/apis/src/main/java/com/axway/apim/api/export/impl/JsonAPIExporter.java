@@ -57,12 +57,12 @@ public class JsonAPIExporter extends APIResultHandler {
     @Override
     public APIFilter getFilter() {
         Builder builder = getBaseAPIFilterBuilder()
-                .includeQuotas(true)
-                .includeImage(true)
-                .includeClientApplications(true)
-                .includeClientOrganizations(true)
-                .includeOriginalAPIDefinition(true)
-                .includeRemoteHost(true);
+            .includeQuotas(true)
+            .includeImage(true)
+            .includeClientApplications(true)
+            .includeClientOrganizations(true)
+            .includeOriginalAPIDefinition(true)
+            .includeRemoteHost(true);
         if (exportMethods)
             builder.includeMethods(true);
         return builder.build();
@@ -72,7 +72,7 @@ public class JsonAPIExporter extends APIResultHandler {
 
         String apiPath = getAPIExportFolder(exportAPI.getPath());
         File localFolder = new File(this.givenExportFolder + File.separator + getVHost(exportAPI) + apiPath);
-        if(!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+        if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
             LOG.debug("Going to export API: {} into folder: {} ", exportAPI.getName(), localFolder);
             validateFolder(localFolder);
         }
@@ -86,26 +86,28 @@ public class JsonAPIExporter extends APIResultHandler {
         String configFile;
         try {
             targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension();
-            if ((!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) || !EnvironmentProperties.PRINT_CONFIG_CONSOLE)) {
-                writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
-                exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension());
+            LOG.info("{}", EnvironmentProperties.PRINT_CONFIG_CONSOLE);
+            LOG.info("condition {}", !(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL));
+            if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL)) {
+                if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+                    writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
+                    exportAPI.getAPIDefinition().setApiSpecificationFile(exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension());
+                }
             }
         } catch (IOException e) {
             throw new AppException("Can't save API-Definition locally to file: " + targetFile, ErrorCode.UNXPECTED_ERROR, e);
         }
         ObjectMapper mapper;
-        if(apiResultHandler instanceof YamlAPIExporter){
+        if (apiResultHandler instanceof YamlAPIExporter) {
             mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
             configFile = "/api-config.yaml";
-        }else {
+        } else {
             mapper = new ObjectMapper();
             configFile = "/api-config.json";
         }
         Image image = exportAPI.getAPIImage();
         if (image != null) {
-            if(EnvironmentProperties.PRINT_CONFIG_CONSOLE){
-
-            }else {
+            if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
                 writeBytesToFile(image.getImageContent(), localFolder + File.separator + image.getBaseFilename());
             }
         }
@@ -116,17 +118,17 @@ public class JsonAPIExporter extends APIResultHandler {
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIExportSerializerModifier()));
         mapper.setSerializationInclusion(Include.NON_NULL);
         FilterProvider filters = new SimpleFilterProvider()
-                .addFilter("CaCertFilter",
-                        SimpleBeanPropertyFilter.filterOutAllExcept("inbound", "outbound", "certFile"))
-                .addFilter("ProfileFilter",
-                        SimpleBeanPropertyFilter.serializeAllExcept("apiMethodId"))
-                .setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept());
+            .addFilter("CaCertFilter",
+                SimpleBeanPropertyFilter.filterOutAllExcept("inbound", "outbound", "certFile"))
+            .addFilter("ProfileFilter",
+                SimpleBeanPropertyFilter.serializeAllExcept("apiMethodId"))
+            .setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept());
         mapper.setFilterProvider(filters);
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            if(EnvironmentProperties.PRINT_CONFIG_CONSOLE){
+            if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
                 mapper.writeValue(System.out, exportAPI);
-            }else {
+            } else {
                 mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), exportAPI);
             }
         } catch (Exception e) {
@@ -156,10 +158,10 @@ public class JsonAPIExporter extends APIResultHandler {
             if (caCert.getCertBlob() == null) {
                 LOG.warn("- Ignoring cert export for null certBlob for alias: {}", caCert.getAlias());
             } else {
-                if(EnvironmentProperties.PRINT_CONFIG_CONSOLE){
-                    final String encodedCertText = "data:base64," + caCert.getCertBlob();
+                if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+                    final String encodedCertText = "data:application/x-pem-file;base64," + caCert.getCertBlob();
                     caCert.setCertFile(encodedCertText);
-                }else {
+                } else {
                     String filename = caCert.getCertFile();
                     final String encodedCertText = new String(encoder.encode(decoder.decode(caCert.getCertBlob())));
                     byte[] certContent = ("-----BEGIN CERTIFICATE-----\n" + encodedCertText + "\n-----END CERTIFICATE-----").getBytes();

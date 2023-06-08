@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class EnvironmentProperties implements Map<String, String> {
 
     public static final boolean RETAIN_BACKEND_URL = Boolean.parseBoolean(System.getenv().getOrDefault("retain.backend.url","false"));
-    public static final boolean PRINT_CONFIG_CONSOLE = Boolean.parseBoolean(System.getenv().getOrDefault("print_config_console","false"));
+    public static final boolean PRINT_CONFIG_CONSOLE = Boolean.parseBoolean(System.getenv().getOrDefault("print_console","false"));
 
     private static final Logger LOG = LoggerFactory.getLogger(EnvironmentProperties.class);
 

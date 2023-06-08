@@ -132,6 +132,10 @@ public class Image {
         return "APIImage [bytes=" + this.imageContent.length + "]";
     }
 
+    public String getContentType() {
+        return contentType;
+    }
+
     public static Image createImageFromFile(File file) throws AppException {
         Image image = new Image();
         try {

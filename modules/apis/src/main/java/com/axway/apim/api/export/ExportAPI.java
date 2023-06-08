@@ -20,7 +20,7 @@ import java.util.*;
 @JsonPropertyOrder({"name", "path", "state", "version", "apiRoutingKey", "organization", "apiSpecification", "summary", "descriptionType", "descriptionManual", "vhost", "remoteHost",
     "backendBasepath", "image", "inboundProfiles", "outboundProfiles", "securityProfiles", "authenticationProfiles", "tags", "customProperties",
     "corsProfiles", "caCerts", "applicationQuota", "systemQuota", "apiMethods"})
-@JsonInclude(value= JsonInclude.Include.NON_EMPTY, content= JsonInclude.Include.NON_NULL)
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY, content = JsonInclude.Include.NON_NULL)
 public class ExportAPI {
     API actualAPIProxy = null;
 
@@ -165,9 +165,18 @@ public class ExportAPI {
 
 
     public String getImage() {
-        if (this.actualAPIProxy.getImage() == null) return null;
+        if (actualAPIProxy.getImage() == null) return null;
         // We don't have an Image provided from the API-Manager
-        return "api-image" + this.actualAPIProxy.getImage().getFileExtension();
+        if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+            byte[] imageData = actualAPIProxy.getImage().getImageContent();
+            Base64.Encoder encoder = Base64.getEncoder();
+            String encodedData = encoder.encodeToString(imageData);
+            String contentType = actualAPIProxy.getImage().getContentType();
+            return "data:" + contentType + ";base64," + encodedData;
+
+        } else {
+            return "api-image" + actualAPIProxy.getImage().getFileExtension();
+        }
     }
 
     @JsonIgnore
@@ -301,10 +310,17 @@ public class ExportAPI {
         DesiredAPISpecification spec = new DesiredAPISpecification();
         if (this.getAPIDefinition() instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL) {
             spec.setResource(actualAPIProxy.getBackendImportedUrl());
-        } else if(EnvironmentProperties.PRINT_CONFIG_CONSOLE){
-            spec.setResource("data:base64," + Base64.getEncoder().encodeToString(this.getAPIDefinition().getApiSpecificationContent()));
-        }else {
-            spec.setResource(this.getAPIDefinition().getApiSpecificationFile());
+        } else if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+            String filename = getAPIDefinition().getApiSpecificationFile();
+            String contentType = "data:text/plain;base64,";
+            if (filename.endsWith("json")) {
+                contentType = "data:application/json;base64,";
+            } else if (filename.endsWith("yaml") || filename.endsWith("yml")) {
+                contentType = "data:application/x-yaml;base64,";
+            }
+            spec.setResource(contentType + Base64.getEncoder().encodeToString(getAPIDefinition().getApiSpecificationContent()));
+        } else {
+            spec.setResource(getAPIDefinition().getApiSpecificationFile());
         }
         return spec;
     }
