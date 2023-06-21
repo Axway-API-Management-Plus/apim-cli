@@ -98,6 +98,36 @@ public class APISpecificationSwagger2xTest {
     }
 
     @Test
+    public void swaggerWithoutHostAndSchemesWithOverride() throws IOException {
+        CoreParameters.getInstance().setOverrideSpecBasePath(true);
+        byte[] content = getSwaggerContent(testPackage + "/petstore-without-schemes-host.json");
+        APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
+        apiDefinition.configureBasePath("http://myhost.customer.com", null);
+
+        Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
+        JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
+        Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com");
+        Assert.assertEquals(swagger.get("basePath").asText(), "/v2");
+        Assert.assertEquals(swagger.get("schemes").get(0).asText(), "http");
+        Assert.assertEquals(swagger.get("schemes").size(), 1);
+    }
+
+    @Test
+    public void swaggerWithoutHostWithOverride() throws IOException {
+        CoreParameters.getInstance().setOverrideSpecBasePath(true);
+        byte[] content = getSwaggerContent(testPackage + "/petstore-without-host.json");
+        APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
+        apiDefinition.configureBasePath("http://myhost.customer.com", null);
+
+        Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
+        JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
+        Assert.assertEquals(swagger.get("host").asText(), "myhost.customer.com");
+        Assert.assertEquals(swagger.get("basePath").asText(), "/v2");
+        Assert.assertEquals(swagger.get("schemes").get(0).asText(), "http");
+        Assert.assertEquals(swagger.get("schemes").size(), 1);
+    }
+
+    @Test
     public void backendBasepathChangesNothing() throws IOException {
         CoreParameters.getInstance().setOverrideSpecBasePath(false);
         byte[] content = getSwaggerContent(testPackage + "/petstore-only-https-scheme.json");
@@ -231,4 +261,5 @@ public class APISpecificationSwagger2xTest {
         Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
         Assert.assertEquals(swagger.get("schemes").size(), 1);
     }
+
 }

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +99,7 @@ public class Swagger2xSpecification extends APISpecification {
                     ((ObjectNode) swagger).put("host", url.getHost() + port);
                     LOG.info("Used the backendBasePath: {} to adjust host the API-Specification.", backendBasePath);
                 }
+                //what if the backendBasePath is http?
                 if (swagger.get("schemes") == null) {
                     ArrayNode newSchemes = this.mapper.createArrayNode();
                     newSchemes.add(url.getProtocol());
@@ -110,8 +112,10 @@ public class Swagger2xSpecification extends APISpecification {
                 }
                 if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
                     String basePath = url.getPath();
-                    LOG.info("Overriding Swagger basePath with value : {}", basePath);
-                    ((ObjectNode) swagger).put("basePath", basePath);
+                    if (StringUtils.isNotEmpty(basePath)) {
+                        LOG.info("Overriding Swagger basePath with value : {}", basePath);
+                        ((ObjectNode) swagger).put("basePath", basePath);
+                    }
                 }
                 this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);
             }
