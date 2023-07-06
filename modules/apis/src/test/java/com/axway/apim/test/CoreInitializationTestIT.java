@@ -141,8 +141,6 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                         .extractFromPayload("$.id", "orgId3"));
                 testRunner.echo("####### Extracted organization id: ${orgId3} as attribute: orgId2 #######");
             }
-
-
             String userName = (String) globalVariables.getVariables().get("oadminUsername1");
             httpGet = new HttpGet(url + "/users?field=loginName&op=eq&value=" + userName);
             httpGet.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
