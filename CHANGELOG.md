@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.14.0] In progress
+## [1.13.8] In progress
 ### Fixed
 - Inbound Security - Query String Pass Through is not included in api get (See issue [#392](https://github.com/Axway-API-Management-Plus/apim-cli/issues/392))
 - breaking changes with overrideSpecBasePath = true (See issue [#397](https://github.com/Axway-API-Management-Plus/apim-cli/issues/397))
@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
       "architecture" : null
     }
     ```
+- Support 7.7 May 2023 release (See issue [#391](https://github.com/Axway-API-Management-Plus/apim-cli/issues/391))
 
 ## [1.13.7] 2023-04-21
 
