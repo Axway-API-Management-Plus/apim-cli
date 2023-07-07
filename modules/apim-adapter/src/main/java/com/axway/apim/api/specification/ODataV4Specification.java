@@ -97,7 +97,7 @@ public class ODataV4Specification extends ODataSpecification {
             createBatchResource(openAPI);
             return true;
         } catch (Exception e) {
-            if(logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 logger.error("Error parsing OData V4 MetaData.", e);
             }
             return false;
@@ -503,11 +503,16 @@ public class ODataV4Specification extends ODataSpecification {
                 schema = new ObjectSchema();
                 for (String propertyName : entityType.getPropertyNames()) {
                     EdmProperty property = (EdmProperty) entityType.getProperty(propertyName);
+                    logger.debug("Property : {}", property);
                     Schema<Object> propSchema = getSchemaForType(edm, property.getType(), true, property.isCollection());
-                    propSchema.setMaxLength(property.getMaxLength());
-                    propSchema.setDefault(property.getDefaultValue());
-                    propSchema.setNullable(property.isNullable());
-                    schema.addProperty(propertyName, propSchema);
+                    logger.debug("propSchema : {}", propSchema);
+
+                    if(propSchema != null) {
+                        propSchema.setMaxLength(property.getMaxLength());
+                        propSchema.setDefault(property.getDefaultValue());
+                        propSchema.setNullable(property.isNullable());
+                        schema.addProperty(propertyName, propSchema);
+                    }
                 }
                 EdmStructuredType typeImpl = (EdmStructuredType) type;
                 schema.setDescription(getDescription(typeImpl));
