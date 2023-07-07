@@ -123,9 +123,13 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
 
     private void addImage(List<ClientApplication> apps, File parentFolder) throws AppException {
         for (ClientApplication app : apps) {
-            if (app.getImageUrl() == null || app.getImageUrl().equals("")) continue;
-            app.setImage(Image.createImageFromFile(new File(parentFolder + File.separator + app.getImageUrl())));
-
+            String imageUrl = app.getImageUrl();
+            if (imageUrl == null || imageUrl.equals("")) continue;
+            if (imageUrl.startsWith("data:")) {
+                app.setImage(Image.createImageFromBase64(imageUrl));
+            } else {
+                app.setImage(Image.createImageFromFile(new File(parentFolder + File.separator + imageUrl)));
+            }
         }
     }
 
@@ -133,15 +137,20 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
         for (ClientApplication app : apps) {
             for (ClientAppCredential cred : app.getCredentials()) {
                 if (cred instanceof OAuth && ((OAuth) cred).getCert() != null) {
-                    File certFile = new File(parentFolder + File.separator + ((OAuth) cred).getCert());
-                    if (!certFile.exists()) {
-                        throw new AppException("Certificate file: '" + certFile + "' not found.", ErrorCode.UNXPECTED_ERROR);
-                    }
-                    try {
-                        String certBlob = new String(Files.readAllBytes(certFile.toPath()));
-                        ((OAuth) cred).setCert(certBlob);
-                    } catch (Exception e) {
-                        throw new AppException("Can't read certificate from disc", ErrorCode.UNXPECTED_ERROR, e);
+                    String certificate = ((OAuth) cred).getCert();
+                    if (certificate.startsWith("data:")) {
+                        ((OAuth) cred).setCert(certificate);
+                    } else {
+                        File certFile = new File(parentFolder + File.separator + certificate);
+                        if (!certFile.exists()) {
+                            throw new AppException("Certificate file: '" + certFile + "' not found.", ErrorCode.UNXPECTED_ERROR);
+                        }
+                        try {
+                            String certBlob = new String(Files.readAllBytes(certFile.toPath()));
+                            ((OAuth) cred).setCert(certBlob);
+                        } catch (Exception e) {
+                            throw new AppException("Can't read certificate from disc", ErrorCode.UNXPECTED_ERROR, e);
+                        }
                     }
                 }
             }
@@ -156,9 +165,9 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
             while (it.hasNext()) {
                 APIAccess apiAccess = it.next();
                 List<API> apis = apiAdapter.getAPIs(new APIFilter.Builder()
-                                .hasName(apiAccess.getApiName())
-                                .build()
-                        , false);
+                        .hasName(apiAccess.getApiName())
+                        .build()
+                    , false);
                 if (apis == null || apis.isEmpty()) {
                     LOG.error("API with name: {} not found. Ignoring this APIs.", apiAccess.getApiName());
                     result.setError(ErrorCode.UNKNOWN_API);
@@ -192,7 +201,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
                 if ("ALL".equals(permission.getUsername())) {
                     // Create a map of all usernames
                     Map<String, ApplicationPermission> usernames = app.getPermissions().stream().collect(
-                            Collectors.toMap(ApplicationPermission::getUsername, Function.identity()));
+                        Collectors.toMap(ApplicationPermission::getUsername, Function.identity()));
                     // Get all users for the app organization
                     List<User> allOrgUsers = userAdapter.getUsers(new UserFilter.Builder().hasOrganization(app.getOrganization().getName()).build());
                     for (User user : allOrgUsers) {

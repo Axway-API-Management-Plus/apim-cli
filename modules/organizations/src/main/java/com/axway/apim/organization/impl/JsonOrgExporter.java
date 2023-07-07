@@ -42,29 +42,32 @@ public class JsonOrgExporter extends OrgResultHandler {
     }
 
     public void saveOrganizationLocally(ExportOrganization org, OrgResultHandler orgResultHandler) throws AppException {
-        String folderName = getExportFolder(org);
-        String targetFolder = params.getTarget();
-        File localFolder = new File(targetFolder + File.separator + folderName);
-        LOG.info("Going to export organizations into folder: {}", localFolder);
-        if (localFolder.exists()) {
-            if (OrgExportParams.getInstance().isDeleteTarget()) {
-                LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
-                try {
-                    FileUtils.deleteDirectory(localFolder);
-                } catch (IOException e) {
-                    throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
-                }
-            } else {
-                LOG.warn("Local export folder: {} already exists. Organization will not be exported. (You may set -deleteTarget)", localFolder);
-                this.hasError = true;
-                return;
-            }
-        }
-        if (!localFolder.mkdirs()) {
-            throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
-        }
+        File localFolder = null;
         ObjectMapper mapper;
         String configFile;
+        if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+            String folderName = getExportFolder(org);
+            String targetFolder = params.getTarget();
+            localFolder = new File(targetFolder + File.separator + folderName);
+            LOG.info("Going to export organizations into folder: {}", localFolder);
+            if (localFolder.exists()) {
+                if (OrgExportParams.getInstance().isDeleteTarget()) {
+                    LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
+                    try {
+                        FileUtils.deleteDirectory(localFolder);
+                    } catch (IOException e) {
+                        throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
+                    }
+                } else {
+                    LOG.warn("Local export folder: {} already exists. Organization will not be exported. (You may set -deleteTarget)", localFolder);
+                    this.hasError = true;
+                    return;
+                }
+            }
+            if (!localFolder.mkdirs()) {
+                throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
+            }
+        }
         if (orgResultHandler instanceof YamlOrgExporter) {
             mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
             configFile = "/org-config.yaml";
@@ -90,7 +93,7 @@ public class JsonOrgExporter extends OrgResultHandler {
         } catch (Exception e) {
             throw new AppException("Can't write configuration file for organization: '" + org.getName() + "'", ErrorCode.UNXPECTED_ERROR, e);
         }
-        if (org.getImage() != null) {
+        if (org.getImage() != null && !EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
             writeBytesToFile(org.getImage().getImageContent(), localFolder + File.separator + org.getImage().getBaseFilename());
         }
         LOG.info("Successfully exported organization into folder: {}", localFolder);
@@ -111,8 +114,8 @@ public class JsonOrgExporter extends OrgResultHandler {
     }
 
     public static void writeBytesToFile(byte[] bFile, String fileDest) throws AppException {
-        try (FileOutputStream fileOuputStream = new FileOutputStream(fileDest)) {
-            fileOuputStream.write(bFile);
+        try (FileOutputStream fileOutputStream = new FileOutputStream(fileDest)) {
+            fileOutputStream.write(bFile);
         } catch (IOException e) {
             throw new AppException("Can't write file", ErrorCode.UNXPECTED_ERROR, e);
         }

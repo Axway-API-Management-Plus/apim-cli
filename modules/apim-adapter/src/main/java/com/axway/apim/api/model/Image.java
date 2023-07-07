@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Base64;
 
 import org.apache.commons.io.IOUtils;
 
@@ -140,7 +141,7 @@ public class Image {
         Image image = new Image();
         try {
             image.setBaseFilename(file.getName());
-            URL imageFromClasspath = Image.class.getClass().getResource(file.getCanonicalPath());
+            URL imageFromClasspath = Image.class.getResource(file.getCanonicalPath());
             if (file.exists()) {
                 try (InputStream inputStream = Files.newInputStream(file.toPath())) {
                     image.setImageContent(IOUtils.toByteArray(inputStream));
@@ -157,6 +158,18 @@ public class Image {
             }
         } catch (Exception e) {
             throw new AppException("Can't read image-file: " + file + " from filesystem or classpath.", ErrorCode.UNXPECTED_ERROR, e);
+        }
+    }
+
+    public static Image createImageFromBase64(String base64Content) throws AppException {
+        Image image = new Image();
+        try {
+            image.setBaseFilename("image.jpg");
+            byte[] data = Base64.getDecoder().decode(base64Content.replaceFirst("data:.+,", ""));
+            image.setImageContent(data);
+            return image;
+        } catch (Exception e) {
+            throw new AppException("Can't read Base64 content as image", ErrorCode.UNXPECTED_ERROR, e);
         }
     }
 }

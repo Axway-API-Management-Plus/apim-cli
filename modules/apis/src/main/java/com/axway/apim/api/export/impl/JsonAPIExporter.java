@@ -86,8 +86,6 @@ public class JsonAPIExporter extends APIResultHandler {
         String configFile;
         try {
             targetFile = localFolder.getCanonicalPath() + "/" + exportAPI.getName() + apiDef.getAPIDefinitionType().getFileExtension();
-            LOG.info("{}", EnvironmentProperties.PRINT_CONFIG_CONSOLE);
-            LOG.info("condition {}", !(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL));
             if (!(apiDef instanceof WSDLSpecification && EnvironmentProperties.RETAIN_BACKEND_URL)) {
                 if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
                     writeBytesToFile(apiDef.getApiSpecificationContent(), targetFile);
