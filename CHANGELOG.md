@@ -4,12 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.13.8] In progress
+# [1.13.8]  07-07-2023
 ### Fixed
 - Inbound Security - Query String Pass Through is not included in api get (See issue [#392](https://github.com/Axway-API-Management-Plus/apim-cli/issues/392))
 - breaking changes with overrideSpecBasePath = true (See issue [#397](https://github.com/Axway-API-Management-Plus/apim-cli/issues/397))
 ### Added
 - Add an option to output the json config file in console(See issue [#322](https://github.com/Axway-API-Management-Plus/apim-cli/issues/322))
+    - Introduced an environment variable print_console.
+        - If the value is set to true, the json config file wille printed on console.
+        - Default value is false
+- Support 7.7 May 2023 release (See issue [#391](https://github.com/Axway-API-Management-Plus/apim-cli/issues/391))
     - If settings are imported from old versions to May 2023 release, set following values  to null as os and architecture elements are removed, (Refer [RDAPI-29419](https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_relnotes/20230530_apimgr_relnotes/index.html))
     ```json
     {
@@ -17,7 +21,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
       "architecture" : null
     }
     ```
-- Support 7.7 May 2023 release (See issue [#391](https://github.com/Axway-API-Management-Plus/apim-cli/issues/391))
 
 ## [1.13.7] 2023-04-21
 
