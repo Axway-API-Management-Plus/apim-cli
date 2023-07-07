@@ -9,13 +9,13 @@ import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.URLParser;
 
 public class URLParserTest {
-	
+
 	@Test
 	public void testNoUsernamePassword() throws AppException {
 		String urlToAPIDefinition = "https://petstore.swagger.io/v2/swagger.json";
 		URLParser parser = new URLParser(urlToAPIDefinition);
-		Assert.assertEquals(parser.getUsername(), null);
-		Assert.assertEquals(parser.getPassword(), null);
+        Assert.assertNull(parser.getUsername());
+        Assert.assertNull(parser.getPassword());
 	}
 
 	@Test
@@ -32,19 +32,19 @@ public class URLParserTest {
 		Assert.assertEquals(parser.getUsername(), "user@axway.com");
 		Assert.assertEquals(parser.getPassword(), "password");
 	}
-	
+
 	@Test
 	public void testInvalidFormat1() {
 		String urlToAPIDefinition = "@https://petstore.swagger.io/v2/swagger.json";
-		assertThrows(AppException.class, () -> {new URLParser(urlToAPIDefinition);});
+		assertThrows(AppException.class, () -> new URLParser(urlToAPIDefinition));
 	}
-	
+
 	@Test
 	public void testInvalidFormat2() {
 		String urlToAPIDefinition = "dadasdsa@https://petstore.swagger.io/v2/swagger.json";
-		assertThrows(AppException.class, () -> {new URLParser(urlToAPIDefinition);});
+		assertThrows(AppException.class, () -> new URLParser(urlToAPIDefinition));
 	}
-	
+
 	@Test
 	public void testPasswordWithAt() throws AppException {
 		String urlToAPIDefinition = "user@axway.com/abc@12345@https://petstore.swagger.io/v2/swagger.json";

@@ -141,8 +141,6 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                         .extractFromPayload("$.id", "orgId3"));
                 testRunner.echo("####### Extracted organization id: ${orgId3} as attribute: orgId2 #######");
             }
-
-
             String userName = (String) globalVariables.getVariables().get("oadminUsername1");
             httpGet = new HttpGet(url + "/users?field=loginName&op=eq&value=" + userName);
             httpGet.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);
@@ -163,15 +161,13 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                 testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.CREATED).messageType(MessageType.JSON)
                         .extractFromPayload("$.id", "oadminUserId1")
                         .extractFromPayload("$.loginName", "oadminUsername1"));
-            }
-            testRunner.echo("Updating password for oadmin user ${oadminUsername1}");
-            testRunner.http(action -> action.client(apiManager).send()
+                testRunner.echo("Updating password for oadmin user ${oadminUsername1}");
+                testRunner.http(action -> action.client(apiManager).send()
                     .post("/users/${oadminUserId1}/changepassword/")
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .payload("newPassword=${oadminPassword1}"));
-
-            testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.NO_CONTENT));
-
+                testRunner.http(action -> action.client(apiManager).receive().response(HttpStatus.NO_CONTENT));
+            }
             String appName = (String) globalVariables.getVariables().get("testAppName");
             httpGet = new HttpGet(url + "/applications?field=name&op=eq&value=" + appName);
             httpGet.setHeader(HttpHeaders.AUTHORIZATION, authorizationHeaderValue);

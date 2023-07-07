@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Base64;
 
 public class APISpecificationFactory {
 
@@ -115,7 +116,10 @@ public class APISpecificationFactory {
             return getAPIDefinitionFromURL(Utils.getAPIDefinitionUriFromFile(apiDefinitionFile));
         } else if (Utils.isHttpUri(apiDefinitionFile)) {
             return getAPIDefinitionFromURL(apiDefinitionFile);
-        } else {
+        } else if(apiDefinitionFile.startsWith("data")){
+            byte[] data = Base64.getDecoder().decode(apiDefinitionFile.replaceFirst("data:.+,", ""));
+            return new ByteArrayInputStream(data);
+        }else {
             try {
                 File inputFile = new File(apiDefinitionFile);
                 if (inputFile.exists()) {
