@@ -37,10 +37,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -139,7 +136,8 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
                 if (cred instanceof OAuth && ((OAuth) cred).getCert() != null) {
                     String certificate = ((OAuth) cred).getCert();
                     if (certificate.startsWith("data:")) {
-                        ((OAuth) cred).setCert(certificate);
+                        byte[] data = Base64.getDecoder().decode(certificate.replaceFirst("data:.+,", ""));
+                        ((OAuth) cred).setCert(new String(data));
                     } else {
                         File certFile = new File(parentFolder + File.separator + certificate);
                         if (!certFile.exists()) {

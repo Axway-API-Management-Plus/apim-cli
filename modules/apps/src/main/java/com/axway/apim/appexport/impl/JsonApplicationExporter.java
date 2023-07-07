@@ -48,29 +48,33 @@ public class JsonApplicationExporter extends ApplicationExporter {
     }
 
     public void saveApplicationLocally(ExportApplication app, ApplicationExporter applicationExporter) throws AppException {
-        String folderName = getExportFolder(app);
-        String targetFolder = params.getTarget();
-        File localFolder = new File(targetFolder + File.separator + folderName);
-        LOG.info("Going to export applications into folder: {}", localFolder);
-        if (localFolder.exists()) {
-            if (AppExportParams.getInstance().isDeleteTarget()) {
-                LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
-                try {
-                    FileUtils.deleteDirectory(localFolder);
-                } catch (IOException e) {
-                    throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
-                }
-            } else {
-                LOG.warn("Local export folder: {} already exists. Application will not be exported. (You may set -deleteTarget)", localFolder);
-                this.hasError = true;
-                return;
-            }
-        }
-        if (!localFolder.mkdirs()) {
-            throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
-        }
         ObjectMapper mapper;
         String configFile;
+        File localFolder = null;
+        if (!EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+            String folderName = getExportFolder(app);
+            String targetFolder = params.getTarget();
+            localFolder = new File(targetFolder + File.separator + folderName);
+            LOG.info("Going to export applications into folder: {}", localFolder);
+            if (localFolder.exists()) {
+                if (AppExportParams.getInstance().isDeleteTarget()) {
+                    LOG.debug("Existing local export folder: {} already exists and will be deleted.", localFolder);
+                    try {
+                        FileUtils.deleteDirectory(localFolder);
+                    } catch (IOException e) {
+                        throw new AppException("Error deleting local folder", ErrorCode.UNXPECTED_ERROR, e);
+                    }
+                } else {
+                    LOG.warn("Local export folder: {} already exists. Application will not be exported. (You may set -deleteTarget)", localFolder);
+                    this.hasError = true;
+                    return;
+                }
+            }
+            if (!localFolder.mkdirs()) {
+                throw new AppException("Cannot create export folder: " + localFolder, ErrorCode.UNXPECTED_ERROR);
+            }
+        }
+
         if (applicationExporter instanceof YamlApplicationExporter) {
             mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
             configFile = "/application-config.yaml";
@@ -93,16 +97,16 @@ public class JsonApplicationExporter extends ApplicationExporter {
         mapper.setSerializationInclusion(Include.NON_NULL);
         try {
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            if(EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
+            if (EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
                 mapper.writeValue(System.out, app);
-            }else {
+            } else {
                 mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), app);
+                this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
             }
-            this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
         } catch (Exception e) {
             throw new AppException("Can't write Application-Configuration file for application: '" + app.getName() + "'", ErrorCode.UNXPECTED_ERROR, e);
         }
-        if (app.getImage() != null) {
+        if (app.getImage() != null && !EnvironmentProperties.PRINT_CONFIG_CONSOLE) {
             writeBytesToFile(app.getImage().getImageContent(), localFolder + File.separator + app.getImage().getBaseFilename());
         }
         LOG.info("Successfully exported application to folder: {}", localFolder);
