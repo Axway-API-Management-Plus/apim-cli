@@ -1,6 +1,7 @@
 package com.axway.apim.test.changestate;
 
 import com.axway.apim.WiremockWrapper;
+import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.CaCert;
 import com.axway.apim.api.model.InboundProfile;
@@ -45,6 +46,7 @@ public class APIChangeStateTest extends WiremockWrapper {
 
     @BeforeMethod
     private void setupTestAPIs() throws IOException {
+        APIManagerAdapter.getInstance();
         testAPI1 = getTestAPI("ChangeStateTestAPI.json");
         testAPI2 = getTestAPI("ChangeStateTestAPI.json");
     }
