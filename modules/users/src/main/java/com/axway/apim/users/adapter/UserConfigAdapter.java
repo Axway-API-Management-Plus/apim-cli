@@ -80,10 +80,15 @@ public class UserConfigAdapter extends UserAdapter {
         setInternalUser(users);
     }
 
-    private void addImage(List<User> users, File parentFolder) throws AppException {
+    public void addImage(List<User> users, File parentFolder) throws AppException {
         for (User user : users) {
-            if (user.getImageUrl() == null || user.getImageUrl().equals("")) continue;
-            user.setImage(Image.createImageFromFile(new File(parentFolder + File.separator + user.getImageUrl())));
+            String imageUrl = user.getImageUrl();
+            if (imageUrl == null || imageUrl.equals("")) continue;
+            if (imageUrl.startsWith("data:")) {
+                user.setImage(Image.createImageFromBase64(imageUrl));
+            } else {
+                user.setImage(Image.createImageFromFile(new File(parentFolder + File.separator + imageUrl)));
+            }
         }
     }
 

@@ -50,7 +50,7 @@ public class OrgConfigAdapter extends OrgAdapter {
                 // Check the config file is json
                 mapper.readTree(configFile);
                 LOG.debug("Handling JSON Configuration file: {}", configFile);
-            }catch (IOException ioException){
+            } catch (IOException ioException) {
                 mapper = new ObjectMapper(CustomYamlFactory.createYamlFactory());
                 LOG.debug("Handling Yaml Configuration file: {}", configFile);
             }
@@ -92,8 +92,13 @@ public class OrgConfigAdapter extends OrgAdapter {
 
     private void addImage(List<Organization> orgs, File parentFolder) throws AppException {
         for (Organization org : orgs) {
-            if (org.getImageUrl() == null || org.getImageUrl().equals("")) continue;
-            org.setImage(Image.createImageFromFile(new File(parentFolder + File.separator + org.getImageUrl())));
+            String imageUrl = org.getImageUrl();
+            if (imageUrl == null || imageUrl.equals("")) continue;
+            if (imageUrl.startsWith("data:")) {
+                org.setImage(Image.createImageFromBase64(imageUrl));
+            } else {
+                org.setImage(Image.createImageFromFile(new File(parentFolder + File.separator + imageUrl)));
+            }
         }
     }
 
@@ -105,9 +110,9 @@ public class OrgConfigAdapter extends OrgAdapter {
             while (it.hasNext()) {
                 APIAccess apiAccess = it.next();
                 List<API> apis = apiAdapter.getAPIs(new APIFilter.Builder()
-                                .hasName(apiAccess.getApiName())
-                                .build()
-                        , false);
+                        .hasName(apiAccess.getApiName())
+                        .build()
+                    , false);
                 if (apis == null || apis.size() == 0) {
                     LOG.error("API with name: {} not found. Ignoring this APIs.", apiAccess.getApiName());
                     result.setError(ErrorCode.UNKNOWN_API);

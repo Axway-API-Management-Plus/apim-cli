@@ -4,9 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.13.8] In progress
+### Fixed
+- Inbound Security - Query String Pass Through is not included in api get (See issue [#392](https://github.com/Axway-API-Management-Plus/apim-cli/issues/392))
+- breaking changes with overrideSpecBasePath = true (See issue [#397](https://github.com/Axway-API-Management-Plus/apim-cli/issues/397))
+### Added
+- Add an option to output the json config file in console(See issue [#322](https://github.com/Axway-API-Management-Plus/apim-cli/issues/322))
+    - If settings are imported from old versions to May 2023 release, set following values  to null as os and architecture elements are removed, (Refer [RDAPI-29419](https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_relnotes/20230530_apimgr_relnotes/index.html))
+    ```json
+    {
+      "os" : null,
+      "architecture" : null
+    }
+    ```
+- Support 7.7 May 2023 release (See issue [#391](https://github.com/Axway-API-Management-Plus/apim-cli/issues/391))
+
 ## [1.13.7] 2023-04-21
 
-
+### Fixed
 - Add output for apim.sh api check-cert (See issue [#374](https://github.com/Axway-API-Management-Plus/apim-cli/issues/374))
 - A change in application quota is not detected (See issue [#382](https://github.com/Axway-API-Management-Plus/apim-cli/issues/382))
 - Snakeyaml size limitation (Nullpointer Exception when downloading API Spec via apim CLI) (See issue [#384](https://github.com/Axway-API-Management-Plus/apim-cli/issues/384))

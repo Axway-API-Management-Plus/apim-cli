@@ -177,7 +177,6 @@ public class CaCert {
             }
             if (filename == null) {
                 LOG.warn("Could not create filename for certificate based on alias: {}", this.getAlias());
-
                 filename = "UnknownCertificate_" + UUID.randomUUID();
                 LOG.warn("Created a random filename: {}.ctr", filename);
             } else {
