@@ -38,7 +38,6 @@ public class CoreCLIOptions extends CLIOptions {
         params.setTimeout(getValue("timeout"));
         params.setDisableCompression(hasOption("disableCompression"));
         params.setOverrideSpecBasePath(hasOption("overrideSpecBasePath"));
-        params.setReplaceHostInSwagger(hasOption("replaceHostInSwagger"));
         return params;
     }
 

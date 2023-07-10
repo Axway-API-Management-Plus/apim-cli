@@ -101,7 +101,7 @@ public class Swagger2xSpecification extends APISpecification {
                 }else {
                     if(swagger.get("host").asText().equals(url.getHost()+port)) {
                         LOG.debug("Swagger Host: '"+swagger.get("host").asText()+"' already matches backendBasePath: '"+backendBasePath+"'. Nothing to do.");
-                    } else if (CoreParameters.getInstance().isReplaceHostInSwagger()){
+                    } else if (CoreParameters.getInstance().isOverrideSpecBasePath()){
                         LOG.debug("Replacing existing host: '"+swagger.get("host").asText()+"' in Swagger-File to '"+url.getHost()+port+"' based on configured backendBasePath: '"+backendBasePath+"'");
                         ((ObjectNode)swagger).put("host", url.getHost()+port);
                     }

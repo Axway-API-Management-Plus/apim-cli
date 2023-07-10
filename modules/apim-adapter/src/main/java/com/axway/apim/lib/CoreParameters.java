@@ -467,11 +467,4 @@ public class CoreParameters implements Parameters {
         return "[hostname=" + hostname + ", username=" + username + ", stage=" + stage + "]";
     }
 
-    public boolean isReplaceHostInSwagger() {
-        return replaceHostInSwagger;
-    }
-
-    public void setReplaceHostInSwagger(boolean replaceHostInSwagger) {
-        this.replaceHostInSwagger = replaceHostInSwagger;
-    }
 }
