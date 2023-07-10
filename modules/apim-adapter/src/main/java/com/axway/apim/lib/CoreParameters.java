@@ -71,6 +71,8 @@ public class CoreParameters implements Parameters {
     private boolean disableCompression;
     private boolean overrideSpecBasePath;
 
+    private boolean replaceHostInSwagger = false;
+
     public CoreParameters() {
         instance = this;
     }
@@ -463,5 +465,13 @@ public class CoreParameters implements Parameters {
     @Override
     public String toString() {
         return "[hostname=" + hostname + ", username=" + username + ", stage=" + stage + "]";
+    }
+
+    public boolean isReplaceHostInSwagger() {
+        return replaceHostInSwagger;
+    }
+
+    public void setReplaceHostInSwagger(boolean replaceHostInSwagger) {
+        this.replaceHostInSwagger = replaceHostInSwagger;
     }
 }
