@@ -38,6 +38,7 @@ public class CoreCLIOptions extends CLIOptions {
         params.setTimeout(getValue("timeout"));
         params.setDisableCompression(hasOption("disableCompression"));
         params.setOverrideSpecBasePath(hasOption("overrideSpecBasePath"));
+        params.setReplaceHostInSwagger(hasOption("replaceHostInSwagger"));
         return params;
     }
 
@@ -149,6 +150,10 @@ public class CoreCLIOptions extends CLIOptions {
         cliOptions.addOption(option);
 
         option = new Option("overrideSpecBasePath", "Override API Specification ( open api, Swagger 2)  using backendBasepath");
+        option.setRequired(false);
+        addOption(option);
+
+        option = new Option("replaceHostInSwagger", "Override API Specification ( open api, Swagger 2)  using backendBasepath");
         option.setRequired(false);
         addOption(option);
     }
