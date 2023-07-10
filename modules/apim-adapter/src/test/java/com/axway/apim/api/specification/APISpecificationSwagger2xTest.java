@@ -238,13 +238,13 @@ public class APISpecificationSwagger2xTest {
         CoreParameters.getInstance().setOverrideSpecBasePath(true);
         byte[] content = getSwaggerContent(testPackage + "/petstore-only-https-scheme.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-        apiDefinition.configureBasePath("https://petstore.swagger.io/test", null);
+        apiDefinition.configureBasePath("http://petstore.swagger.io/test", null);
 
         Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
         JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
         Assert.assertEquals(swagger.get("host").asText(), "petstore.swagger.io");
         Assert.assertEquals(swagger.get("basePath").asText(), "/test");
-        Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
+        Assert.assertEquals(swagger.get("schemes").get(0).asText(), "http");
         Assert.assertEquals(swagger.get("schemes").size(), 1);
     }
 

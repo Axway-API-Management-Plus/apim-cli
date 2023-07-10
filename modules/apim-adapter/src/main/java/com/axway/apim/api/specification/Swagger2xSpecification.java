@@ -112,6 +112,14 @@ public class Swagger2xSpecification extends APISpecification {
                     newSchemes.add(url.getProtocol());
                     LOG.debug("Adding protocol: {} to Swagger-Definition", url.getProtocol());
                     ((ObjectNode) swagger).set("schemes", newSchemes);
+                } else {
+                    if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
+                        //I may have a situation where a backendbasepath in http must overwrite host but in swagger file it's declared a scheme in https which is not coherent
+                        ArrayNode schemes = (ArrayNode) swagger.get("schemes");
+                        schemes.removeAll();
+                        schemes.add(url.getProtocol());
+                        LOG.debug("Setting protocol: {} to Swagger-Definition", url.getProtocol());
+                    }
                 }
                 if (swagger.get("basePath") == null) {
                     LOG.info("Adding default basePath / to swagger");
