@@ -152,9 +152,6 @@ public class CoreCLIOptions extends CLIOptions {
         option.setRequired(false);
         addOption(option);
 
-        option = new Option("replaceHostInSwagger", "Override API Specification ( open api, Swagger 2)  using backendBasepath");
-        option.setRequired(false);
-        addOption(option);
     }
 
     @Override
