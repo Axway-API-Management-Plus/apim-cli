@@ -71,6 +71,8 @@ public class CoreParameters implements Parameters {
     private boolean disableCompression;
     private boolean overrideSpecBasePath;
 
+    private boolean replaceHostInSwagger = false;
+
     public CoreParameters() {
         instance = this;
     }
@@ -464,4 +466,5 @@ public class CoreParameters implements Parameters {
     public String toString() {
         return "[hostname=" + hostname + ", username=" + username + ", stage=" + stage + "]";
     }
+
 }
