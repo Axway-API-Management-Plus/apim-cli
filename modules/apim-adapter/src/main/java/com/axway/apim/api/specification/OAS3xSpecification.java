@@ -138,7 +138,11 @@ public class OAS3xSpecification extends APISpecification {
         URI serverURL = URI.create(serverUrl);
         String newUrl = backendBasePath;
         if (StringUtils.isEmpty(backendBasePathURL.getPath())){
-            newUrl = new URIBuilder(URI.create(serverUrl)).setHost(backendBasePathURL.getHost()).setPort(backendBasePathURL.getPort()).build().toString();
+            newUrl = new URIBuilder(URI.create(serverUrl))
+                    .setHost(backendBasePathURL.getHost())
+                    .setPort(backendBasePathURL.getPort())
+                    .setScheme(backendBasePathURL.getProtocol())
+                    .build().toString();
         }
         LOG.info("overriding openapi Servers url with value : {}", newUrl);
         ObjectNode newServer = createObjectNode("url", newUrl);

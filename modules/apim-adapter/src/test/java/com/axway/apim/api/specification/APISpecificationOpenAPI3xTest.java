@@ -287,4 +287,18 @@ public class APISpecificationOpenAPI3xTest {
         Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
         Assert.assertEquals("https://myhost.customer.com:8767/test", swagger.get("servers").get(0).get("url").asText());
     }
+
+	@Test
+	public void overrideServerURLWithBackendBasePath2() throws IOException {
+		CoreParameters coreParameters = CoreParameters.getInstance();
+		coreParameters.setOverrideSpecBasePath(true);
+		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi.json");
+		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
+		// Check if the Swagger-File has been changed
+		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
+		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
+		Assert.assertEquals(swagger.get("servers").size(), 1, "Expected to get only one server url");
+		Assert.assertEquals("https://myhost.customer.com:8767/api/v3", swagger.get("servers").get(0).get("url").asText());
+	}
 }
