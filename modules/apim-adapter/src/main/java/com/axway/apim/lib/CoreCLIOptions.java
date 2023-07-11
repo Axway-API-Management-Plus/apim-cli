@@ -151,7 +151,6 @@ public class CoreCLIOptions extends CLIOptions {
         option = new Option("overrideSpecBasePath", "Override API Specification ( open api, Swagger 2)  using backendBasepath");
         option.setRequired(false);
         addOption(option);
-
     }
 
     @Override
