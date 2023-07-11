@@ -243,4 +243,87 @@ public class APIMethodTest {
         Assert.assertTrue(Utils.compareValues(apiMethods, apiMethodsDesired));
 
     }
+
+    @Test
+    public void testAPIMethodsWithNoSummary() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String actual = "[{\n" +
+            "    \"name\": \"updateUser\",\n" +
+            "    \"descriptionType\": \"original\"\n" +
+            "  }]";
+        TypeReference<List<APIMethod>> apiMethodsTypeRef = new TypeReference<List<APIMethod>>() {};
+        List<APIMethod> apiMethods = objectMapper.readValue(actual, apiMethodsTypeRef);
+
+        String desired = "[{\n" +
+            "    \"name\": \"updateUser\",\n" +
+            "    \"descriptionType\": \"original\"\n" +
+            "  }]";
+        List<APIMethod> apiMethodsDesired = objectMapper.readValue(desired, apiMethodsTypeRef);
+        Assert.assertTrue(Utils.compareValues(apiMethods, apiMethodsDesired));
+        //Assert.assertTrue(Utils.areEqualIgnoringOrder(apiMethods, apiMethodsDesired, new APIMethodByName()));
+
+    }
+
+
+    @Test
+    public void testAPIMethodsWithSummary() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String actual = "[{\n" +
+            "    \"name\": \"updateUser\",\n" +
+            "    \"summary\": \"Update user\",\n" +
+            "    \"descriptionType\": \"original\"\n" +
+            "  }]";
+        TypeReference<List<APIMethod>> apiMethodsTypeRef = new TypeReference<List<APIMethod>>() {};
+        List<APIMethod> apiMethods = objectMapper.readValue(actual, apiMethodsTypeRef);
+
+        String desired = "[{\n" +
+            "    \"name\": \"updateUser\",\n" +
+            "    \"summary\": \"Update user\",\n" +
+            "    \"descriptionType\": \"original\"\n" +
+            "  }]";
+        List<APIMethod> apiMethodsDesired = objectMapper.readValue(desired, apiMethodsTypeRef);
+        Assert.assertTrue(Utils.compareValues(apiMethods, apiMethodsDesired));
+        //Assert.assertTrue(Utils.areEqualIgnoringOrder(apiMethods, apiMethodsDesired, new APIMethodByName()));
+
+    }
+
+    @Test
+    public void testAPIMethodsWithSourceSummary() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String actual = "[{\n" +
+            "    \"name\": \"updateUser\",\n" +
+            "    \"summary\": \"Update user\",\n" +
+            "    \"descriptionType\": \"original\"\n" +
+            "  }]";
+        TypeReference<List<APIMethod>> apiMethodsTypeRef = new TypeReference<List<APIMethod>>() {};
+        List<APIMethod> apiMethods = objectMapper.readValue(actual, apiMethodsTypeRef);
+
+        String desired = "[{\n" +
+            "    \"name\": \"updateUser\",\n" +
+            "    \"descriptionType\": \"original\"\n" +
+            "  }]";
+        List<APIMethod> apiMethodsDesired = objectMapper.readValue(desired, apiMethodsTypeRef);
+        Assert.assertFalse(Utils.compareValues(apiMethods, apiMethodsDesired));
+
+    }
+
+    @Test
+    public void testAPIMethodsWithTargetSummary() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String actual = "[{\n" +
+            "    \"name\": \"updateUser\",\n" +
+            "    \"descriptionType\": \"original\"\n" +
+            "  }]";
+        TypeReference<List<APIMethod>> apiMethodsTypeRef = new TypeReference<List<APIMethod>>() {};
+        List<APIMethod> apiMethods = objectMapper.readValue(actual, apiMethodsTypeRef);
+
+        String desired = "[{\n" +
+            "    \"name\": \"updateUser\",\n" +
+            "    \"summary\": \"Update user\",\n" +
+            "    \"descriptionType\": \"original\"\n" +
+            "  }]";
+        List<APIMethod> apiMethodsDesired = objectMapper.readValue(desired, apiMethodsTypeRef);
+        Assert.assertFalse(Utils.compareValues(apiMethods, apiMethodsDesired));
+    }
+
 }

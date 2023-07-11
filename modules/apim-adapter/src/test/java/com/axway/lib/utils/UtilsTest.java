@@ -2,6 +2,7 @@ package com.axway.lib.utils;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIMethod;
+import com.axway.apim.api.model.TagMap;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.Utils;
@@ -297,4 +298,43 @@ public class UtilsTest {
         Assert.assertFalse(Utils.askYesNo("Publish or not"));
         in.close();
     }
+
+    @Test void equalsTagMapNull(){
+        Assert.assertTrue(Utils.equalsTagMap(null, null));
+    }
+
+
+    @Test void equalsTagMap(){
+        TagMap source = new TagMap();
+        source.put("stage", new String[]{"dev"});
+
+        TagMap target = new TagMap();
+        target.put("stage", new String[]{"dev"});
+        Assert.assertTrue(Utils.equalsTagMap(source, target));
+    }
+
+    @Test void NotEqualsTagMap(){
+        TagMap source = new TagMap();
+        source.put("stage", new String[]{"dev"});
+
+        TagMap target = new TagMap();
+        target.put("stage", new String[]{"prod"});
+        Assert.assertFalse(Utils.equalsTagMap(source, target));
+    }
+
+    @Test void NotEqualsTagMapSourceNull(){
+
+
+        TagMap target = new TagMap();
+        target.put("stage", new String[]{"prod"});
+        Assert.assertFalse(Utils.equalsTagMap(null, target));
+    }
+
+    @Test void NotEqualsTagMapTargetNull(){
+        TagMap source = new TagMap();
+        source.put("stage", new String[]{"dev"});
+
+        Assert.assertFalse(Utils.equalsTagMap(source, null));
+    }
+
 }

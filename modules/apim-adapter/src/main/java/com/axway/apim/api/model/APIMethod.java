@@ -1,6 +1,8 @@
 package com.axway.apim.api.model;
 
+import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
@@ -126,18 +128,23 @@ public class APIMethod {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         APIMethod apiMethod = (APIMethod) o;
-        if (name.equals(apiMethod.name) && summary.equals(apiMethod.summary) && descriptionType.equals(apiMethod.descriptionType)) {
-            boolean flag = tags == null && apiMethod.tags == null;
-            if (tags != null && apiMethod.tags != null) {
-                flag = tags.equals(apiMethod.tags);
+        if (name.equals(apiMethod.name) && descriptionType.equals(apiMethod.descriptionType)) {
+            if (!Utils.equalsTagMap(tags, apiMethod.tags)) {
+                return false;
             }
-            if (descriptionType.equals("manual") && descriptionManual.equals(apiMethod.descriptionManual)) {
-                flag = true;
-            } else if (descriptionType.equals("url") && descriptionUrl.equals(apiMethod.descriptionUrl)) {
-                flag = true;
-            } else if (descriptionType.equals("markdown") && descriptionMarkdown.equals(apiMethod.descriptionMarkdown)) {
-                flag = true;
+            // Fix defect https://github.com/Axway-API-Management-Plus/apim-cli/issues/390
+            if (!StringUtils.equals(summary, apiMethod.summary)) {
+                return false;
             }
+            boolean flag = false;
+            if (descriptionType.equals("manual") && StringUtils.equals(descriptionManual, apiMethod.descriptionManual)) {
+                flag =  true;
+            } else if (descriptionType.equals("url") && StringUtils.equals(descriptionUrl, apiMethod.descriptionUrl)) {
+                flag =  true;
+            } else if (descriptionType.equals("markdown") && StringUtils.equals(descriptionMarkdown, apiMethod.descriptionMarkdown)) {
+                flag =  true;
+            }else if (descriptionType.equals("original"))
+                flag =  true;
             return flag;
         }
         return false;
