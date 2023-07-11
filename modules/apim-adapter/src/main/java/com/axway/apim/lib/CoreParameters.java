@@ -465,5 +465,4 @@ public class CoreParameters implements Parameters {
     public String toString() {
         return "[hostname=" + hostname + ", username=" + username + ", stage=" + stage + "]";
     }
-
 }
