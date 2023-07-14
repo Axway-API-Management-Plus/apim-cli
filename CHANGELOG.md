@@ -4,7 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-# [1.13.8]  07-07-2023
+
+# [1.14.1]  In progress
+### Fixed
+- Null pointer when converting OData -> Open API  (See issue [#399](https://github.com/Axway-API-Management-Plus/apim-cli/issues/399))
+- nullpointer exception occuring while try to import an api (See issue [#390](https://github.com/Axway-API-Management-Plus/apim-cli/issues/390))
+- Backend basepath issue (See issue [#412](https://github.com/Axway-API-Management-Plus/apim-cli/issues/412))
+### Added
+
+
+# [1.14.0]  07-07-2023
 ### Fixed
 - Inbound Security - Query String Pass Through is not included in api get (See issue [#392](https://github.com/Axway-API-Management-Plus/apim-cli/issues/392))
 - breaking changes with overrideSpecBasePath = true (See issue [#397](https://github.com/Axway-API-Management-Plus/apim-cli/issues/397))
