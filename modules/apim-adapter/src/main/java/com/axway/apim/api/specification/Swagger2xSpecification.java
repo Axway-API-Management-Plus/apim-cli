@@ -93,36 +93,17 @@ public class Swagger2xSpecification extends APISpecification {
                 }
                 URL url = new URL(backendBasePath);
                 String port = url.getPort() == -1 ? ":" + url.getDefaultPort() : ":" + url.getPort();
-                Boolean adjustedHost = false;
                 if (port.equals(":443") || port.equals(":80")) port = "";
                 if (swagger.get("host") == null) {
                     LOG.debug("Adding new host {}{} to Swagger-File based on backendBasePath: {}", url.getHost(), port, backendBasePath);
                     ((ObjectNode) swagger).put("host", url.getHost() + port);
                     LOG.info("Used the backendBasePath: {} to adjust host the API-Specification.", backendBasePath);
-                    adjustedHost = true;
-                }else {
-                    if(swagger.get("host").asText().equals(url.getHost()+port)) {
-                        LOG.debug("Swagger Host: '{}' already matches backendBasePath: '{}'. Nothing to do.",swagger.get("host").asText(),backendBasePath);
-                    } else if (CoreParameters.getInstance().isOverrideSpecBasePath()){
-                        LOG.debug("Replacing existing host: '"+swagger.get("host").asText()+"' in Swagger-File to '"+url.getHost()+port+"' based on configured backendBasePath: '"+backendBasePath+"'");
-                        ((ObjectNode)swagger).put("host", url.getHost()+port);
-                        adjustedHost = true;
-                    }
                 }
-                //what if the backendBasePath is http?
                 if (swagger.get("schemes") == null) {
                     ArrayNode newSchemes = this.mapper.createArrayNode();
                     newSchemes.add(url.getProtocol());
                     LOG.debug("Adding protocol: {} to Swagger-Definition", url.getProtocol());
                     ((ObjectNode) swagger).set("schemes", newSchemes);
-                } else {
-                    if (CoreParameters.getInstance().isOverrideSpecBasePath() || adjustedHost) {
-                        //I may have a situation where a backendbasepath in http must overwrite host but in swagger file it's declared a scheme in https which is not coherent
-                        ArrayNode schemes = (ArrayNode) swagger.get("schemes");
-                        schemes.removeAll();
-                        schemes.add(url.getProtocol());
-                        LOG.debug("Setting protocol: {} to Swagger-Definition", url.getProtocol());
-                    }
                 }
                 if (swagger.get("basePath") == null) {
                     LOG.info("Adding default basePath / to swagger");
@@ -131,8 +112,10 @@ public class Swagger2xSpecification extends APISpecification {
                 if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
                     String basePath = url.getPath();
                     if (StringUtils.isNotEmpty(basePath)) {
-                        LOG.info("Overriding Swagger basePath with value : {}", basePath);
+                        LOG.debug("Overriding Swagger basePath with value : {}", basePath);
                         ((ObjectNode) swagger).put("basePath", basePath);
+                    }else {
+                        LOG.debug("Not updating basePath as BackendBasepath : {}  has empty basePath", backendBasePath);
                     }
                 }
                 this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);

@@ -5,22 +5,16 @@ import com.axway.apim.api.specification.filter.JsonNodeOpenAPI3SpecFilter;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
-import com.axway.apim.lib.utils.URLParser;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Objects;
 
 public class OAS3xSpecification extends APISpecification {
@@ -109,7 +103,7 @@ public class OAS3xSpecification extends APISpecification {
                         if (urlJsonNode != null) {
                             String serverUrl = urlJsonNode.asText();
                             if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
-                                overrideServerSection(backendBasePath,serverUrl); // override openapi url with backendBaseapath
+                                overrideServerSection(backendBasePath); // override openapi url with backendBaseapath
                             } else if (!serverUrl.startsWith("http")) { // If url does not have hostname, add hostname from backendBasepath
                                 updateServerSection(backendBasePath, serverUrl);
                             }
@@ -118,8 +112,9 @@ public class OAS3xSpecification extends APISpecification {
                 }
             } else {
                 if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
-                    overrideServerSection(backendBasePath); // override openapi url to fix issue #412
-                }else {
+                    if (backendBasePath != null)
+                        overrideServerSection(backendBasePath); // override openapi url to fix issue #412
+                } else {
                     updateServerSection(backendBasePath, "/");
                 }
             }
@@ -137,19 +132,11 @@ public class OAS3xSpecification extends APISpecification {
         ((ObjectNode) openAPI).set(SERVERS, mapper.createArrayNode().add(newServer));
     }
 
-    public void overrideServerSection(String backendBasePath, String serverUrl) throws MalformedURLException, URISyntaxException {
-        URL backendBasePathURL = new URL(backendBasePath);
-        URI serverURL = URI.create(serverUrl);
-        String newUrl = backendBasePath;
-        if (StringUtils.isEmpty(backendBasePathURL.getPath())){
-            newUrl = new URIBuilder(URI.create(serverUrl))
-                    .setHost(backendBasePathURL.getHost())
-                    .setPort(backendBasePathURL.getPort())
-                    .setScheme(backendBasePathURL.getProtocol())
-                    .build().toString();
-        }
-        LOG.info("overriding openapi Servers url with value : {}", newUrl);
-        ObjectNode newServer = createObjectNode("url", newUrl);
+    public void overrideServerSection(String backendBasePath) {
+        if (backendBasePath.endsWith("/"))
+            backendBasePath = backendBasePath.substring(0, backendBasePath.length() - 1);
+        LOG.info("overriding openapi Servers url with value : {}", backendBasePath);
+        ObjectNode newServer = createObjectNode("url", backendBasePath);
         ((ObjectNode) openAPI).set(SERVERS, mapper.createArrayNode().add(newServer));
     }
 

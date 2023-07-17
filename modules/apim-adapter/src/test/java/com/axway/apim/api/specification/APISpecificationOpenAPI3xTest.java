@@ -70,7 +70,7 @@ public class APISpecificationOpenAPI3xTest {
 		coreParameters.setOverrideSpecBasePath(true);
 		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi-with-host.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v3", null);
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -294,7 +294,7 @@ public class APISpecificationOpenAPI3xTest {
 		coreParameters.setOverrideSpecBasePath(true);
 		byte[] content = getSwaggerContent(TEST_PACKAGE + "/openapi.json");
 		APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "TestAPI");
-		apiDefinition.configureBasePath("https://myhost.customer.com:8767", null);
+		apiDefinition.configureBasePath("https://myhost.customer.com:8767/api/v3", null);
 		// Check if the Swagger-File has been changed
 		Assert.assertTrue(apiDefinition instanceof OAS3xSpecification);
 		JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());

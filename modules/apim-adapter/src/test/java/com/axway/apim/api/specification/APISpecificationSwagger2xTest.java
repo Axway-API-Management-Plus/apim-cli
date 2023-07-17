@@ -244,7 +244,7 @@ public class APISpecificationSwagger2xTest {
         JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
         Assert.assertEquals(swagger.get("host").asText(), "petstore.swagger.io");
         Assert.assertEquals(swagger.get("basePath").asText(), "/test");
-        Assert.assertEquals(swagger.get("schemes").get(0).asText(), "http");
+        Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
         Assert.assertEquals(swagger.get("schemes").size(), 1);
     }
 
@@ -257,7 +257,6 @@ public class APISpecificationSwagger2xTest {
 
         Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
         JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
-        Assert.assertEquals(swagger.get("host").asText(), "anotherHost");
         Assert.assertEquals(swagger.get("basePath").asText(), "/test");
         Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
         Assert.assertEquals(swagger.get("schemes").size(), 1);
@@ -272,7 +271,6 @@ public class APISpecificationSwagger2xTest {
 
         Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
         JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
-        Assert.assertEquals(swagger.get("host").asText(), "anotherHost");
         Assert.assertEquals(swagger.get("basePath").asText(), "/test");
         Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
         Assert.assertEquals(swagger.get("schemes").size(), 1);
@@ -289,7 +287,7 @@ public class APISpecificationSwagger2xTest {
         JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
         Assert.assertEquals(swagger.get("host").asText(), "anotherHost");
         Assert.assertEquals(swagger.get("basePath").asText(), "/v2");
-        Assert.assertEquals(swagger.get("schemes").get(0).asText(), "http");
+        Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
         Assert.assertEquals(swagger.get("schemes").size(), 1);
     }
 
