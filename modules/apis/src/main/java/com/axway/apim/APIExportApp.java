@@ -151,7 +151,21 @@ public class APIExportApp implements APIMCLIServiceProvider {
             deleteInstances();
             APIGrantAccessParams params = (APIGrantAccessParams) CLIAPIGrantAccessOptions.create(args).getParams();
             APIExportApp app = new APIExportApp();
-            ExportResult result = app.grantAccessToAPI(params, APIListImpl.API_GRANT_ACCESS_HANDLER);
+            ExportResult result = app.grantOrRevokeAccessToAPI(params, APIListImpl.API_GRANT_ACCESS_HANDLER);
+            return result.getRc();
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return ErrorCode.UNXPECTED_ERROR.getCode();
+        }
+    }
+
+    @CLIServiceMethod(name = "revoke-access", description = "Revoke access to an  API to the given organization.")
+    public static int revokeAccess(String[] args) {
+        try {
+            deleteInstances();
+            APIGrantAccessParams params = (APIGrantAccessParams) CLIAPIRevokeAccessOptions.create(args).getParams();
+            APIExportApp app = new APIExportApp();
+            ExportResult result = app.grantOrRevokeAccessToAPI(params, APIListImpl.API_REVOKE_ACCESS_HANDLER);
             return result.getRc();
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -264,7 +278,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
         }
     }
 
-    public ExportResult grantAccessToAPI(APIGrantAccessParams params, APIListImpl resultHandlerImpl) {
+    public ExportResult grantOrRevokeAccessToAPI(APIGrantAccessParams params, APIListImpl resultHandlerImpl) {
         ExportResult result = new ExportResult();
         try {
             params.validateRequiredParameters();

@@ -153,8 +153,8 @@ public class APIManagerAPIAdapter {
             requestedId = "/" + filter.getId();
         }
         return new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + filter.getApiType() + requestedId)
-                .addParameters(filter.getFilters())
-                .build();
+            .addParameters(filter.getFilters())
+            .build();
     }
 
     API getUniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
@@ -308,8 +308,8 @@ public class APIManagerAPIAdapter {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/image").build();
             HttpEntity entity = MultipartEntityBuilder.create()
-                    .addBinaryBody("file", api.getImage().getInputStream(), ContentType.create("image/jpeg"), api.getImage().getBaseFilename())
-                    .build();
+                .addBinaryBody("file", api.getImage().getInputStream(), ContentType.create("image/jpeg"), api.getImage().getBaseFilename())
+                .build();
             RestAPICall apiCall = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -440,11 +440,11 @@ public class APIManagerAPIAdapter {
             for (String specVersion : feAPISpecVersions) {
                 if (filter.isUseFEAPIDefinition()) {
                     uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/discovery/swagger/api/id/" + api.getId())
-                            .setParameter("swaggerVersion", specVersion).build();
+                        .setParameter("swaggerVersion", specVersion).build();
                     LOG.debug("Get API-Specification with version {} from Frontend-API.", specVersion);
                 } else {
                     uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId() + "/download")
-                            .setParameter("original", "true").build();
+                        .setParameter("original", "true").build();
                 }
                 LOG.debug("Download API spec URL :{}", uri);
                 RestAPICall getRequest = new GETRequest(uri);
@@ -560,7 +560,7 @@ public class APIManagerAPIAdapter {
         }
         mapper.setSerializationInclusion(Include.NON_NULL);
         FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-                SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
+            SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIImportSerializerModifier(false)));
         mapper.setFilterProvider(filter);
         mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(false)));
@@ -636,8 +636,8 @@ public class APIManagerAPIAdapter {
             parameters.add(new BasicNameValuePair("id", api.getId()));
             HttpEntity entity = new UrlEncodedFormEntity(parameters);
             URI uri = new URIBuilder(cmd.getAPIManagerURL())
-                    .setPath(cmd.getApiBasepath() + "/proxies/export")
-                    .build();
+                .setPath(cmd.getApiBasepath() + "/proxies/export")
+                .build();
             RestAPICall request = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -669,8 +669,8 @@ public class APIManagerAPIAdapter {
         LOG.debug("Update API-Proxy status to: {}", api.getState());
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL())
-                    .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/" + StatusEndpoint.valueOf(desiredState).endpoint)
-                    .build();
+                .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/" + StatusEndpoint.valueOf(desiredState).endpoint)
+                .build();
             HttpEntity entity;
             if (vhost != null && desiredState.equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
                 entity = new StringEntity("vhost=" + vhost, ContentType.APPLICATION_FORM_URLENCODED);
@@ -713,7 +713,7 @@ public class APIManagerAPIAdapter {
                 return;
             }
             URI uri = new URIBuilder(cmd.getAPIManagerURL())
-                    .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/deprecate").build();
+                .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/deprecate").build();
             RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate=" + formatRetirementDate(retirementDate), ContentType.APPLICATION_FORM_URLENCODED), uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -791,11 +791,11 @@ public class APIManagerAPIAdapter {
         URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/import/").build();
         try {
             HttpEntity entity = MultipartEntityBuilder.create()
-                    .addTextBody("name", api.getName(), ContentType.create("text/plain", StandardCharsets.UTF_8))
-                    .addTextBody("type", "swagger")
-                    .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/json"), "filename")
-                    .addTextBody("fileName", "XYZ").addTextBody("organizationId", api.getOrganization().getId(), ContentType.create("text/plain", StandardCharsets.UTF_8))
-                    .addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
+                .addTextBody("name", api.getName(), ContentType.create("text/plain", StandardCharsets.UTF_8))
+                .addTextBody("type", "swagger")
+                .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/json"), "filename")
+                .addTextBody("fileName", "XYZ").addTextBody("organizationId", api.getOrganization().getId(), ContentType.create("text/plain", StandardCharsets.UTF_8))
+                .addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
             RestAPICall importSwagger = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) importSwagger.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -968,6 +968,25 @@ public class APIManagerAPIAdapter {
             throw new AppException("Can't grant access to organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        }
+    }
+
+    public void revokeClientOrganization(List<Organization> organizations, API api) throws AppException {
+        try {
+            for (Organization organization : organizations) {
+                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + api.getId() + "/apiaccess").addParameter("organizationId", organization.getId()).build();
+                RestAPICall request = new DELRequest(uri);
+                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    if (statusCode != 204) {
+                        LOG.error("Error revoking API using URI: {} Response-Code: {} Response: {}", uri, statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                        throw new AppException("Error revoking api access: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                    }
+                    LOG.info("Organization : {} removed access from API: {} {} ( {} ) successfully revoked ", organization.getName(), api.getName(), api.getVersion(), api.getId());
+                }
+            }
+        } catch (IOException | URISyntaxException e) {
+            throw new AppException("Can't revoke access to organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
         }
     }
 

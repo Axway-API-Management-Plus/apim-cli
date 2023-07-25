@@ -146,6 +146,13 @@ public class APIExportAppTest extends WiremockWrapper {
     }
 
     @Test
+    public void testRevokeAccessAPIWithOrgName() {
+        String[] args = {"-h", "localhost", "-n", "petstore", "-orgName", "orga"};
+        int returnCode = APIExportApp.revokeAccess(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
     public void testCheckCertificates() {
         String[] args = {"-h", "localhost", "-n", "petstore", "-days", "1000"};
         int returnCode = APIExportApp.checkCertificates(args);

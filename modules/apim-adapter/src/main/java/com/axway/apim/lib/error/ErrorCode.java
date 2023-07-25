@@ -64,6 +64,7 @@ public enum ErrorCode {
     UNXPECTED_ERROR(99, "An unexpected error occurred.", true),
     CHECK_CERTS_UNXPECTED_ERROR(100, "There was an unexpected error checking the expiration date of certificates.", false),
     CHECK_CERTS_FOUND_CERTS(101, "Certificates found that will expire within the given number of days.", false);
+   // STAGE_FILE_MISSING(102, "Unable to find staging configuration file.", false);
 
     private final int code;
     private final String description;

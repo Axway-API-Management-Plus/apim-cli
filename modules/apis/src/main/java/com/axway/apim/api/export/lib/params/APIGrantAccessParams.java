@@ -9,13 +9,13 @@ import com.axway.apim.api.model.Organization;
 import com.axway.apim.lib.Parameters;
 
 public class APIGrantAccessParams extends APIExportParams implements Parameters, APIFilterParams {
-	
+
 	private List<API> apis;
 	private List<Organization> orgs;
-	
+
 	private String orgId;
 	private String orgName;
-	
+
 	public String getOrgId() {
 		return orgId;
 	}
@@ -34,10 +34,10 @@ public class APIGrantAccessParams extends APIExportParams implements Parameters,
 				.hasName(orgName)
 				.build();
 	}
-	
+
 	public APIFilter getAPIFilter() {
 		return new APIFilter.Builder()
-				.hasApiId(getId())
+				.hasId(getId())
 				.hasApiPath(getApiPath())
 				.hasName(getName())
 				.hasVHost(getVhost())
@@ -49,7 +49,7 @@ public class APIGrantAccessParams extends APIExportParams implements Parameters,
 				.hasState(API.STATE_PUBLISHED) // Only published APIs are considered
 				.build();
 	}
-	
+
 
 	public List<API> getApis() {
 		return apis;

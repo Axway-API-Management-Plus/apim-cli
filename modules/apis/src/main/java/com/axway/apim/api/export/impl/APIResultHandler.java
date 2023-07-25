@@ -58,6 +58,8 @@ public abstract class APIResultHandler {
         API_APPROVE_HANDLER(ApproveAPIHandler.class),
         API_UPGRADE_ACCESS_HANDLE(UpgradeAccessAPIHandler.class),
         API_GRANT_ACCESS_HANDLER(GrantAccessAPIHandler.class),
+        API_REVOKE_ACCESS_HANDLER(RevokeAccessAPIHandler.class),
+
         API_CHECK_CERTS_HANDLER(CheckCertificatesAPIHandler.class);
 
         private final Class<APIResultHandler> implClass;

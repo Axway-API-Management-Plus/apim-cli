@@ -50,7 +50,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 	public String getGroupDescription() {
 		return "Manage your organizations";
 	}
-	
+
 	@CLIServiceMethod(name = "get", description = "Get Organizations from API-Manager in different formats")
 	public static int exportOrgs(String[] args) {
 		OrgExportParams params;
@@ -63,7 +63,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		OrganizationApp app = new OrganizationApp();
 		return app.exportOrgs(params).getRc();
 	}
-	
+
 	public ExportResult exportOrgs(OrgExportParams params) {
 		ExportResult result = new ExportResult();
 		try {
@@ -92,7 +92,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		// We need to clean some Singleton-Instances, as tests are running in the same JVM
 		APIManagerAdapter.deleteInstance();
 		APIMHttpClient.deleteInstances();
-		
+
 		APIManagerAdapter adapter = APIManagerAdapter.getInstance();
 
 		OrgResultHandler exporter = OrgResultHandler.create(exportImpl, params, result);
@@ -105,7 +105,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			}
 		} else {
 			LOG.info("Found {} organization(s).", orgs.size());
-			
+
 			exporter.export(orgs);
 			if(exporter.hasError()) {
 				LOG.info("");
@@ -117,8 +117,8 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		}
 		return result;
 	}
-	
-	@CLIServiceMethod(name = "import", description = "Import organizatio(s) into the API-Manager")
+
+	@CLIServiceMethod(name = "import", description = "Import organization(s) into the API-Manager")
 	public static int importOrganization(String[] args) {
 		OrgImportParams params;
 		try {
@@ -130,13 +130,13 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 		OrganizationApp orgApp = new OrganizationApp();
 		return orgApp.importOrganization(params);
 	}
-	
+
 	public int importOrganization(OrgImportParams params) {
 		try {
 			params.validateRequiredParameters();
 			APIManagerAdapter.deleteInstance();
 			APIMHttpClient.deleteInstances();
-			
+
 			APIManagerAdapter.getInstance();
 			// Load the desired state of the organization
 			OrgAdapter orgAdapter = new OrgConfigAdapter(params);
@@ -151,7 +151,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			}
 			LOG.info("Successfully replicated organization(s) into API-Manager");
 			return ErrorCode.SUCCESS.getCode();
-		} catch (AppException ap) { 
+		} catch (AppException ap) {
 			ap.logException(LOG);
 			return errorCodeMapper.getMapedErrorCode(ap.getError()).getCode();
 		} catch (Exception e) {
@@ -165,8 +165,8 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			}
 		}
 	}
-	
-	@CLIServiceMethod(name = "delete", description = "Delete selected organizatio(s) from the API-Manager")
+
+	@CLIServiceMethod(name = "delete", description = "Delete selected organization(s) from the API-Manager")
 	public static int delete(String[] args) {
 		try {
 			OrgExportParams params = (OrgExportParams) OrgDeleteCLIOptions.create(args).getParams();
@@ -177,7 +177,7 @@ public class OrganizationApp implements APIMCLIServiceProvider {
 			return e.getError().getCode();
 		}
 	}
-	
+
 	public ExportResult delete(OrgExportParams params) {
 		ExportResult result = new ExportResult();
 		try {

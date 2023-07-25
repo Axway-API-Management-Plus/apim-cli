@@ -10,11 +10,11 @@ import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.error.AppException;
 
 public class CLIAPIGrantAccessOptions extends CLIOptions {
-	
-	private CLIAPIGrantAccessOptions(String[] args) {
+
+	public CLIAPIGrantAccessOptions(String[] args) {
 		super(args);
 	}
-	
+
 	public static CLIOptions create(String[] args) throws AppException {
 		CLIOptions cliOptions = new CLIAPIGrantAccessOptions(args);
 		cliOptions = new CLIAPIFilterOptions(cliOptions);
@@ -23,15 +23,15 @@ public class CLIAPIGrantAccessOptions extends CLIOptions {
 		cliOptions.parse();
 		return cliOptions;
 	}
-	
+
 	@Override
 	public void addOptions() {
-		
+
 		Option option = new  Option("orgName", true, "Filter the desired organizations based on the name to give them the rights to the selected APIs. You may use wildcards at the end or beginning.");
 		option.setRequired(false);
 		option.setArgName("*My organization*");
 		addOption(option);
-		
+
 		option = new  Option("orgId", true, "The ID of the organization to which you want to give the rights for the selected APIs.");
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-ORG");
@@ -40,7 +40,7 @@ public class CLIAPIGrantAccessOptions extends CLIOptions {
 
 	@Override
 	public void printUsage(String message, String[] args) {
-		super.printUsage(message, args);		
+		super.printUsage(message, args);
 		Console.println("----------------------------------------------------------------------------------------");
 		Console.println("Grant access for selected organizations to one or more APIs.");
 		Console.println("You can use all known API filters to select the desired APIs. However, only APIs that are in the Published status are considered.");

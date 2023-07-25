@@ -424,6 +424,19 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
     }
 
     @Test
+    public void revokeClientOrganization(){
+        try {
+            Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+            List<Organization> organizations = new ArrayList<>();
+            organizations.add(organization);
+            API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+            apiManagerAPIAdapter.revokeClientOrganization(organizations, api);
+        }catch (AppException e){
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
     public void grantClientOrganization(){
         try {
             Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
