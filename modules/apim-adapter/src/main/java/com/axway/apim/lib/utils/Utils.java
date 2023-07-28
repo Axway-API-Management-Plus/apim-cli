@@ -19,6 +19,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 import com.axway.apim.api.model.TagMap;
+import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.Console;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
@@ -288,7 +289,7 @@ public class Utils {
                 // Add it to the map of custom properties that will be attached to the API
                 customProperties.put(customPropKey, value.asText());
             }
-            entity.setCustomProperties((customProperties.size() == 0) ? null : customProperties);
+            entity.setCustomProperties((customProperties.isEmpty()) ? null : customProperties);
         }
     }
 
@@ -384,5 +385,20 @@ public class Utils {
             if (!Objects.deepEquals(myTags, otherTags)) return false;
         }
         return true;
+    }
+
+    public static int handleAppException(Exception e, Logger logger, ErrorCodeMapper errorCodeMapper){
+        if(e instanceof  AppException){
+            ErrorCode errorCode = ((AppException) e).getError();
+            if(errorCode == ErrorCode.SUCCESS){
+                return ErrorCode.SUCCESS.getCode();
+            }else {
+                logger.error("Unexpected error :", e);
+                return errorCodeMapper.getMapedErrorCode(errorCode).getCode();
+            }
+        }else {
+            logger.error("Unexpected error :", e);
+            return errorCodeMapper.getMapedErrorCode(ErrorCode.UNXPECTED_ERROR).getCode();
+        }
     }
 }

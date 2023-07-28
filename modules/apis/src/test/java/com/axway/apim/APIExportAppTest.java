@@ -79,7 +79,7 @@ public class APIExportAppTest extends WiremockWrapper {
         String input = "Y";
         InputStream in = new ByteArrayInputStream(input.getBytes());
         System.setIn(in);
-        int returnCode = APIExportApp.unpublish(args);
+        int returnCode = APIExportApp.unPublish(args);
         Assert.assertEquals(returnCode, 0);
     }
 

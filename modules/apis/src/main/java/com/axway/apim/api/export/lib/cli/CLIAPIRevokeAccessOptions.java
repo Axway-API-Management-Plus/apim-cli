@@ -1,8 +1,6 @@
 package com.axway.apim.api.export.lib.cli;
 
-import com.axway.apim.api.export.lib.params.APIGrantAccessParams;
 import com.axway.apim.lib.CLIOptions;
-import com.axway.apim.lib.CoreCLIOptions;
 import com.axway.apim.lib.Parameters;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.utils.rest.Console;
@@ -16,22 +14,13 @@ public class CLIAPIRevokeAccessOptions extends CLIOptions{
 
     @Override
     public Parameters getParams() throws AppException {
-        APIGrantAccessParams params = new APIGrantAccessParams();
-        params.setOrgId(getValue("orgId"));
-        params.setOrgName(getValue("orgName"));
-        params.setAppId(getValue("appId"));
-        params.setAppName(getValue("appName"));
-        return params;
+        return Helper.getParams(this);
     }
 
 
     public static CLIOptions create(String[] args) throws AppException {
         CLIOptions cliOptions = new CLIAPIRevokeAccessOptions(args);
-        cliOptions = new CLIAPIFilterOptions(cliOptions);
-        cliOptions = new CoreCLIOptions(cliOptions);
-        cliOptions.addOptions();
-        cliOptions.parse();
-        return cliOptions;
+        return Helper.create(cliOptions);
     }
 
     @Override
@@ -65,8 +54,12 @@ public class CLIAPIRevokeAccessOptions extends CLIOptions{
         Console.println("----------------------------------------------------------------------------------------");
         Console.println("Revoke access for selected organizations to one or more APIs.");
         Console.println("You can use all known API filters to select the desired APIs. However, only APIs that are in the Published status are considered.");
+        Console.println("----------------------------Revoke API Access to Organization----------------------------");
         Console.println(getBinaryName()+" api revoke-access -s api-env -orgId <UUID-ID-OF-THE-ORG> -id <UUID-ID-OF-THE-API>");
         Console.println(getBinaryName()+" api revoke-access -s api-env -orgName *MyOrg* -n *NameOfAPI*");
+        Console.println("----------------------------Revoke API Access to Application----------------------------");
+        Console.println(getBinaryName()+" api revoke-access -s api-env -orgId <UUID-ID-OF-THE-ORG> -id <UUID-ID-OF-THE-API> -appId <UUID-ID-OF-THE-APP");
+        Console.println(getBinaryName()+" api revoke-access -s api-env -orgName *MyOrg* -n *NameOfAPI* -appName applicationName");
         Console.println();
         Console.println();
         Console.println("For more information and advanced examples please visit:");
