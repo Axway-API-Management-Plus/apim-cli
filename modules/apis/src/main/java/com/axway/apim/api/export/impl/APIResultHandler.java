@@ -43,7 +43,7 @@ public abstract class APIResultHandler {
     APIExportParams params;
 
     protected Result result;
-    boolean hasError = false;
+
 
     public enum APIListImpl {
         JSON_EXPORTER(JsonAPIExporter.class),
@@ -95,10 +95,6 @@ public abstract class APIResultHandler {
     }
 
     public abstract void execute(List<API> apis) throws AppException;
-
-    public boolean hasError() {
-        return this.hasError;
-    }
 
     public Result getResult() {
         return result;

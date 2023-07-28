@@ -8,6 +8,7 @@ import com.axway.apim.api.export.impl.APIResultHandler.APIListImpl;
 import com.axway.apim.api.export.lib.cli.*;
 import com.axway.apim.api.export.lib.params.*;
 import com.axway.apim.api.model.Organization;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.cli.APIMCLIServiceProvider;
 import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ExportResult;
@@ -202,10 +203,8 @@ public class APIExportApp implements APIMCLIServiceProvider {
             } else {
                 LOG.info("{} API(s) selected.", apis.size());
                 resultHandler.execute(apis);
-                if (resultHandler.hasError()) {
-                    LOG.error(CHECK_THE_LOG_AT_LEAST_ONE_ERROR_WAS_RECORDED);
-                } else {
-                    LOG.debug(SUCCESSFULLY_SELECTED_API_S, apis.size());
+                if (resultHandler.getResult().hasError()) {
+                    result.setError(resultHandler.getResult().getErrorCode());
                 }
                 APIManagerAdapter.deleteInstance();
                 if (result.hasError()) {
@@ -259,7 +258,7 @@ public class APIExportApp implements APIMCLIServiceProvider {
             } else {
                 LOG.info("{} API(s) selected.", apis.size());
                 resultHandler.execute(apis);
-                if (resultHandler.hasError()) {
+                if (resultHandler.getResult().hasError()) {
                     LOG.info("");
                     LOG.error(CHECK_THE_LOG_AT_LEAST_ONE_ERROR_WAS_RECORDED);
                 } else {
@@ -304,12 +303,19 @@ public class APIExportApp implements APIMCLIServiceProvider {
             LOG.info("{} API(s) and {} Organization(s) selected.", apis.size(), orgs.size());
             params.setOrgs(orgs);
             params.setApis(apis);
+
+            if (params.getAppId() != null || params.getAppName() != null) {
+                LOG.info("Application filter : {}", params.getApplicationFilter());
+                ClientApplication application = apimanagerAdapter.appAdapter.getApplication(params.getApplicationFilter());
+                if(application == null){
+                    throw new AppException("Application not found", ErrorCode.ERR_GRANTING_ACCESS_TO_API);
+                }
+                params.setClientApplication(application);
+            }
             APIResultHandler resultHandler = APIResultHandler.create(resultHandlerImpl, params);
             resultHandler.execute(apis);
-            if (resultHandler.hasError()) {
-                LOG.error(CHECK_THE_LOG_AT_LEAST_ONE_ERROR_WAS_RECORDED);
-            } else {
-                LOG.debug(SUCCESSFULLY_SELECTED_API_S, apis.size());
+            if (resultHandler.getResult().hasError()) {
+                result.setError(resultHandler.getResult().getErrorCode());
             }
             return result;
         } catch (AppException ap) {

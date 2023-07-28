@@ -971,6 +971,25 @@ public class APIManagerAPIAdapter {
         }
     }
 
+    public void grantClientApplication(ClientApplication clientApplication, API api) throws AppException {
+        try {
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + clientApplication.getId() + "/apis").build();
+            HttpEntity entity = new StringEntity("{\"apiId\":\"" + api.getId() + "\",\"enabled\":true}", ContentType.APPLICATION_JSON);
+            RestAPICall request = new POSTRequest(entity, uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                if (statusCode != 201) {
+                    LOG.error("Error granting Application Access to  API using URI: {} Received Status-Code: {} Response: {}", uri, statusCode, response);
+                    throw new AppException("Error granting Application Access to  API. Received Status-Code: " + statusCode, ErrorCode.GRANT_ACCESS_APPLICATION_ERR);
+                }
+            }
+        } catch (Exception e) {
+            throw new AppException("Error granting Application Access to  API.", ErrorCode.GRANT_ACCESS_APPLICATION_ERR, e);
+        }
+
+    }
+
     public void revokeClientOrganization(List<Organization> organizations, API api) throws AppException {
         try {
             for (Organization organization : organizations) {
@@ -979,8 +998,8 @@ public class APIManagerAPIAdapter {
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != 204) {
-                        LOG.error("Error revoking API using URI: {} Response-Code: {} Response: {}", uri, statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException("Error revoking api access: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                        LOG.error("Error revoking Organization access to API using URI: {} Response-Code: {} Response: {}", uri, statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                        throw new AppException("Error revoking api access: " + statusCode, ErrorCode.ACCESS_ORGANIZATION_ERR);
                     }
                     LOG.info("Organization : {} removed access from API: {} {} ( {} ) successfully revoked ", organization.getName(), api.getName(), api.getVersion(), api.getId());
                 }
@@ -989,6 +1008,31 @@ public class APIManagerAPIAdapter {
             throw new AppException("Can't revoke access to organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
         }
     }
+
+    public void revokeClientApplication(ClientApplication clientApplication, API api) throws AppException {
+        try {
+            List<APIAccess> apiAccesses = clientApplication.getApiAccess();
+            LOG.debug("{}", apiAccesses);
+            for (APIAccess apiAccess : apiAccesses) {
+                if (apiAccess.getApiId().equals(api.getId())) {
+                    URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + clientApplication.getId() + "/apis/" + apiAccess.getId()).build();
+                    RestAPICall request = new DELRequest(uri);
+                    try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                        int statusCode = httpResponse.getStatusLine().getStatusCode();
+                        if (statusCode != 204) {
+                            LOG.error("Error revoking application access to API using URI: {} Response-Code: {} Response: {}", uri, statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                            throw new AppException("Error revoking api access: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                        }
+                        LOG.info("Application : {} removed access from API: {} {} ( {} ) successfully revoked ", clientApplication.getName(), api.getName(), api.getVersion(), api.getId());
+                    }
+                    break;
+                }
+            }
+        } catch (IOException | URISyntaxException e) {
+            throw new AppException("Can't revoke access to organization.", ErrorCode.REVOKE_ACCESS_APPLICATION_ERR, e);
+        }
+    }
+
 
     private String getFilterFields(APIFilter filter) {
         String filterFields = "[";

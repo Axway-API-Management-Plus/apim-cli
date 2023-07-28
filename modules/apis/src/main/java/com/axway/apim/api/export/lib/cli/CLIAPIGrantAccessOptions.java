@@ -36,6 +36,16 @@ public class CLIAPIGrantAccessOptions extends CLIOptions {
 		option.setRequired(false);
 		option.setArgName("UUID-ID-OF-THE-ORG");
 		addOption(option);
+
+        option = new  Option("appName", true, "Desired application name to be granted access to API");
+        option.setRequired(false);
+        option.setArgName("Application Name");
+        addOption(option);
+
+        option = new  Option("appId", true, "The ID of the application to which you give the rights for the selected APIs.");
+        option.setRequired(false);
+        option.setArgName("UUID-ID-OF-THE-APP");
+        addOption(option);
 	}
 
 	@Override
@@ -62,6 +72,8 @@ public class CLIAPIGrantAccessOptions extends CLIOptions {
 		APIGrantAccessParams params = new APIGrantAccessParams();
 		params.setOrgId(getValue("orgId"));
 		params.setOrgName(getValue("orgName"));
+        params.setAppId(getValue("appId"));
+        params.setAppName(getValue("appName"));
 		return params;
 	}
 }

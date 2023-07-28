@@ -63,8 +63,9 @@ public enum ErrorCode {
     ERR_UNPUBSLISH_API(97, "API could not be changed to unpublish state", false),
     UNXPECTED_ERROR(99, "An unexpected error occurred.", true),
     CHECK_CERTS_UNXPECTED_ERROR(100, "There was an unexpected error checking the expiration date of certificates.", false),
-    CHECK_CERTS_FOUND_CERTS(101, "Certificates found that will expire within the given number of days.", false);
-   // STAGE_FILE_MISSING(102, "Unable to find staging configuration file.", false);
+    CHECK_CERTS_FOUND_CERTS(101, "Certificates found that will expire within the given number of days.", false),
+    GRANT_ACCESS_APPLICATION_ERR(102, "Error granting application access to API."),
+    REVOKE_ACCESS_APPLICATION_ERR(103, "Error revoking application access to API.");
 
     private final int code;
     private final String description;

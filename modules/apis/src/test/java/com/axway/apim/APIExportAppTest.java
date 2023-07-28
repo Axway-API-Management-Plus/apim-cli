@@ -136,7 +136,7 @@ public class APIExportAppTest extends WiremockWrapper {
     }
 
     @Test
-    public void testGrantAccessAPIWithName() {
+    public void testOrgGrantAccessAPIWithName() {
         String[] args = {"-h", "localhost", "-n", "petstore"};
         String input = "Y";
         InputStream in = new ByteArrayInputStream(input.getBytes());
@@ -146,8 +146,27 @@ public class APIExportAppTest extends WiremockWrapper {
     }
 
     @Test
-    public void testRevokeAccessAPIWithOrgName() {
-        String[] args = {"-h", "localhost", "-n", "petstore", "-orgName", "orga"};
+    public void testAppGrantAccessAPIWithName() {
+        String[] args = {"-h", "localhost", "-n", "petstore", "-orgName", "orga", "-appName", "Test App 2008"};
+        String input = "Y";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+        int returnCode = APIExportApp.grantAccess(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+
+    @Test
+    public void testOrgRevokeAccessAPIWithOrgName() {
+        String[] args = {"-h", "localhost", "-n", "petstore", "-orgName", "orga", "-force"};
+        int returnCode = APIExportApp.revokeAccess(args);
+        Assert.assertEquals(returnCode, 0);
+    }
+
+    @Test
+    public void testAppRevokeAccessAPIWithOrgName() {
+        System.out.println(System.getProperty("java.io.tmpdir"));
+        String[] args = {"-h", "localhost", "-n", "petstore", "-orgName", "orga", "-appName", "Test App 2008", "-force"};
         int returnCode = APIExportApp.revokeAccess(args);
         Assert.assertEquals(returnCode, 0);
     }

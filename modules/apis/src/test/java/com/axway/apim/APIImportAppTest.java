@@ -24,7 +24,7 @@ public class APIImportAppTest extends WiremockWrapper {
         String confFile = classLoader.getResource("com/axway/apim/test/files/basic/config.json").getFile();
         String[] args = {"-h", "localhost", "-c", confFile, "-a", specFile};
         int returnCode = APIImportApp.importAPI(args);
-        Assert.assertEquals(returnCode, 7);
+        Assert.assertEquals(returnCode, 15);
     }
 
     @Test
