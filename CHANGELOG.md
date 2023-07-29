@@ -31,6 +31,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
       "architecture" : null
     }
     ```
+### Changed
+- Updated libs
+    - jackson-* from 2.14.2 to 2.15.2
+    - commons-csv from 1.9.0 to 1.10.0
+    - org.ehcache from 3.9.9 to 3.10.8
+    - log4j-slf4j-impl from 2.19.0 to 2.20.0
+    - org.glassfish.jaxb 2.3.7 to 2.3.8
+    - org.apache.httpcomponent 4.5.13 4.5.14
 
 ## [1.13.7] 2023-04-21
 
