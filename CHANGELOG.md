@@ -10,8 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Null pointer when converting OData -> Open API  (See issue [#399](https://github.com/Axway-API-Management-Plus/apim-cli/issues/399))
 - nullpointer exception occuring while try to import an api (See issue [#390](https://github.com/Axway-API-Management-Plus/apim-cli/issues/390))
 - Backend basepath issue (See issue [#412](https://github.com/Axway-API-Management-Plus/apim-cli/issues/412))
+- No change is returning RC 0 instead of RC 10 (See issue [#401](https://github.com/Axway-API-Management-Plus/apim-cli/issues/401))
 ### Added
-
+- Add revoke API access command from Org/Application (See issue [#419](https://github.com/Axway-API-Management-Plus/apim-cli/issues/419))
 
 # [1.14.0]  07-07-2023
 ### Fixed
