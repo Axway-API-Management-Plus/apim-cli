@@ -183,7 +183,7 @@ public class CoreInitializationTestIT extends TestRunnerBeforeSuiteSupport {
                 testRunner.http(action -> action.client(apiManager)
                         .send()
                         .post("/applications")
-                        .name("orgCreatedRequest")
+                        .name("createApplication")
                         .header("Content-Type", "application/json")
                         .payload("{\"name\":\"${testAppName}\",\"apis\":[],\"organizationId\":\"${orgId}\"}"));
 

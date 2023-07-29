@@ -279,7 +279,6 @@ public class APIExportApp implements APIMCLIServiceProvider {
         ExportResult result = new ExportResult();
         try {
             params.validateRequiredParameters();
-            deleteInstances();
             APIManagerAdapter apimanagerAdapter = APIManagerAdapter.getInstance();
             if (!APIManagerAdapter.hasAdminAccount()) {
                 LOG.error("Upgrading API-Access needs admin access.");
