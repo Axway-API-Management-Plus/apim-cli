@@ -207,7 +207,7 @@ public class APIManagerAPIAdapter {
      * Translates the methodIds of the given api. The operations are loaded from the API-Manager based on the apiId
      *
      * @param api   in which the methods should be translated
-     * @param apiId the methods are loaded based on this API-ID (this might be an another referenced API
+     * @param apiId the methods are loaded based on this API-ID (this might be an another referenced API)
      * @param mode  translation direction
      * @throws AppException when something goes wrong
      */
@@ -551,13 +551,7 @@ public class APIManagerAPIAdapter {
 
     public API updateAPIProxy(API api) throws AppException {
         LOG.debug("Updating API-Proxy: {} {} ( {} )", api.getName(), api.getVersion(), api.getId());
-        String[] serializeAllExcept;
-        // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
-        if (queryStringPassThroughBreakingVersion.contains(APIManagerAdapter.getInstance().getApiManagerVersion())) {
-            serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
-        } else {
-            serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
-        }
+        String[] serializeAllExcept = getSerializeAllExcept();
         mapper.setSerializationInclusion(Include.NON_NULL);
         FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
             SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
@@ -581,6 +575,17 @@ public class APIManagerAPIAdapter {
         } catch (Exception e) {
             throw new AppException("Cannot update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
         }
+    }
+
+    private String[] getSerializeAllExcept() throws AppException {
+        String[] serializeAllExcept;
+        // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
+        if (queryStringPassThroughBreakingVersion.contains(APIManagerAdapter.getInstance().getApiManagerVersion())) {
+            serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
+        } else {
+            serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
+        }
+        return serializeAllExcept;
     }
 
     public void deleteAPIProxy(API api) throws AppException {
@@ -889,7 +894,7 @@ public class APIManagerAPIAdapter {
         LOG.debug("Upgrade access & subscriptions to API: {} {}  ({})", apiToUpgradeAccess.getName(), apiToUpgradeAccess.getVersion(), apiToUpgradeAccess.getId());
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/upgrade/" + referenceAPI.getId()).build();
-            List<NameValuePair> params = new Vector<>();
+            List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("upgradeApiId", apiToUpgradeAccess.getId()));
             if (deprecateRefApi != null) params.add(new BasicNameValuePair("deprecate", deprecateRefApi.toString()));
             if (retireRefApi != null) params.add(new BasicNameValuePair("retire", retireRefApi.toString()));
@@ -993,7 +998,7 @@ public class APIManagerAPIAdapter {
     public void revokeClientOrganization(List<Organization> organizations, API api) throws AppException {
         try {
             for (Organization organization : organizations) {
-                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/" + api.getId() + "/apiaccess").addParameter("organizationId", organization.getId()).build();
+                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/apiaccess").addParameter("organizationId", organization.getId()).build();
                 RestAPICall request = new DELRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();

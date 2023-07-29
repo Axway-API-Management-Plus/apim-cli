@@ -15,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class APIManagerPoliciesAdapter {
 
@@ -75,9 +72,9 @@ public class APIManagerPoliciesAdapter {
         super();
     }
 
-    public Map<PolicyType, String> apiManagerResponse = new HashMap<>();
+    public final Map<PolicyType, String> apiManagerResponse = new EnumMap<>(PolicyType.class);
 
-    private final Map<PolicyType, List<Policy>> mappedPolicies = new HashMap<>();
+    private final Map<PolicyType, List<Policy>> mappedPolicies = new EnumMap<>(PolicyType.class);
     private final List<Policy> allPolicies = new ArrayList<>();
 
     private void readPoliciesFromAPIManager(PolicyType type) throws AppException {
@@ -85,7 +82,7 @@ public class APIManagerPoliciesAdapter {
         CoreParameters cmd = CoreParameters.getInstance();
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/policies")
-                    .setParameter("type", type.getRestAPIKey()).build();
+                .setParameter("type", type.getRestAPIKey()).build();
             LOG.debug("Load policies with type: {} from API-Manager", type);
             RestAPICall getRequest = new GETRequest(uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {

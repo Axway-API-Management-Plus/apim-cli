@@ -34,10 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class APIManagerAPIAccessAdapter {
 
@@ -53,11 +50,11 @@ public class APIManagerAPIAccessAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(APIManagerAPIAccessAdapter.class);
 
-    private final ObjectMapper mapper = APIManagerAdapter.mapper;
+    private static final ObjectMapper mapper = APIManagerAdapter.mapper;
 
     private final CoreParameters cmd;
 
-    private final Map<Type, Cache<String, String>> caches = new HashMap<>();
+    private final Map<Type, Cache<String, String>> caches = new EnumMap<>(Type.class);
     private static final HttpHelper httpHelper = new HttpHelper();
 
 
@@ -67,7 +64,7 @@ public class APIManagerAPIAccessAdapter {
         caches.put(Type.organizations, APIManagerAdapter.getCache(CacheType.organizationAPIAccessCache, String.class, String.class));
     }
 
-    Map<Type, Map<String, String>> apiManagerResponse = new HashMap<>();
+    Map<Type, Map<String, String>> apiManagerResponse = new EnumMap<>(Type.class);
 
     private void readAPIAccessFromAPIManager(Type type, String id) throws AppException {
         if (apiManagerResponse.get(type) != null && apiManagerResponse.get(type).get(id) != null) return;
@@ -87,7 +84,7 @@ public class APIManagerAPIAccessAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode > 299) {
                     LOG.error("Error loading API-Access from API-Manager for {}. Response-Code: {}. Got response: {}", type, statusCode, response);
-                    throw new AppException("Error loading API-Access from API-Manager for " + type + ". Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error loading API-Access from API-Manager for " + type + ". Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 if (response.startsWith("{")) { // Got a single response!
                     response = "[" + response + "]";
@@ -175,7 +172,7 @@ public class APIManagerAPIAccessAdapter {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + type + "/" + parentEntity.getId() + "/apis").build();
             mapper.setSerializationInclusion(Include.NON_NULL);
             FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-                    SimpleBeanPropertyFilter.serializeAllExcept("apiName", "apiVersion"));
+                SimpleBeanPropertyFilter.serializeAllExcept("apiName", "apiVersion"));
             mapper.setFilterProvider(filter);
             String json = mapper.writeValueAsString(apiAccess);
             HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
@@ -192,7 +189,7 @@ public class APIManagerAPIAccessAdapter {
                     statusCode = httpResponse.getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error creating/updating API Access: {} Response-Code: {} Response Body: {}", apiAccess, statusCode, response);
-                        throw new AppException("Error creating/updating API Access. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                        throw new AppException("Error creating/updating API Access. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                     } else {
                         LOG.info("Successfully created API-Access on retry. Received Status-Code: {}", statusCode);
                     }
@@ -201,7 +198,7 @@ public class APIManagerAPIAccessAdapter {
                     return;
                 } else {
                     LOG.error("Error creating/updating API Access: {} Response-Code: {} Response Body: {}", apiAccess, statusCode, response);
-                    throw new AppException("Error creating/updating API Access. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error creating/updating API Access. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
             }
             // Clean cache for this ID (App/Org) to force reload next time
@@ -228,7 +225,7 @@ public class APIManagerAPIAccessAdapter {
                 if (statusCode < 200 || statusCode > 299) {
                     String errorResponse = EntityUtils.toString(httpResponse.getEntity());
                     LOG.error("Can't delete API access requests for application. Response-Code: {}. Got response: {}", statusCode, errorResponse);
-                    throw new AppException("Can't delete API access requests for application. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Can't delete API access requests for application. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 removeFromCache(parentEntity.getId(), type);
             }
