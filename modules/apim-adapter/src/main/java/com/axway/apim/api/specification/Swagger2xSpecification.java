@@ -99,7 +99,6 @@ public class Swagger2xSpecification extends APISpecification {
                     ((ObjectNode) swagger).put("host", url.getHost() + port);
                     LOG.info("Used the backendBasePath: {} to adjust host the API-Specification.", backendBasePath);
                 }
-                //what if the backendBasePath is http?
                 if (swagger.get("schemes") == null) {
                     ArrayNode newSchemes = this.mapper.createArrayNode();
                     newSchemes.add(url.getProtocol());
@@ -113,8 +112,10 @@ public class Swagger2xSpecification extends APISpecification {
                 if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
                     String basePath = url.getPath();
                     if (StringUtils.isNotEmpty(basePath)) {
-                        LOG.info("Overriding Swagger basePath with value : {}", basePath);
+                        LOG.debug("Overriding Swagger basePath with value : {}", basePath);
                         ((ObjectNode) swagger).put("basePath", basePath);
+                    }else {
+                        LOG.debug("Not updating basePath as BackendBasepath : {}  has empty basePath", backendBasePath);
                     }
                 }
                 this.apiSpecificationContent = this.mapper.writeValueAsBytes(swagger);

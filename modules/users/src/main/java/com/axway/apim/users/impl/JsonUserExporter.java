@@ -86,7 +86,7 @@ public class JsonUserExporter extends UserResultHandler {
             } else {
                 mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), user);
             }
-            this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
+            this.result.addExportedFile((localFolder != null ? localFolder.getCanonicalPath() : null) + configFile);
         } catch (Exception e) {
             throw new AppException("Can't write configuration file for user: '" + user.getName() + "'", ErrorCode.UNXPECTED_ERROR, e);
         }

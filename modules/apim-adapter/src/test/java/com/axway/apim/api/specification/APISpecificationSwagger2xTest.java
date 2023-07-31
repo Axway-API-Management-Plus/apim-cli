@@ -238,7 +238,7 @@ public class APISpecificationSwagger2xTest {
         CoreParameters.getInstance().setOverrideSpecBasePath(true);
         byte[] content = getSwaggerContent(testPackage + "/petstore-only-https-scheme.json");
         APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
-        apiDefinition.configureBasePath("https://petstore.swagger.io/test", null);
+        apiDefinition.configureBasePath("http://petstore.swagger.io/test", null);
 
         Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
         JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
@@ -247,5 +247,49 @@ public class APISpecificationSwagger2xTest {
         Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
         Assert.assertEquals(swagger.get("schemes").size(), 1);
     }
+
+    @Test
+    public void testReplaceHostInSwaggerFalse() throws IOException{
+        CoreParameters.getInstance().setOverrideSpecBasePath(true);
+        byte[] content = getSwaggerContent(testPackage + "/petstore-only-https-scheme.json");
+        APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
+        apiDefinition.configureBasePath("https://anotherHost/test", null);
+
+        Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
+        JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
+        Assert.assertEquals(swagger.get("basePath").asText(), "/test");
+        Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
+        Assert.assertEquals(swagger.get("schemes").size(), 1);
+    }
+
+    @Test
+    public void testReplaceAlsoHostInSwagger() throws IOException{
+        CoreParameters.getInstance().setOverrideSpecBasePath(true);
+        byte[] content = getSwaggerContent(testPackage + "/petstore-only-https-scheme.json");
+        APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
+        apiDefinition.configureBasePath("https://anotherHost/test", null);
+
+        Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
+        JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
+        Assert.assertEquals(swagger.get("basePath").asText(), "/test");
+        Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
+        Assert.assertEquals(swagger.get("schemes").size(), 1);
+    }
+
+    @Test
+    public void testSwaggerWithoutHost() throws IOException{
+        CoreParameters.getInstance().setOverrideSpecBasePath(false);
+        byte[] content = getSwaggerContent(testPackage + "/petstore-without-host.json");
+        APISpecification apiDefinition = APISpecificationFactory.getAPISpecification(content, "teststore.json", "Test-API");
+        apiDefinition.configureBasePath("http://anotherHost/test", null);
+
+        Assert.assertTrue(apiDefinition instanceof Swagger2xSpecification);
+        JsonNode swagger = mapper.readTree(apiDefinition.getApiSpecificationContent());
+        Assert.assertEquals(swagger.get("host").asText(), "anotherHost");
+        Assert.assertEquals(swagger.get("basePath").asText(), "/v2");
+        Assert.assertEquals(swagger.get("schemes").get(0).asText(), "https");
+        Assert.assertEquals(swagger.get("schemes").size(), 1);
+    }
+
 
 }

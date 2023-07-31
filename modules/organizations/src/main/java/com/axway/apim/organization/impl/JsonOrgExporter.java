@@ -89,7 +89,7 @@ public class JsonOrgExporter extends OrgResultHandler {
             } else {
                 mapper.writeValue(new File(localFolder.getCanonicalPath() + configFile), org);
             }
-            this.result.addExportedFile(localFolder.getCanonicalPath() + configFile);
+            this.result.addExportedFile((localFolder != null ? localFolder.getCanonicalPath() : null) + configFile);
         } catch (Exception e) {
             throw new AppException("Can't write configuration file for organization: '" + org.getName() + "'", ErrorCode.UNXPECTED_ERROR, e);
         }

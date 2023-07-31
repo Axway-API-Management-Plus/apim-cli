@@ -4,10 +4,12 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import org.yaml.snakeyaml.LoaderOptions;
 
-public class CustomYamlFactory {
+public final class CustomYamlFactory {
 
+    private CustomYamlFactory() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
     private static YAMLFactory yamlFactory;
-
 
     public static YAMLFactory createYamlFactory() {
         if (yamlFactory == null) {
@@ -17,6 +19,4 @@ public class CustomYamlFactory {
         }
         return yamlFactory;
     }
-
-
 }

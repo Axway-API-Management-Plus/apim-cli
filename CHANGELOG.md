@@ -4,7 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-# [1.13.8]  07-07-2023
+
+# [1.14.1]  2023-07-31
+### Fixed
+- Null pointer when converting OData -> Open API  (See issue [#399](https://github.com/Axway-API-Management-Plus/apim-cli/issues/399))
+- nullpointer exception occuring while try to import an api (See issue [#390](https://github.com/Axway-API-Management-Plus/apim-cli/issues/390))
+- Backend basepath issue (See issue [#412](https://github.com/Axway-API-Management-Plus/apim-cli/issues/412))
+- No change is returning RC 0 instead of RC 10 (See issue [#401](https://github.com/Axway-API-Management-Plus/apim-cli/issues/401))
+### Added
+- Add revoke API access command from Org/Application (See issue [#419](https://github.com/Axway-API-Management-Plus/apim-cli/issues/419))
+### Changed
+- Updated libs
+    - jackson-* from 2.14.2 to 2.15.2
+    - commons-csv from 1.9.0 to 1.10.0
+    - org.ehcache from 3.9.9 to 3.10.8
+    - log4j-slf4j-impl from 2.19.0 to 2.20.0
+    - org.glassfish.jaxb 2.3.7 to 2.3.8
+    - org.apache.httpcomponent 4.5.13 4.5.14
+
+
+# [1.14.0]  2023-07-07
 ### Fixed
 - Inbound Security - Query String Pass Through is not included in api get (See issue [#392](https://github.com/Axway-API-Management-Plus/apim-cli/issues/392))
 - breaking changes with overrideSpecBasePath = true (See issue [#397](https://github.com/Axway-API-Management-Plus/apim-cli/issues/397))

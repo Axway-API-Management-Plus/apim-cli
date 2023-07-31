@@ -13,7 +13,7 @@ import com.consol.citrus.exceptions.ValidationException;
 public class ImportUserTestAction extends CLIAbstractImportTestAction {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ImportUserTestAction.class);
-	
+
 	public ImportUserTestAction(TestContext context) {
 		super(context);
 	}

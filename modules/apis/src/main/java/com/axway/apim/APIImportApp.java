@@ -27,19 +27,19 @@ import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 
 /**
- * This is the Entry-Point of program and responsible to:  
+ * This is the Entry-Point of program and responsible to:
  * - read the command-line parameters to create a <code>CommandParameters</code>
  * - next is to read the API-Contract by creating an <code>APIImportConfig</code> instance and calling getImportAPIDefinition()
  * - the <code>APIManagerAdapter</code> method: <code>getAPIManagerAPI()</code> is used to create the API-Manager API state
  * - An <code>APIChangeState</code> is created based on ImportAPI and API-Manager API
- * - Finally the APIManagerAdapter:applyChanges() is called to replicate the state into the APIManager.   
- * 
+ * - Finally the APIManagerAdapter:applyChanges() is called to replicate the state into the APIManager.
+ *
  * @author cwiechmann@axway.com
  */
 public class APIImportApp implements APIMCLIServiceProvider {
 
 	private static final Logger LOG = LoggerFactory.getLogger(APIImportApp.class);
-	
+
 	@CLIServiceMethod(name = "import", description = "Import APIs into the API-Manager")
 	public static int importAPI(String[] args) {
 		APIImportParams params;
@@ -55,7 +55,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 
 	public int importAPI(APIImportParams params) {
 		ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
-		try {		
+		try {
 			params.validateRequiredParameters();
 			// Clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
@@ -67,7 +67,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 			// Creates an API-Representation of the desired API
 			API desiredAPI = configAdapter.getDesiredAPI();
 			List<NameValuePair> filters = new ArrayList<>();
-			// If we don't have an AdminAccount available, we ignore published APIs - For OrgAdmins 
+			// If we don't have an AdminAccount available, we ignore published APIs - For OrgAdmins
 			// the unpublished or pending APIs become the actual API
 			if(!APIManagerAdapter.hasAdminAccount()) {
 				filters.add(new BasicNameValuePair("field", "state"));
@@ -119,7 +119,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 	public String getGroupId() {
 		return "api";
 	}
-	
+
 	@Override
 	public String getGroupDescription() {
 		return "Manage your APIs";
@@ -129,7 +129,7 @@ public class APIImportApp implements APIMCLIServiceProvider {
 	public String getVersion() {
 		return APIImportApp.class.getPackage().getImplementationVersion();
 	}
-	
+
 	public String getName() {
 		return "API - I M P O R T";
 	}

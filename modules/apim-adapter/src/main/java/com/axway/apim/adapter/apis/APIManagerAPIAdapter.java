@@ -153,8 +153,8 @@ public class APIManagerAPIAdapter {
             requestedId = "/" + filter.getId();
         }
         return new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/" + filter.getApiType() + requestedId)
-                .addParameters(filter.getFilters())
-                .build();
+            .addParameters(filter.getFilters())
+            .build();
     }
 
     API getUniqueAPI(List<API> foundAPIs, APIFilter filter) throws AppException {
@@ -207,7 +207,7 @@ public class APIManagerAPIAdapter {
      * Translates the methodIds of the given api. The operations are loaded from the API-Manager based on the apiId
      *
      * @param api   in which the methods should be translated
-     * @param apiId the methods are loaded based on this API-ID (this might be an another referenced API
+     * @param apiId the methods are loaded based on this API-ID (this might be an another referenced API)
      * @param mode  translation direction
      * @throws AppException when something goes wrong
      */
@@ -308,8 +308,8 @@ public class APIManagerAPIAdapter {
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/image").build();
             HttpEntity entity = MultipartEntityBuilder.create()
-                    .addBinaryBody("file", api.getImage().getInputStream(), ContentType.create("image/jpeg"), api.getImage().getBaseFilename())
-                    .build();
+                .addBinaryBody("file", api.getImage().getInputStream(), ContentType.create("image/jpeg"), api.getImage().getBaseFilename())
+                .build();
             RestAPICall apiCall = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -440,11 +440,11 @@ public class APIManagerAPIAdapter {
             for (String specVersion : feAPISpecVersions) {
                 if (filter.isUseFEAPIDefinition()) {
                     uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/discovery/swagger/api/id/" + api.getId())
-                            .setParameter("swaggerVersion", specVersion).build();
+                        .setParameter("swaggerVersion", specVersion).build();
                     LOG.debug("Get API-Specification with version {} from Frontend-API.", specVersion);
                 } else {
                     uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APIREPO + api.getApiId() + "/download")
-                            .setParameter("original", "true").build();
+                        .setParameter("original", "true").build();
                 }
                 LOG.debug("Download API spec URL :{}", uri);
                 RestAPICall getRequest = new GETRequest(uri);
@@ -551,16 +551,10 @@ public class APIManagerAPIAdapter {
 
     public API updateAPIProxy(API api) throws AppException {
         LOG.debug("Updating API-Proxy: {} {} ( {} )", api.getName(), api.getVersion(), api.getId());
-        String[] serializeAllExcept;
-        // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
-        if (queryStringPassThroughBreakingVersion.contains(APIManagerAdapter.getInstance().getApiManagerVersion())) {
-            serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
-        } else {
-            serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
-        }
+        String[] serializeAllExcept = getSerializeAllExcept();
         mapper.setSerializationInclusion(Include.NON_NULL);
         FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-                SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
+            SimpleBeanPropertyFilter.serializeAllExcept(serializeAllExcept));
         mapper.registerModule(new SimpleModule().setSerializerModifier(new APIImportSerializerModifier(false)));
         mapper.setFilterProvider(filter);
         mapper.registerModule(new SimpleModule().setSerializerModifier(new PolicySerializerModifier(false)));
@@ -581,6 +575,17 @@ public class APIManagerAPIAdapter {
         } catch (Exception e) {
             throw new AppException("Cannot update API-Proxy.", ErrorCode.CANT_UPDATE_API_PROXY, e);
         }
+    }
+
+    private String[] getSerializeAllExcept() throws AppException {
+        String[] serializeAllExcept;
+        // queryStringPassThrough added in inboundProfiles on API manager version 7.7.20220530
+        if (queryStringPassThroughBreakingVersion.contains(APIManagerAdapter.getInstance().getApiManagerVersion())) {
+            serializeAllExcept = new String[]{"apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
+        } else {
+            serializeAllExcept = new String[]{"queryStringPassThrough", "apiDefinition", "certFile", "useForInbound", "useForOutbound", "organization", "applications", "image", "clientOrganizations", "applicationQuota", "systemQuota", "backendBasepath", "remoteHost"};
+        }
+        return serializeAllExcept;
     }
 
     public void deleteAPIProxy(API api) throws AppException {
@@ -636,8 +641,8 @@ public class APIManagerAPIAdapter {
             parameters.add(new BasicNameValuePair("id", api.getId()));
             HttpEntity entity = new UrlEncodedFormEntity(parameters);
             URI uri = new URIBuilder(cmd.getAPIManagerURL())
-                    .setPath(cmd.getApiBasepath() + "/proxies/export")
-                    .build();
+                .setPath(cmd.getApiBasepath() + "/proxies/export")
+                .build();
             RestAPICall request = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -669,8 +674,8 @@ public class APIManagerAPIAdapter {
         LOG.debug("Update API-Proxy status to: {}", api.getState());
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL())
-                    .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/" + StatusEndpoint.valueOf(desiredState).endpoint)
-                    .build();
+                .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/" + StatusEndpoint.valueOf(desiredState).endpoint)
+                .build();
             HttpEntity entity;
             if (vhost != null && desiredState.equals(API.STATE_PUBLISHED)) { // During publish, it might be required to also set the VHost (See issue: #98)
                 entity = new StringEntity("vhost=" + vhost, ContentType.APPLICATION_FORM_URLENCODED);
@@ -713,7 +718,7 @@ public class APIManagerAPIAdapter {
                 return;
             }
             URI uri = new URIBuilder(cmd.getAPIManagerURL())
-                    .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/deprecate").build();
+                .setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/deprecate").build();
             RestAPICall apiCall = new POSTRequest(new StringEntity("retirementDate=" + formatRetirementDate(retirementDate), ContentType.APPLICATION_FORM_URLENCODED), uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) apiCall.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -791,11 +796,11 @@ public class APIManagerAPIAdapter {
         URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/apirepo/import/").build();
         try {
             HttpEntity entity = MultipartEntityBuilder.create()
-                    .addTextBody("name", api.getName(), ContentType.create("text/plain", StandardCharsets.UTF_8))
-                    .addTextBody("type", "swagger")
-                    .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/json"), "filename")
-                    .addTextBody("fileName", "XYZ").addTextBody("organizationId", api.getOrganization().getId(), ContentType.create("text/plain", StandardCharsets.UTF_8))
-                    .addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
+                .addTextBody("name", api.getName(), ContentType.create("text/plain", StandardCharsets.UTF_8))
+                .addTextBody("type", "swagger")
+                .addBinaryBody("file", api.getApiDefinition().getApiSpecificationContent(), ContentType.create("application/json"), "filename")
+                .addTextBody("fileName", "XYZ").addTextBody("organizationId", api.getOrganization().getId(), ContentType.create("text/plain", StandardCharsets.UTF_8))
+                .addTextBody("integral", "false").addTextBody("uploadType", "html5").build();
             RestAPICall importSwagger = new POSTRequest(entity, uri);
             try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) importSwagger.execute()) {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -889,7 +894,7 @@ public class APIManagerAPIAdapter {
         LOG.debug("Upgrade access & subscriptions to API: {} {}  ({})", apiToUpgradeAccess.getName(), apiToUpgradeAccess.getVersion(), apiToUpgradeAccess.getId());
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/proxies/upgrade/" + referenceAPI.getId()).build();
-            List<NameValuePair> params = new Vector<>();
+            List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("upgradeApiId", apiToUpgradeAccess.getId()));
             if (deprecateRefApi != null) params.add(new BasicNameValuePair("deprecate", deprecateRefApi.toString()));
             if (retireRefApi != null) params.add(new BasicNameValuePair("retire", retireRefApi.toString()));
@@ -970,6 +975,69 @@ public class APIManagerAPIAdapter {
             Thread.currentThread().interrupt();
         }
     }
+
+    public void grantClientApplication(ClientApplication clientApplication, API api) throws AppException {
+        try {
+            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + clientApplication.getId() + "/apis").build();
+            HttpEntity entity = new StringEntity("{\"apiId\":\"" + api.getId() + "\",\"enabled\":true}", ContentType.APPLICATION_JSON);
+            RestAPICall request = new POSTRequest(entity, uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                String response = EntityUtils.toString(httpResponse.getEntity());
+                if (statusCode != 201) {
+                    LOG.error("Error granting Application Access to  API using URI: {} Received Status-Code: {} Response: {}", uri, statusCode, response);
+                    throw new AppException("Error granting Application Access to  API. Received Status-Code: " + statusCode, ErrorCode.GRANT_ACCESS_APPLICATION_ERR);
+                }
+            }
+        } catch (Exception e) {
+            throw new AppException("Error granting Application Access to  API.", ErrorCode.GRANT_ACCESS_APPLICATION_ERR, e);
+        }
+
+    }
+
+    public void revokeClientOrganization(List<Organization> organizations, API api) throws AppException {
+        try {
+            for (Organization organization : organizations) {
+                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + PROXIES + api.getId() + "/apiaccess").addParameter("organizationId", organization.getId()).build();
+                RestAPICall request = new DELRequest(uri);
+                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    if (statusCode != 204) {
+                        LOG.error("Error revoking Organization access to API using URI: {} Response-Code: {} Response: {}", uri, statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                        throw new AppException("Error revoking api access: " + statusCode, ErrorCode.ACCESS_ORGANIZATION_ERR);
+                    }
+                    LOG.info("Organization : {} removed access from API: {} {} ( {} ) successfully revoked ", organization.getName(), api.getName(), api.getVersion(), api.getId());
+                }
+            }
+        } catch (IOException | URISyntaxException e) {
+            throw new AppException("Can't revoke access to organization.", ErrorCode.ACCESS_ORGANIZATION_ERR, e);
+        }
+    }
+
+    public void revokeClientApplication(ClientApplication clientApplication, API api) throws AppException {
+        try {
+            List<APIAccess> apiAccesses = clientApplication.getApiAccess();
+            LOG.debug("{}", apiAccesses);
+            for (APIAccess apiAccess : apiAccesses) {
+                if (apiAccess.getApiId().equals(api.getId())) {
+                    URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + clientApplication.getId() + "/apis/" + apiAccess.getId()).build();
+                    RestAPICall request = new DELRequest(uri);
+                    try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                        int statusCode = httpResponse.getStatusLine().getStatusCode();
+                        if (statusCode != 204) {
+                            LOG.error("Error revoking application access to API using URI: {} Response-Code: {} Response: {}", uri, statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                            throw new AppException("Error revoking api access: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                        }
+                        LOG.info("Application : {} removed access from API: {} {} ( {} ) successfully revoked ", clientApplication.getName(), api.getName(), api.getVersion(), api.getId());
+                    }
+                    break;
+                }
+            }
+        } catch (IOException | URISyntaxException e) {
+            throw new AppException("Can't revoke access to organization.", ErrorCode.REVOKE_ACCESS_APPLICATION_ERR, e);
+        }
+    }
+
 
     private String getFilterFields(APIFilter filter) {
         String filterFields = "[";

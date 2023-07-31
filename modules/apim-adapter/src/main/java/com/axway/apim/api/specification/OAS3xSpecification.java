@@ -111,7 +111,12 @@ public class OAS3xSpecification extends APISpecification {
                     }
                 }
             } else {
-                updateServerSection(backendBasePath, "/");
+                if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
+                    if (backendBasePath != null)
+                        overrideServerSection(backendBasePath); // override openapi url to fix issue #412
+                } else {
+                    updateServerSection(backendBasePath, "/");
+                }
             }
             this.apiSpecificationContent = this.mapper.writeValueAsBytes(openAPI);
         } catch (Exception e) {

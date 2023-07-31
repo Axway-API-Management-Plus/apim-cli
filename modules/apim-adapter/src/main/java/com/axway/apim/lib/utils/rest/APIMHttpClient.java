@@ -86,7 +86,7 @@ public class APIMHttpClient {
             // We have make sure, that cookies are correctly parsed!
             CoreParameters params = CoreParameters.getInstance();
             int timeout = params.getTimeout();
-            LOG.debug("API Manager CLI timeout : {}", timeout);
+            LOG.debug("API Manager CLI http client timeout : {}", timeout);
             RequestConfig.Builder defaultRequestConfig = RequestConfig.custom()
                     .setConnectTimeout(timeout)
                     .setSocketTimeout(timeout)

@@ -41,4 +41,13 @@ public class Result {
     public void setResultDetails(Object resultDetails) {
         this.resultDetails = resultDetails;
     }
+
+    @Override
+    public String toString() {
+        return "Result{" +
+            "hasError=" + hasError +
+            ", resultDetails=" + resultDetails +
+            ", errorCodes=" + errorCodes +
+            '}';
+    }
 }

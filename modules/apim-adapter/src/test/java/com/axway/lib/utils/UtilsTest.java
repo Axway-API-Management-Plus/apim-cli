@@ -2,8 +2,11 @@ package com.axway.lib.utils;
 
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.APIMethod;
+import com.axway.apim.api.model.TagMap;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -195,7 +198,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void ignoreBasePath(){
+    public void ignoreBasePath() {
         String serverUrl = "https://petstore3.swagger.io/api/v3";
         String result = Utils.ignoreBasePath(serverUrl);
         Assert.assertEquals(result, "https://petstore3.swagger.io");
@@ -203,7 +206,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void ignoreBasePathWithSlash(){
+    public void ignoreBasePathWithSlash() {
         String serverUrl = "https://petstore3.swagger.io/";
         String result = Utils.ignoreBasePath(serverUrl);
         Assert.assertEquals(result, "https://petstore3.swagger.io");
@@ -211,7 +214,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void ignoreBaseDoNothing(){
+    public void ignoreBaseDoNothing() {
         String serverUrl = "https://petstore3.swagger.io";
         String result = Utils.ignoreBasePath(serverUrl);
         Assert.assertEquals(result, "https://petstore3.swagger.io");
@@ -228,30 +231,30 @@ public class UtilsTest {
     public void testCompareValuesList() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         String actual = "[{\n" +
-                "    \"name\": \"updateUser\",\n" +
-                "    \"summary\": \"Update user\",\n" +
-                "    \"descriptionType\": \"original\"\n" +
-                "  }, {\n" +
-                "    \"name\": \"getUserByName\",\n" +
-                "    \"summary\": \"Get user by user name\",\n" +
-                "    \"descriptionType\": \"original\"\n" +
-                "  }]";
+            "    \"name\": \"updateUser\",\n" +
+            "    \"summary\": \"Update user\",\n" +
+            "    \"descriptionType\": \"original\"\n" +
+            "  }, {\n" +
+            "    \"name\": \"getUserByName\",\n" +
+            "    \"summary\": \"Get user by user name\",\n" +
+            "    \"descriptionType\": \"original\"\n" +
+            "  }]";
         TypeReference<List<APIMethod>> apiMethodsTypeRef = new TypeReference<List<APIMethod>>() {
         };
         List<APIMethod> apiMethods = objectMapper.readValue(actual, apiMethodsTypeRef);
 
         String desired = "[\n" +
-                "  {\n" +
-                "    \"name\": \"getUserByName\",\n" +
-                "    \"summary\": \"Get user by user name\",\n" +
-                "    \"descriptionType\": \"original\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"name\": \"updateUser\",\n" +
-                "    \"summary\": \"Update user\",\n" +
-                "    \"descriptionType\": \"original\"\n" +
-                "  }\n" +
-                "]";
+            "  {\n" +
+            "    \"name\": \"getUserByName\",\n" +
+            "    \"summary\": \"Get user by user name\",\n" +
+            "    \"descriptionType\": \"original\"\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"name\": \"updateUser\",\n" +
+            "    \"summary\": \"Update user\",\n" +
+            "    \"descriptionType\": \"original\"\n" +
+            "  }\n" +
+            "]";
         List<APIMethod> apiMethodsDesired = objectMapper.readValue(desired, apiMethodsTypeRef);
         Assert.assertTrue(Utils.compareValues(apiMethods, apiMethodsDesired));
     }
@@ -283,6 +286,7 @@ public class UtilsTest {
         api.setName("weather");
         Assert.assertEquals("weather 1.0 (1.0)", Utils.getAPILogString(api));
     }
+
     @Test
     public void testAskYesNo() throws IOException {
         String input = "Y";
@@ -297,4 +301,71 @@ public class UtilsTest {
         Assert.assertFalse(Utils.askYesNo("Publish or not"));
         in.close();
     }
+
+    @Test
+    void equalsTagMapNull() {
+        Assert.assertTrue(Utils.equalsTagMap(null, null));
+    }
+
+
+    @Test
+    void equalsTagMap() {
+        TagMap source = new TagMap();
+        source.put("stage", new String[]{"dev"});
+
+        TagMap target = new TagMap();
+        target.put("stage", new String[]{"dev"});
+        Assert.assertTrue(Utils.equalsTagMap(source, target));
+    }
+
+    @Test
+    void NotEqualsTagMap() {
+        TagMap source = new TagMap();
+        source.put("stage", new String[]{"dev"});
+
+        TagMap target = new TagMap();
+        target.put("stage", new String[]{"prod"});
+        Assert.assertFalse(Utils.equalsTagMap(source, target));
+    }
+
+    @Test
+    void NotEqualsTagMapSourceNull() {
+
+
+        TagMap target = new TagMap();
+        target.put("stage", new String[]{"prod"});
+        Assert.assertFalse(Utils.equalsTagMap(null, target));
+    }
+
+    @Test
+    void NotEqualsTagMapTargetNull() {
+        TagMap source = new TagMap();
+        source.put("stage", new String[]{"dev"});
+
+        Assert.assertFalse(Utils.equalsTagMap(source, null));
+    }
+
+    @Test
+    void handleAppExceptionSuccess() {
+        AppException appException = new AppException("help", ErrorCode.SUCCESS);
+        Assert.assertEquals(0, Utils.handleAppException(appException, LoggerFactory.getLogger("Utils"), new ErrorCodeMapper()));
+    }
+
+    @Test
+    void handleAppExceptionErrorCodes() {
+        AppException appException = new AppException("error", ErrorCode.REVOKE_ACCESS_APPLICATION_ERR);
+        Assert.assertEquals(103, Utils.handleAppException(appException, LoggerFactory.getLogger("Utils"), new ErrorCodeMapper()));
+    }
+
+    @Test
+    void handleAppExceptionGeneric() {
+        Exception exception = null;
+
+        try {
+            throw new RuntimeException("exception");
+        } catch (Exception e) {
+            Assert.assertEquals(99, Utils.handleAppException(exception, LoggerFactory.getLogger("Utils"), new ErrorCodeMapper()));
+        }
+    }
+
 }

@@ -1,67 +1,54 @@
 package com.axway.apim.adapter.apis;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
+import com.axway.apim.api.API;
+import com.axway.apim.api.model.*;
+import com.axway.apim.lib.CustomPropertiesFilter;
+import com.axway.apim.lib.error.AppException;
+import com.axway.apim.lib.utils.Utils;
+import com.axway.apim.lib.utils.Utils.FedKeyType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.adapter.apis.APIFilter.Builder.APIType;
-import com.axway.apim.adapter.client.apps.ClientAppFilter;
-import com.axway.apim.api.API;
-import com.axway.apim.api.model.AuthType;
-import com.axway.apim.api.model.AuthenticationProfile;
-import com.axway.apim.api.model.DeviceType;
-import com.axway.apim.api.model.InboundProfile;
-import com.axway.apim.api.model.OutboundProfile;
-import com.axway.apim.api.model.Policy;
-import com.axway.apim.api.model.SecurityDevice;
-import com.axway.apim.api.model.SecurityProfile;
-import com.axway.apim.lib.CustomPropertiesFilter;
-import com.axway.apim.lib.error.AppException;
-import com.axway.apim.lib.utils.Utils;
-import com.axway.apim.lib.utils.Utils.FedKeyType;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class APIFilter implements CustomPropertiesFilter {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ClientAppFilter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(APIFilter.class);
 	public static final String FIELD = "field";
 	public static final String OP = "op";
 	public static final String VALUE = "value";
 	public static final String EQ = "eq";
 
 	public enum METHOD_TRANSLATION {
-		NONE, 
-		AS_NAME, 
+		NONE,
+		AS_NAME,
 		AS_ID
 	}
-	
+
 	public enum POLICY_TRANSLATION {
-		NONE, 
-		TO_KEY, 
+		NONE,
+		TO_KEY,
 		TO_NAME
 	}
-	
+
 	public enum FILTER_OP {
-		eq, 
-		ne, 
-		gt, 
-		lt, 
-		ge, 
-		le, 
+		eq,
+		ne,
+		gt,
+		lt,
+		ge,
+		le,
 		like,
 		gele
 	}
-	
+
 	private String id;
 	private String apiId;
 	private String name;
@@ -81,12 +68,12 @@ public class APIFilter implements CustomPropertiesFilter {
 	private boolean deprecated;
 	private boolean retired;
 	private String apiType;
-	
+
 	private METHOD_TRANSLATION translateMethodMode = METHOD_TRANSLATION.NONE;
-	
+
 	/** If true, the API is loaded from the apirepo endpoint instead of proxies */
 	private boolean loadBackendAPI = false;
-	
+
 	private boolean includeOperations = false;
 	private boolean includeQuotas = false;
 	private boolean includeClientOrganizations = false;
@@ -146,7 +133,7 @@ public class APIFilter implements CustomPropertiesFilter {
 	public String getVhost() {
 		return vhost;
 	}
-	
+
 	public void setPolicyName(String policyName) {
 		if(policyName!=null) this.translatePolicyMode = POLICY_TRANSLATION.TO_NAME;
 		this.policyName = policyName;
@@ -155,7 +142,7 @@ public class APIFilter implements CustomPropertiesFilter {
 	public String getPolicyName() {
 		return policyName;
 	}
-	
+
 	public void setTag(String tag) {
 		this.tag = tag;
 	}
@@ -295,7 +282,7 @@ public class APIFilter implements CustomPropertiesFilter {
 	public void setIncludeClientApplications(boolean includeClientApplications) {
 		this.includeClientApplications = includeClientApplications;
 	}
-	
+
 	public boolean isIncludeClientAppQuota() {
 		return includeClientAppQuota;
 	}
@@ -307,7 +294,7 @@ public class APIFilter implements CustomPropertiesFilter {
 	public void setIncludeImage(boolean includeImage) {
 		this.includeImage = includeImage;
 	}
-	
+
 	public boolean isIncludeRemoteHost() {
 		return includeRemoteHost;
 	}
@@ -351,7 +338,7 @@ public class APIFilter implements CustomPropertiesFilter {
 		filters.add(new BasicNameValuePair(OP, EQ));
 		filters.add(new BasicNameValuePair(VALUE, state));
 	}
-	
+
 	public void setCreatedOn(List<String[]> createdOn) {
 		if(createdOn==null) return;
 		for(String[] createdOnFilter : createdOn) {
@@ -360,7 +347,7 @@ public class APIFilter implements CustomPropertiesFilter {
 			filters.add(new BasicNameValuePair(VALUE, createdOnFilter[0]));
 		}
 	}
-	
+
 	public String getCreatedOn() {
 		return createdOn;
 	}
@@ -388,7 +375,7 @@ public class APIFilter implements CustomPropertiesFilter {
 		if(!(obj instanceof APIFilter)) return false;
 		APIFilter other = (APIFilter)obj;
 		return (
-				StringUtils.equals(other.getId(), this.getId()) && 
+				StringUtils.equals(other.getId(), this.getId()) &&
 				StringUtils.equals(other.getName(), this.getName()) &&
 				StringUtils.equals(other.getApiId(), this.getApiId())
 				);
@@ -450,7 +437,7 @@ public class APIFilter implements CustomPropertiesFilter {
 	}
 
 	public boolean filter(API api) {
-		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null && this.getBackendBasepath()==null 
+		if(this.getApiPath()==null && this.getVhost()==null && this.getQueryStringVersion()==null && this.getPolicyName()==null && this.getBackendBasepath()==null
 				&& this.getTag()==null && this.getInboundSecurity()==null && this.getOutboundAuthentication()==null && this.getOrganization()==null) { // Nothing given to filter out.
 			return false;
 		}
@@ -517,7 +504,7 @@ public class APIFilter implements CustomPropertiesFilter {
 			if(this.getTag().contains("=")) { // Group specific format: "tagGroup=tagValue*"
 				tagGroupFilter = this.getTag().split("=")[0];
 				tagValueFilter = this.getTag().split("=")[1];
-			} 
+			}
 			Pattern groupPattern = Pattern.compile(tagGroupFilter.toLowerCase().replace("*", ".*"));
 			Pattern valuePattern = Pattern.compile(tagValueFilter.toLowerCase().replace("*", ".*"));
 			Iterator<String> it = api.getTags().keySet().iterator();
@@ -586,20 +573,20 @@ public class APIFilter implements CustomPropertiesFilter {
 	 * Build an applicationAdapter based on the given configuration
 	 */
 	public static class Builder {
-		
+
 		public enum APIType {
 			/**
-			 * APIs are created with: 
+			 * APIs are created with:
 			 * - includingQuotas
 			 * - Methods translated to name
 			 * - Policies have the external name
 			 * - Client-Organizations and -Applications are initialized
 			 */
-			ACTUAL_API, 
-			DESIRED_API, 
+			ACTUAL_API,
+			DESIRED_API,
 			CUSTOM
 		}
-		
+
 		String id;
 		String apiId;
 		String name;
@@ -644,11 +631,11 @@ public class APIFilter implements CustomPropertiesFilter {
 		public Builder(APIType type) {
 			this(type, false);
 		}
-		
+
 		/**
 		 * Creates a ClientAppAdapter based on the provided configuration using all registered Adapters
 		 * @param type of the APIFilter
-		 * @param loadBackendAPI is search backendEndAPI if set to true 
+		 * @param loadBackendAPI is search backendEndAPI if set to true
 		 */
 		public Builder(APIType type, boolean loadBackendAPI) {
 			super();
@@ -656,7 +643,7 @@ public class APIFilter implements CustomPropertiesFilter {
 			this.apiType = type;
 			this.loadBackendAPI = loadBackendAPI;
 		}
-		
+
 		public APIFilter build() {
 			APIFilter apiFilter = new APIFilter(this.apiType);
 			apiFilter.setApiPath(this.apiPath);
@@ -710,17 +697,17 @@ public class APIFilter implements CustomPropertiesFilter {
 				break;
 			}
 		}
-		
+
 		public Builder hasId(String id) {
 			this.id = id;
 			return this;
 		}
-		
+
 		public Builder hasApiId(String apiId) {
 			this.apiId = apiId;
 			return this;
 		}
-		
+
 		public Builder hasName(String name) {
 			this.name = name;
 			return this;
@@ -736,52 +723,52 @@ public class APIFilter implements CustomPropertiesFilter {
 			this.apiPath = apiPath;
 			return this;
 		}
-		
+
 		public Builder hasState(String state) {
 			this.state = state;
 			return this;
 		}
-		
+
 		public Builder hasPolicyName(String policyName) {
 			this.policyName = policyName;
 			return this;
 		}
-		
+
 		public Builder hasTag(String tag) {
 			this.tag = tag;
 			return this;
 		}
-		
+
 		public Builder isDeprecated(boolean deprecated) {
 			this.deprecated = deprecated;
 			return this;
 		}
-		
+
 		public Builder isRetired(boolean retired) {
 			this.retired = retired;
 			return this;
 		}
-		
+
 		public Builder isCreatedOnBefore(String createdOn) {
 			if(createdOn==null) return this;
 			if(this.createdOn==null) this.createdOn = new ArrayList<>();
 			this.createdOn.add(new String[] {createdOn, FILTER_OP.lt.name()});
 			return this;
 		}
-		
+
 		public Builder isCreatedOnAfter(String createdOn) {
 			if(createdOn==null) return this;
 			if(this.createdOn==null) this.createdOn = new ArrayList<>();
 			this.createdOn.add(new String[] {createdOn, FILTER_OP.gt.name()});
 			return this;
 		}
-		
+
 
 		public Builder hasQueryStringVersion(String queryStringVersion) {
 			this.queryStringVersion = queryStringVersion;
 			return this;
 		}
-		
+
 		public Builder useFilter(List<NameValuePair> filters) {
 			this.filters = filters;
 			return this;
@@ -791,47 +778,47 @@ public class APIFilter implements CustomPropertiesFilter {
 			this.includeQuotas = includeQuotas;
 			return this;
 		}
-		
+
 		public Builder includeClientOrganizations(boolean includeClientOrganizations) {
 			this.includeClientOrganizations = includeClientOrganizations;
 			return this;
 		}
-		
+
 		public Builder includeClientApplications(boolean includeClientApplications) {
 			this.includeClientApplications = includeClientApplications;
 			return this;
 		}
-		
+
 		public Builder includeClientAppQuota(boolean includeClientAppQuota) {
 			this.includeClientAppQuota = includeClientAppQuota;
 			return this;
 		}
-		
+
 		public Builder includeOriginalAPIDefinition(boolean includeOriginalAPIDefinition) {
 			this.includeOriginalAPIDefinition = includeOriginalAPIDefinition;
 			return this;
 		}
-		
+
 		public Builder useFEAPIDefinition(boolean useFEAPIDefinition) {
 			this.useFEAPIDefinition = useFEAPIDefinition;
 			return this;
-		}	
-		
+		}
+
 		public Builder includeImage(boolean includeImage) {
 			this.includeImage = includeImage;
 			return this;
 		}
-		
+
 		public Builder includeRemoteHost(boolean includeRemoteHost) {
 			this.includeRemoteHost = includeRemoteHost;
 			return this;
 		}
-		
+
 		public Builder includeCustomProperties(List<String> customProperties) {
 			this.customProperties = customProperties;
 			return this;
 		}
-		
+
 		public Builder includeCustomProperties(Map<String, String> customProperties) {
 			if(customProperties==null) return this;
 			this.customProperties = new ArrayList<>(customProperties.keySet());
@@ -842,43 +829,43 @@ public class APIFilter implements CustomPropertiesFilter {
 			this.includeMethods = includeMethods;
 			return this;
 		}
-		
+
 		public Builder translatePolicies(POLICY_TRANSLATION translatePolicyMode) {
 			this.translatePolicyMode = translatePolicyMode;
 			return this;
 		}
-		
+
 		public Builder translateMethods(METHOD_TRANSLATION translateMethodMode) {
 			this.translateMethodMode = translateMethodMode;
 			return this;
 		}
-		
+
 		public Builder hasBackendBasepath(String backendBasepath) {
 			this.backendBasepath = backendBasepath;
 			return this;
 		}
-		
+
 		public Builder hasOutboundAuthentication(String outboundAuthentication) {
 			this.outboundAuthentication = outboundAuthentication;
 			return this;
 		}
-		
+
 		public Builder hasInboundSecurity(String inboundSecurity) {
 			this.inboundSecurity = inboundSecurity;
 			return this;
 		}
-		
+
 		public Builder hasOrganization(String organization) {
 			this.organization = organization;
 			return this;
 		}
-		
+
 		public Builder failOnError(boolean failOnError) {
 			this.failOnError = failOnError;
 			return this;
-		}		
+		}
 	}
-	
+
 	private static boolean isPolicyUsed(API api, String policyName) throws AppException {
 		// pattern for escaping special regex characters (except *)
 		Pattern SPECIAL_REGEX_CHARS = Pattern.compile("[{}()\\[\\].+?^$\\\\|]");

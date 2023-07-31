@@ -43,7 +43,7 @@ public abstract class APIResultHandler {
     APIExportParams params;
 
     protected Result result;
-    boolean hasError = false;
+
 
     public enum APIListImpl {
         JSON_EXPORTER(JsonAPIExporter.class),
@@ -58,6 +58,8 @@ public abstract class APIResultHandler {
         API_APPROVE_HANDLER(ApproveAPIHandler.class),
         API_UPGRADE_ACCESS_HANDLE(UpgradeAccessAPIHandler.class),
         API_GRANT_ACCESS_HANDLER(GrantAccessAPIHandler.class),
+        API_REVOKE_ACCESS_HANDLER(RevokeAccessAPIHandler.class),
+
         API_CHECK_CERTS_HANDLER(CheckCertificatesAPIHandler.class);
 
         private final Class<APIResultHandler> implClass;
@@ -93,10 +95,6 @@ public abstract class APIResultHandler {
     }
 
     public abstract void execute(List<API> apis) throws AppException;
-
-    public boolean hasError() {
-        return this.hasError;
-    }
 
     public Result getResult() {
         return result;

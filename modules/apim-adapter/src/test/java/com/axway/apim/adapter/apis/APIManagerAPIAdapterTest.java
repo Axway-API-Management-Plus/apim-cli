@@ -2,8 +2,10 @@ package com.axway.apim.adapter.apis;
 
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.adapter.client.apps.ClientAppFilter;
 import com.axway.apim.api.API;
 import com.axway.apim.api.model.*;
+import com.axway.apim.api.model.apps.ClientApplication;
 import com.axway.apim.api.specification.APISpecification;
 import com.axway.apim.api.specification.APISpecificationFactory;
 import com.axway.apim.lib.CoreParameters;
@@ -418,6 +420,47 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
             organizations.add(organization);
             API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
             apiManagerAPIAdapter.grantClientOrganization(organizations, api, true);
+        }catch (AppException e){
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void grantClientApplication(){
+        try {
+            ClientAppFilter clientAppFilter = new ClientAppFilter.Builder()
+                .hasName("Test App 2008")
+                .build();
+            ClientApplication clientApplication = apiManagerAdapter.appAdapter.getApplication(clientAppFilter);
+            API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+            apiManagerAPIAdapter.grantClientApplication(clientApplication, api);
+        }catch (AppException e){
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void revokeClientOrganization(){
+        try {
+            Organization organization = apiManagerAdapter.orgAdapter.getOrgForName("orga");
+            List<Organization> organizations = new ArrayList<>();
+            organizations.add(organization);
+            API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+            apiManagerAPIAdapter.revokeClientOrganization(organizations, api);
+        }catch (AppException e){
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void revokeClientApplication(){
+        try {
+            ClientAppFilter clientAppFilter = new ClientAppFilter.Builder()
+                .hasName("Test App 2008")
+                .build();
+            ClientApplication clientApplication = apiManagerAdapter.appAdapter.getApplication(clientAppFilter);
+            API api = apiManagerAPIAdapter.getAPIWithId("e4ded8c8-0a40-4b50-bc13-552fb7209150");
+            apiManagerAPIAdapter.revokeClientApplication(clientApplication, api);
         }catch (AppException e){
             Assert.fail(e.getMessage());
         }
