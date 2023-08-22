@@ -1,0 +1,27 @@
+{
+  "name": "SIT_WSEEInfo",
+  "organization": "orga",
+  "state": "approved",
+  "enabled": true,
+  "credentials": [
+    {
+      "credentialType": "apikeys",
+      "enabled": true,
+      "secret": "43e00038-3439-4740-879e-476c536fb464",
+      "corsOrigins": [
+        "*"
+      ],
+      "apiKey": "eebf7c2e-a131-4010-98e9-e756ac028faa"
+    }
+  ],
+  "apis": [
+    {
+      "apiName": "petstore",
+      "apiVersion": "v1"
+    }
+  ],
+  "permissions": [],
+  "customProperties": {
+    "publicApp": true
+  }
+}
