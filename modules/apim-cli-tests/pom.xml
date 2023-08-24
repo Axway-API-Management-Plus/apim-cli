@@ -10,6 +10,11 @@
 
     <artifactId>apimcli-tests</artifactId>
     <name>Axway API-Manager CLI Tests</name>
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
