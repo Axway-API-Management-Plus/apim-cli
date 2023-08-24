@@ -282,4 +282,24 @@ public abstract class APIResultHandler {
         }
     }
 
+    protected APIFilter createFilter(){
+        Builder builder = getBaseAPIFilterBuilder();
+        switch (params.getWide()) {
+            case standard:
+            case wide:
+                builder.includeQuotas(false);
+                builder.includeClientApplications(false);
+                builder.includeClientOrganizations(false);
+                builder.includeClientAppQuota(false);
+                builder.includeQuotas(false);
+                break;
+            case ultra:
+                builder.includeQuotas(true);
+                builder.includeClientAppQuota(false);
+                builder.includeClientApplications(true);
+                builder.includeClientOrganizations(true);
+                break;
+        }
+        return builder.build();
+    }
 }

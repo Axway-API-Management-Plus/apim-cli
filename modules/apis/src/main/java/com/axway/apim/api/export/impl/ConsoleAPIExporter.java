@@ -2,7 +2,6 @@ package com.axway.apim.api.export.impl;
 
 import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.apis.APIFilter;
-import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.params.APIExportParams;
@@ -161,7 +160,7 @@ public class ConsoleAPIExporter extends APIResultHandler {
 
 
     private boolean hasTags(API api) {
-        return (api.getTags() != null && api.getTags().size() != 0);
+        return (api.getTags() != null && !api.getTags().isEmpty());
     }
 
     private String getOrgCount(API api) {
@@ -185,23 +184,6 @@ public class ConsoleAPIExporter extends APIResultHandler {
 
     @Override
     public APIFilter getFilter() {
-        Builder builder = getBaseAPIFilterBuilder();
-        switch (params.getWide()) {
-            case standard:
-            case wide:
-                builder.includeQuotas(false);
-                builder.includeClientApplications(false);
-                builder.includeClientOrganizations(false);
-                builder.includeClientAppQuota(false);
-                builder.includeQuotas(false);
-                break;
-            case ultra:
-                builder.includeQuotas(true);
-                builder.includeClientAppQuota(false);
-                builder.includeClientApplications(true);
-                builder.includeClientOrganizations(true);
-                break;
-        }
-        return builder.build();
+        return createFilter();
     }
 }
