@@ -10,9 +10,7 @@
 	</parent>
 
 	<artifactId>distribution</artifactId>
-
 	<packaging>pom</packaging>
-
 	<name>Distribution</name>
 
 	<dependencies>
