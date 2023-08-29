@@ -63,7 +63,7 @@ public class APIManagerAPIAdapter {
     ObjectMapper mapper = new ObjectMapper();
     private final CoreParameters cmd;
 
-    private final List<String> queryStringPassThroughBreakingVersion = Arrays.asList("7.7.20220530", "7.7.20220830", "7.7.20221130", "7.7.20230228");
+    private final List<String> queryStringPassThroughBreakingVersion = Arrays.asList("7.7.20220830", "7.7.20220530", "7.7.20220830", "7.7.20221130", "7.7.20230228");
 
     /**
      * Maps the provided status to the REST-API endpoint to change the status!
