@@ -89,7 +89,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
             // Try to read single application
         } catch (MismatchedInputException me) {
             try {
-                LOG.debug("Error reading single application: {} Trying to read single application now.", me.getMessage());
+                LOG.debug("Error reading array of applications, hence trying to read single application now.");
                 ClientApplication app = mapper.readValue(Utils.substituteVariables(configFile), ClientApplication.class);
                 if (stageConfig != null) {
                     try {
@@ -121,7 +121,7 @@ public class ClientAppConfigAdapter extends ClientAppAdapter {
     private void addImage(List<ClientApplication> apps, File parentFolder) throws AppException {
         for (ClientApplication app : apps) {
             String imageUrl = app.getImageUrl();
-            if (imageUrl == null || imageUrl.equals("")) continue;
+            if (imageUrl == null || imageUrl.isEmpty()) continue;
             if (imageUrl.startsWith("data:")) {
                 app.setImage(Image.createImageFromBase64(imageUrl));
             } else {

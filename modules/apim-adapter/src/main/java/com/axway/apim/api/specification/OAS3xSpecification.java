@@ -105,16 +105,19 @@ public class OAS3xSpecification extends APISpecification {
                             if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
                                 overrideServerSection(backendBasePath); // override openapi url with backendBaseapath
                             } else if (!serverUrl.startsWith("http")) { // If url does not have hostname, add hostname from backendBasepath
+                                LOG.info("servers.url does not contain host name hence updating host value from backendBasepath : {}", backendBasePath);
                                 updateServerSection(backendBasePath, serverUrl);
                             }
                         }
                     }
                 }
             } else {
+                LOG.info("Server element not found");
                 if (CoreParameters.getInstance().isOverrideSpecBasePath()) {
                     if (backendBasePath != null)
                         overrideServerSection(backendBasePath); // override openapi url to fix issue #412
                 } else {
+                    LOG.info("Setting up server element as /");
                     updateServerSection(backendBasePath, "/");
                 }
             }

@@ -18,7 +18,8 @@
 		<dependency>
 			<groupId>com.github.axway-api-management-plus.apim-cli</groupId>
 			<artifactId>apimcli-apim-adapter</artifactId>
-		</dependency>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>

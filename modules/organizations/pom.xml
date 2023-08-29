@@ -18,14 +18,17 @@
         <dependency>
             <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
             <artifactId>apimcli-tool</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
             <artifactId>apimcli-apim-adapter</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.axway-api-management-plus.apim-cli</groupId>
             <artifactId>apimcli-apis</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

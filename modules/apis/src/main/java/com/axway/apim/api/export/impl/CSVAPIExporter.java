@@ -1,7 +1,6 @@
 package com.axway.apim.api.export.impl;
 
 import com.axway.apim.adapter.apis.APIFilter;
-import com.axway.apim.adapter.apis.APIFilter.Builder;
 import com.axway.apim.adapter.apis.APIManagerPoliciesAdapter.PolicyType;
 import com.axway.apim.api.API;
 import com.axway.apim.api.export.lib.APIComparator;
@@ -240,24 +239,6 @@ public class CSVAPIExporter extends APIResultHandler {
 
     @Override
     public APIFilter getFilter() {
-        Builder builder = getBaseAPIFilterBuilder();
-
-        switch (params.getWide()) {
-            case standard:
-            case wide:
-                builder.includeQuotas(false);
-                builder.includeClientApplications(false);
-                builder.includeClientOrganizations(false);
-                builder.includeClientAppQuota(false);
-                builder.includeQuotas(false);
-                break;
-            case ultra:
-                builder.includeQuotas(true);
-                builder.includeClientAppQuota(false);
-                builder.includeClientApplications(true);
-                builder.includeClientOrganizations(true);
-                break;
-        }
-        return builder.build();
+        return createFilter();
     }
 }
