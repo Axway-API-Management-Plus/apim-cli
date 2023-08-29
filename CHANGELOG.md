@@ -3,10 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
-# [1.14.2] In progress
+# [1.14.2] 2023-08-29
 ### Fixed
 - Regression in host (See issue [#413](https://github.com/Axway-API-Management-Plus/apim-cli/issues/413))
 - gson library 2.4 has vulnerability CVE-2022-25647 (See issue [#425](https://github.com/Axway-API-Management-Plus/apim-cli/issues/425))
+- Support August 2023 release (See issue [#426](https://github.com/Axway-API-Management-Plus/apim-cli/issues/426))
+
 
 # [1.14.1]  2023-07-31
 ### Fixed
