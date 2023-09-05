@@ -12,6 +12,7 @@ import com.axway.apim.cli.CLIServiceMethod;
 import com.axway.apim.lib.ImportResult;
 import com.axway.apim.lib.error.AppException;
 import com.axway.apim.lib.error.ErrorCode;
+import com.axway.apim.lib.error.ErrorCodeMapper;
 import com.axway.apim.lib.utils.rest.APIMHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,26 +46,28 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 	@CLIServiceMethod(name = "import", description = "Import application(s) into the API-Manager")
 	public static int importApp(String[] args) {
 		AppImportParams params;
-		try {
+        ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
+        try {
 			params = (AppImportParams) AppImportCLIOptions.create(args).getParams();
-		} catch (AppException e) {
+            errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
+        } catch (AppException e) {
 			LOG.error("Error {}" , e.getMessage());
-			return e.getError().getCode();
+            return errorCodeMapper.getMapedErrorCode(e.getError()).getCode();
 		}
 		ClientApplicationImportApp app = new ClientApplicationImportApp();
-		return app.importApp(params).getRc();
+		ImportResult importResult =  app.importApp(params);
+        return errorCodeMapper.getMapedErrorCode(importResult.getErrorCode()).getCode();
 	}
 
 	public ImportResult importApp(AppImportParams params) {
 		ImportResult result = new ImportResult();
-		try {
+        try {
 			params.validateRequiredParameters();
 			// We need to clean some Singleton-Instances, as tests are running in the same JVM
 			APIManagerAdapter.deleteInstance();
 			APIMHttpClient.deleteInstances();
-
 			APIManagerAdapter.getInstance();
-			// Load the desired state of the application
+            // Load the desired state of the application
 			ClientAppAdapter desiredAppsAdapter = new ClientAppConfigAdapter(params, result);
 			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
 			ClientAppImportManager importManager = new ClientAppImportManager();

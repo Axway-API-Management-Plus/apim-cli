@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+# [1.14.3] In progress
+### Fixed
+- Error mapping is not applied when importing "app" (See issue [#437](https://github.com/Axway-API-Management-Plus/apim-cli/issues/437))
+
 # [1.14.2] 2023-08-29
 ### Fixed
 - Regression in host (See issue [#413](https://github.com/Axway-API-Management-Plus/apim-cli/issues/413))
