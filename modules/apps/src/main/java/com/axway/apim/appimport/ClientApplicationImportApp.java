@@ -21,85 +21,83 @@ import java.util.List;
 
 public class ClientApplicationImportApp implements APIMCLIServiceProvider {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ClientApplicationImportApp.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ClientApplicationImportApp.class);
 
-	@Override
-	public String getName() {
-		return "Application - I M P O R T";
-	}
+    @Override
+    public String getName() {
+        return "Application - I M P O R T";
+    }
 
-	@Override
-	public String getVersion() {
-		return ClientApplicationImportApp.class.getPackage().getImplementationVersion();
-	}
+    @Override
+    public String getVersion() {
+        return ClientApplicationImportApp.class.getPackage().getImplementationVersion();
+    }
 
-	@Override
-	public String getGroupId() {
-		return "app";
-	}
+    @Override
+    public String getGroupId() {
+        return "app";
+    }
 
-	@Override
-	public String getGroupDescription() {
-		return "Manage your applications";
-	}
+    @Override
+    public String getGroupDescription() {
+        return "Manage your applications";
+    }
 
-	@CLIServiceMethod(name = "import", description = "Import application(s) into the API-Manager")
-	public static int importApp(String[] args) {
-		AppImportParams params;
+    @CLIServiceMethod(name = "import", description = "Import application(s) into the API-Manager")
+    public static int importApp(String[] args) {
+        AppImportParams params;
         ErrorCodeMapper errorCodeMapper = new ErrorCodeMapper();
         try {
-			params = (AppImportParams) AppImportCLIOptions.create(args).getParams();
+            params = (AppImportParams) AppImportCLIOptions.create(args).getParams();
             errorCodeMapper.setMapConfiguration(params.getReturnCodeMapping());
         } catch (AppException e) {
-			LOG.error("Error {}" , e.getMessage());
+            LOG.error("Error {}", e.getMessage());
             return errorCodeMapper.getMapedErrorCode(e.getError()).getCode();
-		}
-		ClientApplicationImportApp app = new ClientApplicationImportApp();
-		ImportResult importResult =  app.importApp(params);
+        }
+        ClientApplicationImportApp app = new ClientApplicationImportApp();
+        ImportResult importResult = app.importApp(params);
         return errorCodeMapper.getMapedErrorCode(importResult.getErrorCode()).getCode();
-	}
+    }
 
-	public ImportResult importApp(AppImportParams params) {
-		ImportResult result = new ImportResult();
+    public ImportResult importApp(AppImportParams params) {
+        ImportResult result = new ImportResult();
         try {
-			params.validateRequiredParameters();
-			// We need to clean some Singleton-Instances, as tests are running in the same JVM
-			APIManagerAdapter.deleteInstance();
-			APIMHttpClient.deleteInstances();
-			APIManagerAdapter.getInstance();
+            params.validateRequiredParameters();
+            // We need to clean some Singleton-Instances, as tests are running in the same JVM
+            APIManagerAdapter.deleteInstance();
+            APIMHttpClient.deleteInstances();
+            APIManagerAdapter.getInstance();
             // Load the desired state of the application
-			ClientAppAdapter desiredAppsAdapter = new ClientAppConfigAdapter(params, result);
-			List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
-			ClientAppImportManager importManager = new ClientAppImportManager();
-			for(ClientApplication desiredApp : desiredApps) {
-				//I'm reading customProps from desiredApp, what if the desiredApp has no customProps and actualApp has many?
-				ClientApplication actualApp = APIManagerAdapter.getInstance().appAdapter.getApplication(new ClientAppFilter.Builder()
-						.includeCredentials(true)
-						.includeImage(true)
-						.includeQuotas(true)
-						.includeAppPermissions(true)
-						.includeOauthResources(true)
-						.includeCustomProperties(desiredApp.getCustomPropertiesKeys())
-						.hasName(desiredApp.getName())
-						.build());
-				importManager.setDesiredApp(desiredApp);
-				importManager.setActualApp(actualApp);
-				importManager.replicate();
-				LOG.info("Successfully replicated application: {} into API-Manager", desiredApp.getName());
-			}
-			return result;
-		} catch (AppException ap) {
-			ap.logException(LOG);
-			result.setError(ap.getError());
-			return result;
-		} catch (Exception e) {
-			LOG.error(e.getMessage(), e);
-			result.setError(ErrorCode.UNXPECTED_ERROR);
-			return result;
-		} finally {
-			try {
-				APIManagerAdapter.deleteInstance();
-			} catch (AppException ignore) { }
-		}
-	}
+            ClientAppAdapter desiredAppsAdapter = new ClientAppConfigAdapter(params, result);
+            List<ClientApplication> desiredApps = desiredAppsAdapter.getApplications();
+            ClientAppImportManager importManager = new ClientAppImportManager();
+            for (ClientApplication desiredApp : desiredApps) {
+                //I'm reading customProps from desiredApp, what if the desiredApp has no customProps and actualApp has many?
+                ClientApplication actualApp = APIManagerAdapter.getInstance().appAdapter.getApplication(new ClientAppFilter.Builder()
+                    .includeCredentials(true)
+                    .includeImage(true)
+                    .includeQuotas(true)
+                    .includeAppPermissions(true)
+                    .includeOauthResources(true)
+                    .includeCustomProperties(desiredApp.getCustomPropertiesKeys())
+                    .hasName(desiredApp.getName())
+                    .build());
+                importManager.setDesiredApp(desiredApp);
+                importManager.setActualApp(actualApp);
+                importManager.replicate();
+                LOG.info("Successfully replicated application: {} into API-Manager", desiredApp.getName());
+            }
+            return result;
+        } catch (AppException ap) {
+            ap.logException(LOG);
+            result.setError(ap.getError());
+            return result;
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            result.setError(ErrorCode.UNXPECTED_ERROR);
+            return result;
+        } finally {
+            APIManagerAdapter.deleteInstance();
+        }
+    }
 }

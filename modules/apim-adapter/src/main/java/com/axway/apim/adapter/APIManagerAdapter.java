@@ -118,14 +118,18 @@ public class APIManagerAdapter {
         return instance;
     }
 
-    public static synchronized void deleteInstance() throws AppException {
+    public static synchronized void deleteInstance()  {
         if (cacheManager != null && cacheManager.getStatus() == Status.AVAILABLE) {
             LOG.debug("Closing cache ...");
             cacheManager.close();
             LOG.trace("Cache Closed.");
         }
         if (instance != null) {
-            instance.logoutFromAPIManager();
+            try {
+                instance.logoutFromAPIManager();
+            } catch (AppException e) {
+                LOG.debug("Unable to logout ...", e);
+            }
             instance.apiManagerVersion = null;
             instance = null;
         }
@@ -330,13 +334,6 @@ public class APIManagerAdapter {
         return cache;
     }
 
-    public static void clearCache(String cacheName) {
-        if (APIManagerAdapter.cacheManager == null || APIManagerAdapter.cacheManager.getStatus() == Status.UNINITIALIZED)
-            return;
-        Cache<Object, Object> cache = APIManagerAdapter.cacheManager.getCache(cacheName, null, null);
-        cache.clear();
-    }
-
 
     /**
      * Checks if the API-Manager has at least given version. If the given requested version is the same or lower
@@ -433,13 +430,13 @@ public class APIManagerAdapter {
             if (appIds.contains(app)) continue;
             String response;
             try {
-                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/" + type + "").build();
+                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + "/applications/" + app.getId() + "/" + type).build();
                 LOG.debug("Loading credentials of type: {} for application: {} from API-Manager.", type, type);
                 RestAPICall getRequest = new GETRequest(uri);
                 try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) getRequest.execute()) {
                     response = EntityUtils.toString(httpResponse.getEntity());
                     JsonNode clientIds = mapper.readTree(response);
-                    if (clientIds.size() == 0) {
+                    if (clientIds.isEmpty()) {
                         LOG.debug("No credentials (Type: {}) found for application: {}", type, app.getName());
                         continue;
                     }

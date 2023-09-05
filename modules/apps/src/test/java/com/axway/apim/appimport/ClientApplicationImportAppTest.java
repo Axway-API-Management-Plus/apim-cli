@@ -1,6 +1,8 @@
 package com.axway.apim.appimport;
 
 import com.axway.apim.WiremockWrapper;
+import com.axway.apim.adapter.APIManagerAdapter;
+import com.axway.apim.lib.CoreParameters;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -29,11 +31,17 @@ public class ClientApplicationImportAppTest extends WiremockWrapper {
 
     @Test
     public void importApplicationReturnCodeMapping() {
-        ClassLoader classLoader = this.getClass().getClassLoader();
-        String applicationFile = classLoader.getResource("com/axway/apim/appimport/apps/basic/application.json").getFile();
-        String[] args = {"-h", "localhost1", "-c", applicationFile, "-returnCodeMapping", "10:0, 25:0"};
-        int returnCode = ClientApplicationImportApp.importApp(args);
-        Assert.assertEquals(returnCode, 0);
+        try {
+            ClassLoader classLoader = this.getClass().getClassLoader();
+            String applicationFile = classLoader.getResource("com/axway/apim/appimport/apps/basic/application.json").getFile();
+            String[] args = {"-h", "localhost1", "-c", applicationFile, "-returnCodeMapping", "10:0, 25:0"};
+            int returnCode = ClientApplicationImportApp.importApp(args);
+            Assert.assertEquals(returnCode, 0);
+        } finally {
+            CoreParameters.deleteInstance();
+            APIManagerAdapter.deleteInstance();
+
+        }
     }
 
 }

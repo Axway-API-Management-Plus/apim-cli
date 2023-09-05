@@ -99,7 +99,7 @@ public class UserApp implements APIMCLIServiceProvider {
         APIManagerAdapter adapter = APIManagerAdapter.getInstance();
         UserResultHandler exporter = UserResultHandler.create(exportImpl, params, result);
         List<User> users = adapter.userAdapter.getUsers(exporter.getFilter());
-        if (users.size() == 0) {
+        if (users.isEmpty()) {
             if (LOG.isDebugEnabled()) {
                 LOG.info("No users found using filter: {}", exporter.getFilter());
             } else {
@@ -146,11 +146,11 @@ public class UserApp implements APIMCLIServiceProvider {
 
             for (User desiredUser : desiredUsers) {
                 User actualUser = APIManagerAdapter.getInstance().userAdapter.getUser(
-                        new UserFilter.Builder()
-                                .hasLoginName(desiredUser.getLoginName())
-                                .includeImage(true)
-                                .includeCustomProperties(APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.user))
-                                .build());
+                    new UserFilter.Builder()
+                        .hasLoginName(desiredUser.getLoginName())
+                        .includeImage(true)
+                        .includeCustomProperties(APIManagerAdapter.getInstance().customPropertiesAdapter.getCustomPropertyNames(Type.user))
+                        .build());
                 User actualUserWithEmail = APIManagerAdapter.getInstance().userAdapter.getUser(new UserFilter.Builder().hasEmail(desiredUser.getEmail()).build());
                 if (actualUserWithEmail != null && actualUser != null && !actualUser.getId().equals(actualUserWithEmail.getId())) {
                     LOG.error("A different user: {} with the supplied email address: {} already exists. ", actualUserWithEmail.getLoginName(), desiredUser.getEmail());
@@ -169,11 +169,7 @@ public class UserApp implements APIMCLIServiceProvider {
             result.setError(ErrorCode.UNXPECTED_ERROR);
             return result;
         } finally {
-            try {
-                APIManagerAdapter.deleteInstance();
-            } catch (AppException e) {
-                LOG.error("Error deleting instance", e);
-            }
+            APIManagerAdapter.deleteInstance();
         }
     }
 

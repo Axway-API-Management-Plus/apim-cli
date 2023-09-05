@@ -187,10 +187,7 @@ public class APIManagerSettingsApp implements APIMCLIServiceProvider {
             result.setError(ErrorCode.UNXPECTED_ERROR);
             return result;
         } finally {
-            try {
-                APIManagerAdapter.deleteInstance();
-            } catch (AppException ignore) {
-            }
+            APIManagerAdapter.deleteInstance();
         }
     }
 
