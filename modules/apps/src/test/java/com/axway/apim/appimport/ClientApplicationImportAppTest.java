@@ -2,7 +2,6 @@ package com.axway.apim.appimport;
 
 import com.axway.apim.WiremockWrapper;
 import com.axway.apim.adapter.APIManagerAdapter;
-import com.axway.apim.lib.CoreParameters;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -38,9 +37,7 @@ public class ClientApplicationImportAppTest extends WiremockWrapper {
             int returnCode = ClientApplicationImportApp.importApp(args);
             Assert.assertEquals(returnCode, 0);
         } finally {
-            CoreParameters.deleteInstance();
             APIManagerAdapter.deleteInstance();
-
         }
     }
 

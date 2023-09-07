@@ -82,10 +82,6 @@ public class CoreParameters implements Parameters {
         return instance;
     }
 
-    public static synchronized void deleteInstance(){
-        instance = null;
-    }
-
     public String getStage() {
         return stage;
     }
