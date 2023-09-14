@@ -160,6 +160,34 @@ public class APIChangeStateTest extends WiremockWrapper {
         Assert.assertFalse(changeState.isRecreateAPI(), "API-Definition is unchanged.");
     }
 
+    @Test
+    public void compareQuotasWithChanges() throws IOException{
+        API existingAPI = getTestAPI("quota/existing.json");
+        API newAPI = getTestAPI("quota/new.json");
+        APIChangeState changeState = new APIChangeState(existingAPI, newAPI);
+        Assert.assertTrue(changeState.hasAnyChanges());
+
+    }
+
+    @Test
+    public void compareQuotasWithoutChanges() throws IOException{
+        API existingAPI = getTestAPI("quota/existing.json");
+        API newAPI = getTestAPI("quota/existing.json");
+        APIChangeState changeState = new APIChangeState(existingAPI, newAPI);
+        Assert.assertFalse(changeState.hasAnyChanges());
+
+    }
+
+    @Test
+    public void compareQuotasWithEmptyAndNull() throws IOException{
+        API existingAPI = getTestAPI("quota/empty_quota.json");
+        API newAPI = getTestAPI("quota/null_quota.json");
+        APIChangeState changeState = new APIChangeState(existingAPI, newAPI);
+        Assert.assertFalse(changeState.hasAnyChanges());
+
+    }
+
+
 
     private API getTestAPI(String configFile) throws IOException {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(TEST_PACKAGE + configFile);

@@ -1,0 +1,11 @@
+{
+  "id": "10f02b84-fa4a-4cb6-a0c9-da6974c77005",
+  "organizationId": "d9ea6280-8811-4baf-8b5b-011a97142840",
+  "apiId": "679f1e5c-4676-41ea-9b38-888c56c17b5e",
+  "name": "Check-quota",
+  "version": "1.0.0",
+  "state": "published",
+  "applicationQuota": {
+
+  }
+}
