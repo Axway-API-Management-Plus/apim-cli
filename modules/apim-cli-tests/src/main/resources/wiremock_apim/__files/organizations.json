@@ -1,7 +1,7 @@
 [
   {
     "id": "06679911-ee47-4570-bd23-89ab7c765415",
-    "name": "Community",
+    "name": "orga",
     "description": "Unverified untrusted developer users. Not intended for production-level client applications",
     "email": null,
     "image": null,
@@ -10,7 +10,7 @@
     "phone": null,
     "enabled": true,
     "development": false,
-    "dn": "o=Community,ou=organizations,ou=APIPortal",
+    "dn": "o=orga,ou=organizations,ou=APIPortal",
     "createdOn": 1670957709351,
     "startTrialDate": null,
     "endTrialDate": null,
