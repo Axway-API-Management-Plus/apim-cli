@@ -49,12 +49,16 @@ public class ClientAppImportManager {
         this.actualApp = actualApp;
     }
 
-    private static boolean appsAreEqual(ClientApplication desiredApp, ClientApplication actualApp) {
-        return
-            desiredApp.equals(actualApp) &&
-                (desiredApp.getApiAccess() == null || desiredApp.getApiAccess().equals(actualApp.getApiAccess())) &&
-                (desiredApp.getPermissions() == null || desiredApp.getPermissions().containsAll(actualApp.getPermissions())) &&
-                (desiredApp.getAppQuota() == null ||  desiredApp.getAppQuota().equals(actualApp.getAppQuota()));
+    public static boolean appsAreEqual(ClientApplication desiredApp, ClientApplication actualApp) {
+        boolean application = desiredApp.equals(actualApp);
+        boolean apiAccess = (desiredApp.getApiAccess() == null || desiredApp.getApiAccess().equals(actualApp.getApiAccess()));
+        boolean permission = (desiredApp.getPermissions() == null || desiredApp.getPermissions().containsAll(actualApp.getPermissions()));
+        boolean quota = (desiredApp.getAppQuota() == null || desiredApp.getAppQuota().equals(actualApp.getAppQuota()));
+        LOG.debug("apps changed: {}", desiredApp.equals(actualApp));
+        LOG.debug("api access changed: {}", apiAccess);
+        LOG.debug("Permission changed: {}", permission);
+        LOG.debug("Quota changed: {}", quota);
+        return application && apiAccess && permission && quota;
     }
 
     private void copyAppCreatedByPermission(ClientApplication desiredApp, ClientApplication actualApp) {

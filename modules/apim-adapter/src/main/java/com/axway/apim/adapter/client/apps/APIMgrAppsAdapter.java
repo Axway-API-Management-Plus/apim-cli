@@ -4,9 +4,7 @@ import com.axway.apim.adapter.APIManagerAdapter;
 import com.axway.apim.adapter.CacheType;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter;
 import com.axway.apim.adapter.apis.APIManagerAPIAccessAdapter.Type;
-import com.axway.apim.api.model.APIAccess;
-import com.axway.apim.api.model.Image;
-import com.axway.apim.api.model.User;
+import com.axway.apim.api.model.*;
 import com.axway.apim.api.model.apps.*;
 import com.axway.apim.lib.CoreParameters;
 import com.axway.apim.lib.error.AppException;
@@ -246,7 +244,7 @@ public class APIMgrAppsAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 200) {
                     LOG.error("Error reading application oauth resources. Response-Code: {} Got response: {}", statusCode, response);
-                    throw new AppException("Error reading application oauth resources' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error reading application oauth resources' Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 TypeReference<List<ClientAppOauthResource>> classType = new TypeReference<List<ClientAppOauthResource>>() {
                 };
@@ -270,7 +268,7 @@ public class APIMgrAppsAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 200) {
                     LOG.error("Error reading application permissions. Response-Code: {} Got response: {}", statusCode, response);
-                    throw new AppException("Error reading application permissions' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error reading application permissions' Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 TypeReference<List<ApplicationPermission>> classType = new TypeReference<List<ApplicationPermission>>() {
                 };
@@ -334,7 +332,7 @@ public class APIMgrAppsAdapter {
             }
             mapper.setSerializationInclusion(Include.NON_NULL);
             try {
-                RestAPICall request;
+                RestAPICall request = null;
                 if (actualApp == null) {
                     FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                         SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "appScopes", "permissions"));
@@ -343,24 +341,30 @@ public class APIMgrAppsAdapter {
                     HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
                     request = new POSTRequest(entity, uri);
                 } else {
-                    FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-                        SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "apis", "appScopes", "permissions"));
-                    mapper.setFilterProvider(filter);
-                    String json = mapper.writeValueAsString(desiredApp);
-                    HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                    request = new PUTRequest(entity, uri);
+                    if (!actualApp.equals(desiredApp)) {
+                        FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+                            SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "apis", "appScopes", "permissions"));
+                        mapper.setFilterProvider(filter);
+                        String json = mapper.writeValueAsString(desiredApp);
+                        HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+                        request = new PUTRequest(entity, uri);
+                    }
                 }
-                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
-                    if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error creating/updating application. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException("Error creating/updating application. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                if (!(actualApp != null && actualApp.equals(desiredApp))) {
+                    try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                        int statusCode = httpResponse.getStatusLine().getStatusCode();
+                        if (statusCode < 200 || statusCode > 299) {
+                            LOG.error("Error creating/updating application. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                            throw new AppException("Error creating/updating application. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                        }
+                        createdApp = mapper.readValue(httpResponse.getEntity().getContent(), ClientApplication.class);
+                        // enabled=false for a new application is ignored during initial creation, hence another update of the just created app is required
+                        if (actualApp == null && !desiredApp.isEnabled()) {
+                            createOrUpdateApplication(desiredApp, createdApp, true);
+                        }
                     }
-                    createdApp = mapper.readValue(httpResponse.getEntity().getContent(), ClientApplication.class);
-                    // enabled=false for a new application is ignored during initial creation, hence another update of the just created app is required
-                    if (actualApp == null && !desiredApp.isEnabled()) {
-                        createOrUpdateApplication(desiredApp, createdApp, true);
-                    }
+                } else {
+                    createdApp = desiredApp;
                 }
             } catch (Exception e) {
                 throw new AppException("Error creating/updating application. Error: " + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
@@ -471,7 +475,7 @@ public class APIMgrAppsAdapter {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error saving/updating application credentials. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                        throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                     }
                 }
             } catch (Exception e) {
@@ -513,29 +517,31 @@ public class APIMgrAppsAdapter {
     }
 
     public void saveQuota(ClientApplication app, ClientApplication actualApp) throws AppException {
-        if (app.getAppQuota() == null || app.getAppQuota().getRestrictions().isEmpty()) return;
-        if (actualApp != null && app.getAppQuota().equals(actualApp.getAppQuota())) return;
-        if (!APIManagerAdapter.hasAdminAccount()) {
-            LOG.warn("Ignoring quota, as no admin account is given");
+        if (app != null & actualApp != null && app.getAppQuota().equals(actualApp.getAppQuota()))
             return;
-        }
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/quota").build();
-            FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"));
-            mapper.setFilterProvider(filter);
-            mapper.setSerializationInclusion(Include.NON_NULL);
-            String json = mapper.writeValueAsString(app.getAppQuota());
-            HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-            // Use an admin account for this request
-            RestAPICall request = createUpsertUri(entity, uri, actualApp);
-            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                int statusCode = httpResponse.getStatusLine().getStatusCode();
-                if (statusCode < 200 || statusCode > 299) {
-                    LOG.error("Error creating/updating application quota. Response-Code: {}  Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                    throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+            if (app.getAppQuota().getRestrictions().isEmpty()) {
+                // If source is empty and target has values, remove target to match source
+                deleteApplicationQuota(uri);
+            } else {
+                // source and target has different values delete target and add it.
+                FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"));
+                mapper.setFilterProvider(filter);
+                mapper.setSerializationInclusion(Include.NON_NULL);
+                String json = mapper.writeValueAsString(app.getAppQuota());
+                HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+                // Use an admin account for this request
+                RestAPICall request = createUpsertUri(entity, uri, actualApp);
+                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                    int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    if (statusCode < 200 || statusCode > 299) {
+                        LOG.error("Error creating/updating application quota. Response-Code: {}  Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                        throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                    }
+                    // Force reload of this quota next time
+                    applicationsQuotaCache.remove(app.getId());
                 }
-                // Force reload of this quota next time
-                applicationsQuotaCache.remove(app.getId());
             }
         } catch (Exception e) {
             throw new AppException("Error creating application quota. Error: " + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
@@ -586,7 +592,7 @@ public class APIMgrAppsAdapter {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error saving/updating application oauth resource. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                        throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                     }
                 }
             } catch (Exception e) {
@@ -605,7 +611,7 @@ public class APIMgrAppsAdapter {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != 204) {
                         LOG.error("Error deleting application scope. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException("Error deleting application scope. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                        throw new AppException("Error deleting application scope. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                     }
                     LOG.info("Application scope: {} for application: {} successfully deleted", res.getScope(), desiredApp.getName());
                 }
@@ -737,7 +743,7 @@ public class APIMgrAppsAdapter {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode < 200 || statusCode > 299) {
                         LOG.error("Error saving/updating application permission. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException("Error saving/updating application permission' Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                        throw new AppException("Error saving/updating application permission' Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                     }
                 }
             } catch (Exception e) {
@@ -756,13 +762,28 @@ public class APIMgrAppsAdapter {
                     int statusCode = httpResponse.getStatusLine().getStatusCode();
                     if (statusCode != 204) {
                         LOG.error("Error deleting application permission. Response-Code: {} Got response: {}'", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException("Error deleting application permission. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                        throw new AppException("Error deleting application permission. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                     }
                     LOG.info("Application permission for user: {} for application: {} successfully deleted", appPerm.getUsername(), desiredApp.getName());
                 }
             } catch (Exception e) {
                 throw new AppException("Error deleting application permission. Error: " + e.getMessage(), ErrorCode.API_MANAGER_COMMUNICATION, e);
             }
+        }
+    }
+
+    public void deleteApplicationQuota(URI uri) throws AppException {
+        try {
+            RestAPICall request = new DELRequest(uri);
+            try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                int statusCode = httpResponse.getStatusLine().getStatusCode();
+                if (statusCode != 204) {
+                    LOG.error("Error deleting quota. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                    throw new AppException("Error deletingquota. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                }
+            }
+        } catch (Exception e) {
+            throw new AppException("Error deleting application scope. Error: " + e.getMessage(), ErrorCode.API_MANAGER_COMMUNICATION, e);
         }
     }
 
@@ -774,7 +795,7 @@ public class APIMgrAppsAdapter {
                 int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 204) {
                     LOG.error("Error deleting application. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                    throw new AppException("Error deleting application. Response-Code: " + statusCode + "", ErrorCode.API_MANAGER_COMMUNICATION);
+                    throw new AppException("Error deleting application. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                 }
                 LOG.info("Application {} with id {} is successfully deleted", app.getName(), app.getId());
             }
