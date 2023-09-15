@@ -520,27 +520,29 @@ public class APIMgrAppsAdapter {
         if (app != null & actualApp != null && app.getAppQuota() != null && actualApp.getAppQuota() != null && app.getAppQuota().equals(actualApp.getAppQuota()))
             return;
         try {
-            URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/quota").build();
-            if (app.getAppQuota() != null && app.getAppQuota().getRestrictions().isEmpty()) {
-                // If source is empty and target has values, remove target to match source
-                deleteApplicationQuota(uri);
-            } else {
-                // source and target has different values delete target and add it.
-                FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"));
-                mapper.setFilterProvider(filter);
-                mapper.setSerializationInclusion(Include.NON_NULL);
-                String json = mapper.writeValueAsString(app.getAppQuota());
-                HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                // Use an admin account for this request
-                RestAPICall request = createUpsertUri(entity, uri, actualApp);
-                try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
-                    int statusCode = httpResponse.getStatusLine().getStatusCode();
-                    if (statusCode < 200 || statusCode > 299) {
-                        LOG.error("Error creating/updating application quota. Response-Code: {}  Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                        throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+            if(app != null) {
+                URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/quota").build();
+                if (app.getAppQuota() != null && app.getAppQuota().getRestrictions().isEmpty()) {
+                    // If source is empty and target has values, remove target to match source
+                    deleteApplicationQuota(uri);
+                } else {
+                    // source and target has different values delete target and add it.
+                    FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"));
+                    mapper.setFilterProvider(filter);
+                    mapper.setSerializationInclusion(Include.NON_NULL);
+                    String json = mapper.writeValueAsString(app.getAppQuota());
+                    HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+                    // Use an admin account for this request
+                    RestAPICall request = createUpsertUri(entity, uri, actualApp);
+                    try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+                        int statusCode = httpResponse.getStatusLine().getStatusCode();
+                        if (statusCode < 200 || statusCode > 299) {
+                            LOG.error("Error creating/updating application quota. Response-Code: {}  Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                            throw new AppException(ERROR_CREATING_APPLICATION_RESPONSE_CODE + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                        }
+                        // Force reload of this quota next time
+                        applicationsQuotaCache.remove(app.getId());
                     }
-                    // Force reload of this quota next time
-                    applicationsQuotaCache.remove(app.getId());
                 }
             }
         } catch (Exception e) {
