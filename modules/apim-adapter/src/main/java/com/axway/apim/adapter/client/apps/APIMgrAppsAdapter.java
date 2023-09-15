@@ -517,11 +517,11 @@ public class APIMgrAppsAdapter {
     }
 
     public void saveQuota(ClientApplication app, ClientApplication actualApp) throws AppException {
-        if (app != null & actualApp != null && app.getAppQuota().equals(actualApp.getAppQuota()))
+        if (app != null & actualApp != null && app.getAppQuota() != null && actualApp.getAppQuota() != null && app.getAppQuota().equals(actualApp.getAppQuota()))
             return;
         try {
             URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/quota").build();
-            if (app.getAppQuota().getRestrictions().isEmpty()) {
+            if (app.getAppQuota() != null && app.getAppQuota().getRestrictions().isEmpty()) {
                 // If source is empty and target has values, remove target to match source
                 deleteApplicationQuota(uri);
             } else {

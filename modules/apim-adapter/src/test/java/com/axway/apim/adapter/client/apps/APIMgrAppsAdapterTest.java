@@ -226,6 +226,7 @@ public class APIMgrAppsAdapterTest extends WiremockWrapper {
 
         ClientApplication clientApplicationExisting = new ClientApplication();
         clientApplicationExisting.setName("test");
+        clientApplicationNew.setId(UUID.randomUUID().toString());
         try {
             appAdapter.saveQuota(clientApplicationNew, clientApplicationExisting);
         } catch (AppException e) {
