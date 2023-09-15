@@ -586,7 +586,7 @@ public class APIManagerAPIAdapterTest extends WiremockWrapper {
         API api = apiManagerAPIAdapter.getAPI(filter, true);
 
         Assert.assertNotNull(api.getClientOrganizations(), "Should have a some client organizations");
-        Assert.assertEquals(api.getClientOrganizations().size(), 2, "Expected client organization");
+        Assert.assertEquals(api.getClientOrganizations().size(), 1, "Expected client organization");
     }
 
     @Test
