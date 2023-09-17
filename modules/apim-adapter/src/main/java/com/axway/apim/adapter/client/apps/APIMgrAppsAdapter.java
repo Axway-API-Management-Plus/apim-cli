@@ -518,7 +518,7 @@ public class APIMgrAppsAdapter {
     }
 
     public void saveQuota(ClientApplication app, ClientApplication actualApp) throws AppException {
-        if (app != null & actualApp != null && app.getAppQuota() != null && actualApp.getAppQuota() != null && app.getAppQuota().equals(actualApp.getAppQuota()))
+        if (app != null && actualApp != null && app.getAppQuota() != null && actualApp.getAppQuota() != null && app.getAppQuota().equals(actualApp.getAppQuota()))
             return;
         try {
             if (app != null) {
