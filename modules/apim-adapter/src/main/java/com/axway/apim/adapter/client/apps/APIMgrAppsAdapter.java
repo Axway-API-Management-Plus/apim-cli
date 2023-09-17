@@ -315,63 +315,47 @@ public class APIMgrAppsAdapter {
     }
 
     public void createOrUpdateApplication(ClientApplication desiredApp, ClientApplication actualApp) throws AppException {
-        createOrUpdateApplication(desiredApp, actualApp, false);
-    }
-
-    private void createOrUpdateApplication(ClientApplication desiredApp, ClientApplication actualApp, boolean baseAppOnly) throws AppException {
+        LOG.debug("Actual Application : {} vs Desired Application : {}", actualApp, desiredApp);
         ClientApplication createdApp;
         try {
-            URI uri;
-            if (actualApp == null) {
-                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS).build();
-            } else {
-                if (desiredApp.getApiAccess() != null && desiredApp.getApiAccess().isEmpty())
-                    desiredApp.setApiAccess(null);
-                desiredApp.setId(actualApp.getId());
-                uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + actualApp.getId()).build();
-            }
             mapper.setSerializationInclusion(Include.NON_NULL);
             try {
-                RestAPICall request = null;
                 if (actualApp == null) {
+                    LOG.info("Creating new application");
+                    URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS).build();
                     FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
                         SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "appScopes", "permissions"));
                     mapper.setFilterProvider(filter);
                     String json = mapper.writeValueAsString(desiredApp);
                     HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                    request = new POSTRequest(entity, uri);
-                } else {
-                    if (!actualApp.equals(desiredApp)) {
-                        FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
-                            SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "apis", "appScopes", "permissions"));
-                        mapper.setFilterProvider(filter);
-                        String json = mapper.writeValueAsString(desiredApp);
-                        HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
-                        request = new PUTRequest(entity, uri);
-                    }
-                }
-                if (!(actualApp != null && actualApp.equals(desiredApp))) {
+                    RestAPICall request = new POSTRequest(entity, uri);
                     try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
                         int statusCode = httpResponse.getStatusLine().getStatusCode();
                         if (statusCode < 200 || statusCode > 299) {
-                            LOG.error("Error creating/updating application. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
-                            throw new AppException("Error creating/updating application. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+                            LOG.error("Error creating application. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                            throw new AppException("Error creating application. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
                         }
                         createdApp = mapper.readValue(httpResponse.getEntity().getContent(), ClientApplication.class);
                         // enabled=false for a new application is ignored during initial creation, hence another update of the just created app is required
-                        if (actualApp == null && !desiredApp.isEnabled()) {
-                            createOrUpdateApplication(desiredApp, createdApp, true);
+                        if (!desiredApp.isEnabled()) {
+                            uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + createdApp.getId()).build();
+                            desiredApp.setId(createdApp.getId());
+                            createdApp = updateApplication(uri, desiredApp);
                         }
                     }
-                } else {
-                    createdApp = desiredApp;
+                } else if (!actualApp.equals(desiredApp)) {
+                    LOG.info("Creating new application");
+                    URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + actualApp.getId()).build();
+                    desiredApp.setId(actualApp.getId());
+                    createdApp = updateApplication(uri, desiredApp);
+                }else {
+                    createdApp = actualApp;
                 }
             } catch (Exception e) {
                 throw new AppException("Error creating/updating application. Error: " + e.getMessage(), ErrorCode.CANT_CREATE_API_PROXY, e);
             }
             // Remove application from cache to force reload next time
             applicationsCache.remove(createdApp.getId());
-            if (baseAppOnly) return;
             desiredApp.setId(createdApp.getId());
             saveImage(desiredApp, actualApp);
             saveAPIAccess(desiredApp, actualApp);
@@ -381,6 +365,23 @@ public class APIMgrAppsAdapter {
             saveQuota(desiredApp, actualApp);
         } catch (Exception e) {
             throw new AppException("Error creating/updating application. Error: " + e.getMessage(), ErrorCode.ERR_CREATING_APPLICATION, e);
+        }
+    }
+
+    public ClientApplication updateApplication(URI uri, ClientApplication clientApplication) throws IOException {
+        FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(
+            SimpleBeanPropertyFilter.serializeAllExcept("credentials", "appQuota", "organization", "image", "apis", "appScopes", "permissions"));
+        mapper.setFilterProvider(filter);
+        String json = mapper.writeValueAsString(clientApplication);
+        HttpEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+        RestAPICall request = new PUTRequest(entity, uri);
+        try (CloseableHttpResponse httpResponse = (CloseableHttpResponse) request.execute()) {
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            if (statusCode < 200 || statusCode > 299) {
+                LOG.error("Error updating application. Response-Code: {} Got response: {}", statusCode, EntityUtils.toString(httpResponse.getEntity()));
+                throw new AppException("Error updating application. Response-Code: " + statusCode, ErrorCode.API_MANAGER_COMMUNICATION);
+            }
+            return mapper.readValue(httpResponse.getEntity().getContent(), ClientApplication.class);
         }
     }
 
@@ -520,12 +521,12 @@ public class APIMgrAppsAdapter {
         if (app != null & actualApp != null && app.getAppQuota() != null && actualApp.getAppQuota() != null && app.getAppQuota().equals(actualApp.getAppQuota()))
             return;
         try {
-            if(app != null) {
+            if (app != null) {
                 URI uri = new URIBuilder(cmd.getAPIManagerURL()).setPath(cmd.getApiBasepath() + APPLICATIONS + "/" + app.getId() + "/quota").build();
                 if (app.getAppQuota() != null && app.getAppQuota().getRestrictions().isEmpty()) {
                     // If source is empty and target has values, remove target to match source
                     deleteApplicationQuota(uri);
-                } else {
+                } else if (app.getAppQuota() != null) {
                     // source and target has different values delete target and add it.
                     FilterProvider filter = new SimpleFilterProvider().setDefaultFilter(SimpleBeanPropertyFilter.serializeAllExcept("apiId", "apiName", "apiVersion", "apiPath", "vhost", "queryVersion"));
                     mapper.setFilterProvider(filter);

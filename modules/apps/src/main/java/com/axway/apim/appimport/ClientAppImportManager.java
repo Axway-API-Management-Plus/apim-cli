@@ -54,10 +54,10 @@ public class ClientAppImportManager {
         boolean apiAccess = (desiredApp.getApiAccess() == null || desiredApp.getApiAccess().equals(actualApp.getApiAccess()));
         boolean permission = (desiredApp.getPermissions() == null || desiredApp.getPermissions().containsAll(actualApp.getPermissions()));
         boolean quota = (desiredApp.getAppQuota() == null || desiredApp.getAppQuota().equals(actualApp.getAppQuota()));
-        LOG.debug("apps changed: {}", desiredApp.equals(actualApp));
-        LOG.debug("api access changed: {}", apiAccess);
-        LOG.debug("Permission changed: {}", permission);
-        LOG.debug("Quota changed: {}", quota);
+        LOG.debug("apps Not changed: {}", application);
+        LOG.debug("api access Not changed: {}", apiAccess);
+        LOG.debug("Permission Not changed: {}", permission);
+        LOG.debug("Quota Not changed: {}", quota);
         return application && apiAccess && permission && quota;
     }
 

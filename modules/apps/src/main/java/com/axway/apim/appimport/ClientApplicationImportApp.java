@@ -90,6 +90,7 @@ public class ClientApplicationImportApp implements APIMCLIServiceProvider {
             return result;
         } catch (AppException ap) {
             ap.logException(LOG);
+            LOG.error("Error importing application", ap);
             result.setError(ap.getError());
             return result;
         } catch (Exception e) {
